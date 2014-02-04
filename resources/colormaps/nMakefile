@@ -1,0 +1,9 @@
+all: .gnuplot run
+
+.gnuplot: 
+	make -C gnuplot
+	
+run:
+	qmake
+	make
+	./colormaps

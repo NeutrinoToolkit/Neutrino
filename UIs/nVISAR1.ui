@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>nVisar</class>
+ <widget class="QMainWindow" name="nVisar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>492</width>
+    <height>507</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VISAR analysis</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>20</width>
+    <height>20</height>
+   </size>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizeIncrement">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::West</enum>
+      </property>
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="Settings">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_8">
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget1">
+          <property name="tabPosition">
+           <enum>QTabWidget::North</enum>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>Visar 1</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QWidget" name="wvisar1" native="true"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Visar 2</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QWidget" name="wvisar2" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Velocity">
+       <attribute name="title">
+        <string>Velocity</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,1">
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget2">
+          <property name="tabPosition">
+           <enum>QTabWidget::North</enum>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Visar 1</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QWidget" name="setVisar1" native="true">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Visar 2</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QWidget" name="setVisar2" native="true">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QwtPlot" name="plotVelocity">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="SOP">
+       <attribute name="title">
+        <string>SOP</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1">
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Time 0 [px] and delta [time]</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QSpinBox" name="sopOrigin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="minimum">
+              <number>-99999</number>
+             </property>
+             <property name="maximum">
+              <number>99999</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sopOffset">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>-9999999.990000000223517</double>
+             </property>
+             <property name="maximum">
+              <double>9999999.990000000223517</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Time scale [time/px] and direction</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0" columnminimumwidth="1,0">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="sopScale">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>-9999999.990000000223517</double>
+             </property>
+             <property name="maximum">
+              <double>9999999.990000000223517</double>
+             </property>
+             <property name="singleStep">
+              <double>0.001000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="sopDirection">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>V</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>H</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QwtPlot" name="sopPlot">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Reference and Shot</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="sopRef">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="sopShot">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLoadPref"/>
+   <addaction name="actionSavePref"/>
+   <addaction name="separator"/>
+   <addaction name="actionSaveTxt"/>
+   <addaction name="actionSaveTxtMultiple"/>
+   <addaction name="actionSavePDF"/>
+   <addaction name="actionCopy"/>
+   <addaction name="separator"/>
+   <addaction name="actionRect1"/>
+   <addaction name="actionRect2"/>
+   <addaction name="actionRect3"/>
+   <addaction name="separator"/>
+   <addaction name="actionRefresh2"/>
+   <addaction name="actionRefresh"/>
+  </widget>
+  <action name="actionLoadPref">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
+   </property>
+   <property name="text">
+    <string>loadPref</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Preferences</string>
+   </property>
+  </action>
+  <action name="actionSavePref">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
+   </property>
+   <property name="text">
+    <string>savePref</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Preferences</string>
+   </property>
+  </action>
+  <action name="actionSaveTxt">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+   </property>
+   <property name="text">
+    <string>saveTxt</string>
+   </property>
+   <property name="toolTip">
+    <string>Export TXT</string>
+   </property>
+  </action>
+  <action name="actionSavePDF">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
+   </property>
+   <property name="text">
+    <string>savePDF</string>
+   </property>
+   <property name="toolTip">
+    <string>Export PDF or SVG</string>
+   </property>
+  </action>
+  <action name="actionRefresh2">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/refresh2.svg</normaloff>:/icons/refresh2.svg</iconset>
+   </property>
+   <property name="text">
+    <string>refresh2</string>
+   </property>
+   <property name="toolTip">
+    <string>Guess both intefringes</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Calculate both phases</string>
+   </property>
+  </action>
+  <action name="actionRect1">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>rect1</string>
+   </property>
+   <property name="toolTip">
+    <string>Rectangle Visar 1</string>
+   </property>
+  </action>
+  <action name="actionRect2">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>rect2</string>
+   </property>
+   <property name="toolTip">
+    <string>Rectangle Visar 2</string>
+   </property>
+  </action>
+  <action name="actionAutoRefresh">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/noAutoRefresh.png</normaloff>
+     <normalon>:/autoRefresh</normalon>:/icons/noAutoRefresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>autoRefresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto refreh when moving rectangles</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
+   </property>
+   <property name="text">
+    <string>loadPref</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy to clipboard</string>
+   </property>
+  </action>
+  <action name="actionRect3">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>rect3</string>
+   </property>
+   <property name="toolTip">
+    <string>Rectangle SOP</string>
+   </property>
+  </action>
+  <action name="actionSaveTxtMultiple">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
+   </property>
+   <property name="text">
+    <string>saveTxtMultiple</string>
+   </property>
+   <property name="toolTip">
+    <string>Export all curves in TXT</string>
+   </property>
+  </action>
+  <action name="showFiltered">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
+   </property>
+   <property name="text">
+    <string>showFiltered</string>
+   </property>
+   <property name="toolTip">
+    <string>Show filtered images</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/neutrino.qrc"/>
+ </resources>
+ <connections/>
+</ui>

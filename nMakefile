@@ -1,0 +1,97 @@
+VERSION:=$(shell hg identify -n)
+
+ifeq ($(OS),Windows_NT)
+all: win
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+all: linux
+    endif
+    ifeq ($(UNAME_S),Darwin)
+all: mac
+    endif
+endif
+
+colormaps:
+	cd resources/colormaps && qmake && make && ./colormaps
+	
+mac: colormaps doc
+	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
+	cd nPhysImage && ./configure --enable-64 --prefix=/opt/local --with-cuda=/usr/local/cuda
+	make -C nPhysImage clean release
+
+	make -C resources/colormaps -f nMakefile 
+
+	qmake -spec macx-g++
+	make distclean
+	qmake -spec macx-g++
+	rm -rf neutrino.app
+	make -j2
+	
+	sudo -s -- 'macdeployqt neutrino.app; chown -R $(USER) neutrino.app' 
+
+	rm -f sip/PyNeutrino.so
+	python sip/configure.py && make -C sip
+	cp sip/PyNeutrino.so neutrino.app/Contents/Frameworks
+
+	cp /usr/local/cuda/lib/libcufft.dylib /usr/local/cuda/lib/libtlshook.dylib /usr/local/cuda/lib/libcudart.dylib neutrino.app/Contents/Frameworks
+	
+	install_name_tool -change \@rpath/libtlshook.dylib \@executable_path/../Frameworks/libtlshook.dylib neutrino.app/Contents/Frameworks/libcudart.dylib
+	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libcufft.dylib
+	install_name_tool -change \@rpath/libcufft.dylib \@executable_path/../Frameworks/libcufft.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so 
+	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so
+	
+	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" neutrino.app/Contents/Info.plist
+ifneq ("$(findstring +,$VERSION)","+")
+	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" neutrino.app/Contents/Info.plist
+endif
+	rm -f neutrino.dmg
+	cd resources/macPackage && sed -e "s/__VER/${VERSION}/g" sfondo-orig.svg > sfondo.svg; /Applications/Inkscape.app/Contents/Resources/bin/inkscape -f sfondo.svg -e sfondo.png && cd - 
+	rm -rf dmg
+	mkdir dmg
+	cp -r neutrino.app doc/html dmg
+	./resources/macPackage/createdmg.sh --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 508 480 --icon neutrino.app 100 90 --icon html 260 200 --app-drop-link 420 90 neutrino.dmg dmg && rm -rf dmg
+
+py: lib
+	rm -f sip/PyNeutrino.so
+	python sip/configure.py && make -C sip
+	cp sip/PyNeutrino.so .
+
+win:
+	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
+	cd nPhysImage && ./configure CFLAGS='-Ic:/compile/fftw-3.3-dll32 -Ic:/compile/GnuWin32/include -Ic:/compile/HDF_Group/HDFshared/4.2.8/include -Ic:/compile/HDF_Group/HDF5/1.8.10/include -Ic:/compile/cfit3310' LDFLAGS='-L. -Lc:/compile/GnuWin32/lib -Lc:/compile/GnuWin32/bin -Lc:/compile/HDF_Group/HDFshared/4.2.8/lib -Lc:/compile/HDF_Group/HDF5/1.8.10/lib -Lc:/compile/cfit3310'
+	make -C nPhysImage clean release
+	qmake 
+	make release
+	cp -r ../deploy/* app
+	cp nPhysImage/libnPhys*.dll app
+	cp lib/Neutrino.dll app
+	cp resources/neutrino.nsi app 
+	cmd /c "cd sip & python configure.py & make"
+	cp sip/PyNeutrino.pyd app
+	cp sip/neutrino.py app
+	cp sip/nPython.ui app
+	cd app && ../../NSIS/makensis.exe neutrino.nsi
+	cp app/neutrino-installer.exe /e/local/src/neutrino
+
+linux:
+	# make all in nPhysImage
+	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
+	cd nPhysImage && ./configure $(CONFOPTS)
+	make -C nPhysImage clean release
+	qmake
+	make ${MAKEOPTS} 
+
+linux_install:
+	@install -m 755 nPhysImage/libnPhysImageF.so ${DESTDIR}${prefix}/lib
+	@install -m 755 libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib
+	@install -m 755 Neutrino ${DESTDIR}${prefix}/bin
+#	@install -m 644 pytests/* ${DESTDIR}${prefix}/share/neutrino/pytests
+
+doc: .doc
+
+.doc:
+	cd doc ; (cat neutrino.dox; echo "PROJECT_NUMBER=${VERSION}") | doxygen -; cd latex; pdflatex refman.tex; pdflatex refman.tex
+
+
+	 

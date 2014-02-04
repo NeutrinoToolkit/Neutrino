@@ -1,0 +1,8 @@
+
+
+To compile nPhysImage
+
+1. autoconf configure.ac > configure
+2. autoheader configure.ac
+3. sh configure
+4. make

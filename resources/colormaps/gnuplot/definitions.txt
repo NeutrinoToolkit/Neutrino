@@ -1,0 +1,39 @@
+ImagLab ; rgbformulae 33, 13, 10 model RGB
+Gnuplot ; rgbformulae 7, 5, 15 model RGB
+BioHazard ; rgbformulae 3, 11, 6 model RGB
+Really cold ; rgbformulae 23, 28, 3 model RGB
+Disco ; rgbformulae 30, 31, 32 model RGB
+Fruits ; rgbformulae 22, 13, -31 model RGB
+French ; rgbformulae 34, -13, -34 model RGB
+Stacked black ; rgbformulae 3, 2, 19 model HSV
+Romania ; rgbformulae -34, 13, 30 model RGB
+Colorblind ; rgbformulae -36, 21, 10 model RGB
+Hot Cold ; rgbformulae -33, -12, 22 model RGB
+Blue Sky ; rgbformulae 23, 9, 2 model RGB
+Old ; rgbformulae 1, 9, 3 model RGB
+Lemon ; rgbformulae 36, 7, -13 model RGB
+Sunset ; rgbformulae 13, 30, 3 model RGB
+Fashion ; rgbformulae 23, 9, 1 model RGB
+Reggae ; rgbformulae -31, -12, 2 model CMY
+Dawn ; rgbformulae 7, 4, 11 model RGB
+Retro ; rgbformulae -7, -6, -10 model HSV
+XRay ; rgbformulae 36, 3, 3 model RGB
+XRay reverse ; rgbformulae -36, -3, -3 model RGB
+Cold Hot ; rgbformulae 33, 12, -22 model RGB
+Belgium ; rgbformulae -4, 4, 9 model HSV
+Jungle ; rgbformulae 33, 3, 27 model RGB
+Lime ; rgbformulae 26, 3, 15 model RGB
+Hot ; rgbformulae 34, 35, 36 model RGB
+Florence ; rgbformulae 8, -13, -2 model RGB
+Romantic ; rgbformulae -32, -3, 1 model RGB
+Gray:B W ; defined (0 "black", 1 "white")
+Gray:W B ; defined (0 "white", 1 "black") model RGB
+Gray:B W B ; defined (0 "black", 1 "white", 2 "black") model RGB
+Gray:W B W ; defined (0 "white", 1 "black", 2 "white") model RGB
+Cold ; defined (0 "dark-blue", 1 "blue", 2 "cyan", 3 "green", 4 "white") model RGB
+Fire ; defined (0	"dark-blue", 1 "blue", 2 "red", 3 "yellow", 4 "white") model RGB
+MadLab ; defined (1 "#00008f", 8 "#0000ff", 24 "#00ffff", 40 "#ffff00", 56 "#ff0000", 64 "#800000")
+MadLab print ; defined (1 "white", 1 "#00008f", 8 "#0000ff", 24 "#00ffff", 40 "#ffff00", 56 "#ff0000", 64 "#800000")
+JR ; defined (0 "white", 1 "blue", 2 "cyan" , 3 "green", 4 "yellow", 5 "red")
+Stacked white ; defined (0 "red", 1 "white", 1 "green", 2 "white", 2 "yellow", 3 "white", 3 "blue", 4 "white", 4 "magenta", 5 "white") model RGB
+Neutrino ; defined (0 "black", 0.05 "red", 0.4 "yellow", 0.6 "cyan", 0.95 "blue", 1 "white")

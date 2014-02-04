@@ -1,0 +1,108 @@
+VERSION:="$(shell hg identify -n)"
+
+# we should fix architecture
+#NVCC := @NVCC@ -m 64
+NVCC := @NVCC@
+
+DEBUG_VERBOSITY = 10
+DEVEL_VERBOSITY = 7
+
+ifeq ($(OS),Windows_NT)
+CFLAGS+=-m32
+EXTNAME=dll
+else
+EXTNAME=so
+endif
+
+LIBS=libnPhysImageF.$(EXTNAME)
+
+default:release
+
+libs: $(LIBS)
+
+CC = @CXX@
+
+LDFLAGS += @LIBS@ @LDFLAGS@ -L@prefix@/lib
+CFLAGS += @CFLAGS@ @DEFS@ -D__VER=\"$(VERSION)\" -Iunwrapping -fpic -I@prefix@/include -I@prefix@/include/netpbm -I@prefix@/include/hdf
+DEFS := @DEFS@
+
+SRC_CPP = NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc
+SRC_CPP += $(wildcard unwrapping/*.cc)
+
+OBJS_CPP := $(patsubst %.cc,%.o,$(SRC_CPP))
+
+ifneq ($(NVCC),)
+	SRC_CUDA = nCuda.cu
+	OBJS_CUDA  := $(patsubst %.cu,%.o,$(SRC_CUDA))
+	OBJS_CPP += $(OBJS_CUDA)
+#	CFLAGS += -D__phys_cuda
+	LDFLAGS += -Xlinker -rpath -Xlinker /usr/local/cuda/lib -lcufft -lcudart 
+#ifeq ($(OS),Darwin)
+#	CFLAGS += -I/usr/local/cuda/include 
+#	LDFLAGS += -L/usr/local/cuda/lib 
+#endif
+endif
+
+#ifeq ($(OS),Linux)
+#	CXXFLAGS := -std=c++11
+#	CFLAGS += -I/usr/include/hdf
+#endif
+#
+#ifeq ($(OS),Darwin)
+#ifneq "$(wildcard /sw )" ""
+#CFLAGS += -m32 -I/sw/include
+#LDFLAGS += -L/sw/lib
+#NVCCFLAGS = -m 32
+#endif
+#ifneq "$(wildcard /opt/local )" ""
+#CFLAGS += -I/opt/local/include -I/opt/local/include/netpbm
+#LDFLAGS += -L/opt/local/lib
+#NVCCFLAGS = -m 64 
+#endif
+#LDFLAGS += -headerpad_max_install_names
+#endif # Darwin
+
+ifeq ($(OS),Windows_NT)
+EXTNAME=dll
+else
+EXTNAME=so
+endif
+
+
+release: CFLAGS += -O3
+release: libs
+
+devel: CFLAGS += -O3 -Wall -D__phys_debug=$(DEVEL_VERBOSITY)
+devel: libs
+
+debug: CFLAGS += -g -Wall -D__phys_debug=$(DEBUG_VERBOSITY)
+debug: libs
+
+.depend: $(SRC_CPP)
+	rm -rf .depend
+	g++ $(CFLAGS) -MM $^ >> .depend;
+
+.dependCUDA: $(SRC_CUDA)
+	rm -rf .dependCUDA
+ifneq ($(NVCC),)
+	$(NVCC) -M $^ >> .dependCUDA;
+endif
+include .depend .dependCUDA
+
+%.o : %.cc
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cu
+	$(NVCC) @NVCCFLAGS@ -Xcompiler -fpic -Xlinker -rpath,@NVCCBASE@/lib -O3 --use_fast_math  -c $< -o $@
+
+libnPhysImageF.$(EXTNAME): $(OBJS_CPP)
+	$(CC) $(CFLAGS) $(CXXFLAGS) $(OBJS_CPP) $(LDFLAGS) @LCFLAGS@ -shared -o $@ 
+
+clean:
+	rm -f $(OBJS_CPP)  $(OBJS_C) $(LIBS) .depend .dependCUDA
+
+
+
+install_deb:
+	@install -m 644 libnPhysImageF.so ${DESTDIR}${prefix}/lib
+

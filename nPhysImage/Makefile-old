@@ -1,0 +1,68 @@
+CC = g++
+C = gcc
+
+DEBUG_VERBOSITY=5
+
+NVCC := $(shell which nvcc)
+OS := $(shell uname -s)
+ARCH := $(shell uname -m)
+
+CFLAGS = -O3 -Wall -I/sw/include `gsl-config --cflags` -Iunwrapping
+LDFLAGS = -L/sw/lib -lnetpbm -lz -lfftw3 `gsl-config --libs` -lpthread -ltiff -ljpeg -lm
+
+CFLAGS := $(CFLAGS) -D__VER=\"$(shell hg identify -n)\"
+
+#comment this to avoid fits compile
+CFLAGS += -D__phys_fits
+LDFLAGS += -lcfitsio
+
+#comment this to avoid HDF4 compile
+CFLAGS += -I/usr/include/hdf -D__phys_HDF
+LDFLAGS += -lmfhdf -ldf -lhdf5 -lhdf5_hl
+
+ifeq ($(OS),Darwin)
+	CFLAGS := $(CFLAGS) -D__phys_debug=$(DEBUG_VERBOSITY)
+	CFLAGS := -m32 $(CFLAGS)
+	LDFLAGS := $(LDFLAGS) -lsz 
+endif
+
+ifeq ($(OS),Linux)
+	CXXFLAGS := -std=c++11
+endif
+
+all: libnPhysImageF.so
+
+objs := nPhysFormats.o NaNStream.o nPhysMaths.o nPhysWave.o 
+sources_unwrap = $(wildcard unwrapping/*.c)
+
+
+ifneq ($(NVCC),)
+	objs := $(objs) nCuda.o
+	CFLAGS := $(CFLAGS) -D__phys_cuda
+	LDFLAGS := $(LDFLAGS) -Xlinker -rpath -Xlinker /usr/local/cuda/lib -lcufft -lcudart 
+ifeq ($(OS),Darwin)
+	CFLAGS := $(CFLAGS) -I/usr/local/cuda/include 
+	LDFLAGS := $(LDFLAGS) -L/usr/local/cuda/lib 
+endif
+endif
+
+
+libnPhysUnwraps.so: $(sources_unwrap)
+	$(C) $(CFLAGS) -fpic -shared -o $@ $+
+
+nCuda.o: nCuda.cu
+	$(NVCC) -Xlinker -rpath,/usr/local/cuda/lib -c -O3 --use_fast_math $+
+
+%.o: %.cc %.h nPhysImageF.h
+	$(CC) $(CFLAGS) $(CXXFLAGS) -fpic -g -c $<
+
+libnPhysImageF.so: $(objs) libnPhysUnwraps.so
+	$(CC) $(CFLAGS) $(CXXFLAGS) $(LDFLAGS) -L. -lnPhysUnwraps -shared -o $@ $(objs)
+
+
+clean:
+	rm -f *.o *.so
+
+install_deb:
+	@install -m 644 libnPhysImageF.so libnPhysUnwraps.so ${DESTDIR}${prefix}/lib
+

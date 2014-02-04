@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>nRegionPath</class>
+ <widget class="QMainWindow" name="nRegionPath">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>221</width>
+    <height>98</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Region path</string>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="doIt">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Extract</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="doMask">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Creates a 0/1 mask from the curve</string>
+      </property>
+      <property name="text">
+       <string>Generate Mask</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="QComboBox" name="image">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="neutrinoImage" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLoadPref"/>
+   <addaction name="actionSavePref"/>
+   <addaction name="separator"/>
+   <addaction name="actionLine"/>
+   <addaction name="actionBezier"/>
+  </widget>
+  <action name="actionLoadPref">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:icons//loadPref.png</normaloff>:icons/loadPref</iconset>
+   </property>
+   <property name="text">
+    <string>loadPref</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Preferences</string>
+   </property>
+  </action>
+  <action name="actionSavePref">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:icons//savePref.png</normaloff>:icons/savePref</iconset>
+   </property>
+   <property name="text">
+    <string>savePref</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Preferences</string>
+   </property>
+  </action>
+  <action name="actionBezier">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:icons//bezier.png</normaloff>:icons/bezier</iconset>
+   </property>
+   <property name="text">
+    <string>bezier</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Bezier</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:icons//line.png</normaloff>:icons/line</iconset>
+   </property>
+   <property name="text">
+    <string>line</string>
+   </property>
+   <property name="toolTip">
+    <string>Show axis window</string>
+   </property>
+  </action>
+  <action name="actionFlipline">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:icons//flipline.png</normaloff>:icons/flipline</iconset>
+   </property>
+   <property name="text">
+    <string>flipline</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip Monotone</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resources/neutrino.qrc"/>
+ </resources>
+ <connections/>
+</ui>
