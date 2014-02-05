@@ -85,6 +85,8 @@ linux:
 linux_install:
 	@install -m 755 nPhysImage/libnPhysImageF.so ${DESTDIR}${prefix}/lib
 	@install -m 755 libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib
+	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0 
+	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1
 	@install -m 755 Neutrino ${DESTDIR}${prefix}/bin
 #	@install -m 644 pytests/* ${DESTDIR}${prefix}/share/neutrino/pytests
 
