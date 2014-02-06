@@ -1,4 +1,4 @@
-VERSION:=$(shell hg identify -n)
+VERSION:=$(shell git tag)
 
 ifeq ($(OS),Windows_NT)
 all: win
