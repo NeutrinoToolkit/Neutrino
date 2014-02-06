@@ -4,7 +4,7 @@ CONFIG += qt qwt debug_and_release windows
 
 QT += svg xml network core gui
 
-NVERSION=$$system(hg identify -n)
+NVERSION=$$system(git tag)
 
 # VERSION STUFF
 macx {
@@ -122,7 +122,7 @@ neutrino-HDF {
 	DEFINES += __phys_HDF
 
 	macx {
-		LIBS+=-lmfhdf -ldf -ljpeg -lz -lm -lsz -lhdf5
+		LIBS+=-lmfhdf -ldf -ljpeg -lz -lm -lhdf5
 	}
 
 	win32 {
