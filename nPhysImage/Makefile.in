@@ -1,4 +1,4 @@
-VERSION:="$(shell hg identify -n)"
+VERSION:="$(shell git tag)"
 
 # we should fix architecture
 #NVCC := @NVCC@ -m 64
