@@ -4,7 +4,7 @@ CONFIG += qt qwt debug_and_release windows
 
 QT += svg xml network core gui
 
-NVERSION=$$system(git tag)
+NVERSION=$$system(./version.sh)
 
 # VERSION STUFF
 macx {
