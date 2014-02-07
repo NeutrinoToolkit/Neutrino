@@ -607,6 +607,11 @@ public:
 
 			if (uchar_buf == NULL) {
 				uchar_buf = new unsigned char[width*height*4];
+			} else {
+			    if (to_uchar_min==mini && to_uchar_max==maxi) {
+    			    DEBUG(6, "nothing changed");
+                    return uchar_buf;
+			    }
 			}
 			
 			double mult = 255./(maxi - mini);
@@ -874,6 +879,8 @@ private:
 	size_t width;
 	size_t height;
 
+	double to_uchar_min, to_uchar_max;
+
 	// gestione rifiuti
 	void _trash_init()		// for constructors
 	{ _n_inst = new int; *_n_inst = 1; }
@@ -1029,6 +1036,7 @@ nPhysImageF<T>::init_Tvariables()
 	width = 0;
 	height = 0;
 
+    to_uchar_min = to_uchar_max = 0;
 
 	// donne! e' arrivato il monnezzaro
 	vector_buf = axis_buf = NULL;

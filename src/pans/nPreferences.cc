@@ -56,9 +56,13 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	if (!cudaEnabled()) {
 		DEBUG("cuda not enabled");
 		my_w.useCuda->setChecked(false);
-		my_w.useCuda->hide();
+		my_w.useCuda->setEnabled(false);
+	} else {
+		my_w.useCuda->setEnabled(true);
 	}
+	
 
+	
 	loadDefaults();
 	decorate();
 	

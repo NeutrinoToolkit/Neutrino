@@ -2,6 +2,8 @@ TARGET = ../Neutrino
 
 CONFIG += qt qwt debug_and_release windows
 
+CONFIG += neutrino-HDF
+
 QT += svg xml network core gui
 
 NVERSION=$$system(./version.sh)
@@ -55,9 +57,7 @@ macx {
 
 	LIBS += -L/opt/local/lib
 	INCLUDEPATH += /opt/local/include /opt/local/include/netpbm
-		
-	CONFIG += neutrino-HDF
-		
+				
 # workaround for a bug in macdeployqt: http://stackoverflow.com/questions/3454001/macdeployqt-not-copying-plugins
 # sudo ln -sf /Developer/Applications/Qt/plugins /usr/plugins
 
@@ -74,8 +74,6 @@ unix:!macx {
 	neutrino.files = neutrino
     INSTALLS += neutrino
 
-	CONFIG += neutrino-HDF
-
 # gsl
 	LIBS += -L/usr/lib -lgsl -lgslcblas -lm
 
@@ -86,7 +84,6 @@ win32 {
 	QWT_ROOT = "C:\\compile\\qwt-6.0.1\\qwt-6.0.1"
 	
 	LIBS += -L../lib	
-	CONFIG += neutrino-HDF
 		
 	DEFINES += QT_NO_DEBUG
 	
@@ -98,6 +95,9 @@ win32 {
 	INCLUDEPATH += "C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\src"
 	LIBS +=  -lqwt -L"C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\lib" -lfftw3-3
 	
+	# fits
+    LIBS += -L"C:\\compile\\cfit3310"
+
 	DEFINES    += QT_DLL QWT_DLL
 	
 	qtAddLibrary(qwt)
@@ -110,11 +110,6 @@ win32 {
 INCLUDEPATH += ../nPhysImage 
 #LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm -ldf -lcfitsio 
 LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm 
-
-#fits stuff for win
-win32 {
-        LIBS += -L"C:\\compile\\cfit3310"
-}
 
 neutrino-HDF {
     LIBS += -lmfhdf -ldf -lhdf5
