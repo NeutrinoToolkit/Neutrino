@@ -50,7 +50,11 @@ int main(int argc, char **argv)
 	
 	QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
-	new neutrino();
+	neutrino* neu = new neutrino();
+	
+	foreach (QString filename, QCoreApplication::arguments()) {
+		neu->fileOpen(filename);
+	}
 
 	qapp->exec();
 }

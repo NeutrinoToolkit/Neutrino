@@ -90,9 +90,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
 	foreach (QAction * act, my_w.menuTransformation->actions()) {
-		qDebug() << "Action " << act->icon().cacheKey();
 		if (!menuTransformationDefault.isEmpty()) {
-			qDebug() << act->text() << menuTransformationDefault;
 			if (act->text()==menuTransformationDefault) {
 				my_w.menuTransformation->setDefaultAction(act);
 				my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
@@ -250,7 +248,6 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	my_set.setValue("paletteColors",paletteColorsClean);
 
 	QStringList paletteFilesClean,paletteFiles=my_set.value("paletteFiles","").toStringList();
-	qDebug() << "palette files: " << paletteFiles << my_set.value("paletteFilesNames","").toStringList();
 	QStringList paletteFilesNameClean;
 	foreach (QString paletteFile, paletteFiles) {
 		QString name=addPaletteFromFile(paletteFile);
@@ -262,8 +259,6 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	my_set.setValue("paletteFiles",paletteFilesClean);
 	my_set.setValue("paletteFilesNames",paletteFilesNameClean);
 	my_set.endGroup();
-
-	qDebug() << nPalettes.uniqueKeys();
 
 	changeColorTable(nPalettes.keys().first());
 
