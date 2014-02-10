@@ -131,7 +131,7 @@ public slots:
 	void comboChanged(int);
 	nPhysD* getPhysFromCombo(QComboBox*);
 
-	QString getNameForCombo(nPhysD *);
+	QString getNameForCombo(QComboBox*,nPhysD *);
 	void addPhysToCombos(nPhysD*);
 
 	void loadUi(QSettings*);

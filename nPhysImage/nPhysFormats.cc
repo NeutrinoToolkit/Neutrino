@@ -443,7 +443,7 @@ physShort_b16::physShort_b16(const char *ifilename)
 	
 	ifile.close();
 	delete readb;
-	delete ptr;
+	delete [] ptr;
 }
 
 physShort_img::physShort_img(string ifilename)
@@ -474,7 +474,7 @@ physShort_img::physShort_img(string ifilename)
 			int i = fread (buffer2,1,skipbyte,fin);
 			buffer2[i] ='\0';
             DEBUG(5,string(buffer2));
-			delete buffer2;
+			delete [] buffer2;
 //			fseek(fin, skipbyte, SEEK_CUR);
 		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
 			fread (&buffer,bytes,1,fin);
@@ -626,7 +626,7 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	
 	// Compress data using zlib
 	int buffer_size=my_phys->getSurf()*sizeof(double);
-    unsigned char *out= new  unsigned char [buffer_size];
+    unsigned char *out= new unsigned char [buffer_size];
     z_stream strm;
 	
     strm.zalloc = Z_NULL;
@@ -669,6 +669,8 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	ofile<<"\n"<<std::flush;
 	
 	//written_data = ofile.tellg()-pos;
+	
+	delete [] out;
 	return 0;
 }
 
@@ -862,7 +864,7 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 						original->Timg_buffer[i]=swap_endian<char>(buf[i]);
 						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
 					}
-					delete buf;
+					delete [] buf;
 					break;
 				}
 				case 16: {
@@ -872,7 +874,7 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 						original->Timg_buffer[i]=swap_endian<unsigned short>(buf[i]);
 						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
 					}
-					delete buf;
+					delete [] buf;
 					break;
 				}
 			}
@@ -950,7 +952,11 @@ vector <nPhysImageF<double> *> phys_resurrect_binary(std::string fname) {
 		while(ifile.peek()!=-1) {
     		nPhysD *datamatrix = new nPhysD();
     		phys_resurrect_binary(datamatrix,ifile);
-    		if (datamatrix->getSurf()>0) imagelist.push_back(datamatrix);
+    		if (datamatrix->getSurf()>0) {
+    		    imagelist.push_back(datamatrix);
+    		} else {
+    		    delete datamatrix;
+    		}
  		}
 		ifile.close();
 		return imagelist;
@@ -1021,7 +1027,7 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 		return (EXIT_FAILURE);
 	}
     inflateEnd (& strm);
- 	delete in;
+ 	delete [] in;
  	
  	my_phys->setType(PHYS_FILE);
  	
@@ -1285,7 +1291,7 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 						
 					}
 				}
-				delete data;
+				delete [] data;
 			}
 			
 			istat = SDendaccess(sds_id);
@@ -1408,9 +1414,9 @@ nPhysImageF<double> * phys_open_HDF5(std::string fileName, std::string dataName)
 
 			}
 			
-			delete ds_name;
-			delete dims;
-			delete buffer;
+			delete [] ds_name;
+			delete [] dims;
+			delete [] buffer;
 			H5Tclose(tid);
 			H5Sclose(sid);				
 			H5Dclose(did);
@@ -1447,14 +1453,14 @@ void scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
 					}
 				}
 			}
-			delete val;
+			delete [] val;
 		}
 	} else if (classAType ==  H5T_INTEGER) {
 		int nelem=aInfo.data_size/sizeof(int);
 		int *val=new int[nelem];
 		if (H5Aread(aid, nativeType, (void*)val) >= 0) {
 		}
-		delete val;
+		delete [] val;
 	} else if (classAType == H5T_STRING) {
 		char *val =NULL;
 		if (my_data) {
@@ -1483,8 +1489,9 @@ void scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
 			}
 			
 		}
-		delete val;
+		delete [] val;
 	}
+	delete [] attrName;
 	H5Tclose(atype);
 	H5Sclose(aspace);
 }

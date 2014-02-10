@@ -97,7 +97,10 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	father2<<my_w.setVisar1<<my_w.setVisar2;
 	for (int k=0;k<2;k++){
 		visar[k].setupUi(father1.at(k));
+		father1.at(k)->show();
 		setvisar[k].setupUi(father2.at(k));
+		father2.at(k)->show();
+		
 		//hack to save diffrent uis!!!
 		foreach (QWidget *obj, father1.at(k)->findChildren<QWidget*>()) {
 			obj->setObjectName(obj->objectName()+"-VISAR"+QString::number(k+1));

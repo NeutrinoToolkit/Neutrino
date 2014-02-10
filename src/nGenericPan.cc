@@ -92,11 +92,18 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 	nparent->emitPanAdd(this);
 }
 
-QString nGenericPan::getNameForCombo(nPhysD *buffer) {
-	int position = nparent->physList.indexOf(buffer);
-	QString name=QString::fromStdString(buffer->getName());
-	if (name.length()>35) name=name.left(15)+"[...]"+name.right(15); 
-	return QString::number(position)+" : "+name;
+QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
+	if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
+	QString name="";
+	if (nparent) {
+		int position = nparent->physList.indexOf(buffer);
+		name=QString::fromStdString(buffer->getName());
+		int len=combo->property("physNameLength").toInt();
+		if (name.length()>len) name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
+		name.prepend(QString::number(position)+" : ");
+		qDebug() << len << name;
+	} 
+	return name;
 }
 	
 void nGenericPan::addPhysToCombos(nPhysD *buffer) {
@@ -104,7 +111,7 @@ void nGenericPan::addPhysToCombos(nPhysD *buffer) {
 		if (combo->property("neutrinoImage").isValid()) {
 			int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
 			if (alreadyThere == -1) {
-				combo->addItem(getNameForCombo(buffer),qVariantFromValue((void*) buffer));
+				combo->addItem(getNameForCombo(combo,buffer),qVariantFromValue((void*) buffer));
 			}
 		}
 	}
@@ -122,7 +129,12 @@ void nGenericPan::decorate() {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {	
 			if (combo->property("neutrinoImage").toBool()) {
-				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+				//connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
+				
+				if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
+
 			}
 		}
 	}
@@ -159,13 +171,17 @@ nGenericPan::physDel(nPhysD * buffer) {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {
 			if (combo->property("neutrinoImage").toBool()) {
-				disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+//				disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+				disconnect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+				disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
 			}
 			int position=combo->findData(qVariantFromValue((void*) buffer));
 			DEBUG(5, "removed " << buffer->getName() << " " << combo->objectName().toStdString() << " " <<position);
 			combo->removeItem(position);
 			if (combo->property("neutrinoImage").toBool()) {
-				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+//				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
 			}
 		}
 	}
@@ -178,7 +194,7 @@ nGenericPan::bufferChanged(nPhysD * buffer)
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {
 			int position=combo->findData(qVariantFromValue((void*) buffer));
-			if (position >= 0) combo->setItemText(position,getNameForCombo(buffer));
+			if (position >= 0) combo->setItemText(position,getNameForCombo(combo,buffer));
 		}
 	}
 	currentBuffer = buffer;
@@ -196,15 +212,17 @@ nGenericPan::showMessage(QString message,int msec) {
 
 
 void
-nGenericPan::comboChanged(int) {
+nGenericPan::comboChanged(int k) {
 	QComboBox *combo = qobject_cast<QComboBox *>(sender());
 	if (combo) {
-		nPhysD *image=getPhysFromCombo(combo);
+		nPhysD *image=(nPhysD*) (combo->itemData(k).value<void*>());
 		if (image) {
 			nparent->showPhys(image);
 		}
 		DEBUG(panName.toStdString() << " " << combo->objectName().toStdString());
 		emit changeCombo(combo);
+	} else {
+		DEBUG("not a combo");
 	}
 }
 

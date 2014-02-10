@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>518</width>
-    <height>396</height>
+    <height>411</height>
    </rect>
   </property>
   <property name="font">
@@ -18,7 +18,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1,0">
+  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,1">
    <property name="margin">
     <number>0</number>
    </property>

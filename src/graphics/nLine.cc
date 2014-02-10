@@ -292,8 +292,10 @@ nLine::export_txt_points() {
 
 QString nLine::getStringData(QPolygonF vals){
 	QString point_table;
+	double dist=0.0;
 	for (int i=0; i<vals.size(); i++) {
-		point_table.append(QString("%1\t%2").arg(vals.at(i).x()).arg(vals.at(i).y()));
+		if (i>0) dist+=sqrt(pow(vals.at(i).x()-vals.at(i-1).x(),2)+pow(vals.at(i).y()-vals.at(i-1).y(),2));
+		point_table.append(QString("%1\t%2\t%3").arg(dist).arg(vals.at(i).x()).arg(vals.at(i).y()));
 		if (parent()->currentBuffer) {
 			point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
 		} else {

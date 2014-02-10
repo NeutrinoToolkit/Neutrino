@@ -173,19 +173,19 @@ nPhysImageF<mcomplex>::TscanBrightness() {
 
 void 
 phys_add(nPhysImageF<double> &iimage, double val)
-{ for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)+val); }
+{ if (val!=0.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)+val); }
 
 void 
 phys_subtract(nPhysImageF<double> &iimage, double val)
-{ for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)-val); }
+{ if (val!=0.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)-val); }
 
 void
 phys_multiply(nPhysImageF<double> &iimage, double val)
-{ for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)*val); }
+{ if (val!=1.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)*val); }
 
 void 
 phys_divide(nPhysImageF<double> &iimage, double val)
-{ for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)/val); }
+{ if (val!=1.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)/val); }
 
 void 
 phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)

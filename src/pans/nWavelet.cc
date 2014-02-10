@@ -280,6 +280,7 @@ void nWavelet::doRemoveCarrier () {
 		double kx = cos(alpha*_phys_deg)/lambda;
 		double ky = -sin(alpha*_phys_deg)/lambda;
 		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
+		phys_add(*unwrappedSubtracted, my_w.phaseOffset->value());
 		unwrappedSubtracted->TscanBrightness();
 		my_w.erasePreviuosCarrier->setEnabled(true);
 		if (my_w.erasePreviuosCarrier->isChecked()) {
