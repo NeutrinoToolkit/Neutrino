@@ -171,6 +171,9 @@ phys_dump_binary(nPhysImageF<double> *, std::ofstream &);
 int
 phys_resurrect_binary(nPhysImageF<double> *, std::ifstream &);
 
+int
+phys_resurrect_old_binary(nPhysImageF<double> *, std::ifstream &);
+
 std::vector <nPhysImageF<double> *> phys_resurrect_binary(std::string);
 
 //generic raw open

@@ -806,12 +806,19 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						counter++;
 						progress.setValue(counter);
 						nPhysD *my_phys=new nPhysD();
-						int ret=phys_resurrect_binary(my_phys,ifile);
+						
+						int ret=phys_resurrect_old_binary(my_phys,ifile);
 						if (ret>=0 && my_phys->getSurf()>0) {
 							addPhys(my_phys);
 							imagelist.push_back(my_phys);
 						} else {
-							delete my_phys;
+							ret=phys_resurrect_binary(my_phys,ifile);
+							if (ret>=0 && my_phys->getSurf()>0) {
+								addPhys(my_phys);
+								imagelist.push_back(my_phys);
+							} else {
+								delete my_phys;
+							}
 						}
 						progress.setLabelText(QString::fromStdString(my_phys->getShortName()));
 						QApplication::processEvents();

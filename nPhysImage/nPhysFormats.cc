@@ -664,13 +664,12 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	ofile.write((const char *)&writtendata, sizeof (int));
 	ofile.write((const char *)out, sizeof (char)*writtendata);
 	
-	delete out;
+	delete [] out;
 	//	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
 	ofile<<"\n"<<std::flush;
 	
 	//written_data = ofile.tellg()-pos;
 	
-	delete [] out;
 	return 0;
 }
 
@@ -951,17 +950,121 @@ vector <nPhysImageF<double> *> phys_resurrect_binary(std::string fname) {
 		ifstream ifile(fname.c_str(), ios::in | ios::binary);
 		while(ifile.peek()!=-1) {
     		nPhysD *datamatrix = new nPhysD();
-    		phys_resurrect_binary(datamatrix,ifile);
-    		if (datamatrix->getSurf()>0) {
-    		    imagelist.push_back(datamatrix);
-    		} else {
-    		    delete datamatrix;
-    		}
+    		DEBUG("here");
+    		
+            int ret=phys_resurrect_old_binary(datamatrix,ifile);
+            if (ret>=0 && datamatrix->getSurf()>0) {
+                imagelist.push_back(datamatrix);
+            } else {
+                ret=phys_resurrect_binary(datamatrix,ifile);
+                if (ret>=0 && datamatrix->getSurf()>0) {
+                    imagelist.push_back(datamatrix);
+                } else {
+                    delete datamatrix;
+                }
+            }
+
  		}
 		ifile.close();
 		return imagelist;
 }
 
+int
+phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
+	
+	streampos posfile=ifile.tellg();
+
+ 	if (ifile.fail() || ifile.eof()) {
+ 		WARNING("istream error");
+ 		return -1;
+ 	}
+	
+	string line;
+	getline(ifile,line);
+	my_phys->setName(line);
+	getline(ifile,line);
+	getline(ifile,line);
+	my_phys->setShortName(line);
+	getline(ifile,line);
+	my_phys->setFromName(line);
+
+	getline(ifile,line);
+	vec2f orig(line);
+	my_phys->set_origin(orig);
+
+	getline(ifile,line);
+	vec2f scale(line);
+	my_phys->set_scale(scale);
+	
+	getline(ifile,line);
+	if (line!="1") {
+	    DEBUG("OLD neu file, rewind to pos " << posfile);
+	    ifile.seekg(posfile);
+        return -1;
+	}
+
+// 	getline(ifile,pp.phys_short_name);
+// 	getline(ifile,pp.phys_from_name);
+// 	getline(ifile,line);
+// 	pp.origin=bidimvec<double>(line);
+// 	getline(ifile,line);
+// 	pp.scale=bidimvec<double>(line);
+// 	getline(ifile,line);
+// 
+	
+	
+	getline(ifile,line);
+	int my_w=atoi(line.c_str());
+ 	getline(ifile,line);
+	int my_h=atoi(line.c_str());
+	
+ 	getline(ifile,line);
+	int buffer_size=atoi(line.c_str());
+	if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
+	
+ 	my_phys->resize(my_w,my_h);
+    unsigned char *in= new  unsigned char [buffer_size];
+ 	ifile.read((char *)in, buffer_size*sizeof(char));
+	
+    z_stream strm;
+	
+    strm.zalloc = Z_NULL;
+    strm.zfree  = Z_NULL;
+    strm.opaque = Z_NULL;
+    int status;
+    status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+    if (status < 0) {
+		WARNING("Zlib a bad status of " << status);
+	  	delete in;
+		delete my_phys;
+	 	my_phys=NULL;
+		return (EXIT_FAILURE);
+	}
+	
+    strm.next_in = in;
+    strm.avail_in = buffer_size;
+    strm.next_out = (unsigned char *)my_phys->Timg_buffer;
+    strm.avail_out = my_phys->getSurf()*sizeof(double);
+    status = inflate (&strm, Z_SYNC_FLUSH);
+    if (status < 0) {
+		WARNING("Zlib a bad status of " << status);
+	 	delete in;
+	 	delete my_phys;
+	 	my_phys=NULL;
+		return (EXIT_FAILURE);
+	}
+    inflateEnd (& strm);
+ 	delete in;
+ 	
+ 	my_phys->setType(PHYS_FILE);
+ 	
+	//	ifile.read((char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
+	my_phys->TscanBrightness();
+	getline(ifile,line);
+
+
+	return 0;
+}
 
 int
 phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
@@ -971,7 +1074,6 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
  		return -1;
  	}
 	
-
 	my_phys->property.loader(ifile);
 
 	// w/h/size binary read
@@ -1034,10 +1136,9 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	//	ifile.read((char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
 	my_phys->TscanBrightness();
 	getline(ifile,line);
-	return 0;
-	
-	
+	return 0;	
 }
+
 
 /*int
 phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {

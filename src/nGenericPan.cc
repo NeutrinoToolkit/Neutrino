@@ -93,7 +93,7 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 }
 
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
-	if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
+//	if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
 	QString name="";
 	if (nparent) {
 		int position = nparent->physList.indexOf(buffer);
@@ -101,7 +101,6 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 		int len=combo->property("physNameLength").toInt();
 		if (name.length()>len) name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
 		name.prepend(QString::number(position)+" : ");
-		qDebug() << len << name;
 	} 
 	return name;
 }
