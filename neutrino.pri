@@ -6,15 +6,17 @@ CONFIG += neutrino-HDF
 
 QT += svg xml network core gui
 
-NVERSION=$$system(./version.sh)
 
 # VERSION STUFF
+NVERSION=$$system(git describe)
+
 macx {
 	DEFINES += __VER=\'\"$${NVERSION}\"\'
 } else {
 	DEFINES += __VER=\\\"$${NVERSION}\\\"
-} 
+}
 
+message($${NVERSION})
 # nPhysImage compilation
 nPhys.target = nPhys
 CONFIG(debug, debug|release) {

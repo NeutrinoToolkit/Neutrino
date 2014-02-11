@@ -1,4 +1,4 @@
-VERSION:="$(shell ../version.sh)"
+VERSION:="$(shell git describe)"
 
 # we should fix architecture
 #NVCC := @NVCC@ -m 64

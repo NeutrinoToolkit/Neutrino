@@ -1902,7 +1902,7 @@ void neutrino::about() {
 						this);
 	
 	credits.setText(QString("<h1>Neutrino</h1><br><i>the only neutrino faster than light</i><br>")+tr("version: ")+__VER);
-	credits.setInformativeText("Alessandro Flacco: alessandro.flacco@ensta.paristech.fr <br>Tommaso Vinci: tommaso.vinci@polytechnique.edu<hr>http://web.luli.polytechnique.fr/Neutrino<hr>");
+	credits.setInformativeText("Alessandro Flacco: alessandro.flacco@polytechnique.edu <br>Tommaso Vinci: tommaso.vinci@polytechnique.edu<hr>http://web.luli.polytechnique.fr/Neutrino<hr>");
 	QPixmap icona(":icons/icon.png");
 	credits.setIconPixmap(icona.scaledToHeight(100,Qt::SmoothTransformation));
 	credits.exec();

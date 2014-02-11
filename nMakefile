@@ -1,4 +1,4 @@
-VERSION:=$(shell ./version.sh)
+VERSION:=$(shell git describe)
 
 ifeq ($(OS),Windows_NT)
 all: win
@@ -62,6 +62,8 @@ win:
 	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
 	cd nPhysImage && ./configure CFLAGS='-Ic:/compile/fftw-3.3-dll32 -Ic:/compile/GnuWin32/include -Ic:/compile/HDF_Group/HDFshared/4.2.8/include -Ic:/compile/HDF_Group/HDF5/1.8.10/include -Ic:/compile/cfit3310' LDFLAGS='-L. -Lc:/compile/GnuWin32/lib -Lc:/compile/GnuWin32/bin -Lc:/compile/HDF_Group/HDFshared/4.2.8/lib -Lc:/compile/HDF_Group/HDF5/1.8.10/lib -Lc:/compile/cfit3310'
 	make -C nPhysImage clean release
+	qmake 
+	make distclean
 	qmake 
 	make release
 	cp -r ../deploy/* app
