@@ -42,12 +42,12 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1276"
-     inkscape:window-height="980"
+     inkscape:window-height="756"
      id="namedview78"
      showgrid="false"
      inkscape:zoom="1.3474875"
      inkscape:cx="122.27296"
-     inkscape:cy="279.63078"
+     inkscape:cy="-76.587738"
      inkscape:window-x="4"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -2882,6 +2882,18 @@
        sodipodi:role="line"
        x="199.6947"
        y="361.91953"
-       style="font-size:32px;font-weight:bold;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:1.60000002;stroke-miterlimit:4;stroke-dasharray:none;-inkscape-font-specification:Sans Bold"
-       id="tspan3912">version __VER</tspan></text>
+       style="font-size:28.8000005px;font-weight:bold;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:1.60000001999999997;stroke-miterlimit:4;stroke-dasharray:none;-inkscape-font-specification:Sans Bold"
+       id="tspan3912">__VER</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+     x="32.653362"
+     y="586.86768"
+     id="text3381"
+     sodipodi:linespacing="125%"
+     transform="matrix(0.80000001,0,0,0.80000001,-7.3998743e-6,0)"><tspan
+       sodipodi:role="line"
+       id="tspan3383"
+       x="32.653362"
+       y="586.86768" /></text>
 </svg>
