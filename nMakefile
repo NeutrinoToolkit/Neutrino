@@ -75,7 +75,7 @@ win:
 	cp sip/neutrino.py app
 	cp sip/nPython.ui app
 	cd app && ../../NSIS/makensis.exe neutrino.nsi
-	cp app/neutrino-installer.exe /e/local/src/neutrino
+	cp app/neutrino-installer.exe /e/local/src/neutrino/neutrino-${VERSION}.exe
 
 linux:
 	# make all in nPhysImage
