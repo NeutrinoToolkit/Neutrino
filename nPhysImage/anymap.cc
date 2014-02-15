@@ -44,6 +44,7 @@ std::ostream & operator<< (std::ostream &lhs, struct anydata &rhs)
 { 
 	if (rhs.is_d()) return lhs<<rhs.get_d(); 
 	else if (rhs.is_i()) return lhs<<rhs.get_i(); 
+	else if (rhs.is_vec()) return lhs<<rhs.get_str(); // qui passo direttamente a stringa
 	else if (rhs.is_str()) return lhs<<rhs.get_str(); 
 }
 
@@ -63,6 +64,7 @@ std::istream & operator>> (std::istream &lhs, struct anydata &rhs)
 	std::stringstream ssi(st); ssi>>i;
 	if (ssi.eof() == 1) {
 		rhs = i;
+		DEBUG(10, "got int");
 		return lhs;
 	}
 
@@ -70,10 +72,21 @@ std::istream & operator>> (std::istream &lhs, struct anydata &rhs)
 	std::stringstream ssd(st); ssd>>d;
 	if (ssd.eof() == 1) {
 		rhs = d;
+		DEBUG(10, "got double");
 		return lhs;
 	}
 
+	// vector is NOT to be checked here (but later)
+
+	DEBUG(10, "got string or vector");
 	rhs = st;
 	return lhs;
 }
 
+bool check_vec(const std::string &s) {
+	std::string tstr = trim(s, "\t");
+	int ref1 = tstr.find("(",0), ref2 = tstr.find(":",0), ref3 = tstr.find(")",0);
+	if (ref1 != std::string::npos && ref2 != std::string::npos && ref3 != std::string::npos) 
+			return true;
+	else return false;
+}

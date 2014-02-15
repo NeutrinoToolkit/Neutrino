@@ -618,7 +618,7 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	//ofile<<my_phys->property<<"\n";
 	my_phys->property.dumper(ofile);
 
-	std::cerr<<"start binary dump"<<std::endl;
+	DEBUG("Starting binary dump...");
 
 
 	//ofile<<my_phys->getW()<<"\n";
@@ -663,6 +663,7 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	//ofile << writtendata << "\n"; // TODO: to be written in binary
 	ofile.write((const char *)&writtendata, sizeof (int));
 	ofile.write((const char *)out, sizeof (char)*writtendata);
+	DEBUG("Binary dump finished");
 	
 	delete [] out;
 	//	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
@@ -946,27 +947,33 @@ physDouble_fits::physDouble_fits(string ifilename)
 }
 
 vector <nPhysImageF<double> *> phys_resurrect_binary(std::string fname) { 
-		vector <nPhysImageF<double> *> imagelist;
-		ifstream ifile(fname.c_str(), ios::in | ios::binary);
-		while(ifile.peek()!=-1) {
-    		nPhysD *datamatrix = new nPhysD();
-    		DEBUG("here");
-    		
-            int ret=phys_resurrect_old_binary(datamatrix,ifile);
-            if (ret>=0 && datamatrix->getSurf()>0) {
-                imagelist.push_back(datamatrix);
-            } else {
-                ret=phys_resurrect_binary(datamatrix,ifile);
-                if (ret>=0 && datamatrix->getSurf()>0) {
-                    imagelist.push_back(datamatrix);
-                } else {
-                    delete datamatrix;
-                }
-            }
 
- 		}
-		ifile.close();
-		return imagelist;
+	vector <nPhysImageF<double> *> imagelist;
+	ifstream ifile(fname.c_str(), ios::in | ios::binary);
+	int ret;
+	while(ifile.peek()!=-1) {
+		nPhysD *datamatrix = new nPhysD();
+		DEBUG("here");
+    
+	// crisstho della madonna...
+	// i morti con i morti, i vivi con i vivi
+        //    int ret=phys_resurrect_old_binary(datamatrix,ifile);
+        //    if (ret>=0 && datamatrix->getSurf()>0) {
+        //        imagelist.push_back(datamatrix);
+        //    } else {
+
+		ret=phys_resurrect_binary(datamatrix,ifile);
+ 		if (ret>=0 && datamatrix->getSurf()>0) {
+     			imagelist.push_back(datamatrix);
+		} else {
+    			delete datamatrix;
+	//        }
+    
+		}
+
+	}
+	ifile.close();
+	return imagelist;
 }
 
 int

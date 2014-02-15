@@ -81,9 +81,15 @@ linux:
 	# make all in nPhysImage
 	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
 	cd nPhysImage && ./configure $(CONFOPTS)
-	make -C nPhysImage clean release
+	make -C nPhysImage clean devel 
+	# make all in neutrino
 	qmake
 	make ${MAKEOPTS} 
+	# make sip
+	cd sip && python configure.py
+	make -C sip
+	# make plugins stuff
+	
 
 linux_install:
 	@install -m 755 nPhysImage/libnPhysImageF.so ${DESTDIR}${prefix}/lib
