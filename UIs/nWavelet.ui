@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
+    <width>302</width>
     <height>360</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -644,6 +644,9 @@
              <property name="checked">
               <bool>true</bool>
              </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -651,7 +654,7 @@
              <property name="title">
               <string>Carrier: interfringe, angle and weight</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,1,0">
+             <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,1,0,0">
               <property name="margin">
                <number>0</number>
               </property>
@@ -736,6 +739,19 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="3">
+               <widget class="QCheckBox" name="liveView">
+                <property name="toolTip">
+                 <string>automatic update</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -743,6 +759,9 @@
             <widget class="QRadioButton" name="reference">
              <property name="text">
               <string/>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

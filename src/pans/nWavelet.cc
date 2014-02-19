@@ -280,6 +280,9 @@ void nWavelet::doRemove () {
 void nWavelet::doRemoveCarrier () {
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
+	if (sender() && (sender()==my_w.widthCarrier || sender()==my_w.angleCarrier || sender()==my_w.weightCarrier) && (!my_w.liveView->isChecked())) {
+		return;
+	}
 	my_w.carrier->setChecked(true);
 	// check normalize
 	nPhysD *unwrapped=getPhysFromCombo(my_w.unwrapped);
