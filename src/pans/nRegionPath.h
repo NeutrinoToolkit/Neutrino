@@ -51,6 +51,9 @@ public slots:
 	void doIt();
 	void doMask();
 	
+private:
+	double getReplaceVal();
+	
 };
 
 #endif

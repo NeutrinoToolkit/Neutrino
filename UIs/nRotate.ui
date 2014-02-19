@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>181</width>
-    <height>135</height>
+    <width>171</width>
+    <height>168</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,6 +108,38 @@
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="defaultValue">
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>NaN</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mean</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

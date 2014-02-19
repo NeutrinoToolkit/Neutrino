@@ -45,16 +45,16 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 
 	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
 	connect(my_w.doUnwrap, SIGNAL(pressed()), this, SLOT(doUnwrap()));
-	connect(my_w.doRemoveCarrier, SIGNAL(pressed()), this, SLOT(doRemoveCarrier()));
 
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
-	connect(my_w.doRemoveRef, SIGNAL(pressed()), this, SLOT(doRemoveRef()));
+	connect(my_w.doRemove, SIGNAL(pressed()), this, SLOT(doRemove()));
 
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 	connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=NULL;
 	waveletPhys.resize(5);
@@ -81,12 +81,14 @@ void nWavelet::guessCarrier() {
 			my_w.statusbar->showMessage(tr("Carrier: ")+QString::number(vecCarr.first())+"px "+QString::number(vecCarr.second())+"deg", 5000);
 			disconnect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			disconnect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+			disconnect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			my_w.widthCarrier->setValue(vecCarr.first());
 			my_w.angleCarrier->setValue(vecCarr.second());
 			my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 			my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 			connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+			connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 		}
 	}
 }
@@ -102,15 +104,17 @@ void nWavelet::doWavelet () {
 		saveDefaults();
 		QRect geom2=region->getRect();
 		QPoint offset=geom2.topLeft();
-		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
-		datamatrix.setShortName("wavelet source");
+		nPhysD *datamatrix = new nPhysD();
+		
+		*datamatrix=image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+		datamatrix->setShortName("wavelet source");
 
-		origSubmatrix=&datamatrix;
-//		if (my_w.erasePrevious->isChecked()) {
-//			origSubmatrix=nparent->replacePhys(&datamatrix,origSubmatrix,false);
-//		} else {
-//			nparent->addPhys(origSubmatrix);
-//		}
+		if (my_w.erasePrevious->isChecked()) {
+			origSubmatrix=nparent->replacePhys(datamatrix,origSubmatrix,false);
+		} else {
+			nparent->addPhys(datamatrix);
+			origSubmatrix=datamatrix;
+		}
 
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
@@ -175,7 +179,7 @@ void nWavelet::doWavelet () {
 				mat=NULL;
 			} else {
 				if (my_w.erasePrevious->isChecked()) {
-					waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position));
+					waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
 				} else {
 					nparent->addPhys(mat);
 					waveletPhys.at(position)=mat;
@@ -220,11 +224,10 @@ phys_wavelet_trasl_nocuda(nPhysD *iimage, void *params, int &iter) {
 // --------------------------------------------------------------------------
 
 void nWavelet::doUnwrap () {
-	nPhysD *uphase=NULL;
-	nPhysD *phase, *qual;
-	phase=getPhysFromCombo(my_w.imageUnwrap);
-	qual=getPhysFromCombo(my_w.qualityUnwrap);
+	nPhysD *phase=getPhysFromCombo(my_w.imageUnwrap);
+	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
 	if (qual && phase) {
+		nPhysD *uphase=NULL;
 		QString methodName=my_w.method->currentText();
 		// esistono sicuramente dei metodi piu' intelligenti
 		if (methodName=="Simple H+V") {
@@ -244,11 +247,20 @@ void nWavelet::doUnwrap () {
 			uphase->setName(uphase->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromStdString(phase->getFromName())).fileName().toStdString());
 			uphase->setFromName(phase->getFromName());
 			my_w.erasePreviousUnwrap->setEnabled(true);
+			if (my_w.removeCarrierAfterUnwrap->isChecked()) {
+				double alpha=my_w.angleCarrier->value();
+				double lambda=my_w.widthCarrier->value();
+				
+				double kx = cos(alpha*_phys_deg)/lambda;
+				double ky = -sin(alpha*_phys_deg)/lambda;
+				phys_subtract_carrier(*uphase, kx, ky);
+			}
+
 			uphase->TscanBrightness();
 			if (my_w.erasePreviousUnwrap->isChecked()) {
 				unwrapPhys=nparent->replacePhys(uphase,unwrapPhys);
 			} else {
-				unwrapPhys=uphase;
+				uphase=uphase;
 				nparent->addShowPhys(unwrapPhys);
 			}
 			my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
@@ -256,12 +268,19 @@ void nWavelet::doUnwrap () {
 	}
 }
 
+void nWavelet::doRemove () {
+	if (my_w.carrier->isChecked()) {
+		doRemoveCarrier();
+	}
+	if (my_w.reference->isChecked()) {
+		doRemoveReference();
+	}
+}
+
 void nWavelet::doRemoveCarrier () {
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
-	if (sender() && (sender()==my_w.widthCarrier || sender()==my_w.angleCarrier)) {
-		if (!my_w.autoUpdate->isChecked()) return;
-	}
+	my_w.carrier->setChecked(true);
 	// check normalize
 	nPhysD *unwrapped=getPhysFromCombo(my_w.unwrapped);
 	if (unwrapped) {
@@ -280,10 +299,10 @@ void nWavelet::doRemoveCarrier () {
 		double kx = cos(alpha*_phys_deg)/lambda;
 		double ky = -sin(alpha*_phys_deg)/lambda;
 		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
-		phys_add(*unwrappedSubtracted, my_w.phaseOffset->value());
+		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 		unwrappedSubtracted->TscanBrightness();
-		my_w.erasePreviuosCarrier->setEnabled(true);
-		if (my_w.erasePreviuosCarrier->isChecked()) {
+		my_w.erasePreviuos->setEnabled(true);
+		if (my_w.erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
 		} else {
 			nparent->addShowPhys(unwrappedSubtracted);
@@ -291,7 +310,7 @@ void nWavelet::doRemoveCarrier () {
 	}
 }
 
-void nWavelet::doRemoveRef () {
+void nWavelet::doRemoveReference () {
 	// check normalize
 	nPhysD *ref=getPhysFromCombo(my_w.refUnwrap);
 	nPhysD *unwrapped=getPhysFromCombo(my_w.unwrapped);
@@ -300,6 +319,7 @@ void nWavelet::doRemoveRef () {
 			nPhysD *unwrappedSubtracted;
 			unwrappedSubtracted = new nPhysD();
 			*unwrappedSubtracted=(*unwrapped)-(*ref);
+			phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 			unwrappedSubtracted->setName(unwrapped->getName()+" - "+ref->getName());
 			unwrappedSubtracted->setName("Reference removed : "+ref->getName());
 			unwrappedSubtracted->setShortName("Ref removed");
@@ -309,8 +329,8 @@ void nWavelet::doRemoveRef () {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName()+" "+ref->getFromName());
 			}
 			unwrappedSubtracted->TscanBrightness();
-			my_w.erasePreviuosRef->setEnabled(true);
-			if (my_w.erasePreviuosRef->isChecked()) {
+			my_w.erasePreviuos->setEnabled(true);
+			if (my_w.erasePreviuos->isChecked()) {
 				referencePhys=nparent->replacePhys(unwrappedSubtracted,referencePhys);
 			} else {
 				nparent->addShowPhys(unwrappedSubtracted);

@@ -93,7 +93,6 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 }
 
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
-//	if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
 	QString name="";
 	if (nparent) {
 		int position = nparent->physList.indexOf(buffer);
@@ -124,16 +123,20 @@ void nGenericPan::decorate() {
 	neutrinoProperties << "fileTxt" << "fileExport" << "fileIni";
 
 	setWindowTitle(nparent->property("winId").toString()+": "+panName);
+	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
+		if (combo->property("neutrinoImage").isValid()) {	
+			if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
+		}
+	}
+	
 	foreach (nPhysD *buffer, nparent->physList) addPhysToCombos(buffer);
+	
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {	
 			if (combo->property("neutrinoImage").toBool()) {
 				//connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
-				
-				if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
-
 			}
 		}
 	}
@@ -838,5 +841,3 @@ void nGenericPan::button(QString name , int occurrence) {
 		}
 	}
 }
-
-

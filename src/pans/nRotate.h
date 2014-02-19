@@ -45,6 +45,7 @@ public:
 public slots:
 	void doRotateLive();
 	void doRotate();
+	double getReplaceVal();
 };
 
 #endif

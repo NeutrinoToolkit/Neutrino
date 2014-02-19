@@ -46,7 +46,7 @@ void nRotate::doRotateLive () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		if (image!=rotated) {
-			rotated=nparent->replacePhys(image->rotated(alpha),rotated, true);
+			rotated=nparent->replacePhys(image->rotated(alpha,getReplaceVal()),rotated, true);
 		} else {
 			my_w.statusbar->showMessage("Can't work on this image",5000);
 		}
@@ -59,4 +59,32 @@ void nRotate::doRotate () {
 		nPhysD *newRotated=new nPhysD(*rotated);
 		nparent->addPhys(newRotated);
 	}
+}
+
+double nRotate::getReplaceVal() {
+	double val=0.0;
+	nPhysD *image=getPhysFromCombo(my_w.image);
+	if (image) {
+		switch (my_w.defaultValue->currentIndex()) {
+			case 0:
+				val=std::numeric_limits<double>::quiet_NaN();
+				break;
+			case 1:
+				val=image->Tminimum_value;
+				break;
+			case 2:
+				val=image->Tmaximum_value;
+				break;
+			case 3:
+				val=0.5*(image->Tminimum_value+image->Tmaximum_value);
+				break;
+			case 4:
+				val=0.0;
+				break;
+			default:
+				WARNING("something is broken here");
+				break;
+		}
+	}
+	return val;
 }

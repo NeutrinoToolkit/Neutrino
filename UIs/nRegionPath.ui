@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>221</width>
-    <height>98</height>
+    <width>204</width>
+    <height>140</height>
    </rect>
   </property>
   <property name="font">
@@ -25,20 +25,40 @@
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>4</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
-    <item row="1" column="0">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0" colspan="2">
+     <widget class="QComboBox" name="defaultValue">
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>NaN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Max</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Mean</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="2" column="0">
      <widget class="QPushButton" name="doIt">
       <property name="font">
        <font>
@@ -50,7 +70,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="2" column="1">
      <widget class="QPushButton" name="doMask">
       <property name="font">
        <font>
@@ -106,8 +126,8 @@
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//loadPref.png</normaloff>:icons/loadPref</iconset>
+    <iconset>
+     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
    </property>
    <property name="text">
     <string>loadPref</string>
@@ -118,8 +138,8 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//savePref.png</normaloff>:icons/savePref</iconset>
+    <iconset>
+     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
    </property>
    <property name="text">
     <string>savePref</string>
@@ -130,8 +150,8 @@
   </action>
   <action name="actionBezier">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//bezier.png</normaloff>:icons/bezier</iconset>
+    <iconset>
+     <normaloff>:icons//bezier.png</normaloff>:icons//bezier.png</iconset>
    </property>
    <property name="text">
     <string>bezier</string>
@@ -142,8 +162,8 @@
   </action>
   <action name="actionLine">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//line.png</normaloff>:icons/line</iconset>
+    <iconset>
+     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
    </property>
    <property name="text">
     <string>line</string>
@@ -154,8 +174,8 @@
   </action>
   <action name="actionFlipline">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//flipline.png</normaloff>:icons/flipline</iconset>
+    <iconset>
+     <normaloff>:icons//flipline.png</normaloff>:icons//flipline.png</iconset>
    </property>
    <property name="text">
     <string>flipline</string>

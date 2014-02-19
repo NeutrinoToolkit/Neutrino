@@ -57,42 +57,40 @@ nRegionPath::doIt() {
 		if (image) {
 			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
 			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-			nPhysD regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
-			regionPath.setShortName("Region mask");
-			regionPath.setName("mask");
-			regionPath.set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
-			QProgressDialog progress("Extracting", "Stop", 0, regionPath.getW(), this);
+			nPhysD *regionPath = new nPhysD();
+			*regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+			regionPath->setShortName("Region mask");
+			regionPath->setName("mask");
+			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
+			QProgressDialog progress("Extracting", "Stop", 0, regionPath->getW(), this);
 			progress.setWindowModality(Qt::WindowModal);
 			progress.show();
 			QTime time;
 			time.start();
-			for (register size_t i=0; i<regionPath.getW(); i++) {
+			for (register size_t i=0; i<regionPath->getW(); i++) {
 				if (progress.wasCanceled()) break;
 				QApplication::processEvents();
-				for (register size_t j=0; j<regionPath.getH(); j++) {
+				for (register size_t j=0; j<regionPath->getH(); j++) {
 					if (!regionPoly.containsPoint(QPoint(i+rectRegion.x(),j+rectRegion.y()),Qt::OddEvenFill)) {
-						regionPath.set(i,j,numeric_limits<double>::quiet_NaN( ));
+						regionPath->set(i,j,getReplaceVal());
 					}
-
 				}
 				progress.setValue(i);
 			}
-//			regionPath.TscanBrightness();
-//			qDebug() << ">>>>>>>>>>>>>>>>> time " << time.elapsed();
-			regionPhys=nparent->replacePhys(&regionPath,regionPhys);
+			regionPhys=nparent->replacePhys(regionPath,regionPhys);
 		}
 	}
+	qDebug() << region->poly(region->numPoints).toPolygon().size();
 }
 
-void
-nRegionPath::doMask() {
+void nRegionPath::doMask() {
 	if (currentBuffer) {
 		saveDefaults();
 		nPhysD *image=getPhysFromCombo(my_w.image);
 		if (image) {
 			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
 			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-			nPhysD *regionPath = new nPhysD(rectRegion.width(),rectRegion.height(),0.0);
+			nPhysD *regionPath = new nPhysD(rectRegion.width(),rectRegion.height(),getReplaceVal());
 			regionPath->setShortName("Region mask");
 			regionPath->setName("mask");
 			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
@@ -117,4 +115,30 @@ nRegionPath::doMask() {
 	}
 }
 
-
+double nRegionPath::getReplaceVal() {
+	double val=0.0;
+	nPhysD *image=getPhysFromCombo(my_w.image);
+	if (image) {
+		switch (my_w.defaultValue->currentIndex()) {
+			case 0:
+				val=std::numeric_limits<double>::quiet_NaN();
+				break;
+			case 1:
+				val=image->Tminimum_value;
+				break;
+			case 2:
+				val=image->Tmaximum_value;
+				break;
+			case 3:
+				val=0.5*(image->Tminimum_value+image->Tmaximum_value);
+				break;
+			case 4:
+				val=0.0;
+				break;
+			default:
+				WARNING("something is broken here");
+				break;
+		}
+	}
+	return val;
+}

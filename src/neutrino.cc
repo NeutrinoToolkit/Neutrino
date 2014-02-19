@@ -889,7 +889,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
 	if (newPhys) {
-		bool redisplay= (currentBuffer==oldPhys) ?true:false; 
+		bool redisplay = (currentBuffer==oldPhys) ?true:false; 
 		if (physList.contains(oldPhys)) {
 			if (oldPhys==NULL) oldPhys=new nPhysD();
 			*oldPhys=*newPhys;

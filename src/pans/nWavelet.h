@@ -58,8 +58,9 @@ public slots:
 
 	void doWavelet();
 	void doUnwrap();
+	void doRemove();
 	void doRemoveCarrier();
-	void doRemoveRef();
+	void doRemoveReference();
 	
 };
 
