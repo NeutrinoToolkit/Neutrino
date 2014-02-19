@@ -42,7 +42,7 @@
 std::string trim(const std::string&, const std::string&);
 std::ostream & operator<< (std::ostream &, struct anydata &);
 std::istream & operator>> (std::istream &, struct anydata &);
-
+bool check_vec(const std::string &);
 
 // generic data holder
 struct anydata{
@@ -58,10 +58,19 @@ public:
 	{ d=rhs; ddescr = any_double; return *this; }
 	
 	template<class T> anydata & operator= (bidimvec<T> rhs) 
-	{ std::stringstream ss; ss<<rhs; str=ss.str(); ddescr = any_str; return *this; }
+	{ 
+		std::stringstream ss; ss<<rhs; 
+		str = ss.str(); ddescr = any_vec; return *this; 
+	}
 	
 	anydata & operator= (std::string rhs) 
-	{ str=rhs; ddescr = any_str; return *this; }
+	{
+		// can be a vector though, lets check
+		if (check_vec(rhs)) {
+			DEBUG(10, "Got vector in string operator: "<<rhs);
+			str = rhs; ddescr = any_vec; return *this;
+		} else str=rhs; ddescr = any_str; return *this;
+	}
 
 	// extr. ops
 	operator int() const { 
@@ -76,26 +85,30 @@ public:
 
 
 	operator std::string() const {
-		if (!is_str()) WARNING("wrong datatype (string) required for map member!!");
+		if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
 		return get_str();
 	}
 
 
 	template<class T> operator bidimvec<T>() const {
+		if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");
+		DEBUG(10, "string is: "<<get_str());
 		bidimvec<T> vv(get_str());
 		return vv;
 	}	
 
 
-	enum anydata_type {any_int, any_double, any_str, any_none} ddescr;
+	enum anydata_type {any_int, any_double, any_str, any_vec, any_none} ddescr;
 
 	bool is_d() const { return ddescr == any_double; }
 	bool is_i() const { return ddescr == any_int; }
 	bool is_str() const { return ddescr == any_str; }
+	bool is_vec() const { return ddescr == any_vec; }
 
 	double get_d() const { return (ddescr == any_double) ? d : 0; }
 	int get_i() const { return (ddescr == any_int) ? i : 0; }
-	std::string get_str() const { return (ddescr == any_str) ? str : std::string(""); } 
+	template<class T> bidimvec<T> get_vec() const { return (ddescr == any_vec) ? bidimvec<T>(str) : bidimvec<T>("(0:0)"); }
+	std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("(ciuccia)"); } 
 
 private:
 	double d;
@@ -144,15 +157,16 @@ public:
 				std::cout<<"-----------------------------"<<std::endl;
 				continue;
 			}
-			std::string st_key = trim(st.substr(0, eqpos), "\t");
-			std::string st_arg = trim(st.substr(eqpos+1, std::string::npos), "\t");
-			std::cout<<"key: "<<st_key<<std::endl;
-			std::cout<<"arg: "<<st_arg<<std::endl;
-			std::cout<<"-----------------------------"<<std::endl;
+			std::string st_key = trim(st.substr(0, eqpos), "\t ");
+			std::string st_arg = trim(st.substr(eqpos+1, std::string::npos), "\t ");
+			DEBUG(10, "key: "<<st_key);
+			DEBUG(10, "arg: "<<st_arg);
         
 			// filling
 			std::stringstream ss(st_arg);
 			ss>>(*this)[st_key];
+			std::cout<<"-----------------------------"<<std::endl;
+			
 			getline(is, st);
 		}
 		std::cerr<<"[anydata] read "<<size()<<" keys"<<std::endl;
@@ -168,7 +182,7 @@ public:
 		std::map<std::string, anydata>::iterator itr;
 		for (itr=begin(); itr != end(); ++itr) {
 			os<<itr->first<<" = "<<itr->second<<std::endl;
-			std::cerr<<"[anydata] Dumping "<<itr->first<<std::endl;
+			DEBUG(5,"[anydata] Dumping "<<itr->first);
 		}
 		os<<__pp_end_str<<std::endl;
 		
