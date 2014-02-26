@@ -1775,7 +1775,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		datamatrix = new nPhysD;
 		*datamatrix = physShort_imd(fname.c_str());
 		phys_divide(*datamatrix,1000.);
-	} else if (ext=="fits") {
+	} else if (ext.substr(0,3)=="fit") {
 		datamatrix = new physDouble_fits(fname);
 	} else if (ext=="hdf") {
 		vector <nPhysImageF<double> *> imagelist=phys_open_HDF4(fname);
