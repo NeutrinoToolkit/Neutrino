@@ -78,6 +78,13 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	my_w.setupUi(this);
 
+// this below works if there is just one neutrino win open
+//#ifdef Q_OS_MAC
+//	DEBUG("command to have the main menu always visible!!! http://qt-project.org/doc/qt-4.8/mac-differences.html#menu-bar");
+//	my_w.menubar->setParent(NULL);
+//#endif
+
+	
 	currentBuffer=NULL;
 
 	follower=NULL;

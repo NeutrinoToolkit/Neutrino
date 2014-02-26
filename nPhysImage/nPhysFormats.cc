@@ -25,6 +25,7 @@
 #include "nPhysFormats.h"
 #include "NaNStream.h"
 #include "bidimvec.h"
+#include "nPhysMaths.h"
 #include <time.h>
 #include <zlib.h>
 
@@ -502,7 +503,7 @@ physShort_img::physShort_img(string ifilename)
 	DEBUG(5, "w "<< w << " h "<<h);
 	if (w*h>0) {
 		this->resize(w, h);
-		fread(Timg_buffer,bytes*w*h,1,fin);
+		fread(Timg_buffer,bytes,w*h,fin);
 	}	
 	fclose(fin);
 }
@@ -533,15 +534,7 @@ physShort_imd::physShort_imd(string ifilename)
 	}
 	
 	this->resize(w, h);
-	for (int i=0;i<h;i++) {
-		for (int j=0;j<w;j++) {
-			if (fread (&buffer,sizeof(buffer),1,fin)!=1) {
-				Timg_matrix[i][j]= 0;
-			} else {
-				Timg_matrix[i][j]= buffer/1000;
-			}
-		}
-	}
+    fread(Timg_buffer,sizeof(unsigned int),w*h,fin);
 	
 	
 	fclose(fin);
@@ -1781,6 +1774,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 	} else if (ext=="imd") {
 		datamatrix = new nPhysD;
 		*datamatrix = physShort_imd(fname.c_str());
+		phys_divide(*datamatrix,1000.);
 	} else if (ext=="fits") {
 		datamatrix = new physDouble_fits(fname);
 	} else if (ext=="hdf") {

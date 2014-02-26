@@ -41,6 +41,8 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
+	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
+
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
 
 	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
@@ -247,25 +249,23 @@ void nWavelet::doUnwrap () {
 			uphase->setName(uphase->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromStdString(phase->getFromName())).fileName().toStdString());
 			uphase->setFromName(phase->getFromName());
 			my_w.erasePreviousUnwrap->setEnabled(true);
-			if (my_w.removeCarrierAfterUnwrap->isChecked()) {
-				double alpha=my_w.angleCarrier->value();
-				double lambda=my_w.widthCarrier->value();
-				
-				double kx = cos(alpha*_phys_deg)/lambda;
-				double ky = -sin(alpha*_phys_deg)/lambda;
-				phys_subtract_carrier(*uphase, kx, ky);
-			}
 
 			uphase->TscanBrightness();
 			if (my_w.erasePreviousUnwrap->isChecked()) {
 				unwrapPhys=nparent->replacePhys(uphase,unwrapPhys);
 			} else {
-				uphase=uphase;
+				unwrapPhys=uphase;
 				nparent->addShowPhys(unwrapPhys);
 			}
 			my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
 		}
 	}
+}
+
+void nWavelet::doAll () {
+	doWavelet();
+	doUnwrap();
+	doRemove();
 }
 
 void nWavelet::doRemove () {

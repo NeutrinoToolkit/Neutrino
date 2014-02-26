@@ -62,6 +62,9 @@ public slots:
 	void doRemoveCarrier();
 	void doRemoveReference();
 	
+	void doAll();
+
+	
 };
 
 #endif
