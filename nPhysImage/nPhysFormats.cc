@@ -945,6 +945,7 @@ vector <nPhysImageF<double> *> phys_resurrect_binary(std::string fname) {
 	ifstream ifile(fname.c_str(), ios::in | ios::binary);
 	int ret;
 	while(ifile.peek()!=-1) {
+
 		nPhysD *datamatrix = new nPhysD();
 		DEBUG("here");
     
@@ -1111,7 +1112,8 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
     if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	  	delete in;
-		delete my_phys;
+		// my_phys is passed as an argument: function shoud not mess around with it!
+		//delete my_phys;
 	 	my_phys=NULL;
 		return (EXIT_FAILURE);
 	}
@@ -1124,7 +1126,8 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
     if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	 	delete in;
-	 	delete my_phys;
+		// my_phys is passed as an argument: function shoud not mess around with it!
+	 	//delete my_phys;
 	 	my_phys=NULL;
 		return (EXIT_FAILURE);
 	}
@@ -1798,8 +1801,14 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		if (retPhys.size()>1) {
 			ss << " " << i+1;
 		}
-		retPhys[i]->setName(ss.str());
-		retPhys[i]->setShortName(ss.str());
+
+		// if Name and ShortName are set, don't change them
+		if (retPhys[i]->getName().empty())
+			retPhys[i]->setName(ss.str());
+		
+		if (retPhys[i]->getShortName().empty())
+			retPhys[i]->setShortName(ss.str());
+
 		retPhys[i]->setFromName(fname);
  		retPhys[i]->setType(PHYS_FILE);
 	}

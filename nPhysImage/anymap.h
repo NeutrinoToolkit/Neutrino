@@ -85,7 +85,9 @@ public:
 
 
 	operator std::string() const {
-		if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
+		if (ddescr == any_none) {
+			WARNING("accessing uninitialized value");
+		} else if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
 		return get_str();
 	}
 
@@ -108,7 +110,7 @@ public:
 	double get_d() const { return (ddescr == any_double) ? d : 0; }
 	int get_i() const { return (ddescr == any_int) ? i : 0; }
 	template<class T> bidimvec<T> get_vec() const { return (ddescr == any_vec) ? bidimvec<T>(str) : bidimvec<T>("(0:0)"); }
-	std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("(ciuccia)"); } 
+	std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("(empty)"); } 
 
 private:
 	double d;
@@ -181,8 +183,12 @@ public:
 		// keys iterator
 		std::map<std::string, anydata>::iterator itr;
 		for (itr=begin(); itr != end(); ++itr) {
-			os<<itr->first<<" = "<<itr->second<<std::endl;
 			DEBUG(5,"[anydata] Dumping "<<itr->first);
+
+			// check if key was inserted by non-existent access
+			// (strange std::map behaviour...)
+			if (itr->second.ddescr != anydata::any_none)
+				os<<itr->first<<" = "<<itr->second<<std::endl;
 		}
 		os<<__pp_end_str<<std::endl;
 		
