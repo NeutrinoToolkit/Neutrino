@@ -109,10 +109,11 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
 
 
-	QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "").toString();
+	QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
 	foreach (QAction * act, my_w.menuPaths->actions()) {
-		if (!menuTransformationDefault.isEmpty()) {			
+		if (!menuTransformationDefault.isEmpty()) {		
+			DEBUG(act->text().toStdString());
 			if (act->text()==defualtActionPath) {
 				my_w.menuPaths->setDefaultAction(act);
 				my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());

@@ -470,11 +470,12 @@ physShort_img::physShort_img(string ifilename)
 			w=buffer;
 			fread (&buffer,bytes,1,fin);
 			h=buffer;
+			DEBUG("Hamamatsu " << w << " " << h << " " << skipbyte);
 			fseek(fin, 56, SEEK_CUR);
 			char *buffer2=new char[skipbyte];
 			int i = fread (buffer2,1,skipbyte,fin);
 			buffer2[i] ='\0';
-            DEBUG(5,string(buffer2));
+			property["fileinfo"]=string(buffer2);
 			delete [] buffer2;
 //			fseek(fin, skipbyte, SEEK_CUR);
 		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
@@ -514,7 +515,6 @@ physShort_imd::physShort_imd(string ifilename)
 	// Optronics luli
 	//
 	unsigned short buffer_header;
-	unsigned int buffer;
 	FILE *fin;
 	unsigned short w=0;
 	unsigned short h=0;

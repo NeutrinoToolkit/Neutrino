@@ -175,6 +175,10 @@ void nColorBarWin::bufferChanged(nPhysD *phys){
 void nColorBarWin::updatecolorbar() {
 	disconnect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 	disconnect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+	
+	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+	disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
+	
 	disconnect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
 	my_w.comboBox->clear();
 	my_w.comboBox->addItems(nparent->nPalettes.keys());
@@ -183,11 +187,19 @@ void nColorBarWin::updatecolorbar() {
 
 	my_w.actionAutoscale->setChecked(!nparent->colorRelative);
 	if (nparent->colorRelative) {
+		connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+		connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 		my_w.sliderMin->setValue(nparent->colorMin*100.0);
 		my_w.sliderMax->setValue(nparent->colorMax*100.0);
+		disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+		disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	} else {
+		connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
+		connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 		my_w.lineMin->setText(QString::number(nparent->colorMin));
 		my_w.lineMax->setText(QString::number(nparent->colorMax));		
+		disconnect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
+		disconnect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 	}
 	my_w.histogram->repaint();
 	connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));

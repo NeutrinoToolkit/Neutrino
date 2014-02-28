@@ -250,6 +250,14 @@ void nWavelet::doUnwrap () {
 			uphase->setFromName(phase->getFromName());
 			my_w.erasePreviousUnwrap->setEnabled(true);
 
+			if (my_w.removeCarrierAfterUnwrap->isChecked()) {
+				double alpha=my_w.angleCarrier->value();
+				double lambda=my_w.widthCarrier->value();
+				double kx = cos(alpha*_phys_deg)/lambda;
+				double ky = -sin(alpha*_phys_deg)/lambda;
+				phys_subtract_carrier(*uphase, kx, ky);				
+			}
+			
 			uphase->TscanBrightness();
 			if (my_w.erasePreviousUnwrap->isChecked()) {
 				unwrapPhys=nparent->replacePhys(uphase,unwrapPhys);
