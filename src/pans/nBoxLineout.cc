@@ -127,33 +127,36 @@ void nBoxLineout::mouseAtWorld(QPointF p) {
 
 void nBoxLineout::updatePlot() {
 	if (currentBuffer) {
-		QRect geom2=box->getRect().intersected(QRect(0,0,currentBuffer->getW(),currentBuffer->getH()));
-		if (geom2.isEmpty()) {
+		QRect geomBox=box->getRect().intersected(QRect(0,0,currentBuffer->getW(),currentBuffer->getH()));
+		if (geomBox.isEmpty()) {
 			my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
 			return;
 		}
 
-		int dx=geom2.width();
-		int dy=geom2.height();
+		int dx=geomBox.width();
+		int dy=geomBox.height();
 
-		double xd[dx];
-		double yd[dy];
-		for (int j=0;j<dy;j++) yd[j]=0.0;
-		for (int i=0;i<dx;i++) xd[i]=0.0;
-
+		vector<double> xd(dx);
+		vector<double> yd(dy);
 		for (int j=0;j<dy;j++){
 			for (int i=0;i<dx; i++) {
-				double val=currentBuffer->point(i+geom2.x(),j+geom2.y(),0.0);
+				double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
 				xd[i]+=val;
 				yd[j]+=val;
 			}
 		}
 
+		transform(xd.begin(), xd.end(), xd.begin(),bind2nd(std::divides<double>(), dy));
+		transform(yd.begin(), yd.end(), yd.begin(),bind2nd(std::divides<double>(), dx));
+		
 		QVector <QPointF> xdata(dx);
 		QVector <QPointF> ydata(dy);
 		
-		for (int i=0;i<dx;i++) xdata[i]=QPointF((geom2.x()+i-currentBuffer->get_origin().x())*currentBuffer->get_scale().x(),xd[i]/dy);
-		for (int j=0;j<dy;j++) ydata[j]=QPointF(yd[j]/dx,(geom2.y()+j-currentBuffer->get_origin().y())*currentBuffer->get_scale().y());
+		vec2f orig=currentBuffer->get_origin();
+		vec2f scal=currentBuffer->get_scale();
+		
+		for (int i=0;i<dx;i++) xdata[i]=QPointF((geomBox.x()+i-orig.x())*scal.x(),xd[i]);
+		for (int j=0;j<dy;j++) ydata[j]=QPointF(yd[j],(geomBox.y()+j-orig.y())*scal.y());
 
 		xCut.setSamples(xdata);
 		yCut.setSamples(ydata);

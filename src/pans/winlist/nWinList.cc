@@ -74,7 +74,9 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 
 nPhysD*
 nWinList::getPhys(QTreeWidgetItem* item) {
-	return (nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<void*>());
+	nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<void*>());
+	retphys->property.dumper(std::cerr);
+	return retphys;
 }
 
 void

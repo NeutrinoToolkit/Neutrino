@@ -602,7 +602,7 @@ public:
 	}
 	
 	const unsigned char *to_uchar_palette(double mini, double maxi, unsigned char * palette) {
-		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value);
+		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value << " rescaled from " << mini << " to " << maxi);
 		if (width>0 && height>0 && palette) {
 
 			if (uchar_buf == NULL) {

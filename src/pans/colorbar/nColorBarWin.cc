@@ -39,7 +39,7 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
-	connect(my_w.actionSavePDF,SIGNAL(triggered()),my_w.histogram,SLOT(export_PDF_slot()));
+	connect(my_w.savePDF,SIGNAL(triggered()),my_w.histogram,SLOT(export_PDF_slot()));
 	connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
 
 	connect(my_w.cutoff,SIGNAL(released()),this,SLOT(cutOff()));
@@ -158,7 +158,7 @@ void nColorBarWin::invertColors () {
 
 void nColorBarWin::bufferChanged(nPhysD *phys){
 	if (phys) {
-		if (!my_w.actionAutoscale->isChecked()) {
+		if (!my_w.autoscale->isChecked()) {
 			double valmin=phys->Tminimum_value+my_w.sliderMin->value()/100.0*(phys->Tmaximum_value-phys->Tminimum_value);
 			double valmax=phys->Tminimum_value+my_w.sliderMax->value()/100.0*(phys->Tmaximum_value-phys->Tminimum_value);
 			disconnect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
@@ -185,7 +185,7 @@ void nColorBarWin::updatecolorbar() {
 	my_w.comboBox->setCurrentIndex(my_w.comboBox->findText(nparent->colorTable));
 	
 
-	my_w.actionAutoscale->setChecked(!nparent->colorRelative);
+	my_w.autoscale->setChecked(!nparent->colorRelative);
 	if (nparent->colorRelative) {
 		connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 		connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
@@ -204,6 +204,8 @@ void nColorBarWin::updatecolorbar() {
 	my_w.histogram->repaint();
 	connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 	connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
 }
 

@@ -59,7 +59,7 @@
           </font>
          </property>
          <property name="neutrinoImage" stdset="0">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>

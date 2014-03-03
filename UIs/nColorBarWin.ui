@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>394</width>
-    <height>343</height>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,7 +41,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -85,7 +85,7 @@
             </widget>
            </item>
            <item row="0" column="3">
-            <widget class="QToolButton" name="toolButton">
+            <widget class="QToolButton" name="savePDF">
              <property name="text">
               <string>...</string>
              </property>
@@ -481,43 +481,6 @@
     </font>
    </property>
   </widget>
-  <action name="actionSavePDF">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//savePDF.png</normaloff>:icons//savePDF.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePDF</string>
-   </property>
-   <property name="toolTip">
-    <string>Export PDF or SVG</string>
-   </property>
-  </action>
-  <action name="actionAutoscale">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lockClose</normaloff>
-     <normalon>:/lockOpen</normalon>:icons//lockClose</iconset>
-   </property>
-   <property name="text">
-    <string>autoscale</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto/FixedScale</string>
-   </property>
-  </action>
-  <action name="actionCutOff">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
-   </property>
-   <property name="text">
-    <string>cutOff</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -532,7 +495,7 @@
   <tabstop>comboBox</tabstop>
   <tabstop>invert</tabstop>
   <tabstop>checkBox</tabstop>
-  <tabstop>toolButton</tabstop>
+  <tabstop>savePDF</tabstop>
   <tabstop>histogram</tabstop>
   <tabstop>sliderMin</tabstop>
   <tabstop>sliderMax</tabstop>

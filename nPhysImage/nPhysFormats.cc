@@ -74,7 +74,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	
 	DEBUG(5,"file has "<<nlines<<" lines and "<<ncols<<" cols");
 	
-	//physImage myimg(ncols, nlines);
+	//physImage mycc(ncols, nlines);
 	this->resize(ncols, nlines);
 	
 	// 2. read and save five
@@ -1741,7 +1741,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		name.erase(0,last_idx + 1);
 	}
 
-    WARNING(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name);
 	
 	nPhysD *datamatrix=NULL;
 	if (ext=="pgm") {
@@ -1802,12 +1802,17 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 			ss << " " << i+1;
 		}
 
+		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+
 		// if Name and ShortName are set, don't change them
 		if (retPhys[i]->getName().empty())
 			retPhys[i]->setName(ss.str());
-		
+
+
 		if (retPhys[i]->getShortName().empty())
 			retPhys[i]->setShortName(ss.str());
+
+		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
 
 		retPhys[i]->setFromName(fname);
  		retPhys[i]->setType(PHYS_FILE);

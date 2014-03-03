@@ -273,7 +273,6 @@ void nWavelet::doUnwrap () {
 void nWavelet::doAll () {
 	doWavelet();
 	doUnwrap();
-	doRemove();
 }
 
 void nWavelet::doRemove () {

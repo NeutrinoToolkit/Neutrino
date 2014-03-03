@@ -943,6 +943,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 					listabuffer.removeAll(action);
 				}
 			}
+			QApplication::processEvents();
 			delete datamatrix;
 			datamatrix=NULL;
 		}
@@ -1025,6 +1026,7 @@ void
 neutrino::createQimage() {
 	double mini=colorMin;
 	double maxi=colorMax;
+	DEBUG(mini << " " << maxi);
 	if (currentBuffer) {
 		if (colorRelative) {
 			mini=currentBuffer->Tminimum_value+colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
@@ -1140,11 +1142,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_A: {
 			if (currentBuffer) {
-				if ((e->modifiers() & Qt::ShiftModifier)) {
-					colorRelative = false;
-				} else {
-					colorRelative = true;
-				}
 				if (colorRelative) {
 					colorMin=0.0;
 					colorMax=1.0;
@@ -1313,7 +1310,7 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.hdf *.h5);; Any files (*)");
+	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5);; Any files (*)");
 }
 
 void
@@ -1606,9 +1603,14 @@ neutrino::changeColorTable () {
 
 void
 neutrino::changeColorMinMax (double mini, double maxi) {
-	colorRelative=false;
-	colorMin=mini;
-	colorMax=maxi;
+	if (colorRelative) {
+		colorMin = (mini-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+		colorMax = 1.0-(currentBuffer->Tmaximum_value-maxi)/(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+	} else {
+		colorMin=mini;
+		colorMax=maxi;
+	}
+	DEBUG(colorMin << " " << colorMax);
 	createQimage();
 	emit updatecolorbar();	
 }
