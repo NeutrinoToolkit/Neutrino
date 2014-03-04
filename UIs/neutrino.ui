@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>350</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -192,6 +192,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionKeyborard_shortcuts"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
@@ -812,6 +813,11 @@
   <action name="actionPlugin">
    <property name="text">
     <string>Plugin...</string>
+   </property>
+  </action>
+  <action name="actionKeyborard_shortcuts">
+   <property name="text">
+    <string>Keyborard shortcuts</string>
    </property>
   </action>
  </widget>

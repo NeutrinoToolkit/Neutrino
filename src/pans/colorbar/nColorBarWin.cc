@@ -39,12 +39,12 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
-	connect(my_w.savePDF,SIGNAL(triggered()),my_w.histogram,SLOT(export_PDF_slot()));
+	connect(my_w.savePDF,SIGNAL(released()),my_w.histogram,SLOT(export_PDF_slot()));
 	connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
 
 	connect(my_w.cutoff,SIGNAL(released()),this,SLOT(cutOff()));
 
-	connect(my_w.invert,SIGNAL(pressed()),this,SLOT(invertColors()));
+	connect(my_w.invert,SIGNAL(released()),this,SLOT(invertColors()));
 
 	connect(my_w.autoscale, SIGNAL(toggled(bool)), this, SLOT(toogleAutoscale(bool)));
 

@@ -202,6 +202,8 @@ public slots:
 	void toggleMouse(bool);
 	void toggleRuler();
 	void toggleRuler(bool);
+	
+	nGenericPan* Shortcuts();
 
 	// Analysis
 	nGenericPan* FocalSpot();

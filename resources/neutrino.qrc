@@ -87,5 +87,7 @@
         <file>icons/scale.png</file>
         <file>icons/short.png</file>
         <file>icons/name.png</file>
+        
+        <file>shortcuts.html</file>
     </qresource>
 </RCC>

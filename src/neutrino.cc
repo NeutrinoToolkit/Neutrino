@@ -38,6 +38,7 @@
 #include "nBlur.h"
 #include "nRegionPath.h"
 #include "nAutoAlign.h"
+#include "nShortcuts.h"
 
 #include "focalspot_pan.h"
 #include "nLineout.h"
@@ -217,6 +218,8 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionBlur, SIGNAL(triggered()), this, SLOT(Blur()));
 
 	connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
+
+	connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
 	
 	// ---------------------------------------------------------------------------------------------
@@ -1059,12 +1062,13 @@ void neutrino::exportGraphics (QString fout) {
 		printer.setOutputFormat(QPrinter::PdfFormat);
 		printer.setOutputFileName(fout);
 		printer.setColorMode(QPrinter::Color);
-		printer.setPaperSize(my_tics.boundingRect().size().toSize(),QPrinter::Point);
+		printer.setPaperSize(my_tics.boundingRect().size().toSize(),QPrinter::DevicePixel);
 		printer.setOrientation(QPrinter::Portrait);
 		printer.setCreator("Neutrino "+QString(__VER));
 		printer.setDocName(windowTitle());
-		QPainter painter( &printer );
-		my_s.render(&painter);
+		QPainter my_painter( &printer );
+		my_s.render(&my_painter);
+		my_painter.end();
 	} else if	(QFileInfo(fout).suffix().toLower()==QString("svg")) {
 		QSvgGenerator svgGen;
 		svgGen.setFileName(fout);
@@ -1131,6 +1135,9 @@ void neutrino::closeEvent (QCloseEvent *e) {
 void neutrino::keyPressEvent (QKeyEvent *e)
 {
 	switch (e->key()) {
+		case Qt::Key_Question:
+			Shortcuts();
+			break;
 		case Qt::Key_Plus:
 			zoomIn();
 			break;
@@ -1142,6 +1149,9 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_A: {
 			if (currentBuffer) {
+				if (e->modifiers() & Qt::ShiftModifier) {
+					colorRelative=!colorRelative;
+				}
 				if (colorRelative) {
 					colorMin=0.0;
 					colorMax=1.0;
@@ -1197,6 +1207,14 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 					}
 				}
 			break;
+		case Qt::Key_R: {
+			double tmpVal=colorMin;
+			colorMin=colorMax;
+			colorMax=tmpVal;
+			createQimage();
+			emit updatecolorbar();			
+			break;
+		}
 	}
 	if (follower) {
 		follower->keyPressEvent(e);
@@ -1418,6 +1436,14 @@ neutrino::closeCurrentBuffer() {
 			removePhys(currentBuffer);			
 		}
 	}
+}
+
+nGenericPan*
+neutrino::Shortcuts() {
+	QString vwinname=tr("Shortcuts");
+	nGenericPan* win=existsPan(vwinname,true);
+	if (!win) win=new nShortcuts(this,vwinname);
+	return win;	
 }
 
 nGenericPan*

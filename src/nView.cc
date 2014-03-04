@@ -127,7 +127,7 @@ nView::setSize() {
 	parent()->my_mouse.setSize(my_size);
 	setSceneRect(bBox);
 	repaint();
-	emit zoomChanged(transform().m11());
+//	emit zoomChanged(transform().m11());
 }
 
 void
