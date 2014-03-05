@@ -475,7 +475,7 @@ physShort_img::physShort_img(string ifilename)
 			char *buffer2=new char[skipbyte];
 			int i = fread (buffer2,1,skipbyte,fin);
 			buffer2[i] ='\0';
-			property["fileinfo"]=string(buffer2);
+			property["pippo"]=string(buffer2);
 			delete [] buffer2;
 //			fseek(fin, skipbyte, SEEK_CUR);
 		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...

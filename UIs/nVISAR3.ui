@@ -334,7 +334,7 @@
          <double>0.100000000000000</double>
         </property>
         <property name="value">
-         <double>999.000000000000000</double>
+         <double>0.000000000000000</double>
         </property>
         <property name="neutrinoSave" stdset="0">
          <bool>true</bool>

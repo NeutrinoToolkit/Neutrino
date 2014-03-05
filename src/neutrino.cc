@@ -114,7 +114,6 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	foreach (QAction * act, my_w.menuPaths->actions()) {
 		if (!menuTransformationDefault.isEmpty()) {		
-			DEBUG(act->text().toStdString());
 			if (act->text()==defualtActionPath) {
 				my_w.menuPaths->setDefaultAction(act);
 				my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
@@ -650,7 +649,6 @@ void neutrino::fileOpen(QStringList fnames) {
 
 
 vector <nPhysD *> neutrino::fileOpen(QString fname, QString optString) {
-	DEBUG(fname.toUtf8().constData());
 	vector <nPhysD *> imagelist;
 	if (QFileInfo(fname).suffix().toLower()=="neus") {
 		imagelist=openSession(fname);
@@ -999,7 +997,7 @@ void neutrino::removePhys(nPhysD& datamatrixRef) {
 void
 neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
-		datamatrix->TscanBrightness();
+//		datamatrix->TscanBrightness();
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
 		nPhysD *oldBuffer=currentBuffer;
 		currentBuffer=datamatrix;
@@ -1027,14 +1025,14 @@ neutrino::showPhys(nPhysD* datamatrix) {
 
 void
 neutrino::createQimage() {
-	double mini=colorMin;
-	double maxi=colorMax;
-	DEBUG(mini << " " << maxi);
 	if (currentBuffer) {
+		double mini=colorMin;
+		double maxi=colorMax;
 		if (colorRelative) {
 			mini=currentBuffer->Tminimum_value+colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
 			maxi=currentBuffer->Tmaximum_value-(1.0-colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
 		}
+		DEBUG(">>>>>>>>>>>>>>>>>> " << mini << " " << maxi << " " << colorRelative);
 		const unsigned char *pippo=currentBuffer->to_uchar_palette(mini,maxi,nPalettes[colorTable]);
 		const QImage tempImage(pippo, currentBuffer->getW(), currentBuffer->getH(), 
 							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
@@ -1178,7 +1176,13 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			emitBufferChanged();
 			break;
 		case Qt::Key_C:
-			if (e->modifiers() & Qt::ShiftModifier) Colorbar();
+			if (e->modifiers() & Qt::ShiftModifier) {
+				Colorbar();
+			} else {
+				std::swap(colorMin,colorMax);
+				createQimage();
+				emit updatecolorbar();			
+			}
 			break;
 		case Qt::Key_I:
 			if (e->modifiers() & Qt::ShiftModifier) {
@@ -1207,14 +1211,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 					}
 				}
 			break;
-		case Qt::Key_R: {
-			double tmpVal=colorMin;
-			colorMin=colorMax;
-			colorMax=tmpVal;
-			createQimage();
-			emit updatecolorbar();			
-			break;
-		}
 	}
 	if (follower) {
 		follower->keyPressEvent(e);
@@ -1241,7 +1237,7 @@ void neutrino::dragMoveEvent(QDragMoveEvent *e)
 void neutrino::dropEvent(QDropEvent *e) {
 	if (e->mimeData()->hasFormat("data/neutrino")) {
 		nPhysD *my_phys=(nPhysD *) e->mimeData()->data("data/neutrino").toLong();
-		DEBUG((void*)my_phys);
+		DEBUG("DROP pointer: " << (void*)my_phys);
 		if (my_phys) {
 			if (physList.contains(my_phys)) {
 				showPhys(my_phys);
@@ -1442,8 +1438,13 @@ nGenericPan*
 neutrino::Shortcuts() {
 	QString vwinname=tr("Shortcuts");
 	nGenericPan* win=existsPan(vwinname,true);
-	if (!win) win=new nShortcuts(this,vwinname);
-	return win;	
+	if (!win) {
+		win=new nShortcuts(this,vwinname);
+		return win;	
+	} else {
+		win->close();
+		return NULL;
+	}
 }
 
 nGenericPan*
@@ -1636,7 +1637,6 @@ neutrino::changeColorMinMax (double mini, double maxi) {
 		colorMin=mini;
 		colorMax=maxi;
 	}
-	DEBUG(colorMin << " " << colorMax);
 	createQimage();
 	emit updatecolorbar();	
 }
