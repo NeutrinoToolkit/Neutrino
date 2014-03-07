@@ -60,7 +60,7 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-	connect(this, SIGNAL(comboChanged(QComboBox *)), this, SLOT(checkComboChanged(QComboBox *)));
+	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
 	waveletPhys.resize(5);
@@ -69,8 +69,7 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	}
 }
 
-void nWavelet::checkComboChanged(QComboBox *combo) {
-	DEBUG("HERE");
+void nWavelet::checkChangeCombo(QComboBox *combo) {
 	if (combo==my_w.image) {
 		region->show();
 	}
@@ -82,7 +81,7 @@ void nWavelet::bufferChanged(nPhysD* buf) {
 		if (buf==getPhysFromCombo(my_w.image)) {
 			region->show();
 		} else {
-//			region->hide();
+			region->hide();
 		}
 	}
 }

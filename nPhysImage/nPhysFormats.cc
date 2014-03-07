@@ -463,6 +463,7 @@ physShort_img::physShort_img(string ifilename)
 	if ((fin=fopen(ifilename.c_str(),"rb")) == NULL) return;
 	
 	if (fread (&buffer,bytes,1,fin)==1) {
+	    DEBUG(buffer);
 		if (buffer == 19785) { //hamamatsu TODO: check all the stuff inside
 			fread (&buffer,bytes,1,fin);
 			skipbyte=buffer;
@@ -482,7 +483,8 @@ physShort_img::physShort_img(string ifilename)
 			fread (&buffer,bytes,1,fin);
 			if (buffer==7) {
 				fread (&buffer,bytes,1,fin);
-				skipbyte=buffer+4;
+				skipbyte=buffer;
+				fseek(fin,skipbyte,SEEK_SET);
 				fread (&buffer,bytes,1,fin);
 				w=buffer;
 				fread (&buffer,bytes,1,fin);

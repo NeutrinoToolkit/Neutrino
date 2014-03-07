@@ -64,7 +64,7 @@ public slots:
 	void doRemoveReference();
 	
 	void bufferChanged(nPhysD*);
-	void checkComboChanged(QComboBox *);
+	void checkChangeCombo(QComboBox *);
 	
 	void doAll();
 
