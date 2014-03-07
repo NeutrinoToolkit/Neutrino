@@ -58,13 +58,34 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
-	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=NULL;
+	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+
+	connect(this, SIGNAL(comboChanged(QComboBox *)), this, SLOT(checkComboChanged(QComboBox *)));
+	
+	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
 	waveletPhys.resize(5);
 	for (unsigned int i=0;i<waveletPhys.size();i++) {
 		waveletPhys.at(i)=NULL;
 	}
 }
 
+void nWavelet::checkComboChanged(QComboBox *combo) {
+	DEBUG("HERE");
+	if (combo==my_w.image) {
+		region->show();
+	}
+}
+
+void nWavelet::bufferChanged(nPhysD* buf) {
+	if (buf) {
+		DEBUG(buf->getName());
+		if (buf==getPhysFromCombo(my_w.image)) {
+			region->show();
+		} else {
+//			region->hide();
+		}
+	}
+}
 
 void nWavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
@@ -193,6 +214,26 @@ void nWavelet::doWavelet () {
 				}
 			}
 		}
+		
+		
+		if (my_w.synthetic->isChecked()) {
+			nPhysD *tmpSynthetic = new nPhysD(geom2.width(),geom2.height(),0.0);
+			for (size_t ii=0; ii<waveletPhys.at(0)->getSurf(); ii++) {
+				tmpSynthetic->set(ii,waveletPhys.at(1)->point(ii)*(1.0+cos(waveletPhys.at(0)->point(ii)*2*M_PI)));
+			}
+			tmpSynthetic->setShortName("synthetic");
+			tmpSynthetic->setName("synthetic("+waveletPhys.at(0)->getName()+","+waveletPhys.at(1)->getName()+")");
+			tmpSynthetic->TscanBrightness();
+			if (my_w.erasePrevious->isChecked()) {
+				syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
+			} else {
+				nparent->addPhys(tmpSynthetic);
+				syntheticPhys=tmpSynthetic;
+			}			
+			waveletPhys.at(0)->TscanBrightness();
+			DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
+		}
+
 		//delete my_qt.risultati;
 		nparent->showPhys(bufferDisplayed);
 		QString out;

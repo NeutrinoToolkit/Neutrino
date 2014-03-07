@@ -1007,12 +1007,10 @@ neutrino::showPhys(nPhysD* datamatrix) {
 		}
 		if (oldBuffer!=currentBuffer) emitBufferChanged();
 		
-		QString name=QString::fromStdString(datamatrix->getName());
+		setWindowTitle(property("winId").toString()+QString(": ")+QString::fromStdString(datamatrix->getName()));
 		if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
-			setWindowTitle(property("winId").toString()+QString(": ")+QFileInfo(name).fileName());
-			setWindowFilePath(name);
+			setWindowFilePath(QString::fromStdString(datamatrix->getFromName()));
 		} else {
-			setWindowTitle(property("winId").toString()+QString(": ")+name);
 			setWindowFilePath("");
 		}
 		
@@ -1032,7 +1030,7 @@ neutrino::createQimage() {
 			mini=currentBuffer->Tminimum_value+colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
 			maxi=currentBuffer->Tmaximum_value-(1.0-colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
 		}
-		DEBUG(">>>>>>>>>>>>>>>>>> " << mini << " " << maxi << " " << colorRelative);
+//		DEBUG(">>>>>>>>>>>>>>>>>> " << mini << " " << maxi << " " << colorRelative);
 		const unsigned char *pippo=currentBuffer->to_uchar_palette(mini,maxi,nPalettes[colorTable]);
 		const QImage tempImage(pippo, currentBuffer->getW(), currentBuffer->getH(), 
 							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);

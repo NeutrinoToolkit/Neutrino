@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>302</width>
-    <height>360</height>
+    <height>381</height>
    </rect>
   </property>
   <property name="font">
@@ -369,7 +369,7 @@
           </layout>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QWidget" name="widget_3" native="true">
           <layout class="QGridLayout" name="gridLayout_2">
            <property name="margin">
@@ -406,7 +406,7 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -418,6 +418,16 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="synthetic">
+          <property name="text">
+           <string>Synthetic interferogram</string>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

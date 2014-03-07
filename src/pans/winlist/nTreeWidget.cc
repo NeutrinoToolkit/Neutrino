@@ -28,7 +28,13 @@
 
 using namespace std;
 
-nTreeWidget::nTreeWidget(QWidget *){
+nTreeWidget::nTreeWidget(QWidget * pippo){
+	qDebug() << pippo;
+	dragitem=NULL;
+};
+
+nTreeWidget::~nTreeWidget(){
+	if (dragitem) delete dragitem;
 };
 
 void nTreeWidget::mousePressEvent(QMouseEvent *e) {

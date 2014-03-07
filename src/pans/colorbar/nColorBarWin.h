@@ -61,7 +61,7 @@ public slots:
 	
 	void getMinMax();
 
-	void toogleAutoscale();
+	void toggleAutoscale();
 	
 	void invertColors();
 	void setToMin();

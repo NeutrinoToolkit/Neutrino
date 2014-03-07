@@ -669,10 +669,10 @@ void nVisar::doWave(int k) {
 		QApplication::processEvents();
 		double thick_norm=visar[k].resolution->value()*M_PI/(direction(k)?dy:dx); // in this case thickness < 1 has no meaning
 		double damp_norm=visar[k].damp->value()*M_PI;
-		double lambda_norm=visar[k].interfringe->value()/(direction(k)?dx:dy);
 		double cr = cos((visar[k].angle->value()) * _phys_deg); 
 		double sr = sin((visar[k].angle->value()) * _phys_deg);
 
+		double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 		for (size_t x=0;x<dx;x++) {
 			for (size_t y=0;y<dy;y++) {
 				double xr = xx[x]*cr - yy[y]*sr; //rotate

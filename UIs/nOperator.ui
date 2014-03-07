@@ -185,6 +185,21 @@
            <string>Sqrt</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Sin</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Cos</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Tan</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

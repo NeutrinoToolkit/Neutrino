@@ -475,7 +475,7 @@ physShort_img::physShort_img(string ifilename)
 			char *buffer2=new char[skipbyte];
 			int i = fread (buffer2,1,skipbyte,fin);
 			buffer2[i] ='\0';
-			property["pippo"]=string(buffer2);
+			property["info"]=string(buffer2);
 			delete [] buffer2;
 //			fseek(fin, skipbyte, SEEK_CUR);
 		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
@@ -509,7 +509,7 @@ physShort_img::physShort_img(string ifilename)
 	fclose(fin);
 }
 
-physShort_imd::physShort_imd(string ifilename)
+physUint_imd::physUint_imd(string ifilename)
 : nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
 {
 	// Optronics luli
@@ -707,7 +707,7 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 				DEBUG(desc);
 			}
 			if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
-				setShortName(desc);
+ 				property["info"]=string(desc);
 				DEBUG(desc);
 			}
 			setFromName(ifilename);
@@ -1776,7 +1776,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		*datamatrix = physShort_img(fname);
 	} else if (ext=="imd") {
 		datamatrix = new nPhysD;
-		*datamatrix = physShort_imd(fname.c_str());
+		*datamatrix = physUint_imd(fname.c_str());
 		phys_divide(*datamatrix,1000.);
 	} else if (ext.substr(0,3)=="fit") {
 		datamatrix = new physDouble_fits(fname);
@@ -1808,8 +1808,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		if (retPhys[i]->getName().empty())
 			retPhys[i]->setName(ss.str());
 
-
-		if (retPhys[i]->getShortName().empty())
+ 		if (retPhys[i]->getShortName().empty())
 			retPhys[i]->setShortName(ss.str());
 
 		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");

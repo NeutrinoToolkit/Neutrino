@@ -122,7 +122,6 @@ QVariant nIntegralInversion::doInversion() {
 				} else {
 					statusBar()->showMessage("Problem in removing reference", 5000);
 				}
-
 			}
 			if (iimage==NULL) iimage = new nPhysD(*image);
 			iimage->setFromName(iimage->getName());

@@ -47,7 +47,7 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.invert,SIGNAL(released()),this,SLOT(invertColors()));
 
 	my_w.autoscale->setChecked(!nparent->colorRelative);
-	connect(my_w.autoscale, SIGNAL(released()), this, SLOT(toogleAutoscale()));
+	connect(my_w.autoscale, SIGNAL(released()), this, SLOT(toggleAutoscale()));
 
 	
 	QDoubleValidator *dVal = new QDoubleValidator(this);
@@ -100,7 +100,7 @@ void nColorBarWin::getMinMax () {
 	}
 }	
 
-void nColorBarWin::toogleAutoscale () {
+void nColorBarWin::toggleAutoscale () {
 	nparent->colorRelative=!nparent->colorRelative;
 	if (nparent->colorRelative) {
 		nparent->colorMin=my_w.sliderMin->value()/10000.0;

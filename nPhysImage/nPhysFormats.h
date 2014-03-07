@@ -110,9 +110,9 @@ public:
 };
 
 // Optronics luli
-class physShort_imd : public nPhysImageF<unsigned int> {
+class physUint_imd : public nPhysImageF<unsigned int> {
 public:
-	physShort_imd(std::string);
+	physUint_imd(std::string);
 };
 
 

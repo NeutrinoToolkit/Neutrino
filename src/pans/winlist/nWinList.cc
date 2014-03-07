@@ -24,7 +24,6 @@
  */
 #include "neutrino.h"
 #include "nWinList.h"
-
 nWinList::nWinList(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname) {
 	my_w.setupUi(this);
@@ -47,7 +46,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	foreach (nPhysD *phys, nparent->physList) physAdd(phys);
 	updatePad(nparent->currentBuffer);
 
-	QWidget* empty = new QWidget();
+	QWidget* empty = new QWidget(this);
 	empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	my_w.toolBar->insertWidget(my_w.actionPans,empty);
 	
@@ -251,14 +250,13 @@ nWinList::updatePad(nPhysD *my_phys) {
 		} else {
 			WARNING("This should not happend");
 		}
-
 		++it;
 	}
 	if (my_phys) {
-		my_w.line->setMaximumWidth(width());
-		my_w.line->setText(QString::fromStdString(my_phys->getFromName()));
+		my_w.lineEdit->setText(QString::fromStdString(my_phys->getFromName()));
+		my_w.lineEdit->setCursorPosition(0);
 	} else {
-		my_w.line->setText(tr("No image"));
+		my_w.lineEdit->setText(tr("No image"));
 	}
 }
 

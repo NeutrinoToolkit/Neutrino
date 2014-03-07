@@ -251,6 +251,12 @@ void nOperator::doOperation () {
 			phys_square(*myresult);
 		} else if (my_w.operation->currentIndex()==separator[1]+5) {
 			phys_sqrt(*myresult);
+		} else if (my_w.operation->currentIndex()==separator[1]+6) {
+			phys_sin(*myresult);
+		} else if (my_w.operation->currentIndex()==separator[1]+7) {
+			phys_cos(*myresult);
+		} else if (my_w.operation->currentIndex()==separator[1]+8) {
+			phys_tan(*myresult);
 		}
 	}
 	
