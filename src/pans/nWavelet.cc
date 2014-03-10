@@ -126,18 +126,21 @@ void nWavelet::doWavelet () {
 		saveDefaults();
 		QRect geom2=region->getRect();
 		QPoint offset=geom2.topLeft();
-		nPhysD *datamatrix = new nPhysD();
-		
-		*datamatrix=image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
-		datamatrix->setShortName("wavelet source");
 
-		if (my_w.erasePrevious->isChecked()) {
-			origSubmatrix=nparent->replacePhys(datamatrix,origSubmatrix,false);
-		} else {
-			nparent->addPhys(datamatrix);
-			origSubmatrix=datamatrix;
+		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
+		if (my_w.showSource->isChecked()) {
+			datamatrix.setShortName("wavelet source");
+			nPhysD *deepcopy=new nPhysD();
+			*deepcopy=datamatrix;
+			deepcopy->TscanBrightness();
+			if (my_w.erasePrevious->isChecked()) {
+				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
+			} else {
+				nparent->addPhys(deepcopy);
+				origSubmatrix=deepcopy;
+			}
 		}
-
+		
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
 		if (my_w.relative->isChecked()) {
@@ -177,10 +180,10 @@ void nWavelet::doWavelet () {
 		
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
 			// use cuda
-			nThread.setThread(origSubmatrix, &my_params, phys_wavelet_trasl_cuda);
+			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_cuda);
 		} else {
 			// don't use cuda
-			nThread.setThread(origSubmatrix, &my_params, phys_wavelet_trasl_nocuda);
+			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_nocuda);
 		}
 		
 		nThread.setTitle("Wavelet...");
@@ -243,6 +246,7 @@ void nWavelet::doWavelet () {
 			out.prepend("CPU");
 		}
 		my_w.statusbar->showMessage(out);
+
 
 	}
 }
