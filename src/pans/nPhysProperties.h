@@ -22,29 +22,33 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <QtGui>
-#include "ui_nObject.h"
+#ifndef __nPhysProperties_h
+#define __nPhysProperties_h
 
-#ifndef __nTics
-#define __nTics
+#include <QtGui>
+#include <QWidget>
+
+#include "ui_nPhysProperties.h"
+
+#include "nTreeWidget.h"
+#include "nPhysImageF.h"
+#include "nGenericPan.h"
+
+using namespace std;
 
 class neutrino;
 
-class nTics : public QGraphicsItem {
+class nPhysProperties : public nGenericPan {
+Q_OBJECT
+	
 public:
-	
-	neutrino* nparent;
-	
-	nTics(neutrino*);
-	
-	QColor color, rulerColor;
-	bool rulerVisible,gridVisible;
+	nPhysProperties(neutrino*, QString);	
+	Ui::nPhysProperties my_w;
 
-	void changeColor();
+public slots:
+	void showProperty();
+	void bufferChanged(nPhysD*);
 	
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
 };
 
 #endif

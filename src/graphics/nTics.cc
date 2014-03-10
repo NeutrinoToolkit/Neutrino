@@ -31,6 +31,7 @@ nTics::nTics(neutrino *neu) : QGraphicsItem()
 	color=QColor(Qt::black);
 	rulerColor=QColor(Qt::yellow);
 	rulerVisible=false;
+	gridVisible=false;
 }
 
 // reimplementation
@@ -83,6 +84,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(position,-0.15*p->fontMetrics().height());
 						} else {
+							if(gridVisible) {
+								p->setPen(QColor(rulerColor));
+								p->drawLine(QPointF(position,0),QPointF(position,size.height()));
+								p->setPen(QColor(color));
+							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
@@ -100,6 +106,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(position,-0.15*p->fontMetrics().height());
 						} else {
+							if(gridVisible) {
+								p->setPen(QColor(rulerColor));
+								p->drawLine(QPointF(position,0),QPointF(position,size.height()));
+								p->setPen(QColor(color));
+							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
@@ -146,6 +157,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(-0.15*p->fontMetrics().height(),position);
 						} else {
+							if(gridVisible) {
+								p->setPen(QColor(rulerColor));
+								p->drawLine(QPointF(0,position),QPointF(size.width(),position));
+								p->setPen(QColor(color));
+							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
@@ -163,6 +179,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(-0.15*p->fontMetrics().height(),position);
 						} else {
+							if(gridVisible) {
+								p->setPen(QColor(rulerColor));
+								p->drawLine(QPointF(0,position),QPointF(size.width(),position));
+								p->setPen(QColor(color));
+							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
@@ -287,7 +308,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		p->drawPath(allTics);
 		
 		//now draw the ruler
-		if (rulerVisible) {
+		if (rulerVisible && !gridVisible) {
 			p->setPen(QColor(rulerColor));
 			QPainterPath ruler;
 			ruler.moveTo(0,nparent->currentBuffer->get_origin().y());

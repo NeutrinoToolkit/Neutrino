@@ -55,6 +55,7 @@
 
 #include "nPreferences.h"
 #include "nWinList.h"
+#include "nPhysProperties.h"
 
 #include "nPhysFormats.h"
 
@@ -127,7 +128,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	connect(my_w.actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
 	connect(my_w.actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
-	connect(my_w.actionRuler, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+	connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -171,14 +172,17 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionRect_2, SIGNAL(triggered()), this, SLOT(createDrawRect()));
 	connect(my_w.actionEllipse_2, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
 
-	connect(my_w.actionShow_Mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
-	connect(my_w.actionShow_Ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
+	connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
+	connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
+	connect(my_w.actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
 
 	connect(my_w.actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
 	connect(my_w.actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
 	connect(my_w.actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
 	connect(my_w.actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
 	
+	connect(my_w.actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
+
 	
 	connect(my_w.actionZoom_in, SIGNAL(triggered()), this, SLOT(zoomIn()));
 	connect(my_w.actionZoom_out, SIGNAL(triggered()), this, SLOT(zoomOut()));
@@ -306,6 +310,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	my_pixitem.setZValue(-1);
 
 	toggleRuler(false);
+	toggleGrid(false);
 
 	my_s.addItem(&my_mouse);
 
@@ -1099,10 +1104,10 @@ void neutrino::toggleMouse(bool stat) {
 	QCursor cur;
 	if (stat) {
 		cur=QCursor(Qt::BlankCursor);
-		my_w.actionShow_Mouse->setText("Hide Mouse");
+		my_w.actionShow_mouse->setText("Hide mouse");
 	} else {
 		cur=QCursor(Qt::CrossCursor);
-		my_w.actionShow_Mouse->setText("Show Mouse");
+		my_w.actionShow_mouse->setText("Show mouse");
 	}
 	my_pixitem.setCursor(cur);
 }
@@ -1114,10 +1119,25 @@ void neutrino::toggleRuler() {
 void neutrino::toggleRuler(bool stat) {
 	my_tics.rulerVisible=stat;
 	if (stat) {
-		my_w.actionShow_Ruler->setText("Hide Ruler");
+		my_w.actionShow_ruler->setText("Hide ruler");
 	} else {
-		my_w.actionShow_Ruler->setText("Show Ruler");
+		my_w.actionShow_ruler->setText("Show ruler");
 	}
+	my_tics.update();
+}
+
+void neutrino::toggleGrid() {
+	toggleGrid(!my_tics.gridVisible);
+}
+
+void neutrino::toggleGrid(bool stat) {
+	my_tics.gridVisible=stat;
+	if (stat) {
+		my_w.actionShow_grid->setText("Hide grid");
+	} else {
+		my_w.actionShow_grid->setText("Show grid");
+	}
+	my_tics.update();
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
@@ -1200,6 +1220,12 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 				switch (e->key()) {
 					case Qt::Key_R:
 						toggleRuler();
+						break;
+					case Qt::Key_G:
+						toggleGrid();
+						break;
+					case Qt::Key_P:
+						Properties();
 						break;
 					case Qt::Key_M: {
 						toggleMouse();
@@ -1442,13 +1468,8 @@ nGenericPan*
 neutrino::Shortcuts() {
 	QString vwinname=tr("Shortcuts");
 	nGenericPan* win=existsPan(vwinname,true);
-	if (!win) {
-		win=new nShortcuts(this,vwinname);
-		return win;	
-	} else {
-		win->close();
-		return NULL;
-	}
+	if (!win) win=new nShortcuts(this,vwinname);
+	return win;	
 }
 
 nGenericPan*
@@ -1481,6 +1502,14 @@ neutrino::WinList() {
 	QString namepad=tr("WinList");
 	nGenericPan *win = existsPan(namepad,true);
 	if (!win) win = new nWinList (this, namepad);
+	return win;
+}
+
+nGenericPan*
+neutrino::Properties() {
+	QString namepad=tr("Properties");
+	nGenericPan *win = existsPan(namepad,true);
+	if (!win) win = new nPhysProperties (this, namepad);
 	return win;
 }
 
@@ -1894,6 +1923,7 @@ void neutrino::saveDefaults(){
 	my_set.setValue("mouseVisible", my_mouse.isVisible());
 	my_set.setValue("mouseColor", my_mouse.color);
 	my_set.setValue("rulerVisible", my_tics.rulerVisible);
+	my_set.setValue("gridVisible", my_tics.gridVisible);
 	my_set.setValue("rulerColor", my_tics.rulerColor);
 	my_set.setValue("colorTable", colorTable);
 	my_set.setValue("fileExport", property("fileExport"));
@@ -1908,6 +1938,7 @@ void neutrino::loadDefaults(){
 	toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
 	my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
 	my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
+	my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
 	my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
 	changeColorTable(my_set.value("colorTable",colorTable).toString());
 	QVariant variant=my_set.value("comboIconSizeDefault");

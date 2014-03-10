@@ -160,7 +160,6 @@ DEPENDPATH += ../src/pans/winlist
 
 FORMS += neutrino.ui nSbarra.ui
 FORMS += nLine.ui nObject.ui
-FORMS += nColorBarWin.ui
 
 # external colormaps
 SOURCES += neutrinoPalettes.cc
@@ -177,8 +176,14 @@ SOURCES += nView.cc
 HEADERS += nPlug.h 
 SOURCES += nPlug.cc
 
+FORMS += nColorBarWin.ui
 HEADERS += nColorBarWin.h  nHistogram.h
 SOURCES += nColorBarWin.cc nHistogram.cc
+
+FORMS += nPhysProperties.ui
+HEADERS += nPhysProperties.h 
+SOURCES += nPhysProperties.cc
+
 
 macx {
 	HEADERS += osxApp.h

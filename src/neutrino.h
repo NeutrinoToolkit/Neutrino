@@ -202,6 +202,8 @@ public slots:
 	void toggleMouse(bool);
 	void toggleRuler();
 	void toggleRuler(bool);
+	void toggleGrid();
+	void toggleGrid(bool);
 	
 	nGenericPan* Shortcuts();
 
@@ -214,6 +216,9 @@ public slots:
 	nGenericPan* CutoffImage();
 
 	nGenericPan* WinList();
+	
+	nGenericPan* Properties();
+
 	void cycleOverItems();
 //	void setItemSelect(QGraphicsItem *, bool);
 

@@ -87,6 +87,7 @@ void nTreeWidget::dragMoveEvent(QDragMoveEvent *e)
 void nTreeWidget::dropEvent(QDropEvent *e) {
 	nparent->dropEvent(e);
 	e->acceptProposedAction();
+	dragitem=NULL;
 }
 
 void nTreeWidget::keyPressEvent(QKeyEvent *e){

@@ -36,8 +36,8 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../resources/neutrino.qrc">
-           <normaloff>:icons//loadPref.png</normaloff>:icons/loadPref</iconset>
+          <iconset>
+           <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
          </property>
          <property name="iconSize">
           <size>

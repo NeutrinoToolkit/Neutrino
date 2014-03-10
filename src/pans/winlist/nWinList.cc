@@ -82,6 +82,7 @@ void
 nWinList::buttonCopyPhys() {
 	foreach (QTreeWidgetItem* item, my_w.images->selectedItems()) {
 		nPhysD *copyPhys=new nPhysD(*getPhys(item));
+		copyPhys->TscanBrightness();
 		nparent->addShowPhys(copyPhys);
 	}
 }
