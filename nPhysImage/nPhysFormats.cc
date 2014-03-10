@@ -299,9 +299,6 @@ physInt_sif::physInt_sif(const char *ifilename)
 	//
 	
 	char ptr[5];
-	int temp;
-	char *readb;
-	char *rowptr;
 	int w, h;
 	
 	string temp_string;
@@ -348,17 +345,10 @@ physInt_sif::physInt_sif(const char *ifilename)
 	
 	// get data
 	
-	readb = new char [getW()*bpp];
-	for (size_t i=0; i<getH(); i++) {
-		
-		memset(readb,0,getW()*bpp);
-		rowptr = readb;
-		ifile.read(readb,getW()*bpp);
-		
-		for (size_t j=0; j<getW(); j++) {
-			temp = (int) ( *((float *)&readb[bpp*j]) );
-			(Timg_matrix[i])[j] = temp;
-		}
+	char *readb = new char [getSurf()*bpp];
+	ifile.read(readb,getSurf()*bpp);
+	for (size_t i=0; i<getSurf(); i++) {
+		Timg_buffer[i] = (int) ( *((float *)&readb[bpp*i]) );
 	}
 	
 	delete [] readb;
