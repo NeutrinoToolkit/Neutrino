@@ -88,7 +88,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 		col=0;
 		stringstream sline(tline);
    		while( sline >> word && col<ncols) {
-	   		Timg_buffer[row*w+col]= strtod(word.c_str(),NULL);
+	   		set(row*w+col, strtod(word.c_str(),NULL));
    			col++;
    		}
 		row++;
@@ -218,7 +218,7 @@ physDouble_asc::physDouble_asc(const char *ifilename)
 	while (getline(ifile, tline)) {
 		stringstream sline(tline);
 		while ((sline.tellg() < (int) sline.str().length()) && (sline.tellg() > -1)) {
-			sline>>Timg_buffer[row*getW()+col]>>ch;
+			sline >> Timg_buffer[row*getW()+col] >> ch;
 			col++;
 		}
 		col = 0;
@@ -251,7 +251,7 @@ physInt_pgm::physInt_pgm(const char *ifilename)
 	
 	for (size_t i=0; i<getH(); i++) {
 		for (size_t j=0; j<getW(); j++) {
-			(Timg_matrix[i])[j] = (int)((readbuf[i])[j]);
+			set(i,j,(int)((readbuf[i])[j]));
 		}
 	}
 	
@@ -296,65 +296,40 @@ physInt_sif::physInt_sif(const char *ifilename)
 : nPhysImageF<int>(string(ifilename), PHYS_FILE)
 {
 	// Andor camera .sif file
-	//
-	
-	char ptr[5];
-	int w, h;
 	
 	string temp_string;
 
 	ifstream ifile(ifilename, ios::in | ios::binary);
-	
-	ifile.read(ptr,5);
-	
-	if ( strncmp(ptr,"Andor",5) != 0 ) {
+	getline(ifile, temp_string);
+	if ( temp_string.substr(0,5)!=string("Andor")) {
 		WARNING("Does not start with Andor "<<ifilename);
 		return;
 	}
-	
-	int bpp = 4;
-	
-	WARNING("fixed bpp: "<<bpp);
-	
+		
 	// matrix informations on line 5
-	for (size_t i=0; i<5; i++)
+	for (size_t i=0; i<4; i++) {
 		getline(ifile, temp_string);
-	
+		DEBUG(11,temp_string);
+    }
+	int w, h;
 	stringstream ss(temp_string);
-	ss>>w;
-	ss>>h;
-	
+	ss >> w;
+	ss >> h;	
 	this->resize(w, h);
-	
-	DEBUG(5,"width: "<<getW());
-	DEBUG(5,"height: "<<getH());
-	
-	// At least two versions of .sif have been observed, with 22 or 25 lines before the raw part
-	// Last line is usually a single 0 on a terminated line
-	ifile.seekg(0, ios::beg);
-	for (size_t i=0; i<22; i++)
-		getline(ifile, temp_string);
-	
-	DEBUG(5,"raw init @ "<<ifile.tellg());
-	
-	if (strcmp(temp_string.c_str(), "0") != 0) {
-		DEBUG(5,"Old Andor format, workaround!");
-		while (strcmp(temp_string.c_str(), "0") != 0)
-			getline(ifile, temp_string);
-	}
-	
+		
+    while ((!ifile.eof()) && strcmp(temp_string.c_str(), "0")) {
+        getline(ifile, temp_string);
+		DEBUG(11,"unused line: " << temp_string);
+    }
 	// get data
 	
-	char *readb = new char [getSurf()*bpp];
-	ifile.read(readb,getSurf()*bpp);
-	for (size_t i=0; i<getSurf(); i++) {
-		Timg_buffer[i] = (int) ( *((float *)&readb[bpp*i]) );
-	}
-	
-	delete [] readb;
-	TscanBrightness();
-	
+	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+	vector<float> readb(getSurf());
+	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
 	ifile.close();
+	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
+	
+	TscanBrightness();
 	
 }
 
@@ -443,62 +418,64 @@ physShort_img::physShort_img(string ifilename)
 	// Hamamatsu Streak Camera
 	//
 	unsigned short buffer;
-	int bytes=sizeof(unsigned short);
 	
-	FILE *fin;
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
+	
 	int w=0;
 	int h=0;
 	int skipbyte=0;
 	
-	if ((fin=fopen(ifilename.c_str(),"rb")) == NULL) return;
-	
-	if (fread (&buffer,bytes,1,fin)==1) {
-	    DEBUG(buffer);
-		if (buffer == 19785) { //hamamatsu TODO: check all the stuff inside
-			fread (&buffer,bytes,1,fin);
-			skipbyte=buffer;
-			fread (&buffer,bytes,1,fin);
-			w=buffer;
-			fread (&buffer,bytes,1,fin);
-			h=buffer;
-			DEBUG("Hamamatsu " << w << " " << h << " " << skipbyte);
-			fseek(fin, 56, SEEK_CUR);
-			char *buffer2=new char[skipbyte];
-			int i = fread (buffer2,1,skipbyte,fin);
-			buffer2[i] ='\0';
-			property["info"]=string(buffer2);
-			delete [] buffer2;
+	ifile.read((char *)&buffer,sizeof(unsigned short));
+    DEBUG(buffer);
+    
+    if (buffer == 19785) {
+    	ifile.read((char *)&buffer,sizeof(unsigned short));
+        skipbyte=buffer;
+    	ifile.read((char *)&buffer,sizeof(unsigned short));
+        w=buffer;
+    	ifile.read((char *)&buffer,sizeof(unsigned short));
+        h=buffer;
+        DEBUG("skipbyte " << skipbyte);
+        ifile.seekg (56,ios_base::cur);
+        
+//         fseek(fin, 56, SEEK_CUR);
+        string buffer2;
+        buffer2.resize(skipbyte);
+    	ifile.read((char *)&buffer2[0],skipbyte);        
+        property["info"]=buffer2;
+        DEBUG("Hamamatsu " << w << " " << h << " " << ifile.tellg());
 //			fseek(fin, skipbyte, SEEK_CUR);
-		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
-			fread (&buffer,bytes,1,fin);
-			if (buffer==7) {
-				fread (&buffer,bytes,1,fin);
-				skipbyte=buffer;
-				fseek(fin,skipbyte,SEEK_SET);
-				fread (&buffer,bytes,1,fin);
-				w=buffer;
-				fread (&buffer,bytes,1,fin);
-				h=buffer;
-			}
-			fread (&buffer,bytes,1,fin);
-		} else { // LIL images
-			rewind(fin);
-			unsigned int lil_header[4];
-			fread (lil_header,sizeof(unsigned int),4,fin);
-			if (lil_header[0]==2 && lil_header[3]==1) {
-				// lil_header[0] = dimension of the matrix
-				// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
-				w=lil_header[1];
-				h=lil_header[2];
-			}
-		}
-	}
+    } else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
+       	ifile.read((char *)&buffer,sizeof(unsigned short));
+        if (buffer==7) {
+        	ifile.read((char *)&buffer,sizeof(unsigned short));
+            skipbyte=buffer;
+            ifile.seekg (skipbyte,ios_base::cur);
+        	ifile.read((char *)&buffer,sizeof(unsigned short));
+            w=buffer;
+        	ifile.read((char *)&buffer,sizeof(unsigned short));
+            h=buffer;
+        }
+       	ifile.read((char *)&buffer,sizeof(unsigned short));
+       	DEBUG("ARF " << buffer);
+    } else { // LIL images
+        ifile.seekg(0);
+        unsigned int lil_header[4];
+       	ifile.read((char *)lil_header,4*sizeof(unsigned int));       	
+        if (lil_header[0]==2 && lil_header[3]==1) {
+            // lil_header[0] = dimension of the matrix
+            // lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
+            w=lil_header[1];
+            h=lil_header[2];
+        }
+    }
 	DEBUG(5, "w "<< w << " h "<<h);
+	
 	if (w*h>0) {
 		this->resize(w, h);
-		fread(Timg_buffer,bytes,w*h,fin);
+       	ifile.read((char *)Timg_buffer,sizeof(unsigned short)*w*h);
 	}	
-	fclose(fin);
+    ifile.close();    
 }
 
 physUint_imd::physUint_imd(string ifilename)
@@ -507,29 +484,23 @@ physUint_imd::physUint_imd(string ifilename)
 	// Optronics luli
 	//
 	unsigned short buffer_header;
-	FILE *fin;
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
 	unsigned short w=0;
 	unsigned short h=0;
-	
-	if ((fin=fopen(ifilename.c_str(),"rb")) == NULL) return;
-	
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"header " << buffer_header);
-	}
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"width " << buffer_header);
-		w=buffer_header;
-	}
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"height " << buffer_header);
-		h=buffer_header;
-	}
+		
+    ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	DEBUG(5,"header " << buffer_header);
+    ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	DEBUG(5,"width " << buffer_header);
+	w=buffer_header;
+    ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	DEBUG(5,"height " << buffer_header);
+	h=buffer_header;
 	
 	this->resize(w, h);
-    fread(Timg_buffer,sizeof(unsigned int),w*h,fin);
-	
-	
-	fclose(fin);
+   	ifile.read((char *)Timg_buffer,sizeof(unsigned int)*w*h);
+
+    ifile.close();
 	TscanBrightness();
 	DEBUG(5,"object_name: "<<getName());
 	DEBUG(5,"filename: "<<getName());
@@ -625,8 +596,8 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 		exit (EXIT_FAILURE);
 	}
 
-    	strm.next_in = (unsigned char *) my_phys->Timg_buffer;
-    	strm.avail_in = my_phys->getSurf()*sizeof(double);
+    strm.next_in = (unsigned char *) my_phys->Timg_buffer;
+    strm.avail_in = my_phys->getSurf()*sizeof(double);
 	strm.avail_out = buffer_size;
 	strm.next_out = out;
 	status= deflate (& strm, Z_FINISH);
@@ -758,7 +729,6 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char *ofilename, int bytes) 
 		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
  		TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
  		TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, my_phys->getShortName().c_str());
- 		TIFFSetField(tif, TIFFTAG_MAKE,  my_phys->getFromName().c_str());
  		TIFFSetField(tif, TIFFTAG_SOFTWARE, "neutrino");
  		TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
 		
@@ -843,23 +813,21 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 			// FIXME: this is awful
 			switch (bit) {
 				case 8: {
-					char *buf=new char[original->getSurf()];
-					ifileimg.read(buf, sizeof(char)*original->getSurf());
+					vector<char> buf(original->getSurf());
+					ifileimg.read(&buf[0], original->getSurf());
 					for (size_t i=0;i<original->getSurf();i++) {
-						original->Timg_buffer[i]=swap_endian<char>(buf[i]);
-						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
+						original->set(i,swap_endian<char>(buf[i]));
+						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
 					}
-					delete [] buf;
 					break;
 				}
 				case 16: {
-					unsigned short *buf=new unsigned short[original->getSurf()];
-					ifileimg.read((char*)buf, sizeof(unsigned short)*original->getSurf());
+					vector<unsigned short> buf(original->getSurf());
+					ifileimg.read((char*)(&buf[0]), sizeof(unsigned short)*original->getSurf());
 					for (size_t i=0;i<original->getSurf();i++) {
-						original->Timg_buffer[i]=swap_endian<unsigned short>(buf[i]);
-						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
+						original->set(i,swap_endian<unsigned short>(buf[i]));
+						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
 					}
-					delete [] buf;
 					break;
 				}
 			}
@@ -1210,57 +1178,69 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 	if (ifile.fail()) return -1;
 	ifile.seekg(skipbyte);
 	if (ifile.fail() || ifile.eof()) return -1;
-	for (size_t i=0;i<my_phys->getSurf();i++) {
-		switch (kind) {
-			case 0: {
-				char buf;
-				ifile.read(&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<char>(buf) : buf;
-				break;
-			}
-			case 1: {
-				unsigned short buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<unsigned short>(buf) : buf;
-				break;
-			}
-			case 2: {
-				short buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<short>(buf) : buf;
-				break;
-			}
-			case 3: {
-				unsigned int buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<unsigned int>(buf) : buf;
-				break;
-			}
-			case 4: {
-				int buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<int>(buf) : buf;
-				break;
-			}
-			case 5: {
-				float buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<float>(buf) : buf;
-				break;
-			}
-			case 6: {
-				double buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<double>(buf) : buf;
-				break;
-			}
-			default:
-				return -1;
-				break;
-		}
-		// 		cerr << kind << "\t" <<  endian << "\t" <<  i << "\t" <<  my_phys->Timg_buffer[i] << endl;
-	}
-	ifile.close();
+	int bpp=0;
+	
+    switch (kind) {
+        case 0: bpp=sizeof(unsigned char); break;
+        case 1: bpp=sizeof(signed char); break;
+        case 2: bpp=sizeof(unsigned short); break;
+        case 3: bpp=sizeof(signed short); break;
+        case 4: bpp=sizeof(unsigned int); break;
+        case 5: bpp=sizeof(signed int); break;
+        case 6: bpp=sizeof(float); break;
+        case 7: bpp=sizeof(double); break;
+    }
+    
+    if (bpp>0) {
+        vector<char> buffer(bpp*my_phys->getSurf());
+		ifile.read(&buffer[0], buffer.size());
+    	ifile.close();
+        for (size_t i=0;i<my_phys->getSurf();i++) {
+            switch (kind) {
+                case 0: {
+                    unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
+                    break;
+                }
+                case 1: {
+                    signed char buf = *((signed char*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
+                    break;
+                }
+                case 2: {
+                    unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
+                    break;
+                }
+                case 3: {
+                    signed short buf = *((signed short*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
+                    break;
+                }
+                case 4: {
+                    unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
+                    break;
+                }
+                case 5: {
+                    signed int buf = *((signed int*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
+                    break;
+                }
+                case 6: {
+                    float buf = *((float*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
+                    break;
+                }
+                case 7: {
+                    double buf = *((double*)(&buffer[i*bpp]));
+                    my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
+                    break;
+                }
+            }
+        }
+    }
+
 	my_phys->TscanBrightness();
 	return 0;
 }
@@ -1337,34 +1317,34 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 							for (size_t k=0;k<my_data->getSurf();k++) {
 								switch (num_type) {
 									case 3:
-										my_data->Timg_buffer[k]=((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 4:
-										my_data->Timg_buffer[k]=((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 20:
-										my_data->Timg_buffer[k]=(int)((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(int)((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 21:
-										my_data->Timg_buffer[k]=(int)((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(int)((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 5:
-										my_data->Timg_buffer[k]=(float) ((float *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(float) ((float *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 6:
-										my_data->Timg_buffer[k]=((double *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((double *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 22:
-										my_data->Timg_buffer[k]=((short *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 23:
-										my_data->Timg_buffer[k]=((unsigned short *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 24:
-										my_data->Timg_buffer[k]=((int *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 25:
-										my_data->Timg_buffer[k]=((unsigned int *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 								}
 							}
