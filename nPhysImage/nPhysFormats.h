@@ -94,7 +94,7 @@ public:
 // Andor .SIF format
 class physInt_sif : public nPhysImageF<int> {
 public:
-	physInt_sif(const char *);
+	physInt_sif(std::string);
 };
 
 // PCO .B16 format
@@ -198,6 +198,9 @@ nPhysImageF<double> * phys_open_HDF5(std::string, std::string);
 int phys_write_HDF4_SD(nPhysImageF<double> *, int);
 void scan_hdf5_attributes(hid_t, nPhysImageF<double>*);
 #endif
+
+std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
+
 
 std::vector <nPhysImageF<double> *> phys_open(std::string,std::string=std::string());
 

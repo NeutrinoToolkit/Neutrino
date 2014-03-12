@@ -634,7 +634,7 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),"neutrino (*.neu *.neus *.hdf *.h5 *.imd *.png *.pgm *.ppm *.jpg *.tiff *.tif *.gif *.sif *.img *.raw *.txt *.fits *.inf);; Any files (*)");
+	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),"neutrino (*.neu *.neus *.hdf *.h5 *.imd *.png *.pgm *.ppm *.jpg *.tiff *.tif *.gif *.sif *.spe *.img *.raw *.txt *.fits *.inf);; Any files (*)");
 	fileOpen(fnames);
 }
 

@@ -292,14 +292,14 @@ physGray_pgm::physGray_pgm(const char *ifilename)
 #endif
 	
 
-physInt_sif::physInt_sif(const char *ifilename)
-: nPhysImageF<int>(string(ifilename), PHYS_FILE)
+physInt_sif::physInt_sif(string ifilename)
+: nPhysImageF<int>(ifilename, PHYS_FILE)
 {
 	// Andor camera .sif file
 	
 	string temp_string;
 
-	ifstream ifile(ifilename, ios::in | ios::binary);
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
 	getline(ifile, temp_string);
 	if ( temp_string.substr(0,5)!=string("Andor")) {
 		WARNING("Does not start with Andor "<<ifilename);
@@ -713,6 +713,50 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 #else
     WARNING("nPhysImage was not compiled with tiff support!");
 #endif
+}
+
+std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
+    std::vector <nPhysImageF<double> *> vecReturn;
+    
+	ifstream ifile(ifilename.c_str(), ios::in);
+    string header;
+    header.resize(4100);
+    ifile.read((char *)&header[0],header.size());
+    unsigned short type= *((unsigned short *) &header[108]);
+    DEBUG(">>>>>>>>>>>>>>> " << type);
+
+    if (type==0) {
+        unsigned short height= *((unsigned short *) &header[656]);
+        DEBUG(">>>>>>>>>>>>>>> height " << height);
+        unsigned short width= *((unsigned short *) &header[42]);
+        DEBUG(">>>>>>>>>>>>>>> width " << width);
+        unsigned short noscan= *((unsigned short *) &header[34]);
+        DEBUG(">>>>>>>>>>>>>>> noscan " << noscan);
+        unsigned int NumFrames= *((unsigned int *) &header[1446]);
+        DEBUG(">>>>>>>>>>>>>>> NumFrames " << NumFrames);
+
+		if (noscan == 65535) {
+			int lnoscan = *((int *) &header[664]);
+            DEBUG(">>>>>>>>>>>>>>> lnoscan " << lnoscan);
+			if (lnoscan != -1) NumFrames = lnoscan / height;
+		} else {
+		    NumFrames = noscan / height;
+		}
+        DEBUG(">>>>>>>>>>>>>>> NumFrames after " << NumFrames);
+        vector<float> buffer(width*height);
+        for (int nf=0;nf<NumFrames;nf++) {
+            ifile.read((char*) &buffer[0],width*height*sizeof(float));
+            nPhysD *phys=new nPhysD(width,height,0.0);
+            for (unsigned int i=0; i<phys->getSurf(); i++) {
+                phys->set(i,buffer[i]);
+            }
+            phys->TscanBrightness();
+            vecReturn.push_back(phys);
+        }
+        
+    }
+	ifile.close();
+	return vecReturn;
 }
 
 int
@@ -1707,6 +1751,8 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		ext.erase(0,last_idx + 1);
 	}
 
+    transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
 	string name=fname;
     last_idx = fname.find_last_of("\\/");
 	if (std::string::npos != last_idx) {
@@ -1734,6 +1780,9 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		datamatrix = new physDouble_txt(fname.c_str());
 	} else if (ext.substr(0,3)=="tif") {
 		datamatrix = new physDouble_tiff(fname.c_str());
+	} else if (ext=="spe") {
+		vector <nPhysImageF<double> *> imagelist=phys_open_spe(fname);
+		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="inf") {
 		vector <nPhysImageF<double> *> imagelist=phys_open_inf(fname);
 		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
