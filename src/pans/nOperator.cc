@@ -37,8 +37,8 @@ nOperator::nOperator(neutrino *nparent, QString winname)
 	operatorResult=NULL;
 	
 	// separator represents the difference between operations with 2 operands or 1 modify it in .h
-	separator[0]=5;
-	separator[1]=11;
+	separator[0]=7;
+	separator[1]=13;
 	
 	my_w.operation->insertSeparator(separator[0]);
 	my_w.operation->insertSeparator(separator[1]);
@@ -146,6 +146,12 @@ void nOperator::doOperation () {
 							break;
 						case 4:
 							myresult->set(i,j,0.5*(val1+val2));
+							break;
+						case 5:
+							myresult->set(i,j,std::min(val1,val2));
+							break;
+						case 6:
+							myresult->set(i,j,std::max(val1,val2));
 							break;
 					}
 				} else {

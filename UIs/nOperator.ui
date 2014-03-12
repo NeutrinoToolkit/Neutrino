@@ -137,6 +137,16 @@
          </item>
          <item>
           <property name="text">
+           <string>Min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Power</string>
           </property>
          </item>
