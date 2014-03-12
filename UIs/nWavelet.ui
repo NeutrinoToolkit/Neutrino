@@ -439,7 +439,7 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_13">
           <property name="title">
-           <string>Phase (fringeshift) &amp;&amp; quality</string>
+           <string>Phase/2pi &amp;&amp; quality</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_16">
            <property name="leftMargin">
@@ -775,7 +775,7 @@
            <item row="1" column="1">
             <widget class="QGroupBox" name="groupBox_3">
              <property name="title">
-              <string>Reference Phase</string>
+              <string>Reference</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
               <property name="leftMargin">
@@ -806,7 +806,7 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
-           <string>Phase (fringeshift)</string>
+           <string>Phase/2pi</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1">
            <property name="leftMargin">

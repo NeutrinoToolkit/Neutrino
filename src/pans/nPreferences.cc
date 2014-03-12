@@ -99,18 +99,22 @@ void nPreferences::changeFont() {
 }
 
 void nPreferences::changeIconSize(int val) {
-	QSize size=QSize(10*(val+1),10*(val+1));
+	QSize mysize=QSize(10*(val+1),10*(val+1));
 	
 	foreach (QToolBar *obj, nparent->findChildren<QToolBar *>()) {
-		obj->hide();
-		obj->setIconSize(size);
-		obj->show();
+		if (obj->iconSize()!=mysize) {
+			obj->hide();
+			obj->setIconSize(mysize);
+			obj->show();
+		}
 	}
 	foreach (nGenericPan* pan, nparent->getPans()) {
 		foreach (QToolBar *obj, pan->findChildren<QToolBar *>()) {
-			obj->hide();
-			obj->setIconSize(size);
-			obj->show();
+			if (obj->iconSize()!=mysize) {
+				obj->hide();
+				obj->setIconSize(mysize);
+				obj->show();
+			}
 		}
 	}
 }

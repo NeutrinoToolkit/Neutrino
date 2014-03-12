@@ -382,6 +382,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 			m1.set(i,nan_free_phys[i]);
 		}
 	}
+	m1.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);

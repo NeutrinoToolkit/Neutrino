@@ -197,22 +197,24 @@ void nWavelet::doWavelet () {
 		}
 		for(itr = nThread.odata.begin(); itr != nThread.odata.end() && position<waveletPhys.size(); ++itr, ++position) {
 			nPhysD *mat=(*itr);
-			WARNING(nThread.odata.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
-			if ((mat->getShortName()=="angle" && my_params.n_angles==1) ||
-				mat->getShortName()=="lambda" && my_params.n_lambdas==1) {
-				delete mat;
-				mat=NULL;
-			} else {
-				if (my_w.erasePrevious->isChecked()) {
-					waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
+			if (mat) {
+				WARNING(nThread.odata.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
+				if ((mat->getShortName()=="angle" && my_params.n_angles==1) ||
+					mat->getShortName()=="lambda" && my_params.n_lambdas==1) {
+					delete mat;
+					mat=NULL;
 				} else {
-					nparent->addPhys(mat);
-					waveletPhys.at(position)=mat;
-				}
-				if (waveletPhys.at(position)->getShortName()=="phase") {
-					my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
-				} else if (waveletPhys.at(position)->getShortName()=="quality") {
-					my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
+					if (my_w.erasePrevious->isChecked()) {
+						waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
+					} else {
+						nparent->addPhys(mat);
+						waveletPhys.at(position)=mat;
+					}
+					if (waveletPhys.at(position)->getShortName()=="phase/2pi") {
+						my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
+					} else if (waveletPhys.at(position)->getShortName()=="quality") {
+						my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
+					}
 				}
 			}
 		}

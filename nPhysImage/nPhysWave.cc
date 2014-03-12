@@ -292,7 +292,7 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
-		wphase = new nPhysD("phase");
+		wphase = new nPhysD("phase/2pi");
 		wphase->resize(dx, dy);
 		lambda = new nPhysD("lambda");
 		lambda->resize(dx, dy);
@@ -542,7 +542,7 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
-		wphase = new nPhysD("phase");
+		wphase = new nPhysD("phase/2pi");
 		wphase->resize(dx, dy);
 		lambda = new nPhysD("lambda");
 		lambda->resize(dx, dy);

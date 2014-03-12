@@ -641,6 +641,7 @@ void neutrino::fileOpen()
 void neutrino::fileOpen(QStringList fnames) {
 	setProperty("fileOpen", fnames);
 	foreach (QString fname, fnames) {
+		qDebug() << " opening " << fname;
 		vector <nPhysD *> imagelist = fileOpen(fname);
 		if (imagelist.size()==0 && QFileInfo(fname).suffix().toLower()!="h5"){
 			QString vwinname="OpenRaw";
@@ -652,6 +653,10 @@ void neutrino::fileOpen(QStringList fnames) {
 	}
 }
 
+
+void neutrino::openFile(QString fname) {
+	fileOpen(fname);
+}
 
 vector <nPhysD *> neutrino::fileOpen(QString fname, QString optString) {
 	vector <nPhysD *> imagelist;
@@ -1944,12 +1949,15 @@ void neutrino::loadDefaults(){
 	QVariant variant=my_set.value("comboIconSizeDefault");
 	if (variant.isValid()) {
 		int val=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize()).toInt();
+		my_set.setValue("comboIconSizeDefault",val);
 		if (val>=0) {
-			QSize size=QSize(10*(val+1),10*(val+1));
+			QSize mysize=QSize(10*(val+1),10*(val+1));
 			foreach (QToolBar *obj, findChildren<QToolBar *>()) {
-				obj->hide();
-				obj->setIconSize(size);
-				obj->show();
+				if (obj->iconSize()!=mysize) {
+					obj->hide();
+					obj->setIconSize(mysize);
+					obj->show();
+				}
 			}
 		}
 	}

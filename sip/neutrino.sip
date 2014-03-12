@@ -9,13 +9,11 @@
 %End
 
 %ConvertFromTypeCode
-  // Create the list.
   PyObject *l;
   if ((l = PyList_New(sipCpp->size())) == NULL)
     return NULL;
 
   const sipMappedType* qlist_type = sipFindMappedType("QList<qreal>");
-  // Set the list elements.
   for (int i = 0; i < sipCpp->size(); ++i) {
     QList<qreal>* t = new QList<qreal>(sipCpp->at(i));
     PyObject *tobj;

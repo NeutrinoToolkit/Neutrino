@@ -169,6 +169,7 @@ public slots:
 	// File
 	void fileNew();
 
+	void openFile(QString);
 	void fileOpen();
 	std::vector<nPhysD*> fileOpen(QString, QString=QString());
 	void fileOpen(QStringList);
