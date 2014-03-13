@@ -62,7 +62,6 @@ void nOpenRAW::doOpen () {
 		if (datamatrix && datamatrix->getSurf()>0) {
 			datamatrix->setShortName(QFileInfo(fname).fileName().toStdString());
 			datamatrix->setFromName(fname.toStdString());
-			datamatrix->TscanBrightness(); //FIXME: this should be removed when fixed deep copy
 			datamatrix->setType(PHYS_FILE);
 			nparent->addShowPhys(datamatrix);
 			

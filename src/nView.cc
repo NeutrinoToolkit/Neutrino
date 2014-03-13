@@ -205,14 +205,22 @@ void nView::wheelEvent(QWheelEvent *e) {
 			QGraphicsView::wheelEvent(e);
 			break;
 	}
-	if (parent()->follower) parent()->follower->my_w.my_view->wheelEvent(e);
+	if (parent()->follower) {
+		QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+		QWheelEvent eFollow(posFollow,e->delta(),e->buttons(),e->modifiers(),e->orientation());
+		parent()->follower->my_w.my_view->wheelEvent(&eFollow);
+	}
 }
 
 
 void nView::mousePressEvent (QMouseEvent *e)
 {
 	QGraphicsView::mousePressEvent(e);
-	if (parent()->follower) parent()->follower->my_w.my_view->mousePressEvent(e);
+	if (parent()->follower) {
+		QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+		QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
+		parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+	}
 	if (e->modifiers()&Qt::ControlModifier && parent()->currentBuffer) {
 		minMax=QPointF(parent()->currentBuffer->Tmaximum_value,parent()->currentBuffer->Tminimum_value);
 	}
@@ -223,9 +231,18 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 {
 	QGraphicsView::mouseReleaseEvent(e);
 	emit mouseReleaseEvent_sig(mapToScene(e->pos()));
-	if (parent()->follower) parent()->follower->my_w.my_view->mouseReleaseEvent(e);
+	if (parent()->follower) {
+		QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+		QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
+		parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
+	}
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-		parent()->changeColorMinMax(minMax.x(),minMax.y());
+		qDebug() << minMax;
+		if (parent()->currentBuffer && minMax==QPointF(parent()->currentBuffer->Tmaximum_value,parent()->currentBuffer->Tminimum_value)) {
+			parent()->changeColorMinMax(minMax.y(),minMax.x());
+		} else {
+			parent()->changeColorMinMax(minMax.x(),minMax.y());
+		}
 	}
 }
 
@@ -237,7 +254,12 @@ void nView::mouseMoveEvent (QMouseEvent *e)
 			parent()->statusBar()->showMessage(item->toolTip(),2000);
 		}
 	}
-	if (parent()->follower) parent()->follower->my_w.my_view->mouseMoveEvent(e);
+	if (parent()->follower) {
+		QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+		QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
+		parent()->follower->my_w.my_view->mouseMoveEvent(&eFollow);
+	}
+
 	QPointF pos_mouse=mapToScene(e->pos());
 	parent()->my_mouse.setPos(pos_mouse);
 	if (e->modifiers()==Qt::ControlModifier && parent()->currentBuffer) {

@@ -498,68 +498,68 @@ public:
 		return rotated;
 	}
 	
-	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
-		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated= new nPhysImageF<T> (width,height, def_value);
-		size_t w2=width/2;
-		size_t h2=height/2;
-		for (int i=0;i<(int)width;i++){
-			int xc=i-w2;
-			for (int j=0;j<(int)height;j++){
-				int yc=j-h2;
-				size_t ir= w2+xc*cos(alpha)-yc*sin(alpha);
-				size_t jr= h2+xc*sin(alpha)+yc*cos(alpha);
-				rotated->set(i,j,getPoint(ir,jr,def_value));
-			}
-		}		
-		rotated->set_scale(get_scale());
-		rotated->setType(PHYS_DYN);
-		std::ostringstream my_name;
-		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
-
-		rotated->TscanBrightness();
-		return rotated;	
-	}
+// 	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+// 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
+// 		nPhysImageF<T> *rotated= new nPhysImageF<T> (width,height, def_value);
+// 		size_t w2=width/2;
+// 		size_t h2=height/2;
+// 		for (int i=0;i<(int)width;i++){
+// 			int xc=i-w2;
+// 			for (int j=0;j<(int)height;j++){
+// 				int yc=j-h2;
+// 				size_t ir= w2+xc*cos(alpha)-yc*sin(alpha);
+// 				size_t jr= h2+xc*sin(alpha)+yc*cos(alpha);
+// 				rotated->set(i,j,getPoint(ir,jr,def_value));
+// 			}
+// 		}		
+// 		rotated->set_scale(get_scale());
+// 		rotated->setType(PHYS_DYN);
+// 		std::ostringstream my_name;
+// 		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
+// 		rotated->setName(my_name.str());
+// 		rotated->setShortName("rotated");
+// 		rotated->setFromName(getFromName());
+// 
+// 		rotated->TscanBrightness();
+// 		return rotated;	
+// 	}
 
 
 	// get sobel matrix
-	nPhysImageF<T> * sobel() {
-		nPhysImageF<T> *sobo= new nPhysImageF<T>(getW(),getH(),1.0);
-		sobo->set_origin(get_origin());
-		sobo->set_scale(get_scale());
-	
-		sobo->setShortName("Sobel");
-		sobo->setName("Sobel "+getName());
-		sobo->setFromName(getFromName());
-		double Gx[9];
-		Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
-		Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
-		Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
-
-		double Gy[9];
-		Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
-		Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
-		Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
-
-		for(size_t i = 0 ; i < getW() ; i++) {
-			for(size_t j = 0 ; j < getH(); j++) {
-				double value_gx = 0.0;
-				double value_gy = 0.0;
-				for(size_t k = 0 ; k < 3 ; k++) {
-					for(size_t l = 0 ; l < 3 ; l++) {
-						value_gx += Gx[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-						value_gy += Gy[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-					}
-				}
-				sobo->set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
-			}
-		}
-		sobo->TscanBrightness();
-		return sobo;
-	}
+// 	nPhysImageF<T> * sobel() {
+// 		nPhysImageF<T> *sobo= new nPhysImageF<T>(getW(),getH(),1.0);
+// 		sobo->set_origin(get_origin());
+// 		sobo->set_scale(get_scale());
+// 	
+// 		sobo->setShortName("Sobel");
+// 		sobo->setName("Sobel "+getName());
+// 		sobo->setFromName(getFromName());
+// 		double Gx[9];
+// 		Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
+// 		Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
+// 		Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
+// 
+// 		double Gy[9];
+// 		Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
+// 		Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
+// 		Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
+// 
+// 		for(size_t i = 0 ; i < getW() ; i++) {
+// 			for(size_t j = 0 ; j < getH(); j++) {
+// 				double value_gx = 0.0;
+// 				double value_gy = 0.0;
+// 				for(size_t k = 0 ; k < 3 ; k++) {
+// 					for(size_t l = 0 ; l < 3 ; l++) {
+// 						value_gx += Gx[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
+// 						value_gy += Gy[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
+// 					}
+// 				}
+// 				sobo->set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
+// 			}
+// 		}
+// 		sobo->TscanBrightness();
+// 		return sobo;
+// 	}
 
 	// const methods for accessing matrix
 
@@ -949,6 +949,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	std::copy(oth.Timg_buffer, oth.Timg_buffer+width*height, Timg_buffer);
 	property = oth.property;
 	setShortName(sName);
+	TscanBrightness();
 //	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
 }
 

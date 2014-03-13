@@ -447,17 +447,18 @@ physShort_img::physShort_img(string ifilename)
 //			fseek(fin, skipbyte, SEEK_CUR);
     } else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
        	ifile.read((char *)&buffer,sizeof(unsigned short));
+       	DEBUG("ARP " << buffer);
         if (buffer==7) {
         	ifile.read((char *)&buffer,sizeof(unsigned short));
             skipbyte=buffer;
-            ifile.seekg (skipbyte,ios_base::cur);
+            ifile.seekg(skipbyte,ios_base::beg);
         	ifile.read((char *)&buffer,sizeof(unsigned short));
             w=buffer;
         	ifile.read((char *)&buffer,sizeof(unsigned short));
             h=buffer;
         }
        	ifile.read((char *)&buffer,sizeof(unsigned short));
-       	DEBUG("ARF " << buffer);
+       	DEBUG("ARP " << buffer << " " << skipbyte << " " << w  << " " << h);
     } else { // LIL images
         ifile.seekg(0);
         unsigned int lil_header[4];
@@ -842,7 +843,6 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 			original->setType(PHYS_FILE);
 			original->setFromName(ifilename);
 			imagelist.push_back(original);
-			
 			getline(ifile,line);
 			double sensitivity=atoi(line.c_str());
 			getline(ifile,line);

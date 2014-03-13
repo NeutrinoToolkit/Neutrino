@@ -174,7 +174,7 @@ void nBoxLineout::updatePlot() {
 void nBoxLineout::copy_clip() {
 	if (currentBuffer) {
 		QClipboard *clipboard = QApplication::clipboard();
-		QString point_table=QString::fromStdString(currentBuffer->getName())+"\n";
+		QString point_table=QString::fromUtf8(currentBuffer->getName().c_str())+"\n";
 		point_table.append("# Horizontal : "+QString::number(xCut.data()->size()) +"\n");
 		for (unsigned int i=0;i<xCut.data()->size();i++) {
 			point_table.append(QString("%1\t%2\n").arg(xCut.data()->sample(i).x()).arg(xCut.data()->sample(i).y()));
@@ -196,7 +196,7 @@ void nBoxLineout::export_txt() {
 			QFile t(fnametmp);
 			t.open(QIODevice::WriteOnly| QIODevice::Text);
 			QTextStream out(&t);
-			out << "# Box Lineout " << QString::fromStdString(currentBuffer->getName()) <<endl;
+			out << "# Box Lineout " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
 			out << "# Horizontal : " << xCut.data()->size() <<endl;
 			for (unsigned int i=0;i<xCut.data()->size();i++) {
 				out << xCut.data()->sample(i).x() << " " << xCut.data()->sample(i).y() << endl;

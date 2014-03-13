@@ -53,12 +53,13 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 	my_w.propertyValue->clear();
 	DEBUG(currentProperty);
 	if (my_phys) {
-		setWindowTitle(QString::fromStdString(my_phys->getName()));
+		setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
 		for(anymap::iterator iter=my_phys->property.begin();iter!=my_phys->property.end(); iter++ ) {
-			QListWidgetItem *item=new QListWidgetItem(QString::fromStdString(iter->first));
+			QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
 			my_w.propertyList->addItem(item);			
 			if (iter->first==currentProperty) {
-				my_w.propertyValue->setPlainText(QString::fromStdString(iter->second));
+				string myval=iter->second;
+				my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
 				item->setSelected(true);
 				DEBUG("here\n");
 			}
@@ -73,7 +74,8 @@ nPhysProperties::showProperty() {
 		string currentKey=my_w.propertyList->currentItem()->text().toStdString();
 		DEBUG(currentKey);
 		if (currentBuffer) {
-			my_w.propertyValue->setPlainText(QString::fromStdString(currentBuffer->property[currentKey]));
+			string myval=currentBuffer->property[currentKey];
+			my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
 		}
 	}
 }

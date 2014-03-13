@@ -111,7 +111,7 @@ void nCompareLines::updatePlot() {
 			my_val=phys->getPoint(p.x(),p.y());
 			if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
 
-			QwtPlotCurve *profile=new QwtPlotCurve(QString::fromStdString(phys->getName()));
+			QwtPlotCurve *profile=new QwtPlotCurve(QString::fromUtf8(phys->getName().c_str()));
 			if (phys==currentBuffer) {
 				profile->setPen(QPen(Qt::blue,1.0));
 			} else {

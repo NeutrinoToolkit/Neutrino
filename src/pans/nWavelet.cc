@@ -58,6 +58,8 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
+	connect(my_w.blurVal, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
@@ -132,7 +134,6 @@ void nWavelet::doWavelet () {
 			datamatrix.setShortName("wavelet source");
 			nPhysD *deepcopy=new nPhysD();
 			*deepcopy=datamatrix;
-			deepcopy->TscanBrightness();
 			if (my_w.erasePrevious->isChecked()) {
 				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
 			} else {
@@ -221,20 +222,14 @@ void nWavelet::doWavelet () {
 		
 		
 		if (my_w.synthetic->isChecked()) {
-			nPhysD *tmpSynthetic = new nPhysD(geom2.width(),geom2.height(),0.0);
-			for (size_t ii=0; ii<waveletPhys.at(0)->getSurf(); ii++) {
-				tmpSynthetic->set(ii,waveletPhys.at(1)->point(ii)*(1.0+cos(waveletPhys.at(0)->point(ii)*2*M_PI)));
-			}
-			tmpSynthetic->setShortName("synthetic");
-			tmpSynthetic->setName("synthetic("+waveletPhys.at(0)->getName()+","+waveletPhys.at(1)->getName()+")");
-			tmpSynthetic->TscanBrightness();
+			nPhysD *tmpSynthetic = new nPhysD();
+			phys_synthetic_interferogram(*tmpSynthetic,*waveletPhys.at(0),*waveletPhys.at(1));
 			if (my_w.erasePrevious->isChecked()) {
 				syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
 			} else {
 				nparent->addPhys(tmpSynthetic);
 				syntheticPhys=tmpSynthetic;
-			}			
-			waveletPhys.at(0)->TscanBrightness();
+			}
 			DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
 		}
 
@@ -292,7 +287,7 @@ void nWavelet::doUnwrap () {
 		
 		if (uphase) {
 			uphase->setShortName("unwrap");
-			uphase->setName(uphase->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromStdString(phase->getFromName())).fileName().toStdString());
+			uphase->setName(uphase->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
 			uphase->setFromName(phase->getFromName());
 			my_w.erasePreviousUnwrap->setEnabled(true);
 
@@ -304,7 +299,6 @@ void nWavelet::doUnwrap () {
 				phys_subtract_carrier(*uphase, kx, ky);				
 			}
 			
-			uphase->TscanBrightness();
 			if (my_w.erasePreviousUnwrap->isChecked()) {
 				unwrapPhys=nparent->replacePhys(uphase,unwrapPhys);
 			} else {
@@ -322,6 +316,7 @@ void nWavelet::doAll () {
 }
 
 void nWavelet::doRemove () {
+	if (sender()==my_w.blurVal && (!my_w.blur->isChecked())) return;
 	if (my_w.carrier->isChecked()) {
 		doRemoveCarrier();
 	}
@@ -348,7 +343,7 @@ void nWavelet::doRemoveCarrier () {
 
 		unwrappedSubtracted->setName("No carrier ("+QString::number(lambda).toStdString()+","+
 																 QString::number(alpha).toStdString()+") "+
-																 QFileInfo(QString::fromStdString(unwrapped->getFromName())).fileName().toStdString());
+																 QFileInfo(QString::fromUtf8(unwrapped->getFromName().c_str())).fileName().toStdString());
 		unwrappedSubtracted->setShortName("No carrier");
 		unwrappedSubtracted->setFromName(unwrapped->getFromName());
 
@@ -356,7 +351,9 @@ void nWavelet::doRemoveCarrier () {
 		double ky = -sin(alpha*_phys_deg)/lambda;
 		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
 		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
-		unwrappedSubtracted->TscanBrightness();
+		if (my_w.blur->isChecked()){
+			phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
+		}
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
@@ -384,7 +381,9 @@ void nWavelet::doRemoveReference () {
 			} else {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName()+" "+ref->getFromName());
 			}
-			unwrappedSubtracted->TscanBrightness();
+			if (my_w.blur->isChecked()){
+				phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
+			}
 			my_w.erasePreviuos->setEnabled(true);
 			if (my_w.erasePreviuos->isChecked()) {
 				referencePhys=nparent->replacePhys(unwrappedSubtracted,referencePhys);

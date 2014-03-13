@@ -686,6 +686,20 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
 	return uphase;
 }
 
+void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> &phase_over_2pi, nPhysImageF<double> &quality){
+    
+    if (phase_over_2pi.getW()==quality.getW() && phase_over_2pi.getH()==quality.getH()) {
+        synthetic.resize(phase_over_2pi.getW(),phase_over_2pi.getH());
+        for (size_t ii=0; ii<phase_over_2pi.getSurf(); ii++) {
+            synthetic.set(ii,quality.point(ii)*(1.0+cos(phase_over_2pi.point(ii)*2*M_PI)));
+        }
+        synthetic.setShortName("synthetic");
+        synthetic.setName("synthetic("+phase_over_2pi.getName()+","+quality.getName()+")");
+        synthetic.TscanBrightness();
+    }
+
+}
+
 void
 phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 {

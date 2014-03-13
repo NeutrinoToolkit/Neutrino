@@ -82,7 +82,6 @@ void
 nWinList::buttonCopyPhys() {
 	foreach (QTreeWidgetItem* item, my_w.images->selectedItems()) {
 		nPhysD *copyPhys=new nPhysD(*getPhys(item));
-		copyPhys->TscanBrightness();
 		nparent->addShowPhys(copyPhys);
 	}
 }
@@ -235,8 +234,8 @@ nWinList::updatePad(nPhysD *my_phys) {
 		nPhysD *thisPhys=getPhys(*it);
 		if (thisPhys) {
 			(*it)->setData(0,0,nparent->physList.indexOf(thisPhys));
-			(*it)->setData(1,0,QString::fromStdString(thisPhys->getShortName()));
-			(*it)->setData(2,0,QString::fromStdString(thisPhys->getName()));
+			(*it)->setData(1,0,QString::fromUtf8(thisPhys->getShortName().c_str()));
+			(*it)->setData(2,0,QString::fromUtf8(thisPhys->getName().c_str()));
 			(*it)->setData(3,0,QString::number(thisPhys->get_origin().x())+" "+QString::number(thisPhys->get_origin().y()));
 			if (thisPhys->get_scale().x()==thisPhys->get_scale().y()) {
 				(*it)->setData(4,0,QString::number(thisPhys->get_scale().x()));
@@ -254,7 +253,7 @@ nWinList::updatePad(nPhysD *my_phys) {
 		++it;
 	}
 	if (my_phys) {
-		my_w.lineEdit->setText(QString::fromStdString(my_phys->getFromName()));
+		my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
 		my_w.lineEdit->setCursorPosition(0);
 	} else {
 		my_w.lineEdit->setText(tr("No image"));
@@ -274,10 +273,10 @@ nWinList::physDel(nPhysD *my_phys) {
 
 void nWinList::physAdd(nPhysD *my_phys) {
 	QTreeWidgetItem *my_item = new QTreeWidgetItem(my_w.images);
-	QString name=QString::fromStdString(my_phys->getName());
+	QString name=QString::fromUtf8(my_phys->getName().c_str());
 	my_item->setData(0,0,nparent->physList.indexOf(my_phys));
-	my_item->setData(1,0,QString::fromStdString(my_phys->getShortName()));
-	my_item->setData(2,0,QString::fromStdString(my_phys->getName()));
+	my_item->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
+	my_item->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
 	my_item->setData(3,0,QString::number(my_phys->get_origin().x())+" "+QString::number(my_phys->get_origin().y()));
 	if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
 		my_item->setData(4,0,QString::number(my_phys->get_scale().x()));

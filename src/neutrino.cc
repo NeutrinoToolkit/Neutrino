@@ -627,7 +627,7 @@ void neutrino::fileNew() {
 void
 neutrino::fileReopen() {
 	if(currentBuffer && currentBuffer->getType()==PHYS_FILE) {
-		QString fname=QString::fromStdString(currentBuffer->getFromName());
+		QString fname=QString::fromUtf8(currentBuffer->getFromName().c_str());
 		fileOpen(fname);
 	}
 }
@@ -722,7 +722,6 @@ vector <nPhysD *> neutrino::fileOpen(QString fname, QString optString) {
 		updateRecentFileActions(fname);
 		for (vector<nPhysImageF<double> *>::iterator it=imagelist.begin(); it!=imagelist.end();) {
 			if ((*it)->getSurf()>0) {
-				(*it)->TscanBrightness(); //FIXME: this should be removed when fixed deep copy
 				addShowPhys((*it));
 				it++;
 			} else {
@@ -757,7 +756,7 @@ void neutrino::saveSession (QString fname) {
 		for (int i=0;i<physList.size(); i++) {
 			if (progress.wasCanceled()) break;
 			progress.setValue(i);
-			progress.setLabelText(QString::fromStdString(physList.at(i)->getShortName()));
+			progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
 			QApplication::processEvents();
 			ofile << "NeutrinoImage" << endl;
 			phys_dump_binary(physList.at(i),ofile);
@@ -847,7 +846,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						} else {
 							delete my_phys;
 						}
-						progress.setLabelText(QString::fromStdString(my_phys->getShortName()));
+						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
 						QStringList listLine=qLine.split(" ");
@@ -901,7 +900,7 @@ void neutrino::addPhys(nPhysD* datamatrix) {
 
 void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 	QAction *action=new QAction(this);
-	QString name=QString::fromStdString(datamatrix->getName());
+	QString name=QString::fromUtf8(datamatrix->getName().c_str());
 	if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
 		action->setText(QFileInfo(name).fileName()+QString(": ")+name);
 	} else {
@@ -916,7 +915,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
 	if (newPhys) {
-		bool redisplay = (currentBuffer==oldPhys) ?true:false; 
+		bool redisplay = (currentBuffer==oldPhys); 
 		if (physList.contains(oldPhys)) {
 			if (oldPhys==NULL) oldPhys=new nPhysD();
 			*oldPhys=*newPhys;
@@ -1013,19 +1012,25 @@ void neutrino::removePhys(nPhysD& datamatrixRef) {
 void
 neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
-//		datamatrix->TscanBrightness();
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
-		nPhysD *oldBuffer=currentBuffer;
 		currentBuffer=datamatrix;
 		if (!physList.contains(datamatrix)) {
 			// TODO: add memory copy...
 			physList << datamatrix;
 		}
-		if (oldBuffer!=currentBuffer) emitBufferChanged();
 		
-		setWindowTitle(property("winId").toString()+QString(": ")+QString::fromStdString(datamatrix->getName()));
+		emitBufferChanged();
+		
+		QString winName=QString::fromUtf8(datamatrix->getShortName().c_str());
+		winName.prepend(property("winId").toString()+QString(":")+QString::number(physList.indexOf(datamatrix))+QString(" "));
+		
+		QString mypath=QString::fromUtf8(datamatrix->getFromName().c_str());
+		winName.append(QString(" ")+mypath);
+		setWindowTitle(winName);
+
+		DEBUG(datamatrix->getType() << " : " << datamatrix->getFromName());
 		if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
-			setWindowFilePath(QString::fromStdString(datamatrix->getFromName()));
+			setWindowFilePath(mypath);
 		} else {
 			setWindowFilePath("");
 		}
@@ -1424,7 +1429,7 @@ neutrino::fileClose() {
 		foreach (nPhysD *phys, physList) {
 			if (askAll && phys->getType()==	PHYS_DYN) {
 				int res=QMessageBox::warning(this,tr("Attention"),
-											 tr("The image")+QString("\n")+QString::fromStdString(phys->getName())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+											 tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
 											 QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
 				switch (res) {
 					case QMessageBox::Yes:
@@ -1453,7 +1458,7 @@ neutrino::closeCurrentBuffer() {
 	if (currentBuffer)  {
 		if (currentBuffer->getType()==PHYS_DYN) {
 			int res=QMessageBox::warning(this,tr("Attention"),
-										 tr("The image")+QString("\n")+QString::fromStdString(currentBuffer->getName())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+										 tr("The image")+QString("\n")+QString::fromUtf8(currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
 										 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 			switch (res) {
 				case QMessageBox::Yes:
