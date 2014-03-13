@@ -52,8 +52,8 @@ template <class T> inline void phys_rotate_right(nPhysImageF<T> &);
 template <class T>
 inline void phys_flip_ud(nPhysImageF<T> &img)
 {
-	for (size_t i=0; i<img.getW()/2; i++) {
-		for (size_t j=0; j<img.getH(); j++) {
+	for (size_t i=0; i<img.getW(); i++) {
+		for (size_t j=0; j<img.getH()/2; j++) {
     		std::swap(img.Timg_matrix[j][i],img.Timg_matrix[img.getH()-j-1][i]);
 		}
 	}

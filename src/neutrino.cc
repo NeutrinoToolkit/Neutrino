@@ -1914,6 +1914,7 @@ neutrino::Blur() {
 void
 neutrino::createFollower() {
 	follower = new neutrino ();
+	follower->toggleMouse(true);
 }
 
 // MONIOR DIRECTORY

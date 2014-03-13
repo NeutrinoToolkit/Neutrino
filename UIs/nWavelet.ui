@@ -886,9 +886,6 @@
              <property name="text">
               <string>Blur</string>
              </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
             </widget>
            </item>
            <item row="0" column="1">
