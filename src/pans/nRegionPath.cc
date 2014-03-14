@@ -109,6 +109,7 @@ void nRegionPath::doMask() {
 				}
 				progress.setValue(i);
 			}
+			regionPath->TscanBrightness();
 //			qDebug() << ">>>>>>>>>>>>>>>>> time " << time.elapsed();
 			regionPhys=nparent->replacePhys(regionPath,regionPhys);
 		}

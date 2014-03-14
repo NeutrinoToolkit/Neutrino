@@ -68,10 +68,13 @@ neutrino::~neutrino()
 	DEBUG("destructor");
 	currentBuffer=NULL;
 	saveDefaults();
-//	leftDock->close();
+	QApplication::processEvents();
+	foreach (nGenericPan *pan, getPans()) {
+		pan->close();
+	}
 	QApplication::processEvents();
 	foreach (nPhysD *phys, physList) {
-		removePhys(phys);
+		delete phys;
 	}
 }
 
