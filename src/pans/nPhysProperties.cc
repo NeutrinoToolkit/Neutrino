@@ -61,7 +61,6 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 				string myval=iter->second;
 				my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
 				item->setSelected(true);
-				DEBUG("here\n");
 			}
 		}
 	}
@@ -69,7 +68,6 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 
 void
 nPhysProperties::showProperty() {
-	DEBUG("Here");
 	if (my_w.propertyList->currentItem()) {
 		string currentKey=my_w.propertyList->currentItem()->text().toStdString();
 		DEBUG(currentKey);

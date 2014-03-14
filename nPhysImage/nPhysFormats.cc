@@ -298,6 +298,8 @@ physInt_sif::physInt_sif(string ifilename)
 	// Andor camera .sif file
 	
 	string temp_string;
+	stringstream ss;
+	int skiplines=0;
 
 	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
 	getline(ifile, temp_string);
@@ -307,20 +309,37 @@ physInt_sif::physInt_sif(string ifilename)
 	}
 		
 	// matrix informations on line 5
-	for (size_t i=0; i<4; i++) {
+	for (size_t i=0; i<3; i++) {
 		getline(ifile, temp_string);
-		DEBUG(11,temp_string);
+        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-"+ss.str()]=temp_string;
     }
+	getline(ifile, temp_string);
 	int w, h;
-	stringstream ss(temp_string);
+	ss.str(temp_string);
 	ss >> w;
 	ss >> h;	
 	this->resize(w, h);
-		
+	
+	getline(ifile, temp_string);
+    ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+    property["sif-"+ss.str()]=temp_string;
+
+	getline(ifile, temp_string);
+	ss.str(temp_string);
+	int binary_header=0,useless=0;
+	ss >> useless >> binary_header;
+	
+    vector<char> buf(binary_header);
+    ifile.read(&buf[0], buf.size());
+
+    temp_string.clear();
     while ((!ifile.eof()) && strcmp(temp_string.c_str(), "0")) {
-        getline(ifile, temp_string);
-		DEBUG(11,"unused line: " << temp_string);
-    }
+		getline(ifile, temp_string);
+        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-"+ss.str()]=temp_string;
+    }    
+    
 	// get data
 	
 	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
@@ -745,7 +764,7 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 		}
         DEBUG(">>>>>>>>>>>>>>> NumFrames after " << NumFrames);
         vector<float> buffer(width*height);
-        for (int nf=0;nf<NumFrames;nf++) {
+        for (unsigned int nf=0;nf<NumFrames;nf++) {
             ifile.read((char*) &buffer[0],width*height*sizeof(float));
             nPhysD *phys=new nPhysD(width,height,0.0);
             for (unsigned int i=0; i<phys->getSurf(); i++) {

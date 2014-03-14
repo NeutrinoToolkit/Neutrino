@@ -220,30 +220,33 @@ void nWavelet::doWavelet () {
 			}
 		}
 		
-		
-		if (my_w.synthetic->isChecked()) {
-			nPhysD *tmpSynthetic = new nPhysD();
-			phys_synthetic_interferogram(*tmpSynthetic,*waveletPhys.at(0),*waveletPhys.at(1));
-			if (my_w.erasePrevious->isChecked()) {
-				syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
-			} else {
-				nparent->addPhys(tmpSynthetic);
-				syntheticPhys=tmpSynthetic;
+		if (nThread.n_iter>0) {
+			if (my_w.synthetic->isChecked()) {
+				nPhysD *tmpSynthetic = new nPhysD();
+				phys_synthetic_interferogram(*tmpSynthetic,*waveletPhys.at(0),*waveletPhys.at(1));
+				if (my_w.erasePrevious->isChecked()) {
+					syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
+				} else {
+					nparent->addPhys(tmpSynthetic);
+					syntheticPhys=tmpSynthetic;
+				}
+				DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
 			}
-			DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
-		}
-
-		//delete my_qt.risultati;
-		nparent->showPhys(bufferDisplayed);
-		QString out;
-		out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
-		if (settings.value("useCuda").toBool()) {
-			out.prepend("GPU");
+			
+			//delete my_qt.risultati;
+			nparent->showPhys(bufferDisplayed);
+			QString out;
+			out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
+			if (settings.value("useCuda").toBool()) {
+				out.prepend("GPU");
+			} else {
+				out.prepend("CPU");
+			}
+			my_w.statusbar->showMessage(out);
 		} else {
-			out.prepend("CPU");
+			my_w.statusbar->showMessage("Canceled");
 		}
-		my_w.statusbar->showMessage(out);
-
+		nThread.quit();
 
 	}
 }

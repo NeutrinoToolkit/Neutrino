@@ -517,7 +517,9 @@ void neutrino::openRecentFile()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action) {
-		fileOpen(action->data().toString());
+		QString fname=action->data().toString();
+		fileOpen(fname);
+		setProperty("fileOpen", fname);
 	}
 }
 
@@ -825,27 +827,27 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						progress.setValue(counter);
 						nPhysD *my_phys=new nPhysD();
 						
-//						int ret=phys_resurrect_old_binary(my_phys,ifile);
-//						if (ret>=0 && my_phys->getSurf()>0) {
-//							addPhys(my_phys);
-//							imagelist.push_back(my_phys);
-//						} else {
-//							int 	ret=phys_resurrect_binary(my_phys,ifile);
-//							if (ret>=0 && my_phys->getSurf()>0) {
-//								addPhys(my_phys);
-//								imagelist.push_back(my_phys);
-//							} else {
-//								delete my_phys;
-//							}
-//						}
-						
-						int ret=phys_resurrect_binary(my_phys,ifile);
+						int ret=phys_resurrect_old_binary(my_phys,ifile);
 						if (ret>=0 && my_phys->getSurf()>0) {
 							addPhys(my_phys);
 							imagelist.push_back(my_phys);
 						} else {
-							delete my_phys;
+							int 	ret=phys_resurrect_binary(my_phys,ifile);
+							if (ret>=0 && my_phys->getSurf()>0) {
+								addPhys(my_phys);
+								imagelist.push_back(my_phys);
+							} else {
+								delete my_phys;
+							}
 						}
+
+//						int ret=phys_resurrect_binary(my_phys,ifile);
+//						if (ret>=0 && my_phys->getSurf()>0) {
+//							addPhys(my_phys);
+//							imagelist.push_back(my_phys);
+//						} else {
+//							delete my_phys;
+//						}
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
@@ -943,6 +945,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 				emitBufferChanged();
 				setWindowTitle(property("winId").toString()+QString(": Neutrino"));
 				setWindowFilePath("");
+				zoomChanged(1);
 				my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
 				my_w.my_view->setSize();
 			}

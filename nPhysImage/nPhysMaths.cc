@@ -176,6 +176,7 @@ phys_add(nPhysImageF<double> &iimage, double val) {
 	if (val!=0.0) {
 		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)+val); 
+		iimage.TscanBrightness();
 	}
 	std::ostringstream ostr;
 	ostr << val;
@@ -187,6 +188,7 @@ phys_subtract(nPhysImageF<double> &iimage, double val) {
 	if (val!=0.0) {
 		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)-val); 
+		iimage.TscanBrightness();
 	}
 	std::ostringstream ostr;
 	ostr << val;
@@ -198,6 +200,7 @@ phys_multiply(nPhysImageF<double> &iimage, double val) {
 	if (val!=1.0) {
 		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)*val); 
+		iimage.TscanBrightness();
 	}
 	std::ostringstream ostr;
 	ostr << val;
@@ -209,6 +212,7 @@ phys_divide(nPhysImageF<double> &iimage, double val) {
 	if (val!=1.0) {
 		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)/val); 
+		iimage.TscanBrightness();
 	}
 	std::ostringstream ostr;
 	ostr << val;
@@ -221,6 +225,7 @@ phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
 	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
 		iimage.set(ii, iimage.point(ii) + vMax*((double)rand() / RAND_MAX));
 	}
+	iimage.TscanBrightness();
 	std::ostringstream ostr;
 	ostr << vMax;
 	iimage.setName("("+iimage.getName()+")+rand("+ostr.str()+")");
@@ -259,6 +264,7 @@ phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
 		}
 	}
 
+	m1.TscanBrightness();
 	std::ostringstream ostr;
 	ostr << radius;
 	m1.setName("blur("+m1.getName()+","+ostr.str()+")");
@@ -270,6 +276,7 @@ phys_sin(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,sin(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("sin("+m1.getName()+")");
 }
 
@@ -279,6 +286,7 @@ phys_cos(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,cos(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("cos("+m1.getName()+")");
 }
 
@@ -288,6 +296,7 @@ phys_tan(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,tan(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("tan("+m1.getName()+")");
 }
 
@@ -297,6 +306,7 @@ phys_pow(nPhysImageF<double> &m1, double exponent)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),exponent));
 	}
+	m1.TscanBrightness();
 	std::ostringstream ostr;
 	ostr << exponent;
 	m1.setName("("+m1.getName()+")^"+ostr.str());
@@ -308,6 +318,7 @@ phys_square(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),2));
 	}
+	m1.TscanBrightness();
 	m1.setName("("+m1.getName()+")^2");
 }
 
@@ -317,6 +328,7 @@ phys_sqrt(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,sqrt(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("sqrt("+m1.getName()+")");
 }
 
@@ -326,6 +338,7 @@ phys_abs(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,abs(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("abs("+m1.getName()+")");
 }
 
@@ -335,6 +348,7 @@ phys_log(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("ln("+m1.getName()+")");
 }
 
@@ -344,6 +358,7 @@ phys_log10(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log10(m1.point(i)));
 	}
+	m1.TscanBrightness();
 	m1.setName("log("+m1.getName()+")");
 }
 
@@ -427,6 +442,7 @@ phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius
 			m1.set(i,nan_free_phys[i]);
 		}
 	}
+	m1.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);

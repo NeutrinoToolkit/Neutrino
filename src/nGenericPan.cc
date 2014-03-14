@@ -475,7 +475,10 @@ nGenericPan::progressRun(int max_calc) {
 		progress.setValue(nThread.n_iter);
 		QApplication::processEvents();
 		sleeper_thread::msleep(100);
-		if (progress.wasCanceled()) nThread.stop();
+		if (progress.wasCanceled()) {
+			nThread.stop();
+			break;
+		}
 	}
 
 }

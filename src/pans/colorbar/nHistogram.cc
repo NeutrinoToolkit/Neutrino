@@ -110,7 +110,7 @@ void nHistogram::drawPicture (QPainter &p) {
 		p.setPen(QColor(Qt::black));
 		p.setBrush(QColor(0,0,0,127));
 		p.setPen(QColor(0,0,0,127));
-		vector<double> vettore=parentPan->currentBuffer->get_histogram();
+		const vector<double> vettore=parentPan->currentBuffer->get_histogram();
 
 		if (vettore.size()>0) {
 			double dx2=((double) dx)/(vettore.size()-1);
