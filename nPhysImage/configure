@@ -2192,6 +2192,8 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 uname=`uname`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: uname: $uname" >&5
+$as_echo "$as_me: uname: $uname" >&6;}
 
 # Checks for programs.
 : ${CFLAGS=}
@@ -3776,7 +3778,51 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lmfhdf" >&5
+
+case $uname in
+	*MINGW*)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lmfhdfdll" >&5
+$as_echo_n "checking for main in -lmfhdfdll... " >&6; }
+if ${ac_cv_lib_mfhdfdll_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmfhdfdll  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_mfhdfdll_main=yes
+else
+  ac_cv_lib_mfhdfdll_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mfhdfdll_main" >&5
+$as_echo "$ac_cv_lib_mfhdfdll_main" >&6; }
+if test "x$ac_cv_lib_mfhdfdll_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBMFHDFDLL 1
+_ACEOF
+
+  LIBS="-lmfhdfdll $LIBS"
+
+fi
+
+ 	;;
+	*)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lmfhdf" >&5
 $as_echo_n "checking for main in -lmfhdf... " >&6; }
 if ${ac_cv_lib_mfhdf_main+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -3814,6 +3860,10 @@ _ACEOF
   LIBS="-lmfhdf $LIBS"
 
 fi
+
+	;;
+esac
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lnetpbm" >&5
 $as_echo_n "checking for main in -lnetpbm... " >&6; }

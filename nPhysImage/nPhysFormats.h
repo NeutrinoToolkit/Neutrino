@@ -32,7 +32,7 @@ extern "C" {
 #include <pgm.h>
 #endif
 
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
 #define intf hdf4_intf
 #define int8 hdf4_int8
 #include "hdf.h"
