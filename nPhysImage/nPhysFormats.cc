@@ -1292,9 +1292,9 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 //! open HDF4 file (works for: Omega LLR  visar images)
 vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	vector <nPhysImageF<double> *> imagelist;
-	WARNING("HERE");
-#ifdef HAVE_LIBMFHDF
-	WARNING("HERE2");
+	DEBUG("HERE");
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+	DEBUG("HERE2");
 	int32 sd_id, sds_id, n_datasets, n_file_attrs, index,status ;
 	int32 dim_sizes[3];
 	int32 rank, num_type, attributes, istat;
@@ -1618,7 +1618,7 @@ void scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
 #endif
 
 int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
 	if (phys) {
 		intn istat=0;
 		int32 sd_id = SDstart(fname, DFACC_CREATE);
@@ -1632,7 +1632,7 @@ int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
 	return -1;
 }
 
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
 int phys_write_HDF4_SD(nPhysImageF<double> * phys, int sd_id) {
 	intn istat=0;
 	int32 start[2], dimsizes[2];

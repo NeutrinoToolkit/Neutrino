@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `mfhdf' library (-lmfhdf). */
 #undef HAVE_LIBMFHDF
 
+/* Define to 1 if you have the `mfhdfdll' library (-lmfhdfdll). */
+#undef HAVE_LIBMFHDFDLL
+
 /* Define to 1 if you have the `netpbm' library (-lnetpbm). */
 #undef HAVE_LIBNETPBM
 

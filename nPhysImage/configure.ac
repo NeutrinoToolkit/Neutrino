@@ -10,6 +10,7 @@ AC_CONFIG_HEADERS([config.h])
 
 
 uname=`uname`
+AC_MSG_NOTICE([uname: $uname])
 
 # Checks for programs.
 : ${CFLAGS=}
@@ -112,7 +113,17 @@ AC_CHECK_LIB([hdf5], [main])
 AC_CHECK_LIB([hdf5_hl], [main])
 AC_CHECK_LIB([jpeg], [main])
 AC_CHECK_LIB([m], [main])
-AC_CHECK_LIB([mfhdf], [main])
+
+case $uname in
+	*MINGW*)
+		AC_CHECK_LIB([mfhdfdll], [main])
+ 	;;
+	*)
+		AC_CHECK_LIB([mfhdf], [main])
+	;;
+esac
+
+
 AC_CHECK_LIB([netpbm], [main])
 AC_CHECK_LIB([pthread], [main])
 AC_CHECK_LIB([tiff], [main])
