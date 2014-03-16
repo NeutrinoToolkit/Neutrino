@@ -801,17 +801,13 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 
 
 //! General function for Abel inversion
-nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
+nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 {
-
-	if (params == NULL)
-		return NULL;
-
 	
-	std::vector<phys_point> iaxis = params->iaxis; // TODO: passa a bidimvec
-	phys_direction idir = params->idir;
-	inversion_algo ialgo = params->ialgo;
-//	inversion_physics iphysics = params->iphysics;
+	std::vector<phys_point> iaxis = params.iaxis; // TODO: passa a bidimvec
+	phys_direction idir = params.idir;
+	inversion_algo ialgo = params.ialgo;
+//	inversion_physics iphysics = params.iphysics;
 
 
 	if (iimage.getSurf() == 0)
@@ -863,9 +859,17 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 			break;
 	}*/
 
+	*params.iter_ptr = 0;
+	
 	if (ialgo == ABEL) {
 		DEBUG(1, "Plain ABEL inversion");
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)==-1) {
+				    DEBUG("aborting");
+				    break;
+			}
+			(*params.iter_ptr)++;
+			
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
@@ -893,7 +897,6 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 			oimage->set(iaxis[ii].x, iaxis[ii].y, 
 					0.5*(oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
-			*params->iter_ptr = ii;
 		}
 		oimage->setName(string("ABEL ")+oimage->getName());
 		oimage->setShortName("ABEL");
@@ -927,6 +930,12 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 		DEBUG(5, "Axe average: "<<axe_average);
 
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)==-1) {
+				DEBUG("aborting");
+				break;
+			}
+			(*params.iter_ptr)++;
+
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
@@ -964,7 +973,6 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 
 			oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point); 
 
-			*params->iter_ptr = ii;
 			DEBUG(10,"step: "<<ii);
 		}
 		oimage->setName(string("ABEL")+oimage->getName());
@@ -974,12 +982,12 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 		DEBUG(1, "Unknown inversion type: "<<(int)ialgo);
 	}
 
-	DEBUG(5,"after inversion");
 	delete copy_buffer;
 	delete out_buffer;
 
 	oimage->TscanBrightness();
 
+    DEBUG((*params.iter_ptr)); 
 	return oimage;
 }
 

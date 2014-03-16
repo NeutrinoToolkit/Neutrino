@@ -329,7 +329,7 @@ physInt_sif::physInt_sif(string ifilename)
 	ss.str(temp_string);
 	int binary_header=0,useless=0;
 	ss >> useless >> binary_header;
-	
+	DEBUG("unised value " << useless);
 	vector<char> buf(binary_header);
 	ifile.read(&buf[0], buf.size());
 
@@ -339,17 +339,15 @@ physInt_sif::physInt_sif(string ifilename)
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
 		property["sif-"+ss.str()]=temp_string;
 	}	
-	
+
 	// get data
-	
 	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 	vector<float> readb(getSurf());
 	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
 	ifile.close();
 	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
 	
-	TscanBrightness();
-	
+	TscanBrightness();	
 }
 
 physShort_b16::physShort_b16(const char *ifilename)

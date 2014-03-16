@@ -137,7 +137,7 @@ struct abel_params_str {
 typedef struct abel_params_str abel_params;
 
 // main inversion function
-nPhysImageF<double> * phys_invert_abel(nPhysImageF<double> &, abel_params *);
+nPhysImageF<double> * phys_invert_abel(nPhysImageF<double> &, abel_params &);
 
 // inline inversion maths
 inline void phys_invert_abel_1D(double *ivec, double *ovec, size_t size)

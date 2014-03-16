@@ -246,6 +246,7 @@ void nWavelet::doWavelet () {
 		} else {
 			my_w.statusbar->showMessage("Canceled");
 		}
+		QApplication::processEvents();		
 		nThread.quit();
 
 	}
