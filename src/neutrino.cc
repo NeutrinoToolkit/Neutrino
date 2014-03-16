@@ -830,27 +830,27 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						progress.setValue(counter);
 						nPhysD *my_phys=new nPhysD();
 						
-						int ret=phys_resurrect_old_binary(my_phys,ifile);
-						if (ret>=0 && my_phys->getSurf()>0) {
-							addPhys(my_phys);
-							imagelist.push_back(my_phys);
-						} else {
-							int 	ret=phys_resurrect_binary(my_phys,ifile);
-							if (ret>=0 && my_phys->getSurf()>0) {
-								addPhys(my_phys);
-								imagelist.push_back(my_phys);
-							} else {
-								delete my_phys;
-							}
-						}
-
-//						int ret=phys_resurrect_binary(my_phys,ifile);
+//						int ret=phys_resurrect_old_binary(my_phys,ifile);
 //						if (ret>=0 && my_phys->getSurf()>0) {
 //							addPhys(my_phys);
 //							imagelist.push_back(my_phys);
 //						} else {
-//							delete my_phys;
+//							int 	ret=phys_resurrect_binary(my_phys,ifile);
+//							if (ret>=0 && my_phys->getSurf()>0) {
+//								addPhys(my_phys);
+//								imagelist.push_back(my_phys);
+//							} else {
+//								delete my_phys;
+//							}
 //						}
+
+						int ret=phys_resurrect_binary(my_phys,ifile);
+						if (ret>=0 && my_phys->getSurf()>0) {
+							addPhys(my_phys);
+							imagelist.push_back(my_phys);
+						} else {
+							delete my_phys;
+						}
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
