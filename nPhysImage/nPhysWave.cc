@@ -372,7 +372,7 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 			}
 		}
 		
-		if ((*wave_params.iter_ptr)==-1) {
+		if ((*wave_params.iter_ptr)!=-1) {
 		
 			for (size_t k=0; k<ifg.getSurf(); k++) {
 				qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
