@@ -791,30 +791,66 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 	header.resize(4100);
 	ifile.read((char *)&header[0],header.size());
 	unsigned short type= *((unsigned short *) &header[108]);
+	
+	unsigned short height= *((unsigned short *) &header[656]);
+	unsigned short width= *((unsigned short *) &header[42]);
+	unsigned short noscan= *((unsigned short *) &header[34]);
+	unsigned int NumFrames= *((unsigned int *) &header[1446]);
 
-	if (type==0) {
-		unsigned short height= *((unsigned short *) &header[656]);
-		unsigned short width= *((unsigned short *) &header[42]);
-		unsigned short noscan= *((unsigned short *) &header[34]);
-		unsigned int NumFrames= *((unsigned int *) &header[1446]);
-
-		if (noscan == 65535) {
-			int lnoscan = *((int *) &header[664]);
-			if (lnoscan != -1) NumFrames = lnoscan / height;
-		} else {
-			NumFrames = noscan / height;
-		}
-		vector<float> buffer(width*height);
-		for (unsigned int nf=0;nf<NumFrames;nf++) {
-			ifile.read((char*) &buffer[0],width*height*sizeof(float));
-			nPhysD *phys=new nPhysD(width,height,0.0);
-			for (unsigned int i=0; i<phys->getSurf(); i++) {
-				phys->set(i,buffer[i]);
-			}
-			phys->TscanBrightness();
-			vecReturn.push_back(phys);
-		}
+	if (noscan == 65535) {
+		int lnoscan = *((int *) &header[664]);
+		if (lnoscan != -1) NumFrames = lnoscan / height;
+	} else {
+		NumFrames = noscan / height;
 	}
+
+	DEBUG(type << " " << height  << " " << width << " " << noscan << " " << NumFrames);
+
+	for (unsigned int nf=0;nf<NumFrames;nf++) {
+		nPhysD *phys=new nPhysD(width,height,0.0);
+		phys->property["spe-type"]=type;
+		phys->property["spe-frame"]=vec2f(nf,NumFrames);
+		switch (type) {
+			case 0: {
+				vector<float> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(float));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 1: {
+				vector<long> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(long));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 2: {
+				vector<unsigned int> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned int));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 3: {
+				vector<unsigned short> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			default:
+				break;
+		}
+		
+		phys->TscanBrightness();
+		vecReturn.push_back(phys);
+	}
+
 	ifile.close();
 	return vecReturn;
 }
@@ -1766,7 +1802,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		name.erase(0,last_idx + 1);
 	}
 
-	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name);
+	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 	
 	nPhysD *datamatrix=NULL;
 	if (ext=="pgm") {
