@@ -370,6 +370,11 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				}
 				
 			}
+			//! todo: this is awful: add exception?
+            if ((*wave_params.iter_ptr)==-1) {
+                DEBUG("aborting");
+                break;
+            }
 		}
 		
 		if ((*wave_params.iter_ptr)!=-1) {
@@ -586,7 +591,13 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 				cudaThreadSynchronize();
 			
 			}
+			//! todo: this is awful: add exception?
+            if ((*wave_params.iter_ptr)==-1) {
+                DEBUG("aborting");
+                break;
+            }
 		}
+		DEBUG("*wave_params.iter_ptr" <<  *wave_params.iter_ptr);
 		cudaThreadSynchronize();
 
 		if ((*wave_params.iter_ptr)!=-1) {

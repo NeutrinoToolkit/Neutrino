@@ -53,6 +53,9 @@ public:
 	std::vector<nPhysD *> waveletPhys;
 	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
+private:
+	wavelet_params my_params;
+
 public slots:
 		
 	void guessCarrier();

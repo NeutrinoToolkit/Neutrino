@@ -151,7 +151,6 @@ QVariant nIntegralInversion::doInversion() {
 		//inv_image = phys_invert_abel(*iimage, inv_axis, inv_axis_dir, ABEL, ABEL_NONE);
 		// launching thread
 
-		abel_params my_abel_params;
 		my_abel_params.iaxis = inv_axis;
 		my_abel_params.idir = inv_axis_dir;
 		//my_abel_params.ialgo = ABEL;
@@ -176,13 +175,14 @@ QVariant nIntegralInversion::doInversion() {
 		nThread.setTitle("Abel transform...");
 		progressRun(inv_axis.size());
 
+		DEBUG("back from of thread " << nThread.isFinished());
+
 		DEBUG(5,"about to launch thread");
 
 		inv_image = *(nThread.odata.begin());
 		DEBUG(5,"Thread finish " << nThread.n_iter);
 			// apply physics
 		QApplication::processEvents();		
-		nThread.quit();
 
 		if (inv_image && nThread.n_iter!=-1) {
 			switch (my_w.physTabs->currentIndex()) {
@@ -215,6 +215,12 @@ QVariant nIntegralInversion::doInversion() {
 			retVar=qVariantFromValue(*invertedPhys);
 		} else {	
 			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
+		}
+		
+		if(nThread.n_iter==-1) {
+			DEBUG("Thread was killed, waiting end of thread");
+			nThread.wait();
+			DEBUG("Thread was killed, finish waiting end of thread");
 		}
 	}
 

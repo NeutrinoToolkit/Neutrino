@@ -157,7 +157,6 @@ void nWavelet::doWavelet () {
 
 		//my_qt.useCuda=settings.value("useCuda").toBool();
 
-		wavelet_params my_params;
 		if (my_w.numAngle->value()==0) {
 			my_params.init_angle=my_w.angleCarrier->value();
 			my_params.end_angle=my_w.angleCarrier->value();
@@ -179,6 +178,8 @@ void nWavelet::doWavelet () {
 		my_params.thickness=my_w.thickness->value();
 		my_params.damp=my_w.damp->value();
 		
+		nThread.setTitle("Wavelet...");
+
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
 			// use cuda
 			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_cuda);
@@ -187,9 +188,12 @@ void nWavelet::doWavelet () {
 			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_nocuda);
 		}
 		
-		nThread.setTitle("Wavelet...");
-		progressRun(my_params.n_angles*my_params.n_lambdas);
 
+		progressRun(my_params.n_angles*my_params.n_lambdas);
+		
+
+		DEBUG("back from of thread " << nThread.isFinished());
+		
 		std::list<nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);
 		unsigned int position=0;
@@ -246,9 +250,13 @@ void nWavelet::doWavelet () {
 		} else {
 			my_w.statusbar->showMessage("Canceled");
 		}
-		QApplication::processEvents();		
-		nThread.quit();
 
+		
+	}
+	if (nThread.n_iter==-1) {
+		DEBUG("Thread was killed, waiting end of thread " << nThread.isFinished());
+		nThread.wait();
+		DEBUG("Thread was killed, finish waiting end of thread " << nThread.isFinished());
 	}
 }
 

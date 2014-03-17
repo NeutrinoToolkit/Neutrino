@@ -53,7 +53,9 @@ public:
 
 	QPointer<nLine> axis;
 	nPhysD *invertedPhys;
-	
+private:
+	abel_params my_abel_params;
+
 public slots:
 	void sceneChanged();
 	void refphase_checkbChanged(int);
