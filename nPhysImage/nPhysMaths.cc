@@ -380,8 +380,8 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 	
 	fftw_execute(fb);
 
- 	double sx=pow(m1.getW()/(radius*M_PI),2)/2.0;
- 	double sy=pow(m1.getH()/(radius*M_PI),2)/2.0;
+ 	double sx=pow(m1.getW()/(radius),2)/2.0;
+ 	double sy=pow(m1.getH()/(radius),2)/2.0;
 
  	for (size_t j = 0 ; j < m1.getH(); j++) {
 		for (size_t i = 0 ; i < m1.getW()/2+1 ; i++) {

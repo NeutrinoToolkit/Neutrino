@@ -331,6 +331,8 @@ public:
 		Timg_buffer = rhs.Timg_buffer;
 		width = rhs.width;
 		height = rhs.height;
+		histogram=rhs.histogram;
+
 
 		_n_inst = rhs._n_inst;
 		_trash_new();

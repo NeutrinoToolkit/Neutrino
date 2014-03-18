@@ -344,14 +344,12 @@ physInt_sif::physInt_sif(string ifilename)
 		if (temp_string.compare(0,control_string.length(),control_string)==0) {
 			found_control_string=true;
 		}		
-		DEBUG(found_control_string << " " << skiplines << " : " << ifile.tellg() << " : " << temp_string); 
 	}	
 
 	// get data
 	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 	vector<float> readb(getSurf());
 	
-	DEBUG(ifile.gcount());
 	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
 	DEBUG(ifile.gcount());
 	ifile.close();
