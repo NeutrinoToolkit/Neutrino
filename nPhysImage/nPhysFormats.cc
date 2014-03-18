@@ -63,9 +63,10 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	
 	ifile.clear();
 	ifile.seekg(0,ios::beg);
-	
+	string comment("");
 	do {
 		getline (ifile, tline);
+		comment.append(tline);
 	} while ((tline.find('#') != string::npos) || (tline.find_first_not_of(' ') == tline.find_last_not_of(' ')));
 	
 	stringstream ss(tline);
@@ -329,25 +330,35 @@ physInt_sif::physInt_sif(string ifilename)
 	ss.str(temp_string);
 	int binary_header=0,useless=0;
 	ss >> useless >> binary_header;
-	DEBUG("unised value " << useless);
+	DEBUG("unused value " << useless);
 	vector<char> buf(binary_header);
 	ifile.read(&buf[0], buf.size());
 
 	temp_string.clear();
-	while ((!ifile.eof()) && strcmp(temp_string.c_str(), "0")) {
+	bool found_control_string=false;
+	string control_string="Pixel number";
+	while ((!ifile.eof()) && (strcmp(temp_string.c_str(), "0") || found_control_string==false )) {
 		getline(ifile, temp_string);
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
 		property["sif-"+ss.str()]=temp_string;
+		if (temp_string.compare(0,control_string.length(),control_string)==0) {
+			found_control_string=true;
+		}		
+		DEBUG(found_control_string << " " << skiplines << " : " << ifile.tellg() << " : " << temp_string); 
 	}	
 
 	// get data
 	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 	vector<float> readb(getSurf());
+	
+	DEBUG(ifile.gcount());
 	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
+	DEBUG(ifile.gcount());
 	ifile.close();
 	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
 	
-	TscanBrightness();	
+	TscanBrightness();
+	DEBUG(Tminimum_value << " " << Tmaximum_value);
 }
 
 physShort_b16::physShort_b16(const char *ifilename)
@@ -477,9 +488,9 @@ physShort_img::physShort_img(string ifilename)
 	   	ifile.read((char *)&buffer,sizeof(unsigned short));
 	   	DEBUG("ARP " << buffer << " " << skipbyte << " " << w  << " " << h);
 	} else { // LIL images
-		ifile.seekg(0);
-		unsigned int lil_header[4];
-	   	ifile.read((char *)lil_header,4*sizeof(unsigned int));	   	
+		ifile.seekg(ios_base::beg);
+		vector<unsigned int>lil_header (4);
+	   	ifile.read((char *)&lil_header[0],lil_header.size()*sizeof(unsigned int));	   	
 		if (lil_header[0]==2 && lil_header[3]==1) {
 			// lil_header[0] = dimension of the matrix
 			// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
@@ -501,30 +512,40 @@ physUint_imd::physUint_imd(string ifilename)
 : nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
 {
 	// Optronics luli
-	//
+	// we should also check if a .imi text file exists and read it?
+
 	unsigned short buffer_header;
 	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
 	unsigned short w=0;
 	unsigned short h=0;
 		
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
-	DEBUG(5,"header " << buffer_header);
+	property["imd-version"]=buffer_header;
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
-	DEBUG(5,"width " << buffer_header);
 	w=buffer_header;
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
-	DEBUG(5,"height " << buffer_header);
 	h=buffer_header;
 	
 	this->resize(w, h);
    	ifile.read((char *)Timg_buffer,sizeof(unsigned int)*w*h);
 
 	ifile.close();
-	TscanBrightness();
-	DEBUG(5,"object_name: "<<getName());
-	DEBUG(5,"filename: "<<getName());
-	
-	
+
+	string ifilenameimg=ifilename;
+	ifilenameimg.resize(ifilenameimg.size()-3);
+	ifilenameimg = ifilenameimg+"imi";
+	ifstream ifileimg(ifilenameimg.c_str(), ios::in);
+	if (ifileimg) {
+		string comment(""),temp_line;		
+		while (!ifileimg.eof()) {
+			getline(ifileimg, temp_line);
+			comment.append(temp_line);
+		}
+		ifileimg.close();
+		property["imi-info"]=comment;			
+	}
+
+	TscanBrightness();	
 }
 
 
@@ -808,10 +829,10 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 
 	for (unsigned int nf=0;nf<NumFrames;nf++) {
 		nPhysD *phys=new nPhysD(width,height,0.0);
-		phys->property["spe-type"]=type;
 		phys->property["spe-frame"]=vec2f(nf,NumFrames);
 		switch (type) {
 			case 0: {
+				phys->property["spe-type"]="float";
 				vector<float> buffer(width*height);
 				ifile.read((char*) &buffer[0],width*height*sizeof(float));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -820,6 +841,7 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 				break;
 			}
 			case 1: {
+				phys->property["spe-type"]="long";
 				vector<long> buffer(width*height);
 				ifile.read((char*) &buffer[0],width*height*sizeof(long));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -828,6 +850,7 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 				break;
 			}
 			case 2: {
+				phys->property["spe-type"]="unsigned int";
 				vector<unsigned int> buffer(width*height);
 				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned int));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -836,6 +859,7 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 				break;
 			}
 			case 3: {
+				phys->property["spe-type"]="unsigned short";
 				vector<unsigned short> buffer(width*height);
 				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -925,6 +949,7 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 					break;
 				}
 			}
+			linearized->set_scale(resx,resy);
 			linearized->TscanBrightness();
 			original->TscanBrightness();
 		}
