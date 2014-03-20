@@ -177,7 +177,12 @@ void nWavelet::doWavelet () {
 		}
 		my_params.thickness=my_w.thickness->value();
 		my_params.damp=my_w.damp->value();
+
 		
+#if defined(Q_OS_WIN)
+		std::list<nPhysD *> retList = *phys_wavelet_field_2D_morlet(&datamatrix, &my_params);
+		nThread.n_iter=1;
+#else
 		nThread.setTitle("Wavelet...");
 
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
@@ -191,19 +196,23 @@ void nWavelet::doWavelet () {
 
 		progressRun(my_params.n_angles*my_params.n_lambdas);
 		
+		std::list<nPhysD *> retList = nThread.odata;
 
 		DEBUG("back from of thread " << nThread.isFinished());
+		if (nThread.n_iter==0) {
+			QMessageBox::critical(this, tr("Neutrino Wavelet"),tr("CUDA didn't work.\nDisable from preferences window"),QMessageBox::Ok);
+		}
+		
+#endif		
+
 		
 		std::list<nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);
 		unsigned int position=0;
-		if (nThread.n_iter==0) {
-			QMessageBox::critical(this, tr("Neutrino Wavelet"),tr("CUDA didn't work.\nDisable from preferences window"),QMessageBox::Ok);
-		}
-		for(itr = nThread.odata.begin(); itr != nThread.odata.end() && position<waveletPhys.size(); ++itr, ++position) {
+		for(itr = retList.begin(); itr != retList.end() && position<waveletPhys.size(); ++itr, ++position) {
 			nPhysD *mat=(*itr);
 			if (mat) {
-				WARNING(nThread.odata.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
+				WARNING(retList.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
 				if ((mat->getShortName()=="angle" && my_params.n_angles==1) ||
 					mat->getShortName()=="lambda" && my_params.n_lambdas==1) {
 					delete mat;
