@@ -100,10 +100,11 @@ typedef struct wavelet_params_str wavelet_params;
 //typedef struct convolution_result_str convolution_result;
 
 // calculate wavelet field
-std::list<nPhysImageF<double> *> * phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
-std::list<nPhysImageF<double> *> * phys_wavelet_field_2D_morlet(nPhysImageF<double> &, wavelet_params &);
+
+// std::list<nPhysImageF<double> *> phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
+std::list<nPhysImageF<double> *> phys_wavelet_field_2D_morlet(nPhysImageF<double> &, wavelet_params &);
 bool cudaEnabled();
-std::list<nPhysImageF<double> *> * phys_wavelet_field_2D_morlet_cuda(nPhysImageF<double> &, wavelet_params &);
+std::list<nPhysImageF<double> *> phys_wavelet_field_2D_morlet_cuda(nPhysImageF<double> &, wavelet_params &);
 
 // unwrap methods
 nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy);

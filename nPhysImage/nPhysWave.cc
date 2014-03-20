@@ -266,11 +266,11 @@ phys_wavelet_field_2D(nPhysD &ifg, wavelet_params &wave_params)
 // 	return olist;
 // }
 
-list<nPhysD *> *
+list<nPhysD *>
 phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 {
 	DEBUG(5,"start");
-	list<nPhysD *> *olist = new list<nPhysD *>;
+	list<nPhysD *> olist;
 
 	if ((wave_params.n_angles > 0) && (wave_params.n_lambdas > 0) && (ifg.getSurf() != 0)) {
 
@@ -397,14 +397,14 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				}
 			}
 			
-			olist->push_back(wphase);
-			olist->push_back(qmap);
-			olist->push_back(lambda);
-			olist->push_back(angle);
-			olist->push_back(intensity);
+			olist.push_back(wphase);
+			olist.push_back(qmap);
+			olist.push_back(lambda);
+			olist.push_back(angle);
+			olist.push_back(intensity);
 			
 			list<nPhysD *>::const_iterator itr;
-			for(itr = olist->begin(); itr != olist->end(); ++itr) {
+			for(itr = olist.begin(); itr != olist.end(); ++itr) {
 				(*itr)->TscanBrightness();
 				(*itr)->set_origin(ifg.get_origin());
 				(*itr)->set_scale(ifg.get_scale());
@@ -431,13 +431,13 @@ bool cudaEnabled() {
 }
 
 #ifdef HAVE_CUDA
-list<nPhysD *> *
+list<nPhysD *>
 phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 
     wave_params.iter=0;
     *wave_params.iter_ptr = 0;
 
-	list<nPhysD *> *olist = new list<nPhysD *>;
+	list<nPhysD *> olist;
 
 	DEBUG(5,"start");
 
@@ -625,14 +625,14 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 			
 			phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
 			
-			olist->push_back(wphase);
-			olist->push_back(qmap);
-			olist->push_back(lambda);
-			olist->push_back(angle);
-			olist->push_back(intensity);
+			olist.push_back(wphase);
+			olist.push_back(qmap);
+			olist.push_back(lambda);
+			olist.push_back(angle);
+			olist.push_back(intensity);
 			
 			list<nPhysD *>::const_iterator itr;
-			for(itr = olist->begin(); itr != olist->end(); ++itr) {
+			for(itr = olist.begin(); itr != olist.end(); ++itr) {
 				(*itr)->TscanBrightness();
 				(*itr)->set_origin(ifg.get_origin());
 				(*itr)->set_scale(ifg.get_scale());

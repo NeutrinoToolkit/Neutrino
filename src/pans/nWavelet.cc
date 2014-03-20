@@ -274,14 +274,14 @@ void nWavelet::doWavelet () {
 std::list<nPhysD *>
 phys_wavelet_trasl_cuda(nPhysD *iimage, void *params, int &iter) {
 	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList = *phys_wavelet_field_2D_morlet_cuda(*iimage, *((wavelet_params *)params));
+	std::list<nPhysD *> retList = phys_wavelet_field_2D_morlet_cuda(*iimage, *((wavelet_params *)params));
 	return retList;
 }
 
 std::list<nPhysD *>
 phys_wavelet_trasl_nocuda(nPhysD *iimage, void *params, int &iter) {
 	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList =  *phys_wavelet_field_2D_morlet(*iimage, *((wavelet_params *)params));
+	std::list<nPhysD *> retList =  phys_wavelet_field_2D_morlet(*iimage, *((wavelet_params *)params));
 	return retList;
 }
 
