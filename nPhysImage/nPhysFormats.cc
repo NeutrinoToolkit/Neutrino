@@ -667,6 +667,58 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	return 0;
 }
 
+int
+phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
+{	
+
+	if (ofile.fail()) {
+		WARNING("ostream error");
+		return -1;
+	}
+	
+	if (my_phys == NULL) {
+		WARNING("phys error");
+		return -1;
+	}
+	
+	//int pos = ofile.tellg();
+	//int written_data = 0;
+	
+	//ofile<<my_phys->property<<"\n";
+	
+
+
+	DEBUG(5,getName() << " Short: " << getShortName() << " from: " << getFromName());
+
+	if (ofile.good()) {
+
+		stringstream ss;
+		my_phys->property.dumper(ss);
+		std::string str = ss.str(), str2;
+
+		int pos;
+		while((pos = str.find("\n", pos)) != std::string::npos)
+	      	{
+		   	str.insert(pos+1, "# ");
+		   	pos += 1;
+	      	}
+		str.insert(0, "# ");
+
+
+		ofile<<str<<"\n";
+
+		for (register size_t i=0; i<my_phys->getH(); i++) {
+			for (register size_t j=0; j<my_phys->getW()-1; j++)
+				ofile<<std::setprecision(8)<<my_phys->getPoint(j,i)<<"\t";
+			ofile<<std::setprecision(8)<<my_phys->getPoint(my_phys->getW()-1,i)<<"\n";
+		}
+
+	
+		return 0;
+	}
+	return -1;
+}
+
 physDouble_tiff::physDouble_tiff(const char *ifilename)
 : nPhysImageF<double>(string(ifilename), PHYS_FILE) {
 #ifdef HAVE_LIBTIFF

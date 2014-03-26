@@ -169,6 +169,9 @@ int
 phys_dump_binary(nPhysImageF<double> *, std::ofstream &);
 
 int
+phys_dump_ascii(nPhysImageF<double> *, std::ofstream &);
+
+int
 phys_resurrect_binary(nPhysImageF<double> *, std::ifstream &);
 
 int
