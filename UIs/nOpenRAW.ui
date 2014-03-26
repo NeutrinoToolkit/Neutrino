@@ -36,6 +36,11 @@
       </property>
       <item>
        <property name="text">
+        <string>Unsigned Char (1 byte)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>Char (1 byte)</string>
        </property>
       </item>
@@ -208,8 +213,8 @@
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//loadPref.png</normaloff>:icons/loadPref</iconset>
+    <iconset>
+     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
    </property>
    <property name="text">
     <string>loadPref</string>
@@ -220,8 +225,8 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//savePref.png</normaloff>:icons/savePref</iconset>
+    <iconset>
+     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
    </property>
    <property name="text">
     <string>savePref</string>

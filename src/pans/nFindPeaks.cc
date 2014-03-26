@@ -284,7 +284,7 @@ void nFindPeaks::updatePlot() {
 void nFindPeaks::copy_clip() {
 	if (currentBuffer) {
 		QClipboard *clipboard = QApplication::clipboard();
-		QString point_table="# FindPeaks "+QString::fromStdString(currentBuffer->getName())+"\n";
+		QString point_table="# FindPeaks "+QString::fromUtf8(currentBuffer->getName().c_str())+"\n";
 		int k=0;
 		foreach(QwtPlotMarker* mark,markers) {
 			point_table.append(QString("%1\t%2\n").arg(k++).arg(mark->value().x()));
@@ -302,7 +302,7 @@ void nFindPeaks::export_txt() {
 			QFile t(fnametmp);
 			t.open(QIODevice::WriteOnly| QIODevice::Text);
 			QTextStream out(&t);
-			out << "# FindPeaks " << QString::fromStdString(currentBuffer->getName()) <<endl;
+			out << "# FindPeaks " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
 			int k=0;
 			foreach(QwtPlotMarker* mark,markers) {
 				out << k++ << "\t" << mark->value().x() << endl;

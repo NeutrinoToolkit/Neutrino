@@ -292,7 +292,7 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
-		wphase = new nPhysD("phase");
+		wphase = new nPhysD("phase/2pi");
 		wphase->resize(dx, dy);
 		lambda = new nPhysD("lambda");
 		lambda->resize(dx, dy);
@@ -324,10 +324,13 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 		for (size_t i=0; i<lambdas.size(); i++) {
 			for (size_t j=0; j<angles.size(); j++) {
 	
-				if (wave_params.iter==-1) break; 
+				if ((*wave_params.iter_ptr)==-1) {
+				    DEBUG("Aborting");
+				    break;
+				}
 				wave_params.iter++;
 				(*wave_params.iter_ptr)++;
-				DEBUG(5,(100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+				DEBUG(11,(100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
 				double cr = cos(angles[j] * _phys_deg); 
 				double sr = sin(angles[j] * _phys_deg);
 
@@ -367,46 +370,52 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				}
 				
 			}
+			//! todo: this is awful: add exception?
+            if ((*wave_params.iter_ptr)==-1) {
+                DEBUG("aborting");
+                break;
+            }
 		}
 		
+		if ((*wave_params.iter_ptr)!=-1) {
 		
-		for (size_t k=0; k<ifg.getSurf(); k++) {
-			qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
-			intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
-			wphase->Timg_buffer[k]/=2*M_PI;
-		}
-		
-		phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
-
-		for (size_t k=0; k<ifg.getSurf(); k++) {
-			if(!std::isfinite(ifg.Timg_buffer[k])){
-				qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-				wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-				lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-			    intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+			for (size_t k=0; k<ifg.getSurf(); k++) {
+				qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
+				intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
+				wphase->Timg_buffer[k]/=2*M_PI;
+			}
+			
+			phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
+			
+			for (size_t k=0; k<ifg.getSurf(); k++) {
+				if(!std::isfinite(ifg.Timg_buffer[k])){
+					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
+					lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+					intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+				}
+			}
+			
+			olist->push_back(wphase);
+			olist->push_back(qmap);
+			olist->push_back(lambda);
+			olist->push_back(angle);
+			olist->push_back(intensity);
+			
+			list<nPhysD *>::const_iterator itr;
+			for(itr = olist->begin(); itr != olist->end(); ++itr) {
+				(*itr)->TscanBrightness();
+				(*itr)->set_origin(ifg.get_origin());
+				(*itr)->set_scale(ifg.get_scale());
+				(*itr)->setFromName(ifg.getFromName());
+				(*itr)->setShortName((*itr)->getName());
+				(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
 			}
 		}
 		
-		olist->push_back(wphase);
-		olist->push_back(qmap);
-		olist->push_back(lambda);
-		olist->push_back(angle);
-		olist->push_back(intensity);
-
-		list<nPhysD *>::const_iterator itr;
-		for(itr = olist->begin(); itr != olist->end(); ++itr) {
-			(*itr)->TscanBrightness();
-			(*itr)->set_origin(ifg.get_origin());
-			(*itr)->set_scale(ifg.get_scale());
-			(*itr)->setFromName(ifg.getFromName());
-			(*itr)->setShortName((*itr)->getName());
-			(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
-		}
-
 	}
-	DEBUG("HERE WE ARE!!!!!!!!!!!!! "<< olist->size());
-
+	DEBUG("Out of here");
 	return olist;
 }
 
@@ -542,7 +551,7 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
-		wphase = new nPhysD("phase");
+		wphase = new nPhysD("phase/2pi");
 		wphase->resize(dx, dy);
 		lambda = new nPhysD("lambda");
 		lambda->resize(dx, dy);
@@ -568,10 +577,13 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		for (size_t i=0; i<lambdas.size(); i++) {
 			for (size_t j=0; j<angles.size(); j++) {
 	
-				if (wave_params.iter==-1) break; 
+				if ((*wave_params.iter_ptr)==-1) {
+				    DEBUG("aborting");
+				    break;
+				}
 				wave_params.iter++;
 				(*wave_params.iter_ptr)++;
-				DEBUG(5,(100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+				DEBUG((100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
 			
 				gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)wave_params.damp, (float)wave_params.thickness);
 				cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
@@ -579,48 +591,57 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 				cudaThreadSynchronize();
 			
 			}
+			//! todo: this is awful: add exception?
+            if ((*wave_params.iter_ptr)==-1) {
+                DEBUG("aborting");
+                break;
+            }
 		}
+		DEBUG("*wave_params.iter_ptr" <<  *wave_params.iter_ptr);
+		cudaThreadSynchronize();
 
-		cudaMemcpy(b1, cuc1, cubuf_size, cudaMemcpyDeviceToHost);
-		cudaMemcpy(b2, cuc2, cubuf_size, cudaMemcpyDeviceToHost);
-	    cudaThreadSynchronize();
-
-		for (size_t k=0; k<ifg.getSurf(); k++) {
-			if(std::isfinite(ifg.Timg_buffer[k])){
-				qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
-				wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
-				angle->Timg_buffer[k] = b2[k].x;
-				lambda->Timg_buffer[k] = b2[k].y;
-				intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
-			} else {
-				qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-				wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-				lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+		if ((*wave_params.iter_ptr)!=-1) {
+			cudaMemcpy(b1, cuc1, cubuf_size, cudaMemcpyDeviceToHost);
+			cudaMemcpy(b2, cuc2, cubuf_size, cudaMemcpyDeviceToHost);
+			cudaThreadSynchronize();
+			
+			for (size_t k=0; k<ifg.getSurf(); k++) {
+				if(std::isfinite(ifg.Timg_buffer[k])){
+					qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
+					wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
+					angle->Timg_buffer[k] = b2[k].x;
+					lambda->Timg_buffer[k] = b2[k].y;
+					intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
+				} else {
+					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
+					lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+					intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+				}
+				
 			}
-
+			
+			
+			phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
+			
+			olist->push_back(wphase);
+			olist->push_back(qmap);
+			olist->push_back(lambda);
+			olist->push_back(angle);
+			olist->push_back(intensity);
+			
+			list<nPhysD *>::const_iterator itr;
+			for(itr = olist->begin(); itr != olist->end(); ++itr) {
+				(*itr)->TscanBrightness();
+				(*itr)->set_origin(ifg.get_origin());
+				(*itr)->set_scale(ifg.get_scale());
+				(*itr)->setFromName(ifg.getFromName());
+				(*itr)->setShortName((*itr)->getName());
+				(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
+			}
 		}
-
-
-		phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
-
-		olist->push_back(wphase);
-		olist->push_back(qmap);
-		olist->push_back(lambda);
-		olist->push_back(angle);
-		olist->push_back(intensity);
-
-		list<nPhysD *>::const_iterator itr;
-		for(itr = olist->begin(); itr != olist->end(); ++itr) {
-			(*itr)->TscanBrightness();
-			(*itr)->set_origin(ifg.get_origin());
-			(*itr)->set_scale(ifg.get_scale());
-			(*itr)->setFromName(ifg.getFromName());
-			(*itr)->setShortName((*itr)->getName());
-			(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
-		}
-
+		
 		delete [] b1;
 		delete [] b2;
 	
@@ -635,11 +656,14 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		cudaThreadExit();
 
 	}
+	DEBUG("Out of here");
 	return olist;	
 }
 #else
 list<nPhysD *> *
-phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) { }
+phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
+    WARNING("We should never go here...");
+}
 #endif
 
 // unwrap methods
@@ -684,6 +708,20 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
     DEBUG("here");
 
 	return uphase;
+}
+
+void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> &phase_over_2pi, nPhysImageF<double> &quality){
+    
+    if (phase_over_2pi.getW()==quality.getW() && phase_over_2pi.getH()==quality.getH()) {
+        synthetic.resize(phase_over_2pi.getW(),phase_over_2pi.getH());
+        for (size_t ii=0; ii<phase_over_2pi.getSurf(); ii++) {
+            synthetic.set(ii,quality.point(ii)*(1.0+cos(phase_over_2pi.point(ii)*2*M_PI)));
+        }
+        synthetic.setShortName("synthetic");
+        synthetic.setName("synthetic("+phase_over_2pi.getName()+","+quality.getName()+")");
+        synthetic.TscanBrightness();
+    }
+
 }
 
 void
@@ -774,17 +812,13 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 
 
 //! General function for Abel inversion
-nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
+nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 {
-
-	if (params == NULL)
-		return NULL;
-
 	
-	std::vector<phys_point> iaxis = params->iaxis; // TODO: passa a bidimvec
-	phys_direction idir = params->idir;
-	inversion_algo ialgo = params->ialgo;
-//	inversion_physics iphysics = params->iphysics;
+	std::vector<phys_point> iaxis = params.iaxis; // TODO: passa a bidimvec
+	phys_direction idir = params.idir;
+	inversion_algo ialgo = params.ialgo;
+//	inversion_physics iphysics = params.iphysics;
 
 
 	if (iimage.getSurf() == 0)
@@ -836,9 +870,17 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 			break;
 	}*/
 
+	*params.iter_ptr = 0;
+	
 	if (ialgo == ABEL) {
 		DEBUG(1, "Plain ABEL inversion");
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)==-1) {
+				    DEBUG("aborting");
+				    break;
+			}
+			(*params.iter_ptr)++;
+			
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
@@ -866,7 +908,6 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 			oimage->set(iaxis[ii].x, iaxis[ii].y, 
 					0.5*(oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
-			*params->iter_ptr = ii;
 		}
 		oimage->setName(string("ABEL ")+oimage->getName());
 		oimage->setShortName("ABEL");
@@ -900,6 +941,12 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 		DEBUG(5, "Axe average: "<<axe_average);
 
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)==-1) {
+				DEBUG("aborting");
+				break;
+			}
+			(*params.iter_ptr)++;
+
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
@@ -937,7 +984,6 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 
 			oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point); 
 
-			*params->iter_ptr = ii;
 			DEBUG(10,"step: "<<ii);
 		}
 		oimage->setName(string("ABEL")+oimage->getName());
@@ -947,12 +993,12 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params *params)
 		DEBUG(1, "Unknown inversion type: "<<(int)ialgo);
 	}
 
-	DEBUG(5,"after inversion");
 	delete copy_buffer;
 	delete out_buffer;
 
 	oimage->TscanBrightness();
 
+    DEBUG((*params.iter_ptr)); 
 	return oimage;
 }
 

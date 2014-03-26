@@ -31,6 +31,7 @@ nTics::nTics(neutrino *neu) : QGraphicsItem()
 	color=QColor(Qt::black);
 	rulerColor=QColor(Qt::yellow);
 	rulerVisible=false;
+	gridVisible=false;
 }
 
 // reimplementation
@@ -67,12 +68,14 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		typedef QPair <QString,QRectF > my_pair;		
 		QList<my_pair> rects;
 		QPainterPath allTics;
+		QPainterPath allGrid;
 		
 		QSizeF size(nparent->currentBuffer->getW(),nparent->currentBuffer->getH());
 
 		int exponentX=log10(abs(my_sc.x()*size.width()));
 		for (int k=0;k<5;k++) {
 			allTics=QPainterPath();
+			allGrid=QPainterPath();
 			rects.clear();
 			double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentX-1);
 			if (my_sc.x()>0){
@@ -83,6 +86,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(position,-0.15*p->fontMetrics().height());
 						} else {
+							if(gridVisible) {
+								allGrid.moveTo(position,0);
+								allGrid.lineTo(position,size.height());
+							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
@@ -100,6 +107,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(position,-0.15*p->fontMetrics().height());
 						} else {
+							if(gridVisible) {
+								allGrid.moveTo(position,0);
+								allGrid.lineTo(position,size.height());
+							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
@@ -131,11 +142,16 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		allTics.lineTo(nparent->currentBuffer->getW(),0);
 		p->drawPath(allTics);
 
+		p->setPen(QColor(rulerColor));
+		p->drawPath(allGrid);
+		p->setPen(QColor(color));
+		
 
 		
 		int exponentY=log10(abs(my_sc.y()*size.height()));
 		for (int k=0;k<5;k++) {
 			allTics=QPainterPath();
+			allGrid=QPainterPath();
 			rects.clear();
 			double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentY-1);
 			if (my_sc.y()>0){
@@ -146,6 +162,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(-0.15*p->fontMetrics().height(),position);
 						} else {
+							if(gridVisible) {
+								allGrid.moveTo(0,position);
+								allGrid.lineTo(size.width(),position);
+							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
@@ -163,6 +183,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 						if (i%5) {
 							allTics.lineTo(-0.15*p->fontMetrics().height(),position);
 						} else {
+							if(gridVisible) {
+								allGrid.moveTo(0,position);
+								allGrid.lineTo(size.width(),position);
+							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
 							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
@@ -204,6 +228,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		allTics.moveTo(0,0);
 		allTics.lineTo(0,nparent->currentBuffer->getH());
 		p->drawPath(allTics);
+		
+		p->setPen(QColor(rulerColor));
+		p->drawPath(allGrid);
+		p->setPen(QColor(color));
 		
 		unsigned char* listacolori=nparent->nPalettes[nparent->colorTable];
 		
@@ -287,7 +315,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		p->drawPath(allTics);
 		
 		//now draw the ruler
-		if (rulerVisible) {
+		if (rulerVisible && !gridVisible) {
 			p->setPen(QColor(rulerColor));
 			QPainterPath ruler;
 			ruler.moveTo(0,nparent->currentBuffer->get_origin().y());

@@ -52,12 +52,9 @@ template <class T> inline void phys_rotate_right(nPhysImageF<T> &);
 template <class T>
 inline void phys_flip_ud(nPhysImageF<T> &img)
 {
-	T val;
 	for (size_t i=0; i<img.getW(); i++) {
 		for (size_t j=0; j<img.getH()/2; j++) {
-			val = img.Timg_matrix[j][i];
-			img.Timg_matrix[j][i] = img.Timg_matrix[img.getH()-j-1][i];
-			img.Timg_matrix[img.getH()-j-1][i] = val;
+    		std::swap(img.Timg_matrix[j][i],img.Timg_matrix[img.getH()-j-1][i]);
 		}
 	}
 }
@@ -65,12 +62,9 @@ inline void phys_flip_ud(nPhysImageF<T> &img)
 template <class T>
 inline void phys_flip_lr(nPhysImageF<T> &img)
 {
-	T val;
 	for (size_t i=0; i<img.getW()/2; i++) {
 		for (size_t j=0; j<img.getH(); j++) {
-			val = img.Timg_matrix[j][i];
-			img.Timg_matrix[j][i] = img.Timg_matrix[j][img.getW()-i-1];
-			img.Timg_matrix[j][img.getW()-i-1] = val;
+    		std::swap(img.Timg_matrix[j][i],img.Timg_matrix[j][img.getW()-i-1]);
 		}
 	}
 }

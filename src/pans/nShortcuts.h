@@ -22,29 +22,25 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#ifndef __nShortcuts_h
+#define __nShortcuts_h
+
+#include <iostream>
+
 #include <QtGui>
-#include "ui_nObject.h"
+#include <QWidget>
 
-#ifndef __nTics
-#define __nTics
+#include "ui_nShortcuts.h"
+#include "nGenericPan.h"
 
-class neutrino;
-
-class nTics : public QGraphicsItem {
-public:
+class nShortcuts : public nGenericPan
+{
+	Q_OBJECT
 	
-	neutrino* nparent;
+public:	
+	nShortcuts(neutrino*,QString);
+	Ui::nShortcuts my_w;
 	
-	nTics(neutrino*);
-	
-	QColor color, rulerColor;
-	bool rulerVisible,gridVisible;
-
-	void changeColor();
-	
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
 };
 
 #endif

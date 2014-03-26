@@ -22,29 +22,17 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <QtGui>
-#include "ui_nObject.h"
 
-#ifndef __nTics
-#define __nTics
+#include <unistd.h>
 
-class neutrino;
+#include "nShortcuts.h"
+#include "neutrino.h"
 
-class nTics : public QGraphicsItem {
-public:
-	
-	neutrino* nparent;
-	
-	nTics(neutrino*);
-	
-	QColor color, rulerColor;
-	bool rulerVisible,gridVisible;
 
-	void changeColor();
-	
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-};
-
-#endif
+nShortcuts::nShortcuts(neutrino *nparent, QString winname): nGenericPan(nparent, winname) {
+	my_w.setupUi(this);
+	setWindowFlags(Qt::Tool);
+	my_w.textBrowser->setSource(QUrl("qrc:/shortcuts.html"));
+	qDebug() << my_w.textBrowser->source();
+	show();
+}

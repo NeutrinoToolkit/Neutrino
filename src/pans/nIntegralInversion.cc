@@ -122,7 +122,6 @@ QVariant nIntegralInversion::doInversion() {
 				} else {
 					statusBar()->showMessage("Problem in removing reference", 5000);
 				}
-
 			}
 			if (iimage==NULL) iimage = new nPhysD(*image);
 			iimage->setFromName(iimage->getName());
@@ -146,13 +145,12 @@ QVariant nIntegralInversion::doInversion() {
 			iimage = image;
 		}
 
-		nPhysD *inv_image;
+		nPhysD *inv_image=NULL;
 		enum phys_direction inv_axis_dir = (isHorizontal) ? PHYS_X : PHYS_Y;
 		
 		//inv_image = phys_invert_abel(*iimage, inv_axis, inv_axis_dir, ABEL, ABEL_NONE);
 		// launching thread
 
-		abel_params my_abel_params;
 		my_abel_params.iaxis = inv_axis;
 		my_abel_params.idir = inv_axis_dir;
 		//my_abel_params.ialgo = ABEL;
@@ -177,14 +175,16 @@ QVariant nIntegralInversion::doInversion() {
 		nThread.setTitle("Abel transform...");
 		progressRun(inv_axis.size());
 
+		DEBUG("back from of thread " << nThread.isFinished());
+
 		DEBUG(5,"about to launch thread");
+
 		inv_image = *(nThread.odata.begin());
+		DEBUG(5,"Thread finish " << nThread.n_iter);
+			// apply physics
+		QApplication::processEvents();		
 
-		// apply physics
-		if (inv_image == NULL) {
-			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
-		} else {
-
+		if (inv_image && nThread.n_iter!=-1) {
 			switch (my_w.physTabs->currentIndex()) {
 				case 0:
 					DEBUG("Inversions: no physics applied");
@@ -200,21 +200,30 @@ QVariant nIntegralInversion::doInversion() {
 				default:
 					break;
 			}
-		}
-		inv_image->setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
+			inv_image->setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
 
-//		if (my_w.blurRadius_checkb->isChecked()) {	// blur
-//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());
-//		}
-		
-		if (my_w.erasePrevious->isChecked()) {
-			invertedPhys=nparent->replacePhys(inv_image,invertedPhys);
-		} else {
-			invertedPhys=inv_image;
-			nparent->addPhys(inv_image);
+			//		if (my_w.blurRadius_checkb->isChecked()) {	// blur
+			//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());
+			//		}
+
+			if (my_w.erasePrevious->isChecked()) {
+				invertedPhys=nparent->replacePhys(inv_image,invertedPhys);
+			} else {
+				invertedPhys=inv_image;
+				nparent->addPhys(inv_image);
+			}
+			retVar=qVariantFromValue(*invertedPhys);
+		} else {	
+			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
 		}
-		retVar=qVariantFromValue(*invertedPhys);
+		
+		if(nThread.n_iter==-1) {
+			DEBUG("Thread was killed, waiting end of thread");
+			nThread.wait();
+			DEBUG("Thread was killed, finish waiting end of thread");
+		}
 	}
+
 	return retVar;
 }
 
@@ -222,7 +231,7 @@ std::list<nPhysD *>
 phys_invert_abel_transl(nPhysD *iimage, void *params, int& iter) {
 	std::list<nPhysD *> odata;
 	((abel_params *)params)->iter_ptr = &iter;
-	odata.push_back(phys_invert_abel(*iimage, (abel_params *)params));
+	odata.push_back(phys_invert_abel(*iimage, *((abel_params *)params)));
 	return odata;
 }
 

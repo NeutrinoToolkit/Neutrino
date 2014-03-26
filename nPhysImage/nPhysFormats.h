@@ -32,7 +32,7 @@ extern "C" {
 #include <pgm.h>
 #endif
 
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
 #define intf hdf4_intf
 #define int8 hdf4_int8
 #include "hdf.h"
@@ -94,7 +94,7 @@ public:
 // Andor .SIF format
 class physInt_sif : public nPhysImageF<int> {
 public:
-	physInt_sif(const char *);
+	physInt_sif(std::string);
 };
 
 // PCO .B16 format
@@ -110,9 +110,9 @@ public:
 };
 
 // Optronics luli
-class physShort_imd : public nPhysImageF<unsigned int> {
+class physUint_imd : public nPhysImageF<unsigned int> {
 public:
-	physShort_imd(std::string);
+	physUint_imd(std::string);
 };
 
 
@@ -201,6 +201,9 @@ nPhysImageF<double> * phys_open_HDF5(std::string, std::string);
 int phys_write_HDF4_SD(nPhysImageF<double> *, int);
 void scan_hdf5_attributes(hid_t, nPhysImageF<double>*);
 #endif
+
+std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
+
 
 std::vector <nPhysImageF<double> *> phys_open(std::string,std::string=std::string());
 

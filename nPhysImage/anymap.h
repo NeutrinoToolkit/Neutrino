@@ -94,7 +94,7 @@ public:
 
 	template<class T> operator bidimvec<T>() const {
 		if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");
-		DEBUG(10, "string is: "<<get_str());
+		DEBUG(11, "string is: "<<get_str());
 		bidimvec<T> vv(get_str());
 		return vv;
 	}	

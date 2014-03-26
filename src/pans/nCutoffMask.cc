@@ -39,6 +39,7 @@ nCutoffMask::nCutoffMask(neutrino *nparent, QString winname)
 	connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doOperation()));
 	connect(my_w.slider,SIGNAL(valueChanged(int)),this,SLOT(sliderChanged(int)));
 	connect(my_w.image2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMiniMaxi()));
+	connect(my_w.replaceVal, SIGNAL(currentIndexChanged(int)), this, SLOT(doOperation()));
 
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {

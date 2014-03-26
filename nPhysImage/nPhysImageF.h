@@ -1,23 +1,23 @@
 /*
  *
- *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *	Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
  * 
- *    This file is part of nPhysImage library.
+ *	This file is part of nPhysImage library.
  *
- *    nPhysImage is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ *	nPhysImage is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
  *
- *    nPhysImage is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
+ *	nPhysImage is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU Lesser General Public License for more details.
  *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *	Contact Information: 
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -132,7 +132,7 @@ class phys_deprecated: public std::exception
 {
   virtual const char* what() const throw()
   {
-    return "FATAL: function declared UNSAFE!";
+	return "FATAL: function declared UNSAFE!";
   }
 };
 
@@ -141,7 +141,7 @@ class phys_trashable: public std::exception
 {
   virtual const char* what() const throw()
   {
-    return "FATAL: function will be REMOVED";
+	return "FATAL: function will be REMOVED";
   }
 };
 
@@ -297,7 +297,7 @@ public:
 	T sum() 
 	{ T sumTot=0; for (register size_t i=0; i<getSurf(); i++) sumTot+=Timg_buffer[i]; return sumTot; }
 
-    	//! min/max values 
+		//! min/max values 
 	bidimvec<T> get_min_max();
 	T get_min();
 	T get_max();
@@ -331,6 +331,8 @@ public:
 		Timg_buffer = rhs.Timg_buffer;
 		width = rhs.width;
 		height = rhs.height;
+		histogram=rhs.histogram;
+
 
 		_n_inst = rhs._n_inst;
 		_trash_new();
@@ -384,7 +386,7 @@ public:
 	
 	nPhysImageF<T> sub(size_t, size_t, size_t, size_t);
 
-    // ! get interpolated stretched image
+	// ! get interpolated stretched image
 	nPhysImageF<T> * stretch(bidimvec<size_t> newSize) {
 		nPhysImageF<T> *stretched = new nPhysImageF<T> (newSize.x(), newSize.y(), 0.);
 		bidimvec<double> ratio=div_P<double>(newSize,get_size());
@@ -394,32 +396,32 @@ public:
  		stretched->set_origin(mul_P(get_scale(),ratio));
 		stretched->setType(PHYS_DYN);
 
-        for (register size_t j=0; j<stretched->getH(); j++) {
-            for (register size_t i=0; i<stretched->getW(); i++) {
-        		bidimvec<double> p=div_P<double>(bidimvec<double>(i,j),ratio);
-                stretched->set(i,j,getPoint(p.x(),p.y()));
-            }
-        }
+		for (register size_t j=0; j<stretched->getH(); j++) {
+			for (register size_t i=0; i<stretched->getW(); i++) {
+				bidimvec<double> p=div_P<double>(bidimvec<double>(i,j),ratio);
+				stretched->set(i,j,getPoint(p.x(),p.y()));
+			}
+		}
 		return stretched;
 	}
 	nPhysImageF<T> * stretch(size_t newW, size_t newH) { return stretch(bidimvec<size_t>(newW,newH));}
 
-    //! get image with padding around
+	//! get image with padding around
 	nPhysImageF<T> * padding(bidimvec<size_t> newSize,T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		nPhysImageF<T> *padded = new nPhysImageF<T> (newSize.x(), newSize.y(), def_value);
-        bidimvec<int> offset=(newSize-get_size())/2;
-        padded->set_origin(get_origin()-offset);
+		bidimvec<int> offset=(newSize-get_size())/2;
+		padded->set_origin(get_origin()-offset);
 
-        for (register size_t j=0; j<getH(); j++) {
-            for (register size_t i=0; i<getW(); i++) {
-                bidimvec<int> p=bidimvec<double>(i,j)-offset;
-                padded->set(i+offset.x(),j+offset.y(),getPoint(i,j,def_value));
-            }
-        }
+		for (register size_t j=0; j<getH(); j++) {
+			for (register size_t i=0; i<getW(); i++) {
+				bidimvec<int> p=bidimvec<double>(i,j)-offset;
+				padded->set(i+offset.x(),j+offset.y(),getPoint(i,j,def_value));
+			}
+		}
 		return padded;
 	}
 	nPhysImageF<T> * padding(size_t newW, size_t newH,T def_value=std::numeric_limits<T>::quiet_NaN()) {
-	    return padding(bidimvec<size_t>(newW,newH),def_value);
+		return padding(bidimvec<size_t>(newW,newH),def_value);
 	}
 
 	// get rotated matrix
@@ -498,68 +500,68 @@ public:
 		return rotated;
 	}
 	
-	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
-		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated= new nPhysImageF<T> (width,height, def_value);
-        size_t w2=width/2;
-        size_t h2=height/2;
-        for (int i=0;i<(int)width;i++){
-            int xc=i-w2;
-            for (int j=0;j<(int)height;j++){
-                int yc=j-h2;
-                size_t ir= w2+xc*cos(alpha)-yc*sin(alpha);
-                size_t jr= h2+xc*sin(alpha)+yc*cos(alpha);
-                rotated->set(i,j,getPoint(ir,jr,def_value));
-            }
-        }		
-		rotated->set_scale(get_scale());
-		rotated->setType(PHYS_DYN);
-		std::ostringstream my_name;
-		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
-
-		rotated->TscanBrightness();
-		return rotated;	
-    }
+// 	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+// 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
+// 		nPhysImageF<T> *rotated= new nPhysImageF<T> (width,height, def_value);
+// 		size_t w2=width/2;
+// 		size_t h2=height/2;
+// 		for (int i=0;i<(int)width;i++){
+// 			int xc=i-w2;
+// 			for (int j=0;j<(int)height;j++){
+// 				int yc=j-h2;
+// 				size_t ir= w2+xc*cos(alpha)-yc*sin(alpha);
+// 				size_t jr= h2+xc*sin(alpha)+yc*cos(alpha);
+// 				rotated->set(i,j,getPoint(ir,jr,def_value));
+// 			}
+// 		}		
+// 		rotated->set_scale(get_scale());
+// 		rotated->setType(PHYS_DYN);
+// 		std::ostringstream my_name;
+// 		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
+// 		rotated->setName(my_name.str());
+// 		rotated->setShortName("rotated");
+// 		rotated->setFromName(getFromName());
+// 
+// 		rotated->TscanBrightness();
+// 		return rotated;	
+// 	}
 
 
 	// get sobel matrix
-	nPhysImageF<T> * sobel() {
-		nPhysImageF<T> *sobo= new nPhysImageF<T>(getW(),getH(),1.0);
-		sobo->set_origin(get_origin());
-		sobo->set_scale(get_scale());
-	
-		sobo->setShortName("Sobel");
-		sobo->setName("Sobel "+getName());
-		sobo->setFromName(getFromName());
-		double Gx[9];
-		Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
-		Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
-		Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
-
-		double Gy[9];
-		Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
-		Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
-		Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
-
-		for(size_t i = 0 ; i < getW() ; i++) {
-			for(size_t j = 0 ; j < getH(); j++) {
-				double value_gx = 0.0;
-				double value_gy = 0.0;
-				for(size_t k = 0 ; k < 3 ; k++) {
-					for(size_t l = 0 ; l < 3 ; l++) {
-						value_gx += Gx[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-						value_gy += Gy[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-					}
-				}
-				sobo->set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
-			}
-		}
-		sobo->TscanBrightness();
-		return sobo;
-	}
+// 	nPhysImageF<T> * sobel() {
+// 		nPhysImageF<T> *sobo= new nPhysImageF<T>(getW(),getH(),1.0);
+// 		sobo->set_origin(get_origin());
+// 		sobo->set_scale(get_scale());
+// 	
+// 		sobo->setShortName("Sobel");
+// 		sobo->setName("Sobel "+getName());
+// 		sobo->setFromName(getFromName());
+// 		double Gx[9];
+// 		Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
+// 		Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
+// 		Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
+// 
+// 		double Gy[9];
+// 		Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
+// 		Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
+// 		Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
+// 
+// 		for(size_t i = 0 ; i < getW() ; i++) {
+// 			for(size_t j = 0 ; j < getH(); j++) {
+// 				double value_gx = 0.0;
+// 				double value_gy = 0.0;
+// 				for(size_t k = 0 ; k < 3 ; k++) {
+// 					for(size_t l = 0 ; l < 3 ; l++) {
+// 						value_gx += Gx[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
+// 						value_gy += Gy[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
+// 					}
+// 				}
+// 				sobo->set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
+// 			}
+// 		}
+// 		sobo->TscanBrightness();
+// 		return sobo;
+// 	}
 
 	// const methods for accessing matrix
 
@@ -602,16 +604,16 @@ public:
 	}
 	
 	const unsigned char *to_uchar_palette(double mini, double maxi, unsigned char * palette) {
-		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value);
+		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value << " rescaled from " << mini << " to " << maxi);
 		if (width>0 && height>0 && palette) {
 
 			if (uchar_buf == NULL) {
 				uchar_buf = new unsigned char[width*height*4];
 			} else {
-			    if (to_uchar_min==mini && to_uchar_max==maxi) {
-    			    DEBUG(6, "nothing changed");
-                    return uchar_buf;
-			    }
+				if (to_uchar_min==mini && to_uchar_max==maxi) {
+					DEBUG(6, "nothing changed");
+					return uchar_buf;
+				}
 			}
 			
 			double mult = 255./(maxi - mini);
@@ -712,8 +714,8 @@ public:
 		return nan_value;
 	}
 	inline T getPoint(bidimvec<double> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
-	    return getPoint(p.x(),p.y(),nan_value);
-    }
+		return getPoint(p.x(),p.y(),nan_value);
+	}
 	
 	// get point (to be used for accessing data - no overload)
 	inline T point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
@@ -926,8 +928,15 @@ nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp)
 		setFromName(std::string("(undefined)"));
 	}
 	setName(obj_name);
-	setShortName(getName());
 	setType(pp);
+	std::string shortname=obj_name;
+	if (pp==PHYS_FILE) {
+		size_t last_idx = obj_name.find_last_of("\\/");
+		if (std::string::npos != last_idx) {
+			shortname.erase(0,last_idx + 1);
+		}
+	}
+	setShortName(shortname);	
 }
 
 // copy constructor
@@ -942,6 +951,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	std::copy(oth.Timg_buffer, oth.Timg_buffer+width*height, Timg_buffer);
 	property = oth.property;
 	setShortName(sName);
+	TscanBrightness();
 //	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
 }
 
@@ -1036,7 +1046,7 @@ nPhysImageF<T>::init_Tvariables()
 	width = 0;
 	height = 0;
 
-    to_uchar_min = to_uchar_max = 0;
+	to_uchar_min = to_uchar_max = 0;
 
 	// donne! e' arrivato il monnezzaro
 	vector_buf = axis_buf = NULL;
@@ -1318,10 +1328,9 @@ nPhysImageF<T>::sub(size_t x, size_t y, size_t Dx, size_t Dy) {
 	}
 	std::ostringstream my_name;
 	
-	my_name << "submatrix(" << x << "," << y << "," << Dx << "," << Dy << ")";
-	
+	my_name << "submatrix(" << getName() << "," << x << "," << y << "," << Dx << "," << Dy << ")";	
 	subphys.setName(my_name.str());
-	subphys.setShortName("submatrix");
+	subphys.setShortName("submatrix("+getShortName()+")");
 	subphys.setFromName(getFromName());
 
 	subphys.TscanBrightness();
@@ -1765,7 +1774,7 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 
 	new_img.set_origin(property.at("origin"));
 	new_img.set_scale(property.at("scale"));
-	new_img.setName(property.at("phys_name").get_str()+" + "+other.property.at("phys_name").get_str());
+	new_img.setName("("+property.at("phys_name").get_str()+")+("+other.property.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
 	for (register size_t i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = (T)(Timg_buffer[i]) + (T)(other.Timg_buffer[i]);
@@ -1785,7 +1794,7 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 
 	new_img.set_origin(property.at("origin"));
 	new_img.set_scale(property.at("scale"));
-	new_img.setName(property.at("phys_name").get_str()+" - "+other.property.at("phys_name").get_str());
+	new_img.setName("("+property.at("phys_name").get_str()+")-("+other.property.at("phys_name").get_str()+")");
 	new_img.setShortName("Subtract");
 	
 	for (register size_t i=0; i<height*width; i++)
@@ -1805,7 +1814,7 @@ nPhysImageF<T>::operator* (const nPhysImageF<T> &other) const {
 	new_img.set_origin(property.at("origin"));
 	new_img.set_scale(property.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName(property.at("phys_name").get_str()+" * "+other.property.at("phys_name").get_str());
+	new_img.setName("("+property.at("phys_name").get_str()+")*("+other.property.at("phys_name").get_str()+")");
 	new_img.setShortName("Multiply");
 
 	for (register size_t i=0; i<height*width; i++)
@@ -1828,7 +1837,7 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 	new_img.set_origin(property.at("origin"));
 	new_img.set_scale(property.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName(property.at("phys_name").get_str()+" / "+other.property.at("phys_name").get_str());
+	new_img.setName("("+property.at("phys_name").get_str()+")/("+other.property.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");
 	
 	for (register size_t i=0; i<height*width; i++)
@@ -1840,15 +1849,15 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 
 
 template<class T> inline T nPhysImageF<T>::get_min() {
-    return Tminimum_value;
+	return Tminimum_value;
 }
 
 template<class T> inline T nPhysImageF<T>::get_max() {
-    return Tmaximum_value;
+	return Tmaximum_value;
 }
 
 template<class T> inline bidimvec<T> nPhysImageF<T>::get_min_max() {
-    return bidimvec<T>(get_min(),get_max());
+	return bidimvec<T>(get_min(),get_max());
 }
 
 

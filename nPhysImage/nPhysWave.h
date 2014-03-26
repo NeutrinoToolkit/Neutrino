@@ -111,6 +111,9 @@ nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double
 // carrier subtraction
 void phys_subtract_carrier (nPhysImageF<double> &, double, double);
 
+// create a synthetic interferogram from phase and quality
+void phys_synthetic_interferogram (nPhysImageF<double> &, nPhysImageF<double> &, nPhysImageF<double> &);
+
 bidimvec<double> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
 
 // integral inversions
@@ -134,7 +137,7 @@ struct abel_params_str {
 typedef struct abel_params_str abel_params;
 
 // main inversion function
-nPhysImageF<double> * phys_invert_abel(nPhysImageF<double> &, abel_params *);
+nPhysImageF<double> * phys_invert_abel(nPhysImageF<double> &, abel_params &);
 
 // inline inversion maths
 inline void phys_invert_abel_1D(double *ivec, double *ovec, size_t size)

@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>350</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -147,8 +147,9 @@
     <addaction name="actionCycle_over_paths"/>
     <addaction name="separator"/>
     <addaction name="actionFollower"/>
-    <addaction name="actionShow_Mouse"/>
-    <addaction name="actionShow_Ruler"/>
+    <addaction name="actionShow_mouse"/>
+    <addaction name="actionShow_ruler"/>
+    <addaction name="actionShow_grid"/>
     <addaction name="separator"/>
     <addaction name="menuTransformation"/>
    </widget>
@@ -192,6 +193,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionKeyborard_shortcuts"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
@@ -231,7 +233,7 @@
    <addaction name="actionColors"/>
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
-   <addaction name="actionRuler"/>
+   <addaction name="actionMouseInfo"/>
    <addaction name="separator"/>
    <addaction name="actionLineoutH"/>
    <addaction name="actionLineoutV"/>
@@ -487,12 +489,12 @@
     <string>Inversions</string>
    </property>
   </action>
-  <action name="actionShow_Ruler">
+  <action name="actionShow_ruler">
    <property name="text">
     <string>Show ruler</string>
    </property>
   </action>
-  <action name="actionShow_Mouse">
+  <action name="actionShow_mouse">
    <property name="text">
     <string>Show mouse</string>
    </property>
@@ -521,7 +523,7 @@
     <string>Color table</string>
    </property>
   </action>
-  <action name="actionRuler">
+  <action name="actionMouseInfo">
    <property name="icon">
     <iconset>
      <normaloff>:icons//ruler.png</normaloff>:icons//ruler.png</iconset>
@@ -812,6 +814,16 @@
   <action name="actionPlugin">
    <property name="text">
     <string>Plugin...</string>
+   </property>
+  </action>
+  <action name="actionKeyborard_shortcuts">
+   <property name="text">
+    <string>Keyborard shortcuts</string>
+   </property>
+  </action>
+  <action name="actionShow_grid">
+   <property name="text">
+    <string>Show grid</string>
    </property>
   </action>
  </widget>

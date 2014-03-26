@@ -147,6 +147,15 @@ inline void phys_reverse_vector(double *buf, int size);
 // some nice filters
 
 void
+phys_sin(nPhysImageF<double> &);
+
+void
+phys_cos(nPhysImageF<double> &);
+
+void
+phys_tan(nPhysImageF<double> &);
+
+void
 phys_pow(nPhysImageF<double> &, double);
 
 void

@@ -96,7 +96,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 	QString name="";
 	if (nparent) {
 		int position = nparent->physList.indexOf(buffer);
-		name=QString::fromStdString(buffer->getName());
+		name=QString::fromUtf8(buffer->getName().c_str());
 		int len=combo->property("physNameLength").toInt();
 		if (name.length()>len) name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
 		name.prepend(QString::number(position)+" : ");
@@ -350,8 +350,8 @@ nGenericPan::saveUi(QSettings *settings) {
 			for (int i=0; i< widget->count(); i++) {
 				nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<void*>());
 				if (phys) {
-					settings->setValue(widget->objectName(),QString::fromStdString(phys->getName()));
-					settings->setValue(widget->objectName()+"-From",QString::fromStdString(phys->getFromName()));
+					settings->setValue(widget->objectName(),QString::fromUtf8(phys->getName().c_str()));
+					settings->setValue(widget->objectName()+"-From",QString::fromUtf8(phys->getFromName().c_str()));
 				}
 			}		
 		}
@@ -382,31 +382,6 @@ void nGenericPan::closeEvent(QCloseEvent*){
 		}
 	}
 	saveDefaults();
-// this might be useful sometimes
-//	bool askAll=true;
-//	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-//		if (obj->property("neutrinoImage").isValid() && obj->property("neutrinoImage").toBool()) {
-//			nPhysD *phys=(nPhysD*) (obj->itemData(obj->currentIndex()).value<void*>());
-//			if (askAll && phys && phys->getType()!=PHYS_FILE) {
-//				int res=QMessageBox::warning(this,tr("Attention"),
-//											 tr("The image of combo ")+obj->objectName()+QString("\n")+QString::fromStdString(phys->getName())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
-//											 QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
-//				switch (res) {
-//					case QMessageBox::Yes:
-//						nparent->file_save_slot(phys); // TODO: add here a check for a cancel to avoid exiting
-//						break;
-//					case QMessageBox::NoToAll:
-//						askAll=false;
-//						break;
-//					case QMessageBox::Cancel:
-//						e->ignore();
-//						return;
-//						break;
-//				}		
-//			}
-//			e->accept();
-//		}
-//	}
 	foreach (QObject* widget, nparent->children()) {
 		nLine *line=qobject_cast<nLine *>(widget);
 		nRect *rect=qobject_cast<nRect *>(widget);
@@ -500,7 +475,10 @@ nGenericPan::progressRun(int max_calc) {
 		progress.setValue(nThread.n_iter);
 		QApplication::processEvents();
 		sleeper_thread::msleep(100);
-		if (progress.wasCanceled()) nThread.stop();
+		if (progress.wasCanceled()) {
+			nThread.stop();
+			break;
+		}
 	}
 
 }

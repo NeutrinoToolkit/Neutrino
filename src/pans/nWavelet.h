@@ -51,9 +51,13 @@ public:
 	QPointer<nRect> region;
 	
 	std::vector<nPhysD *> waveletPhys;
-	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys;
+	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
+
+private:
+	wavelet_params my_params;
 
 public slots:
+		
 	void guessCarrier();
 
 	void doWavelet();
@@ -61,6 +65,9 @@ public slots:
 	void doRemove();
 	void doRemoveCarrier();
 	void doRemoveReference();
+	
+	void bufferChanged(nPhysD*);
+	void checkChangeCombo(QComboBox *);
 	
 	void doAll();
 

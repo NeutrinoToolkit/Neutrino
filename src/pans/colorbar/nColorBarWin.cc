@@ -39,14 +39,15 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
-	connect(my_w.actionSavePDF,SIGNAL(triggered()),my_w.histogram,SLOT(export_PDF_slot()));
+	connect(my_w.savePDF,SIGNAL(released()),my_w.histogram,SLOT(export_PDF_slot()));
 	connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
 
 	connect(my_w.cutoff,SIGNAL(released()),this,SLOT(cutOff()));
 
-	connect(my_w.invert,SIGNAL(pressed()),this,SLOT(invertColors()));
+	connect(my_w.invert,SIGNAL(released()),this,SLOT(invertColors()));
 
-	connect(my_w.autoscale, SIGNAL(toggled(bool)), this, SLOT(toogleAutoscale(bool)));
+	my_w.autoscale->setChecked(!nparent->colorRelative);
+	connect(my_w.autoscale, SIGNAL(released()), this, SLOT(toggleAutoscale()));
 
 	
 	QDoubleValidator *dVal = new QDoubleValidator(this);
@@ -99,10 +100,18 @@ void nColorBarWin::getMinMax () {
 	}
 }	
 
-void nColorBarWin::toogleAutoscale (bool val) {
-	nparent->colorRelative=!val;
-	nparent->colorMin=my_w.lineMin->text().toDouble();
-	nparent->colorMax=my_w.lineMax->text().toDouble();
+void nColorBarWin::toggleAutoscale () {
+	nparent->colorRelative=!nparent->colorRelative;
+	if (nparent->colorRelative) {
+		nparent->colorMin=my_w.sliderMin->value()/10000.0;
+		nparent->colorMax=my_w.sliderMax->value()/10000.0;
+	} else {
+		nparent->colorMin=my_w.lineMin->text().toDouble();
+		nparent->colorMax=my_w.lineMax->text().toDouble();
+	}
+	bufferChanged(currentBuffer);
+//	DEBUG(">>>>>>>>>>>>>>>>>>..... " << nparent->colorMin << " " << nparent->colorMax);
+//	DEBUG(">>>>>>>>>>>>>>>>>> " << my_w.autoscale->isChecked() << " " << nparent->colorRelative);
 }
 
 void nColorBarWin::setToMin () {
@@ -121,7 +130,7 @@ void nColorBarWin::minChanged (QString value) {
 	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	if (currentBuffer) {
 		double percentage=(value.toDouble()-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value);
-		my_w.sliderMin->setValue(percentage*100.0);
+		my_w.sliderMin->setValue(percentage*10000.0);
 		if (nparent->colorRelative) {
 			nparent->colorMin=percentage;
 		} else {
@@ -137,7 +146,7 @@ void nColorBarWin::maxChanged (QString value) {
 	disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	if (currentBuffer) {
 		double percentage=(value.toDouble()-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value);
-		my_w.sliderMax->setValue(percentage*100.0);
+		my_w.sliderMax->setValue(percentage*10000.0);
 		if (nparent->colorRelative) {
 			nparent->colorMax=percentage;
 		} else {
@@ -158,15 +167,27 @@ void nColorBarWin::invertColors () {
 
 void nColorBarWin::bufferChanged(nPhysD *phys){
 	if (phys) {
-		if (!my_w.actionAutoscale->isChecked()) {
-			double valmin=phys->Tminimum_value+my_w.sliderMin->value()/100.0*(phys->Tmaximum_value-phys->Tminimum_value);
-			double valmax=phys->Tminimum_value+my_w.sliderMax->value()/100.0*(phys->Tmaximum_value-phys->Tminimum_value);
+		//DEBUG(">>>>>>>>>>>>>>>>>> " << my_w.autoscale->isChecked() << " " << nparent->colorRelative);
+		if (nparent->colorRelative) {
+			double valmin=phys->Tminimum_value+my_w.sliderMin->value()/10000.0*(phys->Tmaximum_value-phys->Tminimum_value);
+			double valmax=phys->Tminimum_value+my_w.sliderMax->value()/10000.0*(phys->Tmaximum_value-phys->Tminimum_value);
 			disconnect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 			disconnect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 			my_w.lineMin->setText(QString::number(valmin));
 			my_w.lineMax->setText(QString::number(valmax));
 			connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 			connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+			//DEBUG(">>>>>>>>>>>>>>>>>>..... " << valmin << " " << valmax);
+		} else {
+			double valmin=10000.0*(my_w.lineMin->text().toDouble()-phys->Tminimum_value)/(phys->Tmaximum_value-phys->Tminimum_value);
+			double valmax=10000.0*(my_w.lineMax->text().toDouble()-phys->Tminimum_value)/(phys->Tmaximum_value-phys->Tminimum_value);
+			disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+			disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
+			my_w.sliderMin->setValue(valmin);
+			my_w.sliderMax->setValue(valmax);
+			connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+			connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
+			//DEBUG(">>>>>>>>>>>>>>>>>>..... " << valmin << " " << valmax);
 		}
 	}
 	my_w.histogram->repaint();
@@ -184,13 +205,11 @@ void nColorBarWin::updatecolorbar() {
 	my_w.comboBox->addItems(nparent->nPalettes.keys());
 	my_w.comboBox->setCurrentIndex(my_w.comboBox->findText(nparent->colorTable));
 	
-
-	my_w.actionAutoscale->setChecked(!nparent->colorRelative);
 	if (nparent->colorRelative) {
 		connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 		connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
-		my_w.sliderMin->setValue(nparent->colorMin*100.0);
-		my_w.sliderMax->setValue(nparent->colorMax*100.0);
+		my_w.sliderMin->setValue(nparent->colorMin*10000.0);
+		my_w.sliderMax->setValue(nparent->colorMax*10000.0);
 		disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 		disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	} else {
@@ -204,20 +223,22 @@ void nColorBarWin::updatecolorbar() {
 	my_w.histogram->repaint();
 	connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 	connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
 }
 
 void nColorBarWin::slider_min_changed(int val)
 {
 	double doubleVal=0.0;
-	if (currentBuffer) doubleVal = (double)val/100.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
+	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
 	my_w.lineMin->setText(QString::number(doubleVal, 'g'));
 }
 
 void nColorBarWin::slider_max_changed(int val)
 {
 	double doubleVal=1.0;
-	if (currentBuffer) doubleVal = (double)val/100.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
+	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
 	my_w.lineMax->setText(QString::number(doubleVal, 'g'));
 }
 
@@ -335,8 +356,6 @@ void nColorBarWin::itemDoubleClicked(QTreeWidgetItem *item,int){
 	if (item) {
 		my_w.paletteName->setText(item->text(0));
 		my_w.colorlist->setText(item->text(1));
-	} else {
-		qDebug() << "CLICK outside";
 	}
 }
 

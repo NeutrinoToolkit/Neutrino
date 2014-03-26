@@ -40,7 +40,7 @@ class nTreeWidget : public QTreeWidget {
 	Q_OBJECT
 public:	
 	nTreeWidget(QWidget *);
-	~nTreeWidget(){}
+	~nTreeWidget();
 	neutrino *nparent;
 	QPoint dragposition;
 	QTreeWidgetItem *dragitem;

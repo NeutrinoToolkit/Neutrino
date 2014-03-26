@@ -32,10 +32,12 @@
 class osxApp : public QApplication {
     Q_OBJECT
 public:
-	osxApp( int &argc, char **argv ) : QApplication(argc, argv) {}
+	osxApp( int &argc, char **argv ) : QApplication(argc, argv) {
+		DEBUG(5,"MAC creator ");
+	}
 protected:
 	bool event(QEvent *ev) {
-		DEBUG(11,"MAC APPLICATION EVENT " << ev->type());
+		DEBUG(5,"MAC APPLICATION EVENT " << ev->type());
 		if (ev->type() == QEvent::FileOpen) {
 			QWidget *widget = QApplication::activeWindow();
 			neutrino *neu=qobject_cast<neutrino *>(widget);

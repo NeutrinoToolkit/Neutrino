@@ -1,23 +1,23 @@
 /*
  *
- *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *	Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
  * 
- *    This file is part of nPhysImage library.
+ *	This file is part of nPhysImage library.
  *
- *    nPhysImage is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ *	nPhysImage is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
  *
- *    nPhysImage is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
+ *	nPhysImage is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU Lesser General Public License for more details.
  *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *	Contact Information: 
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -63,9 +63,10 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	
 	ifile.clear();
 	ifile.seekg(0,ios::beg);
-	
+	string comment("");
 	do {
 		getline (ifile, tline);
+		comment.append(tline);
 	} while ((tline.find('#') != string::npos) || (tline.find_first_not_of(' ') == tline.find_last_not_of(' ')));
 	
 	stringstream ss(tline);
@@ -74,7 +75,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	
 	DEBUG(5,"file has "<<nlines<<" lines and "<<ncols<<" cols");
 	
-	//physImage myimg(ncols, nlines);
+	//physImage mycc(ncols, nlines);
 	this->resize(ncols, nlines);
 	
 	// 2. read and save five
@@ -88,7 +89,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 		col=0;
 		stringstream sline(tline);
    		while( sline >> word && col<ncols) {
-	   		Timg_buffer[row*w+col]= strtod(word.c_str(),NULL);
+	   		set(row*w+col, strtod(word.c_str(),NULL));
    			col++;
    		}
 		row++;
@@ -218,7 +219,7 @@ physDouble_asc::physDouble_asc(const char *ifilename)
 	while (getline(ifile, tline)) {
 		stringstream sline(tline);
 		while ((sline.tellg() < (int) sline.str().length()) && (sline.tellg() > -1)) {
-			sline>>Timg_buffer[row*getW()+col]>>ch;
+			sline >> Timg_buffer[row*getW()+col] >> ch;
 			col++;
 		}
 		col = 0;
@@ -251,13 +252,13 @@ physInt_pgm::physInt_pgm(const char *ifilename)
 	
 	for (size_t i=0; i<getH(); i++) {
 		for (size_t j=0; j<getW(); j++) {
-			(Timg_matrix[i])[j] = (int)((readbuf[i])[j]);
+			set(i,j,(int)((readbuf[i])[j]));
 		}
 	}
 	
 	TscanBrightness();
 #else
-    WARNING("nPhysImage was compile without netpbm library");
+	WARNING("nPhysImage was compile without netpbm library");
 #endif
 }
 
@@ -292,80 +293,70 @@ physGray_pgm::physGray_pgm(const char *ifilename)
 #endif
 	
 
-physInt_sif::physInt_sif(const char *ifilename)
-: nPhysImageF<int>(string(ifilename), PHYS_FILE)
+physInt_sif::physInt_sif(string ifilename)
+: nPhysImageF<int>(ifilename, PHYS_FILE)
 {
 	// Andor camera .sif file
-	//
-	
-	char ptr[5];
-	int temp;
-	char *readb;
-	char *rowptr;
-	int w, h;
 	
 	string temp_string;
+	stringstream ss;
+	int skiplines=0;
 
-	ifstream ifile(ifilename, ios::in | ios::binary);
-	
-	ifile.read(ptr,5);
-	
-	if ( strncmp(ptr,"Andor",5) != 0 ) {
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
+	getline(ifile, temp_string);
+	if ( temp_string.substr(0,5)!=string("Andor")) {
 		WARNING("Does not start with Andor "<<ifilename);
 		return;
 	}
-	
-	int bpp = 4;
-	
-	WARNING("fixed bpp: "<<bpp);
-	
+		
 	// matrix informations on line 5
-	for (size_t i=0; i<5; i++)
+	for (size_t i=0; i<3; i++) {
 		getline(ifile, temp_string);
-	
-	stringstream ss(temp_string);
-	ss>>w;
-	ss>>h;
-	
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-"+ss.str()]=temp_string;
+	}
+	getline(ifile, temp_string);
+	int w, h;
+	ss.str(temp_string);
+	ss >> w;
+	ss >> h;	
 	this->resize(w, h);
 	
-	DEBUG(5,"width: "<<getW());
-	DEBUG(5,"height: "<<getH());
-	
-	// At least two versions of .sif have been observed, with 22 or 25 lines before the raw part
-	// Last line is usually a single 0 on a terminated line
-	ifile.seekg(0, ios::beg);
-	for (size_t i=0; i<22; i++)
+	getline(ifile, temp_string);
+	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+	property["sif-"+ss.str()]=temp_string;
+
+	getline(ifile, temp_string);
+	ss.str(temp_string);
+	int binary_header=0,useless=0;
+	ss >> useless >> binary_header;
+	DEBUG("unused value " << useless);
+	vector<char> buf(binary_header);
+	ifile.read(&buf[0], buf.size());
+
+	temp_string.clear();
+	bool found_control_string=false;
+	string control_string="Pixel number";
+	while ((!ifile.eof()) && (strcmp(temp_string.c_str(), "0") || found_control_string==false )) {
 		getline(ifile, temp_string);
-	
-	DEBUG(5,"raw init @ "<<ifile.tellg());
-	
-	if (strcmp(temp_string.c_str(), "0") != 0) {
-		DEBUG(5,"Old Andor format, workaround!");
-		while (strcmp(temp_string.c_str(), "0") != 0)
-			getline(ifile, temp_string);
-	}
-	
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-"+ss.str()]=temp_string;
+		if (temp_string.compare(0,control_string.length(),control_string)==0) {
+			found_control_string=true;
+		}		
+	}	
+
 	// get data
+	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+	vector<float> readb(getSurf());
 	
-	readb = new char [getW()*bpp];
-	for (size_t i=0; i<getH(); i++) {
-		
-		memset(readb,0,getW()*bpp);
-		rowptr = readb;
-		ifile.read(readb,getW()*bpp);
-		
-		for (size_t j=0; j<getW(); j++) {
-			temp = (int) ( *((float *)&readb[bpp*j]) );
-			(Timg_matrix[i])[j] = temp;
-		}
-	}
-	
-	delete [] readb;
-	TscanBrightness();
-	
+	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
+	DEBUG(ifile.gcount());
 	ifile.close();
+	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
 	
+	TscanBrightness();
+	DEBUG(Tminimum_value << " " << Tmaximum_value);
 }
 
 physShort_b16::physShort_b16(const char *ifilename)
@@ -453,96 +444,106 @@ physShort_img::physShort_img(string ifilename)
 	// Hamamatsu Streak Camera
 	//
 	unsigned short buffer;
-	int bytes=sizeof(unsigned short);
 	
-	FILE *fin;
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
+	
 	int w=0;
 	int h=0;
 	int skipbyte=0;
 	
-	if ((fin=fopen(ifilename.c_str(),"rb")) == NULL) return;
+	ifile.read((char *)&buffer,sizeof(unsigned short));
+	DEBUG(buffer);
 	
-	if (fread (&buffer,bytes,1,fin)==1) {
-		if (buffer == 19785) { //hamamatsu TODO: check all the stuff inside
-			fread (&buffer,bytes,1,fin);
-			skipbyte=buffer;
-			fread (&buffer,bytes,1,fin);
-			w=buffer;
-			fread (&buffer,bytes,1,fin);
-			h=buffer;
-			DEBUG("Hamamatsu " << w << " " << h << " " << skipbyte);
-			fseek(fin, 56, SEEK_CUR);
-			char *buffer2=new char[skipbyte];
-			int i = fread (buffer2,1,skipbyte,fin);
-			buffer2[i] ='\0';
-			property["fileinfo"]=string(buffer2);
-			delete [] buffer2;
+	if (buffer == 19785) {
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		skipbyte=buffer;
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		w=buffer;
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		h=buffer;
+		DEBUG("skipbyte " << skipbyte);
+		ifile.seekg (56,ios_base::cur);
+		
+//		 fseek(fin, 56, SEEK_CUR);
+		string buffer2;
+		buffer2.resize(skipbyte);
+		ifile.read((char *)&buffer2[0],skipbyte);		
+		property["info"]=buffer2;
+		DEBUG("Hamamatsu " << w << " " << h << " " << ifile.tellg());
 //			fseek(fin, skipbyte, SEEK_CUR);
-		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
-			fread (&buffer,bytes,1,fin);
-			if (buffer==7) {
-				fread (&buffer,bytes,1,fin);
-				skipbyte=buffer+4;
-				fread (&buffer,bytes,1,fin);
-				w=buffer;
-				fread (&buffer,bytes,1,fin);
-				h=buffer;
-			}
-			fread (&buffer,bytes,1,fin);
-		} else { // LIL images
-			rewind(fin);
-			unsigned int lil_header[4];
-			fread (lil_header,sizeof(unsigned int),4,fin);
-			if (lil_header[0]==2 && lil_header[3]==1) {
-				// lil_header[0] = dimension of the matrix
-				// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
-				w=lil_header[1];
-				h=lil_header[2];
-			}
+	} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
+	   	ifile.read((char *)&buffer,sizeof(unsigned short));
+	   	DEBUG("ARP " << buffer);
+		if (buffer==7) {
+			ifile.read((char *)&buffer,sizeof(unsigned short));
+			skipbyte=buffer;
+			ifile.seekg(skipbyte,ios_base::beg);
+			ifile.read((char *)&buffer,sizeof(unsigned short));
+			w=buffer;
+			ifile.read((char *)&buffer,sizeof(unsigned short));
+			h=buffer;
+		}
+	   	ifile.read((char *)&buffer,sizeof(unsigned short));
+	   	DEBUG("ARP " << buffer << " " << skipbyte << " " << w  << " " << h);
+	} else { // LIL images
+		ifile.seekg(ios_base::beg);
+		vector<unsigned int>lil_header (4);
+	   	ifile.read((char *)&lil_header[0],lil_header.size()*sizeof(unsigned int));	   	
+		if (lil_header[0]==2 && lil_header[3]==1) {
+			// lil_header[0] = dimension of the matrix
+			// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
+			w=lil_header[1];
+			h=lil_header[2];
 		}
 	}
 	DEBUG(5, "w "<< w << " h "<<h);
+	
 	if (w*h>0) {
 		this->resize(w, h);
-		fread(Timg_buffer,bytes,w*h,fin);
+	   	ifile.read((char *)Timg_buffer,sizeof(unsigned short)*w*h);
 	}	
-	fclose(fin);
+	TscanBrightness();
+	ifile.close();	
 }
 
-physShort_imd::physShort_imd(string ifilename)
+physUint_imd::physUint_imd(string ifilename)
 : nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
 {
 	// Optronics luli
-	//
+	// we should also check if a .imi text file exists and read it?
+
 	unsigned short buffer_header;
-	FILE *fin;
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
 	unsigned short w=0;
 	unsigned short h=0;
-	
-	if ((fin=fopen(ifilename.c_str(),"rb")) == NULL) return;
-	
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"header " << buffer_header);
-	}
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"width " << buffer_header);
-		w=buffer_header;
-	}
-	if (fread (&buffer_header,sizeof(buffer_header),1,fin)==1) {
-		DEBUG(5,"height " << buffer_header);
-		h=buffer_header;
-	}
+		
+	ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	property["imd-version"]=buffer_header;
+	ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	w=buffer_header;
+	ifile.read((char *)&buffer_header,sizeof(unsigned short));
+	h=buffer_header;
 	
 	this->resize(w, h);
-    fread(Timg_buffer,sizeof(unsigned int),w*h,fin);
-	
-	
-	fclose(fin);
-	TscanBrightness();
-	DEBUG(5,"object_name: "<<getName());
-	DEBUG(5,"filename: "<<getName());
-	
-	
+   	ifile.read((char *)Timg_buffer,sizeof(unsigned int)*w*h);
+
+	ifile.close();
+
+	string ifilenameimg=ifilename;
+	ifilenameimg.resize(ifilenameimg.size()-3);
+	ifilenameimg = ifilenameimg+"imi";
+	ifstream ifileimg(ifilenameimg.c_str(), ios::in);
+	if (ifileimg) {
+		string comment(""),temp_line;		
+		while (!ifileimg.eof()) {
+			getline(ifileimg, temp_line);
+			comment.append(temp_line);
+		}
+		ifileimg.close();
+		property["imi-info"]=comment;			
+	}
+
+	TscanBrightness();	
 }
 
 
@@ -619,22 +620,22 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	
 	// Compress data using zlib
 	int buffer_size=my_phys->getSurf()*sizeof(double);
-    unsigned char *out= new unsigned char [buffer_size];
-    z_stream strm;
+	unsigned char *out= new unsigned char [buffer_size];
+	z_stream strm;
 	
-    strm.zalloc = Z_NULL;
-    strm.zfree  = Z_NULL;
-    strm.opaque = Z_NULL;
-    int status;
-    status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
+	strm.zalloc = Z_NULL;
+	strm.zfree  = Z_NULL;
+	strm.opaque = Z_NULL;
+	int status;
+	status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
 	if (status < 0) {
 		// .alex. -- questa non compila (e non sono sicuro sia a causa di anymap)
 		//WARNING("Zlib a bad status of " << status);
 		exit (EXIT_FAILURE);
 	}
 
-    	strm.next_in = (unsigned char *) my_phys->Timg_buffer;
-    	strm.avail_in = my_phys->getSurf()*sizeof(double);
+	strm.next_in = (unsigned char *) my_phys->Timg_buffer;
+	strm.avail_in = my_phys->getSurf()*sizeof(double);
 	strm.avail_out = buffer_size;
 	strm.next_out = out;
 	status= deflate (& strm, Z_FINISH);
@@ -645,8 +646,8 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	}
 	int writtendata = buffer_size - strm.avail_out;
 
-    	deflateEnd (& strm);
-    	DEBUG(5,"writtendata " << writtendata);
+		deflateEnd (& strm);
+		DEBUG(5,"writtendata " << writtendata);
 
 	int oo = my_phys->getW();
 	ofile.write((const char *)&oo, sizeof(int));
@@ -725,8 +726,7 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 	TIFF* tif = TIFFOpen(ifilename, "r");
 	if (tif) {
 		DEBUG("Opened");
-		unsigned short samples, compression, config;
-// 		unsigned short *extra;
+		unsigned short samples=1, compression, config;
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
 		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
@@ -735,12 +735,12 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		DEBUG("COMPRESSION_NONE " << compression << " " << COMPRESSION_NONE);
 		DEBUG("PLANARCONFIG_CONTIG " << config << " " << PLANARCONFIG_CONTIG);
 		DEBUG("SAMPLES" << samples);
-// 		TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, extra);
-// 
+//		vector<unsigned short> extra(samples);
+// 		TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
 // 		for (int k=0;k<samples;k++) {
 // 			DEBUG("extra " << k << "  " << extra[k]);
 // 		}
-// 		delete extra;
+	
 		if (compression==COMPRESSION_NONE && config==PLANARCONFIG_CONTIG ) {
 			float resx=1.0, resy=1.0;
 			TIFFGetField(tif, TIFFTAG_XRESOLUTION, &resx);
@@ -759,9 +759,10 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 				DEBUG(desc);
 			}
 			if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
-				setShortName(desc);
+ 				property["info"]=string(desc);
 				DEBUG(desc);
 			}
+
 			setFromName(ifilename);
 			unsigned short bytesperpixel=0;
 			TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bytesperpixel);
@@ -779,6 +780,7 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 					TIFFReadScanline(tif, buf, j);
 					for (tiff_uint32 i=0; i<w; i++) {
 						double val=0;
+// 						samples=1;
 						for (int k=0;k<samples;k++) {
 							if (bytesperpixel == sizeof(char)) {
 								val+=((unsigned char*)buf)[i*samples];
@@ -800,7 +802,7 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 	}
 	TIFFClose(tif);
 #else
-    WARNING("nPhysImage was not compiled with tiff support!");
+	WARNING("nPhysImage was not compiled with tiff support!");
 #endif
 }
 
@@ -818,7 +820,6 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char *ofilename, int bytes) 
 		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
  		TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
  		TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, my_phys->getShortName().c_str());
- 		TIFFSetField(tif, TIFFTAG_MAKE,  my_phys->getFromName().c_str());
  		TIFFSetField(tif, TIFFTAG_SOFTWARE, "neutrino");
  		TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
 		
@@ -826,7 +827,7 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char *ofilename, int bytes) 
 		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_XRESOLUTION, my_phys->get_scale().x());
-	    TIFFSetField(tif, TIFFTAG_YRESOLUTION, my_phys->get_scale().y());
+		TIFFSetField(tif, TIFFTAG_YRESOLUTION, my_phys->get_scale().y());
 		
 		TIFFSetField(tif, TIFFTAG_XPOSITION, my_phys->get_origin().x());
 		TIFFSetField(tif, TIFFTAG_YPOSITION, my_phys->get_origin().y());
@@ -834,11 +835,11 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char *ofilename, int bytes) 
 		unsigned char *buf = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(tif));
 		for (size_t j = 0; j < my_phys->getH(); j++) {
  			for (size_t i=0; i<my_phys->getW(); i++) {
- 			    if (bytes==sizeof(float)) {
-     				((float*)buf)[i]=(float)my_phys->point(i,j) ;
-     			} else if (bytes==sizeof(int)){
-     				((int*)buf)[i]=(float)my_phys->point(i,j) ;
-     			}
+ 				if (bytes==sizeof(float)) {
+	 				((float*)buf)[i]=(float)my_phys->point(i,j) ;
+	 			} else if (bytes==sizeof(int)){
+	 				((int*)buf)[i]=(float)my_phys->point(i,j) ;
+	 			}
  			}
  			TIFFWriteScanline(tif, buf, j, 0);
  		}
@@ -849,8 +850,83 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char *ofilename, int bytes) 
 		return -1;
 	}
 #else
-    WARNING("nPhysImage was not compiled with tiff support!");
+	WARNING("nPhysImage was not compiled with tiff support!");
 #endif
+}
+
+std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
+	std::vector <nPhysImageF<double> *> vecReturn;
+	
+	ifstream ifile(ifilename.c_str(), ios::in);
+	string header;
+	header.resize(4100);
+	ifile.read((char *)&header[0],header.size());
+	unsigned short type= *((unsigned short *) &header[108]);
+	
+	unsigned short height= *((unsigned short *) &header[656]);
+	unsigned short width= *((unsigned short *) &header[42]);
+	unsigned short noscan= *((unsigned short *) &header[34]);
+	unsigned int NumFrames= *((unsigned int *) &header[1446]);
+
+	if (noscan == 65535) {
+		int lnoscan = *((int *) &header[664]);
+		if (lnoscan != -1) NumFrames = lnoscan / height;
+	} else {
+		NumFrames = noscan / height;
+	}
+
+	DEBUG(type << " " << height  << " " << width << " " << noscan << " " << NumFrames);
+
+	for (unsigned int nf=0;nf<NumFrames;nf++) {
+		nPhysD *phys=new nPhysD(width,height,0.0);
+		phys->property["spe-frame"]=vec2f(nf,NumFrames);
+		switch (type) {
+			case 0: {
+				phys->property["spe-type"]="float";
+				vector<float> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(float));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 1: {
+				phys->property["spe-type"]="long";
+				vector<long> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(long));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 2: {
+				phys->property["spe-type"]="unsigned int";
+				vector<unsigned int> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned int));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			case 3: {
+				phys->property["spe-type"]="unsigned short";
+				vector<unsigned short> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
+				for (unsigned int i=0; i<phys->getSurf(); i++) {
+					phys->set(i,buffer[i]);
+				}
+				break;
+			}
+			default:
+				break;
+		}
+		
+		phys->TscanBrightness();
+		vecReturn.push_back(phys);
+	}
+
+	ifile.close();
+	return vecReturn;
 }
 
 std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
@@ -862,6 +938,7 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 		ifilenameimg = ifilenameimg+"img";
 		ifstream ifileimg(ifilenameimg.c_str(), ios::in);
 		if (ifileimg) {
+			DEBUG("start");
 			string line;
 			getline(ifile,line);
 			if (line.compare(string("BAS_IMAGE_FILE"))!=0) {
@@ -880,15 +957,16 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 			int w=atoi(line.c_str());
 			getline(ifile,line);
 			int h=atoi(line.c_str());
-			nPhysImageF<double> *linearized = new nPhysImageF<double>(w,h,0.0,(string("(linearized) ")+ifilename).c_str());
+			nPhysImageF<double> *linearized = new nPhysImageF<double>(w,h,0.0,(string("(linearized)")+ifilename).c_str());
 			linearized->setType(PHYS_FILE);
 			linearized->setFromName(ifilename);
+			linearized->setShortName("(linearized)");
 			imagelist.push_back(linearized);
 			nPhysImageF<double> *original = new nPhysImageF<double>(w,h,0.0,ifilename.c_str());
 			original->setType(PHYS_FILE);
 			original->setFromName(ifilename);
+			original->setShortName("(original)");
 			imagelist.push_back(original);
-			
 			getline(ifile,line);
 			double sensitivity=atoi(line.c_str());
 			getline(ifile,line);
@@ -896,63 +974,55 @@ std::vector <nPhysImageF<double> *> phys_open_inf(std::string ifilename) {
 			DEBUG(5,"resx = "<< resx);
 			DEBUG(5,"resy = "<< resy);
 			DEBUG(5,"bit  = "<< bit);
-			DEBUG(5,"w    = "<< w);
-			DEBUG(5,"h    = "<< h);
+			DEBUG(5,"w	= "<< w);
+			DEBUG(5,"h	= "<< h);
 			DEBUG(5,"sens = "<< sensitivity);
 			DEBUG(5,"lat  = "<< latitude);
 			// FIXME: this is awful
 			switch (bit) {
 				case 8: {
-					char *buf=new char[original->getSurf()];
-					ifileimg.read(buf, sizeof(char)*original->getSurf());
+					vector<char> buf(original->getSurf());
+					ifileimg.read(&buf[0], original->getSurf());
 					for (size_t i=0;i<original->getSurf();i++) {
-						original->Timg_buffer[i]=swap_endian<char>(buf[i]);
-						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
+						original->set(i,swap_endian<char>(buf[i]));
+						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
 					}
-					delete [] buf;
 					break;
 				}
 				case 16: {
-					unsigned short *buf=new unsigned short[original->getSurf()];
-					ifileimg.read((char*)buf, sizeof(unsigned short)*original->getSurf());
+					vector<unsigned short> buf(original->getSurf());
+					ifileimg.read((char*)(&buf[0]), sizeof(unsigned short)*original->getSurf());
 					for (size_t i=0;i<original->getSurf();i++) {
-						original->Timg_buffer[i]=swap_endian<unsigned short>(buf[i]);
-						linearized->Timg_buffer[i] = ((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->Timg_buffer[i]/pow(2.0,bit)-0.5));
+						original->set(i,swap_endian<unsigned short>(buf[i]));
+						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
 					}
-					delete [] buf;
 					break;
 				}
 			}
+			linearized->set_scale(resx,resy);
+			linearized->TscanBrightness();
+			original->TscanBrightness();
 		}
 		ifileimg.close();
 	}
 	ifile.close();
-    if (imagelist.size()==2) {
-        string name=ifilename;
-        size_t last_idx = ifilename.find_last_of("\\/");
-        if (std::string::npos != last_idx) {
-            name.erase(0,last_idx + 1);
-        }
-        imagelist.at(0)->setShortName("(linearized)");
-        imagelist.at(0)->setName(name+"(linearized)");
-    }
 	return imagelist;
 }
 
 physDouble_fits::physDouble_fits(string ifilename)
 : nPhysImageF<double>(ifilename, PHYS_FILE) {
 #ifdef HAVE_LIBCFITSIO
-    fitsfile *fptr;
-    char card[FLEN_CARD];
-    int status = 0,  nkeys, ii;
+	fitsfile *fptr;
+	char card[FLEN_CARD];
+	int status = 0,  nkeys, ii;
 	
-    fits_open_file(&fptr, ifilename.c_str(), READONLY, &status);
+	fits_open_file(&fptr, ifilename.c_str(), READONLY, &status);
 	int bitpix;
 	int anaxis;
 	
 	fits_get_img_type(fptr,&bitpix,&status);
 	if (status)
-        fits_report_error(stderr, status);
+		fits_report_error(stderr, status);
 	
 	DEBUG(5,"fits_get_img_type " << bitpix);
 	fits_get_img_dim(fptr,&anaxis,&status);
@@ -987,7 +1057,7 @@ physDouble_fits::physDouble_fits(string ifilename)
 		
 	}
 	
-    fits_close_file(fptr, &status);
+	fits_close_file(fptr, &status);
 #endif
 }
 
@@ -1000,21 +1070,21 @@ vector <nPhysImageF<double> *> phys_resurrect_binary(std::string fname) {
 
 		nPhysD *datamatrix = new nPhysD();
 		DEBUG("here");
-    
+	
 	// crisstho della madonna...
 	// i morti con i morti, i vivi con i vivi
-        //    int ret=phys_resurrect_old_binary(datamatrix,ifile);
-        //    if (ret>=0 && datamatrix->getSurf()>0) {
-        //        imagelist.push_back(datamatrix);
-        //    } else {
+		//	int ret=phys_resurrect_old_binary(datamatrix,ifile);
+		//	if (ret>=0 && datamatrix->getSurf()>0) {
+		//		imagelist.push_back(datamatrix);
+		//	} else {
 
 		ret=phys_resurrect_binary(datamatrix,ifile);
  		if (ret>=0 && datamatrix->getSurf()>0) {
-     			imagelist.push_back(datamatrix);
+	 			imagelist.push_back(datamatrix);
 		} else {
-    			delete datamatrix;
-	//        }
-    
+				delete datamatrix;
+	//		}
+	
 		}
 
 	}
@@ -1051,9 +1121,9 @@ phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	
 	getline(ifile,line);
 	if (line!="1") {
-	    DEBUG("OLD neu file, rewind to pos " << posfile);
-	    ifile.seekg(posfile);
-        return -1;
+		DEBUG("OLD neu file, rewind to pos " << posfile);
+		ifile.seekg(posfile);
+		return -1;
 	}
 
 // 	getline(ifile,pp.phys_short_name);
@@ -1076,17 +1146,17 @@ phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
 	
  	my_phys->resize(my_w,my_h);
-    unsigned char *in= new  unsigned char [buffer_size];
+	unsigned char *in= new  unsigned char [buffer_size];
  	ifile.read((char *)in, buffer_size*sizeof(char));
 	
-    z_stream strm;
+	z_stream strm;
 	
-    strm.zalloc = Z_NULL;
-    strm.zfree  = Z_NULL;
-    strm.opaque = Z_NULL;
-    int status;
-    status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
-    if (status < 0) {
+	strm.zalloc = Z_NULL;
+	strm.zfree  = Z_NULL;
+	strm.opaque = Z_NULL;
+	int status;
+	status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	  	delete in;
 		delete my_phys;
@@ -1094,19 +1164,19 @@ phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 		return (EXIT_FAILURE);
 	}
 	
-    strm.next_in = in;
-    strm.avail_in = buffer_size;
-    strm.next_out = (unsigned char *)my_phys->Timg_buffer;
-    strm.avail_out = my_phys->getSurf()*sizeof(double);
-    status = inflate (&strm, Z_SYNC_FLUSH);
-    if (status < 0) {
+	strm.next_in = in;
+	strm.avail_in = buffer_size;
+	strm.next_out = (unsigned char *)my_phys->Timg_buffer;
+	strm.avail_out = my_phys->getSurf()*sizeof(double);
+	status = inflate (&strm, Z_SYNC_FLUSH);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	 	delete in;
 	 	delete my_phys;
 	 	my_phys=NULL;
 		return (EXIT_FAILURE);
 	}
-    inflateEnd (& strm);
+	inflateEnd (& strm);
  	delete in;
  	
  	my_phys->setType(PHYS_FILE);
@@ -1151,17 +1221,17 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
 	
  	my_phys->resize(my_w,my_h);
-    unsigned char *in= new  unsigned char [buffer_size];
+	unsigned char *in= new  unsigned char [buffer_size];
  	ifile.read((char *)in, buffer_size*sizeof(char));
 	
-    z_stream strm;
+	z_stream strm;
 	
-    strm.zalloc = Z_NULL;
-    strm.zfree  = Z_NULL;
-    strm.opaque = Z_NULL;
-    int status;
-    status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
-    if (status < 0) {
+	strm.zalloc = Z_NULL;
+	strm.zfree  = Z_NULL;
+	strm.opaque = Z_NULL;
+	int status;
+	status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	  	delete in;
 		// my_phys is passed as an argument: function shoud not mess around with it!
@@ -1170,12 +1240,12 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 		return (EXIT_FAILURE);
 	}
 	
-    strm.next_in = in;
-    strm.avail_in = buffer_size;
-    strm.next_out = (unsigned char *)my_phys->Timg_buffer;
-    strm.avail_out = my_phys->getSurf()*sizeof(double);
-    status = inflate (&strm, Z_SYNC_FLUSH);
-    if (status < 0) {
+	strm.next_in = in;
+	strm.avail_in = buffer_size;
+	strm.next_out = (unsigned char *)my_phys->Timg_buffer;
+	strm.avail_out = my_phys->getSurf()*sizeof(double);
+	status = inflate (&strm, Z_SYNC_FLUSH);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	 	delete in;
 		// my_phys is passed as an argument: function shoud not mess around with it!
@@ -1183,7 +1253,7 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	 	my_phys=NULL;
 		return (EXIT_FAILURE);
 	}
-    inflateEnd (& strm);
+	inflateEnd (& strm);
  	delete [] in;
  	
  	my_phys->setType(PHYS_FILE);
@@ -1219,17 +1289,17 @@ phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
 	
  	my_phys->resize(my_w,my_h);
-    unsigned char *in= new  unsigned char [buffer_size];
+	unsigned char *in= new  unsigned char [buffer_size];
  	ifile.read((char *)in, buffer_size*sizeof(char));
 	
-    z_stream strm;
+	z_stream strm;
 	
-    strm.zalloc = Z_NULL;
-    strm.zfree  = Z_NULL;
-    strm.opaque = Z_NULL;
-    int status;
-    status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
-    if (status < 0) {
+	strm.zalloc = Z_NULL;
+	strm.zfree  = Z_NULL;
+	strm.opaque = Z_NULL;
+	int status;
+	status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	  	delete in;
 		delete my_phys;
@@ -1237,19 +1307,19 @@ phys_resurrect_old_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 		return (EXIT_FAILURE);
 	}
 	
-    strm.next_in = in;
-    strm.avail_in = buffer_size;
-    strm.next_out = (unsigned char *)my_phys->Timg_buffer;
-    strm.avail_out = my_phys->getSurf()*sizeof(double);
-    status = inflate (&strm, Z_SYNC_FLUSH);
-    if (status < 0) {
+	strm.next_in = in;
+	strm.avail_in = buffer_size;
+	strm.next_out = (unsigned char *)my_phys->Timg_buffer;
+	strm.avail_out = my_phys->getSurf()*sizeof(double);
+	status = inflate (&strm, Z_SYNC_FLUSH);
+	if (status < 0) {
 		WARNING("Zlib a bad status of " << status);
 	 	delete in;
 	 	delete my_phys;
 	 	my_phys=NULL;
 		return (EXIT_FAILURE);
 	}
-    inflateEnd (& strm);
+	inflateEnd (& strm);
  	delete in;
  	
  	my_phys->setType(PHYS_FILE);
@@ -1270,57 +1340,69 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 	if (ifile.fail()) return -1;
 	ifile.seekg(skipbyte);
 	if (ifile.fail() || ifile.eof()) return -1;
-	for (size_t i=0;i<my_phys->getSurf();i++) {
-		switch (kind) {
-			case 0: {
-				char buf;
-				ifile.read(&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<char>(buf) : buf;
-				break;
-			}
-			case 1: {
-				unsigned short buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<unsigned short>(buf) : buf;
-				break;
-			}
-			case 2: {
-				short buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<short>(buf) : buf;
-				break;
-			}
-			case 3: {
-				unsigned int buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<unsigned int>(buf) : buf;
-				break;
-			}
-			case 4: {
-				int buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<int>(buf) : buf;
-				break;
-			}
-			case 5: {
-				float buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<float>(buf) : buf;
-				break;
-			}
-			case 6: {
-				double buf;
-				ifile.read((char*)&buf, sizeof(buf));
-				my_phys->Timg_buffer[i] = endian ? swap_endian<double>(buf) : buf;
-				break;
-			}
-			default:
-				return -1;
-				break;
-		}
-		// 		cerr << kind << "\t" <<  endian << "\t" <<  i << "\t" <<  my_phys->Timg_buffer[i] << endl;
+	int bpp=0;
+	
+	switch (kind) {
+		case 0: bpp=sizeof(unsigned char); break;
+		case 1: bpp=sizeof(signed char); break;
+		case 2: bpp=sizeof(unsigned short); break;
+		case 3: bpp=sizeof(signed short); break;
+		case 4: bpp=sizeof(unsigned int); break;
+		case 5: bpp=sizeof(signed int); break;
+		case 6: bpp=sizeof(float); break;
+		case 7: bpp=sizeof(double); break;
 	}
-	ifile.close();
+	
+	if (bpp>0) {
+		vector<char> buffer(bpp*my_phys->getSurf());
+		ifile.read(&buffer[0], buffer.size());
+		ifile.close();
+		for (size_t i=0;i<my_phys->getSurf();i++) {
+			switch (kind) {
+				case 0: {
+					unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
+					break;
+				}
+				case 1: {
+					signed char buf = *((signed char*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
+					break;
+				}
+				case 2: {
+					unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
+					break;
+				}
+				case 3: {
+					signed short buf = *((signed short*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
+					break;
+				}
+				case 4: {
+					unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
+					break;
+				}
+				case 5: {
+					signed int buf = *((signed int*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
+					break;
+				}
+				case 6: {
+					float buf = *((float*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
+					break;
+				}
+				case 7: {
+					double buf = *((double*)(&buffer[i*bpp]));
+					my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
+					break;
+				}
+			}
+		}
+	}
+
 	my_phys->TscanBrightness();
 	return 0;
 }
@@ -1328,9 +1410,9 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 //! open HDF4 file (works for: Omega LLR  visar images)
 vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	vector <nPhysImageF<double> *> imagelist;
-	WARNING("HERE");
-#ifdef HAVE_LIBMFHDF
-	WARNING("HERE2");
+	DEBUG("HERE");
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+	DEBUG("HERE2");
 	int32 sd_id, sds_id, n_datasets, n_file_attrs, index,status ;
 	int32 dim_sizes[3];
 	int32 rank, num_type, attributes, istat;
@@ -1349,9 +1431,9 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 			DEBUG(5,"Image number " << index);
 			sds_id = SDselect(sd_id, index);
 			istat = SDgetinfo(sds_id, name, &rank, dim_sizes, &num_type, &attributes);
-			DEBUG(5,"      rank " << rank << " attributes " << attributes << " : " << num_type);
+			DEBUG(5,"	  rank " << rank << " attributes " << attributes << " : " << num_type);
 			for (i=0;i<rank;i++) {
-				DEBUG(5,"      " << i << " = " << dim_sizes[i]);
+				DEBUG(5,"	  " << i << " = " << dim_sizes[i]);
 			}
 			
 			int surf=1;
@@ -1390,41 +1472,41 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 				if (status!=FAIL && rank>1) {
 					int numMat=(rank==2?1:dim_sizes[0]);
 					if (dim_sizes[rank-1]*dim_sizes[rank-2]>0) {
-						DEBUG(5,"      num mat " << numMat << " " << dim_sizes[rank-1]<< " x " << dim_sizes[rank-2]);
+						DEBUG(5,"	  num mat " << numMat << " " << dim_sizes[rank-1]<< " x " << dim_sizes[rank-2]);
 						for (i=0;i<numMat;i++) {
-							DEBUG(5,"      mat " << i);
+							DEBUG(5,"	  mat " << i);
 							nPhysImageF<double> *my_data = new nPhysImageF<double>(dim_sizes[rank-1],dim_sizes[rank-2],0.0,"hdf4");
 							for (size_t k=0;k<my_data->getSurf();k++) {
 								switch (num_type) {
 									case 3:
-										my_data->Timg_buffer[k]=((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 4:
-										my_data->Timg_buffer[k]=((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 20:
-										my_data->Timg_buffer[k]=(int)((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(int)((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 21:
-										my_data->Timg_buffer[k]=(int)((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(int)((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 5:
-										my_data->Timg_buffer[k]=(float) ((float *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,(float) ((float *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 6:
-										my_data->Timg_buffer[k]=((double *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((double *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 22:
-										my_data->Timg_buffer[k]=((short *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 23:
-										my_data->Timg_buffer[k]=((unsigned short *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 24:
-										my_data->Timg_buffer[k]=((int *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 25:
-										my_data->Timg_buffer[k]=((unsigned int *)data)[k+i*dim_sizes[1]*dim_sizes[2]];
+										my_data->set(k,((unsigned int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 								}
 							}
@@ -1470,7 +1552,7 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 
 
 nPhysImageF<double> * phys_open_HDF5(std::string fileName, std::string dataName) {
-    nPhysD *my_data=NULL;
+	nPhysD *my_data=NULL;
 	DEBUG(fileName << " " << dataName);
 #ifdef HAVE_LIBHDF5
 	hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -1654,7 +1736,7 @@ void scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
 #endif
 
 int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
 	if (phys) {
 		intn istat=0;
 		int32 sd_id = SDstart(fname, DFACC_CREATE);
@@ -1668,7 +1750,7 @@ int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
 	return -1;
 }
 
-#ifdef HAVE_LIBMFHDF
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
 int phys_write_HDF4_SD(nPhysImageF<double> * phys, int sd_id) {
 	intn istat=0;
 	int32 start[2], dimsizes[2];
@@ -1695,12 +1777,12 @@ int phys_write_HDF4_SD(nPhysImageF<double> * phys, int sd_id) {
 
 // int phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
 // #ifdef __phys_HDF
-// 	hid_t       file_id;
-// 	hsize_t     dims[2]={phys->getH(),phys->getW()};
-// 	herr_t      status;
+// 	hid_t	   file_id;
+// 	hsize_t	 dims[2]={phys->getH(),phys->getW()};
+// 	herr_t	  status;
 // 
 // 	file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-//    	status = H5LTmake_dataset(file_id,"neutrino",2,dims,H5T_NATIVE_DOUBLE,phys->Timg_buffer);
+//		status = H5LTmake_dataset(file_id,"neutrino",2,dims,H5T_NATIVE_DOUBLE,phys->Timg_buffer);
 // 	status= H5LTset_attribute_string(file_id,"/","version", __VER);
 // 	double data[2];
 // 	data[0]=phys->get_origin().x();
@@ -1712,7 +1794,7 @@ int phys_write_HDF4_SD(nPhysImageF<double> * phys, int sd_id) {
 // 	status= H5LTset_attribute_string(file_id,"neutrino","physName", phys->getName().c_str());
 // 	status= H5LTset_attribute_string(file_id,"neutrino","physShortName", phys->getShortName().c_str());
 // 
-//    	cerr << "[hdf5] status " << status << endl;
+//		cerr << "[hdf5] status " << status << endl;
 //  	status = H5Fclose (file_id);
 // #endif
 // }
@@ -1732,7 +1814,7 @@ int phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
 #ifdef HAVE_LIBHDF5
 	if (phys) {
 		if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
-			unsigned int    filter_info;
+			unsigned int	filter_info;
 			herr_t status = H5Zget_filter_info (H5Z_FILTER_DEFLATE, &filter_info);
 			if ( (filter_info & H5Z_FILTER_CONFIG_ENCODE_ENABLED) && (filter_info & H5Z_FILTER_CONFIG_DECODE_ENABLED) ) {
 				hid_t file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -1776,24 +1858,26 @@ int phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
 
 
 std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string optarg) {
-    std::vector <nPhysImageF<double> *> retPhys;
-    size_t last_idx=0;
+	std::vector <nPhysImageF<double> *> retPhys;
+	size_t last_idx=0;
 
-    WARNING("DEBUG in warning for release!");
+	WARNING("DEBUG in warning for release!");
 	
 	string ext=fname;
-    last_idx = fname.find_last_of(".");
+	last_idx = fname.find_last_of(".");
 	if (string::npos != last_idx) {
 		ext.erase(0,last_idx + 1);
 	}
 
+	transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
 	string name=fname;
-    last_idx = fname.find_last_of("\\/");
+	last_idx = fname.find_last_of("\\/");
 	if (std::string::npos != last_idx) {
 		name.erase(0,last_idx + 1);
 	}
 
-    WARNING(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 	
 	nPhysD *datamatrix=NULL;
 	if (ext=="pgm") {
@@ -1801,7 +1885,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		datamatrix = new nPhysD;
 		*datamatrix = physGray_pgm(fname.c_str());
 #else
-    WARNING("nPhysImage was compiled without netpbm library");
+	WARNING("nPhysImage was compiled without netpbm library");
 #endif
 	} else if (ext=="txt") {
 		// FIXME: questo e' un baco bastardo: ATTENZIONE! no deep copy when passing reference from
@@ -1814,6 +1898,9 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		datamatrix = new physDouble_txt(fname.c_str());
 	} else if (ext.substr(0,3)=="tif") {
 		datamatrix = new physDouble_tiff(fname.c_str());
+	} else if (ext=="spe") {
+		vector <nPhysImageF<double> *> imagelist=phys_open_spe(fname);
+		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="inf") {
 		vector <nPhysImageF<double> *> imagelist=phys_open_inf(fname);
 		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
@@ -1828,25 +1915,25 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		*datamatrix = physShort_img(fname);
 	} else if (ext=="imd") {
 		datamatrix = new nPhysD;
-		*datamatrix = physShort_imd(fname.c_str());
+		*datamatrix = physUint_imd(fname.c_str());
 		phys_divide(*datamatrix,1000.);
 	} else if (ext.substr(0,3)=="fit") {
 		datamatrix = new physDouble_fits(fname);
 	} else if (ext=="hdf") {
 		vector <nPhysImageF<double> *> imagelist=phys_open_HDF4(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="h5") {
 		if (!optarg.empty()) datamatrix = phys_open_HDF5(fname,optarg);
 	} else if (ext=="neu") {
 		vector <nPhysImageF<double> *> imagelist=phys_resurrect_binary(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	}
 	
-    WARNING("DEBUG in warning for release 2!");
+	WARNING("DEBUG in warning for release 2!");
 
 	if (datamatrix) retPhys.push_back(datamatrix);
-    for (size_t i=0;i<retPhys.size();i++) {
-        WARNING("DEBUG in warning for release! -> "<< i );
+	for (size_t i=0;i<retPhys.size();i++) {
+		WARNING("DEBUG in warning for release! -> "<< i );
 
 		std::ostringstream ss;
 		ss << name;
@@ -1854,12 +1941,16 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 			ss << " " << i+1;
 		}
 
+		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+
 		// if Name and ShortName are set, don't change them
 		if (retPhys[i]->getName().empty())
 			retPhys[i]->setName(ss.str());
-		
-		if (retPhys[i]->getShortName().empty())
+
+ 		if (retPhys[i]->getShortName().empty())
 			retPhys[i]->setShortName(ss.str());
+
+		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
 
 		retPhys[i]->setFromName(fname);
  		retPhys[i]->setType(PHYS_FILE);

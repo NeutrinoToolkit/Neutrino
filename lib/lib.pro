@@ -120,5 +120,9 @@ FORMS += nCompareLines.ui
 SOURCES += nCompareLines.cc
 HEADERS += nCompareLines.h 
  
+# Shortcuts
+FORMS += nShortcuts.ui
+SOURCES += nShortcuts.cc
+HEADERS += nShortcuts.h 
 
 

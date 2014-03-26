@@ -169,6 +169,7 @@ public slots:
 	// File
 	void fileNew();
 
+	void openFile(QString);
 	void fileOpen();
 	std::vector<nPhysD*> fileOpen(QString, QString=QString());
 	void fileOpen(QStringList);
@@ -202,6 +203,10 @@ public slots:
 	void toggleMouse(bool);
 	void toggleRuler();
 	void toggleRuler(bool);
+	void toggleGrid();
+	void toggleGrid(bool);
+	
+	nGenericPan* Shortcuts();
 
 	// Analysis
 	nGenericPan* FocalSpot();
@@ -212,6 +217,9 @@ public slots:
 	nGenericPan* CutoffImage();
 
 	nGenericPan* WinList();
+	
+	nGenericPan* Properties();
+
 	void cycleOverItems();
 //	void setItemSelect(QGraphicsItem *, bool);
 

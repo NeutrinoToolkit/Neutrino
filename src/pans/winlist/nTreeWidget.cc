@@ -28,7 +28,13 @@
 
 using namespace std;
 
-nTreeWidget::nTreeWidget(QWidget *){
+nTreeWidget::nTreeWidget(QWidget * pippo){
+	qDebug() << pippo;
+	dragitem=NULL;
+};
+
+nTreeWidget::~nTreeWidget(){
+	if (dragitem) delete dragitem;
 };
 
 void nTreeWidget::mousePressEvent(QMouseEvent *e) {
@@ -44,7 +50,7 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
 		nPhysD *my_phys=(nPhysD*) (dragitem->data(columnCount()-1,Qt::DisplayRole).value<void*>());
 		DEBUG((void*)my_phys);
 		QList<QUrl> lista;
-		lista << QUrl(QString::fromStdString(my_phys->getName()));
+		lista << QUrl(QString::fromUtf8(my_phys->getName().c_str()));
 		if (lista.size()) mymimeData->setUrls(lista);
 		QByteArray physPointer;
 		physPointer.append(QString::number((long) my_phys));
@@ -81,6 +87,7 @@ void nTreeWidget::dragMoveEvent(QDragMoveEvent *e)
 void nTreeWidget::dropEvent(QDropEvent *e) {
 	nparent->dropEvent(e);
 	e->acceptProposedAction();
+	dragitem=NULL;
 }
 
 void nTreeWidget::keyPressEvent(QKeyEvent *e){

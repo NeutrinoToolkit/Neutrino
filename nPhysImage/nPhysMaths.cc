@@ -1,23 +1,23 @@
 /*
  *
- *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *	Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
  * 
- *    This file is part of nPhysImage library.
+ *	This file is part of nPhysImage library.
  *
- *    nPhysImage is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ *	nPhysImage is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
  *
- *    nPhysImage is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
+ *	nPhysImage is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU Lesser General Public License for more details.
  *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *	Contact Information: 
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -172,20 +172,52 @@ nPhysImageF<mcomplex>::TscanBrightness() {
 }
 
 void 
-phys_add(nPhysImageF<double> &iimage, double val)
-{ if (val!=0.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)+val); }
+phys_add(nPhysImageF<double> &iimage, double val) { 
+	if (val!=0.0) {
+		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
+			iimage.set(ii, iimage.point(ii)+val); 
+		iimage.TscanBrightness();
+	}
+	std::ostringstream ostr;
+	ostr << val;
+	iimage.setName("("+iimage.getName()+")+"+ostr.str());
+}
 
 void 
-phys_subtract(nPhysImageF<double> &iimage, double val)
-{ if (val!=0.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)-val); }
-
-void
-phys_multiply(nPhysImageF<double> &iimage, double val)
-{ if (val!=1.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)*val); }
+phys_subtract(nPhysImageF<double> &iimage, double val) {
+	if (val!=0.0) {
+		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
+			iimage.set(ii, iimage.point(ii)-val); 
+		iimage.TscanBrightness();
+	}
+	std::ostringstream ostr;
+	ostr << val;
+	iimage.setName("("+iimage.getName()+")-"+ostr.str());
+}
 
 void 
-phys_divide(nPhysImageF<double> &iimage, double val)
-{ if (val!=1.0) for (register size_t ii=0; ii<iimage.getSurf(); ii++) iimage.set(ii, iimage.point(ii)/val); }
+phys_multiply(nPhysImageF<double> &iimage, double val) {
+	if (val!=1.0) {
+		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
+			iimage.set(ii, iimage.point(ii)*val); 
+		iimage.TscanBrightness();
+	}
+	std::ostringstream ostr;
+	ostr << val;
+	iimage.setName("("+iimage.getName()+")*"+ostr.str());
+}
+
+void 
+phys_divide(nPhysImageF<double> &iimage, double val) {
+	if (val!=1.0) {
+		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
+			iimage.set(ii, iimage.point(ii)/val); 
+		iimage.TscanBrightness();
+	}
+	std::ostringstream ostr;
+	ostr << val;
+	iimage.setName("("+iimage.getName()+")/"+ostr.str());
+}
 
 void 
 phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
@@ -193,6 +225,10 @@ phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
 	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
 		iimage.set(ii, iimage.point(ii) + vMax*((double)rand() / RAND_MAX));
 	}
+	iimage.TscanBrightness();
+	std::ostringstream ostr;
+	ostr << vMax;
+	iimage.setName("("+iimage.getName()+")+rand("+ostr.str()+")");
 }
 
 
@@ -228,7 +264,40 @@ phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
 		}
 	}
 
+	m1.TscanBrightness();
+	std::ostringstream ostr;
+	ostr << radius;
+	m1.setName("blur("+m1.getName()+","+ostr.str()+")");
+}
 
+void
+phys_sin(nPhysImageF<double> &m1)
+{
+	for (size_t i=0; i< m1.getSurf(); i++) {
+		m1.set(i,sin(m1.point(i)));
+	}
+	m1.TscanBrightness();
+	m1.setName("sin("+m1.getName()+")");
+}
+
+void
+phys_cos(nPhysImageF<double> &m1)
+{
+	for (size_t i=0; i< m1.getSurf(); i++) {
+		m1.set(i,cos(m1.point(i)));
+	}
+	m1.TscanBrightness();
+	m1.setName("cos("+m1.getName()+")");
+}
+
+void
+phys_tan(nPhysImageF<double> &m1)
+{
+	for (size_t i=0; i< m1.getSurf(); i++) {
+		m1.set(i,tan(m1.point(i)));
+	}
+	m1.TscanBrightness();
+	m1.setName("tan("+m1.getName()+")");
 }
 
 void
@@ -237,6 +306,10 @@ phys_pow(nPhysImageF<double> &m1, double exponent)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),exponent));
 	}
+	m1.TscanBrightness();
+	std::ostringstream ostr;
+	ostr << exponent;
+	m1.setName("("+m1.getName()+")^"+ostr.str());
 }
 
 void
@@ -245,6 +318,8 @@ phys_square(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),2));
 	}
+	m1.TscanBrightness();
+	m1.setName("("+m1.getName()+")^2");
 }
 
 void
@@ -253,6 +328,8 @@ phys_sqrt(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,sqrt(m1.point(i)));
 	}
+	m1.TscanBrightness();
+	m1.setName("sqrt("+m1.getName()+")");
 }
 
 void
@@ -261,6 +338,8 @@ phys_abs(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,abs(m1.point(i)));
 	}
+	m1.TscanBrightness();
+	m1.setName("abs("+m1.getName()+")");
 }
 
 void
@@ -269,6 +348,8 @@ phys_log(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log(m1.point(i)));
 	}
+	m1.TscanBrightness();
+	m1.setName("ln("+m1.getName()+")");
 }
 
 void
@@ -277,6 +358,8 @@ phys_log10(nPhysImageF<double> &m1)
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log10(m1.point(i)));
 	}
+	m1.TscanBrightness();
+	m1.setName("log("+m1.getName()+")");
 }
 
 void
@@ -297,8 +380,8 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 	
 	fftw_execute(fb);
 
- 	double sx=pow(m1.getW()/(radius*M_PI),2)/2.0;
- 	double sy=pow(m1.getH()/(radius*M_PI),2)/2.0;
+ 	double sx=pow(m1.getW()/(radius),2)/2.0;
+ 	double sy=pow(m1.getH()/(radius),2)/2.0;
 
  	for (size_t j = 0 ; j < m1.getH(); j++) {
 		for (size_t i = 0 ; i < m1.getW()/2+1 ; i++) {
@@ -314,6 +397,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 			m1.set(i,nan_free_phys[i]);
 		}
 	}
+	m1.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);
@@ -358,6 +442,7 @@ phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius
 			m1.set(i,nan_free_phys[i]);
 		}
 	}
+	m1.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);
@@ -440,16 +525,16 @@ void phys_get_vec_brightness(const double *ivec, size_t vlen, double &vmin, doub
 }	
 
 bidimvec<size_t> phys_max_p(nPhysImageF<double> &image) {
-    bidimvec<size_t> p(0,0);
-    for (size_t i=0;i<image.getW();i++) {
-        for (size_t j=0;j<image.getH();j++) {
+	bidimvec<size_t> p(0,0);
+	for (size_t i=0;i<image.getW();i++) {
+		for (size_t j=0;j<image.getH();j++) {
 			if (image.point(i,j) > image.point(p.x(),p.y())) {
-			    p= bidimvec<size_t>(i,j);
+				p= bidimvec<size_t>(i,j);
 			}
 		}
 	}
-    return p;
-    
+	return p;
+	
 }
 
 
