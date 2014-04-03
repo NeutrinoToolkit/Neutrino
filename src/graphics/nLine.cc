@@ -224,6 +224,7 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 }
 
 void nLine::togglePadella() {
+	DEBUG("here");
 	if (my_pad.isHidden()) {
 		my_pad.show();
 		updatePlot();

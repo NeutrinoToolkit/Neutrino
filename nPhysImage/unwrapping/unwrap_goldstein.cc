@@ -200,7 +200,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	double  value;
 	unsigned int num_index=0;
 	
-	unsigned int *index_list = new unsigned int[dx*dy + 1 + 1]();
+	std::vector<unsigned int> index_list(dx*dy + 1 + 1);
 		
 	/* find starting point */
 	int n = 0;
@@ -211,19 +211,18 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				++num_pieces;
 				value = phase->point(i,j);
 				soln->set(i,j,value);
-				UpdateList(&qual_map, i, j, value, phase, soln, &bits, index_list, &num_index);
+				UpdateList(&qual_map, i, j, value, phase, soln, &bits, index_list, num_index);
 				while (num_index > 0) {
 					++n;
-					if (GetNextOneToUnwrap(&a, &b, index_list, &num_index, dx)) {
+					if (GetNextOneToUnwrap(a, b, index_list, num_index, dx)) {
 						bits.set(a,b,bits.point(a,b) | UNWRAPPED);
 						value = soln->point(a,b);        
-						UpdateList(&qual_map, a, b, value, phase, soln, &bits, index_list, &num_index);
+						UpdateList(&qual_map, a, b, value, phase, soln, &bits, index_list, num_index);
 					}
 				}
 			}
 		}
 	}
-	delete[] index_list;
 	/* unwrap branch cut pixels */
 	for (unsigned int j=1; j<dy; j++) {
 		for (unsigned int i=1; i<dx; i++) {

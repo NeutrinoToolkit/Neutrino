@@ -1610,6 +1610,7 @@ nPhysImageF<double> * phys_open_HDF5(std::string fileName, std::string dataName)
 		}
 	}
 #endif
+	if (my_data) my_data->TscanBrightness();
 	return my_data;
 }
 

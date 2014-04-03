@@ -31,7 +31,7 @@ mac: colormaps doc
 	sudo -s -- 'macdeployqt neutrino.app; chown -R $(USER) neutrino.app' 
 
 	rm -f sip/PyNeutrino.so
-	python sip/configure.py && make -C sip
+	cd sip && python configure.py --pyqt-sipdir=/opt/local/share/py27-sip/PyQt4 && qmake PyNeutrino.pro && make
 	cp sip/PyNeutrino.so neutrino.app/Contents/Frameworks
 
 	cp /usr/local/cuda/lib/libcufft.dylib /usr/local/cuda/lib/libtlshook.dylib /usr/local/cuda/lib/libcudart.dylib neutrino.app/Contents/Frameworks

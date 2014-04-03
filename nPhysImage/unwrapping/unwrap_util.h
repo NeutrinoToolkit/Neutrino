@@ -1,24 +1,25 @@
 #ifndef __LIST
 #define __LIST
 #include "../nPhysImageF.h"
+#include <vector>
 
-#define POSITIVE    0x01   /* 1st bit */
-#define NEGATIVE    0x02   /* 2nd bit */
-#define DONE        0x04   /* 3rd bit */
-#define ACTIVE      0x08   /* 4th bit */
-#define BRANCH_CUT  0x10   /* 5th bit */
-#define BORDER      0x20   /* 6th bit */
-#define UNWRAPPED   0x40   /* 7th bit */
+#define POSITIVE    1
+#define NEGATIVE    2
+#define DONE        4
+#define ACTIVE      8
+#define BRANCH_CUT  16
+#define BORDER      32
+#define UNWRAPPED   64
 #define RESIDUE     (POSITIVE | NEGATIVE)
 #define AVOID       (BRANCH_CUT | BORDER)
 
 double grad(double, double);
+
 typedef nPhysImageF<unsigned char> nPhysBits;
 
+bool GetNextOneToUnwrap(unsigned int &, unsigned int &, std::vector<unsigned int> &, unsigned int &, unsigned int);
 
-bool GetNextOneToUnwrap(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int);
+void UpdateList(nPhysD *, unsigned int, unsigned int, double, nPhysD *, nPhysD *, nPhysBits *, std::vector<unsigned int> &, unsigned int &);
 
-void UpdateList(nPhysD *, unsigned int, unsigned int, double, nPhysD *, nPhysD *, nPhysBits *, unsigned int *, unsigned int *);
-    
-void InsertList(nPhysD *, double, nPhysD *, nPhysBits *, unsigned int, unsigned int *, unsigned int *);
+void InsertList(nPhysD *, double, nPhysD *, nPhysBits *, unsigned int, std::vector<unsigned int> &, unsigned int &);
 #endif

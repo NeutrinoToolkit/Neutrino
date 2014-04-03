@@ -701,12 +701,12 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
  			break;
  			
 		case MIGUEL :
-			unwrap_miguel(&wphase, uphase);
+			unwrap_miguel(&wphase, uphase, &quality);
  			break;
 
 	}
     DEBUG("here");
-
+    uphase->TscanBrightness();
 	return uphase;
 }
 

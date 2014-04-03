@@ -31,9 +31,10 @@
 #ifndef __nWavele
 #define __nWavele
 #include "nPhysWave.h"
+#include "nLine.h"
+#include "nRect.h"
 
 class neutrino;
-class nRect;
 class plotZoomer;
 
 
@@ -50,6 +51,8 @@ public:
 
 	QPointer<nRect> region;
 	
+	QPointer<nLine> linebarrier;
+	
 	std::vector<nPhysD *> waveletPhys;
 	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
@@ -58,6 +61,7 @@ private:
 
 public slots:
 		
+	void useBarrierToggled(bool);
 	void guessCarrier();
 
 	void doWavelet();

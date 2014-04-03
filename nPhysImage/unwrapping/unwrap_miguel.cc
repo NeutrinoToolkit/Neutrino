@@ -41,7 +41,7 @@ int jump(double lVal, double rVal) {
 	return 0;
 } 
 
-void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
+void unwrap_miguel(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
     unsigned int dx=phase->getW();
     unsigned int dy=phase->getH();
 	// initialize
@@ -64,7 +64,10 @@ void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
 			px[i+j*dx].quality = H*H + V*V + D1*D1 + D2*D2;
 		}
     }
-
+	for (unsigned int i = 0; i<dx*dy; ++i) {
+	    px[i].quality /= quality->point(i);
+	}
+	
 	// calculate Edges
 	std::vector<Edge> edge((dx-1)*dy+(dy-1)*dx); // look the 4 for below!
 	int k=0;

@@ -22,6 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+
 #include "nColorBarWin.h"
 #include "neutrino.h"
 

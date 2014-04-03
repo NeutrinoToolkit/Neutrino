@@ -1231,6 +1231,17 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 				WinList();
 			}
 			break;
+		case Qt::Key_S:
+			if (e->modifiers() & Qt::ShiftModifier) {
+#ifdef  __phys_debug
+				if (currentBuffer) {
+					currentBuffer->TscanBrightness();
+					createQimage();					
+				}
+#endif
+			}
+			break;
+			
 		default:
 			if (!(e->modifiers() & Qt::ShiftModifier))
 				switch (e->key()) {

@@ -35,7 +35,12 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	region =  new nRect(nparent);
 	region->setParentPan(panName,1);
 	region->setRect(QRectF(100,100,100,100));
-
+	
+	linebarrier =  new nLine(nparent);
+	linebarrier->setParentPan(panName,1);
+	QPolygonF poly;
+	poly << QPointF(0,0) << QPointF(100,100);
+	linebarrier->setPoints(poly);
 	decorate();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
@@ -44,21 +49,23 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
 
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
-
+	
 	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
 	connect(my_w.doUnwrap, SIGNAL(pressed()), this, SLOT(doUnwrap()));
 
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
 	connect(my_w.doRemove, SIGNAL(pressed()), this, SLOT(doRemove()));
+	
+	connect(my_w.useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
+	connect(my_w.lineBarrier, SIGNAL(released()), linebarrier, SLOT(togglePadella()));
+	useBarrierToggled(my_w.useBarrier->isChecked());
 
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 	connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-
-	connect(my_w.blurVal, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
@@ -68,6 +75,14 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	waveletPhys.resize(5);
 	for (unsigned int i=0;i<waveletPhys.size();i++) {
 		waveletPhys.at(i)=NULL;
+	}
+}
+
+void nWavelet::useBarrierToggled(bool val) {
+	if (val) {
+		linebarrier->show();
+	} else {
+		linebarrier->hide();
 	}
 }
 
@@ -290,7 +305,26 @@ phys_wavelet_trasl_nocuda(nPhysD *iimage, void *params, int &iter) {
 void nWavelet::doUnwrap () {
 	nPhysD *phase=getPhysFromCombo(my_w.imageUnwrap);
 	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
+	nPhysD barrierPhys;
+	
 	if (qual && phase) {
+		if (my_w.useBarrier->isChecked()) {
+			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
+			foreach(QPointF p, linebarrier->poly(phase->getW()+phase->getH())) {
+				barrierPhys.set(p.x()-1,p.y()-1,0.0);
+				barrierPhys.set(p.x()-1,p.y()  ,0.0);
+				barrierPhys.set(p.x()-1,p.y()+1,0.0);
+				barrierPhys.set(p.x()  ,p.y()-1,0.0);
+				barrierPhys.set(p.x()  ,p.y()  ,0.0);
+				barrierPhys.set(p.x()  ,p.y()+1,0.0);
+				barrierPhys.set(p.x()+1,p.y()-1,0.0);
+				barrierPhys.set(p.x()+1,p.y()  ,0.0);
+				barrierPhys.set(p.x()+1,p.y()+1,0.0);
+			}
+			phys_multiply(barrierPhys,*qual);
+			qual=&barrierPhys;
+		}
+		
 		nPhysD *uphase=NULL;
 		QString methodName=my_w.method->currentText();
 		// esistono sicuramente dei metodi piu' intelligenti
@@ -327,6 +361,7 @@ void nWavelet::doUnwrap () {
 				nparent->addShowPhys(unwrapPhys);
 			}
 			my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
+			
 		}
 	}
 }
@@ -337,7 +372,6 @@ void nWavelet::doAll () {
 }
 
 void nWavelet::doRemove () {
-	if (sender()==my_w.blurVal && (!my_w.blur->isChecked())) return;
 	if (my_w.carrier->isChecked()) {
 		doRemoveCarrier();
 	}
@@ -372,9 +406,6 @@ void nWavelet::doRemoveCarrier () {
 		double ky = -sin(alpha*_phys_deg)/lambda;
 		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
 		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
-		if (my_w.blur->isChecked()){
-			phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
-		}
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
@@ -401,9 +432,6 @@ void nWavelet::doRemoveReference () {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName());
 			} else {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName()+" "+ref->getFromName());
-			}
-			if (my_w.blur->isChecked()){
-				phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
 			}
 			my_w.erasePreviuos->setEnabled(true);
 			if (my_w.erasePreviuos->isChecked()) {

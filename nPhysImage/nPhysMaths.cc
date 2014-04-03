@@ -208,6 +208,16 @@ phys_multiply(nPhysImageF<double> &iimage, double val) {
 }
 
 void 
+phys_multiply(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
+	if (iimage.getSurf()==iimage2.getSurf()) {
+		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 
+			iimage.set(ii, iimage.point(ii)*iimage2.point(ii)); 
+		iimage.TscanBrightness();
+		iimage.setName("("+iimage.getName()+")*("+iimage2.getName()+")");
+	}
+}
+
+void 
 phys_divide(nPhysImageF<double> &iimage, double val) {
 	if (val!=1.0) {
 		for (register size_t ii=0; ii<iimage.getSurf(); ii++) 

@@ -7,6 +7,8 @@ CONFIG += neutrino-HDF
 QT += svg xml network core gui
 
 
+VERSION = 0.0.1
+
 # VERSION STUFF
 NVERSION=$$system(git describe)
 

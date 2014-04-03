@@ -37,6 +37,9 @@
       <property name="readOnly">
        <bool>true</bool>
       </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
    </layout>
