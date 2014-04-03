@@ -660,7 +660,7 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 	return olist;	
 }
 #else
-list<nPhysD *> *
+list<nPhysD *>
 phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
     WARNING("We should never go here...");
 }

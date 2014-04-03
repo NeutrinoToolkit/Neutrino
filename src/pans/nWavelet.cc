@@ -194,10 +194,6 @@ void nWavelet::doWavelet () {
 		my_params.damp=my_w.damp->value();
 
 		
-#if defined(Q_OS_WIN)
-		std::list<nPhysD *> retList = *phys_wavelet_field_2D_morlet(&datamatrix, &my_params);
-		nThread.n_iter=1;
-#else
 		nThread.setTitle("Wavelet...");
 
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
@@ -217,9 +213,6 @@ void nWavelet::doWavelet () {
 		if (nThread.n_iter==0) {
 			QMessageBox::critical(this, tr("Neutrino Wavelet"),tr("CUDA didn't work.\nDisable from preferences window"),QMessageBox::Ok);
 		}
-		
-#endif		
-
 		
 		std::list<nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);

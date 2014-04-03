@@ -1566,6 +1566,7 @@ struct QPairFirstComparer {
 };
 
 bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
+	qDebug() << "addPaletteFromString" << paletteStr;
 	if (paletteStr.contains(",")) {
 		QList<QPair<double,QColor> > listDoubleColor;
 		QStringList paletteList=paletteStr.split(",",QString::SkipEmptyParts);
