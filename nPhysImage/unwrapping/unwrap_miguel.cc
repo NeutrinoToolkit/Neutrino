@@ -12,8 +12,8 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
-#include "unwrap_util.h"
 #include "unwrap_miguel.h"
+#include "unwrap_util.h"
 
 // Pixel information
 struct Pixel {
@@ -33,13 +33,6 @@ struct Edge {
 inline bool EdgeComp(Edge const & a, Edge const & b) {
     return a.quality<b.quality;
 }
-
-int jump(double lVal, double rVal) {
-	double difference = lVal - rVal;
-	if (difference > 0.5)	return -1;
-	else if (difference<-0.5)	return 1;
-	return 0;
-} 
 
 void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
     unsigned int dx=phase->getW();
@@ -68,12 +61,9 @@ void unwrap_miguel_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
 			double V = grad(phase->point(i,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i,j+1));
 			double D1 = grad(phase->point(i-1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j+1));
 			double D2 = grad(phase->point(i+1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i-1,j+1));
-			px[i+j*dx].quality = H*H + V*V + D1*D1 + D2*D2;
+			px[i+j*dx].quality = (H*H + V*V + D1*D1 + D2*D2)/quality->point(i+j*dx);
 		}
     }
-	for (unsigned int i = 0; i<dx*dy; ++i) {
-	    px[i].quality /= quality->point(i);
-	}
 	
 	// calculate Edges
 	std::vector<Edge> edge((dx-1)*dy+(dy-1)*dx); // look the 4 for below!

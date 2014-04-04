@@ -1,5 +1,5 @@
-#ifndef __LIST
-#define __LIST
+#ifndef __unwrap_util
+#define __unwrap_util
 #include "../nPhysImageF.h"
 #include <vector>
 
@@ -14,6 +14,8 @@
 #define AVOID       (BRANCH_CUT | BORDER)
 
 double grad(double, double);
+
+int jump(double, double);
 
 typedef nPhysImageF<unsigned char> nPhysBits;
 

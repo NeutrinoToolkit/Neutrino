@@ -697,7 +697,10 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
 
 		case QUALITY :
 			unwrap_quality(&wphase, uphase, &quality);
-            DEBUG("here");
+ 			break;
+
+		case FAST_QUALITY :
+			unwrap_fast_quality(&wphase, uphase, &quality);
  			break;
  			
 		case MIGUEL :

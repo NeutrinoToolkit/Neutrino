@@ -8,6 +8,13 @@ double grad(double p1, double p2) {
 	return r;
 }
 
+int jump(double lVal, double rVal) {
+	double difference = lVal - rVal;
+	if (difference > 0.5)	return -1;
+	else if (difference<-0.5)	return 1;
+	return 0;
+} 
+
 /* Returns false if no pixels left, true otherwise */
 bool GetNextOneToUnwrap(unsigned int &a, unsigned int &b, std::vector<unsigned int> &index_list, unsigned int &num_index, unsigned int dx) {
 	unsigned int index;

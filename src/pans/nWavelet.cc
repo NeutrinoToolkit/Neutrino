@@ -300,6 +300,9 @@ void nWavelet::doUnwrap () {
 	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
 	nPhysD barrierPhys;
 	
+	QTime timer;
+	timer.start();
+
 	if (qual && phase) {
 		if (my_w.useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
@@ -333,6 +336,8 @@ void nWavelet::doUnwrap () {
 			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
 		} else if (methodName=="Quality") {
 			uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
+		} else if (methodName=="Fast Quality") {
+			uphase = phys_phase_unwrap(*phase, *qual, FAST_QUALITY);
 		}
 		
 		if (uphase) {
@@ -359,6 +364,9 @@ void nWavelet::doUnwrap () {
 			
 		}
 	}
+	QString out;
+	out.sprintf("%d msec",timer.elapsed());
+	my_w.statusbar->showMessage(out);
 }
 
 void nWavelet::doAll () {

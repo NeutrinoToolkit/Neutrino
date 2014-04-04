@@ -179,8 +179,9 @@ void nView::keyPressEvent (QKeyEvent *e)
 		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
 //		QCursor::setPos(posCursor);
 //		qDebug() << delta << pos_mouse << posCursor << mapToGlobal(QPoint(0,0));
+	} else {
+		QGraphicsView::keyPressEvent(e);
 	}
-	QGraphicsView::keyPressEvent(e);
 	update();
 	if (parent()->follower) parent()->follower->my_w.my_view->keyPressEvent(e);
 }
