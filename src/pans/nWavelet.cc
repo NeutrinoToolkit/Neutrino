@@ -329,6 +329,8 @@ void nWavelet::doUnwrap () {
 			uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
 		} else if (methodName=="Miguel") {
 			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
+		} else if (methodName=="Miguel+Quality") {
+			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
 		} else if (methodName=="Quality") {
 			uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
 		}

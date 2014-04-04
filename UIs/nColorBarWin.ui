@@ -43,9 +43,6 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>Colorbar</string>
@@ -451,6 +448,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>Comma separated pair ov val and color e.g.  0 #dbff54, 1 #ff6ea0</string>
              </property>
              <property name="text">
               <string/>

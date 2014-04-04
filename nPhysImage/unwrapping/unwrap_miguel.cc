@@ -41,7 +41,14 @@ int jump(double lVal, double rVal) {
 	return 0;
 } 
 
-void unwrap_miguel(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
+void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
+    unsigned int dx=phase->getW();
+    unsigned int dy=phase->getH();
+    nPhysD quality(dx,dy,1.0);
+    unwrap_miguel_quality(phase, unwrap, &quality);
+}
+
+void unwrap_miguel_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
     unsigned int dx=phase->getW();
     unsigned int dy=phase->getH();
 	// initialize

@@ -55,10 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Wavelet">
        <attribute name="title">
@@ -541,6 +538,11 @@
              <item>
               <property name="text">
                <string>Miguel</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Miguel+Quality</string>
               </property>
              </item>
              <item>

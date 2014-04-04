@@ -39,9 +39,6 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
       <widget class="QWidget" name="N_NONE">
        <attribute name="title">
         <string>None</string>

@@ -46,9 +46,6 @@
       <property name="currentIndex">
        <number>2</number>
       </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
       <widget class="QWidget" name="General">
        <attribute name="title">
         <string>General</string>
@@ -293,8 +290,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
-            <normaloff>:icons//saveClipboard.png</normaloff>:icons/saveClipboard</iconset>
+           <iconset>
+            <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -313,8 +310,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
-            <normaloff>:icons//saveTxt.png</normaloff>:icons/saveTxt</iconset>
+           <iconset>
+            <normaloff>:icons//saveTxt.png</normaloff>:icons//saveTxt.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -336,8 +333,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
-            <normaloff>:icons//remove.png</normaloff>:icons/remove</iconset>
+           <iconset>
+            <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -356,8 +353,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
-            <normaloff>:icons//plus.png</normaloff>:icons/plus</iconset>
+           <iconset>
+            <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -497,8 +494,8 @@
   </widget>
   <action name="actionClosedLine">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//closedLine.png</normaloff>:icons/closedLine</iconset>
+    <iconset>
+     <normaloff>:icons//closedLine.png</normaloff>:icons//closedLine.png</iconset>
    </property>
    <property name="text">
     <string>closedLine</string>
@@ -509,8 +506,8 @@
   </action>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//loadPref.png</normaloff>:icons/loadPref</iconset>
+    <iconset>
+     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
    </property>
    <property name="text">
     <string>loadPref</string>
@@ -521,8 +518,8 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//savePref.png</normaloff>:icons/savePref</iconset>
+    <iconset>
+     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
    </property>
    <property name="text">
     <string>savePref</string>
@@ -533,8 +530,8 @@
   </action>
   <action name="actionSaveClipboard">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//saveClipboard.png</normaloff>:icons/saveClipboard</iconset>
+    <iconset>
+     <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
    </property>
    <property name="text">
     <string>saveClipboard</string>
@@ -545,8 +542,8 @@
   </action>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//saveTxt.png</normaloff>:icons/saveTxt</iconset>
+    <iconset>
+     <normaloff>:icons//saveTxt.png</normaloff>:icons//saveTxt.png</iconset>
    </property>
    <property name="text">
     <string>saveTxt</string>
@@ -557,8 +554,8 @@
   </action>
   <action name="actionBezier">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//bezier.png</normaloff>:icons/bezier</iconset>
+    <iconset>
+     <normaloff>:icons//bezier.png</normaloff>:icons//bezier.png</iconset>
    </property>
    <property name="text">
     <string>bezier</string>
@@ -569,8 +566,8 @@
   </action>
   <action name="actionAntialias">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:icons//antialias.png</normaloff>:icons/antialias</iconset>
+    <iconset>
+     <normaloff>:icons//antialias.png</normaloff>:icons//antialias.png</iconset>
    </property>
    <property name="text">
     <string>antialias</string>

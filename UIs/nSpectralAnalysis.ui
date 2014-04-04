@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>375</width>
-    <height>309</height>
+    <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,11 @@
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -72,11 +77,21 @@
         </item>
         <item row="4" column="0">
          <widget class="QWidget" name="radios_w" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="1" column="0">
             <widget class="QRadioButton" name="ftoutput_real">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
              </property>
              <property name="text">
               <string>Real</string>
@@ -85,6 +100,11 @@
            </item>
            <item row="1" column="1">
             <widget class="QRadioButton" name="ftoutput_rectangular">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Rectangular</string>
              </property>
@@ -92,6 +112,11 @@
            </item>
            <item row="2" column="0">
             <widget class="QRadioButton" name="ftoutput_polar">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Polar</string>
              </property>
@@ -105,6 +130,11 @@
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Power spectrum</string>
              </property>
@@ -115,6 +145,11 @@
         </item>
         <item row="3" column="0">
          <widget class="Line" name="line">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -122,6 +157,11 @@
         </item>
         <item row="5" column="0">
          <widget class="Line" name="line_2">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -129,6 +169,11 @@
         </item>
         <item row="6" column="0">
          <widget class="QCheckBox" name="doshift_cb">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Shift</string>
           </property>
@@ -138,14 +183,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>ft1dh_button</zorder>
-       <zorder>ft1dh_button</zorder>
-       <zorder>ft1dv_button</zorder>
-       <zorder>ft2d_button</zorder>
-       <zorder>radios_w</zorder>
-       <zorder>line</zorder>
-       <zorder>line_2</zorder>
-       <zorder>doshift_cb</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
