@@ -101,17 +101,17 @@ void nCompareLines::updatePlot() {
 			
 			double dist=0.0;
 			double my_val=0.0;
-			for(int i=0;i<my_poly.size()-1;i++) {
-				QPointF p=my_poly.at(i);
+			for(int ii=0;ii<my_poly.size()-1;ii++) {
+				QPointF p=my_poly.at(ii);
 				my_val=phys->getPoint(p.x()-phys->get_origin().x(),p.y()-phys->get_origin().y());
 				if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
-				dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
+				dist+=sqrt(pow((my_poly.at(ii+1)-my_poly.at(ii)).x(),2)+pow((my_poly.at(ii+1)-my_poly.at(ii)).y(),2));
 			}
 			QPointF p=my_poly.last();
 			my_val=phys->getPoint(p.x(),p.y());
 			if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
 
-			QwtPlotCurve *profile=new QwtPlotCurve(QString::fromUtf8(phys->getName().c_str()));
+			QwtPlotCurve *profile=new QwtPlotCurve(QString::number(i)+": "+QString::fromUtf8(phys->getShortName().c_str()));
 			if (phys==currentBuffer) {
 				profile->setPen(QPen(Qt::blue,1.0));
 			} else {
@@ -124,8 +124,6 @@ void nCompareLines::updatePlot() {
 			profiles << profile;
 			
 		}
-
-		
 		my_w.plot->replot();
 	}
 }

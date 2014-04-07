@@ -142,6 +142,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 	bool insideItem = false;
 	foreach (QGraphicsItem *item, scene()->selectedItems()){
 		insideItem = true;
+//		item->keyPressEvent(e);
 		switch (e->key()) {
 			case Qt::Key_Backspace:
 				if (item->toGraphicsObject()->property("parentPanControlLevel").toInt()==0){
@@ -179,9 +180,8 @@ void nView::keyPressEvent (QKeyEvent *e)
 		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
 //		QCursor::setPos(posCursor);
 //		qDebug() << delta << pos_mouse << posCursor << mapToGlobal(QPoint(0,0));
-	} else {
-		QGraphicsView::keyPressEvent(e);
 	}
+	QGraphicsView::keyPressEvent(e);
 	update();
 	if (parent()->follower) parent()->follower->my_w.my_view->keyPressEvent(e);
 }

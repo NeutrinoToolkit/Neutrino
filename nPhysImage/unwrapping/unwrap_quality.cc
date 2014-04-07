@@ -5,43 +5,19 @@
 #include <algorithm>
 #include "unwrap_util.h"
 
-void unwrap_quality (nPhysD *phase, nPhysD *soln, nPhysD *qual_map) {    
-    unsigned int dx=phase->getW();
-    unsigned int dy=phase->getH();
-	
-	nPhysBits bitflags(dx,dy,0,"bitflags");
-	std::vector<unsigned int> index_list(dx*dy + 1);
-	
-	
-    for (unsigned int j = 1; j<dy -1; ++j) {
-        for (unsigned int i = 1; i<dx - 1; ++i) {
-            double H = grad(phase->point(i-1,j), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j));
-            double V = grad(phase->point(i,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i,j+1));
-            double D1 = grad(phase->point(i-1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j+1));
-            double D2 = grad(phase->point(i+1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i-1,j+1));
-            qual_map->set(i,j, qual_map->point(i,j) / H*H + V*V + D1*D1 + D2*D2);
-        }
-    }
-    qual_map->TscanBrightness();
-	
-	/* find starting point */
-	unsigned int num_index = 0;
-	for (unsigned int j=0; j<dy; j++) {
-		for (unsigned int i=0; i<dx; i++) {
-			if (!(bitflags.point(i,j) & (AVOID | UNWRAPPED))) {
-				soln->set(i,j,phase->point(i,j));
-				bitflags.set(i,j,bitflags.point(i,j) | UNWRAPPED);
-				UpdateList(qual_map, i, j, phase->point(i,j), phase, soln, &bitflags, index_list, num_index);
-				while (num_index > 0) {
-					unsigned int a,b;
-					if (GetNextOneToUnwrap(a, b, index_list, num_index, dx)) { 
-                        bitflags.set(a,b,bitflags.point(a,b) | UNWRAPPED);
-                        UpdateList(qual_map, a, b, soln->point(a,b), phase, soln, &bitflags, index_list, num_index);
-                    }
-				}
-			}
-		}
-	}
+inline int jump(double lVal, double rVal) {
+	double difference = lVal - rVal;
+	if (difference > 0.5)	return -1;
+	else if (difference<-0.5)	return 1;
+	return 0;
+} 
+
+inline double reliability(nPhysD* phase, int i, int j) {
+    double H = grad(phase->point(i-1,j), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j));
+    double V = grad(phase->point(i,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i,j+1));
+    double D1 = grad(phase->point(i-1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j+1));
+    double D2 = grad(phase->point(i+1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i-1,j+1));
+    return 1.0/sqrt(H*H + V*V + D1*D1 + D2*D2);
 }
 
 // Pixel information
@@ -60,28 +36,50 @@ struct Edge {
 }; 
 
 inline bool EdgeComp(Edge const & a, Edge const & b) {
-    return a.quality<b.quality;
+    return a.quality>b.quality;
 }
 
-void unwrap_fast_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
+void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
+    unsigned int dx=phase->getW();
+    unsigned int dy=phase->getH();
+    nPhysD quality(dx,dy,1.0);
+	for (unsigned int j = 1; j<dy -1; ++j) {
+		for (unsigned int i = 1; i<dx - 1; ++i) {
+			quality.set(i,j,reliability(phase, i,j));
+		}
+    }
+    unwrap_quality(phase, unwrap, &quality);
+}
+
+void unwrap_miguel_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
+    unsigned int dx=phase->getW();
+    unsigned int dy=phase->getH();
+    nPhysD quality_miguel(dx,dy,1.0);
+	for (unsigned int j = 0; j<dy; ++j) {
+		for (unsigned int i = 1; i<dx - 1; ++i) {
+		    if (j>0 && j<dy-1 && i>0 && i < dx-1) {
+                quality_miguel.set(i,j,quality->point(i,j)*reliability(phase, i,j));
+            } else{
+                quality_miguel.set(i,j,quality->point(i+j*dx));
+            }
+		}
+    }
+    unwrap_quality(phase, unwrap, &quality_miguel);
+}
+
+void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
     unsigned int dx=phase->getW();
     unsigned int dy=phase->getH();
 	// initialize
 	std::vector<Pixel> px(dx*dy);
-	for (std::vector<Pixel>::iterator pix = px.begin() ; pix != px.end(); ++pix) {
-		pix->jumps = 0;
-		pix->nPixels = 1;
-		pix->quality = 1.0;
-		pix->first = &*pix;
-		pix->last = &*pix;
-		pix->next = NULL;
-	}	
-	// calculate quality
-	for (unsigned int j = 1; j<dy -1; ++j) {
-		for (unsigned int i = 1; i<dx - 1; ++i) {
-			px[i+j*dx].quality = 1.0/quality->point(i+j*dx);
-		}
-    }
+	for (unsigned int i = 0; i<dx*dy; ++i) {
+		px[i].jumps = 0;
+		px[i].nPixels = 1;
+		px[i].quality = quality->point(i);
+		px[i].first = &px[i];
+		px[i].last = &px[i];
+		px[i].next = NULL;	    
+	}
 	
 	// calculate Edges
 	std::vector<Edge> edge((dx-1)*dy+(dy-1)*dx); // look the 4 for below!

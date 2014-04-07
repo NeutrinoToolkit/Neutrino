@@ -32,7 +32,6 @@
 #endif
 
 #include "unwrapping/unwrap_simple.h"
-#include "unwrapping/unwrap_miguel.h"
 #include "unwrapping/unwrap_goldstein.h"
 #include "unwrapping/unwrap_quality.h"
 
@@ -697,10 +696,6 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
 
 		case QUALITY :
 			unwrap_quality(&wphase, uphase, &quality);
- 			break;
-
-		case FAST_QUALITY :
-			unwrap_fast_quality(&wphase, uphase, &quality);
  			break;
  			
 		case MIGUEL :

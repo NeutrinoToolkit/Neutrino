@@ -263,9 +263,9 @@ void nWavelet::doWavelet () {
 			} else {
 				out.prepend("CPU");
 			}
-			my_w.statusbar->showMessage(out);
+			my_w.statusbar->showMessage(out, 5000);
 		} else {
-			my_w.statusbar->showMessage("Canceled");
+			my_w.statusbar->showMessage("Canceled", 5000);
 		}
 
 		
@@ -300,10 +300,16 @@ void nWavelet::doUnwrap () {
 	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
 	nPhysD barrierPhys;
 	
+	DEBUG(barrierPhys.getSurf());
+	
 	QTime timer;
 	timer.start();
 
 	if (qual && phase) {
+		nPhysD *uphase=NULL;
+
+		QString methodName=my_w.method->currentText();
+
 		if (my_w.useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
 			foreach(QPointF p, linebarrier->poly(phase->getW()+phase->getH())) {
@@ -317,28 +323,38 @@ void nWavelet::doUnwrap () {
 				barrierPhys.set(p.x()+1,p.y()  ,0.0);
 				barrierPhys.set(p.x()+1,p.y()+1,0.0);
 			}
-			phys_multiply(barrierPhys,*qual);
-			qual=&barrierPhys;
+			if (methodName=="Simple H+V") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+			} else if (methodName=="Simple V+H") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+			} else if (methodName=="Goldstein") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+			} else if (methodName=="Miguel") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+			} else if (methodName=="Miguel+Quality") {
+				phys_point_multiply(barrierPhys,*qual);
+				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+			} else if (methodName=="Quality") {
+				phys_point_multiply(barrierPhys,*qual);
+				uphase = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+			}
+		} else {
+			if (methodName=="Simple H+V") {
+				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
+			} else if (methodName=="Simple V+H") {
+				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
+			} else if (methodName=="Goldstein") {
+				uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
+			} else if (methodName=="Miguel") {
+				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
+			} else if (methodName=="Miguel+Quality") {
+				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
+			} else if (methodName=="Quality") {
+				uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
+			}
 		}
 		
-		nPhysD *uphase=NULL;
-		QString methodName=my_w.method->currentText();
 		// esistono sicuramente dei metodi piu' intelligenti
-		if (methodName=="Simple H+V") {
-			uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
-		} else if (methodName=="Simple V+H") {
-			uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
-		} else if (methodName=="Goldstein") {
-			uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
-		} else if (methodName=="Miguel") {
-			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
-		} else if (methodName=="Miguel+Quality") {
-			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
-		} else if (methodName=="Quality") {
-			uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
-		} else if (methodName=="Fast Quality") {
-			uphase = phys_phase_unwrap(*phase, *qual, FAST_QUALITY);
-		}
 		
 		if (uphase) {
 			uphase->setShortName("unwrap");

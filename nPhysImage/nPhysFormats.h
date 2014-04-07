@@ -65,10 +65,9 @@ public:
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
 std::vector <nPhysImageF<double> *> phys_open_inf(std::string);
 
-class physDouble_fits : public nPhysImageF<double> {
-public:
-	physDouble_fits(std::string);
-};
+int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compression=0);
+
+std::vector <nPhysImageF<double> *> phys_open_fits(std::string);
 
 class physDouble_asc : public nPhysImageF<double> {
 public:
@@ -165,6 +164,9 @@ T swap_endian(T u)
 //operator>> (std::istream &, phys_properties &);
 
 // dump out for state save
+int
+phys_dump_binary(nPhysImageF<double> *my_phys, const char *ofile);
+
 int 
 phys_dump_binary(nPhysImageF<double> *, std::ofstream &);
 
@@ -203,6 +205,8 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
 
 
 std::vector <nPhysImageF<double> *> phys_open(std::string,std::string=std::string());
+
+std::string gunzip(std::string);
 
 #endif
 

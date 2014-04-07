@@ -47,7 +47,7 @@
 #ifndef __nPhysWave_h
 #define __nPhysWave_h
 
-enum unwrap_strategy {GOLDSTEIN, QUALITY, FAST_QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
+enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
 
 struct wavelet_params_str {
 	wavelet_params_str()

@@ -90,6 +90,11 @@ public:
 	inline T second(void)
 	{ return myval2; }
 
+	inline void set_first(T val)
+	{ myval1= val;}
+	inline void set_second(T val)
+	{ myval2= val;}
+
 
 private:
 	T myval1, myval2;

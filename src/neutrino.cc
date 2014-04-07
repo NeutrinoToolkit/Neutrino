@@ -639,7 +639,7 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),"neutrino (*.neu *.neus *.hdf *.h5 *.imd *.png *.pgm *.ppm *.jpg *.tiff *.tif *.gif *.sif *.spe *.img *.raw *.txt *.fits *.inf);; Any files (*)");
+	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),"neutrino (*.neu *.neus *.hdf *.h5 *.imd *.png *.pgm *.ppm *.jpg *.tiff *.tif *.gif *.sif *.spe *.img *.raw *.txt *.fits *.inf *.gz);; Any files (*)");
 	fileOpen(fnames);
 }
 
@@ -1233,40 +1233,41 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_S:
 			if (e->modifiers() & Qt::ShiftModifier) {
-#ifdef  __phys_debug
 				if (currentBuffer) {
 					currentBuffer->TscanBrightness();
 					createQimage();					
 				}
-#endif
 			}
 			break;
-			
-		default:
+		case Qt::Key_P:
+			if (e->modifiers() & Qt::ShiftModifier) {
+				Properties();
+			}
+			break;
+		case Qt::Key_R:
 			if (!(e->modifiers() & Qt::ShiftModifier))
-				switch (e->key()) {
-					case Qt::Key_R:
-						toggleRuler();
-						break;
-					case Qt::Key_G:
-						toggleGrid();
-						break;
-					case Qt::Key_P:
-						Properties();
-						break;
-					case Qt::Key_M: {
-						toggleMouse();
-						break;
-					}
-					case Qt::Key_V: {
-						Vlineout();
-						break;
-					}
-					case Qt::Key_H: {
-						Hlineout();
-						break;
-					}
-				}
+				toggleRuler();
+			break;
+		case Qt::Key_G:
+			if (!(e->modifiers() & Qt::ShiftModifier))
+				toggleGrid();
+			break;
+		case Qt::Key_M: {
+			if (!(e->modifiers() & Qt::ShiftModifier))
+				toggleMouse();
+			break;
+		}
+		case Qt::Key_V: {
+			if (!(e->modifiers() & Qt::ShiftModifier))
+				Vlineout();
+			break;
+		}
+		case Qt::Key_H: {
+			if (!(e->modifiers() & Qt::ShiftModifier))
+				Hlineout();
+			break;
+		}
+		default:
 			break;
 	}
 	if (follower) {
@@ -1381,7 +1382,7 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5);; Any files (*)");
+	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.fits);; Any files (*)");
 }
 
 void
@@ -1410,11 +1411,11 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 		QString suffix=QFileInfo(fname).suffix().toLower();
 		int ret=-1;
 		if (suffix.startsWith("neu")) {
-			ofstream ofile(fname.toUtf8().constData(), ios::out | ios::binary);
-			ret = phys_dump_binary(phys,ofile);
-			ofile.close();
+			ret = phys_dump_binary(phys,fname.toUtf8().constData());
 		} else if (suffix.startsWith("tif")) {
 			ret = phys_write_tiff(phys,fname.toUtf8().constData());
+		} else if (suffix.startsWith("fit")) {
+			ret = phys_write_fits(phys,("!"+fname).toUtf8().constData(),4);
 #ifdef __phys_HDF
 		} else if (suffix.startsWith("hdf")) {
 			ret = phys_write_HDF4(phys,fname.toUtf8().constData());

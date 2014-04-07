@@ -4,6 +4,97 @@
 #include "unwrap_util.h"
 #include "unwrap_goldstein.h"
 
+#define POSITIVE    1
+#define NEGATIVE    2
+#define DONE        4
+#define ACTIVE      8
+#define BRANCH_CUT  16
+#define BORDER      32
+#define UNWRAPPED   64
+#define RESIDUE     (POSITIVE | NEGATIVE)
+#define AVOID       (BRANCH_CUT | BORDER)
+
+typedef nPhysImageF<unsigned char> nPhysBits;
+
+/* Returns false if no pixels left, true otherwise */
+bool GetNextOneToUnwrap(unsigned int &a, unsigned int &b, std::vector<unsigned int> &index_list, unsigned int &num_index, unsigned int dx) {
+	unsigned int index;
+	if (num_index ==0) 
+		return false;
+	index = index_list[num_index - 1];
+	a = index%dx;
+	b = index/dx;
+	num_index--;
+	return true;
+}
+
+void InsertList(nPhysD *soln, double val, nPhysD *qual_map, nPhysBits *bits, unsigned int index, 
+                std::vector<unsigned int> &index_list, unsigned int &num_index) {
+    
+	soln->set(index,val);
+	/* otherwise, add to list */
+    /* insert in list in order from lowest to highest quality */
+    if (num_index == 0) {
+        index_list[0] = index;
+    } else {
+        if (qual_map->point(index) <= qual_map->point(index_list[0])) {
+            /* insert at top of list */
+            for (unsigned int i=num_index; i>0; i--) 
+                index_list[i] = index_list[i-1];
+            index_list[0] = index;
+        } else if (qual_map->point(index) > qual_map->point(index_list[num_index - 1])) {
+            /* insert at bottom */
+            index_list[num_index] = index;
+        } else {   /* insert in middle */
+            unsigned int top = 0;
+            unsigned int bot = num_index - 1;
+            while (bot - top > 1) {
+                unsigned int mid = (top + bot)/2;
+                if (qual_map->point(index) <= qual_map->point(index_list[mid]))  bot = mid;
+                else  top = mid;
+            }
+            for (unsigned int i=(num_index); i>top+1; i--) 
+                index_list[i] = index_list[i-1];
+            index_list[top+1] = index;
+        }
+    }
+    num_index++;
+// 	DEBUG((int)bits->point(index) << " | " << (int)UNWRAPPED << " = " << (int) (bits->point(index) | UNWRAPPED));	
+	bits->set(index, bits->point(index) | UNWRAPPED);
+	
+}
+
+/* Insert the four neighboring pixels of the given pixel */
+/* (x,y) into the list.  The quality value of the given  */
+/* pixel is "val".                                       */
+void UpdateList(nPhysD *qual_map, unsigned int x, unsigned int y, double val, nPhysD *phase,
+                nPhysD *soln, nPhysBits *bits, std::vector<unsigned int> &index_list, unsigned int &num_index) {
+    unsigned int dx=phase->getW();
+    unsigned int dy=phase->getH();
+
+	double  my_val;
+	
+	if (x > 0 && !(bits->point(x-1,y) & (AVOID | UNWRAPPED))) {
+		my_val = val + grad(phase->point(x-1,y), phase->point(x,y));
+		InsertList(soln, my_val, qual_map, bits, y*dx+x-1, index_list, num_index);
+	}
+	
+	if (x < dx-1  && !(bits->point(x+1,y) & (AVOID | UNWRAPPED))) {
+		my_val = val - grad(phase->point(x,y), phase->point(x+1,y));
+		InsertList(soln, my_val, qual_map, bits, y*dx+x+1, index_list, num_index);
+	}
+	
+	if (y > 0 && !(bits->point(x,y-1) & (AVOID | UNWRAPPED))) {
+		my_val = val + grad(phase->point(x,y-1), phase->point(x,y));
+		InsertList(soln, my_val, qual_map, bits, (y-1)*dx+x, index_list, num_index);
+	}
+	
+	if (y < dy-1 && !(bits->point(x,y+1) & (AVOID | UNWRAPPED))) {
+		my_val = val - grad(phase->point(x,y), phase->point(x,y+1));
+		InsertList(soln, my_val, qual_map, bits, (y+1)*dx+x, index_list, num_index);
+	}
+}
+
 /* Return the squared distance between the pixel (a,b) and the */
 /* nearest border pixel.  The border pixels are encoded in the */
 /* bits bits by the value of "border_code".               */
@@ -83,10 +174,8 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	int NumRes=0;
 	for (unsigned int j=0; j<dy - 1; j++) {
 		for (unsigned int i=0; i<dx - 1; i++) {
-			if (!((bits.point(i,j) & AVOID)
-			 || (bits.point(i+1,j) & AVOID)
-			 || (bits.point(i+1,j+1) & AVOID)
-			 || (bits.point(i,j+1) & AVOID))) {
+			if (!((bits.point(i,j) & AVOID)   || (bits.point(i+1,j) & AVOID)
+			 || (bits.point(i+1,j+1) & AVOID) || (bits.point(i,j+1) & AVOID))) {
 				double r = grad(phase->point(i+1,j), phase->point(i,j))
 						 + grad(phase->point(i+1,j+1), phase->point(i+1,j))
 						 + grad(phase->point(i,j+1), phase->point(i+1,j+1))
@@ -124,14 +213,15 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	}
 	DEBUG(NumRes << " Residues after Dipole" << std::endl);
 
-	int MaxCutLen = (dx + dy)/2;
+	int MaxCutLen = dx + dy;
 	
-	int            ri, rj;
-	int            rim_i=0, rim_j=0, near_i=0, near_j=0;
+	int ri, rj;
+	int rim_i=0, rim_j=0, near_i=0, near_j=0;
 
-	int max_active = NumRes + 10;
+	int max_active = NumRes+10;
 	
-	unsigned int *active_list = new unsigned int [max_active + 1]();
+	std::vector<unsigned int> active_list(max_active + 1);
+	int num_active = 0;
 	
 	/* branch cuts */
 	for (unsigned int j=0; j<dy; j++) {
@@ -139,10 +229,9 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 			if ((bits.point(i,j) & RESIDUE) && !(bits.point(i,j) & DONE)) {
 				bits.set(i,j,(bits.point(i,j) | DONE) | ACTIVE);   /* turn on ACTIVE and DONE flag */
 				int charge = (bits.point(i,j) & POSITIVE) ? 1 : -1;
-				int num_active = 0;
 				active_list[num_active++] = i+j*dx;
 				if (num_active > max_active) num_active = max_active;
-				for (int bodx = 3; bodx<=2*MaxCutLen && charge!=0; bodx += 2) {
+				for (int bodx = 3; bodx<=MaxCutLen && charge!=0; bodx += 2) {
 					int bs2 = bodx/2;
 					for (int ka=0; ka<num_active && charge!=0; ka++) {
 						int boxctr_i = active_list[ka]%dx;
@@ -150,7 +239,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 						for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0; jj++) {
 							for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0; ii++) {
 								if (ii>=0 && ii<(int)dx && jj>=0 && jj<(int)dy) { 
-									if (ii==0 || ii==(int)dx-1 || jj==0 || jj==(int)dy-1 || (bits.point(ii,jj) & BORDER)) {
+									if (bits.point(ii,jj) & BORDER) {
 										charge = 0;
 										DistToBorder(&bits, boxctr_i, boxctr_j, &ri, &rj);
 										PlaceCut(&bits, ri, rj, boxctr_i, boxctr_j);
@@ -159,6 +248,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 											charge += (bits.point(ii,jj) & POSITIVE) ? 1 : -1;
 											bits.set(ii,jj,bits.point(ii,jj) | DONE);
 										}
+										DEBUG("connected two");
 										active_list[num_active++] = ii+dx*jj;
 										if (num_active > max_active) num_active = max_active;
 										bits.set(ii,jj,bits.point(ii,jj) | ACTIVE);
@@ -193,7 +283,6 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 			}
 		}
 	}
-	delete[] active_list;
 	
 	/*  UNWRAP AROUND CUTS */
 	unsigned int  a, b, num_pieces=0;

@@ -936,6 +936,7 @@ nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp)
 			shortname.erase(0,last_idx + 1);
 		}
 	}
+	DEBUG("shortname: "<<shortname);
 	setShortName(shortname);	
 }
 
