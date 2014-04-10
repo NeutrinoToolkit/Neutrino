@@ -122,9 +122,10 @@
      <property name="title">
       <string>Paths</string>
      </property>
-     <addaction name="actionLine_2"/>
-     <addaction name="actionRect_2"/>
-     <addaction name="actionEllipse_2"/>
+     <addaction name="actionLine"/>
+     <addaction name="actionRect"/>
+     <addaction name="actionPoint"/>
+     <addaction name="actionEllipse"/>
     </widget>
     <widget class="QMenu" name="menuTransformation">
      <property name="title">
@@ -175,6 +176,7 @@
     <addaction name="actionFocal_Spot"/>
     <addaction name="actionCutoff_Mask"/>
     <addaction name="actionMath_operations"/>
+    <addaction name="actionAffine_Transform"/>
     <addaction name="actionRotate"/>
     <addaction name="actionRegionPath"/>
     <addaction name="actionBlur"/>
@@ -339,15 +341,6 @@
    </property>
    <property name="text">
     <string>About</string>
-   </property>
-  </action>
-  <action name="actionHelp">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//help.png</normaloff>:icons//help.png</iconset>
-   </property>
-   <property name="text">
-    <string>Help</string>
    </property>
   </action>
   <action name="actionClose">
@@ -535,42 +528,6 @@
     <string>Point Info</string>
    </property>
   </action>
-  <action name="actionRect">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
-   </property>
-   <property name="text">
-    <string>rect</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a rectangle</string>
-   </property>
-  </action>
-  <action name="actionLine">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
-   </property>
-   <property name="text">
-    <string>line</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a line</string>
-   </property>
-  </action>
-  <action name="actionEllipse">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//ellipse.png</normaloff>:icons//ellipse.png</iconset>
-   </property>
-   <property name="text">
-    <string>ellipse</string>
-   </property>
-   <property name="toolTip">
-    <string>Create an ellipse</string>
-   </property>
-  </action>
   <action name="actionLineoutH">
    <property name="icon">
     <iconset>
@@ -595,7 +552,7 @@
     <string>Vertical lineout</string>
    </property>
   </action>
-  <action name="actionLine_2">
+  <action name="actionLine">
    <property name="icon">
     <iconset>
      <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
@@ -604,7 +561,7 @@
     <string>Line</string>
    </property>
   </action>
-  <action name="actionRect_2">
+  <action name="actionRect">
    <property name="icon">
     <iconset>
      <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
@@ -613,34 +570,13 @@
     <string>Rectangle</string>
    </property>
   </action>
-  <action name="actionEllipse_2">
+  <action name="actionEllipse">
    <property name="icon">
     <iconset>
      <normaloff>:icons//ellipse.png</normaloff>:icons//ellipse.png</iconset>
    </property>
    <property name="text">
     <string>Ellipse</string>
-   </property>
-  </action>
-  <action name="actionPython_2">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//python.png</normaloff>:icons//python.png</iconset>
-   </property>
-   <property name="text">
-    <string>Python shell</string>
-   </property>
-  </action>
-  <action name="actionPython">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//python.png</normaloff>:icons//python.png</iconset>
-   </property>
-   <property name="text">
-    <string>python</string>
-   </property>
-   <property name="toolTip">
-    <string>Run Python Shell</string>
    </property>
   </action>
   <action name="actionRegionPath">
@@ -824,6 +760,20 @@
   <action name="actionShow_grid">
    <property name="text">
     <string>Show grid</string>
+   </property>
+  </action>
+  <action name="actionPoint">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
+   </property>
+   <property name="text">
+    <string>Point</string>
+   </property>
+  </action>
+  <action name="actionAffine_Transform">
+   <property name="text">
+    <string>Affine Transform</string>
    </property>
   </action>
  </widget>

@@ -161,7 +161,7 @@ DEPENDPATH += ../src/pans/winlist
 
 
 FORMS += neutrino.ui nSbarra.ui
-FORMS += nLine.ui nObject.ui
+FORMS += nLine.ui nObject.ui nPoint.ui
 
 # external colormaps
 SOURCES += neutrinoPalettes.cc

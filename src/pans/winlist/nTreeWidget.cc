@@ -28,8 +28,7 @@
 
 using namespace std;
 
-nTreeWidget::nTreeWidget(QWidget * pippo){
-	qDebug() << pippo;
+nTreeWidget::nTreeWidget(QWidget * ){
 	dragitem=NULL;
 };
 

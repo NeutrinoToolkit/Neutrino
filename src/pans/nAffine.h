@@ -22,36 +22,44 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef osxApp_H
-#define osxApp_H
-
-#include <QApplication>
 #include <QtGui>
-#include "neutrino.h"
+#include <QWidget>
 
-class osxApp : public QApplication {
-    Q_OBJECT
-public:
-	osxApp( int &argc, char **argv ) : QApplication(argc, argv) {
-		DEBUG(5,"MAC creator ");
-	}
-protected:
-	bool event(QEvent *ev) {
-//		DEBUG(5,"MAC APPLICATION EVENT " << ev->type());
-		if (ev->type() == QEvent::FileOpen) {
-			QWidget *widget = QApplication::activeWindow();
-			neutrino *neu=qobject_cast<neutrino *>(widget);
-			if (neu == NULL) {
-				nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-				if (pan) neu = pan->nparent;
-			}
-			if (neu == NULL) neu = new neutrino(); 
-			neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
-		} else {
-			return QApplication::event(ev);
-		}
-		return true;
-	}
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>   
+
+
+#include "nGenericPan.h"
+#include "ui_nAffine.h"
+#include "nLine.h"
+
+
+#ifndef __nAffine
+#define __nAffine
+
+class neutrino;
+
+class nAffine : public nGenericPan {
+	Q_OBJECT
+
+public:	
+	nAffine(neutrino *, QString);
+	
+	Ui::nAffine my_w;
+	
+	nPhysD *Affined;
+
+	QPointer<nLine> l1, l2;
+	
+	vec2f affine(vec2f);
+	
+	double a00,a01,a02,a10,a11,a12;
+	
+public slots:
+	void apply();
+	void affine();
+	void bufferChanged(nPhysD*);
+
 };
-#endif
 
+#endif

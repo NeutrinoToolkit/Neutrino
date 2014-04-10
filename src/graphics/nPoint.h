@@ -23,28 +23,28 @@
  *
  */
 #include <QtGui>
-#include "ui_nObject.h"
+#include "ui_nPoint.h"
 
-#ifndef __nRect
-#define __nRect
+#ifndef __nPoint
+#define __nPoint
 
 class neutrino;
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMarker;
 
-class nRect : public QGraphicsObject {
+class nPoint : public QGraphicsObject {
 	Q_OBJECT
 public:
 	
-	nRect(neutrino *);
-	~nRect();
+	nPoint(neutrino *);
+	~nPoint(){};
 	
 	neutrino *parent(){
 		return (neutrino *) QGraphicsObject::parent();
 	};
 	
-	enum { Type = QGraphicsItem::UserType + 2 };
+	enum { Type = QGraphicsItem::UserType + 4 };
 	int type() const { return Type;}
 	
 	void mousePressEvent ( QGraphicsSceneMouseEvent * );
@@ -53,8 +53,10 @@ public:
 	void keyPressEvent ( QKeyEvent *);
 	void keyReleaseEvent ( QKeyEvent *);
 	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
-	void focusInEvent(QFocusEvent * event);
-	void focusOutEvent(QFocusEvent * event);
+	void focusInEvent(QFocusEvent * );
+	void focusOutEvent(QFocusEvent * );
+	void hoverEnterEvent ( QGraphicsSceneHoverEvent * );
+	void hoverLeaveEvent ( QGraphicsSceneHoverEvent * );
 	
 	void moveBy(QPointF);
 	
@@ -65,17 +67,15 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 	
-	QList<QGraphicsRectItem*> ref;
-	QList<int> moveRef;
+	QGraphicsRectItem ref;
+	bool moveRef;
 
 	QPointF click_pos;
-	
-	void changeP(int,QPointF,bool);
 	
 	double zoom;
 	// roba da padelle
 	QMainWindow my_pad;
-	Ui::nObject my_w;
+	Ui::nPoint my_w;
 	
 	QPainterPath path() const;
 	QPainterPath shape() const;
@@ -95,37 +95,23 @@ public slots:
 
 	void interactive();
 	
-	void setRect(QRectF);
-	QRect getRect();
-	QRectF getRectF();
-	QString getRectString();
+	void setPoint(QPointF);
+	QPoint getPoint();
+	QPointF getPointF();
+	QString getPointString();
 
 	void zoomChanged(double);
 	void showMessage(QString);
-	void changePointPad(int);
 	void sizeHolder(double);
 	void setWidthF(double);
 	void setOrder(double);
 	void changeToolTip(QString);
-	void changeColor();
-	void changeColor(QColor);
 	void changeColorHolder();
 	void changeColorHolder(QColor);
-	void tableUpdated(QTableWidgetItem *);
-	
-	void expandX();
-	void expandY();
-	void intersection();
-	
-	void changeWidth();
-	void changeHeight();
-	
-	void updateSize();
-	
-	void movePoints(QPointF);
-	
-	void appendPoint();
-	void addPoint(int);
+
+	void changePos(QString);
+		
+	void movePoint(QPointF);
 	
 	void addPointAfterClick(QPointF);
 

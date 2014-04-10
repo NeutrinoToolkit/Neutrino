@@ -969,21 +969,19 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		fits_report_error(stderr, status);
 		return status;
 	}
-	if (compression != 0.0) {
-		if (fits_set_compression_type(fptr, GZIP_1, &status)) {
-			fits_report_error(stderr, status);
-			return status;
-		}
-		int ndim=2;
-		long ndimLong[2]={phys->getW(),phys->getH()};
-		if (fits_set_tile_dim(fptr,ndim,ndimLong,&status)) {
-			fits_report_error(stderr, status);
-			return status;
-		}
-		if (fits_set_quantize_level(fptr, compression, &status)) {
-			fits_report_error(stderr, status);
-			return status;
-		}
+	if (fits_set_compression_type(fptr, GZIP_1, &status)) {
+		fits_report_error(stderr, status);
+		return status;
+	}
+	int ndim=2;
+	long ndimLong[2]={phys->getW(),phys->getH()};
+	if (fits_set_tile_dim(fptr,ndim,ndimLong,&status)) {
+		fits_report_error(stderr, status);
+		return status;
+	}
+	if (fits_set_quantize_level(fptr, 0.0, &status)) {
+		fits_report_error(stderr, status);
+		return status;
 	}
 	long naxes[2]; naxes[0]= phys->getW(); naxes[1] =phys->getH();
 	

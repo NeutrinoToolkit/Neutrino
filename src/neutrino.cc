@@ -39,6 +39,7 @@
 #include "nRegionPath.h"
 #include "nAutoAlign.h"
 #include "nShortcuts.h"
+#include "nAffine.h"
 
 #include "focalspot_pan.h"
 #include "nLineout.h"
@@ -117,7 +118,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
 	foreach (QAction * act, my_w.menuPaths->actions()) {
-		if (!menuTransformationDefault.isEmpty()) {		
+		if (!defualtActionPath.isEmpty()) {		
 			if (act->text()==defualtActionPath) {
 				my_w.menuPaths->setDefaultAction(act);
 				my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
@@ -136,6 +137,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
 	connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
+	connect(my_w.actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
 	connect(my_w.actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
 	connect(my_w.actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
 	connect(my_w.actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
@@ -171,9 +173,9 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
 	connect(my_w.actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 	connect(my_w.actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
-	connect(my_w.actionLine_2, SIGNAL(triggered()), this, SLOT(createDrawLine()));
-	connect(my_w.actionRect_2, SIGNAL(triggered()), this, SLOT(createDrawRect()));
-	connect(my_w.actionEllipse_2, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
+	connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
+	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
+	connect(my_w.actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
 
 	connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
 	connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
@@ -221,6 +223,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 
 	
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
+	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
 	connect(my_w.actionBlur, SIGNAL(triggered()), this, SLOT(Blur()));
 
 	connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
@@ -1058,8 +1061,8 @@ neutrino::createQimage() {
 			maxi=currentBuffer->Tmaximum_value-(1.0-colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
 		}
 //		DEBUG(">>>>>>>>>>>>>>>>>> " << mini << " " << maxi << " " << colorRelative);
-		const unsigned char *pippo=currentBuffer->to_uchar_palette(mini,maxi,nPalettes[colorTable]);
-		const QImage tempImage(pippo, currentBuffer->getW(), currentBuffer->getH(), 
+		const unsigned char *buff=currentBuffer->to_uchar_palette(mini,maxi,nPalettes[colorTable]);
+		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
 							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
 	}
@@ -1728,7 +1731,7 @@ neutrino::nextColorTable () {
 // testing
 void
 neutrino::createDrawLine() {
-	my_w.menuPaths->setDefaultAction(my_w.actionLine_2);
+	my_w.menuPaths->setDefaultAction(my_w.actionLine);
 	statusBar()->showMessage(tr("Click for points, press Esc to finish"),5000);
 	nLine *item = new nLine(this);
 	item->interactive();
@@ -1753,7 +1756,7 @@ neutrino::newRect(QRectF rectangle, QString name) {
 
 void
 neutrino::createDrawRect() {
-	my_w.menuPaths->setDefaultAction(my_w.actionRect_2);
+	my_w.menuPaths->setDefaultAction(my_w.actionRect);
 	statusBar()->showMessage(tr("Click for the first point of the rectangle"),5000);
 	nRect *item = new nRect(this);
 	item->interactive();
@@ -1763,8 +1766,19 @@ neutrino::createDrawRect() {
 }
 
 void
+neutrino::createDrawPoint() {
+	my_w.menuPaths->setDefaultAction(my_w.actionPoint);
+	statusBar()->showMessage(tr("Click for the point"),5000);
+	nPoint *item = new nPoint(this);
+	item->interactive();
+	if (follower) follower->createDrawPoint();
+	my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
+	QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+}
+
+void
 neutrino::createDrawEllipse() {
-	my_w.menuPaths->setDefaultAction(my_w.actionEllipse_2);
+	my_w.menuPaths->setDefaultAction(my_w.actionEllipse);
 	statusBar()->showMessage(tr("Click and release to create the ellipse"),5000);
 	nEllipse *item = new nEllipse(this);
 	item->interactive();
@@ -1917,6 +1931,15 @@ neutrino::Rotate() {
 	QString vwinname=tr("Rotate");
 	nGenericPan *ret=existsPan(vwinname,true);
 	if (!ret) ret = new nRotate(this, vwinname);
+	return ret;
+}
+
+/// Affine STUFF
+nGenericPan*
+neutrino::Affine() {
+	QString vwinname=tr("Affine");
+	nGenericPan *ret=existsPan(vwinname,true);
+	if (!ret) ret = new nAffine(this, vwinname);
 	return ret;
 }
 

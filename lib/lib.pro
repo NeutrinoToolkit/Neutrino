@@ -13,8 +13,8 @@ HEADERS += nOpenRAW.h
 SOURCES += nOpenRAW.cc
 
 
-SOURCES += nLine.cc nRect.cc nEllipse.cc 
-HEADERS += nLine.h  nRect.h  nEllipse.h  
+SOURCES += nLine.cc nRect.cc nEllipse.cc nPoint.cc
+HEADERS += nLine.h  nRect.h  nEllipse.h  nPoint.h
 HEADERS += nMouse.h  nTics.h
 SOURCES += nMouse.cc nTics.cc
 
@@ -52,6 +52,11 @@ FORMS += nCutoffMask.ui
 HEADERS += nRotate.h
 SOURCES += nRotate.cc
 FORMS += nRotate.ui
+
+## Affine
+HEADERS += nAffine.h
+SOURCES += nAffine.cc
+FORMS += nAffine.ui
 
 ## Blur
 HEADERS += nBlur.h

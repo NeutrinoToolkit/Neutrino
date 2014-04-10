@@ -57,6 +57,7 @@
 #include "nLine.h"
 #include "nRect.h"
 #include "nEllipse.h"
+#include "nPoint.h"
 
 #include "nMouse.h"
 
@@ -243,6 +244,8 @@ public slots:
 
 	void createDrawEllipse();
 
+	void createDrawPoint();
+	
 	void mouseposition(QPointF);
 
 
@@ -290,7 +293,10 @@ public slots:
 
 	// ROTATE STUFF
 	nGenericPan* Rotate();
-
+	
+	// Affine STUFF
+	nGenericPan* Affine();
+	
 	// BLUR STUFF
 	nGenericPan* Blur();
 
