@@ -134,8 +134,6 @@ void nAffine::affine() {
 			corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
 			corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
 			corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);		
-			
-			
 			minx=corners[0].x();
 			double maxx=corners[0].x();
 			miny=corners[0].y();
@@ -148,14 +146,13 @@ void nAffine::affine() {
 			}
 			dx=maxx-minx;
 			dy=maxy-miny;
-			
-			for (unsigned int i=0;i<4;i++) DEBUG(i << " " << corners[i]);
-			DEBUG(minx << " " << maxx);
-			DEBUG(miny << " " << maxy);
 		}
 		
+		DEBUG(affine(vec2f(0,0),vecForward).x() << " " << affine(vec2f(0,0),vecForward).y());
+		DEBUG(affine(vec2f(0,0),vecBackward).x() << " " << affine(vec2f(0,0),vecBackward).y());
+
 		affinePhys=new nPhysD(dx,dy,0.0,"affine");
-		
+		affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
 		for (unsigned int i=0; i<dx; i++) {
 			for (unsigned int j=0; j<dy; j++) {
 				affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
