@@ -45,7 +45,7 @@ nAffine::nAffine(neutrino *nparent, QString winname)
 	l2->changeToolTip(panName+"Line 2");
 	l2->changeColorHolder("blue");
 	poly.clear();
-	poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150);
+	poly << QPointF(150,50) << QPointF(50,50) << QPointF(50,150);
 	l2->setPoints(poly);
 	
 
@@ -85,43 +85,69 @@ void nAffine::bufferChanged(nPhysD* buf) {
 
 void nAffine::affine() {
 	nPhysD *my_phys=NULL;
+	vector<double> vecForward,vecBackward;
 	if (sender()==my_w.first) {
 		my_phys=getPhysFromCombo(my_w.image1);
+		vecForward=forward;
+		vecBackward=backward;
 	} else if (sender()==my_w.second) {
 		my_phys=getPhysFromCombo(my_w.image2);
+		vecForward=backward;
+		vecBackward=forward;
 	}
 	if (my_phys) {
-//		vector<vec2f> corners(4); //clockwise...
-//		corners[0]=affine(vec2f(0,0));
-//		corners[1]=affine(vec2f(my_phys->getW(),0));
-//		corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()));
-//		corners[3]=affine(vec2f(0,my_phys->getH()));		
-//
-//	
-//		double minx=corners[0].x();
-//		double maxx=corners[0].x();
-//		double miny=corners[0].y();
-//		double maxy=corners[0].y();
-//		for (unsigned int i=1;i<3;i++) {
-//			if (minx>corners[i].x()) minx=corners[i].x();
-//			if (maxx<corners[i].x()) maxx=corners[i].x();
-//			if (miny>corners[i].y()) miny=corners[i].y();
-//			if (maxy<corners[i].y()) maxy=corners[i].y();
-//		}
-//		unsigned int dx=maxx-minx+1;
-//		unsigned int dy=maxy-miny+1;
-//		
-//		nPhysD *affinePhys=new nPhysD(dx,dy,0.0,"affine");
+		
+		double replaceVal=0.0;
+		switch (my_w.defaultValue->currentIndex()) {
+			case 0:
+				replaceVal=std::numeric_limits<double>::quiet_NaN();
+				break;
+			case 1:
+				replaceVal=my_phys->Tminimum_value;
+				break;
+			case 2:
+				replaceVal=my_phys->Tmaximum_value;
+				break;
+			case 3:
+				replaceVal=0.5*(my_phys->Tminimum_value+my_phys->Tmaximum_value);
+				break;
+			case 4:
+				replaceVal=0.0;
+				break;
+			default:
+				WARNING("something is broken here");
+				break;
+		}
+		
+		vector<vec2f> corners(4); //clockwise...
+		corners[0]=affine(vec2f(0,0),vecForward);
+		corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
+		corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
+		corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);		
 
-		unsigned int dx=my_phys->getW();
-		unsigned int dy=my_phys->getH();
+	
+		double minx=corners[0].x();
+		double maxx=corners[0].x();
+		double miny=corners[0].y();
+		double maxy=corners[0].y();
+		for (unsigned int i=1;i<4;i++) {
+			if (minx>corners[i].x()) minx=corners[i].x();
+			if (maxx<corners[i].x()) maxx=corners[i].x();
+			if (miny>corners[i].y()) miny=corners[i].y();
+			if (maxy<corners[i].y()) maxy=corners[i].y();
+		}
+		unsigned int dx=maxx-minx;
+		unsigned int dy=maxy-miny;
+
+		for (unsigned int i=0;i<4;i++) DEBUG(i << " " << corners[i]);
+		DEBUG(minx << " " << maxx);
+		DEBUG(miny << " " << maxy);
 		
 		nPhysD *affinePhys=new nPhysD(dx,dy,0.0,"affine");
-		
+
 		for (unsigned int i=0; i<dx; i++) {
 			for (unsigned int j=0; j<dy; j++) {
-				vec2f affPoint=affine(vec2f(i,j));
-				affinePhys->set(i,j,my_phys->getPoint(affPoint.x(),affPoint.y()));
+				affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
 			}
 		}
 		affinePhys->TscanBrightness();
@@ -129,67 +155,79 @@ void nAffine::affine() {
 		if (my_w.erasePrevious->isChecked()) {
 			Affined=nparent->replacePhys(affinePhys,Affined,true);
 		} else {
-			nparent->addPhys(affinePhys);
+			nparent->addShowPhys(affinePhys);
 			Affined=affinePhys;
 		}
 		
 	}
 }
 
-vec2f nAffine::affine(vec2f in){
-	return vec2f(in.x()*a00+in.y()*a01+a02,in.x()*a10+in.y()*a11+a12);
+vec2f nAffine::affine(vec2f in, vector<double> vec){
+	return vec2f(in.x()*vec[0]+in.y()*vec[1]+vec[2],in.x()*vec[3]+in.y()*vec[4]+vec[5]);
 }
 
-void nAffine::apply() {
-	
+vector<double> nAffine::getAffine(QPolygonF poly1, QPolygonF poly2) {
+	vector<double>ret(6);
+	poly1.resize(3);
+	poly2.resize(3);
+
 	vector<double> p1(9), p2(9), mat(9), inva(9);
 	
-	QPolygonF poly1=l1->getPoints();
-	poly1.resize(3);
-	
-		
 	p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
 	p1[3] = poly1[0].y(); p1[4] = poly1[1].y(); p1[5] = poly1[2].y();
 	p1[6] = 1.0;          p1[7] = 1.0;          p1[8] = 1.0;
-
-	QPolygonF poly2=l2->getPoints();
-	poly2.resize(3);
-
+	
+	
 	p2[0] = poly2[0].x(); p2[1] = poly2[1].x(); p2[2] = poly2[2].x();
 	p2[3] = poly2[0].y(); p2[4] = poly2[1].y(); p2[5] = poly2[2].y();
 	p2[6] = 1.0;          p2[7] = 1.0;          p2[8] = 1.0;
-
+	
 	gsl_matrix_view m1 = gsl_matrix_view_array(&p1[0], 3, 3);
 	gsl_matrix_view m2 = gsl_matrix_view_array(&p2[0], 3, 3);
 	gsl_matrix_view affineMat = gsl_matrix_view_array(&mat[0], 3, 3);
-		
+	
 	gsl_matrix_view inv = gsl_matrix_view_array(&inva[0],3,3);
 	gsl_permutation *p = gsl_permutation_alloc (3);
 	
 	int s;
 	gsl_linalg_LU_decomp (&m1.matrix, p, &s);  
-
-	gsl_linalg_LU_invert (&m1.matrix, p, &inv.matrix);
-
-	gsl_permutation_free (p);
-
-	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &m2.matrix, &inv.matrix, 0.0, &affineMat.matrix);
-
-	DEBUG("\nDa capire " << s << " Control (should be 0 0 1) : " << gsl_matrix_get(&affineMat.matrix,2,0) << " " << gsl_matrix_get(&affineMat.matrix,2,1) << " " << gsl_matrix_get(&affineMat.matrix,2,2));
-
-	a00=gsl_matrix_get(&affineMat.matrix,0,0);
-	a01=gsl_matrix_get(&affineMat.matrix,0,1);
-	a02=gsl_matrix_get(&affineMat.matrix,0,2);
-	a10=gsl_matrix_get(&affineMat.matrix,1,0);
-	a11=gsl_matrix_get(&affineMat.matrix,1,1);
-	a12=gsl_matrix_get(&affineMat.matrix,1,2);
 	
-	my_w.A00->setText(QString::number(a00));
-	my_w.A01->setText(QString::number(a01));
-	my_w.A02->setText(QString::number(a02));
-	my_w.A10->setText(QString::number(a10));
-	my_w.A11->setText(QString::number(a11));
-	my_w.A12->setText(QString::number(a12));
+	gsl_linalg_LU_invert (&m1.matrix, p, &inv.matrix);
+	
+	gsl_permutation_free (p);
+	
+	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &m2.matrix, &inv.matrix, 0.0, &affineMat.matrix);
+	
+	ret[0]=gsl_matrix_get(&affineMat.matrix,0,0);
+	ret[1]=gsl_matrix_get(&affineMat.matrix,0,1);
+	ret[2]=gsl_matrix_get(&affineMat.matrix,0,2);
+	ret[3]=gsl_matrix_get(&affineMat.matrix,1,0);
+	ret[4]=gsl_matrix_get(&affineMat.matrix,1,1);
+	ret[5]=gsl_matrix_get(&affineMat.matrix,1,2);
+	return ret;
+}
+
+void nAffine::apply() {
+	
+	
+	forward=getAffine(l1->getPoints(),l2->getPoints());
+	
+	
+	my_w.A00->setText(QString::number(forward[0]));
+	my_w.A01->setText(QString::number(forward[1]));
+	my_w.A02->setText(QString::number(forward[2]));
+	my_w.A10->setText(QString::number(forward[3]));
+	my_w.A11->setText(QString::number(forward[4]));
+	my_w.A12->setText(QString::number(forward[5]));
+	
+	backward=getAffine(l2->getPoints(),l1->getPoints());
+
+	my_w.B00->setText(QString::number(backward[0]));
+	my_w.B01->setText(QString::number(backward[1]));
+	my_w.B02->setText(QString::number(backward[2]));
+	my_w.B10->setText(QString::number(backward[3]));
+	my_w.B11->setText(QString::number(backward[4]));
+	my_w.B12->setText(QString::number(backward[5]));	
 	
 }
 

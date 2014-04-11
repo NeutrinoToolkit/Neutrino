@@ -51,11 +51,12 @@ public:
 
 	QPointer<nLine> l1, l2;
 	
-	vec2f affine(vec2f);
-	
-	double a00,a01,a02,a10,a11,a12;
+	vec2f affine(vec2f, std::vector<double>);
+
+	std::vector<double> forward, backward;
 	
 public slots:
+	std::vector<double> getAffine(QPolygonF, QPolygonF);
 	void apply();
 	void affine();
 	void bufferChanged(nPhysD*);

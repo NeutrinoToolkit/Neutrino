@@ -29,8 +29,6 @@
 #include "nGenericPan.h"
 #include "ui_focalspot.h"
 
-using namespace std;
-
 
 #ifndef __focal_spo
 #define __focal_spo
