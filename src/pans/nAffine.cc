@@ -85,13 +85,17 @@ void nAffine::bufferChanged(nPhysD* buf) {
 
 void nAffine::affine() {
 	nPhysD *my_phys=NULL;
+	nPhysD *my_phys_other=NULL;
+
 	vector<double> vecForward,vecBackward;
 	if (sender()==my_w.first) {
 		my_phys=getPhysFromCombo(my_w.image1);
+		my_phys_other=getPhysFromCombo(my_w.image2);
 		vecForward=forward;
 		vecBackward=backward;
 	} else if (sender()==my_w.second) {
 		my_phys=getPhysFromCombo(my_w.image2);
+		my_phys_other=getPhysFromCombo(my_w.image1);
 		vecForward=backward;
 		vecBackward=forward;
 	}
@@ -118,33 +122,40 @@ void nAffine::affine() {
 				WARNING("something is broken here");
 				break;
 		}
+		nPhysD *affinePhys=NULL;
+		unsigned int dx=my_phys_other->getW();
+		unsigned int dy=my_phys_other->getH();
 		
-		vector<vec2f> corners(4); //clockwise...
-		corners[0]=affine(vec2f(0,0),vecForward);
-		corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
-		corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
-		corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);		
-
-	
-		double minx=corners[0].x();
-		double maxx=corners[0].x();
-		double miny=corners[0].y();
-		double maxy=corners[0].y();
-		for (unsigned int i=1;i<4;i++) {
-			if (minx>corners[i].x()) minx=corners[i].x();
-			if (maxx<corners[i].x()) maxx=corners[i].x();
-			if (miny>corners[i].y()) miny=corners[i].y();
-			if (maxy<corners[i].y()) maxy=corners[i].y();
+		double minx=0.0;
+		double miny=0.0;
+		if (!my_w.crop->isChecked()) {			
+			vector<vec2f> corners(4); //clockwise...
+			corners[0]=affine(vec2f(0,0),vecForward);
+			corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
+			corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
+			corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);		
+			
+			
+			minx=corners[0].x();
+			double maxx=corners[0].x();
+			miny=corners[0].y();
+			double maxy=corners[0].y();
+			for (unsigned int i=1;i<4;i++) {
+				if (minx>corners[i].x()) minx=corners[i].x();
+				if (maxx<corners[i].x()) maxx=corners[i].x();
+				if (miny>corners[i].y()) miny=corners[i].y();
+				if (maxy<corners[i].y()) maxy=corners[i].y();
+			}
+			dx=maxx-minx;
+			dy=maxy-miny;
+			
+			for (unsigned int i=0;i<4;i++) DEBUG(i << " " << corners[i]);
+			DEBUG(minx << " " << maxx);
+			DEBUG(miny << " " << maxy);
 		}
-		unsigned int dx=maxx-minx;
-		unsigned int dy=maxy-miny;
-
-		for (unsigned int i=0;i<4;i++) DEBUG(i << " " << corners[i]);
-		DEBUG(minx << " " << maxx);
-		DEBUG(miny << " " << maxy);
 		
-		nPhysD *affinePhys=new nPhysD(dx,dy,0.0,"affine");
-
+		affinePhys=new nPhysD(dx,dy,0.0,"affine");
+		
 		for (unsigned int i=0; i<dx; i++) {
 			for (unsigned int j=0; j<dy; j++) {
 				affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
@@ -158,7 +169,7 @@ void nAffine::affine() {
 			nparent->addShowPhys(affinePhys);
 			Affined=affinePhys;
 		}
-		
+
 	}
 }
 
