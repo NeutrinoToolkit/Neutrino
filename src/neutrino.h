@@ -212,8 +212,7 @@ public slots:
 	// Analysis
 	nGenericPan* FocalSpot();
 	nGenericPan* MathOperations();
-	nGenericPan* AutoAlign();
-
+	
 	// cutoff mask
 	nGenericPan* CutoffImage();
 

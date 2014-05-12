@@ -182,7 +182,6 @@
     <addaction name="actionBlur"/>
     <addaction name="actionFind_Peaks"/>
     <addaction name="actionOpen_HDF5"/>
-    <addaction name="actionAuto_align"/>
     <addaction name="actionPolarigrams"/>
     <addaction name="actionThomson_P"/>
     <addaction name="separator"/>

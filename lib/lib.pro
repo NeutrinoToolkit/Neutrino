@@ -63,11 +63,6 @@ HEADERS += nBlur.h
 SOURCES += nBlur.cc
 FORMS += nBlur.ui
 
-#Auto align two images tool
-FORMS += nAutoAlign.ui
-SOURCES += nAutoAlign.cc
-HEADERS += nAutoAlign.h 
-
 #HDF stuff 
 neutrino-HDF {
 	FORMS += nHDF5.ui

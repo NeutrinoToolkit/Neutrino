@@ -37,7 +37,6 @@
 #include "nRotate.h"
 #include "nBlur.h"
 #include "nRegionPath.h"
-#include "nAutoAlign.h"
 #include "nShortcuts.h"
 #include "nAffine.h"
 
@@ -219,8 +218,6 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
 	connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
 	connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
-	connect(my_w.actionAuto_align, SIGNAL(triggered()), this, SLOT(AutoAlign()));
-
 	
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
 	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
@@ -728,7 +725,7 @@ vector <nPhysD *> neutrino::fileOpen(QString fname, QString optString) {
 		
 	if (imagelist.size()>0) {
 		updateRecentFileActions(fname);
-		for (vector<nPhysImageF<double> *>::iterator it=imagelist.begin(); it!=imagelist.end();) {
+		for (vector<nPhysD *>::iterator it=imagelist.begin(); it!=imagelist.end();) {
 			if ((*it)->getSurf()>0) {
 				addShowPhys((*it));
 				it++;
@@ -772,7 +769,7 @@ void neutrino::saveSession (QString fname) {
 		for (int i=0;i<pans.size(); i++) {
 			if (progress.wasCanceled()) break;
 			QString namePan=pans.at(i)->property("panName").toString();
-			progress.setValue(i);
+			progress.setValue(physList.size()+i);
 			progress.setLabelText(namePan);
 			QApplication::processEvents();
 			ofile << "NeutrinoPan-begin " << namePan.toStdString() << endl;
@@ -794,7 +791,7 @@ void neutrino::saveSession (QString fname) {
 			}
 			file.close();
 			file.remove();
-			ofile << "NeutrinoPan-end " << pans.at(i)->property("panName").toString().toStdString() << endl;
+			ofile << "NeutrinoPan-end " << namePan.toStdString() << endl;
 		}
 		ofile.close();
 	}
@@ -857,6 +854,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
+                        DEBUG("NeutrinoPan detected >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 						QStringList listLine=qLine.split(" ");
 						QString panName=listLine.at(1);
 						counter++;
@@ -1915,15 +1913,6 @@ neutrino::RegionPath() {
 	return new nRegionPath(this, "RegionPath");
 }
 
-
-/// Auto Align images
-nGenericPan*
-neutrino::AutoAlign() {
-	QString vwinname=tr("AutoAlign");
-	nGenericPan *ret=existsPan(vwinname,true);
-	if (!ret) ret = new nAutoAlign(this, vwinname);
-	return ret;
-}
 
 /// ROTATE STUFF
 nGenericPan*

@@ -84,12 +84,14 @@ void nCutoffMask::doOperation () {
 			} else if (my_w.replaceVal->currentText().toLower() == "zero") {
 				replaceVal=0.0;
 			}
-			nPhysImageF<double> *masked = NULL;
 			if (image2->getSurf() == image1->getSurf()) {
-				masked = new nPhysImageF<double> (image1->getW(),image1->getH(), replaceVal);
+				nPhysD *masked = new nPhysD(image1->getW(),image1->getH(), replaceVal);
 				masked->set_origin(image1->get_origin());
 				masked->set_scale(image1->get_scale());
-				for (size_t k=0; k<image1->getSurf(); k++) if (image2->Timg_buffer[k] >= val) masked->Timg_buffer[k]=image1->Timg_buffer[k];
+				for (size_t k=0; k<image1->getSurf(); k++) 
+					if (image2->Timg_buffer[k] >= val) 
+						masked->Timg_buffer[k]=image1->Timg_buffer[k];
+				
 				std::ostringstream my_name;
 				my_name << "mask(" << image2->getName() << "," << val << ")";
 				masked->setName(my_name.str());
