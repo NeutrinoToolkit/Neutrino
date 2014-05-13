@@ -79,14 +79,10 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
 	my_w.sopPlot->setAxisTitle(QwtPlot::xBottom, tr("Time"));
 	my_w.sopPlot->setAxisTitle(QwtPlot::yLeft, tr("Counts [red]"));
-	my_w.sopPlot->setAxisTitle(QwtPlot::yRight, tr("Converted [blue]"));
 	(qobject_cast<QFrame*> (my_w.sopPlot->canvas()))->setLineWidth(0);
 
-	my_w.sopPlot->enableAxis(QwtPlot::yRight);
-	
 	my_w.sopPlot->setAxisAutoScale(QwtPlot::xBottom);
 	my_w.sopPlot->setAxisAutoScale(QwtPlot::yLeft);
-	my_w.sopPlot->setAxisAutoScale(QwtPlot::yRight);
 	
 	mouseMarker[3].setLineStyle(QwtPlotMarker::VLine);
 	mouseMarker[3].attach(my_w.sopPlot);
@@ -921,7 +917,7 @@ nVisar::export_sop() {
 	out += QString("#SOP Offset       : %L1\n").arg(my_w.sopOffset->value());
 	out += QString("#SOP Time scale   : %L1\n").arg(my_w.sopScale->value());
 	out += QString("#SOP Direction    : %L1\n").arg(my_w.sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
-	out += QString("#Time\tCounts\tConverted\n");
+	out += QString("#Time\tCounts\n");
 	
 	QList<QwtPlotCurve *> listCurve;
 	const QwtPlotItemList& itmList = my_w.sopPlot->itemList();
