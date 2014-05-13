@@ -951,7 +951,7 @@ nVisar::export_one(int k) {
 		out += QString("#VISAR %L1 Offset shift       : %L2\n").arg(QString::number(k+1)).arg(setvisar[k].offsetShift->value());
 		out += QString("#VISAR %L1 Sensitivity        : %L2\n").arg(QString::number(k+1)).arg(setvisar[k].sensitivity->value());
 		out += QString("#VISAR %L1 Reflectivity       : %L2 %L3\n").arg(QString::number(k+1)).arg(setvisar[k].reflOffset->value()).arg(setvisar[k].reflRef->value());
-		out += QString("#VISAR %L1 Jumps              : %L2\n").arg(setvisar[k].jumpst->text());
+		out += QString("#VISAR %L1 Jumps              : %L2\n").arg(QString::number(k+1)).arg(setvisar[k].jumpst->text());
 		out += QString("#Time\tVelocity\tReflectivity\tPixel\tRefShift\tShotShift\tRefInt\tShotInt\tRefContrast\tShotContrast\n");
 		for (unsigned int j=0;j<cPhase[0][k].dataSize();j++) {
 			out += QString("%L1\t%L2\t%L3\t%L4\t%L5\t%L6\t%L7\t%L8\t%L9\t%L10\n")
