@@ -184,7 +184,7 @@ phys_open_RAW(nPhysImageF<double> *, int, int, bool);
 
 //write neutrino tiff files
 int 
-phys_write_tiff(nPhysImageF<double> *, const char *, int=sizeof(float));
+phys_write_tiff(nPhysImageF<double> *, const char *);
 
 
 //! HDF stuff

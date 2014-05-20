@@ -32,8 +32,9 @@
 #ifdef HAVE_LIBTIFF
 #define int32 tiff_int32
 #define uint32 tiff_uint32
-#include <tiff.h>
+extern "C" {
 #include <tiffio.h>
+}
 #undef int32
 #undef uint32
 #endif
@@ -761,17 +762,16 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 }
 
 int
-phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename, int bytes) {
+phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 #ifdef HAVE_LIBTIFF
 	TIFF* tif = TIFFOpen(ofilename, "w");
 	if (tif && my_phys) {
+		TIFFSetWarningHandler(NULL);
 		TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
 		TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
-		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 		TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
 		TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
-		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
  		TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
  		TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, my_phys->getShortName().c_str());
  		TIFFSetField(tif, TIFFTAG_SOFTWARE, "neutrino");
@@ -780,20 +780,17 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename, int bytes)
 		TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, my_phys->getW());
 		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, my_phys->getH());
-		TIFFSetField(tif, TIFFTAG_XRESOLUTION, my_phys->get_scale().x());
-		TIFFSetField(tif, TIFFTAG_YRESOLUTION, my_phys->get_scale().y());
-		
-		TIFFSetField(tif, TIFFTAG_XPOSITION, my_phys->get_origin().x());
-		TIFFSetField(tif, TIFFTAG_YPOSITION, my_phys->get_origin().y());
-		TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8*bytes);
+// 		TIFFSetField(tif, TIFFTAG_XRESOLUTION, my_phys->get_scale().x());
+// 		TIFFSetField(tif, TIFFTAG_YRESOLUTION, my_phys->get_scale().y());
+// 		
+// 		TIFFSetField(tif, TIFFTAG_XPOSITION, my_phys->get_origin().x());
+// 		TIFFSetField(tif, TIFFTAG_YPOSITION, my_phys->get_origin().y());
+		TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8*sizeof(float));
+		DEBUG("tiff " << TIFFScanlineSize(tif) << " " << my_phys->getW() <<  " " << my_phys->getH());
 		unsigned char *buf = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(tif));
 		for (size_t j = 0; j < my_phys->getH(); j++) {
  			for (size_t i=0; i<my_phys->getW(); i++) {
- 				if (bytes==sizeof(float)) {
-	 				((float*)buf)[i]=(float)my_phys->point(i,j) ;
-	 			} else if (bytes==sizeof(int)){
-	 				((int*)buf)[i]=(float)my_phys->point(i,j) ;
-	 			}
+ 				((float*)buf)[i]=(float)my_phys->point(i,j) ;
  			}
  			TIFFWriteScanline(tif, buf, j, 0);
  		}
