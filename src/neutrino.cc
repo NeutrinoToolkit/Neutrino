@@ -40,7 +40,7 @@
 #include "nShortcuts.h"
 #include "nAffine.h"
 
-#include "focalspot_pan.h"
+#include "nFocalSpot.h"
 #include "nLineout.h"
 #include "nLineoutBoth.h"
 
@@ -1505,7 +1505,7 @@ nGenericPan*
 neutrino::FocalSpot() {
 	QString vwinname=tr("FocalSpot");
 	nGenericPan* win=existsPan(vwinname,true);
-	if (!win) win=new focalspot_pan(this,vwinname);
+	if (!win) win=new nFocalSpot(this,vwinname);
 	return win;
 }
 

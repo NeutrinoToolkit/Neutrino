@@ -29,9 +29,9 @@ FORMS += nWinList.ui
 
 
 ## focal spot
-HEADERS += focalspot_pan.h
-SOURCES += focalspot_pan.cc
-FORMS += focalspot.ui
+HEADERS += nFocalSpot.h
+SOURCES += nFocalSpot.cc
+FORMS += nFocalSpot.ui
 
 ## lineout
 HEADERS += nLineout.h  nLineoutBoth.h

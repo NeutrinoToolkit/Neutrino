@@ -32,15 +32,15 @@ nFocalSpot::nFocalSpot(neutrino *nparent, QString winname)
 	: nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-
+	nContour = new nLine(nparent);
+	nContour->setParentPan(panName,3);
+	
 	decorate();
+	connect(nparent, SIGNAL(buffer_changed(nPhysD*)), this, SLOT(calculate_stats()));
+	connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
+	connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
 
 	calculate_stats();
-	connect(nparent, SIGNAL(buffer_changed(nPhysD*)), this, SLOT(calculate_stats()));
-	connect(my_w.zero_dsb, SIGNAL(valueChanged(double)), this, SLOT(calculate_stats()));
-	connect(my_w.check_dsb, SIGNAL(valueChanged(double)), this, SLOT(calculate_stats()));
-
-	nContour = new nLine(nparent);
 }
 
 
@@ -57,13 +57,13 @@ nFocalSpot::calculate_stats()
 	}
 
 	// 1. find centroid
-	vec2f centr;
-	if (cur->get_origin() == vec2f(0,0)) {
+	vec2 centr;
+	if (cur->get_origin() == vec2(0,0)) {
 		nPhysD decimated(*cur);
 		phys_fast_gaussian_blur(decimated, 10);
 		decimated.TscanBrightness();
 	
-		centr = vec2f(decimated.max_Tv_x, decimated.max_Tv_y);
+		centr = vec2(decimated.max_Tv_x, decimated.max_Tv_y);
 		cur->set_origin(centr);
 	} else
 		centr = cur->get_origin();
@@ -91,15 +91,18 @@ nFocalSpot::calculate_stats()
 	else
 		energy_ratio = 0;
 
-	my_w.integral_lbl->setText(QString("%1/%2\n(%3\%)").arg(above_th_energy).arg(total_energy).arg(energy_ratio));
+	my_w.integral_lbl->setText(QString("Threshold integral:\n%1").arg(energy_ratio));
 
 	//std::cerr<<"min/max: "<<cur->get_min()<<"/"<<cur->get_max()<<", surf: "<<cur->getSurf()<<", point_count: "<<point_count<<std::endl;
 	
-	find_contour();
+	double c_integral = find_contour();
+	
+	//double contour_ratio = contour_integral();
+	//my_w.integral_lbl->setText(my_w.integral_lbl->text()+QString("\nContour integral:\n%1").arg(100*above_th_energy/total_energy));
 
 }
 
-void
+double
 nFocalSpot::find_contour(void)
 {
 	// marching squares algorithm
@@ -108,10 +111,10 @@ nFocalSpot::find_contour(void)
 
 	nPhysD *cur = nparent->getBuffer(-1);
 	if (!cur) 
-		return;
+		return -1;
 
 	// 1. generate boolean map
-	vec2f orig = cur->get_origin();
+	vec2 orig = cur->get_origin();
 	double c_value = cur->point(orig.x(),orig.y());
 	double th = my_w.check_dsb->value()*(c_value-my_w.zero_dsb->value()) +my_w.zero_dsb->value();
 
@@ -156,7 +159,7 @@ nFocalSpot::find_contour(void)
 	int b_points = 0;
 	for (int ii=1; ii<15; ii++) b_points+=stats[ii];
 
-	std::cerr<<"[walker] There are "<<stats[0]<<" points under threshold, "<<stats[15]<<" points over threshold and "<<b_points<<" boundary points"<<std::endl;
+	DEBUG(5,"[walker] There are "<<stats[0]<<" points under threshold, "<<stats[15]<<" points over threshold and "<<b_points<<" boundary points"<<std::endl);
 
 	
 	// find only main contour
@@ -171,9 +174,9 @@ nFocalSpot::find_contour(void)
 	stats[cmap.point(ls_x, orig.y())]--;
 
 
-	std::list<vec2f> contour(b_points);
-	std::list<vec2f>::iterator itr = contour.begin(), itr_last = contour.begin();
-	*itr = vec2f(ls_x, orig.y());
+	std::list<vec2> contour(b_points);
+	std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.begin();
+	*itr = vec2(ls_x, orig.y());
 
 	while (itr != contour.end()) {
 		short xx = (*itr).x();
@@ -195,7 +198,7 @@ nFocalSpot::find_contour(void)
 			short central = ((.25*cur->point(xx,yy) + cur->point(xx+1,yy+1) + cur->point(xx+1,yy) + cur->point(xx,yy+1)) > th) ? 1 : -1;
 			short saddle_type = (val == 5) ? 1 : -1;
 
-			vec2f last = *itr- *itr_last; // let's hope we're not starting with a saddle...
+			vec2 last = *itr- *itr_last; // let's hope we're not starting with a saddle...
 
 			//std::cerr<<"[Walker] Saddle point! central: "<<central<<std::endl;
 
@@ -251,11 +254,12 @@ nFocalSpot::find_contour(void)
 
 		itr_last = itr;
 		itr++;
-		*itr = vec2f(xx,yy);
+		*itr = vec2(xx,yy);
 
 		if (*itr == *contour.begin()) {
-			std::cerr<<"Closed contour!!"<<std::endl;
+			//std::cerr<<"Closed contour!!"<<std::endl;
 			contour_ok = true;
+			itr_last++;
 			break;
 		}
 
@@ -268,13 +272,187 @@ nFocalSpot::find_contour(void)
 		QPolygonF myp;
 		for (itr = contour.begin(); itr != itr_last; ++itr) {
 			myp<<QPointF((*itr).x(), (*itr).y());
+			//std::cerr<<*itr<<std::endl;
 		}
+
 
 		nContour->setPoints(myp);
 		my_w.statusBar->showMessage("Contour ok");
+
+		//double intg_contour = contour_integral(contour, itr_last);
+		return 0;
+	}
+}
+
+
+double
+nFocalSpot::contour_integral(std::list<vec2> &contour, std::list<vec2>::iterator &itr_last)
+{
+	nPhysD *cur = nparent->getBuffer(-1);
+	if (!cur) 
+		return -1;
+
+	vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
+	nPhysD check_image(*cur);
+	check_image.TscanBrightness();
+	double check_val = check_image.get_min() - 1;
+	double c_integral = 0;
+
+	for (std::list<vec2>::iterator itr = contour.begin(); itr != itr_last; ++itr) {
+		bbox_inf = vmath::min(bbox_inf, *itr);
+		bbox_sup = vmath::max(bbox_sup, *itr);
+		check_image.set((*itr).x(), (*itr).y(), check_val);
 	}
 
+	nPhysD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
+
+	// integrate by scanline fill
+	
+	double intg=0;
+	std::list<vec2> up_pl, scan_pl, tmplist;
+	vec2 starting_point = intg_image.get_origin();
+
+	for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx++) {
+		up_pl.push_back(vec2(xx, starting_point.y()));
+	}
+	
+	for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx--) {
+		up_pl.push_front(vec2(xx, starting_point.y()));
+	}
+	
+
+	std::cerr<<"walk starting from "<<up_pl.front()<<" to "<<up_pl.back()<<std::endl;
+
+	int line_check =0;
+
+	while (!up_pl.empty()) {
+		
+		//scan_pl = up_pl;
+		//up_pl.clear();
+
+		tmplist.clear();
+		scan_pl.clear();
+		std::list<vec2>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
+		itrf++;
+
+		while (itrf != up_pl.end()) {
+			if (((*itrf).x()-(*itr).x()) > 1) {
+				std::cerr<<"separation at "<<*itr<<" -- "<<*itrf<<std::endl;
+				scan_pl.push_back(*itr);
+				tmplist.clear();
+				tmplist.push_back(*itrf);
+
+
+				std::cerr<<"line "<<line_check<<": sep/walk starting from "<<*itr<<" to "<<*itrf<<std::endl;
+				vec2 ref_sx = *itr, ref_dx = *itrf;
+				while (intg_image.point(scan_pl.back(), check_val) != check_val) {
+					ref_sx+=vec2(1,0);
+					scan_pl.push_back(ref_sx);
+				}
+				std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
+				while (intg_image.point(tmplist.front(), check_val) != check_val) {
+					ref_dx -= vec2(1,0);
+					tmplist.push_front(ref_dx);
+					std::cerr<<"\t\tsep/walking to "<<tmplist.front()<<" - "<<intg_image.point(tmplist.front())<<std::endl;
+				}
+				std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
+				scan_pl.splice(scan_pl.end(), tmplist);
+
+				itr++;
+				itrf++;
+
+
+			} else scan_pl.push_back(*itr);
+
+			itr++;
+			itrf++;
+		}
+		
+		std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
+
+		
+		while (intg_image.point(scan_pl.front(), check_val) != check_val) {
+			scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+			std::cerr<<"--------------"<<intg_image.getPoint(scan_pl.front())<<std::endl;
+		}
+
+		while (intg_image.point(scan_pl.back(), check_val) != check_val) {
+			scan_pl.push_back(scan_pl.back()+vec2(1, 0));
+			//std::cerr<<"--------------"<<intg_image.point(scan_pl.back(), check_val)<<std::endl;
+		}
+
+		std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
+		//if (line_check == 38)
+		//	break;
+
+		up_pl.clear();
+
+		while (!scan_pl.empty()) {
+			vec2 pp = scan_pl.front();
+			scan_pl.pop_front();
+			if (intg_image.point(pp, check_val) != check_val) {
+				intg+=intg_image.point(pp);
+				intg_image.set(pp.x(), pp.y(), check_val);
+				up_pl.push_back(vec2(pp.x(), pp.y()+1));
+				//std::cerr<<"point read: "<<pp<<std::endl;
+			} 
+			//else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
+		}
+
+		line_check++;
+
+	}
+
+	nparent->addPhys(intg_image);
+	return 0;
+
+//	bool isUp = false, isIn = false, isDown = false;
+//	int point_count = 0;
+//	for (register size_t yy=0; yy<intg_image.getH(); yy++) {
+//		size_t xx = 0;
+//		isIn = false; isUp = false, isDown = false;
+//		while (xx<intg_image.getW()) {
+//			double the_point = intg_image.point(xx,yy);
+//			if (the_point == check_val && !isUp) {
+//				isUp = true;
+//				xx++;
+//				continue;
+//			} else if (the_point != check_val && isUp) {
+//				isIn = true;
+//			}
+//
+//			if (the_point == check_val && isIn) {
+//				isDown = true;
+//				isIn = false;
+//				isUp = false;
+//				xx++;
+//				continue;
+//			} else if (the_point != check_val && isDown) {
+//				isDown = false;
+//				xx++;
+//				continue;
+//			}
+//			
+//			
+//
+//			if (isIn) {
+//				c_integral += the_point;
+//				point_count++;
+//			}
+//			xx++;
+//
+//		}
+//
+//		std::cerr<<"point_count: "<<point_count<<std::endl;
+//		if (isIn) {
+//			std::cerr<<"WARNING: boundary problem"<<std::endl;
+//			return -1;
+//		}
+//	}
+//	return c_integral-point_count*my_w.zero_dsb->value();
 }
+
+
 
 void
 nFocalSpot::bufferChanged(nPhysD *buf)

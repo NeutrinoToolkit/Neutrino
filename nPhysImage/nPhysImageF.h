@@ -725,6 +725,14 @@ public:
 			return nan_value;
 	}
 
+	inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
+		if ((Timg_matrix != NULL) && (p.x()<getW()) && (p.y()<getH()))
+			return Timg_matrix[p.y()][p.x()];
+		else
+			return nan_value;
+	}
+
+
 	// must check speed
 	inline T clean_point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
 		if ((Timg_matrix != NULL) && (x<getW()) && (y<getH())) {

@@ -120,7 +120,8 @@ public slots:
 
 	void physAdd(nPhysD *);
 	void physDel(nPhysD *);
-	void bufferChanged(nPhysD *);
+
+	virtual void bufferChanged(nPhysD *);
 
 	void decorate();
 
