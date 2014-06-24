@@ -2055,6 +2055,7 @@ bool neutrino::setData(QList<QList<qreal> >myListList,int num) {
 				newPhys->set(j,i,myListList.at(i).at(j));
 			}
 		}
+        newPhys->TscanBrightness();
 		if (num>=0 && num<physList.size()) {			
 			replacePhys(newPhys, physList.at(num), true);
 		} else {
