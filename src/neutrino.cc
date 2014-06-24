@@ -2067,6 +2067,12 @@ bool neutrino::setData(QList<QList<qreal> >myListList,int num) {
 	}
 }
 
+nGenericPan* neutrino::openPan(QString panName) {
+    nGenericPan *my_pan=NULL;
+    QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+    return my_pan;
+}
+
 nLine* neutrino::line(QString name) {
 	foreach (QObject* widget, children()) {
 		nLine *linea=qobject_cast<nLine *>(widget);

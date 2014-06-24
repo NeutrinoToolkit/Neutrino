@@ -304,6 +304,8 @@ public slots:
 	void about();
 	nGenericPan* Preferences();
 
+    nGenericPan* openPan(QString);
+
 	void emitPanAdd(nGenericPan*);
 	void emitPanDel(nGenericPan*);
 	

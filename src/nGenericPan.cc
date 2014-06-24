@@ -140,11 +140,11 @@ void nGenericPan::decorate() {
 			}
 		}
 	}
-    foreach (QWidget *wdgt, findChildren<QPushButton *>()) {
-        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
-    }
 	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
-		if (wdgt->property("neutrinoSave").isValid() || wdgt->property("neutrinoImage").isValid()) {
+		if (wdgt->property("neutrinoSave").isValid() || 
+            wdgt->property("neutrinoImage").isValid() ||
+            qobject_cast<QPushButton *>(wdgt) 
+            ) {
 			wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
 		}
 	}
