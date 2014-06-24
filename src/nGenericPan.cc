@@ -140,6 +140,9 @@ void nGenericPan::decorate() {
 			}
 		}
 	}
+    foreach (QWidget *wdgt, findChildren<QPushButton *>()) {
+        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+    }
 	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
 		if (wdgt->property("neutrinoSave").isValid() || wdgt->property("neutrinoImage").isValid()) {
 			wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
