@@ -500,39 +500,39 @@ nGenericPan::progressRun(int max_calc) {
 }
 
 void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
-//	qDebug() << "HERE HERE HERE HERE HERE HERE HERE HERE HERE " << name << my_val;
+	qDebug() << "HERE HERE HERE HERE HERE HERE HERE HERE HERE " << name << my_val;
 	bool ok;
 	int my_occurrence=1;
-	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
-			if (my_occurrence==occurrence) {
-				bool found=false;
-				for (int i=0;i<obj->count();i++) {
-					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<void *>());
-					if (*objPhys == *(nPhysD*) (my_val.value<void *>())){
-						obj->setCurrentIndex(i);
-						found=true;
-					}
-				}
-				if (!found) {
-					nparent->addPhys((nPhysD*) (my_val.value<void *>()));
-					QApplication::processEvents();
-					if (obj->findData(my_val)>-1) {
-						obj->setCurrentIndex(obj->findData(my_val));
-						return;
-					} else {
-						if (obj->findText(my_val.toString())>-1) {
-							obj->setCurrentIndex(obj->findText(my_val.toString()));
-							QApplication::processEvents();
-							return;
-						}
-					}
-				}
-			}
-			my_occurrence++;
-		}
-	}
-	my_occurrence=1;
+//	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
+//		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
+//			if (my_occurrence==occurrence) {
+//				bool found=false;
+//				for (int i=0;i<obj->count();i++) {
+//					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<void *>());
+//					if (*objPhys == *(nPhysD*) (my_val.value<void *>())){
+//						obj->setCurrentIndex(i);
+//						found=true;
+//					}
+//				}
+//				if (!found) {
+//					nparent->addPhys((nPhysD*) (my_val.value<void *>()));
+//					QApplication::processEvents();
+//					if (obj->findData(my_val)>-1) {
+//						obj->setCurrentIndex(obj->findData(my_val));
+//						return;
+//					} else {
+//						if (obj->findText(my_val.toString())>-1) {
+//							obj->setCurrentIndex(obj->findText(my_val.toString()));
+//							QApplication::processEvents();
+//							return;
+//						}
+//					}
+//				}
+//			}
+//			my_occurrence++;
+//		}
+//	}
+//	my_occurrence=1;
 	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
@@ -544,9 +544,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 					int pos=obj->findData(my_val);
 					if (pos>-1) {
 						obj->setCurrentIndex(pos);
-						return;
 					}
 				}
+                return;
 			}
 			my_occurrence++;
 		}
@@ -698,16 +698,16 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 QVariant nGenericPan::get(QString name, int occurrence) {
 	int my_occurrence=1;
-	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
-			if (my_occurrence==occurrence) {
-				nPhysD *copyPhys=getPhysFromCombo(obj);
-				return qVariantFromValue(*copyPhys);
-			}
-			my_occurrence++;
-		}
-	}
-	my_occurrence=1;
+//	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
+//		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
+//			if (my_occurrence==occurrence) {
+//				nPhysD *copyPhys=getPhysFromCombo(obj);
+//				return qVariantFromValue(*copyPhys);
+//			}
+//			my_occurrence++;
+//		}
+//	}
+//	my_occurrence=1;
 	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
