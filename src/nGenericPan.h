@@ -154,7 +154,7 @@ public slots:
 	// python stuff
 	void set(QString, QVariant, int=1);
 	QVariant get(QString, int=1);
-	nPhysD* getPhys(QString, int=1);
+	QList<QList<qreal> >  getData(QString, int=1);
 	void button(QString, int=1);	
 
 };
