@@ -125,4 +125,9 @@ FORMS += nShortcuts.ui
 SOURCES += nShortcuts.cc
 HEADERS += nShortcuts.h 
 
+#Find peaks
+FORMS += nGhost.ui
+SOURCES += nGhost.cc
+HEADERS += nGhost.h 
+
 

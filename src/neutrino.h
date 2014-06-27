@@ -298,7 +298,10 @@ public slots:
 	
 	// BLUR STUFF
 	nGenericPan* Blur();
-
+    
+	// remove ghost Fringes
+	nGenericPan* Ghost();
+    
 	nGenericPan* MouseInfo();
 
 	void about();

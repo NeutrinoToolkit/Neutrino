@@ -32,6 +32,7 @@
 #include "nCompareLines.h"
 #include "nVisar.h"
 #include "nWavelet.h"
+#include "nGhost.h"
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
 #include "nRotate.h"
@@ -216,6 +217,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
 	connect(my_w.actionVisar, SIGNAL(triggered()), this, SLOT(Visar()));
 	connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
+	connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
 	connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
 	connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
 	
@@ -1897,6 +1899,15 @@ neutrino::Wavelet() {
 	return ret;
 }
 
+/// Remove Ghost fringes from Visar data
+nGenericPan*
+neutrino::Ghost() {
+	QString vwinname=tr("Ghost");
+    nGenericPan *ret=existsPan(vwinname,true);
+	if (!ret) ret = new nGhost(this, vwinname);
+	return ret;
+}
+
 /// Integral inversion (Abel etc...)
 nGenericPan*
 neutrino::Inversions() {
@@ -2028,12 +2039,12 @@ void neutrino::about() {
 
 QList<QList<qreal> > neutrino::getData(int num) {
 	QList<QList<qreal> > myListList;
-	nPhysD *phys=getBuffer(num);
-	if (phys) {
-		for (size_t i=0; i<phys->getH(); i++) {
+	nPhysD *my_phys=getBuffer(num);
+	if (my_phys) {
+		for (size_t i=0; i<my_phys->getH(); i++) {
 			QList<qreal> myList;
-			for (size_t j=0; j<phys->getW(); j++) {
-				myList.append(phys->point(j,i));
+			for (size_t j=0; j<my_phys->getW(); j++) {
+				myList.append(my_phys->point(j,i));
 			}
 			myListList.append(myList);
 		}

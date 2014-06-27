@@ -227,7 +227,10 @@ void nWavelet::doWavelet () {
 					mat=NULL;
 				} else {
 					if (my_w.erasePrevious->isChecked()) {
+                        bool changebufferDisplayed=false;
+                        if (bufferDisplayed==waveletPhys.at(position)) changebufferDisplayed=true;
 						waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
+                        if (changebufferDisplayed) bufferDisplayed=waveletPhys.at(position);
 					} else {
 						nparent->addPhys(mat);
 						waveletPhys.at(position)=mat;

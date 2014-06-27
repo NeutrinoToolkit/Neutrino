@@ -71,6 +71,7 @@ public:
 	QList<QList<qreal> > getData(int=-1);
 	bool setData(QList<QList<qreal> >,int=-1);
 	nLine* line(QString);
+    nGenericPan* openPan(QString);
 };
 
 class nGenericPan : QMainWindow {
@@ -79,6 +80,7 @@ class nGenericPan : QMainWindow {
 %End
 public:
 	nGenericPan(neutrino *, QString);
+	QList<QList<qreal> > getData(QString,int=1);
 };
 
 class nLine : QGraphicsObject {

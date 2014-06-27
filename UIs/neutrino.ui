@@ -171,6 +171,7 @@
     </widget>
     <addaction name="actionSpectral_Analysis"/>
     <addaction name="actionWavelet"/>
+    <addaction name="actionGhost"/>
     <addaction name="actionInversions"/>
     <addaction name="actionVisar"/>
     <addaction name="actionFocal_Spot"/>
@@ -773,6 +774,11 @@
   <action name="actionAffine_Transform">
    <property name="text">
     <string>Affine Transform</string>
+   </property>
+  </action>
+  <action name="actionGhost">
+   <property name="text">
+    <string>Ghost</string>
    </property>
   </action>
  </widget>

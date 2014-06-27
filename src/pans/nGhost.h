@@ -26,54 +26,34 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nWavelet.h"
+#include "ui_nGhost.h"
 
-#ifndef __nWavelet
-#define __nWavelet
+#ifndef __nGhost
+#define __nGhost
 #include "nPhysWave.h"
 #include "nLine.h"
 #include "nRect.h"
 
 class neutrino;
 
-std::list<nPhysD *> phys_wavelet_trasl_cuda(nPhysD *, void *, int &);
-std::list<nPhysD *> phys_wavelet_trasl_nocuda(nPhysD *, void *, int &);
-
-class nWavelet : public nGenericPan {
+class nGhost : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nWavelet(neutrino *, QString);
+	nGhost(neutrino *, QString);
 	
-	Ui::nWavelet my_w;
+	Ui::nGhost my_w;
 
 	QPointer<nRect> region;
-	
-	QPointer<nLine> linebarrier;
-	
-	std::vector<nPhysD *> waveletPhys;
-	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
-private:
-	wavelet_params my_params;
-
+    nPhysD *ghostBusted;
+    
 public slots:
 		
-	void useBarrierToggled(bool);
 	void guessCarrier();
 
-	void doWavelet();
-	void doUnwrap();
-	void doRemove();
-	void doRemoveCarrier();
-	void doRemoveReference();
-	
-	void bufferChanged(nPhysD*);
-	void checkChangeCombo(QComboBox *);
-	
-	void doAll();
+	void doGhost();
 
-	
 };
 
 #endif
