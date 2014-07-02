@@ -254,13 +254,11 @@ void nVisar::tabChanged(int k) {
 	
 	QApplication::processEvents();
 
-	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>" << k);
 	// QPainter::begin: Paint device returned engine == 0, type: 2
 	
 	QTabWidget *tabWidget=qobject_cast<QTabWidget *>(sender());
 	if (!tabWidget) tabWidget=my_w.tabWidget;
 
-	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>" << k);
 	if (tabWidget==my_w.tabWidget) {
 		if (k==0) {
 			tabWidget=my_w.tabWidget1;
@@ -268,14 +266,12 @@ void nVisar::tabChanged(int k) {
 			tabWidget=my_w.tabWidget2;
 		}
 	}
-	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>" << k);
 	if (k<2) {
 		int visnum=tabWidget->currentIndex();
 		
 		nPhysD *nphys=getPhysFromCombo(visar[visnum].shotImage);
 		if (nphys) {
 			nparent->showPhys(nphys);
-			DEBUG(nphys->getName());
 		}
 		fringeRect[visnum]->show();
 		fringeRect[(visnum+1)%2]->hide();
@@ -663,10 +659,10 @@ void nVisar::doWave(int k) {
 
 		progress.setValue(counter++);
 		QApplication::processEvents();
-		double thick_norm=visar[k].resolution->value()*M_PI/(direction(k)?dy:dx); // in this case thickness < 1 has no meaning
-		double damp_norm=visar[k].damp->value()*M_PI;
 		double cr = cos((visar[k].angle->value()) * _phys_deg); 
 		double sr = sin((visar[k].angle->value()) * _phys_deg);
+		double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+		double damp_norm=visar[k].damp->value()*M_PI;
 
 		double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 		for (size_t x=0;x<dx;x++) {

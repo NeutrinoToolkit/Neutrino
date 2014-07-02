@@ -41,18 +41,21 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
-	
 	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
-
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
-
-	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-
+	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
+    
     ghostBusted=NULL;
+    imageFFT=NULL;
 }
 
+void nGhost::checkChangeCombo(QComboBox *combo) {
+	if (combo==my_w.shot) {
+        delete imageFFT;
+        imageFFT=NULL;
+	}
+}
 
 void nGhost::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.shot);
@@ -81,71 +84,76 @@ void nGhost::doGhost () {
         
         QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersect(region->getRect());
         
+        size_t dx=imageShot->getW();
+        size_t dy=imageShot->getH();
         
         
-        nPhysD dataShot = imageShot->copy();
-        size_t dx=dataShot.getW();
-        size_t dy=dataShot.getH();
-        
-        nPhysC dataShotFFTNorm=dataShot.ft2(PHYS_FORWARD);
-        
-        nPhysImageF<mcomplex> morlet("Morlet");
-        morlet.resize(dx,dy);
-
-        int xx[dx], yy[dy];
-        
-        for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-        for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
-                        
+        if (imageFFT == NULL) {
+            imageFFT = new nPhysC();
+            *imageFFT=imageShot->ft2(PHYS_FORWARD);
+            xx.resize(dx);
+            yy.resize(dy);
+            for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+            for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
+            morlet.resize(dx,dy);
+        }
         
         double cr_ghost = cos((my_w.angleCarrier->value()) * _phys_deg); 
         double sr_ghost = sin((my_w.angleCarrier->value()) * _phys_deg);
-        double thick_ghost=my_w.thickness->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
+        double thick_ghost=my_w.thicknessGhost->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
         double lambda_ghost=my_w.widthCarrier->value()/sqrt(pow(cr_ghost*dx,2)+pow(sr_ghost*dy,2));
         
         double cr_norm = cos((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg); 
         double sr_norm = sin((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg);
         double thick_norm=my_w.thickness->value()*M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
-        double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dy,2));
-        
-        double damp=my_w.damp->value()*M_PI;
-        
+        double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dx,2));
+       
+        DEBUG(sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2)) << " " << sqrt(pow(cr_ghost*dx,2)+pow(sr_ghost*dy,2)));
+        DEBUG(sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2)) << " " << sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dy,2)));
 
+        double weight=my_w.weight->value();
+        
+//        nPhysD *thisFilter=new nPhysD(dx,dy,0.0,"Filter");
+        
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr_ghost = xx[x]*cr_ghost - yy[y]*sr_ghost;
                 double yr_ghost = xx[x]*sr_ghost + yy[y]*cr_ghost;
                 
-                double ex_ghost = -pow(damp*(xr_ghost*lambda_ghost-1.0), 2);
+                double ex_ghost = -pow(M_PI*(xr_ghost*lambda_ghost-1.0), 2);
                 double ey_ghost = -pow(yr_ghost*thick_ghost, 2);
                 
                 double xr_norm = xx[x]*cr_norm - yy[y]*sr_norm;
                 double yr_norm = xx[x]*sr_norm + yy[y]*cr_norm;
                 
-                double ex_norm = -pow(damp*(xr_norm*lambda_norm-1.0), 2);
+                double ex_norm = -pow(M_PI*(xr_norm*lambda_norm-1.0), 2);
                 double ey_norm = -pow(yr_norm*thick_norm, 2);
                 
-                double etot=my_w.weight->value()*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost) * exp(ex_ghost);
+                double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
-                morlet.Timg_matrix[y][x]=dataShotFFTNorm.Timg_matrix[y][x] * etot;           
+                morlet.Timg_matrix[y][x]=imageFFT->Timg_matrix[y][x] * e_tot; 
+//                thisFilter->set((x+(dx+1)/2)%dx,(y+(dy+1)/2)%dy,e_tot);
             }
         }
-                
-        dataShotFFTNorm = morlet.ft2(PHYS_BACKWARD);
+//        thisFilter->TscanBrightness();  
+//        nparent->addPhys(thisFilter);
+
+        morlet = morlet.ft2(PHYS_BACKWARD);
                 
         nPhysD *deepcopy=new nPhysD();
         *deepcopy=imageShot->copy();
         deepcopy->setShortName("deghost");
-
-
+        deepcopy->setName("deghost("+imageShot->getName()+")");
+        
         for(int i=geom.left();i<geom.right(); i++) {
             for(int j=geom.top();j<geom.bottom(); j++) {
                 double val=deepcopy->point(i,j);
-                double valNorm= 2.0*dataShotFFTNorm.point(i,j).mod()/(dx*dy)*cos(-dataShotFFTNorm.point(i,j).arg());
+                double valNorm= 2.0*morlet.point(i,j).mod()/(dx*dy)*cos(-morlet.point(i,j).arg());
                 deepcopy->set(i,j, val+valNorm); 
             }
         }
-
+        deepcopy->TscanBrightness();
+        
         if (my_w.erasePrevious->isChecked()) {
             ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,false);
         } else {
@@ -155,9 +163,10 @@ void nGhost::doGhost () {
         nparent->showPhys(ghostBusted);
         my_w.erasePrevious->setEnabled(true);
 
+//        thisFilter->TscanBrightness();        
+//        filter=nparent->replacePhys(thisFilter,filter,true);
+
 	}
 }
-
-// ---------------------- thread transport functions ------------------------
 
 

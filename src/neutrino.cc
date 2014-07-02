@@ -173,9 +173,6 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
 	connect(my_w.actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 	connect(my_w.actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
-	connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
-	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
-	connect(my_w.actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
 
 	connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
 	connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
@@ -597,6 +594,7 @@ void neutrino::cycleOverItems() {
 
 nGenericPan* neutrino::existsPan(QString name, bool reShow) {
 	foreach (nGenericPan *pan, getPans()) {
+        DEBUG(pan->panName.toStdString() << " " << name.toStdString());
 		if (pan->panName.startsWith(name)) {
 			if (reShow) {
 				pan->show();
@@ -796,6 +794,7 @@ void neutrino::saveSession (QString fname) {
 			ofile << "NeutrinoPan-end " << namePan.toStdString() << endl;
 		}
 		ofile.close();
+        updateRecentFileActions(fname);
 	}
 }
 
@@ -1071,10 +1070,19 @@ neutrino::createQimage() {
 
 // Export
 
-void neutrino::exportGraphics () {
+void neutrino::exportGraphics () {    
+    int ceppa=QApplication::queryKeyboardModifiers();
 	QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
 	if (!fout.isEmpty()) {
-		exportGraphics(fout);
+        if (ceppa == Qt::NoModifier) {
+            exportGraphics(fout);
+        } else {
+            for (int i=0;i<physList.size() ; i++) {
+                actionNextBuffer();
+                QFileInfo fi(fout);
+                exportGraphics(fi.path()+"/"+fi.baseName()+QString("%1").arg(i, 3, 10, QChar('0'))+"."+fi.completeSuffix());
+            }
+        }
 	}
 }
 

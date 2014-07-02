@@ -86,7 +86,7 @@ public:
 
 	operator std::string() const {
 		if (ddescr == any_none) {
-			WARNING("accessing uninitialized value");
+			DEBUG("accessing uninitialized value");
 		} else if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
 		return get_str();
 	}

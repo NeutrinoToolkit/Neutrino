@@ -34,6 +34,7 @@ CONFIG(debug, debug|release) {
     DEFINES += __phys_debug=10
     message("DEBUG!")
 } else {
+    DEFINES += QT_NO_DEBUG_OUTPUT
     message("RELEASE!")
 }
 

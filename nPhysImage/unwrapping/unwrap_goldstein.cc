@@ -292,7 +292,6 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	std::vector<unsigned int> index_list(dx*dy + 1 + 1);
 		
 	/* find starting point */
-	int n = 0;
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
 			if (!(bits.point(i,j) & (AVOID | UNWRAPPED))) {
@@ -302,7 +301,6 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				soln->set(i,j,value);
 				UpdateList(&qual_map, i, j, value, phase, soln, &bits, index_list, num_index);
 				while (num_index > 0) {
-					++n;
 					if (GetNextOneToUnwrap(a, b, index_list, num_index, dx)) {
 						bits.set(a,b,bits.point(a,b) | UNWRAPPED);
 						value = soln->point(a,b);        

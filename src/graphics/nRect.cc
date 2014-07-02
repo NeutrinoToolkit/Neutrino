@@ -546,6 +546,8 @@ QPainterPath nRect::path() const {
 }
 
 void nRect::zoomChanged(double val){
+    DEBUG(val);
+    
 	zoom=val;
 	sizeHolder(nSizeHolder);
 	update();

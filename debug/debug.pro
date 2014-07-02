@@ -14,4 +14,5 @@ RCC_DIR = build
 UI_DIR = build
 
 DEFINES += __phys_debug=10
+DEFINES -= QT_NO_DEBUG_OUTPUT
 

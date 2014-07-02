@@ -937,7 +937,7 @@ nLine::switchOrdering()
 { forceInverseOrdering = !forceInverseOrdering; rearrange_monotone(); }
 
 void nLine::zoomChanged(double val){
-	//qDebug() << "nLine::zoomChanged" << val; 
+	qDebug() << "nLine::zoomChanged" << val; 
 	zoom=val;
 	sizeHolder(nSizeHolder);
 	setWidthF(nWidth);
