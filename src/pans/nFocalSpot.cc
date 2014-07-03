@@ -95,7 +95,7 @@ nFocalSpot::calculate_stats()
 
 	//std::cerr<<"min/max: "<<cur->get_min()<<"/"<<cur->get_max()<<", surf: "<<cur->getSurf()<<", point_count: "<<point_count<<std::endl;
 	
-	double c_integral = find_contour();
+//	double c_integral = find_contour();
 	
 	//double contour_ratio = contour_integral();
 	//my_w.integral_lbl->setText(my_w.integral_lbl->text()+QString("\nContour integral:\n%1").arg(100*above_th_energy/total_energy));
@@ -282,6 +282,7 @@ nFocalSpot::find_contour(void)
 		//double intg_contour = contour_integral(contour, itr_last);
 		return 0;
 	}
+    return -1;
 }
 
 
@@ -296,7 +297,7 @@ nFocalSpot::contour_integral(std::list<vec2> &contour, std::list<vec2>::iterator
 	nPhysD check_image(*cur);
 	check_image.TscanBrightness();
 	double check_val = check_image.get_min() - 1;
-	double c_integral = 0;
+	//double c_integral = 0;
 
 	for (std::list<vec2>::iterator itr = contour.begin(); itr != itr_last; ++itr) {
 		bbox_inf = vmath::min(bbox_inf, *itr);

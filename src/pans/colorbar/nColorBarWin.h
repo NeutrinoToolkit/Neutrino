@@ -72,8 +72,6 @@ public slots:
 	void bufferChanged(nPhysD*);
 	void updatecolorbar();
 
-	void refreshNeutrino();
-
 	void cutOff();
 
 	void addColor();
