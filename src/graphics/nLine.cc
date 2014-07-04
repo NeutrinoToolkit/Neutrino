@@ -224,7 +224,6 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 }
 
 void nLine::togglePadella() {
-	DEBUG("here");
 	if (my_pad.isHidden()) {
 		my_pad.show();
 		updatePlot();
@@ -937,7 +936,6 @@ nLine::switchOrdering()
 { forceInverseOrdering = !forceInverseOrdering; rearrange_monotone(); }
 
 void nLine::zoomChanged(double val){
-	qDebug() << "nLine::zoomChanged" << val; 
 	zoom=val;
 	sizeHolder(nSizeHolder);
 	setWidthF(nWidth);

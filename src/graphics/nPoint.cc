@@ -53,10 +53,6 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 	nparent->setProperty("nunPoint",num);
 	setProperty("nunPoint",num);
 
-#ifdef __use_nPython
-//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Rect")+property("num").toString(), this);
-#endif
-
 	setOrder(0.0);
 	setToolTip(tr("point")+QString(" ")+QString::number(num));
 

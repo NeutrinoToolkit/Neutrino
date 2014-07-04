@@ -65,8 +65,6 @@ void nGhost::guessCarrier() {
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
 		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
-		qDebug() << datamatrix.getH();
-
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
@@ -108,13 +106,8 @@ void nGhost::doGhost () {
         double thick_norm=my_w.thickness->value()*M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
         double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dx,2));
        
-        DEBUG(sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2)) << " " << sqrt(pow(cr_ghost*dx,2)+pow(sr_ghost*dy,2)));
-        DEBUG(sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2)) << " " << sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dy,2)));
-
         double weight=my_w.weight->value();
-        
-//        nPhysD *thisFilter=new nPhysD(dx,dy,0.0,"Filter");
-        
+
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr_ghost = xx[x]*cr_ghost - yy[y]*sr_ghost;
@@ -132,11 +125,9 @@ void nGhost::doGhost () {
                 double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
                 morlet.Timg_matrix[y][x]=imageFFT->Timg_matrix[y][x] * e_tot; 
-//                thisFilter->set((x+(dx+1)/2)%dx,(y+(dy+1)/2)%dy,e_tot);
+
             }
         }
-//        thisFilter->TscanBrightness();  
-//        nparent->addPhys(thisFilter);
 
         morlet = morlet.ft2(PHYS_BACKWARD);
                 
@@ -162,9 +153,6 @@ void nGhost::doGhost () {
         }
         nparent->showPhys(ghostBusted);
         my_w.erasePrevious->setEnabled(true);
-
-//        thisFilter->TscanBrightness();        
-//        filter=nparent->replacePhys(thisFilter,filter,true);
 
 	}
 }

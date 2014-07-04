@@ -61,10 +61,6 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	nparent->setProperty("numEllipse",num);
 	setProperty("numEllipse",num);
 
-#ifdef __use_nPython
-//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Rect")+property("num").toString(), this);
-#endif
-
 	setOrder(0.0);
 	setToolTip(tr("ellipse")+QString(" ")+QString::number(num));
 

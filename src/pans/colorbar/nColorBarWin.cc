@@ -113,8 +113,6 @@ void nColorBarWin::toggleAutoscale () {
 		nparent->colorMax=my_w.lineMax->text().toDouble();
 	}
 	bufferChanged(currentBuffer);
-//	DEBUG(">>>>>>>>>>>>>>>>>>..... " << nparent->colorMin << " " << nparent->colorMax);
-//	DEBUG(">>>>>>>>>>>>>>>>>> " << my_w.autoscale->isChecked() << " " << nparent->colorRelative);
 }
 
 void nColorBarWin::setToMin () {

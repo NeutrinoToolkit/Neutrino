@@ -177,7 +177,7 @@ neutrino::neutrino(): my_mouse(this), my_tics(this) {
 	connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
 	connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
 	connect(my_w.actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
-
+    
 	connect(my_w.actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
 	connect(my_w.actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
 	connect(my_w.actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
@@ -1229,10 +1229,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 		case Qt::Key_C:
 			if (e->modifiers() & Qt::ShiftModifier) {
 				Colorbar();
-			} else {
-				std::swap(colorMin,colorMax);
-				createQimage();
-				emit updatecolorbar();			
 			}
 			break;
 		case Qt::Key_I:
