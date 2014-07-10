@@ -55,32 +55,47 @@ nRegionPath::doIt() {
 		saveDefaults();
 		nPhysD *image=getPhysFromCombo(my_w.image);
 		if (image) {
+            double replaceVal=getReplaceVal();
+            
 			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
 			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
+            
 			nPhysD *regionPath = new nPhysD();
-			*regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+            bidimvec<int> offset(0,0);
+            if (my_w.crop->isChecked()) {
+                regionPath = new nPhysD();
+                *regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+                offset+=bidimvec<int>(rectRegion.x(), rectRegion.y());
+                regionPath->set_origin(image->get_origin()-offset);
+            } else {
+                if (my_w.negative->isChecked()) {
+                    regionPath = new nPhysD(*image);
+                } else {
+                    regionPath = new nPhysD(image->getW(),image->getH(),replaceVal);
+                } 
+            }
 			regionPath->setShortName("Region mask");
 			regionPath->setName("mask");
-			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
-			QProgressDialog progress("Extracting", "Stop", 0, regionPath->getW(), this);
+			QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
 			progress.setWindowModality(Qt::WindowModal);
 			progress.show();
-			QTime time;
-			time.start();
-			for (register size_t i=0; i<regionPath->getW(); i++) {
+			for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
 				if (progress.wasCanceled()) break;
 				QApplication::processEvents();
-				for (register size_t j=0; j<regionPath->getH(); j++) {
-					if (!regionPoly.containsPoint(QPoint(i+rectRegion.x(),j+rectRegion.y()),Qt::OddEvenFill)) {
-						regionPath->set(i,j,getReplaceVal());
-					}
+				for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
+					if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.negative->isChecked()) {
+						regionPath->set(bidimvec<int>(i,j)-offset,replaceVal);
+					} else {
+						regionPath->set(bidimvec<int>(i,j)-offset,image->point(i,j));
+                    }
+
 				}
-				progress.setValue(i);
+				progress.setValue(i-rectRegion.left());
 			}
+            regionPath->TscanBrightness();
 			regionPhys=nparent->replacePhys(regionPath,regionPhys);
 		}
 	}
-	qDebug() << region->poly(region->numPoints).toPolygon().size();
 }
 
 void nRegionPath::doMask() {
