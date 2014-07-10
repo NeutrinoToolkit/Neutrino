@@ -760,6 +760,11 @@ public:
 			Timg_buffer[xy] = val;
 	}
 
+	inline void set(bidimvec<size_t> p, T val) {
+		if (Timg_matrix && (p.x()<getW()) && (p.y()<getH()))
+			Timg_matrix[p.y()][p.x()] = val;
+	}
+
 	const std::vector<double> &get_histogram()
 	{
 		if (width*height == 0) {

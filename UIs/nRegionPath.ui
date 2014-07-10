@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>204</width>
-    <height>140</height>
+    <height>192</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
     <item row="1" column="0" colspan="2">
      <widget class="QComboBox" name="defaultValue">
       <property name="neutrinoSave" stdset="0">
@@ -53,12 +53,17 @@
       </item>
       <item>
        <property name="text">
-        <string>0</string>
+        <string>Zero</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>&lt;value below&gt;</string>
        </property>
       </item>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="4" column="0">
      <widget class="QPushButton" name="doIt">
       <property name="font">
        <font>
@@ -70,7 +75,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="4" column="1">
      <widget class="QPushButton" name="doMask">
       <property name="font">
        <font>
@@ -93,6 +98,27 @@
        </font>
       </property>
       <property name="neutrinoImage" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QCheckBox" name="crop">
+      <property name="text">
+       <string>Crop</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QCheckBox" name="negative">
+      <property name="text">
+       <string>Negative</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QLineEdit" name="replace">
+      <property name="NeutrinoSave" stdset="0">
        <bool>true</bool>
       </property>
      </widget>
@@ -185,6 +211,15 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>image</tabstop>
+  <tabstop>defaultValue</tabstop>
+  <tabstop>replace</tabstop>
+  <tabstop>crop</tabstop>
+  <tabstop>negative</tabstop>
+  <tabstop>doIt</tabstop>
+  <tabstop>doMask</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/neutrino.qrc"/>
  </resources>
