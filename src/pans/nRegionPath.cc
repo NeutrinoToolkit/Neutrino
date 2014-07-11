@@ -105,27 +105,35 @@ void nRegionPath::doMask() {
 		if (image) {
 			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
 			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-			nPhysD *regionPath = new nPhysD(rectRegion.width(),rectRegion.height(),getReplaceVal());
+            double defValue=my_w.negative->isChecked()? 1.0: 0.0;
+			nPhysD *regionPath = new nPhysD();
+            bidimvec<int> offset(0,0);
+            if (my_w.crop->isChecked()) {
+                regionPath = new nPhysD(rectRegion.width(), rectRegion.height(),defValue);
+                offset+=bidimvec<int>(rectRegion.x(), rectRegion.y());
+                regionPath->set_origin(image->get_origin()-offset);
+            } else {
+                regionPath = new nPhysD(image->getW(),image->getH(),defValue);
+            }
 			regionPath->setShortName("Region mask");
 			regionPath->setName("mask");
-			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
-			QProgressDialog progress("Extracting", "Stop", 0, regionPath->getW(), this);
+			QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
 			progress.setWindowModality(Qt::WindowModal);
 			progress.show();
-			QTime time;
-			time.start();
-			for (register size_t i=0; i<regionPath->getW(); i++) {
+			for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
 				if (progress.wasCanceled()) break;
 				QApplication::processEvents();
-				for (register size_t j=0; j<regionPath->getH(); j++) {
-					if (regionPoly.containsPoint(QPoint(i+rectRegion.x(),j+rectRegion.y()),Qt::WindingFill)) {
-						regionPath->set(i,j,1);
-					}
+				for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
+					if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.negative->isChecked()) {
+						regionPath->set(bidimvec<int>(i,j)-offset,0.0);
+					} else {
+						regionPath->set(bidimvec<int>(i,j)-offset,1.0);
+                    }
+                    
 				}
-				progress.setValue(i);
+				progress.setValue(i-rectRegion.left());
 			}
-			regionPath->TscanBrightness();
-//			qDebug() << ">>>>>>>>>>>>>>>>> time " << time.elapsed();
+            regionPath->TscanBrightness();
 			regionPhys=nparent->replacePhys(regionPath,regionPhys);
 		}
 	}
