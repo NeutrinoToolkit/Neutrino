@@ -1070,11 +1070,15 @@ neutrino::createQimage() {
 
 // Export
 
-void neutrino::exportGraphics () {    
-    int ceppa=QApplication::queryKeyboardModifiers();
+void neutrino::exportGraphics () { 
+#if defined(Q_OS_WIN)
+    int modifier=QApplication::keyboardModifiers();
+#else
+    int modifier=QApplication::queryKeyboardModifiers();
+#endif
 	QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
 	if (!fout.isEmpty()) {
-        if (ceppa == Qt::NoModifier) {
+        if (modifier == Qt::NoModifier) {
             exportGraphics(fout);
         } else {
             for (int i=0;i<physList.size() ; i++) {
