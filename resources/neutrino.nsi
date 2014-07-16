@@ -53,7 +53,7 @@ SetFileAttributes "libcfitsio.dll" HIDDEN
 SetFileAttributes "hdf5.dll" HIDDEN
 SetFileAttributes "hdf5_hl.dll" HIDDEN
 SetFileAttributes "libstdc++-6.dll" HIDDEN
-SetFileAttributes "Neutrino.dll" HIDDEN
+SetFileAttributes "Neutrino1.dll" HIDDEN
 SetFileAttributes "PyNeutrino.pyd" HIDDEN
 SetFileAttributes "nPython.ui" HIDDEN
 

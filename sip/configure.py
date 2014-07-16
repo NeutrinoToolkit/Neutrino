@@ -30,7 +30,11 @@ makefile = pyqtconfig.QtGuiModuleMakefile(
     installs=installs
 )
 
-makefile.extra_libs = ["Neutrino","qwt"]
+if sys.platform == 'win32' :
+	makefile.extra_libs = ["Neutrino1","qwt"]
+else :
+	makefile.extra_libs = ["Neutrino","qwt"]
+
 makefile.extra_lib_dirs = [".."]
 if sys.platform == 'win32' :
     makefile.extra_lib_dirs += ["..\\lib","C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\lib"]

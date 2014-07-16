@@ -69,7 +69,7 @@ win:
 	make release
 	cp -r ../deploy/* app
 	cp nPhysImage/libnPhys*.dll app
-	cp lib/Neutrino.dll app
+	cp lib/Neutrino1.dll app/Neutrino1.dll
 	cp resources/neutrino.nsi app 
 	cmd /c "cd sip & python configure.py & make"
 	cp sip/PyNeutrino.pyd app
