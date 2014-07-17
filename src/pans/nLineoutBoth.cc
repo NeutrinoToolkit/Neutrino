@@ -33,18 +33,17 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 {
 	my_w.setupUi(this);
 
+    my_w.statusBar->addPermanentWidget(my_w.autoscale, 0);
+    
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
+
+    connect(my_w.autoscale, SIGNAL(stateChanged(int)), this, SLOT(updateLastPoint(void)));
 
 	my_w.plot->enableAxis(QwtPlot::xTop);
 	my_w.plot->enableAxis(QwtPlot::yRight);
 	my_w.plot->enableAxis(QwtPlot::xBottom);
 	my_w.plot->enableAxis(QwtPlot::yLeft);
 	
-	my_w.minValX->setValidator(new QDoubleValidator(this));
-	my_w.maxValX->setValidator(new QDoubleValidator(this));
-	my_w.minValY->setValidator(new QDoubleValidator(this));
-	my_w.maxValY->setValidator(new QDoubleValidator(this));
-
 	QPen marker_pen;
 	marker_pen.setColor(QColor(255,0,0));
 	marker.setLineStyle(QwtPlotMarker::Cross);
@@ -125,33 +124,28 @@ nLineoutBoth::mouseAtMatrix(QPointF p) {
 			}
 		}
 
-		for (int k=0;k<2;k++) {
-			qDebug() << "Axis" << k << curve[k].xAxis() << curve[k].minXValue() << curve[k].minXValue();
-			qDebug() << "Axis" << k << curve[k].yAxis() << curve[k].minYValue() << curve[k].minYValue();
-		}
-
-		double minx = curve[0].minYValue();
-		double maxx = curve[0].maxYValue();
-		
-		double miny = curve[1].minXValue();
-		double maxy = curve[1].maxXValue();
-		
-		bool ok;
-		double valtmp;
-		
-		valtmp = my_w.minValX->text().toDouble(&ok);
-		if (ok) minx = valtmp;
-		valtmp = my_w.maxValX->text().toDouble(&ok);
-		if (ok) maxx = valtmp;
-		valtmp = my_w.minValY->text().toDouble(&ok);
-		if (ok) miny = valtmp;
-		valtmp = my_w.maxValY->text().toDouble(&ok);
-		if (ok) maxy = valtmp;
-		
-		
+        if (my_w.autoscale->isChecked()) {
+            double minx = curve[0].minYValue();
+            double maxx = curve[0].maxYValue();
+            
+            double miny = curve[1].minXValue();
+            double maxy = curve[1].maxXValue();
+            
+            my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
+            my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
+            my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
+        } else {
+            double mini=nparent->colorMin;
+            double maxi=nparent->colorMax;
+            if (nparent->colorRelative) {
+                mini=currentBuffer->Tminimum_value+nparent->colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+                maxi=currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
+                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
+            }
+        }
+        
 		my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
-		my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
-		my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
 		my_w.plot->setAxisScale(curve[1].yAxis(),curve[1].maxYValue(), curve[1].minYValue(), 0);
 		my_w.plot->replot();
 	}		

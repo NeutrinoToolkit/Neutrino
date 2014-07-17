@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
-    <height>386</height>
+    <width>356</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,11 +23,11 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
+   <layout class="QGridLayout" name="gridLayout">
     <property name="margin">
-     <number>4</number>
+     <number>0</number>
     </property>
-    <item row="0" column="0" colspan="4">
+    <item row="0" column="0">
      <widget class="QwtPlot" name="plot">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -38,86 +38,17 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QLineEdit" name="minValX">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
+     <widget class="QCheckBox" name="autoscale">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
        </font>
       </property>
-      <property name="toolTip">
-       <string>Lower value</string>
+      <property name="text">
+       <string>Autoscale</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>X cut min</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="maxValX">
-      <property name="enabled">
+      <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Higher value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>X cut max</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLineEdit" name="minValY">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Lower value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>Y cut min</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="3">
-     <widget class="QLineEdit" name="maxValY">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Higher value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>Y cut max</string>
       </property>
      </widget>
     </item>
