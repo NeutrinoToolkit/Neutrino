@@ -108,6 +108,8 @@ void nGhost::doGhost () {
        
         double weight=my_w.weight->value();
 
+//        nPhysD *ceppa=new nPhysD(morlet.getW(),morlet.getH(),0.0);
+
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr_ghost = xx[x]*cr_ghost - yy[y]*sr_ghost;
@@ -124,13 +126,17 @@ void nGhost::doGhost () {
                 
                 double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
+//                ceppa->set(x,y,e_tot);
                 morlet.Timg_matrix[y][x]=imageFFT->Timg_matrix[y][x] * e_tot; 
 
             }
         }
+//        ceppa->TscanBrightness();
+//        nparent->addPhys(ceppa);
 
         morlet = morlet.ft2(PHYS_BACKWARD);
-                
+        
+        
         nPhysD *deepcopy=new nPhysD();
         *deepcopy=imageShot->copy();
         deepcopy->setShortName("deghost");

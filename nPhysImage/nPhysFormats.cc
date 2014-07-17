@@ -2080,8 +2080,6 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 	std::vector <nPhysImageF<double> *> retPhys;
 	size_t last_idx=0;
 	
-	WARNING("DEBUG in warning for release!");
-	
 	string ext=fname;
 	last_idx = fname.find_last_of(".");
 	if (string::npos != last_idx) {
@@ -2163,7 +2161,6 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 		
 	if (datamatrix) retPhys.push_back(datamatrix);
 	for (size_t i=0;i<retPhys.size();i++) {
-		WARNING("DEBUG in warning for release! -> "<< i );
 		
 		std::ostringstream ss;
 		if (retPhys.size()>1) {

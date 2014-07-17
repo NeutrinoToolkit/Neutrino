@@ -645,7 +645,6 @@ void neutrino::fileOpen()
 void neutrino::fileOpen(QStringList fnames) {
 	setProperty("fileOpen", fnames);
 	foreach (QString fname, fnames) {
-		qDebug() << " opening " << fname;
 		vector <nPhysD *> imagelist = fileOpen(fname);
 		if (imagelist.size()==0 && QFileInfo(fname).suffix().toLower()!="h5"){
 			QString vwinname="OpenRaw";
