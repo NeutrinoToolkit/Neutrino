@@ -769,6 +769,7 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 		TIFFSetWarningHandler(NULL);
 		TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
 		TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
+		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 		TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
 		TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
