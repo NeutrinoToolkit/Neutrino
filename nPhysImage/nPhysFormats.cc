@@ -780,11 +780,14 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 		TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, my_phys->getW());
 		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, my_phys->getH());
-// 		TIFFSetField(tif, TIFFTAG_XRESOLUTION, my_phys->get_scale().x());
-// 		TIFFSetField(tif, TIFFTAG_YRESOLUTION, my_phys->get_scale().y());
-// 		
-// 		TIFFSetField(tif, TIFFTAG_XPOSITION, my_phys->get_origin().x());
-// 		TIFFSetField(tif, TIFFTAG_YPOSITION, my_phys->get_origin().y());
+		float scalex=my_phys->get_scale().x();
+ 		TIFFSetField(tif, TIFFTAG_XRESOLUTION, scalex);
+		float scaley=my_phys->get_scale().y();
+ 		TIFFSetField(tif, TIFFTAG_YRESOLUTION, scaley);
+		float origx=my_phys->get_origin().x();
+		TIFFSetField(tif, TIFFTAG_XPOSITION, origx);
+		float origy=my_phys->get_origin().y();
+		TIFFSetField(tif, TIFFTAG_XPOSITION, origy);
 		TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8*sizeof(float));
 		DEBUG("tiff " << TIFFScanlineSize(tif) << " " << my_phys->getW() <<  " " << my_phys->getH());
 		unsigned char *buf = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(tif));

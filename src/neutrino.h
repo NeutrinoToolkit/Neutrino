@@ -114,7 +114,7 @@ public:
 	QMap<QString, unsigned char *> nPalettes;
 
 public slots:
-	nGenericPan* existsPan(QString, bool=false);
+	nGenericPan* existsPan(QString);
 	QList<nGenericPan*> getPans();
 
 
