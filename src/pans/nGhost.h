@@ -47,8 +47,11 @@ public:
 	QPointer<nRect> region;
 
     nPhysD *ghostBusted;
-    nPhysC *imageFFT;
+    nPhysC imageFFT;
     nPhysC morlet;
+
+    nPhysD *filter;
+
     std::vector<int> xx, yy;
     
 public slots:

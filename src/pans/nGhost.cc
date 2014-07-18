@@ -28,7 +28,7 @@
 // physGhosts
 
 nGhost::nGhost(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+: nGenericPan(nparent, winname), ghostBusted(NULL)
 {
 	my_w.setupUi(this);
 
@@ -46,14 +46,11 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
     
-    ghostBusted=NULL;
-    imageFFT=NULL;
 }
 
 void nGhost::checkChangeCombo(QComboBox *combo) {
 	if (combo==my_w.shot) {
-        delete imageFFT;
-        imageFFT=NULL;
+        imageFFT.resize(0,0);
 	}
 }
 
@@ -86,16 +83,17 @@ void nGhost::doGhost () {
         size_t dy=imageShot->getH();
         
         
-        if (imageFFT == NULL) {
-            imageFFT = new nPhysC();
-            *imageFFT=imageShot->ft2(PHYS_FORWARD);
+        if (imageFFT.getSurf() == 0) {
+            imageFFT = imageShot->ft2(PHYS_FORWARD);
             xx.resize(dx);
             yy.resize(dy);
             for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
             for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
             morlet.resize(dx,dy);
         }
-        
+
+        filter = new nPhysD(dx,dy,0,"Filter");
+                
         double cr_ghost = cos((my_w.angleCarrier->value()) * _phys_deg); 
         double sr_ghost = sin((my_w.angleCarrier->value()) * _phys_deg);
         double thick_ghost=my_w.thicknessGhost->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
@@ -107,8 +105,6 @@ void nGhost::doGhost () {
         double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dx,2));
        
         double weight=my_w.weight->value();
-
-//        nPhysD *ceppa=new nPhysD(morlet.getW(),morlet.getH(),0.0);
 
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
@@ -126,8 +122,8 @@ void nGhost::doGhost () {
                 
                 double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
-//                ceppa->set(x,y,e_tot);
-                morlet.Timg_matrix[y][x]=imageFFT->Timg_matrix[y][x] * e_tot; 
+                filter->set(x,y,e_tot);
+                morlet.Timg_matrix[y][x]=imageFFT.Timg_matrix[y][x] * e_tot; 
 
             }
         }
@@ -158,6 +154,11 @@ void nGhost::doGhost () {
             ghostBusted=deepcopy;
         }
         nparent->showPhys(ghostBusted);
+        
+        filter->fftshift();
+        filter->TscanBrightness();
+        nparent->addPhys(filter);
+        
         my_w.erasePrevious->setEnabled(true);
 
 	}

@@ -475,7 +475,6 @@ physShort_img::physShort_img(string ifilename)
 		buffer2.resize(skipbyte);
 		ifile.read((char *)&buffer2[0],skipbyte);		
 		property["info"]=buffer2;
-		DEBUG("Hamamatsu " << w << " " << h << " " << ifile.tellg());
 		//			fseek(fin, skipbyte, SEEK_CUR);
 	} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
 	   	ifile.read((char *)&buffer,sizeof(unsigned short));
@@ -490,7 +489,6 @@ physShort_img::physShort_img(string ifilename)
 			h=buffer;
 		}
 	   	ifile.read((char *)&buffer,sizeof(unsigned short));
-	   	DEBUG("ARP " << buffer << " " << skipbyte << " " << w  << " " << h);
 	} else { // LIL images
 		ifile.seekg(ios_base::beg);
 		vector<unsigned int>lil_header (4);
@@ -502,8 +500,8 @@ physShort_img::physShort_img(string ifilename)
 			h=lil_header[2];
 		}
 	}
-	DEBUG(5, "w "<< w << " h "<<h);
-	
+    property[string(__FUNCTION__)+"_skip"]=(int)ifile.tellg();
+
 	if (w*h>0) {
 		this->resize(w, h);
 	   	ifile.read((char *)Timg_buffer,sizeof(unsigned short)*w*h);

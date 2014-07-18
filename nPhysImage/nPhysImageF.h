@@ -726,7 +726,7 @@ public:
 	}
 
 	inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
-		if ((Timg_matrix != NULL) && (p.x()<getW()) && (p.y()<getH()))
+		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()))
 			return Timg_matrix[p.y()][p.x()];
 		else
 			return nan_value;
@@ -1017,11 +1017,10 @@ nPhysImageF<T>::~nPhysImageF()
 {
 //	std::cerr<<"Destructor for "<<object_name<<std::endl;
 	// check for copied instances
-	DEBUG(5,"["<<(void *)this<<"]"<<  getName() << " short: " << getShortName() << " from: " << getFromName());
 
 	int trashDelete=_trash_delete();
 	if ( trashDelete == 0 ) {
-		DEBUG(1,"ALLOWING DELETE! ");
+        DEBUG(1,"["<<(void *)this<<"] "<<  getShortName() << " : " << getName() << " ALLOWING DELETE! " );
 		if (Timg_buffer != NULL)
 			delete Timg_buffer;
 		
@@ -1047,7 +1046,7 @@ nPhysImageF<T>::~nPhysImageF()
 		delete _n_inst; // FIXME alex: check this
 		// end tom
 	} else {
-		DEBUG(1," NOT ALLOWING DELETE! " << trashDelete );
+        DEBUG(1,"["<<(void *)this<<"] "<<  getShortName() << " : " << getName() << " NOT ALLOWING DELETE! " << trashDelete );
 	}
 
 }

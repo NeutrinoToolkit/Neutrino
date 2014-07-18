@@ -1496,9 +1496,10 @@ neutrino::closeCurrentBuffer() {
 					break;
 			}
 		} else {
-			removePhys(currentBuffer);			
+			removePhys(currentBuffer);	
 		}
 	}
+    QApplication::processEvents();
 }
 
 nGenericPan*
