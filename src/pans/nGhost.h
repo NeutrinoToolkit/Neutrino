@@ -49,9 +49,7 @@ public:
     nPhysD *ghostBusted;
     nPhysC imageFFT;
     nPhysC morlet;
-
-    nPhysD *filter;
-
+    
     std::vector<int> xx, yy;
     
 public slots:

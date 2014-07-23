@@ -92,7 +92,7 @@ void nGhost::doGhost () {
             morlet.resize(dx,dy);
         }
 
-        filter = new nPhysD(dx,dy,0,"Filter");
+//        nPhysD *filter = new nPhysD(dx,dy,0,"Filter");
                 
         double cr_ghost = cos((my_w.angleCarrier->value()) * _phys_deg); 
         double sr_ghost = sin((my_w.angleCarrier->value()) * _phys_deg);
@@ -122,7 +122,7 @@ void nGhost::doGhost () {
                 
                 double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
-                filter->set(x,y,e_tot);
+//                filter->set(x,y,e_tot);
                 morlet.Timg_matrix[y][x]=imageFFT.Timg_matrix[y][x] * e_tot; 
 
             }
@@ -155,9 +155,9 @@ void nGhost::doGhost () {
         }
         nparent->showPhys(ghostBusted);
         
-        filter->fftshift();
-        filter->TscanBrightness();
-        nparent->addPhys(filter);
+//        filter->fftshift();
+//        filter->TscanBrightness();
+//        nparent->addPhys(filter);
         
         my_w.erasePrevious->setEnabled(true);
 

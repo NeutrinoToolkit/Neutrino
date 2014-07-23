@@ -145,9 +145,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
 	connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
 	connect(my_w.actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
-#ifdef __phys_HDF
 	connect(my_w.actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
-#endif
 	connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
 
 	connect(my_w.actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
@@ -661,23 +659,18 @@ void neutrino::openFile(QString fname) {
 	fileOpen(fname);
 }
 
-vector <nPhysD *> neutrino::fileOpen(QString fname, QString optString) {
+vector <nPhysD *> neutrino::fileOpen(QString fname) {
 	vector <nPhysD *> imagelist;
 	if (QFileInfo(fname).suffix().toLower()=="neus") {
 		imagelist=openSession(fname);
 	} else {
-		imagelist=phys_open(fname.toUtf8().constData(),optString.toUtf8().constData());
+		imagelist=phys_open(fname.toUtf8().constData());
 	}
 	if (imagelist.size()==0) {
 		// resta quasi solo QImage
 		if (QFileInfo(fname).suffix().toLower()=="h5") {
 #ifdef __phys_HDF
-			QString vwinname="HDF5";
-			nHDF5 *openHDF5=(nHDF5 *)existsPan(vwinname);
-			if (!openHDF5) {
-				openHDF5 = new nHDF5(this, vwinname);
-			}
-			openHDF5->showFile(fname);
+			static_cast<nHDF5*>(openHDF5())->showFile(fname);
 #endif
 		} else {
 			QImage image(fname);
@@ -850,6 +843,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						} else {
 							delete my_phys;
 						}
+                        
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
@@ -1391,7 +1385,7 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.fits);; Any files (*)");
+	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
 }
 
 void
@@ -1428,8 +1422,6 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 #ifdef __phys_HDF
 		} else if (suffix.startsWith("hdf")) {
 			ret = phys_write_HDF4(phys,fname.toUtf8().constData());
-		} else if (suffix.startsWith("h5")) {
-			ret = phys_write_HDF5(phys,fname.toUtf8().constData());
 #endif
 		} else {
 			ret = phys->writeASC(fname.toUtf8().constData());
@@ -1835,16 +1827,16 @@ void neutrino::print()
 	}
 }
 
-#ifdef __phys_HDF
 /// HDF5 treeview
 nGenericPan*
 neutrino::openHDF5() {
 	QString namepad=tr("HDF5");
 	nGenericPan *win = existsPan(namepad);
+#ifdef __phys_HDF
 	if (!win) win = new nHDF5(this, namepad);
+#endif
 	return win;
 }
-#endif
 
 
 /// rectangle lineout

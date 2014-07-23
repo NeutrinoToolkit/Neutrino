@@ -122,16 +122,18 @@ neutrino-HDF {
 	DEFINES += __phys_HDF
 
 	macx {
-		LIBS+=-lmfhdf -ldf -ljpeg -lz -lm -lhdf5
+		LIBS+=-lmfhdf -ldf -ljpeg -lz -lm -lhdf5 -lhdf5_hl
 	}
 
 	win32 {
-		INCLUDEPATH += "C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\include"
-	        LIBS += -L"C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\lib"
-	        LIBS += -lmfhdfdll -lhdfdll -lhdf5 -l hdf5_hl
-	        LIBS -= -ljpeg -lm -lmfhdf -ldf
-	        INCLUDEPATH += "C:\\compile\\HDF_Group\\HDF5\\1.8.10\\include"
-	        LIBS += -L"C:\\compile\\HDF_Group\\HDF5\\1.8.10\\lib"
+        INCLUDEPATH += "C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\include"
+        LIBS += -L"C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\lib"
+        LIBS += -lmfhdfdll -lhdfdll -lhdf5 -l hdf5_hl
+        
+        LIBS -= -ljpeg -lm -lmfhdf -ldf
+        
+        INCLUDEPATH += "C:\\compile\\HDF_Group\\HDF5\\1.8.10\\include"
+        LIBS += -L"C:\\compile\\HDF_Group\\HDF5\\1.8.10\\lib"
 	}
 
 	unix:!macx {

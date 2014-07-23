@@ -83,14 +83,12 @@ public:
 		return get_d();
 	}
 
-
 	operator std::string() const {
 		if (ddescr == any_none) {
 			DEBUG("accessing uninitialized value");
 		} else if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
 		return get_str();
 	}
-
 
 	template<class T> operator bidimvec<T>() const {
 		if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");

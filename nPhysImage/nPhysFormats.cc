@@ -500,8 +500,9 @@ physShort_img::physShort_img(string ifilename)
 			h=lil_header[2];
 		}
 	}
-    property[string(__FUNCTION__)+"_skip"]=(int)ifile.tellg();
-
+	stringstream oss;
+	oss<<ifile.tellg();
+    property["Skip bytes"]=oss.str();
 	if (w*h>0) {
 		this->resize(w, h);
 	   	ifile.read((char *)Timg_buffer,sizeof(unsigned short)*w*h);
@@ -1663,307 +1664,34 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	return imagelist;
 }
 
-
-
-nPhysImageF<double> * phys_open_HDF5(std::string fileName, std::string dataName) {
-	nPhysD *my_data=NULL;
-	DEBUG(fileName << " " << dataName);
-#ifdef HAVE_LIBHDF5
-	hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-	if (fid >= 0) {
-		hid_t did = H5Dopen(fid,dataName.c_str(), H5P_DEFAULT);
-		if (did>=0) {
-			ssize_t sizeName=1+H5Iget_name(did, NULL,0);
-			char *ds_name=new char[sizeName];
-			H5Iget_name(did, ds_name,sizeName);	
-			hid_t sid = H5Dget_space(did);
-			hid_t tid = H5Dget_type(did);
-			
-			size_t tsiz = H5Tget_size(tid);
-			H5T_class_t t_class = H5Tget_class(tid);
-			
-			hid_t nativeType;
-			char *buffer = NULL;
-			int ndims=0;
-			hsize_t *dims=NULL;
-			
-			hid_t file_space_id=H5S_ALL;
-			int narray=1;
-			if (t_class == H5T_FLOAT) {
-				ndims=H5Sget_simple_extent_ndims(sid);
-				dims=new hsize_t[ndims];
-				H5Sget_simple_extent_dims(sid,dims,NULL);
-				int npoints=H5Sget_simple_extent_npoints(sid);
-				buffer = new char[tsiz*npoints];
-				nativeType=H5Tget_native_type(tid,H5T_DIR_DEFAULT);
-			} else if (t_class == H5T_COMPOUND) {
-				DEBUG(10, "compound");
-			} else if(t_class == H5T_ARRAY) {
-				ndims=H5Sget_simple_extent_ndims(sid);
-				DEBUG("ndims: " << ndims);
-				dims=new hsize_t[ndims];
-				H5Sget_simple_extent_dims(sid,dims,NULL);
-				for (int pippo=0;pippo<ndims;pippo++) {
-					narray*=dims[pippo];
-					DEBUG("dims[" << pippo << "]=" << dims[pippo]);
-				}
-				
-				delete dims;
-				
-				
-				ndims = H5Tget_array_ndims(tid);
-				dims=new hsize_t[ndims];
-				H5Tget_array_dims2(tid, dims);
-				buffer = new char[tsiz*narray];
-				DEBUG(5,"H5T_ARRAY " << dims[0] << " " << dims[1] << " tsiz " << tsiz << " narray " << narray);
-				DEBUG(5,"ALLOCATED " << tsiz * narray);
-				nativeType=H5Tget_native_type(H5Tget_super(tid),H5T_DIR_DEFAULT);
-			}
-			if (buffer && ndims==2) {
-				my_data=new nPhysD(ds_name);
-				my_data->setType(PHYS_FILE);
-				string strName(ds_name);
-				strName.erase(0,strName.find_last_of('/'));
-				my_data->setShortName(strName);
-				
-				for (int i = 0; i < H5Aget_num_attrs(did); i++) {
-					hid_t aid =	H5Aopen_idx(did, (unsigned int)i );
-					scan_hdf5_attributes(aid, my_data);
-					H5Aclose(aid);
-				}
-				
-				DEBUG("did " << did << " tid "<< tid << " sid "<< sid );
-				int status = H5Dread(did, tid, sid, file_space_id, H5P_DEFAULT, buffer);
-				DEBUG("status" << status);
-				my_data->resize(dims[1],dims[0]);
-				for (int na=0;na<narray;na++) {
-					DEBUG("na "<< na);
-					if (H5Tequal(nativeType,H5T_NATIVE_USHORT)) {
-						for (size_t k=0;k<my_data->getSurf();k++) {
-							my_data->set(k,my_data->point(k)+((unsigned short*) buffer)[k]);
-						}
-					} else if (H5Tequal(nativeType,H5T_NATIVE_INT)) {
-						for (size_t k=0;k<my_data->getSurf();k++) {
-							my_data->set(k,my_data->point(k)+((int*) buffer)[k+na*my_data->getSurf()]);
-						}
-					} else if (H5Tequal(nativeType,H5T_NATIVE_UINT)) {
-						for (size_t k=0;k<my_data->getSurf();k++) {
-							my_data->set(k,my_data->point(k)+((unsigned int*) buffer)[k+na*my_data->getSurf()]);
-						}
-					} else if (H5Tequal(nativeType,H5T_NATIVE_FLOAT)) {
-						for (size_t k=0;k<my_data->getSurf();k++) {
-							my_data->set(k,my_data->point(k)+((float*) buffer)[k+na*my_data->getSurf()]);
-						}
-					} else if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
-						for (size_t k=0;k<my_data->getSurf();k++) {
-							my_data->set(k,my_data->point(k)+((double*) buffer)[k+na*my_data->getSurf()]);
-						}
-					}
-				}
-				for (size_t k=0;k<my_data->getSurf();k++) {
-					my_data->set(k,my_data->point(k)/narray);
-				}
-				
-			}
-			
-			delete [] ds_name;
-			delete [] dims;
-			delete [] buffer;
-			H5Tclose(tid);
-			H5Sclose(sid);				
-			H5Dclose(did);
-			H5Fclose(fid);
-		}
-	}
-#endif
-	if (my_data) my_data->TscanBrightness();
-	return my_data;
-}
-
-
-#ifdef HAVE_LIBHDF5
-void scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
-	ssize_t len = 1+H5Aget_name(aid, 0, NULL );
-	char *attrName=new char[len];
-	H5Aget_name(aid, len, attrName );
 	
-	hid_t aspace = H5Aget_space(aid); /* the dimensions of the attribute data */
-	hid_t atype  = H5Aget_type(aid);
-	H5A_info_t aInfo;
-	H5Aget_info(aid, &aInfo);
-	hid_t nativeType = H5Tget_native_type(atype,H5T_DIR_DEFAULT);
-	hid_t classAType=H5Tget_class(atype);
-	if (classAType ==  H5T_FLOAT) {
-		if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
-			int nelem=aInfo.data_size/sizeof(double);
-			double *val=new double[nelem];
-			if (H5Aread(aid, nativeType, (void*)val) >= 0) {
-				if (my_data && nelem==2) {
-					if (strcmp(attrName,"physOrigin")==0) {
-						my_data->set_origin(val[0],val[1]);
-					} else if (strcmp(attrName,"physScale")==0) {
-						my_data->set_scale(val[0],val[1]);
-					}
-				}
-			}
-			delete [] val;
-		}
-	} else if (classAType ==  H5T_INTEGER) {
-		int nelem=aInfo.data_size/sizeof(int);
-		int *val=new int[nelem];
-		if (H5Aread(aid, nativeType, (void*)val) >= 0) {
-		}
-		delete [] val;
-	} else if (classAType == H5T_STRING) {
-		char *val =NULL;
-		if (my_data) {
-			int sizeStr=1+aInfo.data_size;
-			val=new char[sizeStr];
-			if (H5Aread(aid, nativeType, val) >= 0) {
-				if (my_data) {
-					if (strcmp(attrName,"physShortName")==0) my_data->setShortName(string(val));
-					if (strcmp(attrName,"physName")==0) my_data->setName(string(val));
-				}
-			}
-		} else {
-			hssize_t ssiz=H5Sget_simple_extent_npoints(aspace);
-			size_t tsiz=H5Tget_size(atype);
-			int sizeStr=ssiz*tsiz;
-			//			hsize_t dims=0;
-			if( sizeStr >= 0) {
-				val = new char[sizeStr];		
-				if (H5Aread(aid, nativeType, val) >= 0) {
-					if (H5Tis_variable_str(atype)) {
-						// use this *((char**) val);					
-					} else {
-						// use this val);
-					}
-				}
-			}
-			
-		}
-		delete [] val;
-	}
-	delete [] attrName;
-	H5Tclose(atype);
-	H5Sclose(aspace);
-}
-#endif
-
 int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
 	if (phys) {
 		intn istat=0;
 		int32 sd_id = SDstart(fname, DFACC_CREATE);
 		if (sd_id != FAIL) {
-			istat += phys_write_HDF4_SD(phys,sd_id);
+			int32 start[2], dimsizes[2];
+			dimsizes[0]=phys->getH();
+			dimsizes[1]=phys->getW();
+			start[0]=0;
+			start[1]=0;
+			int32 sds_id=SDcreate(sd_id, phys->getName().c_str(), DFNT_FLOAT64, 2, dimsizes);
+			comp_info c_info;
+			c_info.deflate.level=6;
+			istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
+			istat+=SDwritedata(sds_id, start, NULL, dimsizes, (VOIDP)phys->Timg_buffer);
+			double data[2];
+			data[0]=phys->get_origin().x();
+			data[1]=phys->get_origin().y();
+			istat+=SDsetattr(sds_id, "physOrigin", DFNT_FLOAT64, 2, data);
+			data[0]=phys->get_scale().x();
+			data[1]=phys->get_scale().y();
+			istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, data);
+			istat+=SDendaccess(sds_id);
 			istat += SDend(sd_id);
 		}
 		return istat;
-	}
-#endif
-	return -1;
-}
-
-#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
-int phys_write_HDF4_SD(nPhysImageF<double> * phys, int sd_id) {
-	intn istat=0;
-	int32 start[2], dimsizes[2];
-	dimsizes[0]=phys->getH();
-	dimsizes[1]=phys->getW();
-	start[0]=0;
-	start[1]=0;
-	int32 sds_id=SDcreate(sd_id, phys->getName().c_str(), DFNT_FLOAT64, 2, dimsizes);
-	comp_info c_info;
-	c_info.deflate.level=6;
-	istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
-	istat+=SDwritedata(sds_id, start, NULL, dimsizes, (VOIDP)phys->Timg_buffer);
-	double data[2];
-	data[0]=phys->get_origin().x();
-	data[1]=phys->get_origin().y();
-	istat+=SDsetattr(sds_id, "physOrigin", DFNT_FLOAT64, 2, data);
-	data[0]=phys->get_scale().x();
-	data[1]=phys->get_scale().y();
-	istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, data);
-	istat+=SDendaccess(sds_id);
-	return sds_id;
-}
-#endif
-
-// int phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
-// #ifdef __phys_HDF
-// 	hid_t	   file_id;
-// 	hsize_t	 dims[2]={phys->getH(),phys->getW()};
-// 	herr_t	  status;
-// 
-// 	file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-//		status = H5LTmake_dataset(file_id,"neutrino",2,dims,H5T_NATIVE_DOUBLE,phys->Timg_buffer);
-// 	status= H5LTset_attribute_string(file_id,"/","version", __VER);
-// 	double data[2];
-// 	data[0]=phys->get_origin().x();
-// 	data[1]=phys->get_origin().y();
-// 	status= H5LTset_attribute_double(file_id,"neutrino","physOrigin", data, 2);
-// 	data[0]=phys->get_scale().x();
-// 	data[1]=phys->get_scale().y();
-// 	status= H5LTset_attribute_double(file_id,"neutrino","physScale", data, 2);
-// 	status= H5LTset_attribute_string(file_id,"neutrino","physName", phys->getName().c_str());
-// 	status= H5LTset_attribute_string(file_id,"neutrino","physShortName", phys->getShortName().c_str());
-// 
-//		cerr << "[hdf5] status " << status << endl;
-//  	status = H5Fclose (file_id);
-// #endif
-// }
-
-bool phys_is_HDF5(std::string fileName) {
-#ifdef HAVE_LIBHDF5
-	hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-	if (fid >= 0) {
-		H5Fclose(fid);
-		return true;
-	}
-#endif
-	return false;
-}
-
-int phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
-#ifdef HAVE_LIBHDF5
-	if (phys) {
-		if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
-			unsigned int	filter_info;
-			herr_t status = H5Zget_filter_info (H5Z_FILTER_DEFLATE, &filter_info);
-			if ( (filter_info & H5Z_FILTER_CONFIG_ENCODE_ENABLED) && (filter_info & H5Z_FILTER_CONFIG_DECODE_ENABLED) ) {
-				hid_t file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-				
-				hsize_t dims[2]={phys->getH(),phys->getW()};
-				hid_t space = H5Screate_simple (2, dims, NULL);
-				
-				hid_t dcpl = H5Pcreate (H5P_DATASET_CREATE);
-				status = H5Pset_deflate (dcpl, 9);
-				hsize_t chunk[2] = {4, 8};
-				status = H5Pset_chunk (dcpl, 2, chunk);
-				
-				hid_t dset = H5Dcreate (file_id, "/neutrino", H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT);
-				status = H5Dwrite (dset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, phys->Timg_buffer);
-				
-				status= H5LTset_attribute_string(file_id,"/","version", __VER);
-				double data[2];
-				data[0]=phys->get_origin().x();
-				data[1]=phys->get_origin().y();
-				status= H5LTset_attribute_double(file_id,"neutrino","physOrigin", data, 2);
-				data[0]=phys->get_scale().x();
-				data[1]=phys->get_scale().y();
-				status= H5LTset_attribute_double(file_id,"neutrino","physScale", data, 2);
-				status= H5LTset_attribute_string(file_id,"neutrino","physName", phys->getName().c_str());
-				status= H5LTset_attribute_string(file_id,"neutrino","physShortName", phys->getShortName().c_str());
-				
-				
-				status = H5Pclose (dcpl);
-				status = H5Dclose (dset);
-				status = H5Sclose (space);
-				status = H5Fclose (file_id);
-			}
-		}
-		return 0;
 	}
 #endif
 	return -1;
@@ -2075,7 +1803,7 @@ string gunzip (string filezipped) {
 	return fileunzipped;
 }
 
-std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string optarg) {
+std::vector <nPhysImageF<double> *> phys_open(std::string fname) {
 	std::vector <nPhysImageF<double> *> retPhys;
 	size_t last_idx=0;
 	
@@ -2139,8 +1867,6 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname, std::string opt
 	} else if (ext=="hdf") {
 		vector <nPhysImageF<double> *> imagelist=phys_open_HDF4(fname);
 		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
-	} else if (ext=="h5") {
-		if (!optarg.empty()) datamatrix = phys_open_HDF5(fname,optarg);
 	} else if (ext=="neu") {
 		vector <nPhysImageF<double> *> imagelist=phys_resurrect_binary(fname);
 		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());

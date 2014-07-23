@@ -41,11 +41,6 @@ extern "C" {
 #undef int8
 #endif
 
-#ifdef HAVE_LIBHDF5
-#include "hdf5.h"
-#include "hdf5_hl.h"
-#endif
-
 }
 
 // .alex. incredibile quanto bordello genera questo...
@@ -190,21 +185,12 @@ phys_write_tiff(nPhysImageF<double> *, const char *);
 //! HDF stuff
 std::vector <nPhysImageF<double> *> phys_open_HDF4(std::string);
 int phys_write_HDF4(nPhysImageF<double> *, const char*);
-int phys_write_HDF5(nPhysImageF<double> *, std::string);
 
-bool phys_is_HDF5 (std::string);
-
-nPhysImageF<double> * phys_open_HDF5(std::string, std::string);
-
-#ifdef HAVE_LIBHDF5
-int phys_write_HDF4_SD(nPhysImageF<double> *, int);
-void scan_hdf5_attributes(hid_t, nPhysImageF<double>*);
-#endif
 
 std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
 
 
-std::vector <nPhysImageF<double> *> phys_open(std::string,std::string=std::string());
+std::vector <nPhysImageF<double> *> phys_open(std::string);
 
 std::string gunzip(std::string);
 

@@ -109,8 +109,6 @@ AC_CHECK_LIB([gsl], [main])
 AC_CHECK_LIB([gslcblas], [main])
 
 
-AC_CHECK_LIB([hdf5], [main])
-AC_CHECK_LIB([hdf5_hl], [main])
 AC_CHECK_LIB([jpeg], [main])
 AC_CHECK_LIB([m], [main])
 

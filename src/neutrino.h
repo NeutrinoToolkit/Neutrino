@@ -172,7 +172,7 @@ public slots:
 
 	void openFile(QString);
 	void fileOpen();
-	std::vector<nPhysD*> fileOpen(QString, QString=QString());
+	std::vector<nPhysD*> fileOpen(QString);
 	void fileOpen(QStringList);
 	void fileReopen();
 
@@ -226,11 +226,7 @@ public slots:
 	nGenericPan* Hlineout();
 	nGenericPan* Vlineout();
 	nGenericPan* bothLineout();
-
-#ifdef __phys_HDF
 	nGenericPan* openHDF5();
-#endif
-
 	nGenericPan* BoxLineout();
 	nGenericPan* FindPeaks();
 	nGenericPan* CompareLines();
