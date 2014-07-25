@@ -85,23 +85,28 @@ unix:!macx {
 }        
 
 win32 {
+	CONFIG -= neutrino-HDF
+
 	ICON = ../resources/icons/icon.ico
-	QWT_ROOT = "C:\\compile\\qwt-6.0.1\\qwt-6.0.1"
+	QWT_ROOT = /c/compile/qwt-6.1.0
 	
 	LIBS += -L../lib	
 		
 	DEFINES += QT_NO_DEBUG
 	
 	# GNU32 subsys
-	INCLUDEPATH += "C:\\compile\\GnuWin32\\include"
-	LIBS +=  -L"C:\\compile\\GnuWin32\\lib"
+	INCLUDEPATH += /c/compile/GnuWin32/include
+	LIBS +=  -L/c/compile/GnuWin32/lib
 	
 	# qwt
-	INCLUDEPATH += "C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\src"
-	LIBS +=  -lqwt -L"C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\lib" -lfftw3-3
+	INCLUDEPATH += /c/compile/qwt-6.1.0/src
+	LIBS +=  -lqwt -L/c/compile/qwt-6.1.0/lib
+
+	INCLUDEPATH +=  /c/compile/fftw-3.3.4-dll32/
+	LIBS += -L/c/compile/fftw-3.3.4-dll32/ -lfftw3-3
 	
 	# fits
-    LIBS += -L"C:\\compile\\cfit3310"
+	LIBS += -L/c/compile/cfitsiodll_3360
 
 	DEFINES    += QT_DLL QWT_DLL
 	
@@ -126,14 +131,14 @@ neutrino-HDF {
 	}
 
 	win32 {
-        INCLUDEPATH += "C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\include"
-        LIBS += -L"C:\\compile\\HDF_Group\\HDFshared\\4.2.8\\lib"
+        INCLUDEPATH += /c/compile/HDF_Group/HDFshared/4.2.10/include
+        LIBS += -L/c/compile/HDF_Group/HDFshared/4.2.10/lib
         LIBS += -lmfhdfdll -lhdfdll -lhdf5 -l hdf5_hl
         
         LIBS -= -ljpeg -lm -lmfhdf -ldf
         
-        INCLUDEPATH += "C:\\compile\\HDF_Group\\HDF5\\1.8.10\\include"
-        LIBS += -L"C:\\compile\\HDF_Group\\HDF5\\1.8.10\\lib"
+        INCLUDEPATH += /c/compile/HDF_Group/HDF5/1.8.10/include
+        LIBS += -L/c/compile/HDF_Group/HDF5/1.8.10/lib
 	}
 
 	unix:!macx {
