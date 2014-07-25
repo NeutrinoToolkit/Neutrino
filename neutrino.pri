@@ -96,30 +96,22 @@ win32 {
 	
 	# GNU32 subsys
 	INCLUDEPATH += /c/compile/GnuWin32/include
-	LIBS +=  -L/c/compile/GnuWin32/lib
+	LIBS += -L/c/compile/GnuWin32/bin -L/c/compile/GnuWin32/lib
 	
 	# qwt
 	INCLUDEPATH += /c/compile/qwt-6.1.0/src
 	LIBS +=  -lqwt -L/c/compile/qwt-6.1.0/lib
 
-	INCLUDEPATH +=  /c/compile/fftw-3.3.4-dll32/
-	LIBS += -L/c/compile/fftw-3.3.4-dll32/ -lfftw3-3
-	
-	# fits
-	LIBS += -L/c/compile/cfitsiodll_3360
-
 	DEFINES    += QT_DLL QWT_DLL
 	
 	qtAddLibrary(qwt)
 	
-} else {
-	LIBS += -lfftw3
-}
+} 
 
 # physImage
 INCLUDEPATH += ../nPhysImage 
 #LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm -ldf -lcfitsio 
-LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm 
+LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm -lfftw3
 
 neutrino-HDF {
     LIBS += -lmfhdf -ldf -lhdf5

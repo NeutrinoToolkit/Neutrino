@@ -61,7 +61,7 @@ py: lib
 
 win:
 	#cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
-	cd nPhysImage && ./configure CFLAGS='-I/c/compile/fftw-3.3.4-dll32 -I/c/compile/GnuWin32/include -Ic:/compile/HDF_Group/HDFshared/4.2.8/include -I/c/compile/cfitsio' LDFLAGS='-L. -Lc:/compile/GnuWin32/lib -Lc:/compile/GnuWin32/bin -Lc:/compile/HDF_Group/HDFshared/4.2.8/lib -L/c/compile/fftw-3.3.4-dll32 -Lc:/compile/cfitsio'
+	cd nPhysImage && ./configure CFLAGS='-I/c/compile/GnuWin32/include -Ic:/compile/HDF_Group/HDFshared/4.2.8/include' LDFLAGS='-L. -Lc:/compile/GnuWin32/lib -Lc:/compile/GnuWin32/bin -Lc:/compile/HDF_Group/HDFshared/4.2.8/lib/'
 	make -C nPhysImage clean
 	make -C nPhysimage release
 	/c/Qt/4.8.6/bin/qmake 
