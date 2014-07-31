@@ -683,8 +683,6 @@ vector <nPhysD *> neutrino::fileOpen(QString fname) {
 							datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
 						}
 					}
-					datamatrix->TscanBrightness();
-					datamatrix->setType(PHYS_FILE);
 					imagelist.push_back(datamatrix);
 				} else {
 					nPhysD *datamatrix[3];
@@ -698,7 +696,6 @@ vector <nPhysD *> neutrino::fileOpen(QString fname) {
 						datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
 						datamatrix[k]->setFromName(fname.toStdString());
 						datamatrix[k]->resize(image.width(), image.height());
-						datamatrix[k]->setType(PHYS_FILE);
 						imagelist.push_back(datamatrix[k]);
 					}
 					for (int i=0;i<image.height();i++) {
@@ -709,7 +706,13 @@ vector <nPhysD *> neutrino::fileOpen(QString fname) {
 							datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
 						}
 					}
+					
 				}
+				for (size_t k=0;k<imagelist.size();k++) {
+					imagelist[k]->TscanBrightness();
+					imagelist[k]->setType(PHYS_FILE);
+				}
+				
 			}
 		}
 	}
