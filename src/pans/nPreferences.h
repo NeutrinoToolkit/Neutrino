@@ -48,7 +48,7 @@ public slots:
 	void changeFont();
 	void hideEvent(QHideEvent*);
 	void showEvent(QShowEvent*);
-	
+	void useDot();
 };
 
 #endif

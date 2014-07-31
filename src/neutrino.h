@@ -168,7 +168,7 @@ public slots:
 	// menu actions
 	void addMenuBuffers(nPhysD*);
 	// File
-	void fileNew();
+	neutrino* fileNew();
 
 	void openFile(QString);
 	void fileOpen();

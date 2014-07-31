@@ -619,11 +619,11 @@ QList<nGenericPan*> neutrino::getPans() {
 // file menu actions
 
 
-void neutrino::fileNew() {
-	QThread *m_thread = new QThread();
-	neutrino*my_neu= new neutrino();
-	my_neu->moveToThread(m_thread);
-	m_thread->start();
+neutrino* neutrino::fileNew() {
+//	QThread *m_thread = new QThread();
+	return new neutrino();
+//	my_neu->moveToThread(m_thread);
+//	m_thread->start();
 }
 
 void
@@ -2010,6 +2010,10 @@ void neutrino::loadDefaults(){
 			}
 		}
 	}
+    if (my_set.value("useDot",false).toBool()) {
+        DEBUG("here!!!!");
+        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    }
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
 	my_set.endGroup();

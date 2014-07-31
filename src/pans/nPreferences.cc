@@ -73,8 +73,16 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	my_w.labelFont->setFont(nparent->my_w.my_view->font());
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
-	
+	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
+}
 
+void nPreferences::useDot() {
+    if (my_w.useDot->isChecked()) {
+        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    } else {
+        QLocale::setDefault(QLocale::system());
+    }
+    my_w.statusBar->showMessage(QLocale::countryToString(QLocale().country()), 5000);
 }
 
 void nPreferences::changeShowDimPixel() {
