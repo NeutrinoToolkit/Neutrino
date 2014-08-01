@@ -26,7 +26,8 @@ SetFileAttributes "QtCore4.dll" HIDDEN
 SetFileAttributes "QtGui4.dll" HIDDEN
 SetFileAttributes "QtOpenGL4.dll" HIDDEN
 SetFileAttributes "QtSvg4.dll" HIDDEN
-SetFileAttributes "cfitsio.dll" HIDDEN
+SetFileAttributes "libcfitsio.dll" HIDDEN
+SetFileAttributes "jpeg62.dll" HIDDEN
 SetFileAttributes "libfftw3-3.dll" HIDDEN
 SetFileAttributes "libgcc_s_dw2-1.dll" HIDDEN
 SetFileAttributes "libgsl.dll" HIDDEN
@@ -37,6 +38,7 @@ SetFileAttributes "libtiff3.dll" HIDDEN
 SetFileAttributes "libwinpthread-1.dll" HIDDEN
 SetFileAttributes "qwt.dll" HIDDEN
 SetFileAttributes "zlib1.dll" HIDDEN
+SetFileAttributes "python27.dll" HIDDEN
 
 SetFileAttributes "libnPhysImageF.dll" HIDDEN
 SetFileAttributes "Neutrino1.dll" HIDDEN
