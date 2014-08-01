@@ -445,7 +445,7 @@
   <action name="actionRefresh2">
    <property name="icon">
     <iconset resource="../resources/neutrino.qrc">
-     <normaloff>:/icons/refresh2.svg</normaloff>:/icons/refresh2.svg</iconset>
+     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
     <string>refresh2</string>

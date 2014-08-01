@@ -15,7 +15,7 @@ endif
 colormaps:
 	cd resources/colormaps && qmake && make && ./colormaps
 	
-mac: colormaps doc
+mac: colormaps
 	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
 	cd nPhysImage && ./configure --enable-64 --prefix=/opt/local --with-cuda=/usr/local/cuda
 	make -C nPhysImage clean release
@@ -50,7 +50,7 @@ endif
 	cd resources/macPackage && sed -e "s/__VER/${VERSION}/g" sfondo-orig.svg > sfondo.svg; /Applications/Inkscape.app/Contents/Resources/bin/inkscape -f sfondo.svg -e sfondo.png && cd - 
 	rm -rf dmg
 	mkdir dmg
-	cp -r neutrino.app doc/html dmg
+	cp -r neutrino.app dmg
 	./resources/macPackage/createdmg.sh --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 508 480 --icon neutrino.app 100 90 --icon html 260 200 --app-drop-link 420 90 neutrino.dmg dmg && rm -rf dmg
 	mv neutrino.dmg neutrino-${VERSION}.dmg
 
