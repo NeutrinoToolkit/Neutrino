@@ -415,7 +415,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 			nan_free_phys[i]=m1.Tminimum_value;
 		}
 	}
-	fftw_complex *b2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*m1.getH()*(m1.getW()/2+1));
+	fftw_complex *b2 = fftw_alloc_complex(m1.getH()*(m1.getW()/2+1));
 	
 	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
 	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
@@ -456,7 +456,7 @@ phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius
 			nan_free_phys[i]=m1.Tminimum_value;
 		}
 	}
-	fftw_complex *b2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*m1.getH()*(m1.getW()/2+1));
+	fftw_complex *b2 = fftw_alloc_complex(m1.getH()*(m1.getW()/2+1));
 	
 	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
 	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
@@ -498,8 +498,8 @@ pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>* img1, nPh
 	if (dx == img2->getW() && dy== img2->getH()) {
 		nPhysD *rPhys=new nPhysD(dx,dy,0.0,"Result");
 		
-		fftw_complex *myData1C=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dy*(dx/2+1));
-		fftw_complex *myData2C=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dy*(dx/2+1));
+		fftw_complex *myData1C=fftw_alloc_complex(dy*(dx/2+1));
+		fftw_complex *myData2C=fftw_alloc_complex(dy*(dx/2+1));
 		
 		fftw_plan plan1R2C=fftw_plan_dft_r2c_2d(dy,dx, img1->Timg_buffer, myData1C, FFTW_ESTIMATE);
 		fftw_plan plan2R2C=fftw_plan_dft_r2c_2d(dy,dx, img2->Timg_buffer, myData2C, FFTW_ESTIMATE);

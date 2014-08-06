@@ -478,11 +478,10 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 	int cubuf_size = sizeof(cufftComplex)*ifg.getSurf();
 	
 	cufftHandle plan;
-	cufftComplex *b1,*b2;
 	cufftComplex *cub1, *cub2, *cub3, *cuc1, *cuc2;
 	
-	b1 = new cufftComplex [ifg.getSurf()];
-	b2 = new cufftComplex [ifg.getSurf()];
+	vector<cufftComplex> b1(ifg.getSurf());
+	vector<cufftComplex> b2(ifg.getSurf());
 	
 	for (size_t j = 0; j < ifg.getH(); j++){
 		for (size_t i = 0; i < ifg.getW(); i++) {
@@ -530,7 +529,7 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		return olist;
 	}
 
-	cudaMemcpy(cub1, b1, cubuf_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(cub1, &b1[0], cubuf_size, cudaMemcpyHostToDevice);
 
 	cufftExecC2C(plan, cub1, cub2, CUFFT_FORWARD);
 	if (cudaGetLastError()!=cudaSuccess) {
@@ -600,8 +599,8 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 		cudaThreadSynchronize();
 
 		if ((*wave_params.iter_ptr)!=-1) {
-			cudaMemcpy(b1, cuc1, cubuf_size, cudaMemcpyDeviceToHost);
-			cudaMemcpy(b2, cuc2, cubuf_size, cudaMemcpyDeviceToHost);
+			cudaMemcpy(&b1[0], cuc1, cubuf_size, cudaMemcpyDeviceToHost);
+			cudaMemcpy(&b2[0], cuc2, cubuf_size, cudaMemcpyDeviceToHost);
 			cudaThreadSynchronize();
 			
 			for (size_t k=0; k<ifg.getSurf(); k++) {
@@ -640,10 +639,7 @@ phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
 				(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
 			}
 		}
-		
-		delete [] b1;
-		delete [] b2;
-	
+			
 		cudaFree(cub1);
 		cudaFree(cub2);
 		cudaFree(cub3);
@@ -745,7 +741,7 @@ phys_guess_carrier(nPhysD &phys, double weight)
 	size_t dx=phys.getW();
 	size_t dy=phys.getH();
 	
-	fftw_complex *myData=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dy*(dx/2+1));
+	fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
 	fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
 	fftw_execute(plan);
 	

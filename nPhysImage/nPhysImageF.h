@@ -1401,8 +1401,8 @@ template<class T> inline nPhysImageF<mcomplex>
 nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 
 	// 1. allocation
-	fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width*height);
-	fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width*height);
+	fftw_complex *t = fftw_alloc_complex(width*height);
+	fftw_complex *Ft = fftw_alloc_complex(width*height);
 	
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
@@ -1452,8 +1452,8 @@ nPhysImageF<T>::ft1(enum phys_direction imgdir, enum phys_fft ftdir)
 		// horizontal
 
 		// 1. allocation
-		fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*getW());
-		fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*getW());
+		fftw_complex *t = fftw_alloc_complex(getW());
+		fftw_complex *Ft = fftw_alloc_complex(getW());
 		nPhysImageF<mcomplex> ftbuf;
 		ftbuf = nPhysImageF<mcomplex>(getW(), getH(), mcomplex(0.,0.));
 
@@ -1487,8 +1487,8 @@ nPhysImageF<T>::ft1(enum phys_direction imgdir, enum phys_fft ftdir)
 		// vertical
 	
 		// 1. allocation
-		fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*getH());
-		fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*getH());
+		fftw_complex *t = fftw_alloc_complex(getH());
+		fftw_complex *Ft = fftw_alloc_complex(getH());
 		nPhysImageF<mcomplex> ftbuf;
 		ftbuf = nPhysImageF<mcomplex>(getW(), getH(), mcomplex(0.,0.));
 
@@ -1563,8 +1563,8 @@ nPhysImageF<T>::getFFT(int direction) {
 	//	throw pIF_FFT_error;
 
 	// 1. allocation
-	fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width*height);
-	fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width*height);
+	fftw_complex *t = fftw_alloc_complex(width*height);
+	fftw_complex *Ft = fftw_alloc_complex(width*height);
 	nPhysImageF<mcomplex> *ftbuf;
 
 	ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.), "ftbuf");
@@ -1635,8 +1635,8 @@ nPhysImageF<T>::getSingletonFFT(enum phys_direction dir, enum phys_fft fftdir) {
 		// horizontal
 
 		// 1. allocation
-		fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width);
-		fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*width);
+		fftw_complex *t = fftw_alloc_complex(width);
+		fftw_complex *Ft = fftw_alloc_complex(width);
 		nPhysImageF<mcomplex> *ftbuf;
 		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
 
@@ -1670,8 +1670,8 @@ nPhysImageF<T>::getSingletonFFT(enum phys_direction dir, enum phys_fft fftdir) {
 		// vertical
 	
 		// 1. allocation
-		fftw_complex *t = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*height);
-		fftw_complex *Ft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*height);
+		fftw_complex *t = fftw_alloc_complex(height);
+		fftw_complex *Ft = fftw_alloc_complex(height);
 		nPhysImageF<mcomplex> *ftbuf;
 		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
 
