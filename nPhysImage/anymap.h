@@ -143,7 +143,7 @@ public:
 
 		getline(is, st);
 		while (st.find(__pp_init_str) == std::string::npos && !is.eof()) {
-			std::cerr<<"get"<<std::endl;
+			DEBUG("get");
 			getline(is, st);
 		}
 
@@ -153,8 +153,7 @@ public:
 
 			size_t eqpos = st.find("=");
 			if (eqpos == std::string::npos) {
-				std::cerr<<st<<": malformed line"<<std::endl;
-				std::cout<<"-----------------------------"<<std::endl;
+			    DEBUG(st<<": malformed line");
 				continue;
 			}
 			std::string st_key = trim(st.substr(0, eqpos), "\t ");
@@ -165,16 +164,15 @@ public:
 			// filling
 			std::stringstream ss(st_arg);
 			ss>>(*this)[st_key];
-			std::cout<<"-----------------------------"<<std::endl;
 			
 			getline(is, st);
 		}
-		std::cerr<<"[anydata] read "<<size()<<" keys"<<std::endl;
+		DEBUG("[anydata] read "<<size()<<" keys");
 	}
 
 
 	void dumper(std::ostream &os) {
-		std::cerr<<"[anydata] Starting dump of "<<size()<<" elements"<<std::endl;
+	    DEBUG("[anydata] Starting dump of "<<size()<<" elements");
 		
 		os<<__pp_init_str<<std::endl;
 		
@@ -190,7 +188,7 @@ public:
 		}
 		os<<__pp_end_str<<std::endl;
 		
-		std::cerr<<"[anydata] Dumping ended"<<std::endl;
+		DEBUG("[anydata] Dumping ended");
 	}
 
 };

@@ -66,7 +66,6 @@
 
 neutrino::~neutrino()
 {
-	DEBUG("destructor");
 	currentBuffer=NULL;
 	saveDefaults();
 	QApplication::processEvents();
@@ -819,6 +818,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 				while(ifile.peek()!=-1) {
 					getline(ifile,line);
 					QString qLine=QString::fromStdString(line);
+                    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << line);
 					if (progress.wasCanceled()) break;
 					if (qLine.startsWith("NeutrinoImage")) {
 						counter++;
@@ -862,6 +862,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 							QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
 							QApplication::processEvents();
 							if (my_pan) {
+                                QApplication::processEvents();
 								QTemporaryFile tmpFile("."+my_pan->panName);
 								// tmpFile.setAutoRemove(false);
 								tmpFile.open();
@@ -872,6 +873,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 									if (!qLine.startsWith("NeutrinoPan-end")) tmpFile.write(line.c_str());
 								}
 								tmpFile.flush();
+                                QApplication::processEvents();
 								my_pan->loadSettings(tmpFile.fileName());
 								tmpFile.close(); // this should also remove it...
 							}
@@ -1169,9 +1171,19 @@ void neutrino::toggleGrid(bool stat) {
 void neutrino::closeEvent (QCloseEvent *e) {
 	disconnect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 	if (fileClose()) {
-		foreach (nGenericPan* pan, getPans()) {
-			pan->close();
-		}
+        saveDefaults();
+        QApplication::processEvents();
+        foreach (nGenericPan *pan, getPans()) {
+            pan->close();
+            QApplication::processEvents();
+        }
+        QApplication::processEvents();
+        currentBuffer=NULL;
+        foreach (nPhysD *phys, physList) {
+            delete phys;
+        }
+        physList.clear();
+
 		e->accept();
 	} else {
 		e->ignore();
