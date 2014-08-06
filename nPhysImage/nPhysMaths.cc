@@ -407,7 +407,7 @@ phys_log10(nPhysImageF<double> &m1)
 void
 phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 {
-	double *nan_free_phys=new double [m1.getSurf()];
+	vector<double> nan_free_phys(m1.getSurf());
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		if (std::isfinite(m1.point(i))) {
 			nan_free_phys[i]=m1.point(i);
@@ -415,10 +415,10 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 			nan_free_phys[i]=m1.Tminimum_value;
 		}
 	}
-	fftw_complex *b2 = new fftw_complex [m1.getH()*(m1.getW()/2+1)];
+	fftw_complex *b2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*m1.getH()*(m1.getW()/2+1));
 	
-	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),nan_free_phys,b2,FFTW_ESTIMATE);
-	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,nan_free_phys,FFTW_ESTIMATE);
+	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
+	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
 	
 	fftw_execute(fb);
 
@@ -443,13 +443,12 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);
-	delete nan_free_phys;
 }
 
 void
 phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius2)
 {
-	double *nan_free_phys=new double [m1.getSurf()];
+	vector<double> nan_free_phys(m1.getSurf());
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		if (std::isfinite(m1.point(i))) {
 			nan_free_phys[i]=m1.point(i);
@@ -457,10 +456,10 @@ phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius
 			nan_free_phys[i]=m1.Tminimum_value;
 		}
 	}
-	fftw_complex *b2 = new fftw_complex [m1.getH()*(m1.getW()/2+1)];
+	fftw_complex *b2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*m1.getH()*(m1.getW()/2+1));
 	
-	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),nan_free_phys,b2,FFTW_ESTIMATE);
-	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,nan_free_phys,FFTW_ESTIMATE);
+	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
+	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
 	
 	fftw_execute(fb);
 
@@ -488,7 +487,6 @@ phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);
-	delete nan_free_phys;
 }
 
 pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>* img1, nPhysImageF<double>* img2) {

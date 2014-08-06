@@ -626,6 +626,7 @@ void nVisar::doWave(int k) {
 		nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
 		progress.setValue(++counter);
 		QApplication::processEvents();
+        DEBUG(progress.value());
 
 		size_t dx=physfftRef.getW();
 		size_t dy=physfftRef.getH();
@@ -647,12 +648,14 @@ void nVisar::doWave(int k) {
 
 		progress.setValue(++counter);
 		QApplication::processEvents();
+        DEBUG(progress.value());
 		for (size_t kk=0; kk<dx*dy; kk++) {
 			intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
 			intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
 		}
 		progress.setValue(++counter);
 		QApplication::processEvents();
+        DEBUG(progress.value());
 		
 		phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
 		phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
