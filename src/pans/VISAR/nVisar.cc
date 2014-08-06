@@ -616,15 +616,15 @@ void nVisar::doWave(int k) {
 		getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
 
 		int counter=0;
-		QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 9, this);
+		QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 10, this);
 		progress.setCancelButton(0);
 		progress.setWindowModality(Qt::WindowModal);
 		progress.show();
 		nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 		nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 
 		size_t dx=physfftRef.getW();
@@ -635,7 +635,7 @@ void nVisar::doWave(int k) {
 		zz_morletRef.resize(dx,dy);
 		zz_morletShot.resize(dx,dy);
 
-		int xx[dx], yy[dy];
+		vector<int> xx(dx), yy(dy);
 		for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
 		for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
@@ -645,19 +645,19 @@ void nVisar::doWave(int k) {
 			intensity[k][m].resize(dx, dy);
 		}
 
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 		for (size_t kk=0; kk<dx*dy; kk++) {
 			intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
 			intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
 		}
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 		
 		phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
 		phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
 
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 		double cr = cos((visar[k].angle->value()) * _phys_deg); 
 		double sr = sin((visar[k].angle->value()) * _phys_deg);
@@ -681,15 +681,15 @@ void nVisar::doWave(int k) {
 			}
 		}
 
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 
 		physfftRef = zz_morletRef.ft2(PHYS_BACKWARD);
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 		physfftShot = zz_morletShot.ft2(PHYS_BACKWARD);
 
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 
 		for (size_t kk=0; kk<dx*dy; kk++) {
@@ -701,12 +701,12 @@ void nVisar::doWave(int k) {
 			contrast[k][1].Timg_buffer[kk] = 2.0*physfftShot.Timg_buffer[kk].mod()/(dx*dy);
 			intensity[k][1].Timg_buffer[kk] -= contrast[k][1].point(kk)*cos(2*M_PI*phase[k][1].point(kk));
 		}
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 
 		getPhase(k);
 		updatePlot();
-		progress.setValue(counter++);
+		progress.setValue(++counter);
 		QApplication::processEvents();
 	}
 }
