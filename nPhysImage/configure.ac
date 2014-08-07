@@ -103,7 +103,6 @@ fi
 
 # Checks for libraries.
 AC_CHECK_LIB([cfitsio], [main])
-AC_CHECK_LIB([df], [main])
 
 AC_CHECK_LIB([gsl], [main])
 AC_CHECK_LIB([gslcblas], [main])
@@ -114,12 +113,15 @@ AC_CHECK_LIB([m], [main])
 
 case $uname in
 	*MINGW*)
-		AC_CHECK_LIB([mfhdfdll], [main])
+		AC_CHECK_LIB([xdr], [main])
+		AC_CHECK_LIB([ws2_32], [main])
+		AC_CHECK_LIB([hdf], [main])
  	;;
 	*)
-		AC_CHECK_LIB([mfhdf], [main])
+		AC_CHECK_LIB([df], [main])
 	;;
 esac
+AC_CHECK_LIB([mfhdf], [main])
 
 
 AC_CHECK_LIB([netpbm], [main])
