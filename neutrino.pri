@@ -169,8 +169,8 @@ SOURCES += neutrinoPalettes.cc
 DEPENDPATH += ../nPhysImage
 HEADERS += config.h
 
-HEADERS += nGenericPan.h  neutrino.h 
-SOURCES += nGenericPan.cc neutrino.cc
+HEADERS += nGenericPan.h  panThread.h neutrino.h 
+SOURCES += nGenericPan.cc panThread.cc  neutrino.cc
 
 HEADERS += nView.h 
 SOURCES += nView.cc

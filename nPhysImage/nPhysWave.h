@@ -50,8 +50,15 @@
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
 
 struct wavelet_params_str {
-	wavelet_params_str()
-	{ iter_ptr = &iter; }
+	wavelet_params_str() :
+	data(NULL),
+	trimimages(false),
+	dosynthetic(false),
+	docropregion(false)	{ 
+	    iter_ptr = &iter; 
+	}
+    
+    nPhysD *data;
 
 	double init_angle;
 	double end_angle;
@@ -64,8 +71,14 @@ struct wavelet_params_str {
 	int thickness;
 	double damp;
 	
+	bool trimimages;
+	bool dosynthetic;
+	bool docropregion;
+	
 	int iter;
 	int *iter_ptr;
+	
+	std::map<std::string, nPhysD*> olist;
 };
 typedef struct wavelet_params_str wavelet_params;
 
@@ -102,9 +115,15 @@ typedef struct wavelet_params_str wavelet_params;
 // calculate wavelet field
 
 // std::list<nPhysImageF<double> *> phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
-std::list<nPhysImageF<double> *> phys_wavelet_field_2D_morlet(nPhysImageF<double> &, wavelet_params &);
+void phys_wavelet_field_2D_morlet(wavelet_params &);
 bool cudaEnabled();
-std::list<nPhysImageF<double> *> phys_wavelet_field_2D_morlet_cuda(nPhysImageF<double> &, wavelet_params &);
+void phys_wavelet_field_2D_morlet_cuda(wavelet_params &);
+
+// traslation functions
+void phys_wavelet_trasl_cuda(void *, int &);
+void phys_wavelet_trasl_nocuda(void *, int &);
+
+
 
 // unwrap methods
 nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy);
@@ -113,7 +132,7 @@ nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double
 void phys_subtract_carrier (nPhysImageF<double> &, double, double);
 
 // create a synthetic interferogram from phase and quality
-void phys_synthetic_interferogram (nPhysImageF<double> &, nPhysImageF<double> &, nPhysImageF<double> &);
+void phys_synthetic_interferogram (nPhysImageF<double> &, nPhysImageF<double> *, nPhysImageF<double> *);
 
 bidimvec<double> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
 
@@ -124,9 +143,12 @@ enum inversion_algo {ABEL = 10, ABEL_HF = 20};
 enum inversion_physics { ABEL_GAS, ABEL_PLASMA, ABEL_NONE };
 struct abel_params_str {
 	abel_params_str()
-		: iter_ptr(0)
+		: iimage(NULL), oimage(NULL), iter_ptr(0)
 	{ }
 
+    nPhysD *iimage;
+    nPhysD *oimage;
+    
 	std::vector<phys_point> iaxis;
 	phys_direction idir;
 	inversion_algo ialgo;
@@ -138,7 +160,7 @@ struct abel_params_str {
 typedef struct abel_params_str abel_params;
 
 // main inversion function
-nPhysImageF<double> * phys_invert_abel(nPhysImageF<double> &, abel_params &);
+void phys_invert_abel(abel_params &);
 
 // inline inversion maths
 inline void phys_invert_abel_1D(double *ivec, double *ovec, size_t size)

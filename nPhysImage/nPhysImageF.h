@@ -500,31 +500,32 @@ public:
 		return rotated;
 	}
 	
-// 	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
-// 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-// 		nPhysImageF<T> *rotated= new nPhysImageF<T> (width,height, def_value);
-// 		size_t w2=width/2;
-// 		size_t h2=height/2;
-// 		for (int i=0;i<(int)width;i++){
-// 			int xc=i-w2;
-// 			for (int j=0;j<(int)height;j++){
-// 				int yc=j-h2;
-// 				size_t ir= w2+xc*cos(alpha)-yc*sin(alpha);
-// 				size_t jr= h2+xc*sin(alpha)+yc*cos(alpha);
-// 				rotated->set(i,j,getPoint(ir,jr,def_value));
-// 			}
-// 		}		
-// 		rotated->set_scale(get_scale());
-// 		rotated->setType(PHYS_DYN);
-// 		std::ostringstream my_name;
-// 		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
-// 		rotated->setName(my_name.str());
-// 		rotated->setShortName("rotated");
-// 		rotated->setFromName(getFromName());
-// 
-// 		rotated->TscanBrightness();
-// 		return rotated;	
-// 	}
+	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
+		nPhysImageF<T> *rotated= new nPhysImageF<T> (getW(),getH(), def_value);
+		double dx_2=0.5*((double) getW());
+		double dy_2=0.5*((double) getH());
+		double cosa=cos(alpha);
+		double sina=sin(alpha);
+		for (size_t j=0; j<getH(); j++) {
+			for (size_t i=0; i<getW(); i++) {
+				double ir=dx_2+(i-dx_2)*cosa-(j-dy_2)*sina;
+				double jr=dy_2+(i-dx_2)*sina+(j-dy_2)*cosa;
+				rotated->set(i,j,getPoint(ir,jr,def_value));
+			}
+		}
+		rotated->set_origin(get_origin());
+		rotated->set_scale(get_scale());
+		rotated->setType(PHYS_DYN);
+		std::ostringstream my_name;
+		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
+		rotated->setName(my_name.str());
+		rotated->setShortName("rotated");
+		rotated->setFromName(getFromName());
+
+		rotated->TscanBrightness();
+		return rotated;	
+	}
 
 
 	// get sobel matrix
@@ -726,7 +727,7 @@ public:
 	}
 
 	inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
-		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()))
+		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()) && (p.x()>=0) && (p.y()>=0))
 			return Timg_matrix[p.y()][p.x()];
 		else
 			return nan_value;
@@ -867,8 +868,17 @@ public:
 	inline void set_scale(vec2f val)
 	{ property["scale"] = val; }	
 	
-	inline vec2f to_real(vec2f val)
-	{ vec2f oo, ss; oo = property["origin"]; ss = property["scale"]; return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); }
+	inline vec2f to_real(vec2f val) { 
+		vec2f oo, ss; 
+		oo = property["origin"]; ss = property["scale"]; 
+		return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
+	}
+
+	inline vec2f to_pixel(vec2f val) { 
+		vec2f oo, ss; 
+		oo = property["origin"]; ss = property["scale"]; 
+		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
+	}
 
 //end
 

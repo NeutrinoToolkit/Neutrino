@@ -32,6 +32,7 @@
 #include "nCompareLines.h"
 #include "nVisar.h"
 #include "nWavelet.h"
+#include "nInterferometry.h"
 #include "nGhost.h"
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
@@ -211,6 +212,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
 	connect(my_w.actionVisar, SIGNAL(triggered()), this, SLOT(Visar()));
 	connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
+	connect(my_w.actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
 	connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
 	connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
 	connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
@@ -931,6 +933,7 @@ nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //T
 		if (show || redisplay) showPhys(newPhys);
 	}
 	return newPhys;
+    emit physMod(make_pair(oldPhys, newPhys));
 }
 
 void neutrino::removePhys(nPhysD* datamatrix) {
@@ -1909,6 +1912,15 @@ neutrino::Wavelet() {
 	QString vwinname=tr("Wavelet");
 	nGenericPan *ret=existsPan(vwinname);
 	if (!ret) ret = new nWavelet(this, vwinname);
+	return ret;
+}
+
+/// Interferometry analysis window
+nGenericPan*
+neutrino::Interferometry() {
+	QString vwinname=tr("Interferometry");
+	nGenericPan *ret=existsPan(vwinname);
+	if (!ret) ret = new nInterferometry(this, vwinname);
 	return ret;
 }
 

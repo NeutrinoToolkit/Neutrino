@@ -25,41 +25,59 @@
 #include <QtGui>
 #include <QWidget>
 
-#include <sstream>
-#include <vector>
-
 #include "nGenericPan.h"
-#include "ui_nIntegralInversion.h"
+#include "ui_nInterferometry.h"
+#include "ui_nInterferometry1.h"
 
-#ifndef __nII
-#define __nII
+#ifndef __nInterferometry
+#define __nInterferometry
 #include "nPhysWave.h"
+#include "nLine.h"
+#include "nRect.h"
 
 class neutrino;
-class nLine;
 
-
-void phys_invert_abel_transl(void *params, int&);
-
-
-
-class nIntegralInversion : public nGenericPan {
+class nInterferometry : public nGenericPan {
 	Q_OBJECT
 
-public:
-	nIntegralInversion(neutrino *, QString);
+public:	
+	nInterferometry(neutrino *, QString);
 	
-	Ui::nIntegralInversion my_w;
+	Ui::nInterferometry my_w;
+	Ui::nInterferometry1 my_image[2];
 
-	QPointer<nLine> axis;
-	nPhysD *invertedPhys;
+	QPointer<nRect> region;	
+	QPointer<nLine> linebarrier;
+    QPointer<nLine> lineRegion;
+	
+	std::map<std::string, nPhysD *> waveletPhys[2];
+
+    std::map<std::string, nPhysD *> localPhys;
+
 private:
-	abel_params my_abel_params;
+	wavelet_params my_params;
+    std::vector<std::string> localPhysNames();
 
 public slots:
-	void sceneChanged();
-	void refphase_checkbChanged(int);
-	QVariant doInversion();
+		
+    void physDel(nPhysD*);
+	void useBarrierToggled(bool);
+	void useRegionToggled(bool);
+	void guessCarrier();
+
+	void doWavelet();
+	void doUnwrap();
+	void doSubtract();
+	void doCutoff();
+	void doAbel();
+	void getPosZero();
+	void setPosZero(QPointF);
+	void getPosAbel();
+	void setPosAbel(QPointF);
+
+	void bufferChanged(nPhysD*);
+	void checkChangeCombo(QComboBox *);
+
 	
 };
 

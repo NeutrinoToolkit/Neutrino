@@ -90,6 +90,11 @@ FORMS += nWavelet.ui
 SOURCES += nWavelet.cc
 HEADERS += nWavelet.h 
 
+# Interferometry
+FORMS += nInterferometry.ui nInterferometry1.ui
+SOURCES += nInterferometry.cc
+HEADERS += nInterferometry.h 
+
 # Spectral Analysis
 FORMS += nSpectralAnalysis.ui
 SOURCES += nSpectralAnalysis.cc

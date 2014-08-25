@@ -71,10 +71,6 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
-	waveletPhys.resize(5);
-	for (unsigned int i=0;i<waveletPhys.size();i++) {
-		waveletPhys.at(i)=NULL;
-	}
 }
 
 void nWavelet::useBarrierToggled(bool val) {
@@ -93,13 +89,13 @@ void nWavelet::checkChangeCombo(QComboBox *combo) {
 
 void nWavelet::bufferChanged(nPhysD* buf) {
 	if (buf) {
-		DEBUG(buf->getName());
 		if (buf==getPhysFromCombo(my_w.image)) {
 			region->show();
 		} else {
 			region->hide();
 		}
 	}
+    nGenericPan::bufferChanged(buf);
 }
 
 void nWavelet::guessCarrier() {
@@ -111,8 +107,7 @@ void nWavelet::guessCarrier() {
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
 		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
-		qDebug() << datamatrix.getH();
-
+		
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
@@ -144,17 +139,6 @@ void nWavelet::doWavelet () {
 		QPoint offset=geom2.topLeft();
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
-		if (my_w.showSource->isChecked()) {
-			datamatrix.setShortName("wavelet source");
-			nPhysD *deepcopy=new nPhysD();
-			*deepcopy=datamatrix;
-			if (my_w.erasePrevious->isChecked()) {
-				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
-			} else {
-				nparent->addPhys(deepcopy);
-				origSubmatrix=deepcopy;
-			}
-		}
 		
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
@@ -191,109 +175,76 @@ void nWavelet::doWavelet () {
 		}
 		my_params.thickness=my_w.thickness->value();
 		my_params.damp=my_w.damp->value();
+        my_params.data=&datamatrix;
 
 		
-		nThread.setTitle("Wavelet...");
-
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
 			// use cuda
-			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_cuda);
+			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		} else {
-			// don't use cuda
-			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_nocuda);
+			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		}
-		
 
-		progressRun(my_params.n_angles*my_params.n_lambdas);
-		
-		std::list<nPhysD *> retList = nThread.odata;
-
-		DEBUG("back from of thread " << nThread.isFinished());
-		if (nThread.n_iter==0) {
-			QMessageBox::critical(this, tr("Neutrino Wavelet"),tr("CUDA didn't work.\nDisable from preferences window"),QMessageBox::Ok);
-		}
-		
-		std::list<nPhysD *>::const_iterator itr;
+		map<string, nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);
-		unsigned int position=0;
-		for(itr = retList.begin(); itr != retList.end() && position<waveletPhys.size(); ++itr, ++position) {
-			nPhysD *mat=(*itr);
-			if (mat) {
-				WARNING(retList.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
-				if ((mat->getShortName()=="angle" && my_params.n_angles==1) ||
-					mat->getShortName()=="lambda" && my_params.n_lambdas==1) {
-					delete mat;
-					mat=NULL;
-				} else {
-					if (my_w.erasePrevious->isChecked()) {
-                        bool changebufferDisplayed=false;
-                        if (bufferDisplayed==waveletPhys.at(position)) changebufferDisplayed=true;
-						waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
-                        if (changebufferDisplayed) bufferDisplayed=waveletPhys.at(position);
-					} else {
-						nparent->addPhys(mat);
-						waveletPhys.at(position)=mat;
-					}
-					if (waveletPhys.at(position)->getShortName()=="phase/2pi") {
-						my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
-					} else if (waveletPhys.at(position)->getShortName()=="quality") {
-						my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
-					}
-				}
-			}
+		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
+            if ((itr->first=="angle" && my_params.n_angles==1) ||
+                itr->first=="lambda" && my_params.n_lambdas==1) {
+                delete itr->second;
+            } else {
+                if (my_w.erasePrevious->isChecked()) {
+                    if (bufferDisplayed==waveletPhys[itr->first]) bufferDisplayed=itr->second;
+                    waveletPhys[itr->first]=nparent->replacePhys(itr->second,waveletPhys[itr->first],false);
+                } else {
+                    nparent->addPhys(itr->second);
+                    waveletPhys[itr->first]=itr->second;
+                }
+                if (itr->first=="phase_2pi") {
+                    DEBUG("here "); 
+                    my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+                } else if (itr->first=="contrast") {
+                    my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+                }
+            }
 		}
 		
-		if (nThread.n_iter>0) {
-			if (my_w.synthetic->isChecked()) {
-				nPhysD *tmpSynthetic = new nPhysD();
-				phys_synthetic_interferogram(*tmpSynthetic,*waveletPhys.at(0),*waveletPhys.at(1));
-				if (my_w.erasePrevious->isChecked()) {
-					syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
-				} else {
-					nparent->addPhys(tmpSynthetic);
-					syntheticPhys=tmpSynthetic;
-				}
-				DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
-			}
-			
-			//delete my_qt.risultati;
-			nparent->showPhys(bufferDisplayed);
-			QString out;
-			out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
-			if (settings.value("useCuda").toBool()) {
-				out.prepend("GPU");
+		if (my_w.showSource->isChecked()) {
+			datamatrix.setShortName("wavelet source");
+			nPhysD *deepcopy=new nPhysD();
+			*deepcopy=datamatrix;
+			if (my_w.erasePrevious->isChecked()) {
+				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
 			} else {
-				out.prepend("CPU");
+				nparent->addPhys(deepcopy);
+				origSubmatrix=deepcopy;
 			}
-			my_w.statusbar->showMessage(out, 5000);
-		} else {
-			my_w.statusbar->showMessage("Canceled", 5000);
 		}
-
-		
-	}
-	if (nThread.n_iter==-1) {
-		DEBUG("Thread was killed, waiting end of thread " << nThread.isFinished());
-		nThread.wait();
-		DEBUG("Thread was killed, finish waiting end of thread " << nThread.isFinished());
-	}
+        if (my_w.synthetic->isChecked()) {
+            nPhysD *tmpSynthetic = new nPhysD();
+            phys_synthetic_interferogram(*tmpSynthetic,waveletPhys["phase_2pi"],waveletPhys["contrast"]);
+            if (my_w.erasePrevious->isChecked()) {
+                syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
+            } else {
+                nparent->addPhys(tmpSynthetic);
+                syntheticPhys=tmpSynthetic;
+            }
+        }
+        
+        nparent->showPhys(bufferDisplayed);
+        QString out;
+        out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
+        if (settings.value("useCuda").toBool()) {
+            out.prepend("GPU");
+        } else {
+            out.prepend("CPU");
+        }
+        my_w.statusbar->showMessage(out, 5000);
+    } else {
+        my_w.statusbar->showMessage("Canceled", 5000);
+    }
+    
 }
 
-// ---------------------- thread transport functions ------------------------
-
-std::list<nPhysD *>
-phys_wavelet_trasl_cuda(nPhysD *iimage, void *params, int &iter) {
-	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList = phys_wavelet_field_2D_morlet_cuda(*iimage, *((wavelet_params *)params));
-	return retList;
-}
-
-std::list<nPhysD *>
-phys_wavelet_trasl_nocuda(nPhysD *iimage, void *params, int &iter) {
-	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList =  phys_wavelet_field_2D_morlet(*iimage, *((wavelet_params *)params));
-	return retList;
-}
 
 // --------------------------------------------------------------------------
 
@@ -301,8 +252,6 @@ void nWavelet::doUnwrap () {
 	nPhysD *phase=getPhysFromCombo(my_w.imageUnwrap);
 	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
 	nPhysD barrierPhys;
-	
-	DEBUG(barrierPhys.getSurf());
 	
 	QTime timer;
 	timer.start();

@@ -36,9 +36,6 @@
 
 class neutrino;
 
-std::list<nPhysD *> phys_wavelet_trasl_cuda(nPhysD *, void *, int &);
-std::list<nPhysD *> phys_wavelet_trasl_nocuda(nPhysD *, void *, int &);
-
 class nWavelet : public nGenericPan {
 	Q_OBJECT
 
@@ -51,7 +48,7 @@ public:
 	
 	QPointer<nLine> linebarrier;
 	
-	std::vector<nPhysD *> waveletPhys;
+	std::map<std::string, nPhysD *> waveletPhys;
 	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
 private:

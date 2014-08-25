@@ -242,6 +242,11 @@ nGenericPan::loadUi(QSettings *settings) {
 			widget->setText(settings->value(widget->objectName(),widget->text()).toString());
 		}
 	}
+	foreach (QSlider *widget, findChildren<QSlider *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+			widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
+		}
+	}
 	foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			widget->setPlainText(settings->value(widget->objectName(),widget->toPlainText()).toString());
@@ -262,7 +267,10 @@ nGenericPan::loadUi(QSettings *settings) {
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
-
+	foreach (QGroupBox *widget, findChildren<QGroupBox *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
+	}
+    
 	foreach (QComboBox *widget, findChildren<QComboBox *>()) {
 		if (widget->property("neutrinoSave").isValid()) {
 			QString currText=widget->currentText();
@@ -321,6 +329,11 @@ nGenericPan::saveUi(QSettings *settings) {
 			settings->setValue(widget->objectName(),widget->text());
 		}
 	}
+	foreach (QSlider *widget, findChildren<QSlider *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+			settings->setValue(widget->objectName(),widget->value());
+		}
+	}
 	foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			settings->setValue(widget->objectName(),widget->toPlainText());
@@ -339,6 +352,9 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
+	}
+	foreach (QGroupBox *widget, findChildren<QGroupBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
 	foreach (QComboBox *widget, findChildren<QComboBox *>()) {
@@ -482,21 +498,36 @@ void nGenericPan::saveSettings(QSettings *settings) {
 // thread run
 //
 void
-nGenericPan::progressRun(int max_calc) {
-	QProgressDialog progress(nThread.winTitle, "Stop", 0, max_calc, this);
-	progress.setWindowModality(Qt::WindowModal);
-	progress.show();
-	nThread.start();
-	while (nThread.isRunning()) {
-		progress.setValue(nThread.n_iter);
-		QApplication::processEvents();
-		sleeper_thread::msleep(100);
-		if (progress.wasCanceled()) {
-			nThread.stop();
-			break;
-		}
-	}
+nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc) {
+    QProgressDialog progress(title, "Stop", 0, max_calc, this);
+    if (max_calc > 0) {
+        progress.setWindowModality(Qt::WindowModal);
+        progress.show();
+    }
+    nThread.params = iparams;
+    nThread.calculation_function = my_func;
 
+    nThread.start();
+	while (nThread.isRunning()) {
+		if (max_calc > 0) {
+            progress.setValue(nThread.n_iter);
+            if (progress.wasCanceled()) {
+                nThread.stop();
+                break;
+            }
+        }
+        QApplication::processEvents();
+		sleeper_thread::msleep(100);
+	}
+    
+    if (nThread.n_iter==0) {
+        QMessageBox::critical(this, tr("Thread problems"),tr("Thread didn't work"),QMessageBox::Ok);
+    }
+    
+}
+
+bool nGenericPan::nPhysExists(nPhysD* phys){
+    return nparent->physList.contains(phys);
 }
 
 void nGenericPan::set(QString name, QVariant my_val, int occurrence) {

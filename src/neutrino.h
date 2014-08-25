@@ -276,7 +276,10 @@ public slots:
 	
 	// WAVELET STUFF
 	nGenericPan* Wavelet();
-
+    
+	// interferometry STUFF
+	nGenericPan* Interferometry();
+    
 	// SPECTRAL ANALYSIS
 	nGenericPan* SpectralAnalysis();
 
@@ -328,6 +331,9 @@ signals:
 	void bufferChanged(nPhysD*);						// visible image update
 	void physAdd(nPhysD*);
 	void physDel(nPhysD*);
+    void physMod(std::pair<nPhysD*,nPhysD*>);
+    
+    
 
 	void keyPressEvent();
 	void closeAll();

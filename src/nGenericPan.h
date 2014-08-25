@@ -26,61 +26,13 @@
 #include <QWidget>
 #include <iostream>
 #include "nPhysImageF.h"
-
+#include "panThread.h"
 #ifndef __generic_pan
 #define __generic_pan
 
 class neutrino;
 
-class panThread : public QThread {
-public:
-	panThread() : idata(NULL), params(NULL), calculation_function(NULL), n_iter(-1), winTitle("Calculating...") { }
-	~panThread(){};
-	
-	void setThread(nPhysD *iimage, void *iparams, std::list<nPhysD *> (*ifunc)(nPhysD *, void *, int &))
-	{
-		idata = iimage;
-		params = iparams;
-		calculation_function = ifunc;
-	}
-	
-	void run() {
-		if (idata==NULL || calculation_function==NULL)
-			return;
-		
-		std::cerr<<"[nGenericPan] pan thread running..."<<std::flush;
-		odata = (*calculation_function)(idata, params, n_iter);
-		std::cerr<<"finished!"<<std::endl;
-	}
-	
-	void stop() {
-		std::cerr<<"killed!"<<std::endl;
-		n_iter = -1;
-	}
-	
-	nPhysD *idata;
-	void *params;
-	std::list<nPhysD *> (*calculation_function)(nPhysD *, void *, int &);
-	int n_iter;
-	std::list<nPhysD *> odata;
-	
-	
-	// style
-	QString winTitle;
-	
-	void setTitle(QString my_title)
-	{ winTitle = my_title; }
-	
-};
-
-class sleeper_thread : public QThread
-{
-public:
-	static void msleep(unsigned long msecs)
-	{
-		QThread::msleep(msecs);
-	}
-};
+typedef void (*ifunc)(void *, int &); 
 
 class nGenericPan : public QMainWindow {
 	Q_OBJECT
@@ -126,8 +78,8 @@ public slots:
 	void decorate();
 
 	// threads
-	void progressRun(int);
-
+    void runThread(void *iparams, ifunc, QString=QString("Calculating"), int=0);
+    
 	// to sync image list on combos on the widget
 	void comboChanged(int);
 	nPhysD* getPhysFromCombo(QComboBox*);
@@ -151,6 +103,8 @@ public slots:
 	void saveSettings();
 	void saveSettings(QSettings *);
 	
+    bool nPhysExists(nPhysD*);
+    
 	// python stuff
 	void set(QString, QVariant, int=1);
 	QVariant get(QString, int=1);

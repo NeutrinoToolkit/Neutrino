@@ -170,21 +170,19 @@ QVariant nIntegralInversion::doInversion() {
 
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 
+        my_abel_params.iimage=iimage;
 
-		nThread.setThread(iimage, &my_abel_params, phys_invert_abel_transl);
-		nThread.setTitle("Abel transform...");
-		progressRun(inv_axis.size());
+        runThread(&my_abel_params, phys_invert_abel_transl, "Abel inversion..." , inv_axis.size());
 
-		DEBUG("back from of thread " << nThread.isFinished());
+        inv_image = my_abel_params.oimage;
+		
 
 		DEBUG(5,"about to launch thread");
 
-		inv_image = *(nThread.odata.begin());
-		DEBUG(5,"Thread finish " << nThread.n_iter);
 			// apply physics
 		QApplication::processEvents();		
 
-		if (inv_image && nThread.n_iter!=-1) {
+		if (inv_image) {
 			switch (my_w.physTabs->currentIndex()) {
 				case 0:
 					DEBUG("Inversions: no physics applied");
@@ -217,22 +215,14 @@ QVariant nIntegralInversion::doInversion() {
 			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
 		}
 		
-		if(nThread.n_iter==-1) {
-			DEBUG("Thread was killed, waiting end of thread");
-			nThread.wait();
-			DEBUG("Thread was killed, finish waiting end of thread");
-		}
 	}
 
 	return retVar;
 }
 
-std::list<nPhysD *>
-phys_invert_abel_transl(nPhysD *iimage, void *params, int& iter) {
-	std::list<nPhysD *> odata;
+void phys_invert_abel_transl(void *params, int& iter) {
 	((abel_params *)params)->iter_ptr = &iter;
-	odata.push_back(phys_invert_abel(*iimage, *((abel_params *)params)));
-	return odata;
+	phys_invert_abel(*((abel_params *)params));
 }
 
 
