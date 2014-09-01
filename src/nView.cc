@@ -36,7 +36,6 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
 	setMouseTracking(true);
 	setInteractive(true);
     grabGesture(Qt::SwipeGesture);
-	bBox=QRectF(0,0,1,1);
 	QSettings settings("neutrino","");
 	settings.beginGroup("Preferences");	
 	QVariant fontString=settings.value("defaultFont");
@@ -47,6 +46,10 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
 		}
 	}
 	showDimPixel=settings.value("showDimPixel",true).toBool();
+
+    setAcceptDrops(false);
+	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    
 }
 
 bool nView::event(QEvent *event)
@@ -106,7 +109,8 @@ void nView::incrzoom(double incr)
 void
 nView::setSize() {
 	QSize my_size=parent()->my_pixitem.pixmap().size();
-	if (parent()->currentBuffer) {
+	QRectF bBox;
+    if (parent()->currentBuffer) {
 		scaledFont=font();
 		if (fillimage) {
 			double ratioFont=min(((double)width())/my_size.width(),((double)height())/my_size.height());
@@ -114,17 +118,18 @@ nView::setSize() {
 		}
 		double fSize=QFontMetrics(scaledFont).size(Qt::TextSingleLine,"M").height();
 		bBox=QRectF(-2.1*fSize,-2.2*fSize,my_size.width()+4.2*fSize, my_size.height()+5.1*fSize);
-		setSceneRect(bBox);
 	} else {
 		bBox=QRectF(0,0,my_size.width(),my_size.height());
 	}
+	setSceneRect(bBox);
 	if (fillimage) {
 		fitInView(bBox, Qt::KeepAspectRatio);
 	}
 //	qDebug() << "nView::setSize" << bBox << font() << scaledFont << transform().m11();
 	parent()->my_mouse.setSize(my_size);
-	setSceneRect(bBox);
 	repaint();
+    qDebug() << transform() << "<><><><><><><><>";
+    
 	emit zoomChanged(transform().m11());
 }
 
@@ -211,6 +216,15 @@ void nView::wheelEvent(QWheelEvent *e) {
 	}
 }
 
+void nView::mouseDoubleClickEvent (QMouseEvent *e) {
+	QGraphicsView::mousePressEvent(e);
+	if (parent()->follower) {
+		QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+		QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
+		parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+	}
+	emit mouseDoubleClickEvent_sig(mapToScene(e->pos()));
+}
 
 void nView::mousePressEvent (QMouseEvent *e)
 {

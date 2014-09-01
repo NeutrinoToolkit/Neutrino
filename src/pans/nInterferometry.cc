@@ -55,6 +55,8 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 		foreach (QWidget *obj, father1.at(k)->findChildren<QWidget*>()) {
 			obj->setObjectName(obj->objectName()+"Interf"+QString::number(k));
 		}
+        
+        connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
     }        
     
     
@@ -85,17 +87,16 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
     
     connect(my_w.posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
     connect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
-    connect(my_w.posZeroButton,SIGNAL(released()), this, SLOT(getPosZero()));
+    connect(my_w.posZeroButton,SIGNAL(toggled(bool)), this, SLOT(getPosZero(bool)));
 
 //	connect(my_w.cutoff,SIGNAL(valueChanged(double)),this,SLOT(doCutoff()));
-	connect(my_w.useRegion, SIGNAL(toggled(bool)), this, SLOT(useRegionToggled(bool)));
-	connect(my_w.lineBarrier, SIGNAL(released()), linebarrier, SLOT(togglePadella()));
-	useRegionToggled(my_w.useRegion->isChecked());
+	connect(my_w.useRegion, SIGNAL(stateChanged(int)), this, SLOT(doCutoff()));
+	connect(my_w.region, SIGNAL(released()), lineRegion, SLOT(togglePadella()));
 
     connect(my_w.abel,SIGNAL(stateChanged(int)), this, SLOT(doAbel()));
     connect(my_w.symmetric,SIGNAL(released()), this, SLOT(doAbel()));
     connect(my_w.abelY,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
-    connect(my_w.abelButton,SIGNAL(released()), this, SLOT(getPosAbel()));
+    connect(my_w.abelButton,SIGNAL(toggled(bool)), this, SLOT(getPosAbel(bool)));
 
     vector<string> localnames=localPhysNames();
     for (vector<string>::const_iterator itr=localnames.begin(); itr!=localnames.end(); itr++) {
@@ -109,8 +110,9 @@ vector<string> nInterferometry::localPhysNames() {
     localnames.push_back("phase");
     localnames.push_back("contrast");
     localnames.push_back("quality");
-    localnames.push_back("phaseCutoff");
+    localnames.push_back("intergratedNeCutoff");
     localnames.push_back("abel");
+    localnames.push_back("intergratedNe");
     return localnames;
 }
 
@@ -123,10 +125,13 @@ void nInterferometry::physDel(nPhysD* buf) {
     }
 }
 
-void nInterferometry::getPosZero() {
-    my_w.posZeroButton->setChecked(true);
-    connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
-    nparent->showPhys(getPhysFromCombo(my_image[1].image));
+void nInterferometry::getPosZero(bool check) {
+    if (check) {
+        nparent->showPhys(getPhysFromCombo(my_image[1].image));
+        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+    }
 }
 
 void nInterferometry::setPosZero(QPointF point) {
@@ -136,9 +141,7 @@ void nInterferometry::setPosZero(QPointF point) {
         vec2f my_pos=currentBuffer->to_real(vec2f(point.x(),point.y()));
         my_w.posZeroX->setValue(my_pos.x());
         my_w.posZeroY->setValue(my_pos.y());
-        my_w.posZeroButton->setChecked(false);
         my_w.Zero->setChecked(true);
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
         doSubtract();
         connect(my_w.posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         connect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
@@ -146,10 +149,13 @@ void nInterferometry::setPosZero(QPointF point) {
 }
 
 
-void nInterferometry::getPosAbel() {
-    my_w.abelButton->setChecked(true);
-    connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setPosAbel(QPointF)));
-    nparent->showPhys(localPhys["phase"]);
+void nInterferometry::getPosAbel(bool check) {
+    if (check) {
+        nparent->showPhys(localPhys["intergratedNe"]);
+        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosAbel(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosAbel(QPointF)));
+    }
 }
 
 void nInterferometry::setPosAbel(QPointF point) {
@@ -157,9 +163,7 @@ void nInterferometry::setPosAbel(QPointF point) {
         disconnect(my_w.abelY,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
         vec2f my_pos=currentBuffer->to_real(vec2f(point.x(),point.y()));
         my_w.abelY->setValue(my_pos.y());
-        my_w.abelButton->setChecked(false);
         my_w.abel->setChecked(true);
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setPosAbel(QPointF)));
         doAbel();
         connect(my_w.abelY,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
     }
@@ -170,14 +174,6 @@ void nInterferometry::useBarrierToggled(bool valDouble) {
 		linebarrier->show();
 	} else {
 		linebarrier->hide();
-	}
-}
-
-void nInterferometry::useRegionToggled(bool valDouble) {
-	if (valDouble) {
-		lineRegion->show();
-	} else {
-		lineRegion->hide();
 	}
 }
 
@@ -194,7 +190,7 @@ void nInterferometry::bufferChanged(nPhysD* buf) {
 		} else {
 			region->hide();
 		}
-		if (buf==localPhys["phase"]) {
+		if (buf==localPhys["phase"] || buf==localPhys["intergratedNeCutoff"]) {
 			lineRegion->show();
 		} else {
 			lineRegion->hide();
@@ -226,57 +222,58 @@ void nInterferometry::guessCarrier() {
 void nInterferometry::doWavelet () {
     QTime timer;
     timer.start();
-    
     for (int iimage=0;iimage<2;iimage++) {
-        string suffix=iimage==0?"ref":"shot";
-        nPhysD *image=getPhysFromCombo(my_image[iimage].image);
-        if (image) {
-            saveDefaults();
-            QRect geom2=region->getRect();
-            QPoint offset=geom2.topLeft();
-            
-            if (my_image[iimage].numAngle->value()==0) {
-                my_params.init_angle=my_w.angleCarrier->value();
-                my_params.end_angle=my_w.angleCarrier->value();
-                my_params.n_angles=1;
-            } else {
-                my_params.init_angle=my_image[iimage].minAngle->value()+my_w.angleCarrier->value();
-                my_params.end_angle=my_image[iimage].maxAngle->value()+my_w.angleCarrier->value();
-                my_params.n_angles=my_image[iimage].numAngle->value();
-            }
-            if (my_image[iimage].numStretch->value()==0) {
-                my_params.init_lambda=my_w.widthCarrier->value();
-                my_params.end_lambda=my_w.widthCarrier->value();
-                my_params.n_lambdas=1;
-            } else {
-                my_params.init_lambda=my_image[iimage].minStretch->value()*my_w.widthCarrier->value();
-                my_params.end_lambda=my_image[iimage].maxStretch->value()*my_w.widthCarrier->value();
-                my_params.n_lambdas=my_image[iimage].numStretch->value();
-            }
-            my_params.thickness=my_w.widthCarrier->value()*my_w.correlation->value();
-            my_params.damp=my_w.correlation->value();
-            my_params.dosynthetic=true;
-            my_params.docropregion=true;
-            my_params.trimimages=true;
-            
-            nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
-            my_params.data=&datamatrix;
-            
-            int niter=my_params.n_angles*my_params.n_lambdas;
-            
-            QSettings settings("neutrino","");
-            settings.beginGroup("Preferences");
-            if (settings.value("useCuda").toBool() && cudaEnabled()) {
-                runThread(&my_params, phys_wavelet_trasl_cuda, "Interferometry...", niter);
-            } else {
-                runThread(&my_params, phys_wavelet_trasl_nocuda, "Interferometry...", niter);
-            }
-            
-            map<string,nPhysD *> retList = my_params.olist;
-            
-            for(map<string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
-                itr->second->setShortName(suffix+itr->second->getShortName());
-                waveletPhys[iimage][itr->first]=nparent->replacePhys(itr->second,waveletPhys[iimage][itr->first],false);                
+        if(sender()==my_w.actionDoAll || sender()==my_image[iimage].doit) {
+            string suffix=iimage==0?"ref":"shot";
+            nPhysD *image=getPhysFromCombo(my_image[iimage].image);
+            if (image) {
+                saveDefaults();
+                QRect geom2=region->getRect();
+                QPoint offset=geom2.topLeft();
+                
+                if (my_image[iimage].numAngle->value()==0) {
+                    my_params.init_angle=my_w.angleCarrier->value();
+                    my_params.end_angle=my_w.angleCarrier->value();
+                    my_params.n_angles=1;
+                } else {
+                    my_params.init_angle=my_image[iimage].minAngle->value()+my_w.angleCarrier->value();
+                    my_params.end_angle=my_image[iimage].maxAngle->value()+my_w.angleCarrier->value();
+                    my_params.n_angles=my_image[iimage].numAngle->value();
+                }
+                if (my_image[iimage].numStretch->value()==0) {
+                    my_params.init_lambda=my_w.widthCarrier->value();
+                    my_params.end_lambda=my_w.widthCarrier->value();
+                    my_params.n_lambdas=1;
+                } else {
+                    my_params.init_lambda=my_image[iimage].minStretch->value()*my_w.widthCarrier->value();
+                    my_params.end_lambda=my_image[iimage].maxStretch->value()*my_w.widthCarrier->value();
+                    my_params.n_lambdas=my_image[iimage].numStretch->value();
+                }
+                my_params.thickness=my_w.widthCarrier->value()*my_w.thickness->value();
+                my_params.damp=my_w.correlation->value();
+                my_params.dosynthetic=true;
+                my_params.docropregion=true;
+                my_params.trimimages=false;
+                
+                nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
+                my_params.data=&datamatrix;
+                
+                int niter=my_params.n_angles*my_params.n_lambdas;
+                
+                QSettings settings("neutrino","");
+                settings.beginGroup("Preferences");
+                if (settings.value("useCuda").toBool() && cudaEnabled()) {
+                    runThread(&my_params, phys_wavelet_trasl_cuda, "Interferometry...", niter);
+                } else {
+                    runThread(&my_params, phys_wavelet_trasl_nocuda, "Interferometry...", niter);
+                }
+                
+                map<string,nPhysD *> retList = my_params.olist;
+                
+                for(map<string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
+                    itr->second->setShortName(suffix+itr->second->getShortName());
+                    waveletPhys[iimage][itr->first]=nparent->replacePhys(itr->second,waveletPhys[iimage][itr->first],false);                
+                }
             }
         }
     }
@@ -397,6 +394,10 @@ void nInterferometry::doSubtract () {
         if (offset!=0.0) phys_add(phase, offset);  
         localPhys["phase"]=nparent->replacePhys(phase.fast_rotated(my_w.rotAngle->value()),localPhys["phase"]);
         localPhys["phase"]->setShortName("phase");
+
+        nPhysD intNe(phase);
+        phys_apply_inversion_plasma(intNe, my_w.probeLambda->text().toDouble()*1e-9, -my_w.imgRes->text().toDouble()/2*M_PI);
+        localPhys["intergratedNe"]=nparent->replacePhys(intNe.fast_rotated(my_w.rotAngle->value()),localPhys["intergratedNe"], true);
     }
     doCutoff();
 }
@@ -404,94 +405,74 @@ void nInterferometry::doSubtract () {
 
 void nInterferometry::doCutoff () {
     nPhysD *regionPath = NULL;
-    if (nPhysExists(localPhys["phase"])) {
-        nPhysD* image=localPhys["phase"];
+    if (my_w.useRegion->isChecked()) {
+        lineRegion->show();
+    } else {
+        lineRegion->hide();
+    }
+
+    if (nPhysExists(localPhys["intergratedNe"])) {
+        nPhysD* image=localPhys["intergratedNe"];
         if (my_w.useRegion->isChecked()) {
+            lineRegion->show();
             regionPath = new nPhysD(image->getW(),image->getH(),0.0);
-            vec2 offset=image->get_origin();
-            offset=vec2(0,0);
+            QPolygon regionPoly=lineRegion->poly(1).translated(lineRegion->pos().x(),lineRegion->pos().y()).toPolygon();
             
-            
-            QPolygon regionPoly=lineRegion->poly(1).toPolygon();
             //            QRect rectRegion=lineRegion->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
             
-            QRect imageRect=QRect(-offset.x(),-offset.y(),image->getW(),image->getH());
+            QRect imageRect=QRect(0,0,image->getW(),image->getH());
             QRect rectRegion=regionPoly.boundingRect().intersected(imageRect);
             
             qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << imageRect << regionPoly.boundingRect();
             qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << rectRegion;
-            qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << offset.x() << offset.y();
+            qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << regionPoly;
             regionPath->property=image->property;
-            regionPath->setShortName("Region mask");
-            QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
+            regionPath->setShortName("phaseMask");
+            QProgressDialog progress("Extracting",QString(), 0, rectRegion.width(), this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
             for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
-                if (progress.wasCanceled()) break;
-                QApplication::processEvents();
                 for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
                     if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)) {
-                        regionPath->set(i+offset.x(),j+offset.y(),image->point(i+offset.x(),j+offset.y()));
+                        regionPath->set(i,j,image->point(i,j));
                     }
-                    
                 }
                 progress.setValue(i-rectRegion.left());
+                QApplication::processEvents();
             }
             regionPath->TscanBrightness();
-            localPhys["phaseCutoff"]=nparent->replacePhys(regionPath,localPhys["phaseCutoff"]);
         } else {
-            localPhys["phaseCutoff"] = image;        
+            regionPath = new nPhysD(*image);
         }
+        localPhys["intergratedNeCutoff"]=nparent->replacePhys(regionPath,localPhys["intergratedNeCutoff"]);
     }        
-    
-//    if(nPhysExists(localPhys["phase"]) && nPhysExists(localPhys["quality"])) {
-//        nPhysD *phase=localPhys["phase"];
-//        nPhysD *quality=localPhys["quality"];
-//
-//        double mini=quality->Tminimum_value;
-//        double maxi=quality->Tmaximum_value;
-//        
-//        double valDouble=mini+my_w.cutoff->value()*(maxi-mini)/100.0;
-//        
-//        DEBUG(mini << " " << valDouble << " " << my_w.cutoff->value());
-//        
-//        if (phase->getW() == quality->getW() && phase->getH() == quality->getH()) {
-//            nPhysD *phaseCutoff = new nPhysD(phase->getW(),phase->getH(), numeric_limits<double>::quiet_NaN());
-//            phaseCutoff->set_origin(phase->get_origin());
-//            phaseCutoff->set_scale(phase->get_scale());
-//            for (size_t k=0; k<phase->getSurf(); k++) 
-//                if (quality->Timg_buffer[k] >= valDouble) 
-//                    phaseCutoff->Timg_buffer[k]=phase->Timg_buffer[k];
-//            
-//            std::ostringstream my_name;
-//            my_name << "mask(" << quality->getName() << "," << valDouble << ")";
-//            phaseCutoff->setName(my_name.str());
-//            phaseCutoff->setShortName("mask");
-//            phaseCutoff->setFromName(phase->getFromName());
-//            phaseCutoff->TscanBrightness();
-//            
-//            localPhys["phaseCutoff"]=nparent->replacePhys(phaseCutoff,localPhys["phaseCutoff"]);
-//        }    
-//    }
     doAbel();    
 }
 
 
 void nInterferometry::doAbel() {
-    if (my_w.abel->isChecked() && nPhysExists(localPhys["phaseCutoff"])) {
-        int dx=localPhys["phaseCutoff"]->getW();
-        int dy=localPhys["phaseCutoff"]->getH();
-        nPhysD* data = localPhys["phaseCutoff"];
+    if (my_w.abel->isChecked() && nPhysExists(localPhys["intergratedNeCutoff"])) {
+        
+        int dx=localPhys["intergratedNeCutoff"]->getW();
+        int dy=localPhys["intergratedNeCutoff"]->getH();
+        nPhysD* data = localPhys["intergratedNeCutoff"];
 
         nPhysD* abel= new nPhysD(dx,dy,0.0,"Abel");
         abel->property=data->property;
         int y0=(abel->to_pixel(vec2f(0,my_w.abelY->value()))).y();
+        
+        QProgressDialog progress("Abel", QString(), 0, dx, this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.show();
+
         if (my_w.symmetric->isChecked()) {
         	int dy2=min(y0,dy-y0);
         	for (int i=0;i<dx;i++){
+                progress.setValue(i);
+                QApplication::processEvents();
         		for (int j=0;j<dy2;j++){
         			for (int k=j+1; k<dy2;k++) {
-        				double val=0.5*(data->point(i,y0+k) + data->point(i,y0-k) - data->point(i,y0+k-1) - data->point(i,y0-(k-1)));
+        				double val=0.5*(data->point(i,y0+k) - data->point(i,y0+k-1) + data->point(i,y0-k) - data->point(i,y0-(k-1)));
                         if (isfinite(val)){
                             abel->set(i,j+y0,abel->point(i,j+y0)-val/sqrt(k*k-j*j)/M_PI);
                         } else {
@@ -504,6 +485,8 @@ void nInterferometry::doAbel() {
         	}
         } else {
         	for (int i=0;i<dx;i++){
+                progress.setValue(i);
+                QApplication::processEvents();
         		for (int j=y0;j>=0;j--){ // lower part
         			for (int k=j-1; k>0;k--) {
                         double val=(data->point(i,k-1)-data->point(i,k))/sqrt((k-y0)*(k-y0)-(j-y0)*(j-y0))/M_PI;
@@ -521,9 +504,15 @@ void nInterferometry::doAbel() {
         		abel->set(i,y0,abel->point(i,y0)/2.0);
         	}
         }        
-        phys_apply_inversion_plasma(*abel, my_w.probeLambda->text().toDouble()*1e-9, -my_w.imgRes->text().toDouble()/2*M_PI);
-        phys_fast_gaussian_blur(*abel,0.2*my_w.widthCarrier->value()*my_w.correlation->value());
+        phys_fast_gaussian_blur(*abel,0.5*my_w.thickness->value()*my_w.correlation->value());
 
+        if (my_w.symmetric->isChecked()) {
+            abel->setShortName("AbelSymm");
+            abel->setName("AbelSymm("+data->getName()+")");
+        } else {
+            abel->setShortName("Abel");
+            abel->setName("Abel("+data->getName()+")");
+        }
         localPhys["abel"]=nparent->replacePhys(abel,localPhys["abel"], true);
     }
 }

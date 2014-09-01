@@ -36,7 +36,7 @@ nTics::nTics(neutrino *neu) : QGraphicsItem()
 
 // reimplementation
 QRectF nTics::boundingRect() const {
-	return nparent->my_w.my_view->bBox;
+	return nparent->my_w.my_view->sceneRect();
 }
 
 void nTics::changeColor() {

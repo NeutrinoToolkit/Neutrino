@@ -38,11 +38,12 @@ nLine::~nLine() {
 	}
 }
 
-nLine::nLine(neutrino *nparent) : QGraphicsObject()
+nLine::nLine(neutrino *nparent) : QGraphicsObject(), physOffset(0,0)
 {
 	setNeutrino(nparent);
 	
 	setAcceptHoverEvents(true);
+	setFlag(QGraphicsItem::ItemIsMovable);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
 	setProperty("parentPan",QString(""));
@@ -109,11 +110,23 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
 
+	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+    
 	lineOut = new QwtPlotCurve(tr("line Cut"));
 	lineOut-> attach(my_w.my_qwt);
 	lineOut->setXAxis(QwtPlot::xBottom);
 	lineOut->setYAxis(QwtPlot::yLeft);
 
+}
+
+void nLine::bufferChanged(nPhysD* my_phys) {    
+    if (my_phys) {
+        QPointF real_pos=pos()-physOffset;
+        physOffset=QPointF(my_phys->get_origin().x(),my_phys->get_origin().y());
+        setPos(real_pos+physOffset);
+    } else {
+        physOffset=QPointF(0,0);
+    }
 }
 
 void nLine::setNeutrino(neutrino*nparent) {
@@ -152,7 +165,13 @@ void nLine::setParentPan(QString winname, int level) {
 
 
 void nLine::setPoints(QPolygonF my_poly) {
-	while (ref.size()>my_poly.size()) {
+    if (parent()->currentBuffer) {
+        vec2f orig=parent()->currentBuffer->get_origin();
+        setPos(QPointF(orig.x(),orig.y()));
+    } else {
+        setPos(QPointF(0,0));
+	}
+    while (ref.size()>my_poly.size()) {
 		prepareGeometryChange();
 		delete ref.at(0);
 		ref.removeAt(0);
@@ -163,14 +182,15 @@ void nLine::setPoints(QPolygonF my_poly) {
 	for (int i=0; i<ref.size();i++) {
 		changeP(i, my_poly.at(i));
 	}
-	moveRef.clear();
+	moveRef=-1;
 }
 
 QPolygonF nLine::getPoints() {
-	QPolygonF my_poly;
-	foreach (QGraphicsEllipseItem* r, ref) {
-		my_poly << r->pos();
-	}
+	QPolygonF my_poly(ref.size());
+    for(int i=0;i<ref.size();i++) {
+        my_poly[i] = mapToScene(ref[i]->pos());
+    }
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_poly;
 	return my_poly;
 }
 
@@ -186,40 +206,36 @@ void nLine::addPointAfterClick ( QPointF ) {
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
+    qDebug() << pos() << e->pos();
 	for (int i=0;i<ref.size();i++) {
 		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-			moveRef.append(i);
-		}
+			moveRef=i;
+            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+		} else {
+            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }
 	}
-	if (moveRef.size()>0) { // if more that one just pick the las
-		int keeplast=moveRef.last();
-		moveRef.clear();
-		moveRef.append(keeplast);
-		showMessage(tr("Moving node ")+QString::number(keeplast+1));
+	if (moveRef>=0) { // if more that one just pick the las
+		showMessage(tr("Moving node ")+QString::number(moveRef));
+        setFlag(QGraphicsItem::ItemIsMovable,false);
 	} else { // if none is selected, append ref.size() to move the whole objec
-		moveRef.append(ref.size());
-		click_pos= e->pos();
+        setFlag(QGraphicsItem::ItemIsMovable,true);
 		showMessage(tr("Moving object"));
 	}
-
-
 	QGraphicsItem::mousePressEvent(e);
-
 }
 
 void nLine::mouseReleaseEvent ( QGraphicsSceneMouseEvent * e ) {
-	moveRef.clear();
+	moveRef=-1;
 	QGraphicsItem::mouseReleaseEvent(e);
 	itemChanged();
 }
 
 void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 	nodeSelected=-1;
-	if (moveRef.contains(ref.size())) {
-		QPointF delta=e->pos()-click_pos;
-		moveBy(delta);
-		click_pos=e->pos();
-	}
+    if (moveRef>=0) {
+        prepareGeometryChange();
+    }
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
@@ -295,9 +311,9 @@ QString nLine::getStringData(QPolygonF vals){
 	double dist=0.0;
 	for (int i=0; i<vals.size(); i++) {
 		if (i>0) dist+=sqrt(pow(vals.at(i).x()-vals.at(i-1).x(),2)+pow(vals.at(i).y()-vals.at(i-1).y(),2));
-		point_table.append(QString("%1\t%2\t%3").arg(dist).arg(vals.at(i).x()).arg(vals.at(i).y()));
+		point_table.append(QString("%1 %2 %3").arg(dist).arg(vals.at(i).x()).arg(vals.at(i).y()));
 		if (parent()->currentBuffer) {
-			point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
+			point_table.append(QString(" %1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
 		} else {
 			point_table.append(QString("\n"));
 		}
@@ -438,8 +454,8 @@ void nLine::setNumPoints ( int val ) {
 void
 nLine::movePoints (QPointF p) {
 	for (int i=0;i<ref.size(); i++) {
-		if (moveRef.contains(i)) {
-			changeP(i,p);
+		if (moveRef>=0) {
+			changeP(moveRef,p);
 		}
 	}
 }
@@ -512,8 +528,9 @@ nLine::changeColorHolder (QColor color) {
 }
 void
 nLine::changeP (int np, QPointF p) {
+    qDebug() << __FILE__ << ":" << __LINE__ << pos() << ref[np]->pos() ;
 	prepareGeometryChange();
-	ref[np]->setPos(p);
+	ref[np]->setPos(p-pos());
 	ref[np]->setVisible(true);
 	changePointPad(np);
 	updatePlot();
@@ -521,7 +538,7 @@ nLine::changeP (int np, QPointF p) {
 
 void nLine::changePointPad(int nrow) {
 	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
-	QPointF p=ref[nrow]->pos();
+	QPointF p=ref[nrow]->pos()-pos();
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(p.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(p.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
@@ -538,17 +555,17 @@ void nLine::addPoint () {
 		i=my_w.points->selectedRanges().first().topRow();
 	}
 	addPoint(i);
-	moveRef.removeLast();
+	moveRef=-1;
 	showMessage(tr("Added point:")+QString::number(i+1));
 }
 
-void nLine::addPoint (int pos) {
-	moveRef.append(pos);
+void nLine::addPoint (int my_pos) {
+	moveRef=my_pos;
 	QPointF position;
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=max(1,min(ref.size()-1,pos));
+		int copyfrom=max(1,min(ref.size()-1,my_pos));
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -559,24 +576,24 @@ void nLine::addPoint (int pos) {
 		refBrush.setColor(colorHolder);
 	}
 
-	ref.insert(pos,new QGraphicsEllipseItem());
-	ref[pos]->setPos(position);
-	ref[pos]->setBrush(refBrush);
-	ref[pos]->setPen(refPen);
-	ref[pos]->setVisible(false);
-	ref[pos]->setParentItem(this);
+	ref.insert(my_pos,new QGraphicsEllipseItem());
+	ref[my_pos]->setPos(position);
+	ref[my_pos]->setBrush(refBrush);
+	ref[my_pos]->setPen(refPen);
+	ref[my_pos]->setVisible(false);
+	ref[my_pos]->setParentItem(this);
 	sizeHolder(nSizeHolder);
 	setNumPoints(numPoints);
 
 	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
-	my_w.points->insertRow(pos);
+	my_w.points->insertRow(my_pos);
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.points->setItem(pos, 0, xitem);
-	my_w.points->setItem(pos, 1, yitem);
-	my_w.points->resizeRowToContents(pos);
+	my_w.points->setItem(my_pos, 0, xitem);
+	my_w.points->setItem(my_pos, 1, yitem);
+	my_w.points->resizeRowToContents(my_pos);
 	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
@@ -628,36 +645,41 @@ nLine::showMessage (QString s) {
 
 void
 nLine::keyPressEvent ( QKeyEvent * e ) {
-	int delta=1.0;
+	int delta=1;
 	if (e->modifiers() & Qt::ShiftModifier) {
-		delta =10.0;
+		delta =10;
 	}
 	switch (e->key()) {
+		case Qt::Key_Return:
+			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+				removeLastPoint();
+				moveRef=-1;
+				showMessage(tr("Adding points ended"));
+			} else {
+                togglePadella();
+            }            
 		case Qt::Key_Escape:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
-				moveRef.clear();
+				moveRef=-1;
 				showMessage(tr("Adding points ended"));
 			}
 			break;
 		case Qt::Key_Up:
-			moveBy(QPointF(0.0,-delta));
+			moveAll(0,-delta);
 			itemChanged();
 			break;
 		case Qt::Key_Down:
-			moveBy(QPointF(0.0,+delta));
+			moveAll(0,delta);
 			itemChanged();
 			break;
 		case Qt::Key_Left:
-			moveBy(QPointF(-delta,0.0));
+			moveAll(-delta,0);
 			itemChanged();
 			break;
 		case Qt::Key_Right:
-			moveBy(QPointF(+delta,0.0));
+			moveAll(delta,0);
 			itemChanged();
-			break;
-		case Qt::Key_Return:
-			togglePadella();
 			break;
 		case Qt::Key_B:
 			toggleBezier();
@@ -670,6 +692,9 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		case Qt::Key_C:
 			toggleClosedLine();
 			updatePlot();
+			break;
+		case Qt::Key_K:
+            qDebug() << getPoints();
 			break;
 		case Qt::Key_P:
 			showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
@@ -712,11 +737,9 @@ nLine::keyReleaseEvent ( QKeyEvent *  ) {
 
 
 void
-nLine::moveBy(QPointF delta) {
+nLine::moveAll(int deltax, int deltay) {
 	if (property("parentPanControlLevel").toInt()<2) {
-		for (int i =0; i<ref.size(); i++) {
-			changeP(i,ref[i]->pos()+delta);
-		}
+        moveBy(deltax,deltay);
 	}
 }
 
@@ -775,7 +798,7 @@ QPainterPath nLine::shape() const {
 	stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
-		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
+		my_shape.addPolygon(ref[i]->rect());
 	}
 	return my_shape;
 }
@@ -799,7 +822,7 @@ QPainterPath nLine::path() const {
 QPolygonF nLine::poly(int steps) const {
 	QPolygonF my_poly, my_poly_interp;
 	foreach (QGraphicsEllipseItem *item, ref){
-		my_poly<< item->pos();
+		my_poly << item->pos();
 	}
 	if (closedLine) my_poly << ref[0]->pos();
 
@@ -1019,8 +1042,9 @@ nLine::saveSettings(QSettings *settings) {
 		settings->beginWriteArray("points");
 		for (int i = 0; i < ref.size(); ++i) {
 			settings->setArrayIndex(i);
-			settings->setValue("x", ref.at(i)->pos().x());
-			settings->setValue("y", ref.at(i)->pos().y());
+            QPointF p=mapToScene(ref[i]->pos());
+			settings->setValue("x", p.x());
+			settings->setValue("y", p.y());
 		}
 		settings->endArray();
 	}

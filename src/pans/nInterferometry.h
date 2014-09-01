@@ -62,7 +62,6 @@ public slots:
 		
     void physDel(nPhysD*);
 	void useBarrierToggled(bool);
-	void useRegionToggled(bool);
 	void guessCarrier();
 
 	void doWavelet();
@@ -70,9 +69,9 @@ public slots:
 	void doSubtract();
 	void doCutoff();
 	void doAbel();
-	void getPosZero();
+	void getPosZero(bool);
 	void setPosZero(QPointF);
-	void getPosAbel();
+	void getPosAbel(bool);
 	void setPosAbel(QPointF);
 
 	void bufferChanged(nPhysD*);

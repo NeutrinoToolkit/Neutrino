@@ -40,6 +40,7 @@
 #include "nGenericPan.h"
 #include "nPlug.h"
 #include "nView.h"
+#include "nScene.h"
 
 // base ui
 #include "ui_neutrino.h"
@@ -78,9 +79,7 @@ public:
 	QGraphicsScene *getScene();
 	Ui::neutrino my_w;
 
-//	QDockWidget *leftDock;
-
-	QGraphicsScene my_s;
+	nScene my_s;
 
 	Ui::nSbarra my_sbarra;
 
@@ -98,7 +97,6 @@ public:
 
 	QList<QAction *> listabuffer;
 
-	//	QGraphicsScene my_s;
 	QGraphicsPixmapItem my_pixitem;
 	
 	double colorMin, colorMax;

@@ -172,8 +172,8 @@ HEADERS += config.h
 HEADERS += nGenericPan.h  panThread.h neutrino.h 
 SOURCES += nGenericPan.cc panThread.cc  neutrino.cc
 
-HEADERS += nView.h 
-SOURCES += nView.cc
+HEADERS += nView.h  nScene.h
+SOURCES += nView.cc nScene.cc
 
 HEADERS += nPlug.h 
 SOURCES += nPlug.cc

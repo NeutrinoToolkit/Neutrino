@@ -236,10 +236,6 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 
 	setCentralWidget(my_w.centralwidget);
 
-	my_w.my_view->setAcceptDrops(false);
-
-	my_w.my_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-
 	connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 
 	connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
@@ -1036,7 +1032,6 @@ neutrino::showPhys(nPhysD* datamatrix) {
 		winName.append(QString(" ")+mypath);
 		setWindowTitle(winName);
 
-		DEBUG(datamatrix->getType() << " : " << datamatrix->getFromName());
 		if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
 			setWindowFilePath(mypath);
 		} else {

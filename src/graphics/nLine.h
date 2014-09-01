@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include <QClipboard>
+#include "nPhysImageF.h"
 #include "ui_nLine.h"
 
 #ifndef __nLine
@@ -62,7 +63,7 @@ public:
 	void focusInEvent(QFocusEvent * event);
 	void focusOutEvent(QFocusEvent * event);
 
-	void moveBy(QPointF);
+	void moveAll(int, int);
 	
 	qreal nWidth;
 	qreal nSizeHolder;
@@ -74,9 +75,8 @@ public:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 		
 	QList<QGraphicsEllipseItem*> ref;
-	QList<int> moveRef;
+	int moveRef;
 	int nodeSelected;
-	QPointF click_pos;
 
 	
 	bool bezier;
@@ -94,6 +94,8 @@ public:
 	QPolygonF poly(int) const;
 	QPainterPath shape() const;
 	
+    QPointF physOffset;
+    
 	void selectThis(bool);
 	
 	QwtPlot *my_qwt;
@@ -130,6 +132,7 @@ public slots:
 	void toggleAntialias();
 	void toggleAntialias(bool);
 
+	void bufferChanged(nPhysD*);
 
 	void changeP(int,QPointF);
 
