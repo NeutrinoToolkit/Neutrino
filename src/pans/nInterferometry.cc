@@ -89,13 +89,13 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
     connect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
     connect(my_w.posZeroButton,SIGNAL(toggled(bool)), this, SLOT(getPosZero(bool)));
 
-//	connect(my_w.cutoff,SIGNAL(valueChanged(double)),this,SLOT(doCutoff()));
-	connect(my_w.useRegion, SIGNAL(stateChanged(int)), this, SLOT(doCutoff()));
+//	connect(my_w.Mask,SIGNAL(valueChanged(double)),this,SLOT(doMask()));
+	connect(my_w.useRegion, SIGNAL(stateChanged(int)), this, SLOT(doMask()));
 	connect(my_w.region, SIGNAL(released()), lineRegion, SLOT(togglePadella()));
 
     connect(my_w.abel,SIGNAL(stateChanged(int)), this, SLOT(doAbel()));
     connect(my_w.symmetric,SIGNAL(released()), this, SLOT(doAbel()));
-    connect(my_w.abelY,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
+    connect(my_w.abelY,SIGNAL(editingFinished()), this, SLOT(doAbel()));
     connect(my_w.abelButton,SIGNAL(toggled(bool)), this, SLOT(getPosAbel(bool)));
 
     vector<string> localnames=localPhysNames();
@@ -110,7 +110,7 @@ vector<string> nInterferometry::localPhysNames() {
     localnames.push_back("phase");
     localnames.push_back("contrast");
     localnames.push_back("quality");
-    localnames.push_back("intergratedNeCutoff");
+    localnames.push_back("intergratedNeMask");
     localnames.push_back("abel");
     localnames.push_back("intergratedNe");
     return localnames;
@@ -190,7 +190,7 @@ void nInterferometry::bufferChanged(nPhysD* buf) {
 		} else {
 			region->hide();
 		}
-		if (buf==localPhys["phase"] || buf==localPhys["intergratedNeCutoff"]) {
+		if (buf==localPhys["phase"] || buf==localPhys["intergratedNeMask"]) {
 			lineRegion->show();
 		} else {
 			lineRegion->hide();
@@ -392,19 +392,26 @@ void nInterferometry::doSubtract () {
         }
         nPhysD phase= *waveletPhys[1]["unwrap"] - *waveletPhys[0]["unwrap"];
         if (offset!=0.0) phys_add(phase, offset);  
+        
         localPhys["phase"]=nparent->replacePhys(phase.fast_rotated(my_w.rotAngle->value()),localPhys["phase"]);
         localPhys["phase"]->setShortName("phase");
 
+        
         nPhysD intNe(phase);
-        phys_apply_inversion_plasma(intNe, my_w.probeLambda->text().toDouble()*1e-9, -my_w.imgRes->text().toDouble()/2*M_PI);
+        double lambda_m=my_w.probeLambda->text().toDouble()*1e-9;
+        double mult = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);         
+                
+        phys_multiply(intNe, mult/1.0e4); // convert m-2 to cm-2
+        
         localPhys["intergratedNe"]=nparent->replacePhys(intNe.fast_rotated(my_w.rotAngle->value()),localPhys["intergratedNe"], true);
+        localPhys["intergratedNe"]->setShortName("intergratedNe");
     }
-    doCutoff();
+    doMask();
 }
 
 
-void nInterferometry::doCutoff () {
-    nPhysD *regionPath = NULL;
+void nInterferometry::doMask () {
+    nPhysD *regionPhys= NULL;
     if (my_w.useRegion->isChecked()) {
         lineRegion->show();
     } else {
@@ -415,47 +422,42 @@ void nInterferometry::doCutoff () {
         nPhysD* image=localPhys["intergratedNe"];
         if (my_w.useRegion->isChecked()) {
             lineRegion->show();
-            regionPath = new nPhysD(image->getW(),image->getH(),0.0);
-            QPolygon regionPoly=lineRegion->poly(1).translated(lineRegion->pos().x(),lineRegion->pos().y()).toPolygon();
-            
-            //            QRect rectRegion=lineRegion->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-            
+            regionPhys = new nPhysD(image->getW(),image->getH(),0.0);
+            QPolygon regionPoly=lineRegion->getLine().toPolygon();
             QRect imageRect=QRect(0,0,image->getW(),image->getH());
             QRect rectRegion=regionPoly.boundingRect().intersected(imageRect);
-            
-            qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << imageRect << regionPoly.boundingRect();
-            qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << rectRegion;
-            qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << regionPoly;
-            regionPath->property=image->property;
-            regionPath->setShortName("phaseMask");
+            regionPhys->property=image->property;
+            regionPhys->setShortName("intergratedNeMask");
             QProgressDialog progress("Extracting",QString(), 0, rectRegion.width(), this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
             for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
                 for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
                     if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)) {
-                        regionPath->set(i,j,image->point(i,j));
+                        regionPhys->set(i,j,image->point(i,j));
                     }
                 }
                 progress.setValue(i-rectRegion.left());
                 QApplication::processEvents();
             }
-            regionPath->TscanBrightness();
+            regionPhys->TscanBrightness();
         } else {
-            regionPath = new nPhysD(*image);
+            regionPhys = new nPhysD(*image);
         }
-        localPhys["intergratedNeCutoff"]=nparent->replacePhys(regionPath,localPhys["intergratedNeCutoff"]);
+        phys_fast_gaussian_blur(*regionPhys,0.5*my_w.widthCarrier->value()*my_w.thickness->value());
+
+        localPhys["intergratedNeMask"]=nparent->replacePhys(regionPhys,localPhys["intergratedNeMask"]);
     }        
     doAbel();    
 }
 
 
 void nInterferometry::doAbel() {
-    if (my_w.abel->isChecked() && nPhysExists(localPhys["intergratedNeCutoff"])) {
+    if (my_w.abel->isChecked() && nPhysExists(localPhys["intergratedNeMask"])) {
         
-        int dx=localPhys["intergratedNeCutoff"]->getW();
-        int dy=localPhys["intergratedNeCutoff"]->getH();
-        nPhysD* data = localPhys["intergratedNeCutoff"];
+        int dx=localPhys["intergratedNeMask"]->getW();
+        int dy=localPhys["intergratedNeMask"]->getH();
+        nPhysD* data = localPhys["intergratedNeMask"];
 
         nPhysD* abel= new nPhysD(dx,dy,0.0,"Abel");
         abel->property=data->property;
@@ -472,14 +474,9 @@ void nInterferometry::doAbel() {
                 QApplication::processEvents();
         		for (int j=0;j<dy2;j++){
         			for (int k=j+1; k<dy2;k++) {
-        				double val=0.5*(data->point(i,y0+k) - data->point(i,y0+k-1) + data->point(i,y0-k) - data->point(i,y0-(k-1)));
-                        if (isfinite(val)){
-                            abel->set(i,j+y0,abel->point(i,j+y0)-val/sqrt(k*k-j*j)/M_PI);
-                        } else {
-                            break;
-                        }
-
-        			}
+        				double val=0.5*(data->point(i,y0+k) - data->point(i,y0+k-1) + data->point(i,y0-k) - data->point(i,y0-(k-1)))/M_PI;
+                        abel->set(i,j+y0,abel->point(i,j+y0)-val/sqrt(k*k-j*j));
+                    }
         			abel->set(i,y0-j,abel->point(i,j+y0));	
         		}
         	}
@@ -490,21 +487,22 @@ void nInterferometry::doAbel() {
         		for (int j=y0;j>=0;j--){ // lower part
         			for (int k=j-1; k>0;k--) {
                         double val=(data->point(i,k-1)-data->point(i,k))/sqrt((k-y0)*(k-y0)-(j-y0)*(j-y0))/M_PI;
-                        if (!isfinite(val)) break;
         				abel->set(i,j,abel->point(i,j)-val);
         			}
         		}
         		for (int j=y0;j<dy;j++){ // upper part
         			for (int k=j+1; k<dy;k++) {
                         double val=(data->point(i,k)-data->point(i,k-1))/sqrt((k-y0)*(k-y0)-(j-y0)*(j-y0))/M_PI;
-                        if (!isfinite(val)) break;
         				abel->set(i,j,abel->point(i,j)-val);
         			}
         		}
         		abel->set(i,y0,abel->point(i,y0)/2.0);
         	}
         }        
-        phys_fast_gaussian_blur(*abel,0.5*my_w.thickness->value()*my_w.correlation->value());
+        double mult=my_w.imgRes->text().toDouble()*1e-4; // convert micron/px to cm/px
+        abel->set_scale(mult,mult);
+        phys_divide(*abel,mult);
+
 
         if (my_w.symmetric->isChecked()) {
             abel->setShortName("AbelSymm");

@@ -67,7 +67,7 @@ public slots:
 	void doWavelet();
 	void doUnwrap();
 	void doSubtract();
-	void doCutoff();
+	void doMask();
 	void doAbel();
 	void getPosZero(bool);
 	void setPosZero(QPointF);

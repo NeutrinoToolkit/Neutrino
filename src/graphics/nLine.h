@@ -58,13 +58,9 @@ public:
 	void keyReleaseEvent ( QKeyEvent *);
 	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
 	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
 	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
-	void focusInEvent(QFocusEvent * event);
-	void focusOutEvent(QFocusEvent * event);
+	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
 
-	void moveAll(int, int);
-	
 	qreal nWidth;
 	qreal nSizeHolder;
 	int numPoints;
@@ -111,6 +107,7 @@ public slots:
 	
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
+	QPolygonF getLine(int np=1);
 
 	void zoomChanged(double);
 	void showMessage(QString);

@@ -137,8 +137,7 @@ void nLine::setNeutrino(neutrino*nparent) {
 		nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
 		setToolTip(tr("line")+QString(" ")+QString::number(num));
-		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
 		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 		zoom=nparent->getZoom();
 	} else {
@@ -182,7 +181,6 @@ void nLine::setPoints(QPolygonF my_poly) {
 	for (int i=0; i<ref.size();i++) {
 		changeP(i, my_poly.at(i));
 	}
-	moveRef=-1;
 }
 
 QPolygonF nLine::getPoints() {
@@ -194,7 +192,12 @@ QPolygonF nLine::getPoints() {
 	return my_poly;
 }
 
+QPolygonF nLine::getLine(int np) {
+    return poly(np).translated(pos().x(),pos().y()).toPolygon();
+}
+
 void nLine::interactive ( ) {
+    connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 	showMessage(tr("Click for first point, press Esc to finish"));
 	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
@@ -207,37 +210,68 @@ void nLine::addPointAfterClick ( QPointF ) {
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
     qDebug() << pos() << e->pos();
-	for (int i=0;i<ref.size();i++) {
-		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-			moveRef=i;
-            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
-		} else {
-            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
-        }
-	}
-	if (moveRef>=0) { // if more that one just pick the las
-		showMessage(tr("Moving node ")+QString::number(moveRef));
-        setFlag(QGraphicsItem::ItemIsMovable,false);
-	} else { // if none is selected, append ref.size() to move the whole objec
-        setFlag(QGraphicsItem::ItemIsMovable,true);
-		showMessage(tr("Moving object"));
-	}
 	QGraphicsItem::mousePressEvent(e);
 }
 
 void nLine::mouseReleaseEvent ( QGraphicsSceneMouseEvent * e ) {
-	moveRef=-1;
+    DEBUG("here");
 	QGraphicsItem::mouseReleaseEvent(e);
+    update();
 	itemChanged();
+    setFlag(QGraphicsItem::ItemIsMovable,true);
+	for (int i=0;i<ref.size();i++) {
+        ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+	}
+	selectThis(false);
+    update();
 }
 
 void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
-	nodeSelected=-1;
-    if (moveRef>=0) {
-        prepareGeometryChange();
-    }
+    DEBUG("here");
+    prepareGeometryChange();
 	QGraphicsItem::mouseMoveEvent(e);
 }
+
+void
+nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
+	selectThis(true);
+	for (int i=0;i<ref.size();i++) {
+        QPointF realpos=mapToItem(ref.at(i),e->pos());
+        QRectF realrect=ref.at(i)->rect();
+        bool contiene=realrect.contains(realpos);        
+		if (contiene) {
+            nodeSelected=i;
+            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+            showMessage("Hover "+QString::number(i));
+            setFlag(QGraphicsItem::ItemIsMovable,false);
+		} else {
+            ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }
+	}
+}
+
+void
+nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *) {
+}
+
+void
+nLine::hoverLeaveEvent( QGraphicsSceneHoverEvent *) {
+    setFlag(QGraphicsItem::ItemIsMovable,true);
+	for (int i=0;i<ref.size();i++) {
+        ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+	}
+	selectThis(false);
+}
+
+void
+nLine::selectThis(bool val) {
+	setSelected(val);
+	for (int i =0; i<ref.size(); i++) {
+		ref[i]->setVisible(val);
+	}
+	showMessage(toolTip());
+}
+
 
 void nLine::togglePadella() {
 	if (my_pad.isHidden()) {
@@ -453,11 +487,7 @@ void nLine::setNumPoints ( int val ) {
 
 void
 nLine::movePoints (QPointF p) {
-	for (int i=0;i<ref.size(); i++) {
-		if (moveRef>=0) {
-			changeP(moveRef,p);
-		}
-	}
+    changeP(ref.size()-1,p);
 }
 
 void
@@ -528,7 +558,7 @@ nLine::changeColorHolder (QColor color) {
 }
 void
 nLine::changeP (int np, QPointF p) {
-    qDebug() << __FILE__ << ":" << __LINE__ << pos() << ref[np]->pos() ;
+    qDebug() << __FILE__ << ":" << __LINE__ << pos() << ref[np]->pos()  << sender();
 	prepareGeometryChange();
 	ref[np]->setPos(p-pos());
 	ref[np]->setVisible(true);
@@ -555,12 +585,10 @@ void nLine::addPoint () {
 		i=my_w.points->selectedRanges().first().topRow();
 	}
 	addPoint(i);
-	moveRef=-1;
 	showMessage(tr("Added point:")+QString::number(i+1));
 }
 
 void nLine::addPoint (int my_pos) {
-	moveRef=my_pos;
 	QPointF position;
 	QBrush refBrush;
 	QPen refPen;
@@ -576,12 +604,11 @@ void nLine::addPoint (int my_pos) {
 		refBrush.setColor(colorHolder);
 	}
 
-	ref.insert(my_pos,new QGraphicsEllipseItem());
+	ref.insert(my_pos,new QGraphicsEllipseItem(this));
 	ref[my_pos]->setPos(position);
 	ref[my_pos]->setBrush(refBrush);
 	ref[my_pos]->setPen(refPen);
 	ref[my_pos]->setVisible(false);
-	ref[my_pos]->setParentItem(this);
 	sizeHolder(nSizeHolder);
 	setNumPoints(numPoints);
 
@@ -652,33 +679,41 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 	switch (e->key()) {
 		case Qt::Key_Return:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+                disconnect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 				removeLastPoint();
-				moveRef=-1;
+                setFlag(QGraphicsItem::ItemIsMovable,true);
+                for (int i=0;i<ref.size();i++) {
+                    ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+                }
 				showMessage(tr("Adding points ended"));
 			} else {
                 togglePadella();
             }            
 		case Qt::Key_Escape:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+                disconnect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 				removeLastPoint();
-				moveRef=-1;
+                setFlag(QGraphicsItem::ItemIsMovable,true);
+                for (int i=0;i<ref.size();i++) {
+                    ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+                }
 				showMessage(tr("Adding points ended"));
 			}
 			break;
 		case Qt::Key_Up:
-			moveAll(0,-delta);
+            if (property("parentPanControlLevel").toInt()<2) moveBy(0,-delta);
 			itemChanged();
 			break;
 		case Qt::Key_Down:
-			moveAll(0,delta);
+            if (property("parentPanControlLevel").toInt()<2) moveBy(0,delta);
 			itemChanged();
 			break;
 		case Qt::Key_Left:
-			moveAll(-delta,0);
+			if (property("parentPanControlLevel").toInt()<2) moveBy(-delta,0);
 			itemChanged();
 			break;
 		case Qt::Key_Right:
-			moveAll(delta,0);
+			if (property("parentPanControlLevel").toInt()<2) moveBy(delta,0);
 			itemChanged();
 			break;
 		case Qt::Key_B:
@@ -733,53 +768,6 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 
 void
 nLine::keyReleaseEvent ( QKeyEvent *  ) {
-}
-
-
-void
-nLine::moveAll(int deltax, int deltay) {
-	if (property("parentPanControlLevel").toInt()<2) {
-        moveBy(deltax,deltay);
-	}
-}
-
-void
-nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *) {
-	setFocus(Qt::MouseFocusReason);
-}
-
-void
-nLine::hoverLeaveEvent( QGraphicsSceneHoverEvent *) {
-	clearFocus();
-}
-
-void
-nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
-	for (int i=0;i<ref.size();i++) {
-		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-			nodeSelected=i;
-		}
-	}
-}
-
-
-void
-nLine::focusInEvent( QFocusEvent *) {
-	selectThis(true);
-}
-
-void
-nLine::focusOutEvent( QFocusEvent *) {
-	selectThis(false);
-}
-
-void
-nLine::selectThis(bool val) {
-	setSelected(val);
-	for (int i =0; i<ref.size(); i++) {
-		ref[i]->setVisible(val);
-	}
-	parent()->my_w.statusbar->showMessage(toolTip());
 }
 
 void nLine::itemChanged() {

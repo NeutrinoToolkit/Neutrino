@@ -85,7 +85,7 @@ QVariant nIntegralInversion::doInversion() {
 		vector<phys_point> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
-		axis_poly = axis->poly(npoints).translated(axis->pos().x(),axis->pos().y());
+		axis_poly = axis->getLine(npoints);
 		
 		//!fixme we should cut the line when it goes outside and not move the point
 		int xpos= std::max<int>(0lu,min((size_t)axis_poly.first().x(),image->getW()-1));
