@@ -47,8 +47,8 @@ public:
 	Ui::nInterferometry1 my_image[2];
 
 	QPointer<nRect> region;	
-	QPointer<nLine> linebarrier;
-    QPointer<nLine> lineRegion;
+	QPointer<nLine> unwrapBarrier;
+    QPointer<nLine> maskRegion;
 	
 	std::map<std::string, nPhysD *> waveletPhys[2];
 
@@ -65,6 +65,7 @@ public slots:
 	void guessCarrier();
 
 	void doWavelet();
+	void doWavelet(int);
 	void doUnwrap();
 	void doSubtract();
 	void doMask();
@@ -73,6 +74,8 @@ public slots:
 	void setPosZero(QPointF);
 	void getPosAbel(bool);
 	void setPosAbel(QPointF);
+
+	void line_key_pressed(int);
 
 	void bufferChanged(nPhysD*);
 	void checkChangeCombo(QComboBox *);

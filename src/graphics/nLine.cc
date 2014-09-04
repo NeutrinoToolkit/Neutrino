@@ -677,6 +677,9 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		delta =10;
 	}
 	switch (e->key()) {
+		case Qt::Key_Question: 
+            togglePadella();
+            break;            
 		case Qt::Key_Return:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
                 disconnect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
@@ -687,7 +690,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
                 }
 				showMessage(tr("Adding points ended"));
 			} else {
-                togglePadella();
+                itemChanged();
             }            
 		case Qt::Key_Escape:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
@@ -698,7 +701,10 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
                     ref.at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
                 }
 				showMessage(tr("Adding points ended"));
-			}
+			} else {
+                itemChanged();
+            }
+
 			break;
 		case Qt::Key_Up:
             if (property("parentPanControlLevel").toInt()<2) moveBy(0,-delta);
@@ -745,6 +751,8 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_X: {
 			if (parent()->currentBuffer) {
+                while (ref.size() > 2) removePoint(0);
+                
 				double val=0.5*(ref[0]->pos().y()+ref[1]->pos().y());
 				changeP(0, QPointF(0.0,val));
 				changeP(1, QPointF(parent()->currentBuffer->getW(),val));
@@ -754,7 +762,9 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		}
 		case Qt::Key_Y:{
 			if (parent()->currentBuffer) {
-				double val=0.5*(ref[0]->pos().x()+ref[1]->pos().x());
+				while (ref.size() > 2) removePoint(0);
+                
+                double val=0.5*(ref[0]->pos().x()+ref[1]->pos().x());
 				changeP(0, QPointF(val,0.0));
 				changeP(1, QPointF(val,parent()->currentBuffer->getH()));
 				itemChanged();
@@ -762,6 +772,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			}
 		}
 		default:
+            emit key_pressed(e->key());
 			break;
 	}
 }

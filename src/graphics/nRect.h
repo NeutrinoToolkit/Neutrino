@@ -140,6 +140,7 @@ public slots:
 	
 signals:
 	void sceneChanged();
+	void key_pressed(int);
 };
 
 #endif

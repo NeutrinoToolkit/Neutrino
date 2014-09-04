@@ -129,7 +129,6 @@ void nWavelet::guessCarrier() {
 void nWavelet::doWavelet () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-		
 		nPhysD *bufferDisplayed=currentBuffer;
 		QTime timer;
 		timer.start();

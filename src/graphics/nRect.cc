@@ -459,6 +459,7 @@ nRect::keyPressEvent ( QKeyEvent * e ) {
 			}
 			break;
 		default:
+            emit key_pressed(e->key());
 			break;
 	}
 }
