@@ -63,7 +63,12 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject(), physOffset(0,0)
 	closedLine=false;
 	antialias=false;
 
-
+	QPen pen;
+	pen.setWidthF(nWidth);
+	pen.setColor(colorLine);
+    my_path.setPen(pen);
+    my_path.setVisible(true);
+    
 #ifdef __use_nPython
 	//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Line")+property("num").toString(), this);
 #endif
@@ -585,6 +590,7 @@ void nLine::addPoint () {
 		i=my_w.points->selectedRanges().first().topRow();
 	}
 	addPoint(i);
+        
 	showMessage(tr("Added point:")+QString::number(i+1));
 }
 
@@ -788,7 +794,9 @@ void nLine::itemChanged() {
 // reimplementation
 QRectF
 nLine::boundingRect() const {
-	return shape().boundingRect();
+    QRectF my_rect=shape().boundingRect();
+    qDebug() << "<><><><><><><>" << my_rect; 
+	return my_rect;
 }
 
 QPainterPath nLine::shape() const {
@@ -1059,4 +1067,3 @@ nLine::saveSettings(QSettings *settings) {
 	settings->setValue("samplePoints",numPoints);
 	settings->endGroup();
 }
-

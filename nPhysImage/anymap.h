@@ -104,6 +104,7 @@ public:
 	bool is_i() const { return ddescr == any_int; }
 	bool is_str() const { return ddescr == any_str; }
 	bool is_vec() const { return ddescr == any_vec; }
+	bool is_none() const {return ddescr==any_none;}
 
 	double get_d() const { return (ddescr == any_double) ? d : 0; }
 	int get_i() const { return (ddescr == any_int) ? i : 0; }

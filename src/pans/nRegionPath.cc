@@ -57,7 +57,7 @@ nRegionPath::doIt() {
 		if (image) {
             double replaceVal=getReplaceVal();
             
-			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
+			QPolygon regionPoly=region->getLine().toPolygon();
 			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
             
 			nPhysD *regionPath = new nPhysD();

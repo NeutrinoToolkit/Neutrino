@@ -71,6 +71,7 @@ public:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 		
 	QList<QGraphicsEllipseItem*> ref;
+    QGraphicsPathItem my_path;
 	int moveRef;
 	int nodeSelected;
 

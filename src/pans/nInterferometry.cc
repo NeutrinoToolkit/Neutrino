@@ -111,6 +111,19 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
     
 }
 
+vector<string> nInterferometry::localPhysNames() {
+    vector<string> localnames;
+    localnames.push_back("phase");
+    localnames.push_back("contrast");
+    localnames.push_back("quality");
+    localnames.push_back("intergratedNe");
+    localnames.push_back("intergratedNeMask");
+    localnames.push_back("phaseMask");
+    localnames.push_back("abel");
+    return localnames;
+}
+
+
 void nInterferometry::line_key_pressed(int key) {
     if (key==Qt::Key_Period) {
         if (sender()==maskRegion) {
@@ -121,17 +134,6 @@ void nInterferometry::line_key_pressed(int key) {
             doWavelet();
         }
     }
-}
-
-vector<string> nInterferometry::localPhysNames() {
-    vector<string> localnames;
-    localnames.push_back("phase");
-    localnames.push_back("contrast");
-    localnames.push_back("quality");
-    localnames.push_back("intergratedNe");
-    localnames.push_back("intergratedNeMask");
-    localnames.push_back("abel");
-    return localnames;
 }
 
 void nInterferometry::physDel(nPhysD* buf) {
@@ -312,8 +314,8 @@ void nInterferometry::doWavelet (int iimage) {
 }
 
 void nInterferometry::doUnwrap () {    
-    QProgressDialog progress("Extracting",QString(), 0, 2, this);
-    progress.show();
+    QProgressDialog progress("Unwrap",QString(), 0, 2, this);
+    progress.setWindowModality(Qt::WindowModal);
     for (unsigned int iimage=0;iimage<2;iimage++) {
         progress.setValue(iimage);
         QApplication::processEvents();
@@ -322,7 +324,8 @@ void nInterferometry::doUnwrap () {
         nPhysD *phase=waveletPhys[iimage]["phase_2pi"];
         nPhysD *qual=waveletPhys[iimage]["contrast"];
         
-        if (phase && qual) {
+        if (nPhysExists(phase) && nPhysExists(qual)) {
+            progress.show();
             nPhysD barrierPhys;
             
             QTime timer;
@@ -396,6 +399,7 @@ void nInterferometry::doUnwrap () {
             }
         }
     }
+    progress.close();
     
     doSubtract();    
 }
@@ -448,17 +452,21 @@ void nInterferometry::doSubtract () {
 
 
 void nInterferometry::doMask () {
+    nPhysD *regionPhys = NULL;
+    nPhysD* image=localPhys["intergratedNe"];
     if (my_w.useMask->isChecked()) {
         maskRegion->show();
-        nPhysD* image=localPhys["intergratedNe"];
-        nPhysD *regionPhys= NULL;
-        if (nPhysExists(image)) {
+        nPhysD* phase=localPhys["phase"];
+        if (nPhysExists(image) && nPhysExists(phase)) {
             regionPhys = new nPhysD(image->getW(),image->getH(),0.0);
+            regionPhys->property=image->property;
+            
+            nPhysD *phaseMask =new nPhysD(phase->getW(),phase->getH(),0.0);
+            phaseMask->property=phase->property;
+
             QPolygon regionPoly=maskRegion->getLine().toPolygon();
             QRect imageRect=QRect(0,0,image->getW(),image->getH());
             QRect rectRegion=regionPoly.boundingRect().intersected(imageRect);
-            regionPhys->property=image->property;
-            regionPhys->setShortName("intergratedNeMask");
             QProgressDialog progress("Extracting",QString(), 0, rectRegion.width(), this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
@@ -466,6 +474,7 @@ void nInterferometry::doMask () {
                 for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
                     if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)) {
                         regionPhys->set(i,j,image->point(i,j));
+                        phaseMask->set(i,j,phase->point(i,j));
                     }
                 }
                 progress.setValue(i-rectRegion.left());
@@ -473,11 +482,21 @@ void nInterferometry::doMask () {
             }
             regionPhys->TscanBrightness();
             phys_fast_gaussian_blur(*regionPhys,0.5*my_w.widthCarrier->value()*my_w.thickness->value());
+
+            phaseMask->TscanBrightness();
+            localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
             
-            localPhys["intergratedNeMask"]=nparent->replacePhys(regionPhys,localPhys["intergratedNeMask"]);
         }
     } else {
-        maskRegion->hide();
+        if (nPhysExists(image)) {
+            maskRegion->hide();
+            regionPhys=new nPhysD(*image);
+        }
+    }
+    if (regionPhys) {
+        regionPhys->setShortName("intergratedNeMask");
+        regionPhys->property["unitsCB"]="cm-2";
+        localPhys["intergratedNeMask"]=nparent->replacePhys(regionPhys,localPhys["intergratedNeMask"]);
     }
     doAbel();    
 }
@@ -532,6 +551,9 @@ void nInterferometry::doAbel() {
         }        
         double mult=my_w.imgRes->text().toDouble()*1e-4; // convert micron/px to cm/px
         abel->set_scale(mult,mult);
+        abel->property["unitsX"]="cm";
+        abel->property["unitsY"]="cm";
+        
         phys_divide(*abel,mult);
 
 
@@ -542,6 +564,7 @@ void nInterferometry::doAbel() {
             abel->setShortName("Abel");
             abel->setName("Abel("+data->getName()+")");
         }
+        abel->property["unitsCB"]="cm-3";
         localPhys["abel"]=nparent->replacePhys(abel,localPhys["abel"], true);
     }
 }

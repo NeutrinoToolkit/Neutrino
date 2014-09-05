@@ -133,11 +133,15 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 			p->drawText(pair.second,Qt::AlignBottom|Qt::AlignHCenter,pair.first);
 		}
 		
+        QString label;
 		if (abs(exponentX)>2) {
-			QString label="x 1e"+QString::number(exponentX);
-			QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
-			p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+			label+="x 1e"+QString::number(exponentX)+" ";
 		}
+        if (!nparent->currentBuffer->property["unitsX"].is_none())
+            label+=QString::fromStdString(nparent->currentBuffer->property["unitsX"]);
+        QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
+        if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+
 		allTics.moveTo(0,0);
 		allTics.lineTo(nparent->currentBuffer->getW(),0);
 		p->drawPath(allTics);
@@ -217,12 +221,15 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 			p->drawText(QRectF((size.height()-labelDimSize.width())/2.0,-size.width()-labelDimSize.height(),labelDimSize.width(),labelDimSize.height()),Qt::AlignTop|Qt::AlignHCenter,labelDim);
 		}
 		
+        label.clear();
 		if (abs(exponentY)>2) {
-			QString label="x 1e"+QString::number(exponentY);
-			QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
-			p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
-			QSizeF sizeImg=QSizeF(nparent->currentBuffer->getW()*nparent->currentBuffer->get_scale().x(),nparent->currentBuffer->getH()*nparent->currentBuffer->get_scale().y());			
+			label+="x 1e"+QString::number(exponentY)+" ";
 		}
+        if (!nparent->currentBuffer->property["unitsY"].is_none())
+            label+=QString::fromStdString(nparent->currentBuffer->property["unitsY"]);
+        labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
+        if (label.trimmed().size()) p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+        
 		p->rotate(-90);
 
 		allTics.moveTo(0,0);
@@ -299,12 +306,16 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 				QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());
 				p->drawText(QRectF(i*size.width()/((double)colorTics)-labelSize.width()/2,size.height()+p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 			}
-			QString label;
-			if (exponentCB!=0) {
-				label="x 1e"+QString::number(exponentCB);
-				QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());
-				p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
-			}
+            
+            label.clear();
+            if (abs(exponentCB)>2) {
+                label+="x 1e"+QString::number(exponentCB)+" ";
+            }
+            if (!nparent->currentBuffer->property["unitsCB"].is_none())
+                label+=QString::fromStdString(nparent->currentBuffer->property["unitsCB"]);
+            QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
+            if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+
 		} else {
 			QString label="All image is "+QString::number(maxi);
 			QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());
