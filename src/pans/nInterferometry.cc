@@ -99,7 +99,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 	connect(my_w.useMask, SIGNAL(stateChanged(int)), this, SLOT(doMask()));
 	connect(my_w.maskRegion, SIGNAL(released()), maskRegion, SLOT(togglePadella()));
 
-    connect(my_w.abel,SIGNAL(stateChanged(int)), this, SLOT(doAbel()));
+    connect(my_w.abel,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
     connect(my_w.symmetric,SIGNAL(released()), this, SLOT(doAbel()));
     connect(my_w.abelY,SIGNAL(editingFinished()), this, SLOT(doAbel()));
     connect(my_w.abelButton,SIGNAL(toggled(bool)), this, SLOT(getPosAbel(bool)));
