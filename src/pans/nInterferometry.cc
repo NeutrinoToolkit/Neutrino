@@ -159,13 +159,12 @@ void nInterferometry::setPosZero(QPointF point) {
         disconnect(my_w.posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         disconnect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         
-        if (nPhysExists(waveletPhys[0]["unwrap"]) && nPhysExists(waveletPhys[1]["unwrap"])) {
-            vec2f my_pos=waveletPhys[0]["unwrap"]->to_real(vec2f(point.x(),point.y()));
-            my_w.posZeroX->setValue(my_pos.x());
-            my_w.posZeroY->setValue(my_pos.y());
-            my_w.Zero->setChecked(true);
-            doSubtract();
-        }
+        vec2f my_pos=currentBuffer->to_real(vec2f(point.x(),point.y()));
+        DEBUG(my_pos.x() << " " << my_pos.y() << " " << point.x() << " " << point.y());
+        my_w.posZeroX->setValue(my_pos.x());
+        my_w.posZeroY->setValue(my_pos.y());
+        my_w.Zero->setChecked(true);
+        doSubtract();
         
         connect(my_w.posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         connect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
@@ -186,6 +185,7 @@ void nInterferometry::setPosAbel(QPointF point) {
     if(currentBuffer) {
         disconnect(my_w.abelY,SIGNAL(valueChanged(int)), this, SLOT(doAbel()));
         vec2f my_pos=currentBuffer->to_real(vec2f(point.x(),point.y()));
+        DEBUG(my_pos.x() << " " << my_pos.y() << " " << point.x() << " " << point.y());
         my_w.abelY->setValue(my_pos.y());
         my_w.abel->setChecked(true);
         doAbel();
