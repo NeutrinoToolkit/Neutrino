@@ -22,13 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#ifndef __nLine
+#define __nLine
+
 #include <QtGui>
 #include <QClipboard>
 #include "nPhysImageF.h"
 #include "ui_nLine.h"
-
-#ifndef __nLine
-#define __nLine
 
 class neutrino;
 class QwtPlot;
@@ -58,9 +58,13 @@ public:
 	void keyReleaseEvent ( QKeyEvent *);
 	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
 	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
-	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
 	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
+	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
+	void focusInEvent(QFocusEvent * event);
+	void focusOutEvent(QFocusEvent * event);
 
+	void moveBy(QPointF);
+	
 	qreal nWidth;
 	qreal nSizeHolder;
 	int numPoints;
@@ -71,9 +75,9 @@ public:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 		
 	QList<QGraphicsEllipseItem*> ref;
-    QGraphicsPathItem my_path;
-	int moveRef;
+	QList<int> moveRef;
 	int nodeSelected;
+	QPointF click_pos;
 
 	
 	bool bezier;
@@ -91,8 +95,6 @@ public:
 	QPolygonF poly(int) const;
 	QPainterPath shape() const;
 	
-    QPointF physOffset;
-    
 	void selectThis(bool);
 	
 	QwtPlot *my_qwt;
@@ -109,7 +111,8 @@ public slots:
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
 	QPolygonF getLine(int np=1);
-
+    void bufferChanged(nPhysD*);
+    
 	void zoomChanged(double);
 	void showMessage(QString);
 	void changePointPad(int);
@@ -130,7 +133,6 @@ public slots:
 	void toggleAntialias();
 	void toggleAntialias(bool);
 
-	void bufferChanged(nPhysD*);
 
 	void changeP(int,QPointF);
 
@@ -170,7 +172,6 @@ public slots:
 	
 signals:
 	void sceneChanged();
-	void key_pressed(int);
 	
 };
 
