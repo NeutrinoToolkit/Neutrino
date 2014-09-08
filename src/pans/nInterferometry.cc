@@ -214,7 +214,10 @@ void nInterferometry::bufferChanged(nPhysD* buf) {
 		} else {
 			region->hide();
 		}
-		if (buf==localPhys["phase"] || buf==localPhys["intergratedNeMask"]) {
+		if (buf==localPhys["phase"] || 
+            buf==localPhys["intergratedNeMask"] || 
+            buf==getPhysFromCombo(my_image[0].image) || 
+            buf==getPhysFromCombo(my_image[1].image)) {
 			maskRegion->show();
 		} else {
 			maskRegion->hide();

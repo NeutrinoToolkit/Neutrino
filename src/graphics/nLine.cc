@@ -452,7 +452,7 @@ void
 nLine::movePoints (QPointF p) {
 	for (int i=0;i<ref.size(); i++) {
 		if (moveRef.contains(i)) {
-			changeP(i,p);
+			changeP(i,mapFromScene(p));
 		}
 	}
 }
@@ -646,6 +646,10 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		delta =10.0;
 	}
 	switch (e->key()) {
+        case Qt::Key_Question: 
+            togglePadella();
+            break;            
+		case Qt::Key_Return:
 		case Qt::Key_Escape:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
@@ -668,9 +672,6 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		case Qt::Key_Right:
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
-			break;
-		case Qt::Key_Return:
-			togglePadella();
 			break;
 		case Qt::Key_B:
 			toggleBezier();
@@ -715,7 +716,8 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			}
 		}
 		default:
-			break;
+            emit key_pressed(e->key());
+            break;
 	}
 }
 

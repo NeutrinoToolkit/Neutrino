@@ -172,7 +172,7 @@ public slots:
 	
 signals:
 	void sceneChanged();
-	
+    void key_pressed(int);
 };
 
 bool orderMonotone_x(const QPointF &, const QPointF &);
