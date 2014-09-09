@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include "ui_nObject.h"
+#include "nPhysImageF.h"
 
 #ifndef __nRect
 #define __nRect
@@ -99,6 +100,8 @@ public slots:
 	QRect getRect();
 	QRectF getRectF();
 	QString getRectString();
+
+    void bufferChanged(nPhysD*);
 
 	void zoomChanged(double);
 	void showMessage(QString);

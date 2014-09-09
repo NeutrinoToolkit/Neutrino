@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include "ui_nPoint.h"
+#include "nPhysImageF.h"
 
 #ifndef __nPoint
 #define __nPoint
@@ -99,6 +100,8 @@ public slots:
 	QPoint getPoint();
 	QPointF getPointF();
 	QString getPointString();
+
+    void bufferChanged(nPhysD*);
 
 	void zoomChanged(double);
 	void showMessage(QString);

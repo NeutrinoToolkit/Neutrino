@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include "ui_nObject.h"
+#include "nPhysImageF.h"
 
 #ifndef __nEllipse
 #define __nEllipse
@@ -102,6 +103,8 @@ public:
 	QRect getRect();
 	QRectF getRectF();
 	
+    void bufferChanged(nPhysD*);
+
 	void zoomChanged(double);
 	void showMessage(QString);
 	void changePointPad(int);
