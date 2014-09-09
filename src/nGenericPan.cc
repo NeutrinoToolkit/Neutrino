@@ -264,6 +264,9 @@ nGenericPan::loadUi(QSettings *settings) {
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
+	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
+	}
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
@@ -349,6 +352,9 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->currentIndex());
 	}
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
+		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
+	}
+	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {

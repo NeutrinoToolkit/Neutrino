@@ -125,7 +125,6 @@ void nLine::setNeutrino(neutrino*nparent) {
 		setProperty("numLine",num);
 		setToolTip(tr("line")+QString(" ")+QString::number(num));
 		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
 		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 		zoom=nparent->getZoom();
@@ -181,6 +180,7 @@ void nLine::bufferChanged(nPhysD* my_phys) {
     } else {
         setPos(0,0);
     }
+    updatePlot();
 }
 
 QPolygonF nLine::getLine(int np) {
@@ -452,7 +452,7 @@ void
 nLine::movePoints (QPointF p) {
 	for (int i=0;i<ref.size(); i++) {
 		if (moveRef.contains(i)) {
-			changeP(i,mapFromScene(p));
+			changeP(i,p);
 		}
 	}
 }
@@ -526,7 +526,7 @@ nLine::changeColorHolder (QColor color) {
 void
 nLine::changeP (int np, QPointF p) {
 	prepareGeometryChange();
-	ref[np]->setPos(p);
+	ref[np]->setPos(mapFromScene(p));
 	ref[np]->setVisible(true);
 	changePointPad(np);
 	updatePlot();

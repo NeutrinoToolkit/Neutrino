@@ -101,6 +101,7 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
 }
@@ -135,8 +136,16 @@ QRectF nRect::getRectF() {
 	if (ref.size()<2) {
 		return QRectF(0,0,0,0);
 	} else {
-		return QRectF(ref[0]->pos(),ref[1]->pos()).normalized();
+		return QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).normalized();
 	}
+}
+
+void nRect::bufferChanged(nPhysD* my_phys) {    
+    if (my_phys) {
+        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+    } else {
+        setPos(0,0);
+    }
 }
 
 void nRect::interactive ( ) {
@@ -286,7 +295,7 @@ nRect::changeColorHolder (QColor color) {
 void
 nRect::changeP (int np, QPointF p, bool updatepad) {
 	prepareGeometryChange();
-	ref[np]->setPos(p);
+	ref[np]->setPos(mapFromScene(p));
 	ref[np]->setVisible(true);
 	if (updatepad) changePointPad(np);
 	updateSize();

@@ -43,6 +43,7 @@
         <file alias="scale">icons/scale.png</file>
         <file alias="short">icons/short.png</file>
         <file alias="name">icons/name.png</file>
+        <file alias="name">icons/icon.png</file>
         
         <file>icons/icon.png</file>
         <file>icons/colors.png</file>
@@ -87,6 +88,7 @@
         <file>icons/scale.png</file>
         <file>icons/short.png</file>
         <file>icons/name.png</file>
+        <file>icons/run.png</file>
         
         <file>shortcuts.html</file>
     </qresource>

@@ -94,6 +94,8 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 	ref.setParentItem(this);
 	sizeHolder(nSizeHolder);
 	
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+
 	moveRef=false;
 }
 
@@ -113,6 +115,14 @@ QPoint nPoint::getPoint() {
 
 QPointF nPoint::getPointF() {
 	return ref.pos();
+}
+
+void nPoint::bufferChanged(nPhysD* my_phys) {    
+    if (my_phys) {
+        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+    } else {
+        setPos(0,0);
+    }
 }
 
 void nPoint::interactive ( ) {
