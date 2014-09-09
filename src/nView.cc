@@ -127,9 +127,7 @@ nView::setSize() {
 	}
 //	qDebug() << "nView::setSize" << bBox << font() << scaledFont << transform().m11();
 	parent()->my_mouse.setSize(my_size);
-	repaint();
-    qDebug() << transform() << "<><><><><><><><>";
-    
+	repaint();    
 	emit zoomChanged(transform().m11());
 }
 
@@ -250,7 +248,6 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 		parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
 	}
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-		qDebug() << minMax;
 		if (parent()->currentBuffer && minMax==QPointF(parent()->currentBuffer->Tmaximum_value,parent()->currentBuffer->Tminimum_value)) {
 			parent()->changeColorMinMax(minMax.y(),minMax.x());
 		} else {

@@ -199,6 +199,11 @@ void phys_point_divide(nPhysImageF<double> &, nPhysImageF<double> &);
 
 void phys_add_noise(nPhysImageF<double> &, double);
 
+double phys_sum_points(nPhysImageF<double> &);
+double phys_sum_square_points(nPhysImageF<double> &);
+void phys_opposite(nPhysImageF<double> &);
+void phys_inverse(nPhysImageF<double> &);
+
 std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>*, nPhysImageF<double>*);
 
 

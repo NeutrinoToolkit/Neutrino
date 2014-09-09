@@ -431,14 +431,21 @@ void nInterferometry::doSubtract () {
         }
         nPhysD phase= *waveletPhys[1]["unwrap"] - *waveletPhys[0]["unwrap"];
         if (offset!=0.0) phys_add(phase, offset);  
+
+        if (phys_sum_points(phase)<0) {
+            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << phys_sum_points(phase));
+            phys_opposite(phase);
+        }
         
         localPhys["phase"]=nparent->replacePhys(phase.fast_rotated(my_w.rotAngle->value()),localPhys["phase"]);
         localPhys["phase"]->setShortName("phase");
+        
+        
 
         
         nPhysD intNe(phase);
         double lambda_m=my_w.probeLambda->text().toDouble()*1e-9;
-        double mult = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);         
+        double mult = -8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);         
                 
         phys_multiply(intNe, mult/1.0e4); // convert m-2 to cm-2
         
@@ -453,6 +460,8 @@ void nInterferometry::doMaskCutoff() {
     nPhysD *regionPhys = NULL;
     nPhysD* image=localPhys["intergratedNe"];
     if (nPhysExists(image)) {
+        nparent->showPhys(image);
+        QApplication::processEvents();
         if (my_w.maskRegion->isChecked()) {
             maskRegion->show();
             nPhysD* phase=localPhys["phase"];
@@ -522,7 +531,6 @@ void nInterferometry::doMaskCutoff() {
 }
         
 void nInterferometry::doAbel() {
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << sender();
     if (my_w.abel->isChecked() && nPhysExists(localPhys["intergratedNeMask"])) {
         
         int dx=localPhys["intergratedNeMask"]->getW();
@@ -531,7 +539,7 @@ void nInterferometry::doAbel() {
 
         nPhysD* abel= new nPhysD(dx,dy,0.0,"Abel");
         abel->property=data->property;
-        vec2 p0=(abel->to_pixel(vec2f(my_w.abelY->value(),my_w.abelY->value())));
+        vec2 p0=(abel->to_pixel(vec2f(my_w.abelX->value(),my_w.abelY->value())));
         
         QProgressDialog progress("Abel", QString(), 0, dx, this);
         progress.setWindowModality(Qt::WindowModal);

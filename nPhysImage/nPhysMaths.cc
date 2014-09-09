@@ -260,6 +260,41 @@ phys_point_divide(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
 	}
 }
 
+double phys_sum_points(nPhysImageF<double> &iimage) {
+	double retVal=0.0;
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		retVal+=iimage.point(ii);
+	}
+	return retVal;
+}
+
+double phys_sum_square_points(nPhysImageF<double> &iimage) {
+	double retVal=0.0;
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		retVal+=iimage.point(ii)*iimage.point(ii);
+	}
+	return retVal;
+}
+
+void phys_opposite(nPhysImageF<double> &iimage) {
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		iimage.set(ii,-iimage.point(ii));
+	}
+	iimage.TscanBrightness();
+	iimage.setName("-("+iimage.getName()+")");
+}
+
+
+void phys_inverse(nPhysImageF<double> &iimage) {
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		iimage.set(ii,1.0/iimage.point(ii));
+	}
+	iimage.TscanBrightness();
+	iimage.setName("1/("+iimage.getName()+")");
+}
+
+
+
 
 void 
 phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
