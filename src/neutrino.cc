@@ -157,6 +157,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
 
 	connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
+	connect(my_w.actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
 
 	connect(my_w.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
@@ -1066,23 +1067,20 @@ neutrino::createQimage() {
 // Export
 
 void neutrino::exportGraphics () { 
-#if defined(Q_OS_WIN)
-    int modifier=QApplication::keyboardModifiers();
-#else
-    int modifier=QApplication::queryKeyboardModifiers();
-#endif
-	QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
-	if (!fout.isEmpty()) {
-        if (modifier == Qt::NoModifier) {
-            exportGraphics(fout);
-        } else {
-            for (int i=0;i<physList.size() ; i++) {
-                actionNextBuffer();
-                QFileInfo fi(fout);
-                exportGraphics(fi.path()+"/"+fi.baseName()+QString("%1").arg(i, 3, 10, QChar('0'))+"."+fi.completeSuffix());
-            }
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
+    if (!fout.isEmpty()) 
+        exportGraphics(fout);
+}
+
+void neutrino::exportAllGraphics () { 
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
+    if (!fout.isEmpty()) {
+        for (int i=0;i<physList.size() ; i++) {
+            actionNextBuffer();
+            QFileInfo fi(fout);
+            exportGraphics(fi.path()+"/"+fi.baseName()+QString("%1").arg(i, 3, 10, QChar('0'))+"."+fi.completeSuffix());
         }
-	}
+    }
 }
 
 void neutrino::exportGraphics (QString fout) {

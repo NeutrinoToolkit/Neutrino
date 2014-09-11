@@ -245,17 +245,9 @@ void nColorBarWin::slider_max_changed(int val)
 }
 
 void nColorBarWin::cutOff() {
-//	QMessageBox::warning(this,"FIXME", QString(__FILE__)+QString(" ")+QString(__FUNCTION__)+QString(" ")+QString::number(__LINE__),QMessageBox::Cancel);
 	if (currentBuffer) {
-		double mini=my_w.lineMin->text().toDouble();
-		double maxi=my_w.lineMax->text().toDouble();
-
-		nPhysD *cut=new nPhysD(currentBuffer->getW(),currentBuffer->getH(),0.0, "IntensityCutoff("+QString::number(mini).toStdString()+","+QString::number(maxi).toStdString()+")");
-		cut->setShortName("IntensityCutoff");
-		cut->setFromName(currentBuffer->getFromName());
-		for (size_t k=0;k<currentBuffer->getSurf();k++) {
-			cut->Timg_buffer[k]=min(max(currentBuffer->Timg_buffer[k],mini),maxi);
-		}
+		nPhysD *cut=new nPhysD(*currentBuffer);
+        phys_cutoff(*cut,my_w.lineMin->text().toDouble(),my_w.lineMax->text().toDouble());
 		cutOffPhys=nparent->replacePhys(cut,cutOffPhys);
 	}
 }

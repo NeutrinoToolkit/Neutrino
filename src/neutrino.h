@@ -187,6 +187,7 @@ public slots:
 	void saveSession(QString=QString());
 
 	void exportGraphics();
+	void exportAllGraphics();
 	void exportGraphics(QString);
 
 	nGenericPan* Monitor();

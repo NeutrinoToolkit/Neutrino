@@ -293,7 +293,37 @@ void phys_inverse(nPhysImageF<double> &iimage) {
 	iimage.setName("1/("+iimage.getName()+")");
 }
 
+void phys_replace(nPhysImageF<double> &iimage, double oldval, double newval) {
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		if (iimage.point(ii)==oldval) iimage.set(ii,newval);
+	}
+	iimage.TscanBrightness();
+	std::ostringstream ostr;
+	ostr << "replace(" << iimage.getName() << "," << oldval << "," << newval << ")";
+	iimage.setName(ostr.str());
+}
 
+void phys_replace_NaN(nPhysImageF<double> &iimage, double newval) {
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+		if (!isfinite(iimage.point(ii))) iimage.set(ii,newval);
+	}
+	iimage.TscanBrightness();
+	
+	std::ostringstream ostr;
+	ostr << "replaceNaN(" << iimage.getName() << "," << newval << ")";
+	iimage.setName(ostr.str());
+}
+
+void phys_cutoff(nPhysImageF<double> &iimage, double minval, double maxval) {
+    iimage.setShortName("IntensityCutoff");
+	for (register size_t ii=0; ii<iimage.getSurf(); ii++) {
+        if (isfinite(iimage.point(ii))) iimage.set(ii,std::min(std::max(iimage.point(ii),minval),maxval));
+    }
+	iimage.TscanBrightness();
+	std::ostringstream ostr;
+	ostr << "min_max(" << iimage.getName() << "," << minval << "," << maxval << ")";
+	iimage.setName(ostr.str());
+}
 
 
 void 

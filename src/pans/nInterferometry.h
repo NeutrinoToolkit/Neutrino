@@ -64,6 +64,7 @@ public slots:
 	void useBarrierToggled(bool);
 	void guessCarrier();
 
+	void doTrash();
 	void doWavelet();
 	void doWavelet(int);
 	void doUnwrap();

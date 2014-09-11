@@ -91,6 +91,7 @@
     <addaction name="actionMonitor_Directory"/>
     <addaction name="separator"/>
     <addaction name="actionExport"/>
+    <addaction name="actionExport_all"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -785,6 +786,11 @@
   <action name="actionGhost">
    <property name="text">
     <string>Ghost</string>
+   </property>
+  </action>
+  <action name="actionExport_all">
+   <property name="text">
+    <string>Export all</string>
    </property>
   </action>
  </widget>

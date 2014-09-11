@@ -98,6 +98,21 @@ void nWavelet::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
 }
 
+void nWavelet::physDel(nPhysD* buf) {
+    vector<nPhysD *> localPhys;
+    localPhys.push_back(origSubmatrix);
+    localPhys.push_back(unwrapPhys);
+    localPhys.push_back(referencePhys);
+    localPhys.push_back(carrierPhys);
+    localPhys.push_back(syntheticPhys);
+    for (vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
+        if (buf==*itr) {
+            *itr=NULL;
+        }
+    }
+}
+
+
 void nWavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {

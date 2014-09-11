@@ -204,6 +204,10 @@ double phys_sum_square_points(nPhysImageF<double> &);
 void phys_opposite(nPhysImageF<double> &);
 void phys_inverse(nPhysImageF<double> &);
 
+void phys_replace(nPhysImageF<double> &, double, double);
+void phys_replace_NaN(nPhysImageF<double> &, double);
+void phys_cutoff(nPhysImageF<double> &, double, double);
+
 std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>*, nPhysImageF<double>*);
 
 
