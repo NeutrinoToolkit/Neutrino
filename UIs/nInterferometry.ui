@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>304</width>
-    <height>611</height>
+    <height>626</height>
    </rect>
   </property>
   <property name="font">
@@ -626,7 +626,7 @@
        </item>
        <item row="1" column="0" colspan="5">
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,0,1,0">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,2,0">
           <property name="margin">
            <number>0</number>
           </property>
@@ -711,13 +711,6 @@
            </widget>
           </item>
           <item>
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QWidget" name="widget_5" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0">
              <property name="spacing">
@@ -730,6 +723,9 @@
               <widget class="QLineEdit" name="abelMinMax">
                <property name="toolTip">
                 <string>Min and max value for abel inversion</string>
+               </property>
+               <property name="text">
+                <string>0 1e20</string>
                </property>
               </widget>
              </item>

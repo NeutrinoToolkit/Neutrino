@@ -1078,8 +1078,9 @@ void neutrino::exportAllGraphics () {
         for (int i=0;i<physList.size() ; i++) {
             actionNextBuffer();
             QFileInfo fi(fout);
-            exportGraphics(fi.path()+"/"+fi.baseName()+QString("%1").arg(i, 3, 10, QChar('0'))+"."+fi.completeSuffix());
+            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
         }
+        setProperty("fileExport",fout);
     }
 }
 
@@ -1110,11 +1111,14 @@ void neutrino::exportGraphics (QString fout) {
 		QPainter painter( &svgGen );		
 		my_s.render(&painter);
 	} else {
-		QImage image(my_size,QImage::Format_ARGB32);
-		image.fill(0);
-		QPainter painter(&image);
-		my_s.render(&painter);
-		image.save(fout);
+        
+        QPixmap pixMap = QPixmap::grabWidget(my_w.my_view);
+        pixMap.save(fout);
+	//	QImage image(my_size,QImage::Format_ARGB32);
+//		image.fill(0);
+//		QPainter painter(&image);
+//		my_s.render(&painter);
+//		image.save(fout);
 	}
 	my_mouse.setVisible(resetmouse);
 }

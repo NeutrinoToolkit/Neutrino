@@ -792,6 +792,9 @@
    <property name="text">
     <string>Export all</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
