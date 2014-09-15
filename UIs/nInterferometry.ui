@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>304</width>
-    <height>626</height>
+    <height>594</height>
    </rect>
   </property>
   <property name="font">
@@ -626,7 +626,7 @@
        </item>
        <item row="1" column="0" colspan="5">
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,2,0">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,2,3,0">
           <property name="margin">
            <number>0</number>
           </property>

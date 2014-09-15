@@ -534,8 +534,7 @@ void nInterferometry::doMaskCutoff() {
         }
 
         if (phaseMask==NULL) {
-            phaseMask=new nPhysD(*phaseMask);
-            phaseMask->property=phase->property;
+            phaseMask=new nPhysD(*phase);
         }
 
         phaseMask->TscanBrightness();

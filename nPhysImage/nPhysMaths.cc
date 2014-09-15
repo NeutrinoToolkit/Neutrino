@@ -325,7 +325,6 @@ void phys_cutoff(nPhysImageF<double> &iimage, double minval, double maxval) {
 	iimage.setName(ostr.str());
 }
 
-
 void 
 phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
 {

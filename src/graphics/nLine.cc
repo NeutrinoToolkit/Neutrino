@@ -728,6 +728,7 @@ nLine::keyReleaseEvent ( QKeyEvent *  ) {
 
 void
 nLine::moveBy(QPointF delta) {
+    DEBUG("HERE" << sender());
 	if (property("parentPanControlLevel").toInt()<2) {
 		for (int i =0; i<ref.size(); i++) {
 			changeP(i,ref[i]->pos()+delta);

@@ -83,6 +83,7 @@ neutrino::~neutrino()
 neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 
 	my_w.setupUi(this);
+    setAcceptDrops(true);
 
 // this below works if there is just one neutrino win open
 //#ifdef Q_OS_MAC
@@ -591,8 +592,7 @@ void neutrino::cycleOverItems() {
 
 nGenericPan* neutrino::existsPan(QString name) {
 	foreach (nGenericPan *pan, getPans()) {
-        DEBUG(pan->panName.toStdString() << " " << name.toStdString());
-		if (pan->panName.startsWith(name)) {
+        if (pan->panName.startsWith(name)) {
             pan->show();
             pan->raise();
 			return pan;
@@ -817,8 +817,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 				while(ifile.peek()!=-1) {
 					getline(ifile,line);
 					QString qLine=QString::fromStdString(line);
-                    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << line);
-					if (progress.wasCanceled()) break;
+                    if (progress.wasCanceled()) break;
 					if (qLine.startsWith("NeutrinoImage")) {
 						counter++;
 						progress.setValue(counter);
@@ -849,8 +848,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
-                        DEBUG("NeutrinoPan detected >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-						QStringList listLine=qLine.split(" ");
+                        QStringList listLine=qLine.split(" ");
 						QString panName=listLine.at(1);
 						counter++;
 						progress.setValue(counter);
@@ -1089,37 +1087,36 @@ void neutrino::exportGraphics (QString fout) {
 	bool resetmouse=my_mouse.isVisible();
 	my_mouse.setVisible(false);
 	QSize my_size=QSize(my_s.width(), my_s.height());
+    qDebug() << ":::::::::::::::::::" << my_size;
 	if (QFileInfo(fout).suffix().toLower()==QString("pdf")) {
-		QPrinter printer(QPrinter::HighResolution);
-		printer.setOutputFormat(QPrinter::PdfFormat);
-		printer.setOutputFileName(fout);
-		printer.setColorMode(QPrinter::Color);
-		printer.setPaperSize(my_tics.boundingRect().size().toSize(),QPrinter::DevicePixel);
-		printer.setOrientation(QPrinter::Portrait);
-		printer.setCreator("Neutrino "+QString(__VER));
-		printer.setDocName(windowTitle());
-		QPainter my_painter( &printer );
-		my_s.render(&my_painter);
-		my_painter.end();
-	} else if	(QFileInfo(fout).suffix().toLower()==QString("svg")) {
+		QPrinter myPrinter(QPrinter::ScreenResolution);
+        myPrinter.setOutputFileName(fout);
+        myPrinter.setOrientation(QPrinter::Landscape);
+        myPrinter.setPaperSize(QPrinter::A4);
+        qDebug() << myPrinter.paperSize() << myPrinter.paperSize(QPrinter::DevicePixel);
+        int newWidth=myPrinter.paperSize(QPrinter::DevicePixel).height() * ((double) my_size.width())/((double)my_size.height());
+        QSize newSize=QSize(newWidth,myPrinter.paperSize(QPrinter::DevicePixel).height());
+        myPrinter.setPaperSize(newSize,QPrinter::DevicePixel);
+
+        myPrinter.setOutputFormat(QPrinter::PdfFormat);
+        myPrinter.setPageMargins(0.0, 0.0, 0.0, 0.0, QPrinter::DevicePixel);
+        
+        QPainter myPainter(&myPrinter);
+        myPainter.setViewport(0, 0, myPrinter.width(), myPrinter.height());
+        my_s.render(&myPainter);
+	} else if (QFileInfo(fout).suffix().toLower()==QString("svg")) {
 		QSvgGenerator svgGen;
 		svgGen.setFileName(fout);
 		svgGen.setSize(my_size);
-		svgGen.setViewBox(QRect(-my_tics.boundingRect().left(),-my_tics.boundingRect().top(),my_tics.boundingRect().width(),my_tics.boundingRect().height()));
+        QRect my_rect(0,0,my_tics.boundingRect().width(),my_tics.boundingRect().height());
+		svgGen.setViewBox(my_rect);
 		svgGen.setTitle("Neutrino");
 		svgGen.setDescription(windowFilePath());
 		QPainter painter( &svgGen );		
 		my_s.render(&painter);
 	} else {
-        
-        QPixmap pixMap = QPixmap::grabWidget(my_w.my_view);
-        pixMap.save(fout);
-	//	QImage image(my_size,QImage::Format_ARGB32);
-//		image.fill(0);
-//		QPainter painter(&image);
-//		my_s.render(&painter);
-//		image.save(fout);
-	}
+        QPixmap::grabWidget(my_w.my_view).save(fout);
+    }
 	my_mouse.setVisible(resetmouse);
 }
 
@@ -1313,7 +1310,6 @@ void neutrino::dragMoveEvent(QDragMoveEvent *e)
 void neutrino::dropEvent(QDropEvent *e) {
 	if (e->mimeData()->hasFormat("data/neutrino")) {
 		nPhysD *my_phys=(nPhysD *) e->mimeData()->data("data/neutrino").toLong();
-		DEBUG("DROP pointer: " << (void*)my_phys);
 		if (my_phys) {
 			if (physList.contains(my_phys)) {
 				showPhys(my_phys);
@@ -1323,7 +1319,7 @@ void neutrino::dropEvent(QDropEvent *e) {
 				addShowPhys(copyhere);
 			}
 		}
-	}	else if (e->mimeData()->hasUrls()) {
+	} else if (e->mimeData()->hasUrls()) {
 		QStringList fileList;
 		foreach (QUrl qurl, e->mimeData()->urls()) {
 			fileList << qurl.toLocalFile();
@@ -2032,7 +2028,6 @@ void neutrino::loadDefaults(){
 		}
 	}
     if (my_set.value("useDot",false).toBool()) {
-        DEBUG("here!!!!");
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));

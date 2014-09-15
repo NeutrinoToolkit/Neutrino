@@ -248,10 +248,6 @@ public slots:
 	void keyPressEvent (QKeyEvent *);
 	void keyReleaseEvent (QKeyEvent *);
 
-	void dragEnterEvent(QDragEnterEvent *);
-	void dragMoveEvent(QDragMoveEvent *);
-	void dropEvent(QDropEvent *);
-
 	void closeEvent(QCloseEvent *);
 
 	void actionPrevBuffer();
@@ -316,8 +312,11 @@ public slots:
 	
 	nLine* line(QString);
 	
+    void dragEnterEvent(QDragEnterEvent *);
+	void dragMoveEvent(QDragMoveEvent *);
+	void dropEvent(QDropEvent *);
+    
 signals:
-	void passdropEvent(QDropEvent *);
 	void updatecolorbar();
 	void colorValue(double);
 

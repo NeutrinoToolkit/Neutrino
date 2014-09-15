@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>277</width>
-    <height>100</height>
+    <height>84</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,9 @@
   <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,1" columnstretch="1,0,1,0">
    <property name="margin">
     <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
    </property>
    <item row="1" column="0">
     <widget class="QDoubleSpinBox" name="minStretch">

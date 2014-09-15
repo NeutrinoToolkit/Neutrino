@@ -47,7 +47,6 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
 	}
 	showDimPixel=settings.value("showDimPixel",true).toBool();
 
-    setAcceptDrops(false);
 	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     
 }
