@@ -199,6 +199,7 @@ void nLine::addPointAfterClick ( QPointF ) {
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
+    click_pos=e->pos();
 	for (int i=0;i<ref.size();i++) {
 		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
 			moveRef.append(i);
@@ -211,10 +212,10 @@ void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 		showMessage(tr("Moving node ")+QString::number(keeplast+1));
 	} else { // if none is selected, append ref.size() to move the whole objec
 		moveRef.append(ref.size());
-		click_pos= e->pos();
 		showMessage(tr("Moving object"));
 	}
 
+    DEBUG(">>>>>>>>>>>>>>>>> " << click_pos.x() << " " << click_pos.y());
 
 	QGraphicsItem::mousePressEvent(e);
 
@@ -230,9 +231,10 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 	nodeSelected=-1;
 	if (moveRef.contains(ref.size())) {
 		QPointF delta=e->pos()-click_pos;
-		moveBy(delta);
-		click_pos=e->pos();
+		DEBUG("HERE" << sender() << " " << delta.x() << " " << delta.y());
+        moveBy(delta);
 	}
+    click_pos=e->pos();
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
@@ -523,6 +525,7 @@ nLine::changeColorHolder (QColor color) {
 		}
 	}
 }
+
 void
 nLine::changeP (int np, QPointF p) {
 	prepareGeometryChange();
@@ -728,10 +731,10 @@ nLine::keyReleaseEvent ( QKeyEvent *  ) {
 
 void
 nLine::moveBy(QPointF delta) {
-    DEBUG("HERE" << sender());
+    DEBUG("HERE" << sender() << " " << delta.x() << " " << delta.y());
 	if (property("parentPanControlLevel").toInt()<2) {
 		for (int i =0; i<ref.size(); i++) {
-			changeP(i,ref[i]->pos()+delta);
+			changeP(i,mapToScene(ref[i]->pos()+delta));
 		}
 	}
 }

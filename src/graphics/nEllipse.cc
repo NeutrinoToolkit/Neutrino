@@ -467,7 +467,7 @@ nEllipse::keyReleaseEvent ( QKeyEvent *  ) {
 void
 nEllipse::moveBy(QPointF delta) {
 	for (int i =0; i<ref.size(); i++) {
-		changeP(i,ref[i]->pos()+delta,true);
+        changeP(i,mapToScene(ref[i]->pos()+delta),true);
 	}
 }
 

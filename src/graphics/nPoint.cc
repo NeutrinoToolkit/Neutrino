@@ -292,7 +292,7 @@ nPoint::keyReleaseEvent ( QKeyEvent *  ) {
 
 void
 nPoint::moveBy(QPointF delta) {
-	setPoint(ref.pos()+delta);
+    setPoint(mapToScene(ref.pos()+delta));
 	showMessage(getPointString());
 }
 

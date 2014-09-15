@@ -456,21 +456,15 @@ void nInterferometry::doSubtract () {
 
     if (waveletPhys[0]["unwrap"] && waveletPhys[1]["unwrap"]) {
 
-        double offset=0.0;
+        nPhysD phase;
 
-        vec2f absPoint=waveletPhys[1]["unwrap"]->to_pixel(vec2f(my_w.posZeroX->value(),my_w.posZeroY->value()));
-        offset=waveletPhys[0]["unwrap"]->point(absPoint)-waveletPhys[1]["unwrap"]->point(absPoint);
-        if (!std::isfinite(offset)) {
-            my_w.statusbar->showMessage("Point outside");
-            offset=0.0;
+        if (my_w.opposite->isChecked()) {
+            phase = *waveletPhys[0]["unwrap"] - *waveletPhys[1]["unwrap"];
+        } else {
+            phase = *waveletPhys[1]["unwrap"] - *waveletPhys[0]["unwrap"];
         }
-        nPhysD phase= *waveletPhys[1]["unwrap"] - *waveletPhys[0]["unwrap"];
-        if (offset!=0.0) phys_add(phase, offset);
-
-        if (phys_sum_points(phase)<0) {
-            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << phys_sum_points(phase));
-            phys_opposite(phase);
-        }
+        double offset=phase.point(waveletPhys[1]["unwrap"]->to_pixel(vec2f(my_w.posZeroX->value(),my_w.posZeroY->value())));
+        if (std::isfinite(offset)) phys_add(phase,offset);
 
         localPhys["phase"]=nparent->replacePhys(phase.fast_rotated(my_w.rotAngle->value()),localPhys["phase"]);
         localPhys["phase"]->setShortName("phase");
