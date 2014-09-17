@@ -74,6 +74,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
 	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
+	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
+    
 }
 
 void nPreferences::useDot() {
@@ -85,9 +87,12 @@ void nPreferences::useDot() {
     my_w.statusBar->showMessage(QLocale::countryToString(QLocale().country()), 5000);
 }
 
+void nPreferences::askCloseUnsaved() {
+    nparent->setProperty("askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
+}
+
 void nPreferences::changeShowDimPixel() {
 	nparent->my_w.my_view->showDimPixel=my_w.showDimPixel->isChecked();
-	
 	nparent->my_w.my_view->update();
 }
 

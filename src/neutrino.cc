@@ -479,10 +479,11 @@ neutrino::loadPlugin()
 		if (plugin) {
 			plug_iface = qobject_cast<nPlug *>(plugin);
 			if (plug_iface) {
-				cerr<<"plugin"<<plug_iface->name().toAscii().constData()<<" cast success"<<endl;
+				DEBUG("plugin"<<plug_iface->name().toAscii().constData()<<" cast success");
 				plug_iface->instantiate(this);
-			} else
-				cerr<<"plugin load fail"<<endl;
+			} else {
+				DEBUG("plugin load fail");
+            }
 		}
 	}
  }
@@ -659,7 +660,8 @@ void neutrino::openFile(QString fname) {
 
 vector <nPhysD *> neutrino::fileOpen(QString fname) {
 	vector <nPhysD *> imagelist;
-	if (QFileInfo(fname).suffix().toLower()=="neus") {
+    QString suffix=QFileInfo(fname).suffix().toLower();
+	if (suffix=="neus") {
 		imagelist=openSession(fname);
 	} else {
 		imagelist=phys_open(fname.toUtf8().constData());
@@ -739,7 +741,6 @@ void neutrino::saveSession (QString fname) {
 		}		
 	} else {
 		setProperty("fileOpen", fname);
-		QString suffix=QFileInfo(fname).suffix().toLower();
 		QList<nGenericPan *> pans=getPans();
 		for(int k = 0; k < (pans.size()/2); k++) pans.swap(k,pans.size()-(1+k));
 		
@@ -757,6 +758,7 @@ void neutrino::saveSession (QString fname) {
 			QApplication::processEvents();
 			ofile << "NeutrinoImage" << endl;
 			phys_dump_binary(physList.at(i),ofile);
+            physList.at(i)->setType(PHYS_FILE);
 		}
 		for (int i=0;i<pans.size(); i++) {
 			if (progress.wasCanceled()) break;
@@ -1396,7 +1398,7 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (*.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
+	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (* *.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
 }
 
 void
@@ -1410,8 +1412,24 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
 	if (!fname.isEmpty()) {
+        int res=QMessageBox::warning(this,tr("Attention"),
+                                     fname+QString("\n")+tr("exists. Overwrite?"),
+                                     QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
+        switch (res) {
+            case QMessageBox::No:
+                fileSave();
+                return;
+                break;
+            case QMessageBox::Cancel:
+                return;
+                break;
+        }
+
+        
 		setProperty("fileOpen", fname);
 		QString suffix=QFileInfo(fname).suffix().toLower();
+        if (suffix.isEmpty()) fileSave(fname+".neus");
+        
 		if (suffix.startsWith("neus")) {
 			saveSession(fname);
 		} else {
@@ -1457,9 +1475,9 @@ neutrino::fileClose() {
 			QApplication::processEvents();
 		}	
 		foreach (nPhysD *phys, physList) {
-			if (askAll && phys->getType()==	PHYS_DYN) {
+            if (askAll && phys->getType()==	PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
 				int res=QMessageBox::warning(this,tr("Attention"),
-											 tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+											 tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
 											 QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
 				switch (res) {
 					case QMessageBox::Yes:
@@ -1486,7 +1504,7 @@ neutrino::fileClose() {
 void
 neutrino::closeCurrentBuffer() {
 	if (currentBuffer)  {
-		if (currentBuffer->getType()==PHYS_DYN) {
+		if (currentBuffer->getType()==PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
 			int res=QMessageBox::warning(this,tr("Attention"),
 										 tr("The image")+QString("\n")+QString::fromUtf8(currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
 										 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
@@ -2030,6 +2048,9 @@ void neutrino::loadDefaults(){
     if (my_set.value("useDot",false).toBool()) {
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
+    
+    setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
+    
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
 	my_set.endGroup();

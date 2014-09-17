@@ -21,12 +21,12 @@ void panThread::run() {
         WARNING("Problems getting calculation_function");
         return;
     }
-    std::cerr<<"[nGenericPan] pan thread running..."<<std::flush;
+    DEBUG("[nGenericPan] pan thread running...");
     (*calculation_function)(params, n_iter);
-    std::cerr<<"finished!"<<std::endl;
+    DEBUG("[nGenericPan] pan thread finished");
 }
 
 void panThread::stop() {
-    std::cerr<<"killed!"<<std::endl;
+    DEBUG("[nGenericPan] pan thread killed");
     n_iter = -1;
 }

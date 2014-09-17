@@ -74,7 +74,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 nPhysD*
 nWinList::getPhys(QTreeWidgetItem* item) {
 	nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<void*>());
-	retphys->property.dumper(std::cerr);
+//	retphys->property.dumper(std::cerr);
 	return retphys;
 }
 
@@ -116,8 +116,6 @@ nWinList::changeProperties() {
 	}
 	bool ok;
 	QString text;
-	qDebug() << physSelected;
-	qDebug() << itemsSelected;
 	if (physSelected.size()>0) {
 		if (sender()==my_w.actionShort) {
 			text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(1,0).toString(), &ok);

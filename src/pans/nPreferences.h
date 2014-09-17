@@ -49,6 +49,7 @@ public slots:
 	void hideEvent(QHideEvent*);
 	void showEvent(QShowEvent*);
 	void useDot();
+    void askCloseUnsaved();
 };
 
 #endif

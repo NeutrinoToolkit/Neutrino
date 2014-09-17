@@ -212,7 +212,7 @@ QVariant nIntegralInversion::doInversion() {
 			}
 			retVar=qVariantFromValue(*invertedPhys);
 		} else {	
-			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
+			DEBUG("[nIntegralInversion] Error: inversion returned NULL");
 		}
 		
 	}

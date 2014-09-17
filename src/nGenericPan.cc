@@ -165,14 +165,12 @@ void nGenericPan::decorate() {
 
 void
 nGenericPan::physAdd(nPhysD * buffer) {
-	DEBUG(5, buffer->getName());
 	addPhysToCombos(buffer);
 	QApplication::processEvents();
 }
 
 void
 nGenericPan::physDel(nPhysD * buffer) {
-	DEBUG(5, buffer->getName());
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {
 			if (combo->property("neutrinoImage").toBool()) {

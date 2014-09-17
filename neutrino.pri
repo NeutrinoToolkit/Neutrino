@@ -30,17 +30,12 @@ QMAKE_EXTRA_TARGETS += nPhys
 PRE_TARGETDEPS = nPhys
 
 
-CONFIG(debug, debug|release) {
+CONFIG(debug) {
     DEFINES += __phys_debug=10
     message("DEBUG!")
 } else {
     DEFINES += QT_NO_DEBUG_OUTPUT
     message("RELEASE!")
-}
-
-#this accounts for a bug in qmake for xcode
-macx-xcode {
-    DEFINES += __phys_debug=10
 }
 
 # base

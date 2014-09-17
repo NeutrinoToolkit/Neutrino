@@ -153,6 +153,7 @@ void nInterferometry::physDel(nPhysD* buf) {
 
 void nInterferometry::getPosZero(bool check) {
     if (check) {
+        my_w.abelButton->setChecked(false);
         nparent->showPhys(getPhysFromCombo(my_image[1].image));
         connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     } else {
@@ -180,6 +181,7 @@ void nInterferometry::setPosZero(QPointF point) {
 
 void nInterferometry::getPosAbel(bool check) {
     if (check) {
+        my_w.posZeroButton->setChecked(false);        
         nparent->showPhys(localPhys["phaseMask"]);
         connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosAbel(QPointF)));
     } else {
@@ -464,7 +466,7 @@ void nInterferometry::doSubtract () {
             phase = *waveletPhys[1]["unwrap"] - *waveletPhys[0]["unwrap"];
         }
         double offset=phase.point(waveletPhys[1]["unwrap"]->to_pixel(vec2f(my_w.posZeroX->value(),my_w.posZeroY->value())));
-        if (std::isfinite(offset)) phys_add(phase,offset);
+        if (std::isfinite(offset)) phys_subtract(phase,offset);
 
         localPhys["phase"]=nparent->replacePhys(phase.fast_rotated(my_w.rotAngle->value()),localPhys["phase"]);
         localPhys["phase"]->setShortName("phase");

@@ -1329,9 +1329,9 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 	 getline(ifile,line);
 	 int buffer_size=atoi(line.c_str());*/
 	
-	std::cerr<<"w: "<<my_w<<std::endl;
-	std::cerr<<"h: "<<my_h<<std::endl;
-	std::cerr<<"s: "<<buffer_size<<std::endl;
+	DEBUG("w: "<<my_w);
+	DEBUG("h: "<<my_h);
+	DEBUG("s: "<<buffer_size);
 	
 	if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
 	

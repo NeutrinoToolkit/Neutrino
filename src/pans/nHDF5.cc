@@ -494,8 +494,7 @@ nPhysD* nHDF5::phys_open_HDF5(string fileName, string dataName) {
 				}
 				
 				DEBUG("did " << did << " tid "<< tid << " sid "<< sid );
-				int status = H5Dread(did, tid, sid, file_space_id, H5P_DEFAULT, buffer);
-				DEBUG("status" << status);
+				H5Dread(did, tid, sid, file_space_id, H5P_DEFAULT, buffer);
 				my_data->resize(dims[1],dims[0]);
 				for (int na=0;na<narray;na++) {
 					DEBUG("na "<< na);

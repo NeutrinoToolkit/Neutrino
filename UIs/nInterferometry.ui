@@ -740,6 +740,9 @@
                <property name="text">
                 <string>0 1e20</string>
                </property>
+               <property name="neutrinoSave" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
