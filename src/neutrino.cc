@@ -1413,22 +1413,29 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
 	if (!fname.isEmpty()) {
-        int res=QMessageBox::warning(this,tr("Attention"), fname+QString("\n")+tr("exists. Overwrite?"),
-                                     QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
-        switch (res) {
-            case QMessageBox::No:
-                fileSave();
-                return;
-                break;
-            case QMessageBox::Cancel:
-                return;
-                break;
-        }
 
         
 		setProperty("fileOpen", fname);
 		QString suffix=QFileInfo(fname).suffix().toLower();
-        if (suffix.isEmpty()) fileSave(fname+".neus");
+        if (suffix.isEmpty()) {
+            fname+=".neus";
+            suffix=QFileInfo(fname).suffix().toLower();
+
+            if (QFile(fname).exists()) {
+                int res=QMessageBox::warning(this,tr("Attention"), fname+QString("\n")+tr("exists. Overwrite?"),
+                                             QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
+                switch (res) {
+                    case QMessageBox::No:
+                        fileSave();
+                        return;
+                        break;
+                    case QMessageBox::Cancel:
+                        return;
+                        break;
+                }
+            }
+        
+        }
         
 		if (suffix.startsWith("neus")) {
 			saveSession(fname);

@@ -668,7 +668,6 @@ void phys_invert_abel(abel_params &params)
 	params.oimage->set_origin(params.iimage->get_origin());
 	params.oimage->set_scale(params.iimage->get_scale());
 
-//     params.rimage.resize(params.iimage->getW(), params.iimage->getH());
     
 	// adorabile ridondanza qui..
 	
@@ -697,10 +696,10 @@ void phys_invert_abel(abel_params &params)
 	copy_buffer = new double[integral_size];
 	out_buffer = new double[integral_size];
 	
-// 	vector<double> rbuffer_pos(integral_size),rbuffer_neg(integral_size);
+//     params.rimage.resize(params.iimage->getW(), params.iimage->getH());
+// 	vector<double> rbuffer_pos(integral_size);
 // 	for (int j=0; j<integral_size; j++) {
 // 	    rbuffer_pos[j]=j;
-// 	    rbuffer_neg[j]=-j;
 //     }
     
 	// .alex. old version
@@ -733,7 +732,7 @@ void phys_invert_abel(abel_params &params)
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
 			int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
 
-// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_neg[0], integral_size, PHYS_NEG);
+// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_NEG);
             
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
