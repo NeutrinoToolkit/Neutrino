@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
-    <height>312</height>
+    <width>280</width>
+    <height>266</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,8 +23,20 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="font">
        <font>
@@ -39,30 +51,9 @@
         <string>Transform</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="ft1dh_button">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>FT 1D Horizontal</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="ft1dv_button">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>FT 1D Vertical</string>
-          </property>
-         </widget>
-        </item>
+        <property name="margin">
+         <number>4</number>
+        </property>
         <item row="2" column="0">
          <widget class="QPushButton" name="ft2d_button">
           <property name="font">
@@ -75,6 +66,18 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="ft1dh_button">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>FT 1D Horizontal</string>
+          </property>
+         </widget>
+        </item>
         <item row="4" column="0">
          <widget class="QWidget" name="radios_w" native="true">
           <property name="font">
@@ -83,6 +86,9 @@
            </font>
           </property>
           <layout class="QGridLayout" name="gridLayout">
+           <property name="margin">
+            <number>2</number>
+           </property>
            <item row="1" column="0">
             <widget class="QRadioButton" name="ftoutput_real">
              <property name="enabled">
@@ -182,12 +188,178 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="ft1dv_button">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>FT 1D Vertical</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>Filter</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Horizontal</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>min</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="filterMinX">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="maximum">
+              <double>99999.990000000005239</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>max</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="filterMaxX">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="maximum">
+              <double>99999.990000000005239</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Vertical</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>min</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="filterMinY">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="maximum">
+              <double>99999.990000000005239</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>max</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="filterMaxY">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="maximum">
+              <double>99999.990000000005239</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>93</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

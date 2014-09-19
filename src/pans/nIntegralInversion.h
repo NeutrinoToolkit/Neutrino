@@ -57,6 +57,7 @@ private:
 	abel_params my_abel_params;
 
 public slots:
+    void physDel(nPhysD*);
 	void sceneChanged();
 	void refphase_checkbChanged(int);
 	QVariant doInversion();

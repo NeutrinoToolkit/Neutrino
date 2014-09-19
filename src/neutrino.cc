@@ -2024,6 +2024,7 @@ void neutrino::saveDefaults(){
 	my_set.setValue("colorTable", colorTable);
 	my_set.setValue("fileExport", property("fileExport"));
 	my_set.setValue("fileOpen", property("fileOpen"));
+	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
 	my_set.endGroup();
 }
 
@@ -2037,21 +2038,17 @@ void neutrino::loadDefaults(){
 	my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
 	my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
 	changeColorTable(my_set.value("colorTable",colorTable).toString());
-	QVariant variant=my_set.value("comboIconSizeDefault");
-	if (variant.isValid()) {
-		int val=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize()).toInt();
-		my_set.setValue("comboIconSizeDefault",val);
-		if (val>=0) {
-			QSize mysize=QSize(10*(val+1),10*(val+1));
-			foreach (QToolBar *obj, findChildren<QToolBar *>()) {
-				if (obj->iconSize()!=mysize) {
-					obj->hide();
-					obj->setIconSize(mysize);
-					obj->show();
-				}
-			}
-		}
-	}
+    int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1).toInt();
+    
+    QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
+    foreach (QToolBar *obj, findChildren<QToolBar *>()) {
+        if (obj->iconSize()!=mysize) {
+            obj->hide();
+            obj->setIconSize(mysize);
+            obj->show();
+        }
+    }
+
     if (my_set.value("useDot",false).toBool()) {
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }

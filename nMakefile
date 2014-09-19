@@ -51,7 +51,7 @@ endif
 	rm -rf dmg
 	mkdir dmg
 	cp -r neutrino.app dmg
-	./resources/macPackage/createdmg.sh --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 508 480 --icon neutrino.app 100 90 --icon html 260 200 --app-drop-link 420 90 neutrino.dmg dmg && rm -rf dmg
+	./resources/macPackage/createdmg.sh --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 508 480 --icon neutrino.app 100 90 --app-drop-link 420 90 neutrino.dmg dmg && rm -rf dmg
 	mv neutrino.dmg neutrino-${VERSION}.dmg
 
 py: lib

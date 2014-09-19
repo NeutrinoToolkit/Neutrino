@@ -66,6 +66,10 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	loadDefaults();
 	decorate();
 	
+    DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
+    
+    my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
+    
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
 	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));

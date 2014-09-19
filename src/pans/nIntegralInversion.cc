@@ -52,6 +52,8 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 
 	connect(my_w.doInversion, SIGNAL(clicked()), SLOT(doInversion()));
 
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+
 	my_w.invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
 	my_w.invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
 	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
@@ -60,6 +62,13 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 	decorate();
 	invertedPhys=NULL;
 }
+
+void nIntegralInversion::physDel(nPhysD* buf) {
+    if (buf==invertedPhys) {
+        invertedPhys=NULL;
+    }
+}
+
 
 void nIntegralInversion::refphase_checkbChanged(int val) {
 	my_w.refphase_cb->setEnabled(val==2);
