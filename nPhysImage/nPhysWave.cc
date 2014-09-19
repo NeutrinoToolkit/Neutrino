@@ -629,9 +629,20 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 	DEBUG(5,"resolution: "<< res << ", probe: " << probe_wl << ", mult: " << mult);
 	for (register size_t ii=0; ii<invimage.getSurf(); ii++) {
 		double the_point = invimage.point(ii)/res;
-		invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
+		invimage.set(ii, - mult * (+2*kappa*the_point));
 	}
 	invimage.TscanBrightness();
+}
+
+void
+phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
+{
+	double mult = 1e-6*(2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
+    phys_multiply(invimage,mult);
+	invimage.set_scale(res*1e2,res*1e2);
+    invimage.property["unitsX"]="cm";
+    invimage.property["unitsY"]="cm";
+    invimage.property["unitsCB"]="C/cm-3";
 }
 
 

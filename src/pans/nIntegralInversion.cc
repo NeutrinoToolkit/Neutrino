@@ -195,6 +195,10 @@ QVariant nIntegralInversion::doInversion() {
 					DEBUG("Inversions: applying plasma physics");
 					phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
 					break;
+				case 3:
+					DEBUG("Inversions: applying proton  physics");
+					phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+					break;
 				default:
 					break;
 			}

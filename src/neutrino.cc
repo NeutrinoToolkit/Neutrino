@@ -1398,7 +1398,8 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),"neutrino (* *.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
+	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),
+                                        "neutrino (* *.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
 }
 
 void
@@ -1412,8 +1413,7 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
 	if (!fname.isEmpty()) {
-        int res=QMessageBox::warning(this,tr("Attention"),
-                                     fname+QString("\n")+tr("exists. Overwrite?"),
+        int res=QMessageBox::warning(this,tr("Attention"), fname+QString("\n")+tr("exists. Overwrite?"),
                                      QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
         switch (res) {
             case QMessageBox::No:

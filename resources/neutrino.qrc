@@ -1,51 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="icon">icons/icon.png</file>
-        <file alias="colors">icons/colors.png</file>
-        <file alias="ruler">icons/ruler.png</file>
-        <file alias="winlist">icons/winlist.png</file>
-        <file alias="line">icons/line.png</file>
-        <file alias="flipline">icons/flipline.png</file>
-        <file alias="bezier">icons/bezier.png</file>
-        <file alias="closedLine">icons/closedLine.png</file>
-        <file alias="antialias">icons/antialias.png</file>
-        <file alias="rect">icons/rect.png</file>
-        <file alias="ellipse">icons/ellipse.png</file>
-        <file alias="lineoutH">icons/lineoutH.png</file>
-        <file alias="lineoutV">icons/lineoutV.png</file>
-        <file alias="lockzoom">icons/lockzoom.png</file>
-        <file alias="lockzoom2">icons/lockzoom2.png</file>
-        <file alias="saveTxt">icons/saveTxt.png</file>
-        <file alias="saveTxtMultiple">icons/saveTxtMultiple.png</file>
-        <file alias="saveClipboard">icons/saveClipboard.png</file>
-        <file alias="remove">icons/remove.png</file>
-        <file alias="plus">icons/plus.png</file>
-        <file alias="python">icons/python.png</file>
-        <file alias="lockOpen">icons/lockOpen.png</file>
-        <file alias="lockClose">icons/lockClose.png</file>
-        <file alias="help">icons/help.png</file>
-        <file alias="filePy">icons/filePy.png</file>
-        <file alias="savePy">icons/savePy.png</file>
-        <file alias="gearPy">icons/gearPy.png</file>
-        <file alias="savePref">icons/savePref.png</file>
-        <file alias="loadPref">icons/loadPref.png</file>
-        <file alias="refresh">icons/refresh.png</file>
-        <file alias="refresh2">icons/refresh2.png</file>
-        <file alias="savePDF">icons/savePDF.png</file>
-        <file alias="info">icons/info.png</file>
-        <file alias="center">icons/center.png</file>
-        <file alias="autoRefresh">icons/autoRefresh.png</file>
-        <file alias="noAutoRefresh">icons/noAutoRefresh.png</file>
-        <file alias="rotateLeft">icons/rotateLeft.png</file>
-        <file alias="rotateRight">icons/rotateRight.png</file>
-        <file alias="flipUpDown">icons/flipUpDown.png</file>
-        <file alias="flipLeftRight">icons/flipLeftRight.png</file>
-        <file alias="scale">icons/scale.png</file>
-        <file alias="short">icons/short.png</file>
-        <file alias="name">icons/name.png</file>
-        <file alias="run">icons/run.png</file>
-        <file alias="trash">icons/trash.png</file>
-        
         <file>icons/icon.png</file>
         <file>icons/colors.png</file>
         <file>icons/ruler.png</file>

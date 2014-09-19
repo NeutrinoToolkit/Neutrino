@@ -316,5 +316,6 @@ inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, besse
 // inversion physics
 void phys_apply_inversion_plasma(nPhysImageF<double> &, double, double);
 void phys_apply_inversion_gas(nPhysImageF<double> &, double, double, double);
+void phys_apply_inversion_protons(nPhysImageF<double> &, double, double, double, double);
 
 #endif
