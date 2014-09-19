@@ -148,6 +148,7 @@ struct abel_params_str {
 
     nPhysD *iimage;
     nPhysD *oimage;
+//     nPhysD rimage;
     
 	std::vector<phys_point> iaxis;
 	phys_direction idir;

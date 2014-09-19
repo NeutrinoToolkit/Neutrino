@@ -428,9 +428,12 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                     params.olist["source"]=tmp;
                 }
             
+                wphase->property["unitsCB"]="2pi";
                 params.olist["phase_2pi"] = wphase;
                 params.olist["contrast"] = qmap;
+                lambda->property["unitsCB"]="px";
                 params.olist["lambda"] = lambda;
+                angle->property["unitsCB"]="deg";
                 params.olist["angle"] = angle;
                 params.olist["intensity"] = intensity;
             
@@ -618,6 +621,7 @@ phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double m
 		//invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 		invimage.set(ii, mult*(pow(the_point/kappa + 1,2.)-1) );
 	}
+    invimage.property["unitsCB"]="m-3";
 	invimage.TscanBrightness();
 }
 
@@ -629,20 +633,21 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 	DEBUG(5,"resolution: "<< res << ", probe: " << probe_wl << ", mult: " << mult);
 	for (register size_t ii=0; ii<invimage.getSurf(); ii++) {
 		double the_point = invimage.point(ii)/res;
-		invimage.set(ii, - mult * (+2*kappa*the_point));
+		invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 	}
+    invimage.property["unitsCB"]="m-3";
 	invimage.TscanBrightness();
 }
 
 void
 phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
 {
-	double mult = 1e-6*(2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
+	double mult = (2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
     phys_multiply(invimage,mult);
 	invimage.set_scale(res*1e2,res*1e2);
     invimage.property["unitsX"]="cm";
     invimage.property["unitsY"]="cm";
-    invimage.property["unitsCB"]="C/cm-3";
+    invimage.property["unitsCB"]="C/m-3";
 }
 
 
@@ -663,6 +668,8 @@ void phys_invert_abel(abel_params &params)
 	params.oimage->set_origin(params.iimage->get_origin());
 	params.oimage->set_scale(params.iimage->get_scale());
 
+//     params.rimage.resize(params.iimage->getW(), params.iimage->getH());
+    
 	// adorabile ridondanza qui..
 	
 	// 1. set direction indexes
@@ -689,7 +696,13 @@ void phys_invert_abel(abel_params &params)
 	double *copy_buffer, *out_buffer;
 	copy_buffer = new double[integral_size];
 	out_buffer = new double[integral_size];
-
+	
+// 	vector<double> rbuffer_pos(integral_size),rbuffer_neg(integral_size);
+// 	for (int j=0; j<integral_size; j++) {
+// 	    rbuffer_pos[j]=j;
+// 	    rbuffer_neg[j]=-j;
+//     }
+    
 	// .alex. old version
 	/*switch (idir) {
 		case PHYS_Y:
@@ -719,18 +732,21 @@ void phys_invert_abel(abel_params &params)
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
 			int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
-			
+
+// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_neg[0], integral_size, PHYS_NEG);
+            
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 	
-			
 			phys_invert_abel_1D(copy_buffer, out_buffer, integral_size);
 			
 			params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
 			
-			
 
 			copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
+
+// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_POS);
+
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
@@ -743,6 +759,7 @@ void phys_invert_abel(abel_params &params)
 					0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
 		}
+
 		params.oimage->setName(string("ABEL ")+params.oimage->getName());
 		params.oimage->setShortName("ABEL");
 
@@ -822,7 +839,6 @@ void phys_invert_abel(abel_params &params)
 		}
 		params.oimage->setName(string("ABEL")+params.oimage->getName());
 		params.oimage->setShortName("ABEL");
-
 	} else {
 		DEBUG(1, "Unknown inversion type: "<<(int)ialgo);
 	}

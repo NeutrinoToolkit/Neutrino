@@ -54,7 +54,8 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 
 	my_w.invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
 	my_w.invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
-
+	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
+    
 	refphase_checkbChanged(my_w.refphase_checkb->checkState());
 	decorate();
 	invertedPhys=NULL;
@@ -195,10 +196,15 @@ QVariant nIntegralInversion::doInversion() {
 					DEBUG("Inversions: applying plasma physics");
 					phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
 					break;
-				case 3:
+				case 3: {
 					DEBUG("Inversions: applying proton  physics");
 					phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+//                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
+//                    phys_point_multiply(*pippo, *inv_image);
+//                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
+//                    nparent->addPhys(pippo);
 					break;
+                }
 				default:
 					break;
 			}

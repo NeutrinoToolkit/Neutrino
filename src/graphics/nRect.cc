@@ -128,7 +128,7 @@ QRect nRect::getRect() {
 	if (ref.size()<2) {
 		return QRect(0,0,0,0);
 	} else {
-		return QRectF(ref[0]->pos(),ref[1]->pos()).toRect().normalized();
+		return QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
 	}
 }
 
