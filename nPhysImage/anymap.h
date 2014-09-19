@@ -183,9 +183,13 @@ public:
 			DEBUG(5,"[anydata] Dumping "<<itr->first);
 
 			// check if key was inserted by non-existent access
-			// (strange std::map behaviour...)
-			if (itr->second.ddescr != anydata::any_none)
-				os<<itr->first<<" = "<<itr->second<<std::endl;
+			// (strange std::map behaviour...)			
+			if (itr->second.ddescr != anydata::any_none) {
+                std::string my_val=itr->second;
+                std::replace(my_val.begin(), my_val.end(),'\n', '\t');
+
+				os<<itr->first<<" = "<<my_val<<std::endl;
+			}
 		}
 		os<<__pp_end_str<<std::endl;
 		
