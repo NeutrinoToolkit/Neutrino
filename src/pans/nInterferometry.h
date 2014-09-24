@@ -59,7 +59,9 @@ private:
     std::vector<std::string> localPhysNames();
 
 public slots:
-		
+
+    void duplicate();
+
     void physDel(nPhysD*);
 	void useBarrierToggled(bool);
 	void guessCarrier();

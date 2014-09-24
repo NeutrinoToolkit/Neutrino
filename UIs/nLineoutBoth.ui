@@ -44,6 +44,9 @@
         <pointsize>10</pointsize>
        </font>
       </property>
+      <property name="toolTip">
+       <string>when unchecked, double click to fix values to particular point</string>
+      </property>
       <property name="text">
        <string>Autoscale</string>
       </property>

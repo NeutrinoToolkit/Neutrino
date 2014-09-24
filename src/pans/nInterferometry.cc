@@ -75,6 +75,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionDoWavelet, SIGNAL(triggered()), this, SLOT(doWavelet()));
 	connect(my_w.actionTrash, SIGNAL(triggered()), this, SLOT(doTrash()));
+	connect(my_w.actionDuplicate, SIGNAL(triggered()), this, SLOT(duplicate()));
 
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
 	connect(my_w.lineBarrier, SIGNAL(released()), unwrapBarrier, SLOT(togglePadella()));
@@ -109,6 +110,18 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
         localPhys[*itr]=NULL;
     }
 
+}
+
+void nInterferometry::duplicate() {
+    vector<string> localnames=localPhysNames();
+    for (vector<string>::const_iterator itr=localnames.begin(); itr!=localnames.end(); itr++) {
+        localPhys[*itr]=NULL;
+    }
+    for (unsigned int iimage=0;iimage<2;iimage++) {
+        for(map<string, nPhysD *>::iterator itr = waveletPhys[iimage].begin(); itr != waveletPhys[iimage].end(); ++itr) {
+            itr->second=NULL;
+        }
+    }
 }
 
 vector<string> nInterferometry::localPhysNames() {
@@ -630,7 +643,7 @@ void nInterferometry::doAbel() {
         intNe->set_origin(p0);
         intNe->property["unitsX"]="cm";
         intNe->property["unitsY"]="cm";
-        intNe->property["unitsCB"]="cm-3";
+        intNe->property["unitsCB"]="cm-2";
         
         
         localPhys["intergratedNe"]=nparent->replacePhys(intNe,localPhys["intergratedNe"], true);

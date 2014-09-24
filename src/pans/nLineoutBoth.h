@@ -46,8 +46,10 @@ public:
 	
 	void nZoom(double);
 	
+public slots:
+    void rescale(QPointF);
 	void updateLastPoint();
-	
+    
 private:
 	Ui::nLineoutBoth my_w;
 	

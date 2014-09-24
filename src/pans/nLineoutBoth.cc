@@ -37,7 +37,7 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
     
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
-    connect(my_w.autoscale, SIGNAL(stateChanged(int)), this, SLOT(updateLastPoint(void)));
+    connect(my_w.autoscale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
 
 	my_w.plot->enableAxis(QwtPlot::xTop);
 	my_w.plot->enableAxis(QwtPlot::yRight);
@@ -78,11 +78,26 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 
 	decorate();
 	updateLastPoint();
+    
 }
 
+void nLineoutBoth::rescale(QPointF p) {
+    DEBUG("HERE " << p.x() << " " << p.y());
+    double minx = curve[0].minYValue();
+    double maxx = curve[0].maxYValue();
+    
+    double miny = curve[1].minXValue();
+    double maxy = curve[1].maxXValue();
+    
+    my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
+    my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
+    my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
+	mouseAtMatrix(p);    
+}
+
+
 // mouse movement
-void
-nLineoutBoth::mouseAtMatrix(QPointF p) {
+void nLineoutBoth::mouseAtMatrix(QPointF p) {
 
 	QPen marker_pen;
 	marker_pen.setColor(nparent->my_mouse.color);
@@ -134,15 +149,15 @@ nLineoutBoth::mouseAtMatrix(QPointF p) {
             my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
             my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
             my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
-        } else {
-            double mini=nparent->colorMin;
-            double maxi=nparent->colorMax;
-            if (nparent->colorRelative) {
-                mini=currentBuffer->Tminimum_value+nparent->colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-                maxi=currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
-                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
-            }
+//        } else {
+//            double mini=nparent->colorMin;
+//            double maxi=nparent->colorMax;
+//            if (nparent->colorRelative) {
+//                mini=currentBuffer->Tminimum_value+nparent->colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+//                maxi=currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+//                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
+//                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
+//            }
         }
         
 		my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
@@ -157,8 +172,14 @@ void nLineoutBoth::nZoom(double) {
 }
 
 void nLineoutBoth::updateLastPoint() {
-	mouseAtMatrix(nparent->my_mouse.pos());
+	mouseAtMatrix(nparent->my_mouse.pos());    
+    if (my_w.autoscale->isChecked()) {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
+    } else {
+        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
+    }
 }
+
 
 
 

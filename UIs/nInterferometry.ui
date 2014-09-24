@@ -814,6 +814,7 @@
    <addaction name="actionRect"/>
    <addaction name="separator"/>
    <addaction name="actionTrash"/>
+   <addaction name="actionDuplicate"/>
    <addaction name="separator"/>
    <addaction name="actionDoWavelet"/>
    <addaction name="chained"/>
@@ -892,6 +893,18 @@
    </property>
    <property name="toolTip">
     <string>Trash old Files</string>
+   </property>
+  </action>
+  <action name="actionDuplicate">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+   <property name="toolTip">
+    <string>Duplicate the images</string>
    </property>
   </action>
  </widget>
