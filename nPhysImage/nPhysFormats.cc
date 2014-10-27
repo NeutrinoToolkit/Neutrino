@@ -444,42 +444,58 @@ physShort_b16::physShort_b16(const char *ifilename)
 	delete [] ptr;
 }
 
-physShort_img::physShort_img(string ifilename)
-: nPhysImageF<unsigned short>(ifilename, PHYS_FILE)
-{
-	// Hamamatsu Streak Camera
-	//
+
+physDouble_img::physDouble_img(string ifilename)
+: nPhysImageF<double>(ifilename, PHYS_FILE) {
+
 	unsigned short buffer;
-	
 	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
-	
+    
 	int w=0;
 	int h=0;
 	int skipbyte=0;
-	
+    int kind=-1;
+
+    bool endian=false;
+    
 	ifile.read((char *)&buffer,sizeof(unsigned short));
-	DEBUG(buffer);
 	
-	if (buffer == 19785) {
+	if (buffer == 19785) { // Hamamatsu
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		skipbyte=buffer;
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		w=buffer;
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		h=buffer;
-		DEBUG("skipbyte " << skipbyte);
-		ifile.seekg (56,ios_base::cur);
+
+		ifile.seekg (4, ios_base::cur);
+
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		kind=buffer;
+
+
+		ifile.seekg (50,ios_base::cur);
 		
-		//		 fseek(fin, 56, SEEK_CUR);
 		string buffer2;
 		buffer2.resize(skipbyte);
 		ifile.read((char *)&buffer2[0],skipbyte);		
-		property["info"]=buffer2;
-		//			fseek(fin, skipbyte, SEEK_CUR);
+
+        property["info"]=buffer2;
+
+        switch (kind) {
+            case 2: // unsigned short int
+                kind=2;
+                break;
+            case 3: // unsigned int
+                kind=4;
+                break;
+            default:
+                break;
+        }		
+
 	} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
 	   	ifile.read((char *)&buffer,sizeof(unsigned short));
-	   	DEBUG("ARP " << buffer);
-		if (buffer==7) {
+	   	if (buffer==7) {
 			ifile.read((char *)&buffer,sizeof(unsigned short));
 			skipbyte=buffer;
 			ifile.seekg(skipbyte,ios_base::beg);
@@ -487,8 +503,9 @@ physShort_img::physShort_img(string ifilename)
 			w=buffer;
 			ifile.read((char *)&buffer,sizeof(unsigned short));
 			h=buffer;
-		}
-	   	ifile.read((char *)&buffer,sizeof(unsigned short));
+            kind=2;
+            ifile.read((char *)&buffer,sizeof(unsigned short));
+        }
 	} else { // LIL images
 		ifile.seekg(ios_base::beg);
 		vector<unsigned int>lil_header (4);
@@ -498,17 +515,19 @@ physShort_img::physShort_img(string ifilename)
 			// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
 			w=lil_header[1];
 			h=lil_header[2];
+            kind=2;
 		}
 	}
-	stringstream oss;
-	oss<<ifile.tellg();
-    property["Skip bytes"]=oss.str();
-	if (w*h>0) {
-		this->resize(w, h);
-	   	ifile.read((char *)Timg_buffer,sizeof(unsigned short)*w*h);
-	}	
-	TscanBrightness();
-	ifile.close();	
+    
+    if (kind!=-1) {
+        resize(w, h);
+        skipbyte=ifile.tellg();
+        ifile.close();
+        property["kind"]=kind;
+        property["skip bytes"]=skipbyte;
+        int retVal=phys_open_RAW(this,kind,skipbyte,endian);
+        if (retVal!=0) resize(0,0);
+	}
 }
 
 physUint_imd::physUint_imd(string ifilename)
@@ -1449,6 +1468,7 @@ phys_resurrect_binary(nPhysImageF<double> * my_phys, std::ifstream &ifile) {
 
 int
 phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian){
+	DEBUG("HERE________________________________");
 	if (my_phys==NULL || my_phys->getSurf()==0) return -1;
 	
 	ifstream ifile(my_phys->getName().c_str(), ios::in | ios::binary);
@@ -1457,6 +1477,7 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 	if (ifile.fail() || ifile.eof()) return -1;
 	int bpp=0;
 	
+	DEBUG (my_phys->getSurf());
 	switch (kind) {
 		case 0: bpp=sizeof(unsigned char); break;
 		case 1: bpp=sizeof(signed char); break;
@@ -1466,54 +1487,56 @@ phys_open_RAW(nPhysImageF<double> * my_phys, int kind, int skipbyte, bool endian
 		case 5: bpp=sizeof(signed int); break;
 		case 6: bpp=sizeof(float); break;
 		case 7: bpp=sizeof(double); break;
+		default: kind=-1;
 	}
 	
-	if (bpp>0) {
-		vector<char> buffer(bpp*my_phys->getSurf());
-		ifile.read(&buffer[0], buffer.size());
-		ifile.close();
-		for (size_t i=0;i<my_phys->getSurf();i++) {
-			switch (kind) {
-				case 0: {
-					unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
-					break;
-				}
-				case 1: {
-					signed char buf = *((signed char*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
-					break;
-				}
-				case 2: {
-					unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
-					break;
-				}
-				case 3: {
-					signed short buf = *((signed short*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
-					break;
-				}
-				case 4: {
-					unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
-					break;
-				}
-				case 5: {
-					signed int buf = *((signed int*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
-					break;
-				}
-				case 6: {
-					float buf = *((float*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
-					break;
-				}
-				case 7: {
-					double buf = *((double*)(&buffer[i*bpp]));
-					my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
-					break;
-				}
+	if (kind<0) return -1;
+	
+	
+	vector<char> buffer(bpp*my_phys->getSurf());
+	ifile.read(&buffer[0], buffer.size());
+	ifile.close();
+	for (size_t i=0;i<my_phys->getSurf();i++) {
+		switch (kind) {
+			case 0: {
+				unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
+				break;
+			}
+			case 1: {
+				signed char buf = *((signed char*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
+				break;
+			}
+			case 2: {
+				unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
+				break;
+			}
+			case 3: {
+				signed short buf = *((signed short*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
+				break;
+			}
+			case 4: {
+				unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
+				break;
+			}
+			case 5: {
+				signed int buf = *((signed int*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
+				break;
+			}
+			case 6: {
+				float buf = *((float*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
+				break;
+			}
+			case 7: {
+				double buf = *((double*)(&buffer[i*bpp]));
+				my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
+				break;
 			}
 		}
 	}
@@ -1855,8 +1878,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname) {
 		datamatrix = new nPhysD;
 		*datamatrix = physShort_b16(fname.c_str());
 	} else if (ext=="img") {
-		datamatrix = new nPhysD;
-		*datamatrix = physShort_img(fname);
+		datamatrix = new physDouble_img(fname);
 	} else if (ext=="imd") {
 		datamatrix = new nPhysD;
 		*datamatrix = physUint_imd(fname.c_str());

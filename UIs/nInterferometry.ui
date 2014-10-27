@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
+    <width>358</width>
     <height>591</height>
    </rect>
   </property>
@@ -380,6 +380,9 @@
          <property name="toolTip">
           <string>zero y position</string>
          </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
          <property name="minimum">
           <number>-99999</number>
          </property>
@@ -414,7 +417,7 @@
           <string>Opposite sign of phase</string>
          </property>
          <property name="text">
-          <string/>
+          <string>+/-</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -432,6 +435,9 @@
         <widget class="QDoubleSpinBox" name="rotAngle">
          <property name="toolTip">
           <string>rotate angle</string>
+         </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
          </property>
          <property name="decimals">
           <number>1</number>
@@ -504,6 +510,9 @@
         <widget class="QDoubleSpinBox" name="cutoffValue">
          <property name="toolTip">
           <string>rotate angle</string>
+         </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
          </property>
          <property name="suffix">
           <string> %</string>
@@ -590,6 +599,9 @@
          <property name="toolTip">
           <string>abel y position</string>
          </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
          <property name="minimum">
           <number>-9999</number>
          </property>
@@ -605,6 +617,9 @@
         <widget class="QSpinBox" name="abelX">
          <property name="toolTip">
           <string>abel x position</string>
+         </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
          </property>
          <property name="minimum">
           <number>-9999</number>

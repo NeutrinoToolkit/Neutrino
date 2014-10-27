@@ -60,6 +60,11 @@ public:
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
 std::vector <nPhysImageF<double> *> phys_open_inf(std::string);
 
+class physDouble_img : public nPhysImageF<double> {
+public:
+	physDouble_img(std::string);
+};
+
 int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compression=0);
 
 std::vector <nPhysImageF<double> *> phys_open_fits(std::string);
@@ -95,12 +100,6 @@ public:
 class physShort_b16 : public nPhysImageF<short> {
 public:
 	physShort_b16(const char *);
-};
-
-// HAMAMATSU or ARP or LIL
-class physShort_img : public nPhysImageF<unsigned short> {
-public:
-	physShort_img(std::string);
 };
 
 // Optronics luli
