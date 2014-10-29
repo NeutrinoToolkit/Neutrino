@@ -48,8 +48,45 @@ case $uname in
 		;;
 esac
 
+# Macro: AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
 
-# — Macro: AC_PATH_PROG (variable, prog-to-check-for, [value-if-not-found], [path = ‘$PATH’])
+#[LIBS="-lseq $LIBS"]
+
+# Checks for libraries.
+AC_CHECK_LIB([cfitsio], [main])
+AC_CHECK_LIB([df], [main])
+
+AC_CHECK_LIB([gsl], [main])
+AC_CHECK_LIB([gslcblas], [main])
+
+
+AC_CHECK_LIB([jpeg], [main])
+AC_CHECK_LIB([m], [main])
+
+case $uname in
+	*MINGW*)
+		AC_CHECK_LIB([mfhdfdll], [main])
+ 	;;
+	*)
+		AC_CHECK_LIB([mfhdf], [main])
+	;;
+esac
+
+
+AC_CHECK_LIB([netpbm], [main])
+AC_CHECK_LIB([pthread], [main])
+AC_CHECK_LIB([tiff], [main])
+AC_CHECK_LIB([z], [main])
+
+case $uname in
+	*MINGW*)
+	AC_CHECK_LIB([fftw3-3], [main], [], [AC_MSG_ERROR([unable to find FFTW lib])])
+		;;
+	*)
+	AC_CHECK_LIB([fftw3], [main], [], [AC_MSG_ERROR([unable to find FFTW lib])])
+		;;
+esac
+
 #AC_PATH_PROG([NVCC], [nvcc], [])
 #m4_ifnblank([NVCC], AC_DEFINE([HAVE_CUDA], [1], [Include CUDA support]))
 
@@ -95,46 +132,6 @@ if test "$with_cuda" != no; then
 else
 	AC_MSG_NOTICE(CUDA disabled)
 fi
-
-
-# — Macro: AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
-
-#[LIBS="-lseq $LIBS"]
-
-# Checks for libraries.
-AC_CHECK_LIB([cfitsio], [main])
-AC_CHECK_LIB([df], [main])
-
-AC_CHECK_LIB([gsl], [main])
-AC_CHECK_LIB([gslcblas], [main])
-
-
-AC_CHECK_LIB([jpeg], [main])
-AC_CHECK_LIB([m], [main])
-
-case $uname in
-	*MINGW*)
-		AC_CHECK_LIB([mfhdfdll], [main])
- 	;;
-	*)
-		AC_CHECK_LIB([mfhdf], [main])
-	;;
-esac
-
-
-AC_CHECK_LIB([netpbm], [main])
-AC_CHECK_LIB([pthread], [main])
-AC_CHECK_LIB([tiff], [main])
-AC_CHECK_LIB([z], [main])
-
-case $uname in
-	*MINGW*)
-	AC_CHECK_LIB([fftw3-3], [main], [], [AC_MSG_ERROR([unable to find FFTW lib])])
-		;;
-	*)
-	AC_CHECK_LIB([fftw3], [main], [], [AC_MSG_ERROR([unable to find FFTW lib])])
-		;;
-esac
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
