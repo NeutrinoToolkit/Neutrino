@@ -766,6 +766,14 @@ public:
 			Timg_matrix[p.y()][p.x()] = val;
 	}
 
+	inline void set(T val) { //! set a value allover the matrix
+		DEBUG(PRINTVAR(val));
+		for (register size_t i=0; i<width*height; i++) {
+			Timg_buffer[i]=val;
+		}
+		TscanBrightness();
+	}
+
 	const std::vector<double> &get_histogram()
 	{
 		if (width*height == 0) {

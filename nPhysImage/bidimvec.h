@@ -62,7 +62,8 @@ public:
 	bidimvec<T> operator/= (double);
 	bidimvec<T> operator/ (double);
 	bidimvec<T> operator- ();
-
+    std::ostream& operator<< (std::ostream&);
+	
 	// products
 	double operator| (bidimvec<T>);	// scalar product
 	double operator^ (bidimvec<T>);	// angle between vectors
@@ -95,10 +96,15 @@ public:
 	inline void set_second(T val)
 	{ myval2= val;}
 
-
 private:
 	T myval1, myval2;
 };
+
+template <class T>  
+std::ostream& bidimvec<T>::operator<< (std::ostream& ss) {
+        ss<<"("<<x()<<":"<<y()<<")";
+        return ss;
+}
 
 
 template <class T> bidimvec<T>

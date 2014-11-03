@@ -45,7 +45,14 @@ nRegionPath::nRegionPath(neutrino *nparent, QString winname)
 	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
-	connect(my_w.doMask, SIGNAL(clicked()), SLOT(doMask()));
+	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
+	regionPhys=NULL;
+}
+
+void nRegionPath::duplicate () {
+    if (regionPhys==NULL) {
+        doIt();
+    }
 	regionPhys=NULL;
 }
 
@@ -56,80 +63,45 @@ nRegionPath::doIt() {
 		nPhysD *image=getPhysFromCombo(my_w.image);
 		if (image) {
             double replaceVal=getReplaceVal();
+            QPolygonF regionPoly=region->poly(1);
+            regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
+            regionPoly=regionPoly.intersected(QPolygonF(QRectF(0,0,image->getW(),image->getH())));
+            qDebug() << PRINTVAR(regionPoly);
             
-			QPolygon regionPoly=region->getLine().toPolygon();
-			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
+            QRect rectRegion=regionPoly.boundingRect().toRect();
             
-			nPhysD *regionPath = new nPhysD();
-            bidimvec<int> offset(0,0);
+            vec2f my_offset(0,0);
+            DEBUG(PRINTVAR(my_offset));
+            
+            nPhysD *regionPath = new nPhysD();
+
             if (my_w.crop->isChecked()) {
                 regionPath = new nPhysD();
                 *regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
-                offset+=bidimvec<int>(rectRegion.x(), rectRegion.y());
-                regionPath->set_origin(image->get_origin()-offset);
+                my_offset+=vec2f(rectRegion.left(),rectRegion.top());
+                DEBUG(PRINTVAR(my_offset));
             } else {
-                if (my_w.negative->isChecked()) {
-                    regionPath = new nPhysD(*image);
-                } else {
-                    regionPath = new nPhysD(image->getW(),image->getH(),replaceVal);
-                } 
+                regionPath = new nPhysD(*image);
             }
-			regionPath->setShortName("Region mask");
-			regionPath->setName("mask");
+            if (!my_w.inverse->isChecked()) {
+                regionPath->set(replaceVal);
+            } 
+            
+			regionPath->setShortName("Region path");
+			regionPath->setName("path");
 			QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
 			progress.setWindowModality(Qt::WindowModal);
 			progress.show();
-			for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
+			for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
 				if (progress.wasCanceled()) break;
 				QApplication::processEvents();
-				for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
-					if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.negative->isChecked()) {
-						regionPath->set(bidimvec<int>(i,j)-offset,replaceVal);
+				for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+					if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.inverse->isChecked()) {
+						regionPath->set(bidimvec<int>(i,j)-my_offset,replaceVal);
 					} else {
-						regionPath->set(bidimvec<int>(i,j)-offset,image->point(i,j));
+						regionPath->set(bidimvec<int>(i,j)-my_offset,image->point(i,j));
                     }
 
-				}
-				progress.setValue(i-rectRegion.left());
-			}
-            regionPath->TscanBrightness();
-			regionPhys=nparent->replacePhys(regionPath,regionPhys);
-		}
-	}
-}
-
-void nRegionPath::doMask() {
-	if (currentBuffer) {
-		saveDefaults();
-		nPhysD *image=getPhysFromCombo(my_w.image);
-		if (image) {
-			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
-			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-            double defValue=my_w.negative->isChecked()? 1.0: 0.0;
-			nPhysD *regionPath = new nPhysD();
-            bidimvec<int> offset(0,0);
-            if (my_w.crop->isChecked()) {
-                regionPath = new nPhysD(rectRegion.width(), rectRegion.height(),defValue);
-                offset+=bidimvec<int>(rectRegion.x(), rectRegion.y());
-                regionPath->set_origin(image->get_origin()-offset);
-            } else {
-                regionPath = new nPhysD(image->getW(),image->getH(),defValue);
-            }
-			regionPath->setShortName("Region mask");
-			regionPath->setName("mask");
-			QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
-			progress.setWindowModality(Qt::WindowModal);
-			progress.show();
-			for (int i=rectRegion.left(); i<rectRegion.right(); i++) {
-				if (progress.wasCanceled()) break;
-				QApplication::processEvents();
-				for (int j=rectRegion.top(); j<rectRegion.bottom(); j++) {
-					if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.negative->isChecked()) {
-						regionPath->set(bidimvec<int>(i,j)-offset,0.0);
-					} else {
-						regionPath->set(bidimvec<int>(i,j)-offset,1.0);
-                    }
-                    
 				}
 				progress.setValue(i-rectRegion.left());
 			}

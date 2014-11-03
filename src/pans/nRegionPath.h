@@ -49,7 +49,7 @@ public:
 	nPhysD *regionPhys;
 public slots:
 	void doIt();
-	void doMask();
+	void duplicate();
 	
 private:
 	double getReplaceVal();

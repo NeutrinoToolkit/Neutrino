@@ -785,7 +785,9 @@ void nLine::itemChanged() {
 // reimplementation
 QRectF
 nLine::boundingRect() const {
-	return shape().boundingRect();
+    QPainterPath my_path=path();
+//    qDebug() << __MSG << my_path.boundingRect();
+	return my_path.boundingRect();
 }
 
 QPainterPath nLine::shape() const {
@@ -875,15 +877,14 @@ QPolygonF nLine::poly(int steps) const {
 		my_poly_interp.append(my_poly.last());
 
 	} else {
-
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p1=my_poly.at(i);
 			QPointF p2=my_poly.at(i+1);
 			for(int j=0;j<steps;j++) {
 				my_poly_interp << p1+j*(p2-p1)/steps;
 			}
-			my_poly_interp<<p2;
 		}
+        my_poly_interp << my_poly.last();
 	}
 
 	return my_poly_interp;
