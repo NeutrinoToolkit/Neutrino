@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
+    <width>218</width>
     <height>169</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,0">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="1,1">
     <item row="6" column="1">
      <widget class="QPushButton" name="duplicate">
       <property name="font">
@@ -89,7 +89,7 @@
       </item>
       <item>
        <property name="text">
-        <string>value -&gt;</string>
+        <string>Value &gt;&gt;&gt;</string>
        </property>
       </item>
      </widget>

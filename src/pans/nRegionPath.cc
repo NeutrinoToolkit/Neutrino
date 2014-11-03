@@ -131,11 +131,8 @@ double nRegionPath::getReplaceVal() {
 			case 4:
 				val=0.0;
 				break;
-			case 5:
-				val=my_w.replace->text().toDouble();
-				break;
 			default:
-				WARNING("something is broken here");
+				val=my_w.replace->text().toDouble();
 				break;
 		}
 	}
