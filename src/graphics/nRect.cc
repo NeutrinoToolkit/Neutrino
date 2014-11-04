@@ -597,13 +597,15 @@ nRect::saveSettings() {
 void
 nRect::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-	int size = settings->beginReadArray("points");
-	QPolygonF poly_tmp;
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		poly_tmp << QPointF(settings->value("x").toDouble(), settings->value("y").toDouble());
-	}
-	settings->endArray();
+    setPos(settings->value("position").toPoint());
+    
+    int size = settings->beginReadArray("points");
+    QPolygonF poly_tmp;
+    for (int i = 0; i < size; ++i) {
+        settings->setArrayIndex(i);
+        poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+    }
+    settings->endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
@@ -622,11 +624,13 @@ void
 nRect::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());
 	settings->beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
 		settings->setArrayIndex(i);
-		settings->setValue("x", ref.at(i)->pos().x());
-		settings->setValue("y", ref.at(i)->pos().y());
+        QPointF ppos=mapToScene(ref.at(i)->pos());
+		settings->setValue("x", ppos.x());
+		settings->setValue("y", ppos.y());
 	}
 	settings->endArray();
 	settings->setValue("name",toolTip());

@@ -406,6 +406,7 @@ nPoint::saveSettings() {
 void
 nPoint::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
+    setPos(settings->value("position").toPoint());
 	setPoint(QPointF(settings->value("x").toDouble(), settings->value("y").toDouble()));
 	setToolTip(settings->value("name",toolTip()).toString());
 	setZValue(settings->value("depth",zValue()).toDouble());
@@ -419,6 +420,7 @@ void
 nPoint::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());
 	settings->setValue("x", ref.pos().x());
 	settings->setValue("y", ref.pos().y());
 	settings->setValue("name",toolTip());

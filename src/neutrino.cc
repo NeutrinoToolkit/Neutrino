@@ -39,6 +39,7 @@
 #include "nRotate.h"
 #include "nBlur.h"
 #include "nRegionPath.h"
+#include "nInterpolatePath.h"
 #include "nShortcuts.h"
 #include "nAffine.h"
 
@@ -218,6 +219,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
 	connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
 	connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
+	connect(my_w.actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
 	
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
 	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
@@ -1968,6 +1970,13 @@ nGenericPan*
 neutrino::RegionPath() {
 	QString vwinname=tr("RegionPath");
 	return new nRegionPath(this, "RegionPath");
+}
+
+/// Region Path
+nGenericPan*
+neutrino::InterpolatePath() {
+	QString vwinname=tr("InterpolatePath");
+	return new nInterpolatePath(this, "InterpolatePath");
 }
 
 

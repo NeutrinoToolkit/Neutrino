@@ -589,13 +589,15 @@ nEllipse::saveSettings() {
 void
 nEllipse::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-	int size = settings->beginReadArray("points");
-	QPolygonF poly_tmp;
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		poly_tmp << QPointF(settings->value("x").toDouble(), settings->value("y").toDouble());
-	}
-	settings->endArray();
+    setPos(settings->value("position").toPoint());
+    
+    int size = settings->beginReadArray("points");
+    QPolygonF poly_tmp;
+    for (int i = 0; i < size; ++i) {
+        settings->setArrayIndex(i);
+        poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+    }
+    settings->endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
@@ -614,6 +616,7 @@ void
 nEllipse::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());
 	settings->beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
 		settings->setArrayIndex(i);

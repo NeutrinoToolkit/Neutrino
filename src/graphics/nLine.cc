@@ -1004,12 +1004,15 @@ nLine::saveSettings() {
 void
 nLine::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
+    qDebug() << PRINTVAR(pos());
+    setPos(settings->value("position").toPoint());
+
 	if (property("parentPanControlLevel").toInt()<2) {
 		int size = settings->beginReadArray("points");
 		QPolygonF poly_tmp;
 		for (int i = 0; i < size; ++i) {
 			settings->setArrayIndex(i);
-			poly_tmp << QPointF(settings->value("x").toDouble(), settings->value("y").toDouble());
+            poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
 		}
 		settings->endArray();
 		if (poly_tmp.size()>0) {
@@ -1035,12 +1038,14 @@ void
 nLine::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());	
 	if (property("parentPanControlLevel").toInt()<2) {
 		settings->beginWriteArray("points");
 		for (int i = 0; i < ref.size(); ++i) {
 			settings->setArrayIndex(i);
-			settings->setValue("x", ref.at(i)->pos().x());
-			settings->setValue("y", ref.at(i)->pos().y());
+            QPointF ppos=mapToScene(ref.at(i)->pos());
+            settings->setValue("x", ppos.x());
+            settings->setValue("y", ppos.y());
 		}
 		settings->endArray();
 	}

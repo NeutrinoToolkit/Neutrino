@@ -130,9 +130,14 @@ FORMS += nShortcuts.ui
 SOURCES += nShortcuts.cc
 HEADERS += nShortcuts.h 
 
-#Find peaks
+#Ghost fringes
 FORMS += nGhost.ui
 SOURCES += nGhost.cc
 HEADERS += nGhost.h 
+
+#interpolate a closed path
+FORMS += nInterpolatePath.ui
+SOURCES += nInterpolatePath.cc
+HEADERS += nInterpolatePath.h 
 
 

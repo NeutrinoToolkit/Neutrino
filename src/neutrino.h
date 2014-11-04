@@ -296,6 +296,9 @@ public slots:
 	// remove ghost Fringes
 	nGenericPan* Ghost();
     
+	// interpoalte inside path
+	nGenericPan* InterpolatePath();
+    
 	nGenericPan* MouseInfo();
 
 	void about();

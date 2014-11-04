@@ -39,6 +39,9 @@ SetFileAttributes "libwinpthread-1.dll" HIDDEN
 SetFileAttributes "qwt.dll" HIDDEN
 SetFileAttributes "zlib1.dll" HIDDEN
 SetFileAttributes "python27.dll" HIDDEN
+SetFileAttributes "xdr.dll" HIDDEN
+SetFileAttributes "hdf.dll" HIDDEN
+SetFileAttributes "mfhdf.dll" HIDDEN
 
 SetFileAttributes "libnPhysImageF.dll" HIDDEN
 SetFileAttributes "Neutrino1.dll" HIDDEN

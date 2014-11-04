@@ -22,10 +22,10 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nRegionPath.h"
+#include "nInterpolatePath.h"
 #include "neutrino.h"
 
-nRegionPath::nRegionPath(neutrino *nparent, QString winname)
+nInterpolatePath::nInterpolatePath(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
 {
 
@@ -46,21 +46,20 @@ nRegionPath::nRegionPath(neutrino *nparent, QString winname)
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
 	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
-	regionPhys=NULL;
+	interpolatePhys=NULL;
 }
 
-void nRegionPath::duplicate () {
-    if (regionPhys==NULL) {
+void nInterpolatePath::duplicate () {
+    if (interpolatePhys==NULL) {
         doIt();
     }
-	regionPhys=NULL;
+	interpolatePhys=NULL;
 }
 
-void nRegionPath::doIt() {
+void nInterpolatePath::doIt() {
     saveDefaults();
     nPhysD *image=getPhysFromCombo(my_w.image);
     if (image) {
-        double replaceVal=getReplaceVal();
         QPolygonF regionPoly=region->poly(1);
         regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
         regionPoly=regionPoly.intersected(QPolygonF(QRectF(0,0,image->getW(),image->getH())));
@@ -71,19 +70,7 @@ void nRegionPath::doIt() {
         vec2f my_offset(0,0);
         DEBUG(PRINTVAR(my_offset));
         
-        nPhysD *regionPath = new nPhysD();
-        
-        if (my_w.crop->isChecked()) {
-            regionPath = new nPhysD();
-            *regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
-            my_offset+=vec2f(rectRegion.left(),rectRegion.top());
-            DEBUG(PRINTVAR(my_offset));
-        } else {
-            regionPath = new nPhysD(*image);
-        }
-        if (!my_w.inverse->isChecked()) {
-            regionPath->set(replaceVal);
-        } 
+        nPhysD *regionPath = new nPhysD(*image);
         
         regionPath->setShortName("Region path");
         regionPath->setName("path");
@@ -94,44 +81,13 @@ void nRegionPath::doIt() {
             if (progress.wasCanceled()) break;
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
-                if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.inverse->isChecked()) {
-                    regionPath->set(bidimvec<int>(i,j)-my_offset,replaceVal);
-                } else {
-                    regionPath->set(bidimvec<int>(i,j)-my_offset,image->point(i,j));
+                if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)) {
+                    regionPath->set(bidimvec<int>(i,j)-my_offset,std::numeric_limits<double>::quiet_NaN());
                 }
-                
             }
             progress.setValue(i-rectRegion.left());
         }
         regionPath->TscanBrightness();
-        regionPhys=nparent->replacePhys(regionPath,regionPhys);
+        interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys);
     }
-}
-
-double nRegionPath::getReplaceVal() {
-	double val=0.0;
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
-		switch (my_w.defaultValue->currentIndex()) {
-			case 0:
-				val=std::numeric_limits<double>::quiet_NaN();
-				break;
-			case 1:
-				val=image->Tminimum_value;
-				break;
-			case 2:
-				val=image->Tmaximum_value;
-				break;
-			case 3:
-				val=0.5*(image->Tminimum_value+image->Tmaximum_value);
-				break;
-			case 4:
-				val=0.0;
-				break;
-			default:
-				val=my_w.replace->text().toDouble();
-				break;
-		}
-	}
-	return val;
 }
