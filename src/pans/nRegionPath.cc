@@ -63,8 +63,11 @@ void nRegionPath::doIt() {
         double replaceVal=getReplaceVal();
         QPolygonF regionPoly=region->poly(1);
         regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
-        regionPoly=regionPoly.intersected(QPolygonF(QRectF(0,0,image->getW(),image->getH())));
-        qDebug() << PRINTVAR(regionPoly);
+        
+        vector<vec2f> vecPoints(regionPoly.size());
+        for(int k=0;k<regionPoly.size();k++) {
+            vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
+        }
         
         QRect rectRegion=regionPoly.boundingRect().toRect();
         
@@ -94,7 +97,8 @@ void nRegionPath::doIt() {
             if (progress.wasCanceled()) break;
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
-                if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)==my_w.inverse->isChecked()) {
+                vec2f pp(i,j);
+                if (inside_poly(vecPoints, pp)==my_w.inverse->isChecked()) {
                     regionPath->set(bidimvec<int>(i,j)-my_offset,replaceVal);
                 } else {
                     regionPath->set(bidimvec<int>(i,j)-my_offset,image->point(i,j));

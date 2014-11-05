@@ -180,6 +180,9 @@ void
 phys_fast_gaussian_blur(nPhysImageF<double> &, double);
 
 void
+phys_fast_gaussian_blur(nPhysImageF<double> &, double, double);
+
+void
 phys_gaussian_subtraction(nPhysImageF<double> &, double, double);
 
 

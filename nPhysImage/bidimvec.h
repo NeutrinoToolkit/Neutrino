@@ -28,6 +28,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #ifndef __bidimvec_h
 #define __bidimvec_h
@@ -256,7 +257,6 @@ template <class T> bidimvec<T>
 bidimvec<T>::rotate(double theta)
 { return bidimvec<T>( myval1*cos(theta)-myval2*sin(theta), myval1*sin(theta)+myval2*cos(theta)); }
 
-	
 template <class T> bidimvec<T>
 mul_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()*v2.x(), v1.y()*v2.y()); }
@@ -264,6 +264,19 @@ mul_P(bidimvec<T> v1, bidimvec<T> v2)
 template <class T> bidimvec<T>
 div_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()/v2.x(), v1.y()/v2.y()); }
+
+template <class T> bool inside_poly(std::vector<bidimvec<T> > vert, bidimvec<T> test)
+{
+    bool c = false;
+    unsigned int i,j;
+    for (i = 0, j = vert.size()-1; i < vert.size(); j = i++) {
+        if ( ((vert[i].y()>test.y()) != (vert[j].y()>test.y())) &&
+            (test.x() < (vert[j].x()-vert[i].x()) * (test.y()-vert[i].y()) / (vert[j].y()-vert[i].y()) + vert[i].x()) )
+            c = !c;
+    }
+    return c;
+}
+
 
 // ------------------ helper functions ------------------
 

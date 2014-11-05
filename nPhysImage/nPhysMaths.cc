@@ -471,6 +471,12 @@ phys_log10(nPhysImageF<double> &m1)
 void
 phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 {
+	phys_fast_gaussian_blur(m1,radius,radius);
+}
+
+void
+phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
+{
 	vector<double> nan_free_phys(m1.getSurf());
 	for (size_t i=0; i< m1.getSurf(); i++) {
 		if (std::isfinite(m1.point(i))) {
@@ -486,8 +492,8 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
 	
 	fftw_execute(fb);
 
- 	double sx=pow(m1.getW()/(radius),2)/2.0;
- 	double sy=pow(m1.getH()/(radius),2)/2.0;
+ 	double sx=pow(m1.getW()/(radiusX),2)/2.0;
+ 	double sy=pow(m1.getH()/(radiusY),2)/2.0;
 
  	for (size_t j = 0 ; j < m1.getH(); j++) {
 		for (size_t i = 0 ; i < m1.getW()/2+1 ; i++) {

@@ -25,6 +25,7 @@
 #include "nInterpolatePath.h"
 #include "neutrino.h"
 
+
 nInterpolatePath::nInterpolatePath(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
 {
@@ -60,34 +61,54 @@ void nInterpolatePath::doIt() {
     saveDefaults();
     nPhysD *image=getPhysFromCombo(my_w.image);
     if (image) {
-        QPolygonF regionPoly=region->poly(1);
-        regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
-        regionPoly=regionPoly.intersected(QPolygonF(QRectF(0,0,image->getW(),image->getH())));
-        qDebug() << PRINTVAR(regionPoly);
+        QPolygonF regionPoly=region->poly(1).translated(image->get_origin().x(),image->get_origin().y());
+
+        vector<vec2f> vecPoints(regionPoly.size());
+        for(int k=0;k<regionPoly.size();k++) {
+            vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
+        }
+        
+        nPhysD *regionPath = new nPhysD(*image);
+
+        QPolygonF regionPoly2=region->poly(20).translated(image->get_origin().x(),image->get_origin().y());
+
+        vector<pair<vec2f, double> > vals;
+        for(int k=0;k<regionPoly2.size();k++) {
+            vec2f p(regionPoly2[k].x(),regionPoly2[k].y());
+            double pval=regionPath->point(p);
+            if (isfinite(pval)) {
+                vals.push_back(make_pair(p, pval));
+            }
+        }
         
         QRect rectRegion=regionPoly.boundingRect().toRect();
         
-        vec2f my_offset(0,0);
-        DEBUG(PRINTVAR(my_offset));
-        
-        nPhysD *regionPath = new nPhysD(*image);
+        double ex=my_w.weight->value();
         
         regionPath->setShortName("Region path");
         regionPath->setName("path");
-        QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
+        QProgressDialog progress("Interpolate", "Stop", 0, rectRegion.width(), this);
         progress.setWindowModality(Qt::WindowModal);
         progress.show();
         for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
             if (progress.wasCanceled()) break;
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
-                if (regionPoly.containsPoint(QPoint(i,j),Qt::OddEvenFill)) {
-                    regionPath->set(bidimvec<int>(i,j)-my_offset,std::numeric_limits<double>::quiet_NaN());
+                vec2f pp(i,j);
+                if (inside_poly(vecPoints, pp)) {
+                    double mean=0;
+                    double weight=0;
+                    for(vector<pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
+                        vec2f p=it->first;
+                        double wi=1.0/(pow(abs((pp-p).x()),ex)+pow(abs((pp-p).y()),ex));
+                        mean+=wi*it->second;
+                        weight+=wi;                        
+                    }
+                    regionPath->set(pp,mean/weight);
                 }
             }
             progress.setValue(i-rectRegion.left());
-        }
-        regionPath->TscanBrightness();
+        }                
         interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys);
     }
 }

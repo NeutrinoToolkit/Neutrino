@@ -215,8 +215,6 @@ void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 		showMessage(tr("Moving object"));
 	}
 
-    DEBUG(">>>>>>>>>>>>>>>>> " << click_pos.x() << " " << click_pos.y());
-
 	QGraphicsItem::mousePressEvent(e);
 
 }
@@ -231,8 +229,7 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 	nodeSelected=-1;
 	if (moveRef.contains(ref.size())) {
 		QPointF delta=e->pos()-click_pos;
-		DEBUG("HERE" << sender() << " " << delta.x() << " " << delta.y());
-        moveBy(delta);
+	    moveBy(delta);
 	}
     click_pos=e->pos();
 	QGraphicsItem::mouseMoveEvent(e);
@@ -731,8 +728,7 @@ nLine::keyReleaseEvent ( QKeyEvent *  ) {
 
 void
 nLine::moveBy(QPointF delta) {
-    DEBUG("HERE" << sender() << " " << delta.x() << " " << delta.y());
-	if (property("parentPanControlLevel").toInt()<2) {
+    if (property("parentPanControlLevel").toInt()<2) {
 		for (int i =0; i<ref.size(); i++) {
 			changeP(i,mapToScene(ref[i]->pos()+delta));
 		}
@@ -825,7 +821,7 @@ QPolygonF nLine::poly(int steps) const {
 	if (closedLine) my_poly << ref[0]->pos();
 
 	if (bezier && my_poly.size()>2) {
-		steps=max(steps,20); // if it's a bezier impose at least 20 steps...
+		steps=max(steps,16); // if it's a bezier impose at least 16 steps...
 		QPolygonF splinePointsX;
 		QPolygonF splinePointsY;
 
@@ -1004,7 +1000,6 @@ nLine::saveSettings() {
 void
 nLine::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-    qDebug() << PRINTVAR(pos());
     setPos(settings->value("position").toPoint());
 
 	if (property("parentPanControlLevel").toInt()<2) {
@@ -1012,7 +1007,8 @@ nLine::loadSettings(QSettings *settings) {
 		QPolygonF poly_tmp;
 		for (int i = 0; i < size; ++i) {
 			settings->setArrayIndex(i);
-            poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+            QPointF ppos=QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+            poly_tmp << ppos;
 		}
 		settings->endArray();
 		if (poly_tmp.size()>0) {
