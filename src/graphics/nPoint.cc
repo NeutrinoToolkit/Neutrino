@@ -36,7 +36,10 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 {
 	nparent->my_s.addItem(this);
 	setParent(nparent);
-
+    if (nparent->currentBuffer) {
+        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    }
+    
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -277,7 +280,7 @@ nPoint::keyPressEvent ( QKeyEvent * e ) {
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
 			break;
-		case Qt::Key_Return:
+		case Qt::Key_W:
 			togglePadella();
 			break;
 		default:

@@ -40,9 +40,22 @@ nRect::~nRect() {
 
 nRect::nRect(neutrino *nparent) : QGraphicsObject()
 {
-	nparent->my_s.addItem(this);
-	setParent(nparent);
-
+    if (nparent) {
+        nparent->my_s.addItem(this);
+        setParent(nparent);
+        int num=nparent->property("numRect").toInt()+1;
+        nparent->setProperty("numRect",num);
+        setProperty("numRect",num);
+        setToolTip(tr("rect")+QString(" ")+QString::number(num));
+        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        zoom=nparent->getZoom();
+        if (nparent->currentBuffer) {
+            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+        }
+    }
+    
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -55,23 +68,8 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	nColor=QColor(Qt::black);
 	holderColor=QColor(0,0,255,200);
 
-	int num=nparent->property("numRect").toInt()+1;
-	nparent->setProperty("numRect",num);
-	setProperty("numRect",num);
-
-#ifdef __use_nPython
-//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Rect")+property("num").toString(), this);
-#endif
 
 	setOrder(0.0);
-	setToolTip(tr("rect")+QString(" ")+QString::number(num));
-
-	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-
-	connect(parent()->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-
-	zoom=parent()->getZoom();
-
 
 	// PADELLA
 	my_pad.setWindowTitle(toolTip());
@@ -101,7 +99,6 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
 }
@@ -156,6 +153,7 @@ void nRect::interactive ( ) {
 
 void nRect::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
+    moveRef.clear();
 	appendPoint();
 	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
@@ -445,7 +443,7 @@ nRect::keyPressEvent ( QKeyEvent * e ) {
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
 			break;
-		case Qt::Key_Return:
+		case Qt::Key_W:
 			togglePadella();
 			break;
 		case Qt::Key_E:

@@ -54,16 +54,22 @@ public:
 
     std::map<std::string, nPhysD *> localPhys;
 
+    void loadSettings(QSettings *);
+    void saveSettings(QSettings *);
+    
 private:
 	wavelet_params my_params;
     std::vector<std::string> localPhysNames();
-
+    std::map<QToolButton*, nLine *> my_shapes;
+    
 public slots:
 
     void duplicate();
 
     void physDel(nPhysD*);
 	void useBarrierToggled(bool);
+	void maskRegionToggled(bool);
+    
 	void guessCarrier();
 
 	void doTrash();
@@ -72,13 +78,15 @@ public slots:
 	void doUnwrap();
 	void doSubtract();
 	void doMaskCutoff();
-	void doAbel();
 	void getPosZero(bool);
 	void setPosZero(QPointF);
-	void getPosAbel(bool);
-	void setPosAbel(QPointF);
 
 	void line_key_pressed(int);
+    
+    void addShape();
+    void addShape(QString);
+    void removeShape(QObject*);
+    void doShape();
 
 	void bufferChanged(nPhysD*);
 	void checkChangeCombo(QComboBox *);

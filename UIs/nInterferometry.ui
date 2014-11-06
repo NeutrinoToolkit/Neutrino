@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>591</height>
+    <width>345</width>
+    <height>471</height>
    </rect>
   </property>
   <property name="font">
@@ -28,7 +28,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,0,0,0,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0">
     <property name="margin">
      <number>4</number>
     </property>
@@ -238,17 +238,23 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="image1">
-      <property name="title">
-       <string>Reference</string>
+     <widget class="QTabWidget" name="images">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="image2">
-      <property name="title">
-       <string>Shot</string>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
       </property>
+      <widget class="QWidget" name="image1">
+       <attribute name="title">
+        <string>Reference</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="image2">
+       <attribute name="title">
+        <string>Shot</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
     <item>
@@ -329,6 +335,11 @@
        </item>
        <item>
         <widget class="QToolButton" name="doUnwrap">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -355,7 +366,7 @@
       <property name="checkable">
        <bool>false</bool>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,0,0,0,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,0,0,0,0,1,0">
        <property name="margin">
         <number>0</number>
        </property>
@@ -365,10 +376,10 @@
           <string>zero x position</string>
          </property>
          <property name="minimum">
-          <number>-99999</number>
+          <number>-9999</number>
          </property>
          <property name="maximum">
-          <number>99999</number>
+          <number>9999</number>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -384,10 +395,10 @@
           <bool>false</bool>
          </property>
          <property name="minimum">
-          <number>-99999</number>
+          <number>-9999</number>
          </property>
          <property name="maximum">
-          <number>99999</number>
+          <number>9999</number>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -412,12 +423,19 @@
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="opposite">
          <property name="toolTip">
-          <string>Opposite sign of phase</string>
+          <string>Change sign of phase</string>
          </property>
          <property name="text">
-          <string>+/-</string>
+          <string>±</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -455,6 +473,11 @@
        </item>
        <item>
         <widget class="QToolButton" name="doSubtract">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -478,10 +501,20 @@
       <property name="checkable">
        <bool>false</bool>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0,0">
        <property name="margin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QCheckBox" name="useMask">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QToolButton" name="maskRegion">
          <property name="text">
@@ -492,7 +525,7 @@
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -543,6 +576,11 @@
        </item>
        <item>
         <widget class="QToolButton" name="doMaskCutoff">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -556,16 +594,16 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="Shapes">
       <property name="title">
-       <string>Abel</string>
+       <string>Interpolate</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1,0,0,0">
        <property name="margin">
         <number>0</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="abel">
+       <item>
+        <widget class="QCheckBox" name="interpolate">
          <property name="toolTip">
           <string>Enable Abel</string>
          </property>
@@ -577,231 +615,61 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QToolButton" name="abelButton">
+       <item>
+        <layout class="QHBoxLayout" name="shapes">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="addShape">
+         <property name="text">
+          <string>+</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/neutrino.qrc">
+           <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="doInterpolate">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="toolTip">
-          <string>Doubleclick on the win to grab a point</string>
+          <string>Interpolation over shapes</string>
          </property>
          <property name="text">
           <string>...</string>
          </property>
          <property name="icon">
           <iconset resource="../resources/neutrino.qrc">
-           <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
+           <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QSpinBox" name="abelY">
-         <property name="toolTip">
-          <string>abel y position</string>
-         </property>
-         <property name="keyboardTracking">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>-9999</number>
-         </property>
-         <property name="maximum">
-          <number>9999</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="abelX">
-         <property name="toolTip">
-          <string>abel x position</string>
-         </property>
-         <property name="keyboardTracking">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>-9999</number>
-         </property>
-         <property name="maximum">
-          <number>9999</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QToolButton" name="symmetric">
-         <property name="toolTip">
-          <string>Symmetrize</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../resources/neutrino.qrc">
-           <normaloff>:/icons/flipUpDown.png</normaloff>:/icons/flipUpDown.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="5">
-        <widget class="QWidget" name="widget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,2,3,0">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QWidget" name="widget_3" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="probeLambda">
-               <property name="toolTip">
-                <string>Probe wavelength [nm]</string>
-               </property>
-               <property name="text">
-                <string>532</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="neutrinoSave" stdset="0">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>nm</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="widget_4" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="imgRes">
-               <property name="toolTip">
-                <string>Magnification [µm/px]</string>
-               </property>
-               <property name="text">
-                <string>1</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="neutrinoSave" stdset="0">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_3">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>µm/px</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="widget_5" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0">
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="abelMinMax">
-               <property name="toolTip">
-                <string>Min and max value for abel inversion</string>
-               </property>
-               <property name="text">
-                <string>0 1e20</string>
-               </property>
-               <property name="neutrinoSave" stdset="0">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_4">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="toolTip">
-                <string>Min and max value for abel inversion</string>
-               </property>
-               <property name="text">
-                <string>cutoff</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="doAbel">
-            <property name="toolTip">
-             <string>do Abel</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/neutrino.qrc">
-              <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
       </layout>
-      <zorder>abelY</zorder>
-      <zorder>abelButton</zorder>
-      <zorder>symmetric</zorder>
-      <zorder>abel</zorder>
-      <zorder>abelX</zorder>
-      <zorder>widget</zorder>
      </widget>
     </item>
    </layout>
@@ -943,15 +811,6 @@
   <tabstop>cutoffValue</tabstop>
   <tabstop>cutoffLog</tabstop>
   <tabstop>doMaskCutoff</tabstop>
-  <tabstop>abel</tabstop>
-  <tabstop>abelX</tabstop>
-  <tabstop>abelY</tabstop>
-  <tabstop>abelButton</tabstop>
-  <tabstop>symmetric</tabstop>
-  <tabstop>probeLambda</tabstop>
-  <tabstop>imgRes</tabstop>
-  <tabstop>abelMinMax</tabstop>
-  <tabstop>doAbel</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/neutrino.qrc"/>

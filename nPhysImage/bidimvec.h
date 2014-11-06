@@ -77,6 +77,8 @@ public:
 	{ return bidimvec<U>(U(myval1), U(myval2)); }
 	
 	double mod();
+	double mod2(); //square of mod (i.e. mod=sqrt(mod2))
+	
 	void norm();
 	bidimvec<T> orthonorm(void);
 	bidimvec<T> rotate(double);
@@ -134,7 +136,11 @@ bidimvec<T>::operator!= (bidimvec<T> rhs)
 
 template <class T> double
 bidimvec<T>::mod()
-{ return sqrt(myval1*myval1+myval2*myval2); }
+{ return sqrt(mod2()); }
+
+template <class T> inline double
+bidimvec<T>::mod2()
+{ return myval1*myval1+myval2*myval2; }
 
 template <class T> void
 bidimvec<T>::norm(void)
@@ -265,7 +271,7 @@ template <class T> bidimvec<T>
 div_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()/v2.x(), v1.y()/v2.y()); }
 
-template <class T> bool inside_poly(std::vector<bidimvec<T> > vert, bidimvec<T> test)
+template <class T> bool point_inside_poly(bidimvec<T> test, std::vector<bidimvec<T> > vert)
 {
     bool c = false;
     unsigned int i,j;

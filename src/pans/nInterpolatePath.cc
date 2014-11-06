@@ -81,7 +81,7 @@ void nInterpolatePath::doIt() {
             }
         }
         
-        QRect rectRegion=regionPoly.boundingRect().toRect();
+        QRect rectRegion=regionPoly2.boundingRect().toRect();
         
         double ex=my_w.weight->value();
         
@@ -95,7 +95,7 @@ void nInterpolatePath::doIt() {
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
                 vec2f pp(i,j);
-                if (inside_poly(vecPoints, pp)) {
+                if (point_inside_poly(pp,vecPoints)) {
                     double mean=0;
                     double weight=0;
                     for(vector<pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){

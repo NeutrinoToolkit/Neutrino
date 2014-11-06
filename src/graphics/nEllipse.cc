@@ -43,6 +43,10 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	nparent->my_s.addItem(this);
 	setParent(nparent);
 
+    if (nparent->currentBuffer) {
+        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    }
+    
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -154,6 +158,7 @@ void nEllipse::interactive ( ) {
 
 void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
+    moveRef.clear();
 	appendPoint();
 	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
@@ -434,7 +439,7 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
 			break;
-		case Qt::Key_Return:
+		case Qt::Key_W:
 			togglePadella();
 			break;
 		case Qt::Key_E:

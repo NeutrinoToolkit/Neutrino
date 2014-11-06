@@ -98,10 +98,10 @@ public slots:
 	void saveDefaults();
 
 	void loadSettings();
-	virtual void loadSettings(QString);
-	void loadSettings(QSettings *);
+	void loadSettings(QString);
+	virtual void loadSettings(QSettings *);
 	void saveSettings();
-	void saveSettings(QSettings *);
+	virtual void saveSettings(QSettings *);
 	
     bool nPhysExists(nPhysD*);
     

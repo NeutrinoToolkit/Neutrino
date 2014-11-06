@@ -97,7 +97,6 @@ signals:
 	void mouseDoubleClickEvent_sig(QPointF);
 	void mouseReleaseEvent_sig(QPointF);
 	void zoomChanged(double);
-
 };
 
 #endif

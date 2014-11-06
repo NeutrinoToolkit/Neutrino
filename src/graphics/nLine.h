@@ -46,8 +46,6 @@ public:
 		return (neutrino *) QGraphicsObject::parent();
 	};
 	
-	void setNeutrino(neutrino*);
-	
 	enum { Type = QGraphicsItem::UserType + 1 };
 	int type() const { return Type;}
 	

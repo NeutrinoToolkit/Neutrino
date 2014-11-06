@@ -333,7 +333,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 //	Palettes();
 //	Colorbar();
 #ifdef  __phys_debug
-    if (numwin==1)	recentFileActs.first()->trigger();
+//    if (numwin==1)	recentFileActs.first()->trigger();
 #endif
     
     //	newRect(QRectF(100,100,300,300), "pippo");

@@ -71,19 +71,8 @@ void nRegionPath::doIt() {
         
         QRect rectRegion=regionPoly.boundingRect().toRect();
         
-        vec2f my_offset(0,0);
-        DEBUG(PRINTVAR(my_offset));
+        nPhysD *regionPath = new nPhysD(*image);
         
-        nPhysD *regionPath = new nPhysD();
-        
-        if (my_w.crop->isChecked()) {
-            regionPath = new nPhysD();
-            *regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
-            my_offset+=vec2f(rectRegion.left(),rectRegion.top());
-            DEBUG(PRINTVAR(my_offset));
-        } else {
-            regionPath = new nPhysD(*image);
-        }
         if (!my_w.inverse->isChecked()) {
             regionPath->set(replaceVal);
         } 
@@ -98,16 +87,17 @@ void nRegionPath::doIt() {
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
                 vec2f pp(i,j);
-                if (inside_poly(vecPoints, pp)==my_w.inverse->isChecked()) {
-                    regionPath->set(bidimvec<int>(i,j)-my_offset,replaceVal);
+                if (point_inside_poly(pp,vecPoints)==my_w.inverse->isChecked()) {
+                    regionPath->set(pp,replaceVal);
                 } else {
-                    regionPath->set(bidimvec<int>(i,j)-my_offset,image->point(i,j));
+                    regionPath->set(pp,image->point(i,j));
                 }
-                
             }
             progress.setValue(i-rectRegion.left());
         }
-        regionPath->TscanBrightness();
+        if (my_w.crop->isChecked()) {
+            *regionPath=regionPath->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+        }
         regionPhys=nparent->replacePhys(regionPath,regionPhys);
     }
 }

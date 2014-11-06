@@ -144,14 +144,16 @@ void nView::keyPressEvent (QKeyEvent *e)
 		insideItem = true;
 //		item->keyPressEvent(e);
 		switch (e->key()) {
-			case Qt::Key_Backspace:
-				if (item->toGraphicsObject()->property("parentPanControlLevel").toInt()==0){
+			case Qt::Key_Backspace: {
+                QGraphicsObject *itemObj=item->toGraphicsObject();
+                if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
 					parent()->statusBar()->showMessage(tr("Removed ")+item->toolTip(),2000);
-					delete item;
+					itemObj->deleteLater();
 				} else {
 					parent()->statusBar()->showMessage(tr("Can't remove ")+item->toolTip(),2000);
 				}
 				break;
+            }
 			default:
 				parent()->keyPressEvent(e);
 				break;

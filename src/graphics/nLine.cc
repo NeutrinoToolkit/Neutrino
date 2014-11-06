@@ -40,8 +40,25 @@ nLine::~nLine() {
 
 nLine::nLine(neutrino *nparent) : QGraphicsObject()
 {
-	setNeutrino(nparent);
 	
+	if (nparent) {
+		nparent->my_s.addItem(this);
+		setParent(nparent);
+		int num=nparent->property("numLine").toInt()+1;
+		nparent->setProperty("numLine",num);
+		setProperty("numLine",num);
+		setToolTip(tr("line")+QString(" ")+QString::number(num));
+		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+		zoom=nparent->getZoom();
+        if (nparent->currentBuffer) {
+            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+        }
+	} else {
+		setToolTip(tr("line"));
+	}
+
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -61,11 +78,6 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	forceInverseOrdering = false;
 	closedLine=false;
 	antialias=false;
-
-
-#ifdef __use_nPython
-	//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Line")+property("num").toString(), this);
-#endif
 
 	setOrder(0.0);
 	// PADELLA
@@ -113,24 +125,6 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	lineOut-> attach(my_w.my_qwt);
 	lineOut->setXAxis(QwtPlot::xBottom);
 	lineOut->setYAxis(QwtPlot::yLeft);
-
-}
-
-void nLine::setNeutrino(neutrino*nparent) {
-	if (nparent) {
-		nparent->my_s.addItem(this);
-		setParent(nparent);
-		int num=nparent->property("numLine").toInt()+1;
-		nparent->setProperty("numLine",num);
-		setProperty("numLine",num);
-		setToolTip(tr("line")+QString(" ")+QString::number(num));
-		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-		zoom=nparent->getZoom();
-	} else {
-		setToolTip(tr("line"));
-	}
 
 }
 
@@ -193,9 +187,11 @@ void nLine::interactive ( ) {
 	appendPoint();
 }
 
-void nLine::addPointAfterClick ( QPointF ) {
+void nLine::addPointAfterClick (QPointF) {
 	showMessage(tr("Point added, press ESC to finish"));
+    moveRef.clear();
 	appendPoint();
+//    moveRef.erase(moveRef.begin(),moveRef.end()-1);
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -555,13 +551,13 @@ void nLine::addPoint () {
 	showMessage(tr("Added point:")+QString::number(i+1));
 }
 
-void nLine::addPoint (int pos) {
-	moveRef.append(pos);
+void nLine::addPoint (int npos) {
+    moveRef.append(npos);
 	QPointF position;
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=max(1,min(ref.size()-1,pos));
+		int copyfrom=max(1,min(ref.size()-1,npos));
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -572,24 +568,24 @@ void nLine::addPoint (int pos) {
 		refBrush.setColor(colorHolder);
 	}
 
-	ref.insert(pos,new QGraphicsEllipseItem());
-	ref[pos]->setPos(position);
-	ref[pos]->setBrush(refBrush);
-	ref[pos]->setPen(refPen);
-	ref[pos]->setVisible(false);
-	ref[pos]->setParentItem(this);
+	ref.insert(npos,new QGraphicsEllipseItem());
+	ref[npos]->setPos(position);
+	ref[npos]->setBrush(refBrush);
+	ref[npos]->setPen(refPen);
+	ref[npos]->setVisible(false);
+	ref[npos]->setParentItem(this);
 	sizeHolder(nSizeHolder);
 	setNumPoints(numPoints);
 
 	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
-	my_w.points->insertRow(pos);
+	my_w.points->insertRow(npos);
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.points->setItem(pos, 0, xitem);
-	my_w.points->setItem(pos, 1, yitem);
-	my_w.points->resizeRowToContents(pos);
+	my_w.points->setItem(npos, 0, xitem);
+	my_w.points->setItem(npos, 1, yitem);
+	my_w.points->resizeRowToContents(npos);
 	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
@@ -646,7 +642,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		delta =10.0;
 	}
 	switch (e->key()) {
-        case Qt::Key_Question: 
+        case Qt::Key_W: 
             togglePadella();
             break;            
 		case Qt::Key_Return:
@@ -782,14 +778,13 @@ void nLine::itemChanged() {
 QRectF
 nLine::boundingRect() const {
     QPainterPath my_path=path();
-//    qDebug() << __MSG << my_path.boundingRect();
 	return my_path.boundingRect();
 }
 
 QPainterPath nLine::shape() const {
 	QPainterPathStroker stroker;
 	double thickness=max(nWidth,10.0)/zoom;
-	stroker.setWidth(thickness);
+    stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
 		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
