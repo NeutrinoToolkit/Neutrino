@@ -277,7 +277,9 @@ void nWavelet::doUnwrap () {
 
 		if (my_w.useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
-			foreach(QPointF p, linebarrier->poly(phase->getW()+phase->getH())) {
+            QPolygonF my_poly=linebarrier->poly(phase->getW()+phase->getH());
+            my_poly.translate(qual->get_origin().x(),qual->get_origin().y());
+			foreach(QPointF p, my_poly) {
 				barrierPhys.set(p.x()-1,p.y()-1,0.0);
 				barrierPhys.set(p.x()-1,p.y()  ,0.0);
 				barrierPhys.set(p.x()-1,p.y()+1,0.0);

@@ -649,9 +649,9 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 		case Qt::Key_Escape:
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
-				moveRef.clear();
 				showMessage(tr("Adding points ended"));
 			}
+            moveRef.clear();
 			break;
 		case Qt::Key_Up:
 			moveBy(QPointF(0.0,-delta));
