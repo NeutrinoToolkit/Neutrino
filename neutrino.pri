@@ -2,10 +2,11 @@ TARGET = ../Neutrino
 
 CONFIG += qt qwt debug_and_release windows
 
-CONFIG += neutrino-HDF
+#CONFIG += neutrino-HDF
 
 QT += svg xml network core gui
 
+QMAKE_LIBDIR_FLAGS = -L../ -L../nPhysImage
 
 VERSION = 1.0.0
 
