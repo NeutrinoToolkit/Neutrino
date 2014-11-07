@@ -603,7 +603,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="interpolate">
+        <widget class="QCheckBox" name="useInterpolate">
          <property name="toolTip">
           <string>Enable Abel</string>
          </property>

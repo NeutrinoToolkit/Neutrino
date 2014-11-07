@@ -69,6 +69,7 @@ public slots:
     void physDel(nPhysD*);
 	void useBarrierToggled(bool);
 	void maskRegionToggled(bool);
+	void interpolateToggled(bool);
     
 	void guessCarrier();
 
