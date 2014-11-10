@@ -2045,6 +2045,10 @@ void neutrino::loadDefaults(){
 	my_set.beginGroup("Preferences");
 	move(my_set.value("geometry",pos()).toPoint());
 	toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
+
+    nPreferences::changeThreads(my_set.value("threads",1).toInt());
+    
+    
 	my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
 	my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
 	my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();

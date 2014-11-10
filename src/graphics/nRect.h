@@ -119,6 +119,7 @@ public slots:
 	void expandX();
 	void expandY();
 	void intersection();
+	void submatrix();
 	
 	void changeWidth();
 	void changeHeight();

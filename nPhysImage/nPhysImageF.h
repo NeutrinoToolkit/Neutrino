@@ -57,6 +57,8 @@
 #include <assert.h>
 #include <fftw3.h>
 
+#include <omp.h>
+
 #include <time.h>
 
 // conf variables from autoconf
@@ -472,13 +474,18 @@ public:
 			rotated = new nPhysImageF<T> (abs(dx1)+abs(dx2)+1,abs(dy1)+abs(dy2)+1, def_value);
 			double shiftx=std::min(dx1,0.0)+std::min(dx2,0.0);
 			double shifty=std::min(dy1,0.0)+std::min(dy2,0.0);
-			for (size_t j=0; j<rotated->getH(); j++) {
-				for (size_t i=0; i<rotated->getW(); i++) {
+			size_t i,j;
+#pragma omp parallel private(i,j)
+{
+#pragma omp for
+			for (j=0; j<rotated->getH(); j++) {
+				for (i=0; i<rotated->getW(); i++) {
 					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
 					double jr=(i+shiftx)*sin(alpha)+(j+shifty)*cos(alpha);
 					rotated->set(i,j,getPoint(ir,jr,def_value));
 				}
 			}
+}
 			vec2f orig=get_origin();
 			double ir=(orig.x())*cos(-alpha)-(orig.y())*sin(-alpha);
 			double jr=(orig.x())*sin(-alpha)+(orig.y())*cos(-alpha);
@@ -621,11 +628,12 @@ public:
 			
 
 // 			memset(uchar_buf, 0, getSurf()*sizeof(unsigned char)*4);
-	
-			for (register size_t i=0; i<width*height; i++) {
+			register size_t i,val;			
+#pragma omp parallel for private(val)
+			for (i=0; i<width*height; i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
 				if (std::isfinite(Timg_buffer[i])) {
-					size_t val = std::max(0,std::min(255,(int) (mult*(Timg_buffer[i]-mini))));
+					val = std::max(0,std::min(255,(int) (mult*(Timg_buffer[i]-mini))));
 					uchar_buf[i*4+3] = 255;
 					uchar_buf[i*4+2] = palette[3*val+0];
 					uchar_buf[i*4+1] = palette[3*val+1];
@@ -1424,6 +1432,10 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 	
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
+	fftw_init_threads();
+	fftw_plan_with_nthreads(sysconf( _SC_NPROCESSORS_ONLN ));
+	
+
 	if (getSurf()>0) {
 		fftw_plan plan_t;
 		if (ftdir == PHYS_FORWARD)

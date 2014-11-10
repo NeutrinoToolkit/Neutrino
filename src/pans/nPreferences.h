@@ -45,6 +45,7 @@ public:
 public slots:
 	void changeShowDimPixel();
 	void changeIconSize(int);
+    static void changeThreads(int);
 	void changeFont();
 	void hideEvent(QHideEvent*);
 	void showEvent(QShowEvent*);

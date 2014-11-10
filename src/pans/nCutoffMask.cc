@@ -88,7 +88,8 @@ void nCutoffMask::doOperation () {
 				nPhysD *masked = new nPhysD(image1->getW(),image1->getH(), replaceVal);
 				masked->set_origin(image1->get_origin());
 				masked->set_scale(image1->get_scale());
-				for (size_t k=0; k<image1->getSurf(); k++) 
+                size_t k;
+				for (k=0; k<image1->getSurf(); k++) 
 					if (image2->Timg_buffer[k] >= val) 
 						masked->Timg_buffer[k]=image1->Timg_buffer[k];
 				

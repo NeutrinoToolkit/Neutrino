@@ -24,6 +24,7 @@ CC = @CXX@
 
 LDFLAGS += @LIBS@ @LDFLAGS@ -L@prefix@/lib
 CFLAGS += @CFLAGS@ @DEFS@ -D__VER=\"$(VERSION)\" -Iunwrapping -fpic -I@prefix@/include -I@prefix@/include/netpbm -I@prefix@/include/hdf -I@prefix@/include/hdf5/serial
+
 DEFS := @DEFS@
 
 SRC_CPP = NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc

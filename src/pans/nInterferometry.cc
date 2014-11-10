@@ -279,12 +279,19 @@ void nInterferometry::doWavelet () {
     timer.start();
     for (int iimage=0;iimage<2;iimage++) {
         if(sender()==my_image[iimage].doit) {
+            QProgressDialog progress("Wavelet",QString(), 0, 1, this);
+            progress.setWindowModality(Qt::WindowModal);
             doWavelet(iimage);
+            doWavelet(1);
         }
     }
     if (sender()==my_w.actionDoWavelet || sender()==region) {
+        QProgressDialog progress("Wavelet",QString(), 0, 2, this);
+        progress.setWindowModality(Qt::WindowModal);
         doWavelet(0);
+        progress.setValue(1);
         doWavelet(1);
+        progress.setValue(2);
     }
     my_w.statusbar->showMessage(QString::number(timer.elapsed())+" msec");
     if (!my_w.chained->isChecked()) doUnwrap();
@@ -330,9 +337,11 @@ void nInterferometry::doWavelet (int iimage) {
         QSettings settings("neutrino","");
         settings.beginGroup("Preferences");
         if (settings.value("useCuda").toBool() && cudaEnabled()) {
-            runThread(&my_params, phys_wavelet_trasl_cuda, "Interferometry...", niter);
+            phys_wavelet_field_2D_morlet_cuda(my_params);
+//            runThread(&my_params, phys_wavelet_trasl_cuda, "Interferometry...", niter);
         } else {
-            runThread(&my_params, phys_wavelet_trasl_nocuda, "Interferometry...", niter);
+            phys_wavelet_field_2D_morlet(my_params);
+//            runThread(&my_params, phys_wavelet_trasl_nocuda, "Interferometry...", niter);
         }
 
         map<string,nPhysD *> retList = my_params.olist;
@@ -483,7 +492,8 @@ void nInterferometry::doMaskCutoff() {
             maskRegion->show();
             nPhysD* phase=localPhys["phase"];
             if (nPhysExists(phase)) {
-                phaseMask =new nPhysD(phase->getW(),phase->getH(),numeric_limits<double>::quiet_NaN());
+                phaseMask =new nPhysD(phase->getW(),phase->getH(),0.0);
+//                phaseMask =new nPhysD(phase->getW(),phase->getH(),numeric_limits<double>::quiet_NaN());
                 phaseMask->property=phase->property;
                 //                 _____ _                     
                 //                |  ___(_)_  ___ __ ___   ___ 

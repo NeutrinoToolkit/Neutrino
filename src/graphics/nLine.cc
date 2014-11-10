@@ -746,6 +746,8 @@ nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
 	for (int i=0;i<ref.size();i++) {
 		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
+            showMessage(toolTip()+" "+QString::number(i));
+            break;
 		}
 	}
 }
@@ -787,7 +789,7 @@ QPainterPath nLine::shape() const {
     stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
-		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
+		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect().adjusted(-2,-2,+2,+2)));
 	}
 	return my_shape;
 }
@@ -810,75 +812,76 @@ QPainterPath nLine::path() const {
 
 QPolygonF nLine::poly(int steps) const {
 	QPolygonF my_poly, my_poly_interp;
-	foreach (QGraphicsEllipseItem *item, ref){
-		my_poly<< item->pos();
-	}
-	if (closedLine) my_poly << ref[0]->pos();
-
-	if (bezier && my_poly.size()>2) {
-		steps=max(steps,16); // if it's a bezier impose at least 16 steps...
-		QPolygonF splinePointsX;
-		QPolygonF splinePointsY;
-
-		QVector<double>param_length;
-
-		double param = 0.0;
-		double x,y,xold=0,yold=0;
-		for (int i = 0; i < my_poly.size(); i++ )
-		{
-			x = my_poly[i].x();
-			y = my_poly[i].y();
-			if ( i > 0 ) {
-				const double delta = qSqrt(qwtSqr(x-xold)+qwtSqr(y-yold));
-				param += qMax( delta, 1.0 );
-			}
-			splinePointsX<< QPointF(param,x);
-			splinePointsY<< QPointF(param,y);
-			param_length << param;
-			xold=x;
-			yold=y;
-		}
-
-		QwtSpline my_splineX,my_splineY;
-		if (closedLine)  {
-			my_splineX.setSplineType(QwtSpline::Periodic);
-			my_splineY.setSplineType(QwtSpline::Periodic);
-		} else {
-			my_splineX.setSplineType(QwtSpline::Natural);
-			my_splineY.setSplineType(QwtSpline::Natural);
-		}
-
-		int size=steps*(my_poly.size()-1);
-
-		my_splineX.setPoints( splinePointsX );
-		my_splineY.setPoints( splinePointsY );
-
-		const double delta = splinePointsX.last().x() / size;
-		for (int i = 1; i < size; i++ )
-		{
-			const double dtmp = i * delta;
-			QPointF p=QPointF(my_splineX.value( dtmp ),my_splineY.value( dtmp ));
-			if (dtmp > param_length.at(0)) {
-				my_poly_interp.append(my_poly[0]);
-				my_poly.remove(0);
-				param_length.remove(0);
-			}
-			my_poly_interp.append(p);
-		}
-		my_poly_interp.append(my_poly.last());
-
-	} else {
-		for(int i=0;i<my_poly.size()-1;i++) {
-			QPointF p1=my_poly.at(i);
-			QPointF p2=my_poly.at(i+1);
-			for(int j=0;j<steps;j++) {
-				my_poly_interp << p1+j*(p2-p1)/steps;
-			}
-		}
-        my_poly_interp << my_poly.last();
-	}
-
-	return my_poly_interp;
+    if(ref.size()>0) {
+        foreach (QGraphicsEllipseItem *item, ref){
+            my_poly<< item->pos();
+        }
+        if (closedLine) my_poly << ref[0]->pos();
+        
+        if (bezier && my_poly.size()>2) {
+            steps=max(steps,16); // if it's a bezier impose at least 16 steps...
+            QPolygonF splinePointsX;
+            QPolygonF splinePointsY;
+            
+            QVector<double>param_length;
+            
+            double param = 0.0;
+            double x,y,xold=0,yold=0;
+            for (int i = 0; i < my_poly.size(); i++ )
+            {
+                x = my_poly[i].x();
+                y = my_poly[i].y();
+                if ( i > 0 ) {
+                    const double delta = qSqrt(qwtSqr(x-xold)+qwtSqr(y-yold));
+                    param += qMax( delta, 1.0 );
+                }
+                splinePointsX<< QPointF(param,x);
+                splinePointsY<< QPointF(param,y);
+                param_length << param;
+                xold=x;
+                yold=y;
+            }
+            
+            QwtSpline my_splineX,my_splineY;
+            if (closedLine)  {
+                my_splineX.setSplineType(QwtSpline::Periodic);
+                my_splineY.setSplineType(QwtSpline::Periodic);
+            } else {
+                my_splineX.setSplineType(QwtSpline::Natural);
+                my_splineY.setSplineType(QwtSpline::Natural);
+            }
+            
+            int size=steps*(my_poly.size()-1);
+            
+            my_splineX.setPoints( splinePointsX );
+            my_splineY.setPoints( splinePointsY );
+            
+            const double delta = splinePointsX.last().x() / size;
+            for (int i = 1; i < size; i++ )
+            {
+                const double dtmp = i * delta;
+                QPointF p=QPointF(my_splineX.value( dtmp ),my_splineY.value( dtmp ));
+                if (dtmp > param_length.at(0)) {
+                    my_poly_interp.append(my_poly[0]);
+                    my_poly.remove(0);
+                    param_length.remove(0);
+                }
+                my_poly_interp.append(p);
+            }
+            my_poly_interp.append(my_poly.last());
+            
+        } else {
+            for(int i=0;i<my_poly.size()-1;i++) {
+                QPointF p1=my_poly.at(i);
+                QPointF p2=my_poly.at(i+1);
+                for(int j=0;j<steps;j++) {
+                    my_poly_interp << p1+j*(p2-p1)/steps;
+                }
+            }
+            my_poly_interp << my_poly.last();
+        }
+    }
+    return my_poly_interp;
 }
 
 void

@@ -3902,6 +3902,47 @@ else
   as_fn_error $? "unable to find FFTW lib" "$LINENO" 5
 fi
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lfftw3_threads" >&5
+$as_echo_n "checking for main in -lfftw3_threads... " >&6; }
+if ${ac_cv_lib_fftw3_threads_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3_threads  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_threads_main=yes
+else
+  ac_cv_lib_fftw3_threads_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_threads_main" >&5
+$as_echo "$ac_cv_lib_fftw3_threads_main" >&6; }
+if test "x$ac_cv_lib_fftw3_threads_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFFTW3_THREADS 1
+_ACEOF
+
+  LIBS="-lfftw3_threads $LIBS"
+
+else
+  as_fn_error $? "unable to find FFTW threaded lib" "$LINENO" 5
+fi
+
 		;;
 esac
 
@@ -4594,6 +4635,8 @@ $as_echo "$ac_cv_prog_c_openmp" >&6; }
   fi
 
 
+
+CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 
 # Checks for library functions.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for working strtod" >&5

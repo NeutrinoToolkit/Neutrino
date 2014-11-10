@@ -194,9 +194,11 @@ void nWavelet::doWavelet () {
 		
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
 			// use cuda
-			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            phys_wavelet_field_2D_morlet_cuda(my_params);
+//			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		} else {
-			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            phys_wavelet_field_2D_morlet(my_params);
+//			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		}
 
 		map<string, nPhysD *>::const_iterator itr;
@@ -252,7 +254,7 @@ void nWavelet::doWavelet () {
         } else {
             out.prepend("CPU");
         }
-        my_w.statusbar->showMessage(out, 5000);
+        my_w.statusbar->showMessage(out, 50000);
     } else {
         my_w.statusbar->showMessage("Canceled", 5000);
     }

@@ -69,7 +69,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
     
     my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
-    
+
+	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
 	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
@@ -80,6 +81,20 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
+}
+
+void nPreferences::changeThreads(int num) {
+    if (num<=1) {
+        fftw_cleanup_threads();
+    } else {
+        fftw_init_threads();
+        fftw_plan_with_nthreads(num);
+    }
+    QSettings settings("neutrino","");
+    settings.beginGroup("Preferences");
+    settings.setValue("threads",num);
+    settings.endGroup();
+    DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
 }
 
 void nPreferences::useDot() {

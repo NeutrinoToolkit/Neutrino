@@ -84,6 +84,7 @@ case $uname in
 		;;
 	*)
 	AC_CHECK_LIB([fftw3], [main], [], [AC_MSG_ERROR([unable to find FFTW lib])])
+	AC_CHECK_LIB([fftw3_threads], [main], [], [AC_MSG_ERROR([unable to find FFTW threaded lib])])
 		;;
 esac
 
@@ -142,6 +143,8 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
 AC_OPENMP
+
+CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 
 # Checks for library functions.
 AC_FUNC_STRTOD

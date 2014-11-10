@@ -379,6 +379,13 @@ void nRect::intersection() {
 	}
 }
 
+void nRect::submatrix() {
+    if (parent()->currentBuffer) {
+        nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+        parent()->showPhys(subPhys);
+    }
+}
+
 void nRect::changeWidth () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
@@ -461,10 +468,7 @@ nRect::keyPressEvent ( QKeyEvent * e ) {
 			intersection();
 			break;
 		case Qt::Key_S:
-			if (parent()->currentBuffer) {
-				nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-				parent()->showPhys(subPhys);
-			}
+            submatrix();
 			break;
 		default:
             emit key_pressed(e->key());
