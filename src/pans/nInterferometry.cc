@@ -210,12 +210,9 @@ void nInterferometry::maskRegionToggled(bool val) {
 }
 
 void nInterferometry::interpolateToggled(bool val) {
-    //                 _____ _                     
-    //                |  ___(_)_  ___ __ ___   ___ 
-    //                | |_  | \ \/ / '_ ` _ \ / _ \
-    //                |  _| | |>  <| | | | | |  __/
-    //                |_|   |_/_/\_\_| |_| |_|\___|
-    //                    
+    for (map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
+        it->second->setVisible(val);
+    }
 }
 
 void nInterferometry::checkChangeCombo(QComboBox *combo) {
@@ -360,7 +357,6 @@ void nInterferometry::doUnwrap () {
 
         if (phase && qual && nPhysExists(phase) && nPhysExists(qual)) {
             progress.show();
-            nPhysD barrierPhys;
 
             QTime timer;
             timer.start();
@@ -370,51 +366,40 @@ void nInterferometry::doUnwrap () {
 
                 QString methodName=my_w.method->currentText();
 
+                nPhysD barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
                 if (my_w.useBarrier->isChecked()) {
-                    barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
-                    QPolygonF my_poly=unwrapBarrier->poly(phase->getW()+phase->getH()).translated(phase->get_origin().x(),phase->get_origin().y());
-                    foreach(QPointF p, my_poly) {
-                        barrierPhys.set(p.x()-1,p.y()-1,0.4);
-                        barrierPhys.set(p.x()-1,p.y()  ,0.2);
-                        barrierPhys.set(p.x()-1,p.y()+1,0.4);
-                        barrierPhys.set(p.x()  ,p.y()-1,0.2);
-                        barrierPhys.set(p.x()  ,p.y()  ,0.0);
-                        barrierPhys.set(p.x()  ,p.y()+1,0.2);
-                        barrierPhys.set(p.x()+1,p.y()-1,0.4);
-                        barrierPhys.set(p.x()+1,p.y()  ,0.2);
-                        barrierPhys.set(p.x()+1,p.y()+1,0.4);
-                    }
-                    if (methodName=="Simple H+V") {
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
-                    } else if (methodName=="Simple V+H") {
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
-                    } else if (methodName=="Goldstein") {
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
-                    } else if (methodName=="Miguel") {
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
-                    } else if (methodName=="Miguel+Quality") {
-                        phys_point_multiply(barrierPhys,*qual);
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
-                    } else if (methodName=="Quality") {
-                        phys_point_multiply(barrierPhys,*qual);
-                        unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
-                    }
-//                    nparent->addPhys(new nPhysD(barrierPhys));
-                } else {
-                    if (methodName=="Simple H+V") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
-                    } else if (methodName=="Simple V+H") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
-                    } else if (methodName=="Goldstein") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
-                    } else if (methodName=="Miguel") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, MIGUEL);
-                    } else if (methodName=="Miguel+Quality") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
-                    } else if (methodName=="Quality") {
-                        unwrap = phys_phase_unwrap(*phase, *qual, QUALITY);
+                    QPolygon my_poly=unwrapBarrier->poly(phase->getW()+phase->getH()).translated(phase->get_origin().x(),phase->get_origin().y()).toPolygon();                    
+                    for(int ip=0; ip<my_poly.size(); ip++) {
+                        QPoint p=my_poly[ip];
+                        if (ip>0 && p!=my_poly[ip-1]) {
+                            barrierPhys.set(p.x()-1,p.y()-1,0.8*barrierPhys.point(p.x()-1,p.y()-1));
+                            barrierPhys.set(p.x()-1,p.y()  ,0.7*barrierPhys.point(p.x()-1,p.y()  ));
+                            barrierPhys.set(p.x()-1,p.y()+1,0.8*barrierPhys.point(p.x()-1,p.y()+1));
+                            barrierPhys.set(p.x()  ,p.y()-1,0.7*barrierPhys.point(p.x()  ,p.y()-1));
+                            barrierPhys.set(p.x()  ,p.y()  ,0.5*barrierPhys.point(p.x()  ,p.y()  ));
+                            barrierPhys.set(p.x()  ,p.y()+1,0.7*barrierPhys.point(p.x()  ,p.y()+1));
+                            barrierPhys.set(p.x()+1,p.y()-1,0.8*barrierPhys.point(p.x()+1,p.y()-1));
+                            barrierPhys.set(p.x()+1,p.y()  ,0.7*barrierPhys.point(p.x()+1,p.y()  ));
+                            barrierPhys.set(p.x()+1,p.y()+1,0.8*barrierPhys.point(p.x()+1,p.y()+1));
+                        }
                     }
                 }
+                if (methodName=="Simple H+V") {
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+                } else if (methodName=="Simple V+H") {
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+                } else if (methodName=="Goldstein") {
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+                } else if (methodName=="Miguel") {
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                } else if (methodName=="Miguel+Quality") {
+                    phys_point_multiply(barrierPhys,*qual);
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                } else if (methodName=="Quality") {
+                    phys_point_multiply(barrierPhys,*qual);
+                    unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+                }
+//                nparent->addPhys(new nPhysD(barrierPhys));
 
                 if (unwrap) {
 

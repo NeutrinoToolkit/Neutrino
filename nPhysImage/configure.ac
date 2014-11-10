@@ -141,6 +141,7 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
+AC_OPENMP
 
 # Checks for library functions.
 AC_FUNC_STRTOD
