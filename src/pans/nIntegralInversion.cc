@@ -223,6 +223,16 @@ QVariant nIntegralInversion::doInversion() {
 			//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());
 			//		}
 
+            bool ok1,ok2;
+            double mini=my_w.minCut->text().toDouble(&ok1);
+            double maxi=my_w.maxCut->text().toDouble(&ok2);
+            if (ok1 || ok2) {
+                phys_cutoff(*inv_image, 
+                            ok1?mini:inv_image->Tminimum_value, 
+                            ok2?maxi:inv_image->Tmaximum_value);
+            }
+            
+            
 			if (my_w.erasePrevious->isChecked()) {
 				invertedPhys=nparent->replacePhys(inv_image,invertedPhys);
 			} else {
@@ -230,7 +240,7 @@ QVariant nIntegralInversion::doInversion() {
 				nparent->addPhys(inv_image);
 			}
 			retVar=qVariantFromValue(*invertedPhys);
-		} else {	
+		} else {
 			DEBUG("[nIntegralInversion] Error: inversion returned NULL");
 		}
 		
