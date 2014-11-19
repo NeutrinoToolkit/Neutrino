@@ -50,7 +50,9 @@ if sys.platform == 'darwin' :
     makefile.extra_include_dirs += ["/opt/local/Library/Frameworks/qwt.framework/Versions/Current/Headers","/opt/local/Library/Frameworks/QtSvg.framework/Versions/Current/Headers"]
 
 if sys.platform.startswith('linux'):
-    makefile.extra_libs += ["hdf5"]
+#    makefile.extra_libs += ["hdf5"] .alex.
+# Taking this out because there is no way to control it
+# TODO: parse ../nPhysImage/config.h from here, to know libs status
     makefile.extra_include_dirs += ["/usr/include/hdf","/usr/include/qwt","/usr/include/qt4/QtSvg"]
 
 makefile.generate()
