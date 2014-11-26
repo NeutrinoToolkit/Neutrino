@@ -144,7 +144,6 @@ void nWavelet::guessCarrier() {
 void nWavelet::doWavelet () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-		nPhysD *bufferDisplayed=currentBuffer;
 		QTime timer;
 		timer.start();
 
@@ -209,21 +208,22 @@ void nWavelet::doWavelet () {
                 delete itr->second;
             } else {
                 if (my_w.erasePrevious->isChecked()) {
-                    if (bufferDisplayed==waveletPhys[itr->first]) bufferDisplayed=itr->second;
                     waveletPhys[itr->first]=nparent->replacePhys(itr->second,waveletPhys[itr->first],false);
                 } else {
                     nparent->addPhys(itr->second);
                     waveletPhys[itr->first]=itr->second;
                 }
-                if (itr->first=="phase_2pi") {
-                    DEBUG("here "); 
-                    my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
-                } else if (itr->first=="contrast") {
-                    my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
-                }
             }
 		}
-		
+        QApplication::processEvents();
+		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
+            if (itr->first=="phase_2pi") {
+                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+            } else if (itr->first=="contrast") {
+                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+            }
+        }
+        
 		if (my_w.showSource->isChecked()) {
 			datamatrix.setShortName("wavelet source");
 			nPhysD *deepcopy=new nPhysD();
@@ -246,7 +246,6 @@ void nWavelet::doWavelet () {
             }
         }
         
-        nparent->showPhys(bufferDisplayed);
         QString out;
         out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
         if (settings.value("useCuda").toBool()) {

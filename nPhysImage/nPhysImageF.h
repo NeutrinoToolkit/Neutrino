@@ -612,7 +612,7 @@ public:
 	}
 	
 	const unsigned char *to_uchar_palette(double mini, double maxi, unsigned char * palette) {
-		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value << " rescaled from " << mini << " to " << maxi);
+		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		if (width>0 && height>0 && palette) {
 
 			if (uchar_buf == NULL) {
@@ -1432,10 +1432,6 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 	
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
-	fftw_init_threads();
-	fftw_plan_with_nthreads(sysconf( _SC_NPROCESSORS_ONLN ));
-	
-
 	if (getSurf()>0) {
 		fftw_plan plan_t;
 		if (ftdir == PHYS_FORWARD)

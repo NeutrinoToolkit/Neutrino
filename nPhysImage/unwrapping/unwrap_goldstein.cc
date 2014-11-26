@@ -204,7 +204,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				}
 			}
 			if (kk) {
-				DEBUG("Connecting dipoles " << i << "," << j << " " << kk%dx << "," << kk/dx);
+// 				DEBUG("Connecting dipoles " << i << "," << j << " " << kk%dx << "," << kk/dx);
 				PlaceCut(&bits, i, j, kk%dx, kk/dx);
 				bits.set(i,j,bits.point(i,j) & (~(RESIDUE)));
 				bits.set(kk,bits.point(kk) & (~(RESIDUE)));
@@ -213,47 +213,52 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	}
 	DEBUG(NumRes << " Residues after Dipole" << std::endl);
 
-	int MaxCutLen = dx + dy;
+	int MaxCutLen = dx+dy;
 	
 	int ri, rj;
 	int rim_i=0, rim_j=0, near_i=0, near_j=0;
 
 	int max_active = NumRes+10;
 	
-	std::vector<unsigned int> active_list(max_active + 1);
+	std::vector<vec2> active_list(max_active + 1);
 	int num_active = 0;
 	
 	/* branch cuts */
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
 			if ((bits.point(i,j) & RESIDUE) && !(bits.point(i,j) & DONE)) {
-				bits.set(i,j,(bits.point(i,j) | DONE) | ACTIVE);   /* turn on ACTIVE and DONE flag */
+				bits.set(i,j,(bits.point(i,j) | DONE) | ACTIVE);
 				int charge = (bits.point(i,j) & POSITIVE) ? 1 : -1;
-				active_list[num_active++] = i+j*dx;
-				if (num_active > max_active) num_active = max_active;
+				active_list[num_active++] = vec2(i,j);
+				if (num_active > max_active) {
+					DEBUG("here1 i,j " << i << " " << j);
+					num_active = max_active;
+				}
 				for (int bodx = 3; bodx<=MaxCutLen && charge!=0; bodx += 2) {
 					int bs2 = bodx/2;
 					for (int ka=0; ka<num_active && charge!=0; ka++) {
-						int boxctr_i = active_list[ka]%dx;
-						int boxctr_j = active_list[ka]/dx;
-						for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0; jj++) {
-							for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0; ii++) {
-								if (ii>=0 && ii<(int)dx && jj>=0 && jj<(int)dy) { 
-									if (bits.point(ii,jj) & BORDER) {
-										charge = 0;
-										DistToBorder(&bits, boxctr_i, boxctr_j, &ri, &rj);
-										PlaceCut(&bits, ri, rj, boxctr_i, boxctr_j);
-									} else if ((bits.point(ii,jj) & RESIDUE) && !(bits.point(ii,jj) & ACTIVE)) {
-										if (!(bits.point(ii,jj) & DONE)) {
-											charge += (bits.point(ii,jj) & POSITIVE) ? 1 : -1;
-											bits.set(ii,jj,bits.point(ii,jj) | DONE);
-										}
-										DEBUG("connected two");
-										active_list[num_active++] = ii+dx*jj;
-										if (num_active > max_active) num_active = max_active;
-										bits.set(ii,jj,bits.point(ii,jj) | ACTIVE);
-										PlaceCut(&bits, ii, jj, boxctr_i, boxctr_j);
+						int boxctr_i = active_list[ka].x();
+						int boxctr_j = active_list[ka].y();
+						for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0 && jj>=0 && jj < dy; jj++) {
+							for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0 && ii>=0 && ii < dx; ii++) {
+								unsigned char bit=bits.point(ii,jj);
+								if (bit & BORDER) {
+									bits.set(ii,jj,bit | DONE);
+									charge = 0;
+									DistToBorder(&bits, boxctr_i, boxctr_j, &ri, &rj);
+									PlaceCut(&bits, ri, rj, boxctr_i, boxctr_j);
+								} else if ((bit & RESIDUE) && !(bit & ACTIVE)) {
+									if (!(bit & DONE)) {
+										charge += (bit & POSITIVE) ? 1 : -1;
+										bits.set(ii,jj,bit | DONE);
 									}
+									active_list[num_active++] = vec2(ii,jj);
+									if (num_active > max_active) {
+										num_active = max_active;
+										DEBUG("here2 " << ii << " " << jj << " i,j " << i << " " << j);
+									}
+									bits.set(ii,jj,bit | ACTIVE);
+									PlaceCut(&bits, ii, jj, boxctr_i, boxctr_j);
 								}
 							}
 						}
@@ -267,8 +272,8 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				} else {
 					int min_dist = dx + dy;  /* large value */
 					for (int ka=0; ka<num_active; ka++) {
-						int ii = active_list[ka]%dx;
-						int jj = active_list[ka]/dx;
+						int ii = active_list[ka].x();
+						int jj = active_list[ka].y();
 						int dist = DistToBorder(&bits, ii, jj, &ri, &rj);
 						if (dist<min_dist) {
 							min_dist = dist;
@@ -283,7 +288,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 			}
 		}
 	}
-	
+	DEBUG("here");
 	/*  UNWRAP AROUND CUTS */
 	unsigned int  a, b, num_pieces=0;
 	double  value;
@@ -292,6 +297,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	std::vector<unsigned int> index_list(dx*dy + 1 + 1);
 		
 	/* find starting point */
+	int n = 0;
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
 			if (!(bits.point(i,j) & (AVOID | UNWRAPPED))) {
@@ -301,6 +307,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				soln->set(i,j,value);
 				UpdateList(&qual_map, i, j, value, phase, soln, &bits, index_list, num_index);
 				while (num_index > 0) {
+					++n;
 					if (GetNextOneToUnwrap(a, b, index_list, num_index, dx)) {
 						bits.set(a,b,bits.point(a,b) | UNWRAPPED);
 						value = soln->point(a,b);        

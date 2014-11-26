@@ -27,21 +27,16 @@
 #ifndef n_phys_formats__
 #define n_phys_formats__
 
-extern "C" {
-#ifdef HAVE_LIBNETPBM
-#include <pgm.h>
-#endif
-
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+extern "C" {
 #define intf hdf4_intf
 #define int8 hdf4_int8
 #include "hdf.h"
 #include "mfhdf.h"
 #undef intf
 #undef int8
-#endif
-
 }
+#endif
 
 // .alex. incredibile quanto bordello genera questo...
 //using namespace std;
@@ -82,6 +77,9 @@ public:
 
 // external library formats
 #ifdef HAVE_LIBNETPBM
+extern "C" {
+#include <pgm.h>
+}
 class physGray_pgm : public nPhysImageF<gray> {
 public:
 	physGray_pgm(const char *);

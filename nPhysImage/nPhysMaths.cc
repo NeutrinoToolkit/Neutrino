@@ -584,55 +584,6 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 	fftw_free(b2);
 }
 
-void
-phys_gaussian_subtraction(nPhysImageF<double> &m1, double radius1, double radius2)
-{
-	vector<double> nan_free_phys(m1.getSurf());
-    register size_t i;
-#pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
-		if (std::isfinite(m1.point(i))) {
-			nan_free_phys[i]=m1.point(i);
-		} else {
-			nan_free_phys[i]=m1.Tminimum_value;
-		}
-	}
-	fftw_complex *b2 = fftw_alloc_complex(m1.getH()*(m1.getW()/2+1));
-	
-	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
-	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
-	
-	fftw_execute(fb);
-
- 	double sx1=pow(m1.getW()/(radius1*M_PI),2)/2.0;
- 	double sy1=pow(m1.getH()/(radius1*M_PI),2)/2.0;
- 	double sx2=pow(m1.getW()/(radius2*M_PI),2)/2.0;
- 	double sy2=pow(m1.getH()/(radius2*M_PI),2)/2.0;
-
-    register size_t j;
-#pragma omp parallel for
- 	for (size_t j = 0 ; j < m1.getH(); j++) {
-	    for (i = 0 ; i < m1.getW()/2+1 ; i++) {
-			double blur1=exp(-((i*i)/sx1+(j-m1.getH()/2)*(j-m1.getH()/2)/sy1))/m1.getSurf();
-			double blur2=exp(-((i*i)/sx2+(j-m1.getH()/2)*(j-m1.getH()/2)/sy2))/m1.getSurf();
-			int k=i+((j+m1.getH()/2+1)%m1.getH())*(m1.getW()/2+1);
-			b2[k][0]*=blur1-blur2;
-			b2[k][1]*=blur1-blur2;
-		}
-	}
-	fftw_execute(bb);	
-#pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
-		if (std::isfinite(m1.point(i))) {
-			m1.set(i,nan_free_phys[i]);
-		}
-	}
-	m1.TscanBrightness();
-	fftw_destroy_plan(fb);
-	fftw_destroy_plan(bb);
-	fftw_free(b2);
-}
-
 pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>* img1, nPhysImageF<double>* img2) {
 	size_t dx=img1->getW();
 	size_t dy=img1->getH();

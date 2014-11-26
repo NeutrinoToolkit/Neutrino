@@ -53,7 +53,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		int dx=params.data->getW();
 		int dy=params.data->getH();
 
-		int xx[dx], yy[dy];
+		vector<int> xx(dx), yy(dy);
 		
 		nPhysImageF<mcomplex> zz_morlet("zz_morlet");
 	
@@ -547,6 +547,7 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
             for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
                 synthetic.set(ii,quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
             }
+            synthetic.property=phase_over_2pi->property;
             synthetic.setShortName("synthetic");
             synthetic.setName("synthetic("+phase_over_2pi->getName()+","+quality->getName()+")");
             synthetic.TscanBrightness();

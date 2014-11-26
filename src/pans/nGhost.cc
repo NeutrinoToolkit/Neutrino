@@ -82,7 +82,6 @@ void nGhost::doGhost () {
         size_t dx=imageShot->getW();
         size_t dy=imageShot->getH();
         
-        
         if (imageFFT.getSurf() == 0) {
             imageFFT = imageShot->ft2(PHYS_FORWARD);
             xx.resize(dx);
@@ -96,16 +95,15 @@ void nGhost::doGhost () {
                 
         double cr_ghost = cos((my_w.angleCarrier->value()) * _phys_deg); 
         double sr_ghost = sin((my_w.angleCarrier->value()) * _phys_deg);
-        double thick_ghost=my_w.thicknessGhost->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
+//        double thick_ghost=my_w.thicknessGhost->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
+        double thick_ghost=M_PI;
         double lambda_ghost=my_w.widthCarrier->value()/sqrt(pow(cr_ghost*dx,2)+pow(sr_ghost*dy,2));
         
         double cr_norm = cos((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg); 
         double sr_norm = sin((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg);
-        double thick_norm=my_w.thickness->value()*M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
+//        double thick_norm=my_w.thickness->value()*M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
+        double thick_norm=M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
         double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dx,2));
-       
-        double weight=my_w.weight->value();
-
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr_ghost = xx[x]*cr_ghost - yy[y]*sr_ghost;
@@ -120,7 +118,7 @@ void nGhost::doGhost () {
                 double ex_norm = -pow(M_PI*(xr_norm*lambda_norm-1.0), 2);
                 double ey_norm = -pow(yr_norm*thick_norm, 2);
                 
-                double e_tot=weight*exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
+                double e_tot=exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
 //                filter->set(x,y,e_tot);
                 morlet.Timg_matrix[y][x]=imageFFT.Timg_matrix[y][x] * e_tot; 
@@ -133,8 +131,7 @@ void nGhost::doGhost () {
         morlet = morlet.ft2(PHYS_BACKWARD);
         
         
-        nPhysD *deepcopy=new nPhysD();
-        *deepcopy=imageShot->copy();
+        nPhysD *deepcopy=new nPhysD(*imageShot);
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
         

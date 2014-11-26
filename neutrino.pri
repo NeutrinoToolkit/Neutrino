@@ -112,6 +112,8 @@ LIBS += -lfftw3_threads
 
 
 QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
+
 
 neutrino-HDF {
     LIBS += -lmfhdf -ldf -lhdf5
