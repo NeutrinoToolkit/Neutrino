@@ -115,7 +115,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 //				double thick_norm=wave_params.thickness*M_PI/dy;
 //				double lambda_norm=lambdas[i]/dx;
                 size_t x,y;
-#pragma parallel omp for collapse(2)
+#pragma omp parallel for collapse(2)
 				for (x=0;x<zz_morlet.getW();x++) {
 					for (y=0;y<zz_morlet.getH();y++) {
 						double xr = xx[x]*cr - yy[y]*sr; //rotate
@@ -133,7 +133,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 				nPhysImageF<mcomplex> zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
 
 				// decision
-#pragma parallel omp for
+#pragma omp parallel for
 				for (size_t k=0; k<params.data->getSurf(); k++) {
 					double qmap_local=zz_convolve.Timg_buffer[k].mcabs();
 					if ( qmap_local > qmap->Timg_buffer[k]) {

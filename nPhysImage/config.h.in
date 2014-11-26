@@ -21,14 +21,14 @@
 /* Define to 1 if you have the `fftw3-3' library (-lfftw3-3). */
 #undef HAVE_LIBFFTW3_3
 
+/* Define to 1 if you have the `fftw3_threads' library (-lfftw3_threads). */
+#undef HAVE_LIBFFTW3_THREADS
+
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
 /* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
 #undef HAVE_LIBGSLCBLAS
-
-/* Define to 1 if you have the `hdf' library (-lhdf). */
-#undef HAVE_LIBHDF
 
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
@@ -39,6 +39,9 @@
 /* Define to 1 if you have the `mfhdf' library (-lmfhdf). */
 #undef HAVE_LIBMFHDF
 
+/* Define to 1 if you have the `mfhdfdll' library (-lmfhdfdll). */
+#undef HAVE_LIBMFHDFDLL
+
 /* Define to 1 if you have the `netpbm' library (-lnetpbm). */
 #undef HAVE_LIBNETPBM
 
@@ -47,12 +50,6 @@
 
 /* Define to 1 if you have the `tiff' library (-ltiff). */
 #undef HAVE_LIBTIFF
-
-/* Define to 1 if you have the `ws2_32' library (-lws2_32). */
-#undef HAVE_LIBWS2_32
-
-/* Define to 1 if you have the `xdr' library (-lxdr). */
-#undef HAVE_LIBXDR
 
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ

@@ -544,7 +544,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 		}
 	}
 }
-    fftw_complex *b2 = fftw_alloc_complex(m1.getH()*(m1.getW()/2+1));
+    fftw_complex *b2 = fftw_alloc_complex(m1.getH()*((m1.getW()/2+1)));
 	
 	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
 	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);

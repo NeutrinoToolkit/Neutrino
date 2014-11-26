@@ -524,6 +524,8 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
 		sleeper_thread::msleep(100);
 	}
     
+    progress.setValue(0);
+    progress.hide();
     if (nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),tr("Thread didn't work"),QMessageBox::Ok);
     }

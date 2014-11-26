@@ -1,11 +1,10 @@
 TARGET = ../Neutrino
 
-CONFIG += qt qwt debug_and_release windows
+CONFIG += qt qwt windows 
 
 CONFIG += neutrino-HDF
 
 QT += svg xml network core gui
-
 
 VERSION = 1.0.0
 
@@ -13,6 +12,13 @@ VERSION = 1.0.0
 NVERSION=$$system(git describe)
 
 macx {
+    QMAKE_CC = /opt/local/bin/gcc-mp-4.8 
+    QMAKE_CXX = /opt/local/bin/g++-mp-4.8 
+    QMAKE_LINK       = $$QMAKE_CXX
+    QMAKE_LINK_SHLIB = $$QMAKE_CXX
+    QMAKE_CXXFLAGS_X86_64 -= -Xarch_x86_64
+    QMAKE_LFLAGS_X86_64 -= -Xarch_x86_64
+
 	DEFINES += __VER=\'\"$${NVERSION}\"\'
 } else {
 	DEFINES += __VER=\\\"$${NVERSION}\\\"
@@ -21,22 +27,19 @@ macx {
 message($${NVERSION})
 # nPhysImage compilation
 nPhys.target = nPhys
+
 CONFIG(debug, debug|release) {
-    nPhys.commands = make -C ../nPhysImage debug
+    nPhys.commands = make -C ../nPhysImage debug; echo $$CONFIG
+    DEFINES += __phys_debug=10
+    message("DEBUG!")
 } else {
-    nPhys.commands = make -C ../nPhysImage release
+    nPhys.commands = make -C ../nPhysImage release; echo $$CONFIG
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    message("RELEASE!")
 }
 QMAKE_EXTRA_TARGETS += nPhys
 PRE_TARGETDEPS = nPhys
 
-
-CONFIG(debug) {
-    DEFINES += __phys_debug=10
-    message("DEBUG!")
-} else {
-    DEFINES += QT_NO_DEBUG_OUTPUT
-    message("RELEASE!")
-}
 
 # base
 INCLUDEPATH += ../src
