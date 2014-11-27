@@ -47,6 +47,30 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	coreNum=sysconf( _SC_NPROCESSORS_ONLN );
 #endif
 
+    int nthreads, procs, maxt, inpar, dynamic, nested;
+#pragma omp parallel private(nthreads)
+    {
+        if (omp_get_thread_num() == 0) 
+        {
+            /* Get environment information */
+            procs = omp_get_num_procs();
+            nthreads = omp_get_num_threads();
+            maxt = omp_get_max_threads();
+            inpar = omp_in_parallel();
+            dynamic = omp_get_dynamic();
+            nested = omp_get_nested();
+            
+            /* Print environment information */
+            my_w.infoCores->insertPlainText("Number of processors     = "+QString::number(procs));
+            my_w.infoCores->insertPlainText("\nNumber of threads        = "+QString::number(nthreads));
+            my_w.infoCores->insertPlainText("\nMax threads              = "+QString::number(maxt));
+            my_w.infoCores->insertPlainText("\nIn parallel?             = "+QString(inpar==0?"No":"Yes"));
+            my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
+            my_w.infoCores->insertPlainText("\nNested supported?        = "+QString(nested==0?"No":"Yes"));
+        }
+    }
+    
+    
 	my_w.threads->setMaximum(coreNum);
 
 	if (coreNum==1) {
@@ -90,6 +114,7 @@ void nPreferences::changeThreads(int num) {
         fftw_init_threads();
         fftw_plan_with_nthreads(num);
     }
+    omp_set_num_threads(num);
     QSettings settings("neutrino","");
     settings.beginGroup("Preferences");
     settings.setValue("threads",num);
