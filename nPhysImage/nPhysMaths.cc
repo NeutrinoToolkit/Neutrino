@@ -389,7 +389,6 @@ phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
 	double mult = 1/(pow(radius, 2.)*2*M_PI);
 	for (size_t i=0; i<xx.getW(); i++) {
     	register size_t j;
-#pragma omp parallel for
 		for (j=0; j<xx.getH(); j++) {
 			gauss.Timg_matrix[j][i] = mult*exp( -(pow(xx.Timg_matrix[j][i],2)+pow(yy.Timg_matrix[j][i],2))/(2.*pow(radius, 2)) );
 		}
@@ -400,7 +399,6 @@ phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
 
 	for (size_t i=0; i<xx.getW(); i++) {
     	register size_t j;
-#pragma omp parallel for
 		for (j=0; j<xx.getH(); j++) {
 			m1.Timg_matrix[j][i] = (out.Timg_matrix[j][i].real())/double(xx.getSurf());
 		}
@@ -533,9 +531,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 {
 	vector<double> nan_free_phys(m1.getSurf());
     register size_t i;
-#pragma omp parallel
-{    
-#pragma omp for
+#pragma omp parallel for
 	for (i=0; i< m1.getSurf(); i++) {
 		if (std::isfinite(m1.point(i))) {
 			nan_free_phys[i]=m1.point(i);
@@ -543,7 +539,6 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 			nan_free_phys[i]=m1.Tminimum_value;
 		}
 	}
-}
     fftw_complex *b2 = fftw_alloc_complex(m1.getH()*((m1.getW()/2+1)));
 	
 	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
@@ -555,9 +550,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
  	double sy=pow(m1.getH()/(radiusY),2)/2.0;
 
     register size_t j;
-#pragma omp parallel private(i,j)
-{
-#pragma omp for
+#pragma omp parallel for collapse(2)
  	for (size_t j = 0 ; j < m1.getH(); j++) {
 		for (i = 0 ; i < m1.getW()/2+1 ; i++) {
 			double blur=exp(-((i*i)/sx+(j-m1.getH()/2)*(j-m1.getH()/2)/sy))/m1.getSurf();
@@ -566,18 +559,14 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 			b2[k][1]*=blur;
 		}
 	}
-}
     fftw_execute(bb);
 
-#pragma omp parallel
-{    
-#pragma omp for
+#pragma omp parallel for
 	for (i=0; i< m1.getSurf(); i++) {
 		if (std::isfinite(m1.point(i))) {
 			m1.set(i,nan_free_phys[i]);
 		}
 	}
-}
     m1.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);

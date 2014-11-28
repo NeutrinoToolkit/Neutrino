@@ -633,6 +633,8 @@ sip.files =''' % target_config.qneu_sip_dir)
 INSTALLS += sip
 ''')
 
+    pro.write('QMAKE_CXXFLAGS += -fopenmp\n')
+    pro.write('QMAKE_LFLAGS += -fopenmp\n')
     pro.write('\n')
 
     # These optimisations could apply to other platforms.
@@ -682,6 +684,13 @@ win32 {
 }
 
 macx {
+    QMAKE_CC = /opt/local/bin/gcc
+    QMAKE_CXX = /opt/local/bin/g++ 
+    QMAKE_LINK       = $$QMAKE_CXX
+    QMAKE_LINK_SHLIB = $$QMAKE_CXX
+    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.6
+    QMAKE_LFLAGS_X86_64 = $$QMAKE_CXXFLAGS_X86_64
+
     QMAKE_LFLAGS += "-undefined dynamic_lookup"
 #     QMAKE_LFLAGS += "-install_name $$absolute_path($$PY_MODULE, $$target.path)"
     QMAKE_POST_LINK = $$QMAKE_POST_LINK$$escape_expand(\\\\n\\\\t)$$quote(install_name_tool -change libNeutrino.%s.dylib %s/libNeutrino.%s.dylib $$PY_MODULE)

@@ -179,7 +179,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 		QPointF pos_mouse=parent()->my_mouse.pos()+delta;
 		parent()->my_mouse.setPos(pos_mouse);
 		emitMouseposition(pos_mouse);
-		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
+//		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
 //		QCursor::setPos(posCursor);
 //		qDebug() << delta << pos_mouse << posCursor << mapToGlobal(QPoint(0,0));
 	}

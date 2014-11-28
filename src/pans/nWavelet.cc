@@ -200,8 +200,8 @@ void nWavelet::doWavelet () {
 			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		}
 
-		map<string, nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);
+        map<string, nPhysD *>::const_iterator itr;
 		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
             if ((itr->first=="angle" && my_params.n_angles==1) ||
                 itr->first=="lambda" && my_params.n_lambdas==1) {
@@ -216,7 +216,8 @@ void nWavelet::doWavelet () {
             }
 		}
         QApplication::processEvents();
-		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
+        
+		for(itr = waveletPhys.begin(); itr != waveletPhys.end(); ++itr) {
             if (itr->first=="phase_2pi") {
                 my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
             } else if (itr->first=="contrast") {

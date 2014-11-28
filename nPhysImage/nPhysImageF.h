@@ -475,9 +475,7 @@ public:
 			double shiftx=std::min(dx1,0.0)+std::min(dx2,0.0);
 			double shifty=std::min(dy1,0.0)+std::min(dy2,0.0);
 			size_t i,j;
-#pragma omp parallel private(i,j)
-{
-#pragma omp for
+#pragma omp parallel for collapse(2)
 			for (j=0; j<rotated->getH(); j++) {
 				for (i=0; i<rotated->getW(); i++) {
 					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
@@ -485,7 +483,6 @@ public:
 					rotated->set(i,j,getPoint(ir,jr,def_value));
 				}
 			}
-}
 			vec2f orig=get_origin();
 			double ir=(orig.x())*cos(-alpha)-(orig.y())*sin(-alpha);
 			double jr=(orig.x())*sin(-alpha)+(orig.y())*cos(-alpha);

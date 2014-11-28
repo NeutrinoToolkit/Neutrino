@@ -2,7 +2,7 @@ TARGET = ../Neutrino
 
 CONFIG += qt qwt windows 
 
-CONFIG += neutrino-HDF
+# CONFIG += neutrino-HDF
 
 QT += svg xml network core gui
 
@@ -12,12 +12,12 @@ VERSION = 1.0.0
 NVERSION=$$system(git describe)
 
 macx {
-    QMAKE_CC = /opt/local/bin/gcc-mp-4.8 
-    QMAKE_CXX = /opt/local/bin/g++-mp-4.8 
+    QMAKE_CC = /opt/local/bin/gcc
+    QMAKE_CXX = /opt/local/bin/g++ 
     QMAKE_LINK       = $$QMAKE_CXX
     QMAKE_LINK_SHLIB = $$QMAKE_CXX
-    QMAKE_CXXFLAGS_X86_64 -= -Xarch_x86_64
-    QMAKE_LFLAGS_X86_64 -= -Xarch_x86_64
+    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.6
+    QMAKE_LFLAGS_X86_64 = $$QMAKE_CXXFLAGS_X86_64
 
 	DEFINES += __VER=\'\"$${NVERSION}\"\'
 } else {
