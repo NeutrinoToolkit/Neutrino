@@ -391,7 +391,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                     break;
                 }
             }
-            DEBUG("*wave_params.iter_ptr" <<  *params.iter_ptr);
+            DEBUG(PRINTVAR(*params.iter_ptr));
             cudaThreadSynchronize();
 
             if ((*params.iter_ptr)!=-1) {

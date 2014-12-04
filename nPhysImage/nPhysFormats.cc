@@ -334,6 +334,7 @@ physInt_sif::physInt_sif(string ifilename)
 	
 	getline(ifile, temp_string);
 	ss.str(temp_string);
+	
 	int binary_header=0,useless=0;
 	ss >> useless >> binary_header;
 	DEBUG("unused value " << useless);
@@ -349,7 +350,7 @@ physInt_sif::physInt_sif(string ifilename)
 		property["sif-"+ss.str()]=temp_string;
 		if (temp_string.compare(0,control_string.length(),control_string)==0) {
 			found_control_string=true;
-		}		
+		}
 	}	
 	
 	// get data
@@ -357,7 +358,8 @@ physInt_sif::physInt_sif(string ifilename)
 	vector<float> readb(getSurf());
 	
 	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
-	DEBUG(ifile.gcount());
+	DEBUG(PRINTVAR(ifile.gcount()));
+	DEBUG(PRINTVAR(ifile.tellg()));
 	ifile.close();
 	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
 	

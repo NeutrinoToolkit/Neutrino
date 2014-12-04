@@ -28,7 +28,7 @@
 // physWavelets
 
 nInterferometry::nInterferometry(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+: nGenericPan(nparent, winname), my_image(2)
 {
 	my_w.setupUi(this);
 	
@@ -51,7 +51,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 	poly << QPointF(0,0) << QPointF(100,100);
 	unwrapBarrier->setPoints(poly);
 
-	for (int k=0;k<2;k++){
+	for (unsigned int k=0;k<my_image.size();k++){
 		my_image[k].setupUi(my_w.images->widget(k));
         my_w.images->setCurrentIndex(k);
 		//hack to save diffrent uis!!!
@@ -85,6 +85,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 	connect(my_w.doSubtract, SIGNAL(released()), this, SLOT(doSubtract()));
 	connect(my_w.doMaskCutoff, SIGNAL(released()), this, SLOT(doMaskCutoff()));
 	connect(my_w.doInterpolate, SIGNAL(released()), this, SLOT(doShape()));
+	connect(my_w.doPlasma, SIGNAL(released()), this, SLOT(doPlasma()));
 
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 	
@@ -101,8 +102,6 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 
 	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
-    connect(my_w.method,SIGNAL(currentIndexChanged(int)), this, SLOT(doUnwrap()));
-
     connect(my_w.rotAngle,SIGNAL(valueChanged(double)), this, SLOT(doSubtract()));
 
     connect(my_w.posZeroButton,SIGNAL(toggled(bool)), this, SLOT(getPosZero(bool)));
@@ -139,6 +138,7 @@ vector<string> nInterferometry::localPhysNames() {
     localnames.push_back("angle");
     localnames.push_back("lambda");
     localnames.push_back("interpPhaseMask");
+    localnames.push_back("integratedPlasma");
     return localnames;
 }
 
@@ -277,27 +277,22 @@ void nInterferometry::doTrash () {
 void nInterferometry::doWavelet () {
     QTime timer;
     timer.start();
-    for (int iimage=0;iimage<2;iimage++) {
-        if(sender()==my_image[iimage].doit) {
-            QProgressDialog progress("Wavelet",QString(), 0, 1, this);
-            progress.setWindowModality(Qt::WindowModal);
-            doWavelet(iimage);
-            doWavelet(1);
-        }
-    }
     if (sender()==my_w.actionDoWavelet || sender()==region) {
-        QProgressDialog progress("Wavelet",QString(), 0, 2, this);
-        progress.setWindowModality(Qt::WindowModal);
         doWavelet(0);
-        progress.setValue(1);
         doWavelet(1);
-        progress.setValue(2);
+    } else {
+        for (int iimage=0;iimage<2;iimage++) {
+            if(sender()==my_image[iimage].doit) {
+                doWavelet(iimage);
+            }
+        }
     }
     my_w.statusbar->showMessage(QString::number(timer.elapsed())+" msec");
     if (!my_w.chained->isChecked()) doUnwrap();
 }
 
 void nInterferometry::doWavelet (int iimage) {
+    qDebug() << sender();
     string suffix=iimage==0?"ref":"shot";
     nPhysD *image=getPhysFromCombo(my_image[iimage].image);
     if (image) {
@@ -337,11 +332,11 @@ void nInterferometry::doWavelet (int iimage) {
         QSettings settings("neutrino","");
         settings.beginGroup("Preferences");
         if (settings.value("useCuda").toBool() && cudaEnabled()) {
-            phys_wavelet_field_2D_morlet_cuda(my_params);
-//            runThread(&my_params, phys_wavelet_trasl_cuda, "Interferometry...", niter);
+//            phys_wavelet_field_2D_morlet_cuda(my_params);
+            runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet "+QString(suffix.c_str()), niter);
         } else {
-            phys_wavelet_field_2D_morlet(my_params);
-//            runThread(&my_params, phys_wavelet_trasl_nocuda, "Interferometry...", niter);
+//            phys_wavelet_field_2D_morlet(my_params);
+            runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet "+QString(suffix.c_str()), niter);
         }
 
         map<string,nPhysD *> retList = my_params.olist;
@@ -593,7 +588,9 @@ void nInterferometry::doShape(){
                     for(unsigned int kk=0;kk<npoints;kk++) {
                         vec2f pp=p1+kk*(p2-p1)/npoints;
                         double val=regionPath->point(pp);
-                        vals.push_back(make_pair(pp, val));
+                        if (isfinite(val)) {
+                            vals.push_back(make_pair(pp, val));
+                        }
                     }
                 }
                 
@@ -620,9 +617,10 @@ void nInterferometry::doShape(){
                     }
                 }          
             }            
-        }            
+        }
         localPhys["interpPhaseMask"]=nparent->replacePhys(regionPath,localPhys["interpPhaseMask"]);
     }
+    if (!my_w.chained->isChecked()) doPlasma();
 }
 
 void nInterferometry::addShape(){
@@ -678,6 +676,45 @@ void nInterferometry::removeShape(QObject *obj){
     }
     if (found) my_shapes.erase(my_shapes.find(found));
 }
+
+void nInterferometry::doPlasma(){
+    if (my_w.useInterpolate->isChecked()) {
+        nPhysD *image=localPhys["interpPhaseMask"];
+        if (nPhysExists(image)) {
+            nPhysD *intNe = new nPhysD(*image);
+            
+            if (my_w.usePlasma->isChecked()) {
+                
+                double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
+                double scale_cm=my_w.imgRes->value()*1e-4; // convert micron/px to cm/px
+                
+                double toNe = -1.0e-4*8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
+                WARNING(lambda_m);
+                WARNING(scale_cm);
+                WARNING(toNe);
+                
+                phys_multiply(*intNe, toNe); 
+                intNe->setShortName("intergratedNe");
+                intNe->set_scale(scale_cm,scale_cm);
+                intNe->property["unitsX"]="cm";
+                intNe->property["unitsY"]="cm";
+                intNe->property["unitsCB"]="cm-2";
+            }
+            
+            bool ok1,ok2;
+            double mini=my_w.cutoffMin->text().toDouble(&ok1);
+            double maxi=my_w.cutoffMax->text().toDouble(&ok2);
+            if (!ok1) mini=intNe->Tminimum_value;
+            if (!ok2) maxi=intNe->Tmaximum_value;
+            phys_cutoff(*intNe,mini,maxi);
+            
+            localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
+        }        
+    }
+}
+
+
+//////////////////////////////////////////////////////////
 
 void nInterferometry::loadSettings(QSettings *settings){
     QStringList valu=settings->value("interpolateShape").toStringList();

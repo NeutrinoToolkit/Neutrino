@@ -647,6 +647,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
             break;            
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
+            DEBUG("here");
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
@@ -785,7 +786,8 @@ nLine::boundingRect() const {
 
 QPainterPath nLine::shape() const {
 	QPainterPathStroker stroker;
-	double thickness=max(nWidth,10.0)/zoom;
+	double thickness=max(nWidth,20.0)/zoom;
+    DEBUG(PRINTVAR(thickness));
     stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {

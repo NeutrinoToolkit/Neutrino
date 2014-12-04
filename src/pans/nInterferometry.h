@@ -44,7 +44,7 @@ public:
 	nInterferometry(neutrino *, QString);
 	
 	Ui::nInterferometry my_w;
-	Ui::nInterferometry1 my_image[2];
+    std::vector<Ui::nInterferometry1> my_image;
 
 	QPointer<nRect> region;	
 	QPointer<nLine> unwrapBarrier;
@@ -89,6 +89,8 @@ public slots:
     void removeShape(QObject*);
     void doShape();
 
+    void doPlasma();
+    
 	void bufferChanged(nPhysD*);
 	void checkChangeCombo(QComboBox *);
 
