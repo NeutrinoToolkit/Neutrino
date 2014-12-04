@@ -99,7 +99,7 @@ linux:
 	cd nPhysImage && ./configure $(CONFOPTS)
 	make -C nPhysImage clean devel 
 	# make all in neutrino
-	qmake CONFIG+=release
+	qmake CONFIG+="neutrino-HDF release"
 	make ${MAKEOPTS} 
 	# make sip
 	cd sip && python configure.py
