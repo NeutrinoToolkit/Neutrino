@@ -30,6 +30,9 @@ makefile = pyqtconfig.QtGuiModuleMakefile(
     installs=installs
 )
 
+makefile.extra_cxxflags += ["-fopenmp"]
+makefile.extra_lflags += ["-fopenmp"]
+
 if sys.platform == 'win32' :
 	makefile.extra_libs = ["Neutrino1","qwt"]
 else :
