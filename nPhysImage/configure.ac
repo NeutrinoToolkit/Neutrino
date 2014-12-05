@@ -35,7 +35,7 @@ case $uname in
 		AC_MSG_NOTICE(OSX : FIX headerpad_max_install_names)
 		LDFLAGS+="-headerpad_max_install_names"
 		;;
-	linux*)
+	*Linux*)
 		# Do something specific for linux
 	AC_SUBST([LCFLAGS], ["-Wl,-soname,\$@.0"])
 		;;
