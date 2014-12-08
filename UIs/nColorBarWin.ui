@@ -205,6 +205,9 @@
            </item>
            <item row="0" column="3">
             <widget class="QToolButton" name="autoscale">
+             <property name="toolTip">
+              <string>Lock on values</string>
+             </property>
              <property name="text">
               <string>...</string>
              </property>

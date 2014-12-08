@@ -866,18 +866,19 @@ std::vector <nPhysImageF<double> *> phys_open_spe(std::string ifilename) {
 				break;
 			}
 			case 1: {
-				phys->property["spe-type"]="long";
-				vector<long> buffer(width*height);
-				ifile.read((char*) &buffer[0],width*height*sizeof(long));
+				phys->property["spe-type"]="int";
+				vector<int> buffer(width*height);
+				DEBUG(sizeof(long));
+				ifile.read((char*) &buffer[0],width*height*sizeof(int));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
 					phys->set(i,buffer[i]);
 				}
 				break;
 			}
 			case 2: {
-				phys->property["spe-type"]="unsigned int";
-				vector<unsigned int> buffer(width*height);
-				ifile.read((char*) &buffer[0],width*height*sizeof(unsigned int));
+				phys->property["spe-type"]="short";
+				vector<short> buffer(width*height);
+				ifile.read((char*) &buffer[0],width*height*sizeof(short));
 				for (unsigned int i=0; i<phys->getSurf(); i++) {
 					phys->set(i,buffer[i]);
 				}

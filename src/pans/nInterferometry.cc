@@ -61,6 +61,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 
         connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
     }
+    adjustSize();
 
 
 	decorate();
@@ -376,15 +377,15 @@ void nInterferometry::doUnwrap () {
                     for(int ip=0; ip<my_poly.size(); ip++) {
                         QPoint p=my_poly[ip];
                         if (ip>0 && p!=my_poly[ip-1]) {
-                            barrierPhys.set(p.x()-1,p.y()-1,0.8*barrierPhys.point(p.x()-1,p.y()-1));
-                            barrierPhys.set(p.x()-1,p.y()  ,0.7*barrierPhys.point(p.x()-1,p.y()  ));
-                            barrierPhys.set(p.x()-1,p.y()+1,0.8*barrierPhys.point(p.x()-1,p.y()+1));
-                            barrierPhys.set(p.x()  ,p.y()-1,0.7*barrierPhys.point(p.x()  ,p.y()-1));
-                            barrierPhys.set(p.x()  ,p.y()  ,0.5*barrierPhys.point(p.x()  ,p.y()  ));
-                            barrierPhys.set(p.x()  ,p.y()+1,0.7*barrierPhys.point(p.x()  ,p.y()+1));
-                            barrierPhys.set(p.x()+1,p.y()-1,0.8*barrierPhys.point(p.x()+1,p.y()-1));
-                            barrierPhys.set(p.x()+1,p.y()  ,0.7*barrierPhys.point(p.x()+1,p.y()  ));
-                            barrierPhys.set(p.x()+1,p.y()+1,0.8*barrierPhys.point(p.x()+1,p.y()+1));
+                            barrierPhys.set(p.x()-1,p.y()-1,0*barrierPhys.point(p.x()-1,p.y()-1));
+                            barrierPhys.set(p.x()-1,p.y()  ,0*barrierPhys.point(p.x()-1,p.y()  ));
+                            barrierPhys.set(p.x()-1,p.y()+1,0*barrierPhys.point(p.x()-1,p.y()+1));
+                            barrierPhys.set(p.x()  ,p.y()-1,0*barrierPhys.point(p.x()  ,p.y()-1));
+                            barrierPhys.set(p.x()  ,p.y()  ,0*barrierPhys.point(p.x()  ,p.y()  ));
+                            barrierPhys.set(p.x()  ,p.y()+1,0*barrierPhys.point(p.x()  ,p.y()+1));
+                            barrierPhys.set(p.x()+1,p.y()-1,0*barrierPhys.point(p.x()+1,p.y()-1));
+                            barrierPhys.set(p.x()+1,p.y()  ,0*barrierPhys.point(p.x()+1,p.y()  ));
+                            barrierPhys.set(p.x()+1,p.y()+1,0*barrierPhys.point(p.x()+1,p.y()+1));
                         }
                     }
                 }
