@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
+    <width>249</width>
     <height>84</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
       </font>
      </property>
      <property name="text">
-      <string>to</string>
+      <string>:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -142,7 +142,7 @@
       </font>
      </property>
      <property name="text">
-      <string>to</string>
+      <string>:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

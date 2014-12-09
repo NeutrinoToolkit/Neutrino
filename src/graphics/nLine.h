@@ -60,7 +60,8 @@ public:
 	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
 	void focusInEvent(QFocusEvent * event);
 	void focusOutEvent(QFocusEvent * event);
-
+    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+    
 	void moveBy(QPointF);
 	
 	qreal nWidth;
@@ -132,6 +133,8 @@ public slots:
 	void toggleAntialias(bool);
 
 
+    void centerOnImage();
+
 	void changeP(int,QPointF);
 
 	// methods to force monotonicity
@@ -153,6 +156,10 @@ public slots:
 
 	void addPointAfterClick(QPointF);
 	
+    void contextAppendPoint();
+    void contextPrependPoint();
+    void contextRemovePoint();
+    
 	void export_txt();
 	void export_txt_points();
 	void copy_clip();

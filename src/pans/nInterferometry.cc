@@ -60,8 +60,9 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 		}
 
         connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
+        QApplication::processEvents();
+        my_w.images->widget(k)->adjustSize();
     }
-    adjustSize();
 
 
 	decorate();

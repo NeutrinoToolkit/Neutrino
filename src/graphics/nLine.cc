@@ -47,7 +47,7 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 		int num=nparent->property("numLine").toInt()+1;
 		nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
-		setToolTip(tr("line")+QString(" ")+QString::number(num));
+		setToolTip(tr("line")+QString::number(num));
 		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
@@ -125,6 +125,8 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	lineOut-> attach(my_w.my_qwt);
 	lineOut->setXAxis(QwtPlot::xBottom);
 	lineOut->setYAxis(QwtPlot::yLeft);
+
+    grabKeyboard();
 
 }
 
@@ -546,6 +548,7 @@ void nLine::addPoint () {
 	if (my_w.points->selectedRanges().size()>0) {
 		i=my_w.points->selectedRanges().first().topRow();
 	}
+	moveRef.clear();
 	addPoint(i);
 	moveRef.removeLast();
 	showMessage(tr("Added point:")+QString::number(i+1));
@@ -615,6 +618,7 @@ void nLine::removePoint(int np) {
 			}
 		}
 	}
+    nodeSelected=-1;
 }
 
 void
@@ -641,16 +645,16 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 	if (e->modifiers() & Qt::ShiftModifier) {
 		delta =10.0;
 	}
-	switch (e->key()) {
+    switch (e->key()) {
         case Qt::Key_W: 
             togglePadella();
             break;            
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-            DEBUG("here");
 			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
+                ungrabKeyboard();
 			}
             moveRef.clear();
 			break;
@@ -679,20 +683,21 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			updatePlot();
 			break;
 		case Qt::Key_C:
-			toggleClosedLine();
-			updatePlot();
-			break;
-		case Qt::Key_P:
-			showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
-			addPoint(nodeSelected);
+            if (e->modifiers() & Qt::ShiftModifier) {
+                centerOnImage();
+            } else {
+                toggleClosedLine();
+                updatePlot();
+            }
 			break;
 		case Qt::Key_A:
-			showMessage(tr("Append to point ")+QString::number(nodeSelected));
-			addPoint(nodeSelected+1);
+            contextAppendPoint();
+			break;
+		case Qt::Key_P:
+            contextPrependPoint();
 			break;
 		case Qt::Key_D:
-			showMessage(tr("Delete point ")+QString::number(nodeSelected));
-			removePoint(nodeSelected);
+            contextRemovePoint();
 			break;
 		case Qt::Key_X: {
 			if (parent()->currentBuffer) {
@@ -716,6 +721,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
             emit key_pressed(e->key());
             break;
 	}
+    e->accept();
 }
 
 void
@@ -733,8 +739,16 @@ nLine::moveBy(QPointF delta) {
 }
 
 void
-nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *) {
+nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *e) {
 	setFocus(Qt::MouseFocusReason);
+	for (int i=0;i<ref.size();i++) {
+        QRectF my_rect=ref.at(i)->rect();
+		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
+			nodeSelected=i;
+            showMessage(toolTip()+":"+QString::number(i+1));
+            break;
+		}
+	}
 }
 
 void
@@ -745,14 +759,54 @@ nLine::hoverLeaveEvent( QGraphicsSceneHoverEvent *) {
 void
 nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
 	for (int i=0;i<ref.size();i++) {
-		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+        QRectF my_rect=ref.at(i)->rect();
+		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
-            showMessage(toolTip()+" "+QString::number(i));
+            showMessage(toolTip()+":"+QString::number(i+1));
             break;
 		}
 	}
 }
 
+void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
+    QMenu menu;
+    if (nodeSelected>=0) {
+        moveRef.clear();
+        QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1));
+        connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
+        QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1));
+        connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
+        QAction *remove = menu.addAction("Remove point "+QString::number(nodeSelected+1));
+        connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
+        menu.addAction(menu.addSeparator());
+    }
+    QAction *bezier = menu.addAction("Straight/Curve");
+    connect(bezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+    QAction *closedline = menu.addAction("Closed/Open");
+    connect(closedline, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
+    QAction *centerimage = menu.addAction("Center on image");
+    connect(centerimage, SIGNAL(triggered()), this, SLOT(centerOnImage()));
+    menu.addAction(menu.addSeparator());
+    QAction *showPan = menu.addAction("Show control");
+    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+    menu.exec(e->screenPos());
+}
+
+
+void nLine::contextAppendPoint(){
+    addPoint(nodeSelected+1);
+    showMessage(tr("Append to point ")+QString::number(nodeSelected));
+}
+
+void nLine::contextPrependPoint(){
+    addPoint(nodeSelected);
+    showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
+}
+
+void nLine::contextRemovePoint(){
+    removePoint(nodeSelected);
+    showMessage(tr("Delete point ")+QString::number(nodeSelected));
+}
 
 void
 nLine::focusInEvent( QFocusEvent *) {
@@ -761,7 +815,7 @@ nLine::focusInEvent( QFocusEvent *) {
 
 void
 nLine::focusOutEvent( QFocusEvent *) {
-	selectThis(false);
+    selectThis(false);
 }
 
 void
@@ -780,18 +834,18 @@ void nLine::itemChanged() {
 // reimplementation
 QRectF
 nLine::boundingRect() const {
-    QPainterPath my_path=path();
+    QPainterPath my_path=shape();
 	return my_path.boundingRect();
 }
 
 QPainterPath nLine::shape() const {
 	QPainterPathStroker stroker;
-	double thickness=max(nWidth,20.0)/zoom;
-    DEBUG(PRINTVAR(thickness));
+	double thickness=max(nWidth,10.0)/zoom;
     stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
-		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect().adjusted(-2,-2,+2,+2)));
+        QRectF my_rect=ref[i]->rect();
+		my_shape.addPolygon(ref[i]->mapToScene(my_rect));
 	}
 	return my_shape;
 }
@@ -884,6 +938,21 @@ QPolygonF nLine::poly(int steps) const {
         }
     }
     return my_poly_interp;
+}
+
+void nLine::centerOnImage(){
+    
+    if (parent()->currentBuffer) {
+        QPointF p(0,0);
+        foreach (QGraphicsEllipseItem *item, ref){
+            p-=item->pos();
+        }
+        p/=ref.size();
+        vec2f p1=parent()->currentBuffer->getSize()/2.0-parent()->currentBuffer->get_origin();
+        p+=QPointF(p1.x(),p1.y());
+        moveBy(p);
+    }
+    
 }
 
 void

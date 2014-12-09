@@ -49,6 +49,7 @@
 
 #include <csignal>
 
+#define PRINTVAR(x) #x"=" << x
 #define __MSG  __FILE__ << ":" << __LINE__ << " (" << __FUNCTION__ << ") "
 #define __header(__msg,__txt) std::cerr << "[" << __msg << "] " << __MSG << __txt << std::endl
 
@@ -57,7 +58,6 @@
 
 
 #ifdef  __phys_debug
-#define PRINTVAR(x) __MSG << #x"=" << x
 #define DEBUG1(__txt) __header("DEBUG", __txt)
 #define DEBUG2(__val,__txt) if(__val<=__phys_debug) __header("DEBUG "<<__val, __txt)
 #define DEBUG3(arg1,arg2,arg3,...) arg3

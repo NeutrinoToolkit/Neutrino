@@ -93,6 +93,7 @@ void nView::focusInEvent (QFocusEvent *) {
 
 void
 nView::zoomEq() {
+    WARNING(fillimage);
 	fillimage=!fillimage;
 	if (!fillimage) resetMatrix();
 	setSize();
@@ -154,9 +155,6 @@ void nView::keyPressEvent (QKeyEvent *e)
 				}
 				break;
             }
-			default:
-				parent()->keyPressEvent(e);
-				break;
 		}
 	}
 	if (!insideItem) {
@@ -174,11 +172,16 @@ void nView::keyPressEvent (QKeyEvent *e)
 			case Qt::Key_Right:
 				delta=QPointF(+1,0);
 				break;
+			default:
+//                parent()->keyPressEvent(e);
+				break;
 		}
-		if (e->modifiers() & Qt::ShiftModifier) delta*=5;
-		QPointF pos_mouse=parent()->my_mouse.pos()+delta;
-		parent()->my_mouse.setPos(pos_mouse);
-		emitMouseposition(pos_mouse);
+        if (delta!=QPointF(0,0)) {
+            if (e->modifiers() & Qt::ShiftModifier) delta*=5;
+            QPointF pos_mouse=parent()->my_mouse.pos()+delta;
+            parent()->my_mouse.setPos(pos_mouse);
+            emitMouseposition(pos_mouse);
+        }
 //		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
 //		QCursor::setPos(posCursor);
 //		qDebug() << delta << pos_mouse << posCursor << mapToGlobal(QPoint(0,0));

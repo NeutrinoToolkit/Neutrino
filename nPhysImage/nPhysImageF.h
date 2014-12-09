@@ -829,6 +829,8 @@ public:
 	inline size_t getSurf() const
 	{ return width*height; }
 
+	inline vec2 getSize() {return vec2(width,height);}
+
 	inline size_t getSizeByIndex(enum phys_direction dir)
 	{ if (dir==PHYS_X) return getW(); if (dir == PHYS_Y) return getH(); return 0; }
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>578</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="font">
@@ -798,6 +798,9 @@
               <pointsize>10</pointsize>
              </font>
             </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -818,6 +821,9 @@
              <font>
               <pointsize>10</pointsize>
              </font>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
