@@ -27,12 +27,12 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_renderer.h>
-#include <qwt_legend.h>
-#if QWT_VERSION < 0x060100
-#include <qwt_legend_item.h>
-#else
-#include <qwt_legend_label.h>
-#endif
+//#include <qwt_legend.h>
+//#if QWT_VERSION < 0x060100
+//#include <qwt_legend_item.h>
+//#else
+//#include <qwt_legend_label.h>
+//#endif
 
 
 nCompareLines::nCompareLines(neutrino *nparent, QString winname)
@@ -55,18 +55,26 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
 
 
 	connect(my_w.actionLine, SIGNAL(triggered()), line, SLOT(togglePadella()));
+	connect(my_w.addImage, SIGNAL(released()), this, SLOT(addImage()));
+	connect(my_w.removeImage, SIGNAL(released()), this, SLOT(removeImage()));
 
+	connect(my_w.current, SIGNAL(released()), this, SLOT(updatePlot()));
+
+	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+	connect(nparent, SIGNAL(physMod(std::pair<nPhysD*,nPhysD*>)), this, SLOT(physMod(std::pair<nPhysD*,nPhysD*>)));
+    
+    
 	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("Distance"));
 	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Value"));
 	my_w.plot->enableAxis(QwtPlot::xBottom);
 	my_w.plot->enableAxis(QwtPlot::yLeft);
 	(qobject_cast<QFrame*> (my_w.plot->canvas()))->setLineWidth(0);
 
-	QwtLegend *legend = new QwtLegend;
+//	QwtLegend *legend = new QwtLegend;
 //!TODO: check this: it is not compatible with qwt6.1.0
 //    legend->setItemMode(QwtLegend::CheckableItem);
 //    my_w.plot->insertLegend(legend, QwtPlot::ExternalLegend);
-    my_w.plot->insertLegend(legend);
+//    my_w.plot->insertLegend(legend);
 	
 	decorate();
 	loadDefaults();
@@ -75,6 +83,25 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
 	updatePlot();
 }
 
+
+void nCompareLines::physDel(nPhysD* my_phys) {
+    images.removeAll(my_phys);    
+}
+
+void nCompareLines::physMod(std::pair<nPhysD*,nPhysD*> my_mod) {
+    images.removeAll(my_mod.first);    
+    images.append(my_mod.second);        
+}
+
+void nCompareLines::addImage() {
+    images.append(nGenericPan::getPhysFromCombo(my_w.image));    
+    updatePlot();
+}
+
+void nCompareLines::removeImage() {
+    images.removeAll(nGenericPan::getPhysFromCombo(my_w.image));        
+    updatePlot();
+}
 
 void nCompareLines::sceneChanged() {
 	if (sender()==line) updatePlot();
@@ -93,36 +120,39 @@ void nCompareLines::updatePlot() {
 		foreach(QGraphicsEllipseItem *item, line->ref){
 			my_points<<item->pos();
 		}
+        
 		QPolygonF my_poly=line->poly(line->numPoints);
 		for (int i=0; i<nparent->physList.size(); i++) {
 			nPhysD *phys=nparent->physList.at(i);
-
-			QVector< QPointF > toPlot;
-			
-			double dist=0.0;
-			double my_val=0.0;
-			for(int ii=0;ii<my_poly.size()-1;ii++) {
-				QPointF p=my_poly.at(ii);
-				my_val=phys->getPoint(p.x()-phys->get_origin().x(),p.y()-phys->get_origin().y());
-				if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
-				dist+=sqrt(pow((my_poly.at(ii+1)-my_poly.at(ii)).x(),2)+pow((my_poly.at(ii+1)-my_poly.at(ii)).y(),2));
-			}
-			QPointF p=my_poly.last();
-			my_val=phys->getPoint(p.x(),p.y());
-			if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
-
-			QwtPlotCurve *profile=new QwtPlotCurve(QString::number(i)+": "+QString::fromUtf8(phys->getShortName().c_str()));
-			if (phys==currentBuffer) {
-				profile->setPen(QPen(Qt::blue,1.0));
-			} else {
-				profile->setPen(QPen(Qt::black,1.0));
-			}	
-			profile->setXAxis(QwtPlot::xBottom);
-			profile->setYAxis(QwtPlot::yLeft);
-			profile->setSamples(toPlot);
-			profile->attach(my_w.plot);
-			profiles << profile;
-			
+            
+            if (images.contains(phys) || (my_w.current->isChecked() && phys==currentBuffer)) {
+                QVector< QPointF > toPlot;
+                
+                double dist=0.0;
+                double my_val=0.0;
+                for(int ii=0;ii<my_poly.size()-1;ii++) {
+                    QPointF p=my_poly.at(ii);
+                    my_val=phys->getPoint(p.x()-phys->get_origin().x(),p.y()-phys->get_origin().y());
+                    if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
+                    dist+=sqrt(pow((my_poly.at(ii+1)-my_poly.at(ii)).x(),2)+pow((my_poly.at(ii+1)-my_poly.at(ii)).y(),2));
+                }
+                QPointF p=my_poly.last();
+                my_val=phys->getPoint(p.x(),p.y());
+                if (std::isfinite(my_val)) toPlot << QPointF(dist, my_val);
+                
+                QwtPlotCurve *profile=new QwtPlotCurve(QString::number(i)+": "+QString::fromUtf8(phys->getShortName().c_str()));
+                if (phys==currentBuffer) {
+                    profile->setPen(QPen(Qt::blue,1.0));
+                } else {
+                    profile->setPen(QPen(Qt::black,1.0));
+                }	
+                profile->setXAxis(QwtPlot::xBottom);
+                profile->setYAxis(QwtPlot::yLeft);
+                profile->setSamples(toPlot);
+                profile->attach(my_w.plot);
+                profiles << profile;
+            }
+            
 		}
 		my_w.plot->replot();
 	}

@@ -290,7 +290,7 @@ void nInterferometry::doWavelet () {
         }
     }
     my_w.statusbar->showMessage(QString::number(timer.elapsed())+" msec");
-    if (!my_w.chained->isChecked()) doUnwrap();
+    if (!my_w.chained->isChecked()) doSubtract();
 }
 
 void nInterferometry::doWavelet (int iimage) {
@@ -347,7 +347,8 @@ void nInterferometry::doWavelet (int iimage) {
             itr->second->setShortName(suffix+itr->second->getShortName());
             waveletPhys[iimage][itr->first]=nparent->replacePhys(itr->second,waveletPhys[iimage][itr->first],false);
         }
-    }
+        doUnwrap(iimage);
+    }    
 }
 
 void nInterferometry::doUnwrap () {
@@ -356,72 +357,82 @@ void nInterferometry::doUnwrap () {
     for (unsigned int iimage=0;iimage<2;iimage++) {
         progress.setValue(iimage);
         QApplication::processEvents();
-        string suffix=iimage==0?"ref":"shot";
+        doUnwrap(iimage);
+    }
+    progress.close();
+    if (!my_w.chained->isChecked()) doSubtract();
+}
 
-        nPhysD *phase=waveletPhys[iimage]["phase_2pi"];
-        nPhysD *qual=waveletPhys[iimage]["contrast"];
-
-        if (phase && qual && nPhysExists(phase) && nPhysExists(qual)) {
-            progress.show();
-
-            QTime timer;
-            timer.start();
-
-            if (qual && phase) {
-                nPhysD *unwrap=NULL;
-
-                QString methodName=my_w.method->currentText();
-
-                nPhysD barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
-                if (my_w.useBarrier->isChecked()) {
-                    QPolygon my_poly=unwrapBarrier->poly(phase->getW()+phase->getH()).translated(phase->get_origin().x(),phase->get_origin().y()).toPolygon();                    
-                    for(int ip=0; ip<my_poly.size(); ip++) {
-                        QPoint p=my_poly[ip];
-                        if (ip>0 && p!=my_poly[ip-1]) {
-                            barrierPhys.set(p.x()-1,p.y()-1,0*barrierPhys.point(p.x()-1,p.y()-1));
-                            barrierPhys.set(p.x()-1,p.y()  ,0*barrierPhys.point(p.x()-1,p.y()  ));
-                            barrierPhys.set(p.x()-1,p.y()+1,0*barrierPhys.point(p.x()-1,p.y()+1));
-                            barrierPhys.set(p.x()  ,p.y()-1,0*barrierPhys.point(p.x()  ,p.y()-1));
-                            barrierPhys.set(p.x()  ,p.y()  ,0*barrierPhys.point(p.x()  ,p.y()  ));
-                            barrierPhys.set(p.x()  ,p.y()+1,0*barrierPhys.point(p.x()  ,p.y()+1));
-                            barrierPhys.set(p.x()+1,p.y()-1,0*barrierPhys.point(p.x()+1,p.y()-1));
-                            barrierPhys.set(p.x()+1,p.y()  ,0*barrierPhys.point(p.x()+1,p.y()  ));
-                            barrierPhys.set(p.x()+1,p.y()+1,0*barrierPhys.point(p.x()+1,p.y()+1));
-                        }
+void nInterferometry::doUnwrap (int iimage) {
+    QProgressDialog progress("Unwrap",QString(), 0, 2, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setValue(iimage);
+    QApplication::processEvents();
+    string suffix=iimage==0?"ref":"shot";
+    
+    nPhysD *phase=waveletPhys[iimage]["phase_2pi"];
+    nPhysD *qual=waveletPhys[iimage]["contrast"];
+    
+    if (phase && qual && nPhysExists(phase) && nPhysExists(qual)) {
+        progress.show();
+        
+        QTime timer;
+        timer.start();
+        
+        if (qual && phase) {
+            nPhysD *unwrap=NULL;
+            
+            QString methodName=my_w.method->currentText();
+            
+            nPhysD barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
+            if (my_w.useBarrier->isChecked()) {
+                QPolygon my_poly=unwrapBarrier->poly(phase->getW()+phase->getH()).translated(phase->get_origin().x(),phase->get_origin().y()).toPolygon();                    
+                for(int ip=0; ip<my_poly.size(); ip++) {
+                    QPoint p=my_poly[ip];
+                    if (ip>0 && p!=my_poly[ip-1]) {
+                        barrierPhys.set(p.x()-1,p.y()-1,0*barrierPhys.point(p.x()-1,p.y()-1));
+                        barrierPhys.set(p.x()-1,p.y()  ,0*barrierPhys.point(p.x()-1,p.y()  ));
+                        barrierPhys.set(p.x()-1,p.y()+1,0*barrierPhys.point(p.x()-1,p.y()+1));
+                        barrierPhys.set(p.x()  ,p.y()-1,0*barrierPhys.point(p.x()  ,p.y()-1));
+                        barrierPhys.set(p.x()  ,p.y()  ,0*barrierPhys.point(p.x()  ,p.y()  ));
+                        barrierPhys.set(p.x()  ,p.y()+1,0*barrierPhys.point(p.x()  ,p.y()+1));
+                        barrierPhys.set(p.x()+1,p.y()-1,0*barrierPhys.point(p.x()+1,p.y()-1));
+                        barrierPhys.set(p.x()+1,p.y()  ,0*barrierPhys.point(p.x()+1,p.y()  ));
+                        barrierPhys.set(p.x()+1,p.y()+1,0*barrierPhys.point(p.x()+1,p.y()+1));
                     }
                 }
-                if (methodName=="Simple H+V") {
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
-                } else if (methodName=="Simple V+H") {
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
-                } else if (methodName=="Goldstein") {
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
-                } else if (methodName=="Miguel") {
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
-                } else if (methodName=="Miguel+Quality") {
-                    phys_point_multiply(barrierPhys,*qual);
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
-                } else if (methodName=="Quality") {
-                    phys_point_multiply(barrierPhys,*qual);
-                    unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
-                }
-//                nparent->addPhys(new nPhysD(barrierPhys));
-
-                if (unwrap) {
-
-                    double alpha=my_w.angleCarrier->value();
-                    double lambda=my_w.widthCarrier->value();
-                    double kx = cos(alpha*_phys_deg)/lambda;
-                    double ky = -sin(alpha*_phys_deg)/lambda;
-                    phys_subtract_carrier(*unwrap, kx, ky);				
-
-                    unwrap->setShortName(suffix+"unwrap");
-                    unwrap->setName(unwrap->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
-                    unwrap->setFromName(phase->getFromName());
-
-                    waveletPhys[iimage]["unwrap"]=nparent->replacePhys(unwrap,waveletPhys[iimage]["unwrap"]);
-
-                }
+            }
+            if (methodName=="Simple H+V") {
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+            } else if (methodName=="Simple V+H") {
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+            } else if (methodName=="Goldstein") {
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+            } else if (methodName=="Miguel") {
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+            } else if (methodName=="Miguel+Quality") {
+                phys_point_multiply(barrierPhys,*qual);
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+            } else if (methodName=="Quality") {
+                phys_point_multiply(barrierPhys,*qual);
+                unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+            }
+            //                nparent->addPhys(new nPhysD(barrierPhys));
+            
+            if (unwrap) {
+                
+                double alpha=my_w.angleCarrier->value();
+                double lambda=my_w.widthCarrier->value();
+                double kx = cos(alpha*_phys_deg)/lambda;
+                double ky = -sin(alpha*_phys_deg)/lambda;
+                phys_subtract_carrier(*unwrap, kx, ky);				
+                
+                unwrap->setShortName(suffix+"unwrap");
+                unwrap->setName(unwrap->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
+                unwrap->setFromName(phase->getFromName());
+                
+                waveletPhys[iimage]["unwrap"]=nparent->replacePhys(unwrap,waveletPhys[iimage]["unwrap"]);
+                
             }
         }
     }
