@@ -280,10 +280,6 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 
 	changeColorTable(nPalettes.keys().first());
 
-	colorMin=0.0;
-	colorMax=1.0;
-	colorRelative=true;
-
 	//recent file stuff
 
 	for (int i = 0; i < MaxRecentFiles; ++i) {
@@ -1027,13 +1023,20 @@ neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
         
+        if (currentBuffer) {
+            if (my_w.actionLockColors->isChecked()) {
+                datamatrix->property["display_range"]=currentBuffer->property["display_range"];
+            }
+        }
+        
 		currentBuffer=datamatrix;
-		if (!physList.contains(datamatrix)) {
+        
+
+        if (!physList.contains(datamatrix)) {
 			// TODO: add memory copy...
 			physList << datamatrix;
 		}
 		
-		emitBufferChanged();
 		
 		QString winName=QString::fromUtf8(datamatrix->getShortName().c_str());
 		winName.prepend(property("winId").toString()+QString(":")+QString::number(physList.indexOf(datamatrix))+QString(" "));
@@ -1049,6 +1052,8 @@ neutrino::showPhys(nPhysD* datamatrix) {
 		}
 		
 		createQimage();
+
+		emitBufferChanged();
 	} else {
 		statusBar()->showMessage("Image not valid",2000);
 	}
@@ -1058,13 +1063,6 @@ neutrino::showPhys(nPhysD* datamatrix) {
 void
 neutrino::createQimage() {
 	if (currentBuffer) {
-		double mini=colorMin;
-		double maxi=colorMax;
-		if (colorRelative) {
-			mini=currentBuffer->get_min()+colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
-			maxi=currentBuffer->get_max()-(1.0-colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
-		}
-        currentBuffer->property["display_range"]=vec2f(mini,maxi);
 		const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
 		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
 							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
@@ -1219,16 +1217,7 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_A: {
 			if (currentBuffer) {
-				if (e->modifiers() & Qt::ShiftModifier) {
-					colorRelative=!colorRelative;
-				}
-				if (colorRelative) {
-					colorMin=0.0;
-					colorMax=1.0;
-				} else {
-					colorMin=currentBuffer->get_min();
-					colorMax=currentBuffer->get_max();
-				}
+                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
 				createQimage();
 				emit updatecolorbar();
 			}
@@ -1740,15 +1729,7 @@ neutrino::changeColorTable () {
 
 void
 neutrino::changeColorMinMax (vec2f minmax) {
-    double mini=minmax.first(); 
-    double maxi=minmax.second();
-	if (colorRelative) {
-		colorMin = (mini-currentBuffer->get_min())/(currentBuffer->get_max() - currentBuffer->get_min());
-		colorMax = 1.0-(currentBuffer->get_max()-maxi)/(currentBuffer->get_max() - currentBuffer->get_min());
-	} else {
-		colorMin=mini;
-		colorMax=maxi;
-	}
+    currentBuffer->property["display_range"]=minmax;
 	createQimage();
 	emit updatecolorbar();	
 }

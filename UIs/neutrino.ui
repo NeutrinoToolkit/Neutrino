@@ -236,6 +236,8 @@
    </attribute>
    <addaction name="actionWinlist"/>
    <addaction name="actionColors"/>
+   <addaction name="actionLockColors"/>
+   <addaction name="separator"/>
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
    <addaction name="actionMouseInfo"/>
@@ -800,6 +802,22 @@
   <action name="actionInterpolate_Path">
    <property name="text">
     <string>Interpolate Path</string>
+   </property>
+  </action>
+  <action name="actionLockColors">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/lockOpen.png</normaloff>
+     <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+   </property>
+   <property name="text">
+    <string>lockColors</string>
+   </property>
+   <property name="toolTip">
+    <string>Lock colorbar</string>
    </property>
   </action>
  </widget>

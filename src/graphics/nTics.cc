@@ -265,13 +265,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		p->setPen(pen);
 		p->setBrush(QColor(0,0,0,0));
 		
-		
-		double mini=nparent->colorMin;
-		double maxi=nparent->colorMax;
-		if (nparent->colorRelative) {
-			mini=nparent->currentBuffer->get_min()+nparent->colorMin*(nparent->currentBuffer->get_max() - nparent->currentBuffer->get_min());
-			maxi=nparent->currentBuffer->get_max()-(1.0-nparent->colorMax)*(nparent->currentBuffer->get_max() - nparent->currentBuffer->get_min());
-		}
+		vec2f minmax=nparent->currentBuffer->property["display_range"];
+		double mini=minmax.first();
+		double maxi=minmax.second();
 		
 		if (maxi != mini ) {
 			// this is bad should be simplified...
@@ -317,7 +313,14 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
 		} else {
-			QString label="All image is "+QString::number(maxi);
+            QString label;
+            vec2f range=nparent->currentBuffer->get_min_max();
+            if (range.first()==range.second()) {
+                label="All image is "+QString::number(maxi);
+            } else {
+                label="Colorbar is "+QString::number(maxi)+ " (" +QString::number(range.first())+":"+QString::number(range.second())+")";
+            }
+
 			QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());
 			p->drawText(QRectF((size.width()-labelSize.width())/2,size.height()+p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);			
 		}

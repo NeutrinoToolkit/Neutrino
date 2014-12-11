@@ -53,7 +53,7 @@
         </property>
         <item row="0" column="0">
          <widget class="QWidget" name="widget_3" native="true">
-          <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0,0">
+          <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0,0,0">
            <property name="margin">
             <number>0</number>
            </property>
@@ -110,6 +110,17 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="4">
+            <widget class="QToolButton" name="cutoff">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/neutrino.qrc">
+               <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -139,10 +150,49 @@
         </item>
         <item row="2" column="0">
          <widget class="QWidget" name="widget" native="true">
-          <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,0">
+          <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,0,0">
            <property name="margin">
             <number>0</number>
            </property>
+           <item row="0" column="0">
+            <widget class="QSlider" name="sliderMin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="maximum">
+              <number>10000</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineMin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>0.0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="setToMin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Min</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0">
             <widget class="QSlider" name="sliderMax">
              <property name="font">
@@ -161,62 +211,6 @@
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="setToMin">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Min</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineMin">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>0.0</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QSlider" name="sliderMin">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="maximum">
-              <number>10000</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QToolButton" name="autoscale">
-             <property name="toolTip">
-              <string>Lock on values</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:icons//lockClose.png</normaloff>:icons//lockClose.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -244,17 +238,6 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="QToolButton" name="cutoff">
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
-             </property>
-            </widget>
-           </item>
           </layout>
           <zorder>sliderMin</zorder>
           <zorder>sliderMax</zorder>
@@ -262,8 +245,6 @@
           <zorder>lineMax</zorder>
           <zorder>setToMin</zorder>
           <zorder>setToMax</zorder>
-          <zorder>autoscale</zorder>
-          <zorder>cutoff</zorder>
          </widget>
         </item>
        </layout>
@@ -509,8 +490,6 @@
   <tabstop>lineMax</tabstop>
   <tabstop>setToMin</tabstop>
   <tabstop>setToMax</tabstop>
-  <tabstop>autoscale</tabstop>
-  <tabstop>cutoff</tabstop>
   <tabstop>paletteName</tabstop>
   <tabstop>colorlist</tabstop>
   <tabstop>palettes</tabstop>

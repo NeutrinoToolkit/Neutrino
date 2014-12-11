@@ -99,9 +99,6 @@ public:
 
 	QGraphicsPixmapItem my_pixitem;
 	
-	double colorMin, colorMax;
-	bool colorRelative;
-
 	nMouse my_mouse;
 	
 	nTics my_tics;
