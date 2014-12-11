@@ -228,8 +228,8 @@ QVariant nIntegralInversion::doInversion() {
             double maxi=my_w.maxCut->text().toDouble(&ok2);
             if (ok1 || ok2) {
                 phys_cutoff(*inv_image, 
-                            ok1?mini:inv_image->Tminimum_value, 
-                            ok2?maxi:inv_image->Tmaximum_value);
+                            ok1?mini:inv_image->get_min(), 
+                            ok2?maxi:inv_image->get_max());
             }
             
             

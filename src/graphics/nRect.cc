@@ -529,7 +529,8 @@ nRect::boundingRect() const {
 
 QPainterPath nRect::shape() const {
 	QPainterPathStroker stroker;
-	stroker.setWidth(4+nWidth/zoom);
+	double thickness=max(nWidth,10.0)/zoom;
+    stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
 		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));

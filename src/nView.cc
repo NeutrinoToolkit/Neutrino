@@ -237,7 +237,7 @@ void nView::mousePressEvent (QMouseEvent *e)
 		parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
 	}
 	if (e->modifiers()&Qt::ControlModifier && parent()->currentBuffer) {
-		minMax=QPointF(parent()->currentBuffer->Tmaximum_value,parent()->currentBuffer->Tminimum_value);
+		minMax=parent()->currentBuffer->get_min_max().swap();
 	}
 	emit mousePressEvent_sig(mapToScene(e->pos()));
 }
@@ -252,10 +252,10 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 		parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
 	}
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-		if (parent()->currentBuffer && minMax==QPointF(parent()->currentBuffer->Tmaximum_value,parent()->currentBuffer->Tminimum_value)) {
-			parent()->changeColorMinMax(minMax.y(),minMax.x());
+		if (parent()->currentBuffer && minMax==parent()->currentBuffer->get_min_max()) {
+			parent()->changeColorMinMax(minMax);
 		} else {
-			parent()->changeColorMinMax(minMax.x(),minMax.y());
+			parent()->changeColorMinMax(minMax);
 		}
 	}
 }
@@ -278,7 +278,7 @@ void nView::mouseMoveEvent (QMouseEvent *e)
 	parent()->my_mouse.setPos(pos_mouse);
 	if (e->modifiers()==Qt::ControlModifier && parent()->currentBuffer) {
 		double val=parent()->currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
-		minMax=QPointF(min(minMax.x(),val),max(minMax.y(),val));
+		minMax=vec2f(min(minMax.x(),val),max(minMax.y(),val));
 	}
 	emitMouseposition(pos_mouse);
 }

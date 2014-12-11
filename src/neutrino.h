@@ -147,7 +147,7 @@ public slots:
 	void previousColorTable ();
 	void nextColorTable ();
 
-	void changeColorMinMax (double,double);
+	void changeColorMinMax (vec2f);
 
 	void addPhys(nPhysD*);
 	void addPhys(nPhysD&);

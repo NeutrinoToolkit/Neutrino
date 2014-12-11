@@ -364,7 +364,6 @@ physInt_sif::physInt_sif(string ifilename)
 	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
 	
 	TscanBrightness();
-	DEBUG(Tminimum_value << " " << Tmaximum_value);
 }
 
 physShort_b16::physShort_b16(const char *ifilename)

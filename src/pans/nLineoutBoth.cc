@@ -153,8 +153,8 @@ void nLineoutBoth::mouseAtMatrix(QPointF p) {
 //            double mini=nparent->colorMin;
 //            double maxi=nparent->colorMax;
 //            if (nparent->colorRelative) {
-//                mini=currentBuffer->Tminimum_value+nparent->colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-//                maxi=currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+//                mini=currentBuffer->get_min()+nparent->colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
+//                maxi=currentBuffer->get_max()-(1.0-nparent->colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
 //                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
 //                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
 //            }

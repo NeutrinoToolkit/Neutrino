@@ -70,13 +70,13 @@ double nRotate::getReplaceVal() {
 				val=std::numeric_limits<double>::quiet_NaN();
 				break;
 			case 1:
-				val=image->Tminimum_value;
+				val=image->get_min();
 				break;
 			case 2:
-				val=image->Tmaximum_value;
+				val=image->get_max();
 				break;
 			case 3:
-				val=0.5*(image->Tminimum_value+image->Tmaximum_value);
+				val=0.5*(image->get_min()+image->get_max());
 				break;
 			case 4:
 				val=0.0;

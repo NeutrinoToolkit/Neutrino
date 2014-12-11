@@ -536,7 +536,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 		if (std::isfinite(m1.point(i))) {
 			nan_free_phys[i]=m1.point(i);
 		} else {
-			nan_free_phys[i]=m1.Tminimum_value;
+			nan_free_phys[i]=m1.get_min();
 		}
 	}
     fftw_complex *b2 = fftw_alloc_complex(m1.getH()*((m1.getW()/2+1)));

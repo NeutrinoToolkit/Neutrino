@@ -277,10 +277,6 @@ public:
 	std::string class_name ()
 	{ return std::string(typeid(T).name()); }
 
-	//! TODO: pass to bicimvec<T>
-	T Tmaximum_value;
-	T Tminimum_value;
-
 	//! min/max point coordinates
 	int min_Tv_x, min_Tv_y, max_Tv_x, max_Tv_y;
 
@@ -608,8 +604,15 @@ public:
 		return NULL;
 	}
 	
-	const unsigned char *to_uchar_palette(double mini, double maxi, unsigned char * palette) {
+	const unsigned char *to_uchar_palette(unsigned char * palette) {
+		if (!property.have("display_range")) {
+			property["display_range"]= bidimvec<T>(Tminimum_value,Tmaximum_value);
+		}
+		bidimvec<T> minmax=property["display_range"];
+		double mini=minmax.first();
+		double maxi=minmax.second();
 		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
+		
 		if (width>0 && height>0 && palette) {
 
 			if (uchar_buf == NULL) {
@@ -918,6 +921,11 @@ private:
 	void matrix_points_aligned();
 	size_t width;
 	size_t height;
+
+	//! TODO: pass to bicimvec<T>
+	T Tmaximum_value;
+	T Tminimum_value;
+
 
 	double to_uchar_min, to_uchar_max;
 
@@ -1394,7 +1402,7 @@ nPhysImageF<T>::TscanBrightness() {
 		
 #else
 		bool found=false;
-		for (register size_t i=0; i<width*height; i++) {
+		for (register size_t i=0; i<getSurf(); i++) {
 			if (std::isfinite(Timg_buffer[i])) {	
 				if (!found) {
 					Tminimum_value = Timg_buffer[i];

@@ -72,7 +72,10 @@ neutrino::~neutrino()
 	saveDefaults();
 	QApplication::processEvents();
 	foreach (nGenericPan *pan, getPans()) {
-		pan->close();
+        pan->hide();
+        pan->close();
+        pan->deleteLater();
+        QApplication::processEvents();
 	}
 	QApplication::processEvents();
 	foreach (nPhysD *phys, physList) {
@@ -1023,6 +1026,7 @@ void
 neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
+        
 		currentBuffer=datamatrix;
 		if (!physList.contains(datamatrix)) {
 			// TODO: add memory copy...
@@ -1057,11 +1061,11 @@ neutrino::createQimage() {
 		double mini=colorMin;
 		double maxi=colorMax;
 		if (colorRelative) {
-			mini=currentBuffer->Tminimum_value+colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-			maxi=currentBuffer->Tmaximum_value-(1.0-colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+			mini=currentBuffer->get_min()+colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
+			maxi=currentBuffer->get_max()-(1.0-colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
 		}
-//		DEBUG(">>>>>>>>>>>>>>>>>> " << mini << " " << maxi << " " << colorRelative);
-		const unsigned char *buff=currentBuffer->to_uchar_palette(mini,maxi,nPalettes[colorTable]);
+        currentBuffer->property["display_range"]=vec2f(mini,maxi);
+		const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
 		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
 							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
@@ -1178,7 +1182,9 @@ void neutrino::closeEvent (QCloseEvent *e) {
         saveDefaults();
         QApplication::processEvents();
         foreach (nGenericPan *pan, getPans()) {
-            pan->close();
+			pan->hide();
+			pan->close();
+			pan->deleteLater();
             QApplication::processEvents();
         }
         QApplication::processEvents();
@@ -1220,8 +1226,8 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 					colorMin=0.0;
 					colorMax=1.0;
 				} else {
-					colorMin=currentBuffer->Tminimum_value;
-					colorMax=currentBuffer->Tmaximum_value;
+					colorMin=currentBuffer->get_min();
+					colorMax=currentBuffer->get_max();
 				}
 				createQimage();
 				emit updatecolorbar();
@@ -1733,10 +1739,12 @@ neutrino::changeColorTable () {
 }
 
 void
-neutrino::changeColorMinMax (double mini, double maxi) {
+neutrino::changeColorMinMax (vec2f minmax) {
+    double mini=minmax.first(); 
+    double maxi=minmax.second();
 	if (colorRelative) {
-		colorMin = (mini-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-		colorMax = 1.0-(currentBuffer->Tmaximum_value-maxi)/(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+		colorMin = (mini-currentBuffer->get_min())/(currentBuffer->get_max() - currentBuffer->get_min());
+		colorMax = 1.0-(currentBuffer->get_max()-maxi)/(currentBuffer->get_max() - currentBuffer->get_min());
 	} else {
 		colorMin=mini;
 		colorMax=maxi;

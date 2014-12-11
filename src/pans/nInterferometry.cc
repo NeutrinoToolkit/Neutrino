@@ -329,7 +329,7 @@ void nInterferometry::doWavelet (int iimage) {
         nPhysD datamatrix = image->sub(geom2.left(),geom2.top(),geom2.width(),geom2.height());		
         my_params.data=&datamatrix;
 
-        int niter=my_params.n_angles*my_params.n_lambdas;
+        int niter=my_params.n_angles*my_params.n_lambdas+1;
 
         QSettings settings("neutrino","");
         settings.beginGroup("Preferences");
@@ -364,17 +364,12 @@ void nInterferometry::doUnwrap () {
 }
 
 void nInterferometry::doUnwrap (int iimage) {
-    QProgressDialog progress("Unwrap",QString(), 0, 2, this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setValue(iimage);
-    QApplication::processEvents();
     string suffix=iimage==0?"ref":"shot";
     
     nPhysD *phase=waveletPhys[iimage]["phase_2pi"];
     nPhysD *qual=waveletPhys[iimage]["contrast"];
     
     if (phase && qual && nPhysExists(phase) && nPhysExists(qual)) {
-        progress.show();
         
         QTime timer;
         timer.start();
@@ -436,8 +431,6 @@ void nInterferometry::doUnwrap (int iimage) {
             }
         }
     }
-    progress.close();
-    if (!my_w.chained->isChecked()) doSubtract();
 }
 
 void nInterferometry::doSubtract () {
@@ -541,8 +534,8 @@ void nInterferometry::doMaskCutoff() {
                 if (my_w.cutoffLog->isChecked()) {
                     phys_log10(loc_qual);
                 }
-                double mini=loc_qual.Tminimum_value;
-                double maxi=loc_qual.Tmaximum_value;
+                double mini=loc_qual.get_min();
+                double maxi=loc_qual.get_max();
                 double valDouble=mini+my_w.cutoffValue->value()*(maxi-mini)/100.0;
                 for (size_t k=0; k<loc_qual.getSurf(); k++)
                     if (loc_qual.Timg_buffer[k] < valDouble)
@@ -702,9 +695,6 @@ void nInterferometry::doPlasma(){
                 double scale_cm=my_w.imgRes->value()*1e-4; // convert micron/px to cm/px
                 
                 double toNe = -1.0e-4*8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
-                WARNING(lambda_m);
-                WARNING(scale_cm);
-                WARNING(toNe);
                 
                 phys_multiply(*intNe, toNe); 
                 intNe->setShortName("intergratedNe");
@@ -717,8 +707,8 @@ void nInterferometry::doPlasma(){
             bool ok1,ok2;
             double mini=my_w.cutoffMin->text().toDouble(&ok1);
             double maxi=my_w.cutoffMax->text().toDouble(&ok2);
-            if (!ok1) mini=intNe->Tminimum_value;
-            if (!ok2) maxi=intNe->Tmaximum_value;
+            if (!ok1) mini=intNe->get_min();
+            if (!ok2) maxi=intNe->get_max();
             phys_cutoff(*intNe,mini,maxi);
             
             localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);

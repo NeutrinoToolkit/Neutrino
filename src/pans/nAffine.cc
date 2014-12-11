@@ -107,13 +107,13 @@ void nAffine::affine() {
 				replaceVal=std::numeric_limits<double>::quiet_NaN();
 				break;
 			case 1:
-				replaceVal=my_phys->Tminimum_value;
+				replaceVal=my_phys->get_min();
 				break;
 			case 2:
-				replaceVal=my_phys->Tmaximum_value;
+				replaceVal=my_phys->get_max();
 				break;
 			case 3:
-				replaceVal=0.5*(my_phys->Tminimum_value+my_phys->Tmaximum_value);
+				replaceVal=0.5*(my_phys->get_min()+my_phys->get_max());
 				break;
 			case 4:
 				replaceVal=0.0;

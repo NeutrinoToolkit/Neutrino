@@ -269,8 +269,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		double mini=nparent->colorMin;
 		double maxi=nparent->colorMax;
 		if (nparent->colorRelative) {
-			mini=nparent->currentBuffer->Tminimum_value+nparent->colorMin*(nparent->currentBuffer->Tmaximum_value - nparent->currentBuffer->Tminimum_value);
-			maxi=nparent->currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(nparent->currentBuffer->Tmaximum_value - nparent->currentBuffer->Tminimum_value);
+			mini=nparent->currentBuffer->get_min()+nparent->colorMin*(nparent->currentBuffer->get_max() - nparent->currentBuffer->get_min());
+			maxi=nparent->currentBuffer->get_max()-(1.0-nparent->colorMax)*(nparent->currentBuffer->get_max() - nparent->currentBuffer->get_min());
 		}
 		
 		if (maxi != mini ) {

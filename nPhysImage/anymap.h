@@ -137,6 +137,10 @@ public:
 		}*/
 	//	return at(val);
 	//}	
+	
+	bool have(std::string search_me) {
+	    return (find(search_me) != end());
+	}
 
 	void loader(std::istream &is) {
 		std::string st;

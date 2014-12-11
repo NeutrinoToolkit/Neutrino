@@ -95,8 +95,8 @@ void nColorBarWin::getMinMax () {
 		double mini=nparent->colorMin;
 		double maxi=nparent->colorMax;
 		if (nparent->colorRelative) {
-			mini=currentBuffer->Tminimum_value+nparent->colorMin*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
-			maxi=currentBuffer->Tmaximum_value-(1.0-nparent->colorMax)*(currentBuffer->Tmaximum_value - currentBuffer->Tminimum_value);
+			mini=currentBuffer->get_min()+nparent->colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
+			maxi=currentBuffer->get_max()-(1.0-nparent->colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
 		}
 		my_w.lineMin->setText(QString::number(mini));
 		my_w.lineMax->setText(QString::number(maxi));
@@ -117,20 +117,20 @@ void nColorBarWin::toggleAutoscale () {
 
 void nColorBarWin::setToMin () {
 	if (currentBuffer) {
-		my_w.lineMin->setText(QString::number(currentBuffer->Tminimum_value));
+		my_w.lineMin->setText(QString::number(currentBuffer->get_min()));
 	}
 }
 
 void nColorBarWin::setToMax () {
 	if (currentBuffer) {
-		my_w.lineMax->setText(QString::number(currentBuffer->Tmaximum_value));
+		my_w.lineMax->setText(QString::number(currentBuffer->get_max()));
 	}
 }
 
 void nColorBarWin::minChanged (QString value) {
 	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	if (currentBuffer) {
-		double percentage=(value.toDouble()-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value);
+		double percentage=(value.toDouble()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
 		my_w.sliderMin->setValue(percentage*10000.0);
 		if (nparent->colorRelative) {
 			nparent->colorMin=percentage;
@@ -146,7 +146,7 @@ void nColorBarWin::minChanged (QString value) {
 void nColorBarWin::maxChanged (QString value) {
 	disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 	if (currentBuffer) {
-		double percentage=(value.toDouble()-currentBuffer->Tminimum_value)/(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value);
+		double percentage=(value.toDouble()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
 		my_w.sliderMax->setValue(percentage*10000.0);
 		if (nparent->colorRelative) {
 			nparent->colorMax=percentage;
@@ -170,8 +170,8 @@ void nColorBarWin::bufferChanged(nPhysD *phys) {
 	if (phys) {
 		//DEBUG(">>>>>>>>>>>>>>>>>> " << my_w.autoscale->isChecked() << " " << nparent->colorRelative);
 		if (nparent->colorRelative) {
-			double valmin=phys->Tminimum_value+my_w.sliderMin->value()/10000.0*(phys->Tmaximum_value-phys->Tminimum_value);
-			double valmax=phys->Tminimum_value+my_w.sliderMax->value()/10000.0*(phys->Tmaximum_value-phys->Tminimum_value);
+			double valmin=phys->get_min()+my_w.sliderMin->value()/10000.0*(phys->get_max()-phys->get_min());
+			double valmax=phys->get_min()+my_w.sliderMax->value()/10000.0*(phys->get_max()-phys->get_min());
 			disconnect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
 			disconnect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 			my_w.lineMin->setText(QString::number(valmin));
@@ -180,8 +180,8 @@ void nColorBarWin::bufferChanged(nPhysD *phys) {
 			connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 			//DEBUG(">>>>>>>>>>>>>>>>>>..... " << valmin << " " << valmax);
 		} else {
-			double valmin=10000.0*(my_w.lineMin->text().toDouble()-phys->Tminimum_value)/(phys->Tmaximum_value-phys->Tminimum_value);
-			double valmax=10000.0*(my_w.lineMax->text().toDouble()-phys->Tminimum_value)/(phys->Tmaximum_value-phys->Tminimum_value);
+			double valmin=10000.0*(my_w.lineMin->text().toDouble()-phys->get_min())/(phys->get_max()-phys->get_min());
+			double valmax=10000.0*(my_w.lineMax->text().toDouble()-phys->get_min())/(phys->get_max()-phys->get_min());
 			disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 			disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 			my_w.sliderMin->setValue(valmin);
@@ -233,14 +233,14 @@ void nColorBarWin::updatecolorbar() {
 void nColorBarWin::slider_min_changed(int val)
 {
 	double doubleVal=0.0;
-	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
+	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
  	my_w.lineMin->setText(QString::number(doubleVal, 'g'));
 }
 
 void nColorBarWin::slider_max_changed(int val)
 {
 	double doubleVal=1.0;
-	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->Tmaximum_value-currentBuffer->Tminimum_value)+currentBuffer->Tminimum_value;
+	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
  	my_w.lineMax->setText(QString::number(doubleVal, 'g'));
 }
 

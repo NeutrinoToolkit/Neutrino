@@ -62,7 +62,7 @@ public:
 
 	void setSize();
 
-	QPointF minMax;
+	vec2f minMax;
 
 	QFont scaledFont;
 

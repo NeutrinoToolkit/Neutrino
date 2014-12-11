@@ -401,6 +401,7 @@ void nLine::toggleBezier ( bool val ) {
 		showMessage(tr("Line is a polygonal chain"));
 	}
 	updatePlot();
+    itemChanged();
 }
 
 void nLine::toggleClosedLine () {
@@ -416,6 +417,7 @@ void nLine::toggleClosedLine ( bool val ) {
 		showMessage(tr("Line is open"));
 	}
 	updatePlot();
+    itemChanged();
 }
 
 void nLine::toggleAntialias () {
@@ -700,28 +702,79 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
             contextRemovePoint();
 			break;
 		case Qt::Key_X: {
-			if (parent()->currentBuffer) {
-				double val=0.5*(ref[0]->pos().y()+ref[1]->pos().y());
-				changeP(0, QPointF(0.0,val));
-				changeP(1, QPointF(parent()->currentBuffer->getW(),val));
-				itemChanged();
-				break;
-			}
+            makeHorizontal();
+			break;
 		}
 		case Qt::Key_Y:{
-			if (parent()->currentBuffer) {
-				double val=0.5*(ref[0]->pos().x()+ref[1]->pos().x());
-				changeP(0, QPointF(val,0.0));
-				changeP(1, QPointF(val,parent()->currentBuffer->getH()));
-				itemChanged();
-				break;
-			}
+            makeVertical();
+			break;
+		}
+		case Qt::Key_R:{
+            makeRectangle();
+			break;
 		}
 		default:
             emit key_pressed(e->key());
             break;
 	}
     e->accept();
+}
+
+
+void nLine::makeHorizontal() {
+    if (parent()->currentBuffer) {
+        QPointF p(0,0);
+        foreach (QGraphicsEllipseItem *item, ref){
+            p-=item->pos();
+        }
+        p/=ref.size();
+        vec2f p1=parent()->currentBuffer->getSize()-parent()->currentBuffer->get_origin();
+        p+=QPointF(p1.x(),p1.y());
+
+        while (ref.size()>2) removePoint(2);
+
+        changeP(0, QPointF(0.0,p.y()));
+        changeP(1, QPointF(parent()->currentBuffer->getW(),p.y()));
+        
+
+        itemChanged();
+        moveRef.clear();
+    } 
+}
+
+void nLine::makeVertical() {
+    if (parent()->currentBuffer) {
+        QPointF p(0,0);
+        foreach (QGraphicsEllipseItem *item, ref){
+            p-=item->pos();
+        }
+        p/=ref.size();
+        vec2f p1=parent()->currentBuffer->getSize()-parent()->currentBuffer->get_origin();
+        p+=QPointF(p1.x(),p1.y());
+        
+        while (ref.size()>2) removePoint(2);
+
+        changeP(0, QPointF(p.x(),0.0));
+        changeP(1, QPointF(p.x(),parent()->currentBuffer->getH()));
+        
+        itemChanged();
+    }
+}
+
+void nLine::makeRectangle() {
+    QRectF my_rect=path().boundingRect();
+
+    while (ref.size()<4) appendPoint();
+    while (ref.size()>4) removePoint(4);
+    
+    QPointF p1=my_rect.topLeft();
+    QPointF p2=my_rect.bottomRight();
+    
+    changeP(0, p1);
+    changeP(1, QPointF(p1.x(),p2.y()));
+    changeP(2, p2);
+    changeP(3, QPointF(p2.x(),p1.y()));
+    
 }
 
 void
@@ -772,22 +825,28 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
     QMenu menu;
     if (nodeSelected>=0) {
         moveRef.clear();
-        QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1));
+        QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1)+" (a)");
         connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
-        QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1));
+        QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1)+" (p)");
         connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
-        QAction *remove = menu.addAction("Remove point "+QString::number(nodeSelected+1));
+        QAction *remove = menu.addAction("Delete point "+QString::number(nodeSelected+1)+" (d)");
         connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
         menu.addAction(menu.addSeparator());
     }
-    QAction *bezier = menu.addAction("Straight/Curve");
+    QAction *bezier = menu.addAction("Straight/Bezier (b)");
     connect(bezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
-    QAction *closedline = menu.addAction("Closed/Open");
+    QAction *closedline = menu.addAction("Closed/Open (c)");
     connect(closedline, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
-    QAction *centerimage = menu.addAction("Center on image");
+    QAction *centerimage = menu.addAction("Center on image (C)");
     connect(centerimage, SIGNAL(triggered()), this, SLOT(centerOnImage()));
+    QAction *twoHoriz = menu.addAction("2 points Horizontal (x)");
+    connect(twoHoriz, SIGNAL(triggered()), this, SLOT(makeHorizontal()));
+    QAction *twoVert = menu.addAction("2 points Vertical (y)");
+    connect(twoVert, SIGNAL(triggered()), this, SLOT(makeVertical()));
+    QAction *makeRect = menu.addAction("4 points Rectangle (r)");
+    connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
     menu.addAction(menu.addSeparator());
-    QAction *showPan = menu.addAction("Show control");
+    QAction *showPan = menu.addAction("Show control (w)");
     connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
     menu.exec(e->screenPos());
 }
@@ -824,7 +883,13 @@ nLine::selectThis(bool val) {
 	for (int i =0; i<ref.size(); i++) {
 		ref[i]->setVisible(val);
 	}
-	parent()->my_w.statusbar->showMessage(toolTip());
+	if (val) {
+        grabKeyboard();
+        parent()->my_w.statusbar->showMessage(toolTip());
+    } else {
+        ungrabKeyboard();
+        parent()->my_w.statusbar->clearMessage();
+    }
 }
 
 void nLine::itemChanged() {

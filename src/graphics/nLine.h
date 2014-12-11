@@ -159,6 +159,11 @@ public slots:
     void contextAppendPoint();
     void contextPrependPoint();
     void contextRemovePoint();
+
+    void makeHorizontal();
+    void makeVertical();
+    void makeRectangle();
+
     
 	void export_txt();
 	void export_txt_points();

@@ -91,19 +91,16 @@ void nGhost::doGhost () {
             morlet.resize(dx,dy);
         }
 
-//        nPhysD *filter = new nPhysD(dx,dy,0,"Filter");
-                
         double cr_ghost = cos((my_w.angleCarrier->value()) * _phys_deg); 
         double sr_ghost = sin((my_w.angleCarrier->value()) * _phys_deg);
-//        double thick_ghost=my_w.thicknessGhost->value()*M_PI/sqrt(pow(sr_ghost*dx,2)+pow(cr_ghost*dy,2));
         double thick_ghost=M_PI;
         double lambda_ghost=my_w.widthCarrier->value()/sqrt(pow(cr_ghost*dx,2)+pow(sr_ghost*dy,2));
         
         double cr_norm = cos((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg); 
         double sr_norm = sin((my_w.angleCarrier->value()+my_w.rotation->value()) * _phys_deg);
-//        double thick_norm=my_w.thickness->value()*M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
         double thick_norm=M_PI/sqrt(pow(sr_norm*dx,2)+pow(cr_norm*dy,2));
         double lambda_norm=my_w.widthCarrier->value()/sqrt(pow(cr_norm*dx,2)+pow(sr_norm*dx,2));
+#pragma omp parallel for collapse(2)
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr_ghost = xx[x]*cr_ghost - yy[y]*sr_ghost;
@@ -120,13 +117,10 @@ void nGhost::doGhost () {
                 
                 double e_tot=exp(ey_norm)*exp(ex_norm) - exp(ey_ghost)*exp(ex_ghost);
                 
-//                filter->set(x,y,e_tot);
                 morlet.Timg_matrix[y][x]=imageFFT.Timg_matrix[y][x] * e_tot; 
 
             }
         }
-//        ceppa->TscanBrightness();
-//        nparent->addPhys(ceppa);
 
         morlet = morlet.ft2(PHYS_BACKWARD);
         

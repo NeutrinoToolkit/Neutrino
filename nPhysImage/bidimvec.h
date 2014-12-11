@@ -83,6 +83,8 @@ public:
 	bidimvec<T> orthonorm(void);
 	bidimvec<T> rotate(double);
 
+	bidimvec<T> swap();
+
 	//double intp(bidimvec<T>, bidimvec<T>);
 
 	inline T x(void)
@@ -258,6 +260,10 @@ template <class T> bidimvec<T>
 bidimvec<T>::orthonorm(void)
 { return bidimvec<T>( (myval2==0) ? 0 : 1, (myval2 == 0) ? myval1 : -myval1/myval2 ); }
 //{ return bidimvec<T>( (myval2==0) ? 0 : -.5/myval2, (myval1 == 0) ? 0 : .5/myval1 ); }
+
+template <class T> bidimvec<T>
+bidimvec<T>::swap(void)
+{ return bidimvec<T>(second(),first());}
 
 template <class T> bidimvec<T>
 bidimvec<T>::rotate(double theta)
