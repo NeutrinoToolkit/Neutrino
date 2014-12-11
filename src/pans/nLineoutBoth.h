@@ -42,7 +42,9 @@ public:
 	nLineoutBoth(neutrino *, QString);
 	
 	public slots:
-	void mouseAtMatrix(QPointF);
+	void updatePlot(QPointF);
+
+    void setBehaviour();
 	
 	void nZoom(double);
 	

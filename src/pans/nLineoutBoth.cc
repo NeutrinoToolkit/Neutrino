@@ -34,10 +34,14 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 	my_w.setupUi(this);
 
     my_w.statusBar->addPermanentWidget(my_w.autoscale, 0);
+    my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
     
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
     connect(my_w.autoscale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
+
+    connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
+    setBehaviour();
 
 	my_w.plot->enableAxis(QwtPlot::xTop);
 	my_w.plot->enableAxis(QwtPlot::yRight);
@@ -70,6 +74,7 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 		
 	}
 	
+
 	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("X (red)"));
 	my_w.plot->setAxisTitle(QwtPlot::yRight, tr("X value (red)"));
 	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Y (blue)"));
@@ -80,6 +85,17 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 	updateLastPoint();
     
 }
+
+void nLineoutBoth::setBehaviour() {
+    if (my_w.lockClick->isChecked()) {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+    }
+}
+
 
 void nLineoutBoth::rescale(QPointF p) {
     DEBUG("HERE " << p.x() << " " << p.y());
@@ -97,7 +113,7 @@ void nLineoutBoth::rescale(QPointF p) {
 
 
 // mouse movement
-void nLineoutBoth::mouseAtMatrix(QPointF p) {
+void nLineoutBoth::updatePlot(QPointF p) {
 
 	QPen marker_pen;
 	marker_pen.setColor(nparent->my_mouse.color);

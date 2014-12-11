@@ -48,7 +48,7 @@ public:
 	nLineout(neutrino *, QString, enum phys_direction);
 	
 	public slots:
-	void mouseAtMatrix(QPointF);
+	void updatePlot(QPointF);
 	
 	void toggle_zoom();
 	void toggle_scale();
@@ -57,7 +57,9 @@ public:
 	void nZoom(double);
 	
 	void updateLastPoint();
-	
+
+    void setBehaviour();
+
 public slots:
 	void getMinMax();
 	void setMinMax(QPointF);

@@ -44,6 +44,9 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
 
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
+    connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
+    setBehaviour();
+    
 	curve = new QwtPlotCurve(win_name);
 	curve->show();
 	curve->attach(my_w.the_plot);
@@ -64,9 +67,20 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
 	updateLastPoint();
 }
 
+void nLineout::setBehaviour() {
+    if (my_w.actionLockClick->isChecked()) {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+    }
+}
+
+
 // mouse movemen
 void
-nLineout::mouseAtMatrix(QPointF p) {
+nLineout::updatePlot(QPointF p) {
 
 	if (currentBuffer != NULL) {
 
@@ -99,7 +113,6 @@ nLineout::mouseAtMatrix(QPointF p) {
 			curve->setRawSamples(currentBuffer->to_axis(cut_dir)+lat_skip, dvec+lat_skip, z_size);
 		}
 
-//  TODO: this might be ugly....
 		QPen marker_pen;
 		marker_pen.setColor(nparent->my_mouse.color);
 		marker.setLinePen(marker_pen);
@@ -123,6 +136,7 @@ nLineout::mouseAtMatrix(QPointF p) {
 	}
 
 }
+
 
 void
 nLineout::toggle_zoom() {

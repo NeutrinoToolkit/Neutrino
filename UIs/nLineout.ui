@@ -99,6 +99,7 @@
    <addaction name="actionMin"/>
    <addaction name="actionMax"/>
    <addaction name="actionToggleZoom"/>
+   <addaction name="actionLockClick"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="font">
@@ -165,6 +166,22 @@
   <action name="actionMax">
    <property name="text">
     <string>Max</string>
+   </property>
+  </action>
+  <action name="actionLockClick">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/autoRefresh.png</normaloff>
+     <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>lockClick</string>
+   </property>
+   <property name="toolTip">
+    <string>update on click</string>
    </property>
   </action>
  </widget>

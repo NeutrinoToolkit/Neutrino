@@ -252,12 +252,8 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 		parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
 	}
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-		if (parent()->currentBuffer && minMax==parent()->currentBuffer->get_min_max()) {
-			parent()->changeColorMinMax(minMax);
-		} else {
-			parent()->changeColorMinMax(minMax);
-		}
-	}
+        parent()->changeColorMinMax(minMax);
+    }
 }
 
 void nView::mouseMoveEvent (QMouseEvent *e)
