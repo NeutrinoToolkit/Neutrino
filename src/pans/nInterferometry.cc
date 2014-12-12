@@ -54,16 +54,12 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 	for (unsigned int k=0;k<my_image.size();k++){
 		my_image[k].setupUi(my_w.images->widget(k));
         my_w.images->setCurrentIndex(k);
-		//hack to save diffrent uis!!!
 		foreach (QWidget *obj, my_w.images->widget(k)->findChildren<QWidget*>()) {
 			obj->setObjectName(obj->objectName()+"Interf"+QString::number(k));
 		}
 
         connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
-        QApplication::processEvents();
-        my_w.images->widget(k)->adjustSize();
     }
-
 
 	decorate();
 
