@@ -269,10 +269,7 @@ void nVisar::tabChanged(int k) {
 	if (k<2) {
 		int visnum=tabWidget->currentIndex();
 		
-		nPhysD *nphys=getPhysFromCombo(visar[visnum].shotImage);
-		if (nphys) {
-			nparent->showPhys(nphys);
-		}
+		nparent->showPhys(getPhysFromCombo(visar[visnum].shotImage));
 		fringeRect[visnum]->show();
 		fringeRect[(visnum+1)%2]->hide();
 		fringeLine[visnum]->show();
@@ -282,10 +279,7 @@ void nVisar::tabChanged(int k) {
 		}
 		sopRect->hide();
 	} else {
-		nPhysD *nphys=getPhysFromCombo(my_w.sopShot);
-		if (nphys) {
-			nparent->showPhys(nphys);
-		}
+		nparent->showPhys(getPhysFromCombo(my_w.sopShot));
 		updatePlotSOP();
 		for (int k=0;k<2;k++){
 			fringeRect[k]->hide();

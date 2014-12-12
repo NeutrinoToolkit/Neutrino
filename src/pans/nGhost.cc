@@ -139,17 +139,12 @@ void nGhost::doGhost () {
         deepcopy->TscanBrightness();
         
         if (my_w.erasePrevious->isChecked()) {
-            ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,false);
+            ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,true);
         } else {
-            nparent->addPhys(deepcopy);
+            nparent->addShowPhys(deepcopy);
             ghostBusted=deepcopy;
         }
-        nparent->showPhys(ghostBusted);
-        
-//        filter->fftshift();
-//        filter->TscanBrightness();
-//        nparent->addPhys(filter);
-        
+
         my_w.erasePrevious->setEnabled(true);
 
 	}

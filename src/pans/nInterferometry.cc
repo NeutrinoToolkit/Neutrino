@@ -710,7 +710,7 @@ void nInterferometry::doPlasma(){
             if (!ok1) mini=intNe->get_min();
             if (!ok2) maxi=intNe->get_max();
             phys_cutoff(*intNe,mini,maxi);
-            
+            intNe->TscanBrightness();
             localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
         }        
     }

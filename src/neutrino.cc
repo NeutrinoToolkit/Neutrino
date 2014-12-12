@@ -899,6 +899,9 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 void neutrino::addPhys(nPhysD* datamatrix) {
 	if (datamatrix && !physList.contains(datamatrix))	{
 		physList << datamatrix;
+        
+//        datamatrix->property["display_range"]= datamatrix->get_min_max();
+
 		addMenuBuffers(datamatrix);
 		emit physAdd(datamatrix);
 	}
@@ -922,13 +925,15 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
 	if (newPhys) {
-		bool redisplay = (currentBuffer==oldPhys); 
+        bool redisplay = (currentBuffer==oldPhys); 
 		if (physList.contains(oldPhys)) {
+            newPhys->property["display_range"]=oldPhys->property["display_range"];
 			if (oldPhys==NULL) oldPhys=new nPhysD();
 			*oldPhys=*newPhys;
 			delete newPhys;
 			newPhys=oldPhys;
 		} else {
+            newPhys->property.erase("display_range");
 			addPhys(newPhys);
 		}
 		if (show || redisplay) showPhys(newPhys);
@@ -1029,6 +1034,12 @@ neutrino::showPhys(nPhysD* datamatrix) {
             }
         }
         
+        if (!datamatrix->property.have("display_range")) {
+			datamatrix->property["display_range"]= datamatrix->get_min_max();		
+        }
+
+        vec2f pippo=datamatrix->property["display_range"];
+        WARNING(datamatrix->getName() << " " << pippo.x() << " " << pippo.y());
 		currentBuffer=datamatrix;
         
 
@@ -1246,14 +1257,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 				MouseInfo();
 			} else {
 				WinList();
-			}
-			break;
-		case Qt::Key_S:
-			if (e->modifiers() & Qt::ShiftModifier) {
-				if (currentBuffer) {
-					currentBuffer->TscanBrightness();
-					createQimage();					
-				}
 			}
 			break;
 		case Qt::Key_P:

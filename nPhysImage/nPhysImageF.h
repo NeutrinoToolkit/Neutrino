@@ -323,6 +323,7 @@ public:
 
 		// copy everything
 		property = rhs.property; // probably missing DEEP operator
+		
 		Tmaximum_value = rhs.Tmaximum_value;
 		Tminimum_value = rhs.Tminimum_value;
 		Timg_matrix = rhs.Timg_matrix;
@@ -360,7 +361,6 @@ public:
 		//lhs->object_name = object_name;
 		//lhs->filename=filename;
 		lhs.property = property;
-
 		return lhs;
 	}
 
@@ -606,7 +606,7 @@ public:
 	
 	const unsigned char *to_uchar_palette(unsigned char * palette) {
 		if (!property.have("display_range")) {
-			property["display_range"]= bidimvec<T>(Tminimum_value,Tmaximum_value);
+			property["display_range"]= get_min_max();
 		}
 		bidimvec<T> minmax=property["display_range"];
 		double mini=minmax.first();
@@ -997,6 +997,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 //	memcpy(Timg_buffer, oth.Timg_buffer, width*height*sizeof(T));
 	std::copy(oth.Timg_buffer, oth.Timg_buffer+width*height, Timg_buffer);
 	property = oth.property;
+	
 	setShortName(sName);
 	TscanBrightness();
 //	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
@@ -1422,7 +1423,6 @@ nPhysImageF<T>::TscanBrightness() {
 			}
 		}
 #endif
-		
 		DEBUG(5,"[brightness scan] "<<Tminimum_value<<" -- "<<Tmaximum_value);
 	}
 }
