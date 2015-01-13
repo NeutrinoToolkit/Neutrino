@@ -95,6 +95,7 @@ linux:
 
 linux_install:
 	@install -m 755 nPhysImage/libnPhysImageF.so ${DESTDIR}${prefix}/lib
+	@ln -sf ${DESTDIR}${prefix}/lib/libnPhysImageF.so ${DESTDIR}${prefix}/lib/libnPhysImageF.so.0
 	@install -m 755 libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib
 	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0 
 	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1
