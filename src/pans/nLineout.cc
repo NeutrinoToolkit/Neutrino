@@ -194,7 +194,7 @@ void nLineout::nZoom(double) {
 }
 
 void nLineout::updateLastPoint() {
-	mouseAtMatrix(nparent->my_mouse.pos());
+	updatePlot(nparent->my_mouse.pos());
 }
 
 

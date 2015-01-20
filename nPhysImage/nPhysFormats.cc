@@ -319,9 +319,12 @@ physInt_sif::physInt_sif(string ifilename)
 	for (size_t i=0; i<3; i++) {
 		getline(ifile, temp_string);
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-"+ss.str()]=temp_string;
+		property["sif-a-"+ss.str()]=temp_string;
 	}
 	getline(ifile, temp_string);
+	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+	property["sif-b-"+ss.str()]=temp_string;
+
 	int w, h;
 	ss.str(temp_string);
 	ss >> w;
@@ -330,7 +333,7 @@ physInt_sif::physInt_sif(string ifilename)
 	
 	getline(ifile, temp_string);
 	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-	property["sif-"+ss.str()]=temp_string;
+	property["sif-c-"+ss.str()]=temp_string;
 	
 	getline(ifile, temp_string);
 	ss.str(temp_string);
@@ -342,19 +345,25 @@ physInt_sif::physInt_sif(string ifilename)
 	ifile.read(&buf[0], buf.size());
 	
 	temp_string.clear();
-	bool found_control_string=false;
-	string control_string="Pixel number"; // we will read until we read this... madness 
-	while ((!ifile.eof()) && (strcmp(temp_string.c_str(), "0") || found_control_string==false )) {
+	// we will read until we find a line with just "0" but after we have found "Pixel number"... madness 
+	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-"+ss.str()]=temp_string;
-		if (temp_string.compare(0,control_string.length(),control_string)==0) {
-			found_control_string=true;
+		property["sif-d-"+ss.str()]=temp_string;
+		if (temp_string.substr(0,12) == "Pixel number") {
+			while ((!ifile.eof()) && temp_string!="0") {
+				getline(ifile, temp_string);
+				ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+				property["sif-e-"+ss.str()]=temp_string;
+			}
+			break;
 		}
 	}	
 	
 	// get data
 	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+	ss.str(""); ss.clear(); ss << ifile.tellg() << " bytes";
+	property["sif-header"]=ss.str();
 	vector<float> readb(getSurf());
 	
 	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
@@ -372,7 +381,6 @@ physShort_b16::physShort_b16(const char *ifilename)
 	
 	char *ptr = new char[3], tempch;
 	char *readb;
-	char *rowptr;
 	char revision;
 	
 	int header_size=0; // cambia con la revision del file
@@ -429,7 +437,6 @@ physShort_b16::physShort_b16(const char *ifilename)
 	for (int i=0; i<h; i++) {
 		
 		memset(readb,0,w*bpp);
-		rowptr = readb;
 		ifile.read(readb,w*bpp);
 		
 		//		for (j=0; j<w; j++) {
@@ -656,7 +663,7 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
 	if (status < 0) {
 		// .alex. -- questa non compila (e non sono sicuro sia a causa di anymap)
-		//WARNING("Zlib a bad status of " << status);
+		WARNING("Zlib a bad status of " << status);
 		exit (EXIT_FAILURE);
 	}
 	
@@ -667,7 +674,7 @@ phys_dump_binary(nPhysImageF<double> *my_phys, std::ofstream &ofile) {
 	status= deflate (& strm, Z_FINISH);
 	
 	if (status < 0) {
-		WARNING("Zlib a bad status of ");
+		WARNING("Zlib a bad status of " << status);
 		exit (EXIT_FAILURE);
 	}
 	int writtendata = buffer_size - strm.avail_out;
@@ -1555,7 +1562,7 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	DEBUG("HERE2");
 	int32 sd_id, sds_id, n_datasets, n_file_attrs, index,status ;
 	int32 dim_sizes[3];
-	int32 rank, num_type, attributes, istat;
+	int32 rank, num_type, attributes;
 	int32 i;
 	
 	char name[64];
@@ -1565,12 +1572,12 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	sd_id = SDstart(fname.c_str(), DFACC_READ);
 	if (sd_id != FAIL) {
 		/* Determine the contents of the file. */
-		istat = SDfileinfo(sd_id, &n_datasets, &n_file_attrs);
+		SDfileinfo(sd_id, &n_datasets, &n_file_attrs);
 		DEBUG(5,"datasets " << n_datasets);
 		for (index = 0; index < n_datasets; index++) {
 			DEBUG(5,"Image number " << index);
 			sds_id = SDselect(sd_id, index);
-			istat = SDgetinfo(sds_id, name, &rank, dim_sizes, &num_type, &attributes);
+			SDgetinfo(sds_id, name, &rank, dim_sizes, &num_type, &attributes);
 			DEBUG(5,"	  rank " << rank << " attributes " << attributes << " : " << num_type);
 			for (i=0;i<rank;i++) {
 				DEBUG(5,"	  " << i << " = " << dim_sizes[i]);
@@ -1583,32 +1590,32 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 				start[i]=0;
 				edges[i]=dim_sizes[i];
 			}
-			char *data=NULL;
+			vector<char> data;
 			switch (num_type) {
 				case 3:
 				case 4:
 				case 20:
 				case 21:
-					data =new char [surf*sizeof(char)];
+					data.resize(surf*sizeof(char));
 					break;
 				case 5:
-					data =new char [surf*sizeof(float)];
+					data.resize(surf*sizeof(float));
 					break;
 				case 6:
-					data =new char [surf*sizeof(double)];
+					data.resize(surf*sizeof(double));
 					break;
 				case 22:
 				case 23:
-					data =new char [surf*sizeof(short)];
+					data.resize(surf*sizeof(short));
 					break;
 				case 24:
 				case 25:
-					data =new char [surf*sizeof(int)];
+					data.resize(surf*sizeof(int));
 					break;
 			}
 			
-			if (data) {
-				status=SDreaddata(sds_id,start,NULL,edges,(VOIDP)data);
+			if (data.size()>0) {
+				status=SDreaddata(sds_id,start,NULL,edges,(VOIDP)&data[0]);
 				if (status!=FAIL && rank>1) {
 					int numMat=(rank==2?1:dim_sizes[0]);
 					if (dim_sizes[rank-1]*dim_sizes[rank-2]>0) {
@@ -1619,34 +1626,34 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 							for (size_t k=0;k<my_data->getSurf();k++) {
 								switch (num_type) {
 									case 3:
-										my_data->set(k,((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 4:
-										my_data->set(k,((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 20:
-										my_data->set(k,(int)((char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,(int)((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 21:
-										my_data->set(k,(int)((unsigned char *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,(int)((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 5:
-										my_data->set(k,(float) ((float *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,(float) ((float *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 6:
-										my_data->set(k,((double *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((double *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 22:
-										my_data->set(k,((short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 23:
-										my_data->set(k,((unsigned short *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((unsigned short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 24:
-										my_data->set(k,((int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 									case 25:
-										my_data->set(k,((unsigned int *)data)[k+i*dim_sizes[1]*dim_sizes[2]]);
+										my_data->set(k,((unsigned int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
 										break;
 								}
 							}
@@ -1669,10 +1676,9 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 						
 					}
 				}
-				delete [] data;
 			}
 			
-			istat = SDendaccess(sds_id);
+			SDendaccess(sds_id);
 		}
 		
 		if (background) {
@@ -1683,7 +1689,7 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 		}
 		
 		/* Terminate access to the SD interface and close the file. */
-		istat = SDend(sd_id);
+		SDend(sd_id);
 	}
 #endif
 	return imagelist;

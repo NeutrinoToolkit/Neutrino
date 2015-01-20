@@ -188,7 +188,7 @@ void nLineoutBoth::nZoom(double) {
 }
 
 void nLineoutBoth::updateLastPoint() {
-	mouseAtMatrix(nparent->my_mouse.pos());    
+	updatePlot(nparent->my_mouse.pos());
     if (my_w.autoscale->isChecked()) {
         disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
     } else {
