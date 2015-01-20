@@ -111,8 +111,9 @@ INCLUDEPATH += ../nPhysImage
 #LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm -ldf -lcfitsio 
 LIBS += -L../nPhysImage -lnPhysImageF -lnetpbm  -L/usr/lib -lgsl -lgslcblas -lm -ltiff -ljpeg -lm -lfftw3
 
-LIBS += -lfftw3_threads
-
+!win32 {
+	LIBS += -lfftw3_threads
+}
 
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
