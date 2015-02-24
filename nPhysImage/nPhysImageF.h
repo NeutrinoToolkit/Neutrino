@@ -145,6 +145,26 @@ class phys_trashable: public std::exception
   }
 };
 
+//! exception in case of file read problems
+class phys_fileerror: public std::exception
+{
+
+public:
+	phys_fileerror(std::string str = std::string("(undefined file error"))
+		: msg(str)
+	{ }
+
+	~phys_fileerror() throw()
+	{ }
+
+	virtual const char* what() const throw()
+	{ return msg.c_str(); }
+
+private:
+	std::string msg;
+
+};
+
 typedef bidimvec<double> vec2f;
 typedef bidimvec<int> vec2;
 
