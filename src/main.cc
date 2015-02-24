@@ -33,13 +33,15 @@
 #endif 
 
 #include "neutrino.h"
+#include "nApp.h"
+
 int main(int argc, char **argv)
 {
 
 #ifdef Q_OS_MAC
 	osxApp *qapp = new osxApp(argc,argv);	
 #else
-	QApplication *qapp = new QApplication(argc,argv);
+	NApplication *qapp = new NApplication(argc,argv);
 #endif
 	
 	qapp->setOrganizationName("ParisTech");

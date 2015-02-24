@@ -188,6 +188,9 @@ HEADERS += nPhysProperties.h
 SOURCES += nPhysProperties.cc
 
 
+# base app
+HEADERS += nApp.h
 macx {
+	# osx app
 	HEADERS += osxApp.h
 }
