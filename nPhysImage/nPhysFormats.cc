@@ -358,9 +358,8 @@ physInt_sif::physInt_sif(string ifilename)
 	string control_string="Pixel number"; 
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
-		// useless, for we don't know how many lines we're reading
-		//ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		//property["sif-"+ss.str()]=temp_string;
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-d-"+ss.str()]=temp_string;
 		if (temp_string.substr(0,12) == control_string) {
 			break;
 		}		
@@ -371,6 +370,9 @@ physInt_sif::physInt_sif(string ifilename)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
+		
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-e-"+ss.str()]=temp_string;
 
 		// most readable ever
                 if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
