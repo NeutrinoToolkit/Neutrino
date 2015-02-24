@@ -367,7 +367,7 @@ physInt_sif::physInt_sif(string ifilename)
 	}	
 
 	temp_string.clear();
-	int magic_number = 0, damp_number = 0; // usually 3 (lol)
+	int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
