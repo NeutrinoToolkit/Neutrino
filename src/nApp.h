@@ -22,41 +22,30 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <string>
-#include <iostream>
+#ifndef nApp_H
+#define nApp_H
 
+#include <QApplication>
 #include <QtGui>
-//#include <QtSql>
-
-#ifdef Q_OS_MAC
-#include "osxApp.h"
-#endif 
-
 #include "neutrino.h"
-#include "nApp.h"
 
-int main(int argc, char **argv)
-{
+class NApplication : public QApplication {
+    Q_OBJECT
+public:
+	NApplication( int &argc, char **argv ) : QApplication(argc, argv) {}
+protected:
 
-#ifdef Q_OS_MAC
-	osxApp *qapp = new osxApp(argc,argv);	
-#else
-	NApplication *qapp = new NApplication(argc,argv);
-#endif
-	
-	qapp->setOrganizationName("ParisTech");
-	qapp->setOrganizationDomain("edu");
-	qapp->setApplicationName("Neutrino");
-	qapp->setApplicationVersion(__VER);
-	
-	QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
+	virtual bool notify(QObject *rec, QEvent *ev)
+	{
+		try {
+			return QApplication::notify(rec, ev);
+		}
+		catch (std::exception &e) {
+			qCritical() << "neutrino got exception: "<<e.what();
+		}
 
-	neutrino* neu = new neutrino();
-	QStringList args=QCoreApplication::arguments();
-    args.removeFirst();
-	foreach (QString filename, args) {
-		neu->fileOpen(filename);
+		return false;
 	}
+};
+#endif
 
-	qapp->exec();
-}

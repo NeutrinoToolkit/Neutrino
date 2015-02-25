@@ -53,8 +53,12 @@ if sys.platform == 'darwin' :
     makefile.extra_include_dirs += ["/opt/local/Library/Frameworks/qwt.framework/Versions/Current/Headers","/opt/local/Library/Frameworks/QtSvg.framework/Versions/Current/Headers"]
 
 if sys.platform.startswith('linux'):
-    makefile.extra_libs += ["hdf5"]
-    makefile.extra_include_dirs += ["/usr/include/hdf","/usr/include/qwt","/usr/include/qt4/QtSvg"]
+    makefile.extra_include_dirs += ["/usr/include/qwt","/usr/include/qt4/QtSvg"]
+    # look for the frigg#$@%&^ing hdf lib path which likes to change soooo often
+    for root, dirs, files in os.walk('/usr/lib/'):
+        if 'libhdf5.so' in files:
+            makefile.extra_libs += ["hdf5"]
+            makefile.extra_lib_dirs += [root]
 
 makefile.generate()
 

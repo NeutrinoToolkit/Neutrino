@@ -1037,10 +1037,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
         if (!datamatrix->property.have("display_range")) {
 			datamatrix->property["display_range"]= datamatrix->get_min_max();		
         }
-
-        vec2f pippo=datamatrix->property["display_range"];
-        WARNING(datamatrix->getName() << " " << pippo.x() << " " << pippo.y());
-		currentBuffer=datamatrix;
+        currentBuffer=datamatrix;
         
 
         if (!physList.contains(datamatrix)) {

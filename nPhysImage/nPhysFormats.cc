@@ -298,119 +298,130 @@ physGray_pgm::physGray_pgm(const char *ifilename)
 }
 #endif
 
-
 physInt_sif::physInt_sif(string ifilename)
 : nPhysImageF<int>(ifilename, PHYS_FILE)
 {
-    // Andor camera .sif file
-    string temp_string;
-    stringstream ss;
-    int skiplines=0;
-    ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
-    getline(ifile, temp_string);
-    if ( temp_string.substr(0,5)!=string("Andor")) {
-        WARNING("Does not start with Andor "<<ifilename);
-        return;
-    }
-    // matrix informations on line 5
-    for (size_t i=0; i<3; i++) {
-        getline(ifile, temp_string);
-        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-        property["sif-a-"+ss.str()]=temp_string;
-    }
-    getline(ifile, temp_string);
-    ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-    property["sif-b-"+ss.str()]=temp_string;
-    
-    int w, h;
-    ss.str(temp_string);
-    ss >> w;
-    ss >> h;
-    this->resize(w, h);
-    getline(ifile, temp_string);
-    ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-    property["sif-c-"+ss.str()]=temp_string;
-    getline(ifile, temp_string);
-    ss.str(temp_string);
-    
-    int binary_header=0,useless=0;
-    ss >> useless >> binary_header;
-    DEBUG("unused value " << useless);
-    vector<char> buf(binary_header);
-    ifile.read(&buf[0], buf.size());
-    
-    /* 
-     * brought to you by some braindead @Andor's!
-     *
-     * 1. look for "Pixel number" (the first occurrence)
-     * 2. look for a line with *a single* number on it (no indent)
-     * 3. read the value and jump by the amount of lines!
-     *
-     * (thank you, Andor, thank you, I love this!)
-     */
-    temp_string.clear();
-    string control_string="Pixel number"; 
-    while (!ifile.eof()) {
-        getline(ifile, temp_string);
-        // useless, for we don't know how many lines we're reading
-        //ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-        //property["sif-"+ss.str()]=temp_string;
-        if (temp_string.substr(0,12) == control_string) {
-            break;
-        }	
-    }	
-    
-    temp_string.clear();
-    int magic_number = 0; // usually 3 (lol)
-    while (!ifile.eof()) {
-        getline(ifile, temp_string);
-        istringstream iss(temp_string);
-        
-        // most readable ever
-        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-            break;
-        }
-    }
-    
-    // jump magic lines
-    DEBUG(5, "jump "<<magic_number<<" lines for the glory of Rah");
-    for (size_t i=0; i<magic_number; i++) {
-        getline(ifile, temp_string);
-    }
-    
-    // consistency check
-    int init_matrix = ifile.tellg();
-    ifile.seekg(0, ifile.end);
-    int datacheck = ifile.tellg()-init_matrix-getSurf()*sizeof(float);
-    
-    if (ifile.eof() || ifile.fail()) {
-        WARNING("SIF: header parsing reached end of file");
-    }
-    
-    if (datacheck < 0) {
-        stringstream oss;
-        oss<<"Failed consistency check before SIF matrix read\n";
-        oss<<"init_matrix: "<<init_matrix<<"\n";
-        oss<<"end_file: "<<ifile.tellg()<<"\n";
-        oss<<"matrix surface: "<<getSurf()<<"\n";
-        oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
-        
-        WARNING(oss.str());
-        
-    } else {
-        // get data
-        ifile.seekg(init_matrix);
-        DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
-        vector<float> readb(getSurf());
-        ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
-        DEBUG(ifile.gcount());
-        ifile.close();
-        for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
-        TscanBrightness();
-        DEBUG(get_min() << " " << get_max());
-        
-    }
-    
+	// Andor camera .sif file
+	
+	string temp_string;
+	stringstream ss;
+	int skiplines=0;
+	
+	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
+	getline(ifile, temp_string);
+	if ( temp_string.substr(0,5)!=string("Andor")) {
+		WARNING("Does not start with Andor "<<ifilename);
+		return;
+	}
+	
+	// matrix informations on line 5
+	for (size_t i=0; i<3; i++) {
+		getline(ifile, temp_string);
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-a-"+ss.str()]=temp_string;
+	}
+	getline(ifile, temp_string);
+	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+	property["sif-b-"+ss.str()]=temp_string;
+
+	int w, h;
+	ss.str(temp_string);
+	ss >> w;
+	ss >> h;
+	this->resize(w, h);
+	
+	getline(ifile, temp_string);
+	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+	property["sif-c-"+ss.str()]=temp_string;
+	
+	getline(ifile, temp_string);
+	ss.str(temp_string);
+
+	int binary_header=0,useless=0;
+	ss >> useless >> binary_header;
+	DEBUG("unused value " << useless);
+	vector<char> buf(binary_header);
+	ifile.read(&buf[0], buf.size());
+	
+
+	/* 
+	 * brought to you by some braindead @Andor's!
+	 *
+	 * 1. look for "Pixel number" (the first occurrence)
+	 * 2. look for a line with *a single* number on it (no indent)
+	 * 3. read the value and jump by the amount of lines!
+	 *
+	 * (thank you, Andor, thank you, I love this!)
+	 */
+	
+	temp_string.clear();
+	string control_string="Pixel number"; 
+	while (!ifile.eof()) {
+		getline(ifile, temp_string);
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-d-"+ss.str()]=temp_string;
+		if (temp_string.substr(0,12) == control_string) {
+			break;
+		}		
+	}	
+
+	temp_string.clear();
+	int magic_number = 0; // usually 3 (lol)
+	while (!ifile.eof()) {
+		getline(ifile, temp_string);
+		istringstream iss(temp_string);
+		
+		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+		property["sif-e-"+ss.str()]=temp_string;
+
+		// most readable ever
+                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+                    break;
+		}
+	}
+
+	// jump magic lines
+	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Rah");
+	for (size_t i=0; i<magic_number; i++) {
+		getline(ifile, temp_string);
+	}
+
+	// consistency check
+	
+	int init_matrix = ifile.tellg();
+	ifile.seekg(0, ifile.end);
+	int datacheck = ifile.tellg()-init_matrix-getSurf()*sizeof(float);
+
+	if (ifile.eof() || ifile.fail()) {
+		throw phys_fileerror("SIF: header parsing reached end of file");
+	}
+
+	if (datacheck < 0) {
+		stringstream oss;
+		oss<<"Failed consistency check before SIF matrix read\n";
+		oss<<"init_matrix: "<<init_matrix<<"\n";
+		oss<<"end_file: "<<ifile.tellg()<<"\n";
+		oss<<"matrix surface: "<<getSurf()<<"\n";
+		oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
+
+		throw phys_fileerror(oss.str());
+
+	} else {
+		// get data
+		ifile.seekg(init_matrix);
+		DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+		vector<float> readb(getSurf());
+	
+		ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
+		DEBUG(ifile.gcount());
+		ifile.close();
+		for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
+	
+		TscanBrightness();
+		DEBUG(get_min() << " " << get_max());
+
+	}
+
 }
 
 physShort_b16::physShort_b16(const char *ifilename)

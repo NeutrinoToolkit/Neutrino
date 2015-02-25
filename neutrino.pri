@@ -6,7 +6,7 @@ CONFIG += qt qwt windows
 
 QT += svg xml network core gui
 
-VERSION = 1.0.0
+QMAKE_LIBDIR_FLAGS = -L../ -L../nPhysImage
 
 # VERSION STUFF
 NVERSION=$$system(git describe)
@@ -29,7 +29,7 @@ message($${NVERSION})
 nPhys.target = nPhys
 
 CONFIG(debug, debug|release) {
-    nPhys.commands = make -C ../nPhysImage debug; echo $$CONFIG
+    nPhys.commands = make -C nPhysImage debug; echo $$CONFIG
     DEFINES += __phys_debug=10
     message("DEBUG!")
 } else {
@@ -190,6 +190,9 @@ HEADERS += nPhysProperties.h
 SOURCES += nPhysProperties.cc
 
 
+# base app
+HEADERS += nApp.h
 macx {
+	# osx app
 	HEADERS += osxApp.h
 }

@@ -29,6 +29,30 @@
 #include <qwt_plot_renderer.h>
 
 
+#if QWT_VERSION < 0x060100
+    nBoxLineoutZoomer::nBoxLineoutZoomer(QwtPlotCanvas *canvas): QwtPlotPicker(canvas) {
+#else
+    nBoxLineoutZoomer::nBoxLineoutZoomer(QWidget *canvas): QwtPlotPicker(canvas) {
+#endif
+        setTrackerMode(AlwaysOn);
+    }
+    
+    QwtText nBoxLineoutZoomer::trackerText(const QPoint &pos) const {
+        QColor bg(Qt::white);
+        bg.setAlpha(200);
+        QwtText text;
+        text.setBackgroundBrush( QBrush( bg ));
+        
+        double x1=plot()->invTransform(QwtPlot::xBottom, pos.x());
+        double x2=plot()->invTransform(QwtPlot::xTop, pos.x());
+        double y1=plot()->invTransform(QwtPlot::yLeft, pos.y());
+        double y2=plot()->invTransform(QwtPlot::yRight, pos.y());
+        
+        text.setText(QString::number(x1)+" "+QString::number(y1)+"("+QString::number(x2)+" "+QString::number(y2)+")");
+        return text;
+    }
+
+    
 nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
 {
@@ -56,6 +80,11 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 	my_w.plot->enableAxis(QwtPlot::yLeft);
 	(qobject_cast<QFrame*> (my_w.plot->canvas()))->setLineWidth(0);
 
+    
+    picker = new nBoxLineoutZoomer(my_w.plot->canvas());  
+    picker->setTrackerMode(QwtPicker::AlwaysOn);  
+    
+    
 	xCut.setPen(QPen(Qt::red,1));
 	yCut.setPen(QPen(Qt::blue,1));
 
@@ -100,7 +129,6 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 	updatePlot();
 }
 
-
 void nBoxLineout::sceneChanged() {
 	if (sender()==box) updatePlot();
 }
@@ -122,6 +150,14 @@ void nBoxLineout::mouseAtWorld(QPointF p) {
 		ryMarker.setVisible(nparent->my_tics.rulerVisible);
 		
 		my_w.plot->replot();
+        
+        
+        double x2=my_w.plot->invTransform(QwtPlot::xTop,my_w.plot->transform(QwtPlot::xBottom, p.x()));
+        double y2=my_w.plot->invTransform(QwtPlot::yRight, my_w.plot->transform(QwtPlot::yLeft, p.y()));
+        
+        my_w.statusBar->showMessage(QString::number(p.x())+" "+QString::number(p.y())+ 
+                                    "("+QString::number(x2)+" "+QString::number(y2)+")");
+        
 	}
 }
 

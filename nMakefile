@@ -32,7 +32,7 @@ mac: colormaps
 	sudo -s -- 'macdeployqt neutrino.app; chown -R $(USER) Neutrino.app' 
 
 	rm -f sip/PyNeutrino.so
-	cd sip && python configure-new.py --pyqt-sipdir=/opt/local/share/py27-sip/PyQt4 --sip=/opt/local/bin/sip-2.7 && qmake PyNeutrino.pro && make
+	cd sip && python configure-new.py --pyqt-sipdir=/opt/local/share/py27-sip/PyQt4 --sip=/opt/local/bin/sip-2.7 && qmake PyNeutrino.pro && make clean && make
 	cp sip/PyNeutrino.so neutrino.app/Contents/Frameworks
 
 	cp /usr/local/cuda/lib/libcufft.dylib /usr/local/cuda/lib/libtlshook.dylib /usr/local/cuda/lib/libcudart.dylib neutrino.app/Contents/Frameworks
@@ -62,7 +62,6 @@ ifneq ("$(findstring +,$VERSION)","+")
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" neutrino.app/Contents/Info.plist
 endif
 	rm -f neutrino.dmg
-	cd resources/macPackage && sed -e "s/__VER/${VERSION}/g" sfondo-orig.svg > sfondo.svg; /Applications/Inkscape.app/Contents/Resources/bin/inkscape -f sfondo.svg -e sfondo.png && cd - 
 	rm -rf dmg
 	mkdir dmg
 	cp -r neutrino.app dmg
@@ -109,6 +108,7 @@ linux:
 
 linux_install:
 	@install -m 755 nPhysImage/libnPhysImageF.so ${DESTDIR}${prefix}/lib
+	@ln -sf ${DESTDIR}${prefix}/lib/libnPhysImageF.so ${DESTDIR}${prefix}/lib/libnPhysImageF.so.0
 	@install -m 755 libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib
 	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0 
 	@ln -sf ${DESTDIR}${prefix}/lib/libNeutrino.so.1.0.0 ${DESTDIR}${prefix}/lib/libNeutrino.so.1
