@@ -79,6 +79,9 @@ void nGhost::doGhost () {
         
         QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersect(region->getRect());
         
+        QTime timer;
+        timer.start();
+
         size_t dx=imageShot->getW();
         size_t dy=imageShot->getH();
         
@@ -124,7 +127,6 @@ void nGhost::doGhost () {
 
         morlet = morlet.ft2(PHYS_BACKWARD);
         
-        
         nPhysD *deepcopy=new nPhysD(*imageShot);
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
@@ -146,7 +148,10 @@ void nGhost::doGhost () {
         }
 
         my_w.erasePrevious->setEnabled(true);
-
+        QString out;
+        out.sprintf("%d msec",timer.elapsed());
+        my_w.statusbar->showMessage(out);
+        
 	}
 }
 

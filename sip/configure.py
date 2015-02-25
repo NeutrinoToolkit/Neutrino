@@ -40,14 +40,14 @@ else :
 
 makefile.extra_lib_dirs = [".."]
 if sys.platform == 'win32' :
-    makefile.extra_lib_dirs += ["..\\lib","C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\lib"]
+    makefile.extra_lib_dirs += ["../lib","/c/compile/qwt-6.1.0/lib"]
 makefile.extra_include_dirs = ["../src",\
 "../nPhysImage",\
 "../build",\
 "../src/pans/colorbar",\
 "../src/graphics"]
 if sys.platform == 'win32' :
-	makefile.extra_include_dirs += ["C:\\compile\\qwt-6.0.1\\qwt-6.0.1\\src","C:\\compile\\GnuWin32\\include","C:\\Qt\\4.7.4\\include\\QtSvg"]
+	makefile.extra_include_dirs += ["/c/compile/qwt-6.1.0/src","/c/compile/GnuWin32/include","/c/Qt/4.7.4/include/QtSvg"]
 
 if sys.platform == 'darwin' :
     makefile.extra_include_dirs += ["/opt/local/Library/Frameworks/qwt.framework/Versions/Current/Headers","/opt/local/Library/Frameworks/QtSvg.framework/Versions/Current/Headers"]

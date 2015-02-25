@@ -561,9 +561,9 @@ def generate_code(target_config, opts):
     argv.append('neutrino.sip')
 
     print argv
-    rc = os.spawnv(os.P_WAIT, target_config.sip, argv)
-    if rc != 0:
-        error("%s returned exit code %d." % (target_config.sip, rc))
+#     rc = os.spawnv(os.P_WAIT, target_config.sip, argv)
+#     if rc != 0:
+#         error("%s returned exit code %d." % (target_config.sip, rc))
 
     # Generate the .pro file.
     generate_pro(target_config, opts)
@@ -694,18 +694,36 @@ macx {
     QMAKE_LFLAGS += "-undefined dynamic_lookup"
 #     QMAKE_LFLAGS += "-install_name $$absolute_path($$PY_MODULE, $$target.path)"
     QMAKE_POST_LINK = $$QMAKE_POST_LINK$$escape_expand(\\\\n\\\\t)$$quote(install_name_tool -change libNeutrino.%s.dylib %s/libNeutrino.%s.dylib $$PY_MODULE)
+
+
+    INCLUDEPATH += /Users/tommaso/local/src/neutrino/src
+    INCLUDEPATH += /Users/tommaso/local/src/neutrino/nPhysImage
+    INCLUDEPATH += /Users/tommaso/local/src/neutrino/build
+    INCLUDEPATH += /Users/tommaso/local/src/neutrino/src/pans/colorbar
+    INCLUDEPATH += /Users/tommaso/local/src/neutrino/src/graphics
+    INCLUDEPATH += /opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7
+
+    LIBS+=-L../nPhysImage
+    LIBS+=-L..
+    LIBS += -lNeutrino
 }
 
-LIBS += -L../nPhysImage -lnPhysImageF 
-LIBS += -L.. -lNeutrino
+LIBS += -lnPhysImageF 
 QT += svg
 CONFIG += qwt
-INCLUDEPATH += /Users/tommaso/local/src/neutrino/src
-INCLUDEPATH += /Users/tommaso/local/src/neutrino/nPhysImage
-INCLUDEPATH += /Users/tommaso/local/src/neutrino/build
-INCLUDEPATH += /Users/tommaso/local/src/neutrino/src/pans/colorbar
-INCLUDEPATH += /Users/tommaso/local/src/neutrino/src/graphics
-INCLUDEPATH += /opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7
+
+win32 {
+    INCLUDEPATH += ../src
+    INCLUDEPATH += ../nPhysImage
+    INCLUDEPATH += ../build
+    INCLUDEPATH += ../src/pans/colorbar
+    INCLUDEPATH += ../src/graphics
+    INCLUDEPATH += /c/Python27/Lib/site-packages/PyQt4/include
+    INCLUDEPATH += /c/compile/GnuWin32/include
+    INCLUDEPATH += /c/compile/qwt-6.1.0/src
+    LIBS+=-L../app
+    LIBS += -lNeutrino1
+}
 
 ''' % (neutrino_version, lib_dir, neutrino_version))
 

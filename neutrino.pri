@@ -83,8 +83,6 @@ unix:!macx {
 }        
 
 win32 {
-	CONFIG -= neutrino-HDF
-
 	ICON = ../resources/icons/icon.ico
 	QWT_ROOT = /c/compile/qwt-6.1.0
 	
@@ -131,12 +129,11 @@ neutrino-HDF {
 	win32 {
         INCLUDEPATH += /c/compile/HDF_Group/HDFshared/4.2.10/include
         LIBS += -L/c/compile/HDF_Group/HDFshared/4.2.10/lib
-        LIBS += -lmfhdfdll -lhdfdll -lhdf5 -l hdf5_hl
+
+        LIBS += -lmfhdfdll -lhdfdll -lhdf5-9 -lhdf5_hl-9
         
         LIBS -= -ljpeg -lm -lmfhdf -ldf
         
-        INCLUDEPATH += /c/compile/HDF_Group/HDF5/1.8.10/include
-        LIBS += -L/c/compile/HDF_Group/HDF5/1.8.10/lib
 	}
 
 	unix:!macx {

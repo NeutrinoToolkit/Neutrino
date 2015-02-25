@@ -42,6 +42,9 @@ SetFileAttributes "python27.dll" HIDDEN
 SetFileAttributes "xdr.dll" HIDDEN
 SetFileAttributes "hdf.dll" HIDDEN
 SetFileAttributes "mfhdf.dll" HIDDEN
+SetFileAttributes "libgomp-1.dll" HIDDEN
+SetFileAttributes "pthreadGC2.dll" HIDDEN
+SetFileAttributes "libhdf5-9.dll" HIDDEN
 
 SetFileAttributes "libnPhysImageF.dll" HIDDEN
 SetFileAttributes "Neutrino1.dll" HIDDEN

@@ -302,77 +302,115 @@ physGray_pgm::physGray_pgm(const char *ifilename)
 physInt_sif::physInt_sif(string ifilename)
 : nPhysImageF<int>(ifilename, PHYS_FILE)
 {
-	// Andor camera .sif file
-	
-	string temp_string;
-	stringstream ss;
-	int skiplines=0;
-	
-	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
-	getline(ifile, temp_string);
-	if ( temp_string.substr(0,5)!=string("Andor")) {
-		WARNING("Does not start with Andor "<<ifilename);
-		return;
-	}
-	
-	// matrix informations on line 5
-	for (size_t i=0; i<3; i++) {
-		getline(ifile, temp_string);
-		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-a-"+ss.str()]=temp_string;
-	}
-	getline(ifile, temp_string);
-	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-	property["sif-b-"+ss.str()]=temp_string;
-
-	int w, h;
-	ss.str(temp_string);
-	ss >> w;
-	ss >> h;	
-	this->resize(w, h);
-	
-	getline(ifile, temp_string);
-	ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-	property["sif-c-"+ss.str()]=temp_string;
-	
-	getline(ifile, temp_string);
-	ss.str(temp_string);
-	
-	int binary_header=0,useless=0;
-	ss >> useless >> binary_header;
-	DEBUG("unused value " << useless);
-	vector<char> buf(binary_header);
-	ifile.read(&buf[0], buf.size());
-	
-	temp_string.clear();
-	// we will read until we find a line with just "0" but after we have found "Pixel number"... madness 
-	while (!ifile.eof()) {
-		getline(ifile, temp_string);
-		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-d-"+ss.str()]=temp_string;
-		if (temp_string.substr(0,12) == "Pixel number") {
-			while ((!ifile.eof()) && temp_string!="0") {
-				getline(ifile, temp_string);
-				ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-				property["sif-e-"+ss.str()]=temp_string;
-			}
-			break;
-		}
-	}	
-	
-	// get data
-	DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
-	ss.str(""); ss.clear(); ss << ifile.tellg() << " bytes";
-	property["sif-header"]=ss.str();
-	vector<float> readb(getSurf());
-	
-	ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
-	DEBUG(PRINTVAR(ifile.gcount()));
-	DEBUG(PRINTVAR(ifile.tellg()));
-	ifile.close();
-	for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
-	
-	TscanBrightness();
+    // Andor camera .sif file
+    string temp_string;
+    stringstream ss;
+    int skiplines=0;
+    ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
+    getline(ifile, temp_string);
+    if ( temp_string.substr(0,5)!=string("Andor")) {
+        WARNING("Does not start with Andor "<<ifilename);
+        return;
+    }
+    // matrix informations on line 5
+    for (size_t i=0; i<3; i++) {
+        getline(ifile, temp_string);
+        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+        property["sif-a-"+ss.str()]=temp_string;
+    }
+    getline(ifile, temp_string);
+    ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+    property["sif-b-"+ss.str()]=temp_string;
+    
+    int w, h;
+    ss.str(temp_string);
+    ss >> w;
+    ss >> h;
+    this->resize(w, h);
+    getline(ifile, temp_string);
+    ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+    property["sif-c-"+ss.str()]=temp_string;
+    getline(ifile, temp_string);
+    ss.str(temp_string);
+    
+    int binary_header=0,useless=0;
+    ss >> useless >> binary_header;
+    DEBUG("unused value " << useless);
+    vector<char> buf(binary_header);
+    ifile.read(&buf[0], buf.size());
+    
+    /* 
+     * brought to you by some braindead @Andor's!
+     *
+     * 1. look for "Pixel number" (the first occurrence)
+     * 2. look for a line with *a single* number on it (no indent)
+     * 3. read the value and jump by the amount of lines!
+     *
+     * (thank you, Andor, thank you, I love this!)
+     */
+    temp_string.clear();
+    string control_string="Pixel number"; 
+    while (!ifile.eof()) {
+        getline(ifile, temp_string);
+        // useless, for we don't know how many lines we're reading
+        //ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+        //property["sif-"+ss.str()]=temp_string;
+        if (temp_string.substr(0,12) == control_string) {
+            break;
+        }	
+    }	
+    
+    temp_string.clear();
+    int magic_number = 0; // usually 3 (lol)
+    while (!ifile.eof()) {
+        getline(ifile, temp_string);
+        istringstream iss(temp_string);
+        
+        // most readable ever
+        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+            break;
+        }
+    }
+    
+    // jump magic lines
+    DEBUG(5, "jump "<<magic_number<<" lines for the glory of Rah");
+    for (size_t i=0; i<magic_number; i++) {
+        getline(ifile, temp_string);
+    }
+    
+    // consistency check
+    int init_matrix = ifile.tellg();
+    ifile.seekg(0, ifile.end);
+    int datacheck = ifile.tellg()-init_matrix-getSurf()*sizeof(float);
+    
+    if (ifile.eof() || ifile.fail()) {
+        WARNING("SIF: header parsing reached end of file");
+    }
+    
+    if (datacheck < 0) {
+        stringstream oss;
+        oss<<"Failed consistency check before SIF matrix read\n";
+        oss<<"init_matrix: "<<init_matrix<<"\n";
+        oss<<"end_file: "<<ifile.tellg()<<"\n";
+        oss<<"matrix surface: "<<getSurf()<<"\n";
+        oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
+        
+        WARNING(oss.str());
+        
+    } else {
+        // get data
+        ifile.seekg(init_matrix);
+        DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+        vector<float> readb(getSurf());
+        ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
+        DEBUG(ifile.gcount());
+        ifile.close();
+        for (size_t i=0; i<getSurf(); i++) set(i,(int) readb[i]);
+        TscanBrightness();
+        DEBUG(get_min() << " " << get_max());
+        
+    }
+    
 }
 
 physShort_b16::physShort_b16(const char *ifilename)
@@ -455,7 +493,7 @@ physShort_b16::physShort_b16(const char *ifilename)
 
 physDouble_img::physDouble_img(string ifilename)
 : nPhysImageF<double>(ifilename, PHYS_FILE) {
-
+    
 	unsigned short buffer;
 	ifstream ifile(ifilename.c_str(), ios::in | ios::binary);
     
@@ -463,7 +501,7 @@ physDouble_img::physDouble_img(string ifilename)
 	int h=0;
 	int skipbyte=0;
     int kind=-1;
-
+    
     bool endian=false;
     
 	ifile.read((char *)&buffer,sizeof(unsigned short));
@@ -475,21 +513,21 @@ physDouble_img::physDouble_img(string ifilename)
 		w=buffer;
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		h=buffer;
-
+        
 		ifile.seekg (4, ios_base::cur);
-
+        
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		kind=buffer;
-
-
+        
+        
 		ifile.seekg (50,ios_base::cur);
 		
 		string buffer2;
 		buffer2.resize(skipbyte);
 		ifile.read((char *)&buffer2[0],skipbyte);		
-
+        
         property["info"]=buffer2;
-
+        
         switch (kind) {
             case 2: // unsigned short int
                 kind=2;
@@ -500,7 +538,7 @@ physDouble_img::physDouble_img(string ifilename)
             default:
                 break;
         }		
-
+        
 	} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
 	   	ifile.read((char *)&buffer,sizeof(unsigned short));
 	   	if (buffer==7) {
@@ -1031,7 +1069,7 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		fits_report_error(stderr, status);
 		return status;
 	}
-
+    
 	double scale_x=phys->get_scale().x();
 	if (fits_update_key(fptr, TDOUBLE, "SCALE_X", &scale_x, "nPhysImage scale x", &status)) {
 		fits_report_error(stderr, status);
@@ -1047,7 +1085,7 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		fits_report_error(stderr, status);
 		return status;
 	}
-
+    
 	if (fits_close_file(fptr, &status)) {
 		fits_report_error(stderr, status);
 		return status;
@@ -1071,7 +1109,7 @@ std::vector <nPhysImageF<double> *> phys_open_fits(std::string ifilename) {
 		fits_report_error(stderr, status);
 	}
 	DEBUG("fits compressed " << status);
-
+    
 	int hdupos=0;
 	if (fits_get_hdu_num(fptr, &hdupos)) {
 		fits_report_error(stderr, status);
@@ -1090,37 +1128,37 @@ std::vector <nPhysImageF<double> *> phys_open_fits(std::string ifilename) {
 		if (fits_get_hdu_type(fptr, &hdutype, &status)) {
 			fits_report_error(stderr, status);
 		}
-// 		DEBUG("fits_get_hdu_type " << hdutype);
-
-
-// 		if (hdutype == IMAGE_HDU) {
-// 			long naxes[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-// 			for (ii = 0; ii < 9; ii++)
-// 				naxes[ii] = 1;
-// 			  int naxis = 0;
-// 			fits_get_img_param(fptr, 9, &bitpix, &naxis, naxes, &status);
-// 
-// 			long totpix = naxes[0] * naxes[1] * naxes[2] * naxes[3] * naxes[4] * naxes[5] * naxes[6] * naxes[7] * naxes[8];
-// // 			DEBUG("totpix " << totpix);
-// 		}
-
+        // 		DEBUG("fits_get_hdu_type " << hdutype);
+        
+        
+        // 		if (hdutype == IMAGE_HDU) {
+        // 			long naxes[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+        // 			for (ii = 0; ii < 9; ii++)
+        // 				naxes[ii] = 1;
+        // 			  int naxis = 0;
+        // 			fits_get_img_param(fptr, 9, &bitpix, &naxis, naxes, &status);
+        // 
+        // 			long totpix = naxes[0] * naxes[1] * naxes[2] * naxes[3] * naxes[4] * naxes[5] * naxes[6] * naxes[7] * naxes[8];
+        // // 			DEBUG("totpix " << totpix);
+        // 		}
+        
 		fits_get_img_type(fptr,&bitpix,&status);
-// 		DEBUG(5,"fits_get_img_type " << bitpix);
-
+        // 		DEBUG(5,"fits_get_img_type " << bitpix);
+        
 		fits_get_img_dim(fptr,&anaxis,&status);
-// 		DEBUG(5,"fits_get_img_dim " << anaxis);
+        // 		DEBUG(5,"fits_get_img_dim " << anaxis);
 		vec2f orig=myphys->get_origin();
 		vec2f scale=myphys->get_scale();
-
+        
 		fits_get_hdrspace(fptr, &nkeys, NULL, &status);
 		for (ii = 1; ii <= nkeys; ii++)  {
 			fits_read_record(fptr, ii, card, &status); /* read keyword */
 			if (status)
 				fits_report_error(stderr, status);
 			string cardStr=string(card);
-// 			transform(cardStr.begin(), cardStr.end(), cardStr.begin(), ::tolower);
+            // 			transform(cardStr.begin(), cardStr.end(), cardStr.begin(), ::tolower);
 			if (fits_get_keyclass(card)==TYP_USER_KEY) {
-// 				DEBUG(cardStr);
+                // 				DEBUG(cardStr);
 				string ctrl="ORIGIN_X";
 				if (cardStr.compare(0,ctrl.length(),ctrl)==0) {
 					char dtype;
@@ -1168,27 +1206,27 @@ std::vector <nPhysImageF<double> *> phys_open_fits(std::string ifilename) {
 		}
 		myphys->set_origin(orig);
 		myphys->set_scale(scale);
-// 		property.dumper(std::cerr);
-
-	
+        // 		property.dumper(std::cerr);
+        
+        
 		if (anaxis==2) {
 			long axissize[2], fpixel[2];
-		
+            
 			fits_get_img_size(fptr,anaxis,axissize,&status);
 			if (status)
 				fits_report_error(stderr, status);
-		
+            
 			long totalsize=axissize[0]*axissize[1];
 			fpixel[0]=fpixel[1]=1;
-		
+            
 			myphys->resize(axissize[0],axissize[1]);
-		
+            
 			fits_read_pix(fptr, TDOUBLE, fpixel, totalsize, NULL, (void *)myphys->Timg_buffer, NULL, &status);
 			if (status)
 				fits_report_error(stderr, status);
-		
+            
 			myphys->TscanBrightness();
-		
+            
 		}
 		if (myphys->getSurf()) {
 			retVec.push_back(myphys);
@@ -1695,7 +1733,7 @@ vector <nPhysImageF<double> *> phys_open_HDF4(string fname) {
 	return imagelist;
 }
 
-	
+
 int phys_write_HDF4(nPhysImageF<double> *phys, const char* fname) {
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
 	if (phys) {
@@ -1735,7 +1773,7 @@ int inflate(FILE *source, FILE *dest)
     unsigned have;
     z_stream strm;
     vector<unsigned char> in(CHUNK), out(CHUNK);
-
+    
     /* allocate inflate state */
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;
@@ -1745,7 +1783,7 @@ int inflate(FILE *source, FILE *dest)
 	ret = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
     if (ret != Z_OK)
         return ret;
-
+    
     /* decompress until deflate stream ends or end of file */
     do {
         strm.avail_in = fread(&in[0], 1, CHUNK, source);
@@ -1756,7 +1794,7 @@ int inflate(FILE *source, FILE *dest)
         if (strm.avail_in == 0)
             break;
         strm.next_in = &in[0];
-
+        
         /* run inflate() on input until output buffer not full */
         do {
             strm.avail_out = CHUNK;
@@ -1778,59 +1816,59 @@ int inflate(FILE *source, FILE *dest)
                 return Z_ERRNO;
             }
         } while (strm.avail_out == 0);
-
+        
         /* done when inflate() says it's done */
     } while (ret != Z_STREAM_END);
-
+    
     /* clean up and return */
     (void)inflateEnd(&strm);
     return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 
 string gunzip (string filezipped) {
-
-// 	string fileunzipped(tmpnam(NULL));
-// 	if (!fileunzipped.empty()) {
+    
+    // 	string fileunzipped(tmpnam(NULL));
+    // 	if (!fileunzipped.empty()) {
 	
-// 		string fileunzipped_ext=filezipped;
-// 		size_t last_idx = fileunzipped_ext.find_last_of(".");
-// 		if (string::npos != last_idx) {
-// 			fileunzipped_ext.erase(last_idx,filezipped.size());
-// 		} else {
-// 			return string();
-// 		}
-// 		last_idx = fileunzipped_ext.find_last_of(".");
-// 		if (string::npos != last_idx) {
-// 			fileunzipped_ext.erase(0,last_idx);
-// 		} else {
-// 			return string();
-// 		}
-// 		fileunzipped.append(fileunzipped_ext);
-
-		string fileunzipped=filezipped;
-		size_t last_idx = filezipped.find_last_of(".");
-
-		if (string::npos == last_idx) return string();
-
-		fileunzipped.erase(last_idx,filezipped.size());
-		
-		DEBUG(fileunzipped);
-		
-		FILE *filein;
-		filein = fopen(filezipped.c_str(),"rb");
-		if (filein == NULL) return string();
-
-		FILE *fileout;
-		fileout = fopen(fileunzipped.c_str(),"wb");
-		if (fileout == NULL) return string();
-
-		if (inflate(filein, fileout) != Z_OK ) {
-			unlink(fileunzipped.c_str());
-			return string();
-		}
-		fclose(filein);
-		fclose(fileout);
-// 	}	
+    // 		string fileunzipped_ext=filezipped;
+    // 		size_t last_idx = fileunzipped_ext.find_last_of(".");
+    // 		if (string::npos != last_idx) {
+    // 			fileunzipped_ext.erase(last_idx,filezipped.size());
+    // 		} else {
+    // 			return string();
+    // 		}
+    // 		last_idx = fileunzipped_ext.find_last_of(".");
+    // 		if (string::npos != last_idx) {
+    // 			fileunzipped_ext.erase(0,last_idx);
+    // 		} else {
+    // 			return string();
+    // 		}
+    // 		fileunzipped.append(fileunzipped_ext);
+    
+    string fileunzipped=filezipped;
+    size_t last_idx = filezipped.find_last_of(".");
+    
+    if (string::npos == last_idx) return string();
+    
+    fileunzipped.erase(last_idx,filezipped.size());
+    
+    DEBUG(fileunzipped);
+    
+    FILE *filein;
+    filein = fopen(filezipped.c_str(),"rb");
+    if (filein == NULL) return string();
+    
+    FILE *fileout;
+    fileout = fopen(fileunzipped.c_str(),"wb");
+    if (fileout == NULL) return string();
+    
+    if (inflate(filein, fileout) != Z_OK ) {
+        unlink(fileunzipped.c_str());
+        return string();
+    }
+    fclose(filein);
+    fclose(fileout);
+    // 	}	
 	return fileunzipped;
 }
 
@@ -1913,7 +1951,7 @@ std::vector <nPhysImageF<double> *> phys_open(std::string fname) {
 		}
 		DEBUG(filenameunzipped);
 	}
-		
+    
 	if (datamatrix) retPhys.push_back(datamatrix);
 	for (size_t i=0;i<retPhys.size();i++) {
 		
