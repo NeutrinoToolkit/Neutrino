@@ -38,10 +38,10 @@ nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, t
 	connect(my_w.exportTxt, SIGNAL(released()),this, SLOT(export_txt()));
 
 	connect(parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(setMouse(QPointF)));
-	connect(my_w.rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-	connect(my_w.ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-	connect(my_w.sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
-	connect(my_w.sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
+	connect(my_w.rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
+	connect(my_w.ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
+	connect(my_w.sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
+	connect(my_w.sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
 
 	connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
 	connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
@@ -113,7 +113,7 @@ void nMouseInfo::updateOrigin() {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
 	}
-	nparent->emitBufferChanged();
+	nparent->my_w.my_view->update();
 }
 
 void nMouseInfo::updateScale() {
@@ -125,7 +125,7 @@ void nMouseInfo::updateScale() {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}
 	}
-	nparent->emitBufferChanged();
+	nparent->my_w.my_view->update();
 }
 
 void nMouseInfo::setMouse(QPointF pos) {

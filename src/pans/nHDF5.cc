@@ -26,9 +26,6 @@
 #include "neutrino.h"
 #include "nPhysFormats.h"
 
-#include "hdf5.h"
-#include "hdf5_hl.h"
-
 
 #define HDF5_MAX_NAME 2048
 

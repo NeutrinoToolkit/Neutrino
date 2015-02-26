@@ -31,10 +31,8 @@
 #ifndef __nHDF5
 #define __nHDF5
 
-#ifdef __phys_HDF
 #include "hdf5.h"
 #include "hdf5_hl.h"
-#endif
 
 class neutrino;
 
