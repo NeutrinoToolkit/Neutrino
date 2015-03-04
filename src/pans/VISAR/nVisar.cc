@@ -217,8 +217,9 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
 }
 
-void nVisar::loadSettings(QString set) {
-	nGenericPan::loadSettings(set);
+void nVisar::loadSettings(QString my_settings) {
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< " << metaObject()->className() );
+	nGenericPan::loadSettings(my_settings);
 	doWave();
 	QApplication::processEvents();
 	QTimer::singleShot(1000, this, SLOT(tabChanged()));

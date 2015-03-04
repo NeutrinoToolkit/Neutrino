@@ -98,7 +98,7 @@ void nLineoutBoth::setBehaviour() {
 
 
 void nLineoutBoth::rescale(QPointF p) {
-    DEBUG("HERE " << p.x() << " " << p.y());
+    WARNING("HERE " << p.x() << " " << p.y());
     double minx = curve[0].minYValue();
     double maxx = curve[0].maxYValue();
     
@@ -183,9 +183,9 @@ void nLineoutBoth::updatePlot(QPointF p) {
 }
 
 
-void nLineoutBoth::nZoom(double) {
-	updateLastPoint();
-}
+//void nLineoutBoth::nZoom(double) {
+//	updateLastPoint();
+//}
 
 void nLineoutBoth::updateLastPoint() {
     if (!my_w.lockClick->isChecked()) {

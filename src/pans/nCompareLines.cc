@@ -122,8 +122,8 @@ void nCompareLines::updatePlot() {
 		}
         
 		QPolygonF my_poly=line->poly(line->numPoints);
-		for (int i=0; i<nparent->physList.size(); i++) {
-			nPhysD *phys=nparent->physList.at(i);
+		for (int i=0; i<nparent->getBufferList().size(); i++) {
+			nPhysD *phys=nparent->getBufferList().at(i);
             
             if (images.contains(phys) || (my_w.current->isChecked() && phys==currentBuffer)) {
                 QVector< QPointF > toPlot;

@@ -40,7 +40,7 @@ class nGenericPan : public QMainWindow {
 public:
 	nGenericPan(){};
 	nGenericPan(neutrino *, QString);
-	~nGenericPan();
+	~nGenericPan(){};
 	QGraphicsScene *my_s;
 
 	neutrino *nparent;
@@ -53,9 +53,6 @@ public:
 	panThread nThread;
 
 signals:
-	void register_paintPath(QMap<QString, QPainterPath> &, nGenericPan *);
-	void unregister_paintPath(nGenericPan *);
-	void refresh_paintPath();
 	void changeCombo(QComboBox*);
 
 

@@ -46,7 +46,7 @@ public:
 
     void setBehaviour();
 	
-	void nZoom(double);
+//	void nZoom(double);
 	
 public slots:
     void rescale(QPointF);

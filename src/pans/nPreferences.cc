@@ -165,7 +165,7 @@ void nPreferences::changeIconSize(int val) {
 			obj->show();
 		}
 	}
-	foreach (nGenericPan* pan, nparent->getPans()) {
+	foreach (nGenericPan* pan, nparent->getPanList()) {
 		foreach (QToolBar *obj, pan->findChildren<QToolBar *>()) {
 			if (obj->iconSize()!=mysize) {
 				obj->hide();

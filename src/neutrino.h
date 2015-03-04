@@ -64,9 +64,6 @@
 
 #include "nTics.h"
 
-template<class T>
-inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
-
 class neutrino : public QMainWindow {
 
 Q_OBJECT
@@ -83,8 +80,6 @@ public:
 
 	Ui::nSbarra my_sbarra;
 
-	QList<nPhysD*> physList;
-									
 	nPlug *plug_iface;
 	
 	QString colorTable;
@@ -108,10 +103,12 @@ public:
 
 	QMap<QString, unsigned char *> nPalettes;
 
+private:
+    QList<nGenericPan*> panList;
+	QList<nPhysD*> physList;
+    
 public slots:
 	nGenericPan* existsPan(QString);
-	QList<nGenericPan*> getPans();
-
 
 	void build_colormap();
 	
@@ -157,7 +154,8 @@ public slots:
 	void addShowPhys(nPhysD&);
 	nPhysD* getBuffer(int=-1);
 
-	QList<nPhysD *> getBufferList();
+	inline QList<nPhysD *> getBufferList() {return physList;};
+    inline QList<nGenericPan*> getPanList() {return panList;};
 
 							
 	// menu actions

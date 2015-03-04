@@ -71,12 +71,14 @@ neutrino::~neutrino()
 	currentBuffer=NULL;
 	saveDefaults();
 	QApplication::processEvents();
-	foreach (nGenericPan *pan, getPans()) {
-        pan->hide();
-        pan->close();
-        pan->deleteLater();
-        QApplication::processEvents();
-	}
+	foreach (nGenericPan *pan, panList) {
+        if (QApplication::topLevelWidgets().contains(pan)) {
+            pan->hide();
+            pan->close();
+            pan->deleteLater();
+            QApplication::processEvents();
+        }
+    }
 	QApplication::processEvents();
 	foreach (nPhysD *phys, physList) {
 		delete phys;
@@ -492,10 +494,6 @@ neutrino::loadPlugin()
 	}
  }
 
-QList<nPhysD *>
-neutrino::getBufferList()
-{ return physList; }
-
 void neutrino::emitBufferChanged(nPhysD *phys) {
 	if (!phys) phys=currentBuffer;
 	my_w.my_view->update();
@@ -503,10 +501,13 @@ void neutrino::emitBufferChanged(nPhysD *phys) {
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
+    panList.removeAll(pan);
+    panList.append(pan);
 	emit panAdd(pan);
 }
 
 void neutrino::emitPanDel(nGenericPan* pan) {
+    panList.removeAll(pan);
 	emit panDel(pan);
 }
 
@@ -596,7 +597,7 @@ void neutrino::cycleOverItems() {
 }
 
 nGenericPan* neutrino::existsPan(QString name) {
-	foreach (nGenericPan *pan, getPans()) {
+	foreach (nGenericPan *pan, panList) {
         if (pan->panName.startsWith(name)) {
             pan->show();
             pan->raise();
@@ -606,16 +607,6 @@ nGenericPan* neutrino::existsPan(QString name) {
 	return NULL;
 }
 
-QList<nGenericPan*> neutrino::getPans() {
-	QList<nGenericPan*> retList;
-	foreach (QWidget *widget, QApplication::allWidgets()) {
-		nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-		if (pan && pan->nparent==this) {
-			retList << pan;
-		}		
-	}
-	return retList;
-}
 
 // public slots
 
@@ -745,15 +736,14 @@ void neutrino::saveSession (QString fname) {
 		}		
 	} else {
 		setProperty("fileOpen", fname);
-		QList<nGenericPan *> pans=getPans();
-		for(int k = 0; k < (pans.size()/2); k++) pans.swap(k,pans.size()-(1+k));
+		for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 		
-		QProgressDialog progress("Save session", "Cancel", 0, pans.size()+physList.size(), this);
+		QProgressDialog progress("Save session", "Cancel", 0, panList.size()+physList.size(), this);
 		progress.setWindowModality(Qt::WindowModal);
 		progress.show();
 		
 		ofstream ofile(fname.toUtf8().constData(), ios::out | ios::binary);
-		ofile << "Neutrino " << __VER << " " << physList.size() << " " << getPans().size() << endl;
+		ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << endl;
 		
 		for (int i=0;i<physList.size(); i++) {
 			if (progress.wasCanceled()) break;
@@ -764,28 +754,29 @@ void neutrino::saveSession (QString fname) {
 			phys_dump_binary(physList.at(i),ofile);
             physList.at(i)->setType(PHYS_FILE);
 		}
-		for (int i=0;i<pans.size(); i++) {
+		for (int i=0;i<panList.size(); i++) {
 			if (progress.wasCanceled()) break;
-			QString namePan=pans.at(i)->property("panName").toString();
+			QString namePan=panList.at(i)->property("panName").toString();
 			progress.setValue(physList.size()+i);
 			progress.setLabelText(namePan);
 			QApplication::processEvents();
 			ofile << "NeutrinoPan-begin " << namePan.toStdString() << endl;
-			QTemporaryFile tmpFile(pans.at(i)->panName);
+			QTemporaryFile tmpFile(panList.at(i)->panName);
 			tmpFile.setAutoRemove(false);
 			tmpFile.open();
+            QString tmp_filename=tmpFile.fileName();
 			QSettings my_set(tmpFile.fileName(),QSettings::IniFormat);
 			my_set.clear();
-			pans.at(i)->saveSettings(&my_set);
+			panList.at(i)->saveSettings(&my_set);
 			my_set.sync();
 			tmpFile.close();
-			QFile file(tmpFile.fileName());
+			QFile file(tmp_filename);
 			if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 				return;
 			
 			while (!file.atEnd()) {
 				QByteArray line = file.readLine();
-				ofile << line.constData();
+                ofile << line.constData();
 			}
 			file.close();
 			file.remove();
@@ -828,21 +819,21 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						counter++;
 						progress.setValue(counter);
 						nPhysD *my_phys=new nPhysD();
-						
-//						int ret=phys_resurrect_old_binary(my_phys,ifile);
-//						if (ret>=0 && my_phys->getSurf()>0) {
-//							addPhys(my_phys);
-//							imagelist.push_back(my_phys);
-//						} else {
-//							int ret=phys_resurrect_binary(my_phys,ifile);
-//							if (ret>=0 && my_phys->getSurf()>0) {
-//								addPhys(my_phys);
-//								imagelist.push_back(my_phys);
-//							} else {
-//								delete my_phys;
-//							}
-//						}
-
+#ifdef __old_neu_format
+						int ret=phys_resurrect_old_binary(my_phys,ifile);
+						if (ret>=0 && my_phys->getSurf()>0) {
+							addPhys(my_phys);
+							imagelist.push_back(my_phys);
+						} else {
+                            int ret=phys_resurrect_binary(my_phys,ifile);
+							if (ret>=0 && my_phys->getSurf()>0) {
+								addPhys(my_phys);
+								imagelist.push_back(my_phys);
+							} else {
+								delete my_phys;
+							}
+						}
+#else
 						int ret=phys_resurrect_binary(my_phys,ifile);
 						if (ret>=0 && my_phys->getSurf()>0) {
 							addPhys(my_phys);
@@ -850,6 +841,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 						} else {
 							delete my_phys;
 						}
+#endif
                         
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
@@ -877,7 +869,10 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 								}
 								tmpFile.flush();
                                 QApplication::processEvents();
-								my_pan->loadSettings(tmpFile.fileName());
+                                QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
+                                QApplication::processEvents();
+
+//								my_pan->loadSettings(tmpFile.fileName());
 								tmpFile.close(); // this should also remove it...
 							}
 						}
@@ -1187,7 +1182,7 @@ void neutrino::closeEvent (QCloseEvent *e) {
 	if (fileClose()) {
         saveDefaults();
         QApplication::processEvents();
-        foreach (nGenericPan *pan, getPans()) {
+        foreach (nGenericPan *pan, panList) {
 			pan->hide();
 			pan->close();
 			pan->deleteLater();
@@ -1413,8 +1408,6 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
 	if (!fname.isEmpty()) {
-
-        
 		setProperty("fileOpen", fname);
 		QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.isEmpty()) {
@@ -1475,7 +1468,7 @@ bool
 neutrino::fileClose() {
 	if (QApplication::activeWindow() == this) {
 		bool askAll=true;
-		foreach (nGenericPan* pan, getPans()) {
+		foreach (nGenericPan* pan, panList) {
 			pan->hide();
 			pan->close();
 			pan->deleteLater();

@@ -25,27 +25,8 @@
 #include "nGenericPan.h"
 #include "neutrino.h"
 
-nGenericPan::~nGenericPan()
-{
-	foreach (QWidget *widget, QApplication::allWidgets()) {
-		neutrino *neu=qobject_cast<neutrino *>(widget);
-		if (neu==nparent) {
-			disconnect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
-			disconnect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
-			
-			disconnect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
-			
-			disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
-			disconnect(nparent->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
-			disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
-			nparent->emitPanDel(this);
-		}
-	}
-	emit unregister_paintPath(this);
-}
-
-nGenericPan::nGenericPan(neutrino *parent, QString name)
-: QMainWindow(), nparent(parent), panName(name), currentBuffer(NULL)
+nGenericPan::nGenericPan(neutrino *myparent, QString name)
+: QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
 #ifdef Q_OS_MAC
 	DEBUG("NEW OSX FEATURE have the main menu always visible!!! might break up things on every update!");
@@ -54,6 +35,7 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 	grabKeyboard();
 #endif
 
+    DEBUG("panName" << panName.toStdString());
 	setProperty("panName",panName);
 	int panNum=0;
 	foreach (QWidget *widget, QApplication::allWidgets()) {
@@ -71,22 +53,22 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(Qt::Window);
 
-	connect(parent, SIGNAL(destroyed()), this, SLOT(close()));
+	connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
 
-	my_s=parent->getScene();
+	my_s=nparent->getScene();
 
-	connect(parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
-	connect(parent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
+	connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
+	connect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
 
-	connect(parent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
+	connect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
 
-	connect(parent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
-	connect(parent->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
+	connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
+	connect(nparent->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
 
-	connect(parent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
+	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
 
-	connect(parent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-	connect(parent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
+	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
 	bufferChanged(nparent->currentBuffer);
 	nparent->emitPanAdd(this);
@@ -95,7 +77,7 @@ nGenericPan::nGenericPan(neutrino *parent, QString name)
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 	QString name="";
 	if (nparent) {
-		int position = nparent->physList.indexOf(buffer);
+		int position = nparent->getBufferList().indexOf(buffer);
 		name=QString::fromUtf8(buffer->getName().c_str());
 		int len=combo->property("physNameLength").toInt();
 		if (name.length()>len) name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
@@ -117,6 +99,7 @@ void nGenericPan::addPhysToCombos(nPhysD *buffer) {
 
 void nGenericPan::decorate() {
 //	qDebug() << __PRETTY_FUNCTION__ << panName << objectName() << metaObject()->className();
+    DEBUG((objectName()+" : "+panName+" : "+metaObject()->className()).toStdString());
 	setProperty("fileTxt", QString(panName+".txt"));
 	setProperty("fileExport", QString(panName+".svg"));
 	setProperty("fileIni", QString(panName+".ini"));
@@ -129,7 +112,7 @@ void nGenericPan::decorate() {
 		}
 	}
 	
-	foreach (nPhysD *buffer, nparent->physList) addPhysToCombos(buffer);
+	foreach (nPhysD *buffer, nparent->getBufferList()) addPhysToCombos(buffer);
 	
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {	
@@ -289,7 +272,7 @@ nGenericPan::loadUi(QSettings *settings) {
 		}
 		if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
 			string imageName=settings->value(widget->objectName()).toString().toStdString();
-			foreach (nPhysD *physAperto,nparent->physList) {
+			foreach (nPhysD *physAperto,nparent->getBufferList()) {
 				if (physAperto->getName()==imageName) {
 					for (int i=0; i<widget->count();i++) {
 						if (physAperto==(nPhysD*) (widget->itemData(i).value<void*>())) {
@@ -405,6 +388,7 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
+    nparent->emitPanDel(this);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {			
 			if (combo->property("neutrinoImage").toBool()) {
@@ -435,6 +419,19 @@ void nGenericPan::closeEvent(QCloseEvent*){
 			elli->deleteLater();
 		}
 	}
+	foreach (QWidget *widget, QApplication::allWidgets()) {
+		neutrino *neu=qobject_cast<neutrino *>(widget);
+		if (neu==nparent) {
+			disconnect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
+			disconnect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
+			
+			disconnect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
+			
+			disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
+			disconnect(nparent->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
+			disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
+		}
+	}
 }
 
 //////////////////// SETTINGS
@@ -452,7 +449,7 @@ void nGenericPan::loadSettings(QString settingsFile) {
 }
 
 void nGenericPan::saveSettings() {
-	QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+	QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property(" ").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
 		setProperty("fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
@@ -533,7 +530,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
 }
 
 bool nGenericPan::nPhysExists(nPhysD* phys){
-    return nparent->physList.contains(phys);
+    return nparent->getBufferList().contains(phys);
 }
 
 void nGenericPan::set(QString name, QVariant my_val, int occurrence) {

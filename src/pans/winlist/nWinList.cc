@@ -43,7 +43,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
 	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 	
-	foreach (nPhysD *phys, nparent->physList) physAdd(phys);
+	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
 	updatePad(nparent->currentBuffer);
 
 	QWidget* empty = new QWidget(this);
@@ -65,7 +65,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 
 	connect(nparent, SIGNAL(panAdd(nGenericPan*)), this, SLOT(panAdd(nGenericPan*)));
 	connect(nparent, SIGNAL(panDel(nGenericPan*)), this, SLOT(panDel(nGenericPan*)));
-	foreach (nGenericPan* pan, nparent->getPans()) {
+	foreach (nGenericPan* pan, nparent->getPanList()) {
 		panAdd(pan);
 	}
 	decorate();
@@ -231,7 +231,7 @@ nWinList::updatePad(nPhysD *my_phys) {
 	while (*it) {
 		nPhysD *thisPhys=getPhys(*it);
 		if (thisPhys) {
-			(*it)->setData(0,0,nparent->physList.indexOf(thisPhys));
+			(*it)->setData(0,0,nparent->getBufferList().indexOf(thisPhys));
 			(*it)->setData(1,0,QString::fromUtf8(thisPhys->getShortName().c_str()));
 			(*it)->setData(2,0,QString::fromUtf8(thisPhys->getName().c_str()));
 			(*it)->setData(3,0,QString::number(thisPhys->get_origin().x())+" "+QString::number(thisPhys->get_origin().y()));
@@ -272,7 +272,7 @@ nWinList::physDel(nPhysD *my_phys) {
 void nWinList::physAdd(nPhysD *my_phys) {
 	QTreeWidgetItem *my_item = new QTreeWidgetItem(my_w.images);
 	QString name=QString::fromUtf8(my_phys->getName().c_str());
-	my_item->setData(0,0,nparent->physList.indexOf(my_phys));
+	my_item->setData(0,0,nparent->getBufferList().indexOf(my_phys));
 	my_item->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
 	my_item->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
 	my_item->setData(3,0,QString::number(my_phys->get_origin().x())+" "+QString::number(my_phys->get_origin().y()));

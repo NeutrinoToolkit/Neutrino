@@ -93,7 +93,6 @@ void nView::focusInEvent (QFocusEvent *) {
 
 void
 nView::zoomEq() {
-    WARNING(fillimage);
 	fillimage=!fillimage;
 	if (!fillimage) resetMatrix();
 	setSize();

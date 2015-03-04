@@ -24,23 +24,33 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
-     <number>0</number>
-    </property>
-    <item row="1" column="0">
-     <widget class="QCheckBox" name="autoscale">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
+    <item row="0" column="0">
+     <widget class="QwtPlot" name="plot">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="toolTip">
-       <string>when unchecked, double click to fix values to particular point</string>
-      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QToolButton" name="autoscale">
       <property name="text">
-       <string>Autoscale</string>
+       <string>...</string>
       </property>
-      <property name="neutrinoSave" stdset="0">
+      <property name="icon">
+       <iconset resource="../resources/neutrino.qrc">
+        <normaloff>:/icons/lockOpen.png</normaloff>
+        <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="checkable">
        <bool>true</bool>
       </property>
      </widget>
@@ -66,16 +76,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
-     <widget class="QwtPlot" name="plot">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -85,32 +85,6 @@
     </font>
    </property>
   </widget>
-  <action name="actionAutoscale">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lockOpen</normaloff>
-     <normalon>:/lockClose</normalon>:icons//lockOpen</iconset>
-   </property>
-   <property name="text">
-    <string>autoscale</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto/FixedScale</string>
-   </property>
-  </action>
-  <action name="actionMin">
-   <property name="text">
-    <string>Min</string>
-   </property>
-  </action>
-  <action name="actionMax">
-   <property name="text">
-    <string>Max</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -12,12 +12,6 @@ QMAKE_LIBDIR_FLAGS = -L../ -L../nPhysImage
 NVERSION=$$system(git describe)
 
 macx {
-    QMAKE_CC = /opt/local/bin/gcc
-    QMAKE_CXX = /opt/local/bin/g++ 
-    QMAKE_LINK       = $$QMAKE_CXX
-    QMAKE_LINK_SHLIB = $$QMAKE_CXX
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.6
-    QMAKE_LFLAGS_X86_64 = $$QMAKE_CXXFLAGS_X86_64
 
 	DEFINES += __VER=\'\"$${NVERSION}\"\'
 } else {

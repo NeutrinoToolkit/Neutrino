@@ -410,6 +410,8 @@ physInt_sif::physInt_sif(string ifilename)
 		// get data
 		ifile.seekg(init_matrix);
 		DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
+		ss.str(""); ss.clear(); ss << init_matrix << " bytes";
+		property["sif-header"]=ss.str();
 		vector<float> readb(getSurf());
 	
 		ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));

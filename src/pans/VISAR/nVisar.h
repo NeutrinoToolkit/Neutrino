@@ -47,6 +47,9 @@ class neutrino;
 class nLine;
 class nRect;
 
+template<class T>
+inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
+
 class nVisar : public nGenericPan {
 	Q_OBJECT
 	
