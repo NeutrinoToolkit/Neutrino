@@ -98,7 +98,6 @@ void nLineoutBoth::setBehaviour() {
 
 
 void nLineoutBoth::rescale(QPointF p) {
-    WARNING("HERE " << p.x() << " " << p.y());
     double minx = curve[0].minYValue();
     double maxx = curve[0].maxYValue();
     

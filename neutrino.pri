@@ -46,6 +46,13 @@ win32:RC_FILE=../resources/neutrino.rc
 QMAKE_INFO_PLIST=../resources/neutrino.plist
 
 macx {
+QMAKE_CC = /opt/local/bin/gcc
+QMAKE_CXX = /opt/local/bin/g++ 
+QMAKE_LINK       = $$QMAKE_CXX
+QMAKE_LINK_SHLIB = $$QMAKE_CXX
+QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.6
+QMAKE_LFLAGS_X86_64 = $$QMAKE_CXXFLAGS_X86_64
+
 	neutrino.path = .
 	neutrino.files = neutrino.app
 	INSTALLS += neutrino

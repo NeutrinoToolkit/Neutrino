@@ -218,7 +218,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 }
 
 void nVisar::loadSettings(QString my_settings) {
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< " << metaObject()->className() );
 	nGenericPan::loadSettings(my_settings);
 	doWave();
 	QApplication::processEvents();
@@ -412,7 +411,7 @@ void nVisar::updatePlotSOP() {
 void nVisar::updatePlot() {
 	disconnections();
 	if (cPhase[0][0].dataSize()>0 || cPhase[0][1].dataSize()>0){
-		QVector<double> tjump,njump;
+		QVector<double> tjump,njump,rjump;
 		foreach (QwtPlotCurve *velJump, velJumps) {
 			velJump->detach();
 			velJump->setData(NULL);
@@ -425,7 +424,9 @@ void nVisar::updatePlot() {
 				mark->detach();
 			}
 			marker.clear();
-			
+
+            double sensitivity=setvisar[k].sensitivity->value();
+
 			QVector< QPointF > velocity, reflectivity;
 			if (visar[k].enableVisar->isChecked()) {
 				
@@ -434,20 +435,32 @@ void nVisar::updatePlot() {
 				
 				tjump.clear();
 				njump.clear();
+                rjump.clear();
 				QStringList jumpt=setvisar[k].jumpst->text().split(";", QString::SkipEmptyParts);
 				foreach (QString piece, jumpt) {
-					QStringList twoval=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
-					if (twoval.size()==2) {
-						bool ok1, ok2;
-						double valdt=twoval.at(0).toDouble(&ok1);
-						double valdn=twoval.at(1).toDouble(&ok2);
-						if (setvisar[k].sensitivity->value()<0) valdn*=-1.0;
-						if (ok1 && ok2) {
-							tjump << valdt;
-							njump << valdn;
-						} else {
-							my_w.statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
-						}
+					QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+                    if (my_jumps.size()>1 && my_jumps.size()<=3) {
+                        if (my_jumps.size()>1 && my_jumps.size()<=3) {
+                            bool ok1, ok2, ok3=true;
+                            double valdt=my_jumps.at(0).toDouble(&ok1);
+                            double valdn=my_jumps.at(1).toDouble(&ok2);
+                            double valdrefr_index=1.0;
+                            if (my_jumps.size()==3) {
+                                valdrefr_index=my_jumps.at(2).toDouble(&ok3);
+                            }
+                            if (sensitivity<0) valdn*=-1.0;
+                            if (ok1 && ok2) {
+                                tjump << valdt;
+                                njump << valdn;
+                            } else {
+                                my_w.statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
+                            }
+                            if (ok3) {
+                                rjump << valdrefr_index;
+                            } else {
+                                rjump << 1.0;
+                            }
+                        }
 					} else {
 						my_w.statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
 					}
@@ -471,7 +484,6 @@ void nVisar::updatePlot() {
 				
 				double offset=setvisar[k].offsetShift->value();
 				double offsetTime=setvisar[k].offsetTime->value();
-				double sensitivity=setvisar[k].sensitivity->value();
 				
 				QVector< QPointF > velJump_array[abs(setvisar[k].jump->value())];
 				
@@ -488,19 +500,23 @@ void nVisar::updatePlot() {
 					}
 					
 					int njumps=0;
+                    double refr_index=1.0;
 					for (int i=0;i<tjump.size();i++) {
-						if (time>tjump.at(i)) njumps+=njump.at(i);
+						if (time>tjump.at(i)) {
+                            njumps+=njump.at(i);
+                            refr_index=rjump.at(i);
+                        }
 					}
 					
-					double speed=(offset+fShot-fRef+njumps)*sensitivity;
+					double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
 					double refle=setvisar[k].reflRef->value()*(iShot/iRef+setvisar[k].reflOffset->value());
 					velocity << QPointF(time,speed);
 					reflectivity << QPointF(time,refle);
 					for (int i=0;i<abs(setvisar[k].jump->value());i++) {
 						int jloc=i+1;
-						if (setvisar[k].sensitivity->value()<0) jloc*=-1;
+						if (sensitivity<0) jloc*=-1;
 						if (setvisar[k].jump->value()<0) jloc*=-1;
-						velJump_array[i] << QPointF(time,(offset+fShot-fRef+jloc)*sensitivity);
+						velJump_array[i] << QPointF(time,(offset+fShot-fRef+jloc)*sensitivity/refr_index);
 					}
 				} 
 				
@@ -594,6 +610,7 @@ void nVisar::getCarrier(int k) {
 }
 
 void nVisar::doWave() {
+    DEBUG(sender());
 	if (sender() && sender()->property("id").isValid()) {
 		int k=sender()->property("id").toInt();
 		doWave(k);

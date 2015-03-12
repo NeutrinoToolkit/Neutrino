@@ -4,7 +4,7 @@ exec wish "$0" "$@"
 
 
 proc init {} {
-	set fid [open "map-definitions.txt" r]
+	set fid [open "definitions.txt" r]
 	set dataFile [read $fid]
 	.editor insert end "$dataFile"
 	close $fid
