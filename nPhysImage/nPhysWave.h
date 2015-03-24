@@ -26,12 +26,14 @@
 #include <iostream>
 #include <cstring>
 
+#ifdef HAVE_LIBGSL
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_const_mksa.h>
 #include <gsl/gsl_dht.h>
 #include <gsl/gsl_sf_bessel.h>
+#endif
 
 
 #include <list>
@@ -240,6 +242,7 @@ void bessel_free(bessel_alloc_t *);
 
 inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, bessel_alloc_t *lut)
 {
+#ifdef HAVE_LIBGSL
 	if (ivec==NULL || ovec==NULL || size==0)
 		return;
 
@@ -309,6 +312,7 @@ inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, besse
 		}
 		ovec[j] *= (1/(2*3.14*pow(2.*N+1.,2)));
 	}*/
+#endif
 
 	return;
 }
