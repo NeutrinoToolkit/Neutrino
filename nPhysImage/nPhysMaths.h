@@ -25,9 +25,11 @@
 // collection of math functions
 #include <iostream>
 
+#ifdef HAVE_LIBGSL
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+#endif
 
 #include "nPhysImageF.h"
 #include "nPhysTools.h"
