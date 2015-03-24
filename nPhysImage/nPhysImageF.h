@@ -324,7 +324,9 @@ public:
 
 	// operators, internal versions; still need crossed versions
 	nPhysImageF<T> operator+ (const nPhysImageF<T> &) const;
+	nPhysImageF<T> operator+ (T &) const;
 	nPhysImageF<T> operator- (const nPhysImageF<T> &) const;
+	nPhysImageF<T> operator- (T &) const;
 	nPhysImageF<T> operator* (const nPhysImageF<T> &) const;
 	nPhysImageF<T> operator/ (const nPhysImageF<T> &) const;
 
@@ -1849,6 +1851,21 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 }
 
 template<class T> nPhysImageF<T>
+nPhysImageF<T>::operator+ (T &val) const {
+	
+	nPhysImageF<T> new_img(*this);
+	std::stringstream ss;
+	ss<<val;
+	
+	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+	new_img.setShortName("Add "+ss.str());
+	for (register size_t i=0; i<getSurf(); i++)
+		new_img.Timg_buffer[i] += val;
+		
+	return(new_img);
+}
+
+template<class T> nPhysImageF<T>
 nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 
 	if ( (width != other.width) || (height != other.height) )
@@ -1865,6 +1882,21 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 	
 	for (register size_t i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = Timg_buffer[i] - other.Timg_buffer[i];
+		
+	return(new_img);
+}
+
+template<class T> nPhysImageF<T>
+nPhysImageF<T>::operator- (T &val) const {
+	
+	nPhysImageF<T> new_img(*this);
+	std::stringstream ss;
+	ss<<val;
+	
+	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+	new_img.setShortName("Add "+ss.str());
+	for (register size_t i=0; i<getSurf(); i++)
+		new_img.Timg_buffer[i] -= val;
 		
 	return(new_img);
 }

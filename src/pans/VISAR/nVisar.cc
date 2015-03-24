@@ -135,7 +135,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 		mouseMarker[2].attach(my_w.plotVelocity);
 
 		visar[k].guess->setProperty("id", k);
-		visar[k].validate->setProperty("id", k);
+		visar[k].doWaveButton->setProperty("id", k);
 		setvisar[k].physScale->setProperty("id", k);
 		
 		QPen pen;
@@ -214,11 +214,13 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	
 	decorate();
 	connections();
+    DEBUG("HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
 }
 
 void nVisar::loadSettings(QString my_settings) {
-	nGenericPan::loadSettings(my_settings);
+	nGenericPan::loadSettings(my_settings);    
+	QApplication::processEvents();
 	doWave();
 	QApplication::processEvents();
 	QTimer::singleShot(1000, this, SLOT(tabChanged()));
@@ -304,7 +306,7 @@ void nVisar::connections() {
 		connect(setvisar[k].offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 		
 		connect(visar[k].guess, SIGNAL(released()), this, SLOT(getCarrier()));
-		connect(visar[k].validate, SIGNAL(released()), this, SLOT(doWave()));
+		connect(visar[k].doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
 		connect(visar[k].multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 		connect(visar[k].offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
@@ -337,7 +339,7 @@ void nVisar::disconnections() {
 		disconnect(setvisar[k].offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 
 		disconnect(visar[k].guess, SIGNAL(released()), this, SLOT(getCarrier()));
-		disconnect(visar[k].validate, SIGNAL(released()), this, SLOT(doWave()));
+		disconnect(visar[k].doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
 		disconnect(visar[k].multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 		disconnect(visar[k].offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
@@ -610,12 +612,13 @@ void nVisar::getCarrier(int k) {
 }
 
 void nVisar::doWave() {
-    DEBUG(sender());
+    DEBUG("HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << sender());
 	if (sender() && sender()->property("id").isValid()) {
 		int k=sender()->property("id").toInt();
 		doWave(k);
 	} else {
 		for (int k=0;k<2;k++){
+            DEBUG("HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " <<k);
 			doWave(k);
 		}
 	}
@@ -623,107 +626,120 @@ void nVisar::doWave() {
 
 
 void nVisar::doWave(int k) {
-	if (visar[k].enableVisar->isChecked() && getPhysFromCombo(visar[k].refImage) && getPhysFromCombo(visar[k].shotImage )  &&
-		getPhysFromCombo(visar[k].refImage)->getW() == getPhysFromCombo(visar[k].shotImage)->getW() &&
-		getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
+    DEBUG("HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " 
+          << visar[k].enableVisar->isChecked() << "\n" 
+          << getPhysFromCombo(visar[k].refImage) << "\n" 
+          << getPhysFromCombo(visar[k].shotImage )  << "\n" 
+          << getPhysFromCombo(visar[k].refImage)->getW() << "\n" 
+          << getPhysFromCombo(visar[k].shotImage)->getW() << "\n" 
+          << getPhysFromCombo(visar[k].refImage)->getH() << "\n" 
+          << getPhysFromCombo(visar[k].shotImage)->getH());
 
-		int counter=0;
-		QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 10, this);
-		progress.setCancelButton(0);
-		progress.setWindowModality(Qt::WindowModal);
-		progress.show();
-		nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
-		progress.setValue(++counter);
-		QApplication::processEvents();
-		nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
-		progress.setValue(++counter);
-		QApplication::processEvents();
-        DEBUG(progress.value());
-
-		size_t dx=physfftRef.getW();
-		size_t dy=physfftRef.getH();
-
-
-		nPhysImageF<mcomplex> zz_morletRef("Ref"), zz_morletShot("Shot");
-		zz_morletRef.resize(dx,dy);
-		zz_morletShot.resize(dx,dy);
-
-		vector<int> xx(dx), yy(dy);
-		for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-		for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
-
-		for (int m=0;m<2;m++) {
-			phase[k][m].resize(dx, dy);
-			contrast[k][m].resize(dx, dy);
-			intensity[k][m].resize(dx, dy);
-		}
-
-		progress.setValue(++counter);
-		QApplication::processEvents();
-        DEBUG(progress.value());
-		for (size_t kk=0; kk<dx*dy; kk++) {
-			intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
-			intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
-		}
-		progress.setValue(++counter);
-		QApplication::processEvents();
-        DEBUG(progress.value());
-		
-		phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
-		phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
-
-		progress.setValue(++counter);
-		QApplication::processEvents();
-		double cr = cos((visar[k].angle->value()) * _phys_deg); 
-		double sr = sin((visar[k].angle->value()) * _phys_deg);
-		double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-		double damp_norm=visar[k].damp->value()*M_PI;
-
-		double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-		for (size_t x=0;x<dx;x++) {
-			for (size_t y=0;y<dy;y++) {
-				double xr = xx[x]*cr - yy[y]*sr; //rotate
-				double yr = xx[x]*sr + yy[y]*cr;
-
-				double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
-				double e_y = -pow(yr*thick_norm, 2);
-
-				double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
-
-				zz_morletRef.Timg_matrix[y][x]=physfftRef.Timg_matrix[y][x]*gauss;
-				zz_morletShot.Timg_matrix[y][x]=physfftShot.Timg_matrix[y][x]*gauss;
-
-			}
-		}
-
-		progress.setValue(++counter);
-		QApplication::processEvents();
-
-		physfftRef = zz_morletRef.ft2(PHYS_BACKWARD);
-		progress.setValue(++counter);
-		QApplication::processEvents();
-		physfftShot = zz_morletShot.ft2(PHYS_BACKWARD);
-
-		progress.setValue(++counter);
-		QApplication::processEvents();
-
-		for (size_t kk=0; kk<dx*dy; kk++) {
-			phase[k][0].Timg_buffer[kk] = -physfftRef.Timg_buffer[kk].arg()/(2*M_PI);
-			contrast[k][0].Timg_buffer[kk] = 2.0*physfftRef.Timg_buffer[kk].mod()/(dx*dy);
-			intensity[k][0].Timg_buffer[kk] -= contrast[k][0].point(kk)*cos(2*M_PI*phase[k][0].point(kk));
-
-			phase[k][1].Timg_buffer[kk] = -physfftShot.Timg_buffer[kk].arg()/(2*M_PI);
-			contrast[k][1].Timg_buffer[kk] = 2.0*physfftShot.Timg_buffer[kk].mod()/(dx*dy);
-			intensity[k][1].Timg_buffer[kk] -= contrast[k][1].point(kk)*cos(2*M_PI*phase[k][1].point(kk));
-		}
-		progress.setValue(++counter);
-		QApplication::processEvents();
-
-		getPhase(k);
-		updatePlot();
-		progress.setValue(++counter);
-		QApplication::processEvents();
-	}
+	if (visar[k].enableVisar->isChecked()){ 
+        if (getPhysFromCombo(visar[k].refImage) && getPhysFromCombo(visar[k].shotImage )  &&
+            getPhysFromCombo(visar[k].refImage)->getW() == getPhysFromCombo(visar[k].shotImage)->getW() &&
+            getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
+            
+            int counter=0;
+            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 10, this);
+            progress.setCancelButton(0);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.show();
+            nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            DEBUG(progress.value());
+            
+            size_t dx=physfftRef.getW();
+            size_t dy=physfftRef.getH();
+            
+            
+            nPhysImageF<mcomplex> zz_morletRef("Ref"), zz_morletShot("Shot");
+            zz_morletRef.resize(dx,dy);
+            zz_morletShot.resize(dx,dy);
+            
+            vector<int> xx(dx), yy(dy);
+            for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+            for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
+            
+            for (int m=0;m<2;m++) {
+                phase[k][m].resize(dx, dy);
+                contrast[k][m].resize(dx, dy);
+                intensity[k][m].resize(dx, dy);
+            }
+            
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            DEBUG(progress.value());
+            for (size_t kk=0; kk<dx*dy; kk++) {
+                intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
+                intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
+            }
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            DEBUG(progress.value());
+            
+            phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
+            phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
+            
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            double cr = cos((visar[k].angle->value()) * _phys_deg); 
+            double sr = sin((visar[k].angle->value()) * _phys_deg);
+            double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+            double damp_norm=visar[k].damp->value()*M_PI;
+            
+            double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+            for (size_t x=0;x<dx;x++) {
+                for (size_t y=0;y<dy;y++) {
+                    double xr = xx[x]*cr - yy[y]*sr; //rotate
+                    double yr = xx[x]*sr + yy[y]*cr;
+                    
+                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
+                    double e_y = -pow(yr*thick_norm, 2);
+                    
+                    double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
+                    
+                    zz_morletRef.Timg_matrix[y][x]=physfftRef.Timg_matrix[y][x]*gauss;
+                    zz_morletShot.Timg_matrix[y][x]=physfftShot.Timg_matrix[y][x]*gauss;
+                    
+                }
+            }
+            
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            
+            physfftRef = zz_morletRef.ft2(PHYS_BACKWARD);
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            physfftShot = zz_morletShot.ft2(PHYS_BACKWARD);
+            
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            
+            for (size_t kk=0; kk<dx*dy; kk++) {
+                phase[k][0].Timg_buffer[kk] = -physfftRef.Timg_buffer[kk].arg()/(2*M_PI);
+                contrast[k][0].Timg_buffer[kk] = 2.0*physfftRef.Timg_buffer[kk].mod()/(dx*dy);
+                intensity[k][0].Timg_buffer[kk] -= contrast[k][0].point(kk)*cos(2*M_PI*phase[k][0].point(kk));
+                
+                phase[k][1].Timg_buffer[kk] = -physfftShot.Timg_buffer[kk].arg()/(2*M_PI);
+                contrast[k][1].Timg_buffer[kk] = 2.0*physfftShot.Timg_buffer[kk].mod()/(dx*dy);
+                intensity[k][1].Timg_buffer[kk] -= contrast[k][1].point(kk)*cos(2*M_PI*phase[k][1].point(kk));
+            }
+            progress.setValue(++counter);
+            QApplication::processEvents();
+            
+            getPhase(k);
+            updatePlot();
+            progress.setValue(++counter);
+            QApplication::processEvents();
+        } else {
+            statusBar()->showMessage("size mismatch",5000);
+        }
+    }
 }
 
 void nVisar::getPhase() {
