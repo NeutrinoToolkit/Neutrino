@@ -25,9 +25,11 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef HAVE_LIBGSL
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+#endif
 
 #include "bidimvec.h"
 #include "nPhysImageF.h"
