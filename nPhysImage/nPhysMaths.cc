@@ -33,6 +33,7 @@ using namespace std;
 
 inline void planeFit(nPhysImageF<double> *pi, double *coeffs)
 {
+#ifdef HAVE_LIBGSL
 	int fit_n = pi->getW()*pi->getH();	// grossino...
 	int fit_p = 2;				// plane fit
 
@@ -66,7 +67,7 @@ inline void planeFit(nPhysImageF<double> *pi, double *coeffs)
 	gsl_vector_free(y);
 	gsl_vector_free(c);
 	gsl_multifit_linear_free(work);
-
+#endif
 }
 
 // ------------------ general purpose functions for wavelet analysis ------------------------
