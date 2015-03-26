@@ -16,12 +16,11 @@ colormaps:
 	cd resources/colormaps && qmake CONFIG+=release && make && ./colormaps
 	
 mac: colormaps
+	make -C resources/colormaps -f nMakefile 
 	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
 	cd nPhysImage && ./configure --enable-64 --prefix=/opt/local --with-cuda=/usr/local/cuda
 	make -C nPhysImage clean
 	make -C nPhysImage CC=g++-mp-4.6 release
-
-	make -C resources/colormaps -f nMakefile 
 
 	qmake CONFIG+="neutrino-HDF release" -spec macx-g++
 	make distclean

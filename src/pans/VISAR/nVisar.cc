@@ -511,7 +511,12 @@ void nVisar::updatePlot() {
 					}
 					
 					double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
-					double refle=setvisar[k].reflRef->value()*(iShot/iRef+setvisar[k].reflOffset->value());
+					//double refle=setvisar[k].reflRef->value()*iShot/iRef+setvisar[k].reflOffset->value();
+                    double Rg=setvisar[k].reflOffset->value();
+                    double Rmat=setvisar[k].reflRef->value();
+                    double beta=-Rg/pow(1.0-Rg,2);
+                    double refle=iShot/iRef * (Rmat-beta) + beta;
+                    
 					velocity << QPointF(time,speed);
 					reflectivity << QPointF(time,refle);
 					for (int i=0;i<abs(setvisar[k].jump->value());i++) {

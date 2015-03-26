@@ -236,7 +236,7 @@
          <string>Tweak the reflectivity: R= ratio*Ishot/Iref+offset</string>
         </property>
         <property name="title">
-         <string>Reflectvity (offset &amp;&amp; ratio)</string>
+         <string>Reflectvity (ghost &amp;&amp; material)</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
          <property name="horizontalSpacing">
