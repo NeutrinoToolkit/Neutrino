@@ -81,6 +81,7 @@ public slots:
 	
 	QString export_one(int);
 	QString export_sop();
+	QString export_plot(QwtPlot*);
 	void export_pdf();
 	void export_clipboard();
 
@@ -95,8 +96,14 @@ public slots:
 	void loadSettings(QString);
 	
 private:
-	QwtPlotCurve cPhase[3][2],cIntensity[3][2],cContrast[2][2];	
-	QList<QwtPlotMarker*> marker;
+	QwtPlotCurve cPhase[2][2],cIntensity[2][2],cContrast[2][2];
+    
+	QwtPlotCurve velocity[2],reflectivity[2], sopCurve[2];
+    
+    QwtPlotCurve Us_R[2],Us_T;
+    
+    
+    QList<QwtPlotMarker*> marker;
 	QList<QwtPlotCurve*> velJumps;	
 	
 	QwtPlotMarker mouseMarker[4];

@@ -45,9 +45,12 @@ QwtText nVisarZoomer::trackerText(const QPoint &pos) const {
 
 	double x=plot()->invTransform(QwtPlot::xBottom, pos.x());
 	double y1=plot()->invTransform(QwtPlot::yLeft, pos.y());
-	double y2=plot()->invTransform(QwtPlot::yRight, pos.y());
-
-	text.setText(QString::number(x)+", "+QString::number(y1)+" ("+QString::number(y2)+")");
+    
+	text.setText(QString::number(x)+", "+QString::number(y1));
+    if (plot()->axisEnabled(QwtPlot::yRight)) {
+        double y2=plot()->invTransform(QwtPlot::yRight, pos.y());
+        text.setText(text.text()+" ("+QString::number(y2)+")");
+    }
 	return text;
 }
 
