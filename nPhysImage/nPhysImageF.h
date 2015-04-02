@@ -505,7 +505,6 @@ public:
 			double ir=(orig.x())*cos(-alpha)-(orig.y())*sin(-alpha);
 			double jr=(orig.x())*sin(-alpha)+(orig.y())*cos(-alpha);
 			rotated->set_origin(ir-shiftx,jr-shifty);
-//			std::cerr << __PRETTY_FUNCTION__ << " " << orig.x()<< "," << orig.y() << " " << ir << "," << jr << std::endl;
 		}
 		//FIXME: this must be roto-translated
 //		rotated->set_origin(get_origin());
