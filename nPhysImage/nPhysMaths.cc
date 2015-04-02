@@ -31,7 +31,7 @@ using namespace std;
  * @{
  */ 
 
-inline void planeFit(nPhysImageF<double> *pi, double *coeffs)
+inline void planeFit(nPhysD *pi, double *coeffs)
 {
 #ifdef HAVE_LIBGSL
 	int fit_n = pi->getW()*pi->getH();	// grossino...
@@ -114,7 +114,7 @@ phys_generate_meshgrid(int x1, int x2, int y1, int y2, nPhysImageF<int> &xx, nPh
 // via function pointers (via meshgrids)
 
 inline void 
-phys_generate_morlet(morlet_data *md, nPhysImageF<double> &xx, nPhysImageF<double> &yy, nPhysImageF<mcomplex> &zz)
+phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysImageF<mcomplex> &zz)
 {
 
 	if ((xx.getW() != yy.getW()) || (xx.getH() != yy.getH())) {
@@ -173,11 +173,10 @@ nPhysImageF<mcomplex>::TscanBrightness() {
 }
 
 void 
-phys_add(nPhysImageF<double> &iimage, double val) { 
+phys_add(nPhysD &iimage, double val) { 
 	if (val!=0.0) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)+val); 
 		iimage.TscanBrightness();
 	}
@@ -187,11 +186,10 @@ phys_add(nPhysImageF<double> &iimage, double val) {
 }
 
 void 
-phys_subtract(nPhysImageF<double> &iimage, double val) {
+phys_subtract(nPhysD &iimage, double val) {
 	if (val!=0.0) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)-val); 
 		iimage.TscanBrightness();
 	}
@@ -201,11 +199,10 @@ phys_subtract(nPhysImageF<double> &iimage, double val) {
 }
 
 void 
-phys_multiply(nPhysImageF<double> &iimage, double val) {
+phys_multiply(nPhysD &iimage, double val) {
 	if (val!=1.0) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)*val); 
 		iimage.TscanBrightness();
 	}
@@ -215,11 +212,10 @@ phys_multiply(nPhysImageF<double> &iimage, double val) {
 }
 
 void 
-phys_divide(nPhysImageF<double> &iimage, double val) {
+phys_divide(nPhysD &iimage, double val) {
 	if (val!=1.0) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)/val); 
 		iimage.TscanBrightness();
 	}
@@ -230,11 +226,10 @@ phys_divide(nPhysImageF<double> &iimage, double val) {
 }
 
 void 
-phys_point_add(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
+phys_point_add(nPhysD &iimage, nPhysD &iimage2) {
 	if (iimage.getSurf()==iimage2.getSurf()) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)+iimage2.point(ii)); 
 		iimage.TscanBrightness();
 		iimage.setName("("+iimage.getName()+")+("+iimage2.getName()+")");
@@ -242,11 +237,10 @@ phys_point_add(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
 }
 
 void 
-phys_point_subtract(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
+phys_point_subtract(nPhysD &iimage, nPhysD &iimage2) {
 	if (iimage.getSurf()==iimage2.getSurf()) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)-iimage2.point(ii)); 
 		iimage.TscanBrightness();
 		iimage.setName("("+iimage.getName()+")-("+iimage2.getName()+")");
@@ -254,11 +248,10 @@ phys_point_subtract(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
 }
 
 void 
-phys_point_multiply(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
+phys_point_multiply(nPhysD &iimage, nPhysD &iimage2) {
 	if (iimage.getSurf()==iimage2.getSurf()) {
-    	register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)*iimage2.point(ii)); 
 		iimage.TscanBrightness();
 		iimage.setName("("+iimage.getName()+")*("+iimage2.getName()+")");
@@ -266,41 +259,37 @@ phys_point_multiply(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
 }
 
 void 
-phys_point_divide(nPhysImageF<double> &iimage, nPhysImageF<double> &iimage2) {
+phys_point_divide(nPhysD &iimage, nPhysD &iimage2) {
 	if (iimage.getSurf()==iimage2.getSurf()) {
-        register size_t ii;
 #pragma omp parallel for
-		for (ii=0; ii<iimage.getSurf(); ii++) 
+		for (size_t ii=0; ii<iimage.getSurf(); ii++) 
 			iimage.set(ii, iimage.point(ii)/iimage2.point(ii)); 
 		iimage.TscanBrightness();
 		iimage.setName("("+iimage.getName()+")/("+iimage2.getName()+")");
 	}
 }
 
-double phys_sum_points(nPhysImageF<double> &iimage) {
+double phys_sum_points(nPhysD &iimage) {
 	double retVal=0.0;
-    register size_t ii;
 #pragma omp parallel for reduction(+:retVal)
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		retVal+=iimage.point(ii);
 	}
 	return retVal;
 }
 
-double phys_sum_square_points(nPhysImageF<double> &iimage) {
+double phys_sum_square_points(nPhysD &iimage) {
 	double retVal=0.0;
-	register size_t ii;
 #pragma omp parallel for reduction(+:retVal)
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		retVal+=iimage.point(ii)*iimage.point(ii);
 	}
 	return retVal;
 }
 
-void phys_opposite(nPhysImageF<double> &iimage) {
-	register size_t ii;
+void phys_opposite(nPhysD &iimage) {
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		iimage.set(ii,-iimage.point(ii));
 	}
 	iimage.TscanBrightness();
@@ -308,20 +297,18 @@ void phys_opposite(nPhysImageF<double> &iimage) {
 }
 
 
-void phys_inverse(nPhysImageF<double> &iimage) {
-	register size_t ii;
+void phys_inverse(nPhysD &iimage) {
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		iimage.set(ii,1.0/iimage.point(ii));
 	}
 	iimage.TscanBrightness();
 	iimage.setName("1/("+iimage.getName()+")");
 }
 
-void phys_replace(nPhysImageF<double> &iimage, double oldval, double newval) {
-	register size_t ii;
+void phys_replace(nPhysD &iimage, double oldval, double newval) {
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		if (iimage.point(ii)==oldval) iimage.set(ii,newval);
 	}
 	iimage.TscanBrightness();
@@ -330,10 +317,9 @@ void phys_replace(nPhysImageF<double> &iimage, double oldval, double newval) {
 	iimage.setName(ostr.str());
 }
 
-void phys_replace_NaN(nPhysImageF<double> &iimage, double newval) {
-	register size_t ii;
+void phys_replace_NaN(nPhysD &iimage, double newval) {
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		if (!isfinite(iimage.point(ii))) iimage.set(ii,newval);
 	}
 	iimage.TscanBrightness();
@@ -343,12 +329,12 @@ void phys_replace_NaN(nPhysImageF<double> &iimage, double newval) {
 	iimage.setName(ostr.str());
 }
 
-void phys_cutoff(nPhysImageF<double> &iimage, double minval, double maxval) {
+void phys_cutoff(nPhysD &iimage, double minval, double maxval) {
     iimage.setShortName("IntensityCutoff");
-	register size_t ii;
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
-        if (isfinite(iimage.point(ii))) iimage.set(ii,min(max(iimage.point(ii),minval),maxval));
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
+		double val=iimage.point(ii);
+        if (isfinite(val)) iimage.set(ii,min(max(val,minval),maxval));
     }
 	iimage.TscanBrightness();
 	ostringstream ostr;
@@ -357,11 +343,10 @@ void phys_cutoff(nPhysImageF<double> &iimage, double minval, double maxval) {
 }
 
 void 
-phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
+phys_add_noise(nPhysD &iimage, double vMax=1.0)
 {
-	register size_t ii;
 #pragma omp parallel for
-	for (ii=0; ii<iimage.getSurf(); ii++) {
+	for (size_t ii=0; ii<iimage.getSurf(); ii++) {
 		iimage.set(ii, iimage.point(ii) + vMax*((double)rand() / RAND_MAX));
 	}
 	iimage.TscanBrightness();
@@ -373,13 +358,13 @@ phys_add_noise(nPhysImageF<double> &iimage, double vMax=1.0)
 
 // gaussian blur
 void
-phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
+phys_gaussian_blur(nPhysD &m1, double radius)
 {
 	DEBUG(5,"radius: "<<radius);
 	if (!(radius > 0) )
 		return;
 
-	nPhysImageF<double> xx, yy, gauss;
+	nPhysD xx, yy, gauss;
 	nPhysImageF<mcomplex> out;
 
 //FIXME: this is probably wrong for odd matrices
@@ -412,11 +397,10 @@ phys_gaussian_blur(nPhysImageF<double> &m1, double radius)
 }
 
 void
-phys_sin(nPhysImageF<double> &m1)
+phys_sin(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,sin(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -424,11 +408,10 @@ phys_sin(nPhysImageF<double> &m1)
 }
 
 void
-phys_cos(nPhysImageF<double> &m1)
+phys_cos(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,cos(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -436,11 +419,10 @@ phys_cos(nPhysImageF<double> &m1)
 }
 
 void
-phys_tan(nPhysImageF<double> &m1)
+phys_tan(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,tan(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -448,11 +430,10 @@ phys_tan(nPhysImageF<double> &m1)
 }
 
 void
-phys_pow(nPhysImageF<double> &m1, double exponent)
+phys_pow(nPhysD &m1, double exponent)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),exponent));
 	}
 	m1.TscanBrightness();
@@ -462,11 +443,10 @@ phys_pow(nPhysImageF<double> &m1, double exponent)
 }
 
 void
-phys_square(nPhysImageF<double> &m1)
+phys_square(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,pow(m1.point(i),2));
 	}
 	m1.TscanBrightness();
@@ -474,11 +454,10 @@ phys_square(nPhysImageF<double> &m1)
 }
 
 void
-phys_sqrt(nPhysImageF<double> &m1)
+phys_sqrt(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,sqrt(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -486,11 +465,10 @@ phys_sqrt(nPhysImageF<double> &m1)
 }
 
 void
-phys_abs(nPhysImageF<double> &m1)
+phys_abs(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,abs(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -498,11 +476,10 @@ phys_abs(nPhysImageF<double> &m1)
 }
 
 void
-phys_log(nPhysImageF<double> &m1)
+phys_log(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -510,11 +487,10 @@ phys_log(nPhysImageF<double> &m1)
 }
 
 void
-phys_log10(nPhysImageF<double> &m1)
+phys_log10(nPhysD &m1)
 {
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		m1.set(i,log10(m1.point(i)));
 	}
 	m1.TscanBrightness();
@@ -522,23 +498,18 @@ phys_log10(nPhysImageF<double> &m1)
 }
 
 void
-phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radius)
+phys_fast_gaussian_blur(nPhysD &m1, double radius)
 {
 	phys_fast_gaussian_blur(m1,radius,radius);
 }
 
 void
-phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
+phys_fast_gaussian_blur(nPhysD &m1, double radiusX, double radiusY)
 {
 	vector<double> nan_free_phys(m1.getSurf());
-    register size_t i;
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
-		if (isfinite(m1.point(i))) {
-			nan_free_phys[i]=m1.point(i);
-		} else {
-			nan_free_phys[i]=m1.get_min();
-		}
+	for (size_t i=0; i< m1.getSurf(); i++) {
+		nan_free_phys[i]=isfinite(m1.point(i))? m1.point(i):m1.get_min();
 	}
     fftw_complex *b2 = fftw_alloc_complex(m1.getH()*((m1.getW()/2+1)));
 	
@@ -553,7 +524,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
     register size_t j;
 #pragma omp parallel for collapse(2)
  	for (size_t j = 0 ; j < m1.getH(); j++) {
-		for (i = 0 ; i < m1.getW()/2+1 ; i++) {
+		for (size_t i = 0 ; i < m1.getW()/2+1 ; i++) {
 			double blur=exp(-((i*i)/sx+(j-m1.getH()/2)*(j-m1.getH()/2)/sy))/m1.getSurf();
 			int k=i+((j+m1.getH()/2+1)%m1.getH())*(m1.getW()/2+1);
 			b2[k][0]*=blur;
@@ -563,7 +534,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
     fftw_execute(bb);
 
 #pragma omp parallel for
-	for (i=0; i< m1.getSurf(); i++) {
+	for (size_t i=0; i< m1.getSurf(); i++) {
 		if (isfinite(m1.point(i))) {
 			m1.set(i,nan_free_phys[i]);
 		}
@@ -574,7 +545,7 @@ phys_fast_gaussian_blur(nPhysImageF<double> &m1, double radiusX, double radiusY)
 	fftw_free(b2);
 }
 
-pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>* img1, nPhysImageF<double>* img2) {
+pair<double, bidimvec<int> > phys_cross_correlate(nPhysD* img1, nPhysD* img2) {
 	size_t dx=img1->getW();
 	size_t dy=img1->getH();
 	double maxValue=-1.0;	
@@ -649,7 +620,7 @@ void phys_get_vec_brightness(const double *ivec, size_t vlen, double &vmin, doub
 	}
 }	
 
-bidimvec<size_t> phys_max_p(nPhysImageF<double> &image) {
+bidimvec<size_t> phys_max_p(nPhysD &image) {
 	bidimvec<size_t> p(0,0);
 	for (size_t i=0;i<image.getW();i++) {
 		for (size_t j=0;j<image.getH();j++) {
@@ -666,9 +637,9 @@ bidimvec<size_t> phys_max_p(nPhysImageF<double> &image) {
 // complex functions
 
 //! split mcomplex matrix on polar representation
-map<string, nPhysImageF<double> > to_polar(nPhysImageF<mcomplex> &iphys) {
-	nPhysImageF<double> rho, theta;
-	map<string, nPhysImageF<double> > omap;
+map<string, nPhysD > to_polar(nPhysImageF<mcomplex> &iphys) {
+	nPhysD rho, theta;
+	map<string, nPhysD > omap;
 
 	rho.resize(iphys.getW(), iphys.getH());
 	theta.resize(iphys.getW(), iphys.getH());
@@ -685,9 +656,9 @@ map<string, nPhysImageF<double> > to_polar(nPhysImageF<mcomplex> &iphys) {
 }
 
 //! split mcomplex matrix on rectangular representation
-map<string, nPhysImageF<double> > to_rect(const nPhysImageF<mcomplex> &iphys) {
-	nPhysImageF<double> re, im;
-	map<string, nPhysImageF<double> > omap;
+map<string, nPhysD > to_rect(const nPhysImageF<mcomplex> &iphys) {
+	nPhysD re, im;
+	map<string, nPhysD > omap;
 
 	re.resize(iphys.getW(), iphys.getH());
 	im.resize(iphys.getW(), iphys.getH());
@@ -704,9 +675,9 @@ map<string, nPhysImageF<double> > to_rect(const nPhysImageF<mcomplex> &iphys) {
 }
 
 //! split mcomplex matrix on power spectrum, representation
-map<string, nPhysImageF<double> > to_powersp(nPhysImageF<mcomplex> &iphys) {
-	nPhysImageF<double> psp;
-	map<string, nPhysImageF<double> > omap;
+map<string, nPhysD > to_powersp(nPhysImageF<mcomplex> &iphys) {
+	nPhysD psp;
+	map<string, nPhysD > omap;
 
 	psp.resize(iphys.getW(), iphys.getH());
 
