@@ -88,7 +88,6 @@ public:
 									
 	nPlug *plug_iface;
 	
-	QString colorTable;
 	
 	
 	static const int MaxRecentFiles=20;
@@ -96,7 +95,6 @@ public:
 	QList <QAction *> recentFileActs;
 	void updateRecentFileActions(QString=QString());
 
-	QList<QAction *> listabuffer;
 
 	//	QGraphicsScene my_s;
 	QGraphicsPixmapItem my_pixitem;
@@ -111,6 +109,11 @@ public:
 	nPhysD* currentBuffer;
 	QPointer<neutrino> follower;
 
+
+
+	// --------- data structures -----------
+	QString colorTable;
+	QList<QAction *> listabuffer;
 	QMap<QString, unsigned char *> nPalettes;
 
 public slots:
@@ -326,6 +329,7 @@ signals:
 	void nZoom(double);
 
 	void bufferChanged(nPhysD*);						// visible image update
+	void bufferOriginChanged();
 	void physAdd(nPhysD*);
 	void physDel(nPhysD*);
 

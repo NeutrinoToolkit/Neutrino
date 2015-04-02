@@ -197,6 +197,7 @@
    <addaction name="actionName"/>
    <addaction name="actionOrigin"/>
    <addaction name="actionScale"/>
+   <addaction name="actionFreeze"/>
    <addaction name="actionPans"/>
   </widget>
   <action name="actionCopy">
@@ -281,6 +282,21 @@
    </property>
    <property name="text">
     <string>Pans</string>
+   </property>
+  </action>
+  <action name="actionFreeze">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/lockClose.png</normaloff>:/icons/lockClose.png</iconset>
+   </property>
+   <property name="text">
+    <string>freeze</string>
+   </property>
+   <property name="toolTip">
+    <string>Set current origin/scale to new images</string>
    </property>
   </action>
  </widget>

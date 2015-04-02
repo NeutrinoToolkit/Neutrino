@@ -25,7 +25,7 @@
 #include "neutrino.h"
 #include "nWinList.h"
 nWinList::nWinList(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
+: nGenericPan(nparent, winname), freezedFrame(false), frScale(1,1), frOrigin(0,0) {
 	my_w.setupUi(this);
 
 	// CHECK: this should be ok...
@@ -40,6 +40,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	my_w.images->setColumnHidden((my_w.images->columnCount()-1),true);
 
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
 	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 	
@@ -62,6 +63,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(my_w.actionScale, SIGNAL(triggered()), this, SLOT(changeProperties()));
 	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(buttonRemovePhys()));
 	connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(buttonCopyPhys()));
+	connect(my_w.actionFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreezed(bool)));
 
 	connect(nparent, SIGNAL(panAdd(nGenericPan*)), this, SLOT(panAdd(nGenericPan*)));
 	connect(nparent, SIGNAL(panDel(nGenericPan*)), this, SLOT(panDel(nGenericPan*)));
@@ -149,6 +151,10 @@ nWinList::changeProperties() {
 					bool ok1,ok2;
 					int xOrigin=lista.at(0).toDouble(&ok1);
 					int yOrigin=lista.at(1).toDouble(&ok2);
+
+					// also update ref. origin (in case button was toggled)
+					frOrigin = vec2f(xOrigin, yOrigin);
+
 					if (ok1 && ok2) {
 						foreach (nPhysD* phys, physSelected) {
 							phys->set_origin(xOrigin,yOrigin);
@@ -161,6 +167,7 @@ nWinList::changeProperties() {
 					}
 				}	
 			}
+
 		} else if (sender()==my_w.actionScale) {
 			text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(4,0).toString(), &ok);
 			if (ok && !text.isEmpty()) {
@@ -170,7 +177,12 @@ nWinList::changeProperties() {
 					case 1: {
 						bool ok1;
 						double val=lista.at(0).toDouble(&ok1);
+						
+
 						if (ok1) {
+							// also update ref. scale (in case button was toggled)
+							frScale = vec2f(val, val);
+
 							foreach (nPhysD* phys, physSelected) {
 								phys->set_scale(val,val);
 								nparent->emitBufferChanged(phys);
@@ -186,6 +198,9 @@ nWinList::changeProperties() {
 						double xVal=lista.at(0).toDouble(&ok1);
 						double yVal=lista.at(1).toDouble(&ok2);
 						if (ok1 && ok2) {
+							// also update ref. scale (in case button was toggled)
+							frScale = vec2f(xVal, yVal);
+
 							foreach (nPhysD* phys, physSelected) {
 								phys->set_scale(xVal,yVal);
 								nparent->emitBufferChanged(phys);
@@ -271,28 +286,68 @@ nWinList::physDel(nPhysD *my_phys) {
 	updatePad();
 }
 
+/// new image entry point
 void nWinList::physAdd(nPhysD *my_phys) {
 	QTreeWidgetItem *my_item = new QTreeWidgetItem(my_w.images);
+	
+	if (freezedFrame) {
+		my_phys->set_scale(frScale);
+		my_phys->set_origin(frOrigin);
+	} 
+
 	QString name=QString::fromUtf8(my_phys->getName().c_str());
+
 	my_item->setData(0,0,nparent->physList.indexOf(my_phys));
 	my_item->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
 	my_item->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
 	my_item->setData(3,0,QString::number(my_phys->get_origin().x())+" "+QString::number(my_phys->get_origin().y()));
+	
 	if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
 		my_item->setData(4,0,QString::number(my_phys->get_scale().x()));
 	} else {
 		my_item->setData(4,0,QString::number(my_phys->get_scale().x())+" "+QString::number(my_phys->get_scale().y()));
 	}
+
 	my_item->setData((my_w.images->columnCount()-1),0,qVariantFromValue((void*) my_phys));
 	my_w.images->sortItems(0,Qt::AscendingOrder);
 	updatePad();
 }
 
 
+/// set static scale/origin
+void
+nWinList::setFreezed(bool st) {
+	if (st) {
+		DEBUG("setFreezed");
+		if (!freezedFrame) {
+			freezedFrame = true;
+
+			// blabla
+			if (currentBuffer) {
+				frScale = currentBuffer->get_scale();
+				frOrigin = currentBuffer->get_origin();
+
+				DEBUG("freeze scale: "<<frScale);
+				DEBUG("freeze origin: "<<frOrigin);
+			}
+
+			return;
+		}
+	} else {
+		DEBUG("unsetFreezed");
+		freezedFrame = false;
+	}
+}
 
 
+/// called for external origin change
+void
+nWinList::originChanged() {
+	if (currentBuffer) {
+		frScale = currentBuffer->get_scale();
+		frOrigin = currentBuffer->get_origin();
 
-
-
-
-
+		DEBUG("freeze scale: "<<frScale);
+		DEBUG("freeze origin: "<<frOrigin);
+	}
+}
