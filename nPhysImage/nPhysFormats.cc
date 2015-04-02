@@ -381,7 +381,7 @@ physInt_sif::physInt_sif(string ifilename)
 	}
 
 	// jump magic lines
-	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Rah");
+	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Ra");
 	for (size_t i=0; i<magic_number; i++) {
 		getline(ifile, temp_string);
 	}

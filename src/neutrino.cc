@@ -1239,6 +1239,10 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 			mouseposition(my_mouse.pos());
 			my_tics.update();
 			emitBufferChanged();
+
+			// I need a signal to communicate explicit origin change not to
+			// be taken for a buffer change. Used in nWinList.
+			emit bufferOriginChanged();
 			break;
 		case Qt::Key_C:
 			if (e->modifiers() & Qt::ShiftModifier) {
