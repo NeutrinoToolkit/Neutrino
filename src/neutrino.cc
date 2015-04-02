@@ -327,6 +327,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	updateRecentFileActions();
 
 	loadDefaults();
+    
 	show();
 	
 	//!enable this for testing
@@ -2019,6 +2020,8 @@ void neutrino::saveDefaults(){
 	my_set.setValue("fileExport", property("fileExport"));
 	my_set.setValue("fileOpen", property("fileOpen"));
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
+    my_set.setValue("physNameLength", property("physNameLength").toInt());
+
 	my_set.endGroup();
 }
 
@@ -2050,6 +2053,8 @@ void neutrino::loadDefaults(){
     if (my_set.value("useDot",false).toBool()) {
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
+    
+    setProperty("physNameLength", my_set.value("physNameLength", 35));
     
     setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
     

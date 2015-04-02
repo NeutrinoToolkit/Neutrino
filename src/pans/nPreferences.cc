@@ -105,6 +105,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
+    connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
+
 }
 
 void nPreferences::changeThreads(int num) {
@@ -184,4 +186,10 @@ void nPreferences::hideEvent(QHideEvent*){
 void nPreferences::showEvent(QShowEvent*){
 	loadDefaults();
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-};
+}
+
+void nPreferences::changephysNameLength(int k) {
+    nparent->setProperty("physNameLength",k);
+}
+
+

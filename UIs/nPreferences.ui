@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
-    <height>235</height>
+    <width>246</width>
+    <height>262</height>
    </rect>
   </property>
   <property name="font">
@@ -133,9 +133,40 @@
          </widget>
         </item>
         <item>
+         <widget class="QWidget" name="widget_4" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>length of name in combobox</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="physNameLength">
+             <property name="value">
+              <number>35</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="useDot">
           <property name="text">
-           <string>Use English notation</string>
+           <string>Force English notation</string>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
@@ -270,6 +301,18 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboIconSize</tabstop>
+  <tabstop>chooseFont</tabstop>
+  <tabstop>physNameLength</tabstop>
+  <tabstop>useDot</tabstop>
+  <tabstop>showDimPixel</tabstop>
+  <tabstop>askCloseUnsaved</tabstop>
+  <tabstop>threads</tabstop>
+  <tabstop>infoCores</tabstop>
+  <tabstop>useCuda</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

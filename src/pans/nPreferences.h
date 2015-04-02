@@ -51,6 +51,7 @@ public slots:
 	void showEvent(QShowEvent*);
 	void useDot();
     void askCloseUnsaved();
+    void changephysNameLength(int);
 };
 
 #endif

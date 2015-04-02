@@ -108,7 +108,7 @@ void nGenericPan::decorate() {
 	setWindowTitle(nparent->property("winId").toString()+": "+panName);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {	
-			if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",35);
+			if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",nparent->property("physNameLength"));
 		}
 	}
 	
