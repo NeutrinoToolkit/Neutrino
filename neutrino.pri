@@ -1,3 +1,4 @@
+#pippo
 TARGET = ../Neutrino
 
 CONFIG += qt qwt windows 
