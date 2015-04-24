@@ -63,6 +63,95 @@ AC_CHECK_LIB([gslcblas], [main])
 AC_CHECK_LIB([jpeg], [main])
 AC_CHECK_LIB([m], [main])
 
+#########################################################################
+## check for hdf
+#########################################################################
+
+AC_ARG_WITH(hdf4, [  --without-hdf4  disable hdf4],
+            [if test "$withval" = no; then disable_hdf4=yes; fi])
+AC_MSG_CHECKING([for hdf4])
+
+cf_result=no
+if test -z "$disable_hdf4"; then
+	if test ! -d "$withval"; then
+		withval="";
+	fi
+
+	for hdf4dir in "" "$withval" /usr /usr/local /opt/local; do
+		for hdf4include in "/include" "/include/hdf"; do
+			if test -f "$hdf4dir$hdf4include/hdf.h"; then
+				HDF4LIBS="-L$hdf4dir/lib -lmfhdf -ldf"
+				HDF4INC="-I$hdf4dir$hdf4include"
+
+				LIBS="$LIBS $HDF4LIBS"
+				CFLAGS="$CFLAGS $HDF4INC"
+
+				AC_LANG([C])
+				AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <hdf.h>]], [[SDstart("", 0)]])], [cf_result=yes], [cf_result=no])
+
+			fi
+		done	
+	done
+
+fi
+
+AC_MSG_RESULT($cf_result)
+
+
+#########################################################################
+## check for hdf5
+#########################################################################
+
+AC_ARG_WITH(hdf5, [  --without-hdf5  disable hdf5],
+            [if test "$withval" = no; then disable_hdf5=yes; fi])
+AC_MSG_CHECKING([for hdf5])
+
+cf_result=no
+if test -z "$disable_hdf5"; then
+	if test ! -d "$withval"; then
+		withval="";
+	fi
+
+	for hdf5dir in "" "$withval" /usr /usr/local /opt/local; do
+		for hdf5include in "/include" "/include/hdf5"; do
+			for sub_hdf5 in "" "/serial"; do
+
+				if test -f "$hdf5dir$hdf5include$sub_hdf5/hdf5.h"; then
+
+					HDF5LIBS="-lhdf5 -L$hdf5dir/lib"
+					HDF5INC="-I$hdf5dir$hdf5include$sub_hdf5"
+	
+					OLDLIBS="$LIBS"
+					OLD_CFLAGS="$CFLAGS"
+
+					if pkg-config hdf5; then
+						H5_PKG_LIBS=`pkg-config --libs hdf5`
+						H5_PKG_INC=`pkg-config --cflags hdf5`
+					fi
+
+
+					LIBS="$LIBS $HDF5LIBS $H5_PKG_LIBS"
+					CFLAGS="$CFLAGS $HDF5INC $H5_PKG_INC"
+	
+					AC_LANG([C])
+					AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <hdf5.h>]], [[H5Fis_hdf5("")]])], [cf_result=yes], [cf_result=no])
+
+					if test "$cf_result" = "no"; then
+						# restore previous state
+						LIBS="$OLD_LIBS"
+						CFLAGS="$OLD_CFLAGS"
+					fi
+	
+				fi
+
+			done
+		done	
+	done
+
+fi
+
+AC_MSG_RESULT($cf_result)
+
 case $uname in
 	*MINGW*)
 		AC_CHECK_LIB([mfhdfdll], [main])
