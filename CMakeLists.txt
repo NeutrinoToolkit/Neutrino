@@ -4,4 +4,6 @@ cmake_minimum_required (VERSION 3.0)
 
 project (neutrino)
 
-#add_subdirectory (nPhysImage src)
+add_subdirectory (nPhysImage src)
+
+
