@@ -52,7 +52,7 @@
 
 #include "nMonitor.h"
 
-#ifdef __phys_HDF
+#ifdef HAVE_HDF5
 #include "nHDF5.h"
 #endif
 
@@ -152,7 +152,9 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
 	connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
 	connect(my_w.actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
+#ifdef HAVE_HDF5
 	connect(my_w.actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
+#endif
 	connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
 
 	connect(my_w.actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
@@ -665,7 +667,7 @@ vector <nPhysD *> neutrino::fileOpen(QString fname) {
 	if (imagelist.size()==0) {
 		// resta quasi solo QImage
 		if (QFileInfo(fname).suffix().toLower()=="h5") {
-#ifdef __phys_HDF
+#ifdef HAVE_HDF5
 			static_cast<nHDF5*>(openHDF5())->showFile(fname);
 #endif
 		} else {
@@ -1856,15 +1858,15 @@ void neutrino::print()
 }
 
 /// HDF5 treeview
+#ifdef HAVE_HDF5
 nGenericPan*
 neutrino::openHDF5() {
 	QString namepad=tr("HDF5");
 	nGenericPan *win = existsPan(namepad);
-#ifdef __phys_HDF
 	if (!win) win = new nHDF5(this, namepad);
-#endif
 	return win;
 }
+#endif
 
 
 /// rectangle lineout
