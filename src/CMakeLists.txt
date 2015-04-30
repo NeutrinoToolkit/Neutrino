@@ -15,12 +15,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 list (APPEND CMAKE_CXX_FLAGS "-fopenmp")
 
 
-## add sources
+## sources
 set (SOURCES nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nBlur.cc pans/nSpectralAnalysis.cc pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc pans/nGhost.cc pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc nApp.cc main.cc 
 )
 
+## UIs
 set (UIS ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui ../UIs/nGhost.ui ../UIs/nInterpolatePath.ui ../UIs/nIntegralInversion.ui ../UIs/nPreferences.ui ../UIs/nOpenRAW.ui ../UIs/nColorBarWin.ui ../UIs/nOperator.ui ../UIs/nCutoffMask.ui ../UIs/nBoxLineout.ui ../UIs/nLineout.ui ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui	
 )
+
+## resources
+set (RESOURCES ../resources/neutrino.qrc)
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
