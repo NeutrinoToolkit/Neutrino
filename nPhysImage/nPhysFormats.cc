@@ -390,7 +390,7 @@ physInt_sif::physInt_sif(string ifilename)
 	
 	int init_matrix = ifile.tellg();
 	ifile.seekg(0, ifile.end);
-	long int datacheck = ifile.tellg()-init_matrix-getSurf()*sizeof(float);
+	long int datacheck = (long int) ifile.tellg()-init_matrix-getSurf()*sizeof(float);
 
 	if (ifile.eof() || ifile.fail()) {
 		throw phys_fileerror("SIF: header parsing reached end of file");
