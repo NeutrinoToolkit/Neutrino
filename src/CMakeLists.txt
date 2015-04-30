@@ -74,7 +74,7 @@ include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
 
 
-SET(QT_LIBRARY_DIR "/opt/local/Library/Frameworks/")
+#SET(QT_LIBRARY_DIR "/opt/local/Library/Frameworks/")
 find_package(Qt4 REQUIRED)
 
 message(STATUS "qt use frmaeworks: ${QT_USE_FRAMEWORKS}")
@@ -176,7 +176,10 @@ QT4_WRAP_UI( UI_HEADERS ${UIS} )
 #QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} ) # probabilmente auto_moc interferisce con questo
 
 if(APPLE) 
-    add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    add_executable(Neutrino 
+        MACOSX_BUNDLE ${myApp_ICON}
+        ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    set_target_properties(Neutrino PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist)
 else()
     add_executable(Neutrino ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
 endif()
