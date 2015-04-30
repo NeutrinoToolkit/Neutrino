@@ -5,11 +5,7 @@
 cmake_minimum_required (VERSION 3.0)
 
 
-exec_program(
-    "git"
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ARGS "describe"
-    OUTPUT_VARIABLE VERSION1 )
+exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe" OUTPUT_VARIABLE VERSION1 )
 
 exec_program(
     "git"
@@ -29,14 +25,14 @@ if (APPLE)
     add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
     
-# MACOSX_BUNDLE_INFO_STRING
-# MACOSX_BUNDLE_ICON_FILE
-# MACOSX_BUNDLE_GUI_IDENTIFIER
-# MACOSX_BUNDLE_LONG_VERSION_STRING
-# MACOSX_BUNDLE_BUNDLE_NAME
-# MACOSX_BUNDLE_SHORT_VERSION_STRING
-# MACOSX_BUNDLE_BUNDLE_VERSION
-# MACOSX_BUNDLE_COPYRIGHT
+    exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "rev-list HEAD --count" OUTPUT_VARIABLE COUNTREV )
+    SET (MACOSX_BUNDLE_BUNDLE_VERSION "${COUNTREV}")
+    SET (MACOSX_BUNDLE_SHORT_VERSION_STRING "${COUNTREV}")
+    SET (MACOSX_BUNDLE_COPYRIGHT "GPL")
+    SET (MACOSX_BUNDLE_GUI_IDENTIFIER "edu.polytechnique.neutrino")
+
+
+    SET (MACOSX_BUNDLE_BUNDLE_NAME "Neutrino")
     SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
     SET (MACOSX_BUNDLE_INFO_STRING  "Neutrino program" )
     SET (MACOSX_BUNDLE_ICON_FILE  "icon.icns" )
@@ -177,7 +173,7 @@ endif()
 # using Qt meta-system (precompiler)
 QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 QT4_WRAP_UI( UI_HEADERS ${UIS} )
-QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} ) # probabilmente auto_moc interferisce con questo
+#QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} ) # probabilmente auto_moc interferisce con questo
 
 if(APPLE) 
     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
