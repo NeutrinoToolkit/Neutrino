@@ -4,6 +4,22 @@
 
 cmake_minimum_required (VERSION 3.0)
 
+
+exec_program(
+    "git"
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ARGS "describe"
+    OUTPUT_VARIABLE VERSION1 )
+
+exec_program(
+    "git"
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ARGS "symbolic-ref HEAD"
+    OUTPUT_VARIABLE VERSION2 )
+
+string(REPLACE "/" ";" VERSION3 "${VERSION2}-${VERSION1}")
+list(GET VERSION3 2 VERSION)
+
 if (APPLE) 
     message(STATUS "Apple : use macports !")
     set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
@@ -12,6 +28,20 @@ if (APPLE)
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
     add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
+    
+# MACOSX_BUNDLE_INFO_STRING
+# MACOSX_BUNDLE_ICON_FILE
+# MACOSX_BUNDLE_GUI_IDENTIFIER
+# MACOSX_BUNDLE_LONG_VERSION_STRING
+# MACOSX_BUNDLE_BUNDLE_NAME
+# MACOSX_BUNDLE_SHORT_VERSION_STRING
+# MACOSX_BUNDLE_BUNDLE_VERSION
+# MACOSX_BUNDLE_COPYRIGHT
+    SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
+    SET (MACOSX_BUNDLE_INFO_STRING  "Neutrino program" )
+    SET (MACOSX_BUNDLE_ICON_FILE  "icon.icns" )
+    set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
+    set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
 if (UNIX AND (NOT APPLE))
@@ -24,7 +54,7 @@ endif()
 add_compile_options(-std=c++0x)
 
 project (neutrino)
-add_definitions(-D__VER="--test--")
+add_definitions(-D__VER="${VERSION}")
 
 set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
@@ -149,8 +179,11 @@ QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 QT4_WRAP_UI( UI_HEADERS ${UIS} )
 QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} ) # probabilmente auto_moc interferisce con questo
 
-add_executable(Neutrino MACOSX_BUNDLE
- ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+if(APPLE) 
+    add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+else()
+    add_executable(Neutrino ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+endif()
 
 target_link_libraries(Neutrino ${LIBS})
 target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtSvg)
