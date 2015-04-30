@@ -1,9 +1,17 @@
 # this is the frigging nPhysImage cmakelists
 cmake_minimum_required (VERSION 3.0)
 
+if (APPLE) 
+    message(STATUS "Apple : use macports !")
+#     set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
+#     set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
+    set (CMAKE_PREFIX_PATH "/opt/local")
+endif()
 
-set (CMAKE_C_COMPILER "gcc")
-set (CMAKE_CXX_COMPILER "g++")
+if (UNIX AND (NOT APPLE))
+    message(STATUS "Linux")
+    set (CMAKE_PREFIX_PATH "/usr")
+endif()
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -11,11 +19,13 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+add_compile_options(-std=c++0x)
+add_compile_options(-fPIC)
 
 
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
 
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+
 
 add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
@@ -31,7 +41,7 @@ include_directories(BEFORE "/opt/local/include")
 include_directories(BEFORE "/usr/local/include")
 
 # gsl
-find_library(GSL NAMES gsl PATHS /usr/lib /opt/local/lib)
+find_library(GSL NAMES gsl)
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	message (STATUS "using gsl: ${GSL}")
 	set(LIBS ${LIBS} ${GSL}) 
@@ -39,7 +49,7 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 endif()
 
 # gslcblas
-find_library(GSLCBLAS NAMES gslcblas PATHS /usr/lib /opt/local/lib)
+find_library(GSLCBLAS NAMES gslcblas)
 if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 	message (STATUS "using gslcblas: ${GSL}")
 	set(LIBS ${LIBS} ${GSLCBLAS}) 
@@ -47,7 +57,7 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 endif()
 
 # fftw_threads
-find_library(FFTW_THREADS NAMES fftw3_threads PATHS /usr/lib /opt/local/lib)
+find_library(FFTW_THREADS NAMES fftw3_threads)
 if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
 	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
 	set(LIBS ${LIBS} ${FFTW_THREADS}) 
@@ -55,7 +65,7 @@ if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
 endif()
 
 #fftw
-find_library(FFTW NAMES fftw3 PATHS /usr/lib /opt/local/lib)
+find_library(FFTW NAMES fftw3)
 if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
 	message (STATUS "using FFTW: ${FFTW}")
 	set(LIBS ${LIBS} ${FFTW}) 
@@ -64,7 +74,7 @@ endif()
 
 
 # pgm
-find_library(PBM NAMES netpbm PATHS /usr/lib /opt/local/lib)
+find_library(PBM NAMES netpbm)
 if (NOT ${PBM} STREQUAL "PBM-NOTFOUND")
 	message (STATUS "using netpbm: ${PBM}")
 	set(LIBS ${LIBS} ${PBM}) 
@@ -75,7 +85,7 @@ if (NOT ${PBM} STREQUAL "PBM-NOTFOUND")
 endif()
 
 # hdf4
-find_library (HDF4 NAMES mfhdf PATHS /usr/lib)
+find_library (HDF4 NAMES mfhdf)
 if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
 	message (STATUS "using hdf4: ${HDF4}")
 	set(LIBS ${LIBS} ${HDF4})
@@ -89,6 +99,13 @@ if (JPEG_FOUND)
 	set(LIBS ${LIBS} ${JPEG_LIBRARIES})
 	add_definitions(-DHAVE_JPEG)
 endif()
+
+# find_library (ZLIB NAMES z)
+# if (NOT ${ZLIB} STREQUAL "ZLIB-NOTFOUND")
+# 	message (STATUS "using zlib: ${ZLIB}")
+# 	set(LIBS ${LIBS} ${ZLIB})
+# 	add_definitions(-DHAVE_ZLIB)
+# endif()
 
 find_package(ZLIB REQUIRED)
 if (ZLIB_FOUND)
@@ -106,10 +123,10 @@ if (TIFF_FOUND)
 endif()
 
 # list include_directories
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-  message(STATUS "dir='${dir}'")
-endforeach()
+#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+# foreach(dir ${dirs})
+#   message(STATUS "dir='${dir}'")
+# endforeach()
 
 
 target_link_libraries(nPhysImageF ${LIBS})
