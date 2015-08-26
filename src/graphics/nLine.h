@@ -22,12 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <QtGui>
-#include <QClipboard>
-#include "ui_nLine.h"
-
 #ifndef __nLine
 #define __nLine
+
+#include <QtGui>
+#include <QClipboard>
+#include "nPhysImageF.h"
+#include "ui_nLine.h"
 
 class neutrino;
 class QwtPlot;
@@ -45,8 +46,6 @@ public:
 		return (neutrino *) QGraphicsObject::parent();
 	};
 	
-	void setNeutrino(neutrino*);
-	
 	enum { Type = QGraphicsItem::UserType + 1 };
 	int type() const { return Type;}
 	
@@ -61,7 +60,8 @@ public:
 	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
 	void focusInEvent(QFocusEvent * event);
 	void focusOutEvent(QFocusEvent * event);
-
+    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+    
 	void moveBy(QPointF);
 	
 	qreal nWidth;
@@ -109,7 +109,9 @@ public slots:
 	
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
-
+	QPolygonF getLine(int np=1);
+    void bufferChanged(nPhysD*);
+    
 	void zoomChanged(double);
 	void showMessage(QString);
 	void changePointPad(int);
@@ -130,6 +132,8 @@ public slots:
 	void toggleAntialias();
 	void toggleAntialias(bool);
 
+
+    void centerOnImage();
 
 	void changeP(int,QPointF);
 
@@ -152,6 +156,15 @@ public slots:
 
 	void addPointAfterClick(QPointF);
 	
+    void contextAppendPoint();
+    void contextPrependPoint();
+    void contextRemovePoint();
+
+    void makeHorizontal();
+    void makeVertical();
+    void makeRectangle();
+
+    
 	void export_txt();
 	void export_txt_points();
 	void copy_clip();
@@ -169,7 +182,7 @@ public slots:
 	
 signals:
 	void sceneChanged();
-	
+    void key_pressed(int);
 };
 
 bool orderMonotone_x(const QPointF &, const QPointF &);

@@ -43,7 +43,15 @@ Q_OBJECT
 	
 public:
 	nWinList(neutrino*, QString);	
+
 	Ui::nWinList my_w;
+
+
+	// stuff for static scale/origin
+	// (should pass to nPhysProperties once this has been merged to nWinList)
+	bool freezedFrame;
+	vec2f frScale, frOrigin;
+
 
 public slots:
 	void updatePad(nPhysD* = NULL);
@@ -57,6 +65,9 @@ public slots:
 	void panAdd(nGenericPan*);
 	void panDel(nGenericPan*);
 	void panClicked(QListWidgetItem*);
+
+	void setFreezed(bool);
+	void originChanged();
 	
 };
 

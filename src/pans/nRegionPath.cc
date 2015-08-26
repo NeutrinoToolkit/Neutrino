@@ -45,75 +45,61 @@ nRegionPath::nRegionPath(neutrino *nparent, QString winname)
 	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
-	connect(my_w.doMask, SIGNAL(clicked()), SLOT(doMask()));
+	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
 	regionPhys=NULL;
 }
 
-void
-nRegionPath::doIt() {
-	if (currentBuffer) {
-		saveDefaults();
-		nPhysD *image=getPhysFromCombo(my_w.image);
-		if (image) {
-			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
-			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-			nPhysD *regionPath = new nPhysD();
-			*regionPath=image->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
-			regionPath->setShortName("Region mask");
-			regionPath->setName("mask");
-			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
-			QProgressDialog progress("Extracting", "Stop", 0, regionPath->getW(), this);
-			progress.setWindowModality(Qt::WindowModal);
-			progress.show();
-			QTime time;
-			time.start();
-			for (register size_t i=0; i<regionPath->getW(); i++) {
-				if (progress.wasCanceled()) break;
-				QApplication::processEvents();
-				for (register size_t j=0; j<regionPath->getH(); j++) {
-					if (!regionPoly.containsPoint(QPoint(i+rectRegion.x(),j+rectRegion.y()),Qt::OddEvenFill)) {
-						regionPath->set(i,j,getReplaceVal());
-					}
-				}
-				progress.setValue(i);
-			}
-			regionPhys=nparent->replacePhys(regionPath,regionPhys);
-		}
-	}
-	qDebug() << region->poly(region->numPoints).toPolygon().size();
+void nRegionPath::duplicate () {
+    if (regionPhys==NULL) {
+        doIt();
+    }
+	regionPhys=NULL;
 }
 
-void nRegionPath::doMask() {
-	if (currentBuffer) {
-		saveDefaults();
-		nPhysD *image=getPhysFromCombo(my_w.image);
-		if (image) {
-			QPolygon regionPoly=region->poly(region->numPoints).toPolygon();
-			QRect rectRegion=region->boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
-			nPhysD *regionPath = new nPhysD(rectRegion.width(),rectRegion.height(),getReplaceVal());
-			regionPath->setShortName("Region mask");
-			regionPath->setName("mask");
-			regionPath->set_origin(image->get_origin()-vec2f(rectRegion.x(),rectRegion.y()));
-			QProgressDialog progress("Extracting", "Stop", 0, regionPath->getW(), this);
-			progress.setWindowModality(Qt::WindowModal);
-			progress.show();
-			QTime time;
-			time.start();
-			for (register size_t i=0; i<regionPath->getW(); i++) {
-				if (progress.wasCanceled()) break;
-				QApplication::processEvents();
-				for (register size_t j=0; j<regionPath->getH(); j++) {
-					if (regionPoly.containsPoint(QPoint(i+rectRegion.x(),j+rectRegion.y()),Qt::WindingFill)) {
-						regionPath->set(i,j,1);
-					}
-				}
-				progress.setValue(i);
-			}
-			regionPath->TscanBrightness();
-//			qDebug() << ">>>>>>>>>>>>>>>>> time " << time.elapsed();
-			regionPhys=nparent->replacePhys(regionPath,regionPhys);
-		}
-	}
+void nRegionPath::doIt() {
+    saveDefaults();
+    nPhysD *image=getPhysFromCombo(my_w.image);
+    if (image) {
+        double replaceVal=getReplaceVal();
+        QPolygonF regionPoly=region->poly(1);
+        regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
+        
+        vector<vec2f> vecPoints(regionPoly.size());
+        for(int k=0;k<regionPoly.size();k++) {
+            vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
+        }
+        
+        QRect rectRegion=regionPoly.boundingRect().toRect();
+        
+        nPhysD *regionPath = new nPhysD(*image);
+        
+        if (!my_w.inverse->isChecked()) {
+            regionPath->set(replaceVal);
+        } 
+        
+        regionPath->setShortName("Region path");
+        regionPath->setName("path");
+        QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.show();
+        for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
+            if (progress.wasCanceled()) break;
+            QApplication::processEvents();
+            for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+                vec2f pp(i,j);
+                if (point_inside_poly(pp,vecPoints)==my_w.inverse->isChecked()) {
+                    regionPath->set(pp,replaceVal);
+                } else {
+                    regionPath->set(pp,image->point(i,j));
+                }
+            }
+            progress.setValue(i-rectRegion.left());
+        }
+        if (my_w.crop->isChecked()) {
+            *regionPath=regionPath->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+        }
+        regionPhys=nparent->replacePhys(regionPath,regionPhys);
+    }
 }
 
 double nRegionPath::getReplaceVal() {
@@ -125,19 +111,19 @@ double nRegionPath::getReplaceVal() {
 				val=std::numeric_limits<double>::quiet_NaN();
 				break;
 			case 1:
-				val=image->Tminimum_value;
+				val=image->get_min();
 				break;
 			case 2:
-				val=image->Tmaximum_value;
+				val=image->get_max();
 				break;
 			case 3:
-				val=0.5*(image->Tminimum_value+image->Tmaximum_value);
+				val=0.5*(image->get_min()+image->get_max());
 				break;
 			case 4:
 				val=0.0;
 				break;
 			default:
-				WARNING("something is broken here");
+				val=my_w.replace->text().toDouble();
 				break;
 		}
 	}

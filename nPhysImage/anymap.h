@@ -83,14 +83,12 @@ public:
 		return get_d();
 	}
 
-
 	operator std::string() const {
 		if (ddescr == any_none) {
-			WARNING("accessing uninitialized value");
-		} else if (!is_str()) WARNING("wrong datatype (string) required for map member!! String is ");
+			DEBUG("accessing uninitialized value");
+		}
 		return get_str();
 	}
-
 
 	template<class T> operator bidimvec<T>() const {
 		if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");
@@ -106,6 +104,7 @@ public:
 	bool is_i() const { return ddescr == any_int; }
 	bool is_str() const { return ddescr == any_str; }
 	bool is_vec() const { return ddescr == any_vec; }
+	bool is_none() const {return ddescr==any_none;}
 
 	double get_d() const { return (ddescr == any_double) ? d : 0; }
 	int get_i() const { return (ddescr == any_int) ? i : 0; }
@@ -138,6 +137,10 @@ public:
 		}*/
 	//	return at(val);
 	//}	
+	
+	bool have(std::string search_me) {
+	    return (find(search_me) != end());
+	}
 
 	void loader(std::istream &is) {
 		std::string st;
@@ -145,7 +148,7 @@ public:
 
 		getline(is, st);
 		while (st.find(__pp_init_str) == std::string::npos && !is.eof()) {
-			std::cerr<<"get"<<std::endl;
+			DEBUG("get");
 			getline(is, st);
 		}
 
@@ -155,8 +158,7 @@ public:
 
 			size_t eqpos = st.find("=");
 			if (eqpos == std::string::npos) {
-				std::cerr<<st<<": malformed line"<<std::endl;
-				std::cout<<"-----------------------------"<<std::endl;
+			    DEBUG(st<<": malformed line");
 				continue;
 			}
 			std::string st_key = trim(st.substr(0, eqpos), "\t ");
@@ -167,16 +169,15 @@ public:
 			// filling
 			std::stringstream ss(st_arg);
 			ss>>(*this)[st_key];
-			std::cout<<"-----------------------------"<<std::endl;
 			
 			getline(is, st);
 		}
-		std::cerr<<"[anydata] read "<<size()<<" keys"<<std::endl;
+		DEBUG("[anydata] read "<<size()<<" keys");
 	}
 
 
 	void dumper(std::ostream &os) {
-		std::cerr<<"[anydata] Starting dump of "<<size()<<" elements"<<std::endl;
+	    DEBUG("[anydata] Starting dump of "<<size()<<" elements");
 		
 		os<<__pp_init_str<<std::endl;
 		
@@ -186,13 +187,17 @@ public:
 			DEBUG(5,"[anydata] Dumping "<<itr->first);
 
 			// check if key was inserted by non-existent access
-			// (strange std::map behaviour...)
-			if (itr->second.ddescr != anydata::any_none)
-				os<<itr->first<<" = "<<itr->second<<std::endl;
+			// (strange std::map behaviour...)			
+			if (itr->second.ddescr != anydata::any_none) {
+                std::string my_val=itr->second;
+                std::replace(my_val.begin(), my_val.end(),'\n', '\t');
+
+				os<<itr->first<<" = "<<my_val<<std::endl;
+			}
 		}
 		os<<__pp_end_str<<std::endl;
 		
-		std::cerr<<"[anydata] Dumping ended"<<std::endl;
+		DEBUG("[anydata] Dumping ended");
 	}
 
 };

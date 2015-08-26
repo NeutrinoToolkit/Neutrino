@@ -28,6 +28,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #ifndef __bidimvec_h
 #define __bidimvec_h
@@ -62,7 +63,8 @@ public:
 	bidimvec<T> operator/= (double);
 	bidimvec<T> operator/ (double);
 	bidimvec<T> operator- ();
-
+    std::ostream& operator<< (std::ostream&);
+	
 	// products
 	double operator| (bidimvec<T>);	// scalar product
 	double operator^ (bidimvec<T>);	// angle between vectors
@@ -75,9 +77,13 @@ public:
 	{ return bidimvec<U>(U(myval1), U(myval2)); }
 	
 	double mod();
+	double mod2(); //square of mod (i.e. mod=sqrt(mod2))
+	
 	void norm();
 	bidimvec<T> orthonorm(void);
 	bidimvec<T> rotate(double);
+
+	bidimvec<T> swap();
 
 	//double intp(bidimvec<T>, bidimvec<T>);
 
@@ -90,10 +96,20 @@ public:
 	inline T second(void)
 	{ return myval2; }
 
+	inline void set_first(T val)
+	{ myval1= val;}
+	inline void set_second(T val)
+	{ myval2= val;}
 
 private:
 	T myval1, myval2;
 };
+
+template <class T>  
+std::ostream& bidimvec<T>::operator<< (std::ostream& ss) {
+        ss<<"("<<x()<<":"<<y()<<")";
+        return ss;
+}
 
 
 template <class T> bidimvec<T>
@@ -122,7 +138,11 @@ bidimvec<T>::operator!= (bidimvec<T> rhs)
 
 template <class T> double
 bidimvec<T>::mod()
-{ return sqrt(myval1*myval1+myval2*myval2); }
+{ return sqrt(mod2()); }
+
+template <class T> inline double
+bidimvec<T>::mod2()
+{ return myval1*myval1+myval2*myval2; }
 
 template <class T> void
 bidimvec<T>::norm(void)
@@ -242,10 +262,13 @@ bidimvec<T>::orthonorm(void)
 //{ return bidimvec<T>( (myval2==0) ? 0 : -.5/myval2, (myval1 == 0) ? 0 : .5/myval1 ); }
 
 template <class T> bidimvec<T>
+bidimvec<T>::swap(void)
+{ return bidimvec<T>(second(),first());}
+
+template <class T> bidimvec<T>
 bidimvec<T>::rotate(double theta)
 { return bidimvec<T>( myval1*cos(theta)-myval2*sin(theta), myval1*sin(theta)+myval2*cos(theta)); }
 
-	
 template <class T> bidimvec<T>
 mul_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()*v2.x(), v1.y()*v2.y()); }
@@ -253,6 +276,19 @@ mul_P(bidimvec<T> v1, bidimvec<T> v2)
 template <class T> bidimvec<T>
 div_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()/v2.x(), v1.y()/v2.y()); }
+
+template <class T> bool point_inside_poly(bidimvec<T> test, std::vector<bidimvec<T> > vert)
+{
+    bool c = false;
+    unsigned int i,j;
+    for (i = 0, j = vert.size()-1; i < vert.size(); j = i++) {
+        if ( ((vert[i].y()>test.y()) != (vert[j].y()>test.y())) &&
+            (test.x() < (vert[j].x()-vert[i].x()) * (test.y()-vert[i].y()) / (vert[j].y()-vert[i].y()) + vert[i].x()) )
+            c = !c;
+    }
+    return c;
+}
+
 
 // ------------------ helper functions ------------------
 

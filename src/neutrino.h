@@ -40,6 +40,7 @@
 #include "nGenericPan.h"
 #include "nPlug.h"
 #include "nView.h"
+#include "nScene.h"
 
 // base ui
 #include "ui_neutrino.h"
@@ -57,13 +58,11 @@
 #include "nLine.h"
 #include "nRect.h"
 #include "nEllipse.h"
+#include "nPoint.h"
 
 #include "nMouse.h"
 
 #include "nTics.h"
-
-template<class T>
-inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 
 class neutrino : public QMainWindow {
 
@@ -77,17 +76,12 @@ public:
 	QGraphicsScene *getScene();
 	Ui::neutrino my_w;
 
-//	QDockWidget *leftDock;
-
-	QGraphicsScene my_s;
+	nScene my_s;
 
 	Ui::nSbarra my_sbarra;
 
-	QList<nPhysD*> physList;
-									
 	nPlug *plug_iface;
 	
-	QString colorTable;
 	
 	
 	static const int MaxRecentFiles=20;
@@ -95,14 +89,9 @@ public:
 	QList <QAction *> recentFileActs;
 	void updateRecentFileActions(QString=QString());
 
-	QList<QAction *> listabuffer;
 
-	//	QGraphicsScene my_s;
 	QGraphicsPixmapItem my_pixitem;
 	
-	double colorMin, colorMax;
-	bool colorRelative;
-
 	nMouse my_mouse;
 	
 	nTics my_tics;
@@ -110,12 +99,19 @@ public:
 	nPhysD* currentBuffer;
 	QPointer<neutrino> follower;
 
+
+
+	// --------- data structures -----------
+	QString colorTable;
+	QList<QAction *> listabuffer;
 	QMap<QString, unsigned char *> nPalettes;
 
+private:
+    QList<nGenericPan*> panList;
+	QList<nPhysD*> physList;
+    
 public slots:
-	nGenericPan* existsPan(QString, bool=false);
-	QList<nGenericPan*> getPans();
-
+	nGenericPan* existsPan(QString);
 
 	void build_colormap();
 	
@@ -148,7 +144,7 @@ public slots:
 	void previousColorTable ();
 	void nextColorTable ();
 
-	void changeColorMinMax (double,double);
+	void changeColorMinMax (vec2f);
 
 	void addPhys(nPhysD*);
 	void addPhys(nPhysD&);
@@ -161,17 +157,18 @@ public slots:
 	void addShowPhys(nPhysD&);
 	nPhysD* getBuffer(int=-1);
 
-	QList<nPhysD *> getBufferList();
+	inline QList<nPhysD *> getBufferList() {return physList;};
+    inline QList<nGenericPan*> getPanList() {return panList;};
 
 							
 	// menu actions
 	void addMenuBuffers(nPhysD*);
 	// File
-	void fileNew();
+	neutrino* fileNew();
 
 	void openFile(QString);
 	void fileOpen();
-	std::vector<nPhysD*> fileOpen(QString, QString=QString());
+	std::vector<nPhysD*> fileOpen(QString);
 	void fileOpen(QStringList);
 	void fileReopen();
 
@@ -188,6 +185,7 @@ public slots:
 	void saveSession(QString=QString());
 
 	void exportGraphics();
+	void exportAllGraphics();
 	void exportGraphics(QString);
 
 	nGenericPan* Monitor();
@@ -211,8 +209,7 @@ public slots:
 	// Analysis
 	nGenericPan* FocalSpot();
 	nGenericPan* MathOperations();
-	nGenericPan* AutoAlign();
-
+	
 	// cutoff mask
 	nGenericPan* CutoffImage();
 
@@ -226,11 +223,9 @@ public slots:
 	nGenericPan* Hlineout();
 	nGenericPan* Vlineout();
 	nGenericPan* bothLineout();
-
-#ifdef __phys_HDF
+#ifdef HAVE_HDF5
 	nGenericPan* openHDF5();
 #endif
-
 	nGenericPan* BoxLineout();
 	nGenericPan* FindPeaks();
 	nGenericPan* CompareLines();
@@ -243,6 +238,8 @@ public slots:
 
 	void createDrawEllipse();
 
+	void createDrawPoint();
+	
 	void mouseposition(QPointF);
 
 
@@ -250,10 +247,6 @@ public slots:
 
 	void keyPressEvent (QKeyEvent *);
 	void keyReleaseEvent (QKeyEvent *);
-
-	void dragEnterEvent(QDragEnterEvent *);
-	void dragMoveEvent(QDragMoveEvent *);
-	void dropEvent(QDropEvent *);
 
 	void closeEvent(QCloseEvent *);
 
@@ -278,7 +271,10 @@ public slots:
 	
 	// WAVELET STUFF
 	nGenericPan* Wavelet();
-
+    
+	// interferometry STUFF
+	nGenericPan* Interferometry();
+    
 	// SPECTRAL ANALYSIS
 	nGenericPan* SpectralAnalysis();
 
@@ -290,14 +286,25 @@ public slots:
 
 	// ROTATE STUFF
 	nGenericPan* Rotate();
-
+	
+	// Affine STUFF
+	nGenericPan* Affine();
+	
 	// BLUR STUFF
 	nGenericPan* Blur();
-
+    
+	// remove ghost Fringes
+	nGenericPan* Ghost();
+    
+	// interpoalte inside path
+	nGenericPan* InterpolatePath();
+    
 	nGenericPan* MouseInfo();
 
 	void about();
 	nGenericPan* Preferences();
+
+    nGenericPan* openPan(QString);
 
 	void emitPanAdd(nGenericPan*);
 	void emitPanDel(nGenericPan*);
@@ -308,8 +315,11 @@ public slots:
 	
 	nLine* line(QString);
 	
+    void dragEnterEvent(QDragEnterEvent *);
+	void dragMoveEvent(QDragMoveEvent *);
+	void dropEvent(QDropEvent *);
+    
 signals:
-	void passdropEvent(QDropEvent *);
 	void updatecolorbar();
 	void colorValue(double);
 
@@ -320,8 +330,12 @@ signals:
 	void nZoom(double);
 
 	void bufferChanged(nPhysD*);						// visible image update
+	void bufferOriginChanged();
 	void physAdd(nPhysD*);
 	void physDel(nPhysD*);
+    void physMod(std::pair<nPhysD*,nPhysD*>);
+    
+    
 
 	void keyPressEvent();
 	void closeAll();

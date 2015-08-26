@@ -62,9 +62,8 @@ public:
 
 	void setSize();
 
-	QPointF minMax;
+	vec2f minMax;
 
-	QRectF bBox;
 	QFont scaledFont;
 
 	// painter
@@ -73,6 +72,7 @@ public:
 	bool showDimPixel;
 	
 public slots:
+    void mouseDoubleClickEvent (QMouseEvent *);
 	void mousePressEvent (QMouseEvent *);
 	void mouseReleaseEvent (QMouseEvent *);
 	void mouseMoveEvent (QMouseEvent *);
@@ -94,9 +94,9 @@ protected:
 signals:
 	void mouseposition(QPointF);
 	void mousePressEvent_sig(QPointF);
+	void mouseDoubleClickEvent_sig(QPointF);
 	void mouseReleaseEvent_sig(QPointF);
 	void zoomChanged(double);
-
 };
 
 #endif

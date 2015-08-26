@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *    Copyright (C) 2014 Alessandro Flacco, Tommaso Vinci All Rights Reserved
  * 
  *    This file is part of neutrino.
  *
@@ -22,19 +22,35 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "focalspot_pan.h"
 
-focalspot_pan::focalspot_pan(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
-	setWindowFlags(Qt::Window);
-	my_w.setupUi(this);
-	decorate();
+#include <QtGui>
+#include <QWidget>
 
-}
+#include "nGenericPan.h"
+#include "ui_nFocalSpot.h"
 
-void
-focalspot_pan::analyze(void)
-{
-	// get nPhysImageF pointer
-	//nPhysD *my_ph;
-}
+#ifndef __nFocalSpot
+#define __nFocalSpot
+
+class neutrino;
+class nLine;
+
+class nFocalSpot : public nGenericPan {
+	Q_OBJECT
+public:
+	nFocalSpot(neutrino *, QString);
+
+	Ui::nFocalSpot my_w;
+
+	QPointer<nLine> nContour;
+
+public slots:
+	void calculate_stats();
+	double find_contour();
+	double contour_integral(std::list<vec2> &, std::list<vec2>::iterator &);
+
+	void bufferChanged(nPhysD*);
+	
+};
+
+#endif

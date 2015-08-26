@@ -13,8 +13,8 @@ HEADERS += nOpenRAW.h
 SOURCES += nOpenRAW.cc
 
 
-SOURCES += nLine.cc nRect.cc nEllipse.cc 
-HEADERS += nLine.h  nRect.h  nEllipse.h  
+SOURCES += nLine.cc nRect.cc nEllipse.cc nPoint.cc
+HEADERS += nLine.h  nRect.h  nEllipse.h  nPoint.h
 HEADERS += nMouse.h  nTics.h
 SOURCES += nMouse.cc nTics.cc
 
@@ -29,9 +29,9 @@ FORMS += nWinList.ui
 
 
 ## focal spot
-HEADERS += focalspot_pan.h
-SOURCES += focalspot_pan.cc
-FORMS += focalspot.ui
+HEADERS += nFocalSpot.h
+SOURCES += nFocalSpot.cc
+FORMS += nFocalSpot.ui
 
 ## lineout
 HEADERS += nLineout.h  nLineoutBoth.h
@@ -53,15 +53,15 @@ HEADERS += nRotate.h
 SOURCES += nRotate.cc
 FORMS += nRotate.ui
 
+## Affine
+HEADERS += nAffine.h
+SOURCES += nAffine.cc
+FORMS += nAffine.ui
+
 ## Blur
 HEADERS += nBlur.h
 SOURCES += nBlur.cc
 FORMS += nBlur.ui
-
-#Auto align two images tool
-FORMS += nAutoAlign.ui
-SOURCES += nAutoAlign.cc
-HEADERS += nAutoAlign.h 
 
 #HDF stuff 
 neutrino-HDF {
@@ -89,6 +89,11 @@ HEADERS += nVisar.h  nVisarZoomer.h
 FORMS += nWavelet.ui
 SOURCES += nWavelet.cc
 HEADERS += nWavelet.h 
+
+# Interferometry
+FORMS += nInterferometry.ui nInterferometry1.ui
+SOURCES += nInterferometry.cc
+HEADERS += nInterferometry.h 
 
 # Spectral Analysis
 FORMS += nSpectralAnalysis.ui
@@ -124,5 +129,15 @@ HEADERS += nCompareLines.h
 FORMS += nShortcuts.ui
 SOURCES += nShortcuts.cc
 HEADERS += nShortcuts.h 
+
+#Ghost fringes
+FORMS += nGhost.ui
+SOURCES += nGhost.cc
+HEADERS += nGhost.h 
+
+#interpolate a closed path
+FORMS += nInterpolatePath.ui
+SOURCES += nInterpolatePath.cc
+HEADERS += nInterpolatePath.h 
 
 

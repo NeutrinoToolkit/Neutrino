@@ -47,6 +47,30 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	coreNum=sysconf( _SC_NPROCESSORS_ONLN );
 #endif
 
+    int nthreads, procs, maxt, inpar, dynamic, nested;
+#pragma omp parallel private(nthreads)
+    {
+        if (omp_get_thread_num() == 0) 
+        {
+            /* Get environment information */
+            procs = omp_get_num_procs();
+            nthreads = omp_get_num_threads();
+            maxt = omp_get_max_threads();
+            inpar = omp_in_parallel();
+            dynamic = omp_get_dynamic();
+            nested = omp_get_nested();
+            
+            /* Print environment information */
+            my_w.infoCores->insertPlainText("Number of processors     = "+QString::number(procs));
+            my_w.infoCores->insertPlainText("\nNumber of threads        = "+QString::number(nthreads));
+            my_w.infoCores->insertPlainText("\nMax threads              = "+QString::number(maxt));
+            my_w.infoCores->insertPlainText("\nIn parallel?             = "+QString(inpar==0?"No":"Yes"));
+            my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
+            my_w.infoCores->insertPlainText("\nNested supported?        = "+QString(nested==0?"No":"Yes"));
+        }
+    }
+    
+    
 	my_w.threads->setMaximum(coreNum);
 
 	if (coreNum==1) {
@@ -66,6 +90,11 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	loadDefaults();
 	decorate();
 	
+    DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
+    
+    my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
+
+	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
 	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
@@ -73,13 +102,43 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	my_w.labelFont->setFont(nparent->my_w.my_view->font());
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
-	
+	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
+	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
+    
+    connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
+}
+
+void nPreferences::changeThreads(int num) {
+    if (num<=1) {
+        fftw_cleanup_threads();
+    } else {
+        fftw_init_threads();
+        fftw_plan_with_nthreads(num);
+    }
+    omp_set_num_threads(num);
+    QSettings settings("neutrino","");
+    settings.beginGroup("Preferences");
+    settings.setValue("threads",num);
+    settings.endGroup();
+    DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
+}
+
+void nPreferences::useDot() {
+    if (my_w.useDot->isChecked()) {
+        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    } else {
+        QLocale::setDefault(QLocale::system());
+    }
+    my_w.statusBar->showMessage(QLocale::countryToString(QLocale().country()), 5000);
+}
+
+void nPreferences::askCloseUnsaved() {
+    nparent->setProperty("askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
 }
 
 void nPreferences::changeShowDimPixel() {
 	nparent->my_w.my_view->showDimPixel=my_w.showDimPixel->isChecked();
-	
 	nparent->my_w.my_view->update();
 }
 
@@ -108,7 +167,7 @@ void nPreferences::changeIconSize(int val) {
 			obj->show();
 		}
 	}
-	foreach (nGenericPan* pan, nparent->getPans()) {
+	foreach (nGenericPan* pan, nparent->getPanList()) {
 		foreach (QToolBar *obj, pan->findChildren<QToolBar *>()) {
 			if (obj->iconSize()!=mysize) {
 				obj->hide();
@@ -127,4 +186,10 @@ void nPreferences::hideEvent(QHideEvent*){
 void nPreferences::showEvent(QShowEvent*){
 	loadDefaults();
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-};
+}
+
+void nPreferences::changephysNameLength(int k) {
+    nparent->setProperty("physNameLength",k);
+}
+
+

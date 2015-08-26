@@ -33,14 +33,15 @@
 #endif 
 
 #include "neutrino.h"
+#include "nApp.h"
+
 int main(int argc, char **argv)
 {
 
 #ifdef Q_OS_MAC
-	DEBUG("Initializing osx app");
 	osxApp *qapp = new osxApp(argc,argv);	
 #else
-	QApplication *qapp = new QApplication(argc,argv);
+	NApplication *qapp = new NApplication(argc,argv);
 #endif
 	
 	qapp->setOrganizationName("ParisTech");
@@ -51,8 +52,9 @@ int main(int argc, char **argv)
 	QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
 	neutrino* neu = new neutrino();
-	
-	foreach (QString filename, QCoreApplication::arguments()) {
+	QStringList args=QCoreApplication::arguments();
+    args.removeFirst();
+	foreach (QString filename, args) {
 		neu->fileOpen(filename);
 	}
 

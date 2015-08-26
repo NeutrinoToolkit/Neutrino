@@ -47,6 +47,9 @@ class neutrino;
 class nLine;
 class nRect;
 
+template<class T>
+inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
+
 class nVisar : public nGenericPan {
 	Q_OBJECT
 	
@@ -78,6 +81,7 @@ public slots:
 	
 	QString export_one(int);
 	QString export_sop();
+	QString export_plot(QwtPlot*);
 	void export_pdf();
 	void export_clipboard();
 
@@ -91,9 +95,17 @@ public slots:
 	void mouseAtMatrix(QPointF);
 	void loadSettings(QString);
 	
+    void bufferChanged(nPhysD*);
+    
 private:
-	QwtPlotCurve cPhase[3][2],cIntensity[3][2],cContrast[2][2];	
-	QList<QwtPlotMarker*> marker;
+	QwtPlotCurve cPhase[2][2],cIntensity[2][2],cContrast[2][2];
+    
+	QwtPlotCurve velocity[2],reflectivity[2], sopCurve[3];
+    
+    QwtPlotCurve Us_R[2],Us_T;
+    
+    
+    QList<QwtPlotMarker*> marker;
 	QList<QwtPlotCurve*> velJumps;	
 	
 	QwtPlotMarker mouseMarker[4];

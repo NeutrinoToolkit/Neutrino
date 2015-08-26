@@ -40,9 +40,22 @@ nRect::~nRect() {
 
 nRect::nRect(neutrino *nparent) : QGraphicsObject()
 {
-	nparent->my_s.addItem(this);
-	setParent(nparent);
-
+    if (nparent) {
+        nparent->my_s.addItem(this);
+        setParent(nparent);
+        int num=nparent->property("numRect").toInt()+1;
+        nparent->setProperty("numRect",num);
+        setProperty("numRect",num);
+        setToolTip(tr("rect")+QString(" ")+QString::number(num));
+        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        zoom=nparent->getZoom();
+        if (nparent->currentBuffer) {
+            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+        }
+    }
+    
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -55,23 +68,8 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	nColor=QColor(Qt::black);
 	holderColor=QColor(0,0,255,200);
 
-	int num=nparent->property("numRect").toInt()+1;
-	nparent->setProperty("numRect",num);
-	setProperty("numRect",num);
-
-#ifdef __use_nPython
-//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Rect")+property("num").toString(), this);
-#endif
 
 	setOrder(0.0);
-	setToolTip(tr("rect")+QString(" ")+QString::number(num));
-
-	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-
-	connect(parent()->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-
-	zoom=parent()->getZoom();
-
 
 	// PADELLA
 	my_pad.setWindowTitle(toolTip());
@@ -123,20 +121,29 @@ void nRect::setRect(QRectF rect) {
 	itemChanged();
 }
 
-QRect nRect::getRect() {
-	if (ref.size()<2) {
-		return QRect(0,0,0,0);
-	} else {
-		return QRectF(ref[0]->pos(),ref[1]->pos()).toRect().normalized();
-	}
+QRect nRect::getRect(nPhysD* image) {
+    QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
+    if (image && parent()->currentBuffer) {
+        vec2f dx(image->get_origin()-parent()->currentBuffer->get_origin());
+        geom2.translate(dx.x(),dx.y());        
+    }
+    return geom2;
 }
 
 QRectF nRect::getRectF() {
 	if (ref.size()<2) {
 		return QRectF(0,0,0,0);
 	} else {
-		return QRectF(ref[0]->pos(),ref[1]->pos()).normalized();
+		return QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).normalized();
 	}
+}
+
+void nRect::bufferChanged(nPhysD* my_phys) {    
+    if (my_phys) {
+        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+    } else {
+        setPos(0,0);
+    }
 }
 
 void nRect::interactive ( ) {
@@ -147,6 +154,7 @@ void nRect::interactive ( ) {
 
 void nRect::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
+    moveRef.clear();
 	appendPoint();
 	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
@@ -286,7 +294,7 @@ nRect::changeColorHolder (QColor color) {
 void
 nRect::changeP (int np, QPointF p, bool updatepad) {
 	prepareGeometryChange();
-	ref[np]->setPos(p);
+	ref[np]->setPos(mapFromScene(p));
 	ref[np]->setVisible(true);
 	if (updatepad) changePointPad(np);
 	updateSize();
@@ -371,6 +379,13 @@ void nRect::intersection() {
 	}
 }
 
+void nRect::submatrix() {
+    if (parent()->currentBuffer) {
+        nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+        parent()->showPhys(subPhys);
+    }
+}
+
 void nRect::changeWidth () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
@@ -436,7 +451,7 @@ nRect::keyPressEvent ( QKeyEvent * e ) {
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
 			break;
-		case Qt::Key_Return:
+		case Qt::Key_W:
 			togglePadella();
 			break;
 		case Qt::Key_E:
@@ -453,12 +468,10 @@ nRect::keyPressEvent ( QKeyEvent * e ) {
 			intersection();
 			break;
 		case Qt::Key_S:
-			if (parent()->currentBuffer) {
-				nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-				parent()->showPhys(subPhys);
-			}
+            submatrix();
 			break;
 		default:
+            emit key_pressed(e->key());
 			break;
 	}
 }
@@ -471,7 +484,7 @@ nRect::keyReleaseEvent ( QKeyEvent *  ) {
 void
 nRect::moveBy(QPointF delta) {
 	for (int i =0; i<ref.size(); i++) {
-		changeP(i,ref[i]->pos()+delta,true);
+        changeP(i,mapToScene(ref[i]->pos()+delta),true);
 	}
 	showMessage(getRectString());
 }
@@ -516,7 +529,8 @@ nRect::boundingRect() const {
 
 QPainterPath nRect::shape() const {
 	QPainterPathStroker stroker;
-	stroker.setWidth(4+nWidth/zoom);
+	double thickness=max(nWidth,10.0)/zoom;
+    stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
 		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
@@ -587,13 +601,15 @@ nRect::saveSettings() {
 void
 nRect::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-	int size = settings->beginReadArray("points");
-	QPolygonF poly_tmp;
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		poly_tmp << QPointF(settings->value("x").toDouble(), settings->value("y").toDouble());
-	}
-	settings->endArray();
+    setPos(settings->value("position").toPoint());
+    
+    int size = settings->beginReadArray("points");
+    QPolygonF poly_tmp;
+    for (int i = 0; i < size; ++i) {
+        settings->setArrayIndex(i);
+        poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+    }
+    settings->endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
@@ -612,11 +628,13 @@ void
 nRect::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());
 	settings->beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
 		settings->setArrayIndex(i);
-		settings->setValue("x", ref.at(i)->pos().x());
-		settings->setValue("y", ref.at(i)->pos().y());
+        QPointF ppos=mapToScene(ref.at(i)->pos());
+		settings->setValue("x", ppos.x());
+		settings->setValue("y", ppos.y());
 	}
 	settings->endArray();
 	settings->setValue("name",toolTip());

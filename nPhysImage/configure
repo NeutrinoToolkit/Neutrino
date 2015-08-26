@@ -625,15 +625,16 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 POW_LIB
+OPENMP_CFLAGS
 EGREP
 GREP
 CPP
-ac_ct_CC
-CFLAGS
-CC
 NVCCBASE
 NVCC
 NVCCFLAGS
+ac_ct_CC
+CFLAGS
+CC
 LCFLAGS
 SET_MAKE
 OBJEXT
@@ -686,6 +687,7 @@ ac_user_opts='
 enable_option_checking
 enable_64
 with_cuda
+enable_openmp
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1309,6 +1311,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-64			 Compile for 64bit
+  --disable-openmp        do not use OpenMP
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2787,155 +2790,7 @@ $as_echo "$as_me: OSX : FIX headerpad_max_install_names" >&6;}
 		;;
 esac
 
-
-# — Macro: AC_PATH_PROG (variable, prog-to-check-for, [value-if-not-found], [path = ‘$PATH’])
-#AC_PATH_PROG([NVCC], [nvcc], [])
-#m4_ifnblank([NVCC], AC_DEFINE([HAVE_CUDA], [1], [Include CUDA support]))
-
-
-# Check whether --enable-64 was given.
-if test "${enable_64+set}" = set; then :
-  enableval=$enable_64; CFLAGS+=" -m64"; NVCCFLAGS+=" -m64"
-fi
-
-
-if test "$with_cuda" != no; then
-
-# Check whether --with-cuda was given.
-if test "${with_cuda+set}" = set; then :
-  withval=$with_cuda;
-else
-  with_cuda="no"
-fi
-
-
-	case $uname in
-		*MINGW*)
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA not supported on MINGW" >&5
-$as_echo "$as_me: CUDA not supported on MINGW" >&6;}
-			;;
-		*)
-		if test "$with_cuda" == yes; then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA/Enable set to auto configuration" >&5
-$as_echo "$as_me: CUDA/Enable set to auto configuration" >&6;}
-			# Extract the first word of "nvcc", so it can be a program name with args.
-set dummy nvcc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_NVCC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $NVCC in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_NVCC="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-NVCC=$ac_cv_path_NVCC
-if test -n "$NVCC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
-$as_echo "$NVCC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-
-$as_echo "#define HAVE_CUDA 1" >>confdefs.h
-
-			NVCCBASE="$prefix"
-
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA/Enable set to manual configuration" >&5
-$as_echo "$as_me: CUDA/Enable set to manual configuration" >&6;}
-			NVCC="$with_cuda"/bin/nvcc
-
-			NVCCBASE="$with_cuda"
-
-
-			# really check
-			# Extract the first word of "nvcc", so it can be a program name with args.
-set dummy nvcc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_NVCC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $NVCC in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in path = "$with_cuda"/bin/nvcc
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_NVCC="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-NVCC=$ac_cv_path_NVCC
-if test -n "$NVCC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
-$as_echo "$NVCC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-
-			if test -n "$NVCC"; then
-
-$as_echo "#define HAVE_CUDA 1" >>confdefs.h
-
-			fi
-
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: NVCC: $NVCC" >&5
-$as_echo "$as_me: NVCC: $NVCC" >&6;}
-
-		fi
-		CFLAGS+=" -I$NVCCBASE/include"
-		LDFLAGS+=" -L$NVCCBASE/lib"
-	#	AC_CHECK_LIB([cudart], [main],, m4_fatal(Cannot find libcudart. Your nvcc installation might be incomplete))
-	#	AC_CHECK_LIB([cufft], [main],, m4_fatal(Cannot find libcufft. Your nvcc installation might be incomplete))
-			;;
-	esac
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA disabled" >&5
-$as_echo "$as_me: CUDA disabled" >&6;}
-fi
-
-
-# — Macro: AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
+# Macro: AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
 
 #[LIBS="-lseq $LIBS"]
 
@@ -3639,84 +3494,6 @@ fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lhdf5" >&5
-$as_echo_n "checking for main in -lhdf5... " >&6; }
-if ${ac_cv_lib_hdf5_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lhdf5  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_hdf5_main=yes
-else
-  ac_cv_lib_hdf5_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_hdf5_main" >&5
-$as_echo "$ac_cv_lib_hdf5_main" >&6; }
-if test "x$ac_cv_lib_hdf5_main" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBHDF5 1
-_ACEOF
-
-  LIBS="-lhdf5 $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lhdf5_hl" >&5
-$as_echo_n "checking for main in -lhdf5_hl... " >&6; }
-if ${ac_cv_lib_hdf5_hl_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lhdf5_hl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_hdf5_hl_main=yes
-else
-  ac_cv_lib_hdf5_hl_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_hdf5_hl_main" >&5
-$as_echo "$ac_cv_lib_hdf5_hl_main" >&6; }
-if test "x$ac_cv_lib_hdf5_hl_main" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBHDF5_HL 1
-_ACEOF
-
-  LIBS="-lhdf5_hl $LIBS"
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -ljpeg" >&5
 $as_echo_n "checking for main in -ljpeg... " >&6; }
 if ${ac_cv_lib_jpeg_main+:} false; then :
@@ -4125,8 +3902,194 @@ else
   as_fn_error $? "unable to find FFTW lib" "$LINENO" 5
 fi
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lfftw3_threads" >&5
+$as_echo_n "checking for main in -lfftw3_threads... " >&6; }
+if ${ac_cv_lib_fftw3_threads_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3_threads  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_threads_main=yes
+else
+  ac_cv_lib_fftw3_threads_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_threads_main" >&5
+$as_echo "$ac_cv_lib_fftw3_threads_main" >&6; }
+if test "x$ac_cv_lib_fftw3_threads_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFFTW3_THREADS 1
+_ACEOF
+
+  LIBS="-lfftw3_threads $LIBS"
+
+else
+  as_fn_error $? "unable to find FFTW threaded lib" "$LINENO" 5
+fi
+
 		;;
 esac
+
+#AC_PATH_PROG([NVCC], [nvcc], [])
+#m4_ifnblank([NVCC], AC_DEFINE([HAVE_CUDA], [1], [Include CUDA support]))
+
+
+# Check whether --enable-64 was given.
+if test "${enable_64+set}" = set; then :
+  enableval=$enable_64; CFLAGS+=" -m64"; NVCCFLAGS+=" -m64"
+fi
+
+
+if test "$with_cuda" != no; then
+
+# Check whether --with-cuda was given.
+if test "${with_cuda+set}" = set; then :
+  withval=$with_cuda;
+else
+  with_cuda="no"
+fi
+
+
+	case $uname in
+		*MINGW*)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA not supported on MINGW" >&5
+$as_echo "$as_me: CUDA not supported on MINGW" >&6;}
+			;;
+		*)
+		if test "$with_cuda" == yes; then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA/Enable set to auto configuration" >&5
+$as_echo "$as_me: CUDA/Enable set to auto configuration" >&6;}
+			# Extract the first word of "nvcc", so it can be a program name with args.
+set dummy nvcc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_NVCC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $NVCC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_NVCC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+NVCC=$ac_cv_path_NVCC
+if test -n "$NVCC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
+$as_echo "$NVCC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+$as_echo "#define HAVE_CUDA 1" >>confdefs.h
+
+			NVCCBASE="$prefix"
+
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA/Enable set to manual configuration" >&5
+$as_echo "$as_me: CUDA/Enable set to manual configuration" >&6;}
+			NVCC="$with_cuda"/bin/nvcc
+
+			NVCCBASE="$with_cuda"
+
+
+			# really check
+			# Extract the first word of "nvcc", so it can be a program name with args.
+set dummy nvcc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_NVCC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $NVCC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in path = "$with_cuda"/bin/nvcc
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_NVCC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+NVCC=$ac_cv_path_NVCC
+if test -n "$NVCC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
+$as_echo "$NVCC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+			if test -n "$NVCC"; then
+
+$as_echo "#define HAVE_CUDA 1" >>confdefs.h
+
+			fi
+
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: NVCC: $NVCC" >&5
+$as_echo "$as_me: NVCC: $NVCC" >&6;}
+
+		fi
+		CFLAGS+=" -I$NVCCBASE/include"
+		LDFLAGS+=" -L$NVCCBASE/lib"
+	#	AC_CHECK_LIB([cudart], [main],, m4_fatal(Cannot find libcudart. Your nvcc installation might be incomplete))
+	#	AC_CHECK_LIB([cufft], [main],, m4_fatal(Cannot find libcufft. Your nvcc installation might be incomplete))
+			;;
+	esac
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA disabled" >&5
+$as_echo "$as_me: CUDA disabled" >&6;}
+fi
 
 # Checks for header files.
 ac_ext=c
@@ -4606,6 +4569,74 @@ _ACEOF
 
 fi
 
+
+  OPENMP_CFLAGS=
+  # Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp;
+fi
+
+  if test "$enable_openmp" != no; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to support OpenMP" >&5
+$as_echo_n "checking for $CC option to support OpenMP... " >&6; }
+if ${ac_cv_prog_c_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_prog_c_openmp='none needed'
+else
+  ac_cv_prog_c_openmp='unsupported'
+	  	  	  	  	  	  	                                	  	  	  	  	  	  for ac_option in -fopenmp -xopenmp -openmp -mp -omp -qsmp=omp -homp \
+                           -Popenmp --openmp; do
+	    ac_save_CFLAGS=$CFLAGS
+	    CFLAGS="$CFLAGS $ac_option"
+	    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_prog_c_openmp=$ac_option
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	    CFLAGS=$ac_save_CFLAGS
+	    if test "$ac_cv_prog_c_openmp" != unsupported; then
+	      break
+	    fi
+	  done
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_c_openmp" >&5
+$as_echo "$ac_cv_prog_c_openmp" >&6; }
+    case $ac_cv_prog_c_openmp in #(
+      "none needed" | unsupported)
+	;; #(
+      *)
+	OPENMP_CFLAGS=$ac_cv_prog_c_openmp ;;
+    esac
+  fi
+
+
+
+CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 
 # Checks for library functions.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for working strtod" >&5

@@ -33,18 +33,21 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 {
 	my_w.setupUi(this);
 
+    my_w.statusBar->addPermanentWidget(my_w.autoscale, 0);
+    my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
+    
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
+
+    connect(my_w.autoscale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
+
+    connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
+    setBehaviour();
 
 	my_w.plot->enableAxis(QwtPlot::xTop);
 	my_w.plot->enableAxis(QwtPlot::yRight);
 	my_w.plot->enableAxis(QwtPlot::xBottom);
 	my_w.plot->enableAxis(QwtPlot::yLeft);
 	
-	my_w.minValX->setValidator(new QDoubleValidator(this));
-	my_w.maxValX->setValidator(new QDoubleValidator(this));
-	my_w.minValY->setValidator(new QDoubleValidator(this));
-	my_w.maxValY->setValidator(new QDoubleValidator(this));
-
 	QPen marker_pen;
 	marker_pen.setColor(QColor(255,0,0));
 	marker.setLineStyle(QwtPlotMarker::Cross);
@@ -71,6 +74,7 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 		
 	}
 	
+
 	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("X (red)"));
 	my_w.plot->setAxisTitle(QwtPlot::yRight, tr("X value (red)"));
 	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Y (blue)"));
@@ -79,11 +83,36 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 
 	decorate();
 	updateLastPoint();
+    
 }
 
+void nLineoutBoth::setBehaviour() {
+    if (my_w.lockClick->isChecked()) {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+    }
+}
+
+
+void nLineoutBoth::rescale(QPointF p) {
+    double minx = curve[0].minYValue();
+    double maxx = curve[0].maxYValue();
+    
+    double miny = curve[1].minXValue();
+    double maxy = curve[1].maxXValue();
+    
+    my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
+    my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
+    my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
+	mouseAtMatrix(p);    
+}
+
+
 // mouse movement
-void
-nLineoutBoth::mouseAtMatrix(QPointF p) {
+void nLineoutBoth::updatePlot(QPointF p) {
 
 	QPen marker_pen;
 	marker_pen.setColor(nparent->my_mouse.color);
@@ -125,46 +154,49 @@ nLineoutBoth::mouseAtMatrix(QPointF p) {
 			}
 		}
 
-		for (int k=0;k<2;k++) {
-			qDebug() << "Axis" << k << curve[k].xAxis() << curve[k].minXValue() << curve[k].minXValue();
-			qDebug() << "Axis" << k << curve[k].yAxis() << curve[k].minYValue() << curve[k].minYValue();
-		}
-
-		double minx = curve[0].minYValue();
-		double maxx = curve[0].maxYValue();
-		
-		double miny = curve[1].minXValue();
-		double maxy = curve[1].maxXValue();
-		
-		bool ok;
-		double valtmp;
-		
-		valtmp = my_w.minValX->text().toDouble(&ok);
-		if (ok) minx = valtmp;
-		valtmp = my_w.maxValX->text().toDouble(&ok);
-		if (ok) maxx = valtmp;
-		valtmp = my_w.minValY->text().toDouble(&ok);
-		if (ok) miny = valtmp;
-		valtmp = my_w.maxValY->text().toDouble(&ok);
-		if (ok) maxy = valtmp;
-		
-		
+        if (my_w.autoscale->isChecked()) {
+            double minx = curve[0].minYValue();
+            double maxx = curve[0].maxYValue();
+            
+            double miny = curve[1].minXValue();
+            double maxy = curve[1].maxXValue();
+            
+            my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
+            my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
+            my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
+//        } else {
+//            double mini=nparent->colorMin;
+//            double maxi=nparent->colorMax;
+//            if (nparent->colorRelative) {
+//                mini=currentBuffer->get_min()+nparent->colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
+//                maxi=currentBuffer->get_max()-(1.0-nparent->colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
+//                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
+//                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
+//            }
+        }
+        
 		my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
-		my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
-		my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
 		my_w.plot->setAxisScale(curve[1].yAxis(),curve[1].maxYValue(), curve[1].minYValue(), 0);
 		my_w.plot->replot();
 	}		
 }
 
 
-void nLineoutBoth::nZoom(double) {
-	updateLastPoint();
-}
+//void nLineoutBoth::nZoom(double) {
+//	updateLastPoint();
+//}
 
 void nLineoutBoth::updateLastPoint() {
-	mouseAtMatrix(nparent->my_mouse.pos());
+    if (!my_w.lockClick->isChecked()) {
+        updatePlot(nparent->my_mouse.pos());
+    }
+    if (my_w.autoscale->isChecked()) {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
+    } else {
+        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
+    }
 }
+
 
 
 

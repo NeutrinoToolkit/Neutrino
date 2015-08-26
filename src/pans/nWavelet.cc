@@ -35,7 +35,12 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	region =  new nRect(nparent);
 	region->setParentPan(panName,1);
 	region->setRect(QRectF(100,100,100,100));
-
+	
+	linebarrier =  new nLine(nparent);
+	linebarrier->setParentPan(panName,1);
+	QPolygonF poly;
+	poly << QPointF(0,0) << QPointF(100,100);
+	linebarrier->setPoints(poly);
 	decorate();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
@@ -44,13 +49,17 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
 
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
-
+	
 	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
 	connect(my_w.doUnwrap, SIGNAL(pressed()), this, SLOT(doUnwrap()));
 
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
 	connect(my_w.doRemove, SIGNAL(pressed()), this, SLOT(doRemove()));
+	
+	connect(my_w.useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
+	connect(my_w.lineBarrier, SIGNAL(released()), linebarrier, SLOT(togglePadella()));
+	useBarrierToggled(my_w.useBarrier->isChecked());
 
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
 	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
@@ -58,16 +67,18 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
-	connect(my_w.blurVal, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-
+	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(bufferChanged(nPhysD*)));
 	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
-	waveletPhys.resize(5);
-	for (unsigned int i=0;i<waveletPhys.size();i++) {
-		waveletPhys.at(i)=NULL;
+}
+
+void nWavelet::useBarrierToggled(bool val) {
+	if (val) {
+		linebarrier->show();
+	} else {
+		linebarrier->hide();
 	}
 }
 
@@ -79,14 +90,29 @@ void nWavelet::checkChangeCombo(QComboBox *combo) {
 
 void nWavelet::bufferChanged(nPhysD* buf) {
 	if (buf) {
-		DEBUG(buf->getName());
 		if (buf==getPhysFromCombo(my_w.image)) {
 			region->show();
 		} else {
 			region->hide();
 		}
 	}
+    nGenericPan::bufferChanged(buf);
 }
+
+void nWavelet::physDel(nPhysD* buf) {
+    vector<nPhysD *> localPhys;
+    localPhys.push_back(origSubmatrix);
+    localPhys.push_back(unwrapPhys);
+    localPhys.push_back(referencePhys);
+    localPhys.push_back(carrierPhys);
+    localPhys.push_back(syntheticPhys);
+    for (vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
+        if (buf==*itr) {
+            *itr=NULL;
+        }
+    }
+}
+
 
 void nWavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
@@ -97,8 +123,7 @@ void nWavelet::guessCarrier() {
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
 		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
-		qDebug() << datamatrix.getH();
-
+		
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
@@ -120,8 +145,6 @@ void nWavelet::guessCarrier() {
 void nWavelet::doWavelet () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-		
-		nPhysD *bufferDisplayed=currentBuffer;
 		QTime timer;
 		timer.start();
 
@@ -130,17 +153,6 @@ void nWavelet::doWavelet () {
 		QPoint offset=geom2.topLeft();
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
-		if (my_w.showSource->isChecked()) {
-			datamatrix.setShortName("wavelet source");
-			nPhysD *deepcopy=new nPhysD();
-			*deepcopy=datamatrix;
-			if (my_w.erasePrevious->isChecked()) {
-				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
-			} else {
-				nparent->addPhys(deepcopy);
-				origSubmatrix=deepcopy;
-			}
-		}
 		
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
@@ -177,125 +189,142 @@ void nWavelet::doWavelet () {
 		}
 		my_params.thickness=my_w.thickness->value();
 		my_params.damp=my_w.damp->value();
-		
-		nThread.setTitle("Wavelet...");
+        my_params.data=&datamatrix;
 
+		
 		if (settings.value("useCuda").toBool() && cudaEnabled()) {
 			// use cuda
-			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_cuda);
+//            phys_wavelet_field_2D_morlet_cuda(my_params);
+			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		} else {
-			// don't use cuda
-			nThread.setThread(&datamatrix, &my_params, phys_wavelet_trasl_nocuda);
+//            phys_wavelet_field_2D_morlet(my_params);
+			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
 		}
-		
 
-		progressRun(my_params.n_angles*my_params.n_lambdas);
-		
-
-		DEBUG("back from of thread " << nThread.isFinished());
-		
-		std::list<nPhysD *>::const_iterator itr;
 		my_w.erasePrevious->setEnabled(true);
-		unsigned int position=0;
-		if (nThread.n_iter==0) {
-			QMessageBox::critical(this, tr("Neutrino Wavelet"),tr("CUDA didn't work.\nDisable from preferences window"),QMessageBox::Ok);
+        map<string, nPhysD *>::const_iterator itr;
+		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
+            if ((itr->first=="angle" && my_params.n_angles==1) ||
+                itr->first=="lambda" && my_params.n_lambdas==1) {
+                delete itr->second;
+            } else {
+                if (my_w.erasePrevious->isChecked()) {
+                    waveletPhys[itr->first]=nparent->replacePhys(itr->second,waveletPhys[itr->first],false);
+                } else {
+                    nparent->addPhys(itr->second);
+                    waveletPhys[itr->first]=itr->second;
+                }
+            }
 		}
-		for(itr = nThread.odata.begin(); itr != nThread.odata.end() && position<waveletPhys.size(); ++itr, ++position) {
-			nPhysD *mat=(*itr);
-			if (mat) {
-				WARNING(nThread.odata.size() << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   " << mat->getShortName()<< " : " << position);
-				if ((mat->getShortName()=="angle" && my_params.n_angles==1) ||
-					mat->getShortName()=="lambda" && my_params.n_lambdas==1) {
-					delete mat;
-					mat=NULL;
-				} else {
-					if (my_w.erasePrevious->isChecked()) {
-						waveletPhys.at(position)=nparent->replacePhys(mat,waveletPhys.at(position),false);
-					} else {
-						nparent->addPhys(mat);
-						waveletPhys.at(position)=mat;
-					}
-					if (waveletPhys.at(position)->getShortName()=="phase/2pi") {
-						my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
-					} else if (waveletPhys.at(position)->getShortName()=="quality") {
-						my_w.qualityUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(waveletPhys.at(position)))));
-					}
-				}
-			}
-		}
-		
-		if (nThread.n_iter>0) {
-			if (my_w.synthetic->isChecked()) {
-				nPhysD *tmpSynthetic = new nPhysD();
-				phys_synthetic_interferogram(*tmpSynthetic,*waveletPhys.at(0),*waveletPhys.at(1));
-				if (my_w.erasePrevious->isChecked()) {
-					syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
-				} else {
-					nparent->addPhys(tmpSynthetic);
-					syntheticPhys=tmpSynthetic;
-				}
-				DEBUG("..............." << waveletPhys.at(0)->Tminimum_value << " " << waveletPhys.at(0)->Tmaximum_value);
-			}
-			
-			//delete my_qt.risultati;
-			nparent->showPhys(bufferDisplayed);
-			QString out;
-			out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
-			if (settings.value("useCuda").toBool()) {
-				out.prepend("GPU");
+        QApplication::processEvents();
+        
+		for(itr = waveletPhys.begin(); itr != waveletPhys.end(); ++itr) {
+            if (itr->first=="phase_2pi") {
+                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+            } else if (itr->first=="contrast") {
+                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+            }
+        }
+        
+		if (my_w.showSource->isChecked()) {
+			datamatrix.setShortName("wavelet source");
+			nPhysD *deepcopy=new nPhysD();
+			*deepcopy=datamatrix;
+			if (my_w.erasePrevious->isChecked()) {
+				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
 			} else {
-				out.prepend("CPU");
+				nparent->addPhys(deepcopy);
+				origSubmatrix=deepcopy;
 			}
-			my_w.statusbar->showMessage(out);
-		} else {
-			my_w.statusbar->showMessage("Canceled");
 		}
-
-		
-	}
-	if (nThread.n_iter==-1) {
-		DEBUG("Thread was killed, waiting end of thread " << nThread.isFinished());
-		nThread.wait();
-		DEBUG("Thread was killed, finish waiting end of thread " << nThread.isFinished());
-	}
+        if (my_w.synthetic->isChecked()) {
+            nPhysD *tmpSynthetic = new nPhysD();
+            phys_synthetic_interferogram(*tmpSynthetic,waveletPhys["phase_2pi"],waveletPhys["contrast"]);
+            if (my_w.erasePrevious->isChecked()) {
+                syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
+            } else {
+                nparent->addPhys(tmpSynthetic);
+                syntheticPhys=tmpSynthetic;
+            }
+        }
+        
+        QString out;
+        out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
+        if (settings.value("useCuda").toBool()) {
+            out.prepend("GPU");
+        } else {
+            out.prepend("CPU");
+        }
+        my_w.statusbar->showMessage(out, 50000);
+    } else {
+        my_w.statusbar->showMessage("Canceled", 5000);
+    }
+    
 }
 
-// ---------------------- thread transport functions ------------------------
-
-std::list<nPhysD *>
-phys_wavelet_trasl_cuda(nPhysD *iimage, void *params, int &iter) {
-	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList = *phys_wavelet_field_2D_morlet_cuda(*iimage, *((wavelet_params *)params));
-	return retList;
-}
-
-std::list<nPhysD *>
-phys_wavelet_trasl_nocuda(nPhysD *iimage, void *params, int &iter) {
-	((wavelet_params *)params)->iter_ptr = &iter;
-	std::list<nPhysD *> retList =  *phys_wavelet_field_2D_morlet(*iimage, *((wavelet_params *)params));
-	return retList;
-}
 
 // --------------------------------------------------------------------------
 
 void nWavelet::doUnwrap () {
 	nPhysD *phase=getPhysFromCombo(my_w.imageUnwrap);
 	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
+	nPhysD barrierPhys;
+	
+	QTime timer;
+	timer.start();
+
 	if (qual && phase) {
 		nPhysD *uphase=NULL;
+
 		QString methodName=my_w.method->currentText();
-		// esistono sicuramente dei metodi piu' intelligenti
-		if (methodName=="Simple H+V") {
-			uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
-		} else if (methodName=="Simple V+H") {
-			uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
-		} else if (methodName=="Goldstein") {
-			uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
-		} else if (methodName=="Miguel") {
-			uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
-		} else if (methodName=="Quality") {
-			uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
+
+		if (my_w.useBarrier->isChecked()) {
+			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
+            QPolygonF my_poly=linebarrier->poly(phase->getW()+phase->getH());
+            my_poly.translate(qual->get_origin().x(),qual->get_origin().y());
+			foreach(QPointF p, my_poly) {
+				barrierPhys.set(p.x()-1,p.y()-1,0.0);
+				barrierPhys.set(p.x()-1,p.y()  ,0.0);
+				barrierPhys.set(p.x()-1,p.y()+1,0.0);
+				barrierPhys.set(p.x()  ,p.y()-1,0.0);
+				barrierPhys.set(p.x()  ,p.y()  ,0.0);
+				barrierPhys.set(p.x()  ,p.y()+1,0.0);
+				barrierPhys.set(p.x()+1,p.y()-1,0.0);
+				barrierPhys.set(p.x()+1,p.y()  ,0.0);
+				barrierPhys.set(p.x()+1,p.y()+1,0.0);
+			}
+			if (methodName=="Simple H+V") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+			} else if (methodName=="Simple V+H") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+			} else if (methodName=="Goldstein") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+			} else if (methodName=="Miguel") {
+				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+			} else if (methodName=="Miguel+Quality") {
+				phys_point_multiply(barrierPhys,*qual);
+				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+			} else if (methodName=="Quality") {
+				phys_point_multiply(barrierPhys,*qual);
+				uphase = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+			}
+		} else {
+			if (methodName=="Simple H+V") {
+				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
+			} else if (methodName=="Simple V+H") {
+				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
+			} else if (methodName=="Goldstein") {
+				uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
+			} else if (methodName=="Miguel") {
+				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
+			} else if (methodName=="Miguel+Quality") {
+				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
+			} else if (methodName=="Quality") {
+				uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
+			}
 		}
+		
+		// esistono sicuramente dei metodi piu' intelligenti
 		
 		if (uphase) {
 			uphase->setShortName("unwrap");
@@ -318,8 +347,12 @@ void nWavelet::doUnwrap () {
 				nparent->addShowPhys(unwrapPhys);
 			}
 			my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
+			
 		}
 	}
+	QString out;
+	out.sprintf("%d msec",timer.elapsed());
+	my_w.statusbar->showMessage(out);
 }
 
 void nWavelet::doAll () {
@@ -328,7 +361,6 @@ void nWavelet::doAll () {
 }
 
 void nWavelet::doRemove () {
-	if (sender()==my_w.blurVal && (!my_w.blur->isChecked())) return;
 	if (my_w.carrier->isChecked()) {
 		doRemoveCarrier();
 	}
@@ -363,9 +395,6 @@ void nWavelet::doRemoveCarrier () {
 		double ky = -sin(alpha*_phys_deg)/lambda;
 		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
 		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
-		if (my_w.blur->isChecked()){
-			phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
-		}
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
@@ -392,9 +421,6 @@ void nWavelet::doRemoveReference () {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName());
 			} else {
 				unwrappedSubtracted->setFromName(unwrapped->getFromName()+" "+ref->getFromName());
-			}
-			if (my_w.blur->isChecked()){
-				phys_fast_gaussian_blur(*unwrappedSubtracted, my_w.blurVal->value());
 			}
 			my_w.erasePreviuos->setEnabled(true);
 			if (my_w.erasePreviuos->isChecked()) {

@@ -48,7 +48,10 @@ public:
 	nCompareLines(neutrino *, QString);
 	Ui::nCompareLines my_w;
 	
-	public slots:
+public slots:
+    
+    void addImage();
+    void removeImage();
 
 	void updatePlot();
 
@@ -63,7 +66,11 @@ public:
 
 	void sceneChanged();
 
+	void physDel(nPhysD*);
+    void physMod(std::pair<nPhysD*,nPhysD*>);
+    
 private:
+    QList <nPhysD*> images;
 	QList <QwtPlotCurve*> profiles;
 	QPointer<nLine> line;
 };

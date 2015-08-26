@@ -43,6 +43,10 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	nparent->my_s.addItem(this);
 	setParent(nparent);
 
+    if (nparent->currentBuffer) {
+        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    }
+    
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -60,10 +64,6 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	int num=nparent->property("numEllipse").toInt()+1;
 	nparent->setProperty("numEllipse",num);
 	setProperty("numEllipse",num);
-
-#ifdef __use_nPython
-//	PythonQt::self()->getMainModule().addObject(QString("n")+nparent->property("winId").toString()+QString("Rect")+property("num").toString(), this);
-#endif
 
 	setOrder(0.0);
 	setToolTip(tr("ellipse")+QString(" ")+QString::number(num));
@@ -103,6 +103,8 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+
 	updateSize();
 }
 
@@ -140,6 +142,14 @@ QRectF nEllipse::getRectF() {
 	}
 }
 
+void nEllipse::bufferChanged(nPhysD* my_phys) {    
+    if (my_phys) {
+        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+    } else {
+        setPos(0,0);
+    }
+}
+
 void nEllipse::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
 	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
@@ -148,6 +158,7 @@ void nEllipse::interactive ( ) {
 
 void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
+    moveRef.clear();
 	appendPoint();
 	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
@@ -287,7 +298,7 @@ nEllipse::changeColorHolder (QColor color) {
 void
 nEllipse::changeP (int np, QPointF p, bool updatepad) {
 	prepareGeometryChange();
-	ref[np]->setPos(p);
+	ref[np]->setPos(mapFromScene(p));
 	ref[np]->setVisible(true);
 	if (updatepad) changePointPad(np);
 	updateSize();
@@ -428,7 +439,7 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			moveBy(QPointF(+delta,0.0));
 			itemChanged();
 			break;
-		case Qt::Key_Return:
+		case Qt::Key_W:
 			togglePadella();
 			break;
 		case Qt::Key_E:
@@ -461,7 +472,7 @@ nEllipse::keyReleaseEvent ( QKeyEvent *  ) {
 void
 nEllipse::moveBy(QPointF delta) {
 	for (int i =0; i<ref.size(); i++) {
-		changeP(i,ref[i]->pos()+delta,true);
+        changeP(i,mapToScene(ref[i]->pos()+delta),true);
 	}
 }
 
@@ -583,13 +594,15 @@ nEllipse::saveSettings() {
 void
 nEllipse::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-	int size = settings->beginReadArray("points");
-	QPolygonF poly_tmp;
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		poly_tmp << QPointF(settings->value("x").toDouble(), settings->value("y").toDouble());
-	}
-	settings->endArray();
+    setPos(settings->value("position").toPoint());
+    
+    int size = settings->beginReadArray("points");
+    QPolygonF poly_tmp;
+    for (int i = 0; i < size; ++i) {
+        settings->setArrayIndex(i);
+        poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+    }
+    settings->endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
@@ -608,6 +621,7 @@ void
 nEllipse::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
+    settings->setValue("position",pos());
 	settings->beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
 		settings->setArrayIndex(i);

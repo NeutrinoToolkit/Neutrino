@@ -23,30 +23,34 @@
  *
  */
 #include <QtGui>
+#include <QWidget>
 
-#include <iostream>
+#include <sstream>
 
 #include "nGenericPan.h"
-#include "ui_focalspot.h"
+#include "ui_nInterpolatePath.h"
 
-using namespace std;
+#ifndef __nInterpolatePath
+#define __nInterpolatePath
 
+class neutrino;
+class nLine;
 
-#ifndef __focal_spo
-#define __focal_spo
+class nInterpolatePath : public nGenericPan {
+	Q_OBJECT
 
-#include "neutrino.h"
-
-class focalspot_pan : public nGenericPan {
-	
-Q_OBJECT
-	
 public:
-	focalspot_pan(neutrino *, QString);
-	Ui::focalspotpan my_w;
+	nInterpolatePath(neutrino *, QString);
 	
+	Ui::nInterpolatePath my_w;
+
+	QPointer<nLine> region;
+	
+	nPhysD *interpolatePhys;
 public slots:
-	void analyze(void);
+	void doIt();
+	void duplicate();
+	
 };
 
 #endif

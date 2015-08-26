@@ -43,7 +43,7 @@ nCutoffMask::nCutoffMask(neutrino *nparent, QString winname)
 
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
-		my_w.cutValue->setText(QString::number(image2->Tminimum_value));
+		my_w.cutValue->setText(QString::number(image2->get_min()));
 	}
 	updateMiniMaxi();
 	cutoffPhys=NULL;
@@ -53,15 +53,15 @@ nCutoffMask::nCutoffMask(neutrino *nparent, QString winname)
 void nCutoffMask::updateMiniMaxi () {
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
-		my_w.mini->setText(QString::number(image2->Tminimum_value));
-		my_w.maxi->setText(QString::number(image2->Tmaximum_value));
+		my_w.mini->setText(QString::number(image2->get_min()));
+		my_w.maxi->setText(QString::number(image2->get_max()));
 	}
 }
 
 void nCutoffMask::sliderChanged(int val) {
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
-		double valDouble=(val-my_w.slider->minimum())*(image2->Tmaximum_value-image2->Tminimum_value)/(my_w.slider->maximum()-my_w.slider->minimum());
+		double valDouble=(val-my_w.slider->minimum())*(image2->get_max()-image2->get_min())/(my_w.slider->maximum()-my_w.slider->minimum());
 		my_w.cutValue->setText(QString::number(valDouble));
 		doOperation();
 	}
@@ -76,20 +76,23 @@ void nCutoffMask::doOperation () {
 		if (image1 && image2 && image1->getW() == image2->getW() && image1->getH() == image2->getH()) {
 			double replaceVal=std::numeric_limits<double>::quiet_NaN();
 			if (my_w.replaceVal->currentText().toLower() == "min") {
-				replaceVal=image1->Tminimum_value;
+				replaceVal=image1->get_min();
 			} else if (my_w.replaceVal->currentText().toLower() == "max") {
-				replaceVal=image1->Tmaximum_value;
+				replaceVal=image1->get_max();
 			} else if (my_w.replaceVal->currentText().toLower() == "mean") {
-				replaceVal=0.5*(image1->Tminimum_value+image1->Tmaximum_value);
+				replaceVal=0.5*(image1->get_min()+image1->get_max());
 			} else if (my_w.replaceVal->currentText().toLower() == "zero") {
 				replaceVal=0.0;
 			}
-			nPhysImageF<double> *masked = NULL;
 			if (image2->getSurf() == image1->getSurf()) {
-				masked = new nPhysImageF<double> (image1->getW(),image1->getH(), replaceVal);
+				nPhysD *masked = new nPhysD(image1->getW(),image1->getH(), replaceVal);
 				masked->set_origin(image1->get_origin());
 				masked->set_scale(image1->get_scale());
-				for (size_t k=0; k<image1->getSurf(); k++) if (image2->Timg_buffer[k] >= val) masked->Timg_buffer[k]=image1->Timg_buffer[k];
+                size_t k;
+				for (k=0; k<image1->getSurf(); k++) 
+					if (image2->Timg_buffer[k] >= val) 
+						masked->Timg_buffer[k]=image1->Timg_buffer[k];
+				
 				std::ostringstream my_name;
 				my_name << "mask(" << image2->getName() << "," << val << ")";
 				masked->setName(my_name.str());

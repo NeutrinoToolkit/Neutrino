@@ -39,7 +39,7 @@ class neutrino;
 class nLine;
 
 
-std::list<nPhysD *> phys_invert_abel_transl(nPhysD *iimage, void *params, int&);
+void phys_invert_abel_transl(void *params, int&);
 
 
 
@@ -57,6 +57,7 @@ private:
 	abel_params my_abel_params;
 
 public slots:
+    void physDel(nPhysD*);
 	void sceneChanged();
 	void refphase_checkbChanged(int);
 	QVariant doInversion();

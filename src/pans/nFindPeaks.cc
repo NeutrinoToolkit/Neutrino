@@ -164,8 +164,8 @@ void nFindPeaks::updatePlot() {
 		int dx=geom2.width();
 		int dy=geom2.height();
 
-		double *xd=new double[dx];
-		double *yd=new double[dy];
+		vector<double> xd(dx);
+		vector<double> yd(dy);
 		for (int j=0;j<dy;j++) yd[j]=0.0;
 		for (int i=0;i<dx;i++) xd[i]=0.0;
 
@@ -187,7 +187,7 @@ void nFindPeaks::updatePlot() {
 		lineout.setSamples((my_w.direction->currentIndex()==0)?xdata:ydata);
 	
 		int sizeCut=lineout.dataSize();
-		double *myData=new double[sizeCut];
+		vector<double> myData(sizeCut);
 		
 		for (int i=0;i<sizeCut;i++) {
 			myData[i]=lineout.sample(i).y()/sizeCut;
@@ -195,9 +195,9 @@ void nFindPeaks::updatePlot() {
 		
 		fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
 		fftw_complex *myDataC2=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
-		fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, myData, myDataC, FFTW_ESTIMATE);
-		fftw_plan planC2R=fftw_plan_dft_c2r_1d(sizeCut, myDataC, myData, FFTW_ESTIMATE);
-		fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC2, myData, FFTW_ESTIMATE);
+		fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
+		fftw_plan planC2R=fftw_plan_dft_c2r_1d(sizeCut, myDataC, &myData[0], FFTW_ESTIMATE);
+		fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC2, &myData[0], FFTW_ESTIMATE);
 		
 		fftw_execute(planR2C);
 		
@@ -237,11 +237,8 @@ void nFindPeaks::updatePlot() {
 		QFont labFont;
 		labFont.setPointSize(10);
 		
-		delete[] xd;
-		delete[] yd;
-
-		xd=new double[sizeCut];
-		yd=new double[sizeCut];
+        xd.resize(sizeCut);
+		yd.resize(sizeCut);
 
 		int k=0;
 		for (int i=1;i<sizeCut-1;i++) {
@@ -259,7 +256,7 @@ void nFindPeaks::updatePlot() {
 		k--;
 		if (k>1) {
 			double c0, c1, cov00, cov01, cov11, sumsq;
-			gsl_fit_linear (xd, 1, yd, 1, k, &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
+			gsl_fit_linear (&xd[0], 1, &yd[0], 1, k, &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
 			my_w.statusBar->showMessage(QString::number(cutoff)+" c00:"+QString::number(cov00)+" c01:"+QString::number(cov01)+" c11:"+QString::number(cov11)+" sq:"+QString::number(sqrt(sumsq)/k));
 			my_w.origin->setText(QString::number(c0));
 			my_w.scale->setText(QString::number(2*c1));
@@ -274,9 +271,6 @@ void nFindPeaks::updatePlot() {
 		fftw_destroy_plan(planC2R2);
 		fftw_free(myDataC);	
 		fftw_free(myDataC2);	
-		delete myData;
-		delete[] xd;
-		delete[] yd;
 	}
 
 }

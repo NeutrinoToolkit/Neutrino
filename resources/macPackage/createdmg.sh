@@ -136,7 +136,7 @@ if ! test -z "$VOLUME_ICON_FILE"; then
 fi
 
 # run applescript
-APPLESCRIPT=$(mktemp -t createdmg)
+APPLESCRIPT=$(mktemp -t createdmg.XXXXXXXXXX)
 cat "$AUX_PATH/applescript.applescript" | sed -e "s/WINX/$WINX/g" -e "s/WINY/$WINY/g" -e "s/WINW/$WINW/g" -e "s/WINH/$WINH/g" -e "s/BACKGROUND_CLAUSE/$BACKGROUND_CLAUSE/g" -e "s/ICON_SIZE/$ICON_SIZE/g" | perl -pe  "s/POSITION_CLAUSE/$POSITION_CLAUSE/g" | perl -pe "s/APPLICATION_CLAUSE/$APPLICATION_CLAUSE/g" >"$APPLESCRIPT"
 
 echo "Running Applescript: /usr/bin/osascript \"${APPLESCRIPT}\" \"${VOLUME_NAME}\""

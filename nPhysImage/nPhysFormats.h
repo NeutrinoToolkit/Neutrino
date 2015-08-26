@@ -27,26 +27,16 @@
 #ifndef n_phys_formats__
 #define n_phys_formats__
 
-extern "C" {
-#ifdef HAVE_LIBNETPBM
-#include <pgm.h>
-#endif
-
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+extern "C" {
 #define intf hdf4_intf
 #define int8 hdf4_int8
 #include "hdf.h"
 #include "mfhdf.h"
 #undef intf
 #undef int8
-#endif
-
-#ifdef HAVE_LIBHDF5
-#include "hdf5.h"
-#include "hdf5_hl.h"
-#endif
-
 }
+#endif
 
 // .alex. incredibile quanto bordello genera questo...
 //using namespace std;
@@ -65,10 +55,14 @@ public:
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
 std::vector <nPhysImageF<double> *> phys_open_inf(std::string);
 
-class physDouble_fits : public nPhysImageF<double> {
+class physDouble_img : public nPhysImageF<double> {
 public:
-	physDouble_fits(std::string);
+	physDouble_img(std::string);
 };
+
+int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compression=0);
+
+std::vector <nPhysImageF<double> *> phys_open_fits(std::string);
 
 class physDouble_asc : public nPhysImageF<double> {
 public:
@@ -83,6 +77,9 @@ public:
 
 // external library formats
 #ifdef HAVE_LIBNETPBM
+extern "C" {
+#include <pgm.h>
+}
 class physGray_pgm : public nPhysImageF<gray> {
 public:
 	physGray_pgm(const char *);
@@ -101,12 +98,6 @@ public:
 class physShort_b16 : public nPhysImageF<short> {
 public:
 	physShort_b16(const char *);
-};
-
-// HAMAMATSU or ARP or LIL
-class physShort_img : public nPhysImageF<unsigned short> {
-public:
-	physShort_img(std::string);
 };
 
 // Optronics luli
@@ -165,6 +156,9 @@ T swap_endian(T u)
 //operator>> (std::istream &, phys_properties &);
 
 // dump out for state save
+int
+phys_dump_binary(nPhysImageF<double> *my_phys, const char *ofile);
+
 int 
 phys_dump_binary(nPhysImageF<double> *, std::ofstream &);
 
@@ -185,27 +179,20 @@ phys_open_RAW(nPhysImageF<double> *, int, int, bool);
 
 //write neutrino tiff files
 int 
-phys_write_tiff(nPhysImageF<double> *, const char *, int=sizeof(float));
+phys_write_tiff(nPhysImageF<double> *, const char *);
 
 
 //! HDF stuff
 std::vector <nPhysImageF<double> *> phys_open_HDF4(std::string);
 int phys_write_HDF4(nPhysImageF<double> *, const char*);
-int phys_write_HDF5(nPhysImageF<double> *, std::string);
 
-bool phys_is_HDF5 (std::string);
-
-nPhysImageF<double> * phys_open_HDF5(std::string, std::string);
-
-#ifdef HAVE_LIBHDF5
-int phys_write_HDF4_SD(nPhysImageF<double> *, int);
-void scan_hdf5_attributes(hid_t, nPhysImageF<double>*);
-#endif
 
 std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
 
 
-std::vector <nPhysImageF<double> *> phys_open(std::string,std::string=std::string());
+std::vector <nPhysImageF<double> *> phys_open(std::string);
+
+std::string gunzip(std::string);
 
 #endif
 

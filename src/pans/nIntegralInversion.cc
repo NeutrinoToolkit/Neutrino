@@ -52,13 +52,23 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 
 	connect(my_w.doInversion, SIGNAL(clicked()), SLOT(doInversion()));
 
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+
 	my_w.invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
 	my_w.invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
-
+	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
+    
 	refphase_checkbChanged(my_w.refphase_checkb->checkState());
 	decorate();
 	invertedPhys=NULL;
 }
+
+void nIntegralInversion::physDel(nPhysD* buf) {
+    if (buf==invertedPhys) {
+        invertedPhys=NULL;
+    }
+}
+
 
 void nIntegralInversion::refphase_checkbChanged(int val) {
 	my_w.refphase_cb->setEnabled(val==2);
@@ -85,7 +95,7 @@ QVariant nIntegralInversion::doInversion() {
 		vector<phys_point> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
-		axis_poly = axis->poly(npoints);
+		axis_poly = axis->getLine(npoints);
 		
 		//!fixme we should cut the line when it goes outside and not move the point
 		int xpos= std::max<int>(0lu,min((size_t)axis_poly.first().x(),image->getW()-1));
@@ -170,21 +180,19 @@ QVariant nIntegralInversion::doInversion() {
 
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 
+        my_abel_params.iimage=iimage;
 
-		nThread.setThread(iimage, &my_abel_params, phys_invert_abel_transl);
-		nThread.setTitle("Abel transform...");
-		progressRun(inv_axis.size());
+        runThread(&my_abel_params, phys_invert_abel_transl, "Abel inversion..." , inv_axis.size());
 
-		DEBUG("back from of thread " << nThread.isFinished());
+        inv_image = my_abel_params.oimage;
+		
 
 		DEBUG(5,"about to launch thread");
 
-		inv_image = *(nThread.odata.begin());
-		DEBUG(5,"Thread finish " << nThread.n_iter);
 			// apply physics
 		QApplication::processEvents();		
 
-		if (inv_image && nThread.n_iter!=-1) {
+		if (inv_image) {
 			switch (my_w.physTabs->currentIndex()) {
 				case 0:
 					DEBUG("Inversions: no physics applied");
@@ -197,6 +205,15 @@ QVariant nIntegralInversion::doInversion() {
 					DEBUG("Inversions: applying plasma physics");
 					phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
 					break;
+				case 3: {
+					DEBUG("Inversions: applying proton  physics");
+					phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+//                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
+//                    phys_point_multiply(*pippo, *inv_image);
+//                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
+//                    nparent->addPhys(pippo);
+					break;
+                }
 				default:
 					break;
 			}
@@ -206,6 +223,16 @@ QVariant nIntegralInversion::doInversion() {
 			//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());
 			//		}
 
+            bool ok1,ok2;
+            double mini=my_w.minCut->text().toDouble(&ok1);
+            double maxi=my_w.maxCut->text().toDouble(&ok2);
+            if (ok1 || ok2) {
+                phys_cutoff(*inv_image, 
+                            ok1?mini:inv_image->get_min(), 
+                            ok2?maxi:inv_image->get_max());
+            }
+            
+            
 			if (my_w.erasePrevious->isChecked()) {
 				invertedPhys=nparent->replacePhys(inv_image,invertedPhys);
 			} else {
@@ -213,26 +240,18 @@ QVariant nIntegralInversion::doInversion() {
 				nparent->addPhys(inv_image);
 			}
 			retVar=qVariantFromValue(*invertedPhys);
-		} else {	
-			std::cerr<<"[nIntegralInversion] Error: inversion returned NULL"<<std::endl;
+		} else {
+			DEBUG("[nIntegralInversion] Error: inversion returned NULL");
 		}
 		
-		if(nThread.n_iter==-1) {
-			DEBUG("Thread was killed, waiting end of thread");
-			nThread.wait();
-			DEBUG("Thread was killed, finish waiting end of thread");
-		}
 	}
 
 	return retVar;
 }
 
-std::list<nPhysD *>
-phys_invert_abel_transl(nPhysD *iimage, void *params, int& iter) {
-	std::list<nPhysD *> odata;
+void phys_invert_abel_transl(void *params, int& iter) {
 	((abel_params *)params)->iter_ptr = &iter;
-	odata.push_back(phys_invert_abel(*iimage, *((abel_params *)params)));
-	return odata;
+	phys_invert_abel(*((abel_params *)params));
 }
 
 

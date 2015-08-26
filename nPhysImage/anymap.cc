@@ -46,6 +46,7 @@ std::ostream & operator<< (std::ostream &lhs, struct anydata &rhs)
 	else if (rhs.is_i()) return lhs<<rhs.get_i(); 
 	else if (rhs.is_vec()) return lhs<<rhs.get_str(); // qui passo direttamente a stringa
 	else if (rhs.is_str()) return lhs<<rhs.get_str(); 
+	else return lhs<<"(unknown)";
 }
 
 // stream input operator (questo e' un po' piu' bordellone)
@@ -86,7 +87,7 @@ std::istream & operator>> (std::istream &lhs, struct anydata &rhs)
 bool check_vec(const std::string &s) {
 	std::string tstr = trim(s, "\t");
 	int ref1 = tstr.find("(",0), ref2 = tstr.find(":",0), ref3 = tstr.find(")",0);
-	if (ref1 != std::string::npos && ref2 != std::string::npos && ref3 != std::string::npos) 
+	if (ref1 != (int)std::string::npos && ref2 != (int)std::string::npos && ref3 != (int)std::string::npos) 
 			return true;
 	else return false;
 }

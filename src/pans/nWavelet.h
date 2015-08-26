@@ -28,17 +28,13 @@
 #include "nGenericPan.h"
 #include "ui_nWavelet.h"
 
-#ifndef __nWavele
-#define __nWavele
+#ifndef __nWavelet
+#define __nWavelet
 #include "nPhysWave.h"
+#include "nLine.h"
+#include "nRect.h"
 
 class neutrino;
-class nRect;
-class plotZoomer;
-
-
-std::list<nPhysD *> phys_wavelet_trasl_cuda(nPhysD *, void *, int &);
-std::list<nPhysD *> phys_wavelet_trasl_nocuda(nPhysD *, void *, int &);
 
 class nWavelet : public nGenericPan {
 	Q_OBJECT
@@ -50,7 +46,9 @@ public:
 
 	QPointer<nRect> region;
 	
-	std::vector<nPhysD *> waveletPhys;
+	QPointer<nLine> linebarrier;
+	
+	std::map<std::string, nPhysD *> waveletPhys;
 	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
 private:
@@ -58,6 +56,7 @@ private:
 
 public slots:
 		
+	void useBarrierToggled(bool);
 	void guessCarrier();
 
 	void doWavelet();
@@ -67,6 +66,7 @@ public slots:
 	void doRemoveReference();
 	
 	void bufferChanged(nPhysD*);
+    void physDel(nPhysD*);
 	void checkChangeCombo(QComboBox *);
 	
 	void doAll();

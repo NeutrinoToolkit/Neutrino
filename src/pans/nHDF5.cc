@@ -25,6 +25,8 @@
 #include "nHDF5.h"
 #include "neutrino.h"
 #include "nPhysFormats.h"
+
+
 #define HDF5_MAX_NAME 2048
 
 nHDF5::nHDF5(neutrino *nparent, QString winname)
@@ -288,10 +290,10 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 
 void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
 	ssize_t len = 1+H5Aget_name(aid, 0, NULL );
-	char *attrName=new char[len];
-	H5Aget_name(aid, len, attrName );
+	vector<char> attrName(len);
+	H5Aget_name(aid, len, &attrName[0] );
 	
-	QTreeWidgetItem *item3=new QTreeWidgetItem(parentItem,QStringList(QString(attrName)));
+	QTreeWidgetItem *item3=new QTreeWidgetItem(parentItem,QStringList(QString(&attrName[0])));
 	item3->setFlags(item3->flags()|Qt::ItemIsEditable);
 	hid_t aspace = H5Aget_space(aid); /* the dimensions of the attribute data */
 	hid_t atype  = H5Aget_type(aid);
@@ -303,12 +305,12 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
 		if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
 			int nelem=aInfo.data_size/sizeof(double);
 			item3->setData(1,0,"Attr double");
-			double *val=new double[nelem];
-			if (H5Aread(aid, nativeType, (void*)val) >= 0) {
+			vector<double> val(nelem);
+			if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
 				if (my_data && nelem==2) {
-					if (strcmp(attrName,"physOrigin")==0) {
+					if (strcmp(&attrName[0],"physOrigin")==0) {
 						my_data->set_origin(val[0],val[1]);
-					} else if (strcmp(attrName,"physScale")==0) {
+					} else if (strcmp(&attrName[0],"physScale")==0) {
 						my_data->set_scale(val[0],val[1]);
 					}
 				}
@@ -316,30 +318,28 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
 				for (int i=1;i<nelem;i++) strData+=" "+QString::number(val[i]);
 				item3->setData(2,0,strData);
 			}
-			delete[] val;
 		}
 	} else if (classAType ==  H5T_INTEGER) {
 		int nelem=aInfo.data_size/sizeof(int);
 		item3->setData(1,0,"Attr int");
-		int *val=new int[nelem];
-		if (H5Aread(aid, nativeType, (void*)val) >= 0) {
+		vector<int> val(nelem);
+		if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
 			QString strData=QString::number(val[0]);
 			for (int i=1;i<nelem;i++) strData+=" "+QString::number(val[i]);
 			item3->setData(2,0,strData);
 		}
-		delete[] val;
 	} else if (classAType == H5T_STRING) {
-		char *val =NULL;
+		vector<char> val;
 		item3->setData(1,0,"Attr string");
 		if (my_data) {
 			int sizeStr=1+aInfo.data_size;
-			val=new char[sizeStr];
-			if (H5Aread(aid, nativeType, val) >= 0) {
+			val.resize(sizeStr);
+			if (H5Aread(aid, nativeType, &val[0]) >= 0) {
 				if (my_data) {
-					if (strcmp(attrName,"physShortName")==0) my_data->setShortName(string(val));
-					if (strcmp(attrName,"physName")==0) my_data->setName(string(val));
+					if (strcmp(&attrName[0],"physShortName")==0) my_data->setShortName(string(&val[0]));
+					if (strcmp(&attrName[0],"physName")==0) my_data->setName(string(&val[0]));
 				}
-				item3->setData(2,0,QString(val));
+				item3->setData(2,0,QString(&val[0]));
 			}
 		} else {
 			hssize_t ssiz=H5Sget_simple_extent_npoints(aspace);
@@ -347,20 +347,18 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
 			int sizeStr=ssiz*tsiz;
 			//			hsize_t dims=0;
 			if( sizeStr >= 0) {
-				val = new char[sizeStr];		
-				if (H5Aread(aid, nativeType, val) >= 0) {
+				val.resize(sizeStr);		
+				if (H5Aread(aid, nativeType, (&val[0])) >= 0) {
 					if (H5Tis_variable_str(atype)) {
-						item3->setData(2,0,QString(*((char**) val)));					
+						item3->setData(2,0,QString(*((char**) (&val[0]))));					
 					} else {
-						item3->setData(2,0,QString(val));
+						item3->setData(2,0,QString((&val[0])));
 					}
 				}
 			}
 			
 		}
-		if (val) delete[] val;
 	}
-	delete[] attrName;
 	H5Tclose(atype);
 	H5Sclose(aspace);
 }
@@ -425,3 +423,224 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 	QApplication::processEvents();
 }
 
+
+nPhysD* nHDF5::phys_open_HDF5(string fileName, string dataName) {
+	nPhysD *my_data=NULL;
+	DEBUG(fileName << " " << dataName);
+	hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+	if (fid >= 0) {
+		hid_t did = H5Dopen(fid,dataName.c_str(), H5P_DEFAULT);
+		if (did>=0) {
+			ssize_t sizeName=1+H5Iget_name(did, NULL,0);
+			char *ds_name=new char[sizeName];
+			H5Iget_name(did, ds_name,sizeName);	
+			hid_t sid = H5Dget_space(did);
+			hid_t tid = H5Dget_type(did);
+			
+			size_t tsiz = H5Tget_size(tid);
+			H5T_class_t t_class = H5Tget_class(tid);
+			
+			hid_t nativeType;
+			char *buffer = NULL;
+			int ndims=0;
+			hsize_t *dims=NULL;
+			
+			hid_t file_space_id=H5S_ALL;
+			int narray=1;
+			if (t_class == H5T_FLOAT) {
+				ndims=H5Sget_simple_extent_ndims(sid);
+				dims=new hsize_t[ndims];
+				H5Sget_simple_extent_dims(sid,dims,NULL);
+				int npoints=H5Sget_simple_extent_npoints(sid);
+				buffer = new char[tsiz*npoints];
+				nativeType=H5Tget_native_type(tid,H5T_DIR_DEFAULT);
+			} else if (t_class == H5T_COMPOUND) {
+				DEBUG(10, "compound");
+			} else if(t_class == H5T_ARRAY) {
+				ndims=H5Sget_simple_extent_ndims(sid);
+				DEBUG("ndims: " << ndims);
+				dims=new hsize_t[ndims];
+				H5Sget_simple_extent_dims(sid,dims,NULL);
+				for (int pippo=0;pippo<ndims;pippo++) {
+					narray*=dims[pippo];
+					DEBUG("dims[" << pippo << "]=" << dims[pippo]);
+				}
+				
+				delete dims;
+				
+				
+				ndims = H5Tget_array_ndims(tid);
+				dims=new hsize_t[ndims];
+				H5Tget_array_dims2(tid, dims);
+				buffer = new char[tsiz*narray];
+				DEBUG(5,"H5T_ARRAY " << dims[0] << " " << dims[1] << " tsiz " << tsiz << " narray " << narray);
+				DEBUG(5,"ALLOCATED " << tsiz * narray);
+				nativeType=H5Tget_native_type(H5Tget_super(tid),H5T_DIR_DEFAULT);
+			}
+			if (buffer && ndims==2) {
+				my_data=new nPhysD(ds_name);
+				my_data->setType(PHYS_FILE);
+				string strName(ds_name);
+				strName.erase(0,strName.find_last_of('/'));
+				my_data->setShortName(strName);
+				
+				for (int i = 0; i < H5Aget_num_attrs(did); i++) {
+					hid_t aid =	H5Aopen_idx(did, (unsigned int)i );
+					scan_hdf5_attributes(aid, my_data);
+					H5Aclose(aid);
+				}
+				
+				DEBUG("did " << did << " tid "<< tid << " sid "<< sid );
+				H5Dread(did, tid, sid, file_space_id, H5P_DEFAULT, buffer);
+				my_data->resize(dims[1],dims[0]);
+				for (int na=0;na<narray;na++) {
+					DEBUG("na "<< na);
+					if (H5Tequal(nativeType,H5T_NATIVE_USHORT)) {
+						for (size_t k=0;k<my_data->getSurf();k++) {
+							my_data->set(k,my_data->point(k)+((unsigned short*) buffer)[k]);
+						}
+					} else if (H5Tequal(nativeType,H5T_NATIVE_INT)) {
+						for (size_t k=0;k<my_data->getSurf();k++) {
+							my_data->set(k,my_data->point(k)+((int*) buffer)[k+na*my_data->getSurf()]);
+						}
+					} else if (H5Tequal(nativeType,H5T_NATIVE_UINT)) {
+						for (size_t k=0;k<my_data->getSurf();k++) {
+							my_data->set(k,my_data->point(k)+((unsigned int*) buffer)[k+na*my_data->getSurf()]);
+						}
+					} else if (H5Tequal(nativeType,H5T_NATIVE_FLOAT)) {
+						for (size_t k=0;k<my_data->getSurf();k++) {
+							my_data->set(k,my_data->point(k)+((float*) buffer)[k+na*my_data->getSurf()]);
+						}
+					} else if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
+						for (size_t k=0;k<my_data->getSurf();k++) {
+							my_data->set(k,my_data->point(k)+((double*) buffer)[k+na*my_data->getSurf()]);
+						}
+					}
+				}
+				for (size_t k=0;k<my_data->getSurf();k++) {
+					my_data->set(k,my_data->point(k)/narray);
+				}
+				
+			}
+			
+			delete [] ds_name;
+			delete [] dims;
+			delete [] buffer;
+			H5Tclose(tid);
+			H5Sclose(sid);				
+			H5Dclose(did);
+			H5Fclose(fid);
+		}
+	}
+	if (my_data) my_data->TscanBrightness();
+	return my_data;
+}
+
+
+int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
+	if (phys) {
+		if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
+			unsigned int	filter_info;
+			herr_t status = H5Zget_filter_info (H5Z_FILTER_DEFLATE, &filter_info);
+			if ( (filter_info & H5Z_FILTER_CONFIG_ENCODE_ENABLED) && (filter_info & H5Z_FILTER_CONFIG_DECODE_ENABLED) ) {
+				hid_t file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+				
+				hsize_t dims[2]={phys->getH(),phys->getW()};
+				hid_t space = H5Screate_simple (2, dims, NULL);
+				
+				hid_t dcpl = H5Pcreate (H5P_DATASET_CREATE);
+				status = H5Pset_deflate (dcpl, 9);
+				hsize_t chunk[2] = {4, 8};
+				status = H5Pset_chunk (dcpl, 2, chunk);
+				
+				hid_t dset = H5Dcreate (file_id, "/neutrino", H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT);
+				status = H5Dwrite (dset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, phys->Timg_buffer);
+				
+				status= H5LTset_attribute_string(file_id,"/","version", __VER);
+				double data[2];
+				data[0]=phys->get_origin().x();
+				data[1]=phys->get_origin().y();
+				status= H5LTset_attribute_double(file_id,"neutrino","physOrigin", data, 2);
+				data[0]=phys->get_scale().x();
+				data[1]=phys->get_scale().y();
+				status= H5LTset_attribute_double(file_id,"neutrino","physScale", data, 2);
+				status= H5LTset_attribute_string(file_id,"neutrino","physName", phys->getName().c_str());
+				status= H5LTset_attribute_string(file_id,"neutrino","physShortName", phys->getShortName().c_str());
+				
+				
+				status = H5Pclose (dcpl);
+				status = H5Dclose (dset);
+				status = H5Sclose (space);
+				status = H5Fclose (file_id);
+			}
+		}
+		return 0;
+	}
+	return -1;
+}
+
+void nHDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
+	ssize_t len = 1+H5Aget_name(aid, 0, NULL );
+	char *attrName=new char[len];
+	H5Aget_name(aid, len, attrName );
+	
+	hid_t aspace = H5Aget_space(aid); /* the dimensions of the attribute data */
+	hid_t atype  = H5Aget_type(aid);
+	H5A_info_t aInfo;
+	H5Aget_info(aid, &aInfo);
+	hid_t nativeType = H5Tget_native_type(atype,H5T_DIR_DEFAULT);
+	hid_t classAType=H5Tget_class(atype);
+	if (classAType ==  H5T_FLOAT) {
+		if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
+			int nelem=aInfo.data_size/sizeof(double);
+			vector<double> val(nelem);
+			if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
+				if (my_data && nelem==2) {
+					if (strcmp(attrName,"physOrigin")==0) {
+						my_data->set_origin(val[0],val[1]);
+					} else if (strcmp(attrName,"physScale")==0) {
+						my_data->set_scale(val[0],val[1]);
+					}
+				}
+			}
+		}
+	} else if (classAType ==  H5T_INTEGER) {
+		int nelem=aInfo.data_size/sizeof(int);
+		vector<int> val(nelem);
+		if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
+            my_data->property[string(attrName)]=val[0]; 
+		}
+	} else if (classAType == H5T_STRING) {
+		char *val =NULL;
+		if (my_data) {
+			int sizeStr=1+aInfo.data_size;
+			val=new char[sizeStr];
+			if (H5Aread(aid, nativeType, val) >= 0) {
+				if (my_data) {
+					if (strcmp(attrName,"physShortName")==0) my_data->setShortName(string(val));
+					if (strcmp(attrName,"physName")==0) my_data->setName(string(val));
+				}
+			}
+		} else {
+			hssize_t ssiz=H5Sget_simple_extent_npoints(aspace);
+			size_t tsiz=H5Tget_size(atype);
+			int sizeStr=ssiz*tsiz;
+			//			hsize_t dims=0;
+			if( sizeStr >= 0) {
+				val = new char[sizeStr];		
+				if (H5Aread(aid, nativeType, val) >= 0) {
+					if (H5Tis_variable_str(atype)) {
+						// use this *((char**) val);					
+					} else {
+						// use this val);
+					}
+				}
+			}
+			
+		}
+		delete [] val;
+	}
+	delete [] attrName;
+	H5Tclose(atype);
+	H5Sclose(aspace);
+}

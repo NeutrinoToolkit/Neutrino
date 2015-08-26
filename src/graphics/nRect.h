@@ -24,9 +24,10 @@
  */
 #include <QtGui>
 #include "ui_nObject.h"
+#include "nPhysImageF.h"
 
-#ifndef __nRec
-#define __nRec
+#ifndef __nRect
+#define __nRect
 
 class neutrino;
 class QwtPlot;
@@ -96,9 +97,11 @@ public slots:
 	void interactive();
 	
 	void setRect(QRectF);
-	QRect getRect();
+	QRect getRect(nPhysD* image =NULL);
 	QRectF getRectF();
 	QString getRectString();
+
+    void bufferChanged(nPhysD*);
 
 	void zoomChanged(double);
 	void showMessage(QString);
@@ -116,6 +119,7 @@ public slots:
 	void expandX();
 	void expandY();
 	void intersection();
+	void submatrix();
 	
 	void changeWidth();
 	void changeHeight();
@@ -140,6 +144,7 @@ public slots:
 	
 signals:
 	void sceneChanged();
+	void key_pressed(int);
 };
 
 #endif

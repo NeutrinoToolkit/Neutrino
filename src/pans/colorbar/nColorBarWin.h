@@ -59,10 +59,6 @@ public slots:
 	void minChanged(QString);
 	void maxChanged(QString);
 	
-	void getMinMax();
-
-	void toggleAutoscale();
-	
 	void invertColors();
 	void setToMin();
 	void setToMax();
@@ -71,8 +67,6 @@ public slots:
 
 	void bufferChanged(nPhysD*);
 	void updatecolorbar();
-
-	void refreshNeutrino();
 
 	void cutOff();
 

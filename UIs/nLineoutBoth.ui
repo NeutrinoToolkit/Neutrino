@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
-    <height>386</height>
+    <width>364</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,11 +23,8 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
-    <property name="margin">
-     <number>4</number>
-    </property>
-    <item row="0" column="0" colspan="4">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <widget class="QwtPlot" name="plot">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -37,87 +34,45 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLineEdit" name="minValX">
-      <property name="enabled">
+    <item row="1" column="2">
+     <widget class="QToolButton" name="autoscale">
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../resources/neutrino.qrc">
+        <normaloff>:/icons/lockOpen.png</normaloff>
+        <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="checkable">
        <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Lower value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>X cut min</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QLineEdit" name="maxValX">
-      <property name="enabled">
+     <widget class="QToolButton" name="lockClick">
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../resources/neutrino.qrc">
+        <normaloff>:/icons/autoRefresh.png</normaloff>
+        <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="checkable">
        <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Higher value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>X cut max</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLineEdit" name="minValY">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Lower value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>Y cut min</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="3">
-     <widget class="QLineEdit" name="maxValY">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Higher value</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="placeholderText">
-       <string>Y cut max</string>
       </property>
      </widget>
     </item>
@@ -130,32 +85,6 @@
     </font>
    </property>
   </widget>
-  <action name="actionAutoscale">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lockOpen</normaloff>
-     <normalon>:/lockClose</normalon>:icons//lockOpen</iconset>
-   </property>
-   <property name="text">
-    <string>autoscale</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto/FixedScale</string>
-   </property>
-  </action>
-  <action name="actionMin">
-   <property name="text">
-    <string>Min</string>
-   </property>
-  </action>
-  <action name="actionMax">
-   <property name="text">
-    <string>Max</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>

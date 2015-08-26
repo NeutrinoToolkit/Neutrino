@@ -42,12 +42,16 @@ public:
 	nLineoutBoth(neutrino *, QString);
 	
 	public slots:
-	void mouseAtMatrix(QPointF);
+	void updatePlot(QPointF);
+
+    void setBehaviour();
 	
-	void nZoom(double);
+//	void nZoom(double);
 	
+public slots:
+    void rescale(QPointF);
 	void updateLastPoint();
-	
+    
 private:
 	Ui::nLineoutBoth my_w;
 	

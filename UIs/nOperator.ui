@@ -162,16 +162,6 @@
          </item>
          <item>
           <property name="text">
-           <string>Gauss diff blur</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Circular Gaussian</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
            <string>Log 10</string>
           </property>
          </item>

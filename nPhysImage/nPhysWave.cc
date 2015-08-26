@@ -32,7 +32,6 @@
 #endif
 
 #include "unwrapping/unwrap_simple.h"
-#include "unwrapping/unwrap_miguel.h"
 #include "unwrapping/unwrap_goldstein.h"
 #include "unwrapping/unwrap_quality.h"
 
@@ -42,242 +41,19 @@ using namespace std;
  * @{
  */ 
 
-//! this is nomore used
-list<nPhysD *> *
-phys_wavelet_field_2D(nPhysD &ifg, wavelet_params &wave_params)
+void phys_wavelet_field_2D_morlet(wavelet_params &params)
 {
 	DEBUG(5,"start");
-	list<nPhysD *> *olist = new list<nPhysD *>;
+            
+            
+	if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
 
-	if ((wave_params.n_angles > 0) && (wave_params.n_lambdas > 0) && (ifg.getSurf() != 0)) {
+        params.olist.clear();
+        
+		int dx=params.data->getW();
+		int dy=params.data->getH();
 
-		double hwF = ifg.getW()/2.;
-		double hhF = ifg.getH()/2.;
-		int surf=ifg.getSurf();
-
-		nPhysD xx("xx"), yy("yy"), dbuffer; 
-		nPhysImageF<mcomplex> zz_morlet("zz_morlet"), zz_convolve("zz_convolve");
-		nPhysD zz_Fmorlet("Fmorlet");
-	
-		meshgrid_data mesh_params = {-hwF, hwF, -hhF, hhF, ifg.getW(), ifg.getH()};
-		phys_generate_meshgrid(&mesh_params, xx, yy);
-	
-		vector<double> angles(wave_params.n_angles), lambdas(wave_params.n_lambdas);
-		int n_iter = angles.size()*lambdas.size();
-		
-		nPhysD *qmap, *wphase, *lambda, *angle;
-		qmap = new nPhysD(xx.getW(), xx.getH(), 0.0, "quality map");
-		
-		wphase = new nPhysD("wrap phase");
-		wphase->resize(xx.getW(), xx.getH());
-		lambda = new nPhysD("lambda");
-		lambda->resize(xx.getW(), xx.getH());
-		angle = new nPhysD("angle");
-		angle->resize(xx.getW(), xx.getH());
-
-
-		if (wave_params.n_angles==1) {
-			angles[0]=0.5*(wave_params.end_angle+wave_params.init_angle);
-		} else {
-			for (size_t i=0; i<wave_params.n_angles; i++)
-				angles[i] = wave_params.init_angle + i*(wave_params.end_angle-wave_params.init_angle)/(wave_params.n_angles-1);
-		}	
-		if (wave_params.n_lambdas==1) {
-			lambdas[0]=0.5*(wave_params.end_lambda+wave_params.init_lambda);
-		} else {
-			for (size_t i=0; i<wave_params.n_lambdas; i++)
-				lambdas[i] = wave_params.init_lambda + i*(wave_params.end_lambda-wave_params.init_lambda)/(wave_params.n_lambdas-1);
-		}
-
-		nPhysImageF<mcomplex> Fmain_window=ifg.ft2(PHYS_FORWARD);
-
-		wave_params.iter=0;
-		
-#ifndef __winz
-//		clock_t initTime=clock();
-#endif
-		for (size_t i=0; i<lambdas.size(); i++) {
-			for (size_t j=0; j<angles.size(); j++) {
-	
-				if (wave_params.iter==-1) break; 
-				wave_params.iter++;
-				DEBUG(5,(100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
-	
-				// morlet generation (to be optimized)
-				morlet_data morlet_params = {lambdas[i], angles[j] * _phys_deg, wave_params.thickness, wave_params.damp};
-				
-				phys_generate_Fmorlet(&morlet_params, xx, yy, zz_morlet);
-				DEBUG(10,"morlet generated");
-				
-				zz_morlet.fftshift();
-				DEBUG(10,"fft shifted");
-				phys_convolve_Fm1_Fm2(Fmain_window, zz_morlet, zz_convolve);
-				DEBUG(10,"convolved");
-	
-				// decision
-				for (size_t k=0; k<xx.getSurf(); k++) {
-					double qmap_local=zz_convolve.Timg_buffer[k].mcabs()/surf;
-					if ( qmap_local > qmap->Timg_buffer[k]) {
-						qmap->Timg_buffer[k] = qmap_local;
-						wphase->Timg_buffer[k] = zz_convolve.Timg_buffer[k].arg()/(2*M_PI);
-						
-						lambda->Timg_buffer[k] = lambdas[i];
-						angle->Timg_buffer[k] = angles[j];
-					}
-				}
-	
-			}
-		}
-// #ifndef __winz
-// 		cerr<<"Calculation end (n_iter "<<wave_params.iter<<"): "<<clock()-initTime<<endl;	
-// #endif
-// 
-		olist->push_back(wphase);
-		olist->push_back(qmap);
-		olist->push_back(lambda);
-		olist->push_back(angle);
-
-		list<nPhysD *>::const_iterator itr;
-		for(itr = olist->begin(); itr != olist->end(); ++itr) {
-			(*itr)->TscanBrightness();
-			(*itr)->set_origin(ifg.get_origin());
-			(*itr)->set_scale(ifg.get_scale());
-			(*itr)->setFromName(ifg.getFromName());
-			(*itr)->setShortName((*itr)->getName());
-			(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
-		}
-
-		return olist;
-	}
-	DEBUG(5,"end");
-	return olist;
-}
-
-// list<nPhysD *> *
-// phys_wavelet_field_2D(nPhysD &ifg, wavelet_params &wave_params)
-// {
-// 	cout<<"[phys_wave] starting wavelet analysis "<< ifg.getSurf() << endl;
-// 	list<nPhysD *> *olist = new list<nPhysD *>;
-// 
-// 	if ((wave_params.n_angles > 0) && (wave_params.n_lambdas > 0) && (ifg.getSurf() != 0)) {
-// 
-// 		double hwF = ifg.getW()/2.;
-// 		double hhF = ifg.getH()/2.;
-// 		int surf=ifg.getSurf();
-// 
-// 		nPhysD xx("xx"), yy("yy"), dbuffer; 
-// 		nPhysImageF<mcomplex> zz_morlet("zz_morlet"), zz_convolve("zz_convolve"), Fmain_window("Fmain-window"), *Fptr;
-// 		nPhysD zz_Fmorlet("Fmorlet");
-// 	
-// 		meshgrid_data mesh_params = {-hwF, hwF, -hhF, hhF, ifg.getW(), ifg.getH()};
-// 		phys_generate_meshgrid(&mesh_params, xx, yy);
-// 	
-// 		vector<double> angles(wave_params.n_angles), lambdas(wave_params.n_lambdas);
-// 		int n_iter = angles.size()*lambdas.size();
-// 		
-// 		nPhysD *qmap, *wphase, *lambda, *angle;
-// 		qmap = new nPhysD(xx.getW(), xx.getH(), 0.0, "quality map");
-// 		
-// 		wphase = new nPhysD("wrap phase");
-// 		wphase->resize(xx.getW(), xx.getH());
-// 		lambda = new nPhysD("lambda");
-// 		lambda->resize(xx.getW(), xx.getH());
-// 		angle = new nPhysD("angle");
-// 		angle->resize(xx.getW(), xx.getH());
-// 
-// 
-// 		if (wave_params.n_angles==1) {
-// 			angles[0]=0.5*(wave_params.end_angle+wave_params.init_angle);
-// 		} else {
-// 			for (size_t i=0; i<wave_params.n_angles; i++)
-// 				angles[i] = wave_params.init_angle + i*(wave_params.end_angle-wave_params.init_angle)/(wave_params.n_angles-1);
-// 		}	
-// 		if (wave_params.n_lambdas==1) {
-// 			lambdas[0]=0.5*(wave_params.end_lambda+wave_params.init_lambda);
-// 		} else {
-// 			for (size_t i=0; i<wave_params.n_lambdas; i++)
-// 				lambdas[i] = wave_params.init_lambda + i*(wave_params.end_lambda-wave_params.init_lambda)/(wave_params.n_lambdas-1);
-// 		}
-// 
-// 		Fptr = ifg.getFFT(1); 
-// 
-// 		Fmain_window = *Fptr;
-// 		delete Fptr;
-// 		
-// 		wave_params.iter=0;
-// 		
-// #ifndef __winz
-// 		clock_t initTime=clock();
-// #endif
-// 		for (size_t i=0; i<lambdas.size(); i++) {
-// 			for (size_t j=0; j<angles.size(); j++) {
-// 	
-// 				if (wave_params.iter==-1) break; 
-// 				wave_params.iter++;
-// 				cout<<"\r"<<(100.*wave_params.iter)/n_iter<<"\% -- lambda: "<<lambdas[i]<<", angle: "<<angles[j] << endl;
-// 	
-// 				// morlet generation (to be optimized)
-// 				morlet_data morlet_params = {lambdas[i], angles[j] * _phys_deg, wave_params.thickness, wave_params.damp};
-// 				
-// 				phys_generate_Fmorlet(&morlet_params, xx, yy, zz_morlet);
-// 				cout<<"morlet generated"<<endl;
-// 				
-// 				zz_morlet.fftshift();
-// 				cout<<"fft shifted"<<endl;
-// 				phys_convolve_Fm1_Fm2(Fmain_window, zz_morlet, zz_convolve);
-// 				cout<<"convolved"<<endl;
-// 	
-// 				// decision
-// 				for (size_t k=0; k<xx.getSurf(); k++) {
-// 					double qmap_local=zz_convolve.Timg_buffer[k].mcabs()/surf;
-// 					if ( qmap_local > qmap->Timg_buffer[k]) {
-// 						qmap->Timg_buffer[k] = qmap_local;
-// 						wphase->Timg_buffer[k] = zz_convolve.Timg_buffer[k].arg()/(2*M_PI);
-// 						
-// 						lambda->Timg_buffer[k] = lambdas[i];
-// 						angle->Timg_buffer[k] = angles[j];
-// 					}
-// 				}
-// 	
-// 			}
-// 		}
-// #ifndef __winz
-// 		cerr<<"Calculation end (n_iter "<<wave_params.iter<<"): "<<clock()-initTime<<endl;	
-// #endif
-// 
-// 		olist->push_back(wphase);
-// 		olist->push_back(qmap);
-// 		olist->push_back(lambda);
-// 		olist->push_back(angle);
-// 
-// 		list<nPhysD *>::const_iterator itr;
-// 		for(itr = olist->begin(); itr != olist->end(); ++itr) {
-// 			(*itr)->TscanBrightness();
-// 			(*itr)->set_origin(ifg.get_origin());
-// 			(*itr)->set_scale(ifg.get_scale());
-// 			(*itr)->setFromName(ifg.getFromName());
-// 			(*itr)->setShortName((*itr)->getName());
-// 			(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
-// 		}
-// 
-// 		return olist;
-// 	}
-// 	cout<<"[phys_wave] ending wavelet analysis"<<endl;
-// 	return olist;
-// }
-
-list<nPhysD *> *
-phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
-{
-	DEBUG(5,"start");
-	list<nPhysD *> *olist = new list<nPhysD *>;
-
-	if ((wave_params.n_angles > 0) && (wave_params.n_lambdas > 0) && (ifg.getSurf() != 0)) {
-
-		int dx=ifg.getW();
-		int dy=ifg.getH();
-
-		int xx[dx], yy[dy];
+		vector<int> xx(dx), yy(dy);
 		
 		nPhysImageF<mcomplex> zz_morlet("zz_morlet");
 	
@@ -286,7 +62,7 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 		for (int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
 		for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 	
-		vector<double> angles(wave_params.n_angles), lambdas(wave_params.n_lambdas);
+		vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
 		int n_iter = angles.size()*lambdas.size();
 		
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
@@ -302,44 +78,46 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 		intensity->resize(dx, dy);
 
 
-		if (wave_params.n_angles==1) {
-			angles[0]=0.5*(wave_params.end_angle+wave_params.init_angle);
+		if (params.n_angles==1) {
+			angles[0]=0.5*(params.end_angle+params.init_angle);
 		} else {
-			for (size_t i=0; i<wave_params.n_angles; i++)
-				angles[i] = wave_params.init_angle + i*(wave_params.end_angle-wave_params.init_angle)/(wave_params.n_angles-1);
+			for (size_t i=0; i<params.n_angles; i++)
+				angles[i] = params.init_angle + i*(params.end_angle-params.init_angle)/(params.n_angles-1);
 		}	
-		if (wave_params.n_lambdas==1) {
-			lambdas[0]=0.5*(wave_params.end_lambda+wave_params.init_lambda);
+		if (params.n_lambdas==1) {
+			lambdas[0]=0.5*(params.end_lambda+params.init_lambda);
 		} else {
-			for (size_t i=0; i<wave_params.n_lambdas; i++)
-				lambdas[i] = wave_params.init_lambda + i*(wave_params.end_lambda-wave_params.init_lambda)/(wave_params.n_lambdas-1);
+			for (size_t i=0; i<params.n_lambdas; i++)
+				lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
 		}
 		
-		nPhysImageF<mcomplex> Fmain_window=ifg.ft2(PHYS_FORWARD);
+		nPhysImageF<mcomplex> Fmain_window=params.data->ft2(PHYS_FORWARD);
 		
-		wave_params.iter=0;
-		*wave_params.iter_ptr=0;
+		params.iter=0;
+		*params.iter_ptr=0;
 		
-		double damp_norm=wave_params.damp*M_PI;
+		double damp_norm=params.damp*M_PI;
 		for (size_t i=0; i<lambdas.size(); i++) {
 			for (size_t j=0; j<angles.size(); j++) {
 	
-				if ((*wave_params.iter_ptr)==-1) {
+				if ((*params.iter_ptr)==-1) {
 				    DEBUG("Aborting");
 				    break;
 				}
-				wave_params.iter++;
-				(*wave_params.iter_ptr)++;
-				DEBUG(11,(100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+				params.iter++;
+				(*params.iter_ptr)++;
+				DEBUG(11,(100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
 				double cr = cos(angles[j] * _phys_deg); 
 				double sr = sin(angles[j] * _phys_deg);
 
-				double thick_norm=wave_params.thickness*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+				double thick_norm=params.thickness*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
 				double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 //				double thick_norm=wave_params.thickness*M_PI/dy;
 //				double lambda_norm=lambdas[i]/dx;
-				for (size_t x=0;x<zz_morlet.getW();x++) {
-					for (size_t y=0;y<zz_morlet.getH();y++) {
+                size_t x,y;
+#pragma omp parallel for collapse(2)
+				for (x=0;x<zz_morlet.getW();x++) {
+					for (y=0;y<zz_morlet.getH();y++) {
 						double xr = xx[x]*cr - yy[y]*sr; //rotate
 						double yr = xx[x]*sr + yy[y]*cr;
 			
@@ -355,11 +133,8 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				nPhysImageF<mcomplex> zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
 
 				// decision
-				for (size_t k=0; k<ifg.getSurf(); k++) {
-// 					double a0=angles[j];
-// 					double a1=angle->Timg_buffer[k];
-// 					double angdist=1.0;
-//					if(i!=0||j!=0) angdist=std::min(abs(a0-a1),abs(a0-a1+360-a1))/360.0;
+#pragma omp parallel for
+				for (size_t k=0; k<params.data->getSurf(); k++) {
 					double qmap_local=zz_convolve.Timg_buffer[k].mcabs();
 					if ( qmap_local > qmap->Timg_buffer[k]) {
 						qmap->Timg_buffer[k] = qmap_local;
@@ -371,24 +146,37 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				
 			}
 			//! todo: this is awful: add exception?
-            if ((*wave_params.iter_ptr)==-1) {
+            if ((*params.iter_ptr)==-1) {
                 DEBUG("aborting");
                 break;
             }
 		}
 		
-		if ((*wave_params.iter_ptr)!=-1) {
+		if ((*params.iter_ptr)!=-1) {
 		
-			for (size_t k=0; k<ifg.getSurf(); k++) {
+			for (size_t k=0; k<params.data->getSurf(); k++) {
 				qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
-				intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
+				intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
 				wphase->Timg_buffer[k]/=2*M_PI;
 			}
 			
-			phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
-			
-			for (size_t k=0; k<ifg.getSurf(); k++) {
-				if(!std::isfinite(ifg.Timg_buffer[k])){
+			phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
+
+            
+            if (params.dosynthetic) {                
+                nPhysD *tmp = new nPhysD();
+                phys_synthetic_interferogram(*tmp,wphase,qmap);
+                params.olist["synthetic"]=tmp;
+            }
+            
+            if (params.docropregion) {                
+                nPhysD *tmp = new nPhysD();
+                *tmp= *(params.data);
+                params.olist["source"]=tmp;
+            }
+            
+			for (size_t k=0; k<params.data->getSurf(); k++) {
+				if(!std::isfinite(params.data->Timg_buffer[k])){
 					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
 					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
 					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
@@ -397,26 +185,32 @@ phys_wavelet_field_2D_morlet(nPhysD &ifg, wavelet_params &wave_params)
 				}
 			}
 			
-			olist->push_back(wphase);
-			olist->push_back(qmap);
-			olist->push_back(lambda);
-			olist->push_back(angle);
-			olist->push_back(intensity);
+            
+			params.olist["phase_2pi"] = wphase;
+			params.olist["contrast"] = qmap;
+			params.olist["lambda"] = lambda;
+			params.olist["angle"] = angle;
+			params.olist["intensity"] = intensity;
 			
-			list<nPhysD *>::const_iterator itr;
-			for(itr = olist->begin(); itr != olist->end(); ++itr) {
-				(*itr)->TscanBrightness();
-				(*itr)->set_origin(ifg.get_origin());
-				(*itr)->set_scale(ifg.get_scale());
-				(*itr)->setFromName(ifg.getFromName());
-				(*itr)->setShortName((*itr)->getName());
-				(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
+			map<string, nPhysD *>::const_iterator itr;
+			for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+                if (params.trimimages) {
+                    nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
+                    delete itr->second;
+                    params.olist[itr->first]=new nPhysD();
+                    *params.olist[itr->first]=image;
+                }
+				itr->second->TscanBrightness();
+				itr->second->set_origin(params.data->get_origin());
+				itr->second->set_scale(params.data->get_scale());
+				itr->second->setFromName(params.data->getFromName());
+				itr->second->setShortName(itr->first);
+				itr->second->setName(itr->first+ " "+params.data->getName());
 			}
 		}
 		
 	}
 	DEBUG("Out of here");
-	return olist;
 }
 
 bool cudaEnabled() {
@@ -431,240 +225,273 @@ bool cudaEnabled() {
 }
 
 #ifdef HAVE_CUDA
-list<nPhysD *> *
-phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
+void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
 
-    wave_params.iter=0;
-    *wave_params.iter_ptr = 0;
+	if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
 
-	list<nPhysD *> *olist = new list<nPhysD *>;
+        params.olist.clear();
 
-	DEBUG(5,"start");
+        params.iter=0;
+        *params.iter_ptr = 0;
 
-	int device_count = 0;
-	cudaGetDeviceCount( &device_count );
-	if (device_count<1) {
-		WARNING("Problem To use CUDA you need an NVIDIA card. You also need to install the driver\nwww.nvidia.com/page/drivers.html");
-		return olist;
-	}
-	
-	
-	cudaDeviceProp device_properties;
-	int max_gflops_device = 0;
-	int max_gflops = 0;
-	
-	int current_device = 0;
-	cudaGetDeviceProperties( &device_properties, current_device );
-	max_gflops = device_properties.multiProcessorCount * device_properties.clockRate;
-	++current_device;
-	
-	while( current_device < device_count )
-	{
-		cudaGetDeviceProperties( &device_properties, current_device );
-		int gflops = device_properties.multiProcessorCount * device_properties.clockRate;
-		if( gflops > max_gflops )
-		{
-			max_gflops        = gflops;
-			max_gflops_device = current_device;
-			
-			if (device_properties.major>=1 && device_properties.minor>=3) {
-				DEBUG("This graphic card could do double precision... please contact developer");
-			}
+        DEBUG(5,"start");
 
-		} 
-		++current_device;
-	}	
-	cudaSetDevice( max_gflops_device );
+        int device_count = 0;
+        cudaGetDeviceCount( &device_count );
+        if (device_count<1) {
+            WARNING("Problem To use CUDA you need an NVIDIA card. You also need to install the driver\nwww.nvidia.com/page/drivers.html");
+            return;
+        }
+    
+    
+        cudaDeviceProp device_properties;
+        int max_gflops_device = 0;
+        int max_gflops = 0;
+    
+        int current_device = 0;
+        cudaGetDeviceProperties( &device_properties, current_device );
+        max_gflops = device_properties.multiProcessorCount * device_properties.clockRate;
+        ++current_device;
+    
+        while( current_device < device_count )
+        {
+            cudaGetDeviceProperties( &device_properties, current_device );
+            int gflops = device_properties.multiProcessorCount * device_properties.clockRate;
+            if( gflops > max_gflops )
+            {
+                max_gflops        = gflops;
+                max_gflops_device = current_device;
+            
+                if (device_properties.major>=1 && device_properties.minor>=3) {
+                    DEBUG("This graphic card could do double precision... please contact developer");
+                }
 
-	int cubuf_size = sizeof(cufftComplex)*ifg.getSurf();
-	
-	cufftHandle plan;
-	cufftComplex *b1,*b2;
-	cufftComplex *cub1, *cub2, *cub3, *cuc1, *cuc2;
-	
-	b1 = new cufftComplex [ifg.getSurf()];
-	b2 = new cufftComplex [ifg.getSurf()];
-	
-	for (size_t j = 0; j < ifg.getH(); j++){
-		for (size_t i = 0; i < ifg.getW(); i++) {
-			b1[i+j*ifg.getW()].x = std::isfinite(ifg.Timg_matrix[j][i]) ? ifg.Timg_matrix[j][i]:0;
-			b1[i+j*ifg.getW()].y=0.0;
-		}
-	}
-	
-	cudaMalloc((void**)&cub1, cubuf_size);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot allocate");
-		return olist;
-	}
-	cudaMalloc((void**)&cub2, cubuf_size);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot allocate");
-		return olist;
-	}
-	cudaMalloc((void**)&cub3, cubuf_size);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot allocate");
-		return olist;
-	}
-	cudaMalloc((void**)&cuc1, cubuf_size);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot allocate");
-		return olist;
-	}
-	cudaMalloc((void**)&cuc2, cubuf_size);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot allocate");
-		return olist;
-	}
-	
-	cudaMemset(cub1, 0, cubuf_size );
-	cudaMemset(cub2, 0, cubuf_size );
-	cudaMemset(cub3, 0, cubuf_size );
-	cudaMemset(cuc1, 0, cubuf_size );
-	cudaMemset(cuc2, 0, cubuf_size );
-	
-	// Create a 2D FFT plan.  
-	cufftPlan2d(&plan, ifg.getH(), ifg.getW(), CUFFT_C2C);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot create plan");
-		return olist;
-	}
+            } 
+            ++current_device;
+        }	
+        cudaSetDevice( max_gflops_device );
 
-	cudaMemcpy(cub1, b1, cubuf_size, cudaMemcpyHostToDevice);
-
-	cufftExecC2C(plan, cub1, cub2, CUFFT_FORWARD);
-	if (cudaGetLastError()!=cudaSuccess) {
-		WARNING("cannot do FFT");
-		return olist;
-	}
-//	cudaThreadSynchronize();
-	
-	if ((wave_params.n_angles > 0) && (wave_params.n_lambdas > 0) && (ifg.getSurf() != 0)) {
-
-		int dx=ifg.getW();
-		int dy=ifg.getH();
-
-		vector<double> angles(wave_params.n_angles), lambdas(wave_params.n_lambdas);
-		int n_iter = angles.size()*lambdas.size();
-		
-		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
-		qmap = new nPhysD(dx, dy, 0.0, "quality");
-		
-		wphase = new nPhysD("phase/2pi");
-		wphase->resize(dx, dy);
-		lambda = new nPhysD("lambda");
-		lambda->resize(dx, dy);
-		angle = new nPhysD("angle");
-		angle->resize(dx, dy);
-		intensity = new nPhysD("intensity");
-		intensity->resize(dx, dy);
-
-
-		if (wave_params.n_angles==1) {
-			angles[0]=0.5*(wave_params.end_angle+wave_params.init_angle);
-		} else {
-			for (size_t i=0; i<wave_params.n_angles; i++)
-				angles[i] = wave_params.init_angle + i*(wave_params.end_angle-wave_params.init_angle)/(wave_params.n_angles-1);
-		}	
-		if (wave_params.n_lambdas==1) {
-			lambdas[0]=0.5*(wave_params.end_lambda+wave_params.init_lambda);
-		} else {
-			for (size_t i=0; i<wave_params.n_lambdas; i++)
-				lambdas[i] = wave_params.init_lambda + i*(wave_params.end_lambda-wave_params.init_lambda)/(wave_params.n_lambdas-1);
-		}
-		
-		for (size_t i=0; i<lambdas.size(); i++) {
-			for (size_t j=0; j<angles.size(); j++) {
-	
-				if ((*wave_params.iter_ptr)==-1) {
-				    DEBUG("aborting");
-				    break;
-				}
-				wave_params.iter++;
-				(*wave_params.iter_ptr)++;
-				DEBUG((100.*wave_params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
-			
-				gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)wave_params.damp, (float)wave_params.thickness);
-				cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
-				fase(cub3, cuc1, cuc2, ifg.getSurf(), angles[j], lambdas[i]);
-				cudaThreadSynchronize();
-			
-			}
-			//! todo: this is awful: add exception?
-            if ((*wave_params.iter_ptr)==-1) {
-                DEBUG("aborting");
-                break;
+        int cubuf_size = sizeof(cufftComplex)*params.data->getSurf();
+    
+        cufftHandle plan;
+        cufftComplex *cub1, *cub2, *cub3, *cuc1, *cuc2;
+    
+        vector<cufftComplex> b1(params.data->getSurf());
+        vector<cufftComplex> b2(params.data->getSurf());
+    
+        for (size_t j = 0; j < params.data->getH(); j++){
+            for (size_t i = 0; i < params.data->getW(); i++) {
+                b1[i+j*params.data->getW()].x = std::isfinite(params.data->Timg_matrix[j][i]) ? params.data->Timg_matrix[j][i]:0;
+                b1[i+j*params.data->getW()].y=0.0;
             }
-		}
-		DEBUG("*wave_params.iter_ptr" <<  *wave_params.iter_ptr);
-		cudaThreadSynchronize();
+        }
+    
+        cudaMalloc((void**)&cub1, cubuf_size);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot allocate");
+            return;
+        }
+        cudaMalloc((void**)&cub2, cubuf_size);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot allocate");
+            return;
+        }
+        cudaMalloc((void**)&cub3, cubuf_size);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot allocate");
+            return;
+        }
+        cudaMalloc((void**)&cuc1, cubuf_size);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot allocate");
+            return;
+        }
+        cudaMalloc((void**)&cuc2, cubuf_size);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot allocate");
+            return;
+        }
+    
+        cudaMemset(cub1, 0, cubuf_size );
+        cudaMemset(cub2, 0, cubuf_size );
+        cudaMemset(cub3, 0, cubuf_size );
+        cudaMemset(cuc1, 0, cubuf_size );
+        cudaMemset(cuc2, 0, cubuf_size );
+    
+        // Create a 2D FFT plan.  
+        cufftPlan2d(&plan, params.data->getH(), params.data->getW(), CUFFT_C2C);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot create plan");
+            return;
+        }
 
-		if ((*wave_params.iter_ptr)!=-1) {
-			cudaMemcpy(b1, cuc1, cubuf_size, cudaMemcpyDeviceToHost);
-			cudaMemcpy(b2, cuc2, cubuf_size, cudaMemcpyDeviceToHost);
-			cudaThreadSynchronize();
-			
-			for (size_t k=0; k<ifg.getSurf(); k++) {
-				if(std::isfinite(ifg.Timg_buffer[k])){
-					qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
-					wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
-					angle->Timg_buffer[k] = b2[k].x;
-					lambda->Timg_buffer[k] = b2[k].y;
-					intensity->Timg_buffer[k] = ifg.Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
-				} else {
-					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-					lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				}
-				
-			}
-			
-			
-			phys_fast_gaussian_blur(*intensity,wave_params.thickness/2.0);
-			
-			olist->push_back(wphase);
-			olist->push_back(qmap);
-			olist->push_back(lambda);
-			olist->push_back(angle);
-			olist->push_back(intensity);
-			
-			list<nPhysD *>::const_iterator itr;
-			for(itr = olist->begin(); itr != olist->end(); ++itr) {
-				(*itr)->TscanBrightness();
-				(*itr)->set_origin(ifg.get_origin());
-				(*itr)->set_scale(ifg.get_scale());
-				(*itr)->setFromName(ifg.getFromName());
-				(*itr)->setShortName((*itr)->getName());
-				(*itr)->setName((*itr)->getShortName()+ " "+ifg.getName());
-			}
-		}
-		
-		delete [] b1;
-		delete [] b2;
-	
-		cudaFree(cub1);
-		cudaFree(cub2);
-		cudaFree(cub3);
-		cudaFree(cuc1);
-		cudaFree(cuc2);
-	
-		cufftDestroy (plan);
-	    cudaThreadSynchronize();
-		cudaThreadExit();
+        cudaMemcpy(cub1, &b1[0], cubuf_size, cudaMemcpyHostToDevice);
 
-	}
+        cufftExecC2C(plan, cub1, cub2, CUFFT_FORWARD);
+        if (cudaGetLastError()!=cudaSuccess) {
+            WARNING("cannot do FFT");
+            return;
+        }
+    //	cudaThreadSynchronize();
+    
+        if ((params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
+
+            int dx=params.data->getW();
+            int dy=params.data->getH();
+
+            vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
+            int n_iter = angles.size()*lambdas.size();
+        
+            nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
+            qmap = new nPhysD(dx, dy, 0.0, "quality");
+        
+            wphase = new nPhysD("phase/2pi");
+            wphase->resize(dx, dy);
+            lambda = new nPhysD("lambda");
+            lambda->resize(dx, dy);
+            angle = new nPhysD("angle");
+            angle->resize(dx, dy);
+            intensity = new nPhysD("intensity");
+            intensity->resize(dx, dy);
+
+
+            if (params.n_angles==1) {
+                angles[0]=0.5*(params.end_angle+params.init_angle);
+            } else {
+                for (size_t i=0; i<params.n_angles; i++)
+                    angles[i] = params.init_angle + i*(params.end_angle-params.init_angle)/(params.n_angles-1);
+            }	
+            if (params.n_lambdas==1) {
+                lambdas[0]=0.5*(params.end_lambda+params.init_lambda);
+            } else {
+                for (size_t i=0; i<params.n_lambdas; i++)
+                    lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
+            }
+        
+            for (size_t i=0; i<lambdas.size(); i++) {
+                for (size_t j=0; j<angles.size(); j++) {
+    
+                    if ((*params.iter_ptr)==-1) {
+                        DEBUG("aborting");
+                        break;
+                    }
+                    params.iter++;
+                    (*params.iter_ptr)++;
+                    DEBUG((100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+            
+                    gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)params.damp, (float)params.thickness);
+                    cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
+                    fase(cub3, cuc1, cuc2, params.data->getSurf(), angles[j], lambdas[i]);
+                    cudaThreadSynchronize();
+            
+                }
+                //! todo: this is awful: add exception?
+                if ((*params.iter_ptr)==-1) {
+                    DEBUG("aborting");
+                    break;
+                }
+            }
+            DEBUG(PRINTVAR(*params.iter_ptr));
+            cudaThreadSynchronize();
+
+            if ((*params.iter_ptr)!=-1) {
+                cudaMemcpy(&b1[0], cuc1, cubuf_size, cudaMemcpyDeviceToHost);
+                cudaMemcpy(&b2[0], cuc2, cubuf_size, cudaMemcpyDeviceToHost);
+                cudaThreadSynchronize();
+            
+                for (size_t k=0; k<params.data->getSurf(); k++) {
+                    if(std::isfinite(params.data->Timg_buffer[k])){
+                        qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
+                        wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
+                        angle->Timg_buffer[k] = b2[k].x;
+                        lambda->Timg_buffer[k] = b2[k].y;
+                        intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
+                    } else {
+                        qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                        wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+                        angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
+                        lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+                        intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
+                    }
+                
+                }
+            
+            
+                phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
+            
+                if (params.dosynthetic) {                
+                    nPhysD *tmp = new nPhysD();
+                    phys_synthetic_interferogram(*tmp,wphase,qmap);
+                    params.olist["synthetic"]=tmp;
+                }
+            
+                if (params.docropregion) {                
+                    nPhysD *tmp = new nPhysD();
+                    *tmp= *(params.data);
+                    params.olist["source"]=tmp;
+                }
+            
+                wphase->property["unitsCB"]="2pi";
+                params.olist["phase_2pi"] = wphase;
+                params.olist["contrast"] = qmap;
+                lambda->property["unitsCB"]="px";
+                params.olist["lambda"] = lambda;
+                angle->property["unitsCB"]="deg";
+                params.olist["angle"] = angle;
+                params.olist["intensity"] = intensity;
+            
+                map<string, nPhysD *>::const_iterator itr;
+                for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+                    if (params.trimimages) {
+                        nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
+                        delete itr->second;
+                        params.olist[itr->first]=new nPhysD();
+                        *params.olist[itr->first]=image;
+                    }
+                    itr->second->TscanBrightness();
+                    itr->second->set_origin(params.data->get_origin());
+                    itr->second->set_scale(params.data->get_scale());
+                    itr->second->setFromName(params.data->getFromName());
+                    itr->second->setShortName(itr->first);
+                    itr->second->setName(itr->first+ " "+params.data->getName());
+                }
+            }
+            
+            cudaFree(cub1);
+            cudaFree(cub2);
+            cudaFree(cub3);
+            cudaFree(cuc1);
+            cudaFree(cuc2);
+    
+            cufftDestroy (plan);
+            cudaThreadSynchronize();
+            cudaThreadExit();
+
+        }
+    }
 	DEBUG("Out of here");
-	return olist;	
 }
 #else
-list<nPhysD *> *
-phys_wavelet_field_2D_morlet_cuda(nPhysD &ifg, wavelet_params &wave_params) {
+void phys_wavelet_field_2D_morlet_cuda(wavelet_params &wave_params) {
     WARNING("We should never go here...");
 }
 #endif
+
+
+// ---------------------- thread transport functions ------------------------
+
+void phys_wavelet_trasl_cuda(void *params, int &iter) {
+    DEBUG("Enter here");
+	((wavelet_params *)params)->iter_ptr = &iter;
+	phys_wavelet_field_2D_morlet_cuda(*((wavelet_params *)params));
+}
+
+void phys_wavelet_trasl_nocuda(void *params, int &iter) {
+    DEBUG("Enter here");
+	((wavelet_params *)params)->iter_ptr = &iter;
+	phys_wavelet_field_2D_morlet(*((wavelet_params *)params));
+}
+
 
 // unwrap methods
 nPhysD *
@@ -697,31 +524,35 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
 
 		case QUALITY :
 			unwrap_quality(&wphase, uphase, &quality);
-            DEBUG("here");
  			break;
  			
 		case MIGUEL :
 			unwrap_miguel(&wphase, uphase);
  			break;
 
+		case MIGUEL_QUALITY :
+			unwrap_miguel_quality(&wphase, uphase, &quality);
+ 			break;
+			
 	}
     DEBUG("here");
-
+    uphase->TscanBrightness();
 	return uphase;
 }
 
-void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> &phase_over_2pi, nPhysImageF<double> &quality){
-    
-    if (phase_over_2pi.getW()==quality.getW() && phase_over_2pi.getH()==quality.getH()) {
-        synthetic.resize(phase_over_2pi.getW(),phase_over_2pi.getH());
-        for (size_t ii=0; ii<phase_over_2pi.getSurf(); ii++) {
-            synthetic.set(ii,quality.point(ii)*(1.0+cos(phase_over_2pi.point(ii)*2*M_PI)));
+void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
+    if (phase_over_2pi && quality) {
+        if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
+            synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
+            for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
+                synthetic.set(ii,quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
+            }
+            synthetic.property=phase_over_2pi->property;
+            synthetic.setShortName("synthetic");
+            synthetic.setName("synthetic("+phase_over_2pi->getName()+","+quality->getName()+")");
+            synthetic.TscanBrightness();
         }
-        synthetic.setShortName("synthetic");
-        synthetic.setName("synthetic("+phase_over_2pi.getName()+","+quality.getName()+")");
-        synthetic.TscanBrightness();
     }
-
 }
 
 void
@@ -743,7 +574,7 @@ phys_guess_carrier(nPhysD &phys, double weight)
 	size_t dx=phys.getW();
 	size_t dy=phys.getH();
 	
-	fftw_complex *myData=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dy*(dx/2+1));
+	fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
 	fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
 	fftw_execute(plan);
 	
@@ -794,6 +625,7 @@ phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double m
 		//invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 		invimage.set(ii, mult*(pow(the_point/kappa + 1,2.)-1) );
 	}
+    invimage.property["unitsCB"]="m-3";
 	invimage.TscanBrightness();
 }
 
@@ -807,12 +639,24 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 		double the_point = invimage.point(ii)/res;
 		invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 	}
+    invimage.property["unitsCB"]="m-3";
 	invimage.TscanBrightness();
+}
+
+void
+phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
+{
+	double mult = (2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
+    phys_multiply(invimage,mult);
+	invimage.set_scale(res*1e2,res*1e2);
+    invimage.property["unitsX"]="cm";
+    invimage.property["unitsY"]="cm";
+    invimage.property["unitsCB"]="C/m-3";
 }
 
 
 //! General function for Abel inversion
-nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
+void phys_invert_abel(abel_params &params)
 {
 	
 	std::vector<phys_point> iaxis = params.iaxis; // TODO: passa a bidimvec
@@ -821,14 +665,14 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 //	inversion_physics iphysics = params.iphysics;
 
 
-	if (iimage.getSurf() == 0)
-		return NULL;
+	if (params.iimage->getSurf() == 0)
+		return;
 
-	nPhysD *oimage;
-	oimage = new nPhysD (iimage.getW(), iimage.getH(),numeric_limits<double>::quiet_NaN(),"Inverted");
-	oimage->set_origin(iimage.get_origin());
-	oimage->set_scale(iimage.get_scale());
+	params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),numeric_limits<double>::quiet_NaN(),"Inverted");
+	params.oimage->set_origin(params.iimage->get_origin());
+	params.oimage->set_scale(params.iimage->get_scale());
 
+    
 	// adorabile ridondanza qui..
 	
 	// 1. set direction indexes
@@ -850,23 +694,29 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 	
 	// 2. switch on algo
 	size_t axe_point[2];
-// 	size_t longitudinal_size = iimage.getSizeByIndex(sym_idx);
-	size_t integral_size = iimage.getSizeByIndex(inv_idx);
+// 	size_t longitudinal_size = params.iimage->getSizeByIndex(sym_idx);
+	size_t integral_size = params.iimage->getSizeByIndex(inv_idx);
 	double *copy_buffer, *out_buffer;
 	copy_buffer = new double[integral_size];
 	out_buffer = new double[integral_size];
-
+	
+//     params.rimage.resize(params.iimage->getW(), params.iimage->getH());
+// 	vector<double> rbuffer_pos(integral_size);
+// 	for (int j=0; j<integral_size; j++) {
+// 	    rbuffer_pos[j]=j;
+//     }
+    
 	// .alex. old version
 	/*switch (idir) {
 		case PHYS_Y:
-			oimage->set(iaxis[ii].x,iaxis[ii].y, 
-					0.5*(oimage->point(iaxis[ii].x-1,iaxis[ii].y)+oimage->point(iaxis[ii].x+1,iaxis[ii].y)));
+			params.oimage->set(iaxis[ii].x,iaxis[ii].y, 
+					0.5*(params.oimage->point(iaxis[ii].x-1,iaxis[ii].y)+params.oimage->point(iaxis[ii].x+1,iaxis[ii].y)));
 			break;
 		
 		case PHYS_X:
 		default:
-			oimage->set(iaxis[ii].x,iaxis[ii].y, 
-					0.5*(oimage->point(iaxis[ii].x,iaxis[ii].y-1)+oimage->point(iaxis[ii].x,iaxis[ii].y+1)));
+			params.oimage->set(iaxis[ii].x,iaxis[ii].y, 
+					0.5*(params.oimage->point(iaxis[ii].x,iaxis[ii].y-1)+params.oimage->point(iaxis[ii].x,iaxis[ii].y+1)));
 			break;
 	}*/
 
@@ -884,35 +734,39 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-			int copied = iimage.get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
-			
+			int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
+
+// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_NEG);
+            
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 	
-			
 			phys_invert_abel_1D(copy_buffer, out_buffer, integral_size);
 			
-			oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
-			
+			params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
 			
 
-			copied = iimage.get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
+			copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
+
+// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_POS);
+
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
 			phys_invert_abel_1D(copy_buffer, out_buffer, integral_size);
-			oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
+			params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
 
 			//FIXME: pretty sure there is a better way!! ALEX!!!!
 			// .alex. : fixed in some way. To be checked
-			oimage->set(iaxis[ii].x, iaxis[ii].y, 
-					0.5*(oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+			params.oimage->set(iaxis[ii].x, iaxis[ii].y, 
+					0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
 		}
-		oimage->setName(string("ABEL ")+oimage->getName());
-		oimage->setShortName("ABEL");
 
-		//oimage->setName(string("Inverted (ABEL) ")+string(iimage.getShortName()));
+		params.oimage->setName(string("ABEL ")+params.oimage->getName());
+		params.oimage->setShortName("ABEL");
+
+		//params.oimage->setName(string("Inverted (ABEL) ")+string(params.iimage->getShortName()));
 	} else if (ialgo == ABEL_HF) {
 		DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
 		// testing purposes only! Many problems in this one:
@@ -925,9 +779,9 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 		//! hence in a modification of the image resolution
 
 		/*if (sym_idx == PHYS_X) {
-			oimage->resize(iimage.getW(), 3*integral_size);
+			params.oimage->resize(params.iimage->getW(), 3*integral_size);
 		} else {
-			oimage->resize(3*integral_size, iimage.getH());
+			params.oimage->resize(3*integral_size, params.iimage->getH());
 		}*/
 
 		int axe_inv_mean[2];
@@ -950,7 +804,7 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 			axe_point[0] = iaxis[ii].x;
 			axe_point[1] = iaxis[ii].y;
 			//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-			int copied = iimage.get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
+			int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
 			
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
@@ -959,36 +813,35 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 			phys_invert_abelHF_1D(copy_buffer, out_buffer, integral_size, &my_lut);
 			//phys_invert_abelHF_1D(copy_buffer, out_buffer, copied, &my_lut);
 			
-			oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
-			//oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_NEG);
+			params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
+			//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_NEG);
 		
 			double upper_axe_point = out_buffer[0];
 			
 
-			copied = iimage.get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
+			copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
 			for (size_t j=copied; j<integral_size; j++)
 				copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
 			phys_invert_abelHF_1D(copy_buffer, out_buffer, integral_size, &my_lut);
 			//phys_invert_abelHF_1D(copy_buffer, out_buffer, copied, &my_lut);
 			
-			oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
-			//oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_POS);
+			params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
+			//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_POS);
 
 			//FIXME: pretty sure there is a better way!! ALEX!!!!
 			// .alex. : fixed in some way. To be checked
 			
 			// me lo ricordo mica cosa fa questa riga..
-			//oimage->set(iaxis[ii].x, iaxis[ii].y, 
-			//		0.5*(oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+			//params.oimage->set(iaxis[ii].x, iaxis[ii].y, 
+			//		0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
-			oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point); 
+			params.oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point); 
 
 			DEBUG(10,"step: "<<ii);
 		}
-		oimage->setName(string("ABEL")+oimage->getName());
-		oimage->setShortName("ABEL");
-
+		params.oimage->setName(string("ABEL")+params.oimage->getName());
+		params.oimage->setShortName("ABEL");
 	} else {
 		DEBUG(1, "Unknown inversion type: "<<(int)ialgo);
 	}
@@ -996,10 +849,9 @@ nPhysD * phys_invert_abel(nPhysD &iimage, abel_params &params)
 	delete copy_buffer;
 	delete out_buffer;
 
-	oimage->TscanBrightness();
+	params.oimage->TscanBrightness();
 
     DEBUG((*params.iter_ptr)); 
-	return oimage;
 }
 
 

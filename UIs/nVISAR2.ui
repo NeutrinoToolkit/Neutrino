@@ -115,7 +115,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/neutrino.qrc">
-          <normaloff>:/icons/refresh2.svg</normaloff>:/icons/refresh2.svg</iconset>
+          <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
         </property>
        </widget>
       </item>
@@ -209,7 +209,7 @@
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="QToolButton" name="validate">
+          <widget class="QToolButton" name="doWaveButton">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
@@ -327,7 +327,7 @@
   <tabstop>enableVisar</tabstop>
   <tabstop>refImage</tabstop>
   <tabstop>shotImage</tabstop>
-  <tabstop>validate</tabstop>
+  <tabstop>doWaveButton</tabstop>
   <tabstop>multRef</tabstop>
   <tabstop>offRef</tabstop>
   <tabstop>offShot</tabstop>

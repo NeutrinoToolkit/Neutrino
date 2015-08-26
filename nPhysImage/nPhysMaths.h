@@ -25,9 +25,11 @@
 // collection of math functions
 #include <iostream>
 
+#ifdef HAVE_LIBGSL
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+#endif
 
 #include "nPhysImageF.h"
 #include "nPhysTools.h"
@@ -180,8 +182,7 @@ void
 phys_fast_gaussian_blur(nPhysImageF<double> &, double);
 
 void
-phys_gaussian_subtraction(nPhysImageF<double> &, double, double);
-
+phys_fast_gaussian_blur(nPhysImageF<double> &, double, double);
 
 template<> void
 nPhysImageF<mcomplex>::TscanBrightness();
@@ -192,7 +193,21 @@ void phys_subtract(nPhysImageF<double> &, double);
 void phys_multiply(nPhysImageF<double> &, double);
 void phys_divide(nPhysImageF<double> &, double);
 
+void phys_point_add(nPhysImageF<double> &, nPhysImageF<double> &);
+void phys_point_subtract(nPhysImageF<double> &, nPhysImageF<double> &);
+void phys_point_multiply(nPhysImageF<double> &, nPhysImageF<double> &);
+void phys_point_divide(nPhysImageF<double> &, nPhysImageF<double> &);
+
 void phys_add_noise(nPhysImageF<double> &, double);
+
+double phys_sum_points(nPhysImageF<double> &);
+double phys_sum_square_points(nPhysImageF<double> &);
+void phys_opposite(nPhysImageF<double> &);
+void phys_inverse(nPhysImageF<double> &);
+
+void phys_replace(nPhysImageF<double> &, double, double);
+void phys_replace_NaN(nPhysImageF<double> &, double);
+void phys_cutoff(nPhysImageF<double> &, double, double);
 
 std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>*, nPhysImageF<double>*);
 

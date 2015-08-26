@@ -52,7 +52,7 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
 		if (e->pos().y()<dyColorBar + 4*offsety) {
 			colorvalue=parentPan->my_w.lineMin->text().toDouble()+frac_value*(parentPan->my_w.lineMax->text().toDouble()-parentPan->my_w.lineMin->text().toDouble());
 		} else {
-			colorvalue=parentPan->currentBuffer->Tminimum_value+frac_value*(parentPan->currentBuffer->Tmaximum_value-parentPan->currentBuffer->Tminimum_value);
+			colorvalue=parentPan->currentBuffer->get_min()+frac_value*(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
 		}
 		parentPan->my_w.statusbar->showMessage(tr("Value : ")+QString::number(colorvalue),2000);
 	}
@@ -74,8 +74,8 @@ void nHistogram::paintEvent(QPaintEvent *)
 			position=min(max(position,offsetx),width()-offsetx);
 			p.drawLine(position,2*offsety,position,2*offsety+dyColorBar);
 		}
-		if (parentPan->currentBuffer->Tmaximum_value!=parentPan->currentBuffer->Tminimum_value) {
-			int position=offsetx+dx*(colorvalue-parentPan->currentBuffer->Tminimum_value)/(parentPan->currentBuffer->Tmaximum_value-parentPan->currentBuffer->Tminimum_value);
+		if (parentPan->currentBuffer->get_max()!=parentPan->currentBuffer->get_min()) {
+			int position=offsetx+dx*(colorvalue-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
 			position=min(max(position,offsetx),width()-offsetx);
 			p.drawLine(position,dyHisto,position,dy);
 		}
@@ -143,8 +143,8 @@ void nHistogram::drawPicture (QPainter &p) {
 		p.setBrush(QColor(0,0,0,127));
 		p.setPen(QColor(0,0,0,127));
 				
-		double mini=dx*(parentPan->my_w.lineMin->text().toDouble()-parentPan->currentBuffer->Tminimum_value)/(parentPan->currentBuffer->Tmaximum_value-parentPan->currentBuffer->Tminimum_value);
-		double maxi=dx*(parentPan->my_w.lineMax->text().toDouble()-parentPan->currentBuffer->Tminimum_value)/(parentPan->currentBuffer->Tmaximum_value-parentPan->currentBuffer->Tminimum_value);
+		double mini=dx*(parentPan->my_w.lineMin->text().toDouble()-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
+		double maxi=dx*(parentPan->my_w.lineMax->text().toDouble()-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
 		p.drawLine(offsetx,2*offsety+dyColorBar,offsetx+mini,dyHisto);
 		p.drawLine(dx+offsetx,2*offsety+dyColorBar,offsetx+maxi,dyHisto);
 		
@@ -178,9 +178,9 @@ void nHistogram::drawPicture (QPainter &p) {
 		while (1) {
 			tics2++;
 			bool finish=false;
-			deltaimage=(parentPan->currentBuffer->Tmaximum_value-parentPan->currentBuffer->Tminimum_value)/((double)tics2);
+			deltaimage=(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min())/((double)tics2);
 			for (int i=0; i<=tics2; i++) {
-				int wid=p.fontMetrics().width(QString::number(parentPan->currentBuffer->Tminimum_value+i*deltaimage));
+				int wid=p.fontMetrics().width(QString::number(parentPan->currentBuffer->get_min()+i*deltaimage));
 				if (wid>dx/tics2/2) finish=true;
 			}
 			if (finish) break;
@@ -207,7 +207,7 @@ void nHistogram::drawPicture (QPainter &p) {
 		for (int i=0; i<=tics2; i++) {
 			p.drawLine(offsetx+i*dx/tics2,height()-2*offsety,offsetx+i*dx/tics2,height()-offsety-4);
 			
-			QString str2=QString::number(parentPan->currentBuffer->Tminimum_value+i*deltaimage);
+			QString str2=QString::number(parentPan->currentBuffer->get_min()+i*deltaimage);
 			QRectF rect2(0,height()-(offsety+2),p.fontMetrics().width(str2),offsety);
 			
 			int align= Qt::AlignVCenter;
@@ -221,7 +221,7 @@ void nHistogram::drawPicture (QPainter &p) {
 				align|=Qt::AlignHCenter;
 				rect2.moveLeft(offsetx+i*dx/tics2-rect2.width()/2);
 			}
-			p.drawText(rect2,align,QString::number(parentPan->currentBuffer->Tminimum_value+i*deltaimage));
+			p.drawText(rect2,align,QString::number(parentPan->currentBuffer->get_min()+i*deltaimage));
 		}
 		
 	} else {

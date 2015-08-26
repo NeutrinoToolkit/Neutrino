@@ -22,32 +22,45 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nAutoAlign
-#define __nAutoAlign
-
 #include <QtGui>
 #include <QWidget>
 
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>   
+
+
 #include "nGenericPan.h"
-#include "ui_nAutoAlign.h"
+#include "ui_nAffine.h"
+#include "nLine.h"
+
+
+#ifndef __nAffine
+#define __nAffine
 
 class neutrino;
-class nRect;
 
-class nAutoAlign : public nGenericPan {
+class nAffine : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nAutoAlign(neutrino *, QString);
+	nAffine(neutrino *, QString);
 	
-	Ui::nAutoAlign my_w;
+	Ui::nAffine my_w;
+	
+	nPhysD *Affined;
 
-	QPointer<nRect> box;
+	QPointer<nLine> l1, l2;
+	
+	vec2f affine(vec2f, std::vector<double>);
 
+	std::vector<double> forward, backward;
+	
 public slots:
-	void doOperation();
-	void doOperation_old();
-	
+	std::vector<double> getAffine(QPolygonF, QPolygonF);
+	void apply();
+	void affine();
+	void bufferChanged(nPhysD*);
+
 };
 
 #endif

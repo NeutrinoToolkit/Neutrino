@@ -36,7 +36,7 @@ class neutrino;
 class nOperator : public nGenericPan {
 	Q_OBJECT
 
-	int separator[2];
+    std::map<std::string,int> separator;
 
 public:	
 	nOperator(neutrino *, QString);
