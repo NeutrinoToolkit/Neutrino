@@ -4,20 +4,22 @@
 
 cmake_minimum_required (VERSION 3.0)
 
+project (Neutrino CXX)
 
-exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe" OUTPUT_VARIABLE VERSION1 )
+set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../resources/cmake)
 
-exec_program(
-    "git"
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ARGS "symbolic-ref HEAD"
-    OUTPUT_VARIABLE VERSION2 )
+include(FindGit)
+set (VERSION_UPDATE_FROM_GIT ON)
+include(GetVersionFromGitTag)
 
-string(REPLACE "/" ";" VERSION3 "${VERSION2}-${VERSION1}")
-list(GET VERSION3 2 VERSION)
+message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
+set (CMAKE_CXX_FLAGS "-std=c++11")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+
+add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
 if (APPLE) 
-    message(STATUS "Apple : use macports !")
+    message(STATUS "Apple : remember to use macports !")
     set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
     set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
     set (CMAKE_PREFIX_PATH "/opt/local")
@@ -25,15 +27,13 @@ if (APPLE)
     add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
     
-    exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "rev-list HEAD --count" OUTPUT_VARIABLE COUNTREV )
-    SET (MACOSX_BUNDLE_BUNDLE_VERSION "${COUNTREV}")
-    SET (MACOSX_BUNDLE_SHORT_VERSION_STRING "${COUNTREV}")
+    SET (MACOSX_BUNDLE_BUNDLE_VERSION "${${PROJECT_NAME}_VERSION_AHEAD}")
+    SET (MACOSX_BUNDLE_SHORT_VERSION_STRING "${${PROJECT_NAME}_VERSION_AHEAD}")
     SET (MACOSX_BUNDLE_COPYRIGHT "GPL")
     SET (MACOSX_BUNDLE_GUI_IDENTIFIER "edu.polytechnique.neutrino")
 
-
     SET (MACOSX_BUNDLE_BUNDLE_NAME "Neutrino")
-    SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
+    SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${${PROJECT_NAME}_VERSION_STRING_FULL}")
     SET (MACOSX_BUNDLE_INFO_STRING  "Neutrino program" )
     SET (MACOSX_BUNDLE_ICON_FILE  "icon.icns" )
     set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
@@ -47,43 +47,82 @@ if (UNIX AND (NOT APPLE))
 endif()
 
 
+
 add_compile_options(-std=c++0x)
 
-project (neutrino)
-add_definitions(-D__VER="${VERSION}")
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 
 set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set (LIBPATHS /usr/lib /opt/local/lib)
+set (LIBPATHS /usr/lib /opt/local/lib ../lib)
 
 ## sources
-set (SOURCES nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nBlur.cc pans/nSpectralAnalysis.cc pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc pans/nGhost.cc pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc osxApp.cc nApp.cc main.cc 
+set (SOURCES 
+    nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc 
+    graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
+    panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
+    pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
+    pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nBlur.cc pans/nSpectralAnalysis.cc 
+    pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc 
+    pans/nGhost.cc pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc 
+    pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
+    pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
+    pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
+    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
+    osxApp.cc nApp.cc main.cc 
 )
 
 ## UIs
-set (UIS ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui ../UIs/nGhost.ui ../UIs/nInterpolatePath.ui ../UIs/nIntegralInversion.ui ../UIs/nPreferences.ui ../UIs/nOpenRAW.ui ../UIs/nColorBarWin.ui ../UIs/nOperator.ui ../UIs/nCutoffMask.ui ../UIs/nBoxLineout.ui ../UIs/nLineout.ui ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui	
+set (UIS 
+    ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui 
+    ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui 
+    ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui 
+    ../UIs/nGhost.ui ../UIs/nInterpolatePath.ui ../UIs/nIntegralInversion.ui 
+    ../UIs/nPreferences.ui ../UIs/nOpenRAW.ui ../UIs/nColorBarWin.ui 
+    ../UIs/nOperator.ui ../UIs/nCutoffMask.ui ../UIs/nBoxLineout.ui ../UIs/nLineout.ui 
+    ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
+    ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
+    ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
+    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui	
 )
 
 ## resources
-set (RESOURCES ../resources/neutrino.qrc)
+set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/../resources/neutrino.qrc")
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
 
-
-#SET(QT_LIBRARY_DIR "/opt/local/Library/Frameworks/")
-find_package(Qt4 REQUIRED)
-
-message(STATUS "qt use frmaeworks: ${QT_USE_FRAMEWORKS}")
+find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
+include(UseQt4)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-list(APPEND CMAKE_MODULE_PATH ".")
+
+list(APPEND CMAKE_MODULE_PATH "../lib")
+
+# cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
+include_directories(../nPhysImage)
+
+#find_library(NPHYSIMAGE NAMES nPhysImageF REQUIRED)
+#if (NOT ${NPHYSIMAGE} STREQUAL "NPHYSIMAGE-NOTFOUND")
+#	message (STATUS "using NPHYSIMAGE: ${NPHYSIMAGE}")
+
+set(LIBS ${LIBS} "nPhysImageF") 
+add_definitions(-DHAVE_NPHYSIMAGE)
+
+#endif()
+
 find_package(Qwt REQUIRED)
 if (QWT_FOUND)
 	include_directories(${QWT_INCLUDE_DIRS})
@@ -128,7 +167,6 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 	set(LIBS ${LIBS} ${GSLCBLAS}) 
 	add_definitions(-DHAVE_LIBGSLCBLAS)
 endif()
-
 # hdf4
 find_library (HDF4 NAMES mfhdf)
 if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
@@ -136,7 +174,11 @@ if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
 	set(LIBS ${LIBS} ${HDF4})
 	include_directories(BEFORE "/usr/include/hdf")
 	add_definitions(-DHAVE_LIBMFHDF)
+else()
+	#message ("----------------- non ho trovato hdf4 della fungia")
 endif()
+
+
 find_library (DF NAMES df)
 if (NOT ${DF} STREQUAL "DF-NOTFOUND")
 	message (STATUS "using df: ${DF}")
@@ -144,57 +186,231 @@ if (NOT ${DF} STREQUAL "DF-NOTFOUND")
 	add_definitions(-DHAVE_LIBDF)
 endif()
 
-#libhdf5_hl
-find_library(HDF5HL NAMES hdf5_hl)
-if (NOT ${HDF5HL} STREQUAL "HDF5HL-NOTFOUND")
-	message (STATUS "using libhdf5_hl: ${HDF5HL}")
-	set(LIBS ${LIBS} ${HDF5HL}) 
-	add_definitions(-DHAVE_LIBHDF5HL)
+
+# pgm
+find_library(PBM NAMES netpbm)
+if (NOT ${PBM} STREQUAL "PBM-NOTFOUND")
+	message (STATUS "using netpbm: ${PBM}")
+	set(LIBS ${LIBS} ${PBM}) 
+	add_definitions(-DHAVE_LIBNETPBM)
+	if (APPLE) 
+		include_directories(BEFORE "/opt/local/include/netpbm")
+	endif()
 endif()
 
+find_package(JPEG REQUIRED)
+if (JPEG_FOUND)
+	include_directories(${JPEG_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${JPEG_LIBRARIES})
+	add_definitions(-DHAVE_JPEG)
+endif()
+
+find_package(TIFF REQUIRED)
+if (TIFF_FOUND)
+	include_directories(${TIFF_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${TIFF_LIBRARIES})
+	add_definitions(-DHAVE_TIFF)
+endif()
+
+
+#libhdf5_hl
+message ("---- looking for the entire HDF5 mess...")
 find_package(HDF5)
 if (HDF5_FOUND)
-	include_directories(${HDF5_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${HDF5_LIBRARIES})
-	add_definitions(-DHAVE_HDF5)
 
-	# add nHDF5 sources
-	set (SOURCES ${SOURCES} pans/nHDF5.cc)
-	set (UIS ${UIS} ../UIs/nHDF5.ui)
+	message(STATUS "HDF5 Found, now looking for HL")
+
+	# IF HDF5 is there, THEN look for hl...
+	find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS})
+	if (${HDF5HL} STREQUAL "HDF5HL-NOTFOUND")
+		message (STATUS "Cannot find HDF5_HL: disabling HDF5 support")
+		message (STATUS "Search dir: " ${HDF5_LIBRARY_DIRS})
+
+	else()
+
+		#hdf5 libs
+		include_directories(${HDF5_INCLUDE_DIRS})
+		set(LIBS ${LIBS} ${HDF5_LIBRARIES})
+		add_definitions(-DHAVE_HDF5)
+
+		# hdf5_hl
+		message (STATUS "using libhdf5_hl: ${HDF5HL}")
+		set(LIBS ${LIBS} ${HDF5HL}) 
+		add_definitions(-DHAVE_LIBHDF5HL)
+
+	
+		# add nHDF5 sources
+		set (SOURCES ${SOURCES} pans/nHDF5.cc)
+		set (UIS ${UIS} ../UIs/nHDF5.ui)
+
+	endif()
+
 endif (HDF5_FOUND)
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
 
 
 # using Qt meta-system (precompiler)
 QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 QT4_WRAP_UI( UI_HEADERS ${UIS} )
-#QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} ) # probabilmente auto_moc interferisce con questo
 
 if(APPLE) 
-    add_executable(Neutrino 
-        MACOSX_BUNDLE ${myApp_ICON}
-        ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
-    set_target_properties(Neutrino PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist)
+#     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
 else()
     add_executable(Neutrino ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
 endif()
 
-target_link_libraries(Neutrino ${LIBS})
-target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtSvg)
-
-# nPhysImage
-include_directories(../nPhysImage)
-target_link_libraries(Neutrino "-L../nPhysImage -lnPhysImageF -lm")
 if (APPLE) 
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
-## ------- TODO ----------
-# carefully check for openmp
+target_link_libraries(Neutrino ${LIBS})
+target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+
+
+# output paths
+if (APPLE)
+    set (EXECUTABLE_OUTPUT_PATH "..")
+else()
+    set (EXECUTABLE_OUTPUT_PATH "../bin")
+    install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
+endif()
+
+
+
+
+
+
+
+
+
+
+
+if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
+	set(CMAKE_INSTALL_PREFIX "/Applications")
+endif()
+
+if(NOT CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
+	add_definitions(-DQT_NO_DEBUG_OUTPUT)
+	set(CMAKE_BUILD_RELEASE TRUE)
+else()
+	set(CMAKE_BUILD_RELEASE FALSE)
+endif()
+
+message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
+
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(PROJECT_VENDOR "neutrino inc.")
+set(PROJECT_COPYRIGHT_YEAR "2011")
+set(PROJECT_DOMAIN_FIRST "neutrino")
+set(PROJECT_DOMAIN_SECOND "com")
+set(PROJECT_DOMAIN "${PROJECT_DOMAIN_FIRST}.${PROJECT_DOMAIN_SECOND}")
+
+if(UNIX AND NOT APPLE)
+	string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
+	set(BIN_INSTALL_DIR "bin")
+	set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
+else()
+	set(BIN_INSTALL_DIR ".")
+	set(DOC_INSTALL_DIR ".")
+endif()
+set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/../resources/icons")
+
+if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
+	add_definitions(-Wall -Wextra)
+	if(CMAKE_BUILD_RELEASE)
+#		add_definitions(-Werror)
+	endif()
+endif()
+
+
+if(APPLE)
+	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+	set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+	set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
+
+	set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
+	set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
+endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
+
+if(APPLE)
+	set(CMAKE_INSTALL_PREFIX "/Applications")
+endif()
+
+message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
+install(TARGETS ${PROJECT_NAME} DESTINATION ${BIN_INSTALL_DIR})
+
+set(LICENSE_FILE "LICENSE.txt")
+
+if(NOT APPLE)
+	install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
+endif()
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
+
+message(STATUS ${${PROJECT_NAME}_SOURCE_DIR})
+
+set(CPACK_RESOURCE_FILE_README "${README_FILE}")
+
+if(WIN32)
+    set(CPACK_GENERATOR "NSIS")
+    set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "${PROJECT_NAME}")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME} ${PROJECT_VERSION}")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/${LICENSE_FILE}")
+    set(CPACK_NSIS_EXECUTABLES_DIRECTORY "${BIN_INSTALL_DIR}")
+    #set(CPACK_NSIS_MUI_ICON "${PROJECT_ICONS_DIRECTORY}/NSIS.ico")
+    #set(CPACK_PACKAGE_ICON "${PROJECT_ICONS_DIRECTORY}\\\\NSISHeader.bmp")
+    set(CPACK_NSIS_URL_INFO_ABOUT "http://${PROJECT_DOMAIN}")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+    set(CPACK_NSIS_MENU_LINKS "${LICENSE_FILE}" "License" "${README_FILE}" "Readme")
+    set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${CPACK_NSIS_INSTALLED_ICON_NAME}")
+elseif(APPLE)
+     set(CMAKE_INSTALL_PREFIX "/Applications")
+     set(CPACK_GENERATOR "DragNDrop")
+     set(CPACK_DMG_FORMAT "UDBZ")
+     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
+     set(CPACK_SYSTEM_NAME "OSX")
+     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
+     set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
+     set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
+     set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
+elseif(UNIX)
+    set(CPACK_GENERATOR "TBZ2")
+    set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")
+include(InstallRequiredSystemLibraries)
+
+if(APPLE)
+    set(EXECUTABLE "${PROJECT_NAME}.app")
+elseif(WIN32)
+    set(EXECUTABLE "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+else()
+    set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+endif()
+
+if(APPLE OR WIN32)
+    include(DeployQt4)
+    install_qt4_executable("${EXECUTABLE}")
+endif()
+
+include (CPack)
