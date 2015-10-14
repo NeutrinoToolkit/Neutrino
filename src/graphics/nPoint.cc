@@ -334,7 +334,9 @@ nPoint::selectThis(bool val) {
 
 QString nPoint::getPointString() {
 	QPointF myR=getPointF();
-	return QString::number(getPointF().x())+","+QString::number(getPointF().y());
+	return QString::number(myR.x())+","+QString::number(myR.y());
+	//.alex. non chiarissima la differenza
+	// return QString::number(getPointF().x())+","+QString::number(getPointF().y());
 }
 
 // reimplementation
