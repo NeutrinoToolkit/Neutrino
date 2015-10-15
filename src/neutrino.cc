@@ -506,6 +506,8 @@ neutrino::loadPlugin()
 			} else {
 				DEBUG("plugin load fail");
 	    		}
+		} else {
+			DEBUG("plugin cannot be loaded (linking problems?)");
 		}
 	}
  }
