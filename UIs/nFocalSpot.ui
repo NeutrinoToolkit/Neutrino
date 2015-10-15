@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
+    <width>247</width>
     <height>221</height>
    </rect>
   </property>
@@ -568,7 +568,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="label_6">
           <property name="font">
            <font>
@@ -580,7 +580,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="2" colspan="2">
+        <item row="6" column="2" colspan="2">
          <widget class="QLabel" name="integral_lbl">
           <property name="font">
            <font>
@@ -595,6 +595,26 @@
           </property>
           <property name="text">
            <string>Integral:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Contour:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" colspan="2">
+         <widget class="QLabel" name="contour_lbl">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="text">
+           <string>Contour data</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

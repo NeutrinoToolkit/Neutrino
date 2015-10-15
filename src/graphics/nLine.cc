@@ -50,11 +50,15 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 		setToolTip(tr("line")+QString::number(num));
 		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+		connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+
 		zoom=nparent->getZoom();
-        if (nparent->currentBuffer) {
-            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
-        }
+
+		if (nparent->currentBuffer) {
+
+	    		setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+		}
+
 	} else {
 		setToolTip(tr("line"));
 	}
@@ -171,16 +175,17 @@ QPolygonF nLine::getPoints() {
 }
 
 void nLine::bufferChanged(nPhysD* my_phys) {    
-    if (my_phys) {
-        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
-    } else {
-        setPos(0,0);
-    }
-    updatePlot();
+	if (my_phys) {
+		// qui si definisce la posizione dell'origine (quindi non deve dipendere dalla scala)
+		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+	} else {
+		setPos(0,0);
+	}
+	updatePlot();
 }
 
 QPolygonF nLine::getLine(int np) {
-    return mapToScene(poly(np));
+	return mapToScene(poly(np));
 }
 
 void nLine::interactive ( ) {
@@ -191,13 +196,13 @@ void nLine::interactive ( ) {
 
 void nLine::addPointAfterClick (QPointF) {
 	showMessage(tr("Point added, press ESC to finish"));
-    moveRef.clear();
+	moveRef.clear();
 	appendPoint();
 //    moveRef.erase(moveRef.begin(),moveRef.end()-1);
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
-    click_pos=e->pos();
+	click_pos=e->pos();
 	for (int i=0;i<ref.size();i++) {
 		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
 			moveRef.append(i);
@@ -248,6 +253,7 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 }
 
 void nLine::export_txt(){
+	// exports poly to file
 	QVariant varia=property("txtFile");
 	QString fname;
 	if (varia.isValid()) {
@@ -304,10 +310,14 @@ QString nLine::getStringData(QPolygonF vals){
 	QString point_table;
 	double dist=0.0;
 	for (int i=0; i<vals.size(); i++) {
-		if (i>0) dist+=sqrt(pow(vals.at(i).x()-vals.at(i-1).x(),2)+pow(vals.at(i).y()-vals.at(i-1).y(),2));
+		if (i>0) 
+			dist+=sqrt(pow(vals.at(i).x()-vals.at(i-1).x(),2)+pow(vals.at(i).y()-vals.at(i-1).y(),2));
 		point_table.append(QString("%1\t%2\t%3").arg(dist).arg(vals.at(i).x()).arg(vals.at(i).y()));
 		if (parent()->currentBuffer) {
-			point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
+			vec2f orig = parent()->currentBuffer->get_origin();
+			point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x()+orig.x(),vals.at(i).y()+orig.y())));
+			//.alex. translate to origin
+			// point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
 		} else {
 			point_table.append(QString("\n"));
 		}
@@ -334,6 +344,8 @@ void nLine::updatePlot () {
 			my_points<<item->pos();
 		}
 
+
+
 		QPolygonF my_poly=poly(numPoints);
 
 		foreach (QwtPlotMarker *mark, marker) {
@@ -344,13 +356,16 @@ void nLine::updatePlot () {
 		QPen penna;
 		penna.setColor(ref[0]->brush().color());
 
+		vec2f orig = mat->get_origin();
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
 			if (antialias) {
-				colore=mat->getPoint(p.x(),p.y());
+				// points in poly are NOT translated with origin
+				// (hence a correction must apply)
+				colore=mat->getPoint(p.x()+orig.x(),p.y()+orig.y());
 			} else {
-				colore=mat->point((int)p.x(),(int)p.y());
+				colore=mat->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
 			}
 			if (std::isfinite(colore)) toPlot << QPointF(dist, colore);
 			if (my_points.contains(p) && nSizeHolder>0.0) {
@@ -363,9 +378,9 @@ void nLine::updatePlot () {
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
 		if (antialias) {
-			colore=mat->getPoint(my_poly.last().x(),my_poly.last().y());
+			colore=mat->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
 		} else {
-			colore=mat->point((int)my_poly.last().x(),(int)my_poly.last().y());
+			colore=mat->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
 		}
 		if (std::isfinite(colore)) toPlot << QPointF(dist, colore);
 
@@ -480,7 +495,7 @@ nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
 	p.rx()=my_w.points->item(item->row(),0)->text().toDouble();
 	p.ry()=my_w.points->item(item->row(),1)->text().toDouble();
-	changeP(item->row(),p);
+	changeP(item->row(),p, true);
 }
 
 void
@@ -524,9 +539,15 @@ nLine::changeColorHolder (QColor color) {
 }
 
 void
-nLine::changeP (int np, QPointF p) {
+nLine::changeP (int np, QPointF p, bool isLocal) {
+	// if the point is already in matrix coordinates (isLocal=true) (eg. from QTableWid) changeP must not apply transformation
+	//
 	prepareGeometryChange();
-	ref[np]->setPos(mapFromScene(p));
+	if (isLocal) {
+		ref[np]->setPos(p);
+	} else {
+		ref[np]->setPos(mapFromScene(p));
+	}
 	ref[np]->setVisible(true);
 	changePointPad(np);
 	updatePlot();
@@ -933,17 +954,18 @@ QPainterPath nLine::path() const {
 
 QPolygonF nLine::poly(int steps) const {
 	QPolygonF my_poly, my_poly_interp;
-    if(ref.size()>0) {
-        foreach (QGraphicsEllipseItem *item, ref){
-            my_poly<< item->pos();
-        }
-        if (closedLine) my_poly << ref[0]->pos();
+	
+	if(ref.size()>0) {
+		foreach (QGraphicsEllipseItem *item, ref){
+			my_poly<< item->pos();
+		}
+		
+		if (closedLine) my_poly << ref[0]->pos();
         
         if (bezier && my_poly.size()>2) {
             steps=max(steps,16); // if it's a bezier impose at least 16 steps...
             QPolygonF splinePointsX;
             QPolygonF splinePointsY;
-            
             QVector<double>param_length;
             
             double param = 0.0;
@@ -956,6 +978,7 @@ QPolygonF nLine::poly(int steps) const {
                     const double delta = qSqrt(qwtSqr(x-xold)+qwtSqr(y-yold));
                     param += qMax( delta, 1.0 );
                 }
+
                 splinePointsX<< QPointF(param,x);
                 splinePointsY<< QPointF(param,y);
                 param_length << param;
@@ -1002,6 +1025,7 @@ QPolygonF nLine::poly(int steps) const {
             my_poly_interp << my_poly.last();
         }
     }
+
     return my_poly_interp;
 }
 

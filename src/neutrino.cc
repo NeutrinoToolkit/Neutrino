@@ -483,16 +483,31 @@ neutrino::loadPlugin()
 
 	if (!pname.isEmpty()) {
 
-		QPluginLoader pluginLoader(pname);
-		QObject *plugin = pluginLoader.instance();
+
+		if (plug_loader) {
+			plug_loader->unload();
+			delete plug_loader;
+		}
+
+
+		plug_loader = new QPluginLoader(pname);
+		QObject *plugin = plug_loader->instance();
+
+		DEBUG("got plugin instance "<<(void *)plugin);
+
+
 		if (plugin) {
-			plug_iface = qobject_cast<nPlug *>(plugin);
+			nPlug *plug_iface = qobject_cast<nPlug *>(plugin);
 			if (plug_iface) {
-				DEBUG("plugin"<<plug_iface->name().toAscii().constData()<<" cast success");
-				plug_iface->instantiate(this);
+				DEBUG("plugin \""<<plug_iface->name().toAscii().constData()<<"\" cast success");
+	
+				if (plug_iface->instantiate(this))
+					DEBUG("plugin \""<<plug_iface->name().toAscii().constData()<<"\" instantiate success");
 			} else {
 				DEBUG("plugin load fail");
-            }
+	    		}
+		} else {
+			DEBUG("plugin cannot be loaded (linking problems?)");
 		}
 	}
  }

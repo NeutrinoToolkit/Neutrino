@@ -80,7 +80,8 @@ public:
 
 	Ui::nSbarra my_sbarra;
 
-	nPlug *plug_iface;
+	QPluginLoader *plug_loader;
+	//nPlug *plug_iface;
 	
 	
 	

@@ -53,7 +53,9 @@ public:
 	QString name()
 	{ return QString("My skel plugin"); }
 
-	bool instantiate(neutrino *);
+	bool instantiate(neutrino *); // where the construction is performed
+
+	bool unload(); // where we dismantle everything when politely asked to
 	
 	nGenericPan *my_GP;
 

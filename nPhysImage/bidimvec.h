@@ -323,6 +323,11 @@ namespace vmath {
 	template <class T> bidimvec<T>
 	max(bidimvec<T> v1, bidimvec<T> v2)
 	{ return bidimvec<T>(std::max(v1.x(), v2.x()), std::max(v1.y(), v2.y())); }
+
+	// diagonal of the tensor product
+	template <class T> bidimvec<T>
+	td(bidimvec<T> v1, bidimvec<T> v2)
+	{ return bidimvec<T>(v1.x()*v2.x(), v1.y()*v2.y()); }
 	
 }
 
