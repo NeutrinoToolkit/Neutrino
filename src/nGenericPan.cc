@@ -35,7 +35,7 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 	grabKeyboard();
 #endif
 
-    DEBUG("panName" << panName.toStdString());
+    DEBUG("panName " << panName.toStdString());
 	setProperty("panName",panName);
 	int panNum=0;
 	foreach (QWidget *widget, QApplication::allWidgets()) {

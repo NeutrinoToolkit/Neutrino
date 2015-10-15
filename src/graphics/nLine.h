@@ -135,7 +135,7 @@ public slots:
 
     void centerOnImage();
 
-	void changeP(int,QPointF);
+	void changeP(int,QPointF, bool isLocal=false);
 
 	// methods to force monotonicity
 	void setMonotone(bool);

@@ -6,7 +6,7 @@ cd $bdir
 
 [ -d ui_ ] || mkdir ui_
 rm -f ui_/*
-cp ../build/ui_* ui_
+cp ../src/ui_* ui_
 
 cwd=$(pwd)
 

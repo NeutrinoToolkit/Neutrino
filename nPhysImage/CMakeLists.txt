@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 3.0)
 
 if (APPLE) 
     message(STATUS "Apple : use macports !")
-#     set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
-#     set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
+    set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
+    set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
     set (CMAKE_PREFIX_PATH "/opt/local")
 endif()
 
@@ -23,8 +23,8 @@ add_compile_options(-std=c++0x)
 add_compile_options(-fPIC)
 
 
-
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+
 
 
 add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
@@ -32,6 +32,10 @@ add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  n
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")
+
+
+
+
 
 
 # force necessary defines on config.h
@@ -100,13 +104,6 @@ if (JPEG_FOUND)
 	add_definitions(-DHAVE_JPEG)
 endif()
 
-# find_library (ZLIB NAMES z)
-# if (NOT ${ZLIB} STREQUAL "ZLIB-NOTFOUND")
-# 	message (STATUS "using zlib: ${ZLIB}")
-# 	set(LIBS ${LIBS} ${ZLIB})
-# 	add_definitions(-DHAVE_ZLIB)
-# endif()
-
 find_package(ZLIB REQUIRED)
 if (ZLIB_FOUND)
 	include_directories(${ZLIB_INCLUDE_DIRS})
@@ -118,17 +115,33 @@ endif()
 find_package(TIFF REQUIRED)
 if (TIFF_FOUND)
 	include_directories(${TIFF_INCLUDE_DIRS})
-    set(LIBS ${LIBS} ${TIFF_LIBRARIES})
-	add_definitions(-DHAVE_TIFF)
+	set(LIBS ${LIBS} ${TIFF_LIBRARIES})
+	add_definitions(-DHAVE_LIBTIFF)
 endif()
 
 # list include_directories
-#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-# foreach(dir ${dirs})
-#   message(STATUS "dir='${dir}'")
-# endforeach()
 
 
 target_link_libraries(nPhysImageF ${LIBS})
+
+# output
+set (LIBRARY_OUTPUT_PATH "../lib")
+
+#set (CMAKE_SKIP_RPATH true)
+
+
+# install
+install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
+
+if (APPLE)
+set (LIB_INSTALL_DIR "/usr/lib")
+set (CMAKE_INSTALL_RPATH "/usr/lib")
+set (MACOSX_RPATH off)
+set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR} MACOSX_RPATH off)
+endif()
+
+if (NOT APPLE)
+    install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
+endif()
 
 

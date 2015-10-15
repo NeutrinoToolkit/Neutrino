@@ -43,6 +43,8 @@ public slots:
 
 	virtual bool instantiate(neutrino *) = 0;
 
+	virtual bool unload() = 0;
+
 };
 
 Q_DECLARE_INTERFACE(nPlug, "org.neutrino.plug")
