@@ -773,7 +773,7 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 	
 
 
-	DEBUG(5,getName() << " Short: " << getShortName() << " from: " << getFromName());
+	DEBUG(5,my_phys->getName() << " Short: " << my_phys->getShortName() << " from: " << my_phys->getFromName());
 
 	if (ofile.good()) {
 
