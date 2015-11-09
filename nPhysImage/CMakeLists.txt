@@ -1,6 +1,8 @@
 # this is the frigging nPhysImage cmakelists
 cmake_minimum_required (VERSION 3.0)
 
+
+
 if (APPLE) 
     message(STATUS "Apple : use macports !")
     set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
@@ -34,7 +36,10 @@ target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")
 
 
+message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 
 
@@ -69,7 +74,7 @@ if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
 endif()
 
 #fftw
-find_library(FFTW NAMES fftw3)
+find_library(FFTW NAMES fftw3 fftw3-3)
 if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
 	message (STATUS "using FFTW: ${FFTW}")
 	set(LIBS ${LIBS} ${FFTW}) 
@@ -122,6 +127,7 @@ endif()
 # list include_directories
 
 
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")
 target_link_libraries(nPhysImageF ${LIBS})
 
 # output

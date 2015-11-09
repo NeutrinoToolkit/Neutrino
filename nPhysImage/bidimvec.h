@@ -30,6 +30,8 @@
 #include <cmath>
 #include <vector>
 
+#include <gsl/gsl_math.h>
+
 #ifndef __bidimvec_h
 #define __bidimvec_h
 
