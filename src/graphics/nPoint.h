@@ -23,6 +23,7 @@
  *
  */
 #include <QtGui>
+#include <QGraphicsObject>
 #include "ui_nPoint.h"
 #include "nPhysImageF.h"
 

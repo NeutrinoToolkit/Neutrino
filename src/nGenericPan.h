@@ -24,6 +24,12 @@
  */
 #include <QtGui>
 #include <QWidget>
+
+#include <QComboBox>
+#include <QGestureEvent>
+#include <QGraphicsScene>
+#include <QMainWindow>
+
 #include <iostream>
 #include "nPhysImageF.h"
 #include "panThread.h"

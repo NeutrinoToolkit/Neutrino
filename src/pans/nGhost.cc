@@ -77,7 +77,9 @@ void nGhost::doGhost () {
 	if (imageShot) {
 		saveDefaults();
         
-        QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersect(region->getRect());
+        //QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersect(region->getRect());
+	//obsolete
+        QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersected(region->getRect());
         
         QTime timer;
         timer.start();

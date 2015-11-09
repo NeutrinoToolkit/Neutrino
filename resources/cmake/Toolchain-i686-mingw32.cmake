@@ -24,8 +24,20 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # dep tree to be found in cross-compile-win, one level up neutrino tree
-include_directories("../../../cross-compile-win/include")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/../../../cross-compile-win/include")
 SET(CMAKE_FIND_ROOT_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../cross-compile-win)
+
+# look for qt5
+# qt subtree to be located in ${CMAKE_FIND_ROOT_PATH}
+#set(Qt5Widgets_DIR ${CMAKE_FIND_ROOT_PATH}/qt/lib/cmake/Qt5Widgets)
+#find_package(Qt5Widgets)
+#set(Qt5Core_DIR ${CMAKE_FIND_ROOT_PATH}/qt/lib/cmake/Qt5Core)
+#find_package(Qt5Core)
+
+set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
+set(QWT_LIBRARY ${CMAKE_FIND_ROOT_PATH}/Qwt-6.1.2/lib/libqwt.a)
+set(QWT_INCLUDE_DIR ${CMAKE_FIND_ROOT_PATH}/Qwt-6.1.2/include)
+#find_package(Qt5 COMPONENTS Core Gui Sql REQUIRED)
 
 #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")
 #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")

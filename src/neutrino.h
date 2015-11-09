@@ -32,6 +32,8 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <QString>
+#include <QPrinter>
 #include <QMap>
 
 // plugins

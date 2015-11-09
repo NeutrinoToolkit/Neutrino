@@ -101,10 +101,13 @@ set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/../resources/neutrino.qrc")
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
 
-find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
-include(UseQt4)
+#find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS})
 
-include(${QT_USE_FILE})
+# to be put back for qt4!! .alex.
+#include(UseQt4)
+#include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -126,6 +129,7 @@ add_definitions(-DHAVE_NPHYSIMAGE)
 find_package(Qwt REQUIRED)
 if (QWT_FOUND)
 	include_directories(${QWT_INCLUDE_DIRS})
+	message(STATUS "qwt link: " ${QWT_LIBRARIES})
 	set(LIBS ${LIBS} ${QWT_LIBRARIES})
 endif(QWT_FOUND)
 
@@ -249,8 +253,12 @@ endif (HDF5_FOUND)
 
 
 # using Qt meta-system (precompiler)
-QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-QT4_WRAP_UI( UI_HEADERS ${UIS} )
+
+# passando a qt5
+#QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+#QT4_WRAP_UI( UI_HEADERS ${UIS} )
+QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+QT5_WRAP_UI( UI_HEADERS ${UIS} )
 
 if(APPLE) 
 #     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
@@ -267,7 +275,9 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 target_link_libraries(Neutrino ${LIBS})
-target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport)
+#target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+#target_link_libraries(Neutrino ${QT_LIBRARIES} Qt5::QtCore Qt5::QtGui Qt5::QtSvg)
 
 
 # output paths

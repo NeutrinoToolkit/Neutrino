@@ -1,7 +1,9 @@
 #ifndef nScene_h
- #define nScene_h
+#define nScene_h
 
- #include <QGraphicsScene>
+#include <QGraphicsScene>
+#include <QGestureEvent>
+
 
  class neutrino;
 

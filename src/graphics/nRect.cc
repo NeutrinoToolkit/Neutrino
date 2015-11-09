@@ -374,7 +374,9 @@ void nRect::expandY() {
 
 void nRect::intersection() {
 	if (parent()->currentBuffer) {
-		QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersect(getRectF());
+		//QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersect(getRectF());
+		//obsolete
+		QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersected(getRectF());
 		setRect(rect);
 	}
 }

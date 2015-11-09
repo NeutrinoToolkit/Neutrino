@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include <QWidget>
+#include <QFileSystemModel>
 
 #include "nGenericPan.h"
 #include "ui_nMonitor.h"

@@ -23,6 +23,7 @@
  *
  */
 #include <QtGui>
+#include <QGraphicsItem>
 #include "ui_nObject.h"
 
 #ifndef __nMouse

@@ -27,6 +27,7 @@
 #include <QtGui>
 #include <QWidget>
 #include <QGraphicsView>
+#include <QGestureEvent>
 
 #include "nGenericPan.h"
 

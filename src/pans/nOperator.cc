@@ -118,7 +118,8 @@ void nOperator::doOperation () {
 		QRectF r1=QRectF(-operand1->get_origin().x(),-operand1->get_origin().y(),operand1->getW(),operand1->getH());
 		QRectF r2=QRectF(-operand2->get_origin().x(),-operand2->get_origin().y(),operand2->getW(),operand2->getH());
 		
-		QRectF rTot=r1.intersect(r2);;
+		// obs
+		QRectF rTot=r1.intersected(r2);;
 		
 		myresult=new nPhysD(rTot.width(),rTot.height(), 1.0);
 		myresult->setName(my_w.operation->currentText().toStdString()+" "+operand1->getName()+" "+operand2->getName());

@@ -32,9 +32,11 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 
 	my_w.images->nparent=nparent;
 	
-	my_w.images->header()->setResizeMode(0,QHeaderView::ResizeToContents);
-	my_w.images->header()->setResizeMode(1,QHeaderView::ResizeToContents);
-	my_w.images->header()->setResizeMode(2,QHeaderView::ResizeToContents);
+	// qt4.8->qt5.5
+	// QHeaderView::resizeMode -> ::sectionResizeMode
+	my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+	my_w.images->header()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+	my_w.images->header()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
 	my_w.images->header()->setStretchLastSection (true);
 
 	my_w.images->setColumnHidden((my_w.images->columnCount()-1),true);

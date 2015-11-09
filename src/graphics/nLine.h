@@ -27,6 +27,7 @@
 
 #include <QtGui>
 #include <QClipboard>
+#include <QGraphicsObject>
 #include "nPhysImageF.h"
 #include "ui_nLine.h"
 
