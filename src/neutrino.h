@@ -30,6 +30,7 @@
 #include <vector>
 #include <limits>
 
+#include <QClipboard>
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QString>

@@ -2107,6 +2107,10 @@ void neutrino::about() {
 
 #ifdef __neutrino_key
 	it.append(QString("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
+
+	// copy serial to clipboard
+	QClipboard *cb = QApplication::clipboard();
+	cb->setText(qApp->property("nHash").toString());
 #endif
 
 	credits.setInformativeText(it);
