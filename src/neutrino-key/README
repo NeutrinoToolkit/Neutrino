@@ -1,0 +1,4 @@
+
+Files in this folder need the neutrino-auth sources to be in the main neutrino folder
+
+The generation of unique HASH to be used as a key to plugins is triggered via the cmake flag -DGENERATE_NHASH=true

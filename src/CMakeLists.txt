@@ -94,6 +94,21 @@ set (UIS
     ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui	
 )
 
+## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
+## add relevant sources
+if (GENERATE_NHASH)
+	set (SOURCES ${SOURCES}
+		neutrino-key/nHash.cc
+		)
+
+	include_directories(neutrino-key)
+	
+	if (UNIX AND (NOT APPLE))
+		add_definitions(-D__neutrino_reg_linux)
+	endif()
+
+endif()
+
 ## resources
 set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/../resources/neutrino.qrc")
 

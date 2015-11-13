@@ -2102,7 +2102,14 @@ void neutrino::about() {
 						this);
 	
 	credits.setText(QString("<h1>Neutrino</h1><br><i>the only neutrino faster than light</i><br>")+tr("version: ")+__VER);
-	credits.setInformativeText("Alessandro Flacco: alessandro.flacco@polytechnique.edu <br>Tommaso Vinci: tommaso.vinci@polytechnique.edu<hr>http://web.luli.polytechnique.fr/Neutrino<hr>");
+
+	QString it("Alessandro Flacco: alessandro.flacco@polytechnique.edu <br>Tommaso Vinci: tommaso.vinci@polytechnique.edu<hr>http://web.luli.polytechnique.fr/Neutrino<hr>");
+
+#ifdef __neutrino_key
+	it.append(QString("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
+#endif
+
+	credits.setInformativeText(it);
 	credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
 	credits.exec();
 }
