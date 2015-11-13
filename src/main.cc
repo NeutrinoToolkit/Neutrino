@@ -35,6 +35,10 @@
 #include "neutrino.h"
 #include "nApp.h"
 
+#ifdef __neutrino_key
+#include "nHash.h"
+#endif
+
 int main(int argc, char **argv)
 {
 
@@ -48,6 +52,12 @@ int main(int argc, char **argv)
 	qapp->setOrganizationDomain("edu");
 	qapp->setApplicationName("Neutrino");
 	qapp->setApplicationVersion(__VER);
+
+#ifdef __neutrino_key
+	std::string hh = getNHash();
+	std::cerr<<"got nHash: "<<hh<<std::endl;
+	qapp->setProperty("nHash", hh.c_str());
+#endif
 	
 	QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 

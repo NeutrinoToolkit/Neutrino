@@ -4,6 +4,11 @@ cmake_minimum_required (VERSION 3.0)
 
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
+if (GENERATE_NHASH)
+	message (STATUS "Compiling neutrino with serial number/key protection")
+	add_definitions(-D__neutrino_key)
+endif()
+
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
 
