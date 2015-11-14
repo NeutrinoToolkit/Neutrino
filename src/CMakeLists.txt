@@ -115,14 +115,31 @@ set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/../resources/neutrino.qrc")
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
+## find qt -- search for 5.x first, fallback to 4.x
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport QUIET)
+if (Qt5_FOUND)
+	# qt5
+	SET (USE_QT5 True)
+	include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS})
+	
+	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT5_WRAP_UI( UI_HEADERS ${UIS} )
+	add_definitions(-DUSE_QT5)
+else()
+	# some incompatibilities between 4.x and 5.x
+	# qt4
+	SET (USE_QT4 True)
+	message(STATUS "Qt5 not found, searching for Qt4 instead")
+	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
+	include(UseQt4)
+	include(${QT_USE_FILE})
+	
+	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT4_WRAP_UI( UI_HEADERS ${UIS} )
+	add_definitions(-DUSE_QT4)
+endif()
 
-#find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport REQUIRED)
-include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS})
 
-# to be put back for qt4!! .alex.
-#include(UseQt4)
-#include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -131,10 +148,6 @@ list(APPEND CMAKE_MODULE_PATH "../lib")
 
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../nPhysImage)
-
-#find_library(NPHYSIMAGE NAMES nPhysImageF REQUIRED)
-#if (NOT ${NPHYSIMAGE} STREQUAL "NPHYSIMAGE-NOTFOUND")
-#	message (STATUS "using NPHYSIMAGE: ${NPHYSIMAGE}")
 
 set(LIBS ${LIBS} "nPhysImageF") 
 add_definitions(-DHAVE_NPHYSIMAGE)
@@ -267,14 +280,6 @@ if (HDF5_FOUND)
 endif (HDF5_FOUND)
 
 
-# using Qt meta-system (precompiler)
-
-# passando a qt5
-#QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-#QT4_WRAP_UI( UI_HEADERS ${UIS} )
-QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-QT5_WRAP_UI( UI_HEADERS ${UIS} )
-
 if(APPLE) 
 #     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
     add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
@@ -290,9 +295,11 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 target_link_libraries(Neutrino ${LIBS})
-qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport)
-#target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
-#target_link_libraries(Neutrino ${QT_LIBRARIES} Qt5::QtCore Qt5::QtGui Qt5::QtSvg)
+if (USE_QT5)
+	qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport)
+elseif(USE_QT4)
+	target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+endif()
 
 
 # output paths
@@ -302,15 +309,6 @@ else()
     set (EXECUTABLE_OUTPUT_PATH "../bin")
     install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
 endif()
-
-
-
-
-
-
-
-
-
 
 
 if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")

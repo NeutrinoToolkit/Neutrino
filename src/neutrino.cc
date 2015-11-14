@@ -2164,9 +2164,15 @@ nGenericPan* neutrino::openPan(QString panName) {
     
     const QMetaObject* metaObject = this->metaObject();
     for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
+	    // frigging method name change between qt4.x and qt5.x
+#ifdef USE_QT5
+	    QString m_sig = QString::fromLatin1(metaObject->method(i).methodSignature());
+#else
+	    QString m_sig = QString::fromLatin1(metaObject->method(i).signature());
+#endif
         if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") && 
             metaObject->method(i).parameterTypes().empty() &&
-            QString::fromLatin1(metaObject->method(i).methodSignature())==panName+"()") {
+            m_sig ==panName+"()") {
             QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
         }
     }
