@@ -436,4 +436,4 @@ if(APPLE OR WIN32)
     install_qt4_executable("${EXECUTABLE}")
 endif()
 
-include (CPack)
+#include (CPack)
