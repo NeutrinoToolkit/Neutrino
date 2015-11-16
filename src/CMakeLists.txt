@@ -57,6 +57,12 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+if (WIN32)
+	if (CMAKE_COMPILER_IS_GNUCXX)
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
+	endif()
+endif()
+
 
 set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
