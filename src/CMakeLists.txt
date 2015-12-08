@@ -83,8 +83,11 @@ set (SOURCES
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
-    osxApp.cc nApp.cc main.cc 
+    nApp.cc main.cc 
 )
+if (APPLE)
+	list (APPEND SOURCES osxApp.cc)
+endif()
 
 ## UIs
 set (UIS 

@@ -1,32 +1,4 @@
 
-## find qt -- search for 5.x first, fallback to 4.x
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport QUIET)
-if (Qt5_FOUND)
-	# qt5
-	SET (USE_QT5 True)
-	include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS})
-	
-	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT5_WRAP_UI( UI_HEADERS ${UIS} )
-	add_definitions(-DUSE_QT5)
-else()
-	# some incompatibilities between 4.x and 5.x
-	# qt4
-	SET (USE_QT4 True)
-	message(STATUS "Qt5 not found, searching for Qt4 instead")
-	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
-	include(UseQt4)
-	include(${QT_USE_FILE})
-	
-	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT4_WRAP_UI( UI_HEADERS ${UIS} )
-	add_definitions(-DUSE_QT4)
-endif()
-
-
-add_definitions(${QT_DEFINITIONS})
-include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-
 
 find_package(Qwt REQUIRED)
 if (QWT_FOUND)
@@ -152,3 +124,38 @@ if (HDF5_FOUND)
 	endif()
 
 endif (HDF5_FOUND)
+
+
+## find qt MUST be LAST to all modifications to SOURCES list
+## (otherwise automoc and autoui won't take new sources in account)
+
+## find qt -- search for 5.x first, fallback to 4.x
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport QUIET)
+if (Qt5_FOUND)
+	# qt5
+	SET (USE_QT5 True)
+	message(STATUS "Using Qt5: ${Qt5Core_INCLUDE_DIRS}")
+	include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS})
+	
+	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT5_WRAP_UI( UI_HEADERS ${UIS} )
+	add_definitions(-DUSE_QT5)
+else()
+	# some incompatibilities between 4.x and 5.x
+	# qt4
+	SET (USE_QT4 True)
+	message(STATUS "Qt5 not found, searching for Qt4 instead")
+	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL REQUIRED)
+	include(UseQt4)
+	include(${QT_USE_FILE})
+	
+	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT4_WRAP_UI( UI_HEADERS ${UIS} )
+	add_definitions(-DUSE_QT4)
+endif()
+
+
+add_definitions(${QT_DEFINITIONS})
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
+

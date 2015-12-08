@@ -28,7 +28,7 @@
 
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
-	setMouseTracking(TRUE);
+	setMouseTracking(true);
 	offsety=9;
 	dyColorBar=offsety*3/2;
 	offsetx=6;

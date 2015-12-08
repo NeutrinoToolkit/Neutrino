@@ -500,10 +500,10 @@ neutrino::loadPlugin()
 		if (plugin) {
 			nPlug *plug_iface = qobject_cast<nPlug *>(plugin);
 			if (plug_iface) {
-				DEBUG("plugin \""<<plug_iface->name().toAscii().constData()<<"\" cast success");
+				DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
 	
 				if (plug_iface->instantiate(this))
-					DEBUG("plugin \""<<plug_iface->name().toAscii().constData()<<"\" instantiate success");
+					DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
 			} else {
 				DEBUG("plugin load fail");
 	    		}
