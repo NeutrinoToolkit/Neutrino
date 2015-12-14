@@ -4,13 +4,7 @@
 
 cmake_minimum_required (VERSION 3.0)
 
-project (Neutrino CXX)
-
-set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../resources/cmake)
-
 include(FindGit)
-set (VERSION_UPDATE_FROM_GIT ON)
-include(GetVersionFromGitTag)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
 set (CMAKE_CXX_FLAGS "-std=c++11")
@@ -36,7 +30,7 @@ if (APPLE)
     SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${${PROJECT_NAME}_VERSION_STRING_FULL}")
     SET (MACOSX_BUNDLE_INFO_STRING  "Neutrino program" )
     SET (MACOSX_BUNDLE_ICON_FILE  "icon.icns" )
-    set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
+    set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns)
     set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
@@ -119,7 +113,7 @@ if (GENERATE_NHASH)
 endif()
 
 ## resources
-set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/../resources/neutrino.qrc")
+set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
@@ -195,7 +189,7 @@ else()
 	set(BIN_INSTALL_DIR ".")
 	set(DOC_INSTALL_DIR ".")
 endif()
-set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/../resources/icons")
+set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
 	add_definitions(-Wall -Wextra)

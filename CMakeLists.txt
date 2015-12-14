@@ -2,6 +2,8 @@
 
 cmake_minimum_required (VERSION 3.0)
 
+project (Neutrino CXX)
+
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
 if (GENERATE_NHASH)
@@ -13,8 +15,18 @@ endif()
 ## ADD DEB DESCRIPTION
 ## CHECK LIB RPATH in PACKS
 
-set (CPACK_PACKAGE_NAME "Neutrino")
-set (CPACK_PACKAGE_VERSION "v2.0-8")
+
+set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
+
+include(FindGit)
+set (VERSION_UPDATE_FROM_GIT ON)
+include(GetVersionFromGitTag)
+
+if (GIT_FOUND)
+	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
+	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+	message(STATUS "Neutrino version: ${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+endif()
 
 if (DEBIAN)
 	message (STATUS "we are debian")
