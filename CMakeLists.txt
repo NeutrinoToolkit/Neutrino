@@ -18,18 +18,27 @@ endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
 
+include(FindNeutrinoDeps)
+
 include(FindGit)
 set (VERSION_UPDATE_FROM_GIT ON)
 include(GetVersionFromGitTag)
 
 if (GIT_FOUND)
 	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+	
+	# generate clean (debian-wise) tag name
+	string(REGEX REPLACE "^[a-zA-Z]" "" ${PROJECT_NAME}_VERSION_NUM ${${PROJECT_NAME}_VERSION_STRING})
+
+	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_NUM}-${${PROJECT_NAME}_VERSION_AHEAD}")
 	message(STATUS "Neutrino version: ${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+	message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
 endif()
 
 if (DEBIAN)
 	message (STATUS "we are debian")
+
+
 	set(CPACK_INSTALL_PREFIX "/usr")
 	set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
 
