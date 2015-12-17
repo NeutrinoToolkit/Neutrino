@@ -36,17 +36,21 @@ if (GIT_FOUND)
 endif()
 
 if (DEBIAN)
-	message (STATUS "we are debian")
+	message (STATUS "Using CPackDeb for packaging")
 
 
 	set(CPACK_INSTALL_PREFIX "/usr")
 	set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
 
+	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "alessandro.flacco@polytechnique.edu")
 	set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
 	set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 
-	set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+	execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+	#set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 endif()
 include (CPack) # this to be included LAST with resp. to its vars
