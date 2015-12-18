@@ -26,6 +26,7 @@ add_compile_options(-fPIC)
 
 
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+set (CMAKE_CXX_FLAGS "-O3")
 
 
 
@@ -137,7 +138,11 @@ set (LIBRARY_OUTPUT_PATH "../lib")
 
 
 # install
-install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
+if (WIN32)
+	install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)
+else()
+	install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
+endif()
 
 if (APPLE)
 set (LIB_INSTALL_DIR "/usr/lib")
