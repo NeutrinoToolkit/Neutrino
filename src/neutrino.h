@@ -323,6 +323,16 @@ public slots:
 	void dragMoveEvent(QDragMoveEvent *);
 	void dropEvent(QDropEvent *);
     
+
+#ifdef HAVE_PYTHONQT
+    void loadPyScripts();
+    void runPyScript();
+    void runPyScript(QString);
+    // pythonqt STUFF
+    nGenericPan* Python();
+    nGenericPan* newPan(QString=QString());
+#endif
+
 signals:
 	void updatecolorbar();
 	void colorValue(double);
@@ -348,6 +358,20 @@ signals:
 
 };
 
+QVariant toVariant(anydata &my_data);
+
+anydata toAnydata(QVariant &my_variant);
+
+#ifdef HAVE_PYTHONQT
+class nPyWrapper : public QObject {
+    Q_OBJECT
+
+    public slots:
+    neutrino* new_neutrino() {return new neutrino();};
+    void delete_neutrino(neutrino* neu) {neu->deleteLater();};
+
+};
+#endif
 
 Q_DECLARE_METATYPE(nPhysD);
 

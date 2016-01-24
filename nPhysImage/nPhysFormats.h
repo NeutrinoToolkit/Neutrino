@@ -75,16 +75,10 @@ public:
 	physInt_pgm(const char *);
 };
 
-// external library formats
-#ifdef HAVE_LIBNETPBM
-extern "C" {
-#include <pgm.h>
-}
-class physGray_pgm : public nPhysImageF<gray> {
+class physGray_pgm : public nPhysImageF<unsigned int> {
 public:
 	physGray_pgm(const char *);
 };
-#endif
 
 // proprietary formats
 

@@ -25,18 +25,17 @@
 #include "nTics.h"
 #include "neutrino.h"
 
-nTics::nTics(neutrino *neu) : QGraphicsItem()
+nTics::nTics(neutrino *neu) : QGraphicsItem(),
+    nparent(neu),
+    color(QColor(Qt::black)),
+    rulerVisible(false),
+    gridVisible(false)
 {	
-	nparent=neu;
-	color=QColor(Qt::black);
-	rulerColor=QColor(Qt::yellow);
-	rulerVisible=false;
-	gridVisible=false;
 }
 
 // reimplementation
 QRectF nTics::boundingRect() const {
-	return nparent->my_w.my_view->sceneRect();
+    return nparent->my_w.my_view->sceneRect();
 }
 
 void nTics::changeColor() {
@@ -53,8 +52,8 @@ void
 nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 	if (nparent->currentBuffer) {
 // enable this for testing 
-		//p->drawRect(boundingRect());
-		p->setClipRect( option->exposedRect );
+        //p->drawRect(boundingRect());
+        p->setClipRect( option->exposedRect );
 		p->setFont(nparent->my_w.my_view->scaledFont);
 		vec2f my_or=nparent->currentBuffer->get_origin();
 		vec2f my_sc=nparent->currentBuffer->get_scale();

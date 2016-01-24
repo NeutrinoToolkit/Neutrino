@@ -29,6 +29,13 @@
 #include <time.h>
 #include <zlib.h>
 
+#ifdef HAVE_LIBNETPBM
+extern "C" {
+#include <pgm.h>
+}
+#endif
+
+
 #ifdef HAVE_LIBTIFF
 #define int32 tiff_int32
 #define uint32 tiff_uint32
@@ -271,7 +278,7 @@ physInt_pgm::physInt_pgm(const char *ifilename)
 
 #ifdef HAVE_LIBNETPBM
 physGray_pgm::physGray_pgm(const char *ifilename)
-: nPhysImageF<gray>(string(ifilename), PHYS_FILE)
+: nPhysImageF<unsigned int>(string(ifilename), PHYS_FILE)
 {
 	gray grays;
 	gray **readbuf;
@@ -1105,7 +1112,7 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		return status;
 	}
 	int ndim=2;
-	long ndimLong[2]={phys->getW(),phys->getH()};
+    long ndimLong[2]={(long)phys->getW(),(long)phys->getH()};
 	if (fits_set_tile_dim(fptr,ndim,ndimLong,&status)) {
 		fits_report_error(stderr, status);
 		return status;

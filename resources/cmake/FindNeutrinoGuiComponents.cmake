@@ -14,12 +14,19 @@ if (HDF5_FOUND_COMPLETE)
 	set (UIS ${UIS} ../UIs/nHDF5.ui)
 endif()
 
+if (PYTHONQT_FOUND_COMPLETE)
+    MESSAGE(STATUS "adding python wrappers")
+	include_directories(python)
+	list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)	
+	list (APPEND UIS ../UIs/nPython.ui)	
+endif()
+
 
 ## find qt MUST be LAST to all modifications to SOURCES list
 ## (otherwise automoc and autoui won't take new sources in account)
 
 ## find qt -- search for 5.x first, fallback to 4.x
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport QUIET)
+find_package(Qt5 COMPONENTS Core Gui UiTools Sql Widgets Svg PrintSupport QUIET)
 if (Qt5_FOUND)
 	# qt5
 	SET (USE_QT5 True)

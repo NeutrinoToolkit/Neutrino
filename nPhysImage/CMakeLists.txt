@@ -2,14 +2,6 @@
 cmake_minimum_required (VERSION 3.0)
 
 
-
-if (APPLE) 
-    message(STATUS "Apple : use macports !")
-    set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
-    set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
-    set (CMAKE_PREFIX_PATH "/opt/local")
-endif()
-
 if (UNIX AND (NOT APPLE))
     message(STATUS "Linux")
     set (CMAKE_PREFIX_PATH "/usr")
@@ -23,7 +15,6 @@ endif()
 
 add_compile_options(-std=c++0x)
 add_compile_options(-fPIC)
-
 
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS "-O3")
@@ -47,8 +38,8 @@ message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 # force necessary defines on config.h
 add_definitions(-DHAVE_LIBPTHREAD)
 
-include_directories(BEFORE "/opt/local/include")
-include_directories(BEFORE "/usr/local/include")
+# include_directories(BEFORE "/opt/local/include")
+# include_directories(BEFORE "/usr/local/include")
 
 # gsl
 find_library(GSL NAMES gsl)
@@ -84,14 +75,22 @@ endif()
 
 
 # pgm
-find_library(PBM NAMES netpbm)
-if (NOT ${PBM} STREQUAL "PBM-NOTFOUND")
-	message (STATUS "using netpbm: ${PBM}")
-	set(LIBS ${LIBS} ${PBM}) 
+find_library(NETPBM NAMES netpbm)
+if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
+	message (STATUS "using netpbm: ${NETPBM}")
+	set(LIBS ${LIBS} ${NETPBM}) 
 	add_definitions(-DHAVE_LIBNETPBM)
-	if (APPLE) 
-		include_directories(BEFORE "/opt/local/include/netpbm")
-	endif()
+
+  FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
+  /usr/local/include
+  /usr/local/include/netpbm
+  /usr/include
+  )
+  IF (NETPBM_INCLUDE_DIR)
+	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
+	include_directories(${NETPBM_INCLUDE_DIR})
+  ENDIF (NETPBM_INCLUDE_DIR)
+
 endif()
 
 # hdf4
@@ -138,17 +137,13 @@ set (LIBRARY_OUTPUT_PATH "../lib")
 
 
 # install
-if (WIN32)
-	install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)
-else()
-	install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
-endif()
+install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 
 if (APPLE)
-set (LIB_INSTALL_DIR "/usr/lib")
-set (CMAKE_INSTALL_RPATH "/usr/lib")
-set (MACOSX_RPATH off)
-set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR} MACOSX_RPATH off)
+set (LIB_INSTALL_DIR "/usr/local/lib")
+set (CMAKE_INSTALL_RPATH "/usr/local/lib")
+set (CMAKE_MACOSX_RPATH off)
+set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR})
 endif()
 
 if (NOT APPLE)

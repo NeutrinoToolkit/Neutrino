@@ -7,16 +7,15 @@ cmake_minimum_required (VERSION 3.0)
 include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
-set (CMAKE_CXX_FLAGS "-O3 -std=c++11")
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -Wextra -D__phys_debug=10")
+set (CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
 if (APPLE) 
-    message(STATUS "Apple : remember to use macports !")
-    set (CMAKE_C_COMPILER "/opt/local/bin/gcc")
-    set (CMAKE_CXX_COMPILER "/opt/local/bin/g++")
-    set (CMAKE_PREFIX_PATH "/opt/local")
+    message(STATUS "Apple : remember to use brew !")
+    set (CMAKE_C_COMPILER "/usr/local/bin/gcc-5")
+    set (CMAKE_CXX_COMPILER "/usr/local/bin/g++-5")
+    set (CMAKE_PREFIX_PATH "/usr/local")
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
     add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
@@ -30,7 +29,7 @@ if (APPLE)
     SET (MACOSX_BUNDLE_LONG_VERSION_STRING "${${PROJECT_NAME}_VERSION_STRING_FULL}")
     SET (MACOSX_BUNDLE_INFO_STRING  "Neutrino program" )
     SET (MACOSX_BUNDLE_ICON_FILE  "icon.icns" )
-    set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns)
+    set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
     set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
@@ -62,7 +61,7 @@ set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set (LIBPATHS /usr/lib /opt/local/lib ../lib)
+set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
 ## sources
 set (SOURCES 
@@ -94,7 +93,7 @@ set (UIS
     ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
     ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
     ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
-    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui	
+    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 	
 )
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
@@ -112,15 +111,18 @@ if (GENERATE_NHASH)
 
 endif()
 
+# all dependencies search now moved to FindNeutrinoGuiComponents.cmake
+# (see neutrino cmake resources folder)
+include(FindNeutrinoGuiComponents)
+
 ## resources
 set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
-# all dependencies search now moved to FindNeutrinoGuiComponents.cmake
-# (see neutrino cmake resources folder)
-include(FindNeutrinoGuiComponents)
+
+
 
 list(APPEND CMAKE_MODULE_PATH "../lib")
 
@@ -132,7 +134,7 @@ add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
 #     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
-    add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
 elseif(WIN32)
 	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
 	add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${RC_WIN})
@@ -260,7 +262,7 @@ if(WIN32)
 #    set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${CPACK_NSIS_INSTALLED_ICON_NAME}")
 elseif(APPLE)
      set(CMAKE_INSTALL_PREFIX "/Applications")
-     set(CPACK_GENERATOR "DragNDrop")
+     set(CPACK_GENERATOR "Bundle")
      set(CPACK_DMG_FORMAT "UDBZ")
      set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
      set(CPACK_SYSTEM_NAME "OSX")
@@ -290,5 +292,6 @@ if(APPLE)
     include(DeployQt4)
     install_qt4_executable("${EXECUTABLE}")
 endif()
+
 
 #include (CPack)

@@ -4,6 +4,13 @@ cmake_minimum_required (VERSION 3.0)
 
 project (Neutrino CXX)
 
+if(${NDEBUG})
+    MESSAGE(STATUS "Neutrino in DEBUG MODE DEBUG MODE DEBUG MODE DEBUG MODE DEBUG MODE DEBUG MODE DEBUG MODE DEBUG MODE")
+    ADD_DEFINITIONS(-D__phys_debug=10 -Wall -Wextra)
+endif()
+
+
+
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
 if (GENERATE_NHASH)

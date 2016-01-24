@@ -15,49 +15,56 @@ endif
 colormaps:
 	cd resources/colormaps && qmake CONFIG+=release && make && ./colormaps
 	
-mac: colormaps
-	make -C resources/colormaps -f nMakefile
+mac: 
+# 	make -C resources/colormaps -f nMakefile
 	
 # 	cd nPhysImage && autoheader configure.ac && autoconf -o configure configure.ac
 # 	cd nPhysImage && ./configure --enable-64 --prefix=/opt/local --with-cuda=/usr/local/cuda
-	make -C nPhysImage clean
-	CC=gcc CXX=g++ cmake nPhysImage
-	make -C nPhysImage
+# 	make -C nPhysImage clean
+# 	CC=gcc CXX=g++ cmake nPhysImage
+# 	make -C nPhysImage
+# 
+# 	qmake CONFIG+="neutrino-HDF release" -spec macx-g++
+# 	make distclean
+# 	qmake CONFIG+="neutrino-HDF release" -spec macx-g++
+# 	rm -rf neutrino.app
+# 	make -j2
+# 	
+# 	sudo -s -- 'macdeployqt neutrino.app; chown -R $(USER) Neutrino.app' 
+# 
+# 	rm -f sip/PyNeutrino.so
+# 	cd sip && python configure-new.py --pyqt-sipdir=/opt/local/share/py27-sip/PyQt4 --sip=/opt/local/bin/sip-2.7 && qmake PyNeutrino.pro && make clean && make
+# 	cp sip/PyNeutrino.so neutrino.app/Contents/Frameworks
+# 
+# 	cp /usr/local/cuda/lib/libcufft.dylib /usr/local/cuda/lib/libtlshook.dylib /usr/local/cuda/lib/libcudart.dylib neutrino.app/Contents/Frameworks
+# 	install_name_tool -change \@rpath/libtlshook.dylib \@executable_path/../Frameworks/libtlshook.dylib neutrino.app/Contents/Frameworks/libcudart.dylib
+# 	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libcufft.dylib
+# 	install_name_tool -change \@rpath/libcufft.dylib \@executable_path/../Frameworks/libcufft.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so 
+# 	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so
+# 
+# 	cp /opt/local/lib/libgcc/libstdc++.6.dylib /opt/local/lib/libgcc/libgomp.1.dylib /opt/local/lib/libgcc/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/
+# 	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/MacOS/Neutrino
+# 	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/MacOS/Neutrino
+# 	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/MacOS/Neutrino
+# 
+# 	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
+# 	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
+# 	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
+# 
+# 	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
+# 	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
+# 	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
+# 	
+# 	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libgomp.1.dylib 
+# 	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libstdc++.6.dylib	
+# 	
 
-	qmake CONFIG+="neutrino-HDF release" -spec macx-g++
-	make distclean
-	qmake CONFIG+="neutrino-HDF release" -spec macx-g++
-	rm -rf neutrino.app
-	make -j2
-	
-	sudo -s -- 'macdeployqt neutrino.app; chown -R $(USER) Neutrino.app' 
-
-	rm -f sip/PyNeutrino.so
-	cd sip && python configure-new.py --pyqt-sipdir=/opt/local/share/py27-sip/PyQt4 --sip=/opt/local/bin/sip-2.7 && qmake PyNeutrino.pro && make clean && make
-	cp sip/PyNeutrino.so neutrino.app/Contents/Frameworks
-
-	cp /usr/local/cuda/lib/libcufft.dylib /usr/local/cuda/lib/libtlshook.dylib /usr/local/cuda/lib/libcudart.dylib neutrino.app/Contents/Frameworks
-	install_name_tool -change \@rpath/libtlshook.dylib \@executable_path/../Frameworks/libtlshook.dylib neutrino.app/Contents/Frameworks/libcudart.dylib
-	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libcufft.dylib
-	install_name_tool -change \@rpath/libcufft.dylib \@executable_path/../Frameworks/libcufft.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so 
-	install_name_tool -change \@rpath/libcudart.dylib \@executable_path/../Frameworks/libcudart.dylib neutrino.app/Contents/Frameworks/libnPhysImageF.so
-
-	cp /opt/local/lib/libgcc/libstdc++.6.dylib /opt/local/lib/libgcc/libgomp.1.dylib /opt/local/lib/libgcc/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/
-	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/MacOS/Neutrino
-	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/MacOS/Neutrino
-	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/MacOS/Neutrino
-
-	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
-	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
-	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libnPhysImageF.so
-
-	install_name_tool -change /opt/local/lib/libgcc/libstdc++.6.dylib \@executable_path/../Frameworks/libstdc++.6.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
-	install_name_tool -change /opt/local/lib/libgcc/libgomp.1.dylib \@executable_path/../Frameworks/libgomp.1.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
-	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libNeutrino.1.dylib 
-	
-	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libgomp.1.dylib 
-	install_name_tool -change /opt/local/lib/libgcc/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libstdc++.6.dylib	
-	
+	rm -rf build 
+	mkdir build
+	cd build && cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc-5 -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cd build && make -j2
+	cp -r build/Neutrino.app .
+	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" neutrino.app/Contents/Info.plist
 ifneq ("$(findstring +,$VERSION)","+")
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" neutrino.app/Contents/Info.plist
@@ -66,8 +73,8 @@ endif
 	rm -rf dmg
 	mkdir dmg
 	cp -r neutrino.app dmg
-	./resources/macPackage/createdmg.sh --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 508 480 --icon neutrino.app 100 90 --app-drop-link 420 90 neutrino.dmg dmg && rm -rf dmg
-	mv neutrino.dmg neutrino-${VERSION}.dmg
+	./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon neutrino.app 90 75 --app-drop-link 320 75 neutrino.dmg dmg && rm -rf dmg
+	mv neutrino.dmg Neutrino-${VERSION}.dmg
 
 py: lib
 	rm -f sip/PyNeutrino.so

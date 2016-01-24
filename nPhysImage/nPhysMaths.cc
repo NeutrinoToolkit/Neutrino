@@ -368,7 +368,7 @@ phys_gaussian_blur(nPhysD &m1, double radius)
 	nPhysImageF<mcomplex> out;
 
 //FIXME: this is probably wrong for odd matrices
-	meshgrid_data md = {-m1.getW()/2., m1.getW()/2, -m1.getH()/2., m1.getH()/2., m1.getW(), m1.getH()};
+    meshgrid_data md = {-m1.getW()/2., m1.getW()/2., -m1.getH()/2., m1.getH()/2., m1.getW(), m1.getH()};
 	phys_generate_meshgrid(&md, xx, yy);
 
 	gauss.resize(xx.getW(), xx.getH());

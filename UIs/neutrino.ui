@@ -200,9 +200,16 @@
     <addaction name="actionAbout"/>
     <addaction name="actionKeyborard_shortcuts"/>
    </widget>
+   <widget class="QMenu" name="menuPython">
+    <property name="title">
+     <string>Python</string>
+    </property>
+    <addaction name="actionPython"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
    <addaction name="menuAnalysis"/>
+   <addaction name="menuPython"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -241,6 +248,7 @@
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
    <addaction name="actionMouseInfo"/>
+   <addaction name="actionOperator"/>
    <addaction name="separator"/>
    <addaction name="actionLineoutH"/>
    <addaction name="actionLineoutV"/>
@@ -818,6 +826,27 @@
    </property>
    <property name="toolTip">
     <string>Lock colorbar</string>
+   </property>
+  </action>
+  <action name="actionPython">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
+   </property>
+   <property name="text">
+    <string>Shell</string>
+   </property>
+  </action>
+  <action name="actionOperator">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
+   </property>
+   <property name="text">
+    <string>Operator</string>
+   </property>
+   <property name="toolTip">
+    <string>Math operations</string>
    </property>
   </action>
  </widget>
