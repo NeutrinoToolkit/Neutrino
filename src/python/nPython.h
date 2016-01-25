@@ -1,10 +1,8 @@
 #ifndef __npython
 #define __npython
 
-#ifdef HAVE_PYTHONQT
-#include <cmath>
-#include "PythonQt.h"
-#endif
+#include <PythonQt.h>
+#include <PythonQt_QtAll.h>
 
 #include <QtGui>
 #include <QWidget>

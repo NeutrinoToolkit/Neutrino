@@ -45,6 +45,7 @@
         <file>icons/name.png</file>
         <file>icons/run.png</file>
         <file>icons/trash.png</file>
+        <file>icons/math.png</file>
         
         <file>shortcuts.html</file>
     </qresource>

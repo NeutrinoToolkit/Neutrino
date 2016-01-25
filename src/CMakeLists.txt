@@ -78,9 +78,6 @@ set (SOURCES
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
     nApp.cc main.cc 
 )
-if (APPLE)
-	list (APPEND SOURCES osxApp.cc)
-endif()
 
 ## UIs
 set (UIS 
@@ -114,9 +111,6 @@ endif()
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
 include(FindNeutrinoGuiComponents)
-
-## resources
-set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)

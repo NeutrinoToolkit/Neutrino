@@ -680,7 +680,7 @@ void nInterferometry::removeShape(QObject *obj){
 }
 
 void nInterferometry::doPlasma(){
-    if (my_w.useInterpolate->isChecked()) {
+    if (my_w.usePlasma->isChecked()) {
         nPhysD *image=localPhys["interpPhaseMask"];
         if (nPhysExists(image)) {
             nPhysD *intNe = new nPhysD(*image);

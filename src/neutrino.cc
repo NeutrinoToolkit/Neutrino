@@ -22,7 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include <QMetaObject>
 #include <QtSvg>
+
+#if QT_VERSION >= 0x050000
+#include <QtUiTools>
+#endif
+
 #include <QPrintDialog>
 
 #include "neutrino.h"
@@ -82,11 +88,13 @@ neutrino::~neutrino()
 }
 
 /// Creator
-neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
+neutrino::neutrino():
+    my_s(this),
+    my_mouse(this),
+    my_tics(this)
+{
 
-	my_w.setupUi(this);
-    show();
-
+    my_w.setupUi(this);
     setAcceptDrops(true);
 
 // this below works if there is just one neutrino win open
@@ -318,35 +326,35 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	// lasciamo questo per ultimo
 	//	my_w.scrollArea->setWidget(my_view);
 
-	my_w.my_view->setScene(&my_s);
+    my_w.my_view->setScene(&my_s);
+
 	
-	
-	my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-	//	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
+    my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+    //	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
 
-	my_s.addItem(&my_pixitem);
-	my_pixitem.setEnabled(true);
-	my_pixitem.setZValue(-1);
+    my_s.addItem(&my_pixitem);
+    my_pixitem.setEnabled(true);
+    my_pixitem.setZValue(-1);
 
-	toggleRuler(false);
-	toggleGrid(false);
+    toggleRuler(false);
+    toggleGrid(false);
 
-	my_s.addItem(&my_mouse);
+    my_s.addItem(&my_mouse);
 
-	my_w.my_view->setSize();
-	my_s.addItem(&my_tics);
-	
-	my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
-	my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
+    my_w.my_view->setSize();
+    my_s.addItem(&my_tics);
+
+    my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
+    my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
 
 
 //	my_s.setBackgroundBrush(QBrush(QColor(255,255,255,255)));
-	
+
 	updateRecentFileActions();
 
 	loadDefaults();
     
-	show();
+    show();
 	
 	//!enable this for testing
 
@@ -355,7 +363,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 #ifdef  __phys_debug
     if (numwin==1)	recentFileActs.first()->trigger();
 #endif
-    
+
     //	newRect(QRectF(100,100,300,300), "pippo");
 
 //	WinList();

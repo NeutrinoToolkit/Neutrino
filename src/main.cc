@@ -28,10 +28,6 @@
 #include <QtGui>
 //#include <QtSql>
 
-#ifdef Q_OS_MAC
-#include "osxApp.h"
-#endif
-
 #include "neutrino.h"
 #include "nApp.h"
 
@@ -40,9 +36,6 @@
 #endif
 
 #ifdef HAVE_PYTHONQT
-#include <cmath>
-#include "PythonQt.h"
-#include <PythonQt_QtAll.h>
 #include "nPhysPyWrapper.h"
 #include "nPython.h"
 #endif
@@ -50,11 +43,7 @@
 int main(int argc, char **argv)
 {
 
-#ifdef Q_OS_MAC
-    osxApp qapp(argc,argv);
-#else
     NApplication qapp(argc,argv);
-#endif
 
     qapp.setOrganizationName("ParisTech");
     qapp.setOrganizationDomain("edu");
@@ -69,11 +58,10 @@ int main(int argc, char **argv)
 
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
-    neutrino *neu = new neutrino();
+    bool somethingDone=false;
+
     QStringList args=QCoreApplication::arguments();
     args.removeFirst();
-
-    bool somethingDone=false;
 
 #ifdef HAVE_PYTHONQT
 
@@ -111,7 +99,9 @@ int main(int argc, char **argv)
     }
 #endif
 
+
     if (!somethingDone) {
+        neutrino *neu = new neutrino();
         neu->fileOpen(args);
     }
 
