@@ -48,13 +48,31 @@
         <string>Colorbar</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="0" column="0">
          <widget class="QWidget" name="widget_3" native="true">
           <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,0,0,0,0">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -151,7 +169,16 @@
         <item row="2" column="0">
          <widget class="QWidget" name="widget" native="true">
           <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,0,0">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -254,7 +281,16 @@
         <string>Palette files</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_9">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="2" column="0">
@@ -313,7 +349,16 @@
         <string>Palette colorlists</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="4" column="0">
@@ -347,7 +392,16 @@
         <item row="1" column="0">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QGridLayout" name="gridLayout_5" columnstretch="1">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -483,6 +537,7 @@
   <tabstop>invert</tabstop>
   <tabstop>checkBox</tabstop>
   <tabstop>savePDF</tabstop>
+  <tabstop>cutoff</tabstop>
   <tabstop>histogram</tabstop>
   <tabstop>sliderMin</tabstop>
   <tabstop>sliderMax</tabstop>
@@ -490,10 +545,15 @@
   <tabstop>lineMax</tabstop>
   <tabstop>setToMin</tabstop>
   <tabstop>setToMax</tabstop>
+  <tabstop>fileList</tabstop>
+  <tabstop>addPaletteFile</tabstop>
+  <tabstop>removePaletteFile</tabstop>
   <tabstop>paletteName</tabstop>
+  <tabstop>addPalette</tabstop>
+  <tabstop>removePalette</tabstop>
   <tabstop>colorlist</tabstop>
-  <tabstop>palettes</tabstop>
   <tabstop>addColor</tabstop>
+  <tabstop>palettes</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/neutrino.qrc"/>

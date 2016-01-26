@@ -151,7 +151,8 @@ neutrino::neutrino():
 
 	connect(my_w.actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
 	connect(my_w.actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
-	connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
