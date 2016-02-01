@@ -105,6 +105,5 @@ int main(int argc, char **argv)
         neu->fileOpen(args);
     }
 
-    cout << "exit here" << endl;
     return qapp.exec();
 }
