@@ -49,6 +49,7 @@
 #include "nInterpolatePath.h"
 #include "nShortcuts.h"
 #include "nAffine.h"
+#include "nCamera.h"
 
 #include "nFocalSpot.h"
 #include "nLineout.h"
@@ -64,7 +65,7 @@
 #endif
 
 #ifdef HAVE_PYTHONQT
-//#include <QUiLoader>
+#include <QUiLoader>
 #include "nPython.h"
 #endif
 
@@ -153,6 +154,8 @@ neutrino::neutrino():
 	connect(my_w.actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
     connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
     connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
+
+    connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -2037,6 +2040,15 @@ neutrino::Blur() {
 	return ret;
 }
 
+/// Blur STUFF
+nGenericPan*
+neutrino::Camera() {
+    QString vwinname=tr("Camera");
+    nGenericPan *ret=existsPan(vwinname);
+    if (!ret) ret = new nCamera(this, vwinname);
+    return ret;
+}
+
 // FOLLOWER
 void
 neutrino::createFollower() {
@@ -2230,54 +2242,54 @@ nGenericPan* neutrino::newPan(QString my_string) {
             QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
         }
     }
-//    if (!my_pan) {
-//        QString panName;
+    if (!my_pan) {
+        QString panName;
 
-//        QWidget *uiwidget=NULL;
+        QWidget *uiwidget=NULL;
 
-//        if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
-//            QFile file(my_string);
-//            file.open(QFile::ReadOnly);
-//            QUiLoader loader;
-//            uiwidget = loader.load(&file);
-//            file.close();
-//            uiwidget->setParent(my_pan);
-//            panName=QFileInfo(my_string).baseName();
-//        }
+        if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
+            QFile file(my_string);
+            file.open(QFile::ReadOnly);
+            QUiLoader loader;
+            uiwidget = loader.load(&file);
+            file.close();
+            uiwidget->setParent(my_pan);
+            panName=QFileInfo(my_string).baseName();
+        }
 
-//        if (panName.isEmpty())
-//            panName.sprintf("n%03d pan",property("winId").toInt());
+        if (panName.isEmpty())
+            panName.sprintf("n%03d pan",property("winId").toInt());
 
-//        my_pan=new nGenericPan(this,panName);
+        my_pan=new nGenericPan(this,panName);
 
-//        if (uiwidget) {
+        if (uiwidget) {
 
-//            my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
-//            foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
-//                if(my_widget->objectName()=="centralwidget") {
-//                    my_pan->setCentralWidget(my_widget);
-//                }
-//            }
-//            foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
-//                my_pan->setStatusBar(my_widget);
-//            }
-//            foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
-//                my_pan->addToolBar(my_widget);
-//            }
+            my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
+            foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
+                if(my_widget->objectName()=="centralwidget") {
+                    my_pan->setCentralWidget(my_widget);
+                }
+            }
+            foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
+                my_pan->setStatusBar(my_widget);
+            }
+            foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
+                my_pan->addToolBar(my_widget);
+            }
 
-//            const QMetaObject *metaobject=uiwidget->metaObject();
-//            for (int i=0; i<metaobject->propertyCount(); ++i) {
-//                QMetaProperty metaproperty = metaobject->property(i);
-//                const char *name = metaproperty.name();
-//                QVariant value = uiwidget->property(name);
-//                DEBUG(metaproperty.name() << " : " << value.toString().toStdString());
-//            }
+            const QMetaObject *metaobject=uiwidget->metaObject();
+            for (int i=0; i<metaobject->propertyCount(); ++i) {
+                QMetaProperty metaproperty = metaobject->property(i);
+                const char *name = metaproperty.name();
+                QVariant value = uiwidget->property(name);
+                DEBUG(metaproperty.name() << " : " << value.toString().toStdString());
+            }
 
-////            my_pan->setCentralWidget(uiwidget);
-//            my_pan->decorate();
-//        }
+//            my_pan->setCentralWidget(uiwidget);
+            my_pan->decorate();
+        }
 
-//    }
+    }
 
     return my_pan;
 }

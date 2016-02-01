@@ -27,12 +27,12 @@ endif()
 set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")
 
 ## find qt -- search for 5.x first, fallback to 4.x
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets REQUIRED)
 if (Qt5_FOUND)
 	# qt5
 	SET (USE_QT5 True)
 	message(STATUS "Using Qt5: ${Qt5Core_INCLUDE_DIRS}")
-	include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5UiTools_INCLUDE_DIRS})
+        include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5UiTools_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS} ${Qt5MultimediaWidgets_INCLUDE_DIRS})
 	
 	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 	QT5_WRAP_UI( UI_HEADERS ${UIS} )

@@ -84,6 +84,8 @@ set (SOURCES
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
     nApp.cc main.cc 
+
+    pans/nCamera.cc
 )
 
 ## UIs
@@ -97,7 +99,7 @@ set (UIS
     ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
     ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
     ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
-    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 	
+    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui ../UIs/nCamera.ui
 )
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
@@ -152,7 +154,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 target_link_libraries(Neutrino ${LIBS})
 if (USE_QT5)
-	qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport)
+        qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
 	target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
 endif()

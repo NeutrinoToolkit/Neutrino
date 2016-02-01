@@ -300,7 +300,10 @@ public slots:
 	// remove ghost Fringes
 	nGenericPan* Ghost();
     
-	// interpoalte inside path
+    // grab picture from camera
+    nGenericPan* Camera();
+
+    // interpoalte inside path
 	nGenericPan* InterpolatePath();
     
 	nGenericPan* MouseInfo();

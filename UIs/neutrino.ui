@@ -34,7 +34,16 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="1" column="0">
@@ -84,6 +93,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionOpen_RAW"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="actionCamera"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
@@ -847,6 +857,11 @@
    </property>
    <property name="toolTip">
     <string>Math operations</string>
+   </property>
+  </action>
+  <action name="actionCamera">
+   <property name="text">
+    <string>Camera</string>
    </property>
   </action>
  </widget>
