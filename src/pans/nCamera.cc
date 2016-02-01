@@ -26,7 +26,6 @@
 #include "neutrino.h"
 #include <QCameraInfo>
 #include <QCameraImageCapture>
-// physWavelets
 
 nCamera::nCamera(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname),
@@ -35,16 +34,15 @@ nCamera::nCamera(neutrino *nparent, QString winname)
   imgGray(NULL)
 {
 	my_w.setupUi(this);
-	
 	decorate();
-	
+
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
         my_w.cameras->addItem(cameraInfo.description(), cameraInfo.deviceName());
     }
 
     connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doIt()));
-
+    connect(my_w.cameras,SIGNAL(activated(int)),this, SLOT(changeCamera()));
     changeCamera();
 }
 
@@ -72,13 +70,9 @@ void nCamera::setupCam (const QCameraInfo &cameraInfo) {
     delete camera;
 
     camera = new QCamera(cameraInfo);
-
     imageCapture = new QCameraImageCapture(camera);
-
     connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(processCapturedImage(int,QImage)));
-
     camera->setViewfinder(my_w.viewfinder);
-
     camera->start();
 }
 
@@ -99,5 +93,4 @@ void nCamera::processCapturedImage(int requestId, const QImage& image)
         datamatrix->TscanBrightness();
         imgGray=nparent->replacePhys(datamatrix,imgGray);
     }
-
 }

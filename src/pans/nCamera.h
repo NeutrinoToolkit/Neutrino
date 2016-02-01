@@ -22,16 +22,14 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <QtGui>
-#include <QWidget>
+#ifndef __nCamera
+#define __nCamera
+
 #include <QCamera>
 #include <QCameraImageCapture>
 
 #include "nGenericPan.h"
 #include "ui_nCamera.h"
-
-#ifndef __nCamera
-#define __nCamera
 
 class neutrino;
 
