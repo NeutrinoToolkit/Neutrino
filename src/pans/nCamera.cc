@@ -31,7 +31,8 @@
 nCamera::nCamera(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname),
   camera(NULL),
-  imageCapture(NULL)
+  imageCapture(NULL),
+  imgGray(NULL)
 {
 	my_w.setupUi(this);
 	
@@ -54,7 +55,8 @@ nCamera::~nCamera()
 }
 
 void nCamera::doIt() {
-    imageCapture->capture();
+    if (imageCapture)
+        imageCapture->capture();
 }
 
 void nCamera::changeCamera() {
@@ -80,90 +82,22 @@ void nCamera::setupCam (const QCameraInfo &cameraInfo) {
     camera->start();
 }
 
-void nCamera::keyPressEvent(QKeyEvent * event)
-{
-    if (event->isAutoRepeat())
-        return;
-
-    switch (event->key()) {
-    case Qt::Key_CameraFocus:
-//        displayViewfinder();
-        WARNING("here");
-        camera->searchAndLock();
-        event->accept();
-        break;
-    case Qt::Key_Camera:
-        WARNING("here");
-        if (camera->captureMode() == QCamera::CaptureStillImage) {
-            WARNING("here");
-            doIt();
-        }
-        event->accept();
-        break;
-    default:
-        QMainWindow::keyPressEvent(event);
-    }
-}
-
-void nCamera::keyReleaseEvent(QKeyEvent *event)
-{
-    if (event->isAutoRepeat())
-        return;
-
-    switch (event->key()) {
-    case Qt::Key_CameraFocus:
-        camera->unlock();
-        break;
-    default:
-        QMainWindow::keyReleaseEvent(event);
-    }
-}
-
 void nCamera::processCapturedImage(int requestId, const QImage& image)
 {
     Q_UNUSED(requestId);
-
-    vector <nPhysD *> imagelist;
     if (!image.isNull()) {
-        if (image.isGrayscale()) {
-            nPhysD *datamatrix = new nPhysD("Camera gray");
-            datamatrix->resize(image.width(), image.height());
-            for (int i=0;i<image.height();i++) {
-                for (int j=0;j<image.width();j++) {
-                    datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
-                }
+        if (my_w.keep_copy->isChecked())
+            imgGray=NULL;
+        nPhysD *datamatrix = new nPhysD("Camera gray");
+        datamatrix->resize(image.width(), image.height());
+        for (int i=0;i<image.height();i++) {
+            for (int j=0;j<image.width();j++) {
+                QRgb px = image.pixel(j,i);
+                datamatrix->Timg_matrix[i][j]= (qRed(px)+qGreen(px)+qBlue(px))/3.0;
             }
-            imagelist.push_back(datamatrix);
-        } else {
-            nPhysD *datamatrix[3];
-            string name[3];
-            name[0]="Red";
-            name[1]="Green";
-            name[2]="Blue";
-            for (int k=0;k<3;k++) {
-                datamatrix[k] = new nPhysD("Camera color");
-                datamatrix[k]->setShortName(name[k]);
-                datamatrix[k]->setName("Camera "+name[k]);
-                datamatrix[k]->resize(image.width(), image.height());
-                imagelist.push_back(datamatrix[k]);
-            }
-            for (int i=0;i<image.height();i++) {
-                for (int j=0;j<image.width();j++) {
-                    QRgb px = image.pixel(j,i);
-                    datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-                    datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-                    datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
-                }
-            }
-
         }
+        datamatrix->TscanBrightness();
+        imgGray=nparent->replacePhys(datamatrix,imgGray);
     }
-
-    for (vector<nPhysD *>::iterator it=imagelist.begin(); it!=imagelist.end();) {
-        (*it)->TscanBrightness();
-        nparent->addShowPhys(*it);
-        it++;
-    }
-
 
 }

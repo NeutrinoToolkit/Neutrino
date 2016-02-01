@@ -46,9 +46,7 @@ public:
     QCamera* camera;
     QCameraImageCapture *imageCapture;
 
-protected:
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+    nPhysD *imgGray;
 
 public slots:
     void doIt();
