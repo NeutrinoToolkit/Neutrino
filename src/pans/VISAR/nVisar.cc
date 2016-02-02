@@ -518,7 +518,7 @@ void nVisar::updatePlotSOP() {
             int numrefl=0;
             for (int k=0;k<reflList.size();k++) {
                 if (reflectivity[reflList[k]].dataSize()>0) {
-                    for (int j=1;j<reflectivity[reflList[k]].dataSize();j++) {
+                    for (int j=1;j<(int)reflectivity[reflList[k]].dataSize();j++) {
                         double valj_1=reflectivity[reflList[k]].sample(j-1).x();
                         double valj=reflectivity[reflList[k]].sample(j).x();
                         
