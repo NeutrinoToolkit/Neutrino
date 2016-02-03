@@ -54,14 +54,25 @@ void nGhost::checkChangeCombo(QComboBox *combo) {
             size_t dy=imageShot->getH();
             deghosted.resize(dx,dy);
 
-            nPhysC imageFFT = imageShot->ft2(PHYS_FORWARD);
+            // 1. allocation
+            fftw_complex *t = fftw_alloc_complex(dx*(dy/2+1));
+
+            fftw_plan plan_t_fw = fftw_plan_dft_r2c_2d(dx, dy, imageShot->Timg_buffer, t, FFTW_ESTIMATE);
+
+            fftw_execute(plan_t_fw);
+            fftw_destroy_plan(plan_t_fw);
+
             for (size_t x=1;x<dx;x++) {
-                imageFFT.Timg_matrix[0][x]=0.0;
+                t[x][0]=0.0;
+                t[x][1]=0.0;
             }
-            imageFFT = imageFFT.ft2(PHYS_BACKWARD);
-            for (size_t i=0;i<imageFFT.getSurf();i++) {
-                deghosted.Timg_buffer[i]=(imageFFT.Timg_buffer[i]).real()/imageFFT.getSurf();
-            }
+
+            fftw_plan plan_t_bw = fftw_plan_dft_c2r_2d(dx, dy, t, deghosted.Timg_buffer, FFTW_ESTIMATE);
+            fftw_execute(plan_t_bw);
+            fftw_destroy_plan(plan_t_bw);
+            fftw_free(t);
+
+            phys_divide(deghosted,dx*dy);
             doGhost();
         }
     }
