@@ -807,27 +807,33 @@ void neutrino::saveSession (QString fname) {
 			progress.setValue(physList.size()+i);
 			progress.setLabelText(namePan);
 			QApplication::processEvents();
-			ofile << "NeutrinoPan-begin " << namePan.toStdString() << endl;
-			QTemporaryFile tmpFile(panList.at(i)->panName);
-			tmpFile.setAutoRemove(false);
-			tmpFile.open();
-            QString tmp_filename=tmpFile.fileName();
-			QSettings my_set(tmpFile.fileName(),QSettings::IniFormat);
-			my_set.clear();
-			panList.at(i)->saveSettings(&my_set);
-			my_set.sync();
-			tmpFile.close();
-			QFile file(tmp_filename);
-			if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-				return;
-			
-			while (!file.atEnd()) {
-				QByteArray line = file.readLine();
-                ofile << line.constData();
-			}
-			file.close();
-			file.remove();
-			ofile << "NeutrinoPan-end " << namePan.toStdString() << endl;
+            QTemporaryFile tmpFile(this);
+            if (tmpFile.open()) {
+                QString tmp_filename=tmpFile.fileName();
+                QApplication::processEvents();
+                QSettings my_set(tmp_filename,QSettings::IniFormat);
+                my_set.clear();
+                panList.at(i)->saveSettings(&my_set);
+                my_set.sync();
+                tmpFile.close();
+                QFile file(tmp_filename);
+                if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    ofile << "NeutrinoPan-begin " << namePan.toStdString() << endl;
+                    ofile.flush();
+                    while (!file.atEnd()) {
+                        QByteArray line = file.readLine();
+                        ofile << line.constData();
+                    }
+                    file.close();
+                    file.remove();
+                    ofile << "NeutrinoPan-end " << namePan.toStdString() << endl;
+                    ofile.flush();
+                } else {
+                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
+                }
+            } else {
+                QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName, QMessageBox::Ok);
+            }
 		}
 		ofile.close();
         updateRecentFileActions(fname);
