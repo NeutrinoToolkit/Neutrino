@@ -923,8 +923,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                                 QApplication::processEvents();
-
-                                my_pan->loadSettings(tmpFile.fileName());
+//                                my_pan->loadSettings(tmpFile.fileName());
 								tmpFile.close(); // this should also remove it...
 							}
 						}
