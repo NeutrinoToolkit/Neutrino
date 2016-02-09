@@ -901,8 +901,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
                         QStringList listLine=qLine.split(" ");
 						QString panName=listLine.at(1);
-						counter++;
-						progress.setValue(counter);
+                        progress.setValue(counter++);
 						progress.setLabelText(panName);
 						QApplication::processEvents();
 						if (metaObject()->indexOfMethod((panName+"()").toLatin1().constData())>0) {
@@ -911,11 +910,11 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 							QApplication::processEvents();
 							if (my_pan) {
                                 QApplication::processEvents();
-								QTemporaryFile tmpFile("."+my_pan->panName);
-								// tmpFile.setAutoRemove(false);
+                                QTemporaryFile tmpFile(this);
 								tmpFile.open();
 								while(!qLine.startsWith("NeutrinoPan-end") && !ifile.eof()) {
 									getline(ifile,line);
+//                                    WARNING(line);
 									qLine=QString::fromStdString(line);
 									line+="\n";
 									if (!qLine.startsWith("NeutrinoPan-end")) tmpFile.write(line.c_str());
@@ -925,7 +924,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
                                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                                 QApplication::processEvents();
 
-//								my_pan->loadSettings(tmpFile.fileName());
+                                my_pan->loadSettings(tmpFile.fileName());
 								tmpFile.close(); // this should also remove it...
 							}
 						}
