@@ -25,8 +25,11 @@
 #include "nGhost.h"
 #include "neutrino.h"
 
+// physGhosts
+
 nGhost::nGhost(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname), ghostBusted(NULL)
+: nGenericPan(nparent, winname),
+  ghostBusted(NULL)
 {
 	my_w.setupUi(this);
 
@@ -38,70 +41,110 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-    connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
+	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
+	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
+	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
+    connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
     connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
-    connect(region, SIGNAL(sceneChanged()), this, SLOT(doGhost()));
+
+    QApplication::processEvents();
 
     checkChangeCombo(my_w.shot);
 }
 
-void nGhost::checkChangeCombo(QComboBox *combo) {
-	if (combo==my_w.shot) {
-        nPhysD *imageShot=getPhysFromCombo(my_w.shot);
+void nGhost::guessCarrier() {
+    nPhysD *image=getPhysFromCombo(my_w.ref);
+	if (image) {
+		QRect geom2=region->getRect();
+		nPhysD datamatrix;
+		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-        if (imageShot) {
+		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+		if (vecCarr.first()==0) {
+			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+		} else {
+			my_w.statusbar->showMessage(tr("Carrier: ")+QString::number(vecCarr.first())+"px "+QString::number(vecCarr.second())+"deg", 5000);
+			my_w.widthCarrier->setValue(vecCarr.first());
+			my_w.angleCarrier->setValue(vecCarr.second());
+		}
+	}
+}
+
+void nGhost::checkChangeCombo(QComboBox *combo) {
+    if (combo==my_w.shot) {
+        nPhysD *imageShot=getPhysFromCombo(my_w.shot);
+        if (imageShot && imageShot!=ghostBusted) {
             size_t dx=imageShot->getW();
             size_t dy=imageShot->getH();
-            deghosted.resize(dx,dy);
-
-            // 1. allocation
-            fftw_complex *t = fftw_alloc_complex(dx*(dy/2+1));
-
-            fftw_plan plan_t_fw = fftw_plan_dft_r2c_2d(dx, dy, imageShot->Timg_buffer, t, FFTW_ESTIMATE);
-
-            fftw_execute(plan_t_fw);
-            fftw_destroy_plan(plan_t_fw);
-
-            for (size_t x=1;x<dx;x++) {
-                t[x][0]=0.0;
-                t[x][1]=0.0;
-            }
-
-            fftw_plan plan_t_bw = fftw_plan_dft_c2r_2d(dx, dy, t, deghosted.Timg_buffer, FFTW_ESTIMATE);
-            fftw_execute(plan_t_bw);
-            fftw_destroy_plan(plan_t_bw);
-            fftw_free(t);
-
-            phys_divide(deghosted,dx*dy);
-            doGhost();
+            imageFFT = imageShot->ft2(PHYS_FORWARD);
+            phys_divide(imageFFT,dx*dy);
+            xx.resize(dx);
+            yy.resize(dy);
+            for (size_t i=0;i<dx;i++)
+                xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+            for (size_t i=0;i<dy;i++)
+                yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
+            morlet.resize(dx,dy);
         }
     }
 }
 
 void nGhost::doGhost () {
 	nPhysD *imageShot=getPhysFromCombo(my_w.shot);
-	if (imageShot) {
-		saveDefaults();
-        
+    if (imageShot && imageShot->getSurf() == morlet.getSurf()) {
+        saveDefaults();
+
+        if (imageShot->getSurf() != morlet.getSurf()) {
+            checkChangeCombo(my_w.shot);
+        }
+
         QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersected(region->getRect());
         
+        QTime timer;
+        timer.start();
+
+        size_t dx=imageShot->getW();
+        size_t dy=imageShot->getH();
+        
+        double cr = cos((my_w.angleCarrier->value()) * _phys_deg);
+        double sr = sin((my_w.angleCarrier->value()) * _phys_deg);
+
+        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*my_w.widthCarrier->value());
+
+        for (size_t x=0;x<dx;x++) {
+            for (size_t y=0;y<dy;y++) {
+                double xr = xx[x]*cr - yy[y]*sr;
+                double yr = xx[x]*sr + yy[y]*cr;
+                double e_tot = 1.0-exp(-pow(yr*M_PI,2))/(xr<0 ? 1.0: 1.0+exp(lambda-xr));
+                morlet.set(x,y,imageFFT.point(x,y) * e_tot);
+            }
+        }
+
+        morlet = morlet.ft2(PHYS_BACKWARD);
+
         nPhysD *deepcopy=new nPhysD(*imageShot);
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
         
         for(int i=geom.left();i<geom.right(); i++) {
             for(int j=geom.top();j<geom.bottom(); j++) {
-                deepcopy->set(i,j, deghosted.point(i,j));
+                deepcopy->set(i,j, morlet.point(i,j).mod());
             }
         }
         deepcopy->TscanBrightness();
         
-        if (!my_w.erasePrevious->isChecked()) {
-            ghostBusted=NULL;
+        if (my_w.erasePrevious->isChecked()) {
+            ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,true);
+        } else {
+            nparent->addShowPhys(deepcopy);
+            ghostBusted=deepcopy;
         }
-        ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,true);
 
-        my_w.erasePrevious->setEnabled(true);        
+        my_w.erasePrevious->setEnabled(true);
+        QString out;
+        out.sprintf("%d msec",timer.elapsed());
+        my_w.statusbar->showMessage(out);
+
 	}
 }
 

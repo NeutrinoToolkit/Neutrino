@@ -225,6 +225,20 @@ phys_divide(nPhysD &iimage, double val) {
 
 }
 
+void
+phys_divide(nPhysImageF<mcomplex> &iimage, double val) {
+    if (val!=1.0) {
+#pragma omp parallel for
+        for (size_t ii=0; ii<iimage.getSurf(); ii++)
+            iimage.set(ii, iimage.point(ii)/val);
+        iimage.TscanBrightness();
+    }
+    ostringstream ostr;
+    ostr << val;
+    iimage.setName("("+iimage.getName()+")/"+ostr.str());
+
+}
+
 void 
 phys_point_add(nPhysD &iimage, nPhysD &iimage2) {
 	if (iimage.getSurf()==iimage2.getSurf()) {

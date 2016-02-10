@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>218</width>
-    <height>115</height>
+    <width>268</width>
+    <height>243</height>
    </rect>
   </property>
   <property name="font">
@@ -28,23 +28,11 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_7">
-    <property name="leftMargin">
-     <number>4</number>
-    </property>
-    <property name="topMargin">
-     <number>4</number>
-    </property>
-    <property name="rightMargin">
-     <number>4</number>
-    </property>
-    <property name="bottomMargin">
-     <number>4</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_14">
       <property name="title">
-       <string>Image</string>
+       <string>Reference &amp; Shot</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <property name="leftMargin">
@@ -69,31 +57,177 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="ref">
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QCheckBox" name="erasePrevious">
-      <property name="enabled">
-       <bool>false</bool>
+     <widget class="QGroupBox" name="carrierBox">
+      <property name="title">
+       <string>Ghost:Interfringe, angle and weight</string>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Erase previous</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
+      <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,0,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="angleCarrier">
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix">
+          <string>˚</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>360.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QDoubleSpinBox" name="widthCarrier">
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix">
+          <string> px</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>-9999.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9999.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QDoubleSpinBox" name="weightCarrier">
+         <property name="toolTip">
+          <string>Frequency weight (&lt;0 for lower freq; &gt;0 for higher freq)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9.900000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QWidget" name="widget_3" native="true">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="erasePrevious">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Erase previous</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="doGhost">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Calculate</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -115,6 +249,8 @@
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
    <addaction name="actionRect"/>
+   <addaction name="separator"/>
+   <addaction name="actionCarrier"/>
   </widget>
   <action name="actionRect">
    <property name="icon">
@@ -152,10 +288,28 @@
     <string>Load Preferences</string>
    </property>
   </action>
+  <action name="actionCarrier">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Carrier</string>
+   </property>
+   <property name="toolTip">
+    <string>Guess carrier interfringe and angle</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>shot</tabstop>
+  <tabstop>widthCarrier</tabstop>
+  <tabstop>angleCarrier</tabstop>
+  <tabstop>doGhost</tabstop>
+  <tabstop>erasePrevious</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/neutrino.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -192,6 +192,7 @@ void phys_add(nPhysImageF<double> &, double);
 void phys_subtract(nPhysImageF<double> &, double);
 void phys_multiply(nPhysImageF<double> &, double);
 void phys_divide(nPhysImageF<double> &, double);
+void phys_divide(nPhysImageF<mcomplex> &, double);
 
 void phys_point_add(nPhysImageF<double> &, nPhysImageF<double> &);
 void phys_point_subtract(nPhysImageF<double> &, nPhysImageF<double> &);

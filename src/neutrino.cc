@@ -82,6 +82,9 @@
 neutrino::~neutrino()
 {
     saveDefaults();
+    foreach (nGenericPan *pan, panList) {
+        pan->deleteLater();
+    }
     foreach (nPhysD *phys, physList) {
         delete phys;
     }
@@ -1232,25 +1235,11 @@ void neutrino::closeEvent (QCloseEvent *e) {
 	disconnect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 	if (fileClose()) {
         saveDefaults();
-        QApplication::processEvents();
-        foreach (nGenericPan *pan, panList) {
-			pan->hide();
-			pan->close();
-			pan->deleteLater();
-            QApplication::processEvents();
-        }
-        QApplication::processEvents();
-        currentBuffer=NULL;
-        foreach (nPhysD *phys, physList) {
-            delete phys;
-        }
-        physList.clear();
-
 		e->accept();
 	} else {
 		e->ignore();
-	}
-	connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    }
 }
 
 // keyevents: pass to my_view!

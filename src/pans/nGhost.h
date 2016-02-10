@@ -47,13 +47,16 @@ public:
 	QPointer<nRect> region;
 
     nPhysD *ghostBusted;
-    nPhysD deghosted;
+    nPhysC imageFFT;
+    nPhysC morlet;
     
     std::vector<int> xx, yy;
     
 public slots:
 		
-    void doGhost();
+	void guessCarrier();
+
+	void doGhost();
 
 	void checkChangeCombo(QComboBox *);
 
