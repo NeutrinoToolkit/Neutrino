@@ -45,11 +45,9 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
 	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
-    connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 
     QApplication::processEvents();
 
-    checkChangeCombo(my_w.shot);
 }
 
 void nGhost::guessCarrier() {
@@ -63,49 +61,31 @@ void nGhost::guessCarrier() {
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-			my_w.statusbar->showMessage(tr("Carrier: ")+QString::number(vecCarr.first())+"px "+QString::number(vecCarr.second())+"deg", 5000);
 			my_w.widthCarrier->setValue(vecCarr.first());
 			my_w.angleCarrier->setValue(vecCarr.second());
 		}
 	}
 }
 
-void nGhost::checkChangeCombo(QComboBox *combo) {
-    if (combo==my_w.shot) {
-        nPhysD *imageShot=getPhysFromCombo(my_w.shot);
-        if (imageShot && imageShot!=ghostBusted) {
-            size_t dx=imageShot->getW();
-            size_t dy=imageShot->getH();
-            imageFFT = imageShot->ft2(PHYS_FORWARD);
-            phys_divide(imageFFT,dx*dy);
-            xx.resize(dx);
-            yy.resize(dy);
-            for (size_t i=0;i<dx;i++)
-                xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-            for (size_t i=0;i<dy;i++)
-                yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
-            morlet.resize(dx,dy);
-        }
-    }
-}
-
 void nGhost::doGhost () {
 	nPhysD *imageShot=getPhysFromCombo(my_w.shot);
-    if (imageShot && imageShot->getSurf() == morlet.getSurf()) {
+    if (imageShot) {
         saveDefaults();
 
-        if (imageShot->getSurf() != morlet.getSurf()) {
-            checkChangeCombo(my_w.shot);
-        }
-
-        QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersected(region->getRect());
-        
         QTime timer;
         timer.start();
 
         size_t dx=imageShot->getW();
         size_t dy=imageShot->getH();
         
+        nPhysC imageFFT = imageShot->ft2(PHYS_FORWARD);
+        std::vector<int> xx(dx), yy(dy);
+
+        for (size_t i=0;i<dx;i++)
+            xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+        for (size_t i=0;i<dy;i++)
+            yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
+
         double cr = cos((my_w.angleCarrier->value()) * _phys_deg);
         double sr = sin((my_w.angleCarrier->value()) * _phys_deg);
 
@@ -116,19 +96,20 @@ void nGhost::doGhost () {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
                 double e_tot = 1.0-exp(-pow(yr*M_PI,2))/(xr<0 ? 1.0: 1.0+exp(lambda-xr));
-                morlet.set(x,y,imageFFT.point(x,y) * e_tot);
+                imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
             }
         }
 
-        morlet = morlet.ft2(PHYS_BACKWARD);
+        imageFFT = imageFFT.ft2(PHYS_BACKWARD);
 
         nPhysD *deepcopy=new nPhysD(*imageShot);
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
         
+        QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersected(region->getRect());
         for(int i=geom.left();i<geom.right(); i++) {
             for(int j=geom.top();j<geom.bottom(); j++) {
-                deepcopy->set(i,j, morlet.point(i,j).mod());
+                deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
             }
         }
         deepcopy->TscanBrightness();
@@ -142,7 +123,7 @@ void nGhost::doGhost () {
 
         my_w.erasePrevious->setEnabled(true);
         QString out;
-        out.sprintf("%d msec",timer.elapsed());
+        out.sprintf("Time: %d msec",timer.elapsed());
         my_w.statusbar->showMessage(out);
 
 	}

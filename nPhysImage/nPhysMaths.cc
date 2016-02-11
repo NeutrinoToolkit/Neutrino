@@ -382,7 +382,7 @@ phys_gaussian_blur(nPhysD &m1, double radius)
 	nPhysImageF<mcomplex> out;
 
 //FIXME: this is probably wrong for odd matrices
-    meshgrid_data md = {-m1.getW()/2., m1.getW()/2., -m1.getH()/2., m1.getH()/2., m1.getW(), m1.getH()};
+    meshgrid_data md = {-m1.getW()/2., m1.getW()/2., -m1.getH()/2., m1.getH()/2., (int) (m1.getW()), (int) m1.getH()};
 	phys_generate_meshgrid(&md, xx, yy);
 
 	gauss.resize(xx.getW(), xx.getH());
@@ -517,30 +517,58 @@ phys_fast_gaussian_blur(nPhysD &m1, double radius)
 	phys_fast_gaussian_blur(m1,radius,radius);
 }
 
+void phys_median_filter(nPhysD& image, int N){
+    nPhysD pippo=image;
+    int median_pos=(N*N)/2;
+#pragma omp parallel for collapse(2)
+    for(size_t i = 0 ; i < image.getW(); i++) {
+        for(size_t j = 0 ; j < image.getH(); j++) {
+            vector<double> mat(N*N);
+            int k=0;
+            for(size_t ii = 0 ; ii < N ; ii++) {
+               for(size_t jj = 0 ; jj < N; jj++) {
+                    mat[k++]=image.point(i+ii,j+jj);
+               }
+            }
+            nth_element(mat.begin(), mat.begin()+median_pos, mat.end());
+            pippo.set(i,j,mat[median_pos]);
+        }
+    }
+#pragma omp parallel for collapse(2)
+    for(size_t i = 0 ; i < image.getW()-N ; i++) {
+        for(size_t j = 0 ; j < image.getH()-N; j++) {
+            image.set(i+N/2,j+N/2,pippo.point(i,j));
+        }
+    }
+    image.setShortName("median");
+    image.setName("median("+image.getName()+")");
+    image.TscanBrightness();
+}
+
 void
-phys_fast_gaussian_blur(nPhysD &m1, double radiusX, double radiusY)
+phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
 {
-	vector<double> nan_free_phys(m1.getSurf());
+    vector<double> nan_free_phys(image.getSurf());
 #pragma omp parallel for
-	for (size_t i=0; i< m1.getSurf(); i++) {
-		nan_free_phys[i]=isfinite(m1.point(i))? m1.point(i):m1.get_min();
+    for (size_t i=0; i< image.getSurf(); i++) {
+        nan_free_phys[i]=isfinite(image.point(i))? image.point(i):image.get_min();
 	}
-    fftw_complex *b2 = fftw_alloc_complex(m1.getH()*((m1.getW()/2+1)));
+    fftw_complex *b2 = fftw_alloc_complex(image.getH()*((image.getW()/2+1)));
 	
-	fftw_plan fb = fftw_plan_dft_r2c_2d(m1.getH(),m1.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
-	fftw_plan bb = fftw_plan_dft_c2r_2d(m1.getH(),m1.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
+    fftw_plan fb = fftw_plan_dft_r2c_2d(image.getH(),image.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
+    fftw_plan bb = fftw_plan_dft_c2r_2d(image.getH(),image.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
 	
 	fftw_execute(fb);
 
- 	double sx=pow(m1.getW()/(radiusX),2)/2.0;
- 	double sy=pow(m1.getH()/(radiusY),2)/2.0;
+    double sx=pow(image.getW()/(radiusX),2)/2.0;
+    double sy=pow(image.getH()/(radiusY),2)/2.0;
 
     register size_t j;
 #pragma omp parallel for collapse(2)
- 	for (size_t j = 0 ; j < m1.getH(); j++) {
-		for (size_t i = 0 ; i < m1.getW()/2+1 ; i++) {
-			double blur=exp(-((i*i)/sx+(j-m1.getH()/2)*(j-m1.getH()/2)/sy))/m1.getSurf();
-			int k=i+((j+m1.getH()/2+1)%m1.getH())*(m1.getW()/2+1);
+    for (size_t j = 0 ; j < image.getH(); j++) {
+        for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
+            double blur=exp(-((i*i)/sx+(j-image.getH()/2)*(j-image.getH()/2)/sy))/image.getSurf();
+            int k=i+((j+image.getH()/2+1)%image.getH())*(image.getW()/2+1);
 			b2[k][0]*=blur;
 			b2[k][1]*=blur;
 		}
@@ -548,12 +576,12 @@ phys_fast_gaussian_blur(nPhysD &m1, double radiusX, double radiusY)
     fftw_execute(bb);
 
 #pragma omp parallel for
-	for (size_t i=0; i< m1.getSurf(); i++) {
-		if (isfinite(m1.point(i))) {
-			m1.set(i,nan_free_phys[i]);
+    for (size_t i=0; i< image.getSurf(); i++) {
+        if (isfinite(image.point(i))) {
+            image.set(i,nan_free_phys[i]);
 		}
 	}
-    m1.TscanBrightness();
+    image.TscanBrightness();
 	fftw_destroy_plan(fb);
 	fftw_destroy_plan(bb);
 	fftw_free(b2);

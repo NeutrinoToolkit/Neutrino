@@ -176,6 +176,9 @@ void
 phys_log10(nPhysImageF<double> &);
 
 void
+phys_median_filter(nPhysD&, int);
+
+void
 phys_gaussian_blur(nPhysImageF<double> &, double);
 
 void
