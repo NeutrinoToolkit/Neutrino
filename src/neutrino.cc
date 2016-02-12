@@ -255,13 +255,12 @@ neutrino::neutrino():
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
 	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
 	connect(my_w.actionBlur, SIGNAL(triggered()), this, SLOT(Blur()));
-
 	connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
-
 	connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
 	
 #ifdef HAVE_PYTHONQT
+    my_w.menuPython->setEnabled(true);
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     my_w.toolBar->addWidget(spacer);
@@ -269,8 +268,6 @@ neutrino::neutrino():
     my_w.toolBar->addAction(QIcon(":icons/python.png"),tr("Python shell"),this,SLOT(Python()));
     connect(my_w.actionPython, SIGNAL(triggered()), this, SLOT(Python()));
     loadPyScripts();
-#else
-    my_w.menuPython->hide();
 #endif
 
 	// ---------------------------------------------------------------------------------------------
@@ -280,11 +277,9 @@ neutrino::neutrino():
 	my_w.statusbar->addPermanentWidget(sbarra, 0);
 
 	setAttribute(Qt::WA_DeleteOnClose);
-
 	setCentralWidget(my_w.centralwidget);
 
-	connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-
+    connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 	connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 	build_colormap();
@@ -2313,7 +2308,6 @@ neutrino::loadPyScripts() {
         //	.split(QRegExp("\\s*,\\s*"));
 
         if (scriptlist.size() > 0) {
-            my_w.menuPython->setEnabled(true);
             foreach (QAction* myaction, my_w.menuPython->actions()) {
                 if (QFileInfo(myaction->data().toString()).suffix()=="py")
                     my_w.menuPython->removeAction(myaction);

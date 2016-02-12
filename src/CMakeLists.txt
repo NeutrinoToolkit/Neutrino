@@ -31,6 +31,8 @@ if (APPLE)
 
     set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
     set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+    set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
+
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
 
@@ -85,8 +87,6 @@ set (SOURCES
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
     nApp.cc main.cc 
-
-    
 )
 
 ## UIs
@@ -106,9 +106,7 @@ set (UIS
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
 if (GENERATE_NHASH)
-	set (SOURCES ${SOURCES}
-		neutrino-key/nHash.cc
-		)
+        set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
 
 	include_directories(neutrino-key)
 	

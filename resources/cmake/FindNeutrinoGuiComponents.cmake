@@ -33,7 +33,62 @@ else()
 endif()
 
 
+# PYTHNOQT
+
+if (APPLE)
+
+    include(FindPythonLibs)
+
+    if(PYTHONLIBS_FOUND)
+        list(APPEND LIBS ${PYTHON_LIBRARIES})
+        include_directories(${PYTHON_INCLUDE_DIRS})
+
+        set(pythonqt_src "${CMAKE_CURRENT_SOURCE_DIR}/../../pythonqt-code")
+
+        INCLUDE_DIRECTORIES(${pythonqt_src}/src ${pythonqt_src}/src/gui)
+        LINK_DIRECTORIES(${pythonqt_src}/lib)
+
+        find_library(PYTHONQT NAMES PythonQt PATHS ${pythonqt_src}/lib)
+        find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ${pythonqt_src}/lib)
+
+        if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
+
+            message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
+            list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
+            add_definitions(-DHAVE_PYTHONQT)
+
+            FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ${pythonqt_src}/src)
+            IF (PYTHONQT_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
+                  include_directories(${PYTHONQT_INCLUDE_DIR})
+            ENDIF ()
+
+            FIND_PATH(PYTHONQTGUI_INCLUDE_DIR PythonQtScriptingConsole.h ${pythonqt_src}/src/gui)
+            IF (PYTHONQTGUI_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] gui header dir: ${PYTHONQTGUI_INCLUDE_DIR}")
+                  include_directories(${PYTHONQTGUI_INCLUDE_DIR})
+            ENDIF ()
+
+            FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ${pythonqt_src}/extensions/PythonQt_QtAll)
+            IF (PYTHONQTALL_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
+                  include_directories(${PYTHONQTALL_INCLUDE_DIR})
+            ENDIF ()
+
+            set (PYTHONQT_FOUND_COMPLETE "TRUE")
+
+        endif()
+
+
+    endif()
+endif()
+
+
+
+
+
 add_definitions(${QT_DEFINITIONS})
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
 
 
