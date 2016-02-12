@@ -117,5 +117,16 @@ public slots:
 };
 
 
+#ifdef HAVE_PYTHONQT
+class nPanPyWrapper : public QObject {
+    Q_OBJECT
+
+    public slots:
+    nGenericPan* new_nPan() {return new nGenericPan();}; // opens new neutrino with that image
+    void delete_nPan(nGenericPan* pan) {pan->deleteLater();};
+
+};
+#endif
+
 
 #endif

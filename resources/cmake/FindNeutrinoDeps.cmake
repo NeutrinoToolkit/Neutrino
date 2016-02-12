@@ -61,14 +61,23 @@ endif()
 
 
 # pgm
-find_library(PBM NAMES netpbm)
-if (NOT ${PBM} STREQUAL "PBM-NOTFOUND")
-	message (STATUS "using netpbm: ${PBM}")
-	set(LIBS ${LIBS} ${PBM}) 
+find_library(NETPBM NAMES netpbm)
+if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
+	message (STATUS "using netpbm: ${NETPBM}")
+	set(LIBS ${LIBS} ${NETPBM}) 
 	add_definitions(-DHAVE_LIBNETPBM)
-	if (APPLE) 
-		include_directories(BEFORE "/opt/local/include/netpbm")
-	endif()
+
+  FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
+  /usr/include
+  /usr/include/netpbm
+  /usr/local/include
+  /usr/local/include/netpbm
+  )
+  IF (NETPBM_INCLUDE_DIR)
+	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
+	include_directories(${NETPBM_INCLUDE_DIR})
+  ENDIF (NETPBM_INCLUDE_DIR)
+
 endif()
 
 find_package(JPEG REQUIRED)
@@ -116,3 +125,48 @@ if (HDF5_FOUND)
 
 endif (HDF5_FOUND)
 
+if (APPLE)
+
+    include(FindPythonLibs)
+    
+    if(PYTHONLIBS_FOUND)
+        list(APPEND LIBS ${PYTHON_LIBRARIES})
+        include_directories(${PYTHON_INCLUDE_DIRS})    
+    
+        INCLUDE_DIRECTORIES(../../pythonqt-code/src ../../pythonqt-code/src/gui)
+        LINK_DIRECTORIES(/Users/tommaso/pythonqt-code/lib)
+
+        find_library(PYTHONQT NAMES PythonQt PATHS ../pythonqt-code/lib)
+        find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ../pythonqt-code/lib)
+        
+        if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
+
+            message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
+            list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
+            add_definitions(-DHAVE_PYTHONQT)
+        
+            FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ../pythonqt-code/src)
+            IF (PYTHONQT_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
+                  include_directories(${PYTHONQT_INCLUDE_DIR})
+            ENDIF ()
+
+            FIND_PATH(PYTHONQTGUI_INCLUDE_DIR PythonQtScriptingConsole.h ../pythonqt-code/src/gui)
+            IF (PYTHONQTGUI_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] gui header dir: ${PYTHONQTGUI_INCLUDE_DIR}")
+                  include_directories(${PYTHONQTGUI_INCLUDE_DIR})
+            ENDIF ()
+
+            FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ../pythonqt-code/extensions/PythonQt_QtAll)
+            IF (PYTHONQTALL_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
+                  include_directories(${PYTHONQTALL_INCLUDE_DIR})
+            ENDIF ()
+
+            set (PYTHONQT_FOUND_COMPLETE "TRUE")
+        
+        endif()
+
+
+    endif()
+endif()

@@ -28,13 +28,6 @@
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
-#ifdef Q_OS_MAC
-	DEBUG("NEW OSX FEATURE have the main menu always visible!!! might break up things on every update!");
-	setParent(nparent);
-	setWindowFlags(Qt::Tool|Qt::WindowStaysOnBottomHint);
-	grabKeyboard();
-#endif
-
     DEBUG("panName " << panName.toStdString());
 	setProperty("panName",panName);
 	int panNum=0;

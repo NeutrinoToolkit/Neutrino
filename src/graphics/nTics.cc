@@ -25,18 +25,17 @@
 #include "nTics.h"
 #include "neutrino.h"
 
-nTics::nTics(neutrino *neu) : QGraphicsItem()
+nTics::nTics(neutrino *neu) : QGraphicsItem(),
+    nparent(neu),
+    color(QColor(Qt::black)),
+    rulerVisible(false),
+    gridVisible(false)
 {	
-	nparent=neu;
-	color=QColor(Qt::black);
-	rulerColor=QColor(Qt::yellow);
-	rulerVisible=false;
-	gridVisible=false;
 }
 
 // reimplementation
 QRectF nTics::boundingRect() const {
-	return nparent->my_w.my_view->sceneRect();
+    return nparent->my_w.my_view->sceneRect();
 }
 
 void nTics::changeColor() {

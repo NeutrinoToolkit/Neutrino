@@ -28,7 +28,8 @@
 // physWavelets
 
 nBlur::nBlur(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+: nGenericPan(nparent, winname),
+  blurPhys(NULL)
 {
 	my_w.setupUi(this);
 	
@@ -38,7 +39,6 @@ nBlur::nBlur(neutrino *nparent, QString winname)
 	connect(my_w.valueBlur,SIGNAL(valueChanged(double)),this,SLOT(doBlur(double)));
 	connect(my_w.image,SIGNAL(activated(int)),this,SLOT(doBlur()));
 	
-	blurPhys=NULL;
 	doBlur();
 }
 

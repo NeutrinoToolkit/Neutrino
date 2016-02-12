@@ -113,7 +113,7 @@ void nOperator::doOperation () {
 		}
 		
 		if (operand1->get_scale() != operand2->get_scale())  {
-			QMessageBox::question(this,tr("Scale problem"),tr("The images have not the same scale"),QMessageBox::Ok); 
+            QMessageBox::warning(this,tr("Scale problem"),tr("The images do not have the same scale"),QMessageBox::Ok);
 		}
 		QRectF r1=QRectF(-operand1->get_origin().x(),-operand1->get_origin().y(),operand1->getW(),operand1->getH());
 		QRectF r2=QRectF(-operand2->get_origin().x(),-operand2->get_origin().y(),operand2->getW(),operand2->getH());
@@ -155,9 +155,9 @@ void nOperator::doOperation () {
 							myresult->set(i,j,std::max(val1,val2));
 							break;
 					}
-				} else {
+                } else {
 					myresult->set(i,j,isfinite(val1)?val1:val2);
-				}
+                }
 				
 			}
 		}
@@ -171,7 +171,9 @@ void nOperator::doOperation () {
 				if (ok) {
 					myresult=new nPhysD(*image1);
 					phys_pow(*myresult, scalar);				
-				}
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Expected 2 values"));
+                }
 			} else if (my_w.operation->currentIndex()==separator["0"]+2) {
 				QStringList scalars=my_w.num2->text().split(" ");
 				if  (scalars.size()==1){
@@ -180,6 +182,8 @@ void nOperator::doOperation () {
                     if (ok) {
                         myresult=new nPhysD(*image1);
                         phys_fast_gaussian_blur(*myresult, scalar);				
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: Exepcted a float radius"));
                     }
                 } else if (scalars.size()==2) {
 					bool ok1, ok2;
@@ -188,18 +192,34 @@ void nOperator::doOperation () {
 					if(ok1 && ok2) {
 						myresult=new nPhysD(*image1);
 						phys_fast_gaussian_blur(*myresult, scalar1, scalar2);				
-					}
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));
+                    }
 				} 
             } else if (my_w.operation->currentIndex()==separator["0"]+3) {
-				bool ok;
+                QStringList scalars=my_w.num2->text().split(" ");
+                if  (scalars.size()==1){
+                    bool ok;
+                    int scalar=my_w.num2->text().toInt(&ok);
+                    if (ok) {
+                        myresult=new nPhysD(*image1);
+                        phys_median_filter(*myresult, scalar);
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: Scalar should be an integer"));
+                    }
+                }
+            } else if (my_w.operation->currentIndex()==separator["0"]+4) {
+                bool ok;
 				double scalar=my_w.num2->text().toDouble(&ok);
 				if (ok) {
 					myresult=image1->rotated(scalar);
-				}
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
+                }
 			}
 			
 		}
-	} else { // one value needed
+    } else { // no value needed
 		myresult=new nPhysD(*image1);
 		myresult->setName(my_w.operation->currentText().toStdString()+" "+image1->getName());
 		if (my_w.operation->currentIndex()==separator["1"]+1) {

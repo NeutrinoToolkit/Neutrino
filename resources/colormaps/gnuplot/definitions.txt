@@ -72,4 +72,5 @@ Pastel2 ; defined ( 0 '#B3E2CD', 1 '#FDCDAC', 2 '#CDB5E8', 3 '#F4CAE4', 4 '#D6F5
 Set1 ; defined ( 0 '#E41A1C', 1 '#377EB8', 2 '#4DAF4A', 3 '#984EA3', 4 '#FF7F00', 5 '#FFFF33', 6 '#A65628', 7 '#F781BF' ) 
 Set2 ; defined ( 0 '#66C2A5', 1 '#FC8D62', 2 '#8DA0CB', 3 '#E78AC3', 4 '#A6D854', 5 '#FFD92F', 6 '#E5C494', 7 '#B3B3B3' ) 
 Set3 ; defined ( 0 '#8DD3C7', 1 '#FFFFB3', 2 '#BEBADA', 3 '#FB8072', 4 '#80B1D3', 5 '#FDB462', 6 '#B3DE69', 7 '#FCCDE5' ) 
+Parula ; defined (0 '#352a87', 1 '#0363e1',2 '#1485d4', 3 '#06a7c6', 4 '#38b99e', 5 '#92bf73', 6 '#d9ba56', 7 '#fcce2e', 8 '#f9fb0e')
 

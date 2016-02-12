@@ -127,14 +127,14 @@ nView::setSize() {
 //	qDebug() << "nView::setSize" << bBox << font() << scaledFont << transform().m11();
 	parent()->my_mouse.setSize(my_size);
 	repaint();    
-	emit zoomChanged(transform().m11());
+//	emit zoomChanged(transform().m11());
 }
 
 void
 nView::resizeEvent(QResizeEvent *e) {
 	QGraphicsView::resizeEvent(e);
 	//qDebug() << "nView::resizeEvent" << e->size() << parent()->my_pixitem.pixmap().size() << transform().m11();
-	setSize();
+    setSize();
 }
 
 void nView::keyPressEvent (QKeyEvent *e)

@@ -22,34 +22,35 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef osxApp_H
-#define osxApp_H
+#ifndef __nCamera
+#define __nCamera
 
-#include <QApplication>
-#include <QtGui>
-#include "neutrino.h"
+#include <QCamera>
+#include <QCameraImageCapture>
 
-class osxApp : public QApplication {
-    Q_OBJECT
-public:
-	osxApp( int &argc, char **argv ) : QApplication(argc, argv) {}
-protected:
-	bool event(QEvent *ev) {
-//		DEBUG(5,"MAC APPLICATION EVENT " << ev->type());
-		if (ev->type() == QEvent::FileOpen) {
-			QWidget *widget = QApplication::activeWindow();
-			neutrino *neu=qobject_cast<neutrino *>(widget);
-			if (neu == NULL) {
-				nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-				if (pan) neu = pan->nparent;
-			}
-			if (neu == NULL) neu = new neutrino(); 
-			neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
-		} else {
-			return QApplication::event(ev);
-		}
-		return true;
-	}
+#include "nGenericPan.h"
+#include "ui_nCamera.h"
+
+class neutrino;
+
+class nCamera : public nGenericPan {
+	Q_OBJECT
+
+public:	
+    nCamera(neutrino *, QString);
+    ~nCamera();
+
+    Ui::nCamera my_w;
+    QCamera* camera;
+    QCameraImageCapture *imageCapture;
+
+    nPhysD *imgGray;
+
+public slots:
+    void doIt();
+    void changeCamera();
+    void setupCam (const QCameraInfo &cameraInfo);
+    void processCapturedImage(int requestId, const QImage &img);
 };
-#endif
 
+#endif

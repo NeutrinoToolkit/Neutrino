@@ -69,17 +69,19 @@ public:
 	physDouble_asc(const char *);
 };
 
-// external library formats
-class physInt_pgm : public nPhysImageF<int> {
-public:
-	physInt_pgm(const char *);
-};
 
 // external library formats
 #ifdef HAVE_LIBNETPBM
 extern "C" {
 #include <pgm.h>
 }
+
+// external library formats
+class physInt_pgm : public nPhysImageF<int> {
+public:
+	physInt_pgm(const char *);
+};
+
 class physGray_pgm : public nPhysImageF<gray> {
 public:
 	physGray_pgm(const char *);

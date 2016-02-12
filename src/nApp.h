@@ -46,6 +46,14 @@ protected:
 
 		return false;
 	}
+
+    bool event(QEvent *ev);
+
+public slots:
+    QList<neutrino*> neus();
+
+    QStringList neuNames();
+    neutrino* neu(QString neu_name=QString());
 };
 #endif
 

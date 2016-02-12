@@ -492,12 +492,6 @@ void nInterferometry::doMaskCutoff() {
                 phaseMask =new nPhysD(phase->getW(),phase->getH(),0.0);
 //                phaseMask =new nPhysD(phase->getW(),phase->getH(),numeric_limits<double>::quiet_NaN());
                 phaseMask->property=phase->property;
-                //                 _____ _                     
-                //                |  ___(_)_  ___ __ ___   ___ 
-                //                | |_  | \ \/ / '_ ` _ \ / _ \
-                //                |  _| | |>  <| | | | | |  __/
-                //                |_|   |_/_/\_\_| |_| |_|\___|
-                //                
                 QPolygon regionPoly=maskRegion->getLine().toPolygon();
                 QRect imageRect=QRect(0,0,phase->getW(),phase->getH());
                 QRect rectRegion=regionPoly.boundingRect().intersected(imageRect);
@@ -680,7 +674,7 @@ void nInterferometry::removeShape(QObject *obj){
 }
 
 void nInterferometry::doPlasma(){
-    if (my_w.useInterpolate->isChecked()) {
+    if (my_w.usePlasma->isChecked()) {
         nPhysD *image=localPhys["interpPhaseMask"];
         if (nPhysExists(image)) {
             nPhysD *intNe = new nPhysD(*image);

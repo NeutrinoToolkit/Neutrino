@@ -34,7 +34,16 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="1" column="0">
@@ -84,6 +93,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionOpen_RAW"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="actionCamera"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
@@ -200,9 +210,16 @@
     <addaction name="actionAbout"/>
     <addaction name="actionKeyborard_shortcuts"/>
    </widget>
+   <widget class="QMenu" name="menuPython">
+    <property name="title">
+     <string>Python</string>
+    </property>
+    <addaction name="actionPython"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
    <addaction name="menuAnalysis"/>
+   <addaction name="menuPython"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -241,6 +258,7 @@
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
    <addaction name="actionMouseInfo"/>
+   <addaction name="actionOperator"/>
    <addaction name="separator"/>
    <addaction name="actionLineoutH"/>
    <addaction name="actionLineoutV"/>
@@ -818,6 +836,32 @@
    </property>
    <property name="toolTip">
     <string>Lock colorbar</string>
+   </property>
+  </action>
+  <action name="actionPython">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
+   </property>
+   <property name="text">
+    <string>Shell</string>
+   </property>
+  </action>
+  <action name="actionOperator">
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
+   </property>
+   <property name="text">
+    <string>Operator</string>
+   </property>
+   <property name="toolTip">
+    <string>Math operations</string>
+   </property>
+  </action>
+  <action name="actionCamera">
+   <property name="text">
+    <string>Camera</string>
    </property>
   </action>
  </widget>

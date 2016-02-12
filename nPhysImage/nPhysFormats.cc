@@ -29,6 +29,7 @@
 #include <time.h>
 #include <zlib.h>
 
+
 #ifdef HAVE_LIBTIFF
 #define int32 tiff_int32
 #define uint32 tiff_uint32
@@ -235,10 +236,10 @@ physDouble_asc::physDouble_asc(const char *ifilename)
 }
 
 
+#ifdef HAVE_LIBNETPBM
 physInt_pgm::physInt_pgm(const char *ifilename)
 : nPhysImageF<int>(string(ifilename), PHYS_FILE)
 {
-#ifdef HAVE_LIBNETPBM
 	int grays;
 	int **readbuf;
 	int w, h;
@@ -263,10 +264,8 @@ physInt_pgm::physInt_pgm(const char *ifilename)
 	}
 	
 	TscanBrightness();
-#else
-	WARNING("nPhysImage was compile without netpbm library");
-#endif
 }
+#endif
 
 
 #ifdef HAVE_LIBNETPBM
@@ -1105,7 +1104,7 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		return status;
 	}
 	int ndim=2;
-	long ndimLong[2]={phys->getW(),phys->getH()};
+	long ndimLong[2]={(long)phys->getW(), (long)phys->getH()};
 	if (fits_set_tile_dim(fptr,ndim,ndimLong,&status)) {
 		fits_report_error(stderr, status);
 		return status;
