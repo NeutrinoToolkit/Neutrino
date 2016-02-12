@@ -2,6 +2,13 @@
 # CAVEAT: source inclusion must not be done here (but in FindNeutrinoGuiComponents.cmake or
 # in src/CMakeLists.txt)
 
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    message(STATUS "OpenMP CXX: ${OpenMP_CXX_FLAGS} C: ${OpenMP_C_FLAGS} ")
+endif()
+
 find_package(TIFF REQUIRED)
 if (TIFF_FOUND)
 	include_directories(${TIFF_INCLUDE_DIRS})

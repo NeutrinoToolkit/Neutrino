@@ -18,6 +18,11 @@ endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
 
+
+set (CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+
+
 include(FindNeutrinoDeps)
 
 include(FindGit)

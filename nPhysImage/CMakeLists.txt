@@ -10,16 +10,6 @@ endif()
 add_compile_options(-std=c++0x)
 add_compile_options(-fPIC)
 
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
-set (CMAKE_CXX_FLAGS "-O3")
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    message(STATUS "OpenMP CXX: ${OpenMP_CXX_FLAGS} C: ${OpenMP_C_FLAGS} ")
-endif()
-
 add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 

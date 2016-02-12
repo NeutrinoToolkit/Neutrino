@@ -7,8 +7,6 @@ cmake_minimum_required (VERSION 3.0)
 include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
-set (CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wextra -D__phys_debug=10")
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
@@ -46,17 +44,7 @@ if (UNIX AND (NOT APPLE))
     include_directories(BEFORE "/usr/include")
 endif()
 
-
-
 add_compile_options(-std=c++0x)
-
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    message(STATUS "OpenMP CXX: ${OpenMP_CXX_FLAGS} C: ${OpenMP_C_FLAGS} ")
-endif()
 
 if (WIN32)
 	if (CMAKE_COMPILER_IS_GNUCXX)
