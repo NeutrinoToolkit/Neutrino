@@ -7,21 +7,6 @@ if (QWT_FOUND)
 	set(LIBS ${LIBS} ${QWT_LIBRARIES})
 endif(QWT_FOUND)
 
-
-if (HDF5_FOUND_COMPLETE)
-	# add nHDF5 sources
-	set (SOURCES ${SOURCES} pans/nHDF5.cc)
-	set (UIS ${UIS} ../UIs/nHDF5.ui)
-endif()
-
-if (PYTHONQT_FOUND_COMPLETE)
-    MESSAGE(STATUS "adding python wrappers")
-	include_directories(python)
-	list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)	
-	list (APPEND UIS ../UIs/nPython.ui)	
-endif()
-
-
 ## find qt MUST be LAST to all modifications to SOURCES list
 ## (otherwise automoc and autoui won't take new sources in account)
 set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")

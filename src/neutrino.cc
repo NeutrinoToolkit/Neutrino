@@ -163,7 +163,7 @@ neutrino::neutrino():
 #ifdef USE_QT5
     connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
-	//my_w.actionCamera->hide();
+    my_w.actionCamera->setVisibility(false);
 #endif
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
