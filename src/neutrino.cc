@@ -49,7 +49,9 @@
 #include "nInterpolatePath.h"
 #include "nShortcuts.h"
 #include "nAffine.h"
+#ifdef USE_QT5
 #include "nCamera.h"
+#endif
 
 #include "nFocalSpot.h"
 #include "nLineout.h"
@@ -158,8 +160,11 @@ neutrino::neutrino():
     connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
     connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
+#ifdef USE_QT5
     connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
-
+#else
+	//my_w.actionCamera->hide();
+#endif
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
 	connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
@@ -2033,13 +2038,17 @@ neutrino::Blur() {
 	return ret;
 }
 
-/// Blur STUFF
+/// camera
 nGenericPan*
 neutrino::Camera() {
+#ifdef USE_QT5
     QString vwinname=tr("Camera");
     nGenericPan *ret=existsPan(vwinname);
     if (!ret) ret = new nCamera(this, vwinname);
     return ret;
+#else
+    return NULL;
+#endif
 }
 
 // FOLLOWER

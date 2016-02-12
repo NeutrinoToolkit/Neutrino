@@ -70,6 +70,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
+include(FindNeutrinoGuiComponents)
+
 ## sources
 set (SOURCES 
     nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc 
@@ -85,7 +87,7 @@ set (SOURCES
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
     nApp.cc main.cc 
 
-    pans/nCamera.cc
+    
 )
 
 ## UIs
@@ -99,7 +101,7 @@ set (UIS
     ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
     ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
     ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
-    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui ../UIs/nCamera.ui
+    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 
 )
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
@@ -119,7 +121,17 @@ endif()
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
-include(FindNeutrinoGuiComponents)
+if (USE_QT5)
+	# add here QT5 only sources
+	list (APPEND SOURCES pans/nCamera.cc)
+	list (APPEND UIS ../UIs/nCamera.ui)
+
+	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT5_WRAP_UI( UI_HEADERS ${UIS} )
+elseif (USE_QT4)
+	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+	QT4_WRAP_UI( UI_HEADERS ${UIS} )
+endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
