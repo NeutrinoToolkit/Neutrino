@@ -51,6 +51,8 @@ public slots:
     void changeCamera();
     void setupCam (const QCameraInfo &cameraInfo);
     void processCapturedImage(int requestId, const QImage &img);
+    void processCapturedImage(int requestId, const QString &img);
+    void giveNeutrino(const QImage &img);
 };
 
 #endif

@@ -71,17 +71,19 @@ void nCamera::setupCam (const QCameraInfo &cameraInfo) {
 
     camera = new QCamera(cameraInfo);
     imageCapture = new QCameraImageCapture(camera);
-    connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(processCapturedImage(int,QImage)));
+    imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    if (imageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer)) {
+        connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(processCapturedImage(int,QImage)));
+    } else {
+        connect(imageCapture, SIGNAL(imageSaved(int,QString)), this, SLOT(processCapturedImage(int,QString)));
+    }
+
     camera->setViewfinder(my_w.viewfinder);
     camera->start();
 }
 
-void nCamera::processCapturedImage(int requestId, const QImage& image)
-{
-    Q_UNUSED(requestId);
-    if (!image.isNull()) {
-        if (my_w.keep_copy->isChecked())
-            imgGray=NULL;
+void nCamera::giveNeutrino(const QImage& image) {
+    if(!image.isNull()) {
         nPhysD *datamatrix = new nPhysD("Camera gray");
         datamatrix->resize(image.width(), image.height());
         for (int i=0;i<image.height();i++) {
@@ -91,6 +93,24 @@ void nCamera::processCapturedImage(int requestId, const QImage& image)
             }
         }
         datamatrix->TscanBrightness();
+        if (my_w.keep_copy->isChecked())
+            imgGray=NULL;
         imgGray=nparent->replacePhys(datamatrix,imgGray);
     }
 }
+
+void nCamera::processCapturedImage(int requestId, const QImage& image)
+{
+    Q_UNUSED(requestId);
+    giveNeutrino(image);
+}
+
+void nCamera::processCapturedImage(int requestId, const QString& imageFile)
+{
+    Q_UNUSED(requestId);
+    const QImage image(imageFile);
+    giveNeutrino(image);
+    QFile::remove(imageFile);
+
+}
+

@@ -1,4 +1,9 @@
+message("ceppa")
+
 include (../neutrino.pri)
+
+include (../ceppa.pri)
+message("Master pro file path : ["$${PROJECT_ROOT_DIRECTORY}"]")
 
 TEMPLATE = lib
 
