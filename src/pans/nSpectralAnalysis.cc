@@ -29,20 +29,39 @@ nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent, QString winname)
 	: nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-	decorate();
+    my_w.direction->setIcon(my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
+    decorate();
+}
+
+void nSpectralAnalysis::on_direction_toggled(bool val) {
+    my_w.direction->setIcon(val? my_w.direction->style()->standardIcon(QStyle::SP_ArrowLeft) : my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
 }
 
 void nSpectralAnalysis::on_calculate_released() {
+    saveDefaults();
     int kind = my_w.spectral_transform->currentIndex();
     nPhysD *image=getPhysFromCombo(my_w.image);
-
+    phys_fft dir = my_w.direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
     if (image) {
         nPhysC ft;
 
-        switch (kind) {
-        case 0: ft = image->ft1(PHYS_X); break;     // 1D horizontal
-        case 1: ft = image->ft1(PHYS_Y); break;     // 1D vertical
-        case 2: ft = image->ft2(); break;           // 2D
+        if (!my_w.useImaginary->isChecked()) {
+            switch (kind) {
+            case 0: ft = image->ft1(PHYS_X,dir); break;     // 1D horizontal
+            case 1: ft = image->ft1(PHYS_Y,dir); break;     // 1D vertical
+            case 2: ft = image->ft2(dir); break;           // 2D
+            }
+        } else {
+            nPhysD *imaginary=getPhysFromCombo(my_w.imaginary);
+            if (imaginary) {
+                nPhysC temp_complex = from_real_imaginary(*image, *imaginary);
+                switch (kind) {
+                case 0: ft = temp_complex.ft1(PHYS_X,dir); break;     // 1D horizontal
+                case 1: ft = temp_complex.ft1(PHYS_Y,dir); break;     // 1D vertical
+                case 2: ft = temp_complex.ft2(dir); break;           // 2D
+                }
+
+            }
         }
 
         // ftshift
@@ -67,6 +86,7 @@ void nSpectralAnalysis::on_calculate_released() {
             nPhysD *perm = new nPhysD;
             *perm = itr->second;
             perm->TscanBrightness();
+            perm->setShortName(itr->first);
             perm->setName(itr->first);
             nparent->showPhys( perm );
         }

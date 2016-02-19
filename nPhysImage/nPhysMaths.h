@@ -286,4 +286,6 @@ nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
 	return oimg;
 }
 
+nPhysC from_real_imaginary (nPhysD&, nPhysD&);
+
 #endif

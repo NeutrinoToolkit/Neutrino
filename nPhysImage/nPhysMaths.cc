@@ -736,6 +736,19 @@ map<string, nPhysD > to_powersp(nPhysC &iphys, bool doLog) {
 	return omap;
 }
 
+// 2 real matrix to complex fftw
+nPhysC from_real_imaginary (nPhysD& real, nPhysD&imag) {
+    nPhysC ret;
+    if (real.getSize() == imag.getSize()) {
+          ret.resize(real.getW(),real.getH());
+#pragma omp parallel for
+          for (size_t ii=0; ii<real.getSurf(); ii++) {
+              ret.set(ii, mcomplex(real.point(ii),imag.point(ii)));
+          }
+    }
+
+    return ret;
+}
 /*!
  * @}
  */

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>311</width>
-    <height>271</height>
+    <height>307</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,39 +36,6 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox_4">
-      <property name="title">
-       <string>Input image</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <property name="leftMargin">
-        <number>4</number>
-       </property>
-       <property name="topMargin">
-        <number>4</number>
-       </property>
-       <property name="rightMargin">
-        <number>4</number>
-       </property>
-       <property name="bottomMargin">
-        <number>4</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="image">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBox_3">
       <property name="title">
@@ -87,6 +54,24 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="doshift_cb">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Shift</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QComboBox" name="output_format">
          <property name="font">
@@ -119,7 +104,7 @@
          </item>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0">
         <widget class="QComboBox" name="spectral_transform">
          <property name="font">
           <font>
@@ -146,17 +131,12 @@
          </item>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="doshift_cb">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="direction">
          <property name="text">
-          <string>Shift</string>
+          <string>...</string>
          </property>
-         <property name="checked">
+         <property name="checkable">
           <bool>true</bool>
          </property>
          <property name="neutrinoSave" stdset="0">
@@ -330,6 +310,81 @@
       </layout>
      </widget>
     </item>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="title">
+       <string>Input image real and imaginary</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="useImaginary">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Imaginary</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="imaginary">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Real image</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -396,6 +451,22 @@
     <hint type="destinationlabel">
      <x>108</x>
      <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useImaginary</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>imaginary</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>61</y>
     </hint>
    </hints>
   </connection>

@@ -42,6 +42,7 @@ public:
 
 public slots:
     void on_calculate_released();
+    void on_direction_toggled(bool);
 };
 
 #endif
