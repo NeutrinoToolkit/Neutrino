@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
-    <height>307</height>
+    <width>322</width>
+    <height>316</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,117 +36,6 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="title">
-       <string>Output</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,0">
-       <property name="leftMargin">
-        <number>4</number>
-       </property>
-       <property name="topMargin">
-        <number>4</number>
-       </property>
-       <property name="rightMargin">
-        <number>4</number>
-       </property>
-       <property name="bottomMargin">
-        <number>4</number>
-       </property>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="doshift_cb">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Shift</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="output_format">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>Polar</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Rectagular</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Power spectrum</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Log10 power spectrum</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="spectral_transform">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>1D horizontal Fourier</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1D vertical Fourier</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>2D Fourier</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QToolButton" name="direction">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="3" column="0">
      <widget class="QPushButton" name="calculate">
       <property name="font">
@@ -328,6 +217,30 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Real image</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="QCheckBox" name="useImaginary">
          <property name="font">
@@ -340,6 +253,9 @@
          </property>
          <property name="text">
           <string>Imaginary</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -358,28 +274,157 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="image">
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="title">
+       <string>Output</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="spectral_transform">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="neutrinoImage" stdset="0">
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>1D horizontal Fourier</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1D vertical Fourier</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2D Fourier</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="direction">
+         <property name="toolTip">
+          <string>Forward (&gt;) / Backward(&lt;)</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Real image</string>
-         </property>
+       <item row="1" column="0" colspan="2">
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QComboBox" name="output_format">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+            <item>
+             <property name="text">
+              <string>Polar</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Rectagular</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Power spectrum</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Log10 power spectrum</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="doshift_cb">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Swap FFT quadrants (after for forward and before for backward)</string>
+            </property>
+            <property name="text">
+             <string>Shift</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="normalize">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Divide results by the square root of the image surface</string>
+            </property>
+            <property name="text">
+             <string>Normalize</string>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

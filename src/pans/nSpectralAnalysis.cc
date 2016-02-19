@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -26,9 +26,9 @@
 #include "neutrino.h"
 
 nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent, QString winname)
-	: nGenericPan(nparent, winname)
+    : nGenericPan(nparent, winname)
 {
-	my_w.setupUi(this);
+    my_w.setupUi(this);
     my_w.direction->setIcon(my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
     decorate();
 }
@@ -44,28 +44,33 @@ void nSpectralAnalysis::on_calculate_released() {
     phys_fft dir = my_w.direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
     if (image) {
         nPhysC ft;
-
-        if (!my_w.useImaginary->isChecked()) {
-            switch (kind) {
-            case 0: ft = image->ft1(PHYS_X,dir); break;     // 1D horizontal
-            case 1: ft = image->ft1(PHYS_Y,dir); break;     // 1D vertical
-            case 2: ft = image->ft2(dir); break;           // 2D
-            }
-        } else {
+        nPhysC temp_complex;
+        if (my_w.useImaginary->isChecked()) {
             nPhysD *imaginary=getPhysFromCombo(my_w.imaginary);
             if (imaginary) {
-                nPhysC temp_complex = from_real_imaginary(*image, *imaginary);
-                switch (kind) {
-                case 0: ft = temp_complex.ft1(PHYS_X,dir); break;     // 1D horizontal
-                case 1: ft = temp_complex.ft1(PHYS_Y,dir); break;     // 1D vertical
-                case 2: ft = temp_complex.ft2(dir); break;           // 2D
-                }
+                temp_complex= from_real_imaginary(*image, *imaginary);
+            }
+        } else {
+            temp_complex= from_real(*image);
+        }
 
+        // ftshift before if backward
+        if (my_w.doshift_cb->isChecked() && dir==PHYS_BACKWARD) {
+            switch (kind) {
+            case 0: temp_complex = ftshift1(temp_complex, PHYS_X); break;   // 1D horizontal
+            case 1: temp_complex = ftshift1(temp_complex, PHYS_Y); break;   // 1D vertical
+            case 2: temp_complex = ftshift2(temp_complex); break;           // 2D
             }
         }
 
-        // ftshift
-        if (my_w.doshift_cb->isChecked()) {
+        switch (kind) {
+        case 0: ft = temp_complex.ft1(PHYS_X,dir); break;     // 1D horizontal
+        case 1: ft = temp_complex.ft1(PHYS_Y,dir); break;     // 1D vertical
+        case 2: ft = temp_complex.ft2(dir); break;           // 2D
+        }
+
+        // ftshift after if forward
+        if (my_w.doshift_cb->isChecked()&& dir==PHYS_FORWARD) {
             switch (kind) {
             case 0: ft = ftshift1(ft, PHYS_X); break;   // 1D horizontal
             case 1: ft = ftshift1(ft, PHYS_Y); break;   // 1D vertical
@@ -73,6 +78,9 @@ void nSpectralAnalysis::on_calculate_released() {
             }
         }
 
+        if (my_w.normalize->isChecked()) {
+            phys_divide(ft, sqrt(image->getSurf()));
+        }
 
         std::map<string, nPhysD> omap;
         switch (my_w.output_format->currentIndex()) {

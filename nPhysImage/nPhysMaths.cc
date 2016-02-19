@@ -749,6 +749,18 @@ nPhysC from_real_imaginary (nPhysD& real, nPhysD&imag) {
 
     return ret;
 }
+
+nPhysC from_real (nPhysD&real, double val){
+    nPhysC ret;
+    ret.resize(real.getW(),real.getH());
+#pragma omp parallel for
+    for (size_t ii=0; ii<real.getSurf(); ii++) {
+        ret.set(ii, mcomplex(real.point(ii),val));
+    }
+    return ret;
+}
+
+
 /*!
  * @}
  */
