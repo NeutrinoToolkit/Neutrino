@@ -89,14 +89,14 @@ void nWavelet::checkChangeCombo(QComboBox *combo) {
 }
 
 void nWavelet::bufferChanged(nPhysD* buf) {
-	if (buf) {
+    nGenericPan::bufferChanged(buf);
+    if (buf) {
 		if (buf==getPhysFromCombo(my_w.image)) {
 			region->show();
 		} else {
 			region->hide();
 		}
 	}
-    nGenericPan::bufferChanged(buf);
 }
 
 void nWavelet::physDel(nPhysD* buf) {

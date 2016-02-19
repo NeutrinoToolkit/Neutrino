@@ -44,15 +44,18 @@ public:
     QCamera* camera;
     QCameraImageCapture *imageCapture;
 
+    QMenu *cameraMenu;
     nPhysD *imgGray;
 
 public slots:
-    void doIt();
-    void changeCamera();
+    void on_grab_clicked();
     void setupCam (const QCameraInfo &cameraInfo);
     void processCapturedImage(int requestId, const QImage &img);
     void processCapturedImage(int requestId, const QString &img);
     void giveNeutrino(const QImage &img);
+    void contextMenuEvent (QContextMenuEvent *);
+    void changeCameraAction();
+
 };
 
 #endif

@@ -68,8 +68,8 @@ nAffine::nAffine(neutrino *nparent, QString winname)
 }
 
 void nAffine::bufferChanged(nPhysD* buf) {
+    nGenericPan::bufferChanged(buf);
 	if (buf) {
-		DEBUG(buf->getName());
 		if (buf==getPhysFromCombo(my_w.image1)) {
 			l1->show();
 		} else {

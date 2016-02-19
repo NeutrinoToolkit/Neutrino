@@ -29,86 +29,47 @@ nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent, QString winname)
 	: nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-
 	decorate();
-
-	connect(my_w.ft2d_button, SIGNAL(clicked()), this, SLOT(calculate_ft2()));
-	connect(my_w.ft1dv_button, SIGNAL(clicked()), this, SLOT(calculate_ft1()));
-	connect(my_w.ft1dh_button, SIGNAL(clicked()), this, SLOT(calculate_ft1()));
 }
 
-void
-nSpectralAnalysis::calculate_ft2()
-{
-	nPhysD *cur = nparent->getBuffer(-1);
-	if (!cur) 
-		return;
-		
-	nPhysC ft = cur->ft2();
+void nSpectralAnalysis::on_calculate_released() {
+    int kind = my_w.spectral_transform->currentIndex();
+    nPhysD *image=getPhysFromCombo(my_w.image);
 
-	if (my_w.doshift_cb->isChecked()) {
-		ft = ftshift2(ft);	// check for leaks here!!
-	}
+    if (image) {
+        nPhysC ft;
 
-	std::map<string, nPhysD> omap;
-	std::map<string, nPhysD>::iterator itr;
+        switch (kind) {
+        case 0: ft = image->ft1(PHYS_X); break;     // 1D horizontal
+        case 1: ft = image->ft1(PHYS_Y); break;     // 1D vertical
+        case 2: ft = image->ft2(); break;           // 2D
+        }
 
-	if (my_w.ftoutput_polar->isChecked()) {
-		omap = to_polar(ft);
-	} else if (my_w.ftoutput_rectangular->isChecked()) {
-		omap = to_rect(ft);
-	} else if (my_w.ftoutput_power->isChecked()) {
-		omap = to_powersp(ft);
-	} else return;
-
-	for (itr = omap.begin(); itr != omap.end(); itr++) {
-		nPhysD *perm = new nPhysD;
-		*perm = itr->second;
-		perm->setName(itr->first);
-
-		nparent->showPhys( perm );
-	}
+        // ftshift
+        if (my_w.doshift_cb->isChecked()) {
+            switch (kind) {
+            case 0: ft = ftshift1(ft, PHYS_X); break;   // 1D horizontal
+            case 1: ft = ftshift1(ft, PHYS_Y); break;   // 1D vertical
+            case 2: ft = ftshift2(ft); break;           // 2D
+            }
+        }
 
 
-	
+        std::map<string, nPhysD> omap;
+        switch (my_w.output_format->currentIndex()) {
+        case 0: omap = to_polar(ft); break; // polar
+        case 1: omap = to_rect(ft); break; // rectangular
+        case 2: omap = to_powersp(ft, false); break; // power spectrum linear
+        case 3: omap = to_powersp(ft, true); break;// power spectrum log10
+        }
+
+        for (std::map<string, nPhysD>::iterator itr = omap.begin(); itr != omap.end(); itr++) {
+            nPhysD *perm = new nPhysD;
+            *perm = itr->second;
+            perm->TscanBrightness();
+            perm->setName(itr->first);
+            nparent->showPhys( perm );
+        }
+    }
 }
 
-void
-nSpectralAnalysis::calculate_ft1()
-{
-	nPhysD *cur = nparent->getBuffer(-1);
-	if (!cur) 
-		return;
-
-	enum phys_direction fdir = PHYS_X;
-	if (sender() == my_w.ft1dv_button) {
-		fdir = PHYS_Y;
-	}
-		
-	nPhysC ft = cur->ft1(fdir);
-
-	if (my_w.doshift_cb->isChecked()) {
-		ft = ftshift1(ft, fdir);	// check for leaks here!!
-	}
-
-	std::map<string, nPhysD> omap;
-	std::map<string, nPhysD>::iterator itr;
-
-	if (my_w.ftoutput_polar->isChecked()) {
-		omap = to_polar(ft);
-	} else if (my_w.ftoutput_rectangular->isChecked()) {
-		omap = to_rect(ft);
-	} else if (my_w.ftoutput_power->isChecked()) {
-		omap = to_powersp(ft);
-	} else return;
-
-	for (itr = omap.begin(); itr != omap.end(); itr++) {
-		nPhysD *perm = new nPhysD;
-		*perm = itr->second;
-		perm->setName(itr->first);
-
-		nparent->showPhys( perm );
-	}
-
-
-}

@@ -44,7 +44,7 @@
 
 
 
-inline void planeFit(nPhysImageF<double> *pi, double *coeffs);
+inline void planeFit(nPhysD *pi, double *coeffs);
 
 // ------------------ general purpose functions for wavelet analysis ------------------------
 inline mcomplex 
@@ -68,7 +68,7 @@ struct meshgrid_data_str {
 };
 
 inline void
-phys_generate_meshgrid(meshgrid_data *mesh, nPhysImageF<double> &xx, nPhysImageF<double> &yy)
+phys_generate_meshgrid(meshgrid_data *mesh, nPhysD &xx, nPhysD &yy)
 {
 	if (mesh==NULL)
 		return;
@@ -96,10 +96,10 @@ typedef struct morlet_data_str morlet_data;
 struct morlet_data_str { double lambda, angle, thickness, damp; };
 
 inline void 
-phys_generate_morlet(morlet_data *md, nPhysImageF<double> &xx, nPhysImageF<double> &yy, nPhysImageF<mcomplex> &zz);
+phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz);
 
 inline void 
-phys_generate_Fmorlet(morlet_data *md, nPhysImageF<double> &xx, nPhysImageF<double> &yy, nPhysImageF<mcomplex> &zz)
+phys_generate_Fmorlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz)
 {
 	if ((xx.getW() != yy.getW()) || (xx.getH() != yy.getH())) {
 		WARNING("size mismatch: op1 is: "<<xx.getW()<<"x"<<xx.getH()<<", op2 is: "<<yy.getW()<<"x"<<yy.getH());
@@ -149,71 +149,71 @@ inline void phys_reverse_vector(double *buf, int size);
 // some nice filters
 
 void
-phys_sin(nPhysImageF<double> &);
+phys_sin(nPhysD &);
 
 void
-phys_cos(nPhysImageF<double> &);
+phys_cos(nPhysD &);
 
 void
-phys_tan(nPhysImageF<double> &);
+phys_tan(nPhysD &);
 
 void
-phys_pow(nPhysImageF<double> &, double);
+phys_pow(nPhysD &, double);
 
 void
-phys_square(nPhysImageF<double> &);
+phys_square(nPhysD &);
 
 void
-phys_sqrt(nPhysImageF<double> &);
+phys_sqrt(nPhysD &);
 
 void
-phys_abs(nPhysImageF<double> &);
+phys_abs(nPhysD &);
 
 void
-phys_log(nPhysImageF<double> &);
+phys_log(nPhysD &);
 
 void
-phys_log10(nPhysImageF<double> &);
+phys_log10(nPhysD &);
 
 void
-phys_median_filter(nPhysD&, int);
+phys_median_filter(nPhysD&, unsigned int);
 
 void
-phys_gaussian_blur(nPhysImageF<double> &, double);
+phys_gaussian_blur(nPhysD &, double);
 
 void
-phys_fast_gaussian_blur(nPhysImageF<double> &, double);
+phys_fast_gaussian_blur(nPhysD &, double);
 
 void
-phys_fast_gaussian_blur(nPhysImageF<double> &, double, double);
+phys_fast_gaussian_blur(nPhysD &, double, double);
 
 template<> void
-nPhysImageF<mcomplex>::TscanBrightness();
+nPhysC::TscanBrightness();
 
 // constant operations
-void phys_add(nPhysImageF<double> &, double);
-void phys_subtract(nPhysImageF<double> &, double);
-void phys_multiply(nPhysImageF<double> &, double);
-void phys_divide(nPhysImageF<double> &, double);
-void phys_divide(nPhysImageF<mcomplex> &, double);
+void phys_add(nPhysD &, double);
+void phys_subtract(nPhysD &, double);
+void phys_multiply(nPhysD &, double);
+void phys_divide(nPhysD &, double);
+void phys_divide(nPhysC &, double);
 
-void phys_point_add(nPhysImageF<double> &, nPhysImageF<double> &);
-void phys_point_subtract(nPhysImageF<double> &, nPhysImageF<double> &);
-void phys_point_multiply(nPhysImageF<double> &, nPhysImageF<double> &);
-void phys_point_divide(nPhysImageF<double> &, nPhysImageF<double> &);
+void phys_point_add(nPhysD &, nPhysD &);
+void phys_point_subtract(nPhysD &, nPhysD &);
+void phys_point_multiply(nPhysD &, nPhysD &);
+void phys_point_divide(nPhysD &, nPhysD &);
 
-void phys_add_noise(nPhysImageF<double> &, double);
+void phys_add_noise(nPhysD &, double);
 
-double phys_sum_points(nPhysImageF<double> &);
-double phys_sum_square_points(nPhysImageF<double> &);
-void phys_opposite(nPhysImageF<double> &);
-void phys_inverse(nPhysImageF<double> &);
+double phys_sum_points(nPhysD &);
+double phys_sum_square_points(nPhysD &);
+void phys_opposite(nPhysD &);
+void phys_inverse(nPhysD &);
 
-void phys_replace(nPhysImageF<double> &, double, double);
-void phys_replace_NaN(nPhysImageF<double> &, double);
-void phys_cutoff(nPhysImageF<double> &, double, double);
+void phys_replace(nPhysD &, double, double);
+void phys_replace_NaN(nPhysD &, double);
+void phys_cutoff(nPhysD &, double, double);
 
-std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysImageF<double>*, nPhysImageF<double>*);
+std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysD*, nPhysD*);
 
 
 // crap functions
@@ -221,12 +221,12 @@ void phys_get_vec_brightness(const double *, size_t, double &, double &);
 
 
 bidimvec<size_t>
-phys_max_p(nPhysImageF<double> &);
+phys_max_p(nPhysD &);
 
 // complex functions
-std::map<std::string, nPhysImageF<double> > to_polar(nPhysImageF<mcomplex> &iphys);
-std::map<std::string, nPhysImageF<double> > to_rect(const nPhysImageF<mcomplex> &iphys);
-std::map<std::string, nPhysImageF<double> > to_powersp(nPhysImageF<mcomplex> &iphys);
+std::map<std::string, nPhysD > to_polar(nPhysC &iphys);
+std::map<std::string, nPhysD > to_rect(const nPhysC &iphys);
+std::map<std::string, nPhysD > to_powersp(nPhysC &iphys, bool);
 
 // shift functions
 template <class T>

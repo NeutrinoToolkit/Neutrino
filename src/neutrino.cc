@@ -1122,7 +1122,7 @@ neutrino::createQimage() {
 	if (currentBuffer) {
 		const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
 		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
-							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
+                               currentBuffer->getW()*4, QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
 	}
 	my_w.my_view->setSize();
@@ -2383,7 +2383,7 @@ anydata toAnydata(QVariant &my_variant) {
                 my_data=my_vec2f;
             } else {
                 string valStr=my_variant.toString().toStdString();
-                DEBUG("it's point "<<valStr);
+                DEBUG("it's string "<<valStr);
                 if (!valStr.empty()) {
                     my_data=valStr;
                 }

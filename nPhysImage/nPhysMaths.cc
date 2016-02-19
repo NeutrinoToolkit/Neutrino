@@ -114,7 +114,7 @@ phys_generate_meshgrid(int x1, int x2, int y1, int y2, nPhysImageF<int> &xx, nPh
 // via function pointers (via meshgrids)
 
 inline void 
-phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysImageF<mcomplex> &zz)
+phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz)
 {
 
 	if ((xx.getW() != yy.getW()) || (xx.getH() != yy.getH())) {
@@ -168,7 +168,7 @@ inline void phys_reverse_vector(double *buf, int size)
 
 
 template<> void
-nPhysImageF<mcomplex>::TscanBrightness() {
+nPhysC::TscanBrightness() {
 	return;
 }
 
@@ -226,7 +226,7 @@ phys_divide(nPhysD &iimage, double val) {
 }
 
 void
-phys_divide(nPhysImageF<mcomplex> &iimage, double val) {
+phys_divide(nPhysC &iimage, double val) {
     if (val!=1.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -379,7 +379,7 @@ phys_gaussian_blur(nPhysD &m1, double radius)
 		return;
 
 	nPhysD xx, yy, gauss;
-	nPhysImageF<mcomplex> out;
+    nPhysC out;
 
 //FIXME: this is probably wrong for odd matrices
     meshgrid_data md = {-m1.getW()/2., m1.getW()/2., -m1.getH()/2., m1.getH()/2., (int) (m1.getW()), (int) m1.getH()};
@@ -517,7 +517,7 @@ phys_fast_gaussian_blur(nPhysD &m1, double radius)
 	phys_fast_gaussian_blur(m1,radius,radius);
 }
 
-void phys_median_filter(nPhysD& image, int N){
+void phys_median_filter(nPhysD& image, unsigned int N){
     nPhysD pippo=image;
     int median_pos=(N*N)/2;
 #pragma omp parallel for collapse(2)
@@ -563,7 +563,6 @@ phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
     double sx=pow(image.getW()/(radiusX),2)/2.0;
     double sy=pow(image.getH()/(radiusY),2)/2.0;
 
-    register size_t j;
 #pragma omp parallel for collapse(2)
     for (size_t j = 0 ; j < image.getH(); j++) {
         for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
@@ -679,7 +678,7 @@ bidimvec<size_t> phys_max_p(nPhysD &image) {
 // complex functions
 
 //! split mcomplex matrix on polar representation
-map<string, nPhysD > to_polar(nPhysImageF<mcomplex> &iphys) {
+map<string, nPhysD > to_polar(nPhysC &iphys) {
 	nPhysD rho, theta;
 	map<string, nPhysD > omap;
 
@@ -698,7 +697,7 @@ map<string, nPhysD > to_polar(nPhysImageF<mcomplex> &iphys) {
 }
 
 //! split mcomplex matrix on rectangular representation
-map<string, nPhysD > to_rect(const nPhysImageF<mcomplex> &iphys) {
+map<string, nPhysD > to_rect(const nPhysC &iphys) {
 	nPhysD re, im;
 	map<string, nPhysD > omap;
 
@@ -717,16 +716,22 @@ map<string, nPhysD > to_rect(const nPhysImageF<mcomplex> &iphys) {
 }
 
 //! split mcomplex matrix on power spectrum, representation
-map<string, nPhysD > to_powersp(nPhysImageF<mcomplex> &iphys) {
+map<string, nPhysD > to_powersp(nPhysC &iphys, bool doLog) {
 	nPhysD psp;
 	map<string, nPhysD > omap;
 
 	psp.resize(iphys.getW(), iphys.getH());
 
-	for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
-		psp.set(ii, log10(iphys.point(ii).mcabs()) );
-	}
-
+    if (doLog) {
+        for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+            psp.set(ii, log10(iphys.point(ii).mcabs()) );
+        }
+    } else {
+        for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+            psp.set(ii, iphys.point(ii).mcabs() );
+        }
+    }
+    psp.TscanBrightness();
 	omap[string("power spectrum")] = psp;
 	return omap;
 }

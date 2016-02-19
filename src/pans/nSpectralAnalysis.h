@@ -41,9 +41,7 @@ public:
 	Ui::nSpectralAnalysis my_w;
 
 public slots:
-	void calculate_ft2(void);
-	void calculate_ft1(void);
-	
+    void on_calculate_released();
 };
 
 #endif

@@ -36,14 +36,20 @@ nCamera::nCamera(neutrino *nparent, QString winname)
 	my_w.setupUi(this);
 	decorate();
 
+    cameraMenu=new QMenu(this);
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
-        my_w.cameras->addItem(cameraInfo.description(), cameraInfo.deviceName());
+        QAction *my_act = new QAction(cameraInfo.description(),cameraMenu);
+        my_act->setData(cameraInfo.deviceName());
+        connect(my_act, SIGNAL(triggered()), this, SLOT(changeCameraAction()));
+        cameraMenu->addAction(my_act);
     }
-
-    connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doIt()));
-    connect(my_w.cameras,SIGNAL(activated(int)),this, SLOT(changeCamera()));
-    changeCamera();
+    if (cameraMenu->actions().size()) {
+        cameraMenu->actions().first()->trigger();
+    } else {
+        QLabel *not_found = new QLabel("Camera not present", my_w.centralwidget);
+        my_w.centralwidget->layout()->addWidget(not_found);
+    }
 }
 
 nCamera::~nCamera()
@@ -52,17 +58,21 @@ nCamera::~nCamera()
     delete camera;
 }
 
-void nCamera::doIt() {
+void nCamera::on_grab_clicked() {
     if (imageCapture)
         imageCapture->capture();
 }
 
-void nCamera::changeCamera() {
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, cameras) {
-        if (cameraInfo.deviceName() == my_w.cameras->currentData())
-            setupCam(cameraInfo);
+void nCamera::changeCameraAction() {
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action) {
+        QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+        foreach (const QCameraInfo &cameraInfo, cameras) {
+            if (cameraInfo.deviceName() == action->data().toString())
+                setupCam(cameraInfo);
+        }
     }
+
 }
 
 void nCamera::setupCam (const QCameraInfo &cameraInfo) {
@@ -93,7 +103,7 @@ void nCamera::giveNeutrino(const QImage& image) {
             }
         }
         datamatrix->TscanBrightness();
-        if (my_w.keep_copy->isChecked())
+        if (!my_w.keep_copy->isChecked())
             imgGray=NULL;
         imgGray=nparent->replacePhys(datamatrix,imgGray);
     }
@@ -113,4 +123,9 @@ void nCamera::processCapturedImage(int requestId, const QString& imageFile)
     QFile::remove(imageFile);
 
 }
+
+void nCamera::contextMenuEvent (QContextMenuEvent *ev) {
+    cameraMenu->exec(ev->globalPos());
+}
+
 

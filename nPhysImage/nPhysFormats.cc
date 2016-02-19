@@ -61,9 +61,10 @@ using namespace std;
 physDouble_txt::physDouble_txt(const char *ifilename)
 : nPhysImageF<double>(string(ifilename), PHYS_FILE)
 {
-	clock_t time1, time2, time3;
-	time1=clock();
-	
+#ifdef  __phys_debug
+    clock_t time1, time2, time3;
+    time1=clock();
+#endif
 	ifstream ifile(ifilename);
 	// 1. get image statistics
 	string tline;
@@ -95,7 +96,9 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	ifile.clear();
 	ifile.seekg(0, ios::beg);
 	
-	time2=clock();
+#ifdef  __phys_debug
+    time2=clock();
+#endif
 	int row = 0, col = 0;
 	int w = getW();
 	while (getline(ifile, tline) && row<nlines) {
@@ -109,8 +112,11 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	}
 	
 	TscanBrightness();
-	time3=clock();
-	DEBUG(5,"times: " << time2-time1 << " " << time3-time1);
+
+#ifdef  __phys_debug
+    time3=clock();
+    DEBUG(5,"times: " << time2-time1 << " " << time3-time1);
+#endif
 }
 
 /* This below is the older version, kept just in case */
