@@ -39,6 +39,8 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 	message (STATUS "using gslcblas: ${GSL}")
 	set(LIBS ${LIBS} ${GSLCBLAS}) 
 	add_definitions(-DHAVE_LIBGSLCBLAS)
+else()
+	message(FATAL_ERROR "Missing libgsl. Stop.")
 endif()
 # hdf4
 find_library (HDF4 NAMES mfhdf)

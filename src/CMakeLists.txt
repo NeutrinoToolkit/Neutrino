@@ -70,7 +70,7 @@ set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 include(FindNeutrinoGuiComponents)
 
 ## sources
-set (SOURCES 
+list (APPEND SOURCES 
     nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc 
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
@@ -86,7 +86,7 @@ set (SOURCES
 )
 
 ## UIs
-set (UIS 
+list (APPEND UIS 
     ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui 
     ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui 
     ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui 

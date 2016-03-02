@@ -10,8 +10,8 @@ endif(QWT_FOUND)
 
 if (HDF5_FOUND_COMPLETE)
 	# add nHDF5 sources
-	set (SOURCES ${SOURCES} pans/nHDF5.cc)
-	set (UIS ${UIS} ../UIs/nHDF5.ui)
+	list (APPEND SOURCES pans/nHDF5.cc)
+	list (APPEND UIS ${UIS} ../UIs/nHDF5.ui)
 endif()
 
 if (PYTHONQT_FOUND_COMPLETE)
