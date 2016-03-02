@@ -7,6 +7,7 @@ cmake_minimum_required (VERSION 3.0)
 include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
+set (CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
@@ -16,6 +17,22 @@ if (APPLE)
     add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
     
+    set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
+
+	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
+	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_NAME} ${PROJECT_VERSION}")
+	set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+
+	set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
+	set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
+
     set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
     set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
@@ -26,7 +43,16 @@ if (UNIX AND (NOT APPLE))
     include_directories(BEFORE "/usr/include")
 endif()
 
+
+
 add_compile_options(-std=c++0x)
+
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
 if (WIN32)
 	if (CMAKE_COMPILER_IS_GNUCXX)
@@ -41,7 +67,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
-include(FindNeutrinoGuiComponents)
 
 ## sources
 set (SOURCES 
@@ -73,10 +98,14 @@ set (UIS
     ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 
 )
 
+include(FindNeutrinoGuiComponents)
+
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
 if (GENERATE_NHASH)
-        set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
+	set (SOURCES ${SOURCES}
+		neutrino-key/nHash.cc
+		)
 
 	include_directories(neutrino-key)
 	
@@ -85,21 +114,6 @@ if (GENERATE_NHASH)
 	endif()
 
 endif()
-
-# HDF5 sources and uis
-if (HDF5_FOUND_COMPLETE)
-        # add nHDF5 sources
-        list (APPEND SOURCES pans/nHDF5.cc)
-        list (APPEND UIS ../UIs/nHDF5.ui)
-endif()
-
-if (PYTHONQT_FOUND_COMPLETE)
-    MESSAGE(STATUS "adding python wrappers")
-        include_directories(python)
-        list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)
-        list (APPEND UIS ../UIs/nPython.ui)
-endif()
-
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
@@ -130,26 +144,28 @@ set(LIBS ${LIBS} "nPhysImageF")
 add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
+#     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
 elseif(WIN32)
-    set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${RC_WIN})
+	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
+	add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${RC_WIN})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    add_executable(Neutrino ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
 endif()
 
 if (APPLE) 
-    target_link_libraries(${PROJECT_NAME} "-framework IOKit -framework CoreFoundation")
+    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
+
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
-target_link_libraries(${PROJECT_NAME} ${LIBS})
+target_link_libraries(Neutrino ${LIBS})
 if (USE_QT5)
-        qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
+        qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
-        target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+	target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
 endif()
 
 
@@ -158,7 +174,12 @@ if (APPLE)
     set (EXECUTABLE_OUTPUT_PATH "..")
 else()
     set (EXECUTABLE_OUTPUT_PATH "../bin")
-    install (TARGETS ${PROJECT_NAME} COMPONENT binary DESTINATION bin)
+    install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
+endif()
+
+
+if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
+	set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
@@ -173,7 +194,7 @@ message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 set(PROJECT_VENDOR "neutrino inc.")
 set(PROJECT_COPYRIGHT_YEAR "2011")
-set(PROJECT_DOMAIN_FIRST ${PROJECT_NAME})
+set(PROJECT_DOMAIN_FIRST "neutrino")
 set(PROJECT_DOMAIN_SECOND "com")
 set(PROJECT_DOMAIN "${PROJECT_DOMAIN_FIRST}.${PROJECT_DOMAIN_SECOND}")
 
@@ -198,6 +219,10 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
+
+if(APPLE)
+	set(CMAKE_INSTALL_PREFIX "/Applications")
+endif()
 
 message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
 #install(TARGETS ${PROJECT_NAME} DESTINATION ${BIN_INSTALL_DIR})
@@ -231,6 +256,16 @@ if(WIN32)
 #    set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
 #    set(CPACK_NSIS_MENU_LINKS "${LICENSE_FILE}" "License" "${README_FILE}" "Readme")
 #    set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${CPACK_NSIS_INSTALLED_ICON_NAME}")
+elseif(APPLE)
+     set(CMAKE_INSTALL_PREFIX "/Applications")
+     set(CPACK_GENERATOR "Bundle")
+     set(CPACK_DMG_FORMAT "UDBZ")
+     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
+     set(CPACK_SYSTEM_NAME "OSX")
+     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
+     set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
+     set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
+     set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
 elseif(UNIX)
     set(CPACK_GENERATOR "TBZ2")
     set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
@@ -253,6 +288,5 @@ if(APPLE)
     include(DeployQt4)
     install_qt4_executable("${EXECUTABLE}")
 endif()
-
 
 #include (CPack)

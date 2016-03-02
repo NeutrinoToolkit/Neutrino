@@ -7,8 +7,20 @@ if (UNIX AND (NOT APPLE))
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 add_compile_options(-std=c++0x)
 add_compile_options(-fPIC)
+
+
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+set (CMAKE_CXX_FLAGS "-O3")
+
+
 
 add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
@@ -27,8 +39,6 @@ message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 # force necessary defines on config.h
 add_definitions(-DHAVE_LIBPTHREAD)
 
-# include_directories(BEFORE "/opt/local/include")
-# include_directories(BEFORE "/usr/local/include")
 
 # gsl
 find_library(GSL NAMES gsl)
@@ -69,12 +79,12 @@ if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
 	message (STATUS "using netpbm: ${NETPBM}")
 	set(LIBS ${LIBS} ${NETPBM}) 
 	add_definitions(-DHAVE_LIBNETPBM)
-
-  FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
-  /usr/local/include
-  /usr/local/include/netpbm
-  /usr/include
-  )
+      
+	FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
+  		/usr/local/include
+  		/usr/local/include/netpbm
+  		/usr/include
+  	)
   IF (NETPBM_INCLUDE_DIR)
 	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
 	include_directories(${NETPBM_INCLUDE_DIR})
@@ -126,7 +136,11 @@ set (LIBRARY_OUTPUT_PATH "../lib")
 
 
 # install
-install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
+if (WIN32)
+	install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)
+else()
+	install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
+endif()
 
 if (APPLE)
 set (LIB_INSTALL_DIR "/usr/local/lib")

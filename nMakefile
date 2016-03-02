@@ -19,10 +19,10 @@ version_number:=$(shell git rev-list master ${version_tag}^..HEAD --count)
 VERSION:=${version_tag}-${version_number}
 
 osx: 
-	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
-
-	rm -rf build 
-	mkdir build
+# 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
+# 	rm -rf build 
+	mkdir -p build
+	# debug cmake command line
 	# cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	cd build && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	cd build && make -j2
@@ -32,7 +32,7 @@ osx:
 ifneq ("$(findstring +,$VERSION)","+")
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" Neutrino.app/Contents/Info.plist
 endif
-	rm -f Neutrino.dmg
+	rm -f Neutrino.dmg rw.Neutrino.dmg
 	rm -rf dmg
 	mkdir dmg
 	cp -r Neutrino.app dmg
