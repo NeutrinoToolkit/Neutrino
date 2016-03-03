@@ -20,7 +20,7 @@ VERSION:=${version_tag}-${version_number}
 
 osx: 
 # 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
-# 	rm -rf build 
+	rm -rf build 
 	mkdir -p build
 	# debug cmake command line
 	# cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
