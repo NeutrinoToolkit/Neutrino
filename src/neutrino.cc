@@ -109,6 +109,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	currentBuffer=NULL;
 
 	follower=NULL;
+	plug_loader = NULL;
 	
 	int numwin=qApp->property("numWin").toInt()+1;
 	qApp->setProperty("numWin",numwin);
@@ -512,6 +513,8 @@ neutrino::loadPlugin()
 	QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
 
 	if (!pname.isEmpty()) {
+
+		DEBUG(10, "loading plugin "<<pname.toAscii().constData());
 
 
 		if (plug_loader) {

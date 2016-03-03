@@ -7,7 +7,6 @@ cmake_minimum_required (VERSION 3.0)
 include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
-set (CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 

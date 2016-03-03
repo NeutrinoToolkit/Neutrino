@@ -6,6 +6,17 @@ project (Neutrino CXX)
 
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
+## default build type is release
+if (CMAKE_BUILD_TYPE STREQUAL "")
+	set (CMAKE_BUILD_TYPE "Release")
+endif()
+message(STATUS "Neutrino build type: ${CMAKE_BUILD_TYPE}")
+
+## global compile options
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3")
+add_compile_options(-std=c++0x)
+
 if (GENERATE_NHASH)
 	message (STATUS "Compiling neutrino with serial number/key protection")
 	add_definitions(-D__neutrino_key)
