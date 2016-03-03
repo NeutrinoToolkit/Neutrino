@@ -647,7 +647,7 @@ public:
 				}
 			}
 			
-			double mult = 255./(maxi - mini);
+//			double mult = 255./(maxi - mini);
 			
 
 // 			memset(uchar_buf, 0, getSurf()*sizeof(unsigned char)*4);
@@ -656,15 +656,15 @@ public:
 			for (i=0; i<width*height; i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
 				if (std::isfinite(Timg_buffer[i])) {
-					val = std::max(0,std::min(255,(int) (mult*(Timg_buffer[i]-mini))));
-					uchar_buf[i*4+3] = 255;
-					uchar_buf[i*4+2] = palette[3*val+0];
-					uchar_buf[i*4+1] = palette[3*val+1];
-					uchar_buf[i*4+0] = palette[3*val+2];
+                    val = std::max(0,std::min(255,(int) ((255*(Timg_buffer[i]-mini)/(maxi-mini)))));
+                    uchar_buf[i*4+0] = palette[3*val+0];
+                    uchar_buf[i*4+1] = palette[3*val+1];
+                    uchar_buf[i*4+2] = palette[3*val+2];
+                    uchar_buf[i*4+3] = 255;
 
 					//((int *)uchar_buf)[i] = palette[val][0]+palette[val][1]<<8 +palette[val][2]<<16 + 255<<24;
 				} else {
-					uchar_buf[i*4+3] = 0;
+                    uchar_buf[i*4+3] = 0;
 				}
 			}
 

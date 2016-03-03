@@ -89,14 +89,14 @@ void nWavelet::checkChangeCombo(QComboBox *combo) {
 }
 
 void nWavelet::bufferChanged(nPhysD* buf) {
-	if (buf) {
+    nGenericPan::bufferChanged(buf);
+    if (buf) {
 		if (buf==getPhysFromCombo(my_w.image)) {
 			region->show();
 		} else {
 			region->hide();
 		}
 	}
-    nGenericPan::bufferChanged(buf);
 }
 
 void nWavelet::physDel(nPhysD* buf) {
@@ -118,7 +118,6 @@ void nWavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		QRect geom2=region->getRect();
-		QPoint offset=geom2.topLeft();
 		nPhysD datamatrix;
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
@@ -150,7 +149,6 @@ void nWavelet::doWavelet () {
 
 		saveDefaults();
 		QRect geom2=region->getRect();
-		QPoint offset=geom2.topLeft();
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
 		
@@ -204,8 +202,8 @@ void nWavelet::doWavelet () {
 		my_w.erasePrevious->setEnabled(true);
         map<string, nPhysD *>::const_iterator itr;
 		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
-            if ((itr->first=="angle" && my_params.n_angles==1) ||
-                itr->first=="lambda" && my_params.n_lambdas==1) {
+            if ((itr->first=="angle"  && my_params.n_angles==1) ||
+                (itr->first=="lambda" && my_params.n_lambdas==1)) {
                 delete itr->second;
             } else {
                 if (my_w.erasePrevious->isChecked()) {

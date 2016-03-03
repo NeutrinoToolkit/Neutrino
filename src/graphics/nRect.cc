@@ -68,7 +68,6 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	nColor=QColor(Qt::black);
 	holderColor=QColor(0,0,255,200);
 
-
 	setOrder(0.0);
 
 	// PADELLA
@@ -240,8 +239,6 @@ void
 nRect::setOrder (double w) {
 	setZValue(w);
 }
-
-
 
 void
 nRect::tableUpdated (QTableWidgetItem * item) {

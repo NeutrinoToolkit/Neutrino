@@ -67,7 +67,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
-include(FindNeutrinoGuiComponents)
 
 ## sources
 set (SOURCES 
@@ -98,6 +97,8 @@ set (UIS
     ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
     ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 
 )
+
+include(FindNeutrinoGuiComponents)
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources

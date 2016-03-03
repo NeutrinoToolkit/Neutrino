@@ -220,7 +220,8 @@ void nInterferometry::checkChangeCombo(QComboBox *combo) {
 }
 
 void nInterferometry::bufferChanged(nPhysD* buf) {
-	if (buf) {
+    nGenericPan::bufferChanged(buf);
+    if (buf) {
 		if (buf==getPhysFromCombo(my_image[0].image) || buf==getPhysFromCombo(my_image[1].image)) {
 			region->show();
 		} else {
@@ -235,7 +236,6 @@ void nInterferometry::bufferChanged(nPhysD* buf) {
 			maskRegion->hide();
 		}
 	}
-    nGenericPan::bufferChanged(buf);
 }
 
 void nInterferometry::guessCarrier() {

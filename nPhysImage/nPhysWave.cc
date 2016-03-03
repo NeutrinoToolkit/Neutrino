@@ -574,26 +574,6 @@ phys_guess_carrier(nPhysD &phys, double weight)
 	size_t dx=phys.getW();
 	size_t dy=phys.getH();
 	
-//	fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
-//	fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
-//	fftw_execute(plan);
-	
-//	double valmax=0.0;
-//	int imax=0,jmax=0;
-//	for (size_t i=0; i<dx/2+1; i++) {
-//		for (size_t j=0; j<dy; j++) {
-//			int j1=(dy/2+1)-(j+dy/2+1)%dy;
-//			double r=sqrt(i*i+j1*j1);
-//			size_t k=i+j*(dx/2+1);
-//			double val=pow(r,weight)*vec2f(myData[k][0],myData[k][1]).mod();
-//			if (val>valmax && (i>0||j>0)) {
-//				valmax=val;
-//				imax=i;
-//				jmax=j1;
-//			}
-//		}
-//	}
-
     fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
     fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
     fftw_execute(plan);
