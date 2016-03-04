@@ -395,6 +395,9 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	//	currentBuffer->set_scale(1500.0,1500.0);
 	//	Visar();
 	
+    // plugins
+    scanPlugins();
+	
 
     
 }
@@ -468,28 +471,51 @@ nPhysD* neutrino::getBuffer(int i) {
 	return currentBuffer;
 }
 
-//void
-//neutrino::scanPlugins()
-//{
-//   	QDir pluginsDir(qApp->applicationDirPath());
-//#if defined(Q_OS_WIN)
-//   	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-//       		pluginsDir.cdUp();
-//#elif defined(Q_OS_MAC)
-//   	if (pluginsDir.dirName() == "MacOS") {
-//       		pluginsDir.cdUp();
-//       		pluginsDir.cdUp();
-//       		pluginsDir.cdUp();
-//   	}
-//#endif
-//   	pluginsDir.cd("plugins");
-//   	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-//		QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-//
-//		
-//	
-//	}
-//}
+// ------------------ PLUGINS -----------------------
+
+void
+neutrino::scanPlugins()
+{
+   	QDir pluginsDir(qApp->applicationDirPath());
+#if defined(Q_OS_WIN)
+   	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+       		pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+   	if (pluginsDir.dirName() == "MacOS") {
+       		pluginsDir.cdUp();
+       		pluginsDir.cdUp();
+       		pluginsDir.cdUp();
+   	}
+#endif
+   	pluginsDir.cd("plugins");
+   	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+		DEBUG(10, "found plugin "<<fileName.toAscii().constData());
+		QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+		QObject *plug_o = pluginLoader.instance();
+		if (plug_o) {
+			nPlug *plug_iface = qobject_cast<nPlug *>(plug_o);
+			if (plug_iface) {
+				DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
+	
+				//if (plug_iface->instantiate(this))
+				//	DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
+				QAction *action=new QAction(this);
+				QString name=plug_iface->name().toStdString();
+				connect(action, SIGNAL(triggered()),plug_iface, SLOT(instantiate(this)));
+
+			} else {
+				DEBUG("plugin load fail");
+			}
+		} else {
+			DEBUG("plugin cannot be loaded (linking problems?)");
+		}
+
+
+
+		
+	
+	}
+}
 
 void
 neutrino::loadPlugin()

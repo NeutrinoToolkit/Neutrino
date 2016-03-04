@@ -130,6 +130,7 @@ public slots:
 	void menuPaths();
 	
 	void loadPlugin();
+	void scanPlugins();
 	
 	void openRecentFile();
 	void clearRecentFile();
