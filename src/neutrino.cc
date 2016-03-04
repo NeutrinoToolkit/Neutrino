@@ -33,6 +33,7 @@
 
 #include "neutrino.h"
 #include "nMouseInfo.h"
+#include "nPluginLoader.h"
 
 #include "nBoxLineout.h"
 #include "nFindPeaks.h"
@@ -490,30 +491,17 @@ neutrino::scanPlugins()
    	pluginsDir.cd("plugins");
    	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
 		DEBUG(10, "found plugin "<<fileName.toAscii().constData());
-		QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-		QObject *plug_o = pluginLoader.instance();
-		if (plug_o) {
-			nPlug *plug_iface = qobject_cast<nPlug *>(plug_o);
-			if (plug_iface) {
-				DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
-	
-				//if (plug_iface->instantiate(this))
-				//	DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
-				QAction *action=new QAction(this);
-				QString name=plug_iface->name().toStdString();
-				connect(action, SIGNAL(triggered()),plug_iface, SLOT(instantiate(this)));
 
-			} else {
-				DEBUG("plugin load fail");
-			}
-		} else {
-			DEBUG("plugin cannot be loaded (linking problems?)");
+		nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+		if (my_npl->ok()) {
+			// I will probably need to leave a copy of the pointer as a QVariant inside the action
+			QAction *action = new QAction(this);
+			action->setText(my_npl->name());
+			connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
+			my_w.menuPlugins->addAction(action);
+
+			
 		}
-
-
-
-		
-	
 	}
 }
 
