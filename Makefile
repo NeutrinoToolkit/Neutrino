@@ -1,32 +1,26 @@
 
 ifeq ($(OS),Windows_NT)
-all: win
+    UNAME_S := Windows_NT
 else
     UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-all: linux
-    endif
-    ifeq ($(UNAME_S),Darwin)
-all: osx
-    endif
 endif
 
-
+all: $(UNAME_S)
 
 version_tag:=$(shell git describe --abbrev=0 --tags)
 version_number:=$(shell git rev-list master ${version_tag}^..HEAD --count)
 
 VERSION:=${version_tag}-${version_number}
 
-osx: 
+Darwin::
 # 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
-	rm -rf build 
-	mkdir -p build
+	rm -rf $@ 
+	mkdir -p $@
 	# debug cmake command line
-	# cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
-	cd build && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
-	cd build && make -j2
-	cp -r build/Neutrino.app .
+	# cd $@ && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cd $@ && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+	cp -r $@/Neutrino.app .
 	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" Neutrino.app/Contents/Info.plist
 ifneq ("$(findstring +,$VERSION)","+")
