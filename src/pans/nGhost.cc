@@ -91,11 +91,18 @@ void nGhost::doGhost () {
 
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*my_w.widthCarrier->value());
 
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
+#ifdef __phys_debug
+        nPhysD*pippo=new nPhysD(dx,dy,0.0,"pippo");
+#endif
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr*M_PI,2))/(xr<0 ? 1.0: 1.0+exp(lambda-xr));
+                double e_tot = 1.0-exp(-pow(yr,2))/(1.0+exp(lambda-abs(xr)));
+#ifdef __phys_debug
+                pippo->set(x,y,e_tot);
+#endif
                 imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
             }
         }
@@ -125,6 +132,11 @@ void nGhost::doGhost () {
         QString out;
         out.sprintf("Time: %d msec",timer.elapsed());
         my_w.statusbar->showMessage(out);
+
+#ifdef __phys_debug
+        pippo->TscanBrightness();
+        nparent->addShowPhys(pippo);
+#endif
 
 	}
 }
