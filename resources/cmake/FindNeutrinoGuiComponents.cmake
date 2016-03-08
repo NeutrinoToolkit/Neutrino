@@ -1,5 +1,14 @@
 # find components specific to Neutrino GUI: qwt/qt/additional files here!
 
+if(DEFINED ENV{QTDIR})
+  set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
+endif()
+
+if(DEFINED QTDIR)
+  set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
+endif()
+
+
 find_package(Qwt REQUIRED)
 if (QWT_FOUND)
 	include_directories(${QWT_INCLUDE_DIRS})
@@ -7,6 +16,33 @@ if (QWT_FOUND)
 	set(LIBS ${LIBS} ${QWT_LIBRARIES})
 endif(QWT_FOUND)
 
+#libhdf5_hl
+find_package(HDF5)
+if (HDF5_FOUND)
+
+        # IF HDF5 is there, THEN look for hl...
+        find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS})
+        if (${HDF5HL} STREQUAL "HDF5HL-NOTFOUND")
+                message (STATUS "Cannot find HDF5_HL: disabling HDF5 support")
+                message (STATUS "Search dir: " ${HDF5_LIBRARY_DIRS})
+
+        else()
+
+                #hdf5 libs
+                include_directories(${HDF5_INCLUDE_DIRS})
+                set(LIBS ${LIBS} ${HDF5_LIBRARIES})
+                add_definitions(-DHAVE_HDF5)
+
+                # hdf5_hl
+                message (STATUS "using libhdf5_hl: ${HDF5HL}")
+                set(LIBS ${LIBS} ${HDF5HL})
+                add_definitions(-DHAVE_LIBHDF5HL)
+
+                set (HDF5_FOUND_COMPLETE "TRUE")
+
+        endif()
+
+endif (HDF5_FOUND)
 
 if (HDF5_FOUND_COMPLETE)
 	# add nHDF5 sources

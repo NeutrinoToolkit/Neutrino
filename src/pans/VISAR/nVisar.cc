@@ -442,7 +442,7 @@ void nVisar::updatePlotSOP() {
 	nPhysD *ref=getPhysFromCombo(my_w.sopRef);
 	int dir=my_w.sopDirection->currentIndex();
 	if (shot) {
-		QRect geom2=sopRect->getRect().intersected(QRect(0,0,shot->getW(),shot->getH()));
+        QRect geom2=sopRect->getRect(shot);
 		if (ref) geom2=geom2.intersected(QRect(0,0,ref->getW(),ref->getH()));
 		if (geom2.isEmpty()) {
 			my_w.statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
