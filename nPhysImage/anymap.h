@@ -109,7 +109,7 @@ public:
 	double get_d() const { return (ddescr == any_double) ? d : 0; }
 	int get_i() const { return (ddescr == any_int) ? i : 0; }
 	template<class T> bidimvec<T> get_vec() const { return (ddescr == any_vec) ? bidimvec<T>(str) : bidimvec<T>("(0:0)"); }
-	std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("(empty)"); } 
+    std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("[empty]"); }
 
 private:
 	double d;
