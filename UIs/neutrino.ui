@@ -211,6 +211,9 @@
     <addaction name="actionKeyborard_shortcuts"/>
    </widget>
    <widget class="QMenu" name="menuPython">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Python</string>
     </property>

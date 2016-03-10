@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
-    <height>388</height>
+    <width>299</width>
+    <height>389</height>
    </rect>
   </property>
   <property name="font">
@@ -55,14 +55,23 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="Wavelet">
        <attribute name="title">
         <string>Wavelet</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_13">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -270,11 +279,25 @@
            <item row="3" column="0" colspan="3">
             <widget class="QWidget" name="widget" native="true">
              <layout class="QGridLayout" name="gridLayout_11" columnstretch="0,1,1">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="relative">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Rel. to carrier</string>
                 </property>
@@ -325,7 +348,16 @@
            <string>Thickness and Damp</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -369,7 +401,16 @@
         <item row="6" column="0">
          <widget class="QWidget" name="widget_3" native="true">
           <layout class="QGridLayout" name="gridLayout_2">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -389,6 +430,11 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Erase previous</string>
              </property>
@@ -406,11 +452,25 @@
         <item row="3" column="0">
          <widget class="QWidget" name="widget_7" native="true">
           <layout class="QGridLayout" name="gridLayout_19">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QCheckBox" name="showSource">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>crop region</string>
              </property>
@@ -421,6 +481,11 @@
            </item>
            <item row="0" column="1">
             <widget class="QCheckBox" name="synthetic">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>synthetic</string>
              </property>
@@ -452,7 +517,16 @@
         <string>Unwrap</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_12">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -509,7 +583,16 @@
            <string>Method</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,0,0">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -579,7 +662,16 @@
         <item row="4" column="0">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QGridLayout" name="gridLayout_6">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="1" column="0">
@@ -599,6 +691,11 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Erase previous</string>
              </property>
@@ -612,6 +709,11 @@
            </item>
            <item row="0" column="0">
             <widget class="QCheckBox" name="removeCarrierAfterUnwrap">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>remove carrier</string>
              </property>
@@ -630,39 +732,67 @@
         <string>Subtract</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_10">
-        <property name="margin">
+        <property name="leftMargin">
          <number>0</number>
         </property>
-        <item row="4" column="0">
-         <widget class="QWidget" name="widget_5" native="true">
-          <layout class="QGridLayout" name="gridLayout_15">
-           <property name="margin">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Phase/2pi</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1">
+           <property name="leftMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="doRemove">
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="phaseOffset">
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_4">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Subtract</string>
+              <string>Offset</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="erasePreviuos">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Erase previous</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
+           <item row="0" column="0" colspan="2">
+            <widget class="QComboBox" name="unwrapped">
+             <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
@@ -673,11 +803,20 @@
         <item row="1" column="0">
          <widget class="QWidget" name="widget_4" native="true">
           <layout class="QGridLayout" name="gridLayout_14" rowstretch="0,0" columnstretch="0,1">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <property name="horizontalSpacing">
             <number>2</number>
-           </property>
-           <property name="margin">
-            <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QRadioButton" name="carrier">
@@ -698,7 +837,16 @@
               <string>Carrier: interfringe, angle and weight</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,1,0,0">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item row="0" column="1">
@@ -839,17 +987,14 @@
           </layout>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Phase/2pi</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1">
+        <item row="3" column="0">
+         <widget class="QWidget" name="widget_5" native="true">
+          <layout class="QGridLayout" name="gridLayout_15">
            <property name="leftMargin">
             <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
             <number>0</number>
@@ -857,37 +1002,35 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="phaseOffset">
-             <property name="decimals">
-              <number>3</number>
-             </property>
-             <property name="minimum">
-              <double>-999.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>999.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_4">
+           <item row="0" column="0">
+            <widget class="QPushButton" name="doRemove">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Offset</string>
+              <string>Subtract</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0" colspan="2">
-            <widget class="QComboBox" name="unwrapped">
-             <property name="neutrinoImage" stdset="0">
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="erasePreviuos">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Erase previous</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
@@ -895,7 +1038,7 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -908,30 +1051,19 @@
           </property>
          </spacer>
         </item>
-        <item row="2" column="0">
-         <widget class="QWidget" name="widget_6" native="true">
-          <property name="neutirnoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_18" columnstretch="0">
-           <property name="margin">
-            <number>0</number>
-           </property>
-          </layout>
-         </widget>
-        </item>
        </layout>
-       <zorder>groupBox_2</zorder>
-       <zorder>widget_4</zorder>
-       <zorder>widget_5</zorder>
-       <zorder>verticalSpacer_3</zorder>
-       <zorder>widget_6</zorder>
       </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>

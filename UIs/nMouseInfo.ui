@@ -38,7 +38,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -166,7 +166,16 @@
            <string>Colors</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_11">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -234,7 +243,16 @@
            <string>Real position</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
             <number>4</number>
            </property>
            <item row="0" column="0">
@@ -275,7 +293,16 @@
            <string>Distance px and real</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
             <number>4</number>
            </property>
            <item row="0" column="0">
@@ -322,7 +349,16 @@
            <string>Angle to x and to y</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
             <number>4</number>
            </property>
            <item row="0" column="0">
@@ -369,7 +405,16 @@
            <string>Increment: dx/dy and dy/dx</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
             <number>4</number>
            </property>
            <item row="0" column="0">
@@ -412,7 +457,16 @@
         <string>Point logger</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -507,7 +561,7 @@
             <string>X</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </column>
           <column>
@@ -515,7 +569,7 @@
             <string>Y</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </column>
           <column>
@@ -523,7 +577,7 @@
             <string>Real X</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </column>
           <column>
@@ -531,7 +585,7 @@
             <string>Real Y</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </column>
           <column>
@@ -539,7 +593,7 @@
             <string>Value</string>
            </property>
            <property name="textAlignment">
-            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+            <set>AlignCenter</set>
            </property>
           </column>
          </widget>
@@ -582,8 +636,6 @@
   <tabstop>points</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/neutrino.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

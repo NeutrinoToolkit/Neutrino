@@ -10,12 +10,16 @@ set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 if (CMAKE_BUILD_TYPE STREQUAL "")
 	set (CMAKE_BUILD_TYPE "Release")
 endif()
+
 message(STATUS "Neutrino build type: ${CMAKE_BUILD_TYPE}")
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
 
 ## global compile options
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
-add_compile_options(-std=c++0x)
 
 if (GENERATE_NHASH)
 	message (STATUS "Compiling neutrino with serial number/key protection")
@@ -25,6 +29,14 @@ endif()
 ## ADD DYNAMIC VERSIONING!
 ## ADD DEB DESCRIPTION
 ## CHECK LIB RPATH in PACKS
+
+add_compile_options(-std=c++11)
+add_compile_options(-Wall)
+add_compile_options(-fPIC)
+
+
+set (CMAKE_CXX_FLAGS "-O3")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
 
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
@@ -97,6 +109,30 @@ if (DEBIAN)
 	#set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 endif()
+
+
+if(APPLE)
+     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
+     set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
+
+     set(CPACK_BUNDLE_NAME "Neutrino")
+     set(CPACK_BUNDLE_ICON "${ICONS_DIR}/icon.icns")
+     set(CPACK_BUNDLE_PLIST "${ICONS_DIR}/../neutrino.plist")
+
+     set(CMAKE_INSTALL_PREFIX "/Applications")
+     set(CPACK_GENERATOR "Bundle")
+     set(CPACK_DMG_FORMAT "UDBZ")
+     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
+     set(CPACK_SYSTEM_NAME "OSX")
+     set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
+     set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
+endif()
+
+if(APPLE)
+    include(DeployQt4)
+    install_qt4_executable("${EXECUTABLE}")
+endif()
+
 include (CPack) # this to be included LAST with resp. to its vars
 
 

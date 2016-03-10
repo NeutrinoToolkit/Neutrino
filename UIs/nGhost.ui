@@ -34,7 +34,7 @@
       <property name="title">
        <string>Reference &amp; Shot</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
         <number>4</number>
        </property>
@@ -47,18 +47,18 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="shot">
-         <property name="toolTip">
-          <string>Shot</string>
-         </property>
+       <item>
+        <widget class="QComboBox" name="ref">
          <property name="neutrinoImage" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="ref">
+       <item>
+        <widget class="QComboBox" name="shot">
+         <property name="toolTip">
+          <string>Shot</string>
+         </property>
          <property name="neutrinoImage" stdset="0">
           <bool>true</bool>
          </property>

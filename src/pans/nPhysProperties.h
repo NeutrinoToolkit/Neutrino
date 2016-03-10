@@ -48,6 +48,7 @@ public:
 public slots:
 	void showProperty();
 	void bufferChanged(nPhysD*);
+    void on_changePhysProperty_pressed();
 	
 };
 

@@ -94,9 +94,13 @@ neutrino::~neutrino()
 }
 
 /// Creator
-neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
+neutrino::neutrino():
+    my_s(this),
+    my_mouse(this),
+    my_tics(this)
+{
 
-	my_w.setupUi(this);
+    my_w.setupUi(this);
     setAcceptDrops(true);
 
 // this below works if there is just one neutrino win open
@@ -120,6 +124,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
     pyname.sprintf("n%03d",property("winId").toInt());
     setObjectName(pyname);
 #endif
+
 	setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
 	QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
@@ -159,7 +164,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 #ifdef USE_QT5
     connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
-	//my_w.actionCamera->hide();
+    my_w.actionCamera->setVisibility(false);
 #endif
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -251,9 +256,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
 	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
 	connect(my_w.actionBlur, SIGNAL(triggered()), this, SLOT(Blur()));
-
 	connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
-
 	connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
 	
@@ -268,6 +271,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 #else
     my_w.menuPython->hide();
 #endif
+
 	// ---------------------------------------------------------------------------------------------
 
 	QWidget *sbarra=new QWidget(this);
@@ -275,11 +279,9 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 	my_w.statusbar->addPermanentWidget(sbarra, 0);
 
 	setAttribute(Qt::WA_DeleteOnClose);
-
 	setCentralWidget(my_w.centralwidget);
 
-	connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-
+    connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 	connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 	build_colormap();
@@ -356,12 +358,12 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 
 
 //	my_s.setBackgroundBrush(QBrush(QColor(255,255,255,255)));
-	
+
 	updateRecentFileActions();
 
 	loadDefaults();
     
-	show();
+    show();
 	
 	//!enable this for testing
 
@@ -370,7 +372,7 @@ neutrino::neutrino(): my_s(this), my_mouse(this), my_tics(this) {
 #ifdef  __phys_debug
     if (numwin==1)	recentFileActs.first()->trigger();
 #endif
-    
+
     //	newRect(QRectF(100,100,300,300), "pippo");
 
 //	WinList();
@@ -514,7 +516,7 @@ neutrino::loadPlugin()
 
 	if (!pname.isEmpty()) {
 
-		DEBUG(10, "loading plugin "<<pname.toAscii().constData());
+        DEBUG(10, "loading plugin "<<pname.toStdString());
 
 
 		if (plug_loader) {
@@ -534,8 +536,9 @@ neutrino::loadPlugin()
 			if (plug_iface) {
 				DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
 	
-				if (plug_iface->instantiate(this))
+                if (plug_iface->instantiate(this)) {
 					DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
+                }
 			} else {
 				DEBUG("plugin load fail");
 	    		}
@@ -918,6 +921,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
 								tmpFile.open();
 								while(!qLine.startsWith("NeutrinoPan-end") && !ifile.eof()) {
 									getline(ifile,line);
+//                                    WARNING(line);
 									qLine=QString::fromStdString(line);
 									line+="\n";
 									if (!qLine.startsWith("NeutrinoPan-end")) tmpFile.write(line.c_str());
@@ -926,8 +930,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                                 QApplication::processEvents();
-
-//								my_pan->loadSettings(tmpFile.fileName());
+//                                my_pan->loadSettings(tmpFile.fileName());
 								tmpFile.close(); // this should also remove it...
 							}
 						}
@@ -1121,9 +1124,9 @@ neutrino::showPhys(nPhysD* datamatrix) {
 void
 neutrino::createQimage() {
 	if (currentBuffer) {
-		const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
+        const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
 		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
-							   currentBuffer->getW()*4, QImage::Format_ARGB32_Premultiplied);
+                               currentBuffer->getW()*4, QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
 	}
 	my_w.my_view->setSize();
@@ -2309,7 +2312,6 @@ neutrino::loadPyScripts() {
         //	.split(QRegExp("\\s*,\\s*"));
 
         if (scriptlist.size() > 0) {
-            my_w.menuPython->setEnabled(true);
             foreach (QAction* myaction, my_w.menuPython->actions()) {
                 if (QFileInfo(myaction->data().toString()).suffix()=="py")
                     my_w.menuPython->removeAction(myaction);
@@ -2385,7 +2387,7 @@ anydata toAnydata(QVariant &my_variant) {
                 my_data=my_vec2f;
             } else {
                 string valStr=my_variant.toString().toStdString();
-                DEBUG("it's point "<<valStr);
+                DEBUG("it's string "<<valStr);
                 if (!valStr.empty()) {
                     my_data=valStr;
                 }

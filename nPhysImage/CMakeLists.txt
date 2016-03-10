@@ -1,24 +1,12 @@
 # this is the frigging nPhysImage cmakelists
 cmake_minimum_required (VERSION 3.0)
 
-## local (nPhys) compile options
-add_compile_options(-fPIC)
-
-if (UNIX AND (NOT APPLE))
+if (LINUX)
     message(STATUS "Linux")
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
-
-
 add_library (nPhysImageF SHARED NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
-
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")

@@ -53,9 +53,9 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 void nGhost::guessCarrier() {
     nPhysD *image=getPhysFromCombo(my_w.ref);
 	if (image) {
-		QRect geom2=region->getRect();
+        QRect geom2=region->getRect(image);
 		nPhysD datamatrix;
-		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
 		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
 		if (vecCarr.first()==0) {
@@ -91,11 +91,12 @@ void nGhost::doGhost () {
 
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*my_w.widthCarrier->value());
 
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr*M_PI,2))/(xr<0 ? 1.0: 1.0+exp(lambda-xr));
+                double e_tot = 1.0-exp(-pow(yr,2))/(1.0+exp(lambda-abs(xr)));
                 imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
             }
         }
@@ -106,7 +107,7 @@ void nGhost::doGhost () {
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
         
-        QRect geom=QRect(0,0,imageShot->getW(),imageShot->getH()).intersected(region->getRect());
+        QRect geom=region->getRect(imageShot);
         for(int i=geom.left();i<geom.right(); i++) {
             for(int j=geom.top();j<geom.bottom(); j++) {
                 deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));

@@ -98,6 +98,7 @@ void nRegionPath::doIt() {
         if (my_w.crop->isChecked()) {
             *regionPath=regionPath->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
         }
+        regionPath->TscanBrightness();
         regionPhys=nparent->replacePhys(regionPath,regionPhys);
     }
 }
