@@ -627,13 +627,13 @@ public:
 		return NULL;
 	}
 	
-	const unsigned char *to_uchar_palette(unsigned char * palette) {
+    const unsigned char *to_uchar_palette(unsigned char * palette, double color_power=1.0) {
 		if (!property.have("display_range")) {
 			property["display_range"]= get_min_max();
 		}
 		bidimvec<T> minmax=property["display_range"];
-		double mini=minmax.first();
-		double maxi=minmax.second();
+        double mini=pow(minmax.first(),color_power);
+        double maxi=pow(minmax.second(),color_power);
 		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		
 		if (width>0 && height>0 && palette) {
@@ -651,12 +651,12 @@ public:
 			
 
 // 			memset(uchar_buf, 0, getSurf()*sizeof(unsigned char)*4);
-			register size_t i,val;			
-#pragma omp parallel for private(val)
-			for (i=0; i<width*height; i++) {
+#pragma omp parallel for
+            for (size_t i=0; i<width*height; i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
-				if (std::isfinite(Timg_buffer[i])) {
-                    val = std::max(0,std::min(255,(int) ((255*(Timg_buffer[i]-mini)/(maxi-mini)))));
+                double dval=pow(Timg_buffer[i],color_power);
+                if (std::isfinite(dval)) {
+                    unsigned char val = std::max(0,std::min(255,(int) ((255*(dval-mini)/(maxi-mini)))));
                     uchar_buf[i*4+0] = palette[3*val+0];
                     uchar_buf[i*4+1] = palette[3*val+1];
                     uchar_buf[i*4+2] = palette[3*val+2];

@@ -21,8 +21,13 @@ all: $(UNAME_S)
 
 version_tag:=$(shell git describe --abbrev=0 --tags)
 version_number:=$(shell git rev-list master ${version_tag}^..HEAD --count)
+version_branch:=$(shell git name-rev --name-only HEAD)
 
 VERSION:=${version_tag}-${version_number}
+
+ifneq ($(version_branch),master)
+	VERSION:=$(VERSION)-$(version_branch)
+endif
 
 colormap:
 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps

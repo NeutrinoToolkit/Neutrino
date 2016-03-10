@@ -97,7 +97,8 @@ neutrino::~neutrino()
 neutrino::neutrino():
     my_s(this),
     my_mouse(this),
-    my_tics(this)
+    my_tics(this),
+    gamma(0)
 {
 
     my_w.setupUi(this);
@@ -284,6 +285,7 @@ neutrino::neutrino():
     connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
 	connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
+
 	build_colormap();
 
 	
@@ -356,6 +358,8 @@ neutrino::neutrino():
     my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
 
+
+    setGamma(0);
 
 //	my_s.setBackgroundBrush(QBrush(QColor(255,255,255,255)));
 
@@ -629,6 +633,19 @@ void neutrino::updateRecentFileActions(QString fname)
 	}
 
 	my_set.setValue("recentFiles",listarecentfiles);			
+}
+
+int neutrino::getGamma() const
+{
+    return gamma;
+}
+
+void neutrino::setGamma(int value)
+{
+    gamma = value;
+    my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(gamma));
+    emit gammaChanged(value);
+    createQimage();
 }
 
 /// Using TAB you can cycle over the items in the canvas (lines, rectangles, ovals)
@@ -1124,7 +1141,9 @@ neutrino::showPhys(nPhysD* datamatrix) {
 void
 neutrino::createQimage() {
 	if (currentBuffer) {
-        const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable]);
+        double real_gamma = (gamma == 0 ? 1 : (gamma > 0 ? gamma : 1.0/double(-gamma) ));
+        DEBUG(">>>>>>>>>>>>>" << real_gamma);
+        const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable], real_gamma);
 		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
                                currentBuffer->getW()*4, QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
@@ -1250,89 +1269,98 @@ void neutrino::closeEvent (QCloseEvent *e) {
 void neutrino::keyPressEvent (QKeyEvent *e)
 {
 	switch (e->key()) {
-		case Qt::Key_Question:
-			Shortcuts();
-			break;
-		case Qt::Key_Plus:
-			zoomIn();
-			break;
-		case Qt::Key_Minus:
-			zoomOut();
-			break;
-		case Qt::Key_Equal:
-			zoomEq();
-			break;
-		case Qt::Key_A: {
-			if (currentBuffer) {
-                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
-				createQimage();
-				emit updatecolorbar();
-			}
-			break;
-		}
-		case Qt::Key_O:
-			if (e->modifiers() & Qt::ShiftModifier) {
-				foreach (nPhysD* phys, physList) {
-					phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-					emit bufferChanged(phys);
-				}
-			} else {
-				if (currentBuffer) currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-			}
-			mouseposition(my_mouse.pos());
-			my_tics.update();
-			emitBufferChanged();
+    case Qt::Key_Less:
+        setGamma(gamma-1);
+        break;
+    case Qt::Key_Greater:
+        setGamma(gamma+1);
+        break;
+    case Qt::Key_Period:
+        setGamma(0);
+        break;
+    case Qt::Key_Question:
+        Shortcuts();
+        break;
+    case Qt::Key_Plus:
+        zoomIn();
+        break;
+    case Qt::Key_Minus:
+        zoomOut();
+        break;
+    case Qt::Key_Equal:
+        zoomEq();
+        break;
+    case Qt::Key_A: {
+        if (currentBuffer) {
+            currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+            createQimage();
+            emit updatecolorbar();
+        }
+        break;
+    }
+    case Qt::Key_O:
+        if (e->modifiers() & Qt::ShiftModifier) {
+            foreach (nPhysD* phys, physList) {
+                phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+                emit bufferChanged(phys);
+            }
+        } else {
+            if (currentBuffer) currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+        }
+        mouseposition(my_mouse.pos());
+        my_tics.update();
+        emitBufferChanged();
 
-			// I need a signal to communicate explicit origin change not to
-			// be taken for a buffer change. Used in nWinList.
-			emit bufferOriginChanged();
-			break;
-		case Qt::Key_C:
-			if (e->modifiers() & Qt::ShiftModifier) {
-				Colorbar();
-			}
-			break;
-		case Qt::Key_I:
-			if (e->modifiers() & Qt::ShiftModifier) {
-				MouseInfo();
-			} else {
-				WinList();
-			}
-			break;
-		case Qt::Key_P:
-			if (e->modifiers() & Qt::ShiftModifier) {
-				Properties();
-			}
-			break;
-		case Qt::Key_R:
-			if (!(e->modifiers() & Qt::ShiftModifier))
-				toggleRuler();
-			break;
-		case Qt::Key_G:
-			if (!(e->modifiers() & Qt::ShiftModifier))
-				toggleGrid();
-			break;
-		case Qt::Key_M: {
-			if (!(e->modifiers() & Qt::ShiftModifier))
-				toggleMouse();
-			break;
-		}
-		case Qt::Key_V: {
-			if (!(e->modifiers() & Qt::ShiftModifier))
-				Vlineout();
-			break;
-		}
-		case Qt::Key_H: {
-			if (!(e->modifiers() & Qt::ShiftModifier))
-				Hlineout();
-			break;
-		}
-		default:
-			break;
-	}
-	if (follower) {
-		follower->keyPressEvent(e);
-	}
+        // I need a signal to communicate explicit origin change not to
+        // be taken for a buffer change. Used in nWinList.
+        emit bufferOriginChanged();
+        break;
+    case Qt::Key_C:
+        if (e->modifiers() & Qt::ShiftModifier) {
+            Colorbar();
+        }
+        break;
+    case Qt::Key_I:
+        if (e->modifiers() & Qt::ShiftModifier) {
+            MouseInfo();
+        } else {
+            WinList();
+        }
+        break;
+    case Qt::Key_P:
+        if (e->modifiers() & Qt::ShiftModifier) {
+            Properties();
+        }
+        break;
+    case Qt::Key_R:
+        if (!(e->modifiers() & Qt::ShiftModifier))
+            toggleRuler();
+        break;
+    case Qt::Key_G:
+        if (!(e->modifiers() & Qt::ShiftModifier))
+            toggleGrid();
+        break;
+    case Qt::Key_M: {
+        if (!(e->modifiers() & Qt::ShiftModifier))
+            toggleMouse();
+        break;
+    }
+    case Qt::Key_V: {
+        if (!(e->modifiers() & Qt::ShiftModifier))
+            Vlineout();
+        break;
+    }
+    case Qt::Key_H: {
+        if (!(e->modifiers() & Qt::ShiftModifier))
+            Hlineout();
+        break;
+    }
+    default:
+        break;
+    }
+    if (follower) {
+        follower->keyPressEvent(e);
+    }
 }
 
 void neutrino::keyReleaseEvent (QKeyEvent *e)
@@ -2082,6 +2110,8 @@ void neutrino::saveDefaults(){
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
     my_set.setValue("physNameLength", property("physNameLength").toInt());
 
+    my_set.setValue("gamma", gamma);
+
 	my_set.endGroup();
 }
 
@@ -2100,7 +2130,9 @@ void neutrino::loadDefaults(){
 	my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
 	changeColorTable(my_set.value("colorTable",colorTable).toString());
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1).toInt();
-    
+
+    setGamma(my_set.value("gamma",gamma).toInt());
+
     QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
     foreach (QToolBar *obj, findChildren<QToolBar *>()) {
         if (obj->iconSize()!=mysize) {

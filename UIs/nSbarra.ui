@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item row="0" column="0">
@@ -22,7 +31,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Mouse x position</string>
+      <string>x pixel</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -38,6 +47,52 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="6">
+    <widget class="QLabel" name="pos_z">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Value at mouse position</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>value</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="8">
+    <widget class="QLabel" name="gamma">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>gamma</string>
+     </property>
+     <property name="text">
+      <string>gamma</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="1">
     <widget class="QLabel" name="pos_y">
      <property name="font">
@@ -46,7 +101,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Mouse y position</string>
+      <string>y pixel</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -59,13 +114,6 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </item>
@@ -112,27 +160,10 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="6">
-    <widget class="QLabel" name="pos_z">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Value at mouse position</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>value</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+   <item row="0" column="7">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </item>

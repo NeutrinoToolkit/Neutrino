@@ -113,12 +113,16 @@ public:
 private:
     QList<nGenericPan*> panList;
 	QList<nPhysD*> physList;
+
+    int gamma;
     
 public slots:
 	nGenericPan* existsPan(QString);
 
 	void build_colormap();
-	
+    int getGamma() const;
+    void setGamma(int value);
+
 	void processEvents();
 	void contextMenuEvent(QContextMenuEvent *);
 	void menuFlipRotate();
@@ -338,7 +342,8 @@ public slots:
 
 signals:
 	void updatecolorbar();
-	void colorValue(double);
+    void colorValue(double);
+    void gammaChanged(double);
 
 	// signals for communications with pans
 	void mouseAtMatrix(QPointF);					// mouse position on the matrix, no scale
