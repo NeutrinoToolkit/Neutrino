@@ -588,75 +588,25 @@ public:
 // 	}
 
 	// const methods for accessing matrix
-
-	const unsigned char *to_uchar() {
-		return to_uchar(Tminimum_value, Tmaximum_value);
-	}
-
-	const unsigned char *to_uchar(double min, double max) {
-		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value);
-//
-//
-//		T lower_cut;
-//		T higher_cut;
-//		
-//		T delta = Tmaximum_value - Tminimum_value;
-//		lower_cut = Tminimum_value + min*delta;
-//		higher_cut = Tminimum_value + max*delta;
-//		
-		if (width>0 && height>0) {
-
-			if (uchar_buf == NULL)
-				uchar_buf = new unsigned char[width*height];
-	
-			double mult = 255./(max - min);
-			
-
-			memset(uchar_buf, 0, width*height*sizeof(unsigned char));
-			for (register size_t i=0; i<width*height; i++) {
-				//int val = mult*(Timg_buffer[i]-lower_cut);
-				int val = mult*(Timg_buffer[i]-min);
-				if (val>=0)
-					uchar_buf[i] = (val<256) ? (unsigned char)val : 255;
-			}
-
-			return uchar_buf;
-		}
-		DEBUG(6,"asking for uchar buffer of empty image");
-
-		return NULL;
-	}
 	
     const unsigned char *to_uchar_palette(unsigned char * palette, double color_power=1.0) {
 		if (!property.have("display_range")) {
 			property["display_range"]= get_min_max();
 		}
 		bidimvec<T> minmax=property["display_range"];
-        double mini=pow(minmax.first(),color_power);
-        double maxi=pow(minmax.second(),color_power);
+        double mini=minmax.first();
+        double maxi=minmax.second();
 		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		
-		if (width>0 && height>0 && palette) {
+        if (getSurf()>0 && palette) {
 
-			if (uchar_buf == NULL) {
-				uchar_buf = new unsigned char[width*height*4];
-			} else {
-				if (to_uchar_min==mini && to_uchar_max==maxi) {
-					DEBUG(6, "nothing changed");
-					return uchar_buf;
-				}
-			}
-			
-//			double mult = 255./(maxi - mini);
-			
+            uchar_buf.resize(width*height*4);
 
-// 			memset(uchar_buf, 0, getSurf()*sizeof(unsigned char)*4);
 #pragma omp parallel for
-            for (size_t i=0; i<width*height; i++) {
+            for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
-                double dval=pow(Timg_buffer[i],color_power);
-                if (std::isfinite(dval)) {
-                    unsigned char val = std::max(0,std::min(255,(int) ((255*(dval-mini)/(maxi-mini)))));
+                if (std::isfinite(Timg_buffer[i])) {
+                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),color_power))));
                     uchar_buf[i*4+0] = palette[3*val+0];
                     uchar_buf[i*4+1] = palette[3*val+1];
                     uchar_buf[i*4+2] = palette[3*val+2];
@@ -668,7 +618,7 @@ public:
 				}
 			}
 
-			return uchar_buf;
+            return &uchar_buf[0];
 		}
 		WARNING("asking for uchar buffer of empty image");
 
@@ -934,7 +884,7 @@ public:
 	T **Timg_matrix;
 
 protected:
-	unsigned char *uchar_buf;
+    std::vector<unsigned char> uchar_buf;
 	double **vector_buf;
 	double **axis_buf;
 	std::vector<double> histogram;
@@ -1083,7 +1033,6 @@ nPhysImageF<T>::~nPhysImageF()
 		
 		//tom
 		if (Timg_matrix != NULL) delete Timg_matrix;
-		if (uchar_buf != NULL) delete uchar_buf;
 	
 		if (vector_buf != NULL) {
 			if (vector_buf[0] != NULL)
@@ -1123,19 +1072,6 @@ nPhysImageF<T>::init_Tvariables()
 	_trash_init();
 	_init_temp_pointers();
 
-// now in _init_temp_ptrs();
-//
-//	Timg_buffer = NULL;
-//	Timg_matrix = NULL;
-//	uchar_buf = NULL;
-//
-//	vector_buf = new double *[2];
-//	memset(vector_buf, 0, 2*sizeof(double *));
-//	axis_buf = new double *[2];
-//	memset(axis_buf, 0, 2*sizeof(double *));
-
-	
-
 	//pIF_size.set_msg("size error");
 
 	min_Tv_x = min_Tv_y = max_Tv_x = max_Tv_y = -1;
@@ -1150,7 +1086,6 @@ nPhysImageF<T>::_init_temp_pointers()
 {
 	Timg_buffer = NULL;
 	Timg_matrix = NULL;
-	uchar_buf = NULL;
 
 	if (vector_buf)
 		delete vector_buf;
@@ -1186,10 +1121,7 @@ nPhysImageF<T>::matrix_points_aligned()
 		Timg_matrix = NULL;
 	}
 
-	if (uchar_buf != NULL) {
-		delete uchar_buf;
-		uchar_buf = NULL;
-	}
+    uchar_buf.clear();
 
 	if (vector_buf != NULL) {
 		if (vector_buf[0] != NULL)
