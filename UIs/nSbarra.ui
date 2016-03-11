@@ -89,7 +89,10 @@
       <string>γ color</string>
      </property>
      <property name="text">
-      <string>gamma</string>
+      <string>γ</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

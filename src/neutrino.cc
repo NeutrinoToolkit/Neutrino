@@ -97,8 +97,7 @@ neutrino::~neutrino()
 neutrino::neutrino():
     my_s(this),
     my_mouse(this),
-    my_tics(this),
-    gamma(0)
+    my_tics(this)
 {
 
     my_w.setupUi(this);
@@ -358,8 +357,6 @@ neutrino::neutrino():
     my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
 
-
-    setGamma(0);
 
 //	my_s.setBackgroundBrush(QBrush(QColor(255,255,255,255)));
 
@@ -635,17 +632,12 @@ void neutrino::updateRecentFileActions(QString fname)
 	my_set.setValue("recentFiles",listarecentfiles);			
 }
 
-int neutrino::getGamma() const
-{
-    return gamma;
-}
-
-void neutrino::setGamma(int value)
-{
-    gamma = value;
-    my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(gamma));
-    emit gammaChanged(value);
-    createQimage();
+void neutrino::setGamma(int value) {
+    if (currentBuffer) {
+        currentBuffer->property["gamma"]=value;
+        createQimage();
+        emitBufferChanged();
+    }
 }
 
 /// Using TAB you can cycle over the items in the canvas (lines, rectangles, ovals)
@@ -1098,10 +1090,9 @@ neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
         
-        if (currentBuffer) {
-            if (my_w.actionLockColors->isChecked()) {
-                datamatrix->property["display_range"]=currentBuffer->property["display_range"];
-            }
+        if (currentBuffer && my_w.actionLockColors->isChecked()) {
+            datamatrix->property["display_range"]=currentBuffer->property["display_range"];
+            datamatrix->property["gamma"]=currentBuffer->property["gamma"];
         }
         
         if (!datamatrix->property.have("display_range")) {
@@ -1141,17 +1132,16 @@ neutrino::showPhys(nPhysD* datamatrix) {
 void
 neutrino::createQimage() {
 	if (currentBuffer) {
-        double real_gamma = (gamma == 0 ? 1 : (gamma > 0 ? gamma : 1.0/double(-gamma) ));
-        DEBUG(">>>>>>>>>>>>>" << real_gamma);
-        const unsigned char *buff=currentBuffer->to_uchar_palette(nPalettes[colorTable], real_gamma);
-		const QImage tempImage(buff, currentBuffer->getW(), currentBuffer->getH(), 
-                               currentBuffer->getW()*4, QImage::Format_RGBA8888_Premultiplied);
+        const QImage tempImage(currentBuffer->to_uchar_palette(nPalettes[colorTable]),
+                               currentBuffer->getW(),
+                               currentBuffer->getH(),
+                               currentBuffer->getW()*4,
+                               QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-	}
-	my_w.my_view->setSize();
+        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(int(currentBuffer->property["gamma"])));
+    }
+	my_w.my_view->setSize();    
 }
-
-// Export
 
 void neutrino::exportGraphics () { 
     QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
@@ -1270,13 +1260,19 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 {
 	switch (e->key()) {
     case Qt::Key_Less:
-        setGamma(gamma-1);
+        if (currentBuffer) {
+             setGamma(int(currentBuffer->property["gamma"])-1);
+        }
         break;
     case Qt::Key_Greater:
-        setGamma(gamma+1);
+        if (currentBuffer) {
+             setGamma(int(currentBuffer->property["gamma"])+1);
+        }
         break;
     case Qt::Key_Period:
-        setGamma(0);
+        if (currentBuffer) {
+             setGamma(0);
+        }
         break;
     case Qt::Key_Question:
         Shortcuts();
@@ -2109,9 +2105,6 @@ void neutrino::saveDefaults(){
 	my_set.setValue("fileOpen", property("fileOpen"));
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
     my_set.setValue("physNameLength", property("physNameLength").toInt());
-
-    my_set.setValue("gamma", gamma);
-
 	my_set.endGroup();
 }
 
@@ -2130,8 +2123,6 @@ void neutrino::loadDefaults(){
 	my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
 	changeColorTable(my_set.value("colorTable",colorTable).toString());
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1).toInt();
-
-    setGamma(my_set.value("gamma",gamma).toInt());
 
     QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
     foreach (QToolBar *obj, findChildren<QToolBar *>()) {

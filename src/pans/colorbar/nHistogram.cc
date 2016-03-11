@@ -32,7 +32,6 @@ nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 	offsety=9;
 	dyColorBar=offsety*3/2;
 	offsetx=6;
-	setProperty("fileExport","Colorbar.pdf");
 	setMinimumHeight(200);
 	parentPan=NULL;
 }
@@ -231,39 +230,6 @@ void nHistogram::drawPicture (QPainter &p) {
 		p.drawText(geometry(),Qt::AlignHCenter|Qt::AlignVCenter,"No image present");
 	}
 	
-}
-
-void nHistogram::export_PDF_slot () {
-	QString filter;
-	if (QFileInfo(property("fileExport").toString()).suffix().toLower()==QString("svg")) {
-		filter="Scable Vector Graphics (*.svg);; PDF files (*.pdf);; Any files (*)";
-	} else if (QFileInfo(property("fileExport").toString()).suffix().toLower()==QString("pdf")) {
-		filter="PDF files (*.pdf);; Scable Vector Graphics (*.svg);; Any files (*)";
-	}
-	QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),filter);
-	if (!fout.isEmpty()) {
-		setProperty("fileExport",fout);
-		QPainter p;
-		QPrinter *printer;
-		QSvgGenerator *svgGen;
-		if (QFileInfo(fout).suffix().toLower()==QString("svg")) {
-			svgGen=new QSvgGenerator();
-			svgGen->setFileName(fout);
-			svgGen->setSize(size());
-			svgGen->setTitle("Neutrino");
-			svgGen->setDescription("Colorbar");
-			p.begin( svgGen );
-		} else if (QFileInfo(fout).suffix().toLower()==QString("pdf")) {
-			printer=new QPrinter();
-			printer->setOutputFormat(QPrinter::PdfFormat);
-			printer->setOutputFileName(fout);
-			printer->setColorMode(QPrinter::Color);
-			printer->setPaperSize(size()*1.2,QPrinter::Point);
-			printer->setOrientation(QPrinter::Portrait);
-			p.begin( printer );
-		}
-		drawPicture(p);
-	}
 }
 
 

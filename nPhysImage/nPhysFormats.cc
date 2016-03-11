@@ -365,7 +365,7 @@ physInt_sif::physInt_sif(string ifilename)
 	}	
 
 	temp_string.clear();
-	int magic_number = 0; // usually 3 (lol)
+    unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
@@ -791,7 +791,7 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		my_phys->property.dumper(ss);
 		std::string str = ss.str(), str2;
 
-		int pos;
+        size_t pos;
 		while((pos = str.find("\n", pos)) != std::string::npos)
 	      	{
 		   	str.insert(pos+1, "# ");

@@ -79,6 +79,7 @@ public slots:
 	
 	void addPaletteFile();
 	void removePaletteFile();
+    void on_gamma_valueChanged(int);
 signals:
 	void change_contrast(double,double);
 

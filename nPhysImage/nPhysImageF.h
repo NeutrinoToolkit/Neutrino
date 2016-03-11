@@ -589,14 +589,14 @@ public:
 
 	// const methods for accessing matrix
 	
-    const unsigned char *to_uchar_palette(unsigned char * palette, double color_power=1.0) {
-		if (!property.have("display_range")) {
-			property["display_range"]= get_min_max();
-		}
-		bidimvec<T> minmax=property["display_range"];
+    const unsigned char *to_uchar_palette(unsigned char * palette) {
+        bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
         double mini=minmax.first();
         double maxi=minmax.second();
-		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
+        int gamma_int= property.have("gamma") ? property["gamma"] : 0;
+        double gamma=gamma_int < 0 ? -1.0/gamma_int : (gamma_int == 0 ? 1 : gamma_int);
+
+        DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		
         if (getSurf()>0 && palette) {
 
@@ -606,13 +606,11 @@ public:
             for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
-                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),color_power))));
+                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),gamma))));
                     uchar_buf[i*4+0] = palette[3*val+0];
                     uchar_buf[i*4+1] = palette[3*val+1];
                     uchar_buf[i*4+2] = palette[3*val+2];
                     uchar_buf[i*4+3] = 255;
-
-					//((int *)uchar_buf)[i] = palette[val][0]+palette[val][1]<<8 +palette[val][2]<<16 + 255<<24;
 				} else {
                     uchar_buf[i*4+3] = 0;
 				}

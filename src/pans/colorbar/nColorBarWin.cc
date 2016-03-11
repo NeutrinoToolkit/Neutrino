@@ -40,8 +40,7 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
-	connect(my_w.savePDF,SIGNAL(released()),my_w.histogram,SLOT(export_PDF_slot()));
-	connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
+    connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
 
 	connect(my_w.cutoff,SIGNAL(released()),this,SLOT(cutOff()));
 
@@ -75,17 +74,26 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 
 	decorate();
 
-	loadPalettes();
+    if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
+
+    loadPalettes();
 
 	my_w.comboBox->addItems(nparent->nPalettes.keys());
 	my_w.comboBox->setCurrentIndex(nparent->nPalettes.keys().indexOf(parent->colorTable));
-	connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+    connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
 	
 
 	updatecolorbar();
 	cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
+}
+
+void nColorBarWin::on_gamma_valueChanged(int val) {
+    if (currentBuffer) {
+        currentBuffer->property["gamma"]=val;
+        nparent->createQimage();
+    }
 }
 
 void nColorBarWin::setToMin () {
@@ -141,6 +149,7 @@ void nColorBarWin::bufferChanged(nPhysD *phys) {
         vec2f minmax=phys->property["display_range"];
         my_w.lineMin->setText(QString::number(minmax.first()));
         my_w.lineMax->setText(QString::number(minmax.second()));
+        my_w.gamma->setValue(phys->property["gamma"]);
         my_w.histogram->repaint();
     }
 }
