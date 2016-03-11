@@ -133,13 +133,11 @@ void nLineoutBoth::updatePlot(QPointF p) {
 			corner = nparent->my_w.my_view->mapToScene(lowerRight);
 			
 			int b_o[2], b_c[2], b_p[2];
-			double b_r[2], b_s[2];
-			b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
+
+            b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
 			b_c[0] = int(corner.x()); b_c[1] = int(corner.y());
 			b_p[0] = int(p.x()); b_p[1] = int(p.y());
-			b_r[0] = currentBuffer->get_origin().x(); b_r[1] = currentBuffer->get_origin().y();
-			b_s[0] = currentBuffer->get_scale().x(); b_s[1] = currentBuffer->get_scale().y();
-			
+
 			statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
 			
 			double vmin=0, vmax=0;

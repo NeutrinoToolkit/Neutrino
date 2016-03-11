@@ -30,8 +30,8 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 {
 	my_w.setupUi(this);
 	
-	my_w.histogram->parentPan=this;
-	
+    my_w.histogram->parentPan=this;
+
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	connect(nparent, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));

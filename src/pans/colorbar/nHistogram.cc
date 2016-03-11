@@ -29,11 +29,11 @@
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
 	setMouseTracking(true);
-	offsety=9;
+    offsety=8;
 	dyColorBar=offsety*3/2;
 	offsetx=6;
 	setMinimumHeight(200);
-	parentPan=NULL;
+    parentPan=NULL;
 }
 
 
@@ -45,9 +45,10 @@ void nHistogram::colorValue(double val) {
 void nHistogram::mouseMoveEvent (QMouseEvent *e)
 {
 	if (parentPan->currentBuffer) {
-		double frac_value;
-		frac_value=(e->pos().x()-offsetx)/((double) width()-2*offsetx);
-		frac_value=max(0.0,min(1.0, frac_value));
+        double  frac_value=(e->pos().x()-offsetx)/((double) width()-2*offsetx);
+        frac_value=max(0.0,min(1.0, frac_value));
+//        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
+
 		if (e->pos().y()<dyColorBar + 4*offsety) {
 			colorvalue=parentPan->my_w.lineMin->text().toDouble()+frac_value*(parentPan->my_w.lineMax->text().toDouble()-parentPan->my_w.lineMin->text().toDouble());
 		} else {
@@ -159,8 +160,7 @@ void nHistogram::drawPicture (QPainter &p) {
 		
 		double deltacolor;
 		double deltaimage;
-		QString pippo;
-		
+
 		int tics1=0;
 		while (1) {
 			tics1++;

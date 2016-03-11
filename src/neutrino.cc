@@ -1138,7 +1138,7 @@ neutrino::createQimage() {
                                currentBuffer->getW()*4,
                                QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(int(currentBuffer->property["gamma"])));
+        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(currentBuffer->gamma()));
     }
 	my_w.my_view->setSize();    
 }
@@ -1271,7 +1271,7 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         break;
     case Qt::Key_Period:
         if (currentBuffer) {
-             setGamma(0);
+             setGamma(1);
         }
         break;
     case Qt::Key_Question:

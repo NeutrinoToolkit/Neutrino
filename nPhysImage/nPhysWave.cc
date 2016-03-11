@@ -63,8 +63,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 	
 		vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-		int n_iter = angles.size()*lambdas.size();
-		
+
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
@@ -106,7 +105,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 				}
 				params.iter++;
 				(*params.iter_ptr)++;
-				DEBUG(11,(100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+                DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
 				double cr = cos(angles[j] * _phys_deg); 
 				double sr = sin(angles[j] * _phys_deg);
 
@@ -340,8 +339,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
             int dy=params.data->getH();
 
             vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-            int n_iter = angles.size()*lambdas.size();
-        
+
             nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
             qmap = new nPhysD(dx, dy, 0.0, "quality");
         
@@ -377,7 +375,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                     }
                     params.iter++;
                     (*params.iter_ptr)++;
-                    DEBUG((100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+                    DEBUG((100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
             
                     gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)params.damp, (float)params.thickness);
                     cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
@@ -790,8 +788,8 @@ void phys_invert_abel(abel_params &params)
 			axe_inv_mean[0] += iaxis[ii].x;
 			axe_inv_mean[1] += iaxis[ii].y;
 		}
-		int axe_average = (double)axe_inv_mean[inv_idx]/iaxis.size();
-		DEBUG(5, "Axe average: "<<axe_average);
+
+        DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
 
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
 			if ((*params.iter_ptr)==-1) {
