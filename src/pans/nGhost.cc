@@ -48,6 +48,15 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 
     QApplication::processEvents();
 
+
+    vector<unsigned char> pippo = {100,100};
+
+    QMap<QString, vector<unsigned char> > m;
+
+    m["pippo"]={100,100};
+
+    vector<unsigned char> *ceppa=&(m["pippo"]);
+
 }
 
 void nGhost::guessCarrier() {

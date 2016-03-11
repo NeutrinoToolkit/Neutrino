@@ -108,7 +108,7 @@ public:
 	// --------- data structures -----------
 	QString colorTable;
 	QList<QAction *> listabuffer;
-	QMap<QString, unsigned char *> nPalettes;
+    QMap<QString, vector<unsigned char>> nPalettes;
 
 private:
     QList<nGenericPan*> panList;

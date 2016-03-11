@@ -1138,7 +1138,8 @@ neutrino::createQimage() {
                                currentBuffer->getW()*4,
                                QImage::Format_RGBA8888_Premultiplied);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString::number(currentBuffer->gamma()));
+        QString gamma_str=currentBuffer->gamma()<1? "1/"+ QString::number(int(1.0/currentBuffer->gamma())) : QString::number(int(currentBuffer->gamma()));
+        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+gamma_str);
     }
 	my_w.my_view->setSize();    
 }
@@ -1693,7 +1694,7 @@ bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
 					listDoubleColor[i]=qMakePair(256.0*(listDoubleColor.at(i).first-minVal)/(maxVal-minVal),listDoubleColor.at(i).second);
 				}
 				
-				unsigned char *palC = new unsigned char [768];
+                vector<unsigned char> palC(768);
 				
 				int counter=1;
 				for (int i=0;i<256;i++) {
@@ -1709,9 +1710,6 @@ bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
 
 					while (i+1>listDoubleColor.at(counter).first) counter++;
 				}
-				if (nPalettes.contains(paletteName)) {
-					delete nPalettes[paletteName];
-				}				
 				nPalettes[paletteName] = palC;
 				changeColorTable(paletteName);
 				return true;
@@ -1725,7 +1723,7 @@ QString neutrino::addPaletteFromFile(QString paletteFile) {
 	QFile file(paletteFile);
 	QString paletteName=QFileInfo(paletteFile).baseName();
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		unsigned char *palette = new unsigned char[256*3]();
+        vector<unsigned char> palette(768);
 		bool allOk=true;
 		int i=0;
 		while (!file.atEnd() && allOk) {
@@ -1766,7 +1764,6 @@ QString neutrino::addPaletteFromFile(QString paletteFile) {
 			nPalettes[paletteName] = palette;
 			changeColorTable(paletteName);
 		} else {
-			delete palette;
 			paletteName.clear();
 		}
 	}

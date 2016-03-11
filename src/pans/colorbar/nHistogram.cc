@@ -86,11 +86,10 @@ void nHistogram::drawPicture (QPainter &p) {
 	int dy= height()-2*offsety;
 	int dx= width()-2*offsetx;
 	int dyHisto=2*offsety+2*dyColorBar;
-	unsigned char *listacolori=parentPan->nparent->nPalettes[parentPan->nparent->colorTable];
 
-	if (listacolori) {
+    if (parentPan->nparent->nPalettes[parentPan->nparent->colorTable].size()) {
 		for (int i=0; i<256; i++) {
-			QColor colore=QColor((int)listacolori[3*i+0],(int)listacolori[3*i+1],(int)listacolori[3*i+2]);
+            QColor colore=QColor((int)parentPan->nparent->nPalettes[parentPan->nparent->colorTable][3*i+0],(int)parentPan->nparent->nPalettes[parentPan->nparent->colorTable][3*i+1],(int)parentPan->nparent->nPalettes[parentPan->nparent->colorTable][3*i+2]);
 			p.setBrush(colore);
 			p.setPen(QPen(colore));
 			p.drawRect(offsetx+i*dx/256,2*offsety,1+dx/256,dyColorBar);

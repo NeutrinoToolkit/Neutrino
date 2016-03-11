@@ -238,16 +238,14 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		p->setPen(QColor(rulerColor));
 		p->drawPath(allGrid);
 		p->setPen(QColor(color));
-		
-		unsigned char* listacolori=nparent->nPalettes[nparent->colorTable];
-		
-		if (listacolori) {
+				
+        if (nparent->nPalettes[nparent->colorTable].size()) {
 			QPen emptyPen=pen;
 			emptyPen.setColor(QColor(0,0,0,0));
 			emptyPen.setWidth(0);
 			p->setPen(emptyPen);
 			for (int i=0; i<256; i++) {
-				QColor colore=QColor((int)listacolori[3*i+0],(int)listacolori[3*i+1],(int)listacolori[3*i+2]);
+                QColor colore=QColor((int)nparent->nPalettes[nparent->colorTable][3*i+0],(int)nparent->nPalettes[nparent->colorTable][3*i+1],(int)nparent->nPalettes[nparent->colorTable][3*i+2]);
 				p->setBrush(colore);
 				//			p.setPen(QPen(colore));
 				double dx=((double) size.width())/256.0;

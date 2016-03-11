@@ -208,7 +208,6 @@ void nColorBarWin::removePalette() {
 		if (paletteName==my_w.paletteName->text()){
 			if (nparent->nPalettes.contains(paletteName)) {
 				if (nparent->colorTable==paletteName) nparent->nextColorTable();
-				delete nparent->nPalettes[paletteName];
 				nparent->nPalettes.remove(paletteName);
 				QSettings my_set("neutrino","");
 				my_set.beginGroup("Palettes");
@@ -311,7 +310,6 @@ void nColorBarWin::removePaletteFile() {
 			QString paletteName=(*it)->text(0);
 			if (nparent->nPalettes.contains(paletteName)) {
 				if (nparent->colorTable==paletteName) nparent->nextColorTable();
-				delete nparent->nPalettes[paletteName];
 				nparent->nPalettes.remove(paletteName);
 				paletteFiles.removeAll((*it)->text(1));
 				delete (*it);

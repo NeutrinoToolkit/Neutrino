@@ -592,14 +592,14 @@ public:
         return gamma_int < 1 ? -1.0/(gamma_int-2) : (gamma_int == 0 ? 1 : gamma_int);
     }
 
-    const unsigned char *to_uchar_palette(unsigned char * palette) {
+    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette) {
         bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
         double mini=minmax.first();
         double maxi=minmax.second();
 
         DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		
-        if (getSurf()>0 && palette) {
+        if (getSurf()>0 && palette.size()==768) {
 
             uchar_buf.resize(width*height*4);
             if (!property.have("gamma")) {
