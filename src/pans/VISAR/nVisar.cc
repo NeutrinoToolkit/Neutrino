@@ -744,7 +744,14 @@ void nVisar::updatePlot() {
 				
                 velocity[k].setSamples(my_vel);
                 reflectivity[k].setSamples(my_refl);
-			}
+
+                velocity[k].show();
+                reflectivity[k].show();
+            } else {
+
+                velocity[k].hide();
+                reflectivity[k].hide();
+            }
 		}			
 
 		int k;
@@ -799,7 +806,7 @@ void nVisar::getCarrier(int k) {
 
 	nPhysD *phys=getPhysFromCombo(combo); 
 	if (phys && fringeRect[k]) {
-		QRect geom2=fringeRect[k]->getRect();
+        QRect geom2=fringeRect[k]->getRect(phys);
 		nPhysD datamatrix = phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
 		vec2f vecCarr=phys_guess_carrier(datamatrix, visar[k].guessWeight->value());
@@ -958,7 +965,7 @@ void nVisar::getPhase(int k) {
 			QList<nPhysD*> imageList;
 			imageList << getPhysFromCombo(visar[k].refImage) << getPhysFromCombo(visar[k].shotImage);
 			for (int m=0;m<2;m++) {
-				QRect geom2=fringeRect[k]->getRect();
+                QRect geom2=fringeRect[k]->getRect(imageList[m]);
 				QPolygonF shiftData, intensityData, contrastData;
 				int intensityShift=visar[k].intensityShift->value();
 				double offsetIntensity=(m==0?visar[k].offRef->value():visar[k].offShot->value());
