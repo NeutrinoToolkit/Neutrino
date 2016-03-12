@@ -295,11 +295,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 				allTics.moveTo(i*((double)size.width())/((double)colorTics),size.height()+3.0*p->fontMetrics().height()/4.0);
 				allTics.lineTo(i*((double)size.width())/((double)colorTics),size.height()+p->fontMetrics().height());
 
-                double number=mini+pow(double(i)/((double)colorTics),1.0/nparent->currentBuffer->gamma())*(maxi-mini);
+                double number=mini+pow(double(i)/colorTics,1.0/nparent->currentBuffer->gamma())*(maxi-mini);
 
 				if (exponentCB!=0) number/=pow(10.0,exponentCB);
 				QString label=QString::number(number,'f',2);
-                DEBUG("> > > > > > > > " << i << " " << label.toStdString());
 				QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());
 				p->drawText(QRectF(i*size.width()/((double)colorTics)-labelSize.width()/2,size.height()+p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 			}

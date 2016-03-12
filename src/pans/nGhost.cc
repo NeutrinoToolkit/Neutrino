@@ -46,17 +46,6 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
-    QApplication::processEvents();
-
-
-    vector<unsigned char> pippo = {100,100};
-
-    QMap<QString, vector<unsigned char> > m;
-
-    m["pippo"]={100,100};
-
-    vector<unsigned char> *ceppa=&(m["pippo"]);
-
 }
 
 void nGhost::guessCarrier() {

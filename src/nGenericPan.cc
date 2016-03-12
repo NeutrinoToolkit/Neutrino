@@ -125,6 +125,10 @@ void nGenericPan::decorate() {
 		}
 	}
 
+    foreach (QAction *wdgt, findChildren<QAction *>()) {
+        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+    }
+
 	QSize iconSize;
 	foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {
 		iconSize=widget->iconSize();
@@ -238,6 +242,9 @@ nGenericPan::loadUi(QSettings *settings) {
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
+    foreach (QAction *widget, findChildren<QAction *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
+    }
 	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
@@ -328,7 +335,10 @@ nGenericPan::saveUi(QSettings *settings) {
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
-	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
+    foreach (QAction *widget, findChildren<QAction *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
+    }
+    foreach (QToolButton *widget, findChildren<QToolButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
@@ -890,12 +900,21 @@ void nGenericPan::button(QString name , int occurrence) {
 		}
 	}
 	my_occurrence=1;
-	foreach (QAction *obj, findChildren<QAction *>()) {
+    foreach (QToolButton *obj, findChildren<QToolButton *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
-				obj->trigger();
+                obj->click();
 			}
 			my_occurrence++;
 		}
 	}
+    my_occurrence=1;
+    foreach (QAction *obj, findChildren<QAction *>()) {
+        if (obj->objectName()==name) {
+            if (my_occurrence==occurrence) {
+                obj->trigger();
+            }
+            my_occurrence++;
+        }
+    }
 }

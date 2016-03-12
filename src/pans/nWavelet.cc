@@ -117,7 +117,7 @@ void nWavelet::physDel(nPhysD* buf) {
 void nWavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-		QRect geom2=region->getRect();
+        QRect geom2=region->getRect(image);
 		nPhysD datamatrix;
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
@@ -148,7 +148,7 @@ void nWavelet::doWavelet () {
 		timer.start();
 
 		saveDefaults();
-		QRect geom2=region->getRect();
+        QRect geom2=region->getRect(image);
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
 		

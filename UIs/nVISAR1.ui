@@ -55,15 +55,21 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
       <widget class="QWidget" name="Settings">
        <attribute name="title">
         <string>Settings</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -72,14 +78,23 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
             <string>Visar 1</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -92,7 +107,16 @@
             <string>Visar 2</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_4">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -109,7 +133,16 @@
         <string>Velocity</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,1">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -120,15 +153,21 @@
           <property name="currentIndex">
            <number>0</number>
           </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
             <string>Visar 1</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_3">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -147,7 +186,16 @@
             <string>Visar 2</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_7">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -185,7 +233,16 @@
         <string>Temperature</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,1">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0" colspan="3">
@@ -194,7 +251,16 @@
            <string>Reference and Shot and offset</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9" columnstretch="1,1,0">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -223,6 +289,9 @@
            </item>
            <item row="0" column="2">
             <widget class="QDoubleSpinBox" name="sopOffset">
+             <property name="toolTip">
+              <string>Background value</string>
+             </property>
              <property name="minimum">
               <double>-99999999.989999994635582</double>
              </property>
@@ -240,7 +309,16 @@
            <string>Time 0 [px] and delta [time]</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_10">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -303,7 +381,16 @@
            <string>Refl.</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_16">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -347,7 +434,16 @@
            <string>Time scale [time/px] and direction</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="1">
@@ -411,7 +507,16 @@
            <string>SOP calibration T0 A</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_14">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -462,7 +567,16 @@
            <string>min max</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_12">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -501,6 +615,9 @@
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
    </property>
    <property name="floatable">
     <bool>false</bool>

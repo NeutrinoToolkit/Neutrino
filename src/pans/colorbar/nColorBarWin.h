@@ -52,7 +52,9 @@ public:
 	};
 	nPhysD *cutOffPhys;
 	Ui::Colorbar my_w;
-	
+
+    QPointer<QComboBox> palettes;
+
 	QColor colorBase;
 	
 public slots:

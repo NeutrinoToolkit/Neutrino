@@ -46,6 +46,10 @@
         <file>icons/run.png</file>
         <file>icons/trash.png</file>
         <file>icons/math.png</file>
+        <file>icons/expand.png</file>
+        <file>icons/invert_colorbar.png</file>
+        <file>icons/histoNorm.png</file>
+        <file>icons/histolog.png</file>
         
         <file>shortcuts.html</file>
     </qresource>
