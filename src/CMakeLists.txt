@@ -64,7 +64,8 @@ set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
 ## sources
 list (APPEND SOURCES 
-    nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc 
+    neutrino.cc neutrinoPalettes.cc 
+    graphics/nScene.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc 
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
     pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
@@ -74,7 +75,7 @@ list (APPEND SOURCES
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
-    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
+    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nGenericPan.cc 
     nApp.cc main.cc 
 )
 

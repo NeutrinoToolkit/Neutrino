@@ -872,7 +872,7 @@
   <customwidget>
    <class>nView</class>
    <extends>QGraphicsView</extends>
-   <header>../src/nView.h</header>
+   <header>../src/graphics/nView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
