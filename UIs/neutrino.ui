@@ -212,7 +212,7 @@
    </widget>
    <widget class="QMenu" name="menuPython">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title">
      <string>Python</string>
