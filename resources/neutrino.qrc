@@ -50,6 +50,7 @@
         <file>icons/invert_colorbar.png</file>
         <file>icons/histoNorm.png</file>
         <file>icons/histolog.png</file>
+        <file>icons/lockColor.png</file>
         
         <file>shortcuts.html</file>
     </qresource>

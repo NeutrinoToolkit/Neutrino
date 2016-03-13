@@ -636,6 +636,7 @@ void neutrino::setGamma(int value) {
     if (currentBuffer) {
         currentBuffer->property["gamma"]=value;
         createQimage();
+        setProperty("gamma",value);
         emitBufferChanged();
     }
 }
@@ -1090,9 +1091,15 @@ neutrino::showPhys(nPhysD* datamatrix) {
 	if (datamatrix) {
 		if (!physList.contains(datamatrix)) addPhys(datamatrix);
         
-        if (currentBuffer && my_w.actionLockColors->isChecked()) {
-            datamatrix->property["display_range"]=currentBuffer->property["display_range"];
-            datamatrix->property["gamma"]=currentBuffer->property["gamma"];
+        if (currentBuffer) {
+            if (my_w.actionLockColors->isChecked()) {
+                datamatrix->property["display_range"]=currentBuffer->property["display_range"];
+                datamatrix->property["gamma"]=currentBuffer->gamma();
+            } else {
+                if (!datamatrix->property.have("gamma")) {
+                    datamatrix->property["gamma"]=property("gamma").toInt();
+                }
+            }
         }
         
         if (!datamatrix->property.have("display_range")) {
@@ -2101,7 +2108,12 @@ void neutrino::saveDefaults(){
 	my_set.setValue("fileExport", property("fileExport"));
 	my_set.setValue("fileOpen", property("fileOpen"));
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
-    my_set.setValue("physNameLength", property("physNameLength").toInt());
+    my_set.setValue("physNameLength", property("physNameLength"));
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    if (currentBuffer) {
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << property("gamma").toInt());
+        my_set.setValue("gamma",property("gamma"));
+    }
 	my_set.endGroup();
 }
 
@@ -2140,7 +2152,9 @@ void neutrino::loadDefaults(){
     
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
-	my_set.endGroup();
+    setProperty("gamma", my_set.value("gamma",0));
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << property("gamma").toInt());
+    my_set.endGroup();
 }
 
 nGenericPan*

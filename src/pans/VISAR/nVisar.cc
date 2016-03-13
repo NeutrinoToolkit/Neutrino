@@ -42,9 +42,9 @@ nVisar::nVisar(neutrino *nparent, QString winname)
  
 	// signals
 
-	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-	connect(my_w.tabWidget1, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-	connect(my_w.tabWidget2, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(my_w.tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(my_w.tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(my_w.tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
@@ -258,7 +258,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	for (int k=0;k<2;k++){
 		for (int m=0;m<2;m++){
 			QString name="Visar "+QString::number(k+1)+" "+QString::number(m);
-			phase[k][m].setName(name.toUtf8().constData());
+            phase[k][m].setName(name.toUtf8().constData());
 			phase[k][m].setShortName("phase");
 			contrast[k][m].setName(name.toUtf8().constData());
 			contrast[k][m].setShortName("contrast");
@@ -271,7 +271,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	
 	decorate();
 	connections();
-    my_w.tabWidget->setCurrentIndex(0);
+    my_w.tabs->setCurrentIndex(0);
 
 }
 
@@ -286,13 +286,13 @@ void nVisar::loadSettings(QString my_settings) {
 void nVisar::mouseAtMatrix(QPointF p) {
 	int k=0;
 	double position=0.0;
-	if (my_w.tabWidget->currentIndex()==0) {
-		k=my_w.tabWidget1->currentIndex();
+    if (my_w.tabs->currentIndex()==0) {
+        k=my_w.tabPhase->currentIndex();
 		position=(direction(k)==0) ? p.y() : p.x();
 		mouseMarker[k].setXValue(position);
 		mouseMarker[k].plot()->replot();
-	} else if (my_w.tabWidget->currentIndex()==1) {
-		k=my_w.tabWidget2->currentIndex();
+    } else if (my_w.tabs->currentIndex()==1) {
+        k=my_w.tabVelocity->currentIndex();
 		position=((direction(k)==0 ? p.y() : p.x() )-setvisar[k].physOrigin->value())*setvisar[k].physScale->value()+setvisar[k].offsetTime->value();
 		mouseMarker[2].setXValue(position);
 		mouseMarker[2].plot()->replot();
@@ -332,21 +332,21 @@ void nVisar::tabChanged(int k) {
 
 	// QPainter::begin: Paint device returned engine == 0, type: 2
 	
-	QTabWidget *tabWidget=qobject_cast<QTabWidget *>(sender());
-	if (!tabWidget) tabWidget=my_w.tabWidget;
+    QTabWidget *tabWidget=qobject_cast<QTabWidget *>(sender());
+    if (!tabWidget) tabWidget=my_w.tabs;
 
-	if (tabWidget==my_w.tabWidget) {
+    if (tabWidget==my_w.tabs) {
 		if (k==0) {
-			tabWidget=my_w.tabWidget1;
+            tabWidget=my_w.tabPhase;
 		} else if (k==1) {
-			tabWidget=my_w.tabWidget2;
+            tabWidget=my_w.tabVelocity;
 		}
 	}
     
 	if (k<2) {
-		int visnum=tabWidget->currentIndex();
+        int visnum=tabWidget->currentIndex();
 		nparent->showPhys(getPhysFromCombo(visar[visnum].shotImage));
-        if (tabWidget==my_w.tabWidget2) {
+        if (tabWidget==my_w.tabVelocity) {
 			updatePlot();
 		}
 	} else if (k==2){
@@ -712,7 +712,7 @@ void nVisar::updatePlot() {
 		}			
 
 		int k;
-		k=my_w.tabWidget2->currentIndex();
+        k=my_w.tabVelocity->currentIndex();
 		QPen pen;
 
 		pen=velocity[k].pen();
@@ -747,7 +747,7 @@ void nVisar::getCarrier() {
 			getCarrier(k);
 		}
 	}
-	if (my_w.tabWidget->currentIndex()==1) {
+    if (my_w.tabs->currentIndex()==1) {
 		my_w.statusbar->showMessage(tr("Carrier (")+QString::number(visar[0].interfringe->value())+tr("px, ")+visar[0].angle->value()+tr("deg) - (")+QString::number(visar[1].interfringe->value())+tr("px, ")+visar[1].angle->value()+tr("deg)"));
 	}
 }
@@ -773,7 +773,7 @@ void nVisar::getCarrier(int k) {
 		} else {
 			visar[k].interfringe->setValue(vecCarr.first());
 			visar[k].angle->setValue(vecCarr.second());
-			if (my_w.tabWidget1->currentIndex()==k) {
+            if (my_w.tabPhase->currentIndex()==k) {
 				my_w.statusbar->showMessage(tr("Carrier :")+QString::number(vecCarr.first())+tr("px, ")+QString::number(vecCarr.second())+tr("deg"));
 			}
 		}
@@ -1039,12 +1039,12 @@ nVisar::export_txt_multiple() {
 void
 nVisar::export_txt() {
 	QString title=tr("Export ");
-	switch (my_w.tabWidget->currentIndex()) {
+    switch (my_w.tabs->currentIndex()) {
 		case 0:
-			title=tr("VISAR")+QString(" ")+QString::number(my_w.tabWidget1->currentIndex()+1);
+            title=tr("VISAR")+QString(" ")+QString::number(my_w.tabPhase->currentIndex()+1);
 			break;
 		case 1:
-			title=tr("VISAR")+QString(" ")+QString::number(my_w.tabWidget2->currentIndex()+1);
+            title=tr("VISAR")+QString(" ")+QString::number(my_w.tabVelocity->currentIndex()+1);
 			break;
 		case 2:
 			title=tr("SOP");
@@ -1056,12 +1056,12 @@ nVisar::export_txt() {
 		QFile t(fnametmp);
 		t.open(QIODevice::WriteOnly| QIODevice::Text);
 		QTextStream out(&t);
-		switch (my_w.tabWidget->currentIndex()) {
+        switch (my_w.tabs->currentIndex()) {
 			case 0:
-				out << export_one(my_w.tabWidget1->currentIndex());
+                out << export_one(my_w.tabPhase->currentIndex());
 				break;
 			case 1:
-				out << export_one(my_w.tabWidget2->currentIndex());
+                out << export_one(my_w.tabVelocity->currentIndex());
 				break;
 			case 2:
 				out << export_sop();
@@ -1077,10 +1077,10 @@ nVisar::export_txt() {
 void
 nVisar::export_clipboard() {
 	QClipboard *clipboard = QApplication::clipboard();
-	switch (my_w.tabWidget->currentIndex()) {
+    switch (my_w.tabs->currentIndex()) {
 		case 0:
-			clipboard->setText(export_one(my_w.tabWidget1->currentIndex()));
-			my_w.statusbar->showMessage(tr("Points copied to clipboard ")+my_w.tabWidget1->tabText(my_w.tabWidget1->currentIndex()));
+            clipboard->setText(export_one(my_w.tabPhase->currentIndex()));
+            my_w.statusbar->showMessage(tr("Points copied to clipboard ")+my_w.tabPhase->tabText(my_w.tabPhase->currentIndex()));
 			break;
 		case 1:
 			clipboard->setText(export_one(0)+"\n\n"+export_one(1));
@@ -1175,9 +1175,9 @@ nVisar::export_pdf() {
         
         QSizeF my_size(150, 100);
         
-		switch (my_w.tabWidget->currentIndex()) {
+        switch (my_w.tabs->currentIndex()) {
 			case 0:
-				renderer.renderDocument(visar[my_w.tabWidget1->currentIndex()].plotPhaseIntensity, fnametmp, QFileInfo(fnametmp).suffix(), my_size, DPI);
+                renderer.renderDocument(visar[my_w.tabPhase->currentIndex()].plotPhaseIntensity, fnametmp, QFileInfo(fnametmp).suffix(), my_size, DPI);
 				break;
 			case 1:
 				renderer.renderDocument(my_w.plotVelocity, fnametmp, QFileInfo(fnametmp).suffix(), my_size, DPI);

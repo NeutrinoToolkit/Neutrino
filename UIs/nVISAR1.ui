@@ -37,7 +37,7 @@
      <number>0</number>
     </property>
     <item row="1" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabs">
       <property name="sizeIncrement">
        <size>
         <width>0</width>
@@ -54,6 +54,9 @@
       </property>
       <property name="currentIndex">
        <number>0</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
       </property>
       <widget class="QWidget" name="Settings">
        <attribute name="title">
@@ -73,12 +76,15 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <widget class="QTabWidget" name="tabWidget1">
+         <widget class="QTabWidget" name="tabPhase">
           <property name="tabPosition">
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
            <number>0</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -146,12 +152,15 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <widget class="QTabWidget" name="tabWidget2">
+         <widget class="QTabWidget" name="tabVelocity">
           <property name="tabPosition">
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
            <number>0</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">

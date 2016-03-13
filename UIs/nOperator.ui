@@ -209,6 +209,11 @@
          </item>
          <item>
           <property name="text">
+           <string>Blur+Sobel</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Log 10</string>
           </property>
          </item>
@@ -245,6 +250,11 @@
          <item>
           <property name="text">
            <string>Tan</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Sobel</string>
           </property>
          </item>
         </widget>

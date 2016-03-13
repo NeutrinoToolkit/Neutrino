@@ -517,8 +517,45 @@ phys_fast_gaussian_blur(nPhysD &m1, double radius)
 	phys_fast_gaussian_blur(m1,radius,radius);
 }
 
+// get sobel matrix
+void phys_sobel(nPhysD &image) {
+    nPhysD my_copy=image;
+    image.setShortName("Sobel");
+    image.setName("Sobel "+image.getName());
+    image.setFromName(image.getFromName());
+    double Gx[9];
+    Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
+    Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
+    Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
+
+    double Gy[9];
+    Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
+    Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
+    Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
+
+    for(size_t i = 0 ; i < my_copy.getW() ; i++) {
+        for(size_t j = 0 ; j < my_copy.getH(); j++) {
+            double value_gx = 0.0;
+            double value_gy = 0.0;
+            for(size_t k = 0 ; k < 3 ; k++) {
+                for(size_t l = 0 ; l < 3 ; l++) {
+                    value_gx += Gx[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                    value_gy += Gy[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                }
+            }
+            image.set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
+        }
+    }
+    image.TscanBrightness();
+}
+
+void phys_gauss_sobel(nPhysD &image, double radius) {
+    phys_fast_gaussian_blur(image, radius);
+    phys_sobel(image);
+}
+
 void phys_median_filter(nPhysD& image, unsigned int N){
-    nPhysD pippo=image;
+    nPhysD my_copy=image;
     int median_pos=(N*N)/2;
 #pragma omp parallel for collapse(2)
     for(size_t i = 0 ; i < image.getW(); i++) {
@@ -531,13 +568,13 @@ void phys_median_filter(nPhysD& image, unsigned int N){
                }
             }
             nth_element(mat.begin(), mat.begin()+median_pos, mat.end());
-            pippo.set(i,j,mat[median_pos]);
+            my_copy.set(i,j,mat[median_pos]);
         }
     }
 #pragma omp parallel for collapse(2)
     for(size_t i = 0 ; i < image.getW()-N ; i++) {
         for(size_t j = 0 ; j < image.getH()-N; j++) {
-            image.set(i+N/2,j+N/2,pippo.point(i,j));
+            image.set(i+N/2,j+N/2,my_copy.point(i,j));
         }
     }
     image.setShortName("median");

@@ -39,7 +39,7 @@ nOperator::nOperator(neutrino *nparent, QString winname)
 
     // separator represents the difference between operations with 2 operands or 1 modify it in .h
     separator[0]=8;
-    separator[1]=13;
+    separator[1]=14;
 
     my_w.operation->insertSeparator(separator[0]);
     my_w.operation->insertSeparator(separator[1]);
@@ -220,6 +220,15 @@ void nOperator::doOperation () {
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
+            } else if (my_w.operation->currentIndex()==separator[0]+5) {
+                bool ok;
+                double scalar=my_w.num2->text().toDouble(&ok);
+                if (ok) {
+                    myresult=new nPhysD(*image1);
+                    phys_gauss_sobel(*myresult,scalar);
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
+                }
             }
 
         }
@@ -242,6 +251,8 @@ void nOperator::doOperation () {
             phys_cos(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+8) {
             phys_tan(*myresult);
+        } else if (my_w.operation->currentIndex()==separator[1]+9) {
+            phys_sobel(*myresult);
         }
     }
 

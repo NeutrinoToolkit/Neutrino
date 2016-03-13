@@ -187,6 +187,12 @@ phys_fast_gaussian_blur(nPhysD &, double);
 void
 phys_fast_gaussian_blur(nPhysD &, double, double);
 
+void
+phys_sobel(nPhysD&);
+
+void
+phys_gauss_sobel(nPhysD&, double);
+
 template<> void
 nPhysC::TscanBrightness();
 
