@@ -17,6 +17,12 @@ ifeq ($(UNAME_S),Darwin)
         NUMPROC := $(shell sysctl -n hw.ncpu)
 endif
 
+CMAKEFLAGS ?=
+ifeq (,$(findstring debug,$(config)))
+	CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Debug
+endif
+
+
 all: $(UNAME_S)
 
 version_tag:=$(shell git describe --abbrev=0 --tags)
@@ -34,14 +40,14 @@ colormap:
 
 debug::
 	mkdir -p $@
-	cd $@ && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cd $@ && cmake $(CMAKEFLAGS) .. 
 	$(MAKE) -C $@ -j $(NUMPROC)
 	@echo "\nDebug : $@/Neutrino.app"
 
 Darwin:: 
 	rm -rf $@ 
 	mkdir -p $@
-	cd $@ && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cd $@ && cmake  -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	$(MAKE) -C $@ -j $(NUMPROC)
 	rm -rf Neutrino.app
 	cp -r $@/Neutrino.app .

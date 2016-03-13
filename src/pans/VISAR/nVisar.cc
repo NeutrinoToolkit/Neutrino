@@ -195,8 +195,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	zoomer[2]->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
 	zoomer[2]->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 
-    DEBUG("here");
-    
     sopCurve[0].setPen(QPen(Qt::red,1));
     sopCurve[0].setXAxis(QwtPlot::xBottom);
     sopCurve[0].setYAxis(QwtPlot::yLeft);
@@ -230,7 +228,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
     sopCurve[3].attach(my_w.sopPlot);
     sopCurve[3].setStyle(QwtPlotCurve::NoCurve);
     
-    DEBUG("here");
 	zoomer[3] = new nVisarZoomer(my_w.sopPlot->canvas());
 	zoomer[3]->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
 	zoomer[3]->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
@@ -275,7 +272,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 	decorate();
 	connections();
     my_w.tabWidget->setCurrentIndex(0);
-    DEBUG("HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
 }
 
@@ -569,45 +565,6 @@ void nVisar::updatePlotSOP() {
 	connections();
 }
 
-
-//void nVisar::updatePlotRefl1() {
-//	DEBUG("here");
-//	my_w.UsR->detachItems(QwtPlotItem::Rtti_PlotCurve);
-//    
-//	disconnections();
-//
-//    for (int k=0;k<2;k++) {
-//        if(velocity[k].dataSize() == reflectivity[k].dataSize()) {
-//            QVector<QPointF> refl(velocity[k].dataSize());
-//            for (int i=0;i<refl.size();i++) {
-//                refl[i].rx()=velocity[k].sample(i).y();
-//                refl[i].ry()=reflectivity[k].sample(i).y();
-//            }       
-//            QwtPlotCurve *reflCurve= new QwtPlotCurve();
-//            reflCurve->setStyle(QwtPlotCurve::NoCurve);
-//            
-//            QwtSymbol *sym=new QwtSymbol(QwtSymbol::Ellipse);
-//            sym->setSize(5,5);
-//            sym->setPen(QPen(k==0?Qt::red : Qt::blue,1));
-//            sym->setColor(k==0?Qt::red:Qt::blue);
-//
-//            
-//            reflCurve->setSymbol(sym);
-//            reflCurve->setXAxis(QwtPlot::xBottom);
-//            reflCurve->setYAxis(QwtPlot::yLeft);
-//            reflCurve->setSamples(refl);
-//            reflCurve->attach(my_w.UsR);
-//        }
-//    }
-//    
-//    my_w.UsR->setAxisAutoScale(QwtPlot::xBottom);
-//    my_w.UsR->setAxisAutoScale(QwtPlot::yLeft);
-//    my_w.UsR->replot();
-//    zoomer[4]->setZoomBase();    
-//    
-//	connections();
-//}
-
 void nVisar::updatePlot() {
 	disconnections();
 	if (cPhase[0][0].dataSize()>0 || cPhase[0][1].dataSize()>0){
@@ -855,7 +812,6 @@ void nVisar::doWave(int k) {
             nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
             progress.setValue(++counter);
             QApplication::processEvents();
-            DEBUG(progress.value());
             
             size_t dx=physfftRef.getW();
             size_t dy=physfftRef.getH();
@@ -877,15 +833,13 @@ void nVisar::doWave(int k) {
             
             progress.setValue(++counter);
             QApplication::processEvents();
-            DEBUG(progress.value());
             for (size_t kk=0; kk<dx*dy; kk++) {
                 intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
                 intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
             }
             progress.setValue(++counter);
             QApplication::processEvents();
-            DEBUG(progress.value());
-            
+
             phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
             phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
             
@@ -894,7 +848,7 @@ void nVisar::doWave(int k) {
             double cr = cos((visar[k].angle->value()) * _phys_deg); 
             double sr = sin((visar[k].angle->value()) * _phys_deg);
             double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-            double damp_norm=visar[k].damp->value()*M_PI;
+            double damp_norm=M_PI;
             
             double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
             for (size_t x=0;x<dx;x++) {
@@ -1166,8 +1120,8 @@ nVisar::export_plot(QwtPlot* my_plot) {
             listCurve << (QwtPlotCurve*)(*it);
         }
     }
-	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> listCurve.size() " << listCurve.size());
-	if (listCurve.size()>0) {
+
+    if (listCurve.size()>0) {
 		for (unsigned int j=0;j<listCurve.at(0)->dataSize();j++) {
 			out += QString("%L1\t").arg(listCurve.at(0)->sample(j).x(),10,'E',3);
 			for (int i=0; i<listCurve.size();i++) {

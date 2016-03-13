@@ -524,7 +524,7 @@ physDouble_img::physDouble_img(string ifilename)
             ifile.read((char *)&buffer,sizeof(unsigned short));
             DEBUG(">>>>>>>>>>> " <<  i << " " << buffer);
             if (buffer != 0)
-                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please cntact developpers");
+                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
         }
 
 		ifile.read((char *)&buffer,sizeof(unsigned short));
@@ -532,9 +532,8 @@ physDouble_img::physDouble_img(string ifilename)
         
         for (int i=0;i<25;i++) {
             ifile.read((char *)&buffer,sizeof(unsigned short));
-            DEBUG(">>>>>>>>>>> " <<  i << " " << buffer);
             if (buffer != 0)
-                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please cntact developpers");
+                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
         }
 
 		string buffer2;
@@ -586,7 +585,6 @@ physDouble_img::physDouble_img(string ifilename)
         ifile.close();
         property["kind"]=kind;
         property["skip bytes"]=skipbyte;
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>> " << skipbyte);
 
         int retVal=phys_open_RAW(this,kind,skipbyte,endian);
         if (retVal!=0) resize(0,0);
