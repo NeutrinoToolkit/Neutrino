@@ -43,7 +43,6 @@
 #include "nGenericPan.h"
 #include "nPlug.h"
 #include "nView.h"
-#include "nScene.h"
 
 // base ui
 #include "ui_neutrino.h"
@@ -79,7 +78,7 @@ public:
 	QGraphicsScene *getScene();
 	Ui::neutrino my_w;
 
-	nScene my_s;
+    QGraphicsScene my_s;
 
 	Ui::nSbarra my_sbarra;
 

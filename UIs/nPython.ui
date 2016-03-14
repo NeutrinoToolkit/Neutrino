@@ -22,7 +22,7 @@
      <number>4</number>
     </property>
     <property name="topMargin">
-     <number>6</number>
+     <number>8</number>
     </property>
     <property name="rightMargin">
      <number>4</number>
@@ -48,7 +48,16 @@
         <string>Scripts</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -119,7 +128,16 @@
         <string>Config</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item row="0" column="0">
@@ -244,13 +262,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
   </widget>
  </widget>
  <resources>

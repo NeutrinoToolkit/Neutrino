@@ -739,17 +739,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 QVariant nGenericPan::get(QString name, int occurrence) {
 	int my_occurrence=1;
-//	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-//		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
-//			if (my_occurrence==occurrence) {
-//				nPhysD *copyPhys=getPhysFromCombo(obj);
-//				return qVariantFromValue(*copyPhys);
-//			}
-//			my_occurrence++;
-//		}
-//	}
-//	my_occurrence=1;
-	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
+x`	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
 				return QVariant(obj->currentIndex());
