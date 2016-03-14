@@ -91,6 +91,7 @@ neutrino::~neutrino()
         delete phys;
     }
     currentBuffer=NULL;
+    PythonQt::self()->getMainModule().removeVariable(objectName());
 }
 
 /// Creator
@@ -109,7 +110,7 @@ neutrino::neutrino():
 //	my_w.menubar->setParent(NULL);
 //#endif
 
-	
+
 	currentBuffer=NULL;
 
 	follower=NULL;
@@ -118,12 +119,6 @@ neutrino::neutrino():
 	int numwin=qApp->property("numWin").toInt()+1;
 	qApp->setProperty("numWin",numwin);
 	setProperty("winId",numwin);
-
-#ifdef HAVE_PYTHONQT
-    QString pyname;
-    pyname.sprintf("n%03d",property("winId").toInt());
-    setObjectName(pyname);
-#endif
 
 	setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
@@ -1297,6 +1292,7 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     case Qt::Key_A: {
         if (currentBuffer) {
             currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+            currentBuffer->property["gamma"]=1;
             createQimage();
             emit updatecolorbar();
         }
@@ -2188,47 +2184,6 @@ void neutrino::about() {
 	credits.setInformativeText(it);
 	credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
 	credits.exec();
-}
-
-QList<QList<qreal> > neutrino::getData(int num) {
-	QList<QList<qreal> > myListList;
-	nPhysD *my_phys=getBuffer(num);
-	if (my_phys) {
-		for (size_t i=0; i<my_phys->getH(); i++) {
-			QList<qreal> myList;
-			for (size_t j=0; j<my_phys->getW(); j++) {
-				myList.append(my_phys->point(j,i));
-			}
-			myListList.append(myList);
-		}
-	}
-	return myListList;
-}
-
-bool neutrino::setData(QList<QList<qreal> >myListList,int num) {
-	size_t sizeH = myListList.size();
-	if (sizeH > 0) {
-		size_t sizeW = myListList.first().size();
-		nPhysD *newPhys=new nPhysD(sizeW,sizeH,0.0,"Python");
-		for (size_t i=0; i<sizeH; i++) {
-			if (myListList.at(i).size()!=int(sizeW)) {
-				delete newPhys;
-				return false;
-			}
-			for (size_t j=0; j<sizeW; j++) {
-				newPhys->set(j,i,myListList.at(i).at(j));
-			}
-		}
-        newPhys->TscanBrightness();
-		if (num>=0 && num<physList.size()) {			
-			replacePhys(newPhys, physList.at(num), true);
-		} else {
-			addShowPhys(newPhys);
-		}
-		return true;
-	} else {
-		return false;
-	}
 }
 
 nGenericPan* neutrino::openPan(QString panName) {

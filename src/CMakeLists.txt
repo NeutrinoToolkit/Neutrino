@@ -64,7 +64,8 @@ set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
 ## sources
 list (APPEND SOURCES 
-    neutrino.cc neutrinoPalettes.cc 
+    neutrino.cc
+    graphics/neutrinoPalettes.cc
     graphics/nScene.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc 
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  

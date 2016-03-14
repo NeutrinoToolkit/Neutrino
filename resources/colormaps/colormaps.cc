@@ -4,7 +4,7 @@
 #include <iomanip>
 
 int main(int , char **) {
-	QFile fileout("../../src/neutrinoPalettes.cc");
+	QFile fileout("../../src/graphics/neutrinoPalettes.cc");
 	fileout.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream outs(&fileout);
     outs << "#include \"neutrino.h\"\nvoid neutrino::build_colormap() \{\n";

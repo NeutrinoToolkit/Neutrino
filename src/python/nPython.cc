@@ -21,6 +21,8 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
 	completer->setCompletionMode(QCompleter::PopupCompletion);
 	my_w.scriptFile->setCompleter(completer);
 
+    PythonQt::self()->getMainModule().addObject("neu", nparent);
+
 	decorate();
     
     connect(my_w.changeScriptsFolder, SIGNAL(released()), this, SLOT(changeScriptsFolder()));

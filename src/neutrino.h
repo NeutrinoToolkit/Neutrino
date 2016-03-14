@@ -318,8 +318,6 @@ public slots:
 	void emitPanDel(nGenericPan*);
 	
 	// to python
-	QList<QList<qreal> > getData(int=-1);
-	bool setData(QList<QList<qreal> >,int=-1);
 	
 	nLine* line(QString);
 	
