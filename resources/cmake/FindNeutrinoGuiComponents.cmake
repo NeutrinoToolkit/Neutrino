@@ -57,11 +57,6 @@ if (PYTHONQT_FOUND_COMPLETE)
 	list (APPEND UIS ../UIs/nPython.ui)	
 endif()
 
-
-## find qt MUST be LAST to all modifications to SOURCES list
-## (otherwise automoc and autoui won't take new sources in account)
-set (RESOURCES "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.qrc")
-
 ## find qt -- search for 5.x first, fallback to 4.x
 find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets QUIET)
 if (Qt5_FOUND)

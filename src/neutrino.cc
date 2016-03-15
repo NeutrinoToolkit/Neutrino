@@ -2105,9 +2105,7 @@ void neutrino::saveDefaults(){
 	my_set.setValue("fileOpen", property("fileOpen"));
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
     my_set.setValue("physNameLength", property("physNameLength"));
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     if (currentBuffer) {
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << property("gamma").toInt());
         my_set.setValue("gamma",property("gamma"));
     }
 	my_set.endGroup();
@@ -2149,7 +2147,6 @@ void neutrino::loadDefaults(){
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
     setProperty("gamma", my_set.value("gamma",0));
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>" << property("gamma").toInt());
     my_set.endGroup();
 }
 
@@ -2171,19 +2168,36 @@ void neutrino::about() {
 	
 	credits.setText(QString("<h1>Neutrino</h1><br><i>the only neutrino faster than light</i><br>")+tr("version: ")+__VER);
 
-	QString it("Alessandro Flacco: alessandro.flacco@polytechnique.edu <br>Tommaso Vinci: tommaso.vinci@polytechnique.edu<hr>http://web.luli.polytechnique.fr/Neutrino<hr>");
 
 #ifdef __neutrino_key
-	it.append(QString("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
+    QString it("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
 
 	// copy serial to clipboard
-	QClipboard *cb = QApplication::clipboard();
-	cb->setText(qApp->property("nHash").toString());
+    QApplication::clipboard()->setText(qApp->property("nHash").toString());
+    credits.setInformativeText(it);
 #endif
 
-	credits.setInformativeText(it);
-	credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
-	credits.exec();
+    credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
+    QGridLayout *l=qobject_cast<QGridLayout *>(credits.layout());
+
+    DEBUG(l << " - " << credits.layout()->objectName().toStdString());
+    if (l) {
+        QTextBrowser *creditsText= new QTextBrowser(this);
+        creditsText->setReadOnly(true);
+        creditsText->setOpenExternalLinks(false);
+        creditsText->setOpenLinks(false);
+        QFile lic(":/html/license.html");
+        if (lic.open(QFile::ReadOnly | QFile::Text)) {
+            creditsText->insertHtml(QTextStream(&lic).readAll());
+            DEBUG(l->rowCount() << " " << l->columnCount());
+            l->addWidget(creditsText,l->rowCount(),0,1,l->columnCount());
+        }
+    } else {
+        credits.setInformativeText(credits.informativeText()+ QString("<a href=\"mailto:alessandro.flacco@polytechnique.edu,tommaso.vinci@polytechnique.edu\">Alessandro Flacco, Tommaso Vinci</a><hr><a href=\"http://web.luli.polytechnique.fr/Neutrino\">Homepage</a><br><a href=\"https://github.com/aflux/neutrino\">Repository</a><br><a href=\"https://github.com/aflux/neutrino/releases\">Download</a><br><a href=\"https://github.com/aflux/neutrino/issues\">Report a bug</a>"));
+    }
+
+
+    credits.exec();
 }
 
 nGenericPan* neutrino::openPan(QString panName) {

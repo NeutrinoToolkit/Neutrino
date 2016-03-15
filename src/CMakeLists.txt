@@ -49,9 +49,9 @@ if (OPENMP_FOUND)
 endif()
 
 if (WIN32)
-	if (CMAKE_COMPILER_IS_GNUCXX)
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
-	endif()
+    if (CMAKE_COMPILER_IS_GNUCXX)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
+    endif()
 endif()
 
 
@@ -100,31 +100,56 @@ include(FindNeutrinoGuiComponents)
 if (GENERATE_NHASH)
         set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
 
-	include_directories(neutrino-key)
-	
-	if (UNIX AND (NOT APPLE))
-		add_definitions(-D__neutrino_reg_linux)
-	endif()
+    include_directories(neutrino-key)
+
+    if (UNIX AND (NOT APPLE))
+        add_definitions(-D__neutrino_reg_linux)
+    endif()
 
 endif()
+
+set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
+file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
+set(ICONS_QRC ${ICONSDIR}/icons.qrc)
+file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
+foreach(image_file ${ICONS})
+    file(RELATIVE_PATH image_file_relative_path ${ICONSDIR} ${image_file})
+    file(APPEND ${ICONS_QRC} "        <file>${image_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
+
+set(HTMLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/html)
+file(GLOB_RECURSE ICONS ${HTMLDIR}/*.html)
+set(HTML_QRC ${HTMLDIR}/html.qrc)
+file(WRITE ${HTML_QRC} "<RCC>\n    <qresource prefix=\"/html/\">\n")
+foreach(image_file ${ICONS})
+    file(RELATIVE_PATH image_file_relative_path ${HTMLDIR} ${image_file})
+    file(APPEND ${HTML_QRC} "        <file>${image_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
+
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
 if (USE_QT5)
-	# add here QT5 only sources
-	list (APPEND SOURCES pans/nCamera.cc)
-	list (APPEND UIS ../UIs/nCamera.ui)
+    # add here QT5 only sources
+    list (APPEND SOURCES pans/nCamera.cc)
+    list (APPEND UIS ../UIs/nCamera.ui)
 
-	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT5_WRAP_UI( UI_HEADERS ${UIS} )
+    qt5_add_resources(RES_SOURCES ${ICONS_QRC})
+    qt5_add_resources(RES_SOURCES ${HTML_QRC})
+    QT5_WRAP_UI( UI_HEADERS ${UIS} )
 elseif (USE_QT4)
-	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT4_WRAP_UI( UI_HEADERS ${UIS} )
+    qt4_add_resources(RES_SOURCES ${ICONS_QRC})
+    qt4_add_resources(RES_SOURCES ${HTML_QRC})
+    QT4_WRAP_UI( UI_HEADERS ${UIS} )
 endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
+
+message(STATUS "Adding qrcs: ${RES_SOURCES}")
 
 
 
@@ -137,17 +162,17 @@ set(LIBS ${LIBS} "nPhysImageF")
 add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
 if(WIN32)
-	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
-	add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${RC_WIN})
+    set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN})
 endif()
 
 if(LINUX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
 endif()
 
 
@@ -158,7 +183,7 @@ target_link_libraries(Neutrino ${LIBS})
 if (USE_QT5)
         qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
-	target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+    target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
 endif()
 
 
@@ -172,14 +197,14 @@ endif()
 
 
 if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
-	set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
-	add_definitions(-DQT_NO_DEBUG_OUTPUT)
-	set(CMAKE_BUILD_RELEASE TRUE)
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+    set(CMAKE_BUILD_RELEASE TRUE)
 else()
-	set(CMAKE_BUILD_RELEASE FALSE)
+    set(CMAKE_BUILD_RELEASE FALSE)
 endif()
 
 message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
@@ -192,20 +217,20 @@ set(PROJECT_DOMAIN_SECOND "com")
 set(PROJECT_DOMAIN "${PROJECT_DOMAIN_FIRST}.${PROJECT_DOMAIN_SECOND}")
 
 if(LINUX)
-	string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
-	set(BIN_INSTALL_DIR "bin")
-	set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
+    string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
+    set(BIN_INSTALL_DIR "bin")
+    set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
 else()
-	set(BIN_INSTALL_DIR ".")
-	set(DOC_INSTALL_DIR ".")
+    set(BIN_INSTALL_DIR ".")
+    set(DOC_INSTALL_DIR ".")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
-	#add_definitions(-Wall -Wextra)
-	# -Wxx are compiler flags and NOT definitions (otherwise: messes up resource compiler)
-	if(CMAKE_BUILD_RELEASE)
-#		add_definitions(-Werror)
-	endif()
+    #add_definitions(-Wall -Wextra)
+    # -Wxx are compiler flags and NOT definitions (otherwise: messes up resource compiler)
+    if(CMAKE_BUILD_RELEASE)
+#        add_definitions(-Werror)
+    endif()
 endif()
 
 
@@ -213,7 +238,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 
 if(APPLE)
-	set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
 
 message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
@@ -222,7 +247,7 @@ message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
 set(LICENSE_FILE "LICENSE.txt")
 
 if(NOT APPLE)
-	install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
+    install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
 endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")

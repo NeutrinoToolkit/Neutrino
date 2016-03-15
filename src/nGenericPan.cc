@@ -739,7 +739,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 QVariant nGenericPan::get(QString name, int occurrence) {
 	int my_occurrence=1;
-x`	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
+    foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
 				return QVariant(obj->currentIndex());
