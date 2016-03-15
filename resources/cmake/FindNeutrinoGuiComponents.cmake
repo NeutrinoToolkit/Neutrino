@@ -50,10 +50,56 @@ if (HDF5_FOUND_COMPLETE)
 	list (APPEND UIS ${UIS} ../UIs/nHDF5.ui)
 endif()
 
+
+if (APPLE)
+
+    include(FindPythonLibs)
+
+    if(PYTHONLIBS_FOUND)
+        list(APPEND LIBS ${PYTHON_LIBRARIES})
+        include_directories(${PYTHON_INCLUDE_DIRS})
+
+        INCLUDE_DIRECTORIES(../../pythonqt-code/src ../../pythonqt-code/src/gui)
+        LINK_DIRECTORIES(/Users/tommaso/pythonqt-code/lib)
+
+        find_library(PYTHONQT NAMES PythonQt PATHS ../pythonqt-code/lib)
+        find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ../pythonqt-code/lib)
+
+        if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
+
+            set (PYTHONQT_FOUND_COMPLETE "TRUE")
+
+            message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
+            list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
+            add_definitions(-DHAVE_PYTHONQT)
+
+            FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ../../pythonqt-code/src)
+            IF (PYTHONQT_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
+                  include_directories(${PYTHONQT_INCLUDE_DIR})
+            ELSE()
+                set (PYTHONQT_FOUND_COMPLETE "FALSE")
+            ENDIF ()
+
+            FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ../../pythonqt-code/extensions/PythonQt_QtAll)
+            IF (PYTHONQTALL_INCLUDE_DIR)
+                  message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
+                  include_directories(${PYTHONQTALL_INCLUDE_DIR})
+            ELSE()
+                set (PYTHONQT_FOUND_COMPLETE "FALSE")
+            ENDIF ()
+
+        endif()
+
+
+    endif()
+endif()
+
+
 if (PYTHONQT_FOUND_COMPLETE)
     MESSAGE(STATUS "adding python wrappers")
 	include_directories(python)
-	list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)	
+        list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc python/PythonQtScriptingConsole.cpp)
 	list (APPEND UIS ../UIs/nPython.ui)	
 endif()
 
