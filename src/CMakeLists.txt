@@ -63,7 +63,9 @@ set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
 
 ## sources
-list (APPEND SOURCES 
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
+
+list (APPEND SOURCES
     neutrino.cc
     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
@@ -79,26 +81,14 @@ list (APPEND SOURCES
     nApp.cc main.cc 
 )
 
-## UIs
-list (APPEND UIS 
-    ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui 
-    ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui 
-    ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui 
-    ../UIs/nGhost.ui ../UIs/nInterpolatePath.ui ../UIs/nIntegralInversion.ui 
-    ../UIs/nPreferences.ui ../UIs/nOpenRAW.ui ../UIs/nColorBarWin.ui 
-    ../UIs/nOperator.ui ../UIs/nCutoffMask.ui ../UIs/nBoxLineout.ui ../UIs/nLineout.ui 
-    ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
-    ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
-    ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
-    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 
-)
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 
 include(FindNeutrinoGuiComponents)
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
 if (GENERATE_NHASH)
-        set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
+    set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
 
     include_directories(neutrino-key)
 
@@ -108,25 +98,36 @@ if (GENERATE_NHASH)
 
 endif()
 
+# write automatically the qrc file for icons
 set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
 file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
 set(ICONS_QRC ${ICONSDIR}/icons.qrc)
 file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
-foreach(image_file ${ICONS})
-    file(RELATIVE_PATH image_file_relative_path ${ICONSDIR} ${image_file})
-    file(APPEND ${ICONS_QRC} "        <file>${image_file_relative_path}</file>\n")
+foreach(my_file ${ICONS})
+    file(RELATIVE_PATH my_file_relative_path ${ICONSDIR} ${my_file})
+    file(APPEND ${ICONS_QRC} "        <file>${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
 
+# write automatically the qrc file for html
 set(HTMLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/html)
-file(GLOB_RECURSE ICONS ${HTMLDIR}/*.html)
+file(GLOB HTMLS ${HTMLDIR}/*.html)
 set(HTML_QRC ${HTMLDIR}/html.qrc)
 file(WRITE ${HTML_QRC} "<RCC>\n    <qresource prefix=\"/html/\">\n")
-foreach(image_file ${ICONS})
-    file(RELATIVE_PATH image_file_relative_path ${HTMLDIR} ${image_file})
-    file(APPEND ${HTML_QRC} "        <file>${image_file_relative_path}</file>\n")
+foreach(my_file ${HTMLS})
+    file(RELATIVE_PATH my_file_relative_path ${HTMLDIR} ${my_file})
+    file(APPEND ${HTML_QRC} "        <file>${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
+
+file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*.html)
+set(LICENSES_QRC ${HTMLDIR}/licenses.qrc)
+file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
+foreach(my_file ${HTMLLICENSES})
+    file(RELATIVE_PATH my_file_relative_path ${HTMLDIR} ${my_file})
+    file(APPEND ${LICENSES_QRC} "        <file>${my_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
@@ -138,10 +139,12 @@ if (USE_QT5)
 
     qt5_add_resources(RES_SOURCES ${ICONS_QRC})
     qt5_add_resources(RES_SOURCES ${HTML_QRC})
+    qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
     QT5_WRAP_UI( UI_HEADERS ${UIS} )
 elseif (USE_QT4)
     qt4_add_resources(RES_SOURCES ${ICONS_QRC})
     qt4_add_resources(RES_SOURCES ${HTML_QRC})
+    qt4_add_resources(RES_SOURCES ${LICENSES_QRC})
     QT4_WRAP_UI( UI_HEADERS ${UIS} )
 endif()
 

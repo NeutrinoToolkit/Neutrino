@@ -2180,18 +2180,34 @@ void neutrino::about() {
     credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
     QGridLayout *l=qobject_cast<QGridLayout *>(credits.layout());
 
+
     DEBUG(l << " - " << credits.layout()->objectName().toStdString());
     if (l) {
         QTextBrowser *creditsText= new QTextBrowser(this);
         creditsText->setReadOnly(true);
         creditsText->setOpenExternalLinks(false);
         creditsText->setOpenLinks(false);
-        QFile lic(":/html/license.html");
-        if (lic.open(QFile::ReadOnly | QFile::Text)) {
-            creditsText->insertHtml(QTextStream(&lic).readAll());
-            DEBUG(l->rowCount() << " " << l->columnCount());
-            l->addWidget(creditsText,l->rowCount(),0,1,l->columnCount());
+
+        credits.setMinimumHeight(0);
+        credits.setMaximumHeight(QWIDGETSIZE_MAX);
+        credits.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+        QDirIterator it(":licenses/", QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            QString fname=it.next();
+            QFile lic(fname);
+            if (lic.open(QFile::ReadOnly | QFile::Text)) {
+                QString licenseText=QTextStream(&lic).readAll();
+                if (!licenseText.isEmpty()) {
+                    creditsText->insertHtml("<h1>"+QFileInfo(fname).completeBaseName()+" license :</h1><br>");
+                    creditsText->insertHtml(licenseText);
+                    creditsText->insertHtml("<br><hr>");
+                    DEBUG(fname.toStdString());
+                }
+            }
         }
+        l->addWidget(creditsText,l->rowCount(),0,1,l->columnCount());
+
     } else {
         credits.setInformativeText(credits.informativeText()+ QString("<a href=\"mailto:alessandro.flacco@polytechnique.edu,tommaso.vinci@polytechnique.edu\">Alessandro Flacco, Tommaso Vinci</a><hr><a href=\"http://web.luli.polytechnique.fr/Neutrino\">Homepage</a><br><a href=\"https://github.com/aflux/neutrino\">Repository</a><br><a href=\"https://github.com/aflux/neutrino/releases\">Download</a><br><a href=\"https://github.com/aflux/neutrino/issues\">Report a bug</a>"));
     }
