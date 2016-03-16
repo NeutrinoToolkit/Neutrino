@@ -31,50 +31,31 @@
 #include "nGenericPan.h"
 
 // you should include here the relevant (if any) ui_??.h
-//#include "ui_skel.h"
+#include "ui_test-plugin.h"
 
-#ifndef __skel_plugin
-#define __skel_plugin
+#ifndef __test_plugin_plugin
+#define __test_plugin_plugin
 
 class neutrino;
 
-// This object does the real work, here you write a nGenericPan as if it were in the main tree
-class mySkelGUI : public nGenericPan {
-Q_OBJECT
-public:
-	mySkelGUI(neutrino *, QString);
-
-	Ui::skel my_w;
-
-public slots:
-
-	// here the GUI slots
-
-private:
-
-	// here your private stuff
-
-};
-
-
-// the skel object is in charge of reconstructing connections (runtime) with neutrino. It is in charge
+// the test_plugin object is in charge of reconstructing connections (runtime) with neutrino. It is in charge
 // of the real object instantiation.
-class skel : public QObject, nPlug {
+class test_plugin : public QObject, nPlug {
 Q_OBJECT
 Q_INTERFACES(nPlug)
 
 public:
-	skel();
+	test_plugin();
 
-	~skel()
-	{ std::cerr<<"~skel"<<  std::endl; }
+	~test_plugin()
+	{ std::cerr<<"~test_plugin"<<  std::endl; }
 	
 	QString name()
-	{ return QString("My skel plugin"); }
+	{ return QString("My test_plugin plugin"); }
 
 	bool instantiate(neutrino *); // where the construction is performed
 
-	bool unload(); // where we dismantle everything when politely asked to
+	bool unload() // where we dismantle everything when politely asked to
 	{ }
 	
 	nGenericPan *my_GP;
@@ -91,5 +72,22 @@ private:
 };
 
 
+// This object does the real work, here you write a nGenericPan as if it were in the main tree
+class mySkelGUI : public nGenericPan {
+Q_OBJECT
+public:
+	mySkelGUI(neutrino *, QString);
+
+	Ui::test_plugin_objectName my_w;
+
+public slots:
+
+	// here the GUI slots
+
+private:
+
+	// here your private stuff
+
+};
 
 #endif
