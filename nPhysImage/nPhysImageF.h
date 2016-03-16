@@ -604,7 +604,7 @@ public:
 		
         if (getSurf()>0 && palette.size()==768) {
 
-            uchar_buf.resize(width*height*4);
+            uchar_buf.resize(width*height*3);
             if (!property.have("gamma")) {
                 property["gamma"]=1;
             }
@@ -615,12 +615,13 @@ public:
 				//int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
                     unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
-                    uchar_buf[i*4+0] = palette[3*val+0];
-                    uchar_buf[i*4+1] = palette[3*val+1];
-                    uchar_buf[i*4+2] = palette[3*val+2];
-                    uchar_buf[i*4+3] = 255;
+                    uchar_buf[i*3+0] = palette[3*val+0];
+                    uchar_buf[i*3+1] = palette[3*val+1];
+                    uchar_buf[i*3+2] = palette[3*val+2];
 				} else {
-                    uchar_buf[i*4+3] = 0;
+                    uchar_buf[i*3+0] = 255;
+                    uchar_buf[i*3+1] = 255;
+                    uchar_buf[i*3+2] = 255;
 				}
 			}
 

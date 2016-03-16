@@ -120,7 +120,7 @@ foreach(my_file ${HTMLS})
 endforeach()
 file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
 
-file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*.html)
+file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*.txt)
 set(LICENSES_QRC ${HTMLDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})

@@ -1137,8 +1137,8 @@ neutrino::createQimage() {
         const QImage tempImage(currentBuffer->to_uchar_palette(nPalettes[colorTable]),
                                currentBuffer->getW(),
                                currentBuffer->getH(),
-                               currentBuffer->getW()*4,
-                               QImage::Format_RGBA8888_Premultiplied);
+                               currentBuffer->getW()*3,
+                               QImage::Format_RGB888);
 		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
         QString gamma_str=currentBuffer->gamma()<1? "1/"+ QString::number(int(1.0/currentBuffer->gamma())) : QString::number(int(currentBuffer->gamma()));
         my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+gamma_str);
@@ -2168,6 +2168,7 @@ void neutrino::about() {
 	
 	credits.setText(QString("<h1>Neutrino</h1><br><i>the only neutrino faster than light</i><br>")+tr("version: ")+__VER);
 
+    credits.setInformativeText("<a href=\"mailto:alessandro.flacco@polytechnique.edu\">Alessandro Flacco</a><br><a href=\"mailto:tommaso.vinci@polytechnique.edu\">Tommaso Vinci</a><br><a href=\"http://web.luli.polytechnique.fr/Neutrino\">Website</a>");
 
 #ifdef __neutrino_key
     QString it("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
@@ -2199,13 +2200,15 @@ void neutrino::about() {
             if (lic.open(QFile::ReadOnly | QFile::Text)) {
                 QString licenseText=QTextStream(&lic).readAll();
                 if (!licenseText.isEmpty()) {
-                    creditsText->insertHtml("<h1>"+QFileInfo(fname).completeBaseName()+" license :</h1><br>");
+                    creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><br><PRE>\n");
                     creditsText->insertHtml(licenseText);
-                    creditsText->insertHtml("<br><hr>");
+                    creditsText->insertHtml("\n</PRE><br><hr>");
                     DEBUG(fname.toStdString());
                 }
             }
+
         }
+
         l->addWidget(creditsText,l->rowCount(),0,1,l->columnCount());
 
     } else {

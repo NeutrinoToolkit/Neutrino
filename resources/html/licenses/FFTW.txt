@@ -1,9 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-</HEAD>
-<BODY LANG="en" DIR="LTR" style="font-size:10px">
-<PRE>
  FFTW is copyright © 1997--1999 Massachusetts Institute of Technology.
 
 FFTW is free software; you can redistribute it and/or modify it under the terms of the 
@@ -27,6 +21,3 @@ License. (e.g. they do not require you to accompany any object code using FFTW w
 corresponding source code.) For these alternate terms you must purchase a license from 
 MIT's Technology Licensing Office. Users interested in such a license should contact us 
 (fftw@fftw.org) for more information. 
-</PRE>
-</BODY>
-</HTML>
