@@ -23,11 +23,36 @@
  *
  */
 
-#include "skel.h"
+#include "test-plugin.h"
 
 #include "neutrino.h"
 
+// virtuals
+test_plugin::test_plugin()
+	: nparent(NULL)
+{ }
 
+bool
+test_plugin::instantiate(neutrino *neu)
+{
+	if (neu) {
+		nparent = neu;
+	} else
+		return false;
+
+	my_GP = new mySkelGUI(nparent, QString("This test_plugin is a test_plugin"));
+
+	connect(my_GP, SIGNAL(destroyed(QObject *)), this, SLOT(pan_closed(QObject *)));
+}
+
+void
+test_plugin::pan_closed(QObject *qobj)
+{
+	std::cerr<<"[test_plugin] pan closed"<<std::endl;
+	emit(plugin_died(this));
+}
+
+// ------------------------------------------------------------------------------
 
 mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
 	: nGenericPan(nparent, winname)
@@ -35,36 +60,10 @@ mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
 	// here my pan creator
 	
 	// you probably want to instantiate the widget from Ui::
-	//my_w.setupUi(this);
-	//decorate();
+	my_w.setupUi(this);
+
+	decorate();
 
 }
 
-// ------------------------------------------------------------------------------
-// virtuals
-skel::skel()
-	: nparent(NULL)
-{ }
-
-bool
-skel::instantiate(neutrino *neu)
-{
-	if (neu) {
-		nparent = neu;
-	} else
-		return false;
-
-	my_GP = new mySkelGUI(nparent, QString("This skel is a skel"));
-
-	connect(my_GP, SIGNAL(destroyed(QObject *)), this, SLOT(pan_closed(QObject *)));
-}
-
-void
-skel::pan_closed(QObject *qobj)
-{
-	std::cerr<<"[skel] pan closed"<<std::endl;
-	emit(plugin_died(this));
-}
-
-
-Q_EXPORT_PLUGIN2(skel, skel)
+Q_EXPORT_PLUGIN2(test_plugin, test_plugin)
