@@ -69,7 +69,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
+           <iconset resource="../resources/icons/icons.qrc">
             <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
           </property>
           <property name="iconSize">
@@ -107,7 +107,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/neutrino.qrc">
+           <iconset resource="../resources/icons/icons.qrc">
             <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
           </property>
           <property name="iconSize">
@@ -265,7 +265,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -651,7 +651,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/neutrino.qrc">
+              <iconset resource="../resources/icons/icons.qrc">
                <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
              </property>
             </widget>
@@ -1126,7 +1126,7 @@
   </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -1138,7 +1138,7 @@
   </action>
   <action name="actionDoAll">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -1167,7 +1167,7 @@
   <tabstop>refUnwrap</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

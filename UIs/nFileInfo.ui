@@ -23,11 +23,25 @@
     </font>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
      <number>10</number>
     </property>
     <item row="0" column="0">
      <widget class="QLabel" name="label">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="text">
        <string>Name</string>
       </property>
@@ -39,8 +53,6 @@
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../resources/neutrino.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

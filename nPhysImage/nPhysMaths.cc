@@ -544,6 +544,8 @@ void phys_sobel(nPhysD &image) {
                 }
             }
             image.set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
+//angle            image.set(i,j,atan2(value_gy,value_gx));
+
         }
     }
     image.TscanBrightness();

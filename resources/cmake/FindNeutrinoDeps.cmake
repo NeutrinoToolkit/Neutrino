@@ -102,3 +102,18 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
 	add_definitions(-DHAVE_LIBCFITSIO)
 endif()
 
+# opencl
+find_package(OpenCL)
+if (OpenCL_FOUND)
+    message (STATUS "using OpenCL: ${OpenCL_LIBRARIES}")
+    include_directories(${OpenCL_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${OpenCL_LIBRARIES})
+    add_definitions(-DHAVE_OPENCL)
+
+    find_library (CLFFT NAMES clFFT)
+    if (NOT ${CLFFT} STREQUAL "CLFFT-NOTFOUND")
+        message (STATUS "using clFFT: ${CLFFT}")
+        set(LIBS ${LIBS} ${CLFFT})
+        add_definitions(-DHAVE_LIBCLFFT)
+    endif()
+endif()

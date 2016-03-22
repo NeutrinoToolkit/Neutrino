@@ -108,7 +108,6 @@ endif()
 
 # list include_directories
 
-
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")
 target_link_libraries(nPhysImageF ${LIBS})
 
@@ -135,5 +134,6 @@ endif()
 if (NOT APPLE)
     install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
 endif()
+
 
 

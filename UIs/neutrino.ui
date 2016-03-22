@@ -193,7 +193,6 @@
     <addaction name="actionRotate"/>
     <addaction name="actionRegionPath"/>
     <addaction name="actionInterpolate_Path"/>
-    <addaction name="actionBlur"/>
     <addaction name="actionFind_Peaks"/>
     <addaction name="actionOpen_HDF5"/>
     <addaction name="actionPolarigrams"/>
@@ -790,7 +789,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -830,7 +829,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -843,7 +842,7 @@
   </action>
   <action name="actionPython">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
    </property>
    <property name="text">
@@ -852,7 +851,7 @@
   </action>
   <action name="actionOperator">
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
    </property>
    <property name="text">
@@ -876,7 +875,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

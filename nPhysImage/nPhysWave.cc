@@ -31,6 +31,10 @@
 #include "nCuda.h"
 #endif
 
+#ifdef HAVE_LIBCLFFT
+#include "clFFT.h"
+#endif
+
 #include "unwrapping/unwrap_simple.h"
 #include "unwrapping/unwrap_goldstein.h"
 #include "unwrapping/unwrap_quality.h"
@@ -222,6 +226,21 @@ bool cudaEnabled() {
 #endif
 	return false;
 }
+
+int openclEnabled() {
+#ifdef HAVE_LIBCLFFT
+    DEBUG("HAVE_CLFFT");
+    cl_int err;
+    // Discover the number of platforms:
+    cl_uint nplatforms=0;
+    err = clGetPlatformIDs(0, NULL, &nplatforms);
+    if (err == CL_SUCCESS && nplatforms>0) {
+        return nplatforms;
+    }
+#endif
+    return 0;
+}
+
 
 #ifdef HAVE_CUDA
 void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {

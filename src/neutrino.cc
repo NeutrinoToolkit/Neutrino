@@ -44,7 +44,6 @@
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
 #include "nRotate.h"
-#include "nBlur.h"
 #include "nRegionPath.h"
 #include "nInterpolatePath.h"
 #include "nShortcuts.h"
@@ -83,15 +82,6 @@
 
 neutrino::~neutrino()
 {
-    saveDefaults();
-    foreach (nGenericPan *pan, panList) {
-        pan->deleteLater();
-    }
-    foreach (nPhysD *phys, physList) {
-        delete phys;
-    }
-    currentBuffer=NULL;
-    PythonQt::self()->getMainModule().removeVariable(objectName());
 }
 
 /// Creator
@@ -250,7 +240,6 @@ neutrino::neutrino():
 	
 	connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
 	connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
-	connect(my_w.actionBlur, SIGNAL(triggered()), this, SLOT(Blur()));
 	connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
 	connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
@@ -266,6 +255,10 @@ neutrino::neutrino():
 #else
     my_w.menuPython->hide();
 #endif
+
+
+    setProperty("openclUnits",openclEnabled());
+    setProperty("openclUnit",0);
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -357,9 +350,6 @@ neutrino::neutrino():
 
 	updateRecentFileActions();
 
-	loadDefaults();
-    
-    show();
 	
 	//!enable this for testing
 
@@ -394,7 +384,9 @@ neutrino::neutrino():
 	//	Visar();
 	
 
-    
+    loadDefaults();
+    show();
+
 }
 
 void neutrino::processEvents()
@@ -1568,6 +1560,20 @@ neutrino::fileClose() {
 				}
 			}
 		}
+
+        saveDefaults();
+        foreach (nGenericPan *pan, panList) {
+            pan->deleteLater();
+        }
+        QApplication::processEvents();
+        currentBuffer=NULL;
+        foreach (nPhysD *phys, physList) {
+            delete phys;
+        }
+    #ifdef HAVE_PYTHONQT
+        PythonQt::self()->getMainModule().removeVariable(objectName());
+    #endif
+
 		deleteLater();
 		return true;
 	} else {
@@ -2052,15 +2058,6 @@ neutrino::Affine() {
 	return ret;
 }
 
-/// Blur STUFF
-nGenericPan*
-neutrino::Blur() {
-	QString vwinname=tr("Blur");
-	nGenericPan *ret=existsPan(vwinname);
-	if (!ret) ret = new nBlur(this, vwinname);
-	return ret;
-}
-
 /// camera
 nGenericPan*
 neutrino::Camera() {
@@ -2108,7 +2105,8 @@ void neutrino::saveDefaults(){
     if (currentBuffer) {
         my_set.setValue("gamma",property("gamma"));
     }
-	my_set.endGroup();
+    my_set.setValue("openclUnit", property("openclUnit"));
+    my_set.endGroup();
 }
 
 void neutrino::loadDefaults(){
@@ -2147,6 +2145,10 @@ void neutrino::loadDefaults(){
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
     setProperty("gamma", my_set.value("gamma",0));
+
+
+    setProperty("openclUnit",my_set.value("openclUnit", 0));
+
     my_set.endGroup();
 }
 
@@ -2159,64 +2161,41 @@ neutrino::Preferences() {
 }
 
 void neutrino::about() {
-	QMessageBox credits(QString("About"),QString("neutrino"),
-						QMessageBox::NoIcon,
-						QMessageBox::Close,
-						QMessageBox::NoButton,
-						QMessageBox::NoButton,
-						this);
-	
-	credits.setText(QString("<h1>Neutrino</h1><br><i>the only neutrino faster than light</i><br>")+tr("version: ")+__VER);
 
-    credits.setInformativeText("<a href=\"mailto:alessandro.flacco@polytechnique.edu\">Alessandro Flacco</a><br><a href=\"mailto:tommaso.vinci@polytechnique.edu\">Tommaso Vinci</a><br><a href=\"http://web.luli.polytechnique.fr/Neutrino\">Website</a>");
+    QDialog myabout(this);
+    my_about.setupUi(&myabout);
+    connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
+    connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
 #ifdef __neutrino_key
-    QString it("<br><br>This neutrino serial number: %1").arg(qApp->property("nHash").toString()));
-
-	// copy serial to clipboard
-    QApplication::clipboard()->setText(qApp->property("nHash").toString());
-    credits.setInformativeText(it);
+    QString serial(qApp->property("nHash").toString());
+    // copy serial to clipboard
+    myabout.label->setText(myabout.label->text()+"\nSerial number:"+serial);
+    QApplication::clipboard()->setText(serial);
 #endif
 
-    credits.setIconPixmap(QPixmap(":icons/icon.png").scaledToHeight(100,Qt::SmoothTransformation));
-    QGridLayout *l=qobject_cast<QGridLayout *>(credits.layout());
+    my_about.creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
+    my_about.creditsText->setLineWrapColumnOrWidth(80);
+    QScrollBar *vScrollBar = my_about.creditsText->verticalScrollBar();
+    vScrollBar->triggerAction(QScrollBar::SliderToMinimum);
+    QApplication::processEvents();
 
-
-    DEBUG(l << " - " << credits.layout()->objectName().toStdString());
-    if (l) {
-        QTextBrowser *creditsText= new QTextBrowser(this);
-        creditsText->setReadOnly(true);
-        creditsText->setOpenExternalLinks(false);
-        creditsText->setOpenLinks(false);
-
-        credits.setMinimumHeight(0);
-        credits.setMaximumHeight(QWIDGETSIZE_MAX);
-        credits.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-        QDirIterator it(":licenses/", QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            QString fname=it.next();
-            QFile lic(fname);
-            if (lic.open(QFile::ReadOnly | QFile::Text)) {
-                QString licenseText=QTextStream(&lic).readAll();
-                if (!licenseText.isEmpty()) {
-                    creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><br><PRE>\n");
-                    creditsText->insertHtml(licenseText);
-                    creditsText->insertHtml("\n</PRE><br><hr>");
-                    DEBUG(fname.toStdString());
-                }
+    QDirIterator it(":licenses/", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fname=it.next();
+        QFile lic(fname);
+        if (lic.open(QFile::ReadOnly | QFile::Text)) {
+            QString licenseText=QTextStream(&lic).readAll();
+            DEBUG(licenseText.toStdString());
+            if (!licenseText.isEmpty()) {
+                my_about.creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
+                my_about.creditsText->insertPlainText(licenseText);
+                my_about.creditsText->insertHtml("</PRE><br><hr><br>");
+                DEBUG(fname.toStdString());
             }
-
         }
-
-        l->addWidget(creditsText,l->rowCount(),0,1,l->columnCount());
-
-    } else {
-        credits.setInformativeText(credits.informativeText()+ QString("<a href=\"mailto:alessandro.flacco@polytechnique.edu,tommaso.vinci@polytechnique.edu\">Alessandro Flacco, Tommaso Vinci</a><hr><a href=\"http://web.luli.polytechnique.fr/Neutrino\">Homepage</a><br><a href=\"https://github.com/aflux/neutrino\">Repository</a><br><a href=\"https://github.com/aflux/neutrino/releases\">Download</a><br><a href=\"https://github.com/aflux/neutrino/issues\">Report a bug</a>"));
     }
-
-
-    credits.exec();
+    myabout.exec();
 }
 
 nGenericPan* neutrino::openPan(QString panName) {

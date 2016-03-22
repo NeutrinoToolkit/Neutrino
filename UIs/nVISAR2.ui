@@ -76,7 +76,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/neutrino.qrc">
+         <iconset resource="../resources/icons/icons.qrc">
           <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
         </property>
         <property name="neutrinoSave" stdset="0">
@@ -270,7 +270,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/neutrino.qrc">
+         <iconset resource="../resources/icons/icons.qrc">
           <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
         </property>
         <property name="neutrinoSave" stdset="0">
@@ -392,7 +392,7 @@
   <tabstop>resolution</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

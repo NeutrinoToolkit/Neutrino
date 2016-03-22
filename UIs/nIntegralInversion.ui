@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>361</width>
+    <width>366</width>
     <height>504</height>
    </rect>
   </property>
@@ -23,7 +23,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,1,0,0,0" columnstretch="1,0,0">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
      <number>4</number>
     </property>
     <item row="2" column="0" colspan="3">
@@ -47,7 +56,16 @@
         <string>None</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="0" column="0">
@@ -70,7 +88,16 @@
         <string>Neutral</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="1" column="1">
@@ -111,7 +138,16 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <string>Plasma</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_9">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="0" column="0">
@@ -139,7 +175,16 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <string>Protons</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="1" column="1">
@@ -553,7 +598,16 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <item row="3" column="0" colspan="3">
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -610,6 +664,9 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
    </property>
    <property name="iconSize">
     <size>
@@ -701,8 +758,6 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <tabstop>molarRefr_le</tabstop>
   <tabstop>plainTextEdit_3</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/neutrino.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

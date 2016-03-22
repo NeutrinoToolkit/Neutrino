@@ -47,6 +47,7 @@
 // base ui
 #include "ui_neutrino.h"
 #include "ui_nSbarra.h"
+#include "ui_nAbout.h"
 
 //#include "nColorBar.h"
 #include "nColorBarWin.h"
@@ -80,7 +81,8 @@ public:
 
     QGraphicsScene my_s;
 
-	Ui::nSbarra my_sbarra;
+    Ui::nSbarra my_sbarra;
+    Ui::nAbout my_about;
 
 	QPluginLoader *plug_loader;
 	//nPlug *plug_iface;
@@ -294,9 +296,6 @@ public slots:
 	// Affine STUFF
 	nGenericPan* Affine();
 	
-	// BLUR STUFF
-	nGenericPan* Blur();
-    
 	// remove ghost Fringes
 	nGenericPan* Ghost();
     

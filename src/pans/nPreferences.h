@@ -52,6 +52,7 @@ public slots:
 	void useDot();
     void askCloseUnsaved();
     void changephysNameLength(int);
+    void on_openclUnit_valueChanged(int);
 };
 
 #endif

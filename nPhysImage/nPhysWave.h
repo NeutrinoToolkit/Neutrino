@@ -4,7 +4,7 @@
  * 
  *    This file is part of nPhysImage library.
  *
- *    nPhysImage is free software: you can redistribute it and/or modify
+ *    nPhysImage is free software: you can redistribute it and/or modndy
  *    it under the terms of the GNU Lesser General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
  *    (at your option) any later version.
@@ -124,6 +124,7 @@ void phys_wavelet_trasl_cuda(void *, int &);
 void phys_wavelet_trasl_nocuda(void *, int &);
 
 
+int openclEnabled();
 
 // unwrap methods
 nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy);

@@ -33,6 +33,10 @@
 #include <windows.h>
 #endif
 
+#ifdef HAVE_LIBCLFFT
+#include "clFFT.h"
+#endif
+
 nPreferences::nPreferences(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname) {
 	my_w.setupUi(this);
@@ -77,7 +81,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 		my_w.threads->hide();
 		my_w.labelThreads->hide();
 	}
-	if (!cudaEnabled()) {
+
+    if (!cudaEnabled()) {
 		DEBUG("cuda not enabled");
 		my_w.useCuda->setChecked(false);
 		my_w.useCuda->setEnabled(false);
@@ -85,6 +90,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 		my_w.useCuda->setEnabled(true);
 	}
 	
+    my_w.openclUnit->setMaximum(nparent->property("openclUnits").toInt());
+    my_w.openclUnit->setValue(nparent->property("openclUnit").toInt());
 
 	
 	loadDefaults();
@@ -107,6 +114,42 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     
     connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
+}
+
+void nPreferences::on_openclUnit_valueChanged(int num) {
+    nparent->setProperty("openclUnit",num);
+#ifdef HAVE_LIBCLFFT
+    if (num>0){
+        // Discover the number of platforms:
+        cl_uint nplatforms;
+        cl_int err = clGetPlatformIDs(0, NULL, &nplatforms);
+
+        if (num <= nplatforms) {
+
+            // Now ask OpenCL for the platform IDs:
+            cl_platform_id* platforms = (cl_platform_id*)malloc(sizeof(cl_platform_id) * nplatforms);
+            err = clGetPlatformIDs(nplatforms, platforms, NULL);
+
+            // Ask OpenCL about each platform to understand the problem:
+            char name[128];
+            char vendor[128];
+            char version[128];
+
+            fprintf(stdout, "OpenCL reports %d platforms.\n", nplatforms);
+
+            err |= clGetPlatformInfo(platforms[num-1], CL_PLATFORM_VENDOR, 128, vendor, NULL);
+            err |= clGetPlatformInfo(platforms[num-1], CL_PLATFORM_NAME, 128, name, NULL);
+            err |= clGetPlatformInfo(platforms[num-1], CL_PLATFORM_VERSION, 128, version, NULL);
+
+            my_w.statusBar->showMessage("Platform " + QString::number(num) + " " + vendor + " " + name + " " + version);
+
+
+            free(platforms);
+        }
+    } else {
+        my_w.statusBar->showMessage("");
+    }
+#endif
 }
 
 void nPreferences::changeThreads(int num) {

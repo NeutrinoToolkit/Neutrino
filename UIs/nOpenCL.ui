@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nBlur</class>
- <widget class="QMainWindow" name="nBlur">
+ <class>nRotate</class>
+ <widget class="QMainWindow" name="nRotate">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>176</width>
-    <height>163</height>
+    <width>198</width>
+    <height>168</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Blur</string>
+   <string>Rotate</string>
   </property>
   <property name="iconSize">
    <size>
@@ -36,48 +36,7 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>Source image</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <property name="margin">
-        <number>4</number>
-       </property>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="image">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="4" column="0">
-     <widget class="QPushButton" name="doIt">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Blur</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
      <widget class="QGroupBox" name="groupBox_2">
       <property name="font">
        <font>
@@ -85,7 +44,7 @@
        </font>
       </property>
       <property name="title">
-       <string>Value</string>
+       <string>Angle</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
@@ -101,28 +60,25 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QDoubleSpinBox" name="valueBlur">
+        <widget class="QDoubleSpinBox" name="valueAngle">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="suffix">
-          <string> [px]</string>
+          <string> [deg]</string>
          </property>
          <property name="decimals">
           <number>3</number>
          </property>
          <property name="minimum">
-          <double>0.000000000000000</double>
+          <double>-180.000000000000000</double>
          </property>
          <property name="maximum">
-          <double>9999.000000000000000</double>
+          <double>180.000000000000000</double>
          </property>
          <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="value">
           <double>1.000000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
@@ -130,7 +86,63 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="defaultValue">
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>NaN</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mean</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </item>
+        </widget>
+       </item>
       </layout>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QComboBox" name="image">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="neutrinoImage" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QPushButton" name="doIt">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Keep a copy</string>
+      </property>
      </widget>
     </item>
    </layout>
@@ -143,8 +155,6 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="../resources/neutrino.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
