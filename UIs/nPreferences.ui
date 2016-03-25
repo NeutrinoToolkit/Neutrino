@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>368</height>
+    <width>317</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="font">
@@ -201,6 +201,11 @@
         </item>
         <item>
          <widget class="QCheckBox" name="useDot">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Force English notation</string>
           </property>
@@ -211,6 +216,11 @@
         </item>
         <item>
          <widget class="QCheckBox" name="showDimPixel">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Show image size in pixels</string>
           </property>
@@ -227,6 +237,11 @@
         </item>
         <item>
          <widget class="QCheckBox" name="askCloseUnsaved">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Ask before closing unsaved buffer</string>
           </property>
@@ -270,6 +285,13 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
+        <item row="4" column="0">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QWidget" name="widget_3" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -320,7 +342,7 @@
         </item>
         <item row="5" column="0">
          <widget class="QWidget" name="widget_5" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <layout class="QGridLayout" name="gridLayout_3">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -333,7 +355,14 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
+           <item row="0" column="2">
+            <widget class="QSpinBox" name="openclUnit">
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
             <widget class="QLabel" name="label_4">
              <property name="font">
               <font>
@@ -345,23 +374,27 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QSpinBox" name="openclUnit"/>
+           <item row="1" column="1" colspan="2">
+            <widget class="QPlainTextEdit" name="openclDescription">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPlainTextEdit" name="infoCores">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPlainTextEdit" name="infoCores">
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -377,13 +410,6 @@
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>

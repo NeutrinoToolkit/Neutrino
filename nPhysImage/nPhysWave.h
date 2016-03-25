@@ -42,19 +42,25 @@
 #include "mcomplex.h"
 #include "bidimvec.h"
 
+#ifdef HAVE_LIBCLFFT
+#include "clFFT.h"
+#endif
+
+
 //using namespace std;
 
 #ifndef __nPhysWave_h
 #define __nPhysWave_h
 
+#ifdef HAVE_LIBCLFFT
+#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << __err_msg);};
+#endif
+
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
 
 struct wavelet_params_str {
 	wavelet_params_str() :
-	data(NULL),
-	trimimages(false),
-	dosynthetic(false),
-	docropregion(false)	{ 
+    data(NULL),	trimimages(false),	dosynthetic(false),	docropregion(false), opencl_unit(0)	{
 	    iter_ptr = &iter; 
 	}
     
@@ -74,7 +80,8 @@ struct wavelet_params_str {
 	bool trimimages;
 	bool dosynthetic;
 	bool docropregion;
-	
+    int opencl_unit;
+
 	int iter;
 	int *iter_ptr;
 	
@@ -119,12 +126,23 @@ void phys_wavelet_field_2D_morlet(wavelet_params &);
 bool cudaEnabled();
 void phys_wavelet_field_2D_morlet_cuda(wavelet_params &);
 
+void phys_wavelet_field_2D_morlet_opencl(wavelet_params &);
+
 // traslation functions
 void phys_wavelet_trasl_cuda(void *, int &);
 void phys_wavelet_trasl_nocuda(void *, int &);
 
-
 int openclEnabled();
+
+unsigned int opencl_closest_size(unsigned int);
+
+vec2 opencl_closest_size(vec2);
+
+#ifdef HAVE_LIBCLFFT
+std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int);
+#endif
+
+void phys_wavelet_trasl_opencl(void *, int &);
 
 // unwrap methods
 nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy);
@@ -210,7 +228,7 @@ inline void phys_invert_abel_1D(double *ivec, double *ovec, size_t size)
 
 	// shift of half index on the right
 	double prev_p = ovec[0];
-	for (register size_t ii=1; ii<size; ii++) {
+    for (size_t ii=1; ii<size; ii++) {
 		ovec[ii] = .5*(prev_p+ovec[ii]);
 		prev_p = ovec[ii];
 	}

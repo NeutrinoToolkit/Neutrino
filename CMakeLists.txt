@@ -34,6 +34,16 @@ add_compile_options(-std=c++11)
 add_compile_options(-Wall)
 add_compile_options(-fPIC)
 
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  add_compile_options(-stdlib=libc++)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-static-libgcc -static-libstdc++)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  # using Intel C++
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+endif()
+
 
 set (CMAKE_CXX_FLAGS "-O3")
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")

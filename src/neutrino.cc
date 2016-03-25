@@ -70,6 +70,10 @@
 #include "nPython.h"
 #endif
 
+#ifdef HAVE_LIBCLFFT
+#include "nOpenCL.h"
+#endif
+
 #include "nPreferences.h"
 #include "nWinList.h"
 #include "nPhysProperties.h"
@@ -257,8 +261,12 @@ neutrino::neutrino():
 #endif
 
 
-    setProperty("openclUnits",openclEnabled());
-    setProperty("openclUnit",0);
+#ifdef HAVE_LIBCLFFT
+    QAction* action_OpenCL=new QAction("OpenCL", this);
+    connect(action_OpenCL, SIGNAL(triggered()), this, SLOT(OpenCL()));
+    my_w.menuAnalysis->addAction(action_OpenCL);
+#else
+#endif
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -355,9 +363,6 @@ neutrino::neutrino():
 
 //	Palettes();
 //	Colorbar();
-#ifdef  __phys_debug
-    if (numwin==1)	recentFileActs.first()->trigger();
-#endif
 
     //	newRect(QRectF(100,100,300,300), "pippo");
 
@@ -385,6 +390,11 @@ neutrino::neutrino():
 	
 
     loadDefaults();
+
+#ifdef  __phys_debug
+    if (numwin==1)	recentFileActs.first()->trigger();
+#endif
+
     show();
 
 }
@@ -1125,7 +1135,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
 
 void
 neutrino::createQimage() {
-	if (currentBuffer) {
+    if (currentBuffer && currentBuffer->getSurf()>0) {
         const QImage tempImage(currentBuffer->to_uchar_palette(nPalettes[colorTable]),
                                currentBuffer->getW(),
                                currentBuffer->getH(),
@@ -2105,7 +2115,6 @@ void neutrino::saveDefaults(){
     if (currentBuffer) {
         my_set.setValue("gamma",property("gamma"));
     }
-    my_set.setValue("openclUnit", property("openclUnit"));
     my_set.endGroup();
 }
 
@@ -2145,9 +2154,6 @@ void neutrino::loadDefaults(){
 	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
 	setProperty("fileOpen", my_set.value("fileOpen",""));
     setProperty("gamma", my_set.value("gamma",0));
-
-
-    setProperty("openclUnit",my_set.value("openclUnit", 0));
 
     my_set.endGroup();
 }
@@ -2347,6 +2353,8 @@ neutrino::runPyScript(QString fname) {
     t.close();
 }
 
+#endif
+
 // col functions outside neutrino....
 
 
@@ -2399,4 +2407,8 @@ anydata toAnydata(QVariant &my_variant) {
 }
 
 
+#ifdef HAVE_LIBCLFFT
+nGenericPan* neutrino::OpenCL() {
+    return new nOpenCL(this, "nOpenCL");
+}
 #endif

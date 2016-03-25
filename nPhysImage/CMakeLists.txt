@@ -6,7 +6,7 @@ if (LINUX)
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
-add_library (nPhysImageF SHARED bidimvec.cc tools.cc anymap.cc NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
+add_library (nPhysImageF SHARED bidimvec.cc tools.cc nPhysTools.cc anymap.cc NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")
@@ -106,9 +106,8 @@ if (TIFF_FOUND)
 	add_definitions(-DHAVE_LIBTIFF)
 endif()
 
-# list include_directories
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")
 target_link_libraries(nPhysImageF ${LIBS})
 
 # output

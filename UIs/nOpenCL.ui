@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nRotate</class>
- <widget class="QMainWindow" name="nRotate">
+ <class>nOpenCL</class>
+ <widget class="QMainWindow" name="nOpenCL">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>198</width>
-    <height>168</height>
+    <width>263</width>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,105 +23,20 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="topMargin">
      <number>4</number>
     </property>
     <property name="rightMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="4" column="0">
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>Angle</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="leftMargin">
-        <number>4</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>4</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QDoubleSpinBox" name="valueAngle">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="suffix">
-          <string> [deg]</string>
-         </property>
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="minimum">
-          <double>-180.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>180.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="defaultValue">
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>NaN</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Min</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Max</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Mean</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="3" column="0">
+    <item>
      <widget class="QComboBox" name="image">
       <property name="font">
        <font>
@@ -133,7 +48,448 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="0">
+    <item>
+     <widget class="QGroupBox" name="carrierBox">
+      <property name="title">
+       <string>Carrier: interfringe, angle and weight</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,0,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QDoubleSpinBox" name="interfringeCarrier">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix">
+          <string> px</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>-9999.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9999.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QDoubleSpinBox" name="weightCarrier">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Frequency weight (&lt;0 for lower freq; &gt;0 for higher freq)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="minimum">
+          <double>-9.900000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9.900000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.500000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="angleCarrier">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix">
+          <string> ˚</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>360.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_8">
+      <property name="title">
+       <string>Stretch &amp;&amp; rotation</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0" columnstretch="1,1,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Min</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QDoubleSpinBox" name="minStretch">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9999.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Max</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="maxStretch">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>9999.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>number</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QSpinBox" name="numStretch">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>255</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QDoubleSpinBox" name="minAngle">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="suffix">
+          <string> deg</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>360.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QDoubleSpinBox" name="maxAngle">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="suffix">
+          <string> deg</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>360.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QSpinBox" name="numAngle">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>255</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QGridLayout" name="gridLayout_11" columnstretch="0,0">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QLabel" name="angleCarrierLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="widthCarrierLabel">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Thickness and Damp</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QDoubleSpinBox" name="thickness">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="suffix">
+          <string> [px]</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>999.990000000000009</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="damp">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="doIt">
       <property name="font">
        <font>
@@ -141,7 +497,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Keep a copy</string>
+       <string>Calculate</string>
       </property>
      </widget>
     </item>
@@ -154,7 +510,46 @@
     </font>
    </property>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRegion"/>
+   <addaction name="actionGuess_Carrier"/>
+  </widget>
+  <action name="actionGuess_Carrier">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Guess Carrier</string>
+   </property>
+  </action>
+  <action name="actionRegion">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>region</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -325,6 +325,10 @@ public slots:
     
 
 #ifdef HAVE_PYTHONQT
+    nGenericPan* OpenCL();
+#endif
+
+#ifdef HAVE_PYTHONQT
     void loadPyScripts();
     void runPyScript();
     void runPyScript(QString);

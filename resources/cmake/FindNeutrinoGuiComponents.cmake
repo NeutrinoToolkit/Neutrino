@@ -105,8 +105,7 @@ endif()
 
 if (OpenCL_FOUND)
     MESSAGE(STATUS "adding opencl win")
-    include_directories(python)
-    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc python/PythonQtScriptingConsole.cpp)
+    list (APPEND SOURCES pans/nOpenCL.cc)
     list (APPEND UIS ../UIs/nOpenCL.ui)
 endif()
 

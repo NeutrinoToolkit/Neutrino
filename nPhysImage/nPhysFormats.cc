@@ -142,7 +142,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
  
  // .alex. -> zappo via a piene mani, secondo me non serve tutta questa roba
  //	string ostr = ss.str();
- //	for (register size_t ii=0; ii<ostr.length(); ii++) {
+ //	for (size_t ii=0; ii<ostr.length(); ii++) {
  //		if (isprint(ostr[ii])) {
  
  
@@ -170,7 +170,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
  stringstream sline(tline);
  NaNStream nis(sline, sline);
  //while ((sline.tellg() < sline.str().length()) && (sline.tellg() > -1)) {
- for (register size_t col=0; col<ncols; col++) {
+ for (size_t col=0; col<ncols; col++) {
  nis>>Timg_buffer[row*w+col];
  //sline>>Timg_buffer[row*w+col];
  //sline>>Timg_buffer[row*width+col]>>ch;	// forse questo non ci va
@@ -767,12 +767,12 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		WARNING("phys error");
 		return -1;
 	}
-	
-	//int pos = ofile.tellg();
-	//int written_data = 0;
-	
-	//ofile<<my_phys->property<<"\n";
-	
+
+    //int pos = ofile.tellg();
+    //int written_data = 0;
+
+    //ofile<<my_phys->property<<"\n";
+
 
 
 	DEBUG(5,my_phys->getName() << " Short: " << my_phys->getShortName() << " from: " << my_phys->getFromName());
@@ -783,7 +783,7 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		my_phys->property.dumper(ss);
 		std::string str = ss.str(), str2;
 
-        size_t pos;
+        size_t pos=0;
 		while((pos = str.find("\n", pos)) != std::string::npos)
 	      	{
 		   	str.insert(pos+1, "# ");
@@ -794,14 +794,14 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 
 		ofile<<str<<"\n";
 
-		for (register size_t i=0; i<my_phys->getH(); i++) {
-			for (register size_t j=0; j<my_phys->getW()-1; j++)
+        for (size_t i=0; i<my_phys->getH(); i++) {
+            for (size_t j=0; j<my_phys->getW()-1; j++)
 				ofile<<std::setprecision(8)<<my_phys->getPoint(j,i)<<"\t";
 			ofile<<std::setprecision(8)<<my_phys->getPoint(my_phys->getW()-1,i)<<"\n";
 		}
 
-	
-		return 0;
+
+        return 0;
 	}
 	return -1;
 }

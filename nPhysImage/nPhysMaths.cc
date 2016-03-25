@@ -388,7 +388,7 @@ phys_gaussian_blur(nPhysD &m1, double radius)
 	gauss.resize(xx.getW(), xx.getH());
 	double mult = 1/(pow(radius, 2.)*2*M_PI);
 	for (size_t i=0; i<xx.getW(); i++) {
-    	register size_t j;
+        size_t j;
 		for (j=0; j<xx.getH(); j++) {
 			gauss.Timg_matrix[j][i] = mult*exp( -(pow(xx.Timg_matrix[j][i],2)+pow(yy.Timg_matrix[j][i],2))/(2.*pow(radius, 2)) );
 		}
@@ -398,7 +398,7 @@ phys_gaussian_blur(nPhysD &m1, double radius)
 	out.fftshift();
 
 	for (size_t i=0; i<xx.getW(); i++) {
-    	register size_t j;
+        size_t j;
 		for (j=0; j<xx.getH(); j++) {
 			m1.Timg_matrix[j][i] = (out.Timg_matrix[j][i].real())/double(xx.getSurf());
 		}
@@ -690,7 +690,7 @@ void phys_get_vec_brightness(const double *ivec, size_t vlen, double &vmin, doub
 	vmin = isfinite(ivec[0]) ? ivec[0]:0;
 	vmax = isfinite(ivec[0]) ? ivec[0]:0;
 
-	for (register size_t ii=0; ii<vlen; ii++) {
+    for (size_t ii=0; ii<vlen; ii++) {
 		if (isfinite(ivec[ii])) {
 			if (ivec[ii] < vmin)
 				vmin = ivec[ii];
@@ -724,7 +724,7 @@ map<string, nPhysD > to_polar(nPhysC &iphys) {
 	rho.resize(iphys.getW(), iphys.getH());
 	theta.resize(iphys.getW(), iphys.getH());
 
-	for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+    for (size_t ii=0; ii<iphys.getSurf(); ii++) {
 		mcomplex pt = iphys.point(ii);
 		rho.set(ii, pt.mod() );
 		theta.set(ii, pt.arg() );
@@ -743,7 +743,7 @@ map<string, nPhysD > to_rect(const nPhysC &iphys) {
 	re.resize(iphys.getW(), iphys.getH());
 	im.resize(iphys.getW(), iphys.getH());
 
-	for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+    for (size_t ii=0; ii<iphys.getSurf(); ii++) {
 		mcomplex pt = iphys.point(ii);
 		re.set(ii, pt.real() );
 		im.set(ii, pt.imag() );
@@ -762,11 +762,11 @@ map<string, nPhysD > to_powersp(nPhysC &iphys, bool doLog) {
 	psp.resize(iphys.getW(), iphys.getH());
 
     if (doLog) {
-        for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+        for (size_t ii=0; ii<iphys.getSurf(); ii++) {
             psp.set(ii, log10(iphys.point(ii).mcabs()) );
         }
     } else {
-        for (register size_t ii=0; ii<iphys.getSurf(); ii++) {
+        for (size_t ii=0; ii<iphys.getSurf(); ii++) {
             psp.set(ii, iphys.point(ii).mcabs() );
         }
     }
