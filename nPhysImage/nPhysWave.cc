@@ -153,7 +153,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		
 		if ((*params.iter_ptr)!=-1) {
 		
-			for (size_t k=0; k<params.data->getSurf(); k++) {
+#pragma omp parallel for
+            for (size_t k=0; k<params.data->getSurf(); k++) {
 				qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
 				intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
 				wphase->Timg_buffer[k]/=2*M_PI;
@@ -161,18 +162,6 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 			
 			phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
 
-            
-			for (size_t k=0; k<params.data->getSurf(); k++) {
-				if(!std::isfinite(params.data->Timg_buffer[k])){
-					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-					lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				}
-			}
-			
-            
 			params.olist["phase_2pi"] = wphase;
 			params.olist["contrast"] = qmap;
 			params.olist["lambda"] = lambda;
@@ -181,19 +170,19 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 			
 			map<string, nPhysD *>::const_iterator itr;
 			for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                if (params.trimimages) {
-                    nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
-                    delete itr->second;
-                    params.olist[itr->first]=new nPhysD();
-                    *params.olist[itr->first]=image;
-                }
 				itr->second->TscanBrightness();
 				itr->second->set_origin(params.data->get_origin());
 				itr->second->set_scale(params.data->get_scale());
 				itr->second->setFromName(params.data->getFromName());
 				itr->second->setShortName(itr->first);
 				itr->second->setName(itr->first+ " "+params.data->getName());
-			}
+#pragma omp parallel for
+                for (size_t k=0; k<params.data->getSurf(); k++) {
+                    if(!std::isfinite(params.data->Timg_buffer[k])){
+                        itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                    }
+                }
+            }
 		}
 		
 	}
@@ -383,25 +372,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                 cudaMemcpy(&b1[0], cuc1, cubuf_size, cudaMemcpyDeviceToHost);
                 cudaMemcpy(&b2[0], cuc2, cubuf_size, cudaMemcpyDeviceToHost);
                 cudaThreadSynchronize();
-            
-                for (size_t k=0; k<params.data->getSurf(); k++) {
-                    if(std::isfinite(params.data->Timg_buffer[k])){
-                        qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
-                        wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
-                        angle->Timg_buffer[k] = b2[k].x;
-                        lambda->Timg_buffer[k] = b2[k].y;
-                        intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
-                    } else {
-                        qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-                        wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                        angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-                        lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                        intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                    }
-                
-                }
-            
-            
+                        
                 phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
                         
                 wphase->property["unitsCB"]="2pi";
@@ -415,18 +386,17 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
             
                 map<string, nPhysD *>::const_iterator itr;
                 for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                    if (params.trimimages) {
-                        nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
-                        delete itr->second;
-                        params.olist[itr->first]=new nPhysD();
-                        *params.olist[itr->first]=image;
-                    }
                     itr->second->TscanBrightness();
                     itr->second->set_origin(params.data->get_origin());
                     itr->second->set_scale(params.data->get_scale());
                     itr->second->setFromName(params.data->getFromName());
                     itr->second->setShortName(itr->first);
                     itr->second->setName(itr->first+ " "+params.data->getName());
+                    for (size_t k=0; k<params.data->getSurf(); k++) {
+                        if(!std::isfinite(params.data->Timg_buffer[k])){
+                            itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                        }
+                    }
                 }
             }
             
@@ -516,6 +486,7 @@ pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
             }
         }
     }
+    DEBUG("HERE");
     return make_pair(platform,device);
 }
 #endif
@@ -580,7 +551,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
                 "    if (quality>outQual[id]) {\n"
                 "        outQual[id]=quality;\n"
-                "        outPhase[id]=atan2pi(inImag[id],inReal[id])/2;\n"
+                "        outPhase[id]=atan2pi(inImag[id],inReal[id]);\n"
                 "        outLambdaAngle[id]=nlambdaangle;\n"
                 "    }\n"
                 "}\n";
@@ -843,9 +814,8 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             }
         }
 
-        /* Fetch results of calculations : Real and Imaginary. */
-        vector<float> quality(N,0);
-        err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality[0], 0, NULL, NULL);
+        vector<float> quality_sqr(N,0);
+        err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality_sqr[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
         vector<float> phase(N,0);
@@ -884,23 +854,22 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         nPhysD *nQuality = new nPhysD(params.data->getW(),params.data->getH(),0,"Quality");
         nPhysD *nPhase = new nPhysD(params.data->getW(),params.data->getH(),0,"Phase");
+        nPhysD *nIntensity = new nPhysD(params.data->getW(),params.data->getH(),0,"Intensity");
 
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
                 unsigned int k=(j+offset.y())*dx+i+offset.x();
-                nQuality->set(i,j,quality[k]);
-                nPhase->set(i,j,phase[k]);
+                nQuality->set(i,j,sqrt(quality_sqr[k]));
+                nPhase->set(i,j,phase[k]/2.0);
+                nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(M_PI*phase[k]));
             }
         }
 
-        nQuality->TscanBrightness();
-        nQuality->set_origin(params.data->get_origin());
-        nPhase->TscanBrightness();
-        nPhase->set_origin(params.data->get_origin());
-
+        phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
 
         params.olist["phase_2pi"] = nPhase;
         params.olist["contrast"] = nQuality;
+        params.olist["intensity"] = nIntensity;
 
 
         if (params.n_angles>1) {
@@ -911,8 +880,6 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     nAngle->set(i,j,angles[lambdaangle[k]%params.n_angles]);
                 }
             }
-            nAngle->TscanBrightness();
-            nAngle->set_origin(params.data->get_origin());
             params.olist["angle"] = nAngle;
         }
 
@@ -924,26 +891,24 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     nLambda->set(i,j,lambdas[lambdaangle[k]/params.n_angles]);
                 }
             }
-            nLambda->TscanBrightness();
-            nLambda->set_origin(params.data->get_origin());
             params.olist["lambda"] = nLambda;
         }
 
 
         map<string, nPhysD *>::const_iterator itr;
         for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-            if (params.trimimages) {
-                nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
-                delete itr->second;
-                params.olist[itr->first]=new nPhysD();
-                *params.olist[itr->first]=image;
-            }
             itr->second->TscanBrightness();
             itr->second->set_origin(params.data->get_origin());
             itr->second->set_scale(params.data->get_scale());
             itr->second->setFromName(params.data->getFromName());
             itr->second->setShortName(itr->first);
             itr->second->setName(itr->first+ " "+params.data->getName());
+#pragma omp parallel for
+            for (size_t k=0; k<params.data->getSurf(); k++) {
+                if (isnan(params.data->point(k))) {
+                    itr->second->set(k,numeric_limits<double>::quiet_NaN());
+                }
+            }
         }
 
     }
@@ -1024,8 +989,9 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
+#pragma omp parallel for
             for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
-                synthetic.set(ii,quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
+                synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
             }
             synthetic.property=phase_over_2pi->property;
             synthetic.setShortName("synthetic");
@@ -1039,6 +1005,7 @@ void
 phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 {
 
+#pragma omp parallel for collapse(2)
     for (size_t ii=0; ii<iphys.getW(); ii++) {
         for (size_t jj=0; jj<iphys.getH(); jj++) {
 			iphys.Timg_matrix[jj][ii] -= ii*kx + jj*ky;

@@ -42,9 +42,17 @@ endif()
 # fftw_threads
 find_library(FFTW_THREADS NAMES fftw3_threads)
 if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
-	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
-	set(LIBS ${LIBS} ${FFTW_THREADS}) 
-	add_definitions(-DHAVE_LIBFFTW_THREADS)
+        message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
+        set(LIBS ${LIBS} ${FFTW_THREADS})
+        add_definitions(-DHAVE_LIBFFTW_THREADS)
+endif()
+
+# fftw_openmp
+find_library(FFTW_OPENMP NAMES fftw3_omp)
+if (NOT ${FFTW_OPENMP} STREQUAL "FFTW_OPENMP-NOTFOUND")
+        message (STATUS "using FFTW_OPENMP: ${FFTW_OPENMP}")
+        set(LIBS ${LIBS} ${FFTW_OPENMP})
+        add_definitions(-DHAVE_LIBFFTW_OPENMP)
 endif()
 
 #fftw

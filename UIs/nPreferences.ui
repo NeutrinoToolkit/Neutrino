@@ -29,10 +29,10 @@
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="neutrinoSave" stdset="0">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <widget class="QWidget" name="decoration">
        <attribute name="title">
@@ -371,6 +371,9 @@
              </property>
              <property name="text">
               <string>OpenCL unit</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>

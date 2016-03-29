@@ -257,6 +257,7 @@ void nWavelet::doWavelet () {
         QString status_bar_measure;
         status_bar_measure.sprintf("%.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
         my_w.statusbar->showMessage(out+status_bar_measure, 50000);
+        DEBUG(status_bar_measure.toStdString());
     } else {
         my_w.statusbar->showMessage("Canceled", 5000);
     }

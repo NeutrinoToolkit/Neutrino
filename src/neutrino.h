@@ -322,11 +322,6 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *);
 	void dragMoveEvent(QDragMoveEvent *);
 	void dropEvent(QDropEvent *);
-    
-
-#ifdef HAVE_PYTHONQT
-    nGenericPan* OpenCL();
-#endif
 
 #ifdef HAVE_PYTHONQT
     void loadPyScripts();

@@ -43,6 +43,8 @@ Darwin::
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" Neutrino.app/Contents/Info.plist
 ifneq ("$(findstring +,$VERSION)","+")
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Set NSPrincipalClass NSApplication" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Set NSHighResolutionCapable True" Neutrino.app/Contents/Info.plist
 endif
 	-diskutil eject /Volumes/Neutrino 2> /dev/null
 	rm -rf Neutrino.dmg rw.Neutrino.dmg dmg

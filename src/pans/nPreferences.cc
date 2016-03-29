@@ -117,63 +117,64 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
 void nPreferences::on_openclUnit_valueChanged(int num) {
 my_w.openclDescription->clear();
+saveDefaults();
 
 #ifdef HAVE_LIBCLFFT
-    saveDefaults();
-    string desc;
-    pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(num);
-    cl_device_id device=my_pair.second;
+    if (num>0) {
+        string desc;
+        pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(num);
+        cl_device_id device=my_pair.second;
 
-    size_t valueSize;
-    clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &valueSize);
-    string value;
+        size_t valueSize;
+        clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &valueSize);
+        string value;
 
-    value.resize(valueSize);
-    clGetDeviceInfo(device, CL_DEVICE_NAME, valueSize, &value[0], NULL);
-    desc+="Device : "+value;
+        value.resize(valueSize);
+        clGetDeviceInfo(device, CL_DEVICE_NAME, valueSize, &value[0], NULL);
+        desc+="Device : "+value;
 
-    // print hardware device version
-    clGetDeviceInfo(device, CL_DEVICE_VERSION, 0, NULL, &valueSize);
-    value.resize(valueSize);
-    clGetDeviceInfo(device, CL_DEVICE_VERSION, valueSize, &value[0], NULL);
-    desc+="\nHardware version : "+value;
+        // print hardware device version
+        clGetDeviceInfo(device, CL_DEVICE_VERSION, 0, NULL, &valueSize);
+        value.resize(valueSize);
+        clGetDeviceInfo(device, CL_DEVICE_VERSION, valueSize, &value[0], NULL);
+        desc+="\nHardware version : "+value;
 
-    // print software driver version
-    clGetDeviceInfo(device, CL_DRIVER_VERSION, 0, NULL, &valueSize);
-    value.resize(valueSize);
-    clGetDeviceInfo(device, CL_DRIVER_VERSION, valueSize, &value[0], NULL);
-    desc+="\nSoftware version : "+value;
+        // print software driver version
+        clGetDeviceInfo(device, CL_DRIVER_VERSION, 0, NULL, &valueSize);
+        value.resize(valueSize);
+        clGetDeviceInfo(device, CL_DRIVER_VERSION, valueSize, &value[0], NULL);
+        desc+="\nSoftware version : "+value;
 
-    // print c version supported by compiler for device
-    clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, 0, NULL, &valueSize);
-    value.resize(valueSize);
-    clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, valueSize, &value[0], NULL);
-    desc+="\nOpenCL C version : "+value;
+        // print c version supported by compiler for device
+        clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, 0, NULL, &valueSize);
+        value.resize(valueSize);
+        clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, valueSize, &value[0], NULL);
+        desc+="\nOpenCL C version : "+value;
 
-    // print parallel compute units
-    cl_uint int_val;
-    clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS,sizeof(int_val), &int_val, NULL);
-    desc+="\nParallel compute units : "+std::to_string(int_val);
+        // print parallel compute units
+        cl_uint int_val;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS,sizeof(int_val), &int_val, NULL);
+        desc+="\nParallel compute units : "+std::to_string(int_val);
 
-    clGetDeviceInfo(device,  CL_DEVICE_MAX_CLOCK_FREQUENCY ,sizeof(int_val), &int_val, NULL);
-    desc+="\nClock frequency : "+std::to_string(int_val);
+        clGetDeviceInfo(device,  CL_DEVICE_MAX_CLOCK_FREQUENCY ,sizeof(int_val), &int_val, NULL);
+        desc+="\nClock frequency : "+std::to_string(int_val);
 
-    cl_ulong ulong_val;
-    clGetDeviceInfo(device,  CL_DEVICE_MAX_MEM_ALLOC_SIZE ,sizeof(ulong_val), &ulong_val, NULL);
-    desc+="\nAllocatable Memory : "+std::to_string(ulong_val) +"bytes";
-    DEBUG(desc);
+        cl_ulong ulong_val;
+        clGetDeviceInfo(device,  CL_DEVICE_MAX_MEM_ALLOC_SIZE ,sizeof(ulong_val), &ulong_val, NULL);
+        desc+="\nAllocatable Memory : "+std::to_string(ulong_val) +"bytes";
+        DEBUG(desc);
 
-    clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, 0, NULL, &valueSize );
-    value.resize(valueSize);
-    clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, valueSize, &value[0], NULL );
-    desc+="\nExtensions : "+value;
+        clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, 0, NULL, &valueSize );
+        value.resize(valueSize);
+        clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, valueSize, &value[0], NULL );
+        desc+="\nExtensions : "+value;
 
-    desc+="\nDouble support : ";
-    desc+=((value.find("cl_khr_fp64") != std::string::npos) ? "Yes":"No");
+        desc+="\nDouble support : ";
+        desc+=((value.find("cl_khr_fp64") != std::string::npos) ? "Yes":"No");
 
-    my_w.openclDescription->setPlainText(QString::fromStdString(desc));
+        my_w.openclDescription->setPlainText(QString::fromStdString(desc));
 
-
+    }
 
 #endif
 }

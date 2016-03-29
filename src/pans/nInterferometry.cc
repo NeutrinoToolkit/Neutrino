@@ -318,7 +318,6 @@ void nInterferometry::doWavelet (int iimage) {
         my_params.damp=my_w.correlation->value();
         my_params.dosynthetic=true;
         my_params.docropregion=true;
-        my_params.trimimages=false;
 
         QRect geom2=region->getRect(image);
         
@@ -332,6 +331,10 @@ void nInterferometry::doWavelet (int iimage) {
         if (settings.value("useCuda").toBool() && cudaEnabled()) {
 //            phys_wavelet_field_2D_morlet_cuda(my_params);
             runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet "+QString(suffix.c_str()), niter);
+        } else if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
+            DEBUG("Ready to run on OpenCL");
+            my_params.opencl_unit=settings.value("openclUnit").toInt();
+            runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet "+QString(suffix.c_str()), niter);
         } else {
 //            phys_wavelet_field_2D_morlet(my_params);
             runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet "+QString(suffix.c_str()), niter);

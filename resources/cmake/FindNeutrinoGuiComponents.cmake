@@ -103,12 +103,6 @@ if (PYTHONQT_FOUND_COMPLETE)
     list (APPEND UIS ../UIs/nPython.ui)
 endif()
 
-if (OpenCL_FOUND)
-    MESSAGE(STATUS "adding opencl win")
-    list (APPEND SOURCES pans/nOpenCL.cc)
-    list (APPEND UIS ../UIs/nOpenCL.ui)
-endif()
-
 ## find qt -- search for 5.x first, fallback to 4.x
 find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets QUIET)
 if (Qt5_FOUND)

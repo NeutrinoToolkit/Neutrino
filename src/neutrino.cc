@@ -70,10 +70,6 @@
 #include "nPython.h"
 #endif
 
-#ifdef HAVE_LIBCLFFT
-#include "nOpenCL.h"
-#endif
-
 #include "nPreferences.h"
 #include "nWinList.h"
 #include "nPhysProperties.h"
@@ -258,14 +254,6 @@ neutrino::neutrino():
     loadPyScripts();
 #else
     my_w.menuPython->hide();
-#endif
-
-
-#ifdef HAVE_LIBCLFFT
-    QAction* action_OpenCL=new QAction("OpenCL", this);
-    connect(action_OpenCL, SIGNAL(triggered()), this, SLOT(OpenCL()));
-    my_w.menuAnalysis->addAction(action_OpenCL);
-#else
 #endif
 
 	// ---------------------------------------------------------------------------------------------
@@ -691,8 +679,18 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),"neutrino (*.neu *.neus *.hdf *.h5 *.imd *.png *.pgm *.ppm *.jpg *.tiff *.tif *.gif *.sif *.spe *.img *.raw *.txt *.fits *.inf *.gz);; Any files (*)");
-	fileOpen(fnames);
+    QString formats("");
+    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.png *.pgm *.ppm *.sif *.spe *.img *.raw *.fits *.inf *.gz);;";
+    formats+="Images (";
+    foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
+        formats+="*."+format+" ";
+    }
+    formats.chop(1);
+    formats+=");;";
+    formats+=("Any files (*)");
+
+    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),formats);
+    fileOpen(fnames);
 }
 
 void neutrino::fileOpen(QStringList fnames) {
@@ -1471,8 +1469,16 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),
-                                        "neutrino (* *.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);; Any files (*)");
+    QString formats("");
+    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.png *.pgm *.ppm *.sif *.spe *.img *.raw *.fits *.inf *.gz);;";
+    formats+="Images (";
+    foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
+        formats+="*."+format+" ";
+    }
+    formats.chop(1);
+    formats+=");;";
+    formats+=("Any files (*)");
+    return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),formats);
 }
 
 void
@@ -1522,7 +1528,7 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 		int ret=-1;
 		if (suffix.startsWith("neu")) {
 			ret = phys_dump_binary(phys,fname.toUtf8().constData());
-		} else if (suffix.startsWith("tif")) {
+        } else if (fname.endsWith("tif") || fname.endsWith("tiff")) {
 			ret = phys_write_tiff(phys,fname.toUtf8().constData());
 		} else if (suffix.startsWith("fit")) {
 			ret = phys_write_fits(phys,("!"+fname).toUtf8().constData(),4);
@@ -1530,9 +1536,11 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 		} else if (suffix.startsWith("hdf")) {
 			ret = phys_write_HDF4(phys,fname.toUtf8().constData());
 #endif
-		} else {
+        } else if (suffix.startsWith("txt") || suffix.startsWith("dat")) {
 			ret = phys->writeASC(fname.toUtf8().constData());
-		}
+        } else {
+            my_pixitem.pixmap().save(fname);
+        }
 		if (ret==0) {
 			phys->setType(PHYS_FILE);
 			phys->setShortName(QFileInfo(fname).fileName().toStdString());
@@ -2108,8 +2116,9 @@ void neutrino::saveDefaults(){
 	my_set.setValue("gridVisible", my_tics.gridVisible);
 	my_set.setValue("rulerColor", my_tics.rulerColor);
 	my_set.setValue("colorTable", colorTable);
-	my_set.setValue("fileExport", property("fileExport"));
-	my_set.setValue("fileOpen", property("fileOpen"));
+    my_set.setValue("fileExport", property("fileExport"));
+    my_set.setValue("fileExportImage", property("fileExportImage"));
+    my_set.setValue("fileOpen", property("fileOpen"));
 	my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
     my_set.setValue("physNameLength", property("physNameLength"));
     if (currentBuffer) {
@@ -2151,8 +2160,9 @@ void neutrino::loadDefaults(){
     
     setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
     
-	setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
-	setProperty("fileOpen", my_set.value("fileOpen",""));
+    setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
+    setProperty("fileExportImage", my_set.value("fileExportImage", "Untitled.png"));
+    setProperty("fileOpen", my_set.value("fileOpen",""));
     setProperty("gamma", my_set.value("gamma",0));
 
     my_set.endGroup();
@@ -2405,10 +2415,3 @@ anydata toAnydata(QVariant &my_variant) {
     }
     return my_data;
 }
-
-
-#ifdef HAVE_LIBCLFFT
-nGenericPan* neutrino::OpenCL() {
-    return new nOpenCL(this, "nOpenCL");
-}
-#endif
