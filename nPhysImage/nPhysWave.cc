@@ -542,7 +542,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    if (j>=(int)dy/2) j-=dy;\n"
                 "    float xr=i*cr-j*sr;\n"
                 "    float yr=i*sr+j*cr;\n"
-                "    float gauss=exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*exp(-pown(yr*thick_norm,2));\n"
+                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
                 "    outReal[id] = gauss * inReal[id];\n"
                 "    outImag[id] = gauss * inImag[id];\n"
                 "}\n"
@@ -562,7 +562,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         cl_program program = clCreateProgramWithSource(ctx,1,&source, NULL, &err);
         check_opencl_error(err, "clCreateProgramWithSource");
-        err=clBuildProgram(program, 1, &device, "-Werror", NULL, NULL);
+        err=clBuildProgram(program, 1, &device, "-Werror -cl-fast-relaxed-math", NULL, NULL);
         check_opencl_error(err, "clBuildProgram");
 
         if (err == CL_BUILD_PROGRAM_FAILURE) {
