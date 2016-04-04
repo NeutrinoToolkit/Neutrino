@@ -4,14 +4,13 @@
 #include <iomanip>
 
 int main(int , char **) {
-	QFile fileout("../../src/neutrinoPalettes.cc");
+	QFile fileout("../../src/graphics/neutrinoPalettes.cc");
 	fileout.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream outs(&fileout);
     outs << "#include \"neutrino.h\"\nvoid neutrino::build_colormap() \{\n";
 	QDir::setCurrent("cmaps");
     QStringList allFiles = QDir().entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
 	unsigned char *palette = new unsigned char[256*3]();
-	int k=0;
     foreach (QString paletteFile, allFiles) {
 		QFile filein(paletteFile);
 		if (filein.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -46,19 +45,16 @@ int main(int , char **) {
 			}
 			if (i==256 && allOk) {
 				qDebug() << paletteFile << paletteName;
-				outs << "\tunsigned char p" << k <<"[] = {";
-				outs << (int)palette[0];
+				outs << "\tnPalettes[\"" << paletteName << "\"] = {" << (int)palette[0];
 				for (int i=1; i<768; i++) {
 					outs << "," << (int)palette[i];
 				}
-				outs << "};\n\tnPalettes[\"" << paletteName << "\"] = new unsigned char[768]; memcpy(nPalettes[\"" << paletteName << "\"],&p";
-				outs << k <<",768);\n";
-			    k++;
+				outs << "};" << endl;
 			}
 			outs.setFieldWidth(0);			
 		}   
 		filein.close();
 	}
 	delete palette;
-	outs << "}\n";
+	outs << "}" << endl;
 }

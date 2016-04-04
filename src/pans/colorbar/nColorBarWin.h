@@ -52,7 +52,9 @@ public:
 	};
 	nPhysD *cutOffPhys;
 	Ui::Colorbar my_w;
-	
+
+    QPointer<QComboBox> palettes;
+
 	QColor colorBase;
 	
 public slots:
@@ -79,6 +81,7 @@ public slots:
 	
 	void addPaletteFile();
 	void removePaletteFile();
+    void on_gamma_valueChanged(int);
 signals:
 	void change_contrast(double,double);
 

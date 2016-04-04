@@ -55,9 +55,6 @@ using namespace std;
 physDouble_txt::physDouble_txt(const char *ifilename)
 : nPhysImageF<double>(string(ifilename), PHYS_FILE)
 {
-	clock_t time1, time2, time3;
-	time1=clock();
-	
 	ifstream ifile(ifilename);
 	// 1. get image statistics
 	string tline;
@@ -89,7 +86,6 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	ifile.clear();
 	ifile.seekg(0, ios::beg);
 	
-	time2=clock();
 	int row = 0, col = 0;
 	int w = getW();
 	while (getline(ifile, tline) && row<nlines) {
@@ -103,8 +99,6 @@ physDouble_txt::physDouble_txt(const char *ifilename)
 	}
 	
 	TscanBrightness();
-	time3=clock();
-	DEBUG(5,"times: " << time2-time1 << " " << time3-time1);
 }
 
 /* This below is the older version, kept just in case */
@@ -365,7 +359,7 @@ physInt_sif::physInt_sif(string ifilename)
 	}	
 
 	temp_string.clear();
-	int magic_number = 0; // usually 3 (lol)
+	unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
@@ -518,7 +512,7 @@ physDouble_img::physDouble_img(string ifilename)
     
 	ifile.read((char *)&buffer,sizeof(unsigned short));
 	
-	if (buffer == 19785) { // Hamamatsu
+    if (string((char *)&buffer,sizeof(unsigned short)) == "IM") { // Hamamatsu
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		skipbyte=buffer;
 		ifile.read((char *)&buffer,sizeof(unsigned short));
@@ -526,14 +520,22 @@ physDouble_img::physDouble_img(string ifilename)
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		h=buffer;
         
-		ifile.seekg (4, ios_base::cur);
-        
+        for (int i=0;i<2;i++) {
+            ifile.read((char *)&buffer,sizeof(unsigned short));
+            DEBUG(">>>>>>>>>>> " <<  i << " " << buffer);
+            if (buffer != 0)
+                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
+        }
+
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		kind=buffer;
         
-        
-		ifile.seekg (50,ios_base::cur);
-		
+        for (int i=0;i<25;i++) {
+            ifile.read((char *)&buffer,sizeof(unsigned short));
+            if (buffer != 0)
+                throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
+        }
+
 		string buffer2;
 		buffer2.resize(skipbyte);
 		ifile.read((char *)&buffer2[0],skipbyte);		
@@ -542,7 +544,7 @@ physDouble_img::physDouble_img(string ifilename)
         
         switch (kind) {
             case 2: // unsigned short int
-                kind=2;
+                kind=3;
                 break;
             case 3: // unsigned int
                 kind=4;
@@ -780,7 +782,7 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		my_phys->property.dumper(ss);
 		std::string str = ss.str(), str2;
 
-		int pos;
+        size_t pos;
 		while((pos = str.find("\n", pos)) != std::string::npos)
 	      	{
 		   	str.insert(pos+1, "# ");

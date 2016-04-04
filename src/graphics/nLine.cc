@@ -126,11 +126,9 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
 
 	lineOut = new QwtPlotCurve(tr("line Cut"));
-	lineOut-> attach(my_w.my_qwt);
+	lineOut->attach(my_w.my_qwt);
 	lineOut->setXAxis(QwtPlot::xBottom);
 	lineOut->setYAxis(QwtPlot::yLeft);
-
-    grabKeyboard();
 
 }
 

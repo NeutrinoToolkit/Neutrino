@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>230</width>
-    <height>169</height>
+    <height>171</height>
    </rect>
   </property>
   <property name="font">
@@ -109,11 +109,25 @@
     <item row="4" column="0" colspan="2">
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
         <widget class="QCheckBox" name="inverse">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Inverse</string>
          </property>
@@ -124,6 +138,11 @@
        </item>
        <item>
         <widget class="QCheckBox" name="crop">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Crop</string>
          </property>
@@ -226,8 +245,6 @@
  <tabstops>
   <tabstop>image</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/neutrino.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

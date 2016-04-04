@@ -30,8 +30,8 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 {
 	my_w.setupUi(this);
 	
-	my_w.histogram->parentPan=this;
-	
+    my_w.histogram->parentPan=this;
+
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	connect(nparent, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));
@@ -40,12 +40,11 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
-	connect(my_w.savePDF,SIGNAL(released()),my_w.histogram,SLOT(export_PDF_slot()));
-	connect(my_w.checkBox,SIGNAL(stateChanged(int)),my_w.histogram,SLOT(repaint()));
+    connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(repaint()));
 
-	connect(my_w.cutoff,SIGNAL(released()),this,SLOT(cutOff()));
+    connect(my_w.actionCutoff,SIGNAL(triggered()),this,SLOT(cutOff()));
 
-	connect(my_w.invert,SIGNAL(released()),this,SLOT(invertColors()));
+    connect(my_w.actionInvert,SIGNAL(triggered()),this,SLOT(invertColors()));
 	
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
@@ -67,25 +66,40 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	connect(my_w.addPalette, SIGNAL(released()), this, SLOT(addPalette()));
 	connect(my_w.removePalette, SIGNAL(released()), this, SLOT(removePalette()));
 	connect(my_w.addColor, SIGNAL(released()), this, SLOT(addColor()));
-	connect(my_w.palettes, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem *,int)));
+    connect(my_w.paletteColorlist, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem *,int)));
 
 	
 	connect(my_w.addPaletteFile, SIGNAL(released()), this, SLOT(addPaletteFile()));
 	connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
 
-	decorate();
+    palettes = new QComboBox(this);
+    QFont f=palettes->font();
+    f.setPointSize(10);
+    palettes->setFont(f);
+    palettes->addItems(nparent->nPalettes.keys());
+    palettes->setCurrentIndex(nparent->nPalettes.keys().indexOf(parent->colorTable));
+    connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+    my_w.toolBar->insertWidget(my_w.actionInvert,palettes);
 
-	loadPalettes();
+    decorate();
 
-	my_w.comboBox->addItems(nparent->nPalettes.keys());
-	my_w.comboBox->setCurrentIndex(nparent->nPalettes.keys().indexOf(parent->colorTable));
-	connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+    if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
+
+    loadPalettes();
+
 	
 
 	updatecolorbar();
 	cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
+}
+
+void nColorBarWin::on_gamma_valueChanged(int val) {
+    if (currentBuffer) {
+        currentBuffer->property["gamma"]=val;
+        nparent->createQimage();
+    }
 }
 
 void nColorBarWin::setToMin () {
@@ -141,15 +155,19 @@ void nColorBarWin::bufferChanged(nPhysD *phys) {
         vec2f minmax=phys->property["display_range"];
         my_w.lineMin->setText(QString::number(minmax.first()));
         my_w.lineMax->setText(QString::number(minmax.second()));
-        my_w.histogram->repaint();
+        my_w.gamma->setValue(phys->property["gamma"]);
+    } else{
+        my_w.lineMin->setText("");
+        my_w.lineMax->setText("");
     }
+    my_w.histogram->repaint();
 }
 
 void nColorBarWin::updatecolorbar() {
-	disconnect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
-	my_w.comboBox->clear();
-	my_w.comboBox->addItems(nparent->nPalettes.keys());
-	my_w.comboBox->setCurrentIndex(my_w.comboBox->findText(nparent->colorTable));
+    disconnect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+    palettes->clear();
+    palettes->addItems(nparent->nPalettes.keys());
+    palettes->setCurrentIndex(palettes->findText(nparent->colorTable));
 	
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
@@ -158,7 +176,7 @@ void nColorBarWin::updatecolorbar() {
     }
     
 	my_w.histogram->repaint();
-	connect(my_w.comboBox, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+    connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
 }
 
 void nColorBarWin::slider_min_changed(int val)
@@ -193,13 +211,12 @@ void nColorBarWin::addColor() {
 }
 
 void nColorBarWin::removePalette() {
-	QTreeWidgetItemIterator it(my_w.palettes);
+    QTreeWidgetItemIterator it(my_w.paletteColorlist);
 	while (*it) {
 		QString paletteName=(*it)->text(0);
 		if (paletteName==my_w.paletteName->text()){
-			if (nparent->nPalettes.contains(paletteName)) {
+            if (nparent->nPalettes.contains(paletteName)) {
 				if (nparent->colorTable==paletteName) nparent->nextColorTable();
-				delete nparent->nPalettes[paletteName];
 				nparent->nPalettes.remove(paletteName);
 				QSettings my_set("neutrino","");
 				my_set.beginGroup("Palettes");
@@ -224,7 +241,7 @@ void nColorBarWin::addPalette() {
 	if (nparent->addPaletteFromString(my_w.paletteName->text(), my_w.colorlist->text())) {
 		QStringList liststring;
 		liststring << my_w.paletteName->text() << my_w.colorlist->text();
-		new QTreeWidgetItem(my_w.palettes,liststring);
+        new QTreeWidgetItem(my_w.paletteColorlist,liststring);
 		savePalettes();
 	}
 }
@@ -234,7 +251,7 @@ void nColorBarWin::savePalettes() {
 	my_set.beginGroup("Palettes");
 	QStringList paletteNames;
 	QStringList paletteColors;
-	QTreeWidgetItemIterator it(my_w.palettes);
+    QTreeWidgetItemIterator it(my_w.paletteColorlist);
 	while (*it) {
 		paletteNames.append((*it)->text(0));
 		paletteColors.append((*it)->text(1));
@@ -254,7 +271,7 @@ void nColorBarWin::loadPalettes() {
 		for (int i=0;i<paletteNames.size();i++) {
 			QStringList liststring;
 			liststring << paletteNames.at(i) << paletteColors.at(i);
-			new QTreeWidgetItem(my_w.palettes,liststring);				
+            new QTreeWidgetItem(my_w.paletteColorlist,liststring);
 		}
 	}
 	
@@ -302,7 +319,6 @@ void nColorBarWin::removePaletteFile() {
 			QString paletteName=(*it)->text(0);
 			if (nparent->nPalettes.contains(paletteName)) {
 				if (nparent->colorTable==paletteName) nparent->nextColorTable();
-				delete nparent->nPalettes[paletteName];
 				nparent->nPalettes.remove(paletteName);
 				paletteFiles.removeAll((*it)->text(1));
 				delete (*it);

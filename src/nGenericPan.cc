@@ -119,11 +119,20 @@ void nGenericPan::decorate() {
 	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
 		if (wdgt->property("neutrinoSave").isValid() || 
             wdgt->property("neutrinoImage").isValid() ||
-            qobject_cast<QPushButton *>(wdgt) 
+                qobject_cast<QPushButton*>(wdgt) ||
+                qobject_cast<QToolButton*>(wdgt)
             ) {
-			wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+#ifdef HAVE_PYTHONQT
+            wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+#endif
 		}
 	}
+
+#ifdef HAVE_PYTHONQT
+    foreach (QAction *wdgt, findChildren<QAction *>()) {
+        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+    }
+#endif
 
 	QSize iconSize;
 	foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {
@@ -238,6 +247,9 @@ nGenericPan::loadUi(QSettings *settings) {
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
+    foreach (QAction *widget, findChildren<QAction *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
+    }
 	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
 	}
@@ -328,7 +340,10 @@ nGenericPan::saveUi(QSettings *settings) {
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
-	foreach (QToolButton *widget, findChildren<QToolButton *>()) {
+    foreach (QAction *widget, findChildren<QAction *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
+    }
+    foreach (QToolButton *widget, findChildren<QToolButton *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->isChecked());
 	}
 	foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
@@ -724,16 +739,6 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 QVariant nGenericPan::get(QString name, int occurrence) {
 	int my_occurrence=1;
-//	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-//		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
-//			if (my_occurrence==occurrence) {
-//				nPhysD *copyPhys=getPhysFromCombo(obj);
-//				return qVariantFromValue(*copyPhys);
-//			}
-//			my_occurrence++;
-//		}
-//	}
-//	my_occurrence=1;
 	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
@@ -890,12 +895,21 @@ void nGenericPan::button(QString name , int occurrence) {
 		}
 	}
 	my_occurrence=1;
-	foreach (QAction *obj, findChildren<QAction *>()) {
+    foreach (QToolButton *obj, findChildren<QToolButton *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
-				obj->trigger();
+                obj->click();
 			}
 			my_occurrence++;
 		}
 	}
+    my_occurrence=1;
+    foreach (QAction *obj, findChildren<QAction *>()) {
+        if (obj->objectName()==name) {
+            if (my_occurrence==occurrence) {
+                obj->trigger();
+            }
+            my_occurrence++;
+        }
+    }
 }

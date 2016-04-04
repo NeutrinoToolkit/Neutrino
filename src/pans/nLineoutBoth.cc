@@ -35,8 +35,9 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 
     my_w.statusBar->addPermanentWidget(my_w.autoscale, 0);
     my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
-    
-	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
+    my_w.statusBar->addPermanentWidget(my_w.lockColors, 0);
+
+    connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
     connect(my_w.autoscale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
 
@@ -133,13 +134,11 @@ void nLineoutBoth::updatePlot(QPointF p) {
 			corner = nparent->my_w.my_view->mapToScene(lowerRight);
 			
 			int b_o[2], b_c[2], b_p[2];
-			double b_r[2], b_s[2];
-			b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
+
+            b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
 			b_c[0] = int(corner.x()); b_c[1] = int(corner.y());
 			b_p[0] = int(p.x()); b_p[1] = int(p.y());
-			b_r[0] = currentBuffer->get_origin().x(); b_r[1] = currentBuffer->get_origin().y();
-			b_s[0] = currentBuffer->get_scale().x(); b_s[1] = currentBuffer->get_scale().y();
-			
+
 			statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
 			
 			double vmin=0, vmax=0;
@@ -164,15 +163,14 @@ void nLineoutBoth::updatePlot(QPointF p) {
             my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
             my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
             my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
-//        } else {
-//            double mini=nparent->colorMin;
-//            double maxi=nparent->colorMax;
-//            if (nparent->colorRelative) {
-//                mini=currentBuffer->get_min()+nparent->colorMin*(currentBuffer->get_max() - currentBuffer->get_min());
-//                maxi=currentBuffer->get_max()-(1.0-nparent->colorMax)*(currentBuffer->get_max() - currentBuffer->get_min());
-//                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
-//                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
-//            }
+        } else {
+            if (my_w.lockColors->isChecked()) {
+                vec2f minmax=currentBuffer->property["display_range"];
+                double mini=minmax.first();
+                double maxi=minmax.second();
+                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
+                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
+            }
         }
         
 		my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);

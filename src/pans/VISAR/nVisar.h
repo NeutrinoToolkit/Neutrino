@@ -100,11 +100,8 @@ public slots:
 private:
 	QwtPlotCurve cPhase[2][2],cIntensity[2][2],cContrast[2][2];
     
-	QwtPlotCurve velocity[2],reflectivity[2], sopCurve[3];
-    
-    QwtPlotCurve Us_R[2],Us_T;
-    
-    
+    QwtPlotCurve velocity[2],reflectivity[2], sopCurve[4];
+        
     QList<QwtPlotMarker*> marker;
 	QList<QwtPlotCurve*> velJumps;	
 	

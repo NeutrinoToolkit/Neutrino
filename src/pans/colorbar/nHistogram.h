@@ -52,8 +52,8 @@ public:
 public slots:
 	void paintEvent(QPaintEvent *);
 	void mouseMoveEvent (QMouseEvent *);
-	void export_PDF_slot();
-	void drawPicture (QPainter&);
+
+    void drawPicture (QPainter&);
 	void colorValue(double);
 
 };

@@ -127,6 +127,11 @@ nLineout::updatePlot(QPointF p) {
 		if (autoScale) {
 			my_w.minVal->setText(QString::number(vmin));
 			my_w.maxVal->setText(QString::number(vmax));
+            if (my_w.actionLockColors->isChecked()) {
+                vec2f minmax=currentBuffer->property["display_range"];
+                vmin=minmax.first();
+                vmax=minmax.second();
+            }
 			my_w.the_plot->setAxisScale(curve->yAxis(),vmin,vmax,0);
 		} else {
 			my_w.the_plot->setAxisScale(curve->yAxis(),my_w.minVal->text().toDouble(),my_w.maxVal->text().toDouble(),0);

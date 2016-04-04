@@ -587,88 +587,46 @@ public:
 // 		return sobo;
 // 	}
 
-	// const methods for accessing matrix
+    // for simplicity we store it in an int whihc represents the power.
+    // correspondence between int/power
+    // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
+    double gamma() {
+        int gamma_int= property.have("gamma") ? property["gamma"] : 1;
+        return gamma_int < 1 ? -1.0/(gamma_int-2) : (gamma_int == 0 ? 1 : gamma_int);
+    }
 
-	const unsigned char *to_uchar() {
-		return to_uchar(Tminimum_value, Tmaximum_value);
-	}
 
-	const unsigned char *to_uchar(double min, double max) {
-		DEBUG(6,"creates 8bit buffer from "<<Tminimum_value<<" to "<<Tmaximum_value);
-//
-//
-//		T lower_cut;
-//		T higher_cut;
-//		
-//		T delta = Tmaximum_value - Tminimum_value;
-//		lower_cut = Tminimum_value + min*delta;
-//		higher_cut = Tminimum_value + max*delta;
-//		
-		if (width>0 && height>0) {
+    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette) {
+        bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
+        double mini=minmax.first();
+        double maxi=minmax.second();
 
-			if (uchar_buf == NULL)
-				uchar_buf = new unsigned char[width*height];
-	
-			double mult = 255./(max - min);
-			
-
-			memset(uchar_buf, 0, width*height*sizeof(unsigned char));
-			for (register size_t i=0; i<width*height; i++) {
-				//int val = mult*(Timg_buffer[i]-lower_cut);
-				int val = mult*(Timg_buffer[i]-min);
-				if (val>=0)
-					uchar_buf[i] = (val<256) ? (unsigned char)val : 255;
-			}
-
-			return uchar_buf;
-		}
-		DEBUG(6,"asking for uchar buffer of empty image");
-
-		return NULL;
-	}
-	
-	const unsigned char *to_uchar_palette(unsigned char * palette) {
-		if (!property.have("display_range")) {
-			property["display_range"]= get_min_max();
-		}
-		bidimvec<T> minmax=property["display_range"];
-		double mini=minmax.first();
-		double maxi=minmax.second();
-		DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
+        DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
 		
-		if (width>0 && height>0 && palette) {
+        if (getSurf()>0 && palette.size()==768) {
 
-			if (uchar_buf == NULL) {
-				uchar_buf = new unsigned char[width*height*4];
-			} else {
-				if (to_uchar_min==mini && to_uchar_max==maxi) {
-					DEBUG(6, "nothing changed");
-					return uchar_buf;
-				}
-			}
-			
-			double mult = 255./(maxi - mini);
-			
+            uchar_buf.resize(width*height*3);
+            if (!property.have("gamma")) {
+                property["gamma"]=1;
+            }
 
-// 			memset(uchar_buf, 0, getSurf()*sizeof(unsigned char)*4);
-			register size_t i,val;			
-#pragma omp parallel for private(val)
-			for (i=0; i<width*height; i++) {
+            double my_gamma=gamma();
+#pragma omp parallel for
+            for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
-				if (std::isfinite(Timg_buffer[i])) {
-					val = std::max(0,std::min(255,(int) (mult*(Timg_buffer[i]-mini))));
-					uchar_buf[i*4+3] = 255;
-					uchar_buf[i*4+2] = palette[3*val+0];
-					uchar_buf[i*4+1] = palette[3*val+1];
-					uchar_buf[i*4+0] = palette[3*val+2];
-
-					//((int *)uchar_buf)[i] = palette[val][0]+palette[val][1]<<8 +palette[val][2]<<16 + 255<<24;
+                if (std::isfinite(Timg_buffer[i])) {
+                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
+                    uchar_buf[i*3+0] = palette[3*val+0];
+                    uchar_buf[i*3+1] = palette[3*val+1];
+                    uchar_buf[i*3+2] = palette[3*val+2];
 				} else {
-					uchar_buf[i*4+3] = 0;
+                    uchar_buf[i*3+0] = 255;
+                    uchar_buf[i*3+1] = 255;
+                    uchar_buf[i*3+2] = 255;
 				}
 			}
 
-			return uchar_buf;
+            return &uchar_buf[0];
 		}
 		WARNING("asking for uchar buffer of empty image");
 
@@ -934,7 +892,7 @@ public:
 	T **Timg_matrix;
 
 protected:
-	unsigned char *uchar_buf;
+    std::vector<unsigned char> uchar_buf;
 	double **vector_buf;
 	double **axis_buf;
 	std::vector<double> histogram;
@@ -1083,7 +1041,6 @@ nPhysImageF<T>::~nPhysImageF()
 		
 		//tom
 		if (Timg_matrix != NULL) delete Timg_matrix;
-		if (uchar_buf != NULL) delete uchar_buf;
 	
 		if (vector_buf != NULL) {
 			if (vector_buf[0] != NULL)
@@ -1123,19 +1080,6 @@ nPhysImageF<T>::init_Tvariables()
 	_trash_init();
 	_init_temp_pointers();
 
-// now in _init_temp_ptrs();
-//
-//	Timg_buffer = NULL;
-//	Timg_matrix = NULL;
-//	uchar_buf = NULL;
-//
-//	vector_buf = new double *[2];
-//	memset(vector_buf, 0, 2*sizeof(double *));
-//	axis_buf = new double *[2];
-//	memset(axis_buf, 0, 2*sizeof(double *));
-
-	
-
 	//pIF_size.set_msg("size error");
 
 	min_Tv_x = min_Tv_y = max_Tv_x = max_Tv_y = -1;
@@ -1150,7 +1094,6 @@ nPhysImageF<T>::_init_temp_pointers()
 {
 	Timg_buffer = NULL;
 	Timg_matrix = NULL;
-	uchar_buf = NULL;
 
 	if (vector_buf)
 		delete vector_buf;
@@ -1186,10 +1129,7 @@ nPhysImageF<T>::matrix_points_aligned()
 		Timg_matrix = NULL;
 	}
 
-	if (uchar_buf != NULL) {
-		delete uchar_buf;
-		uchar_buf = NULL;
-	}
+    uchar_buf.clear();
 
 	if (vector_buf != NULL) {
 		if (vector_buf[0] != NULL)

@@ -63,8 +63,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 	
 		vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-		int n_iter = angles.size()*lambdas.size();
-		
+
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
@@ -106,7 +105,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 				}
 				params.iter++;
 				(*params.iter_ptr)++;
-				DEBUG(11,(100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+                DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
 				double cr = cos(angles[j] * _phys_deg); 
 				double sr = sin(angles[j] * _phys_deg);
 
@@ -340,8 +339,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
             int dy=params.data->getH();
 
             vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-            int n_iter = angles.size()*lambdas.size();
-        
+
             nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
             qmap = new nPhysD(dx, dy, 0.0, "quality");
         
@@ -377,7 +375,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                     }
                     params.iter++;
                     (*params.iter_ptr)++;
-                    DEBUG((100.*params.iter)/n_iter<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
+                    DEBUG((100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
             
                     gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)params.damp, (float)params.thickness);
                     cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
@@ -574,26 +572,6 @@ phys_guess_carrier(nPhysD &phys, double weight)
 	size_t dx=phys.getW();
 	size_t dy=phys.getH();
 	
-//	fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
-//	fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
-//	fftw_execute(plan);
-	
-//	double valmax=0.0;
-//	int imax=0,jmax=0;
-//	for (size_t i=0; i<dx/2+1; i++) {
-//		for (size_t j=0; j<dy; j++) {
-//			int j1=(dy/2+1)-(j+dy/2+1)%dy;
-//			double r=sqrt(i*i+j1*j1);
-//			size_t k=i+j*(dx/2+1);
-//			double val=pow(r,weight)*vec2f(myData[k][0],myData[k][1]).mod();
-//			if (val>valmax && (i>0||j>0)) {
-//				valmax=val;
-//				imax=i;
-//				jmax=j1;
-//			}
-//		}
-//	}
-
     fftw_complex *myData=fftw_alloc_complex(dy*(dx/2+1));
     fftw_plan plan=fftw_plan_dft_r2c_2d(dy,dx, phys.Timg_buffer, myData, FFTW_ESTIMATE);
     fftw_execute(plan);
@@ -810,8 +788,8 @@ void phys_invert_abel(abel_params &params)
 			axe_inv_mean[0] += iaxis[ii].x;
 			axe_inv_mean[1] += iaxis[ii].y;
 		}
-		int axe_average = (double)axe_inv_mean[inv_idx]/iaxis.size();
-		DEBUG(5, "Axe average: "<<axe_average);
+
+        DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
 
 		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
 			if ((*params.iter_ptr)==-1) {

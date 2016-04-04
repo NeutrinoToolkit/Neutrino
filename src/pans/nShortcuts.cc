@@ -32,7 +32,7 @@
 nShortcuts::nShortcuts(neutrino *nparent, QString winname): nGenericPan(nparent, winname) {
 	my_w.setupUi(this);
 	setWindowFlags(Qt::Tool);
-	my_w.textBrowser->setSource(QUrl("qrc:/shortcuts.html"));
+    my_w.textBrowser->setSource(QUrl("qrc:/html/shortcuts.html"));
 	qDebug() << my_w.textBrowser->source();
 	show();
 }

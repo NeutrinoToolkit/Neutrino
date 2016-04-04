@@ -37,7 +37,7 @@ nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
 	
 	connect(my_w.propertyList, SIGNAL(itemSelectionChanged()), this, SLOT(showProperty()));
 
-	bufferChanged(nparent->currentBuffer);
+    bufferChanged(nparent->currentBuffer);
 
 	show();
 	decorate();
@@ -45,38 +45,52 @@ nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
 
 void
 nPhysProperties::bufferChanged(nPhysD *my_phys) {
-	string currentProperty("");
-	if (my_w.propertyList->selectedItems().size() >0) {
-		currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
-	}
-	my_w.propertyList->clear();
-	my_w.propertyValue->clear();
-	DEBUG(currentProperty);
-	if (my_phys) {
-		setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
-		for(anymap::iterator iter=my_phys->property.begin();iter!=my_phys->property.end(); iter++ ) {
-			QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
-			my_w.propertyList->addItem(item);			
-			if (iter->first==currentProperty) {
-				string myval=iter->second;
-				my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
-				item->setSelected(true);
-			}
-		}
-	}
+    nGenericPan::bufferChanged(my_phys);
+    if (my_phys) {
+        string currentProperty("");
+        if (my_w.propertyList->selectedItems().size() >0) {
+            currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
+        }
+        my_w.propertyList->clear();
+        my_w.propertyValue->clear();
+        DEBUG(currentProperty);
+        setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
+        for(anymap::iterator iter=my_phys->property.begin();iter!=my_phys->property.end(); iter++ ) {
+            QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
+            my_w.propertyList->addItem(item);
+            if (iter->first==currentProperty) {
+                string myval=iter->second;
+                my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+                item->setSelected(true);
+            }
+        }
+    }
 }
 
 void
 nPhysProperties::showProperty() {
 	if (my_w.propertyList->currentItem()) {
 		string currentKey=my_w.propertyList->currentItem()->text().toStdString();
-		DEBUG(currentKey);
-		if (currentBuffer) {
+        DEBUG(currentKey);
+        DEBUG(currentBuffer);
+        if (currentBuffer) {
 			string myval=currentBuffer->property[currentKey];
-			my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+            DEBUG(myval);
+            my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
 		}
 	}
 }
+
+void nPhysProperties::on_changePhysProperty_pressed() {
+    DEBUG("Do something");
+    QVariant pippo(my_w.propertyValue->toPlainText());
+    DEBUG(pippo.toString().toStdString());
+    string item=  my_w.propertyList->currentItem()->text().toStdString();
+    if (currentBuffer) {
+        currentBuffer->property[item]=toAnydata(pippo).get_str();
+    }
+}
+
 
 
 

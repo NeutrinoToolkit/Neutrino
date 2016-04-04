@@ -50,10 +50,9 @@ protected:
     bool event(QEvent *ev);
 
 public slots:
+#ifdef HAVE_PYTHONQT
     QList<neutrino*> neus();
-
-    QStringList neuNames();
-    neutrino* neu(QString neu_name=QString());
+#endif
 };
 #endif
 

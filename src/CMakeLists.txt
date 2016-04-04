@@ -10,7 +10,9 @@ message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
-if (APPLE) 
+set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
+
+if (APPLE)
     message(STATUS "Apple : remember to use brew !")
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
     add_compile_options(-fPIC)
@@ -18,19 +20,19 @@ if (APPLE)
     
     set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
 
-	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
-	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
-	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
-	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+    set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_NAME} ${PROJECT_VERSION}")
+    set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
 
-	set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
-	set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
-	execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
+    set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
+    set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
 
     set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
     set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -66,11 +68,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
-include(FindNeutrinoGuiComponents)
 
 ## sources
-list (APPEND SOURCES 
-    nScene.cc neutrino.cc neutrinoPalettes.cc graphics/nRect.cc graphics/nMouse.cc 
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
+
+list (APPEND SOURCES
+    neutrino.cc
+    graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
     pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
@@ -80,23 +84,11 @@ list (APPEND SOURCES
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
-    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nView.cc nGenericPan.cc 
+    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nGenericPan.cc 
     nApp.cc nPluginLoader.cc main.cc 
 )
 
-## UIs
-list (APPEND UIS 
-    ../UIs/nCompareLines.ui ../UIs/nFocalSpot.ui ../UIs/nPhysProperties.ui 
-    ../UIs/nWinList.ui ../UIs/nInterferometry1.ui ../UIs/nVISAR2.ui 
-    ../UIs/nSpectralAnalysis.ui ../UIs/nVISAR3.ui ../UIs/nLine.ui ../UIs/nRegionPath.ui 
-    ../UIs/nGhost.ui ../UIs/nInterpolatePath.ui ../UIs/nIntegralInversion.ui 
-    ../UIs/nPreferences.ui ../UIs/nOpenRAW.ui ../UIs/nColorBarWin.ui 
-    ../UIs/nOperator.ui ../UIs/nCutoffMask.ui ../UIs/nBoxLineout.ui ../UIs/nLineout.ui 
-    ../UIs/nPoint.ui ../UIs/nVISAR1.ui ../UIs/nSbarra.ui ../UIs/nMonitor.ui 
-    ../UIs/nFindPeaks.ui ../UIs/nShortcuts.ui ../UIs/nAffine.ui ../UIs/nBlur.ui 
-    ../UIs/nLineoutBoth.ui ../UIs/nWavelet.ui ../UIs/nInterferometry.ui ../UIs/nRotate.ui
-    ../UIs/nMouseInfo.ui ../UIs/nObject.ui ../UIs/neutrino.ui ../UIs/nFileInfo.ui 
-)
+include(FindNeutrinoGuiComponents)
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
@@ -113,6 +105,38 @@ if (GENERATE_NHASH)
 
 endif()
 
+# write automatically the qrc file for icons
+set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
+file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
+set(ICONS_QRC ${ICONSDIR}/icons.qrc)
+file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
+foreach(my_file ${ICONS})
+    file(RELATIVE_PATH my_file_relative_path ${ICONSDIR} ${my_file})
+    file(APPEND ${ICONS_QRC} "        <file>${my_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
+
+# write automatically the qrc file for html
+set(HTMLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/html)
+file(GLOB HTMLS ${HTMLDIR}/*.html)
+set(HTML_QRC ${HTMLDIR}/html.qrc)
+file(WRITE ${HTML_QRC} "<RCC>\n    <qresource prefix=\"/html/\">\n")
+foreach(my_file ${HTMLS})
+    file(RELATIVE_PATH my_file_relative_path ${HTMLDIR} ${my_file})
+    file(APPEND ${HTML_QRC} "        <file>${my_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
+
+file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*.txt)
+set(LICENSES_QRC ${HTMLDIR}/licenses.qrc)
+file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
+foreach(my_file ${HTMLLICENSES})
+    file(RELATIVE_PATH my_file_relative_path ${HTMLDIR} ${my_file})
+    file(APPEND ${LICENSES_QRC} "        <file>${my_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
+
+
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
 if (USE_QT5)
@@ -120,16 +144,22 @@ if (USE_QT5)
 	list (APPEND SOURCES pans/nCamera.cc)
 	list (APPEND UIS ../UIs/nCamera.ui)
 
-	QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT5_WRAP_UI( UI_HEADERS ${UIS} )
+    qt5_add_resources(RES_SOURCES ${ICONS_QRC})
+    qt5_add_resources(RES_SOURCES ${HTML_QRC})
+    qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
+    QT5_WRAP_UI( UI_HEADERS ${UIS} )
 elseif (USE_QT4)
-	QT4_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
-	QT4_WRAP_UI( UI_HEADERS ${UIS} )
+    qt4_add_resources(RES_SOURCES ${ICONS_QRC})
+    qt4_add_resources(RES_SOURCES ${HTML_QRC})
+    qt4_add_resources(RES_SOURCES ${LICENSES_QRC})
+    QT4_WRAP_UI( UI_HEADERS ${UIS} )
 endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
 
+
+message(STATUS "Adding qrcs: ${RES_SOURCES}")
 
 
 
@@ -142,17 +172,17 @@ set(LIBS ${LIBS} "nPhysImageF")
 add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
-#     add_executable(Neutrino MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES})
-elseif(WIN32)
-	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
-	add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${RC_WIN})
-else()
-    add_executable(Neutrino ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
+    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
-if (APPLE) 
-    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
+if(WIN32)
+    set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN})
+endif()
+
+if(UNIX AND NOT APPLE)
+    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
 endif()
 
 
@@ -241,33 +271,6 @@ message(STATUS ${${PROJECT_NAME}_SOURCE_DIR})
 
 set(CPACK_RESOURCE_FILE_README "${README_FILE}")
 
-if(WIN32)
-#    set(CPACK_GENERATOR "NSIS")
-#    set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "${PROJECT_NAME}")
-#    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
-#    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME} ${PROJECT_VERSION}")
-#    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/${LICENSE_FILE}")
-#    set(CPACK_NSIS_EXECUTABLES_DIRECTORY "${BIN_INSTALL_DIR}")
-#    #set(CPACK_NSIS_MUI_ICON "${PROJECT_ICONS_DIRECTORY}/NSIS.ico")
-#    #set(CPACK_PACKAGE_ICON "${PROJECT_ICONS_DIRECTORY}\\\\NSISHeader.bmp")
-#    set(CPACK_NSIS_URL_INFO_ABOUT "http://${PROJECT_DOMAIN}")
-#    set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-#    set(CPACK_NSIS_MENU_LINKS "${LICENSE_FILE}" "License" "${README_FILE}" "Readme")
-#    set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${CPACK_NSIS_INSTALLED_ICON_NAME}")
-elseif(APPLE)
-     set(CMAKE_INSTALL_PREFIX "/Applications")
-     set(CPACK_GENERATOR "Bundle")
-     set(CPACK_DMG_FORMAT "UDBZ")
-     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
-     set(CPACK_SYSTEM_NAME "OSX")
-     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
-     set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
-     set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
-     set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
-elseif(UNIX)
-    set(CPACK_GENERATOR "TBZ2")
-    set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-endif()
 
 
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")
@@ -281,10 +284,3 @@ else()
     set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
 
-#if(APPLE OR WIN32)
-if(APPLE)
-    include(DeployQt4)
-    install_qt4_executable("${EXECUTABLE}")
-endif()
-
-#include (CPack)

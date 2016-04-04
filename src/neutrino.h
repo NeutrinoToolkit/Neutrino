@@ -43,7 +43,6 @@
 #include "nGenericPan.h"
 #include "nPlug.h"
 #include "nView.h"
-#include "nScene.h"
 
 // base ui
 #include "ui_neutrino.h"
@@ -79,7 +78,7 @@ public:
 	QGraphicsScene *getScene();
 	Ui::neutrino my_w;
 
-	nScene my_s;
+    QGraphicsScene my_s;
 
 	Ui::nSbarra my_sbarra;
 
@@ -108,7 +107,7 @@ public:
 	// --------- data structures -----------
 	QString colorTable;
 	QList<QAction *> listabuffer;
-	QMap<QString, unsigned char *> nPalettes;
+    QMap<QString, vector<unsigned char>> nPalettes;
 
 private:
     QList<nGenericPan*> panList;
@@ -118,7 +117,7 @@ public slots:
 	nGenericPan* existsPan(QString);
 
 	void build_colormap();
-	
+    void setGamma(int value);
 	void processEvents();
 	void contextMenuEvent(QContextMenuEvent *);
 	void menuFlipRotate();
@@ -318,8 +317,6 @@ public slots:
 	void emitPanDel(nGenericPan*);
 	
 	// to python
-	QList<QList<qreal> > getData(int=-1);
-	bool setData(QList<QList<qreal> >,int=-1);
 	
 	nLine* line(QString);
 	

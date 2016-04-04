@@ -163,8 +163,8 @@ void nBoxLineout::mouseAtWorld(QPointF p) {
 
 void nBoxLineout::updatePlot() {
 	if (currentBuffer) {
-		QRect geomBox=box->getRect().intersected(QRect(0,0,currentBuffer->getW(),currentBuffer->getH()));
-		if (geomBox.isEmpty()) {
+        QRect geomBox=box->getRect(currentBuffer);
+        if (geomBox.isEmpty()) {
 			my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
 			return;
 		}

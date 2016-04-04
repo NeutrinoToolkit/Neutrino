@@ -24,7 +24,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
      <number>4</number>
     </property>
     <item row="0" column="1">
@@ -85,6 +94,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <property name="floatable">
     <bool>false</bool>
    </property>
@@ -94,6 +106,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionLockColors"/>
    <addaction name="actionGetMinMax"/>
    <addaction name="actionAutoscale"/>
    <addaction name="actionMin"/>
@@ -131,7 +144,7 @@
    <property name="icon">
     <iconset>
      <normaloff>:icons//lockOpen</normaloff>
-     <normalon>:/lockClose</normalon>:icons//lockOpen</iconset>
+     <normalon>:/icons/lockClose.png</normalon>:icons//lockOpen</iconset>
    </property>
    <property name="text">
     <string>autoscale</string>
@@ -182,6 +195,22 @@
    </property>
    <property name="toolTip">
     <string>update on click</string>
+   </property>
+  </action>
+  <action name="actionLockColors">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/neutrino.qrc">
+     <normaloff>:/icons/lockColor.png</normaloff>
+     <normalon>:/icons/lockColor.png</normalon>:/icons/lockColor.png</iconset>
+   </property>
+   <property name="text">
+    <string>lockColors</string>
+   </property>
+   <property name="toolTip">
+    <string>Lock on displayed colorbar</string>
    </property>
   </action>
  </widget>

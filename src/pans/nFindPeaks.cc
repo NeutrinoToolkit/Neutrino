@@ -155,7 +155,7 @@ void nFindPeaks::mouseAtMatrix(QPointF p) {
 
 void nFindPeaks::updatePlot() {
 	if (currentBuffer && isVisible()) {
-		QRect geom2=box->getRect().intersected(QRect(0,0,currentBuffer->getW(),currentBuffer->getH()));
+        QRect geom2=box->getRect(currentBuffer);
 		if (geom2.isEmpty()) {
 			my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
 			return;

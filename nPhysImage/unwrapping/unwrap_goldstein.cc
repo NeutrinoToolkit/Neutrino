@@ -239,8 +239,8 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 					for (int ka=0; ka<num_active && charge!=0; ka++) {
 						int boxctr_i = active_list[ka].x();
 						int boxctr_j = active_list[ka].y();
-						for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0 && jj>=0 && jj < dy; jj++) {
-							for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0 && ii>=0 && ii < dx; ii++) {
+                        for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0 && jj>=0 && jj < int(dy); jj++) {
+                            for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0 && ii>=0 && ii < int(dx); ii++) {
 								unsigned char bit=bits.point(ii,jj);
 								if (bit & BORDER) {
 									bits.set(ii,jj,bit | DONE);
