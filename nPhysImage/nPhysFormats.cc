@@ -359,19 +359,25 @@ physInt_sif::physInt_sif(string ifilename)
 	}	
 
 	temp_string.clear();
+
+    DEBUG("We are at byte "<< ifile.tellg());
     unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
 		
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-e-"+ss.str()]=temp_string;
+        property["sif-e-"+ss.str()]=temp_string;
+
+        DEBUG(ss.str() << " " << temp_string)
 
 		// most readable ever
-                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-                    break;
-		}
+        if ( !(iss  >> magic_number).fail() && iss.eof() ) {
+
+            break;
+        }
 	}
+    DEBUG("We are at byte "<< ifile.tellg());
 
 	// jump magic lines
 	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Ra");
@@ -389,18 +395,20 @@ physInt_sif::physInt_sif(string ifilename)
 		throw phys_fileerror("SIF: header parsing reached end of file");
 	}
 
-	if (datacheck < 0) {
-		stringstream oss;
-		oss<<"Failed consistency check before SIF matrix read\n";
-		oss<<"init_matrix: "<<init_matrix<<"\n";
-		oss<<"end_file: "<<ifile.tellg()<<"\n";
-		oss<<"matrix surface: "<<getSurf()<<"\n";
-		oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
+    if (datacheck < 0) {
+        stringstream oss;
+        oss<<"Failed consistency check before SIF matrix read\n";
+        oss<<"init_matrix: "<<init_matrix<<"\n";
+        oss<<"end_file: "<<ifile.tellg()<<"\n";
+        oss<<"matrix surface: "<<getSurf()<<"\n";
+        oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
 
-		throw phys_fileerror(oss.str());
+//        property.dumper(std::cerr);
 
-	} else {
-		// get data
+        throw phys_fileerror(oss.str());
+
+    } else {
+        // get data
 		ifile.seekg(init_matrix);
 		DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 		ss.str(""); ss.clear(); ss << init_matrix << " bytes";
@@ -415,7 +423,7 @@ physInt_sif::physInt_sif(string ifilename)
 		TscanBrightness();
 		DEBUG(get_min() << " " << get_max());
 
-	}
+    }
 
 }
 
@@ -812,21 +820,25 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 	TIFF* tif = TIFFOpen(ifilename, "r");
 	if (tif) {
 		DEBUG("Opened");
-		unsigned short samples=1, compression, config;
+        unsigned short samples=1, compression, config, format,fillorder;
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
-		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
-		
+        TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
+        TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format);
+        TIFFGetField(tif, TIFFTAG_FILLORDER, &fillorder);
+
 		
 		DEBUG("COMPRESSION_NONE " << compression << " " << COMPRESSION_NONE);
 		DEBUG("PLANARCONFIG_CONTIG " << config << " " << PLANARCONFIG_CONTIG);
-		DEBUG("SAMPLES" << samples);
-		//		vector<unsigned short> extra(samples);
-		// 		TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
-		// 		for (int k=0;k<samples;k++) {
-		// 			DEBUG("extra " << k << "  " << extra[k]);
-		// 		}
-		
+        DEBUG("FORMAT " << format);
+        DEBUG("FILLORDER " << fillorder);
+        DEBUG("SAMPLES " << samples);
+        vector<unsigned short> extra(samples);
+        TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
+        for (int k=0;k<samples;k++) {
+            DEBUG("extra " << k << "  " << extra[k]);
+        }
+
 		if (compression==COMPRESSION_NONE && config==PLANARCONFIG_CONTIG ) {
 			float resx=1.0, resy=1.0;
 			TIFFGetField(tif, TIFFTAG_XRESOLUTION, &resx);
@@ -866,16 +878,35 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 					TIFFReadScanline(tif, buf, j);
 					for (tiff_uint32 i=0; i<w; i++) {
 						double val=0;
-						// 						samples=1;
 						for (int k=0;k<samples;k++) {
 							if (bytesperpixel == sizeof(char)) {
-								val+=((unsigned char*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned char*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((char*)buf)[i*samples];
+                                }
 							} else if (bytesperpixel == sizeof(short)) {
-								val+=((unsigned short*)buf)[i*samples];
-							} else if (bytesperpixel == sizeof(float)) {
-								val+=((float*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned short*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((short*)buf)[i*samples];
+                                }
+                            } else if (bytesperpixel == sizeof(int)) {
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_IEEEFP) {
+                                    val+=((float*)buf)[i*samples];
+                                }
 							} else if (bytesperpixel == sizeof(double)) {
-								val+=((double*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((long unsigned int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((long int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_IEEEFP) {
+                                    val+=((double*)buf)[i*samples];
+                                }
 							}
 						}
 						set(i,j,val/samples);
@@ -885,8 +916,10 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 				TscanBrightness();
 			}
 		}
-	}
-	TIFFClose(tif);
+        TIFFClose(tif);
+    } else {
+        throw phys_fileerror("TIIF: file is corrupted");
+    }
 #else
 	WARNING("nPhysImage was not compiled with tiff support!");
 #endif

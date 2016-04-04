@@ -41,7 +41,11 @@ protected:
 			return QApplication::notify(rec, ev);
 		}
 		catch (std::exception &e) {
-			qCritical() << "neutrino got exception: "<<e.what();
+            QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+            dlg.exec();
+
+//			qCritical() << "neutrino got exception: "<<e.what();
 		}
 
 		return false;
