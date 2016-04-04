@@ -34,16 +34,7 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
+    <property name="margin">
      <number>0</number>
     </property>
     <item row="1" column="0">
@@ -76,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>450</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -180,6 +171,12 @@
      <addaction name="actionBoxLineout"/>
      <addaction name="actionCompareLines"/>
     </widget>
+    <widget class="QMenu" name="menuPlugins">
+     <property name="title">
+      <string>Plugins</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
     <addaction name="actionSpectral_Analysis"/>
     <addaction name="actionWavelet"/>
     <addaction name="actionInterferometry"/>
@@ -201,6 +198,7 @@
     <addaction name="separator"/>
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
+    <addaction name="menuPlugins"/>
     <addaction name="actionPlugin"/>
    </widget>
    <widget class="QMenu" name="menuHelp">

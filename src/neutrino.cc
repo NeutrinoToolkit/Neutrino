@@ -162,7 +162,7 @@ neutrino::neutrino():
 #ifdef USE_QT5
     connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
-    my_w.actionCamera->setVisibility(false);
+    my_w.actionCamera->setEnabled(false);
 #endif
 
 	connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -2386,9 +2386,10 @@ neutrino::runPyScript(QString fname) {
     t.close();
 }
 
+#endif
+
+
 // col functions outside neutrino....
-
-
 QVariant toVariant(anydata &my_data) {
     if (my_data.is_i()) {
         DEBUG("here");
@@ -2438,4 +2439,3 @@ anydata toAnydata(QVariant &my_variant) {
 }
 
 
-#endif
