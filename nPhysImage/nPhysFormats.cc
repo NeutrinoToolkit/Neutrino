@@ -814,12 +814,39 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 	return -1;
 }
 
+#ifdef HAVE_LIBTIFF
+
+#define           TIFFTAG_NEUTRINO         34595
+
+static const TIFFFieldInfo xtiffFieldInfo[] = {
+        { TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
+};
+
+static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+
+static void registerCustomTIFFTags(TIFF *tif)
+{
+    /* Install the extended Tag field info */
+    int error = TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
+    if (error) throw phys_fileerror("TIFF: can't support custom Tiff tags");
+    if (parent_extender) (*parent_extender)(tif);
+}
+
+static void augment_libtiff_with_custom_tags() {
+    static bool first_time = true;
+    if (!first_time) return;
+    first_time = false;
+    parent_extender = TIFFSetTagExtender(registerCustomTIFFTags);
+}
+#endif
+
 physDouble_tiff::physDouble_tiff(const char *ifilename)
 : nPhysImageF<double>(string(ifilename), PHYS_FILE) {
 #ifdef HAVE_LIBTIFF
+    augment_libtiff_with_custom_tags();
 	TIFF* tif = TIFFOpen(ifilename, "r");
 	if (tif) {
-		DEBUG("Opened");
+        DEBUG("Opened");
         unsigned short samples=1, compression, config, format,fillorder;
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
@@ -851,15 +878,52 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 			TIFFGetField(tif, TIFFTAG_YPOSITION, &posy);
 			set_origin(posx,posy);
 			
-			char *desc=NULL;
-			if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &desc)) {
-				setName(desc);
-				DEBUG(desc);
-			}
-			if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
- 				property["info"]=string(desc);
-				DEBUG(desc);
-			}
+            char *docname=NULL;
+            if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &docname)) {
+                setName(docname);
+                DEBUG(docname);
+            }
+            char *neu_prop=NULL;
+            if (TIFFGetField(tif, TIFFTAG_NEUTRINO, &neu_prop)) {
+                string str_desc=string(neu_prop);
+                DEBUG(str_desc.size() << "\n" << str_desc);
+                stringstream ss(str_desc);
+                property.loader(ss);
+                ss.str(str_desc);
+            }
+            char *desc=NULL;
+            if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
+                string str_desc=string(desc);
+                DEBUG(str_desc.size() << "\n" << str_desc);
+                stringstream ss(str_desc);
+                vec2f display_range(0,0);
+                string my_line;
+                while (!(ss  >> my_line).fail()) {
+                    auto index = my_line.find('=');
+                    std::pair<std::string,std::string> keyVal;
+                    if (index != std::string::npos) {
+                        // Split around ':' character
+                        string left=my_line.substr(0,index);
+                        string right=my_line.substr(index+1);
+                        if (left=="ImageJ") {
+                            property["ImageJ-version"]=right;
+                        } else if (left=="min") {
+                            stringstream rightss(right);
+                            double val=0;
+                            rightss >> val;
+                            display_range.set_first(val);
+                        } else if (left=="max") {
+                            stringstream rightss(right);
+                            double val=0;
+                            rightss >> val;
+                            display_range.set_second(val);
+                        }
+                    }
+                }
+                if (display_range != vec2f(0,0)) {
+                    property["display_range"] =display_range;
+                }
+            }
 			
 			setFromName(ifilename);
 			unsigned short bytesperpixel=0;
@@ -918,7 +982,7 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		}
         TIFFClose(tif);
     } else {
-        throw phys_fileerror("TIIF: file is corrupted");
+        throw phys_fileerror("TIFF: file is corrupted");
     }
 #else
 	WARNING("nPhysImage was not compiled with tiff support!");
@@ -928,7 +992,8 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 int
 phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 #ifdef HAVE_LIBTIFF
-	TIFF* tif = TIFFOpen(ofilename, "w");
+    augment_libtiff_with_custom_tags();
+    TIFF* tif = TIFFOpen(ofilename, "w");
 	if (tif && my_phys) {
 		TIFFSetWarningHandler(NULL);
 		TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
@@ -938,10 +1003,18 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 		TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
  		TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
- 		TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, my_phys->getShortName().c_str());
+        stringstream prop_ss;
+        my_phys->property.dumper(prop_ss);
+        prop_ss.flush();
+        my_phys->property.dumper(std::cerr);
+        string description=prop_ss.str();
+
+        DEBUG(description);
+
+        TIFFSetField(tif, TIFFTAG_NEUTRINO, description.c_str());
  		TIFFSetField(tif, TIFFTAG_SOFTWARE, "neutrino");
- 		TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
-		
+        TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
+
 		TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, my_phys->getW());
 		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, my_phys->getH());
