@@ -142,7 +142,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
  
  // .alex. -> zappo via a piene mani, secondo me non serve tutta questa roba
  //	string ostr = ss.str();
- //	for (register size_t ii=0; ii<ostr.length(); ii++) {
+ //	for (size_t ii=0; ii<ostr.length(); ii++) {
  //		if (isprint(ostr[ii])) {
  
  
@@ -170,7 +170,7 @@ physDouble_txt::physDouble_txt(const char *ifilename)
  stringstream sline(tline);
  NaNStream nis(sline, sline);
  //while ((sline.tellg() < sline.str().length()) && (sline.tellg() > -1)) {
- for (register size_t col=0; col<ncols; col++) {
+ for (size_t col=0; col<ncols; col++) {
  nis>>Timg_buffer[row*w+col];
  //sline>>Timg_buffer[row*w+col];
  //sline>>Timg_buffer[row*width+col]>>ch;	// forse questo non ci va
@@ -359,19 +359,23 @@ physInt_sif::physInt_sif(string ifilename)
 	}	
 
 	temp_string.clear();
-	unsigned int magic_number = 0; // usually 3 (lol)
+    unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		istringstream iss(temp_string);
 		
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
-		property["sif-e-"+ss.str()]=temp_string;
+        property["sif-e-"+ss.str()]=temp_string;
+
+        DEBUG(ss.str() << " " << temp_string)
 
 		// most readable ever
-                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-                    break;
-		}
+        if ( !(iss  >> magic_number).fail() && iss.eof() ) {
+
+            break;
+        }
 	}
+    DEBUG("We are at byte "<< ifile.tellg());
 
 	// jump magic lines
 	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Ra");
@@ -389,18 +393,20 @@ physInt_sif::physInt_sif(string ifilename)
 		throw phys_fileerror("SIF: header parsing reached end of file");
 	}
 
-	if (datacheck < 0) {
-		stringstream oss;
-		oss<<"Failed consistency check before SIF matrix read\n";
-		oss<<"init_matrix: "<<init_matrix<<"\n";
-		oss<<"end_file: "<<ifile.tellg()<<"\n";
-		oss<<"matrix surface: "<<getSurf()<<"\n";
-		oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
+    if (datacheck < 0) {
+        stringstream oss;
+        oss<<"Failed consistency check before SIF matrix read\n";
+        oss<<"init_matrix: "<<init_matrix<<"\n";
+        oss<<"end_file: "<<ifile.tellg()<<"\n";
+        oss<<"matrix surface: "<<getSurf()<<"\n";
+        oss<<"matrix size: "<<getSurf()*sizeof(float)<<"\n";
 
-		throw phys_fileerror(oss.str());
+//        property.dumper(std::cerr);
 
-	} else {
-		// get data
+        throw phys_fileerror(oss.str());
+
+    } else {
+        // get data
 		ifile.seekg(init_matrix);
 		DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 		ss.str(""); ss.clear(); ss << init_matrix << " bytes";
@@ -415,7 +421,7 @@ physInt_sif::physInt_sif(string ifilename)
 		TscanBrightness();
 		DEBUG(get_min() << " " << get_max());
 
-	}
+    }
 
 }
 
@@ -511,7 +517,7 @@ physDouble_img::physDouble_img(string ifilename)
     bool endian=false;
     
 	ifile.read((char *)&buffer,sizeof(unsigned short));
-	
+
     if (string((char *)&buffer,sizeof(unsigned short)) == "IM") { // Hamamatsu
 		ifile.read((char *)&buffer,sizeof(unsigned short));
 		skipbyte=buffer;
@@ -585,6 +591,7 @@ physDouble_img::physDouble_img(string ifilename)
         ifile.close();
         property["kind"]=kind;
         property["skip bytes"]=skipbyte;
+
         int retVal=phys_open_RAW(this,kind,skipbyte,endian);
         if (retVal!=0) resize(0,0);
 	}
@@ -766,12 +773,12 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		WARNING("phys error");
 		return -1;
 	}
-	
-	//int pos = ofile.tellg();
-	//int written_data = 0;
-	
-	//ofile<<my_phys->property<<"\n";
-	
+
+    //int pos = ofile.tellg();
+    //int written_data = 0;
+
+    //ofile<<my_phys->property<<"\n";
+
 
 
 	DEBUG(5,my_phys->getName() << " Short: " << my_phys->getShortName() << " from: " << my_phys->getFromName());
@@ -782,7 +789,7 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 		my_phys->property.dumper(ss);
 		std::string str = ss.str(), str2;
 
-        size_t pos;
+        size_t pos=0;
 		while((pos = str.find("\n", pos)) != std::string::npos)
 	      	{
 		   	str.insert(pos+1, "# ");
@@ -793,39 +800,70 @@ phys_dump_ascii(nPhysImageF<double> *my_phys, std::ofstream &ofile)
 
 		ofile<<str<<"\n";
 
-		for (register size_t i=0; i<my_phys->getH(); i++) {
-			for (register size_t j=0; j<my_phys->getW()-1; j++)
+        for (size_t i=0; i<my_phys->getH(); i++) {
+            for (size_t j=0; j<my_phys->getW()-1; j++)
 				ofile<<std::setprecision(8)<<my_phys->getPoint(j,i)<<"\t";
 			ofile<<std::setprecision(8)<<my_phys->getPoint(my_phys->getW()-1,i)<<"\n";
 		}
 
-	
-		return 0;
+
+        return 0;
 	}
 	return -1;
 }
 
+#ifdef HAVE_LIBTIFF
+
+#define           TIFFTAG_NEUTRINO         34595
+
+static const TIFFFieldInfo xtiffFieldInfo[] = {
+        { TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
+};
+
+static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+
+static void registerCustomTIFFTags(TIFF *tif)
+{
+    /* Install the extended Tag field info */
+    int error = TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
+    if (error) throw phys_fileerror("TIFF: can't support custom Tiff tags");
+    if (parent_extender) (*parent_extender)(tif);
+}
+
+static void augment_libtiff_with_custom_tags() {
+    static bool first_time = true;
+    if (!first_time) return;
+    first_time = false;
+    parent_extender = TIFFSetTagExtender(registerCustomTIFFTags);
+}
+#endif
+
 physDouble_tiff::physDouble_tiff(const char *ifilename)
 : nPhysImageF<double>(string(ifilename), PHYS_FILE) {
 #ifdef HAVE_LIBTIFF
+    augment_libtiff_with_custom_tags();
 	TIFF* tif = TIFFOpen(ifilename, "r");
 	if (tif) {
-		DEBUG("Opened");
-		unsigned short samples=1, compression, config;
+        DEBUG("Opened");
+        unsigned short samples=1, compression, config, format,fillorder;
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
-		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
-		
+        TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
+        TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format);
+        TIFFGetField(tif, TIFFTAG_FILLORDER, &fillorder);
+
 		
 		DEBUG("COMPRESSION_NONE " << compression << " " << COMPRESSION_NONE);
 		DEBUG("PLANARCONFIG_CONTIG " << config << " " << PLANARCONFIG_CONTIG);
-		DEBUG("SAMPLES" << samples);
-		//		vector<unsigned short> extra(samples);
-		// 		TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
-		// 		for (int k=0;k<samples;k++) {
-		// 			DEBUG("extra " << k << "  " << extra[k]);
-		// 		}
-		
+        DEBUG("FORMAT " << format);
+        DEBUG("FILLORDER " << fillorder);
+        DEBUG("SAMPLES " << samples);
+        vector<unsigned short> extra(samples);
+        TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
+        for (int k=0;k<samples;k++) {
+            DEBUG("extra " << k << "  " << extra[k]);
+        }
+
 		if (compression==COMPRESSION_NONE && config==PLANARCONFIG_CONTIG ) {
 			float resx=1.0, resy=1.0;
 			TIFFGetField(tif, TIFFTAG_XRESOLUTION, &resx);
@@ -838,15 +876,52 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 			TIFFGetField(tif, TIFFTAG_YPOSITION, &posy);
 			set_origin(posx,posy);
 			
-			char *desc=NULL;
-			if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &desc)) {
-				setName(desc);
-				DEBUG(desc);
-			}
-			if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
- 				property["info"]=string(desc);
-				DEBUG(desc);
-			}
+            char *docname=NULL;
+            if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &docname)) {
+                setName(docname);
+                DEBUG(docname);
+            }
+            char *neu_prop=NULL;
+            if (TIFFGetField(tif, TIFFTAG_NEUTRINO, &neu_prop)) {
+                string str_desc=string(neu_prop);
+                DEBUG(str_desc.size() << "\n" << str_desc);
+                stringstream ss(str_desc);
+                property.loader(ss);
+                ss.str(str_desc);
+            }
+            char *desc=NULL;
+            if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
+                string str_desc=string(desc);
+                DEBUG(str_desc.size() << "\n" << str_desc);
+                stringstream ss(str_desc);
+                vec2f display_range(0,0);
+                string my_line;
+                while (!(ss  >> my_line).fail()) {
+                    auto index = my_line.find('=');
+                    std::pair<std::string,std::string> keyVal;
+                    if (index != std::string::npos) {
+                        // Split around ':' character
+                        string left=my_line.substr(0,index);
+                        string right=my_line.substr(index+1);
+                        if (left=="ImageJ") {
+                            property["ImageJ-version"]=right;
+                        } else if (left=="min") {
+                            stringstream rightss(right);
+                            double val=0;
+                            rightss >> val;
+                            display_range.set_first(val);
+                        } else if (left=="max") {
+                            stringstream rightss(right);
+                            double val=0;
+                            rightss >> val;
+                            display_range.set_second(val);
+                        }
+                    }
+                }
+                if (display_range != vec2f(0,0)) {
+                    property["display_range"] =display_range;
+                }
+            }
 			
 			setFromName(ifilename);
 			unsigned short bytesperpixel=0;
@@ -865,16 +940,35 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 					TIFFReadScanline(tif, buf, j);
 					for (tiff_uint32 i=0; i<w; i++) {
 						double val=0;
-						// 						samples=1;
 						for (int k=0;k<samples;k++) {
 							if (bytesperpixel == sizeof(char)) {
-								val+=((unsigned char*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned char*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((char*)buf)[i*samples];
+                                }
 							} else if (bytesperpixel == sizeof(short)) {
-								val+=((unsigned short*)buf)[i*samples];
-							} else if (bytesperpixel == sizeof(float)) {
-								val+=((float*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned short*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((short*)buf)[i*samples];
+                                }
+                            } else if (bytesperpixel == sizeof(int)) {
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((unsigned int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_IEEEFP) {
+                                    val+=((float*)buf)[i*samples];
+                                }
 							} else if (bytesperpixel == sizeof(double)) {
-								val+=((double*)buf)[i*samples];
+                                if (format==SAMPLEFORMAT_UINT) {
+                                    val+=((long unsigned int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_INT) {
+                                    val+=((long int*)buf)[i*samples];
+                                } else if (format==SAMPLEFORMAT_IEEEFP) {
+                                    val+=((double*)buf)[i*samples];
+                                }
 							}
 						}
 						set(i,j,val/samples);
@@ -884,8 +978,10 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 				TscanBrightness();
 			}
 		}
-	}
-	TIFFClose(tif);
+        TIFFClose(tif);
+    } else {
+        throw phys_fileerror("TIFF: file is corrupted");
+    }
 #else
 	WARNING("nPhysImage was not compiled with tiff support!");
 #endif
@@ -894,7 +990,8 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 int
 phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 #ifdef HAVE_LIBTIFF
-	TIFF* tif = TIFFOpen(ofilename, "w");
+    augment_libtiff_with_custom_tags();
+    TIFF* tif = TIFFOpen(ofilename, "w");
 	if (tif && my_phys) {
 		TIFFSetWarningHandler(NULL);
 		TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
@@ -904,10 +1001,18 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
 		TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
  		TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
- 		TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, my_phys->getShortName().c_str());
+        stringstream prop_ss;
+        my_phys->property.dumper(prop_ss);
+        prop_ss.flush();
+        my_phys->property.dumper(std::cerr);
+        string description=prop_ss.str();
+
+        DEBUG(description);
+
+        TIFFSetField(tif, TIFFTAG_NEUTRINO, description.c_str());
  		TIFFSetField(tif, TIFFTAG_SOFTWARE, "neutrino");
- 		TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
-		
+        TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http::/web.luli.polytchnique.fr/neutrino");
+
 		TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, my_phys->getW());
 		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, my_phys->getH());
 		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, my_phys->getH());

@@ -5,19 +5,6 @@ else
     UNAME_S := $(shell uname -s)
 endif
 
-ifeq ($(UNAME_S),Windows_NT)
-        NUMPROC := 1    
-endif
-
-ifeq ($(UNAME_S),Linux)
-        NUMPROC := $(shell grep -c ^processor /proc/cpuinfo)
-endif
-
-ifeq ($(UNAME_S),Darwin)
-        NUMPROC := $(shell sysctl -n hw.ncpu)
-endif
-
-CMAKEFLAGS ?=
 ifeq (,$(findstring debug,$(config)))
 	CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Debug
 endif
@@ -41,18 +28,19 @@ colormap:
 debug::
 	mkdir -p $@
 	cd $@ && cmake $(CMAKEFLAGS) .. 
-	$(MAKE) -C $@ -j $(NUMPROC)
-	@echo "\nDebug : $@/Neutrino.app"
+	$(MAKE) -C $@
 
 Darwin:: 
 	rm -rf $@ 
 	mkdir -p $@
-	cd $@ && cmake  -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
-	$(MAKE) -C $@ -j $(NUMPROC)
+	cd $@ && cmake  -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	$(MAKE) -C $@
 	rm -rf Neutrino.app
 	cp -r $@/Neutrino.app .
 	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add NSPrincipalClass string NSApplication" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
 ifneq ("$(findstring +,$VERSION)","+")
 	/usr/libexec/PlistBuddy -c "Set CFBundleVersion ${VERSION}" Neutrino.app/Contents/Info.plist
 endif

@@ -45,6 +45,10 @@ int main(int argc, char **argv)
 
     NApplication qapp(argc,argv);
 
+#ifdef USE_QT5
+    qapp.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+
     qapp.setOrganizationName("ParisTech");
     qapp.setOrganizationDomain("edu");
     qapp.setApplicationName("Neutrino");

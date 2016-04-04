@@ -47,6 +47,7 @@
 // base ui
 #include "ui_neutrino.h"
 #include "ui_nSbarra.h"
+#include "ui_nAbout.h"
 
 //#include "nColorBar.h"
 #include "nColorBarWin.h"
@@ -80,7 +81,8 @@ public:
 
     QGraphicsScene my_s;
 
-	Ui::nSbarra my_sbarra;
+    Ui::nSbarra my_sbarra;
+    Ui::nAbout my_about;
 
 	QPluginLoader *plug_loader;
 	//nPlug *plug_iface;
@@ -112,12 +114,13 @@ public:
 private:
     QList<nGenericPan*> panList;
 	QList<nPhysD*> physList;
-    
+
 public slots:
 	nGenericPan* existsPan(QString);
 
 	void build_colormap();
     void setGamma(int value);
+
 	void processEvents();
 	void contextMenuEvent(QContextMenuEvent *);
 	void menuFlipRotate();
@@ -294,9 +297,6 @@ public slots:
 	// Affine STUFF
 	nGenericPan* Affine();
 	
-	// BLUR STUFF
-	nGenericPan* Blur();
-    
 	// remove ghost Fringes
 	nGenericPan* Ghost();
     
@@ -323,7 +323,6 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *);
 	void dragMoveEvent(QDragMoveEvent *);
 	void dropEvent(QDropEvent *);
-    
 
 #ifdef HAVE_PYTHONQT
     void loadPyScripts();
@@ -336,7 +335,7 @@ public slots:
 
 signals:
 	void updatecolorbar();
-	void colorValue(double);
+    void colorValue(double);
 
 	// signals for communications with pans
 	void mouseAtMatrix(QPointF);					// mouse position on the matrix, no scale

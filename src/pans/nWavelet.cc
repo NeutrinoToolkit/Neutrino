@@ -68,8 +68,7 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(bufferChanged(nPhysD*)));
-	connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
+    connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
 }
@@ -189,15 +188,24 @@ void nWavelet::doWavelet () {
 		my_params.damp=my_w.damp->value();
         my_params.data=&datamatrix;
 
-		
-		if (settings.value("useCuda").toBool() && cudaEnabled()) {
+        QString out;
+
+        if (cudaEnabled() && settings.value("useCuda").toBool()) {
 			// use cuda
-//            phys_wavelet_field_2D_morlet_cuda(my_params);
+            out="CUDA: ";
+            phys_wavelet_field_2D_morlet_cuda(my_params);
 			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
-		} else {
-//            phys_wavelet_field_2D_morlet(my_params);
-			runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
-		}
+        } else if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
+            DEBUG("Ready to run on OpenCL");
+            out="OpenCL: ";
+            my_params.opencl_unit=settings.value("openclUnit").toInt();
+            runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+        } else {
+            out="CPU: ";
+            //            phys_wavelet_field_2D_morlet(my_params);
+            runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+        }
+
 
 		my_w.erasePrevious->setEnabled(true);
         map<string, nPhysD *>::const_iterator itr;
@@ -246,14 +254,10 @@ void nWavelet::doWavelet () {
             }
         }
         
-        QString out;
-        out.sprintf(": %.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
-        if (settings.value("useCuda").toBool()) {
-            out.prepend("GPU");
-        } else {
-            out.prepend("CPU");
-        }
-        my_w.statusbar->showMessage(out, 50000);
+        QString status_bar_measure;
+        status_bar_measure.sprintf("%.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
+        my_w.statusbar->showMessage(out+status_bar_measure, 50000);
+        DEBUG(status_bar_measure.toStdString());
     } else {
         my_w.statusbar->showMessage("Canceled", 5000);
     }

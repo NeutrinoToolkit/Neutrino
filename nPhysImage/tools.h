@@ -51,15 +51,15 @@
 
 #define PRINTVAR(x) #x"=" << x
 #define __MSG  __FILE__ << ":" << __LINE__ << " (" << __FUNCTION__ << ") "
-#define __header(__msg,__txt) std::cerr << "[" << __msg << "] " << __MSG << __txt << std::endl
+#define __header(__msg,__txt) std::cerr << "[" << __msg << "] " << __MSG << __txt << std::endl;
 
 #define WARNING(__txt) __header("WARNING", __txt);
 #define ERROREXIT(__txt) {__header("ERROR", __txt); std::raise(SIGSEGV);};
 
 
 #ifdef  __phys_debug
-#define DEBUG1(__txt) __header("DEBUG", __txt)
-#define DEBUG2(__val,__txt) if(__val<=__phys_debug) __header("DEBUG "<<__val, __txt)
+#define DEBUG1(__txt) __header("DEBUG", __txt);
+#define DEBUG2(__val,__txt) if(__val<=__phys_debug) __header("DEBUG "<<__val, __txt);
 #define DEBUG3(arg1,arg2,arg3,...) arg3
 #define DEBUG4(...) DEBUG3(__VA_ARGS__,DEBUG2,DEBUG1,)
 #define DEBUG(...) DEBUG4(__VA_ARGS__)(__VA_ARGS__)

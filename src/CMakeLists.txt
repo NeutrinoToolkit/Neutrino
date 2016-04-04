@@ -15,9 +15,8 @@ set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 if (APPLE)
     message(STATUS "Apple : remember to use brew !")
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
-    add_compile_options(-fPIC)
     add_compile_options(-mmacosx-version-min=10.6)
-    
+
     set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
 
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
@@ -38,16 +37,10 @@ if (APPLE)
     set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-if (UNIX AND (NOT APPLE))
-    message(STATUS "Linux")
+if (LINUX)
     set (CMAKE_PREFIX_PATH "/usr")
     include_directories(BEFORE "/usr/include")
 endif()
-
-
-
-add_compile_options(-std=c++0x)
-
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -56,9 +49,9 @@ if (OPENMP_FOUND)
 endif()
 
 if (WIN32)
-	if (CMAKE_COMPILER_IS_GNUCXX)
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
-	endif()
+    if (CMAKE_COMPILER_IS_GNUCXX)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
+    endif()
 endif()
 
 
@@ -78,7 +71,7 @@ list (APPEND SOURCES
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
     pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
-    pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nBlur.cc pans/nSpectralAnalysis.cc 
+    pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
     pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc 
     pans/nGhost.cc pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc 
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
@@ -88,20 +81,20 @@ list (APPEND SOURCES
     nApp.cc nPluginLoader.cc main.cc 
 )
 
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
+
 include(FindNeutrinoGuiComponents)
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
 if (GENERATE_NHASH)
-	set (SOURCES ${SOURCES}
-		neutrino-key/nHash.cc
-		)
+    set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
 
-	include_directories(neutrino-key)
-	
-	if (UNIX AND (NOT APPLE))
-		add_definitions(-D__neutrino_reg_linux)
-	endif()
+    include_directories(neutrino-key)
+
+    if (UNIX AND (NOT APPLE))
+        add_definitions(-D__neutrino_reg_linux)
+    endif()
 
 endif()
 
@@ -140,9 +133,9 @@ file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
 if (USE_QT5)
-	# add here QT5 only sources
-	list (APPEND SOURCES pans/nCamera.cc)
-	list (APPEND UIS ../UIs/nCamera.ui)
+    # add here QT5 only sources
+    list (APPEND SOURCES pans/nCamera.cc)
+    list (APPEND UIS ../UIs/nCamera.ui)
 
     qt5_add_resources(RES_SOURCES ${ICONS_QRC})
     qt5_add_resources(RES_SOURCES ${HTML_QRC})
@@ -181,19 +174,19 @@ if(WIN32)
     add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN})
 endif()
 
-if(UNIX AND NOT APPLE)
+if(LINUX)
     add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
 endif()
 
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-
 target_link_libraries(Neutrino ${LIBS})
+
 if (USE_QT5)
         qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
-	target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
+    target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
 endif()
 
 
@@ -207,14 +200,14 @@ endif()
 
 
 if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
-	set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
-	add_definitions(-DQT_NO_DEBUG_OUTPUT)
-	set(CMAKE_BUILD_RELEASE TRUE)
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+    set(CMAKE_BUILD_RELEASE TRUE)
 else()
-	set(CMAKE_BUILD_RELEASE FALSE)
+    set(CMAKE_BUILD_RELEASE FALSE)
 endif()
 
 message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
@@ -226,22 +219,21 @@ set(PROJECT_DOMAIN_FIRST "neutrino")
 set(PROJECT_DOMAIN_SECOND "com")
 set(PROJECT_DOMAIN "${PROJECT_DOMAIN_FIRST}.${PROJECT_DOMAIN_SECOND}")
 
-if(UNIX AND NOT APPLE)
-	string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
-	set(BIN_INSTALL_DIR "bin")
-	set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
+if(LINUX)
+    string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
+    set(BIN_INSTALL_DIR "bin")
+    set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
 else()
-	set(BIN_INSTALL_DIR ".")
-	set(DOC_INSTALL_DIR ".")
+    set(BIN_INSTALL_DIR ".")
+    set(DOC_INSTALL_DIR ".")
 endif()
-set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
-	#add_definitions(-Wall -Wextra)
-	# -Wxx are compiler flags and NOT definitions (otherwise: messes up resource compiler)
-	if(CMAKE_BUILD_RELEASE)
-#		add_definitions(-Werror)
-	endif()
+    #add_definitions(-Wall -Wextra)
+    # -Wxx are compiler flags and NOT definitions (otherwise: messes up resource compiler)
+    if(CMAKE_BUILD_RELEASE)
+#        add_definitions(-Werror)
+    endif()
 endif()
 
 
@@ -249,7 +241,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 
 if(APPLE)
-	set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
 
 message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
@@ -258,7 +250,7 @@ message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
 set(LICENSE_FILE "LICENSE.txt")
 
 if(NOT APPLE)
-	install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
+    install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
 endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
@@ -267,10 +259,13 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
 
-message(STATUS ${${PROJECT_NAME}_SOURCE_DIR})
-
 set(CPACK_RESOURCE_FILE_README "${README_FILE}")
 
+
+if(LINUX)
+    set(CPACK_GENERATOR "TBZ2")
+    set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 
 
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")

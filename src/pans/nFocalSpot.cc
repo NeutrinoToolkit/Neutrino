@@ -77,7 +77,7 @@ nFocalSpot::calculate_stats()
 	double above_th_energy = 0;
 	int point_count = 0;
 	double th = my_w.check_dsb->value()*(c_value-my_w.zero_dsb->value()) +my_w.zero_dsb->value() ;
-	for (register size_t ii=0; ii<cur->getSurf(); ii++) 
+    for (size_t ii=0; ii<cur->getSurf(); ii++)
 		if (cur->point(ii) > th) {
 			above_th_energy += cur->point(ii);
 			point_count++;
@@ -119,13 +119,13 @@ nFocalSpot::find_contour(void)
 	double th = my_w.check_dsb->value()*(c_value-my_w.zero_dsb->value()) +my_w.zero_dsb->value();
 
 	nPhysImageF<short> bmap(cur->getW(), cur->getH(), 0);
-	for (register size_t ii=0; ii<cur->getSurf(); ii++)
+    for (size_t ii=0; ii<cur->getSurf(); ii++)
 		if (cur->point(ii) > th) 
 			bmap.set(ii, 1);
 
 	// 2. cell map
 	nPhysImageF<short> cmap(cur->getW()-1, cur->getH()-1, 0);
-	for (register size_t ii=0; ii<cmap.getSurf(); ii++) {
+    for (size_t ii=0; ii<cmap.getSurf(); ii++) {
 		int xx = ii%cmap.getW();
 		int yy = ii/cmap.getW();
 
@@ -153,7 +153,7 @@ nFocalSpot::find_contour(void)
 	int stats[16];
 	for (int i=0; i<16; i++)
 		stats[i] = 0;
-	for (register size_t ii=0; ii<cmap.getSurf(); ii++)
+    for (size_t ii=0; ii<cmap.getSurf(); ii++)
 		stats[cmap.point(ii)] ++;
 
 	int b_points = 0;
@@ -429,7 +429,7 @@ nFocalSpot::contour_integral(std::list<vec2> &contour, std::list<vec2>::iterator
 
 //	bool isUp = false, isIn = false, isDown = false;
 //	int point_count = 0;
-//	for (register size_t yy=0; yy<intg_image.getH(); yy++) {
+//	for (size_t yy=0; yy<intg_image.getH(); yy++) {
 //		size_t xx = 0;
 //		isIn = false; isUp = false, isDown = false;
 //		while (xx<intg_image.getW()) {

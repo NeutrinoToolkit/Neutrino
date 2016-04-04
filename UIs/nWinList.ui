@@ -289,7 +289,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -309,7 +309,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

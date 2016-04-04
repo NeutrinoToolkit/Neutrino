@@ -179,7 +179,7 @@
   <tabstop>image</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

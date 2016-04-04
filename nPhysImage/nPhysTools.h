@@ -76,8 +76,8 @@ inline void phys_rotate_left(nPhysImageF<T> &img)
 {
 	nPhysImageF<T> rotated=img;
 	img.resize(img.getH(),img.getW());
-	for (register size_t j=0; j<img.getH(); j++) {
-		for (register size_t i=0; i<img.getW(); i++) {
+    for (size_t j=0; j<img.getH(); j++) {
+        for (size_t i=0; i<img.getW(); i++) {
 			img.set(i,j,rotated.point(rotated.getW()-1-j,i));
 		}
 	}
@@ -88,8 +88,8 @@ inline void phys_rotate_right(nPhysImageF<T> &img)
 {
 	nPhysImageF<T> rotated=img;
 	img.resize(img.getH(),img.getW());
-	for (register size_t j=0; j<img.getH(); j++) {
-		for (register size_t i=0; i<img.getW(); i++) {
+    for (size_t j=0; j<img.getH(); j++) {
+        for (size_t i=0; i<img.getW(); i++) {
 			img.set(i,j,rotated.point(j,rotated.getH()-1-i));
 		}
 	}

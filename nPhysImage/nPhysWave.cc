@@ -62,8 +62,6 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		for (int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
 		for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 	
-		vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-
 		nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
 		qmap = new nPhysD(dx, dy, 0.0, "quality");
 		
@@ -77,7 +75,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		intensity->resize(dx, dy);
 
 
-		if (params.n_angles==1) {
+        vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
+        if (params.n_angles==1) {
 			angles[0]=0.5*(params.end_angle+params.init_angle);
 		} else {
 			for (size_t i=0; i<params.n_angles; i++)
@@ -153,7 +152,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 		
 		if ((*params.iter_ptr)!=-1) {
 		
-			for (size_t k=0; k<params.data->getSurf(); k++) {
+#pragma omp parallel for
+            for (size_t k=0; k<params.data->getSurf(); k++) {
 				qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
 				intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
 				wphase->Timg_buffer[k]/=2*M_PI;
@@ -161,30 +161,6 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 			
 			phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
 
-            
-            if (params.dosynthetic) {                
-                nPhysD *tmp = new nPhysD();
-                phys_synthetic_interferogram(*tmp,wphase,qmap);
-                params.olist["synthetic"]=tmp;
-            }
-            
-            if (params.docropregion) {                
-                nPhysD *tmp = new nPhysD();
-                *tmp= *(params.data);
-                params.olist["source"]=tmp;
-            }
-            
-			for (size_t k=0; k<params.data->getSurf(); k++) {
-				if(!std::isfinite(params.data->Timg_buffer[k])){
-					qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-					wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-					lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-					intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-				}
-			}
-			
-            
 			params.olist["phase_2pi"] = wphase;
 			params.olist["contrast"] = qmap;
 			params.olist["lambda"] = lambda;
@@ -193,19 +169,19 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 			
 			map<string, nPhysD *>::const_iterator itr;
 			for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                if (params.trimimages) {
-                    nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
-                    delete itr->second;
-                    params.olist[itr->first]=new nPhysD();
-                    *params.olist[itr->first]=image;
-                }
 				itr->second->TscanBrightness();
 				itr->second->set_origin(params.data->get_origin());
 				itr->second->set_scale(params.data->get_scale());
 				itr->second->setFromName(params.data->getFromName());
 				itr->second->setShortName(itr->first);
 				itr->second->setName(itr->first+ " "+params.data->getName());
-			}
+#pragma omp parallel for
+                for (size_t k=0; k<params.data->getSurf(); k++) {
+                    if(!std::isfinite(params.data->Timg_buffer[k])){
+                        itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                    }
+                }
+            }
 		}
 		
 	}
@@ -223,9 +199,8 @@ bool cudaEnabled() {
 	return false;
 }
 
-#ifdef HAVE_CUDA
 void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
-
+#ifdef HAVE_CUDA
 	if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
 
         params.olist.clear();
@@ -396,39 +371,9 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
                 cudaMemcpy(&b1[0], cuc1, cubuf_size, cudaMemcpyDeviceToHost);
                 cudaMemcpy(&b2[0], cuc2, cubuf_size, cudaMemcpyDeviceToHost);
                 cudaThreadSynchronize();
-            
-                for (size_t k=0; k<params.data->getSurf(); k++) {
-                    if(std::isfinite(params.data->Timg_buffer[k])){
-                        qmap->Timg_buffer[k] = sqrt(b1[k].x)/(dx*dy);
-                        wphase->Timg_buffer[k] = b1[k].y/(2*M_PI);
-                        angle->Timg_buffer[k] = b2[k].x;
-                        lambda->Timg_buffer[k] = b2[k].y;
-                        intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(b1[k].y);
-                    } else {
-                        qmap->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-                        wphase->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                        angle->Timg_buffer[k]  = numeric_limits<double>::quiet_NaN();
-                        lambda->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                        intensity->Timg_buffer[k] = numeric_limits<double>::quiet_NaN();
-                    }
-                
-                }
-            
-            
+                        
                 phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
-            
-                if (params.dosynthetic) {                
-                    nPhysD *tmp = new nPhysD();
-                    phys_synthetic_interferogram(*tmp,wphase,qmap);
-                    params.olist["synthetic"]=tmp;
-                }
-            
-                if (params.docropregion) {                
-                    nPhysD *tmp = new nPhysD();
-                    *tmp= *(params.data);
-                    params.olist["source"]=tmp;
-                }
-            
+                        
                 wphase->property["unitsCB"]="2pi";
                 params.olist["phase_2pi"] = wphase;
                 params.olist["contrast"] = qmap;
@@ -440,18 +385,17 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
             
                 map<string, nPhysD *>::const_iterator itr;
                 for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                    if (params.trimimages) {
-                        nPhysD image = itr->second->sub(params.thickness,params.thickness,itr->second->getW()-2*params.thickness,itr->second->getH()-2*params.thickness);
-                        delete itr->second;
-                        params.olist[itr->first]=new nPhysD();
-                        *params.olist[itr->first]=image;
-                    }
                     itr->second->TscanBrightness();
                     itr->second->set_origin(params.data->get_origin());
                     itr->second->set_scale(params.data->get_scale());
                     itr->second->setFromName(params.data->getFromName());
                     itr->second->setShortName(itr->first);
                     itr->second->setName(itr->first+ " "+params.data->getName());
+                    for (size_t k=0; k<params.data->getSurf(); k++) {
+                        if(!std::isfinite(params.data->Timg_buffer[k])){
+                            itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                        }
+                    }
                 }
             }
             
@@ -467,13 +411,509 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
 
         }
     }
-	DEBUG("Out of here");
+#endif
+    DEBUG("Out of here");
 }
-#else
-void phys_wavelet_field_2D_morlet_cuda(wavelet_params &wave_params) {
-    WARNING("We should never go here...");
+
+unsigned int opencl_closest_size(unsigned int num) {
+    unsigned int closest=2*num;
+    for (unsigned int i7=0; i7<=log(num)/log(7); i7++ ) {
+        for (unsigned int i5=0; i5<=log(num)/log(5); i5++ ) {
+            for (unsigned int i3=0; i3<=log(num)/log(3); i3++ ) {
+                for (unsigned int i2=0; i2<=log(num)/log(2); i2++ ) {
+                    unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7);
+                    if (test_val>=num && test_val<closest) {
+                        closest=test_val;
+                        if (closest==num) return num;
+                    }
+                }
+            }
+        }
+    }
+    return closest;
+}
+
+vec2 opencl_closest_size(vec2 num){
+    return vec2(opencl_closest_size(num.x()),opencl_closest_size(num.y()));
+}
+
+int openclEnabled() {
+    int found_GPU=0;
+#ifdef HAVE_LIBCLFFT
+    // get all platforms
+    cl_uint platformCount;
+    clGetPlatformIDs(0, NULL, &platformCount);
+    vector<cl_platform_id> platforms(platformCount);
+    clGetPlatformIDs(platformCount, &platforms[0], NULL);
+    for (unsigned int i = 0; i < platformCount; i++) {
+        cl_uint deviceCount;
+        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &deviceCount);
+        if (deviceCount>0) {
+            found_GPU++;
+        }
+    }
+#endif
+    return found_GPU;
+}
+
+#ifdef HAVE_LIBCLFFT
+pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
+    cl_platform_id platform = 0;
+    cl_device_id device = 0;
+    int found_GPU=0;
+    // get all platforms
+    cl_uint platformCount;
+    clGetPlatformIDs(0, NULL, &platformCount);
+    vector<cl_platform_id> platforms(platformCount);
+    clGetPlatformIDs(platformCount, &platforms[0], NULL);
+
+    for (unsigned int i = 0; i < platformCount; i++) {
+
+        // get all devices
+        cl_uint deviceCount;
+        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &deviceCount);
+        vector<cl_device_id> devices(deviceCount);
+        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, deviceCount, &devices[0], NULL);
+
+        DEBUG(deviceCount);
+        // for each device print critical attributes
+        for (int j = 0; j < deviceCount; j++) {
+            found_GPU++;
+            if (found_GPU==num) {
+                platform=platforms[i];
+                device=devices[j];
+            }
+        }
+    }
+    DEBUG("HERE");
+    return make_pair(platform,device);
 }
 #endif
+
+void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
+#ifdef HAVE_LIBCLFFT
+
+    if (params.opencl_unit>0) {
+
+        params.iter=0;
+        *params.iter_ptr=0;
+
+        vec2 newSize(opencl_closest_size(params.data->getSize()));
+
+        double mean=params.data->sum()/params.data->getSurf();
+
+        nPhysD padded(newSize.x(), newSize.y(), mean);
+        bidimvec<int> offset=(newSize-params.data->get_size())/2;
+        DEBUG("padding offset : " << offset);
+        padded.set_origin(params.data->get_origin()+offset);
+
+        for (size_t j=0; j<params.data->getH(); j++) {
+            for (size_t i=0; i<params.data->getW(); i++) {
+                padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));
+            }
+        }
+
+        unsigned int dx = padded.getW();
+        unsigned int dy = padded.getH();
+
+        cl_int err;
+
+        pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(params.opencl_unit);
+        cl_platform_id platform = my_pair.first;
+        cl_device_id device=my_pair.second;
+
+        /* Setup OpenCL environment. */
+
+        cl_context_properties props[3] = {CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0};
+        cl_context ctx = clCreateContext(props, 1, &device, NULL, NULL, &err);
+        check_opencl_error(err, "clCreateContext");
+        cl_command_queue queue = clCreateCommandQueue(ctx, device, 0, &err);
+        check_opencl_error(err, "clCreateCommandQueue");
+
+
+        // KERNEL
+        string textkernel=
+                "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy,  const float sr,  const float cr, const float lambda_norm, const float damp_norm,  const float thick_norm){\n"
+                "    size_t id = get_global_id(0);\n"
+                "    int i = id%dx;\n"
+                "    int j = id/dx;\n"
+                "    if (i>=(int)dx/2) i-=dx;\n"
+                "    if (j>=(int)dy/2) j-=dy;\n"
+                "    float xr=i*cr-j*sr;\n"
+                "    float yr=i*sr+j*cr;\n"
+                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
+                "    outReal[id] = gauss * inReal[id];\n"
+                "    outImag[id] = gauss * inImag[id];\n"
+                "}\n"
+                "__kernel void best(__global float *inReal, __global float *inImag, __global float *outQual, __global float *outPhase, __global unsigned int *outLambdaAngle, const unsigned int nlambdaangle){\n"
+                "    size_t id = get_global_id(0);\n"
+                "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
+                "    if (quality>outQual[id]) {\n"
+                "        outQual[id]=quality;\n"
+                "        outPhase[id]=atan2pi(inImag[id],inReal[id]);\n"
+                "        outLambdaAngle[id]=nlambdaangle;\n"
+                "    }\n"
+                "}\n";
+
+        DEBUG("KERNEL:\n" << textkernel << "\nEND KERNEL") ;
+
+        const char *source=textkernel.c_str();
+
+        cl_program program = clCreateProgramWithSource(ctx,1,&source, NULL, &err);
+        check_opencl_error(err, "clCreateProgramWithSource");
+        err=clBuildProgram(program, 1, &device, "-Werror -cl-fast-relaxed-math", NULL, NULL);
+        check_opencl_error(err, "clBuildProgram");
+
+        if (err == CL_BUILD_PROGRAM_FAILURE) {
+            // Determine the size of the log
+            size_t log_size;
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+
+            // Allocate memory for the log
+            std::string mylog(log_size, ' ');
+
+            // Get the log
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, log_size, &mylog[0], NULL);
+
+            // Print the log
+            WARNING(mylog);
+        }
+
+        /* Setup clFFT. */
+        clfftSetupData fftSetup;
+        err = clfftInitSetupData(&fftSetup);
+        check_opencl_error(err, "clfftInitSetupData");
+        err = clfftSetup(&fftSetup);
+        check_opencl_error(err, "clfftSetup");
+
+        /* Create a default plan for a complex FFT. */
+        clfftPlanHandle planHandle;
+        vector<size_t> clLengths =  {(size_t)dx, (size_t)dy};
+        err = clfftCreateDefaultPlan(&planHandle, ctx, CLFFT_2D, &clLengths[0]);
+        check_opencl_error(err, "clfftCreateDefaultPlan");
+
+        /* Set plan parameters. */
+        err = clfftSetPlanPrecision(planHandle, CLFFT_SINGLE);
+        check_opencl_error(err, "clfftSetPlanPrecision");
+        err = clfftSetLayout(planHandle, CLFFT_COMPLEX_PLANAR, CLFFT_COMPLEX_PLANAR);
+        check_opencl_error(err, "clfftSetLayout");
+        err = clfftSetResultLocation(planHandle, CLFFT_OUTOFPLACE);
+        check_opencl_error(err, "clfftSetResultLocation");
+
+        /* Bake the plan. */
+        err = clfftBakePlan(planHandle, 1, &queue, NULL, NULL);
+        check_opencl_error(err, "clfftBakePlan");
+
+        /* Real and Imaginary arrays. */
+        cl_uint N = dx*dy;
+        vector<cl_float> inReal(N,0);
+        vector<cl_float> inImag(N,0);
+
+        /* Initialization of inReal*/
+        for(cl_uint j=0; j<dy; j++) {
+          for(cl_uint i=0; i<dx; i++) {
+            inReal[j*dx+i] = padded.point(i,j);
+          }
+        }
+
+        /* Size of temp buffer. */
+        size_t tmpBufferSize = 0;
+        err = clfftGetTmpBufSize(planHandle, &tmpBufferSize);
+        check_opencl_error(err, "clfftGetTmpBufSize");
+
+        /* Temporary buffer. */
+        cl_mem tmpBuffer = 0;
+        if ((err == 0) && (tmpBufferSize > 0)) {
+          tmpBuffer = clCreateBuffer(ctx, CL_MEM_READ_WRITE, tmpBufferSize, 0, &err);
+          check_opencl_error(err, "tmpBuffer clCreateBuffer " << tmpBufferSize);
+          DEBUG("intermediate buffer needed");
+        }
+
+        cl_mem buffersIn[2]  = {0, 0};
+        /* Prepare OpenCL memory objects : create buffer for input. */
+        buffersIn[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_float), &inReal[0], &err);
+        check_opencl_error(err, "inReal buffersIn[0] clCreateBuffer");
+
+        /* Enqueue write inReal array into buffersIn[0]. */
+        err = clEnqueueWriteBuffer(queue, buffersIn[0], CL_TRUE, 0, N * sizeof(float), &inReal[0], 0, NULL, NULL);
+        check_opencl_error(err, "inReal buffersIn[0] clEnqueueWriteBuffer");
+
+        /* Prepare OpenCL memory objects : create buffer for input. */
+        buffersIn[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_float), &inImag[0], &err);
+        check_opencl_error(err, "inImag buffersIn[1] clCreateBuffer");
+
+        /* Enqueue write inImag array into buffersIn[1]. */
+        err = clEnqueueWriteBuffer(queue, buffersIn[1], CL_TRUE, 0, N * sizeof(float), &inImag[0], 0, NULL, NULL);
+        check_opencl_error(err, "inImag buffersIn[1] clEnqueueWriteBuffer");
+
+        cl_mem buffersOut[2] = {0, 0};
+        /* Prepare OpenCL memory objects : create buffer for output. */
+        buffersOut[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float), NULL, &err);
+        check_opencl_error(err, "buffersOut[0] clCreateBuffer");
+
+        buffersOut[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float), NULL, &err);
+        check_opencl_error(err, "buffersOut[1] clCreateBuffer");
+
+        cl_mem best[3] = {0, 0, 0};
+//        best[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float),  NULL, &err);
+//        check_opencl_error(err, "best[0] clCreateBuffer");
+//        best[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float),  NULL, &err);
+//        check_opencl_error(err, "best[1] clCreateBuffer");
+//        best[2] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(unsigned char),  NULL, &err);
+//        check_opencl_error(err, "best[1] clCreateBuffer");
+//        best[3] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(unsigned char),  NULL, &err);
+//        check_opencl_error(err, "best[1] clCreateBuffer");
+
+
+        /* Prepare OpenCL memory objects : create buffer for quality. */
+        best[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_float), &inImag[0], &err);
+        check_opencl_error(err, "inReal best[0] clCreateBuffer");
+        err = clEnqueueWriteBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &inImag[0], 0, NULL, NULL);
+        check_opencl_error(err, "inReal best[0] clEnqueueWriteBuffer");
+
+        best[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float),  NULL, &err);
+        check_opencl_error(err, "best[1] clCreateBuffer");
+        best[2] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_uint),  NULL, &err);
+        check_opencl_error(err, "best[2] clCreateBuffer");
+
+        /* Execute Forward FFT. */
+        err = clfftEnqueueTransform(planHandle, CLFFT_FORWARD, 1, &queue, 0, NULL, NULL, buffersIn, buffersOut, tmpBuffer);
+        check_opencl_error(err, "clfftEnqueueTransform");
+
+        /* Wait for calculations to be finished. */
+        err = clFinish(queue);
+        check_opencl_error(err, "clFinish");
+
+        err=clReleaseMemObject(tmpBuffer);
+        check_opencl_error(err, "clReleaseMemObject tmpBuffer");
+
+        /* Release the plan. */
+        err = clfftDestroyPlan(&planHandle );
+        check_opencl_error(err, "clfftDestroyPlan");
+
+
+//            make new plan
+        err = clfftCreateDefaultPlan(&planHandle, ctx, CLFFT_2D, &clLengths[0]);
+        check_opencl_error(err, "clfftCreateDefaultPlan");
+
+        /* Set plan parameters. */
+        err = clfftSetPlanPrecision(planHandle, CLFFT_SINGLE);
+        check_opencl_error(err, "clfftSetPlanPrecision");
+        err = clfftSetLayout(planHandle, CLFFT_COMPLEX_PLANAR, CLFFT_COMPLEX_PLANAR);
+        check_opencl_error(err, "clfftSetLayout");
+        err = clfftSetResultLocation(planHandle, CLFFT_INPLACE);
+        check_opencl_error(err, "clfftSetResultLocation");
+
+        /* Bake the plan. */
+        err = clfftBakePlan(planHandle, 1, &queue, NULL, NULL);
+        check_opencl_error(err, "clfftBakePlan");
+
+        /* Size of temp buffer. */
+        err = clfftGetTmpBufSize(planHandle, &tmpBufferSize);
+        check_opencl_error(err, "clfftGetTmpBufSize");
+
+        /* Temporary buffer. */
+        if ((err == 0) && (tmpBufferSize > 0)) {
+          tmpBuffer = clCreateBuffer(ctx, CL_MEM_READ_WRITE, tmpBufferSize, 0, &err);
+          check_opencl_error(err, "tmpBuffer clCreateBuffer " << tmpBufferSize);
+          DEBUG("intermediate buffer needed");
+        }
+
+
+        cl_kernel kernelGabor = clCreateKernel(program, "gabor", &err);
+        check_opencl_error(err, "clCreateKernel");
+
+        clSetKernelArg(kernelGabor, 0, sizeof(cl_mem), &buffersOut[0]); //out because fft: in->out and gabor: out->in
+        clSetKernelArg(kernelGabor, 1, sizeof(cl_mem), &buffersOut[1]);
+        clSetKernelArg(kernelGabor, 2, sizeof(cl_mem), &buffersIn[0]);
+        clSetKernelArg(kernelGabor, 3, sizeof(cl_mem), &buffersIn[1]);
+        clSetKernelArg(kernelGabor, 4, sizeof(unsigned int), &dx);
+        clSetKernelArg(kernelGabor, 5, sizeof(unsigned int), &dy);
+        float damp_norm= params.damp * M_PI;
+        clSetKernelArg(kernelGabor, 9, sizeof(float), &damp_norm);
+
+        cl_kernel kernelBest = clCreateKernel(program, "best", &err);
+        check_opencl_error(err, "clCreateKernel best");
+
+        clSetKernelArg(kernelBest, 0, sizeof(cl_mem), &buffersIn[0]); //out because fft: in->out and gabor: out->in
+        clSetKernelArg(kernelBest, 1, sizeof(cl_mem), &buffersIn[1]);
+        clSetKernelArg(kernelBest, 2, sizeof(cl_mem), &best[0]);
+        clSetKernelArg(kernelBest, 3, sizeof(cl_mem), &best[1]);
+        clSetKernelArg(kernelBest, 4, sizeof(cl_mem), &best[2]);
+
+
+
+        vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
+        if (params.n_angles==1) {
+            angles[0]=0.5*(params.end_angle+params.init_angle);
+        } else {
+            for (size_t nangle=0; nangle<params.n_angles; nangle++)
+                angles[nangle] = params.init_angle + nangle*(params.end_angle-params.init_angle)/(params.n_angles-1);
+        }
+        if (params.n_lambdas==1) {
+            lambdas[0]=0.5*(params.end_lambda+params.init_lambda);
+        } else {
+            for (size_t nlambda=0; nlambda<params.n_lambdas; nlambda++)
+                lambdas[nlambda] = params.init_lambda + nlambda*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
+        }
+
+
+        size_t totalJobs=N;
+
+        for (unsigned char nangle=0; nangle <params.n_angles; nangle++) {
+
+            for (unsigned char nlambda=0; nlambda <params.n_lambdas; nlambda++) {
+
+                if ((*params.iter_ptr)==-1) {
+                    DEBUG("Aborting");
+                    break;
+                }
+
+                DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] );
+
+
+                float sr=sin(angles[nangle]*_phys_deg);
+                float cr=cos(angles[nangle]*_phys_deg);
+                err=clSetKernelArg(kernelGabor, 6, sizeof(float), &sr);
+                check_opencl_error(err, "clSetKernelArg");
+                err=clSetKernelArg(kernelGabor, 7, sizeof(float), &cr);
+                check_opencl_error(err, "clSetKernelArg");
+                float lambda_norm=lambdas[nlambda]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                err=clSetKernelArg(kernelGabor, 8, sizeof(float), &lambda_norm);
+                check_opencl_error(err, "clSetKernelArg");
+
+                float thick_norm=params.thickness * M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                err=clSetKernelArg(kernelGabor,10, sizeof(float), &thick_norm);
+                check_opencl_error(err, "clSetKernelArg");
+
+
+                clEnqueueNDRangeKernel(queue, kernelGabor, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
+                err = clFinish(queue);
+                check_opencl_error(err, "clFinish");
+
+
+                /* Execute Backward FFT. */
+                err = clfftEnqueueTransform(planHandle, CLFFT_BACKWARD, 1, &queue, 0, NULL, NULL, buffersIn, NULL, tmpBuffer);
+                check_opencl_error(err, "clfftEnqueueTransform ");
+
+                /* Wait for calculations to be finished. */
+                err = clFinish(queue);
+                check_opencl_error(err, "clFinish");
+
+                unsigned int iter=params.iter;
+                err=clSetKernelArg(kernelBest, 5, sizeof(unsigned int), &iter);
+                check_opencl_error(err, "clSetKernelArg");
+
+                clEnqueueNDRangeKernel(queue, kernelBest, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
+                err = clFinish(queue);
+                check_opencl_error(err, "clFinish");
+                params.iter++;
+                (*params.iter_ptr)++;
+
+            }
+        }
+
+        vector<float> quality_sqr(N,0);
+        err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality_sqr[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
+
+        vector<float> phase(N,0);
+        err = clEnqueueReadBuffer(queue, best[1], CL_TRUE, 0, N * sizeof(float), &phase[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
+
+        vector<unsigned int> lambdaangle(N,0);
+        err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
+
+        err = clFinish(queue);
+        check_opencl_error(err, "clFinish");
+
+        /* Release OpenCL memory objects. */
+        clReleaseMemObject(buffersIn[0]);
+        clReleaseMemObject(buffersIn[1]);
+        clReleaseMemObject(buffersOut[0]);
+        clReleaseMemObject(buffersOut[1]);
+        clReleaseMemObject(best[0]);
+        clReleaseMemObject(best[1]);
+        clReleaseMemObject(best[2]);
+        clReleaseMemObject(tmpBuffer);
+
+        /* Release the plan. */
+        err = clfftDestroyPlan(&planHandle );
+        check_opencl_error(err, "clfftDestroyPlan");
+
+        /* Release clFFT library. */
+        clfftTeardown( );
+
+        /* Release OpenCL working objects. */
+        clReleaseCommandQueue(queue);
+        clReleaseContext(ctx);
+
+        params.olist.clear();
+
+        nPhysD *nQuality = new nPhysD(params.data->getW(),params.data->getH(),0,"Quality");
+        nPhysD *nPhase = new nPhysD(params.data->getW(),params.data->getH(),0,"Phase");
+        nPhysD *nIntensity = new nPhysD(params.data->getW(),params.data->getH(),0,"Intensity");
+
+        for (size_t j=0; j<params.data->getH(); j++) {
+            for (size_t i=0; i<params.data->getW(); i++) {
+                unsigned int k=(j+offset.y())*dx+i+offset.x();
+                nQuality->set(i,j,sqrt(quality_sqr[k]));
+                nPhase->set(i,j,phase[k]/2.0);
+                nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(M_PI*phase[k]));
+            }
+        }
+
+        phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
+
+        params.olist["phase_2pi"] = nPhase;
+        params.olist["contrast"] = nQuality;
+        params.olist["intensity"] = nIntensity;
+
+
+        if (params.n_angles>1) {
+            nPhysD *nAngle = new nPhysD(params.data->getW(),params.data->getH(),0,"Angle");
+            for (size_t j=0; j<params.data->getH(); j++) {
+                for (size_t i=0; i<params.data->getW(); i++) {
+                    unsigned int k=(j+offset.y())*dx+i+offset.x();
+                    nAngle->set(i,j,angles[lambdaangle[k]%params.n_angles]);
+                }
+            }
+            params.olist["angle"] = nAngle;
+        }
+
+        if (params.n_lambdas>1) {
+            nPhysD *nLambda = new nPhysD(params.data->getW(),params.data->getH(),0,"Lambda");
+            for (size_t j=0; j<params.data->getH(); j++) {
+                for (size_t i=0; i<params.data->getW(); i++) {
+                    unsigned int k=(j+offset.y())*dx+i+offset.x();
+                    nLambda->set(i,j,lambdas[lambdaangle[k]/params.n_angles]);
+                }
+            }
+            params.olist["lambda"] = nLambda;
+        }
+
+
+        map<string, nPhysD *>::const_iterator itr;
+        for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+            itr->second->TscanBrightness();
+            itr->second->set_origin(params.data->get_origin());
+            itr->second->set_scale(params.data->get_scale());
+            itr->second->setFromName(params.data->getFromName());
+            itr->second->setShortName(itr->first);
+            itr->second->setName(itr->first+ " "+params.data->getName());
+#pragma omp parallel for
+            for (size_t k=0; k<params.data->getSurf(); k++) {
+                if (isnan(params.data->point(k))) {
+                    itr->second->set(k,numeric_limits<double>::quiet_NaN());
+                }
+            }
+        }
+
+    }
+#endif
+}
+
 
 
 // ---------------------- thread transport functions ------------------------
@@ -482,6 +922,12 @@ void phys_wavelet_trasl_cuda(void *params, int &iter) {
     DEBUG("Enter here");
 	((wavelet_params *)params)->iter_ptr = &iter;
 	phys_wavelet_field_2D_morlet_cuda(*((wavelet_params *)params));
+}
+
+void phys_wavelet_trasl_opencl(void *params, int &iter) {
+    DEBUG("Enter here");
+    ((wavelet_params *)params)->iter_ptr = &iter;
+    phys_wavelet_field_2D_morlet_opencl(*((wavelet_params *)params));
 }
 
 void phys_wavelet_trasl_nocuda(void *params, int &iter) {
@@ -542,8 +988,9 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
+#pragma omp parallel for
             for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
-                synthetic.set(ii,quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
+                synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
             }
             synthetic.property=phase_over_2pi->property;
             synthetic.setShortName("synthetic");
@@ -557,8 +1004,9 @@ void
 phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 {
 
-	for (register size_t ii=0; ii<iphys.getW(); ii++) {
-		for (register size_t jj=0; jj<iphys.getH(); jj++) {
+#pragma omp parallel for collapse(2)
+    for (size_t ii=0; ii<iphys.getW(); ii++) {
+        for (size_t jj=0; jj<iphys.getH(); jj++) {
 			iphys.Timg_matrix[jj][ii] -= ii*kx + jj*ky;
 		}
 	}
@@ -617,7 +1065,7 @@ phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double m
 	double kappa = 2*M_PI/probe_wl;
 	//double mult = _phys_avogadro / (3*kappa*kappa*molar_refr);
 	double mult = _phys_avogadro / (3*molar_refr);
-	for (register size_t ii=0; ii<invimage.getSurf(); ii++) {
+    for (size_t ii=0; ii<invimage.getSurf(); ii++) {
 		double the_point = invimage.point(ii)/res;
 		//invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 		invimage.set(ii, mult*(pow(the_point/kappa + 1,2.)-1) );
@@ -632,7 +1080,7 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 	double kappa = 2*M_PI/probe_wl;
 	double mult = _phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
 	DEBUG(5,"resolution: "<< res << ", probe: " << probe_wl << ", mult: " << mult);
-	for (register size_t ii=0; ii<invimage.getSurf(); ii++) {
+    for (size_t ii=0; ii<invimage.getSurf(); ii++) {
 		double the_point = invimage.point(ii)/res;
 		invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 	}
@@ -721,7 +1169,7 @@ void phys_invert_abel(abel_params &params)
 	
 	if (ialgo == ABEL) {
 		DEBUG(1, "Plain ABEL inversion");
-		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+        for (size_t ii = 0; ii<iaxis.size(); ii++) {
 			if ((*params.iter_ptr)==-1) {
 				    DEBUG("aborting");
 				    break;
@@ -784,14 +1232,14 @@ void phys_invert_abel(abel_params &params)
 		int axe_inv_mean[2];
 		axe_inv_mean[0] = 0;
 		axe_inv_mean[1] = 0;
-		for (register size_t ii=0; ii<iaxis.size(); ii++) {
+        for (size_t ii=0; ii<iaxis.size(); ii++) {
 			axe_inv_mean[0] += iaxis[ii].x;
 			axe_inv_mean[1] += iaxis[ii].y;
 		}
 
         DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
 
-		for (register size_t ii = 0; ii<iaxis.size(); ii++) {
+        for (size_t ii = 0; ii<iaxis.size(); ii++) {
 			if ((*params.iter_ptr)==-1) {
 				DEBUG("aborting");
 				break;

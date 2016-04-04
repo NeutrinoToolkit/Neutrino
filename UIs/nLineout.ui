@@ -186,7 +186,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -202,7 +202,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/neutrino.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/lockColor.png</normaloff>
      <normalon>:/icons/lockColor.png</normalon>:/icons/lockColor.png</iconset>
    </property>
@@ -223,7 +223,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

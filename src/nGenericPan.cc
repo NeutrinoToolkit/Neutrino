@@ -81,7 +81,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 	
 void nGenericPan::addPhysToCombos(nPhysD *buffer) {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
-		if (combo->property("neutrinoImage").isValid()) {
+        if (combo->property("neutrinoImage").isValid()) {
 			int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
 			if (alreadyThere == -1) {
 				combo->addItem(getNameForCombo(combo,buffer),qVariantFromValue((void*) buffer));
@@ -113,7 +113,11 @@ void nGenericPan::decorate() {
 				//connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
-			}
+
+//                QPalette Pal(palette());
+//                Pal.setColor(QPalette::Text, Qt::darkRed);
+//                combo->setPalette(Pal);
+            }
 		}
 	}
 	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
@@ -739,7 +743,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 QVariant nGenericPan::get(QString name, int occurrence) {
 	int my_occurrence=1;
-	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
+    foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
 				return QVariant(obj->currentIndex());

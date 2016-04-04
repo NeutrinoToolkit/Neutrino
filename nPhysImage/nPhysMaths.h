@@ -240,7 +240,7 @@ nPhysImageF<T> ftshift2(nPhysImageF<T> &iimg) {
 	nPhysImageF<T> oimg;
 	oimg.resize(iimg.getW(), iimg.getH());
 	std::vector<T> vec;
-	for (register size_t jj=0; jj<iimg.getH(); jj++) {
+    for (size_t jj=0; jj<iimg.getH(); jj++) {
 		iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
 		oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
 	}
@@ -255,12 +255,12 @@ nPhysImageF<T> ftshift1(nPhysImageF<T> &iimg, enum phys_direction ftdir=PHYS_X) 
 	std::vector<T> vec;
 
 	if (ftdir == PHYS_X) {
-		for (register size_t jj=0; jj<iimg.getH(); jj++) {
+        for (size_t jj=0; jj<iimg.getH(); jj++) {
 			iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
 			oimg.set_Trow(jj, 0, vec);
 		}
 	} else {
-		for (register size_t jj=0; jj<iimg.getH(); jj++) {
+        for (size_t jj=0; jj<iimg.getH(); jj++) {
 			iimg.get_Trow(jj, 0, vec);
 			oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
 		}
@@ -281,9 +281,9 @@ nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
 
 	DEBUG("Hscale: "<<hscale<<", Vscale: "<<vscale);
 
-	for (register size_t ii=0; ii<oimg.getH(); ii++) {
+    for (size_t ii=0; ii<oimg.getH(); ii++) {
 		double frow = vscale*ii; 
-		for (register size_t jj=0; jj<oimg.getW(); jj++) {
+        for (size_t jj=0; jj<oimg.getW(); jj++) {
 			double fcol = hscale*jj;
 			oimg.set(jj, ii, iimg.getPoint(fcol, frow));
 		}

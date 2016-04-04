@@ -10,12 +10,16 @@ set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 if (CMAKE_BUILD_TYPE STREQUAL "")
 	set (CMAKE_BUILD_TYPE "Release")
 endif()
+
 message(STATUS "Neutrino build type: ${CMAKE_BUILD_TYPE}")
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
 
 ## global compile options
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
-add_compile_options(-std=c++0x)
 
 if (GENERATE_NHASH)
 	message (STATUS "Compiling neutrino with serial number/key protection")
@@ -25,6 +29,24 @@ endif()
 ## ADD DYNAMIC VERSIONING!
 ## ADD DEB DESCRIPTION
 ## CHECK LIB RPATH in PACKS
+
+add_compile_options(-std=c++11)
+add_compile_options(-Wall)
+add_compile_options(-fPIC)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  add_compile_options(-stdlib=libc++)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-static-libgcc -static-libstdc++)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  # using Intel C++
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+endif()
+
+
+set (CMAKE_CXX_FLAGS "-O3")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
 
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
@@ -120,6 +142,7 @@ if(APPLE)
     include(DeployQt4)
     install_qt4_executable("${EXECUTABLE}")
 endif()
+
 include (CPack) # this to be included LAST with resp. to its vars
 
 

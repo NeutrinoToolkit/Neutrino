@@ -53,6 +53,8 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 class nVisar : public nGenericPan {
 	Q_OBJECT
 	
+    using nGenericPan::loadSettings;
+
 public:
 	
 	nVisar(neutrino *, QString);
@@ -93,6 +95,7 @@ public slots:
 	void tabChanged(int=0);
 	
 	void mouseAtMatrix(QPointF);
+
 	void loadSettings(QString);
 	
     void bufferChanged(nPhysD*);

@@ -45,7 +45,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../resources/neutrino.qrc">
+       <iconset resource="../resources/icons/icons.qrc">
         <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
       </property>
      </widget>
@@ -59,7 +59,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../resources/neutrino.qrc">
+       <iconset resource="../resources/icons/icons.qrc">
         <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
       </property>
      </widget>
@@ -217,7 +217,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/neutrino.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

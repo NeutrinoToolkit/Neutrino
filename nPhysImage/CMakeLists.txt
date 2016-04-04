@@ -1,16 +1,12 @@
 # this is the frigging nPhysImage cmakelists
 cmake_minimum_required (VERSION 3.0)
 
-## local (nPhys) compile options
-add_compile_options(-fPIC)
-
-if (UNIX AND (NOT APPLE))
+if (LINUX)
     message(STATUS "Linux")
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
-add_library (nPhysImageF SHARED bidimvec.cc tools.cc anymap.cc NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
-
+add_library (nPhysImageF SHARED bidimvec.cc tools.cc nPhysTools.cc anymap.cc NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")
@@ -46,9 +42,17 @@ endif()
 # fftw_threads
 find_library(FFTW_THREADS NAMES fftw3_threads)
 if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
-	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
-	set(LIBS ${LIBS} ${FFTW_THREADS}) 
-	add_definitions(-DHAVE_LIBFFTW_THREADS)
+        message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
+        set(LIBS ${LIBS} ${FFTW_THREADS})
+        add_definitions(-DHAVE_LIBFFTW_THREADS)
+endif()
+
+# fftw_openmp
+find_library(FFTW_OPENMP NAMES fftw3_omp)
+if (NOT ${FFTW_OPENMP} STREQUAL "FFTW_OPENMP-NOTFOUND")
+        message (STATUS "using FFTW_OPENMP: ${FFTW_OPENMP}")
+        set(LIBS ${LIBS} ${FFTW_OPENMP})
+        add_definitions(-DHAVE_LIBFFTW_OPENMP)
 endif()
 
 #fftw
@@ -110,10 +114,8 @@ if (TIFF_FOUND)
 	add_definitions(-DHAVE_LIBTIFF)
 endif()
 
-# list include_directories
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS} -static-libgcc -static-libstdc++")
 target_link_libraries(nPhysImageF ${LIBS})
 
 # output
@@ -139,5 +141,6 @@ endif()
 if (NOT APPLE)
     install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
 endif()
+
 
 

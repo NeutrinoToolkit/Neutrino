@@ -26,6 +26,7 @@
 #include "nVisarZoomer.h"
 #include "neutrino.h"
 #include "fftw3.h"
+#include <QColor>
 
 #include <qwt_scale_engine.h>
 #include <qwt_curve_fitter.h>
@@ -630,7 +631,8 @@ void nVisar::updatePlot() {
 				foreach (double a, tjump) {
 					QwtPlotMarker *mark=new QwtPlotMarker();
 					mark->setLineStyle(QwtPlotMarker::VLine);
-					QPen pen(QColor(Qt::gray));
+                    QColor gr_color((Qt::gray));
+                    QPen pen(gr_color);
 					pen.setStyle(Qt::DashLine);
 					mark->setLinePen(pen);
 					mark->setXValue(a);
@@ -645,7 +647,7 @@ void nVisar::updatePlot() {
 				double offset=setvisar[k].offsetShift->value();
 				double offsetTime=setvisar[k].offsetTime->value();
 				
-				QVector< QPointF > velJump_array[abs(setvisar[k].jump->value())];
+                QVector<QVector< QPointF > > velJump_array(abs(setvisar[k].jump->value()));
 				
 				for (unsigned int j=0;j<cPhase[0][k].dataSize();j++) {
 					double time;

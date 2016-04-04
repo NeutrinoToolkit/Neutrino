@@ -52,8 +52,8 @@ void
 nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 	if (nparent->currentBuffer) {
 // enable this for testing 
-		//p->drawRect(boundingRect());
-		p->setClipRect( option->exposedRect );
+        //p->drawRect(boundingRect());
+        p->setClipRect( option->exposedRect );
 		p->setFont(nparent->my_w.my_view->scaledFont);
 		vec2f my_or=nparent->currentBuffer->get_origin();
 		vec2f my_sc=nparent->currentBuffer->get_scale();
@@ -238,7 +238,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		p->setPen(QColor(rulerColor));
 		p->drawPath(allGrid);
 		p->setPen(QColor(color));
-		
+
         if (nparent->nPalettes[nparent->colorTable].size()) {
 			QPen emptyPen=pen;
 			emptyPen.setColor(QColor(0,0,0,0));
@@ -290,6 +290,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 				}
 				if (!intersected) break;
 			}
+
 			for (int i=0; i<=colorTics; i++) {
 				allTics.moveTo(i*((double)size.width())/((double)colorTics),size.height()+3.0*p->fontMetrics().height()/4.0);
 				allTics.lineTo(i*((double)size.width())/((double)colorTics),size.height()+p->fontMetrics().height());
