@@ -40,5 +40,5 @@ make && make install.
 
 6. run cmake with the appropriate toolchain
 
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../resources/cmake/Toolchain-i686-mingw32.cmake
+cmake .. -DCMAKE_TOOLCHAIN_FILE=../resources/cmake/Toolchain-i686-mingw32.cmake -DNEUTRINO_CROSS_ROOT=<path to xcompile libs root>
 
