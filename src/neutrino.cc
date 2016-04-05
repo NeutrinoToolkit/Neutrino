@@ -255,9 +255,8 @@ neutrino::neutrino():
     connect(my_w.actionPython, SIGNAL(triggered()), this, SLOT(Python()));
     loadPyScripts();
 #else
-    my_w.menuPython->hide();
-#endif
     my_w.menuPython->menuAction()->setVisible(false);
+#endif
 
     // ---------------------------------------------------------------------------------------------
 

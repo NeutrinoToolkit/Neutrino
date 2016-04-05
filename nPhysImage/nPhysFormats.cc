@@ -376,7 +376,7 @@ physInt_sif::physInt_sif(string ifilename)
         }
 	}
 
-    // to praise the hindi god of beer, we test if we have another line
+    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
     long int test_position = ifile.tellg();
     getline(ifile, temp_string);
     if (temp_string != "0") {
@@ -1014,6 +1014,9 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
         prop_ss.flush();
         my_phys->property.dumper(std::cerr);
         string description=prop_ss.str();
+
+        std::replace( description.begin(), description.end(), '\0', ' ');
+
 
         DEBUG(description);
 
