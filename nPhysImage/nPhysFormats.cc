@@ -375,6 +375,14 @@ physInt_sif::physInt_sif(string ifilename)
             break;
         }
 	}
+
+    // to praise the hindi god of beer, we test if we have another line
+    long int test_position = ifile.tellg();
+    getline(ifile, temp_string);
+    if (temp_string != "0") {
+        ifile.seekg(test_position);
+    }
+
     DEBUG("We are at byte "<< ifile.tellg());
 
 	// jump magic lines

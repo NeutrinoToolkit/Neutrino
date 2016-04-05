@@ -257,6 +257,7 @@ neutrino::neutrino():
 #else
     my_w.menuPython->hide();
 #endif
+    my_w.menuPython->menuAction()->setVisible(false);
 
     // ---------------------------------------------------------------------------------------------
 
