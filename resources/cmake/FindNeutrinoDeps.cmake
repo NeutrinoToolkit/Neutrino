@@ -101,7 +101,18 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
 endif()
 
 # opencl
-find_package(OpenCL)
+if (NOT CMAKE_MINOR_VERSION LESS "5")
+	find_package(OpenCL QUIET)
+else()
+	# opencl-config.cmake not available until cmake 3.5.x
+	find_library(OpenCL_LIBRARIES NAMES OpenCL)
+	find_path(OpenCL_INCLUDE_DIRS opencl.h PATH_SUFFIXES CL)
+	if (NOT ${OpenCL_LIBRARIES} STREQUAL "OpenCL_LIBRARIES-NOTFOUND")
+		message(STATUS "Found OpenCL")
+		set (OpenCL_FOUND true)
+	endif()
+endif()
+
 if (OpenCL_FOUND)
     message (STATUS "using OpenCL: ${OpenCL_LIBRARIES}")
     include_directories(${OpenCL_INCLUDE_DIRS})
