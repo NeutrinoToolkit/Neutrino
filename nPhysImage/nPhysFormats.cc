@@ -361,29 +361,35 @@ physInt_sif::physInt_sif(string ifilename)
 	temp_string.clear();
     unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
+        long int test_position = ifile.tellg();
 		getline(ifile, temp_string);
+
+        if (temp_string.size() > 10000) {
+            ifile.seekg(test_position);
+            break;
+        }
 		istringstream iss(temp_string);
 		
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
         property["sif-e-"+ss.str()]=temp_string;
 
-        DEBUG(ss.str() << " " << temp_string)
+        DEBUG(ss.str() << " " << temp_string.size())
 
 		// most readable ever
         if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
             property["sif-magic_number"]=(int)magic_number;
             break;
         }
-	}
+    }
 
-//    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
-//    long int test_position = ifile.tellg();
-//    getline(ifile, temp_string);
-//    if (temp_string != "0") {
-//        ifile.seekg(test_position);
-//    } else {
-//        property["pippo"]=(int)test_position;
-//    }
+    //    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
+    //    long int test_position = ifile.tellg();
+    //    getline(ifile, temp_string);
+    //    if (temp_string != "0") {
+    //        ifile.seekg(test_position);
+    //    } else {
+    //        property["pippo"]=(int)test_position;
+    //    }
 
     DEBUG("We are at byte "<< ifile.tellg());
 
@@ -391,7 +397,10 @@ physInt_sif::physInt_sif(string ifilename)
 	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Ra");
 	for (size_t i=0; i<magic_number; i++) {
 		getline(ifile, temp_string);
-	}
+        istringstream iss(temp_string);
+        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+        property["sif-f-"+ss.str()]=temp_string;
+    }
 
 	// consistency check
 	
