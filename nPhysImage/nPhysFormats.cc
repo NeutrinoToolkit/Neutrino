@@ -370,18 +370,20 @@ physInt_sif::physInt_sif(string ifilename)
         DEBUG(ss.str() << " " << temp_string)
 
 		// most readable ever
-        if ( !(iss  >> magic_number).fail() && iss.eof() ) {
-
+        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+            property["sif-magic_number"]=(int)magic_number;
             break;
         }
 	}
 
-    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
-    long int test_position = ifile.tellg();
-    getline(ifile, temp_string);
-    if (temp_string != "0") {
-        ifile.seekg(test_position);
-    }
+//    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
+//    long int test_position = ifile.tellg();
+//    getline(ifile, temp_string);
+//    if (temp_string != "0") {
+//        ifile.seekg(test_position);
+//    } else {
+//        property["pippo"]=(int)test_position;
+//    }
 
     DEBUG("We are at byte "<< ifile.tellg());
 
@@ -857,7 +859,12 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
         TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
-        TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format);
+
+        if (!TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format)) {
+            format=SAMPLEFORMAT_UINT;
+        }
+
+
         TIFFGetField(tif, TIFFTAG_FILLORDER, &fillorder);
 
 		
@@ -869,7 +876,9 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
         vector<unsigned short> extra(samples);
         TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
         for (int k=0;k<samples;k++) {
-            DEBUG("extra " << k << "  " << extra[k]);
+            stringstream ss("Tiff_extra");
+            ss<<k;
+            property[ss.str()]=extra[k];
         }
 
 		if (compression==COMPRESSION_NONE && config==PLANARCONFIG_CONTIG ) {
@@ -938,7 +947,8 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 			unsigned int w=0, h=0;
 			TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
 			TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-			DEBUG("Width " << w << " Height " << h << " BYTESperPIXEL " << bytesperpixel);
+            DEBUG("Width " << w << " Height " << h << " BYTESperPIXEL " << bytesperpixel);
+
 			if (w*h>0 && bytesperpixel>0 ) {
 				tsize_t scanlineSize=TIFFScanlineSize(tif);
 				tdata_t buf = _TIFFmalloc(scanlineSize);
@@ -988,10 +998,10 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		}
         TIFFClose(tif);
     } else {
-        throw phys_fileerror("TIFF: file is corrupted");
+        throw phys_fileerror("TIFF: contact Neutrino developers");
     }
 #else
-	WARNING("nPhysImage was not compiled with tiff support!");
+    throw phys_fileerror("Neutrino was compiled without TIFF support");
 #endif
 }
 
@@ -1015,8 +1025,8 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
         my_phys->property.dumper(std::cerr);
         string description=prop_ss.str();
 
-        std::replace( description.begin(), description.end(), '\0', ' ');
-
+        //std::replace( description.begin(), description.end(), '\0', ' ');
+        description.erase(std::remove_if(description.begin(), description.end(), (int(*)(int))std::isalnum), description.end());
 
         DEBUG(description);
 
