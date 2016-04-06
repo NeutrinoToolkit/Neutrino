@@ -844,8 +844,7 @@ static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of ext
 static void registerCustomTIFFTags(TIFF *tif)
 {
     /* Install the extended Tag field info */
-    int error = TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
-    if (error) throw phys_fileerror("TIFF: can't support custom Tiff tags");
+    TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
     if (parent_extender) (*parent_extender)(tif);
 }
 

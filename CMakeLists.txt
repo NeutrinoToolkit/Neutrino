@@ -32,7 +32,9 @@ endif()
 
 add_compile_options(-std=c++11)
 add_compile_options(-Wall)
-add_compile_options(-fPIC)
+if (!WIN32)
+    add_compile_options(-fPIC)
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_compile_options(-stdlib=libc++)
