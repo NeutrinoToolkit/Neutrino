@@ -18,7 +18,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 ## global compile options
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
+set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 if (GENERATE_NHASH)
@@ -45,11 +45,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++
 endif()
-
-
-set (CMAKE_CXX_FLAGS "-O3")
-set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
-
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
 
