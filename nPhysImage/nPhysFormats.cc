@@ -1290,8 +1290,8 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		fits_report_error(stderr, status);
 		return status;
 	}
-	return 1;	
 #endif
+    return 1;
 }
 
 std::vector <nPhysImageF<double> *> phys_open_fits(std::string ifilename) {
