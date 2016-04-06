@@ -370,10 +370,9 @@ physInt_sif::physInt_sif(string ifilename)
         DEBUG(ss.str() << " " << temp_string)
 
 		// most readable ever
-        if ( !(iss  >> magic_number).fail() && iss.eof() ) {
-
-            break;
-        }
+                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+                    break;
+		}
 	}
 
     // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
