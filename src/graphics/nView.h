@@ -59,7 +59,9 @@ public:
 	QTransform trasformazione;
 	bool fillimage;
 	void incrzoom(double);
-	void zoomEq();
+    void zoomOut();
+    void zoomIn();
+    void zoomEq();
 
 	void setSize();
 

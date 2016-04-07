@@ -68,7 +68,9 @@ public slots:
 
 	void setFreezed(bool);
 	void originChanged();
-	
+
+    void keyPressEvent(QKeyEvent *);
+
 };
 
 #endif

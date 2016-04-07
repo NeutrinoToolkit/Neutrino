@@ -28,8 +28,11 @@
 
 using namespace std;
 
-nTreeWidget::nTreeWidget(QWidget * ){
-    dragitem=NULL;
+nTreeWidget::nTreeWidget(QWidget *parent) :
+    QTreeWidget(parent),
+    dragitem(NULL)
+{
+    nparent=qobject_cast<neutrino *> (parent->parent()->parent());
 };
 
 nTreeWidget::~nTreeWidget(){
@@ -87,31 +90,5 @@ void nTreeWidget::dropEvent(QDropEvent *e) {
     nparent->dropEvent(e);
     e->acceptProposedAction();
     dragitem=NULL;
-}
-
-void nTreeWidget::keyPressEvent(QKeyEvent *e){
-    switch (e->key()) {
-    case Qt::Key_Backspace:
-    case Qt::Key_Delete: {
-        QList<nPhysD*> my_list;
-        foreach (QTreeWidgetItem * item, selectedItems()) {
-            my_list << (nPhysD*) (item->data(columnCount()-1,0).value<void*>());
-        }
-        nparent->removePhys(my_list);
-        QApplication::processEvents();
-        break;
-    }
-    case Qt::Key_Up:
-        nparent->actionPrevBuffer();
-        break;
-    case Qt::Key_Down:
-        nparent->actionNextBuffer();
-        break;
-    default:
-        QTreeWidget::keyPressEvent(e);
-        break;
-    }
-
-    e->accept();
 }
 

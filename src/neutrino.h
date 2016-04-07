@@ -157,7 +157,6 @@ public slots:
 	void addPhys(nPhysD&);
 	nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
 	void removePhys(nPhysD*);
-    void removePhys(QList<nPhysD*>);
     void removePhys(nPhysD&);
 	void showPhys(nPhysD*);
 	void showPhys(nPhysD&);
@@ -201,10 +200,6 @@ public slots:
 	// Image
 	void createQimage();
 	
-	void zoomIn();
-	void zoomOut();
-	void zoomEq();
-
 	void toggleMouse();
 	void toggleMouse(bool);
 	void toggleRuler();
@@ -249,7 +244,6 @@ public slots:
 	void createDrawPoint();
 	
 	void mouseposition(QPointF);
-
 
 	void zoomChanged(double);
 

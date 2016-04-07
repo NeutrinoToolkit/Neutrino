@@ -177,7 +177,6 @@ nGenericPan::physDel(nPhysD * buffer) {
 			}
 		}
 	}
-    QApplication::processEvents();
 }
 
 void

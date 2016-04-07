@@ -197,7 +197,7 @@ neutrino::neutrino():
     connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
     connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
     connect(my_w.actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
-    
+
     connect(my_w.actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
     connect(my_w.actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
     connect(my_w.actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
@@ -206,9 +206,9 @@ neutrino::neutrino():
     connect(my_w.actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
 
 
-    connect(my_w.actionZoom_in, SIGNAL(triggered()), this, SLOT(zoomIn()));
-    connect(my_w.actionZoom_out, SIGNAL(triggered()), this, SLOT(zoomOut()));
-    connect(my_w.actionZoom_eq, SIGNAL(triggered()), this, SLOT(zoomEq()));
+    connect(my_w.actionZoom_in, SIGNAL(triggered()), my_w.my_view, SLOT(zoomIn()));
+    connect(my_w.actionZoom_out, SIGNAL(triggered()), my_w.my_view, SLOT(zoomOut()));
+    connect(my_w.actionZoom_eq, SIGNAL(triggered()), my_w.my_view, SLOT(zoomEq()));
 
     connect(my_w.actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
@@ -348,7 +348,7 @@ neutrino::neutrino():
 
     // plugins
     scanPlugins();
-	
+
 
 
     loadDefaults();
@@ -437,32 +437,32 @@ nPhysD* neutrino::getBuffer(int i) {
 void
 neutrino::scanPlugins()
 {
-   	QDir pluginsDir(qApp->applicationDirPath());
+    QDir pluginsDir(qApp->applicationDirPath());
 #if defined(Q_OS_WIN)
-   	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-       		pluginsDir.cdUp();
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+            pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
-   	if (pluginsDir.dirName() == "MacOS") {
-       		pluginsDir.cdUp();
-       		pluginsDir.cdUp();
-       		pluginsDir.cdUp();
-   	}
+    if (pluginsDir.dirName() == "MacOS") {
+            pluginsDir.cdUp();
+            pluginsDir.cdUp();
+            pluginsDir.cdUp();
+    }
 #endif
-   	pluginsDir.cd("plugins");
-   	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-		DEBUG(10, "found plugin "<<fileName.toStdString());
+    pluginsDir.cd("plugins");
+    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+        DEBUG(10, "found plugin "<<fileName.toStdString());
 
-		nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
-		if (my_npl->ok()) {
-			// I will probably need to leave a copy of the pointer as a QVariant inside the action
-			QAction *action = new QAction(this);
-			action->setText(my_npl->name());
-			connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
-			my_w.menuPlugins->addAction(action);
+        nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+        if (my_npl->ok()) {
+            // I will probably need to leave a copy of the pointer as a QVariant inside the action
+            QAction *action = new QAction(this);
+            action->setText(my_npl->name());
+            connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
+            my_w.menuPlugins->addAction(action);
 
-			
-		}
-	}
+
+        }
+    }
 }
 
 void
@@ -893,7 +893,7 @@ vector <nPhysD *> neutrino::openSession (QString fname) {
                             delete my_phys;
                         }
 #endif
-                        
+
                         progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
@@ -943,7 +943,7 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 void neutrino::addPhys(nPhysD* datamatrix) {
     if (datamatrix && !physList.contains(datamatrix))	{
         physList << datamatrix;
-        
+
 //        datamatrix->property["display_range"]= datamatrix->get_min_max();
 
         addMenuBuffers(datamatrix);
@@ -1023,48 +1023,6 @@ void neutrino::removePhys(nPhysD* datamatrix) {
     }
 }
 
-void neutrino::removePhys(QList<nPhysD*> my_phys_list) {
-    int position=0;
-    foreach (nPhysD* datamatrix, my_phys_list) {
-
-        if (datamatrix) {
-            emit physDel(datamatrix);
-            position=physList.indexOf(datamatrix);
-            if (position != -1) {
-                physList.removeAll(datamatrix);
-
-                QList<QAction *> lista=my_w.menuBuffers->actions();
-                foreach (QAction* action, my_w.menuBuffers->actions()) {
-                    if (action->data() == qVariantFromValue((void*) datamatrix)) {
-                        my_w.menuBuffers->removeAction(action);
-                    }
-                }
-
-                foreach (QAction* action, listabuffer) {
-                    if (action->data() == qVariantFromValue((void*) datamatrix)) {
-                        listabuffer.removeAll(action);
-                    }
-                }
-                QApplication::processEvents();
-                delete datamatrix;
-                datamatrix=NULL;
-            }
-        }
-    }
-    if (physList.size()>0) {
-        showPhys(physList.at(min(position,physList.size()-1)));
-    } else {
-        currentBuffer=NULL;
-        emitBufferChanged();
-        setWindowTitle(property("winId").toString()+QString(": Neutrino"));
-        setWindowFilePath("");
-        zoomChanged(1);
-        my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-        my_w.my_view->setSize();
-    }
-}
-
-
 void neutrino::showPhys(nPhysD& datamatrixRef) {
     bool found=false;
     foreach (nPhysD* datamatrix, physList) {
@@ -1111,7 +1069,7 @@ void
 neutrino::showPhys(nPhysD* datamatrix) {
     if (datamatrix) {
         if (!physList.contains(datamatrix)) addPhys(datamatrix);
-        
+
         if (currentBuffer) {
             if (my_w.actionLockColors->isChecked()) {
                 datamatrix->property["display_range"]=currentBuffer->property["display_range"];
@@ -1122,12 +1080,12 @@ neutrino::showPhys(nPhysD* datamatrix) {
                 }
             }
         }
-        
+
         if (!datamatrix->property.have("display_range")) {
             datamatrix->property["display_range"]= datamatrix->get_min_max();
         }
         currentBuffer=datamatrix;
-        
+
 
         if (!physList.contains(datamatrix)) {
             // TODO: add memory copy...
@@ -1172,13 +1130,13 @@ neutrino::createQimage() {
     my_w.my_view->setSize();
 }
 
-void neutrino::exportGraphics () { 
+void neutrino::exportGraphics () {
     QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
     if (!fout.isEmpty())
         exportGraphics(fout);
 }
 
-void neutrino::exportAllGraphics () { 
+void neutrino::exportAllGraphics () {
     QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("fileExport").toString(),"Available formats (*.svg, *.pdf, *.png);; Any files (*)");
     if (!fout.isEmpty()) {
         for (int i=0;i<physList.size() ; i++) {
@@ -1208,7 +1166,7 @@ void neutrino::exportGraphics (QString fout) {
 
         myPrinter.setOutputFormat(QPrinter::PdfFormat);
         myPrinter.setPageMargins(0.0, 0.0, 0.0, 0.0, QPrinter::DevicePixel);
-        
+
         QPainter myPainter(&myPrinter);
         myPainter.setViewport(0, 0, myPrinter.width(), myPrinter.height());
         my_s.render(&myPainter);
@@ -1307,13 +1265,13 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         Shortcuts();
         break;
     case Qt::Key_Plus:
-        zoomIn();
+        my_w.my_view->zoomIn();
         break;
     case Qt::Key_Minus:
-        zoomOut();
+        my_w.my_view->zoomOut();
         break;
     case Qt::Key_Equal:
-        zoomEq();
+        my_w.my_view->zoomEq();
         break;
     case Qt::Key_A: {
         if (currentBuffer) {
@@ -1451,24 +1409,9 @@ neutrino::zoomChanged(double zoom) {
     update();
 }
 
-void
-neutrino::zoomIn() {
-    my_w.my_view->incrzoom(1.05);
-}
-
-void
-neutrino::zoomOut() {
-    my_w.my_view->incrzoom(1.0/1.05);
-}
-
 double
 neutrino::getZoom() const {
     return my_w.my_view->transform().m11();
-}
-
-void
-neutrino::zoomEq() {
-    my_w.my_view->zoomEq();
 }
 
 void
@@ -1539,7 +1482,7 @@ void neutrino::fileSave(QString fname) {
             }
 
         }
-        
+
         if (suffix.startsWith("neus")) {
             saveSession(fname);
         } else {
@@ -2159,8 +2102,8 @@ void neutrino::loadDefaults(){
     toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
 
     nPreferences::changeThreads(my_set.value("threads",1).toInt());
-    
-    
+
+
     my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
     my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
     my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
@@ -2180,11 +2123,11 @@ void neutrino::loadDefaults(){
     if (my_set.value("useDot",false).toBool()) {
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
-    
+
     setProperty("physNameLength", my_set.value("physNameLength", 35));
-    
+
     setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
-    
+
     setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
     setProperty("fileOpen", my_set.value("fileOpen",""));
     setProperty("gamma", my_set.value("gamma",0));
@@ -2240,7 +2183,7 @@ void neutrino::about() {
 
 nGenericPan* neutrino::openPan(QString panName) {
     nGenericPan *my_pan=NULL;
-    
+
     const QMetaObject* metaObject = this->metaObject();
     for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
         // frigging method name change between qt4.x and qt5.x
