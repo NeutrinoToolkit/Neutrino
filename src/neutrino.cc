@@ -2131,6 +2131,7 @@ void neutrino::about() {
     connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
     connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
+     my_about.version->setText(QString(__VER));
 #ifdef __neutrino_key
     QString serial(qApp->property("nHash").toString());
     // copy serial to clipboard
