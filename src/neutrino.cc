@@ -332,8 +332,8 @@ neutrino::neutrino():
     my_pixitem.setEnabled(true);
     my_pixitem.setZValue(-1);
 
-    toggleRuler(false);
-    toggleGrid(false);
+    my_tics.rulerVisible=false;
+    my_tics.gridVisible=false;
 
     my_s.addItem(&my_mouse);
 
@@ -962,8 +962,6 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
     }
     action->setData(qVariantFromValue((void*) datamatrix));
     connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
-
-    listabuffer << action;
     my_w.menuBuffers->addAction(action);
 }
 
@@ -992,7 +990,6 @@ void neutrino::removePhys(nPhysD* datamatrix) {
         int position=physList.indexOf(datamatrix);
         if (position != -1) {
             physList.removeAll(datamatrix);
-
             if (physList.size()>0) {
                 showPhys(physList.at(min(position,physList.size()-1)));
             } else {
@@ -1006,17 +1003,11 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             }
             QList<QAction *> lista=my_w.menuBuffers->actions();
             foreach (QAction* action, my_w.menuBuffers->actions()) {
+                DEBUG(action->text().toStdString());
                 if (action->data() == qVariantFromValue((void*) datamatrix)) {
                     my_w.menuBuffers->removeAction(action);
                 }
             }
-
-            foreach (QAction* action, listabuffer) {
-                if (action->data() == qVariantFromValue((void*) datamatrix)) {
-                    listabuffer.removeAll(action);
-                }
-            }
-            QApplication::processEvents();
             delete datamatrix;
             datamatrix=NULL;
         }
@@ -1086,12 +1077,10 @@ neutrino::showPhys(nPhysD* datamatrix) {
         }
         currentBuffer=datamatrix;
 
-
         if (!physList.contains(datamatrix)) {
             // TODO: add memory copy...
             physList << datamatrix;
         }
-
 
         QString winName=QString::fromUtf8(datamatrix->getShortName().c_str());
         winName.prepend(property("winId").toString()+QString(":")+QString::number(physList.indexOf(datamatrix))+QString(" "));
@@ -1113,7 +1102,6 @@ neutrino::showPhys(nPhysD* datamatrix) {
         statusBar()->showMessage("Image not valid",2000);
     }
 }
-
 
 void
 neutrino::createQimage() {
@@ -1204,12 +1192,8 @@ void neutrino::toggleMouse(bool stat) {
 }
 
 void neutrino::toggleRuler() {
-    toggleRuler(!my_tics.rulerVisible);
-}
-
-void neutrino::toggleRuler(bool stat) {
-    my_tics.rulerVisible=stat;
-    if (stat) {
+    my_tics.rulerVisible=!my_tics.rulerVisible;
+    if (my_tics.rulerVisible) {
         my_w.actionShow_ruler->setText("Hide ruler");
     } else {
         my_w.actionShow_ruler->setText("Show ruler");
@@ -1218,12 +1202,8 @@ void neutrino::toggleRuler(bool stat) {
 }
 
 void neutrino::toggleGrid() {
-    toggleGrid(!my_tics.gridVisible);
-}
-
-void neutrino::toggleGrid(bool stat) {
-    my_tics.gridVisible=stat;
-    if (stat) {
+    my_tics.gridVisible=!my_tics.gridVisible;
+    if (my_tics.gridVisible) {
         my_w.actionShow_grid->setText("Hide grid");
     } else {
         my_w.actionShow_grid->setText("Show grid");
@@ -1366,6 +1346,7 @@ void neutrino::dragMoveEvent(QDragMoveEvent *e)
 
 void neutrino::dropEvent(QDropEvent *e) {
     if (e->mimeData()->hasFormat("data/neutrino")) {
+        e->acceptProposedAction();
         nPhysD *my_phys=(nPhysD *) e->mimeData()->data("data/neutrino").toLong();
         if (my_phys) {
             if (physList.contains(my_phys)) {
@@ -1377,6 +1358,7 @@ void neutrino::dropEvent(QDropEvent *e) {
             }
         }
     } else if (e->mimeData()->hasUrls()) {
+        e->acceptProposedAction();
         QStringList fileList;
         foreach (QUrl qurl, e->mimeData()->urls()) {
             fileList << qurl.toLocalFile();
@@ -1385,7 +1367,6 @@ void neutrino::dropEvent(QDropEvent *e) {
             fileOpen(fileList);
         }
     }
-    e->acceptProposedAction();
 }
 
 // switch buffers

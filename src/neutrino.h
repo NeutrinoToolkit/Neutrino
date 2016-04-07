@@ -104,11 +104,7 @@ public:
 	nPhysD* currentBuffer;
 	QPointer<neutrino> follower;
 
-
-
-	// --------- data structures -----------
 	QString colorTable;
-	QList<QAction *> listabuffer;
     QMap<QString, vector<unsigned char>> nPalettes;
 
 private:
@@ -203,9 +199,7 @@ public slots:
 	void toggleMouse();
 	void toggleMouse(bool);
 	void toggleRuler();
-	void toggleRuler(bool);
 	void toggleGrid();
-	void toggleGrid(bool);
 	
 	nGenericPan* Shortcuts();
 
