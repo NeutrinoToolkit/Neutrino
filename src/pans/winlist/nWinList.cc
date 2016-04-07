@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *    Copyright (C) 2013 Alessand Flacco, Tommaso Vinci All Rights Reserved
  * 
  *    This file is part of neutrino.
  *
@@ -28,11 +28,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname), freezedFrame(false), frScale(1,1), frOrigin(0,0) {
 	my_w.setupUi(this);
 
-	// CHECK: this should be ok...
-
-	my_w.images->nparent=nparent;
-	
-	// qt4.8->qt5.5
+    // qt4.8->qt5.5
 	// QHeaderView::resizeMode -> ::sectionResizeMode
 #ifdef USE_QT5
 	my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
@@ -50,7 +46,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 	
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
 	updatePad(nparent->currentBuffer);
@@ -98,12 +94,15 @@ nWinList::buttonCopyPhys() {
 
 void
 nWinList::buttonRemovePhys() {
-    QList<nPhysD*> my_list;
-    foreach (QTreeWidgetItem * item, my_w.images->selectedItems()) {
-        my_list << getPhys(item);
+    QList<QTreeWidgetItem*> my_sel= my_w.images->selectedItems();
+    foreach (QTreeWidgetItem * item, my_sel) {
+        nPhysD *phys=getPhys(item);
+        if (phys) {
+            my_w.statusBar->showMessage("Removing "+ QString::fromStdString(phys->getShortName()),500);
+            nparent->removePhys(phys);
+            QApplication::processEvents();
+        }
     }
-    nparent->removePhys(my_list);
-    QApplication::processEvents();
 }
 
 void
@@ -228,6 +227,26 @@ nWinList::changeProperties() {
 		}
 	} 
 }
+
+void nWinList::keyPressEvent(QKeyEvent *e){
+    switch (e->key()) {
+    case Qt::Key_Return:
+        nparent->showPhys(getPhys(my_w.images->selectedItems().first()));
+        break;
+    case Qt::Key_Backspace:
+    case Qt::Key_Delete:
+        buttonRemovePhys();
+        break;
+    case Qt::Key_Up:
+        nparent->actionPrevBuffer();
+        break;
+    case Qt::Key_Down:
+        nparent->actionNextBuffer();
+        break;
+    }
+    e->accept();
+}
+
 
 void
 nWinList::panAdd(nGenericPan *pan) {

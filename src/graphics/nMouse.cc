@@ -58,17 +58,17 @@ void nMouse::changeColor() {
 QPainterPath nMouse::shape() const {
 	QPainterPath my_path;
 
-//	double r=4.0/nparent->my_w.my_view->transform().m11();
-//	my_path.moveTo(0,-5*r);
-//	my_path.lineTo(0,-r);
-//	my_path.moveTo(0,r);
-//	my_path.lineTo(0,5*r);
-//	
-//	my_path.moveTo(-5*r,0);
-//	my_path.lineTo(-r,0);
-//	my_path.moveTo(r,0);
-//	my_path.lineTo(5*r,0);
-//	my_path.addEllipse(-r, -r, 2*r, 2*r);
+    double r=4.0/nparent->my_w.my_view->transform().m11();
+    my_path.moveTo(0,-5*r);
+    my_path.lineTo(0,-r);
+    my_path.moveTo(0,r);
+    my_path.lineTo(0,5*r);
+
+    my_path.moveTo(-5*r,0);
+    my_path.lineTo(-r,0);
+    my_path.moveTo(r,0);
+    my_path.lineTo(5*r,0);
+    my_path.addEllipse(-r, -r, 2*r, 2*r);
 	my_path.moveTo(0,-pos().y());
 	my_path.lineTo(0,size.height()-pos().y());
 	my_path.moveTo(-pos().x(),0);

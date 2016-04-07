@@ -104,11 +104,7 @@ public:
 	nPhysD* currentBuffer;
 	QPointer<neutrino> follower;
 
-
-
-	// --------- data structures -----------
 	QString colorTable;
-	QList<QAction *> listabuffer;
     QMap<QString, vector<unsigned char>> nPalettes;
 
 private:
@@ -157,7 +153,6 @@ public slots:
 	void addPhys(nPhysD&);
 	nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
 	void removePhys(nPhysD*);
-    void removePhys(QList<nPhysD*>);
     void removePhys(nPhysD&);
 	void showPhys(nPhysD*);
 	void showPhys(nPhysD&);
@@ -201,16 +196,10 @@ public slots:
 	// Image
 	void createQimage();
 	
-	void zoomIn();
-	void zoomOut();
-	void zoomEq();
-
 	void toggleMouse();
 	void toggleMouse(bool);
 	void toggleRuler();
-	void toggleRuler(bool);
 	void toggleGrid();
-	void toggleGrid(bool);
 	
 	nGenericPan* Shortcuts();
 
@@ -249,7 +238,6 @@ public slots:
 	void createDrawPoint();
 	
 	void mouseposition(QPointF);
-
 
 	void zoomChanged(double);
 

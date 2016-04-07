@@ -91,11 +91,18 @@ void nView::focusInEvent (QFocusEvent *) {
 //	((neutrino *) parent())->emitBufferChanged();
 }
 
-void
-nView::zoomEq() {
+void nView::zoomEq() {
 	fillimage=!fillimage;
 	if (!fillimage) resetMatrix();
 	setSize();
+}
+
+void nView::zoomIn() {
+    incrzoom(1.1);
+}
+
+void nView::zoomOut() {
+    incrzoom(1.0/1.1);
 }
 
 void nView::incrzoom(double incr)
@@ -127,7 +134,7 @@ nView::setSize() {
 //	qDebug() << "nView::setSize" << bBox << font() << scaledFont << transform().m11();
 	parent()->my_mouse.setSize(my_size);
 	repaint();    
-//	emit zoomChanged(transform().m11());
+    emit zoomChanged(transform().m11());
 }
 
 void

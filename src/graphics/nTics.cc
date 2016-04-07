@@ -141,9 +141,12 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
-		allTics.moveTo(0,0);
-		allTics.lineTo(nparent->currentBuffer->getW(),0);
-		p->drawPath(allTics);
+//		allTics.moveTo(0,0);
+//        allTics.lineTo(nparent->currentBuffer->getW(),0);
+//        allTics.moveTo(0,0);
+//		allTics.lineTo(0,nparent->currentBuffer->getH());
+        allTics.addRect(0,0,nparent->currentBuffer->getW(),nparent->currentBuffer->getH());
+        p->drawPath(allTics);
 
 		p->setPen(QColor(rulerColor));
 		p->drawPath(allGrid);
@@ -231,8 +234,6 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         
 		p->rotate(-90);
 
-		allTics.moveTo(0,0);
-		allTics.lineTo(0,nparent->currentBuffer->getH());
 		p->drawPath(allTics);
 		
 		p->setPen(QColor(rulerColor));
