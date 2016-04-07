@@ -361,25 +361,27 @@ physInt_sif::physInt_sif(string ifilename)
 	temp_string.clear();
     unsigned int magic_number = 0; // usually 3 (lol)
 	while (!ifile.eof()) {
+        long int test_position = ifile.tellg();
 		getline(ifile, temp_string);
+
+        // to praise the hindi god of love Kamadeva, add this line
+        if (temp_string.size() > 10000) {
+            temp_string.clear();
+            ifile.seekg(test_position);
+            break;
+        }
 		istringstream iss(temp_string);
 		
 		ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
         property["sif-e-"+ss.str()]=temp_string;
 
-        DEBUG(ss.str() << " " << temp_string)
+        DEBUG(ss.str() << " " << temp_string.size())
 
 		// most readable ever
-                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-                    break;
-		}
-	}
-
-    // to praise the hindi god of love Kamadeva, we test if we have another line with just "0"
-    long int test_position = ifile.tellg();
-    getline(ifile, temp_string);
-    if (temp_string != "0") {
-        ifile.seekg(test_position);
+        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+            property["sif-magic_number"]=(int)magic_number;
+            break;
+        }
     }
 
     DEBUG("We are at byte "<< ifile.tellg());
@@ -388,7 +390,10 @@ physInt_sif::physInt_sif(string ifilename)
 	DEBUG(5, "jump "<<magic_number<<" lines for the glory of Ra");
 	for (size_t i=0; i<magic_number; i++) {
 		getline(ifile, temp_string);
-	}
+        istringstream iss(temp_string);
+        ss.str(""); ss.clear(); ss << setw(2) << setfill('0') << skiplines++;
+        property["sif-f-"+ss.str()]=temp_string;
+    }
 
 	// consistency check
 	
@@ -397,12 +402,12 @@ physInt_sif::physInt_sif(string ifilename)
 	long int datacheck = (long int) ifile.tellg()-init_matrix-getSurf()*sizeof(float);
 
 	if (ifile.eof() || ifile.fail()) {
-		throw phys_fileerror("SIF: header parsing reached end of file");
+        throw phys_fileerror("SIF: header parsing reached end of file "+ifilename);
 	}
 
     if (datacheck < 0) {
         stringstream oss;
-        oss<<"Failed consistency check before SIF matrix read\n";
+        oss<<ifilename << "\nFailed consistency check before SIF matrix read\n";
         oss<<"init_matrix: "<<init_matrix<<"\n";
         oss<<"end_file: "<<ifile.tellg()<<"\n";
         oss<<"matrix surface: "<<getSurf()<<"\n";
@@ -832,8 +837,7 @@ static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of ext
 static void registerCustomTIFFTags(TIFF *tif)
 {
     /* Install the extended Tag field info */
-    int error = TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
-    if (error) throw phys_fileerror("TIFF: can't support custom Tiff tags");
+    TIFFMergeFieldInfo(tif, xtiffFieldInfo, sizeof(xtiffFieldInfo)/sizeof(xtiffFieldInfo[0]));
     if (parent_extender) (*parent_extender)(tif);
 }
 
@@ -856,7 +860,12 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
         TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
-        TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format);
+
+        if (!TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format)) {
+            format=SAMPLEFORMAT_UINT;
+        }
+
+
         TIFFGetField(tif, TIFFTAG_FILLORDER, &fillorder);
 
 		
@@ -868,7 +877,9 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
         vector<unsigned short> extra(samples);
         TIFFGetField(tif, TIFFTAG_EXTRASAMPLES, &extra[0]);
         for (int k=0;k<samples;k++) {
-            DEBUG("extra " << k << "  " << extra[k]);
+            stringstream ss("Tiff_extra");
+            ss<<k;
+            property[ss.str()]=extra[k];
         }
 
 		if (compression==COMPRESSION_NONE && config==PLANARCONFIG_CONTIG ) {
@@ -937,7 +948,8 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 			unsigned int w=0, h=0;
 			TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
 			TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-			DEBUG("Width " << w << " Height " << h << " BYTESperPIXEL " << bytesperpixel);
+            DEBUG("Width " << w << " Height " << h << " BYTESperPIXEL " << bytesperpixel);
+
 			if (w*h>0 && bytesperpixel>0 ) {
 				tsize_t scanlineSize=TIFFScanlineSize(tif);
 				tdata_t buf = _TIFFmalloc(scanlineSize);
@@ -987,10 +999,10 @@ physDouble_tiff::physDouble_tiff(const char *ifilename)
 		}
         TIFFClose(tif);
     } else {
-        throw phys_fileerror("TIFF: file is corrupted");
+        throw phys_fileerror("TIFF: contact Neutrino developers");
     }
 #else
-	WARNING("nPhysImage was not compiled with tiff support!");
+    throw phys_fileerror("Neutrino was compiled without TIFF support");
 #endif
 }
 
@@ -1014,8 +1026,8 @@ phys_write_tiff(nPhysImageF<double> *my_phys, const char * ofilename) {
         my_phys->property.dumper(std::cerr);
         string description=prop_ss.str();
 
-        std::replace( description.begin(), description.end(), '\0', ' ');
-
+        //std::replace( description.begin(), description.end(), '\0', ' ');
+        description.erase(std::remove_if(description.begin(), description.end(), (int(*)(int))std::isalnum), description.end());
 
         DEBUG(description);
 
@@ -1271,8 +1283,9 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		fits_report_error(stderr, status);
 		return status;
 	}
-	return 1;	
 #endif
+    throw phys_fileerror("Neutrino compiled without FITS support");
+    return 1;
 }
 
 std::vector <nPhysImageF<double> *> phys_open_fits(std::string ifilename) {

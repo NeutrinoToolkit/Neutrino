@@ -1004,7 +1004,6 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
                 my_w.my_view->setSize();
             }
-
             QList<QAction *> lista=my_w.menuBuffers->actions();
             foreach (QAction* action, my_w.menuBuffers->actions()) {
                 if (action->data() == qVariantFromValue((void*) datamatrix)) {
@@ -1021,6 +1020,47 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             delete datamatrix;
             datamatrix=NULL;
         }
+    }
+}
+
+void neutrino::removePhys(QList<nPhysD*> my_phys_list) {
+    int position=0;
+    foreach (nPhysD* datamatrix, my_phys_list) {
+
+        if (datamatrix) {
+            emit physDel(datamatrix);
+            position=physList.indexOf(datamatrix);
+            if (position != -1) {
+                physList.removeAll(datamatrix);
+
+                QList<QAction *> lista=my_w.menuBuffers->actions();
+                foreach (QAction* action, my_w.menuBuffers->actions()) {
+                    if (action->data() == qVariantFromValue((void*) datamatrix)) {
+                        my_w.menuBuffers->removeAction(action);
+                    }
+                }
+
+                foreach (QAction* action, listabuffer) {
+                    if (action->data() == qVariantFromValue((void*) datamatrix)) {
+                        listabuffer.removeAll(action);
+                    }
+                }
+                QApplication::processEvents();
+                delete datamatrix;
+                datamatrix=NULL;
+            }
+        }
+    }
+    if (physList.size()>0) {
+        showPhys(physList.at(min(position,physList.size()-1)));
+    } else {
+        currentBuffer=NULL;
+        emitBufferChanged();
+        setWindowTitle(property("winId").toString()+QString(": Neutrino"));
+        setWindowFilePath("");
+        zoomChanged(1);
+        my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+        my_w.my_view->setSize();
     }
 }
 
