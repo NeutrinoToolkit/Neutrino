@@ -50,7 +50,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 	
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
 	updatePad(nparent->currentBuffer);
@@ -98,9 +98,12 @@ nWinList::buttonCopyPhys() {
 
 void
 nWinList::buttonRemovePhys() {
-	foreach (QTreeWidgetItem* item, my_w.images->selectedItems()) {
-		nparent->removePhys(getPhys(item));
-	}
+    QList<nPhysD*> my_list;
+    foreach (QTreeWidgetItem * item, my_w.images->selectedItems()) {
+        my_list << getPhys(item);
+    }
+    nparent->removePhys(my_list);
+    QApplication::processEvents();
 }
 
 void

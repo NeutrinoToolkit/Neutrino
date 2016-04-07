@@ -364,7 +364,9 @@ physInt_sif::physInt_sif(string ifilename)
         long int test_position = ifile.tellg();
 		getline(ifile, temp_string);
 
+        // this is shit:
         if (temp_string.size() > 10000) {
+            temp_string.clear();
             ifile.seekg(test_position);
             break;
         }
@@ -1291,6 +1293,7 @@ int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compres
 		return status;
 	}
 #endif
+    throw phys_fileerror("Neutrino compiled without FITS support");
     return 1;
 }
 
