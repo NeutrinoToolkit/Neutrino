@@ -85,10 +85,12 @@ public slots:
 
 	void emitMouseposition (QPointF);
 
+    void setZoomFactor(int val);
+
 private:
     bool gestureEvent(QGestureEvent *event);
     void swipeTriggered(QSwipeGesture*);
-    float currentStepScaleFactor;
+    unsigned int currentStepScaleFactor;
 
 protected:
 	// what does is this for??

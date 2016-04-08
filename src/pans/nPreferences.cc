@@ -105,6 +105,8 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
 	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
 
+    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
+
 	my_w.labelFont->setFont(nparent->my_w.my_view->font());
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	

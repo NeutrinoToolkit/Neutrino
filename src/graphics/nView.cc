@@ -47,8 +47,14 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
 	}
 	showDimPixel=settings.value("showDimPixel",true).toBool();
 
+    currentStepScaleFactor=settings.value("currentStepScaleFactor",15).toInt();
+
 	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     
+}
+
+void nView::setZoomFactor(int val) {
+    currentStepScaleFactor=val;
 }
 
 bool nView::event(QEvent *event)
@@ -98,11 +104,11 @@ void nView::zoomEq() {
 }
 
 void nView::zoomIn() {
-    incrzoom(1.1);
+    incrzoom(1.0+currentStepScaleFactor/100.);
 }
 
 void nView::zoomOut() {
-    incrzoom(1.0/1.1);
+    incrzoom(1.0-currentStepScaleFactor/100.);
 }
 
 void nView::incrzoom(double incr)
