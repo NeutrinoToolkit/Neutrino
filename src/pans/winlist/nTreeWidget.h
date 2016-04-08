@@ -41,11 +41,10 @@ class neutrino;
 class nTreeWidget : public QTreeWidget {
 	Q_OBJECT
 public:	
-    nTreeWidget(QWidget *);
-    ~nTreeWidget();
-	neutrino *nparent;
+    nTreeWidget(QWidget *parent):QTreeWidget(parent){};
+    ~nTreeWidget(){};
 	QPoint dragposition;
-    QTreeWidgetItem *dragitem;
+    QList<QTreeWidgetItem*> dragitems;
 	QTime dragtime;
 	
 public slots:

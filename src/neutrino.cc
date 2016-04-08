@@ -1347,16 +1347,32 @@ void neutrino::dragMoveEvent(QDragMoveEvent *e)
 void neutrino::dropEvent(QDropEvent *e) {
     if (e->mimeData()->hasFormat("data/neutrino")) {
         e->acceptProposedAction();
-        nPhysD *my_phys=(nPhysD *) e->mimeData()->data("data/neutrino").toLong();
-        if (my_phys) {
-            if (physList.contains(my_phys)) {
-                showPhys(my_phys);
-            } else {
-                nPhysD *copyhere;
-                copyhere = new nPhysD(*my_phys);
-                addShowPhys(copyhere);
+        QList<QByteArray> pippo=e->mimeData()->data("data/neutrino").split(' ');
+        foreach(QByteArray bytephys, pippo) {
+            bool ok=false;
+            nPhysD *my_phys=(nPhysD *) bytephys.toLongLong(&ok);
+            if (ok && my_phys) {
+                DEBUG(bytephys.constData());
+                if (physList.contains(my_phys)) {
+                    showPhys(my_phys);
+                } else {
+                    nPhysD *copyhere;
+                    copyhere = new nPhysD(*my_phys);
+                    addShowPhys(copyhere);
+                }
             }
         }
+
+//        nPhysD *my_phys=(nPhysD *) e->mimeData()->data("data/neutrino").toLong();
+//        if (my_phys) {
+//            if (physList.contains(my_phys)) {
+//                showPhys(my_phys);
+//            } else {
+//                nPhysD *copyhere;
+//                copyhere = new nPhysD(*my_phys);
+//                addShowPhys(copyhere);
+//            }
+//        }
     } else if (e->mimeData()->hasUrls()) {
         e->acceptProposedAction();
         QStringList fileList;
