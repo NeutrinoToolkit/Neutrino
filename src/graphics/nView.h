@@ -59,9 +59,6 @@ public:
 	QTransform trasformazione;
 	bool fillimage;
 	void incrzoom(double);
-    void zoomOut();
-    void zoomIn();
-    void zoomEq();
 
 	void setSize();
 
@@ -75,6 +72,11 @@ public:
 	bool showDimPixel;
 	
 public slots:
+
+    void zoomOut();
+    void zoomIn();
+    void zoomEq();
+
     void mouseDoubleClickEvent (QMouseEvent *);
 	void mousePressEvent (QMouseEvent *);
 	void mouseReleaseEvent (QMouseEvent *);
