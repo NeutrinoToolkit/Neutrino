@@ -51,7 +51,6 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
                     lista << QUrl(QString::fromUtf8(my_phys->getName().c_str()));
                 }
             }
-            DEBUG(dragPhysPointers.constData());
             if (lista.size()) {
                 QMimeData *mymimeData=new QMimeData;
                 mymimeData->setUrls(lista);

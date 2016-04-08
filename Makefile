@@ -25,15 +25,11 @@ endif
 colormap:
 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
 
-debug::
-	mkdir -p $@
-	cd $@ && cmake $(CMAKEFLAGS) .. 
-	$(MAKE) -C $@
-
 Darwin:: 
 	rm -rf $@ 
 	mkdir -p $@
-	cd $@ && cmake  -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+# 	cd $@ && cmake cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 ..  
+	cd $@ && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	$(MAKE) -C $@
 	rm -rf Neutrino.app
 	cp -r $@/Neutrino.app .
@@ -51,6 +47,15 @@ endif
 	./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg && rm -rf dmg
 	mv Neutrino.dmg Neutrino-${VERSION}-${@}.dmg
 	@echo "\nBuild $@ : Neutrino-${VERSION}-${@}.dmg"
+
+
+cross::
+	rm -rf $@ 
+	mkdir -p $@
+	cd $@ && cmake .. -DCMAKE_TOOLCHAIN_FILE=../resources/cmake/Toolchain-i686-mingw32.cmake -DNEUTRINO_CROSS_ROOT=/home/neutrino/CROSS-SOURCES
+	$(MAKE) -C $@
+	$(MAKE) -C $@ package
+	
 
 .PHONY: doc smonta
 
