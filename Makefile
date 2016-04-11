@@ -74,9 +74,10 @@ appdir:: Linux
 	# apt-get install pax-utils
 	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
 
-	~/AppImageKit/AppImageAssistant -f  Neutrino.AppDir Neutrino
+	rm -rf Neutrino
+	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
 
-	zip -FSr Neutrino-${VERSION}-${@}.zip Neutrino
+	zip -FSr Neutrino-${VERSION}-$(UNAME_S).zip Neutrino
 
 
 .PHONY: doc smonta
