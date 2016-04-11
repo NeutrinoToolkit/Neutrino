@@ -50,7 +50,6 @@ endif
 
 
 cross::
-	rm -rf $@ 
 	mkdir -p $@
 	cd $@ && cmake .. -DCMAKE_TOOLCHAIN_FILE=../resources/cmake/Toolchain-i686-mingw32.cmake -DNEUTRINO_CROSS_ROOT=/home/neutrino/CROSS-SOURCES
 	$(MAKE) -C $@
@@ -58,7 +57,6 @@ cross::
 	
 
 Linux::
-#	rm -rf $@
 	mkdir -p $@
 	cd $@ && cmake ..
 	$(MAKE) -C $@
