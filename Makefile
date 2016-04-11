@@ -57,10 +57,9 @@ cross::
 
 Linux::
 	mkdir -p $@	
-	cd $@ && cmake ..
-	$(MAKE) -C $@
+	cd $@ && cmake .. -DDEBIAN=True
+	$(MAKE) -C $@ package
 
-appdir:: Linux
 	mkdir -p Neutrino.AppDir/usr
 
 	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
