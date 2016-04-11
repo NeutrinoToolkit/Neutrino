@@ -57,6 +57,31 @@ cross::
 	$(MAKE) -C $@ package
 	
 
+Linux::
+#	rm -rf $@
+	mkdir -p $@
+	cd $@ && cmake ..
+	$(MAKE) -C $@
+
+appdir:: Linux
+	rm -rf Neutrino.AppDir
+	mkdir -p Neutrino.AppDir/usr
+
+	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
+	cp resources/icons/icon.png Neutrino.AppDir/
+
+	cp resources/linuxPackage/*  Neutrino.AppDir
+
+	# apt-get install pax-utils
+	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+
+	rm -rf Neutrino Neutrino-${VERSION}-${@}.zip
+
+	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
+
+	zip Neutrino-${VERSION}-${@}.zip Neutrino
+
+
 .PHONY: doc smonta
 
 doc:
