@@ -68,18 +68,17 @@ appdir:: Linux
 	mkdir -p Neutrino.AppDir/usr
 
 	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
-	cp resources/icons/icon.png Neutrino.AppDir/
+	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
 
-	cp resources/linuxPackage/*  Neutrino.AppDir
+	mkdir -p Neutrino.AppDir/usr/lib/qt4
+	cp -r /usr/lib/x86_64-linux-gnu/qt4/plugins Neutrino.AppDir/usr/lib/qt4
 
 	# apt-get install pax-utils
 	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
 
-	rm -rf Neutrino Neutrino-${VERSION}-${@}.zip
+	~/AppImageKit/AppImageAssistant -f  Neutrino.AppDir Neutrino
 
-	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-
-	zip Neutrino-${VERSION}-${@}.zip Neutrino
+	zip -FSr Neutrino-${VERSION}-${@}.zip Neutrino
 
 
 .PHONY: doc smonta
