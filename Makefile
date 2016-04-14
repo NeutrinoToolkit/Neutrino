@@ -25,6 +25,7 @@ endif
 colormap:
 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
 
+
 Darwin:: 
 	mkdir -p $@
 # 	cd $@ && cmake cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-5 ..  
@@ -57,16 +58,21 @@ cross::
 
 Linux::
 	mkdir -p $@	
-	cd $@ && cmake ..
-	$(MAKE) -C $@
+	cd $@ && cmake .. -DDEBIAN=True -DQWTDIR=/usr/local/qwt-6.1.3-svn
+	$(MAKE) -C $@ package
 
-appdir:: Linux
+
+appdir::
+	mkdir -p $@	
+	cd $@ && cmake .. -DDEBIAN=True -DQWTDIR=/usr/local/qwt-6.1.3-svn
+	$(MAKE) -C $@ 
+	
 	mkdir -p Neutrino.AppDir/usr
 
 	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
 	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
 
-	cp -r /usr/lib/x86_64-linux-gnu/qt4/plugins Neutrino.AppDir/usr/bin
+	cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins Neutrino.AppDir/usr/bin
 
 	# apt-get install pax-utils
 	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
