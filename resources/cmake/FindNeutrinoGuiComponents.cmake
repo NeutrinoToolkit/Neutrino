@@ -9,7 +9,7 @@ if(DEFINED QTDIR)
 endif()
 
 
-if(DEFINED QWTDIR)
+if(LINUX AND DEFINED QWTDIR)
 set (QWT_LIBRARY ${QWTDIR}/lib/libqwt.so)
 set (QWT_INCLUDE_DIR ${QWTDIR}/include)
 endif()
