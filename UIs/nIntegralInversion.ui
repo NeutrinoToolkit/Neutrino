@@ -323,6 +323,11 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </item>
     <item row="5" column="1">
      <widget class="QCheckBox" name="autoUpdate">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="text">
        <string>AutoUpdate</string>
       </property>
@@ -546,6 +551,11 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
        </item>
        <item row="2" column="0">
         <widget class="QCheckBox" name="blurRadius_checkb">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="layoutDirection">
           <enum>Qt::RightToLeft</enum>
          </property>
@@ -559,6 +569,11 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
        </item>
        <item row="2" column="2">
         <widget class="QCheckBox" name="multiply_checkb">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="layoutDirection">
           <enum>Qt::RightToLeft</enum>
          </property>

@@ -8,6 +8,13 @@ if(DEFINED QTDIR)
   set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
 endif()
 
+if(LINUX)
+    if(DEFINED QWTDIR)
+    set (QWT_LIBRARY ${QWTDIR}/lib/libqwt.so)
+    set (QWT_INCLUDE_DIR ${QWTDIR}/include)
+    endif()
+endif()
+
 find_package(Qwt REQUIRED)
 if (QWT_FOUND)
 	include_directories(${QWT_INCLUDE_DIRS})
@@ -50,7 +57,7 @@ if (HDF5_FOUND_COMPLETE)
 endif()
 
 
-if (APPLE)
+if (NOT WIN32)
 
     include(FindPythonLibs)
 
@@ -58,40 +65,38 @@ if (APPLE)
         list(APPEND LIBS ${PYTHON_LIBRARIES})
         include_directories(${PYTHON_INCLUDE_DIRS})
 
-        INCLUDE_DIRECTORIES(../../pythonqt-code/src ../../pythonqt-code/src/gui)
-        LINK_DIRECTORIES(/Users/tommaso/pythonqt-code/lib)
+	    INCLUDE_DIRECTORIES(../../pythonqt-code/src ../../pythonqt-code/src/gui)
+	    LINK_DIRECTORIES(../../pythonqt-code/lib)
 
-        find_library(PYTHONQT NAMES PythonQt PATHS ../pythonqt-code/lib)
-        find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ../pythonqt-code/lib)
+	    find_library(PYTHONQT NAMES PythonQt PATHS ../../pythonqt-code/lib)
+	    find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ../../pythonqt-code/lib)
 
-        if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
+	    if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
 
-            set (PYTHONQT_FOUND_COMPLETE "TRUE")
+	        set (PYTHONQT_FOUND_COMPLETE "TRUE")
 
-            message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
-            list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
-            add_definitions(-DHAVE_PYTHONQT)
+	        message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
+	        list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
+	        add_definitions(-DHAVE_PYTHONQT)
 
-            FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ../../pythonqt-code/src)
-            IF (PYTHONQT_INCLUDE_DIR)
-                  message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
-                  include_directories(${PYTHONQT_INCLUDE_DIR})
-            ELSE()
-                set (PYTHONQT_FOUND_COMPLETE "FALSE")
-            ENDIF ()
+	        FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ../../pythonqt-code/src)
+	        IF (PYTHONQT_INCLUDE_DIR)
+		      message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
+		      include_directories(${PYTHONQT_INCLUDE_DIR})
+	        ELSE()
+		    set (PYTHONQT_FOUND_COMPLETE "FALSE")
+	        ENDIF ()
 
-            FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ../../pythonqt-code/extensions/PythonQt_QtAll)
-            IF (PYTHONQTALL_INCLUDE_DIR)
-                  message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
-                  include_directories(${PYTHONQTALL_INCLUDE_DIR})
-            ELSE()
-                set (PYTHONQT_FOUND_COMPLETE "FALSE")
-            ENDIF ()
+	        FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ../../pythonqt-code/extensions/PythonQt_QtAll)
+	        IF (PYTHONQTALL_INCLUDE_DIR)
+		      message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
+		      include_directories(${PYTHONQTALL_INCLUDE_DIR})
+	        ELSE()
+		    set (PYTHONQT_FOUND_COMPLETE "FALSE")
+	        ENDIF ()
 
-        endif()
-
-
-    endif()
+	    endif()
+	endif()
 endif()
 
 
