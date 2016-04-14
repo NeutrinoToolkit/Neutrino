@@ -192,32 +192,31 @@ QVariant nIntegralInversion::doInversion() {
 			// apply physics
 		QApplication::processEvents();		
 
-		if (inv_image) {
-			switch (my_w.physTabs->currentIndex()) {
-				case 0:
-					DEBUG("Inversions: no physics applied");
-					break;
-				case 1:
-					DEBUG("Inversions: applying neutral gas physics");
-					phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, my_w.molarRefr_le->text().toDouble());
-					break;
-				case 2:
-					DEBUG("Inversions: applying plasma physics");
-					phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
-					break;
-				case 3: {
-					DEBUG("Inversions: applying proton  physics");
-					phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
-//                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
-//                    phys_point_multiply(*pippo, *inv_image);
-//                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
-//                    nparent->addPhys(pippo);
-					break;
-                }
-				default:
-					break;
-			}
-			inv_image->setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
+        if (inv_image) {
+            switch (my_w.physTabs->currentIndex()) {
+            case 0:
+                DEBUG("Inversions: no physics applied");
+                break;
+            case 1:
+                phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, QLocale().toDouble(my_w.molarRefr_le->text()));
+                break;
+            case 2:
+                DEBUG("Inversions: applying plasma physics");
+                phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
+                break;
+            case 3: {
+                DEBUG("Inversions: applying proton  physics");
+                phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+                //                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
+                //                    phys_point_multiply(*pippo, *inv_image);
+                //                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
+                //                    nparent->addPhys(pippo);
+                break;
+            }
+            default:
+                break;
+            }
+            inv_image->setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
 
 			//		if (my_w.blurRadius_checkb->isChecked()) {	// blur
 			//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());

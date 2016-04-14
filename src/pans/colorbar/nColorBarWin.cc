@@ -196,7 +196,9 @@ void nColorBarWin::slider_max_changed(int val)
 void nColorBarWin::cutOff() {
 	if (currentBuffer) {
 		nPhysD *cut=new nPhysD(*currentBuffer);
-        phys_cutoff(*cut,my_w.lineMin->text().toDouble(),my_w.lineMax->text().toDouble());
+
+
+        phys_cutoff(*cut,QLocale().toDouble(my_w.lineMin->text()),QLocale().toDouble(my_w.lineMax->text()));
 		cutOffPhys=nparent->replacePhys(cut,cutOffPhys);
 	}
 }
