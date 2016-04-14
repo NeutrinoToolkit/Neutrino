@@ -69,7 +69,7 @@ appdir::
 	
 	mkdir -p Neutrino.AppDir/usr
 
-	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
+	cp -r $@/lib $@/bin Neutrino.AppDir/usr
 	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
 
 	cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins Neutrino.AppDir/usr/bin
