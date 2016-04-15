@@ -33,6 +33,9 @@
 #include <iostream>
 #include "nPhysImageF.h"
 #include "panThread.h"
+
+#include "ui_nPanHelp.h"
+
 #ifndef __generic_pan
 #define __generic_pan
 
@@ -58,11 +61,15 @@ public:
 	// thread stuff
 	panThread nThread;
 
+    Ui::PanHelp my_w;
+
 signals:
 	void changeCombo(QComboBox*);
 
 
 public slots:
+    void help();
+
 	void showMessage(QString);
 	void showMessage(QString,int);
 	virtual void mouseAtMatrix(QPointF) { }

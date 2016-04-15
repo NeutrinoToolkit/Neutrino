@@ -90,8 +90,46 @@ void nGenericPan::addPhysToCombos(nPhysD *buffer) {
 	}
 }
 
+void nGenericPan::help() {
+
+    QString helpfile(":/help/"+panName+"/index.html");
+    DEBUG("here " << helpfile.toStdString());
+    if (QFileInfo(helpfile).exists()) {
+        DEBUG("here");
+        QMainWindow *helpwin=new QMainWindow(this, Qt::Tool);
+        my_w.setupUi(helpwin);
+        my_w.help->setSource(QUrl("qrc"+helpfile));
+        connect(my_w.actionHome, SIGNAL(triggered()), my_w.help, SLOT(home()));
+        connect(my_w.actionBack, SIGNAL(triggered()), my_w.help, SLOT(backward()));
+        connect(my_w.actionForward, SIGNAL(triggered()), my_w.help, SLOT(forward()));
+        connect(my_w.actionClose, SIGNAL(triggered()), helpwin, SLOT(close()));
+        helpwin->show();
+    }
+}
+
 void nGenericPan::decorate() {
-//	qDebug() << __PRETTY_FUNCTION__ << panName << objectName() << metaObject()->className();
+
+    DEBUG(panName.toStdString());
+
+    QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
+    foreach (QToolBar *my_tool, my_toolbars) {
+        if (my_tool->objectName() == "toolBar") {
+            QDirIterator it(":/help");
+            while (it.hasNext()) {
+                QDir helpdir(it.next());
+                DEBUG(helpdir.dirName().toStdString());
+                QString indexName=helpdir.canonicalPath()+"/index.html";
+                if (helpdir.exists() && helpdir.dirName() == panName && QFileInfo(indexName).exists()) {
+                    DEBUG(indexName.toStdString());
+                    QWidget* spacer = new QWidget();
+                    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                    my_tool->addWidget(spacer);
+                    my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
+                }
+            }
+        }
+    }
+    //	qDebug() << __PRETTY_FUNCTION__ << panName << objectName() << metaObject()->className();
     DEBUG((objectName()+" : "+panName+" : "+metaObject()->className()).toStdString());
 	setProperty("fileTxt", QString(panName+".txt"));
 	setProperty("fileExport", QString(panName+".svg"));
