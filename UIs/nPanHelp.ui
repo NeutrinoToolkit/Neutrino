@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Shortcuts</string>
+   <string>Help</string>
   </property>
   <property name="iconSize">
    <size>
@@ -43,6 +43,18 @@
         <pointsize>10</pointsize>
        </font>
       </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -54,6 +66,11 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -69,8 +86,6 @@
    <addaction name="actionBack"/>
    <addaction name="actionHome"/>
    <addaction name="actionForward"/>
-   <addaction name="separator"/>
-   <addaction name="actionClose"/>
   </widget>
   <action name="actionHome">
    <property name="icon">
@@ -103,15 +118,6 @@
    </property>
    <property name="toolTip">
     <string>Forward</string>
-   </property>
-  </action>
-  <action name="actionClose">
-   <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
-     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
-   </property>
-   <property name="text">
-    <string>Close</string>
    </property>
   </action>
  </widget>

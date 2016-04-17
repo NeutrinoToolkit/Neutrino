@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>489</width>
+    <width>492</width>
     <height>402</height>
    </rect>
   </property>
@@ -52,7 +52,7 @@
       <item row="0" column="0">
        <widget class="QDoubleSpinBox" name="resolution">
         <property name="suffix">
-         <string>[px]</string>
+         <string> [px]</string>
         </property>
         <property name="value">
          <double>1.000000000000000</double>
@@ -117,7 +117,7 @@
         <property name="title">
          <string>Reference and Shot</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1,0">
+        <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -284,7 +284,7 @@
    <item row="3" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Intensity parameters</string>
+      <string>Intensity parameters: </string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <property name="leftMargin">
@@ -299,48 +299,13 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QDoubleSpinBox" name="multRef">
-        <property name="toolTip">
-         <string>Reference multiplication factor</string>
-        </property>
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="minimum">
-         <double>-99.989999999999995</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QSpinBox" name="intensityShift">
-        <property name="toolTip">
-         <string>Pixel delay of intensity between probe and shot</string>
-        </property>
-        <property name="minimum">
-         <number>-1000</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="offRef">
         <property name="toolTip">
          <string>offset reference</string>
+        </property>
+        <property name="suffix">
+         <string> [counts]</string>
         </property>
         <property name="maximum">
          <double>99999.000000000000000</double>
@@ -355,8 +320,55 @@
         <property name="toolTip">
          <string>offset shot</string>
         </property>
+        <property name="suffix">
+         <string> [counts]</string>
+        </property>
         <property name="maximum">
          <double>99999.000000000000000</double>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QSpinBox" name="intensityShift">
+        <property name="toolTip">
+         <string>Pixel delay of intensity between probe and shot</string>
+        </property>
+        <property name="suffix">
+         <string> [px]</string>
+        </property>
+        <property name="minimum">
+         <number>-1000</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QDoubleSpinBox" name="multRef">
+        <property name="toolTip">
+         <string>Reference multiplication factor</string>
+        </property>
+        <property name="suffix">
+         <string> X</string>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
         <property name="neutrinoSave" stdset="0">
          <bool>true</bool>
@@ -380,16 +392,17 @@
   <tabstop>enableVisar</tabstop>
   <tabstop>refImage</tabstop>
   <tabstop>shotImage</tabstop>
-  <tabstop>multRef</tabstop>
-  <tabstop>offRef</tabstop>
-  <tabstop>offShot</tabstop>
-  <tabstop>intensityShift</tabstop>
   <tabstop>guess</tabstop>
   <tabstop>carrierPhys</tabstop>
   <tabstop>guessWeight</tabstop>
   <tabstop>interfringe</tabstop>
   <tabstop>angle</tabstop>
   <tabstop>resolution</tabstop>
+  <tabstop>doWaveButton</tabstop>
+  <tabstop>offRef</tabstop>
+  <tabstop>offShot</tabstop>
+  <tabstop>intensityShift</tabstop>
+  <tabstop>multRef</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/icons/icons.qrc"/>

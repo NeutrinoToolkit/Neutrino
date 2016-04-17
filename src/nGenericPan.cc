@@ -44,7 +44,6 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 	setProperty("panNum",panNum);
 	
 	setAttribute(Qt::WA_DeleteOnClose);
-	setWindowFlags(Qt::Window);
 
 	connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
 
@@ -79,7 +78,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 	return name;
 }
 	
-void nGenericPan::addPhysToCombos(nPhysD *buffer) {
+void nGenericPan::physAdd(nPhysD *buffer) {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
 			int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
@@ -88,26 +87,53 @@ void nGenericPan::addPhysToCombos(nPhysD *buffer) {
 			}
 		}
 	}
+    QApplication::processEvents();
 }
 
 void nGenericPan::help() {
-
     QString helpfile(":/help/"+panName+"/index.html");
-    DEBUG("here " << helpfile.toStdString());
     if (QFileInfo(helpfile).exists()) {
-        DEBUG("here");
-        QMainWindow *helpwin=new QMainWindow(this, Qt::Tool);
-        my_w.setupUi(helpwin);
-        my_w.help->setSource(QUrl("qrc"+helpfile));
-        connect(my_w.actionHome, SIGNAL(triggered()), my_w.help, SLOT(home()));
-        connect(my_w.actionBack, SIGNAL(triggered()), my_w.help, SLOT(backward()));
-        connect(my_w.actionForward, SIGNAL(triggered()), my_w.help, SLOT(forward()));
-        connect(my_w.actionClose, SIGNAL(triggered()), helpwin, SLOT(close()));
-        helpwin->show();
+        QMainWindow *helpwin=nullptr;
+        foreach (helpwin, findChildren<QMainWindow *>()) {
+            if (helpwin->property("NeutrinoHelp").isValid()) {
+                helpwin->raise();
+                helpwin->show();
+                break;
+            }
+        }
+        if (!helpwin) {
+            helpwin=new QMainWindow(this);
+            my_help.setupUi(helpwin);
+            helpwin->setWindowTitle(panName+" help");
+            helpwin->setProperty("NeutrinoHelp",true);
+            my_help.help->setSource(QUrl("qrc"+helpfile));
+            connect(my_help.actionHome, SIGNAL(triggered()), my_help.help, SLOT(home()));
+            connect(my_help.actionBack, SIGNAL(triggered()), my_help.help, SLOT(backward()));
+            connect(my_help.actionForward, SIGNAL(triggered()), my_help.help, SLOT(forward()));
+
+            helpwin->show();
+        }
+    }
+}
+
+void nGenericPan::grabSave() {
+    int ok=0;
+    while (ok<10000) {
+        ok++;
+        QString fname=QDir::homePath()+"/Grab_"+panName+"_"+QString("%1").arg(ok, 5, 10, QChar('0'))+".png";
+        if (!QFileInfo(fname).exists()) {
+            setUnifiedTitleAndToolBarOnMac(false);
+            grab().save(fname);
+            setUnifiedTitleAndToolBarOnMac(true);
+            break;
+        }
     }
 }
 
 void nGenericPan::decorate() {
+
+    QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
+    connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
 
     DEBUG(panName.toStdString());
 
@@ -143,7 +169,7 @@ void nGenericPan::decorate() {
 		}
 	}
 	
-	foreach (nPhysD *buffer, nparent->getBufferList()) addPhysToCombos(buffer);
+    foreach (nPhysD *buffer, nparent->getBufferList()) physAdd(buffer);
 	
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {	
@@ -151,10 +177,6 @@ void nGenericPan::decorate() {
 				//connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
-
-//                QPalette Pal(palette());
-//                Pal.setColor(QPalette::Text, Qt::darkRed);
-//                combo->setPalette(Pal);
             }
 		}
 	}
@@ -190,14 +212,7 @@ void nGenericPan::decorate() {
 	show();
 }
 
-void
-nGenericPan::physAdd(nPhysD * buffer) {
-	addPhysToCombos(buffer);
-	QApplication::processEvents();
-}
-
-void
-nGenericPan::physDel(nPhysD * buffer) {
+void nGenericPan::physDel(nPhysD * buffer) {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {
 			if (combo->property("neutrinoImage").toBool()) {
@@ -217,8 +232,7 @@ nGenericPan::physDel(nPhysD * buffer) {
 	}
 }
 
-void
-nGenericPan::bufferChanged(nPhysD * buffer)
+void nGenericPan::bufferChanged(nPhysD * buffer)
 {
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {
@@ -229,19 +243,15 @@ nGenericPan::bufferChanged(nPhysD * buffer)
 	currentBuffer = buffer;
 }
 
-void
-nGenericPan::showMessage(QString message) {
+void nGenericPan::showMessage(QString message) {
 	nparent->statusBar()->showMessage(message);
 }
 
-void
-nGenericPan::showMessage(QString message,int msec) {
+void nGenericPan::showMessage(QString message,int msec) {
 	nparent->statusBar()->showMessage(message,msec);
 }
 
-
-void
-nGenericPan::comboChanged(int k) {
+void nGenericPan::comboChanged(int k) {
 	QComboBox *combo = qobject_cast<QComboBox *>(sender());
 	if (combo) {
 		nPhysD *image=(nPhysD*) (combo->itemData(k).value<void*>());
@@ -437,6 +447,7 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
+    DEBUG("closeevent " << panName.toStdString());
     nparent->emitPanDel(this);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {			

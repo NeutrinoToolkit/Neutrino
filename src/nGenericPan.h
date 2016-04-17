@@ -61,13 +61,15 @@ public:
 	// thread stuff
 	panThread nThread;
 
-    Ui::PanHelp my_w;
+    Ui::PanHelp my_help;
 
 signals:
 	void changeCombo(QComboBox*);
 
 
 public slots:
+
+    void grabSave();
     void help();
 
 	void showMessage(QString);
@@ -95,7 +97,6 @@ public slots:
 	nPhysD* getPhysFromCombo(QComboBox*);
 
 	QString getNameForCombo(QComboBox*,nPhysD *);
-	void addPhysToCombos(nPhysD*);
 
 	void loadUi(QSettings*);
 	void saveUi(QSettings*);

@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -301,6 +301,9 @@
              <property name="toolTip">
               <string>Background value</string>
              </property>
+             <property name="suffix">
+              <string> [counts]</string>
+             </property>
              <property name="minimum">
               <double>-99999999.989999994635582</double>
              </property>
@@ -315,7 +318,7 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
-           <string>Time 0 [px] and delta [time]</string>
+           <string>Time zero and delta t</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_10">
            <property name="leftMargin">
@@ -338,7 +341,7 @@
               </font>
              </property>
              <property name="suffix">
-              <string/>
+              <string> [px]</string>
              </property>
              <property name="minimum">
               <number>-99999</number>
@@ -359,7 +362,7 @@
               </font>
              </property>
              <property name="suffix">
-              <string/>
+              <string> [t]</string>
              </property>
              <property name="decimals">
               <number>6</number>
@@ -440,7 +443,7 @@
         <item row="1" column="2">
          <widget class="QGroupBox" name="groupBox_4">
           <property name="title">
-           <string>Time scale [time/px] and direction</string>
+           <string>Time scale and direction</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
            <property name="leftMargin">
@@ -485,7 +488,7 @@
               </font>
              </property>
              <property name="suffix">
-              <string/>
+              <string> [t/px]</string>
              </property>
              <property name="decimals">
               <number>6</number>
@@ -821,6 +824,22 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabs</tabstop>
+  <tabstop>tabPhase</tabstop>
+  <tabstop>tabVelocity</tabstop>
+  <tabstop>sopRef</tabstop>
+  <tabstop>sopShot</tabstop>
+  <tabstop>sopOffset</tabstop>
+  <tabstop>sopOrigin</tabstop>
+  <tabstop>sopTimeOffset</tabstop>
+  <tabstop>whichRefl</tabstop>
+  <tabstop>sopScale</tabstop>
+  <tabstop>sopDirection</tabstop>
+  <tabstop>sopCalibT0</tabstop>
+  <tabstop>sopCalibA</tabstop>
+  <tabstop>Tminmax</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/icons/icons.qrc"/>
  </resources>
