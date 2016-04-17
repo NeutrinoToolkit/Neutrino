@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Visar help</title>
+  </head>
+  <body>
+    <h1>Wavelet analysis</h1>
+    In the Window there are 3 tabs : <b>Wavelet</b>, <b>Unwrap</b> and
+    <b>Subtract</b>
+    <h2>Wavelet:</h2>
+    This is the filter panel. <br>
+    <ol>
+      <li>Select the image to filter</li>
+      <li>Set the parameters for the Morlet wavelet filter, for the
+        stretch and the angle, give the <b>min</b>,&nbsp;
+        <meta charset="utf-8">
+        <b>max</b> and the <b>number</b> of test functions.</li>
+      <li>Based on the <b>Rel. to carrier</b> check the stretch values
+        are relative to the carrier. When this option is active, check
+        carefully the values for the carrier (interfringe and rotation)
+        and if they're not right, hit the <img
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAAAAABWESUoAAAA0mlDQ1BJQ0MgUHJvZmlsZQAAGJVjYGCsSCwoyGESYGDIzSspcg9yjIyIjFJgv8rAzsDIAAaJycUFjgEBPgw4wbdrELWXdUFm4VaHFbCkpBYnA+ktQFyaXFBUwsDAqANkq5eXFIDYIUC2SHZIkDOQnQFk80HVg4C0c2JOZlJRYklqioJ7UWKlgnN+Tn5RcUFiciqJriAClKRWlIBo5/yCyqLM9IwSBUegb1OBduYWlJakFukoeOYl6zEwgMIPouNzIDhcGMXOJJcWlUGNYWQyZmAAABFdNMUdedORAAAB1WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjE8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlBob3RvbWV0cmljSW50ZXJwcmV0YXRpb24+MTwvdGlmZjpQaG90b21ldHJpY0ludGVycHJldGF0aW9uPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4K/nZYwQAAAWtJREFUOBG9U71qAkEYnD0jQQ8DIWCRziBIHsAq2oRA0iTYio1NsLHIK+QRFBtJo0WwsBFsJVVS2WujSWchiGA8Nai32XN/buWOpAn5imP2m7nZb+duCcXPdQB8vY4uznxU72+nqUOA0rKJ5JB6apiEWaYUdJ4GSN3D0zoB0nNqYLNgNpZ3C4tNt9jA8DL7nX8WLEVodKmNoc0wbW05sW1NXYUmaHfEwui0/QTjisWicYpYlTFH7Ok6NLr27HNXM7vbUAL2sXh9VPFyLfAA1buYwEpQ62MyEU2gX3sU2N1CkftAOeSb/ZO44AaT87yUKUGs8HD5xP3s+2ZBjgAlQPbZOOLnpEYyKw20Y0aLpozaLEaVwHXAbdAWW1zdKF7bAseZAO8HMiFfAWSbSODIfs3hLwTEMfEx2rUJY8IJICJDdqdHPAIkws7V6+VSpZX3Zq1KqVyPUsLSW69DPGPtfQbpMhhkv5eId5/TVt+kJZrcOC/z8QAAAABJRU5ErkJggg=="
+          alt=""> button to get the right values (you may want to do
+        this by moving the ROI on a steady part of the interferogram or
+        directly on a reference image).</li>
+      <li>Set a proper value for the <b>Thickness</b> of the fringes
+        (i.e. the transverse part of the 2D Morlet funciton)</li>
+      <li>The <b>Damp</b> value should remain 1.0 unless the
+        interferogram is really noisy and you want to calculate the
+        phase by taking more peaks correlation.</li>
+      <li>Use <b>Crop region</b> check if you want to get an image of
+        the original ROI</li>
+      <li>Use <b>Syntetic</b> to generate an artifical image of the
+        interferogram based on the phase and contrast values.</li>
+      <li><b>Erase previous</b> will overwrite the previous set of
+        result images.</li>
+      <li>Hit the <b>Calculate</b> button to start the calculation. (Go
+        to the preferences panel if you want to use the OpenCl
+        algorithm)<br>
+      </li>
+    </ol>
+    <h2>Unwrap:</h2>
+    <p>Here we do a 2D unwrap of the interferogram. <br>
+    </p>
+    <ol>
+      <li>Select the <b>phase</b> and <b>quality</b> images. Usually
+        these are already set after the previous computation done,
+        otherwise you have to manually select them.</li>
+      <li>Choose the unwrap <b>method</b> (Qaulity and Miguel are
+        usually a good choice).</li>
+      <li>Choose or not to activate a barrier by checking the box right
+        the unwrap method. This will display a barrier line which will
+        avoid the unwap algorithm to unwrap the phase through.</li>
+      <li>Choose whether or not <b>remove</b> the <b>carrier</b> plane
+        phase. <br>
+      </li>
+      <li>Hit the <b>Unwrap</b> button</li>
+    </ol>
+    <h2>Subtract:</h2>
+    <p>Once you get the phase, here we subtract either the <b>carrie</b>r
+      plane (if not done in the previous tab) or a <b>reference image
+        phase</b>.<br>
+      The <b>Offset</b> value is subtracted to the whole image<br>
+    </p>
+    <p><br>
+    </p>
+  </body>
+</html>

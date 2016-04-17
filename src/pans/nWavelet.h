@@ -69,6 +69,8 @@ public slots:
     void physDel(nPhysD*);
 	void checkChangeCombo(QComboBox *);
 	
+    void on_relative_toggled(bool);
+
 	void doAll();
 
 	

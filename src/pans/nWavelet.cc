@@ -73,6 +73,11 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
 }
 
+void nWavelet::on_relative_toggled(bool tog) {
+    my_w.minStretch->setSuffix(tog?" X":" [px]");
+    my_w.maxStretch->setSuffix(tog?" X":" [px]");
+}
+
 void nWavelet::useBarrierToggled(bool val) {
 	if (val) {
 		linebarrier->show();
