@@ -7,7 +7,11 @@
   <body>
     <h1>Wavelet analysis</h1>
     In the Window there are 3 tabs : <b>Wavelet</b>, <b>Unwrap</b> and
-    <b>Subtract</b>
+    <b>Subtract</b>. If all the parameters are already set you can press
+    the <img
+src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAAAAABWESUoAAAA0mlDQ1BJQ0MgUHJvZmlsZQAAGJVjYGCsSCwoyGESYGDIzSspcg9yjIyIjFJgv8rAzsDIAAaJycUFjgEBPgw4wbdrELWXdUFm4VaHFbCkpBYnA+ktQFyaXFBUwsDAqANkq5eXFIDYIUC2SHZIkDOQnQFk80HVg4C0c2JOZlJRYklqioJ7UWKlgnN+Tn5RcUFiciqJriAClKRWlIBo5/yCyqLM9IwSBUegb1OBduYWlJakFukoeOYl6zEwgMIPouNzIDhcGMXOJJcWlUGNYWQyZmAAABFdNMUdedORAAAB1WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjE8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlBob3RvbWV0cmljSW50ZXJwcmV0YXRpb24+MTwvdGlmZjpQaG90b21ldHJpY0ludGVycHJldGF0aW9uPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4K/nZYwQAAAd5JREFUOBGlk7FLQlEUxo8+zQpTCEmDWqzEhoZagv6Dolc0BUGrm6Cz0CIYBC1FQ3ttRSFB1NAQlDgV1dQU5lAPKXjEK5/o6Z77zs3nUkNnePee8/3ed8+9l+tB+D28v8sA/wd87iUahvHh74+GPK6iC3g5Pbmv1bXg8MzSdKCNIMfX/pSmquHVe1VG4Nl7tlfJNCaKLRYYMFPOdrw9AaeB2HEH0FqXvQyl9i7Od/QgeYzeOITjUIqKkn/lrklF6yBJxLKFhoXcw2HcC1rGZFcsjwsgtJ3Tqww07KfNybma0hGLYUF0gV5n4DL9iEalrX9eyUUgL0qyhwIkdn/8Ee2NCDUB3WcM2IvCb6EkO5Q21bUYASNkSg6VEUpja6IljmZpoQtg0RYpAWfdBEBkgwoc5m4CCjQnIC/15NUni2KoGPiYvqRcAHVd7AggXGzrtbnJzSe7wUBVz231CWK8rAgzo4E3fihT4WAZaC3TKskDcbSIzbsVv8iiJQXQeDtGRFDfOb/YSw3R3LfuXDg1SXE8SFXwBHr43lN8cgpoFROS4E9v9t35UW7TmT6s0g3J0Kb2v1hHT/tl1ctH188fzUBkYn5WHrWEXQAAmq9vjeDAAG1CRQegiu7x/0/vT4dv03qoDkVPRC0AAAAASUVORK5CYII="
+      alt="">button to get all the 3 calculation done one after each
+    other (useful if you have a series of images to process)
     <h2>Wavelet:</h2>
     This is the filter panel. <br>
     <ol>
@@ -25,13 +29,13 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAAAAABWESUoAAAA0mlDQ
         this by moving the ROI on a steady part of the interferogram or
         directly on a reference image).</li>
       <li>Set a proper value for the <b>Thickness</b> of the fringes
-        (i.e. the transverse part of the 2D Morlet funciton)</li>
+        (i.e. the transverse part of the 2D Morlet function)</li>
       <li>The <b>Damp</b> value should remain 1.0 unless the
         interferogram is really noisy and you want to calculate the
         phase by taking more peaks correlation.</li>
       <li>Use <b>Crop region</b> check if you want to get an image of
         the original ROI</li>
-      <li>Use <b>Syntetic</b> to generate an artifical image of the
+      <li>Use <b>Synthetic</b> to generate an artificial image of the
         interferogram based on the phase and contrast values.</li>
       <li><b>Erase previous</b> will overwrite the previous set of
         result images.</li>
@@ -47,7 +51,7 @@ src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAAAAABWESUoAAAA0mlDQ
       <li>Select the <b>phase</b> and <b>quality</b> images. Usually
         these are already set after the previous computation done,
         otherwise you have to manually select them.</li>
-      <li>Choose the unwrap <b>method</b> (Qaulity and Miguel are
+      <li>Choose the unwrap <b>method</b> (Quality and Miguel are
         usually a good choice).</li>
       <li>Choose or not to activate a barrier by checking the box right
         the unwrap method. This will display a barrier line which will
