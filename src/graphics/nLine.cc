@@ -29,8 +29,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 
-#include <qwt_spline.h>
-#include <qwt_curve_fitter.h>
+#include <spline.h>
 
 nLine::~nLine() {
 	foreach (QGraphicsEllipseItem* item, ref) {
@@ -958,57 +957,48 @@ QPolygonF nLine::poly(int steps) const {
 		foreach (QGraphicsEllipseItem *item, ref){
 			my_poly<< item->pos();
 		}
-		
-		if (closedLine) my_poly << ref[0]->pos();
-        
-        if (bezier && my_poly.size()>2) {
-            steps=max(steps,16); // if it's a bezier impose at least 16 steps...
-            QPolygonF splinePointsX;
-            QPolygonF splinePointsY;
-            QVector<double>param_length;
-            
-            double param = 0.0;
-            double x,y,xold=0,yold=0;
-            for (int i = 0; i < my_poly.size(); i++ )
-            {
-                x = my_poly[i].x();
-                y = my_poly[i].y();
-                if ( i > 0 ) {
-                    const double delta = qSqrt(qwtSqr(x-xold)+qwtSqr(y-yold));
-                    param += qMax( delta, 1.0 );
-                }
 
-                splinePointsX<< QPointF(param,x);
-                splinePointsY<< QPointF(param,y);
-                param_length << param;
-                xold=x;
-                yold=y;
-            }
-            
-            QwtSpline my_splineX,my_splineY;
+        if (closedLine) my_poly << ref[0]->pos();
+
+        if (bezier && my_poly.size()>2) {
+
+            std::vector<double> T,X,Y;
             if (closedLine)  {
-                my_splineX.setSplineType(QwtSpline::Periodic);
-                my_splineY.setSplineType(QwtSpline::Periodic);
+                T.resize(my_poly.size()+2);
+                X.resize(my_poly.size()+2);
+                Y.resize(my_poly.size()+2);
+                T[0]=-1;
+                X[0]=ref.last()->pos().x();
+                Y[0]=ref.last()->pos().y();
+                for (int i = 0; i < my_poly.size(); i++ ) {
+                    T[i+1]=i;
+                    X[i+1]=my_poly[i].x();
+                    Y[i+1]=my_poly[i].y();
+                }
+                T[my_poly.size()+1]=my_poly.size();
+                X[my_poly.size()+1]=ref[1]->pos().x();
+                Y[my_poly.size()+1]=ref[1]->pos().y();
             } else {
-                my_splineX.setSplineType(QwtSpline::Natural);
-                my_splineY.setSplineType(QwtSpline::Natural);
+                T.resize(my_poly.size());
+                X.resize(my_poly.size());
+                Y.resize(my_poly.size());
+                for (int i = 0; i < my_poly.size(); i++ ) {
+                    T[i]=i;
+                    X[i]=my_poly[i].x();
+                    Y[i]=my_poly[i].y();
+                }
             }
-            
+
+            spline::spline sX, sY;
+            sX.set_points(T,X);
+            sY.set_points(T,Y);
+
+            steps=max(steps,16); // if it's a bezier impose at least 16 steps...
             int size=steps*(my_poly.size()-1);
             
-            my_splineX.setPoints( splinePointsX );
-            my_splineY.setPoints( splinePointsY );
-            
-            const double delta = splinePointsX.last().x() / size;
-            for (int i = 1; i < size; i++ )
-            {
-                const double dtmp = i * delta;
-                QPointF p=QPointF(my_splineX.value( dtmp ),my_splineY.value( dtmp ));
-                if (dtmp > param_length.at(0)) {
-                    my_poly_interp.append(my_poly[0]);
-                    my_poly.remove(0);
-                    param_length.remove(0);
-                }
+            for (int i = 0; i < size; i++ ) {
+                const double dtmp = (double) i / steps;
+                QPointF p=QPointF(sX(dtmp),sY(dtmp));
                 my_poly_interp.append(p);
             }
             my_poly_interp.append(my_poly.last());

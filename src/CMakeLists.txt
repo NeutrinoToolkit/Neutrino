@@ -69,6 +69,7 @@ list (APPEND SOURCES
     neutrino.cc
     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
+    graphics/spline.cc 
     panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nPhysProperties.cc  
     pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
     pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
