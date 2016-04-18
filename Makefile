@@ -58,7 +58,7 @@ cross::
 
 Linux::
 	mkdir -p $@	
-	cd $@ && cmake .. -DDEBIAN=True -DQWTDIR=/usr/local/qwt-6.1.3-svn
+	cd $@ && cmake .. -DDEBIAN=True
 	$(MAKE) -C $@ package
 
 

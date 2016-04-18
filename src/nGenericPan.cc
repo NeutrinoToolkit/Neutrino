@@ -117,6 +117,7 @@ void nGenericPan::help() {
 }
 
 void nGenericPan::grabSave() {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     int ok=0;
     while (ok<10000) {
         ok++;
@@ -128,6 +129,7 @@ void nGenericPan::grabSave() {
             break;
         }
     }
+#endif
 }
 
 void nGenericPan::decorate() {
