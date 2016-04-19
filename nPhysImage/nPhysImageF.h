@@ -889,8 +889,6 @@ private:
 	T Tminimum_value;
 
 
-	double to_uchar_min, to_uchar_max;
-
 	// gestione rifiuti
 	void _trash_init()		// for constructors
 	{ _n_inst = new int; *_n_inst = 1; }
@@ -1053,8 +1051,6 @@ nPhysImageF<T>::init_Tvariables()
 {
 	width = 0;
 	height = 0;
-
-	to_uchar_min = to_uchar_max = 0;
 
 	// donne! e' arrivato il monnezzaro
 	vector_buf = axis_buf = NULL;

@@ -1111,9 +1111,10 @@ neutrino::createQimage() {
                                currentBuffer->getH(),
                                currentBuffer->getW()*3,
                                QImage::Format_RGB888);
+
         my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-        QString gamma_str=currentBuffer->gamma()<1? "1/"+ QString::number(int(1.0/currentBuffer->gamma())) : QString::number(int(currentBuffer->gamma()));
-        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+gamma_str);
+        double gamma_val=currentBuffer->gamma();
+        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
     }
     my_w.my_view->setSize();
 }

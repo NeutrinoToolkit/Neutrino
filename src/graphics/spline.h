@@ -292,58 +292,58 @@ void spline::set_points(const std::vector<double>& x, const std::vector<double>&
         assert(m_x[i]<m_x[i+1]);
     }
 
-        // setting up the matrix and right hand side of the equation system
-        // for the parameters b[]
-        band_matrix A(n,1,1);
-        std::vector<double>  rhs(n);
-        for(int i=1; i<n-1; i++) {
-            A(i,i-1)=1.0/3.0*(x[i]-x[i-1]);
-            A(i,i)=2.0/3.0*(x[i+1]-x[i-1]);
-            A(i,i+1)=1.0/3.0*(x[i+1]-x[i]);
-            rhs[i]=(y[i+1]-y[i])/(x[i+1]-x[i]) - (y[i]-y[i-1])/(x[i]-x[i-1]);
-        }
-        // boundary conditions
-        if(m_left == spline::second_deriv) {
-            // 2*b[0] = f''
-            A(0,0)=2.0;
-            A(0,1)=0.0;
-            rhs[0]=m_left_value;
-        } else if(m_left == spline::first_deriv) {
-            // c[0] = f', needs to be re-expressed in terms of b:
-            // (2b[0]+b[1])(x[1]-x[0]) = 3 ((y[1]-y[0])/(x[1]-x[0]) - f')
-            A(0,0)=2.0*(x[1]-x[0]);
-            A(0,1)=1.0*(x[1]-x[0]);
-            rhs[0]=3.0*((y[1]-y[0])/(x[1]-x[0])-m_left_value);
-        } else {
-            assert(false);
-        }
-        if(m_right == spline::second_deriv) {
-            // 2*b[n-1] = f''
-            A(n-1,n-1)=2.0;
-            A(n-1,n-2)=0.0;
-            rhs[n-1]=m_right_value;
-        } else if(m_right == spline::first_deriv) {
-            // c[n-1] = f', needs to be re-expressed in terms of b:
-            // (b[n-2]+2b[n-1])(x[n-1]-x[n-2])
-            // = 3 (f' - (y[n-1]-y[n-2])/(x[n-1]-x[n-2]))
-            A(n-1,n-1)=2.0*(x[n-1]-x[n-2]);
-            A(n-1,n-2)=1.0*(x[n-1]-x[n-2]);
-            rhs[n-1]=3.0*(m_right_value-(y[n-1]-y[n-2])/(x[n-1]-x[n-2]));
-        } else {
-            assert(false);
-        }
+    // setting up the matrix and right hand side of the equation system
+    // for the parameters b[]
+    band_matrix A(n,1,1);
+    std::vector<double>  rhs(n);
+    for(int i=1; i<n-1; i++) {
+        A(i,i-1)=1.0/3.0*(x[i]-x[i-1]);
+        A(i,i)=2.0/3.0*(x[i+1]-x[i-1]);
+        A(i,i+1)=1.0/3.0*(x[i+1]-x[i]);
+        rhs[i]=(y[i+1]-y[i])/(x[i+1]-x[i]) - (y[i]-y[i-1])/(x[i]-x[i-1]);
+    }
+    // boundary conditions
+    if(m_left == spline::second_deriv) {
+        // 2*b[0] = f''
+        A(0,0)=2.0;
+        A(0,1)=0.0;
+        rhs[0]=m_left_value;
+    } else if(m_left == spline::first_deriv) {
+        // c[0] = f', needs to be re-expressed in terms of b:
+        // (2b[0]+b[1])(x[1]-x[0]) = 3 ((y[1]-y[0])/(x[1]-x[0]) - f')
+        A(0,0)=2.0*(x[1]-x[0]);
+        A(0,1)=1.0*(x[1]-x[0]);
+        rhs[0]=3.0*((y[1]-y[0])/(x[1]-x[0])-m_left_value);
+    } else {
+        assert(false);
+    }
+    if(m_right == spline::second_deriv) {
+        // 2*b[n-1] = f''
+        A(n-1,n-1)=2.0;
+        A(n-1,n-2)=0.0;
+        rhs[n-1]=m_right_value;
+    } else if(m_right == spline::first_deriv) {
+        // c[n-1] = f', needs to be re-expressed in terms of b:
+        // (b[n-2]+2b[n-1])(x[n-1]-x[n-2])
+        // = 3 (f' - (y[n-1]-y[n-2])/(x[n-1]-x[n-2]))
+        A(n-1,n-1)=2.0*(x[n-1]-x[n-2]);
+        A(n-1,n-2)=1.0*(x[n-1]-x[n-2]);
+        rhs[n-1]=3.0*(m_right_value-(y[n-1]-y[n-2])/(x[n-1]-x[n-2]));
+    } else {
+        assert(false);
+    }
 
-        // solve the equation system to obtain the parameters b[]
-        m_b=A.lu_solve(rhs);
+    // solve the equation system to obtain the parameters b[]
+    m_b=A.lu_solve(rhs);
 
-        // calculate parameters a[] and c[] based on b[]
-        m_a.resize(n);
-        m_c.resize(n);
-        for(int i=0; i<n-1; i++) {
-            m_a[i]=1.0/3.0*(m_b[i+1]-m_b[i])/(x[i+1]-x[i]);
-            m_c[i]=(y[i+1]-y[i])/(x[i+1]-x[i])
-                   - 1.0/3.0*(2.0*m_b[i]+m_b[i+1])*(x[i+1]-x[i]);
-        }
+    // calculate parameters a[] and c[] based on b[]
+    m_a.resize(n);
+    m_c.resize(n);
+    for(int i=0; i<n-1; i++) {
+        m_a[i]=1.0/3.0*(m_b[i+1]-m_b[i])/(x[i+1]-x[i]);
+        m_c[i]=(y[i+1]-y[i])/(x[i+1]-x[i])
+                - 1.0/3.0*(2.0*m_b[i]+m_b[i+1])*(x[i+1]-x[i]);
+    }
 
     // for left extrapolation coefficients
     m_b0 = (m_force_linear_extrapolation==false) ? m_b[0] : 0.0;

@@ -28,9 +28,6 @@ nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname) {
 	my_w.setupUi(this);
 
-	setWindowFlags(Qt::Tool);
-	// CHECK: this should be ok...
-
 	my_w.splitter->setStretchFactor(0, 1);
 	my_w.splitter->setStretchFactor(1, 2);
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
@@ -59,7 +56,7 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
             QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
             my_w.propertyList->addItem(item);
             if (iter->first==currentProperty) {
-                string myval=iter->second;
+                string myval=iter->second.get_str();
                 my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
                 item->setSelected(true);
             }
@@ -74,9 +71,9 @@ nPhysProperties::showProperty() {
         DEBUG(currentKey);
         DEBUG(currentBuffer);
         if (currentBuffer) {
-			string myval=currentBuffer->property[currentKey];
-            DEBUG(myval);
-            my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+            QVariant my_variant=toVariant(currentBuffer->property[currentKey]);
+            DEBUG(my_variant.toString().toStdString());
+            my_w.propertyValue->setPlainText(my_variant.toString());
 		}
 	}
 }
@@ -87,7 +84,9 @@ void nPhysProperties::on_changePhysProperty_pressed() {
     DEBUG(pippo.toString().toStdString());
     string item=  my_w.propertyList->currentItem()->text().toStdString();
     if (currentBuffer) {
-        currentBuffer->property[item]=toAnydata(pippo).get_str();
+        anydata my_val=toAnydata(pippo);
+        currentBuffer->property[item]=my_val;
+        nparent->showPhys(currentBuffer);
     }
 }
 

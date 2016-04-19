@@ -68,7 +68,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Save</string>
+       <string>Change property</string>
       </property>
      </widget>
     </item>

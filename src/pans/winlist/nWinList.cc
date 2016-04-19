@@ -46,8 +46,11 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 	connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-	
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+
+//    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+
+
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
 	updatePad(nparent->currentBuffer);
 
@@ -75,6 +78,21 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 		panAdd(pan);
 	}
 	decorate();
+}
+
+void nWinList::on_images_itemSelectionChanged() {
+    QList<QTreeWidgetItem *> sel=my_w.images->selectedItems();
+    if (sel.size()) {
+        QTreeWidgetItem *item=sel.last();
+        if (item) {
+            nPhysD *phys=getPhys(item);
+            if (phys) {
+                disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+                nparent->showPhys(phys);
+                connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+            }
+        }
+    }
 }
 
 nPhysD*

@@ -54,6 +54,8 @@ public:
 
 
 public slots:
+    void on_images_itemSelectionChanged();
+
 	void updatePad(nPhysD* = NULL);
 	void physAdd(nPhysD*);
 	void physDel(nPhysD*);

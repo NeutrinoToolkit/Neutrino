@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>355</width>
-    <height>267</height>
+    <width>333</width>
+    <height>253</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,13 +46,13 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,1,1">
         <property name="leftMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
          <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -67,15 +67,15 @@
           <property name="title">
            <string>Mouse [px]</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_5" rowstretch="1">
+          <layout class="QGridLayout" name="gridLayout_5" rowstretch="1" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -120,15 +120,15 @@
           <property name="title">
            <string>Origin [px]</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_4" rowstretch="1">
+          <layout class="QGridLayout" name="gridLayout_4" rowstretch="1" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -165,12 +165,12 @@
           <property name="title">
            <string>Colors</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_11">
+          <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,1">
            <property name="leftMargin">
             <number>0</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
             <number>0</number>
@@ -198,7 +198,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Ruler/grid</string>
+              <string>Grid</string>
              </property>
             </widget>
            </item>
@@ -210,15 +210,15 @@
           <property name="title">
            <string>Scale</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_10">
+          <layout class="QGridLayout" name="gridLayout_10" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -242,18 +242,18 @@
           <property name="title">
            <string>Real position</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_6">
+          <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QLineEdit" name="px">
@@ -292,18 +292,18 @@
           <property name="title">
            <string>Distance px and real</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_9">
+          <layout class="QGridLayout" name="gridLayout_9" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QLineEdit" name="dist_px">
@@ -348,18 +348,18 @@
           <property name="title">
            <string>Angle to x and to y</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_8">
+          <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QLineEdit" name="atan_dx_dy">
@@ -404,18 +404,18 @@
           <property name="title">
            <string>Increment: dx/dy and dy/dx</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_7">
+          <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,1">
            <property name="leftMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>4</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>4</number>
+            <number>0</number>
            </property>
            <item row="0" column="0">
             <widget class="QLineEdit" name="dx_dy">
@@ -540,6 +540,11 @@
         </item>
         <item row="1" column="0" colspan="4">
          <widget class="QTableWidget" name="points">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
           </property>

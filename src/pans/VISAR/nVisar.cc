@@ -268,9 +268,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 		}
 	}
     
-    
-	
-	decorate();
+    decorate();
 	connections();
     my_w.tabs->setCurrentIndex(0);
 
