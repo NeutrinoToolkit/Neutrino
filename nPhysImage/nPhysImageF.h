@@ -1401,40 +1401,37 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
 	if (getSurf()>0) {
-		fftw_plan plan_t;
-		if (ftdir == PHYS_FORWARD)
-			plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-		else
-			plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-		
-		// 2. data copy	
-//#pragma omp parallel for
-//        for (size_t i = 0; i < getSurf(); i++) {
-//            assign_val_to_fftw_complex(Timg_buffer[i], t[i]);
-//        }
+//        fftw_plan plan_t = fftw_plan_dft_2d(width, height, t, Ft, (ftdir == PHYS_FORWARD ? FFTW_FORWARD : FFTW_BACKWARD), FFTW_ESTIMATE);
+        fftw_plan plan_t = fftw_plan_dft_2d(height, width, t, Ft, (ftdir == PHYS_FORWARD ? FFTW_FORWARD : FFTW_BACKWARD), FFTW_ESTIMATE);
 
-#pragma omp parallel for collapse(2)
-        for (size_t  j = 0; j < height; j++){
-            for (size_t i = 0; i < width; i++) {
-                assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
-            }
+        // 2. data copy
+#pragma omp parallel for
+        for (size_t i = 0; i < getSurf(); i++) {
+            assign_val_to_fftw_complex(Timg_buffer[i], t[i]);
         }
+
+//#pragma omp parallel for collapse(2)
+//        for (size_t  j = 0; j < height; j++){
+//            for (size_t i = 0; i < width; i++) {
+//                assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
+//            }
+//        }
 		
 		// 3. transform
 		fftw_execute(plan_t);
 		
 		// 4. transplant
-//#pragma omp parallel for
-//        for (size_t i = 0; i < getSurf(); i++) {
-//            ftbuf.Timg_buffer[i]=mcomplex(Ft[i][0], Ft[i][1]);
-//        }
-
-#pragma omp parallel for collapse(2)
-        for (size_t  j = 0; j < height; j++){
-            for (size_t i = 0; i < width; i++) {
-                ftbuf.Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
-            }
+#pragma omp parallel for
+        for (size_t i = 0; i < getSurf(); i++) {
+            ftbuf.Timg_buffer[i]=mcomplex(Ft[i][0], Ft[i][1]);
         }
+
+//#pragma omp parallel for collapse(2)
+//        for (size_t  j = 0; j < height; j++){
+//            for (size_t i = 0; i < width; i++) {
+//                ftbuf.Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
+//            }
+//        }
 		
 		// 5. return
 		fftw_free(t);
