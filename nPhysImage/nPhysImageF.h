@@ -574,8 +574,11 @@ public:
     // correspondence between int/power
     // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
     double gamma() {
-        int gamma_int= property.have("gamma") ? property["gamma"] : 1;
-        return gamma_int < 1 ? -1.0/(gamma_int-2) : (gamma_int == 0 ? 1 : gamma_int);
+        if (!property.have("gamma")) {
+            property["gamma"]=1;
+        }
+        int gamma_int= property["gamma"];
+        return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
 
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
