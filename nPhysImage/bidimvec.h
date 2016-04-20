@@ -208,6 +208,8 @@ bidimvec<T>::operator^ (bidimvec<T> rhs)
 }
 
 
+//creators
+
 template <class T>
 bidimvec<T>::bidimvec(void) 
 	: myval1(0), myval2(0) 

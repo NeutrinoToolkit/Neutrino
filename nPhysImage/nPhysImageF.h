@@ -305,6 +305,7 @@ public:
 	//phys_properties property; now on anymap
 	//anymap property; specialized class: phys_properties
 	phys_properties property;
+    phys_properties display_property;
 
 	// image derivation
 	//nPhysImageF<T> *get_Tlast()
@@ -577,21 +578,34 @@ public:
         return gamma_int < 1 ? -1.0/(gamma_int-2) : (gamma_int == 0 ? 1 : gamma_int);
     }
 
-    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette) {
+    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
         bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
         double mini=minmax.first();
         double maxi=minmax.second();
 
-        DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
-		
+        double my_gamma=gamma();
+
         if (getSurf()>0 && palette.size()==768) {
 
-            uchar_buf.resize(width*height*3);
-            if (!property.have("gamma")) {
-                property["gamma"]=1;
+            if (uchar_buf.size() == width*height*3 &&
+                    display_property.have("display_range") &&
+                    display_property.have("palette_name") &&
+                    display_property["palette_name"].get_str()==palette_name &&
+                    display_property.have("gamma") &&
+                    display_property["gamma"].get_i()==property["gamma"].get_i()) {
+
+                vec2f old_display_range=display_property["display_range"];
+                vec2f new_display_range=property["display_range"];
+
+                if (old_display_range==new_display_range) {
+                    DEBUG("reusing old uchar_buf");
+                    return &uchar_buf[0];
+                }
             }
 
-            double my_gamma=gamma();
+            DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
+            uchar_buf.resize(width*height*3);
+
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
@@ -606,6 +620,10 @@ public:
                     uchar_buf[i*3+2] = 255;
 				}
 			}
+
+            display_property["palette_name"]=palette_name;
+            display_property["gamma"]=property["gamma"];
+            display_property["display_range"]=property["display_range"];
 
             return &uchar_buf[0];
 		}

@@ -787,7 +787,7 @@ void nVisar::doWave() {
 		int k=sender()->property("id").toInt();
 		doWave(k);
 	} else {
-		for (int k=0;k<2;k++){
+        for (int k=0;k<2;k++){
 			doWave(k);
 		}
 	}
@@ -822,7 +822,9 @@ void nVisar::doWave(int k) {
             zz_morletShot.resize(dx,dy);
             
             vector<int> xx(dx), yy(dy);
+#pragma omp parallel for
             for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+#pragma omp parallel for
             for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
             
             for (int m=0;m<2;m++) {
@@ -833,6 +835,7 @@ void nVisar::doWave(int k) {
             
             progress.setValue(++counter);
             QApplication::processEvents();
+#pragma omp parallel for
             for (size_t kk=0; kk<dx*dy; kk++) {
                 intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));			
                 intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));			
@@ -851,6 +854,7 @@ void nVisar::doWave(int k) {
             double damp_norm=M_PI;
             
             double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+#pragma omp parallel for collapse(2)
             for (size_t x=0;x<dx;x++) {
                 for (size_t y=0;y<dy;y++) {
                     double xr = xx[x]*cr - yy[y]*sr; //rotate
@@ -878,6 +882,7 @@ void nVisar::doWave(int k) {
             progress.setValue(++counter);
             QApplication::processEvents();
             
+#pragma omp parallel for
             for (size_t kk=0; kk<dx*dy; kk++) {
                 phase[k][0].Timg_buffer[kk] = -physfftRef.Timg_buffer[kk].arg()/(2*M_PI);
                 contrast[k][0].Timg_buffer[kk] = 2.0*physfftRef.Timg_buffer[kk].mod()/(dx*dy);

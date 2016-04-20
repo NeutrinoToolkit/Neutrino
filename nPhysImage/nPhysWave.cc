@@ -477,7 +477,7 @@ pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
 
         DEBUG(deviceCount);
         // for each device print critical attributes
-        for (int j = 0; j < deviceCount; j++) {
+        for (int j = 0; j < (int) deviceCount; j++) {
             found_GPU++;
             if (found_GPU==num) {
                 platform=platforms[i];

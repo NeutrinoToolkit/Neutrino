@@ -1064,7 +1064,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
         if (currentBuffer) {
             if (my_w.actionLockColors->isChecked()) {
                 datamatrix->property["display_range"]=currentBuffer->property["display_range"];
-                datamatrix->property["gamma"]=currentBuffer->gamma();
+                datamatrix->property["gamma"]=currentBuffer->property["gamma"];
             } else {
                 if (!datamatrix->property.have("gamma")) {
                     datamatrix->property["gamma"]=property("gamma").toInt();
@@ -1106,7 +1106,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
 void
 neutrino::createQimage() {
     if (currentBuffer && currentBuffer->getSurf()>0) {
-        const QImage tempImage(currentBuffer->to_uchar_palette(nPalettes[colorTable]),
+        const QImage tempImage(currentBuffer->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString()),
                                currentBuffer->getW(),
                                currentBuffer->getH(),
                                currentBuffer->getW()*3,
