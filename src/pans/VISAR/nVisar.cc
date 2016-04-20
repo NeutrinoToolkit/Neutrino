@@ -802,7 +802,7 @@ void nVisar::doWave(int k) {
             getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
             
             int counter=0;
-            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 10, this);
+            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 11, this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
@@ -896,6 +896,10 @@ void nVisar::doWave(int k) {
             QApplication::processEvents();
             
             getPhase(k);
+
+            progress.setValue(++counter);
+            QApplication::processEvents();
+
             updatePlot();
             progress.setValue(++counter);
             QApplication::processEvents();
