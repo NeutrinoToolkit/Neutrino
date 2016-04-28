@@ -24,6 +24,8 @@
  */
 // collection of math functions
 #include <iostream>
+#include <iterator>
+#include <list>
 
 #ifdef HAVE_LIBGSL
 #include <gsl/gsl_vector.h>
@@ -295,5 +297,9 @@ nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
 nPhysC from_real_imaginary (nPhysD&, nPhysD&);
 
 nPhysC from_real (nPhysD&, double=0.0);
+
+//! contour trace function
+void contour_trace(nPhysD &, std::list<vec2> &, float, float, bool blur=false, float blur_radius=10.);
+double contour_integrate(nPhysD &, std::list<vec2> &);
 
 #endif

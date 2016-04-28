@@ -47,9 +47,12 @@ public:
 public slots:
 	void calculate_stats();
 	double find_contour();
-	double contour_integral(std::list<vec2> &, std::list<vec2>::iterator &);
 
 	void bufferChanged(nPhysD*);
+
+private:
+	// blurred image for easier calculations
+	nPhysD decimated;
 	
 };
 
