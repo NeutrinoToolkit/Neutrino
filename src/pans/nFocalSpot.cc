@@ -23,7 +23,6 @@
  *
  */
 
-#include <iterator>
 
 #include "nFocalSpot.h"
 #include "neutrino.h"
@@ -116,7 +115,7 @@ nFocalSpot::find_contour(void)
 	contour_trace(decimated, contour, my_w.zero_dsb->value(), my_w.check_dsb->value());
 	std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.end();
 
-	DEBUG(5, "got contour of "<<contour.size()<<" points (distance: "<<std::distance(itr, itr_last)<<")");
+	DEBUG(5, "got contour of "<<contour.size()<<" points");
 
 
 	nContour->setPoints(QPolygonF());
