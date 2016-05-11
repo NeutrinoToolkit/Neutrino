@@ -53,6 +53,8 @@ QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nObject.ui)
 QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
 QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nColorBarWin.ui)
 QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nSbarra.ui)
+QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
+QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
 # add sources here

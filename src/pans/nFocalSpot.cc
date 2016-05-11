@@ -74,17 +74,27 @@ nFocalSpot::calculate_stats()
 
 	// 2. calculate integrals
 	double c_value = cur->point(centr.x(),centr.y());
-	double total_energy = cur->sum()-cur->getSurf()*my_w.zero_dsb->value();
+	double total_energy = 0;
 	double above_th_energy = 0;
-	int point_count = 0;
+	double below_zero_energy = 0;
+	int point_count = 0, zero_point_count = 0;
 	double th = my_w.check_dsb->value()*(c_value-my_w.zero_dsb->value()) +my_w.zero_dsb->value() ;
-    for (size_t ii=0; ii<cur->getSurf(); ii++)
+	double zl = my_w.zero_dsb->value();
+	for (size_t ii=0; ii<cur->getSurf(); ii++) {
 		if (cur->point(ii) > th) {
 			above_th_energy += cur->point(ii);
 			point_count++;
+		} else if (cur->point(ii) < zl) {
+			below_zero_energy += cur->point(ii); // to minimize stupid results when zero level is far from reality
+			zero_point_count++;
+		} else {
+			below_zero_energy += zl;
+			zero_point_count++;
 		}
-
-	above_th_energy -= point_count*my_w.zero_dsb->value();
+	}
+	double zero_energy_in_peak = (below_zero_energy/zero_point_count)*point_count;
+	total_energy = cur->sum()-below_zero_energy-zero_energy_in_peak;
+	above_th_energy -= zero_energy_in_peak;
 
 	double energy_ratio;
 	if (total_energy != 0)
@@ -96,20 +106,43 @@ nFocalSpot::calculate_stats()
 
 	//std::cerr<<"min/max: "<<cur->get_min()<<"/"<<cur->get_max()<<", surf: "<<cur->getSurf()<<", point_count: "<<point_count<<std::endl;
 	
-	double c_integral = find_contour();
+	QList<double> c_integral = find_contour();
+	double ath_integral=0, ath_points=0;
 	
 	//double contour_ratio = contour_integral();
-	my_w.integral_lbl->setText(my_w.integral_lbl->text()+QString("\nContour integral %:\n%1\n(total: %2)").arg(100*c_integral/total_energy).arg(c_integral));
+	if (c_integral.size() > 0) {
+		ath_integral = c_integral.front();
+		c_integral.pop_front();
+		ath_points = c_integral.front();
+		c_integral.pop_front();
+	} else {
+	}
+	my_w.integral_lbl->setText(my_w.integral_lbl->text()+QString("\nContour integral %:\n%1\n(total: %2)").arg(100*(ath_integral-zero_energy_in_peak)/total_energy).arg(ath_integral));
 
+	// populate numerics
+	my_w.num_d1->setText(QString("total:"));
+	my_w.num_v1->setText(QString("%1").arg(cur->sum()));
+
+	my_w.num_d2->setText(QString("below zero\n average:"));
+	my_w.num_v2->setText(QString("%1").arg(below_zero_energy/zero_point_count));
+
+	my_w.num_d3->setText(QString("points stats\n (bz/az)"));
+	my_w.num_v3->setText(QString("%1/%2").arg(zero_point_count).arg(point_count));
+
+	my_w.num_d4->setText(QString("contour integral\n (contour points)"));
+	my_w.num_v4->setText(QString("%1\n(%2)").arg(ath_integral).arg(ath_points));
+
+	my_w.num_d5->setText(QString(""));
+	my_w.num_v5->setText(QString(""));
 }
 
-double
+QList<double>
 nFocalSpot::find_contour(void)
 {
 	
 	nPhysD *cur = nparent->getBuffer(-1);
 	if (!cur) 
-		return -1;
+		return QList<double>();
 
 	std::list<vec2> contour;
 	contour_trace(decimated, contour, my_w.zero_dsb->value(), my_w.check_dsb->value());
@@ -145,10 +178,15 @@ nFocalSpot::find_contour(void)
 		nContour->setPoints(myp);
 		my_w.statusBar->showMessage("Contour ok");
 
-		double intg_contour = contour_integrate(*cur, contour);
-		return intg_contour;
+		std::list<double> ci = contour_integrate(*cur, contour, true);
+		QList<double> ql;
+		while (ci.size() > 0) {
+			ql.append(ci.front()); ci.pop_front();
+		}
+
+		return ql;
 	}
-    return -1;
+    return QList<double>();
 }
 
 

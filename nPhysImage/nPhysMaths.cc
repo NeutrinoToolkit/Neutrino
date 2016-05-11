@@ -988,13 +988,14 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float base_level, f
 
 }
 
-double contour_integrate(nPhysD &iimage, std::list<vec2> &contour)
+std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
 {
 	vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
 
 	nPhysD check_image(iimage);
 	check_image.TscanBrightness();
 	double check_val = check_image.get_min() - 1;
+	int points_count = 0;
 	//double c_integral = 0;
 
 	for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
@@ -1094,6 +1095,8 @@ double contour_integrate(nPhysD &iimage, std::list<vec2> &contour)
 			scan_pl.pop_front();
 			if (intg_image.point(pp, check_val) != check_val) {
 				intg+=intg_image.point(pp);
+				points_count++;
+
 				intg_image.set(pp.x(), pp.y(), check_val);
 
 				up_pl.push_back(vec2(pp.x(), pp.y()+1));
@@ -1107,8 +1110,22 @@ double contour_integrate(nPhysD &iimage, std::list<vec2> &contour)
 
 	}
 
-	//nparent->addPhys(intg_image);
-	return intg;
+	DEBUG(5, "contour integral: "<<intg);
+	if (integrate_boundary) {
+		// add boundary points
+		double bps = 0;
+		for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
+			bps+= iimage.point((*itr).x(), (*itr).y());
+			points_count++;
+		}
+		DEBUG(5, "boundary points account for "<<bps);
+		intg+=bps;	
+	}
+
+	std::list<double> ret;
+	ret.push_front(points_count);
+	ret.push_front(intg);
+	return ret;
 
 }
 

@@ -300,6 +300,6 @@ nPhysC from_real (nPhysD&, double=0.0);
 
 //! contour trace function
 void contour_trace(nPhysD &, std::list<vec2> &, float, float, bool blur=false, float blur_radius=10.);
-double contour_integrate(nPhysD &, std::list<vec2> &);
+std::list<double> contour_integrate(nPhysD &, std::list<vec2> &, bool integrate_boundary=false);
 
 #endif
