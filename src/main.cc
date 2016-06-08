@@ -24,6 +24,7 @@
  */
 #include <string>
 #include <iostream>
+#include <cmath>
 
 #include <QtGui>
 //#include <QtSql>
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
 
     PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
 
-    PythonQt_QtAll::init();
+    //PythonQt_QtAll::init();
 
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
     PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");

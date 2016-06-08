@@ -88,9 +88,9 @@ if (WIN32)
 	#SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
 	SET(CPACK_NSIS_MODIFY_PATH ON)
 
-	# looks for runtume deps in CMAKE_FIND_ROOT_PATH/runtime
-	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/runtime/*dll)
-	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/runtime/platforms/*dll)
+	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
+	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
+	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
 
 	#message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
 	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
@@ -98,9 +98,15 @@ if (WIN32)
 
 endif()
 
-if (DEBIAN)
-	message (STATUS "Using CPackDeb for packaging")
 
+
+if (LINUX)
+
+    execute_process(COMMAND "lsb_release -is" OUTPUT_VARIABLE DISTRO)
+
+    if (DISTRO STREQUAL "Debian" OR DISTRO STREQUAL "Ubuntu")
+
+	message (STATUS "Using CPackDeb for packaging")
 
 	set(CPACK_INSTALL_PREFIX "/usr")
 	set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
@@ -115,6 +121,7 @@ if (DEBIAN)
 	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 	#set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
+    endif()
 endif()
 
 

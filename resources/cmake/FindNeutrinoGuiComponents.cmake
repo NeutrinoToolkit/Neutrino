@@ -55,46 +55,37 @@ if (HDF5_FOUND_COMPLETE)
 endif()
 
 
-if (NOT WIN32)
 
-    include(FindPythonLibs)
+include(FindPythonLibs)
 
-    if(PYTHONLIBS_FOUND)
-        list(APPEND LIBS ${PYTHON_LIBRARIES})
-        include_directories(${PYTHON_INCLUDE_DIRS})
+if(PYTHONLIBS_FOUND)
+	list(APPEND LIBS ${PYTHON_LIBRARIES})
+	include_directories(${PYTHON_INCLUDE_DIRS})
 
-	    INCLUDE_DIRECTORIES(../../pythonqt-code/src ../../pythonqt-code/src/gui)
-	    LINK_DIRECTORIES(../../pythonqt-code/lib)
 
-	    find_library(PYTHONQT NAMES PythonQt PATHS ../../pythonqt-code/lib)
-	    find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ../../pythonqt-code/lib)
+	find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
+	#find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ${PYTHONQT_SEARCH_DIR}/lib)
+	if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
+		set (PYTHONQT_FOUND_COMPLETE "TRUE")
 
-	    if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
+		message(STATUS "Using pythonqt : ${PYTHONQT}")
 
-	        set (PYTHONQT_FOUND_COMPLETE "TRUE")
+	    	list(APPEND LIBS ${PYTHONQT})    	
+    		add_definitions(-DHAVE_PYTHONQT)
 
-	        message(STATUS "[PYTHONQT] using pythonqt : ${PYTHONQT} ${PYTHONQTALL}")
-	        list(APPEND LIBS ${PYTHONQT} ${PYTHONQTALL})
-	        add_definitions(-DHAVE_PYTHONQT)
-
-	        FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h ../../pythonqt-code/src)
-	        IF (PYTHONQT_INCLUDE_DIR)
-		      message (STATUS "[PYTHONQT] header dir: ${PYTHONQT_INCLUDE_DIR}")
-		      include_directories(${PYTHONQT_INCLUDE_DIR})
-	        ELSE()
-		    set (PYTHONQT_FOUND_COMPLETE "FALSE")
-	        ENDIF ()
-
-	        FIND_PATH(PYTHONQTALL_INCLUDE_DIR PythonQt_QtAll.h ../../pythonqt-code/extensions/PythonQt_QtAll)
-	        IF (PYTHONQTALL_INCLUDE_DIR)
-		      message (STATUS "[PYTHONQT] all header dir: ${PYTHONQTALL_INCLUDE_DIR}")
-		      include_directories(${PYTHONQTALL_INCLUDE_DIR})
-	        ELSE()
-		    set (PYTHONQT_FOUND_COMPLETE "FALSE")
-	        ENDIF ()
-
-	    endif()
+		FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h PATH_SUFFIXES PythonQt)
+		IF (NOT ${PYTHONQT_INCLUDE_DIR} STREQUAL "PYTHONQT_INCLUDE_DIR-NOTFOUND")
+			message (STATUS "PythonQt header dir: ${PYTHONQT_INCLUDE_DIR}")
+			include_directories(${PYTHONQT_INCLUDE_DIR})
+		ELSE()
+			set (PYTHONQT_FOUND_COMPLETE "FALSE")
+			message(STATUS "PythonQt.h NOT FOUND (perhaps you forgot -DCMAKE_INCLUDE_PATH)")
+		ENDIF ()
+	else()
+		message(STATUS "PythonQt NOT FOUND (perhaps you forgot -DCMAKE_LIBRARY_PATH)")
 	endif()
+else()
+	message(STATUS "No python libraries found: python subsystem is DISABLED!")
 endif()
 
 
@@ -119,8 +110,9 @@ else()
 	# qt4
 	SET (USE_QT4 True)
 	message(STATUS "Qt5 not found, searching for Qt4 instead")
-	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL QtSvg REQUIRED)
-	include(UseQt4)
+	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL QtSvg QtUiTools REQUIRED)
+	
+#include(UseQt4)
 	include(${QT_USE_FILE})
 	
 	add_definitions(-DUSE_QT4)
