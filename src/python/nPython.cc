@@ -1,5 +1,5 @@
 #include "nPython.h"
-#include "PythonQtScriptingConsole.h"
+#include "gui/PythonQtScriptingConsole.h"
 #include "neutrino.h"
 #include <QThread>
 

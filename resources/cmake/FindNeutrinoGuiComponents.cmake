@@ -92,7 +92,7 @@ endif()
 if (PYTHONQT_FOUND_COMPLETE)
     MESSAGE(STATUS "adding python wrappers")
     include_directories(python)
-    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc python/PythonQtScriptingConsole.cpp)
+    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)
     list (APPEND UIS ../UIs/nPython.ui)
 endif()
 
