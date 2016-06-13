@@ -37,6 +37,7 @@
 #endif
 
 #ifdef HAVE_PYTHONQT
+#include "PythonQt_QtBindings.h"
 #include "nPhysPyWrapper.h"
 #include "nPython.h"
 #endif
@@ -73,6 +74,7 @@ int main(int argc, char **argv)
     PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
 
     //PythonQt_QtAll::init();
+    PythonQt_init_QtBindings();
 
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
     PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
