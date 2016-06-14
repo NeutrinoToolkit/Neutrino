@@ -106,7 +106,7 @@ nFocalSpot::calculate_stats()
 
 	//std::cerr<<"min/max: "<<cur->get_min()<<"/"<<cur->get_max()<<", surf: "<<cur->getSurf()<<", point_count: "<<point_count<<std::endl;
 	
-	QList<double> c_integral = find_contour();
+	QList<double> c_integral = find_contour(th);
 	double ath_integral=0, ath_points=0;
 	
 	//double contour_ratio = contour_integral();
@@ -137,7 +137,7 @@ nFocalSpot::calculate_stats()
 }
 
 QList<double>
-nFocalSpot::find_contour(void)
+nFocalSpot::find_contour(double th)
 {
 	
 	nPhysD *cur = nparent->getBuffer(-1);
@@ -145,7 +145,7 @@ nFocalSpot::find_contour(void)
 		return QList<double>();
 
 	std::list<vec2> contour;
-	contour_trace(decimated, contour, my_w.zero_dsb->value(), my_w.check_dsb->value());
+	contour_trace(decimated, contour, th);
 	std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.end();
 
 	DEBUG(5, "got contour of "<<contour.size()<<" points");

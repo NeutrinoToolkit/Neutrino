@@ -799,16 +799,12 @@ nPhysC from_real (nPhysD&real, double val){
 
 // contour functions
 //
-void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float base_level, float check_level, bool blur, float blur_radius)
+void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool blur, float blur_radius)
 {
 	// marching squares algorithm
 	
 	contour.clear();
 	bool contour_ok = false;
-	if (check_level >= 1 || check_level <=0) {
-		DEBUG(5, "contour level is not between 0 and 1. Empty contour");
-		return;
-	}
 
 	nPhysD wimage(iimage); // work image
 	if (blur) {
@@ -830,11 +826,10 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float base_level, f
 	// 1. generate boolean map
 	vec2 orig = wimage.get_origin();
 	double c_value = wimage.point(orig.x(),orig.y());
-	double th = check_level*(c_value-base_level)+base_level;
 
 	nPhysImageF<short> bmap(wimage.getW(), wimage.getH(), 0);
 	for (size_t ii=0; ii<wimage.getSurf(); ii++)
-		if (wimage.point(ii) > th) 
+		if (wimage.point(ii) > level) 
 			bmap.set(ii, 1);
 
 	// 2. cell map
@@ -903,7 +898,7 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float base_level, f
 
 		// saddles: check central value and last movement
 		if (val==5 || val==10) {
-			short central = ((.25*wimage.point(xx,yy) + wimage.point(xx+1,yy+1) + wimage.point(xx+1,yy) + wimage.point(xx,yy+1)) > th) ? 1 : -1;
+			short central = ((.25*wimage.point(xx,yy) + wimage.point(xx+1,yy+1) + wimage.point(xx+1,yy) + wimage.point(xx,yy+1)) > level) ? 1 : -1;
 			short saddle_type = (val == 5) ? 1 : -1;
 
 			vec2 last = *itr- *itr_last; // let's hope we're not starting with a saddle...

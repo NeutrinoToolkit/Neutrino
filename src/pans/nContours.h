@@ -27,33 +27,30 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nFocalSpot.h"
+#include "ui_nContours.h"
 
-#ifndef __nFocalSpot
-#define __nFocalSpot
+#ifndef __nContours
+#define __nContours
 
 class neutrino;
 class nLine;
 
-class nFocalSpot : public nGenericPan {
+class nContours : public nGenericPan {
 	Q_OBJECT
 public:
-	nFocalSpot(neutrino *, QString);
+	nContours(neutrino*, QString);
+	
+	Ui::nContours my_w;
 
-	Ui::nFocalSpot my_w;
-
-	QPointer<nLine> nContour;
+	QPointer<nLine> my_c;
 
 public slots:
-	void calculate_stats();
-	QList<double> find_contour(double);
+	void draw();
 
-	void bufferChanged(nPhysD*);
 
 private:
 	// blurred image for easier calculations
 	nPhysD decimated;
-	
 };
 
 #endif

@@ -183,6 +183,7 @@
     <addaction name="actionInversions"/>
     <addaction name="actionVisar"/>
     <addaction name="actionGhost"/>
+    <addaction name="actionContours"/>
     <addaction name="actionFocal_Spot"/>
     <addaction name="actionCutoff_Mask"/>
     <addaction name="actionMath_operations"/>
@@ -862,6 +863,11 @@
   <action name="actionCamera">
    <property name="text">
     <string>Camera</string>
+   </property>
+  </action>
+  <action name="actionContours">
+   <property name="text">
+    <string>Contours</string>
    </property>
   </action>
  </widget>
