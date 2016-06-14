@@ -46,7 +46,7 @@ public:
 
 public slots:
 	void calculate_stats();
-	QList<double> find_contour();
+	QList<double> find_contour(double);
 
 	void bufferChanged(nPhysD*);
 
