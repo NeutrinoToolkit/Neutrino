@@ -205,6 +205,7 @@ public slots:
 
 	// Analysis
 	nGenericPan* FocalSpot();
+	nGenericPan* Contours();
 	nGenericPan* MathOperations();
 	
 	// cutoff mask

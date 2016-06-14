@@ -54,6 +54,7 @@
 #endif
 
 #include "nFocalSpot.h"
+#include "nContours.h"
 #include "nLineout.h"
 #include "nLineoutBoth.h"
 
@@ -213,6 +214,7 @@ neutrino::neutrino():
     connect(my_w.actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
     connect(my_w.actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
+    connect(my_w.actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
 
     connect(my_w.actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
     connect(my_w.actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
@@ -1592,6 +1594,14 @@ neutrino::FocalSpot() {
     QString vwinname=tr("FocalSpot");
     nGenericPan* win=existsPan(vwinname);
     if (!win) win=new nFocalSpot(this,vwinname);
+    return win;
+}
+
+nGenericPan*
+neutrino::Contours() {
+    QString vwinname=tr("Contours");
+    nGenericPan* win=existsPan(vwinname);
+    if (!win) win=new nContours(this,vwinname);
     return win;
 }
 
