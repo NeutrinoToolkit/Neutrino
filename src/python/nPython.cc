@@ -43,13 +43,14 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
     
     DEBUG("->\n" << my_w.initScript->toPlainText().toStdString() << "\n<-");
     if (my_w.initScript->toPlainText().isEmpty()) {
-        QFile t(":neutrinoInit.py");
+        QFile t(":init.py");
         t.open(QIODevice::ReadOnly| QIODevice::Text);
         QString initScript=QTextStream(&t).readAll();
         t.close();    
         my_w.initScript->insertPlainText(initScript);
         runScript(initScript);
-    }       
+    }
+
     console->setFocus();
 }
 

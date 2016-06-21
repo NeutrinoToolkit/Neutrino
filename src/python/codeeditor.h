@@ -43,7 +43,6 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
-#include <QFont>
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -53,6 +52,8 @@ class QWidget;
 QT_END_NAMESPACE
 
 class LineNumberArea;
+
+//![codeeditordefinition]
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -65,7 +66,7 @@ public:
     int lineNumberAreaWidth();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
@@ -76,17 +77,22 @@ private:
     QWidget *lineNumberArea;
 };
 
+//![codeeditordefinition]
+//![extraarea]
+
 class LineNumberArea : public QWidget
 {
 public:
-    LineNumberArea(CodeEditor *editor) : QWidget(editor), codeEditor(editor) {};
+    LineNumberArea(CodeEditor *editor) : QWidget(editor) {
+        codeEditor = editor;
+    }
 
-    QSize sizeHint() {
+    QSize sizeHint() const override {
         return QSize(codeEditor->lineNumberAreaWidth(), 0);
     }
 
 protected:
-    void paintEvent(QPaintEvent *event) {
+    void paintEvent(QPaintEvent *event) override {
         codeEditor->lineNumberAreaPaintEvent(event);
     }
 

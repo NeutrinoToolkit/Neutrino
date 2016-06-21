@@ -165,12 +165,22 @@ if (USE_QT5)
     qt5_add_resources(RES_SOURCES ${HTML_QRC})
     qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
     qt5_add_resources(RES_SOURCES ${HELP_QRC})
+
+    if (PYTHONQT_FOUND_COMPLETE)
+        qt5_add_resources(RES_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/python/python.qrc)
+    endif()
+
     QT5_WRAP_UI( UI_HEADERS ${UIS} )
 elseif (USE_QT4)
     qt4_add_resources(RES_SOURCES ${ICONS_QRC})
     qt4_add_resources(RES_SOURCES ${HTML_QRC})
     qt4_add_resources(RES_SOURCES ${LICENSES_QRC})
     qt4_add_resources(RES_SOURCES ${HELP_QRC})
+
+    if (PYTHONQT_FOUND_COMPLETE)
+        qt4_add_resources(RES_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/python/python.qrc)
+    endif()
+
     QT4_WRAP_UI( UI_HEADERS ${UIS} )
 endif()
 
