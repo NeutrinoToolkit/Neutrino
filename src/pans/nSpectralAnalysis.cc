@@ -82,7 +82,7 @@ void nSpectralAnalysis::on_calculate_released() {
             phys_divide(ft, sqrt(image->getSurf()));
         }
 
-        std::map<string, nPhysD> omap;
+        std::map<std::string, nPhysD> omap;
         switch (my_w.output_format->currentIndex()) {
         case 0: omap = to_polar(ft); break; // polar
         case 1: omap = to_rect(ft); break; // rectangular
@@ -90,7 +90,7 @@ void nSpectralAnalysis::on_calculate_released() {
         case 3: omap = to_powersp(ft, true); break;// power spectrum log10
         }
 
-        for (std::map<string, nPhysD>::iterator itr = omap.begin(); itr != omap.end(); itr++) {
+        for (std::map<std::string, nPhysD>::iterator itr = omap.begin(); itr != omap.end(); itr++) {
             nPhysD *perm = new nPhysD;
             *perm = itr->second;
             perm->TscanBrightness();

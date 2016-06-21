@@ -507,6 +507,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         DEBUG("padding offset : " << offset);
         padded.set_origin(params.data->get_origin()+offset);
 
+#pragma omp parallel for collapse(2)
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
                 padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));

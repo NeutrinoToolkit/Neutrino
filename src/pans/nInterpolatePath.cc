@@ -63,7 +63,7 @@ void nInterpolatePath::doIt() {
     if (image) {
         QPolygonF regionPoly=region->poly(1).translated(image->get_origin().x(),image->get_origin().y());
 
-        vector<vec2f> vecPoints(regionPoly.size());
+        std::vector<vec2f> vecPoints(regionPoly.size());
         for(int k=0;k<regionPoly.size();k++) {
             vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
         }
@@ -72,12 +72,12 @@ void nInterpolatePath::doIt() {
 
         QPolygonF regionPoly2=region->poly(20).translated(image->get_origin().x(),image->get_origin().y());
 
-        vector<pair<vec2f, double> > vals;
+        std::vector<std::pair<vec2f, double> > vals;
         for(int k=0;k<regionPoly2.size();k++) {
             vec2f p(regionPoly2[k].x(),regionPoly2[k].y());
             double pval=regionPath->point(p);
-            if (isfinite(pval)) {
-                vals.push_back(make_pair(p, pval));
+            if (std::isfinite(pval)) {
+                vals.push_back(std::make_pair(p, pval));
             }
         }
         
@@ -98,9 +98,9 @@ void nInterpolatePath::doIt() {
                 if (point_inside_poly(pp,vecPoints)) {
                     double mean=0;
                     double weight=0;
-                    for(vector<pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
+                    for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
                         vec2f p=it->first;
-                        double wi=1.0/(pow(abs((pp-p).x()),ex)+pow(abs((pp-p).y()),ex));
+                        double wi=1.0/(pow(std::abs((pp-p).x()),ex)+pow(std::abs((pp-p).y()),ex));
                         mean+=wi*it->second;
                         weight+=wi;                        
                     }

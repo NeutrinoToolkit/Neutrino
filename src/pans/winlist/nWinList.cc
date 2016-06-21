@@ -48,7 +48,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
-//    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
 
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
@@ -80,7 +80,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	decorate();
 }
 
-void nWinList::on_images_itemSelectionChanged() {
+void nWinList::selectionChanged() {
     QList<QTreeWidgetItem *> sel=my_w.images->selectedItems();
     if (sel.size()) {
         QTreeWidgetItem *item=sel.last();
@@ -112,15 +112,20 @@ nWinList::buttonCopyPhys() {
 
 void
 nWinList::buttonRemovePhys() {
+    disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+    disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
     QList<QTreeWidgetItem*> my_sel= my_w.images->selectedItems();
     foreach (QTreeWidgetItem * item, my_sel) {
         nPhysD *phys=getPhys(item);
         if (phys) {
-            my_w.statusBar->showMessage("Removing "+ QString::fromStdString(phys->getShortName()),500);
+            delete item;
             nparent->removePhys(phys);
-            QApplication::processEvents();
         }
     }
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 }
 
 void
@@ -255,12 +260,6 @@ void nWinList::keyPressEvent(QKeyEvent *e){
     case Qt::Key_Delete:
         buttonRemovePhys();
         break;
-    case Qt::Key_Up:
-        nparent->actionPrevBuffer();
-        break;
-    case Qt::Key_Down:
-        nparent->actionNextBuffer();
-        break;
     }
     e->accept();
 }
@@ -286,6 +285,9 @@ void
 nWinList::panClicked(QListWidgetItem* item) {
 	nGenericPan* pan=(nGenericPan*)(item->data(Qt::UserRole).value<void*>());
     pan->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+    pan->raise();  // for MacOS
+    pan->activateWindow(); // for Windows
+
 }
 
 void

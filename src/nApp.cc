@@ -11,8 +11,23 @@ QList<neutrino*> NApplication::neus() {
 }
 #endif
 
+bool NApplication::notify(QObject *rec, QEvent *ev)
+{
+    try {
+        return QApplication::notify(rec, ev);
+    }
+    catch (std::exception &e) {
+        DEBUG("Exception caught:" <<e.what());
+        QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+        dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+        dlg.exec();
+    }
+
+    return false;
+}
+
+
 bool NApplication::event(QEvent *ev) {
-    DEBUG("MAC APPLICATION EVENT " << ev->type());
     if (ev->type() == QEvent::FileOpen) {
         QWidget *widget = QApplication::activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);

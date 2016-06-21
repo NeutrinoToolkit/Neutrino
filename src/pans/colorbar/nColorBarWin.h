@@ -35,7 +35,6 @@
 #include "nHistogram.h"
 
 class neutrino;
-using namespace std;
 
 class nColorBarWin : public nGenericPan {
 	Q_OBJECT
@@ -82,6 +81,9 @@ public slots:
 	void addPaletteFile();
 	void removePaletteFile();
     void on_gamma_valueChanged(int);
+
+    vec2f sliderValues();
+
 signals:
 	void change_contrast(double,double);
 

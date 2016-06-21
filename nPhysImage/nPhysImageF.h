@@ -70,11 +70,6 @@
 #include "anymap.h"
 #include "tools.h"
 
-#ifdef __phys_threads
-#include <thread>
-#include "nPhysThreaded.h"
-#endif
-
 #include "string.h"
 
 #include "bidimvec.h"
@@ -106,11 +101,12 @@
 
 //enum phys_direction { PHYS_HORIZONTAL, PHYS_VERTICAL, PHYS_X, PHYS_Y, PHYS_ROW, PHYS_COLUMN };
 
-#if (__GNUC_MINOR__ > 5)
-enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-#else
-enum phys_direction { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-#endif
+// direction defs moved to bidimvec.h
+//#if (__GNUC_MINOR__ > 5)
+//enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
+//#else
+//enum phys_direction { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
+//#endif
 
 enum phys_way { PHYS_POS, PHYS_NEG };
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
@@ -291,7 +287,7 @@ public:
 	nPhysImageF<mcomplex> ft1(enum phys_direction, enum phys_fft ftdir = PHYS_FORWARD);
 
 	//! ASCII output of the buffer
-	inline int writeASC(const char *);
+    inline void writeASC(const char *);
 
 	//! RAW dump
 	void writeRAW(const char *);
@@ -300,7 +296,7 @@ public:
 	{ return std::string(typeid(T).name()); }
 
 	//! min/max point coordinates
-	int min_Tv_x, min_Tv_y, max_Tv_x, max_Tv_y;
+    vec2 min_Tv, max_Tv;
 
 	//phys_properties property; now on anymap
 	//anymap property; specialized class: phys_properties
@@ -382,7 +378,7 @@ public:
 		nPhysImageF<U> lhs;
 //		lhs = new nPhysImageF<U>;
 		lhs.resize(width, height);
-        for (size_t i=0; i<width*height; i++)
+        for (size_t i=0; i<getSurf(); i++)
 			lhs.Timg_buffer[i] = U(Timg_buffer[i]);	
 		lhs.TscanBrightness();
 		
@@ -400,15 +396,6 @@ public:
 		return *new_img;
 	}
 
-
-	// ------------------- data access ----------------------
-// 	nPhysImageF<T> *submatrix(size_t x, size_t y, size_t dx, size_t dy)
-// 	{
-// 		nPhysImageF<T> *newphys = new nPhysImageF<T>;
-// 		*newphys = sub(x, y, dx, dy);
-// 		return newphys;
-// 
-// 	}
 	
 	nPhysImageF<T> sub(size_t, size_t, size_t, size_t);
 
@@ -536,51 +523,14 @@ public:
 		return rotated;	
 	}
 
-
-	// get sobel matrix
-// 	nPhysImageF<T> * sobel() {
-// 		nPhysImageF<T> *sobo= new nPhysImageF<T>(getW(),getH(),1.0);
-// 		sobo->set_origin(get_origin());
-// 		sobo->set_scale(get_scale());
-// 	
-// 		sobo->setShortName("Sobel");
-// 		sobo->setName("Sobel "+getName());
-// 		sobo->setFromName(getFromName());
-// 		double Gx[9];
-// 		Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
-// 		Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
-// 		Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
-// 
-// 		double Gy[9];
-// 		Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
-// 		Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
-// 		Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
-// 
-// 		for(size_t i = 0 ; i < getW() ; i++) {
-// 			for(size_t j = 0 ; j < getH(); j++) {
-// 				double value_gx = 0.0;
-// 				double value_gy = 0.0;
-// 				for(size_t k = 0 ; k < 3 ; k++) {
-// 					for(size_t l = 0 ; l < 3 ; l++) {
-// 						value_gx += Gx[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-// 						value_gy += Gy[l * 3 + k] * point((i+1)+(1-k),(j+1)+(1-l));
-// 					}
-// 				}
-// 				sobo->set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
-// 			}
-// 		}
-// 		sobo->TscanBrightness();
-// 		return sobo;
-// 	}
-
-    // for simplicity we store it in an int whihc represents the power.
-    // correspondence between int/power
+    // for simplicity we store it in an int which represents the power.
+    // correspondence between int/power:
     // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
     double gamma() {
         if (!property.have("gamma")) {
-            property["gamma"]=1;
+            property["gamma"]=(int)1;
         }
-        int gamma_int= property["gamma"];
+        int gamma_int= property["gamma"].get_i();
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
 
@@ -589,11 +539,14 @@ public:
         double mini=minmax.first();
         double maxi=minmax.second();
 
+        if (!property.have("gamma")) {
+            property["gamma"]=(int)1;
+        }
         double my_gamma=gamma();
 
         if (getSurf()>0 && palette.size()==768) {
 
-            if (uchar_buf.size() == width*height*3 &&
+            if (uchar_buf.size() == getSurf()*3 &&
                     display_property.have("display_range") &&
                     display_property.have("palette_name") &&
                     display_property["palette_name"].get_str()==palette_name &&
@@ -610,7 +563,7 @@ public:
             }
 
             DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
-            uchar_buf.resize(width*height*3);
+            uchar_buf.resize(getSurf()*3);
 
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
@@ -628,7 +581,7 @@ public:
 			}
 
             display_property["palette_name"]=palette_name;
-            display_property["gamma"]=property["gamma"];
+            display_property["gamma"]=property["gamma"].get_i();
             display_property["display_range"]=property["display_range"];
 
             return &uchar_buf[0];
@@ -639,6 +592,7 @@ public:
 	}
 
 	const double *to_dvector(enum phys_direction direction, size_t index) {
+        throw phys_deprecated();
 
 //		std::cerr<<"[to_dvector] dir: "<<direction<<", index: "<<index<<std::endl;
 		size_t size[2]={width,height};
@@ -664,7 +618,8 @@ public:
 	}
 
 	const double *to_axis(enum phys_direction direction) {
-		size_t size= direction==PHYS_X ? width : height;
+        throw phys_deprecated();
+        size_t size= direction==PHYS_X ? width : height;
 		
 		if (axis_buf[direction]==NULL) axis_buf[direction] = new double [size];
 		
@@ -762,7 +717,7 @@ public:
 
 	inline void set(T val) { //! set a value allover the matrix
 		DEBUG(PRINTVAR(val));
-        for (size_t i=0; i<width*height; i++) {
+        for (size_t i=0; i<getSurf(); i++) {
 			Timg_buffer[i]=val;
 		}
 		TscanBrightness();
@@ -770,7 +725,7 @@ public:
 
 	const std::vector<double> &get_histogram()
 	{
-		if (width*height == 0) {
+        if (getSurf() == 0) {
 			histogram.resize(0);
 			return histogram;
 		}
@@ -788,7 +743,7 @@ public:
 
 		DEBUG(5,"histogram has "<<nbins<<" bins, bin width: "<<binw);
 
-        for (size_t i=0; i<width*height; i++) {
+        for (size_t i=0; i<getSurf(); i++) {
 			size_t bin_n = (size_t)floor((Timg_buffer[i]-Tminimum_value)/(binw));
 			histogram[bin_n]++;
 		}
@@ -800,7 +755,7 @@ public:
 
 	double count_colors() {
 		std::map<T, int> img_colors;
-        for (size_t i=0; i<width*height; i++)
+        for (size_t i=0; i<getSurf(); i++)
 			img_colors[Timg_buffer[i]]++;
 
 		return img_colors.size();
@@ -831,63 +786,63 @@ public:
 
 	// getting and setting properties
 	inline std::string getName()
-	{ return property["phys_name"]; }
+    { return property["phys_name"]; }
 	void setName(std::string name)
-	{ property["phys_name"] = name; }
+    { property["phys_name"] = name; }
 
 //tom
 	inline std::string getShortName()
-	{ return property["phys_short_name"]; }
+    { return property["phys_short_name"]; }
 	
 	inline void setShortName(std::string name)
-	{ property["phys_short_name"] = name; }
+    { property["phys_short_name"] = name; }
 
 	inline std::string getFromName()
-	{ return property["phys_from_name"]; }
+    { return property["phys_from_name"]; }
 	
 	inline void setFromName(std::string name)
-	{ property["phys_from_name"] = name; }
+    { property["phys_from_name"] = name; }
 
 	inline vec2f get_origin()
-	{ return property["origin"]; }
+    { return property["origin"]; }
 
 	inline double get_origin(enum phys_direction direction)
-	{ return (direction==PHYS_X ? vec2f(property["origin"].get_str()).x() : vec2f(property["origin"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(property["origin"].get_str()).x() : vec2f(property["origin"].get_str()).y()); }
 
 	inline void set_origin(T val_x, T val_y)
-	{ property["origin"] = vec2f(val_x,val_y); }	
+    { property["origin"] = vec2f(val_x,val_y); }
 	
 	inline void set_origin(vec2f val) 
-	{ property["origin"] = val; }	
+    { property["origin"] = val; }
 
-	inline vec2f get_scale()
-	{ return property["scale"]; }
+    inline vec2f get_scale()
+    { return property["scale"]; }
 
 	inline double get_scale(enum phys_direction direction)
-	{ return (direction==PHYS_X ? vec2f(property["scale"].get_str()).x() : vec2f(property["scale"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(property["scale"].get_str()).x() : vec2f(property["scale"].get_str()).y()); }
 
 	inline void set_scale(T val_x, T val_y)
-	{ property["scale"] = vec2f(val_x,val_y); }	
+    { property["scale"] = vec2f(val_x,val_y); }
 	
 	inline void set_scale(vec2f val)
-	{ property["scale"] = val; }	
+    { property["scale"] = val; }
 	
 	inline vec2f to_real(vec2f val) { 
 		vec2f oo, ss; 
-		oo = property["origin"]; ss = property["scale"]; 
+        oo = property["origin"]; ss = property["scale"];
 		return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
 	}
 
 	inline vec2f to_pixel(vec2f val) { 
 		vec2f oo, ss; 
-		oo = property["origin"]; ss = property["scale"]; 
+        oo = property["origin"]; ss = property["scale"];
 		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
 	}
 
 //end
 
 	inline phys_type getType()
-	{ return property["phys_orig"]; }
+    { return property["phys_orig"]; }
 	void setType(std::string orig)
 	{ property["phys_orig"] = orig; }
 
@@ -978,8 +933,8 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	init_Tvariables();
 	resize(oth.width, oth.height);
 	
-//	memcpy(Timg_buffer, oth.Timg_buffer, width*height*sizeof(T));
-	std::copy(oth.Timg_buffer, oth.Timg_buffer+width*height, Timg_buffer);
+//	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
+    std::copy(oth.Timg_buffer, oth.Timg_buffer+getSurf(), Timg_buffer);
 	property = oth.property;
 	
 	setShortName(sName);
@@ -1013,7 +968,7 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t w, size_t h, std::string obj_nam
 	// not calling correspondent physImage constructor for matrix_points_aligned
 	//
 	// TODO: pass to std::copy
-	memcpy(Timg_buffer, o_buffer, width*height*sizeof(T));
+    memcpy(Timg_buffer, o_buffer, getSurf()*sizeof(T));
 	
 }
 
@@ -1025,7 +980,7 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t o_width, size_t o_height) {
 	matrix_points_aligned();
 
 	// not calling correspondent physImage constructor for matrix_points_aligned
-	memcpy(Timg_buffer, o_buffer, width*height*sizeof(T));
+    memcpy(Timg_buffer, o_buffer, getSurf()*sizeof(T));
 	
 	// rounding
 }*/
@@ -1083,7 +1038,9 @@ nPhysImageF<T>::init_Tvariables()
 
 	//pIF_size.set_msg("size error");
 
-	min_Tv_x = min_Tv_y = max_Tv_x = max_Tv_y = -1;
+	min_Tv=vec2(-1,-1);
+	max_Tv=vec2(-1,-1);
+
 	Tmaximum_value = 0;
 	Tminimum_value = 0;
 
@@ -1151,8 +1108,8 @@ nPhysImageF<T>::matrix_points_aligned()
 	}
 
 
-	if (Timg_buffer == NULL && width>0 && height>0) {
-		assert( Timg_buffer = new T[width*height] );
+    if (Timg_buffer == NULL && getSurf()>0) {
+        assert( Timg_buffer = new T[getSurf()] );
 		DEBUG(11,"[\t\t|--> ] template 32bit contiguous allocated");
 
 		assert( Timg_matrix = new T* [height] );
@@ -1352,21 +1309,10 @@ nPhysImageF<T>::sub(size_t x, size_t y, size_t Dx, size_t Dy) {
 
 template<class T> void
 nPhysImageF<T>::TscanBrightness() {
-	if (width*height>0) {
-		//std::cerr<<"[physImage] test val is: "<<minimum_value<<std::endl;
-#ifdef __phys_threads
-		T min_v[2], max_v[2];
-		thread t1(th_scanBrightness<T>, Timg_buffer, getSurf()/2, min_v, max_v);
-		thread t2(th_scanBrightness<T>, Timg_buffer+getSurf()/2, getSurf()-getSurf()/2, min_v+1, max_v+1);
-		
-		t1.join();
-		t2.join();
-		
-		Tminimum_value = std::min(min_v[0], min_v[1]);
-		Tmaximum_value = std::max(max_v[0], max_v[1]);
-		
-#else
-		bool found=false;
+    if (getSurf()>0) {
+        bool found=false;
+
+#pragma omp parallel for
         for (size_t i=0; i<getSurf(); i++) {
 			if (std::isfinite(Timg_buffer[i])) {	
 				if (!found) {
@@ -1375,18 +1321,15 @@ nPhysImageF<T>::TscanBrightness() {
 					found=true;
 				} else {
 					 if ((Timg_buffer[i]) > Tmaximum_value) {
-						 max_Tv_x = i%width;
-						 max_Tv_y = (i-max_Tv_x)/width;	
-						 Tmaximum_value = (Timg_buffer[i]);
+                         max_Tv=vec2(i%width, i/width);
+                         Tmaximum_value = (Timg_buffer[i]);
 					 } else if ((Timg_buffer[i]) < Tminimum_value) {
-						 min_Tv_x = i%width;
-						 min_Tv_y = (i-min_Tv_x)/width;	
+                         min_Tv=vec2(i%width, i/width);
 						 Tminimum_value = (Timg_buffer[i]);
 					 }
 				}
 			}
 		}
-#endif
 		DEBUG(5,"[brightness scan] "<<Tminimum_value<<" -- "<<Tmaximum_value);
 	}
 }
@@ -1398,8 +1341,8 @@ template<class T> inline nPhysImageF<mcomplex>
 nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 
 	// 1. allocation
-	fftw_complex *t = fftw_alloc_complex(width*height);
-	fftw_complex *Ft = fftw_alloc_complex(width*height);
+    fftw_complex *t = fftw_alloc_complex(getSurf());
+    fftw_complex *Ft = fftw_alloc_complex(getSurf());
 	
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
@@ -1565,8 +1508,8 @@ nPhysImageF<T>::getFFT(int direction) {
 	//	throw pIF_FFT_error;
 
 	// 1. allocation
-	fftw_complex *t = fftw_alloc_complex(width*height);
-	fftw_complex *Ft = fftw_alloc_complex(width*height);
+    fftw_complex *t = fftw_alloc_complex(getSurf());
+    fftw_complex *Ft = fftw_alloc_complex(getSurf());
 	nPhysImageF<mcomplex> *ftbuf;
 
 	ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.), "ftbuf");
@@ -1711,7 +1654,7 @@ nPhysImageF<T>::getSingletonFFT(enum phys_direction dir, enum phys_fft fftdir) {
 //
 // --------------------------------------------------------------------------------------------------
 
-template<class T> int
+template<class T> void
 nPhysImageF<T>::writeASC(const char *ofilename) {
 	// alla bruttissimo dio
 	DEBUG(5,getName() << " Short: " << getShortName() << " from: " << getFromName());
@@ -1723,13 +1666,13 @@ nPhysImageF<T>::writeASC(const char *ofilename) {
 			ofile<<std::setprecision(8)<<Timg_buffer[width-1+i*width] << "\n";
 		}
 		ofile.close();
-		return 0;
-	}
-	return -1;
+    } else {
+        throw phys_fileerror("ofstream error");
+    }
 }
 
 // specializzazione per classe complex
-template<> inline int
+template<> inline void
 nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
 	std::ofstream r_ofile((std::string(ofilename)+".re").c_str());
 	std::ofstream i_ofile((std::string(ofilename)+".im").c_str());	
@@ -1745,20 +1688,20 @@ nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
 		}
 		r_ofile.close();
 		i_ofile.close();
-		return 0;
-	}
-	return -1;
+    } else {
+        throw phys_fileerror("ofstream error");
+    }
 }
 
 
 template<class T> void
 nPhysImageF<T>::writeRAW(const char *ofilename) {
-	std::ofstream ofile(ofilename);
-
+    throw phys_deprecated();
+    std::ofstream ofile(ofilename);
 
 	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
 	// alla bruttissimo dio
-	ofile.write((char *)Timg_buffer, height*width*sizeof(T));
+    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
 	ofile.close();
 }
 
@@ -1767,7 +1710,7 @@ nPhysImageF<T>::writeRAW(const char *ofilename) {
 /*template<class T> nPhysImageF<T> &
 nPhysImageF<T>::operator= (const nPhysImageF<T> &other) {
 	resize(other.width, other.height);
-	memcpy(Timg_buffer, other.Timg_buffer, width*height*sizeof(T));
+    memcpy(Timg_buffer, other.Timg_buffer, getSurf()*sizeof(T));
 	Tmaximum_value = other.Tmaximum_value;
 	Tminimum_value = other.Tminimum_value;
 	return *this;

@@ -28,12 +28,6 @@
 #include "nGenericPan.h"
 #include "ui_nCompareLines.h"
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-
 #ifndef __nCompareLines
 #define __nCompareLines
 
@@ -53,9 +47,12 @@ public slots:
     void addImage();
     void removeImage();
 
+    void addImages();
+    void removeImages();
+
 	void updatePlot();
 
-	QString getText();
+    void getText(QTextStream&);
 	
 	void copy_clip();
 	void export_txt();
@@ -71,8 +68,8 @@ public slots:
     
 private:
     QList <nPhysD*> images;
-	QList <QwtPlotCurve*> profiles;
-	QPointer<nLine> line;
+
+    QPointer<nLine> line;
 };
 
 #endif

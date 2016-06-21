@@ -22,9 +22,6 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
    <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
     <item row="6" column="1">
      <widget class="QPushButton" name="duplicate">

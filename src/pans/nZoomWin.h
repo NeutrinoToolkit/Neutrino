@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -25,24 +25,32 @@
 #include <QtGui>
 #include <QWidget>
 
-#include <qwt_plot_zoomer.h>
+#include "nGenericPan.h"
+#include "ui_nZoomWin.h"
 
-#ifndef __nVisarZoomer
-#define __nVisarZoomer
+#ifndef __nZoomWin
+#define __nZoomWin
+#include "nPhysWave.h"
+#include "nLine.h"
+#include "nRect.h"
 
+class neutrino;
 
-class nVisarZoomer: public QwtPlotZoomer
-{
-		
+class nZoomWin : public nGenericPan {
+    Q_OBJECT
+
 public:
-#if QWT_VERSION < 0x060100
-	nVisarZoomer(QwtPlotCanvas *canvas);
-#else
-	nVisarZoomer(QWidget *);
-#endif
-	
-	virtual QwtText trackerText(const QPoint &pos) const;
-	
+    nZoomWin(neutrino *, QString);
+
+    Ui::nZoomWin my_w;
+
+public slots:
+
+    void updatePlot(QPointF);
+    void changeZoom(double);
+
+    void setBehaviour();
+
 };
 
 #endif

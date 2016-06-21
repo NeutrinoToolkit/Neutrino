@@ -46,6 +46,7 @@ public:
 
     QMenu *cameraMenu;
     nPhysD *imgGray;
+    std::vector<nPhysD *> imgColor;
 
 public slots:
     void on_grab_clicked();

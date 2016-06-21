@@ -25,12 +25,6 @@
 #include "nPoint.h"
 #include "neutrino.h"
 #include <iostream>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-
-#include <qwt_spline.h>
-#include <qwt_curve_fitter.h>
 
 nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 {

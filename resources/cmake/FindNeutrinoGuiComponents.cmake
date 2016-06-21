@@ -1,4 +1,4 @@
-# find components specific to Neutrino GUI: qwt/qt/additional files here!
+# find components specific to Neutrino GUI files here!
 
 if(DEFINED ENV{QTDIR})
   set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
@@ -7,18 +7,6 @@ endif()
 if(DEFINED QTDIR)
   set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
 endif()
-
-if(LINUX AND DEFINED QWTDIR)
-set (QWT_LIBRARY ${QWTDIR}/lib/libqwt.so)
-set (QWT_INCLUDE_DIR ${QWTDIR}/include)
-endif()
-
-find_package(Qwt REQUIRED)
-if (QWT_FOUND)
-	include_directories(${QWT_INCLUDE_DIRS})
-	message(STATUS "qwt link: " ${QWT_LIBRARIES})
-	set(LIBS ${LIBS} ${QWT_LIBRARIES})
-endif(QWT_FOUND)
 
 #libhdf5_hl
 find_package(HDF5)
@@ -55,15 +43,14 @@ if (HDF5_FOUND_COMPLETE)
 endif()
 
 
-
 include(FindPythonLibs)
 
 if(PYTHONLIBS_FOUND)
 	list(APPEND LIBS ${PYTHON_LIBRARIES})
 	include_directories(${PYTHON_INCLUDE_DIRS})
 
-
 	find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
+
 	#find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ${PYTHONQT_SEARCH_DIR}/lib)
 	if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
 
@@ -88,12 +75,6 @@ else()
 	message(STATUS "No python libraries found: python subsystem is DISABLED!")
 endif()
 
-
-if (PYTHONQT_FOUND_COMPLETE)
-    MESSAGE(STATUS "adding python wrappers")
-    include_directories(python)
-    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc)
-    list (APPEND UIS ../UIs/nPython.ui)
 endif()
 
 ## find qt -- search for 5.x first, fallback to 4.x
@@ -111,9 +92,8 @@ else()
 	SET (USE_QT4 True)
 	message(STATUS "Qt5 not found, searching for Qt4 instead")
 	find_package(Qt4 4.7.0 COMPONENTS QtMain QtCore QtGui QtSQL QtSvg QtUiTools REQUIRED)
-	
-#include(UseQt4)
-	include(${QT_USE_FILE})
+
+        include(${QT_USE_FILE})
 	
 	add_definitions(-DUSE_QT4)
 endif()

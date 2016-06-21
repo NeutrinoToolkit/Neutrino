@@ -71,7 +71,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		
 		QSizeF size(nparent->currentBuffer->getW(),nparent->currentBuffer->getH());
 
-		int exponentX=log10(abs(my_sc.x()*size.width()));
+        int exponentX=log10(std::abs(my_sc.x()*size.width()));
 		for (int k=0;k<5;k++) {
 			allTics=QPainterPath();
 			allGrid=QPainterPath();
@@ -91,7 +91,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
-							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
+                            if (std::abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
 							QString label=" "+QString::number(numLabel)+" ";
 							QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
 							rects << qMakePair(label, QRectF(position-labelSize.width()/2,-1.3*labelSize.height(),labelSize.width(),labelSize.height()));
@@ -112,7 +112,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 							}
 							allTics.lineTo(position,-0.3*p->fontMetrics().height());
 							double numLabel=i*ticsTmp/5.0;
-							if (abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
+                            if (std::abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
 							QString label=" "+QString::number(numLabel)+" ";
 							QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
 							rects << qMakePair(label, QRectF(position-labelSize.width()/2,-1.3*labelSize.height(),labelSize.width(),labelSize.height()));
@@ -133,7 +133,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		}
 		
         QString label;
-		if (abs(exponentX)>2) {
+        if (std::abs(exponentX)>2) {
 			label+="x 1e"+QString::number(exponentX)+" ";
 		}
         if (!nparent->currentBuffer->property["unitsX"].is_none())
@@ -154,7 +154,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		
 
 		
-		int exponentY=log10(abs(my_sc.y()*size.height()));
+        int exponentY=log10(std::abs(my_sc.y()*size.height()));
 		for (int k=0;k<5;k++) {
 			allTics=QPainterPath();
 			allGrid=QPainterPath();
@@ -174,7 +174,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
-							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
+                            if (std::abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
 							QString label=" "+QString::number(numLabel)+" ";
 							QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
 							rects << qMakePair(label, QRectF(position-labelSize.width()/2,0.3*p->fontMetrics().height(),labelSize.width(),labelSize.height()));
@@ -195,7 +195,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 							}
 							allTics.lineTo(-0.3*p->fontMetrics().height(),position);
 							double numLabel=i*ticsTmp/5.0;
-							if (abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
+                            if (std::abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
 							QString label=" "+QString::number(numLabel)+" ";
 							QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
 							rects << qMakePair(label, QRectF(position-labelSize.width()/2,0.3*p->fontMetrics().height(),labelSize.width(),labelSize.height()));
@@ -224,7 +224,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		}
 		
         label.clear();
-		if (abs(exponentY)>2) {
+        if (std::abs(exponentY)>2) {
 			label+="x 1e"+QString::number(exponentY)+" ";
 		}
         if (!nparent->currentBuffer->property["unitsY"].is_none())
@@ -270,7 +270,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		if (maxi != mini ) {
 			// this is bad should be simplified...
 			//		int exponent=log10(abs(maxi-mini));
-			int exponentCB=log10(abs(maxi-mini))-fmod(log10(abs(maxi-mini)),3.0);
+            int exponentCB=log10(std::abs(maxi-mini))-fmod(log10(std::abs(maxi-mini)),3.0);
 			QList<QRectF> colorRects;
 			int colorTics;
 			for (colorTics=10;colorTics>=0;colorTics--) {
@@ -305,7 +305,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 			}
             
             label.clear();
-            if (abs(exponentCB)>2) {
+            if (std::abs(exponentCB)>2) {
                 label+="x 1e"+QString::number(exponentCB)+" ";
             }
             if (!nparent->currentBuffer->property["unitsCB"].is_none())
@@ -317,9 +317,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             QString label;
             vec2f range=nparent->currentBuffer->get_min_max();
             if (range.first()==range.second()) {
-                label="All image is "+QString::number(maxi);
+                label="All image is "+QString::number(range.first());
             } else {
-                label="Colorbar is "+QString::number(maxi)+ " (" +QString::number(range.first())+":"+QString::number(range.second())+")";
+                label="Colorbar is "+QString::number(mini)+":"+QString::number(maxi)+ " (" +QString::number(range.first())+":"+QString::number(range.second())+")";
             }
 
 			QSize labelSize=QSize(p->fontMetrics().width(label), p->fontMetrics().height());

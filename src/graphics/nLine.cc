@@ -25,11 +25,9 @@
 #include "nLine.h"
 #include "neutrino.h"
 #include <iostream>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
 
-#include <spline.h>
+//https://github.com/graiola/spline
+#include "spline.h"
 
 nLine::~nLine() {
 	foreach (QGraphicsEllipseItem* item, ref) {
@@ -39,21 +37,21 @@ nLine::~nLine() {
 
 nLine::nLine(neutrino *nparent) : QGraphicsObject()
 {
-	
-	if (nparent) {
-		nparent->my_s.addItem(this);
-		setParent(nparent);
-		int num=nparent->property("numLine").toInt()+1;
-		nparent->setProperty("numLine",num);
-		setProperty("numLine",num);
-		setToolTip(tr("line")+QString::number(num));
-		connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-		connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-		zoom=nparent->getZoom();
+    if (nparent) {
+        nparent->my_s.addItem(this);
+        setParent(nparent);
+        int num=nparent->property("numLine").toInt()+1;
+        nparent->setProperty("numLine",num);
+        setProperty("numLine",num);
+        setToolTip(tr("line")+QString::number(num));
+        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+        connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-		if (nparent->currentBuffer) {
+        zoom=nparent->getZoom();
+
+        if (nparent->currentBuffer) {
 
 	    		setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
 		}
@@ -123,12 +121,6 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.cutPoints, SIGNAL(valueChanged(int)), this, SLOT(setNumPoints(int)));
 
 	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
-
-	lineOut = new QwtPlotCurve(tr("line Cut"));
-    lineOut->attach(my_w.my_qwt);
-
-	lineOut->setXAxis(QwtPlot::xBottom);
-	lineOut->setYAxis(QwtPlot::yLeft);
 
 }
 
@@ -331,9 +323,20 @@ void nLine::copy_clip()
 }
 
 void nLine::updatePlot () {
-	if (my_w.my_qwt->isVisible() && parent()->currentBuffer) {
+    if (my_w.plot->isVisible() && parent()->currentBuffer) {
+
+        if (my_w.plot->graphCount()==0) {
+            my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+            my_w.plot->graph(0)->setPen(QPen(Qt::blue));
+            my_w.plot->xAxis->setLabel(tr("distance"));
+            my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+            my_w.plot->xAxis->setLabelPadding(-1);
+            my_w.plot->yAxis->setLabelPadding(-1);
+        }
+
 		double colore;
-		QVector<QPointF> toPlot;
+        QVector<double> toPlotx;
+        QVector<double> toPloty;
 
 		nPhysD *mat=parent()->currentBuffer;
 
@@ -346,10 +349,7 @@ void nLine::updatePlot () {
 
 		QPolygonF my_poly=poly(numPoints);
 
-		foreach (QwtPlotMarker *mark, marker) {
-			mark->detach();
-		}
-		marker.clear();
+        my_w.plot->clearItems();
 
 		QPen penna;
 		penna.setColor(ref[0]->brush().color());
@@ -365,13 +365,16 @@ void nLine::updatePlot () {
 			} else {
 				colore=mat->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
 			}
-			if (std::isfinite(colore)) toPlot << QPointF(dist, colore);
+            if (std::isfinite(colore)) {
+                toPlotx << dist;
+                toPloty << colore;
+            }
 			if (my_points.contains(p) && nSizeHolder>0.0) {
-				QwtPlotMarker *mark=new QwtPlotMarker();
-				mark->setLineStyle(QwtPlotMarker::VLine);
-				mark->setLinePen(penna);
-				mark->setXValue(dist);
-				marker << mark;
+                QCPItemLine *marker=new QCPItemLine(my_w.plot);
+                marker->start->setCoords(dist, QCPRange::minRange);
+                marker->end->setCoords(dist, QCPRange::maxRange);
+                marker->setPen(penna);
+                my_w.plot->addItem(marker);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
@@ -380,23 +383,17 @@ void nLine::updatePlot () {
 		} else {
 			colore=mat->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
 		}
-		if (std::isfinite(colore)) toPlot << QPointF(dist, colore);
-
-		if (nSizeHolder>0.0) {
-			QwtPlotMarker *mark=new QwtPlotMarker();
-			mark->setLineStyle(QwtPlotMarker::VLine);
-			mark->setLinePen(penna);
-			mark->setXValue(dist);
-			marker << mark;
-			foreach(QwtPlotMarker *mark, marker) {
-				mark->attach(my_w.my_qwt);
-			}
+        if (std::isfinite(colore)) {
+            toPlotx << dist;
+            toPloty << colore;
 		}
 
-		lineOut->setSamples(toPlot);
-		my_w.my_qwt->setAxisScale(lineOut->xAxis(),lineOut->minXValue(),lineOut->maxXValue(),0);
-		my_w.my_qwt->setAxisScale(lineOut->yAxis(),lineOut->minYValue(),lineOut->maxYValue(),0);
-		my_w.my_qwt->replot();
+        my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
+        my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
+
+        my_w.plot->graph(0)->setData(toPlotx,toPloty);
+        my_w.plot->rescaleAxes();
+        my_w.plot->replot();
 	}
 
 }
@@ -581,7 +578,7 @@ void nLine::addPoint (int npos) {
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=max(1,min(ref.size()-1,npos));
+        int copyfrom=std::max(1,std::min(ref.size()-1,npos));
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -637,6 +634,7 @@ void nLine::removePoint(int np) {
 			if (ref.size()==1) {
 				deleteLater();
 			}
+            itemChanged();
 		}
 	}
     nodeSelected=-1;
@@ -924,7 +922,7 @@ nLine::boundingRect() const {
 
 QPainterPath nLine::shape() const {
 	QPainterPathStroker stroker;
-	double thickness=max(nWidth,10.0)/zoom;
+    double thickness=std::max(nWidth,10.0)/zoom;
     stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
@@ -958,26 +956,18 @@ QPolygonF nLine::poly(int steps) const {
 			my_poly<< item->pos();
 		}
 
-        if (closedLine) my_poly << ref[0]->pos();
-
         if (bezier && my_poly.size()>2) {
 
             std::vector<double> T,X,Y;
             if (closedLine)  {
-                T.resize(my_poly.size()+2);
-                X.resize(my_poly.size()+2);
-                Y.resize(my_poly.size()+2);
-                T[0]=-1;
-                X[0]=ref.last()->pos().x();
-                Y[0]=ref.last()->pos().y();
-                for (int i = 0; i < my_poly.size(); i++ ) {
-                    T[i+1]=i;
-                    X[i+1]=my_poly[i].x();
-                    Y[i+1]=my_poly[i].y();
+                T.resize(my_poly.size()+4);
+                X.resize(my_poly.size()+4);
+                Y.resize(my_poly.size()+4);
+                for (unsigned int i = 0; i < T.size(); i++ ) {
+                    T[i]=i-2;
+                    X[i]=my_poly[(i+ref.size()-2)%ref.size()].x();
+                    Y[i]=my_poly[(i+ref.size()-2)%ref.size()].y();
                 }
-                T[my_poly.size()+1]=my_poly.size();
-                X[my_poly.size()+1]=ref[1]->pos().x();
-                Y[my_poly.size()+1]=ref[1]->pos().y();
             } else {
                 T.resize(my_poly.size());
                 X.resize(my_poly.size());
@@ -989,29 +979,28 @@ QPolygonF nLine::poly(int steps) const {
                 }
             }
 
-            spline::spline sX, sY;
+            tk::spline sX, sY;
+
             sX.set_points(T,X);
             sY.set_points(T,Y);
 
-            steps=max(steps,16); // if it's a bezier impose at least 16 steps...
-            int size=steps*(my_poly.size()-1);
+            steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
+            int size=steps*(my_poly.size()-(closedLine?0:1));
             
-            for (int i = 0; i < size; i++ ) {
+            for (int i = 0; i < size+1; i++ ) {
                 const double dtmp = (double) i / steps;
-                QPointF p=QPointF(sX(dtmp),sY(dtmp));
-                my_poly_interp.append(p);
+                my_poly_interp.append(QPointF(sX(dtmp),sY(dtmp)));
             }
-            my_poly_interp.append(my_poly.last());
             
         } else {
+            if (closedLine) my_poly << ref[0]->pos();
             for(int i=0;i<my_poly.size()-1;i++) {
                 QPointF p1=my_poly.at(i);
                 QPointF p2=my_poly.at(i+1);
-                for(int j=0;j<steps;j++) {
+                for(int j=0;j<=steps;j++) {
                     my_poly_interp << p1+j*(p2-p1)/steps;
                 }
             }
-            my_poly_interp << my_poly.last();
         }
     }
 
@@ -1042,7 +1031,7 @@ nLine::rearrange_monotone() {
 		my_poly<< item->pos();
 	}
 
-	if (abs(my_poly.last().rx()-my_poly.first().rx()) > abs(my_poly.last().ry()-my_poly.first().ry()))
+    if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
 		horizontal = true;
 	else
 		horizontal = false;
@@ -1079,7 +1068,7 @@ nLine::getHMonotone()
 		my_poly<< item->pos();
 	}
 
-	if (abs(my_poly.last().rx()-my_poly.first().rx()) > abs(my_poly.last().ry()-my_poly.first().ry()))
+    if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
 		horizontal = true;
 	else
 		horizontal = false;

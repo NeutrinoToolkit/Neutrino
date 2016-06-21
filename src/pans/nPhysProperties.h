@@ -34,8 +34,6 @@
 #include "nPhysImageF.h"
 #include "nGenericPan.h"
 
-using namespace std;
-
 class neutrino;
 
 class nPhysProperties : public nGenericPan {

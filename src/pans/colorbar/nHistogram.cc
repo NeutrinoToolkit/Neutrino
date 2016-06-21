@@ -46,7 +46,7 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
 {
     if (parentPan->currentBuffer) {
         double  frac_value=(e->pos().x()-offsetx)/((double) width()-2*offsetx);
-        frac_value=max(0.0,min(1.0, frac_value));
+        frac_value=std::max(0.0,std::min(1.0, frac_value));
         //        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
 
         if (e->pos().y()<dyColorBar + 4*offsety) {
@@ -71,12 +71,12 @@ void nHistogram::paintEvent(QPaintEvent *)
     if (parentPan->currentBuffer) {
         if (parentPan->my_w.lineMax->text().toDouble() != parentPan->my_w.lineMin->text().toDouble()) {
             int position=offsetx+dx*(colorvalue-parentPan->my_w.lineMin->text().toDouble())/(parentPan->my_w.lineMax->text().toDouble()-parentPan->my_w.lineMin->text().toDouble());
-            position=min(max(position,offsetx),width()-offsetx);
+            position=std::min(std::max(position,offsetx),width()-offsetx);
             p.drawLine(position,2*offsety,position,2*offsety+dyColorBar);
         }
         if (parentPan->currentBuffer->get_max()!=parentPan->currentBuffer->get_min()) {
             int position=offsetx+dx*(colorvalue-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
-            position=min(max(position,offsetx),width()-offsetx);
+            position=std::min(std::max(position,offsetx),width()-offsetx);
             p.drawLine(position,dyHisto,position,dy);
         }
     }
@@ -109,7 +109,7 @@ void nHistogram::drawPicture (QPainter &p) {
         p.setPen(QColor(Qt::black));
         p.setBrush(QColor(0,0,0,127));
         p.setPen(QColor(0,0,0,127));
-        const vector<double> vettore=parentPan->currentBuffer->get_histogram();
+        const std::vector<double> vettore=parentPan->currentBuffer->get_histogram();
 
         if (vettore.size()>0) {
             double dx2=((double) dx)/(vettore.size()-1);
@@ -130,7 +130,7 @@ void nHistogram::drawPicture (QPainter &p) {
                     } else {
                         frac=(vettore.at(i)-minivec)/(maxivec-minivec);
                     }
-                    frac=max(0.0,min(1.0,frac));
+                    frac=std::max(0.0,std::min(1.0,frac));
                     polygon << QPointF(offsetx+i*dx2,dy-(dy-dyHisto)*frac);
                 }
                 polygon << QPointF(width()-offsetx,height()-2*offsety);
@@ -147,8 +147,8 @@ void nHistogram::drawPicture (QPainter &p) {
         p.drawLine(offsetx,2*offsety+dyColorBar,offsetx+mini,dyHisto);
         p.drawLine(dx+offsetx,2*offsety+dyColorBar,offsetx+maxi,dyHisto);
 
-        double mini_screen=min(mini,maxi);
-        double maxi_screen=max(mini,maxi);
+        double mini_screen=std::min(mini,maxi);
+        double maxi_screen=std::max(mini,maxi);
 
         p.drawRect(offsetx,dyHisto,mini_screen,dy-dyHisto);
         p.drawRect(offsetx+maxi_screen,dyHisto,dx-maxi_screen,dy-dyHisto);

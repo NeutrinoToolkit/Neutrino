@@ -46,7 +46,7 @@ public:
 
 public slots:
 	void draw();
-
+    void on_percent_released();
 
 private:
 	// blurred image for easier calculations

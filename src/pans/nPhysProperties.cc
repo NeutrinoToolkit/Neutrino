@@ -44,7 +44,7 @@ void
 nPhysProperties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
     if (my_phys) {
-        string currentProperty("");
+        std::string currentProperty("");
         if (my_w.propertyList->selectedItems().size() >0) {
             currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
         }
@@ -56,7 +56,7 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
             QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
             my_w.propertyList->addItem(item);
             if (iter->first==currentProperty) {
-                string myval=iter->second.get_str();
+                std::string myval=iter->second.get_str();
                 my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
                 item->setSelected(true);
             }
@@ -67,7 +67,7 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 void
 nPhysProperties::showProperty() {
 	if (my_w.propertyList->currentItem()) {
-		string currentKey=my_w.propertyList->currentItem()->text().toStdString();
+        std::string currentKey=my_w.propertyList->currentItem()->text().toStdString();
         DEBUG(currentKey);
         DEBUG(currentBuffer);
         if (currentBuffer) {
@@ -82,7 +82,7 @@ void nPhysProperties::on_changePhysProperty_pressed() {
     DEBUG("Do something");
     QVariant pippo(my_w.propertyValue->toPlainText());
     DEBUG(pippo.toString().toStdString());
-    string item=  my_w.propertyList->currentItem()->text().toStdString();
+    std::string item=  my_w.propertyList->currentItem()->text().toStdString();
     if (currentBuffer) {
         anydata my_val=toAnydata(pippo);
         currentBuffer->property[item]=my_val;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
-    <height>362</height>
+    <width>325</width>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -36,10 +36,19 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item row="2" column="4">
+    <item>
+     <widget class="nCustomDoublePlot" name="plot" native="true"/>
+    </item>
+    <item>
      <widget class="QToolButton" name="lockColors">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="focusPolicy">
        <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>use colorbar extremes</string>
       </property>
       <property name="text">
        <string>...</string>
@@ -59,10 +68,13 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="5">
-     <widget class="QToolButton" name="autoscale">
+    <item>
+     <widget class="QToolButton" name="autoScale">
       <property name="focusPolicy">
        <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>lock range</string>
       </property>
       <property name="text">
        <string>...</string>
@@ -83,20 +95,13 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="3">
-     <widget class="QwtPlot" name="plot">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="3">
+    <item>
      <widget class="QToolButton" name="lockClick">
       <property name="focusPolicy">
        <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Switch between live and click update</string>
       </property>
       <property name="text">
        <string>...</string>
@@ -104,7 +109,7 @@
       <property name="icon">
        <iconset resource="../resources/icons/icons.qrc">
         <normaloff>:/icons/autoRefresh.png</normaloff>
-        <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
+        <normalon>:/icons/center.png</normalon>:/icons/autoRefresh.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -114,6 +119,9 @@
       </property>
       <property name="checkable">
        <bool>true</bool>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
@@ -129,9 +137,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
-   <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <class>nCustomDoublePlot</class>
+   <extends>QWidget</extends>
+   <header>nCustomPlots.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

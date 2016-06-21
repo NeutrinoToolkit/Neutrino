@@ -49,7 +49,7 @@ nHDF5::nHDF5(neutrino *nparent, QString winname)
 void nHDF5::copyPath(){
     QString clipText;
     foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
-        clipText+="openFile(\""+getFilename(item)+"\",\""+item->data(3,0).toString()+"\") ";
+        clipText+="fileOpen(\""+getFilename(item)+"\",\""+item->data(3,0).toString()+"\") ";
     }
     QApplication::clipboard()->setText(clipText);
 }
@@ -290,7 +290,7 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 
 void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
-    vector<char> attrName(len);
+    std::vector<char> attrName(len);
     H5Aget_name(aid, len, &attrName[0] );
 
     QTreeWidgetItem *item3=new QTreeWidgetItem(parentItem,QStringList(QString(&attrName[0])));
@@ -305,7 +305,7 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
         if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
             int nelem=aInfo.data_size/sizeof(double);
             item3->setData(1,0,"Attr double");
-            vector<double> val(nelem);
+            std::vector<double> val(nelem);
             if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
                 if (my_data && nelem==2) {
                     if (strcmp(&attrName[0],"physOrigin")==0) {
@@ -322,22 +322,22 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
     } else if (classAType ==  H5T_INTEGER) {
         int nelem=aInfo.data_size/sizeof(int);
         item3->setData(1,0,"Attr int");
-        vector<int> val(nelem);
+        std::vector<int> val(nelem);
         if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
             QString strData=QString::number(val[0]);
             for (int i=1;i<nelem;i++) strData+=" "+QString::number(val[i]);
             item3->setData(2,0,strData);
         }
     } else if (classAType == H5T_STRING) {
-        vector<char> val;
+        std::vector<char> val;
         item3->setData(1,0,"Attr string");
         if (my_data) {
             int sizeStr=1+aInfo.data_size;
             val.resize(sizeStr);
             if (H5Aread(aid, nativeType, &val[0]) >= 0) {
                 if (my_data) {
-                    if (strcmp(&attrName[0],"physShortName")==0) my_data->setShortName(string(&val[0]));
-                    if (strcmp(&attrName[0],"physName")==0) my_data->setName(string(&val[0]));
+                    if (strcmp(&attrName[0],"physShortName")==0) my_data->setShortName(std::string(&val[0]));
+                    if (strcmp(&attrName[0],"physName")==0) my_data->setName(std::string(&val[0]));
                 }
                 item3->setData(2,0,QString(&val[0]));
             }
@@ -424,7 +424,7 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 }
 
 
-nPhysD* nHDF5::phys_open_HDF5(string fileName, string dataName) {
+nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
     nPhysD *my_data=NULL;
     DEBUG(fileName << " " << dataName);
     hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -480,7 +480,7 @@ nPhysD* nHDF5::phys_open_HDF5(string fileName, string dataName) {
             if (buffer && ndims==2) {
                 my_data=new nPhysD(ds_name);
                 my_data->setType(PHYS_FILE);
-                string strName(ds_name);
+                std::string strName(ds_name);
                 strName.erase(0,strName.find_last_of('/'));
                 my_data->setShortName(strName);
 
@@ -537,7 +537,7 @@ nPhysD* nHDF5::phys_open_HDF5(string fileName, string dataName) {
 }
 
 
-int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, string fname) {
+int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
     if (phys) {
         if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
             unsigned int	filter_info;
@@ -593,7 +593,7 @@ void nHDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
     if (classAType ==  H5T_FLOAT) {
         if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
             int nelem=aInfo.data_size/sizeof(double);
-            vector<double> val(nelem);
+            std::vector<double> val(nelem);
             if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
                 if (my_data && nelem==2) {
                     if (strcmp(attrName,"physOrigin")==0) {
@@ -606,9 +606,9 @@ void nHDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
         }
     } else if (classAType ==  H5T_INTEGER) {
         int nelem=aInfo.data_size/sizeof(int);
-        vector<int> val(nelem);
+        std::vector<int> val(nelem);
         if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
-            my_data->property[string(attrName)]=val[0];
+            my_data->property[std::string(attrName)]=val[0];
         }
     } else if (classAType == H5T_STRING) {
         char *val =NULL;
@@ -617,8 +617,8 @@ void nHDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
             val=new char[sizeStr];
             if (H5Aread(aid, nativeType, val) >= 0) {
                 if (my_data) {
-                    if (strcmp(attrName,"physShortName")==0) my_data->setShortName(string(val));
-                    if (strcmp(attrName,"physName")==0) my_data->setName(string(val));
+                    if (strcmp(attrName,"physShortName")==0) my_data->setShortName(std::string(val));
+                    if (strcmp(attrName,"physName")==0) my_data->setName(std::string(val));
                 }
             }
         } else {

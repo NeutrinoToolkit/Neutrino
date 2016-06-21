@@ -28,32 +28,10 @@
 #include "nGenericPan.h"
 #include "ui_nBoxLineout.h"
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-#include <qwt_plot_zoomer.h>
-
 #ifndef __nBoxLineout
 #define __nBoxLineout
 
 #include "neutrino.h"
-
-
-class nBoxLineoutZoomer: public QwtPlotPicker{
-    
-public:
-#if QWT_VERSION < 0x060100
-	nBoxLineoutZoomer(QwtPlotCanvas *canvas);
-#else
-	nBoxLineoutZoomer(QWidget *);
-#endif
-	
-	virtual QwtText trackerText(const QPoint &pos) const;
-	
-};
-
 
 class nRect;
 
@@ -70,7 +48,8 @@ public:
 	void mouseAtWorld(QPointF);
 	void updatePlot();
 	
-	void copy_clip();
+    void export_data(QTextStream &);
+    void copy_clipboard();
 	void export_txt();
 	
 	void export_pdf();
@@ -80,11 +59,8 @@ public:
 	void sceneChanged();
 
 private:
-    QPointer<nBoxLineoutZoomer> picker;
 
-	QwtPlotCurve xCut,yCut;	
-	QwtPlotMarker xMarker,yMarker, rxMarker, ryMarker;
-	QPointer<nRect> box;
+    QPointer<nRect> box;
 };
 
 #endif

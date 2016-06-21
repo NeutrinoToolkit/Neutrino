@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>247</width>
-    <height>221</height>
+    <width>262</width>
+    <height>233</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,18 +28,30 @@
      <widget class="QTabWidget" name="tabWidget">
       <property name="font">
        <font>
-        <pointsize>9</pointsize>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="currentIndex">
        <number>0</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="analysis">
        <attribute name="title">
         <string>Analysis</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="1" column="0" colspan="2">
@@ -603,6 +615,11 @@
         </item>
         <item row="5" column="0">
          <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Contour:</string>
           </property>
@@ -610,6 +627,11 @@
         </item>
         <item row="5" column="2" colspan="2">
          <widget class="QLabel" name="contour_lbl">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="frameShape">
            <enum>QFrame::Box</enum>
           </property>
@@ -628,13 +650,25 @@
         <string>Parameters</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="0" column="1" colspan="2">
          <widget class="QDoubleSpinBox" name="blur_radius_sb">
           <property name="value">
            <double>2.000000000000000</double>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -647,8 +681,16 @@
         </item>
         <item row="1" column="2">
          <widget class="QCheckBox" name="show_decimated_cb">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Show blurred</string>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -667,6 +709,11 @@
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Blur radius</string>
           </property>
@@ -679,6 +726,18 @@
         <string>Numerics</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item row="0" column="0" rowspan="2" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -687,6 +746,7 @@
              <widget class="QLabel" name="num_d1">
               <property name="font">
                <font>
+                <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -700,6 +760,7 @@
              <widget class="QLabel" name="num_d2">
               <property name="font">
                <font>
+                <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -713,6 +774,7 @@
              <widget class="QLabel" name="num_d3">
               <property name="font">
                <font>
+                <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -726,6 +788,7 @@
              <widget class="QLabel" name="num_d4">
               <property name="font">
                <font>
+                <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -739,6 +802,7 @@
              <widget class="QLabel" name="num_d5">
               <property name="font">
                <font>
+                <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -770,6 +834,11 @@
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
              <widget class="QLabel" name="num_v1">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -777,6 +846,11 @@
             </item>
             <item>
              <widget class="QLabel" name="num_v2">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -784,6 +858,11 @@
             </item>
             <item>
              <widget class="QLabel" name="num_v3">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -791,6 +870,11 @@
             </item>
             <item>
              <widget class="QLabel" name="num_v4">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -798,6 +882,11 @@
             </item>
             <item>
              <widget class="QLabel" name="num_v5">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>

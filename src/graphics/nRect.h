@@ -31,9 +31,6 @@
 #define __nRect
 
 class neutrino;
-class QwtPlot;
-class QwtPlotCurve;
-class QwtPlotMarker;
 
 class nRect : public QGraphicsObject {
 	Q_OBJECT
@@ -57,7 +54,8 @@ public:
 	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
 	void focusInEvent(QFocusEvent * event);
 	void focusOutEvent(QFocusEvent * event);
-	
+    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+
 	void moveBy(QPointF);
 	
 	qreal nWidth, nSizeHolder;
@@ -82,13 +80,8 @@ public:
 	QPainterPath path() const;
 	QPainterPath shape() const;
 	
-	//	QList<QwtPlotMarker*> marker;
 	void selectThis(bool);
-	
-	QwtPlot *my_qwt;
-	QwtPlotCurve *lineOut;
-	QList<QwtPlotMarker*> marker;
-	
+		
 public slots:
 	
 	void togglePadella();

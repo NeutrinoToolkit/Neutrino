@@ -1,14 +1,13 @@
 import sys
 
-#sys.path.append("/Library/Python/2.6/site-packages")
+
 sys.path.append("/usr/lib/python2.7/dist-packages")
 sys.path.append("/usr/lib/pyshared/python2.7")
-#from PyQt4 import QtGui as qt
-#from PyQt4 import QtCore
+
+
 
 import PythonQt.QtGui as qt
 
-#import numpy as np
 
 def mousemove(mm):
     x = mm.x()

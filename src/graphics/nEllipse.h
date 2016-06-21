@@ -31,9 +31,6 @@
 #define __nEllipse
 
 class neutrino;
-class QwtPlot;
-class QwtPlotCurve;
-class QwtPlotMarker;
 
 class nEllipse : public QGraphicsObject {
 	Q_OBJECT
@@ -85,13 +82,8 @@ public:
 	QPainterPath path() const;
 	QPainterPath shape() const;
 	
-	//	QList<QwtPlotMarker*> marker;
 	void selectThis(bool);
-	
-	QwtPlot *my_qwt;
-	QwtPlotCurve *lineOut;
-	QList<QwtPlotMarker*> marker;
-	
+		
 	public slots:
 	
 	void togglePadella();

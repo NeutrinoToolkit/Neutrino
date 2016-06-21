@@ -2,61 +2,83 @@
 #include "gui/PythonQtScriptingConsole.h"
 #include "neutrino.h"
 #include <QThread>
+#include <QFont>
 
 nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winname) {
 
 	my_w.setupUi(this);
 
-	connect(my_w.loadScript, SIGNAL(released()), this, SLOT(loadScript()));
-	connect(my_w.runScript, SIGNAL(released()), this, SLOT(runScript()));
+#ifdef USE_QT5
+    QFont my_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+#else
+    QFont my_font;
+    my_font.setStyleHint(QFont::TypeWriter);
+#endif
+    my_font.setPointSize(10);
+
+    connect(my_w.actionRun_script, SIGNAL(triggered()), this, SLOT(loadScript()));
 
 	PythonQtScriptingConsole *console;
 	console = new PythonQtScriptingConsole(this, PythonQt::self()->getMainModule());
-	console->setFont(my_w.scriptFile->font());
 	my_w.console->addWidget(console);
+    console->setFont(my_font);
 	console->show();
 
-	QCompleter *completer = new QCompleter(this);
-	completer->setModel(new QDirModel(completer));
-	completer->setCompletionMode(QCompleter::PopupCompletion);
-	my_w.scriptFile->setCompleter(completer);
+    QKeySequence key_seq=QKeySequence(Qt::CTRL + Qt::Key_Return);
+    my_w.script->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute");
+    QShortcut* my_shortcut = new QShortcut(key_seq, my_w.script);
+    connect(my_shortcut, SIGNAL(activated()), this, SLOT(runScript()));
+
+    my_w.script->setFont(my_font);
+    my_w.splitter->setSizes(QList<int>({2,1,0}));
 
     PythonQt::self()->getMainModule().addObject("neu", nparent);
+
+    setProperty("fileTxt","test.py");
 
 	decorate();
     
     connect(my_w.changeScriptsFolder, SIGNAL(released()), this, SLOT(changeScriptsFolder()));
     connect(my_w.changeSiteFolder, SIGNAL(released()), this, SLOT(changeSiteFolder()));
     
-    DEBUG("->" << my_w.initScript->toPlainText().toStdString() << "<-");
+    DEBUG("->\n" << my_w.initScript->toPlainText().toStdString() << "\n<-");
     if (my_w.initScript->toPlainText().isEmpty()) {
         QFile t(":neutrinoInit.py");
         t.open(QIODevice::ReadOnly| QIODevice::Text);
         QString initScript=QTextStream(&t).readAll();
-        DEBUG(initScript.toStdString());
-        PythonQt::self()->getMainModule().evalScript(initScript);
         t.close();    
         my_w.initScript->insertPlainText(initScript);
+        runScript(initScript);
     }       
     console->setFocus();
 }
 
 void nPython::loadScript(void) {
 	QString fname;
-	fname = QFileDialog::getOpenFileName(this,tr("Open python source"),my_w.scriptFile->text(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
+    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
 	if (!fname.isEmpty()) {
-		my_w.scriptFile->setText(fname);
-		my_w.scriptFile->setCursorPosition(0);
+        setProperty("fileTxt",fname);
+        QFile t(fname);
+        t.open(QIODevice::ReadOnly| QIODevice::Text);
+        QTextStream out(&t);
+        QString toRun=out.readAll();
+        t.close();
+        runScript(toRun);
 	}
 }
 
-void nPython::runScript(void) {
-	QFile t(my_w.scriptFile->text());
-	t.open(QIODevice::ReadOnly| QIODevice::Text);
-	QTextStream out(&t);
-	PythonQt::self()->getMainModule().evalScript(out.readAll());
-	t.close();
+void nPython::runScript(QString cmd) {
+    saveDefaults();
+    DEBUG("\n" << cmd.toStdString());
+    QVariant res=PythonQt::self()->getMainModule().evalScript(cmd);
+    DEBUG("result" << res.type() << "\n" << res.toString().toStdString());
 }
+
+void nPython::runScript(void) {
+    runScript(my_w.script->toPlainText());
+}
+
+
 
 void nPython::changeScriptsFolder() {
     QString dirName = QFileDialog::getExistingDirectory(this,tr("Python scripts directory"),my_w.changeScriptsFolder->text());

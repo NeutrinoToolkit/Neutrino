@@ -64,7 +64,7 @@ void nRegionPath::doIt() {
         QPolygonF regionPoly=region->poly(1);
         regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
         
-        vector<vec2f> vecPoints(regionPoly.size());
+        std::vector<vec2f> vecPoints(regionPoly.size());
         for(int k=0;k<regionPoly.size();k++) {
             vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
         }

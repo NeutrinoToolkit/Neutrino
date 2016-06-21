@@ -7,7 +7,6 @@
 #include <QtGui>
 #include <QWidget>
 
-#include "nPhysWave.h"
 #include "neutrino.h"
 
 //! Wrapper for images nPhysD
@@ -21,6 +20,8 @@ public slots:
 	//! return a new empty nPhysD
 	/*! */
 	nPhysD* new_nPhysD() {return new nPhysD();};
+
+    QList<nPhysD*> static_nPhysD_open(QString=QString());
 
 	//! return a new nPhysD starting with a vector(row major order) and usually used to set data from python
 	/*! */

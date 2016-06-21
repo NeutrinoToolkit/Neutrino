@@ -35,8 +35,6 @@
 
 class nColorBarWin;
 
-using namespace std;
-
 class nHistogram : public QWidget
 {
 	Q_OBJECT

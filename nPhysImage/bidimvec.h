@@ -35,6 +35,12 @@
 #ifndef __bidimvec_h
 #define __bidimvec_h
 
+#if (__GNUC_MINOR__ > 5)
+enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
+#else
+enum phys_direction { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
+#endif
+
 template <class T> bool
 bd_from_string(T& t, const std::string& s)
 {
@@ -102,6 +108,10 @@ public:
 	{ myval1= val;}
 	inline void set_second(T val)
 	{ myval2= val;}
+
+    inline T operator () (phys_direction dir) {
+        return dir==0?myval1:myval2;
+    }
 
 private:
 	T myval1, myval2;

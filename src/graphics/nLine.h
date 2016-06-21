@@ -32,9 +32,6 @@
 #include "ui_nLine.h"
 
 class neutrino;
-class QwtPlot;
-class QwtPlotCurve;
-class QwtPlotMarker;
 
 class nLine : public QGraphicsObject {
  Q_OBJECT
@@ -96,10 +93,6 @@ public:
 	QPainterPath shape() const;
 	
 	void selectThis(bool);
-	
-	QwtPlot *my_qwt;
-	QwtPlotCurve *lineOut;
-	QList<QwtPlotMarker*> marker;
 
 public slots:
 	

@@ -34,8 +34,6 @@
 #include "nPhysImageF.h"
 #include "nGenericPan.h"
 
-using namespace std;
-
 class neutrino;
 
 class nWinList : public nGenericPan {
@@ -54,7 +52,7 @@ public:
 
 
 public slots:
-    void on_images_itemSelectionChanged();
+    void selectionChanged();
 
 	void updatePad(nPhysD* = NULL);
 	void physAdd(nPhysD*);

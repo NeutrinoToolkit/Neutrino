@@ -63,10 +63,11 @@ nFocalSpot::calculate_stats()
 	// 1. find centroid
 	vec2 centr;
 	if (cur->get_origin() == vec2(0,0)) {
-		centr = vec2(decimated.max_Tv_x, decimated.max_Tv_y);
+        centr = decimated.max_Tv;
 		cur->set_origin(centr);
-	} else
+    } else {
 		centr = cur->get_origin();
+    }
 	decimated.set_origin(centr);
 
 	my_w.centroid_lbl->setText(QString("%1:%2").arg(centr.x()).arg(centr.y()));

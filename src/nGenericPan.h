@@ -130,8 +130,13 @@ class nPanPyWrapper : public QObject {
     Q_OBJECT
 
     public slots:
-    nGenericPan* new_nPan() {return new nGenericPan();}; // opens new neutrino with that image
-    void delete_nPan(nGenericPan* pan) {pan->deleteLater();};
+    nGenericPan* new_nPan(neutrino* neu, QString name) {
+        DEBUG("here "<< name.toStdString());
+        return new nGenericPan(neu,name);}; // opens new neutrino with that image
+    void delete_nPan(nGenericPan* pan) {
+        DEBUG("here "<< pan->panName.toStdString());
+        pan->deleteLater();
+    };
 
 };
 #endif

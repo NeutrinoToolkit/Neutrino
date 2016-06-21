@@ -35,26 +35,12 @@ public:
 	NApplication( int &argc, char **argv ) : QApplication(argc, argv) {}
 protected:
 
-	virtual bool notify(QObject *rec, QEvent *ev)
-	{
-		try {
-			return QApplication::notify(rec, ev);
-		}
-		catch (std::exception &e) {
-            QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
-            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-            dlg.exec();
-
-//			qCritical() << "neutrino got exception: "<<e.what();
-		}
-
-		return false;
-	}
+    bool notify(QObject *rec, QEvent *ev);
 
     bool event(QEvent *ev);
 
-public slots:
 #ifdef HAVE_PYTHONQT
+public slots:
     QList<neutrino*> neus();
 #endif
 };

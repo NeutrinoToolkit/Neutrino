@@ -30,6 +30,9 @@
 #include <vector>
 #include <limits>
 
+#include <QVector>
+#include <QList>
+
 #include <QClipboard>
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -87,8 +90,6 @@ public:
 	QPluginLoader *plug_loader;
 	//nPlug *plug_iface;
 	
-	
-	
 	static const int MaxRecentFiles=20;
 
 	QList <QAction *> recentFileActs;
@@ -105,13 +106,15 @@ public:
 	QPointer<neutrino> follower;
 
 	QString colorTable;
-    QMap<QString, vector<unsigned char>> nPalettes;
+    QMap<QString, std::vector<unsigned char>> nPalettes;
 
 private:
     QList<nGenericPan*> panList;
 	QList<nPhysD*> physList;
 
 public slots:
+    inline int indexOf(nPhysD* my_phys){return physList.indexOf(my_phys);};
+
 	nGenericPan* existsPan(QString);
 
 	void build_colormap();
@@ -158,20 +161,18 @@ public slots:
 	void showPhys(nPhysD&);
 	void addShowPhys(nPhysD*);
 	void addShowPhys(nPhysD&);
-	nPhysD* getBuffer(int=-1);
+    nPhysD* getBuffer(int=-1,bool=true);
 
 	inline QList<nPhysD *> getBufferList() {return physList;};
     inline QList<nGenericPan*> getPanList() {return panList;};
-
 							
 	// menu actions
 	void addMenuBuffers(nPhysD*);
 	// File
 	neutrino* fileNew();
 
-	void openFile(QString);
 	void fileOpen();
-	std::vector<nPhysD*> fileOpen(QString);
+    QList<nPhysD*> fileOpen(QString);
 	void fileOpen(QStringList);
 	void fileReopen();
 
@@ -184,7 +185,7 @@ public slots:
 	bool fileClose();
 //	void file_quit_slot();
 
-	vector <nPhysD *> openSession(QString);
+    QList <nPhysD *> openSession(QString);
 	void saveSession(QString=QString());
 
 	void exportGraphics();
@@ -207,6 +208,8 @@ public slots:
 	nGenericPan* FocalSpot();
 	nGenericPan* Contours();
 	nGenericPan* MathOperations();
+	
+    nGenericPan* ZoomWin();
 	
 	// cutoff mask
 	nGenericPan* CutoffImage();
@@ -301,7 +304,7 @@ public slots:
 	void about();
 	nGenericPan* Preferences();
 
-    nGenericPan* openPan(QString);
+    nGenericPan* openPan(QString,bool=true);
 
 	void emitPanAdd(nGenericPan*);
 	void emitPanDel(nGenericPan*);
@@ -321,6 +324,7 @@ public slots:
     // pythonqt STUFF
     nGenericPan* Python();
     nGenericPan* newPan(QString=QString());
+    nGenericPan* getPan(QString);
 #endif
 
 signals:

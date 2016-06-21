@@ -7,6 +7,7 @@
 
 #include <QtGui>
 #include <QWidget>
+#include <QShortcut>
 
 #include "nGenericPan.h"
 #include "ui_nPython.h"
@@ -29,6 +30,7 @@ public:
 public slots:
 	void loadScript(void);
 	void runScript(void);
+    void runScript(QString);
     void changeScriptsFolder();
     void changeSiteFolder();
 };

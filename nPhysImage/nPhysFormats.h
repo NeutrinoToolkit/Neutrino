@@ -38,8 +38,16 @@ extern "C" {
 }
 #endif
 
-// .alex. incredibile quanto bordello genera questo...
-//using namespace std;
+#ifdef HAVE_LIBTIFF
+#define int32 tiff_int32
+#define uint32 tiff_uint32
+extern "C" {
+#include <tiffio.h>
+}
+#undef int32
+#undef uint32
+#endif
+
 
 // standard formats
 class physDouble_txt : public nPhysImageF<double> {
@@ -47,22 +55,17 @@ public:
 	physDouble_txt(const char *);
 };
 
-class physDouble_tiff : public nPhysImageF<double> {
-public:
-	physDouble_tiff(const char *);
-};
-
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
-std::vector <nPhysImageF<double> *> phys_open_inf(std::string);
+std::vector <nPhysD*> phys_open_inf(std::string);
 
 class physDouble_img : public nPhysImageF<double> {
 public:
 	physDouble_img(std::string);
 };
 
-int phys_write_fits(nPhysImageF<double> *phys, const char * fname, float compression=0);
+void phys_write_fits(nPhysD*phys, const char * fname, float compression=0);
 
-std::vector <nPhysImageF<double> *> phys_open_fits(std::string);
+std::vector <nPhysD*> phys_open_fits(std::string);
 
 class physDouble_asc : public nPhysImageF<double> {
 public:
@@ -158,41 +161,40 @@ T swap_endian(T u)
 //operator>> (std::istream &, phys_properties &);
 
 // dump out for state save
-int
-phys_dump_binary(nPhysImageF<double> *my_phys, const char *ofile);
+void phys_dump_binary(nPhysD*my_phys, const char *ofile);
 
-int 
-phys_dump_binary(nPhysImageF<double> *, std::ofstream &);
+void phys_dump_binary(nPhysD*, std::ofstream &);
 
-int
-phys_dump_ascii(nPhysImageF<double> *, std::ofstream &);
+void phys_dump_ascii(nPhysD*, std::ofstream &);
 
 int
-phys_resurrect_binary(nPhysImageF<double> *, std::ifstream &);
+phys_resurrect_binary(nPhysD*, std::ifstream &);
 
-int
-phys_resurrect_old_binary(nPhysImageF<double> *, std::ifstream &);
-
-std::vector <nPhysImageF<double> *> phys_resurrect_binary(std::string);
+std::vector <nPhysD*> phys_resurrect_binary(std::string);
 
 //generic raw open
-int
-phys_open_RAW(nPhysImageF<double> *, int, int, bool);
+void phys_open_RAW(nPhysD*, int, int, bool);
+
+std::vector <nPhysD*> phys_open_tiff(std::string);
 
 //write neutrino tiff files
-int 
-phys_write_tiff(nPhysImageF<double> *, const char *);
+void phys_write_tiff(std::vector<nPhysD*>, std::string);
+void phys_write_tiff(nPhysD*, std::string);
 
+#ifdef HAVE_LIBTIFF
+void phys_write_one_tiff(nPhysD*, TIFF*);
+#endif
 
 //! HDF stuff
-std::vector <nPhysImageF<double> *> phys_open_HDF4(std::string);
-int phys_write_HDF4(nPhysImageF<double> *, const char*);
+std::vector <nPhysD*> phys_open_HDF4(std::string);
+void phys_write_HDF4(nPhysD*, const char*);
 
 
-std::vector <nPhysImageF<double> *> phys_open_spe(std::string);
+std::vector <nPhysD*> phys_open_spe(std::string);
 
+std::vector <nPhysD*> phys_open_pcoraw(std::string);
 
-std::vector <nPhysImageF<double> *> phys_open(std::string);
+std::vector <nPhysD*> phys_open(std::string);
 
 std::string gunzip(std::string);
 

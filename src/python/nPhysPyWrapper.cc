@@ -7,6 +7,34 @@
 /**
  nPhysD "creator" set a new nPhysD from array and shape data, usually to push data from Python
  */
+QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
+    QList<nPhysD*> my_list;
+    if (fname.isEmpty()) {
+        QString formats("");
+        formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+        formats+="Images (";
+        foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
+            formats+="*."+format+" ";
+        }
+        formats.chop(1);
+        formats+=");;";
+        formats+=("Any files (*)");
+
+        fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
+    }
+    if (!fname.isEmpty()) {
+        std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
+        for(auto it : my_vec) {
+            if (it->getSurf()>0) {
+                my_list << it;
+            } else {
+                delete it;
+            }
+        }
+    }
+    return my_list;
+}
+
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
     DEBUG("here");
 	nPhysD *phys=new nPhysD();

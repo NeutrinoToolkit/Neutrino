@@ -22,13 +22,11 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#ifndef __nlineout
+#define __nlineout
+
 #include <QtGui>
 #include <QWidget>
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_series_data.h>
-#include <qwt_plot_marker.h>
 
 #include "nGenericPan.h"
 #include "ui_nLineout.h"
@@ -37,46 +35,26 @@
 #include "nPhysImageF.h"
 #include "nPhysMaths.h"
 
-#ifndef __nlineout
-#define __nlineout
-
 #include "neutrino.h"
 
 class nLineout : public nGenericPan {
 	Q_OBJECT
 public:
 	nLineout(neutrino *, QString, enum phys_direction);
-	
-	public slots:
-	void updatePlot(QPointF);
-	
-	void toggle_zoom();
-	void toggle_scale();
-	void toggle_scale(bool);
-
-	void nZoom(double);
-	
-	void updateLastPoint();
-
-    void setBehaviour();
 
 public slots:
-	void getMinMax();
-	void setMinMax(QPointF);
+	void updatePlot(QPointF);
+	
+	void nZoom(double);
+	
+    void updateLastPoint();
+
+    void setBehaviour();
 	
 private:
 	Ui::nLineout my_w;
 	
-	QwtPlotCurve *curve;
-	QwtPlotMarker marker, markerRuler;
-	QAction *toggleZoom,*toggleAutoscale;
-	
-	bool lineout_zoom;
 	enum phys_direction cut_dir;
-	
-	bool autoScale;
-
-	int paxis_index, naxis_index;
 	
 };
 

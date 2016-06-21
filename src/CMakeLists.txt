@@ -15,7 +15,7 @@ set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 if (APPLE)
     message(STATUS "Apple : remember to use brew !")
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
-    add_compile_options(-mmacosx-version-min=10.6)
+    add_compile_options(-mmacosx-version-min=10.6 -fvisibility=hidden)
 
     set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
 
@@ -67,24 +67,32 @@ file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 
 list (APPEND SOURCES
     neutrino.cc
+    nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nApp.cc main.cc
+
     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
-    graphics/spline.cc 
-    panThread.cc nPlug.cc pans/nFocalSpot.cc pans/nContours.cc pans/nPhysProperties.cc  
-    pans/VISAR/nVisarZoomer.cc pans/VISAR/nVisar.cc pans/nFindPeaks.cc 
+    graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
+
+    pans/nFocalSpot.cc pans/nPhysProperties.cc pans/nVisar.cc pans/nFindPeaks.cc pans/nContours.cc
     pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
     pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc 
     pans/nGhost.cc pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc 
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
-    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc nGenericPan.cc 
-    nApp.cc nPluginLoader.cc main.cc 
+    pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc pans/nZoomWin.cc
 )
 
 file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 
 include(FindNeutrinoGuiComponents)
+
+if (PYTHONQT_FOUND_COMPLETE)
+    MESSAGE(STATUS "adding python wrappers")
+    include_directories(python)
+    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc python/codeeditor.cpp)
+endif()
+
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
@@ -98,6 +106,7 @@ if (GENERATE_NHASH)
     endif()
 
 endif()
+
 
 # write automatically the qrc file for icons
 set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
@@ -166,7 +175,7 @@ elseif (USE_QT4)
 endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
-include_directories(graphics doc pans pans/VISAR pans/colorbar pans/winlist)
+include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 message(STATUS "Adding qrcs: ${RES_SOURCES}")

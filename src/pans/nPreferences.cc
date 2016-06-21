@@ -123,13 +123,13 @@ saveDefaults();
 
 #ifdef HAVE_LIBCLFFT
     if (num>0) {
-        string desc;
-        pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(num);
+        std::string desc;
+        std::pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(num);
         cl_device_id device=my_pair.second;
 
         size_t valueSize;
         clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &valueSize);
-        string value;
+        std::string value;
 
         value.resize(valueSize);
         clGetDeviceInfo(device, CL_DEVICE_NAME, valueSize, &value[0], NULL);

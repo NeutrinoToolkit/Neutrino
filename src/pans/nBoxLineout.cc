@@ -23,35 +23,6 @@
  *
  */
 #include "nBoxLineout.h"
-
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
-
-
-#if QWT_VERSION < 0x060100
-    nBoxLineoutZoomer::nBoxLineoutZoomer(QwtPlotCanvas *canvas): QwtPlotPicker(canvas) {
-#else
-    nBoxLineoutZoomer::nBoxLineoutZoomer(QWidget *canvas): QwtPlotPicker(canvas) {
-#endif
-        setTrackerMode(AlwaysOn);
-    }
-    
-    QwtText nBoxLineoutZoomer::trackerText(const QPoint &pos) const {
-        QColor bg(Qt::white);
-        bg.setAlpha(200);
-        QwtText text;
-        text.setBackgroundBrush( QBrush( bg ));
-        
-        double x1=plot()->invTransform(QwtPlot::xBottom, pos.x());
-        double x2=plot()->invTransform(QwtPlot::xTop, pos.x());
-        double y1=plot()->invTransform(QwtPlot::yLeft, pos.y());
-        double y2=plot()->invTransform(QwtPlot::yRight, pos.y());
-        
-        text.setText(QString::number(x1)+" "+QString::number(y1)+"("+QString::number(x2)+" "+QString::number(y2)+")");
-        return text;
-    }
-
     
 nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
@@ -70,57 +41,6 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 	connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
 	connect(my_w.actionSavePDF, SIGNAL(triggered()), this, SLOT(export_pdf()));
 
-	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("X (red)"));
-	my_w.plot->setAxisTitle(QwtPlot::yRight, tr("X value (red)"));
-	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Y (blue)"));
-	my_w.plot->setAxisTitle(QwtPlot::xTop, tr("Y value (blue)"));
-	my_w.plot->enableAxis(QwtPlot::xTop);
-	my_w.plot->enableAxis(QwtPlot::yRight);
-	my_w.plot->enableAxis(QwtPlot::xBottom);
-	my_w.plot->enableAxis(QwtPlot::yLeft);
-	(qobject_cast<QFrame*> (my_w.plot->canvas()))->setLineWidth(0);
-
-    
-    picker = new nBoxLineoutZoomer(my_w.plot->canvas());  
-    picker->setTrackerMode(QwtPicker::AlwaysOn);  
-    
-    
-	xCut.setPen(QPen(Qt::red,1));
-	yCut.setPen(QPen(Qt::blue,1));
-
-	xCut.setXAxis(QwtPlot::xBottom);
-	xCut.setYAxis(QwtPlot::yRight);
-	yCut.setXAxis(QwtPlot::xTop);
-	yCut.setYAxis(QwtPlot::yLeft);
-
-	xCut.attach(my_w.plot);
-	yCut.attach(my_w.plot);
-
-
-	QPen marker_pen;
-	marker_pen.setColor(QColor(255,0,0));
-	xMarker.setLinePen(marker_pen);
-	yMarker.setLinePen(marker_pen);
-
-
-	xMarker.setLineStyle(QwtPlotMarker::VLine);
-	xMarker.attach(my_w.plot);
-
-	yMarker.setLineStyle(QwtPlotMarker::HLine);
-	yMarker.attach(my_w.plot);
-
-	marker_pen.setColor(QColor(0,0,255));
-	rxMarker.setLinePen(marker_pen);
-	ryMarker.setLinePen(marker_pen);
-
-	rxMarker.setLineStyle(QwtPlotMarker::VLine);
-	rxMarker.attach(my_w.plot);
-
-	ryMarker.setLineStyle(QwtPlotMarker::HLine);
-	ryMarker.attach(my_w.plot);
-
-	rxMarker.setXValue(0);
-	ryMarker.setYValue(0);
 
 	decorate();
 	loadDefaults();
@@ -135,29 +55,7 @@ void nBoxLineout::sceneChanged() {
 
 void nBoxLineout::mouseAtWorld(QPointF p) {
 	if (currentBuffer) {
-		QPen marker_pen;
-		marker_pen.setColor(nparent->my_mouse.color);
-		xMarker.setLinePen(marker_pen);
-		yMarker.setLinePen(marker_pen);
-		marker_pen.setColor(nparent->my_tics.rulerColor);
-		rxMarker.setLinePen(marker_pen);
-		ryMarker.setLinePen(marker_pen);
-		
-		xMarker.setXValue(p.x());
-		yMarker.setYValue(p.y());
-				
-		rxMarker.setVisible(nparent->my_tics.rulerVisible);
-		ryMarker.setVisible(nparent->my_tics.rulerVisible);
-		
-		my_w.plot->replot();
-        
-        
-        double x2=my_w.plot->invTransform(QwtPlot::xTop,my_w.plot->transform(QwtPlot::xBottom, p.x()));
-        double y2=my_w.plot->invTransform(QwtPlot::yRight, my_w.plot->transform(QwtPlot::yLeft, p.y()));
-        
-        my_w.statusBar->showMessage(QString::number(p.x())+" "+QString::number(p.y())+ 
-                                    "("+QString::number(x2)+" "+QString::number(y2)+")");
-        
+        my_w.plot->setMousePosition(p.x(),p.y());
 	}
 }
 
@@ -172,9 +70,9 @@ void nBoxLineout::updatePlot() {
 		int dx=geomBox.width();
 		int dy=geomBox.height();
 
-		vector<double> xd(dx);
-		vector<double> yd(dy);
-		for (int j=0;j<dy;j++){
+        QVector<double> xd(dx);
+        QVector<double> yd(dy);
+        for (int j=0;j<dy;j++){
 			for (int i=0;i<dx; i++) {
 				double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
 				xd[i]+=val;
@@ -185,42 +83,45 @@ void nBoxLineout::updatePlot() {
 		transform(xd.begin(), xd.end(), xd.begin(),bind2nd(std::divides<double>(), dy));
 		transform(yd.begin(), yd.end(), yd.begin(),bind2nd(std::divides<double>(), dx));
 		
-		QVector <QPointF> xdata(dx);
-		QVector <QPointF> ydata(dy);
-		
+        QVector <double> xdata(dx);
+        QVector <double> ydata(dy);
+
 		vec2f orig=currentBuffer->get_origin();
 		vec2f scal=currentBuffer->get_scale();
 		
-		for (int i=0;i<dx;i++) xdata[i]=QPointF((geomBox.x()+i-orig.x())*scal.x(),xd[i]);
-		for (int j=0;j<dy;j++) ydata[j]=QPointF(yd[j],(geomBox.y()+j-orig.y())*scal.y());
+        for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
+        for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
 
-		xCut.setSamples(xdata);
-		yCut.setSamples(ydata);
+        my_w.plot->graph(0)->setData(xdata,xd);
+        my_w.plot->graph(1)->setData(ydata,yd);
 
-		my_w.plot->setAxisScale(xCut.xAxis(),xCut.minXValue(),xCut.maxXValue(),0);
-		my_w.plot->setAxisScale(xCut.yAxis(),xCut.minYValue(),xCut.maxYValue(),0);
-		my_w.plot->setAxisScale(yCut.xAxis(),yCut.minXValue(),yCut.maxXValue(),0);
-		my_w.plot->setAxisScale(yCut.yAxis(),yCut.maxYValue(),yCut.minYValue(),0);
-
-		my_w.plot->replot();
-	}
+        my_w.plot->rescaleAxes();
+        my_w.plot->replot();
+    }
 
 }
 
-void nBoxLineout::copy_clip() {
+void nBoxLineout::export_data(QTextStream &out) {
+    out << "# " << panName << " " << QString::fromStdString(currentBuffer->getName()) <<endl;
+    for (int g=0; g<my_w.plot->graphCount(); g++) {
+        out << "# " << (g==0?"Horizontal":"Vertical") << endl;
+        const QCPDataMap *dataMap = my_w.plot->graph(g)->data();
+        QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
+        while (i != dataMap->constEnd()) {
+            out << i.value().key << " " << i.value().value << endl;
+            ++i;
+        }
+        out << endl << endl;
+    }
+}
+
+void nBoxLineout::copy_clipboard() {
 	if (currentBuffer) {
-		QClipboard *clipboard = QApplication::clipboard();
-		QString point_table=QString::fromUtf8(currentBuffer->getName().c_str())+"\n";
-		point_table.append("# Horizontal : "+QString::number(xCut.data()->size()) +"\n");
-		for (unsigned int i=0;i<xCut.data()->size();i++) {
-			point_table.append(QString("%1\t%2\n").arg(xCut.data()->sample(i).x()).arg(xCut.data()->sample(i).y()));
-		}
-		point_table.append("# Vertical : "+QString::number(yCut.data()->size()) +"\n");
-		for (unsigned int i=0;i<yCut.data()->size();i++) {
-			point_table.append(QString("%1\t%2\n").arg(yCut.data()->sample(i).x()).arg(yCut.data()->sample(i).y()));
-		}
-		clipboard->setText(point_table);
-		showMessage(tr("Points copied to clipboard"));
+        QString point_table;
+        QTextStream out(&point_table);
+        export_data(out);
+        QApplication::clipboard()->setText(point_table);
+        my_w.statusBar->showMessage(tr("Points copied to clipboard"),2000);
 	}
 }
 
@@ -232,35 +133,20 @@ void nBoxLineout::export_txt() {
 			QFile t(fnametmp);
 			t.open(QIODevice::WriteOnly| QIODevice::Text);
 			QTextStream out(&t);
-			out << "# Box Lineout " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
-			out << "# Horizontal : " << xCut.data()->size() <<endl;
-			for (unsigned int i=0;i<xCut.data()->size();i++) {
-				out << xCut.data()->sample(i).x() << " " << xCut.data()->sample(i).y() << endl;
-			}
-			out << endl  << endl << "# Vertical : " << yCut.data()->size() <<endl;
-			for (unsigned int j=0;j<yCut.data()->size();j++) {
-				out << yCut.data()->sample(j).y() << " " << yCut.data()->sample(j).x() << endl;
-			}
-			t.close();
-			showMessage(tr("Export in file:")+fnametmp,2000);
-		}
+            export_data(out);
+            t.close();
+            my_w.statusBar->showMessage(tr("Export :")+fnametmp,2000);
+        }
 	}
 }
 
 void
 nBoxLineout::export_pdf() {
 	QString fout;
-	QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
+    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf)");
 	if (!fnametmp.isEmpty()) {
 		setProperty("fileExport", fnametmp);
-		QwtPlotRenderer renderer;
-
-		// flags to make the document look like the widge
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-//		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
-
-		renderer.renderDocument(my_w.plot, fnametmp, QFileInfo(fnametmp).suffix(), QSizeF(150, 100), 85);
-
+        my_w.plot->savePdf(fnametmp,true,0,0,"Neutrino", panName);
 	}
 
 }

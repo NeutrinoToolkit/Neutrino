@@ -41,7 +41,7 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
 	my_w.molarRefr_le->setValidator(dVal);
-	my_w.molarRefr_le->setText("5.23e-7");
+    my_w.molarRefr_le->setText(QString::number(5.23e-7));
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
@@ -92,19 +92,19 @@ QVariant nIntegralInversion::doInversion() {
 
 		QPolygonF axis_poly;
 		QPolygon axis_clean;
-		vector<phys_point> inv_axis;
+        std::vector<phys_point> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
 		axis_poly = axis->getLine(npoints);
 		
 		//!fixme we should cut the line when it goes outside and not move the point
-		int xpos= std::max<int>(0lu,min((size_t)axis_poly.first().x(),image->getW()-1));
-		int ypos=std::max<int>(0lu,min((size_t)axis_poly.first().y(),image->getH()-1));
+        int xpos= std::max<int>(0lu,std::min((size_t)axis_poly.first().x(),image->getW()-1));
+        int ypos=std::max<int>(0lu,std::min((size_t)axis_poly.first().y(),image->getH()-1));
 		axis_clean << QPoint(xpos,ypos);
 
 		for (int i=1; i<axis_poly.size(); i++) {
-			int xpos=std::max<int>(0lu,min((size_t)axis_poly.at(i).x(),image->getW()-1));
-			int ypos=std::max<int>(0lu,min((size_t)axis_poly.at(i).y(),image->getH()-1));
+            int xpos=std::max<int>(0lu,std::min((size_t)axis_poly.at(i).x(),image->getW()-1));
+            int ypos=std::max<int>(0lu,std::min((size_t)axis_poly.at(i).y(),image->getH()-1));
 			if (isHorizontal) {
 				if (xpos != axis_clean.last().x()) axis_clean << QPoint(xpos,ypos);
 			} else {
@@ -139,13 +139,13 @@ QVariant nIntegralInversion::doInversion() {
 
 			if (my_w.blurRadius_checkb->isChecked()) {	// blur
 				phys_fast_gaussian_blur(*iimage, my_w.blurRadius_sb->value());
-				ostringstream oss; oss<<iimage->getName()<<" (blur"<<my_w.blurRadius_sb->value()<<")";
+                std::ostringstream oss; oss<<iimage->getName()<<" (blur"<<my_w.blurRadius_sb->value()<<")";
 				iimage->setName(oss.str());
 			}
 
 			if (my_w.multiply_checkb->isChecked()) {	// multiply
 				phys_multiply(*iimage, my_w.multiply_sb->value());
-				ostringstream oss; oss<<iimage->getName()<<" *( "<<my_w.multiply_sb->value()<<")";
+                std::ostringstream oss; oss<<iimage->getName()<<" *( "<<my_w.multiply_sb->value()<<")";
 				iimage->setName(oss.str());
 			}
 

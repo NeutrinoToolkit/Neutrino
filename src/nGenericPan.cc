@@ -35,7 +35,7 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 		nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
 		if (pan && pan != this && pan->nparent == nparent) {
 			if (pan->panName.contains(panName)) {
-				panNum=max(pan->property("panNum").toInt(),panNum);				
+                panNum=std::max(pan->property("panNum").toInt(),panNum);
 			}
 		}
 	}
@@ -155,6 +155,7 @@ void nGenericPan::decorate() {
                     my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
                 }
             }
+            break;
         }
     }
     //	qDebug() << __PRETTY_FUNCTION__ << panName << objectName() << metaObject()->className();
@@ -182,13 +183,18 @@ void nGenericPan::decorate() {
             }
 		}
 	}
+    int occurrency=0;
 	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
+
 		if (wdgt->property("neutrinoSave").isValid() || 
             wdgt->property("neutrinoImage").isValid() ||
                 qobject_cast<QPushButton*>(wdgt) ||
                 qobject_cast<QToolButton*>(wdgt)
             ) {
 #ifdef HAVE_PYTHONQT
+            if (wdgt->objectName().isEmpty()) {
+                wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
+            }
             wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
 #endif
 		}
@@ -329,7 +335,7 @@ nGenericPan::loadUi(QSettings *settings) {
 			widget->setCurrentIndex(settings->value(widget->objectName()+"Default",0).toInt());
 		}
 		if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
-			string imageName=settings->value(widget->objectName()).toString().toStdString();
+            std::string imageName=settings->value(widget->objectName()).toString().toStdString();
 			foreach (nPhysD *physAperto,nparent->getBufferList()) {
 				if (physAperto->getName()==imageName) {
 					for (int i=0; i<widget->count();i++) {
@@ -543,6 +549,7 @@ void nGenericPan::loadSettings(QSettings *settings) {
 		QString prop=settings->value("property").toString();
 		QString valu=settings->value("value").toString();
 		setProperty(prop.toUtf8().constData(),valu);
+        DEBUG("property" << prop.toStdString() << " : " << valu.toStdString() );
 	}
 	settings->endArray();
 }
@@ -554,6 +561,7 @@ void nGenericPan::saveSettings(QSettings *settings) {
 		settings->setArrayIndex(i);
 		settings->setValue("property", neutrinoProperties.at(i));
 		settings->setValue("value", property(neutrinoProperties.at(i).toUtf8().constData()).toString());
+        DEBUG("property " << neutrinoProperties.at(i).toStdString() << " : " << property(neutrinoProperties.at(i).toUtf8().constData()).toString().toStdString() );
 	}
 	settings->endArray();
 }

@@ -41,8 +41,6 @@ message(STATUS "Using as cross root: ${CMAKE_FIND_ROOT_PATH}")
 #find_package(Qt5Core)
 
 set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
-set(QWT_LIBRARY ${CMAKE_FIND_ROOT_PATH}/Qwt-6.1.2/lib/libqwt.a)
-set(QWT_INCLUDE_DIR ${CMAKE_FIND_ROOT_PATH}/Qwt-6.1.2/include)
 
 
 #find_package(Qt5 COMPONENTS Core Gui Sql REQUIRED)

@@ -60,9 +60,13 @@ if (GIT_FOUND)
 	# generate clean (debian-wise) tag name
 	string(REGEX REPLACE "^[a-zA-Z]" "" ${PROJECT_NAME}_VERSION_NUM ${${PROJECT_NAME}_VERSION_STRING})
 
+        IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
+            message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
 	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
-	message(STATUS "Neutrino version: ${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+        ELSE()
+            set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}-${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
 	message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
+        ENDIF()
 endif()
 
 # targets
@@ -141,11 +145,6 @@ if(APPLE)
      set(CPACK_SYSTEM_NAME "OSX")
      set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
      set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
-endif()
-
-if(APPLE)
-    include(DeployQt4)
-    install_qt4_executable("${EXECUTABLE}")
 endif()
 
 include (CPack) # this to be included LAST with resp. to its vars

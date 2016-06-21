@@ -25,12 +25,6 @@
 #include "nRect.h"
 #include "neutrino.h"
 #include <iostream>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-
-#include <qwt_spline.h>
-#include <qwt_curve_fitter.h>
 
 nRect::~nRect() {
 	foreach (QGraphicsRectItem* item, ref) {
@@ -100,6 +94,17 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
 	updateSize();
+}
+
+void nRect::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
+    QMenu menu;
+    QAction *showPan = menu.addAction("Show control (w)");
+    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+    QAction *expandx = menu.addAction("Expand width (x)");
+    connect(expandx, SIGNAL(triggered()), this, SLOT(expandX()));
+    QAction *expandy = menu.addAction("Expand height (y)");
+    connect(expandy, SIGNAL(triggered()), this, SLOT(expandY()));
+    menu.exec(e->screenPos());
 }
 
 void nRect::setParentPan(QString winname, int level) {
@@ -317,7 +322,7 @@ void nRect::addPoint (int pos) {
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=max(pos, 1);
+        int copyfrom=std::max(pos, 1);
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -528,7 +533,7 @@ nRect::boundingRect() const {
 
 QPainterPath nRect::shape() const {
 	QPainterPathStroker stroker;
-	double thickness=max(nWidth,10.0)/zoom;
+    double thickness=std::max(nWidth,10.0)/zoom;
     stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {

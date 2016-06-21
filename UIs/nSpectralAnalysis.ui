@@ -248,9 +248,6 @@
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
          <property name="text">
           <string>Imaginary</string>
          </property>

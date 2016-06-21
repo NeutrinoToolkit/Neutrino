@@ -87,7 +87,7 @@ void nAffine::affine() {
 	nPhysD *my_phys=NULL;
 	nPhysD *my_phys_other=NULL;
 
-	vector<double> vecForward,vecBackward;
+    std::vector<double> vecForward,vecBackward;
 	if (sender()==my_w.first) {
 		my_phys=getPhysFromCombo(my_w.image1);
 		my_phys_other=getPhysFromCombo(my_w.image2);
@@ -129,7 +129,7 @@ void nAffine::affine() {
 		double minx=0.0;
 		double miny=0.0;
 		if (!my_w.crop->isChecked()) {			
-			vector<vec2f> corners(4); //clockwise...
+            std::vector<vec2f> corners(4); //clockwise...
 			corners[0]=affine(vec2f(0,0),vecForward);
 			corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
 			corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
@@ -170,16 +170,16 @@ void nAffine::affine() {
 	}
 }
 
-vec2f nAffine::affine(vec2f in, vector<double> vec){
+vec2f nAffine::affine(vec2f in, std::vector<double> vec){
 	return vec2f(in.x()*vec[0]+in.y()*vec[1]+vec[2],in.x()*vec[3]+in.y()*vec[4]+vec[5]);
 }
 
-vector<double> nAffine::getAffine(QPolygonF poly1, QPolygonF poly2) {
-	vector<double>ret(6);
+std::vector<double> nAffine::getAffine(QPolygonF poly1, QPolygonF poly2) {
+    std::vector<double>ret(6);
 	poly1.resize(3);
 	poly2.resize(3);
 
-	vector<double> p1(9), p2(9), mat(9), inva(9);
+    std::vector<double> p1(9), p2(9), mat(9), inva(9);
 	
 	p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
 	p1[3] = poly1[0].y(); p1[4] = poly1[1].y(); p1[5] = poly1[2].y();

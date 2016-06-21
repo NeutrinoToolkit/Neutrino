@@ -25,46 +25,24 @@
 #include "nLineout.h"
 
 nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_dir)
-: nGenericPan(parent, win_name), lineout_zoom(false), cut_dir(plot_dir)
+: nGenericPan(parent, win_name), cut_dir(plot_dir)
 {
 	my_w.setupUi(this);
 
-	// indexes
-	paxis_index = (int)plot_dir;
-	naxis_index = (paxis_index+1)%2;
+    connect(my_w.actionToggleZoom,SIGNAL(triggered()), this, SLOT(updateLastPoint()));
 
-	connect(my_w.actionToggleZoom,SIGNAL(triggered()), this, SLOT(toggle_zoom()));
-	connect(my_w.actionAutoscale,SIGNAL(triggered()), this, SLOT(toggle_scale()));
-	connect(my_w.actionGetMinMax,SIGNAL(triggered()), this, SLOT(getMinMax()));
-	autoScale=true;
-	toggle_scale(autoScale);
-	my_w.toolBar->insertWidget(my_w.actionMax,my_w.minVal);
-	my_w.toolBar->insertWidget(my_w.actionToggleZoom,my_w.maxVal);
-	my_w.toolBar->insertSeparator(my_w.actionToggleZoom);
-
-	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
+    connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint()));
 
     connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
     setBehaviour();
+
+    connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), my_w.actionLockColors, SLOT(setEnabled(bool)));
     
-	curve = new QwtPlotCurve(win_name);
-	curve->show();
-	curve->attach(my_w.the_plot);
+    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+    my_w.plot->graph(0)->setPen(QPen(Qt::black));
 
-
-	QPen marker_pen;
-	marker_pen.setColor(QColor(255,0,0));
-	marker.setLineStyle(QwtPlotMarker::VLine);
-	marker.setLinePen(marker_pen);
-	marker.attach(my_w.the_plot);
-	marker_pen.setColor(QColor(0,0,255));
-	markerRuler.setLineStyle(QwtPlotMarker::VLine);
-	markerRuler.setLinePen(marker_pen);
-	markerRuler.attach(my_w.the_plot);
-	markerRuler.setXValue(0);
-
-	decorate();
-	updateLastPoint();
+    decorate();
+    updateLastPoint();
 }
 
 void nLineout::setBehaviour() {
@@ -82,124 +60,65 @@ void nLineout::setBehaviour() {
 void
 nLineout::updatePlot(QPointF p) {
 
-	if (currentBuffer != NULL) {
+    if (currentBuffer != NULL) {
 
-		// get bounds from schermo
-		QPointF orig, corner;
-		orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
-		QPoint lowerRight=QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height());
-		corner = nparent->my_w.my_view->mapToScene(lowerRight);
+        vec2 b_p(p.x(),p.y());
 
-		int b_o[2], b_c[2], b_p[2];
-		double b_r[2], b_s[2];
-		b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
-		b_c[0] = int(corner.x()); b_c[1] = int(corner.y());
-		b_p[0] = int(p.x()); b_p[1] = int(p.y());
-		b_r[0] = currentBuffer->get_origin().x(); b_r[1] = currentBuffer->get_origin().y();
-		b_s[0] = currentBuffer->get_scale().x(); b_s[1] = currentBuffer->get_scale().y();
+        //get bounds from view
+        QPointF orig,corner;
+        if (my_w.actionToggleZoom->isChecked()) {
+            orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
+            corner = nparent->my_w.my_view->mapToScene(QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height()));
+        } else {
+            orig = QPoint(0,0);
+            corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
+        }
 
-		statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
+        vec2 b_o((int)orig.x(),(int)orig.y());
+        vec2 b_c((int)corner.x(),(int)corner.y());
 
-		double vmin=0, vmax=0;
-		const double *dvec = currentBuffer->to_dvector(cut_dir, b_p[naxis_index]);
-		if (!lineout_zoom) {
-			phys_get_vec_brightness(dvec, currentBuffer->getSizeByIndex(cut_dir), vmin, vmax);
-			curve->setRawSamples(currentBuffer->to_axis(cut_dir), dvec, currentBuffer->getSizeByIndex(cut_dir));
-			curve->attach(my_w.the_plot);
-		} else {
-			size_t lat_skip = max(b_o[paxis_index], 0);
-			size_t z_size = min(b_c[paxis_index]-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);
-			phys_get_vec_brightness(dvec+lat_skip, z_size, vmin, vmax);
-			curve->setRawSamples(currentBuffer->to_axis(cut_dir)+lat_skip, dvec+lat_skip, z_size);
-		}
+        phys_direction other_dir=cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL;
 
-		QPen marker_pen;
-		marker_pen.setColor(nparent->my_mouse.color);
-		marker.setLinePen(marker_pen);
-		marker_pen.setColor(nparent->my_tics.rulerColor);
-		markerRuler.setLinePen(marker_pen);
+        size_t lat_skip = std::max(b_o(cut_dir), 0);
+        size_t z_size = std::min(b_c(cut_dir)-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);
 
-		marker.setXValue((b_p[paxis_index]-b_r[paxis_index])*b_s[paxis_index]);
-
-		markerRuler.setVisible(nparent->my_tics.rulerVisible);
-
-		my_w.the_plot->setAxisScale(curve->xAxis(),curve->minXValue(),curve->maxXValue(),0);
-		if (autoScale) {
-			my_w.minVal->setText(QString::number(vmin));
-			my_w.maxVal->setText(QString::number(vmax));
-            if (my_w.actionLockColors->isChecked()) {
-                vec2f minmax=currentBuffer->property["display_range"];
-                vmin=minmax.first();
-                vmax=minmax.second();
+        QVector<double> x(z_size);
+        for (unsigned int i=0;i<z_size;i++){
+            x[i]=(i+lat_skip-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
+        }
+        QVector<double> y(z_size);
+        if (cut_dir==PHYS_HORIZONTAL) {
+            for (unsigned int i=0;i<z_size;i++){
+                y[i]=currentBuffer->point(i+lat_skip,b_p(other_dir));
             }
-			my_w.the_plot->setAxisScale(curve->yAxis(),vmin,vmax,0);
-		} else {
-			my_w.the_plot->setAxisScale(curve->yAxis(),my_w.minVal->text().toDouble(),my_w.maxVal->text().toDouble(),0);
-		}
-		my_w.the_plot->replot();
+        } else {
+            for (unsigned int i=0;i<z_size;i++){
+                y[i]=currentBuffer->point(b_p(other_dir),i+lat_skip);
+            }
+        }
+        my_w.plot->graph(0)->setData(x,y);
+        my_w.plot->graph(0)->keyAxis()->setRange(x.first(), x.last());
 
-	}
+        if(!my_w.actionAutoscale->isChecked()) {
+            my_w.plot->graph(0)->rescaleValueAxis();
+        } else {
+            if(my_w.actionLockColors->isChecked()) {
+                vec2f rang=currentBuffer->property["display_range"];
+                my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
+            }
+        }
+        statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
+        my_w.plot->setMousePosition(b_p(cut_dir)-currentBuffer->get_origin(cut_dir));
+    }
 
 }
 
-
-void
-nLineout::toggle_zoom() {
-	lineout_zoom = !lineout_zoom;
-	if (lineout_zoom) {
-		statusBar()->showMessage(tr("Lineout linked to visible part"),2000);
-	} else {
-		statusBar()->showMessage(tr("Lineout on the whole image"),2000);
-	}
-	updateLastPoint();
-}
-
-void
-nLineout::toggle_scale() {
-	updateLastPoint();
-	toggle_scale(!autoScale);
-}
-
-void
-nLineout::toggle_scale(bool val) {
-	autoScale=val;
-	my_w.minVal->setReadOnly(autoScale);
-	my_w.maxVal->setReadOnly(autoScale);
-	my_w.actionGetMinMax->setEnabled(!autoScale);
-	if (autoScale) {
-		statusBar()->showMessage(tr("Auto scale"),2000);
-	} else {
-		statusBar()->showMessage(tr("Fixed scale"),2000);
-	}
-}
-
-void nLineout::getMinMax() {
-	if (my_w.actionGetMinMax->isChecked()) {
-		autoScale=true;
-		my_w.actionAutoscale->setEnabled(false);
-		statusBar()->showMessage(tr("Press mouse to get min and max"),5000);
-		connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setMinMax(QPointF)));
-	} else {
-		autoScale=false;
-		statusBar()->showMessage(tr("Canceled"),5000);
-		disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setMinMax(QPointF)));
-	}
-}
-
-void nLineout::setMinMax(QPointF point) {
-	autoScale=false;
-	my_w.actionAutoscale->setEnabled(true);
-	statusBar()->showMessage(tr("Got min and max")+")"+QString::number(point.x())+","+QString::number(point.x())+")",5000);
-	my_w.actionGetMinMax->setChecked(false);
-	disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(setMinMax(QPointF)));
-}
-
-void nLineout::nZoom(double) {
-	if (lineout_zoom) updateLastPoint();
+void nLineout::nZoom(double d) {
+    updateLastPoint();
 }
 
 void nLineout::updateLastPoint() {
-	updatePlot(nparent->my_mouse.pos());
+    updatePlot(nparent->my_mouse.pos());
 }
 
 

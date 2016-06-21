@@ -24,11 +24,6 @@
  */
 #include "nFindPeaks.h"
 
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_symbol.h>
-
 #include <gsl/gsl_fit.h>
 
 nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
@@ -56,39 +51,13 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
 	my_w.toolBar->addWidget(my_w.direction);
 	my_w.toolBar->addWidget(my_w.param);
 
-	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("Position [px]"));
-	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Value"));
-	my_w.plot->enableAxis(QwtPlot::xBottom);
-	my_w.plot->enableAxis(QwtPlot::yLeft);
-	(qobject_cast<QFrame*> (my_w.plot->canvas()))->setLineWidth(0);
-	
-	lineout.setPen(QPen(Qt::red,1));
+    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+    my_w.plot->graph(0)->setPen(QPen(Qt::blue));
 
-	lineout.setXAxis(QwtPlot::xBottom);
-	lineout.setYAxis(QwtPlot::yLeft);
-
-	lineout.attach(my_w.plot);
-
-	QPen marker_pen;
-	marker_pen.setColor(QColor(255,0,0));
-	xMarker.setLinePen(marker_pen);
-
-
-	xMarker.setLineStyle(QwtPlotMarker::VLine);
-	xMarker.attach(my_w.plot);
-
-	marker_pen.setColor(QColor(0,0,255));
-	rxMarker.setLinePen(marker_pen);
-
-	rxMarker.setLineStyle(QwtPlotMarker::VLine);
-	rxMarker.attach(my_w.plot);
-
-	rxMarker.setXValue(0);
-	
 	decorate();
 	loadDefaults();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
-	connect(box, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
+    connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
  	connect(my_w.direction, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
  	connect(my_w.param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 	updatePlot();
@@ -133,28 +102,19 @@ void nFindPeaks::setScale() {
 	}
 }
 
-void nFindPeaks::sceneChanged() {
-	if (sender()==box) updatePlot();
-}
-
 void nFindPeaks::mouseAtMatrix(QPointF p) {
 	if (currentBuffer) {
-		QPen marker_pen;
-		marker_pen.setColor(nparent->my_mouse.color);
-		xMarker.setLinePen(marker_pen);
-		marker_pen.setColor(nparent->my_tics.rulerColor);
-		rxMarker.setLinePen(marker_pen);
-		
-		xMarker.setXValue(my_w.direction->currentIndex()==0?p.x():p.y());
-				
-		rxMarker.setVisible(nparent->my_tics.rulerVisible);
-		
-		my_w.plot->replot();
-	}
+        if (my_w.direction->currentIndex()==0) {
+            my_w.plot->setMousePosition(p.x());
+        } else {
+            my_w.plot->setMousePosition(p.y());
+        }
+    }
 }
 
 void nFindPeaks::updatePlot() {
 	if (currentBuffer && isVisible()) {
+        saveDefaults();
         QRect geom2=box->getRect(currentBuffer);
 		if (geom2.isEmpty()) {
 			my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
@@ -164,10 +124,8 @@ void nFindPeaks::updatePlot() {
 		int dx=geom2.width();
 		int dy=geom2.height();
 
-		vector<double> xd(dx);
-		vector<double> yd(dy);
-		for (int j=0;j<dy;j++) yd[j]=0.0;
-		for (int i=0;i<dx;i++) xd[i]=0.0;
+        QVector<double> xd(dx,0.0);
+        QVector<double> yd(dy,0.0);
 
 		for (int j=0;j<dy;j++){
 			for (int i=0;i<dx; i++) {
@@ -176,116 +134,131 @@ void nFindPeaks::updatePlot() {
 				yd[j]+=val;
 			}
 		}
+        transform(xd.begin(), xd.end(), xd.begin(),bind2nd(std::divides<double>(), dy));
+        transform(yd.begin(), yd.end(), yd.begin(),bind2nd(std::divides<double>(), dx));
 
-		QVector <QPointF> xdata(dx);
-		QVector <QPointF> ydata(dy);
+        QVector<double> xdata(dx);
+        QVector<double> ydata(dy);
 		
-		for (int i=0;i<dx;i++) xdata[i]=QPointF(i+geom2.x(),xd[i]/dy);
-		for (int j=0;j<dy;j++) ydata[j]=QPointF(j+geom2.y(),yd[j]/dx);
+        for (int i=0;i<dx;i++) xdata[i]=i+geom2.x();
+        for (int j=0;j<dy;j++) ydata[j]=j+geom2.y();
 
-		
-		lineout.setSamples((my_w.direction->currentIndex()==0)?xdata:ydata);
-	
-		int sizeCut=lineout.dataSize();
-		vector<double> myData(sizeCut);
-		
-		for (int i=0;i<sizeCut;i++) {
-			myData[i]=lineout.sample(i).y()/sizeCut;
-		}
-		
-		fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
-		fftw_complex *myDataC2=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
-		fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
-		fftw_plan planC2R=fftw_plan_dft_c2r_1d(sizeCut, myDataC, &myData[0], FFTW_ESTIMATE);
-		fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC2, &myData[0], FFTW_ESTIMATE);
-		
-		fftw_execute(planR2C);
-		
-		for (int i=0;i<sizeCut/2+1;i++) {
-			myDataC2[i][0]=myDataC[i][0];
-			myDataC2[i][1]=myDataC[i][1];
-			double aR=myDataC[i][0];
-			double aI=myDataC[i][1];
-			myDataC[i][0]=aR*aR+aI*aI;
-			myDataC[i][1]=0.0;
-		}
-		
-		fftw_execute(planC2R);
-		
-		double cutoff=1.0;
-		for (int i=1;i<sizeCut/2;i++) {
-			if (myData[i+1]>myData[i] && myData[i-1]>myData[i]){
-				cutoff=M_PI*i/2.0;
-				break;
-			}
-		}
 
-		double sx=my_w.param->value()*pow(sizeCut/cutoff,2);
-		
-		for (int i=0;i<sizeCut/2+1;i++) {
-			double blur=exp(-i*i/sx);
-			myDataC2[i][0]*=blur;
-			myDataC2[i][1]*=blur;
-		}
-		fftw_execute(planC2R2);
-		
-		foreach(QwtPlotMarker *mark, markers) {
-			mark->detach();
-		}
-		markers.clear();
-		
-		QFont labFont;
-		labFont.setPointSize(10);
-		
-        xd.resize(sizeCut);
-		yd.resize(sizeCut);
+        std::vector<double> myData;
 
-		int k=0;
-		for (int i=1;i<sizeCut-1;i++) {
-			if (myData[i]>myData[i-1] && myData[i]>myData[i+1]){
-				QwtPlotMarker *mark=new QwtPlotMarker();
-				mark->setValue(lineout.sample(i));
-				mark->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(QColor(255, 0, 0, 127)),QPen(Qt::black),QSize(5,5)));
-				mark->attach(my_w.plot);
-				markers << mark;
-				xd[k]=k;
-				yd[k]=lineout.sample(i).x();
-				k++;
-			}
-		}
-		k--;
-		if (k>1) {
-			double c0, c1, cov00, cov01, cov11, sumsq;
-			gsl_fit_linear (&xd[0], 1, &yd[0], 1, k, &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
-			my_w.statusBar->showMessage(QString::number(cutoff)+" c00:"+QString::number(cov00)+" c01:"+QString::number(cov01)+" c11:"+QString::number(cov11)+" sq:"+QString::number(sqrt(sumsq)/k));
-			my_w.origin->setText(QString::number(c0));
-			my_w.scale->setText(QString::number(2*c1));
-		}
+        if (my_w.direction->currentIndex()==0) {
+            my_w.plot->graph(0)->setData(xdata,xd);
+            myData.resize(xd.size());
+            std::copy ( xd.begin(), xd.end(), myData.begin() );
+        } else {
+            my_w.plot->graph(0)->setData(ydata,yd);
+            myData.resize(yd.size());
+            std::copy ( yd.begin(), yd.end(), myData.begin() );
+        }
+
+        int sizeCut=myData.size();
+        transform(myData.begin(), myData.end(), myData.begin(),bind2nd(std::divides<double>(), sizeCut));
 		
-		my_w.plot->setAxisScale(lineout.xAxis(),lineout.minXValue(),lineout.maxXValue(),0);
-		my_w.plot->setAxisScale(lineout.yAxis(),lineout.minYValue(),lineout.maxYValue(),0);
+        fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
+        fftw_complex *myDataC2=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
+        fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
+        fftw_plan planC2R=fftw_plan_dft_c2r_1d(sizeCut, myDataC, &myData[0], FFTW_ESTIMATE);
+        fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC2, &myData[0], FFTW_ESTIMATE);
 		
-		my_w.plot->replot();
-		fftw_destroy_plan(planR2C);
-		fftw_destroy_plan(planC2R);
-		fftw_destroy_plan(planC2R2);
-		fftw_free(myDataC);	
-		fftw_free(myDataC2);	
-	}
+        fftw_execute(planR2C);
+		
+        for (int i=0;i<sizeCut/2+1;i++) {
+            myDataC2[i][0]=myDataC[i][0];
+            myDataC2[i][1]=myDataC[i][1];
+            double aR=myDataC[i][0];
+            double aI=myDataC[i][1];
+            myDataC[i][0]=aR*aR+aI*aI;
+            myDataC[i][1]=0.0;
+        }
+		
+        fftw_execute(planC2R);
+		
+        double cutoff=1.0;
+        for (int i=1;i<sizeCut/2;i++) {
+            if (myData[i+1]>myData[i] && myData[i-1]>myData[i]){
+                cutoff=M_PI*i/2.0;
+                break;
+            }
+        }
+
+        double sx=my_w.param->value()*pow(sizeCut/cutoff,2);
+		
+        for (int i=0;i<sizeCut/2+1;i++) {
+            double blur=exp(-i*i/sx);
+            myDataC2[i][0]*=blur;
+            myDataC2[i][1]*=blur;
+        }
+        fftw_execute(planC2R2);
+		
+        my_w.plot->clearItems();
+
+        std::vector<double> fitx;
+        std::vector<double> fity;
+
+        int k=0;
+        for (int i=1;i<sizeCut-1;i++) {
+            if (myData[i]>myData[i-1] && myData[i]>myData[i+1]){
+                double posx=i+(my_w.direction->currentIndex()==0?geom2.x():geom2.y());
+                double posy=my_w.direction->currentIndex()==0?xd[i]:yd[i];
+
+                QCPItemEllipse *marker=new QCPItemEllipse(my_w.plot);
+                marker->topLeft->setCoords(posx-1, posy-1);
+                marker->bottomRight->setCoords(posx+1, posy+1);
+
+                marker->setPen(QPen(Qt::red));
+                my_w.plot->addItem(marker);
+
+                fitx.push_back(k);
+                fity.push_back(posx);
+                k++;
+            }
+        }
+
+        if (fitx.size()>2) {
+            double c0, c1, cov00, cov01, cov11, sumsq;
+            gsl_fit_linear (&fitx[0], 1, &fity[0], 1, fitx.size(), &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
+            my_w.statusBar->showMessage(QString::number(cutoff)+" c00:"+QString::number(cov00)+" c01:"+QString::number(cov01)+" c11:"+QString::number(cov11)+" sq:"+QString::number(sqrt(sumsq)/fitx.size()));
+            my_w.origin->setText(QString::number(c0));
+            my_w.scale->setText(QString::number(c1));
+        }
+		
+        fftw_destroy_plan(planR2C);
+        fftw_destroy_plan(planC2R);
+        fftw_destroy_plan(planC2R2);
+        fftw_free(myDataC);
+        fftw_free(myDataC2);
+
+        my_w.plot->rescaleAxes();
+        my_w.plot->replot();
+
+    }
 
 }
 
 void nFindPeaks::copy_clip() {
 	if (currentBuffer) {
 		QClipboard *clipboard = QApplication::clipboard();
-		QString point_table="# FindPeaks "+QString::fromUtf8(currentBuffer->getName().c_str())+"\n";
-		int k=0;
-		foreach(QwtPlotMarker* mark,markers) {
-			point_table.append(QString("%1\t%2\n").arg(k++).arg(mark->value().x()));
-		}
-		clipboard->setText(point_table);
+        QString point_table;
+        QTextStream out(&point_table);
+        export_data(out);
+        clipboard->setText(point_table);
 		showMessage(tr("Points copied to clipboard"));
 	}
+}
+
+void nFindPeaks::export_data(QTextStream &out) {
+    out << "# FindPeaks " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
+    for(int i=0;i<my_w.plot->itemCount();i++) {
+        QCPItemEllipse *elli=qobject_cast<QCPItemEllipse*>(my_w.plot->item(i));
+        if (elli) {
+            out << i << " " << 0.5*(elli->bottomRight->coords().x() + elli->topLeft->coords().x()) <<endl;
+        }
+    }
 }
 
 void nFindPeaks::export_txt() {
@@ -296,11 +269,7 @@ void nFindPeaks::export_txt() {
 			QFile t(fnametmp);
 			t.open(QIODevice::WriteOnly| QIODevice::Text);
 			QTextStream out(&t);
-			out << "# FindPeaks " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
-			int k=0;
-			foreach(QwtPlotMarker* mark,markers) {
-				out << k++ << "\t" << mark->value().x() << endl;
-			}
+            export_data(out);
 			t.close();
 			showMessage(tr("Export in file:")+fnametmp,2000);
 		}
@@ -310,18 +279,10 @@ void nFindPeaks::export_txt() {
 void
 nFindPeaks::export_pdf() {
 	QString fout;
-	QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
+    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf)");
 	if (!fnametmp.isEmpty()) {
 		setProperty("fileExport", fnametmp);
-		QwtPlotRenderer renderer;
-
-		// flags to make the document look like the widge
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-//		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
-
-		renderer.renderDocument(my_w.plot, fnametmp, QFileInfo(fnametmp).suffix(), QSizeF(150, 100), 85);
-
+        my_w.plot->savePdf(fnametmp,true,0,0,"Neutrino", panName);
 	}
-
 }
 

@@ -34,8 +34,6 @@
 #ifndef __nMouseInfo_h
 #define __nMouseInfo_h
 
-using namespace std;
-
 class neutrino;
 
 class nMouseInfo : public nGenericPan {

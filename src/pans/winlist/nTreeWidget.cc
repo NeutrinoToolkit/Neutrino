@@ -26,8 +26,6 @@
 #include "nWinList.h"
 #include "neutrino.h"
 
-using namespace std;
-
 void nTreeWidget::mousePressEvent(QMouseEvent *e) {
     dragitems.clear();
     foreach (QTreeWidgetItem * item, selectedItems()) {

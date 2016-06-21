@@ -815,12 +815,11 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool b
 	// 0. find centroid if not supplied
 	vec2 centr;
 	if (wimage.get_origin() == vec2(0,0)) {
-		centr = vec2(wimage.max_Tv_x, wimage.max_Tv_y);
-		wimage.set_origin(centr);
-		iimage.set_origin(centr);
-	} else
+        wimage.set_origin(wimage.max_Tv);
+        iimage.set_origin(wimage.max_Tv);
+    } else {
 		centr = wimage.get_origin();
-
+    }
 
 
 	// 1. generate boolean map

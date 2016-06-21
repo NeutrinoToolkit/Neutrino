@@ -104,13 +104,13 @@ void nWavelet::bufferChanged(nPhysD* buf) {
 }
 
 void nWavelet::physDel(nPhysD* buf) {
-    vector<nPhysD *> localPhys;
+    std::vector<nPhysD *> localPhys;
     localPhys.push_back(origSubmatrix);
     localPhys.push_back(unwrapPhys);
     localPhys.push_back(referencePhys);
     localPhys.push_back(carrierPhys);
     localPhys.push_back(syntheticPhys);
-    for (vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
+    for (std::vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
         if (buf==*itr) {
             *itr=NULL;
         }
@@ -213,7 +213,7 @@ void nWavelet::doWavelet () {
 
 
 		my_w.erasePrevious->setEnabled(true);
-        map<string, nPhysD *>::const_iterator itr;
+        std::map<std::string, nPhysD *>::const_iterator itr;
 		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
             if ((itr->first=="angle"  && my_params.n_angles==1) ||
                 (itr->first=="lambda" && my_params.n_lambdas==1)) {

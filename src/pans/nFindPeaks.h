@@ -25,19 +25,13 @@
 #include <QtGui>
 #include <QWidget>
 
-#include "nGenericPan.h"
-#include "ui_nFindPeaks.h"
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-
 #ifndef __nFindPeaks
 #define __nFindPeaks
 
+#include "nGenericPan.h"
+#include "ui_nFindPeaks.h"
 #include "neutrino.h"
+
 class nRect;
 
 class nFindPeaks : public nGenericPan {
@@ -56,20 +50,15 @@ public:
 	void setOrigin();
 	void setScale();
 
+    void export_data(QTextStream &);
+
 	void copy_clip();
 	void export_txt();
 	
 	void export_pdf();
 	
-	// fun stuff
-
-	void sceneChanged();
-
 private:
-	QwtPlotCurve lineout;	
-	QwtPlotMarker xMarker, rxMarker;
-	QPointer<nRect> box;
-	QVector<QwtPlotMarker *> markers;
+    QPointer<nRect> box;
 };
 
 #endif

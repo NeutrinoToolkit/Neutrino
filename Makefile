@@ -19,7 +19,7 @@ version_branch:=$(shell git name-rev --name-only HEAD)
 VERSION:=${version_tag}-${version_number}
 
 ifneq ($(version_branch),master)
-	VERSION:=$(VERSION)-$(version_branch)
+	VERSION:=$(version_branch)-$(VERSION)
 endif
 
 colormap:
@@ -58,18 +58,14 @@ cross::
 
 Linux::
 	mkdir -p $@	
-	cd $@ && cmake .. -DDEBIAN=True
+	cd $@ && cmake ..
 	$(MAKE) -C $@ package
 
 
-appdir::
-	mkdir -p $@	
-	cd $@ && cmake .. -DDEBIAN=True -DQWTDIR=/usr/local/qwt-6.1.3-svn
-	$(MAKE) -C $@ 
-	
+appdir:: Linux
 	mkdir -p Neutrino.AppDir/usr
 
-	cp -r $@/lib $@/bin Neutrino.AppDir/usr
+	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
 	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
 
 	cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins Neutrino.AppDir/usr/bin

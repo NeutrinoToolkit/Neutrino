@@ -25,12 +25,6 @@
 #include "nEllipse.h"
 #include "neutrino.h"
 #include <iostream>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-
-#include <qwt_spline.h>
-#include <qwt_curve_fitter.h>
 
 nEllipse::~nEllipse() {
 	foreach (QGraphicsRectItem* item, ref) {
@@ -322,7 +316,7 @@ void nEllipse::addPoint (int pos) {
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=max(pos, 1);
+        int copyfrom=std::max(pos, 1);
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();

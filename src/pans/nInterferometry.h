@@ -46,25 +46,24 @@ public:
 	Ui::nInterferometry my_w;
     std::vector<Ui::nInterferometry1> my_image;
 
-	QPointer<nRect> region;	
+    QPointer<nRect> region;
 	QPointer<nLine> unwrapBarrier;
     QPointer<nLine> maskRegion;
 	
-	std::map<std::string, nPhysD *> waveletPhys[2];
-
     std::map<std::string, nPhysD *> localPhys;
 
     void loadSettings(QSettings *);
     void saveSettings(QSettings *);
-    
+
 private:
 	wavelet_params my_params;
-    std::vector<std::string> localPhysNames();
+
     std::map<QToolButton*, nLine *> my_shapes;
-    
+
 public slots:
 
-    void duplicate();
+    void on_actionDuplicate_triggered();
+    void on_actionDelete_triggered();
 
     void physDel(nPhysD*);
 	void useBarrierToggled(bool);
@@ -73,7 +72,6 @@ public slots:
     
 	void guessCarrier();
 
-	void doTrash();
 	void doWavelet();
 	void doWavelet(int);
 	void doUnwrap();
@@ -95,7 +93,6 @@ public slots:
 	void bufferChanged(nPhysD*);
 	void checkChangeCombo(QComboBox *);
 
-	
 };
 
 #endif

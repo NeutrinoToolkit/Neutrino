@@ -33,8 +33,6 @@
 #ifndef __nTreeWidget_h
 #define __nTreeWidget_h
 
-using namespace std;
-
 class nWinList;
 class neutrino;
 

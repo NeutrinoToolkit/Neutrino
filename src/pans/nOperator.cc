@@ -132,7 +132,7 @@ void nOperator::doOperation () {
             for (size_t i=0; i<myresult->getW(); i++) {
                 double val1=operand1->point(i+shift1.x(),j+shift1.y());
                 double val2=operand2->point(i+shift2.x(),j+shift2.y());
-                if (isfinite(val1) && isfinite(val2)) {
+                if (std::isfinite(val1) && std::isfinite(val2)) {
                     switch (my_w.operation->currentIndex()) {
                     case 0:
                         myresult->set(i,j,val1+val2);
@@ -160,7 +160,7 @@ void nOperator::doOperation () {
                         break;
                     }
                 } else {
-                    myresult->set(i,j,isfinite(val1)?val1:val2);
+                    myresult->set(i,j,std::isfinite(val1)?val1:val2);
                 }
 
             }

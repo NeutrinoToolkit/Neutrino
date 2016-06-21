@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nVisar</class>
- <widget class="QMainWindow" name="nVisar">
+ <class>nVISAR1</class>
+ <widget class="QMainWindow" name="nVISAR1">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>550</width>
+    <width>623</width>
     <height>521</height>
    </rect>
   </property>
@@ -25,18 +25,18 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
-     <number>4</number>
+     <number>0</number>
     </property>
     <property name="topMargin">
-     <number>10</number>
+     <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>4</number>
+     <number>0</number>
     </property>
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item row="1" column="0">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabs">
       <property name="sizeIncrement">
        <size>
@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -81,7 +81,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
@@ -138,7 +138,7 @@
        <attribute name="title">
         <string>Velocity</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,1">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -151,7 +151,7 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
+        <item>
          <widget class="QTabWidget" name="tabVelocity">
           <property name="tabPosition">
            <enum>QTabWidget::North</enum>
@@ -220,20 +220,8 @@
           </widget>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QwtPlot" name="plotVelocity">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-         </widget>
+        <item>
+         <widget class="nVisarPlot" name="plotVelocity" native="true"/>
         </item>
        </layout>
       </widget>
@@ -254,12 +242,12 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0" colspan="3">
-         <widget class="QGroupBox" name="groupBox">
+        <item row="2" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_8">
           <property name="title">
-           <string>Reference and Shot and offset</string>
+           <string>SOP calibration T0 A</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_9" columnstretch="1,1,0">
+          <layout class="QGridLayout" name="gridLayout_14">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -273,47 +261,49 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QComboBox" name="sopRef">
+            <widget class="QDoubleSpinBox" name="sopCalibT0">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
-             <property name="neutrinoImage" stdset="0">
+             <property name="decimals">
+              <number>7</number>
+             </property>
+             <property name="maximum">
+              <double>999999.989999999990687</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QComboBox" name="sopShot">
+            <widget class="QDoubleSpinBox" name="sopCalibA">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
-             <property name="neutrinoImage" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QDoubleSpinBox" name="sopOffset">
-             <property name="toolTip">
-              <string>Background value</string>
-             </property>
-             <property name="suffix">
-              <string> [counts]</string>
+             <property name="decimals">
+              <number>7</number>
              </property>
              <property name="minimum">
-              <double>-99999999.989999994635582</double>
+              <double>-99999999.000000000000000</double>
              </property>
              <property name="maximum">
-              <double>99999999.989999994635582</double>
+              <double>99999999.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <widget class="nVisarPlot" name="sopPlot" native="true"/>
         </item>
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_2">
@@ -513,12 +503,12 @@
           </layout>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_8">
+        <item row="0" column="0" colspan="3">
+         <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>SOP calibration T0 A</string>
+           <string>Reference and Shot and offset</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_14">
+          <layout class="QGridLayout" name="gridLayout_9" columnstretch="1,1,0">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -532,41 +522,42 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QDoubleSpinBox" name="sopCalibT0">
+            <widget class="QComboBox" name="sopRef">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
-             <property name="decimals">
-              <number>7</number>
-             </property>
-             <property name="maximum">
-              <double>999999.989999999990687</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
+             <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sopCalibA">
+            <widget class="QComboBox" name="sopShot">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
-             <property name="decimals">
-              <number>7</number>
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QDoubleSpinBox" name="sopOffset">
+             <property name="toolTip">
+              <string>Background value</string>
+             </property>
+             <property name="suffix">
+              <string> [counts]</string>
              </property>
              <property name="minimum">
-              <double>-99999999.000000000000000</double>
+              <double>-99999999.989999994635582</double>
              </property>
              <property name="maximum">
-              <double>99999999.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
+              <double>99999999.989999994635582</double>
              </property>
             </widget>
            </item>
@@ -599,16 +590,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="3">
-         <widget class="QwtPlot" name="sopPlot">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
          </widget>
         </item>
        </layout>
@@ -652,7 +633,7 @@
    <addaction name="actionRect2"/>
    <addaction name="actionRect3"/>
    <addaction name="separator"/>
-   <addaction name="actionRefresh2"/>
+   <addaction name="actionGuess"/>
    <addaction name="actionRefresh"/>
   </widget>
   <action name="actionLoadPref">
@@ -703,7 +684,7 @@
     <string>Export PDF or SVG</string>
    </property>
   </action>
-  <action name="actionRefresh2">
+  <action name="actionGuess">
    <property name="icon">
     <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
@@ -818,9 +799,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
-   <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <class>nVisarPlot</class>
+   <extends>QWidget</extends>
+   <header>nVisar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

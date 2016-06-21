@@ -24,65 +24,34 @@
  */
 #include "nLineoutBoth.h"
 #include "neutrino.h"
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
 
 nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 : nGenericPan(parent, win_name)
 {
 	my_w.setupUi(this);
 
-    my_w.statusBar->addPermanentWidget(my_w.autoscale, 0);
-    my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
+    my_w.statusBar->addPermanentWidget(my_w.autoScale, 0);
     my_w.statusBar->addPermanentWidget(my_w.lockColors, 0);
+    my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
 
     connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
-    connect(my_w.autoscale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
+    connect(my_w.autoScale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
+    connect(parent, SIGNAL(nZoom(double)), this, SLOT(updateLastPoint(void)));
 
     connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
     setBehaviour();
 
-	my_w.plot->enableAxis(QwtPlot::xTop);
-	my_w.plot->enableAxis(QwtPlot::yRight);
-	my_w.plot->enableAxis(QwtPlot::xBottom);
-	my_w.plot->enableAxis(QwtPlot::yLeft);
-	
-	QPen marker_pen;
-	marker_pen.setColor(QColor(255,0,0));
-	marker.setLineStyle(QwtPlotMarker::Cross);
-	marker.setLinePen(marker_pen);
-	marker.attach(my_w.plot);
-	marker_pen.setColor(QColor(0,0,255));
-	markerRuler.setLinePen(marker_pen);
-	markerRuler.attach(my_w.plot);
+    connect(my_w.autoScale, SIGNAL(toggled(bool)), my_w.lockColors, SLOT(setEnabled(bool)));
 
-	markerRuler.setLineStyle(QwtPlotMarker::Cross);
-	markerRuler.setValue(0,0);
+    for (int k=0;k<2;k++) {
+        if (currentBuffer) {
+            my_w.plot->graph(k)->keyAxis()->setRange(currentBuffer->getW(),currentBuffer->getH());
+            my_w.plot->graph(k)->valueAxis()->setRange(currentBuffer->get_min(),currentBuffer->get_max());
+        }
+    }
 
-	curve[0].setXAxis(QwtPlot::xBottom);
-	curve[0].setYAxis(QwtPlot::yRight);
-	curve[1].setXAxis(QwtPlot::xTop);
-	curve[1].setYAxis(QwtPlot::yLeft);
-
-	curve[0].setPen(QPen(Qt::red,1));
-	curve[1].setPen(QPen(Qt::blue,1));
-	
-	for (int k=0;k<2;k++) {
-		curve[k].attach(my_w.plot);
-		curve[k].show();
-		
-	}
-	
-
-	my_w.plot->setAxisTitle(QwtPlot::xBottom, tr("X (red)"));
-	my_w.plot->setAxisTitle(QwtPlot::yRight, tr("X value (red)"));
-	my_w.plot->setAxisTitle(QwtPlot::yLeft, tr("Y (blue)"));
-	my_w.plot->setAxisTitle(QwtPlot::xTop, tr("Y value (blue)"));
-	(qobject_cast<QFrame*> (my_w.plot->canvas()))->setLineWidth(0);
-
-	decorate();
+    decorate();
 	updateLastPoint();
     
 }
@@ -97,101 +66,67 @@ void nLineoutBoth::setBehaviour() {
     }
 }
 
-
-void nLineoutBoth::rescale(QPointF p) {
-    double minx = curve[0].minYValue();
-    double maxx = curve[0].maxYValue();
-    
-    double miny = curve[1].minXValue();
-    double maxy = curve[1].maxXValue();
-    
-    my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
-    my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
-    my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
-	mouseAtMatrix(p);    
-}
-
-
-// mouse movement
 void nLineoutBoth::updatePlot(QPointF p) {
 
-	QPen marker_pen;
-	marker_pen.setColor(nparent->my_mouse.color);
-	marker.setLinePen(marker_pen);
-	marker_pen.setColor(nparent->my_tics.rulerColor);
-	markerRuler.setLinePen(marker_pen);
-	
-	marker.setValue(p);
-	markerRuler.setVisible(nparent->my_tics.rulerVisible);
-	
-	if (currentBuffer != NULL) {
-		for (int k=0;k<2;k++) {
+    if (currentBuffer != NULL) {
 
-			//get bounds from schermo
-			QPointF orig, corner;
-			orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
-			QPoint lowerRight=QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height());
-			corner = nparent->my_w.my_view->mapToScene(lowerRight);
-			
-			int b_o[2], b_c[2], b_p[2];
+        vec2 b_p(p.x(),p.y());
 
-            b_o[0] = int(orig.x()); b_o[1] = int(orig.y());
-			b_c[0] = int(corner.x()); b_c[1] = int(corner.y());
-			b_p[0] = int(p.x()); b_p[1] = int(p.y());
+        //get bounds from view
+        QPointF orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
+        QPointF corner = nparent->my_w.my_view->mapToScene(QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height()));
 
-			statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
-			
-			double vmin=0, vmax=0;
-			const double *dvec = currentBuffer->to_dvector((phys_direction)k, b_p[(k+1)%2]);
-			size_t lat_skip = max(b_o[k], 0);
-			size_t z_size = min(b_c[k]-lat_skip, currentBuffer->getSizeByIndex((phys_direction)k)-lat_skip);
-			phys_get_vec_brightness(dvec+lat_skip, z_size, vmin, vmax);
-			if (k==0) {
-				curve[k].setRawSamples(currentBuffer->to_axis((phys_direction)k)+lat_skip, dvec+lat_skip, z_size);
-			} else {
-				curve[k].setRawSamples(dvec+lat_skip, currentBuffer->to_axis((phys_direction)k)+lat_skip, z_size);
-			}
-		}
+        vec2 b_o((int)orig.x(),(int)orig.y());
+        vec2 b_c((int)corner.x(),(int)corner.y());
 
-        if (my_w.autoscale->isChecked()) {
-            double minx = curve[0].minYValue();
-            double maxx = curve[0].maxYValue();
-            
-            double miny = curve[1].minXValue();
-            double maxy = curve[1].maxXValue();
-            
-            my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
-            my_w.plot->setAxisScale(curve[0].yAxis(), minx, maxx, 0);
-            my_w.plot->setAxisScale(curve[1].xAxis(), miny, maxy, 0);
-        } else {
-            if (my_w.lockColors->isChecked()) {
-                vec2f minmax=currentBuffer->property["display_range"];
-                double mini=minmax.first();
-                double maxi=minmax.second();
-                my_w.plot->setAxisScale(curve[0].yAxis(), mini, maxi, 0);
-                my_w.plot->setAxisScale(curve[1].xAxis(), mini, maxi, 0);
+        for (int k=0;k<2;k++) {
+            phys_direction cut_dir=k==0?PHYS_HORIZONTAL:PHYS_VERTICAL;
+            phys_direction oth_dir=k==0?PHYS_VERTICAL:PHYS_HORIZONTAL;
+
+            size_t lat_skip = std::max(b_o(cut_dir), 0);
+            size_t z_size = std::min(b_c(cut_dir)-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);
+
+            QVector<double> x(z_size);
+            for (unsigned int i=0;i<z_size;i++){
+                x[i]=(i+lat_skip-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
             }
+            QVector<double> y(z_size);
+            if (k==0) {
+                for (unsigned int i=0;i<z_size;i++){
+                    y[i]=currentBuffer->point(i+lat_skip,b_p(oth_dir));
+                }
+            } else {
+                for (unsigned int i=0;i<z_size;i++){
+                    y[i]=currentBuffer->point(b_p(oth_dir),i+lat_skip);
+                }
+            }
+            my_w.plot->graph(k)->setData(x,y);
+
+            my_w.plot->graph(k)->keyAxis()->setRange(x.first(), x.last());
+
+
+            if(!my_w.autoScale->isChecked()) {
+                my_w.plot->graph(k)->rescaleValueAxis();
+            } else {
+                if(my_w.lockColors->isChecked()) {
+                    vec2f rang=currentBuffer->property["display_range"];
+                    my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
+                }
+            }
+
+            vec2f phys_origin=currentBuffer->get_origin();
+            my_w.plot->setMousePosition(p.x()-phys_origin.x(),p.y()-phys_origin.y());
         }
-        
-		my_w.plot->setAxisScale(curve[0].xAxis(),curve[0].minXValue(), curve[0].maxXValue(),0);
-		my_w.plot->setAxisScale(curve[1].yAxis(),curve[1].maxYValue(), curve[1].minYValue(), 0);
-		my_w.plot->replot();
-	}		
+
+
+        statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
+        my_w.plot->replot();
+    }
 }
-
-
-//void nLineoutBoth::nZoom(double) {
-//	updateLastPoint();
-//}
 
 void nLineoutBoth::updateLastPoint() {
     if (!my_w.lockClick->isChecked()) {
         updatePlot(nparent->my_mouse.pos());
-    }
-    if (my_w.autoscale->isChecked()) {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
-    } else {
-        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(rescale(QPointF)));
     }
 }
 
