@@ -102,6 +102,7 @@ endif()
 
 if (LINUX)
 
+	message("building on linux")
     execute_process(COMMAND "lsb_release -is" OUTPUT_VARIABLE DISTRO)
 
     if (DISTRO STREQUAL "Debian" OR DISTRO STREQUAL "Ubuntu")

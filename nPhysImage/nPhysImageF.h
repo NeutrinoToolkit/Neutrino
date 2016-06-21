@@ -370,8 +370,11 @@ public:
 
 	// check for shallowness
 	bool operator== (const nPhysImageF<T> &rhs)
-	{ return (_n_inst == rhs._n_inst); } 
+	{ return (Timg_buffer == rhs.Timg_buffer); } 
 
+	// .alex. -- I do ignore the sense of this..
+	//bool operator== (const nPhysImageF<T> &rhs)
+	//{ return (_n_inst == rhs._n_inst); } 
 
 	template <class U> operator nPhysImageF<U>  () const
 	{
