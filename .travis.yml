@@ -1,0 +1,5 @@
+os: linux
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libhdf5-dev libcfitsio-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl-dev libhdf4-dev build-essential
