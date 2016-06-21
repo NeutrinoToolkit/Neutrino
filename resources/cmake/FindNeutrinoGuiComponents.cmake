@@ -51,11 +51,9 @@ if(PYTHONLIBS_FOUND)
 
 	find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
 
-	#find_library(PYTHONQTALL NAMES PythonQt_QtAll PATHS ${PYTHONQT_SEARCH_DIR}/lib)
 	if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
 
 		message(STATUS "Using pythonqt : ${PYTHONQT}")
-
 	    	list(APPEND LIBS ${PYTHONQT})    	
     		add_definitions(-DHAVE_PYTHONQT)
 
@@ -73,7 +71,6 @@ if(PYTHONLIBS_FOUND)
 	endif()
 else()
 	message(STATUS "No python libraries found: python subsystem is DISABLED!")
-endif()
 
 endif()
 
