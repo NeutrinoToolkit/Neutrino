@@ -5,11 +5,15 @@ if (GIT_FOUND)
 
     if (VERSION_UPDATE_FROM_GIT)
         # Get branch 
+        message (STATUS "${GIT_EXECUTABLE} symbolic-ref HEAD")
+        
         execute_process(COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD 
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE ${PROJECT_NAME}_PARTIAL_BRANCH
             OUTPUT_STRIP_TRAILING_WHITESPACE)
     
+        message (STATUS "REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH}")
+
         string(REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH})
         unset(${PROJECT_NAME}_PARTIAL_BRANCH)
 
