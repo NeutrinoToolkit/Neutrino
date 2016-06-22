@@ -80,11 +80,9 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     QVariant fontString=settings.value("defaultFont");
     settings.endGroup();
     if (fontString.isValid()) {
-        DEBUG("here");
         QFont fontTmp;
         if (fontTmp.fromString(fontString.toString())) {
             foreach(QCPAxis* axis, all_axis) {
-                DEBUG("   here");
                 axis->setTickLabelFont(fontTmp);
                 axis->setLabelFont(fontTmp);
             }
@@ -114,7 +112,6 @@ void nCustomPlot::get_data(QTextStream &out) {
         }
         out << endl << endl;
     }
-    DEBUG("\n" << out.string()->toStdString());
 }
 
 void nCustomPlot::save_data(){
@@ -145,7 +142,6 @@ void nCustomPlot::export_image(){
 }
 
 void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {
-    DEBUG("Here");
     axisRect()->setRangeDragAxes(ax,ax);
     axisRect()->setRangeDrag(ax->orientation());
     axisRect()->setRangeZoomAxes(ax,ax);

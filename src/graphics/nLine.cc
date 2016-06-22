@@ -127,12 +127,16 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 }
 
-void nLine::copy_points() {
+QString nLine::getPointsStr(){
     QString str_points;
     foreach(QPointF p, getPoints()) {
         str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
     }
-    QApplication::clipboard()->setText(str_points);
+    return str_points;
+}
+
+void nLine::copy_points() {
+    QApplication::clipboard()->setText(getPointsStr());
 }
 
 void nLine::save_points() {
@@ -142,11 +146,7 @@ void nLine::save_points() {
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
-        QString str_points;
-        foreach(QPointF p, getPoints()) {
-            str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
-        }
-        out << str_points;
+        out << getPointsStr();
         t.close();
     }
 
