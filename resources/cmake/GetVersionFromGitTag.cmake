@@ -12,7 +12,7 @@ if (GIT_FOUND)
             OUTPUT_VARIABLE ${PROJECT_NAME}_PARTIAL_BRANCH
             OUTPUT_STRIP_TRAILING_WHITESPACE)
     
-        message (STATUS "REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH}")
+        message (STATUS 'REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH}')
 
         string(REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH})
         unset(${PROJECT_NAME}_PARTIAL_BRANCH)
@@ -37,6 +37,8 @@ if (GIT_FOUND)
             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
         # Get partial versions into a list
+        message (STATUS 'REGEX MATCHALL "-.*$|[0-9]+" ${PROJECT_NAME}_PARTIAL_VERSION_LIST')
+
         string(REGEX MATCHALL "-.*$|[0-9]+" ${PROJECT_NAME}_PARTIAL_VERSION_LIST
             ${${PROJECT_NAME}_VERSION_STRING})
 
