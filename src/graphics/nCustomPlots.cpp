@@ -31,6 +31,10 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     my_menu(new QMenu(this))
 {
 
+    QFont f = my_menu->font();
+    f.setPointSize(10);
+    my_menu->setFont(f);
+
     setProperty("fileTxt", "data.txt");
     setProperty("fileExport", "data.pdf");
 

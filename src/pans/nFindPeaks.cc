@@ -54,6 +54,7 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
 
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::blue));
+    my_w.plot->graph(0)->setName("FindPeaks");
 
 	decorate();
 	loadDefaults();

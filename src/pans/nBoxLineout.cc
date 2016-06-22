@@ -42,6 +42,9 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
     connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
     connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
 
+    my_w.plot->graph(0)->setName("Horizontal");
+    my_w.plot->graph(1)->setName("Vertical");
+
 	decorate();
 	loadDefaults();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));

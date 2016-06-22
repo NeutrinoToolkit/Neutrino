@@ -59,6 +59,8 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
     my_w.plot->xAxis->setLabel(tr("Distance"));
     my_w.plot->yAxis->setLabel(tr("Value"));
 
+    my_w.plot->graph(0)->setName("Compare Lines");
+
     decorate();
     loadDefaults();
     connect(line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
