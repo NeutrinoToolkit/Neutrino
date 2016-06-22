@@ -87,12 +87,12 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.copyGraphPoints, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.saveGraphPoints, SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
-    connect(my_w.saveGraphImage , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
+    connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
+    connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
 
     connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
