@@ -50,13 +50,6 @@ public:
 	void setOrigin();
 	void setScale();
 
-    void export_data(QTextStream &);
-
-	void copy_clip();
-	void export_txt();
-	
-	void export_pdf();
-	
 private:
     QPointer<nRect> box;
 };

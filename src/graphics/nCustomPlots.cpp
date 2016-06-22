@@ -98,7 +98,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
 void nCustomPlot::get_data(QTextStream &out) {
     out << "# " <<  property("panName").toString() << " " << graphCount() << endl;
     for (int g=0; g<graphCount(); g++) {
-        out << "# " << g << " " << graph(g)->name() << endl;
+        out << "# " << g << " name: " << graph(g)->name() << endl;
         const QCPDataMap *dataMap = graph(g)->data();
         QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
         while (i != dataMap->constEnd()) {

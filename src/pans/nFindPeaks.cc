@@ -39,9 +39,10 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionSaveClipboard, SIGNAL(triggered()), this, SLOT(copy_clip()));
-	connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-	connect(my_w.actionSavePDF, SIGNAL(triggered()), this, SLOT(export_pdf()));
+
+    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
 
 	connect(my_w.setOrigin, SIGNAL(pressed()), this, SLOT(setOrigin()));
 	connect(my_w.setScale, SIGNAL(pressed()), this, SLOT(setScale()));
@@ -240,49 +241,4 @@ void nFindPeaks::updatePlot() {
 
 }
 
-void nFindPeaks::copy_clip() {
-	if (currentBuffer) {
-		QClipboard *clipboard = QApplication::clipboard();
-        QString point_table;
-        QTextStream out(&point_table);
-        export_data(out);
-        clipboard->setText(point_table);
-		showMessage(tr("Points copied to clipboard"));
-	}
-}
-
-void nFindPeaks::export_data(QTextStream &out) {
-    out << "# FindPeaks " << QString::fromUtf8(currentBuffer->getName().c_str()) <<endl;
-    for(int i=0;i<my_w.plot->itemCount();i++) {
-        QCPItemEllipse *elli=qobject_cast<QCPItemEllipse*>(my_w.plot->item(i));
-        if (elli) {
-            out << i << " " << 0.5*(elli->bottomRight->coords().x() + elli->topLeft->coords().x()) <<endl;
-        }
-    }
-}
-
-void nFindPeaks::export_txt() {
-	if (currentBuffer) {
-		QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-		if (!fnametmp.isEmpty()) {
-			setProperty("fileTxt", fnametmp);
-			QFile t(fnametmp);
-			t.open(QIODevice::WriteOnly| QIODevice::Text);
-			QTextStream out(&t);
-            export_data(out);
-			t.close();
-			showMessage(tr("Export in file:")+fnametmp,2000);
-		}
-	}
-}
-
-void
-nFindPeaks::export_pdf() {
-	QString fout;
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf)");
-	if (!fnametmp.isEmpty()) {
-		setProperty("fileExport", fnametmp);
-        my_w.plot->savePdf(fnametmp,true,0,0,"Neutrino", panName);
-	}
-}
 

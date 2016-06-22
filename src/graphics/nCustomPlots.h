@@ -26,6 +26,7 @@
 #define nCustomPlots_H
 
 #include "qcustomplot.h"
+#include <QMenu>
 
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT

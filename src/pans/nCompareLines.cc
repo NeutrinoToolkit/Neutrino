@@ -38,9 +38,11 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
 
     connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), this, SLOT(copy_clip()));
-    connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-    connect(my_w.actionSavePDF, SIGNAL(triggered()), this, SLOT(export_pdf()));
+
+    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
+
     connect(my_w.actionAddAll, SIGNAL(triggered()), this, SLOT(addImages()));
     connect(my_w.actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeImages()));
 
@@ -148,50 +150,6 @@ void nCompareLines::updatePlot() {
         }
         my_w.plot->rescaleAxes();
         my_w.plot->replot();
-    }
-}
-
-void nCompareLines::copy_clip() {
-    QString t;
-    QTextStream out(&t);
-    getText(out);
-    QApplication::clipboard()->setText(t);
-    showMessage(tr("Points copied to clipboard"));
-}
-
-void nCompareLines::getText(QTextStream &out) {
-    out << "# " << panName << " " << my_w.plot->graphCount() << endl;
-    for (int g=0; g<my_w.plot->graphCount(); g++) {
-        out << "# " << g << " " << my_w.plot->graph(g)->name() << endl;
-        const QCPDataMap *dataMap = my_w.plot->graph(g)->data();
-        QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
-        while (i != dataMap->constEnd()) {
-            out << i.value().key << " " << i.value().value << endl;
-            ++i;
-        }
-        out << endl << endl;
-    }
-}
-
-void nCompareLines::export_txt() {
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-    if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
-        QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
-        QTextStream out(&t);
-        getText(out);
-        t.close();
-        showMessage(tr("Export in file:")+fnametmp,2000);
-    }
-}
-
-void
-nCompareLines::export_pdf() {
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
-    if (!fnametmp.isEmpty()) {
-        setProperty("fileExport", fnametmp);
-        my_w.plot->savePdf(fnametmp,true,0,0,"Neutrino", panName);
     }
 }
 
