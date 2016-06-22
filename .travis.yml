@@ -25,6 +25,7 @@ before_install:
 
 script:
   - git checkout -b travis
+  - git tag -a v1.0 -m "travis 1.0"
   - git commit -a -m "travis build"
   - mkdir build
   - cd build
