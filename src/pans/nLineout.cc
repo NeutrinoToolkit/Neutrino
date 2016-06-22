@@ -40,6 +40,7 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
     
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
+    my_w.plot->graph(0)->setName(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
 
     decorate();
     updateLastPoint();
@@ -77,7 +78,7 @@ nLineout::updatePlot(QPointF p) {
         vec2 b_o((int)orig.x(),(int)orig.y());
         vec2 b_c((int)corner.x(),(int)corner.y());
 
-        phys_direction other_dir=cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL;
+        phys_direction other_dir=(cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL);
 
         size_t lat_skip = std::max(b_o(cut_dir), 0);
         size_t z_size = std::min(b_c(cut_dir)-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);

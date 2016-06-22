@@ -99,8 +99,6 @@ public slots:
 	void interactive();
 	void togglePadella();
 
-	QString getStringData(QPolygonF);
-	
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
 	QPolygonF getLine(int np=1);
@@ -157,16 +155,12 @@ public slots:
     void makeHorizontal();
     void makeVertical();
     void makeRectangle();
-
     
-	void export_txt();
-	void export_txt_points();
-	void copy_clip();
-	void copyPoints();
-	
 	void itemChanged();
 
 	void setParentPan(QString,int);
+
+    void copy_points();
 
 	//SETTINGS
 	void loadSettings();

@@ -50,6 +50,8 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
             my_w.plot->graph(k)->valueAxis()->setRange(currentBuffer->get_min(),currentBuffer->get_max());
         }
     }
+    my_w.plot->graph(0)->setName("Horizontal");
+    my_w.plot->graph(1)->setName("Vertical");
 
     decorate();
 	updateLastPoint();

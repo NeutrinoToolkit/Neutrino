@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/iltommi/neutrino.svg?branch=master)](https://travis-ci.org/iltommi/neutrino)
+
 neutrino
 ========
 

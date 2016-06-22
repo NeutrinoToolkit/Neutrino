@@ -47,14 +47,6 @@ public:
 
 	void mouseAtWorld(QPointF);
 	void updatePlot();
-	
-    void export_data(QTextStream &);
-    void copy_clipboard();
-	void export_txt();
-	
-	void export_pdf();
-	
-	// fun stuff
 
 	void sceneChanged();
 

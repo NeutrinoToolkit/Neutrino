@@ -89,9 +89,11 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionSaveClipboard, SIGNAL(triggered()), this, SLOT(copy_clip()));
-	connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-	connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+
+    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.actionSaveTxt, SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+
+    connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
 	connect(my_w.actionAntialias, SIGNAL(triggered()), this, SLOT(toggleAntialias()));
 
@@ -108,8 +110,7 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
-	connect(my_w.exportTxt, SIGNAL(released()),this, SLOT(export_txt_points()));
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -123,6 +124,15 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
 
 }
+
+void nLine::copy_points() {
+    QString str_points;
+    foreach(QPointF p, getPoints()) {
+        str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+    }
+    QApplication::clipboard()->setText(str_points);
+}
+
 
 void nLine::setParentPan(QString winname, int level) {
 	my_w.name->setText(winname+"Line");
@@ -242,85 +252,6 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 	QGraphicsItem::mouseDoubleClickEvent(e);
 }
 
-void nLine::export_txt(){
-	// exports poly to file
-	QVariant varia=property("txtFile");
-	QString fname;
-	if (varia.isValid()) {
-		fname=varia.toString();
-	} else {
-		fname=QString("lineData.txt");
-	}
-
-	QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),fname,tr("Text files (*.txt *.csv);;Any files (*)"));
-
-	if (!fnametmp.isEmpty()) {
-		setProperty("txtFile",fnametmp);
-		QFile t(fnametmp);
-		t.open(QIODevice::WriteOnly| QIODevice::Text);
-		QTextStream out(&t);
-		out << getStringData(poly(numPoints));
-		t.close();
-		showMessage(tr("Data saved in file ")+fnametmp);
-	}
-}
-
-void
-nLine::copyPoints() {
-	QClipboard *clipboard = QApplication::clipboard();
-	clipboard->setText(getStringData(getPoints()));
-	showMessage(tr("Points copied to clipboard"));
-}
-
-void
-nLine::export_txt_points() {
-	if (!property("filePoints").isValid()) {
-		setProperty("filePoints",my_pad.windowTitle()+QString(".txt"));
-	}
-	QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data"),property("filePoints").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-	if (!fnametmp.isEmpty()) {
-		setProperty("filePoints",fnametmp);
-		QFile t(fnametmp);
-		t.open(QIODevice::WriteOnly| QIODevice::Text);
-		QTextStream out(&t);
-		for (int i=0; i<my_w.points->rowCount(); i++) {
-			for (int j=0; j<my_w.points->columnCount();j++) {
-				out << my_w.points->item(i, j)->text().toDouble() << "\t";
-			}
-			out << "\n";
-		}
-		t.close();
-		showMessage(tr("Export in file:")+fnametmp);
-	} else {
-		showMessage(tr("Export canceled"));
-	}
-}
-
-QString nLine::getStringData(QPolygonF vals){
-	QString point_table;
-	double dist=0.0;
-	for (int i=0; i<vals.size(); i++) {
-		if (i>0) 
-			dist+=sqrt(pow(vals.at(i).x()-vals.at(i-1).x(),2)+pow(vals.at(i).y()-vals.at(i-1).y(),2));
-		point_table.append(QString("%1\t%2\t%3").arg(dist).arg(vals.at(i).x()).arg(vals.at(i).y()));
-		if (parent()->currentBuffer) {
-			vec2f orig = parent()->currentBuffer->get_origin();
-			point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x()+orig.x(),vals.at(i).y()+orig.y())));
-			//.alex. translate to origin
-			// point_table.append(QString("\t%1\n").arg(parent()->currentBuffer->point(vals.at(i).x(),vals.at(i).y())));
-		} else {
-			point_table.append(QString("\n"));
-		}
-	}
-	return point_table;
-}
-
-void nLine::copy_clip()
-{
-	QClipboard *clipboard = QApplication::clipboard();
-	clipboard->setText(getStringData(poly(numPoints)));
-	showMessage(tr("Points copied to clipboard"));
-}
 
 void nLine::updatePlot () {
     if (my_w.plot->isVisible() && parent()->currentBuffer) {

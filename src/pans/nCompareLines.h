@@ -52,15 +52,6 @@ public slots:
 
 	void updatePlot();
 
-    void getText(QTextStream&);
-	
-	void copy_clip();
-	void export_txt();
-	
-	void export_pdf();
-	
-	// fun stuff
-
 	void sceneChanged();
 
 	void physDel(nPhysD*);

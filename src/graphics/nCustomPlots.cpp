@@ -27,8 +27,45 @@
 #include "neutrino.h"
 
 nCustomPlot::nCustomPlot(QWidget* parent):
-    QCustomPlot(parent)
+    QCustomPlot(parent),
+    my_menu(new QMenu(this))
 {
+
+    QFont f = my_menu->font();
+    f.setPointSize(10);
+    my_menu->setFont(f);
+
+    setProperty("fileTxt", "data.txt");
+    setProperty("fileExport", "data.pdf");
+
+//    my_menu=new QMenu(this);
+    QAction *my_act;
+
+    my_act = new QAction("Copy data",my_menu);
+    connect(my_act, SIGNAL(triggered()), this, SLOT(copy_data()));
+    my_menu->addAction(my_act);
+
+    my_act = new QAction("Save data",my_menu);
+    connect(my_act, SIGNAL(triggered()), this, SLOT(save_data()));
+    my_menu->addAction(my_act);
+
+    my_act = new QAction("Export image",my_menu);
+    connect(my_act, SIGNAL(triggered()), this, SLOT(export_image()));
+    my_menu->addAction(my_act);
+
+    setProperty("panName", "orphan graph");
+
+    QObject *this_widget = dynamic_cast<QObject*>(this);
+    while (this_widget && this_widget->parent()) {
+        this_widget=this_widget->parent();
+        nGenericPan* this_pan = dynamic_cast<nGenericPan*>(this_widget);
+        if (this_pan) {
+            setProperty("panName", this_pan->panName);
+            break;
+        }
+    }
+
+
     connect(this, SIGNAL(axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
@@ -41,10 +78,13 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     QSettings settings("neutrino","");
     settings.beginGroup("Preferences");
     QVariant fontString=settings.value("defaultFont");
+    settings.endGroup();
     if (fontString.isValid()) {
+        DEBUG("here");
         QFont fontTmp;
         if (fontTmp.fromString(fontString.toString())) {
             foreach(QCPAxis* axis, all_axis) {
+                DEBUG("   here");
                 axis->setTickLabelFont(fontTmp);
                 axis->setLabelFont(fontTmp);
             }
@@ -55,6 +95,53 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     axisRect()->setRangeDrag(0);
     axisRect()->setRangeZoom(0);
 
+}
+
+void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
+    my_menu->exec(ev->globalPos());
+}
+
+
+void nCustomPlot::get_data(QTextStream &out) {
+    out << "# " <<  property("panName").toString() << " " << graphCount() << endl;
+    for (int g=0; g<graphCount(); g++) {
+        out << "# " << g << " name: " << graph(g)->name() << endl;
+        const QCPDataMap *dataMap = graph(g)->data();
+        QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
+        while (i != dataMap->constEnd()) {
+            out << i.value().key << " " << i.value().value << endl;
+            ++i;
+        }
+        out << endl << endl;
+    }
+    DEBUG("\n" << out.string()->toStdString());
+}
+
+void nCustomPlot::save_data(){
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("fileTxt", fnametmp);
+        QFile t(fnametmp);
+        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        QTextStream out(&t);
+        get_data(out);
+        t.close();
+    }
+}
+
+void nCustomPlot::copy_data(){
+    QString t;
+    QTextStream out(&t);
+    get_data(out);
+    QApplication::clipboard()->setText(t);
+}
+
+void nCustomPlot::export_image(){
+    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
+    if (!fnametmp.isEmpty()) {
+        setProperty("fileExport", fnametmp);
+        savePdf(fnametmp,true,0,0,"Neutrino", property("panName").toString());
+    }
 }
 
 void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {

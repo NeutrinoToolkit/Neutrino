@@ -37,10 +37,13 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionSaveClipboard, SIGNAL(triggered()), this, SLOT(copy_clip()));
-	connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-	connect(my_w.actionSavePDF, SIGNAL(triggered()), this, SLOT(export_pdf()));
 
+    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
+
+    my_w.plot->graph(0)->setName("Horizontal");
+    my_w.plot->graph(1)->setName("Vertical");
 
 	decorate();
 	loadDefaults();
@@ -100,54 +103,3 @@ void nBoxLineout::updatePlot() {
     }
 
 }
-
-void nBoxLineout::export_data(QTextStream &out) {
-    out << "# " << panName << " " << QString::fromStdString(currentBuffer->getName()) <<endl;
-    for (int g=0; g<my_w.plot->graphCount(); g++) {
-        out << "# " << (g==0?"Horizontal":"Vertical") << endl;
-        const QCPDataMap *dataMap = my_w.plot->graph(g)->data();
-        QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
-        while (i != dataMap->constEnd()) {
-            out << i.value().key << " " << i.value().value << endl;
-            ++i;
-        }
-        out << endl << endl;
-    }
-}
-
-void nBoxLineout::copy_clipboard() {
-	if (currentBuffer) {
-        QString point_table;
-        QTextStream out(&point_table);
-        export_data(out);
-        QApplication::clipboard()->setText(point_table);
-        my_w.statusBar->showMessage(tr("Points copied to clipboard"),2000);
-	}
-}
-
-void nBoxLineout::export_txt() {
-	if (currentBuffer) {
-		QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-		if (!fnametmp.isEmpty()) {
-			setProperty("fileTxt", fnametmp);
-			QFile t(fnametmp);
-			t.open(QIODevice::WriteOnly| QIODevice::Text);
-			QTextStream out(&t);
-            export_data(out);
-            t.close();
-            my_w.statusBar->showMessage(tr("Export :")+fnametmp,2000);
-        }
-	}
-}
-
-void
-nBoxLineout::export_pdf() {
-	QString fout;
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf)");
-	if (!fnametmp.isEmpty()) {
-		setProperty("fileExport", fnametmp);
-        my_w.plot->savePdf(fnametmp,true,0,0,"Neutrino", panName);
-	}
-
-}
-
