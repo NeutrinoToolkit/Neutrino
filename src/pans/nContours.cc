@@ -95,6 +95,9 @@ nContours::draw()
 		// set polygon
 		my_c->setPoints(QPolygonF());
 		QPolygonF myp;
+        for(auto p; contour) {
+            myp<<QPointF(p.x(), p.y());
+        }
 		for (itr = contour.begin(); itr != itr_last; ++itr) {
 			myp<<QPointF((*itr).x(), (*itr).y());
 			//std::cerr<<*itr<<std::endl;
