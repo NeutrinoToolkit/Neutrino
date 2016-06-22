@@ -1,5 +1,9 @@
 os: linux
 
+install: make get-deps
+
+language: cpp
+
 sudo: required
 
 dist: trusty
@@ -11,6 +15,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
+      
 env: COMPILER=g++-5
           
 before_install:
