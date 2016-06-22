@@ -157,13 +157,7 @@ public slots:
     void makeHorizontal();
     void makeVertical();
     void makeRectangle();
-
     
-	void export_txt();
-	void export_txt_points();
-	void copy_clip();
-	void copyPoints();
-	
 	void itemChanged();
 
 	void setParentPan(QString,int);
