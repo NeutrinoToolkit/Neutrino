@@ -110,8 +110,7 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
-	connect(my_w.exportTxt, SIGNAL(released()),this, SLOT(export_txt_points()));
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -125,6 +124,15 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
 
 }
+
+void nLine::copy_points() {
+    QString str_points;
+    foreach(QPointF p, getPoints()) {
+        str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+    }
+    QApplication::clipboard()->setText(str_points);
+}
+
 
 void nLine::setParentPan(QString winname, int level) {
 	my_w.name->setText(winname+"Line");

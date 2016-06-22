@@ -78,10 +78,13 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     QSettings settings("neutrino","");
     settings.beginGroup("Preferences");
     QVariant fontString=settings.value("defaultFont");
+    settings.endGroup();
     if (fontString.isValid()) {
+        DEBUG("here");
         QFont fontTmp;
         if (fontTmp.fromString(fontString.toString())) {
             foreach(QCPAxis* axis, all_axis) {
+                DEBUG("   here");
                 axis->setTickLabelFont(fontTmp);
                 axis->setLabelFont(fontTmp);
             }
