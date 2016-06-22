@@ -19,6 +19,7 @@ addons:
 env: COMPILER=g++-5
           
 before_install:
+  - cat .travis.yml
   - sudo apt-get -qq update
   - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
 
