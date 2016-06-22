@@ -27,15 +27,24 @@
 
 #include "qcustomplot.h"
 
-
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT
+
+private:
+    QMenu *my_menu;
 
 public:
     nCustomPlot(QWidget*);
 
 public slots:
     void my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*);
+
+    void get_data(QTextStream &);
+    void save_data();
+    void copy_data();
+    void export_image();
+
+    void contextMenuEvent (QContextMenuEvent*) override;
 
 };
 
