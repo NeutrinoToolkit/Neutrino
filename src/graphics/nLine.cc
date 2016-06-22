@@ -129,7 +129,7 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 QString nLine::getPointsStr(){
     QString str_points;
-    foreach(QPointF p, getPoints()) {
+    foreach(QPointF p, poly()) {
         str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
     }
     return str_points;
