@@ -33,14 +33,17 @@ nContours::nContours(neutrino *nparent, QString winname)
 	my_w.setupUi(this);
 	my_c = new nLine(nparent);
 	my_c->setParentPan(panName,3);
-	
-    connect(my_w.line, SIGNAL(released()), my_c, SLOT(togglePadella()));
+    my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
+
+    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+    connect(my_w.actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
 
 	decorate();
     on_percent_released();
 	//connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
 	//connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
-	connect(my_w.draw_pb, SIGNAL(clicked()), this, SLOT(draw()));
+    connect(my_w.draw_pb, SIGNAL(released()), this, SLOT(draw()));
 
 	//calculate_stats();
 }
