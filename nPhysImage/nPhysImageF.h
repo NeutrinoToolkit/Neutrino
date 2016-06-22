@@ -534,6 +534,10 @@ public:
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
 
+    inline void reset_display() {
+        display_property.erase("display_range");
+    }
+
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
         bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
         double mini=minmax.first();

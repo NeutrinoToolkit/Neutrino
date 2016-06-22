@@ -166,7 +166,7 @@ inline void phys_reverse_vector(double *buf, int size)
 
 // some nice filters
 
-
+//TODO:
 template<> void
 nPhysC::TscanBrightness() {
 	return;
@@ -823,8 +823,8 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool b
 
 
 	// 1. generate boolean map
-	vec2 orig = wimage.get_origin();
-	double c_value = wimage.point(orig.x(),orig.y());
+    vec2 orig = wimage.get_origin();
+//	double c_value = wimage.point(orig.x(),orig.y());
 
 	nPhysImageF<short> bmap(wimage.getW(), wimage.getH(), 0);
 	for (size_t ii=0; ii<wimage.getSurf(); ii++)
