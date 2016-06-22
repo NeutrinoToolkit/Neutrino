@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>192</width>
-    <height>165</height>
+    <width>210</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,6 +51,9 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="maximum">
+          <number>9999</number>
          </property>
          <property name="value">
           <number>2</number>
@@ -171,6 +174,13 @@
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
    <addaction name="actionLine"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </widget>
   <action name="actionLoadPref">
    <property name="icon">

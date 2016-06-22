@@ -87,7 +87,7 @@ nContours::draw()
     contour_trace(decimated, contour, cutoff);
 	std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.end();
 
-	DEBUG(5, "got contour of "<<contour.size()<<" points");
+    my_w.statusBar->showMessage(QString::number(contour.size())+" "+tr("points"),5000);
 
 	my_c->setPoints(QPolygonF());
 	if (contour.size() > 0) {
