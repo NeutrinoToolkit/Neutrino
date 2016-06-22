@@ -99,8 +99,6 @@ public slots:
 	void interactive();
 	void togglePadella();
 
-	QString getStringData(QPolygonF);
-	
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
 	QPolygonF getLine(int np=1);
