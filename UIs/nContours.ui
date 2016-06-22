@@ -173,6 +173,7 @@
    <addaction name="actionLoadPref"/>
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
+   <addaction name="actionCenter"/>
    <addaction name="actionLine"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -215,7 +216,22 @@
     <string>line</string>
    </property>
    <property name="toolTip">
-    <string>Show axis window</string>
+    <string>Show contour line window</string>
+   </property>
+  </action>
+  <action name="actionCenter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
+     <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
+   </property>
+   <property name="text">
+    <string>line</string>
+   </property>
+   <property name="toolTip">
+    <string>Set image origin</string>
    </property>
   </action>
  </widget>

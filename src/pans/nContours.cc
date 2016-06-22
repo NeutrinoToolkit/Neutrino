@@ -54,6 +54,25 @@ nContours::on_percent_released() {
 }
 
 void
+nContours::on_actionCenter_toggled(bool check) {
+    if (check) {
+        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+    } else {
+        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+    }
+}
+
+void
+nContours::setOrigin(QPointF p) {
+    nPhysD *cur = nparent->getBuffer(-1);
+    if (cur) {
+        cur->set_origin(p.x(),p.y());
+        nparent->createQimage();
+    }
+    my_w.actionCenter->setChecked(false);
+}
+
+void
 nContours::draw()
 {
     saveDefaults();
@@ -85,7 +104,6 @@ nContours::draw()
     DEBUG("cutoff" << cutoff);
 
     contour_trace(decimated, contour, cutoff);
-	std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.end();
 
     my_w.statusBar->showMessage(QString::number(contour.size())+" "+tr("points"),5000);
 
@@ -95,14 +113,9 @@ nContours::draw()
 		// set polygon
 		my_c->setPoints(QPolygonF());
 		QPolygonF myp;
-        for(auto p; contour) {
+        for(auto &p : contour) {
             myp<<QPointF(p.x(), p.y());
         }
-		for (itr = contour.begin(); itr != itr_last; ++itr) {
-			myp<<QPointF((*itr).x(), (*itr).y());
-			//std::cerr<<*itr<<std::endl;
-		}
-
 		my_c->setPoints(myp);
 		//my_w.statusBar->showMessage("Contour ok");
 	}
