@@ -183,8 +183,10 @@ void nGenericPan::decorate() {
             }
 		}
 	}
+#ifdef HAVE_PYTHONQT
     int occurrency=0;
-	foreach (QWidget *wdgt, findChildren<QWidget *>()) {
+#endif
+    foreach (QWidget *wdgt, findChildren<QWidget *>()) {
 
 		if (wdgt->property("neutrinoSave").isValid() || 
             wdgt->property("neutrinoImage").isValid() ||
