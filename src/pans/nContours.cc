@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2014 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -28,24 +28,24 @@
 #include "neutrino.h"
 
 nContours::nContours(neutrino *nparent, QString winname)
-	: nGenericPan(nparent, winname)
+    : nGenericPan(nparent, winname)
 {
-	my_w.setupUi(this);
-	my_c = new nLine(nparent);
-	my_c->setParentPan(panName,3);
+    my_w.setupUi(this);
+    my_c = new nLine(nparent);
+    my_c->setParentPan(panName,3);
     my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
     connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(my_w.actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
 
-	decorate();
+    decorate();
     on_percent_released();
-	//connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
-	//connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
+    //connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
+    //connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     connect(my_w.draw_pb, SIGNAL(released()), this, SLOT(draw()));
 
-	//calculate_stats();
+    //calculate_stats();
 }
 
 void
@@ -76,49 +76,50 @@ void
 nContours::draw()
 {
     saveDefaults();
-	nPhysD *cur = nparent->getBuffer(-1);
-	if (!cur) 
-		return;
+    nPhysD *cur = nparent->getBuffer(-1);
+    if (!cur)
+        return;
 
-	// 0. build decimated
-	decimated = nPhysD(*cur);
+    // 0. build decimated
+    decimated = nPhysD(*cur);
     if(my_w.blur_radius_sb->value()>0) {
-	phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
+        phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
     }
 
-	// 1. find centroid
-	vec2 centr;
-	if (cur->get_origin() == vec2(0,0)) {
+    // 1. find centroid
+    vec2 centr;
+    if (cur->get_origin() == vec2(0,0)) {
         centr = decimated.max_Tv;
-		cur->set_origin(centr);
-	} else
-		centr = cur->get_origin();
-	decimated.set_origin(centr);
+        cur->set_origin(centr);
+    } else {
+        centr = cur->get_origin();
+    }
+    decimated.set_origin(centr);
 
-	std::list<vec2> contour;
+    std::list<vec2> contour;
     double cutoff=my_w.level_dsb->value();
     if (my_w.percent->isChecked()) {
-        cutoff = cur->get_min() + (cur->get_max()-cur->get_min())*(cutoff/100.0) ;
+        cutoff = decimated.get_min() + (decimated.get_max()-decimated.get_min())*(cutoff/100.0) ;
     }
 
     DEBUG("cutoff" << cutoff);
 
     contour_trace(decimated, contour, cutoff);
 
-    my_w.statusBar->showMessage(QString::number(contour.size())+" "+tr("points"),5000);
+    my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
 
-	my_c->setPoints(QPolygonF());
-	if (contour.size() > 0) {
+    my_c->setPoints(QPolygonF());
+    if (contour.size() > 0) {
 
-		// set polygon
-		my_c->setPoints(QPolygonF());
-		QPolygonF myp;
+        // set polygon
+        my_c->setPoints(QPolygonF());
+        QPolygonF myp;
         for(auto &p : contour) {
             myp<<QPointF(p.x(), p.y());
         }
-		my_c->setPoints(myp);
-		//my_w.statusBar->showMessage("Contour ok");
-	}
+        my_c->setPoints(myp);
+        //my_w.statusBar->showMessage("Contour ok");
+    }
 
 }
 
