@@ -44,7 +44,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="General">
        <attribute name="title">
@@ -310,7 +310,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -343,7 +343,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2" rowspan="6">
+        <item row="0" column="2" rowspan="7">
          <widget class="QTableWidget" name="points">
           <property name="font">
            <font>
@@ -412,13 +412,24 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="0">
+         <widget class="QToolButton" name="savePoints">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../neutrino-build/src/icons.qrc">
+            <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Graph">
        <attribute name="title">
         <string>Graph</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3" rowstretch="0" columnstretch="0">
+       <layout class="QGridLayout" name="gridLayout_3">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -432,7 +443,53 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
+         <widget class="QToolButton" name="copyGraphPoints">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../neutrino-build/src/icons.qrc">
+            <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="4">
          <widget class="nCustomPlot" name="plot" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QToolButton" name="saveGraphPoints">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../neutrino-build/src/icons.qrc">
+            <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QToolButton" name="saveGraphImage">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../neutrino-build/src/icons.qrc">
+            <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>49</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -464,9 +521,6 @@
    </attribute>
    <addaction name="actionLoadPref"/>
    <addaction name="actionSavePref"/>
-   <addaction name="separator"/>
-   <addaction name="actionSaveClipboard"/>
-   <addaction name="actionSaveTxt"/>
    <addaction name="separator"/>
    <addaction name="actionClosedLine"/>
    <addaction name="actionBezier"/>
@@ -563,6 +617,18 @@
     <string>Switch antialias smoothing</string>
    </property>
   </action>
+  <action name="actionSavePDF">
+   <property name="icon">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
+     <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
+   </property>
+   <property name="text">
+    <string>savePDF</string>
+   </property>
+   <property name="toolTip">
+    <string>save PDF</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -589,6 +655,8 @@
   <tabstop>spinSizeHolder</tabstop>
   <tabstop>colorButton</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../neutrino-build/src/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

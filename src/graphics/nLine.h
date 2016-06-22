@@ -161,6 +161,7 @@ public slots:
 	void setParentPan(QString,int);
 
     void copy_points();
+    void save_points();
 
 	//SETTINGS
 	void loadSettings();

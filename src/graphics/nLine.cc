@@ -90,8 +90,9 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.actionSaveTxt, SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.copyGraphPoints, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.saveGraphPoints, SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.saveGraphImage , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
 
     connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
@@ -110,7 +111,8 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -133,6 +135,22 @@ void nLine::copy_points() {
     QApplication::clipboard()->setText(str_points);
 }
 
+void nLine::save_points() {
+    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("fileTxt", fnametmp);
+        QFile t(fnametmp);
+        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        QTextStream out(&t);
+        QString str_points;
+        foreach(QPointF p, getPoints()) {
+            str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+        }
+        out << str_points;
+        t.close();
+    }
+
+}
 
 void nLine::setParentPan(QString winname, int level) {
 	my_w.name->setText(winname+"Line");
