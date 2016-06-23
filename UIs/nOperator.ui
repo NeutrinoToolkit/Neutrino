@@ -209,6 +209,11 @@
          </item>
          <item>
           <property name="text">
+           <string>Blur+Laplace</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Blur+Sobel</string>
           </property>
          </item>
@@ -250,6 +255,11 @@
          <item>
           <property name="text">
            <string>Tan</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Laplace</string>
           </property>
          </item>
          <item>

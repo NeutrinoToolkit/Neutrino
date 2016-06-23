@@ -132,6 +132,7 @@ QString nLine::getPointsStr(){
     foreach(QPointF p, poly(1)) {
         str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
     }
+    DEBUG(str_points.toStdString());
     return str_points;
 }
 
@@ -307,6 +308,7 @@ void nLine::updatePlot () {
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
+//            DEBUG(p.x() << " " << p.y() << " " << dist);
 			if (antialias) {
 				// points in poly are NOT translated with origin
 				// (hence a correction must apply)

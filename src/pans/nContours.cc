@@ -90,7 +90,6 @@ nContours::draw()
     vec2 centr;
     if (cur->get_origin() == vec2(0,0)) {
         centr = decimated.max_Tv;
-        cur->set_origin(centr);
     } else {
         centr = cur->get_origin();
     }
@@ -106,7 +105,6 @@ nContours::draw()
 
     contour_trace(decimated, contour, cutoff);
 
-    my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
 
     my_c->setPoints(QPolygonF());
     if (contour.size() > 0) {
@@ -114,11 +112,15 @@ nContours::draw()
         // set polygon
         my_c->setPoints(QPolygonF());
         QPolygonF myp;
-        for(auto &p : contour) {
+        for (auto &p : contour) {
             myp<<QPointF(p.x(), p.y());
         }
         my_c->setPoints(myp);
+        cur->set_origin(centr);
         //my_w.statusBar->showMessage("Contour ok");
+        my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
+    } else {
+        my_w.statusBar->showMessage(QString::number(cutoff) + " : "+tr(" cannot trace contour"),5000);
     }
 
 }
