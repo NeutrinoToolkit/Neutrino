@@ -128,12 +128,9 @@ nVisar::nVisar(neutrino *nparent, QString winname)
     decorate();
     connections();
     my_w.tabs->setCurrentIndex(0);
-
-    DEBUG("out");
 }
 
 void nVisar::loadSettings(QString my_settings) {
-    DEBUG("in");
     nGenericPan::loadSettings(my_settings);
     QApplication::processEvents();
     doWave();
@@ -141,7 +138,6 @@ void nVisar::loadSettings(QString my_settings) {
 }
 
 void nVisar::mouseAtMatrix(QPointF p) {
-    DEBUG("in");
     int k=0;
     double position=0.0;
     if (my_w.tabs->currentIndex()==0) {
@@ -157,18 +153,14 @@ void nVisar::mouseAtMatrix(QPointF p) {
         my_w.sopPlot->setMousePosition(position);
     }
     my_w.statusbar->showMessage("Postion : "+QString::number(position));
-    DEBUG("out");
 }
 
 int nVisar::direction(int k) {
-    DEBUG("in");
     int dir=((int) ((visar[k].angle->value()+360+45)/90.0) )%2;
-    DEBUG("out");
     return dir;
 }
 
 void nVisar::bufferChanged(nPhysD*phys) {
-    DEBUG("in");
     for (int k=0;k<2;k++){
         fringeRect[k]->hide();
         fringeLine[k]->hide();
@@ -183,11 +175,9 @@ void nVisar::bufferChanged(nPhysD*phys) {
             sopRect->show();
         }
     }
-    DEBUG("out");
 }
 
 void nVisar::tabChanged(int k) {
-    DEBUG("in");
     QApplication::processEvents();
     QTabWidget *tabWidget=qobject_cast<QTabWidget *>(sender());
     if (!tabWidget) tabWidget=my_w.tabs;
@@ -210,11 +200,9 @@ void nVisar::tabChanged(int k) {
         nparent->showPhys(getPhysFromCombo(my_w.sopShot));
         updatePlotSOP();
     }
-    DEBUG("out");
 }
 
 void nVisar::connections() {
-    DEBUG("in");
     for (int k=0;k<2;k++){
         connect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
         connect(setvisar[k].offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
@@ -250,11 +238,9 @@ void nVisar::connections() {
     connect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
-    DEBUG("out");
 }
 
 void nVisar::disconnections() {
-    DEBUG("in");
     for (int k=0;k<2;k++){
         disconnect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
         disconnect(setvisar[k].offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
@@ -290,12 +276,9 @@ void nVisar::disconnections() {
     disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
-    DEBUG("out");
 }
 
 void nVisar::updatePlotSOP() {
-    DEBUG("in");
-
     disconnections();
     nPhysD *shot=getPhysFromCombo(my_w.sopShot);
     nPhysD *ref=getPhysFromCombo(my_w.sopRef);
@@ -444,11 +427,9 @@ void nVisar::updatePlotSOP() {
         my_w.sopPlot->replot();
     }
     connections();
-    DEBUG("out");
 }
 
 void nVisar::updatePlot() {
-    DEBUG("in");
     disconnections();
 
     my_w.plotVelocity->clearGraphs();
@@ -606,11 +587,9 @@ void nVisar::updatePlot() {
     updatePlotSOP();
 
     connections();
-    DEBUG("out");
 }
 
 void nVisar::getCarrier() {
-    DEBUG("in");
     if (sender() && sender()->property("id").isValid()) {
         int k=sender()->property("id").toInt();
         getCarrier(k);
@@ -622,11 +601,9 @@ void nVisar::getCarrier() {
     if (my_w.tabs->currentIndex()==1) {
         my_w.statusbar->showMessage(tr("Carrier (")+QString::number(visar[0].interfringe->value())+tr("px, ")+visar[0].angle->value()+tr("deg) - (")+QString::number(visar[1].interfringe->value())+tr("px, ")+visar[1].angle->value()+tr("deg)"));
     }
-    DEBUG("out");
 }
 
 void nVisar::getCarrier(int k) {
-    DEBUG("in");
     disconnections();
     QComboBox *combo=NULL;
     if (visar[k].carrierPhys->currentIndex()==0) {
@@ -654,11 +631,9 @@ void nVisar::getCarrier(int k) {
     }
     QApplication::processEvents();
     connections();
-    DEBUG("out");
 }
 
 void nVisar::doWave() {
-    DEBUG("in");
     if (sender() && sender()->property("id").isValid()) {
         int k=sender()->property("id").toInt();
         doWave(k);
@@ -667,13 +642,10 @@ void nVisar::doWave() {
             doWave(k);
         }
     }
-    DEBUG("out");
 }
 
 
 void nVisar::doWave(int k) {
-    DEBUG("in");
-
     if (visar[k].enableVisar->isChecked()){
         if (getPhysFromCombo(visar[k].refImage) && getPhysFromCombo(visar[k].shotImage )  &&
                 getPhysFromCombo(visar[k].refImage)->getW() == getPhysFromCombo(visar[k].shotImage)->getW() &&
@@ -785,11 +757,9 @@ void nVisar::doWave(int k) {
             statusBar()->showMessage("size mismatch",5000);
         }
     }
-    DEBUG("out");
 }
 
 void nVisar::getPhase() {
-    DEBUG("in");
     if (sender() && sender()->property("id").isValid()) {
         int k=sender()->property("id").toInt();
         getPhase(k);
@@ -799,11 +769,9 @@ void nVisar::getPhase() {
         }
     }
     updatePlot();
-    DEBUG("out");
 }
 
 void nVisar::getPhase(int k) {
-    DEBUG("in");
     disconnections();
     if (visar[k].enableVisar->isChecked()) {
         visar[k].plotPhaseIntensity->clearGraphs();
@@ -922,12 +890,10 @@ void nVisar::getPhase(int k) {
         }
     }
     connections();
-    DEBUG("out");
 }
 
 void
 nVisar::export_txt_multiple() {
-    DEBUG("in");
     QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("fileTxt", fnametmp);
@@ -942,12 +908,10 @@ nVisar::export_txt_multiple() {
         t.close();
         statusBar()->showMessage(tr("Export in file:")+fnametmp,5000);
     }
-    DEBUG("out");
 }
 
 void
 nVisar::export_txt() {
-    DEBUG("in");
     QString title=tr("Export ");
     switch (my_w.tabs->currentIndex()) {
     case 0:
@@ -982,12 +946,10 @@ nVisar::export_txt() {
         t.close();
         statusBar()->showMessage(tr("Export in file:")+fnametmp,5000);
     }
-    DEBUG("out");
 }
 
 void
 nVisar::export_clipboard() {
-    DEBUG("in");
     QClipboard *clipboard = QApplication::clipboard();
     switch (my_w.tabs->currentIndex()) {
     case 0:
@@ -1005,11 +967,9 @@ nVisar::export_clipboard() {
     default:
         break;
     }
-    DEBUG("out");
 }
 
 QString nVisar::export_sop() {
-    DEBUG("in");
     QString out;
     out += QString("#SOP Origin       : %L1\n").arg(my_w.sopOrigin->value());
     out += QString("#SOP Offset       : %L1\n").arg(my_w.sopTimeOffset->value());
@@ -1024,12 +984,10 @@ QString nVisar::export_sop() {
         }
         out += "\n";
     }
-    DEBUG("out");
     return out;
 }
 
 QString nVisar::export_one(int k) {
-    DEBUG("in");
     QString out;
     if (k<2) {
         if (visar[k].enableVisar->isChecked()) {
@@ -1055,13 +1013,11 @@ QString nVisar::export_one(int k) {
             }
         }
     }
-    DEBUG("out");
     return out;
 }
 
 void
 nVisar::export_pdf() {
-    DEBUG("in");
     QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
         setProperty("fileExport", fnametmp);
@@ -1079,7 +1035,6 @@ nVisar::export_pdf() {
             break;
         }
     }
-    DEBUG("out");
 }
 
 

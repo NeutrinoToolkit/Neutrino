@@ -124,7 +124,6 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         scanAttribute(aid, item2);
         H5Aclose(aid);
     }
-    DEBUG(11,"BEGIN DATASET");
     ssize_t sizeName=1+H5Iget_name(did, NULL,0);
     char *ds_name=new char[sizeName];
     H5Iget_name(did, ds_name,sizeName);
@@ -137,7 +136,6 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     hsize_t *dims=NULL;
 
     ndims=H5Sget_simple_extent_ndims(sid);
-    DEBUG(11,"NAME" << ds_name << " " << ndims);
     if (t_class == H5T_FLOAT) {
         item2->setData(1,0,"DS Float");
         dims=new hsize_t[ndims];
@@ -166,16 +164,13 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         H5Tget_array_dims2(tid, dims);
     } else if(t_class == H5T_COMPOUND) {
 
-        DEBUG(11,"*** BEGIN COMPOUND ***");
         int size=H5Tget_size(tid);
 
         ndims=H5Sget_simple_extent_ndims(sid);
-        DEBUG(11,"ndims: " << ndims);
         dims=new hsize_t[ndims];
         H5Sget_simple_extent_dims(sid,dims,NULL);
         for (int pippo=0;pippo<ndims;pippo++) {
             size*=dims[pippo];
-            DEBUG(11,"dims[" << pippo << "]=" << dims[pippo]);
         }
 
         delete[] dims;
@@ -184,11 +179,9 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 
         item2->setData(1,0,"DS Compound");
         int nCompund=H5Tget_nmembers(tid);
-        DEBUG(11,"nCompound " << nCompund << " size: " << size );
         item2->setData(2,0,QString::number(nCompund)+" objs");
         char *buffer=new char[size*nCompund];
         hid_t dataread=H5Dread(did, tid, sid, H5S_ALL, H5P_DEFAULT, buffer);
-        DEBUG(11,"did " << did << " tid "<< tid << " sid "<< sid << " dataread " << dataread);
         if (dataread>=0) {
             int position=0;
             for (int i=0; i< nCompund ; i++) {
@@ -258,7 +251,6 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
             }
         }
         delete[] buffer;
-        DEBUG(11,"***  END COMPOUND  ***");
     } else {
         item2->setData(1,0,"DS "+QString::number(t_class));
         item2->setData(2,0,"Ask for support!");
@@ -285,7 +277,6 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     if (dims) delete[] dims;
     H5Tclose(tid);
     H5Sclose(sid);
-    DEBUG(11,"  END DATASET");
 }
 
 void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
@@ -373,7 +364,6 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
         scanAttribute(aid,parentItem);
         H5Aclose(aid);
     }
-    //	DEBUG(11,group_name);
 
     H5G_info_t infoGroup;
     H5Gget_info(gid,&infoGroup);
@@ -381,9 +371,6 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
         int size = 1+H5Lget_name_by_idx (gid, ".", H5_INDEX_NAME, H5_ITER_INC,i, NULL, 0, H5P_DEFAULT);
         char *memb_name=new char[size];
         H5Lget_name_by_idx (gid, ".", H5_INDEX_NAME, H5_ITER_INC,i, memb_name, size, H5P_DEFAULT);
-
-        //		DEBUG(11,group_name << "/" << memb_name << " " << i);
-        //		QApplication::processEvents();
 
         QTreeWidgetItem *item2=new QTreeWidgetItem(parentItem,QStringList(QString(memb_name)));
         switch(H5Gget_objtype_by_idx(gid, i)) {
@@ -426,7 +413,6 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 
 nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
     nPhysD *my_data=NULL;
-    DEBUG(fileName << " " << dataName);
     hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     if (fid >= 0) {
         hid_t did = H5Dopen(fid,dataName.c_str(), H5P_DEFAULT);
@@ -455,15 +441,13 @@ nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
                 buffer = new char[tsiz*npoints];
                 nativeType=H5Tget_native_type(tid,H5T_DIR_DEFAULT);
             } else if (t_class == H5T_COMPOUND) {
-                DEBUG(10, "compound");
+                DEBUG(10, "compound not implemented");
             } else if(t_class == H5T_ARRAY) {
                 ndims=H5Sget_simple_extent_ndims(sid);
-                DEBUG("ndims: " << ndims);
                 dims=new hsize_t[ndims];
                 H5Sget_simple_extent_dims(sid,dims,NULL);
                 for (int pippo=0;pippo<ndims;pippo++) {
                     narray*=dims[pippo];
-                    DEBUG("dims[" << pippo << "]=" << dims[pippo]);
                 }
 
                 delete dims;
@@ -473,8 +457,6 @@ nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
                 dims=new hsize_t[ndims];
                 H5Tget_array_dims2(tid, dims);
                 buffer = new char[tsiz*narray];
-                DEBUG(5,"H5T_ARRAY " << dims[0] << " " << dims[1] << " tsiz " << tsiz << " narray " << narray);
-                DEBUG(5,"ALLOCATED " << tsiz * narray);
                 nativeType=H5Tget_native_type(H5Tget_super(tid),H5T_DIR_DEFAULT);
             }
             if (buffer && ndims==2) {
@@ -490,11 +472,9 @@ nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
                     H5Aclose(aid);
                 }
 
-                DEBUG("did " << did << " tid "<< tid << " sid "<< sid );
                 H5Dread(did, tid, sid, file_space_id, H5P_DEFAULT, buffer);
                 my_data->resize(dims[1],dims[0]);
                 for (int na=0;na<narray;na++) {
-                    DEBUG("na "<< na);
                     if (H5Tequal(nativeType,H5T_NATIVE_USHORT)) {
                         for (size_t k=0;k<my_data->getSurf();k++) {
                             my_data->set(k,my_data->point(k)+((unsigned short*) buffer)[k]);

@@ -47,6 +47,9 @@ public:
 public slots:
 	void draw();
     void on_percent_released();
+    void on_actionCenter_toggled(bool);
+
+    void setOrigin(QPointF);
 
 private:
 	// blurred image for easier calculations

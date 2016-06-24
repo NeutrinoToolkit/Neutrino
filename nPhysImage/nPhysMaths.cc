@@ -166,7 +166,7 @@ inline void phys_reverse_vector(double *buf, int size)
 
 // some nice filters
 
-
+//TODO:
 template<> void
 nPhysC::TscanBrightness() {
 	return;
@@ -517,6 +517,36 @@ phys_fast_gaussian_blur(nPhysD &m1, double radius)
 	phys_fast_gaussian_blur(m1,radius,radius);
 }
 
+void phys_laplace(nPhysD &image) {
+    nPhysD my_copy=image;
+    image.setShortName("Laplace");
+    image.setName("Laplace "+image.getName());
+    image.setFromName(image.getFromName());
+    double Lap[9];
+    Lap[0] = 1.0; Lap[1] = 1.0; Lap[2] = 1.0;
+    Lap[3] = 1.0; Lap[4] =-8.0; Lap[5] = 1.0;
+    Lap[6] = 1.0; Lap[7] = 1.0; Lap[8] = 1.0;
+
+    for(size_t i = 0 ; i < my_copy.getW() ; i++) {
+        for(size_t j = 0 ; j < my_copy.getH(); j++) {
+            double val_lap = 0.0;
+            for(size_t k = 0 ; k < 3 ; k++) {
+                for(size_t l = 0 ; l < 3 ; l++) {
+                    val_lap += Lap[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                }
+            }
+            image.set(i,j,val_lap);
+        }
+    }
+    image.TscanBrightness();
+}
+
+void phys_gauss_laplace(nPhysD &image, double radius) {
+    phys_fast_gaussian_blur(image, radius);
+    phys_laplace(image);
+}
+
+
 // get sobel matrix
 void phys_sobel(nPhysD &image) {
     nPhysD my_copy=image;
@@ -823,8 +853,8 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool b
 
 
 	// 1. generate boolean map
-	vec2 orig = wimage.get_origin();
-	double c_value = wimage.point(orig.x(),orig.y());
+    vec2 orig = wimage.get_origin();
+//	double c_value = wimage.point(orig.x(),orig.y());
 
 	nPhysImageF<short> bmap(wimage.getW(), wimage.getH(), 0);
 	for (size_t ii=0; ii<wimage.getSurf(); ii++)

@@ -39,7 +39,7 @@ nOperator::nOperator(neutrino *nparent, QString winname)
 
     // separator represents the difference between operations with 2 operands or 1 modify it in .h
     separator[0]=8;
-    separator[1]=14;
+    separator[1]=15;
 
     my_w.operation->insertSeparator(separator[0]);
     my_w.operation->insertSeparator(separator[1]);
@@ -79,11 +79,14 @@ void nOperator::enableGroups (int num) {
 }
 
 void nOperator::doOperation () {
+    saveDefaults();
     nPhysD *image1=getPhysFromCombo(my_w.image1);
     nPhysD *image2=getPhysFromCombo(my_w.image2);
 
-    saveDefaults();
-    qDebug() << "Operator " << my_w.operation->currentIndex() << separator[0] << separator[1];
+    for (int k=0;k<my_w.operation->count();k++) {
+        DEBUG("Operator " << k << " " << my_w.operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << my_w.operation->itemText(k).toStdString());
+    }
+    DEBUG("Operator " << my_w.operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << my_w.operation->currentText().toStdString());
     nPhysD *myresult=NULL;
     if (my_w.operation->currentIndex() < separator[0]) { // two values neeeded
         nPhysD *operand1=NULL;
@@ -225,6 +228,15 @@ void nOperator::doOperation () {
                 double scalar=my_w.num2->text().toDouble(&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
+                    phys_gauss_laplace(*myresult,scalar);
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
+                }
+            } else if (my_w.operation->currentIndex()==separator[0]+6) {
+                bool ok;
+                double scalar=my_w.num2->text().toDouble(&ok);
+                if (ok) {
+                    myresult=new nPhysD(*image1);
                     phys_gauss_sobel(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -252,6 +264,8 @@ void nOperator::doOperation () {
         } else if (my_w.operation->currentIndex()==separator[1]+8) {
             phys_tan(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+9) {
+            phys_laplace(*myresult);
+        } else if (my_w.operation->currentIndex()==separator[1]+10) {
             phys_sobel(*myresult);
         }
     }

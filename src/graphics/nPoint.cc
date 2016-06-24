@@ -173,7 +173,6 @@ void nPoint::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 void nPoint::sizeHolder ( double val ) {
 	nSizeHolder=val;
 	QPointF p=QPointF(val/zoom,val/zoom);
-	DEBUG(p.x() << " " << p.y());
 	ref.setRect(QRectF(-p,p));
 }
 

@@ -361,8 +361,6 @@ neutrino::neutrino():
     // plugins
     scanPlugins();
 
-
-
     loadDefaults();
     show();
 
@@ -718,8 +716,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         }
     }
     if (imagelist.size()==0) {
-        DEBUG("resta quasi solo QImage");
-
         if (QFileInfo(fname).suffix().toLower()=="h5") {
 #ifdef HAVE_HDF5
             static_cast<nHDF5*>(openHDF5())->showFile(fname);
@@ -1011,7 +1007,6 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             }
             QList<QAction *> lista=my_w.menuBuffers->actions();
             foreach (QAction* action, my_w.menuBuffers->actions()) {
-                DEBUG(action->text().toStdString());
                 if (action->data() == qVariantFromValue((void*) datamatrix)) {
                     my_w.menuBuffers->removeAction(action);
                 }
@@ -1157,13 +1152,11 @@ void neutrino::exportGraphics (QString fout) {
     bool resetmouse=my_mouse.isVisible();
     my_mouse.setVisible(false);
     QSize my_size=QSize(my_s.width(), my_s.height());
-    qDebug() << ":::::::::::::::::::" << my_size;
     if (QFileInfo(fout).suffix().toLower()==QString("pdf")) {
         QPrinter myPrinter(QPrinter::ScreenResolution);
         myPrinter.setOutputFileName(fout);
         myPrinter.setOrientation(QPrinter::Landscape);
         myPrinter.setPaperSize(QPrinter::A4);
-        qDebug() << myPrinter.paperSize() << myPrinter.paperSize(QPrinter::DevicePixel);
         int newWidth=myPrinter.paperSize(QPrinter::DevicePixel).height() * ((double) my_size.width())/((double)my_size.height());
         QSize newSize=QSize(newWidth,myPrinter.paperSize(QPrinter::DevicePixel).height());
         myPrinter.setPaperSize(newSize,QPrinter::DevicePixel);
@@ -1349,7 +1342,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
             QString text = QInputDialog::getText(this,"","Open", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
             if (ok && !text.isEmpty()) {
                      nGenericPan *my_pan= openPan(text,false);
-                     DEBUG(my_pan);
                      if(!my_pan) {
                          statusBar()->showMessage(tr("Can't find ")+text, 2000);
                      }
@@ -2210,12 +2202,10 @@ void neutrino::about() {
         QFile lic(fname);
         if (lic.open(QFile::ReadOnly | QFile::Text)) {
             QString licenseText=QTextStream(&lic).readAll();
-            DEBUG(licenseText.toStdString());
             if (!licenseText.isEmpty()) {
                 my_about.creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
                 my_about.creditsText->insertPlainText(licenseText);
                 my_about.creditsText->insertHtml("</PRE><br><hr><br>");
-                DEBUG(fname.toStdString());
             }
         }
     }
@@ -2324,7 +2314,6 @@ nGenericPan* neutrino::newPan(QString my_string) {
                 QMetaProperty metaproperty = metaobject->property(i);
                 const char *name = metaproperty.name();
                 QVariant value = uiwidget->property(name);
-                DEBUG(metaproperty.name() << " : " << value.toString().toStdString());
             }
 
 //            my_pan->setCentralWidget(uiwidget);
@@ -2360,7 +2349,6 @@ neutrino::loadPyScripts() {
         }
 
         foreach (QString sname, scriptlist) {
-            qDebug()<< "file: " << sname;
             QAction *action = new QAction(this);
             action->setText(QFileInfo(sname).baseName());
             connect(action, SIGNAL(triggered()), this, SLOT(runPyScript()));
@@ -2380,7 +2368,6 @@ neutrino::runPyScript() {
 
 void
 neutrino::runPyScript(QString fname) {
-    qDebug() << "run script: " << fname;
     QFile t(fname);
     t.open(QIODevice::ReadOnly| QIODevice::Text);
     PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
@@ -2392,17 +2379,13 @@ neutrino::runPyScript(QString fname) {
 // col functions outside neutrino....
 QVariant toVariant(anydata &my_data) {
     if (my_data.is_i()) {
-        DEBUG("here");
         return QVariant::fromValue((int)my_data);
     } else if (my_data.is_d()) {
-        DEBUG("here");
         return QVariant::fromValue((double)my_data);
     } else if (my_data.is_vec()) {
-        DEBUG("here");
         vec2f my_val(my_data.get_str());
         return QVariant::fromValue(QPointF(my_val.x(),my_val.y()));
     } else if (my_data.is_str()) {
-        DEBUG("here");
         return QVariant::fromValue(QString::fromStdString((std::string)my_data));
     }
     return QVariant();
@@ -2413,22 +2396,18 @@ anydata toAnydata(QVariant &my_variant) {
     anydata my_data;
     int valInt=my_variant.toInt(&ok);
     if (ok) {
-        DEBUG("it's int "<<valInt);
         my_data=valInt;
     } else {
         double valDouble=my_variant.toDouble(&ok);
         if (ok) {
-            DEBUG("it's double "<<valDouble);
             my_data=valDouble;
         } else {
             QPointF valPoint=my_variant.toPointF();
             if (!valPoint.isNull()) {
                 vec2f my_vec2f(valPoint.x(),valPoint.y());
-                DEBUG("it's point "<<my_vec2f);
                 my_data=my_vec2f;
             } else {
                 std::string valStr=my_variant.toString().toStdString();
-                DEBUG("it's string "<<valStr);
                 if (!valStr.empty()) {
                     my_data=valStr;
                 }

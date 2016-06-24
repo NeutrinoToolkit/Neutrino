@@ -87,11 +87,12 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.actionSaveTxt, SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
+    connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
+    connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
+    connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
 
     connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
@@ -110,7 +111,8 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -125,14 +127,31 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 }
 
-void nLine::copy_points() {
+QString nLine::getPointsStr(){
     QString str_points;
-    foreach(QPointF p, getPoints()) {
+    foreach(QPointF p, poly(1)) {
         str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
     }
-    QApplication::clipboard()->setText(str_points);
+    DEBUG(str_points.toStdString());
+    return str_points;
 }
 
+void nLine::copy_points() {
+    QApplication::clipboard()->setText(getPointsStr());
+}
+
+void nLine::save_points() {
+    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("fileTxt", fnametmp);
+        QFile t(fnametmp);
+        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        QTextStream out(&t);
+        out << getPointsStr();
+        t.close();
+    }
+
+}
 
 void nLine::setParentPan(QString winname, int level) {
 	my_w.name->setText(winname+"Line");
@@ -289,6 +308,7 @@ void nLine::updatePlot () {
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
+//            DEBUG(p.x() << " " << p.y() << " " << dist);
 			if (antialias) {
 				// points in poly are NOT translated with origin
 				// (hence a correction must apply)

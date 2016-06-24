@@ -137,7 +137,6 @@ void nGenericPan::decorate() {
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
     connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
 
-    DEBUG(panName.toStdString());
 
     QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
     foreach (QToolBar *my_tool, my_toolbars) {
@@ -145,10 +144,8 @@ void nGenericPan::decorate() {
             QDirIterator it(":/help");
             while (it.hasNext()) {
                 QDir helpdir(it.next());
-                DEBUG(helpdir.dirName().toStdString());
                 QString indexName=helpdir.canonicalPath()+"/index.html";
                 if (helpdir.exists() && helpdir.dirName() == panName && QFileInfo(indexName).exists()) {
-                    DEBUG(indexName.toStdString());
                     QWidget* spacer = new QWidget();
                     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
                     my_tool->addWidget(spacer);
@@ -158,9 +155,8 @@ void nGenericPan::decorate() {
             break;
         }
     }
-    //	qDebug() << __PRETTY_FUNCTION__ << panName << objectName() << metaObject()->className();
-    DEBUG((objectName()+" : "+panName+" : "+metaObject()->className()).toStdString());
-	setProperty("fileTxt", QString(panName+".txt"));
+
+    setProperty("fileTxt", QString(panName+".txt"));
 	setProperty("fileExport", QString(panName+".svg"));
 	setProperty("fileIni", QString(panName+".ini"));
 	neutrinoProperties << "fileTxt" << "fileExport" << "fileIni";
@@ -231,8 +227,8 @@ void nGenericPan::physDel(nPhysD * buffer) {
 				disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
 			}
 			int position=combo->findData(qVariantFromValue((void*) buffer));
-			DEBUG(5, "removed " << buffer->getName() << " " << combo->objectName().toStdString() << " " <<position);
-			combo->removeItem(position);
+
+            combo->removeItem(position);
 			if (combo->property("neutrinoImage").toBool()) {
 //				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
 				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
@@ -268,10 +264,7 @@ void nGenericPan::comboChanged(int k) {
 		if (image) {
 			nparent->showPhys(image);
 		}
-		DEBUG(panName.toStdString() << " " << combo->objectName().toStdString());
 		emit changeCombo(combo);
-	} else {
-		DEBUG("not a combo");
 	}
 }
 
@@ -457,7 +450,6 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
-    DEBUG("closeevent " << panName.toStdString());
     nparent->emitPanDel(this);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {			
@@ -551,8 +543,7 @@ void nGenericPan::loadSettings(QSettings *settings) {
 		QString prop=settings->value("property").toString();
 		QString valu=settings->value("value").toString();
 		setProperty(prop.toUtf8().constData(),valu);
-        DEBUG("property" << prop.toStdString() << " : " << valu.toStdString() );
-	}
+    }
 	settings->endArray();
 }
 
@@ -563,8 +554,7 @@ void nGenericPan::saveSettings(QSettings *settings) {
 		settings->setArrayIndex(i);
 		settings->setValue("property", neutrinoProperties.at(i));
 		settings->setValue("value", property(neutrinoProperties.at(i).toUtf8().constData()).toString());
-        DEBUG("property " << neutrinoProperties.at(i).toStdString() << " : " << property(neutrinoProperties.at(i).toUtf8().constData()).toString().toStdString() );
-	}
+   }
 	settings->endArray();
 }
 
@@ -641,8 +631,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
-				//qDebug() << name << my_val;
-				int val=my_val.toInt(&ok);
+                int val=my_val.toInt(&ok);
 				if (ok && val>=0 && val < obj->maxVisibleItems()) {
 					obj->setCurrentIndex(val);
 				} else {
