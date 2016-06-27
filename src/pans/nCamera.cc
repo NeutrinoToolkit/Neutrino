@@ -32,9 +32,13 @@ nCamera::nCamera(neutrino *nparent, QString winname)
   camera(NULL),
   imageCapture(NULL),
   imgGray(NULL),
-  imgColor(3,nullptr)
+  imgColor(3,nullptr),
+  timeLapse(this)
 {
 	my_w.setupUi(this);
+
+    connect(&timeLapse, SIGNAL(timeout()), this, SLOT(on_grab_clicked()));
+
 	decorate();
 
     cameraMenu=new QMenu(this);
@@ -51,12 +55,23 @@ nCamera::nCamera(neutrino *nparent, QString winname)
         QLabel *not_found = new QLabel("Camera not present", my_w.centralwidget);
         my_w.centralwidget->layout()->addWidget(not_found);
     }
+    on_timeLapse_valueChanged(my_w.timeLapse->value());
 }
 
 nCamera::~nCamera()
 {
     delete imageCapture;
     delete camera;
+}
+
+void nCamera::on_timeLapse_valueChanged(int val) {
+    DEBUG(val);
+    if (val==0) {
+        timeLapse.stop();
+    } else {
+        timeLapse.setInterval(val);
+        timeLapse.start();
+    }
 }
 
 void nCamera::on_grab_clicked() {

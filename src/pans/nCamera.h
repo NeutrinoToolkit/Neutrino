@@ -31,6 +31,8 @@
 #include "nGenericPan.h"
 #include "ui_nCamera.h"
 
+#include <QTimer>
+
 class neutrino;
 
 class nCamera : public nGenericPan {
@@ -48,6 +50,8 @@ public:
     nPhysD *imgGray;
     std::vector<nPhysD *> imgColor;
 
+    QTimer timeLapse;
+
 public slots:
     void on_grab_clicked();
     void setupCam (const QCameraInfo &cameraInfo);
@@ -56,6 +60,7 @@ public slots:
     void giveNeutrino(const QImage &img);
     void contextMenuEvent (QContextMenuEvent *);
     void changeCameraAction();
+    void on_timeLapse_valueChanged(int);
 
 };
 
