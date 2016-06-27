@@ -201,7 +201,9 @@ public slots:
 	void toggleMouse(bool);
 	void toggleRuler();
 	void toggleGrid();
-	
+
+    void showLogWin();
+
 	nGenericPan* Shortcuts();
 
 	// Analysis

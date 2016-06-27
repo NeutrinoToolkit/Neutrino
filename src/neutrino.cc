@@ -27,6 +27,7 @@
 #include <QList>
 
 #include "neutrino.h"
+#include "nApp.h"
 
 #include <QMetaObject>
 #include <QtSvg>
@@ -256,6 +257,7 @@ neutrino::neutrino():
     connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
     connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
     connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
+    connect(my_w.actionLog_window, SIGNAL(triggered()), this, SLOT(showLogWin()));
 
 
 #ifdef HAVE_PYTHONQT
@@ -1623,6 +1625,13 @@ neutrino::Shortcuts() {
     if (!win) win=new nShortcuts(this,vwinname);
     return win;
 }
+
+void neutrino::showLogWin() {
+    NApplication *napp=static_cast<NApplication*>(qApp);
+    if (napp) {
+        napp->toggleLog();
+    }
+};
 
 nGenericPan*
 neutrino::FocalSpot() {
