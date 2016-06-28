@@ -40,7 +40,9 @@ protected:
 
 
 public slots:
+#ifdef USE_QT5
     void toggleLog();
+#endif
     QList<neutrino*> neus();
 };
 #endif

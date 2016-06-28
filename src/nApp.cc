@@ -188,12 +188,14 @@ bool NApplication::notify(QObject *rec, QEvent *ev)
     return false;
 }
 
+#ifdef USE_QT5
 void NApplication::toggleLog() {
     logWin->setWindowState(logWin->windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
     logWin->raise();  // for MacOS
     logWin->activateWindow(); // for Windows
     logWin->show();
 }
+#endif
 
 bool NApplication::event(QEvent *ev) {
     if (ev->type() == QEvent::FileOpen) {
