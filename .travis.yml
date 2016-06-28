@@ -6,7 +6,7 @@ language: cpp
 
 sudo: required
 
-dist: precise
+dist: trusty
 
 compiler: gcc
 addons:
