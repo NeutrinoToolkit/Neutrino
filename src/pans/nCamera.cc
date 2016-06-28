@@ -69,12 +69,13 @@ void nCamera::on_timeLapse_valueChanged(int val) {
     if (val==0) {
         timeLapse.stop();
     } else {
-        timeLapse.setInterval(val);
+        timeLapse.setInterval(val*1000);
         timeLapse.start();
     }
 }
 
 void nCamera::on_grab_clicked() {
+    saveDefaults();
     if (imageCapture)
         imageCapture->capture();
 }
