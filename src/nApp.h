@@ -41,9 +41,7 @@ protected:
 
 public slots:
     void toggleLog();
-#ifdef HAVE_PYTHONQT
     QList<neutrino*> neus();
-#endif
 };
 #endif
 

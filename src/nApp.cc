@@ -30,13 +30,13 @@ static void s_TiffWarningHandler(const char* module, const char* fmt, va_list ar
 
 #endif
 
-
-#ifdef USE_QT5
-#include <QtDebug>
 #include <codeeditor.h>
 
 QPointer<QMainWindow> logWin;
 QPointer<CodeEditor> logText;
+
+#ifdef USE_QT5
+#include <QtDebug>
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -164,7 +164,6 @@ NApplication::NApplication( int &argc, char **argv ) :
 
 
 
-#ifdef HAVE_PYTHONQT
 QList<neutrino*> NApplication::neus() {
     QList<neutrino*> retList;
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
@@ -173,7 +172,6 @@ QList<neutrino*> NApplication::neus() {
     }
     return retList;
 }
-#endif
 
 bool NApplication::notify(QObject *rec, QEvent *ev)
 {
