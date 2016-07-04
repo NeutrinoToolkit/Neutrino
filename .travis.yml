@@ -37,6 +37,6 @@ script:
   - git tag -a v1.0 -m "travis 1.0"
   - mkdir build
   - cd build
-  - cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu/cmake/Qt5 -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+  - cmake -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5 -DCMAKE_CXX_COMPILER=$COMPILER .. && make
 
 install:
