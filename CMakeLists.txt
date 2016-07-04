@@ -4,6 +4,12 @@ cmake_minimum_required (VERSION 3.0)
 
 project (Neutrino CXX)
 
+### top level compile options
+
+option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
+
+#############################
+
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
 ## default build type is release

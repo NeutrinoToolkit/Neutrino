@@ -43,7 +43,11 @@ if (HDF5_FOUND_COMPLETE)
 endif()
 
 
-include(FindPythonLibs)
+if (OPTION_USE_PYTHON)
+	include(FindPythonLibs)
+else()
+	message(STATUS "Python disabled")
+endif()
 
 if(PYTHONLIBS_FOUND)
 	list(APPEND LIBS ${PYTHON_LIBRARIES})
