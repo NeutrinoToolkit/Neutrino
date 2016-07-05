@@ -35,7 +35,8 @@ script:
   #       this causes problems when we try to use our prebuilt version of
   #       libgit2 (because of its need of libc). So, to 'fix' this, we ask for
   #       libgit2 to be built on Linux...
-  -    cd build
+  -    mkdir -p build
+    && cd build
     && if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
           cmake -DCMAKE_BUILD_TYPE=$CONFIG -DCMAKE_PREFIX_PATH=/opt/qt54/lib/cmake  ..
          ;
