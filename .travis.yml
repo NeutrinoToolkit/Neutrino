@@ -1,12 +1,10 @@
 language: cpp
 
-sudo: required
-
-os:
-  - linux
-#  - osx
-
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
 
 env:
   - CONFIG=Release
