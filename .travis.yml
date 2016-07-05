@@ -4,8 +4,8 @@ os:
   - linux
 #  - osx
 
-#env:
-#  - CONFIG=Release
+env:
+  - CONFIG=Release
 #  - CONFIG=Debug
 
 install:
@@ -37,7 +37,6 @@ script:
   #       libgit2 to be built on Linux...
   -    cd build
     && if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-#         cmake -DCMAKE_BUILD_TYPE=$CONFIG -DCMAKE_PREFIX_PATH=/opt/qt54/lib/cmake  ..
           cmake -DCMAKE_BUILD_TYPE=$CONFIG -DCMAKE_PREFIX_PATH=/opt/qt54/lib/cmake  ..
          ;
        else
@@ -45,27 +44,6 @@ script:
          ;
        fi
     && make -j 3
-#    && cd ..
-#    && if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-#         build/bin/runtests
-#         ;
-#       else
-#         build/OpenCOR.app/Contents/MacOS/runtests
-#         ;
-#       fi
 
           
-# before_install:
-# - cat .travis.yml
-# - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
-# - sudo apt-get update -qq
-# - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
-#
-#script:
-#  - git checkout -b travis
-#  - git tag -a v1.0 -m "travis 1.0"
-#  - mkdir build
-#  - cd build
-#  - cmake -DCMAKE_PREFIX=/usr/lib/x86_64-linux-gnu/cmake/Qt5 -DQt5_DIR=/usr/lib/x86_64-linux-gnu/qt5 .. && make
-
 install:
