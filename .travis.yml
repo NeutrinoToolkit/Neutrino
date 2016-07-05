@@ -23,10 +23,13 @@ before_install:
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
   - sudo apt-get remove -y '^qt4.*'
+  - sudo apt-get autoremove -y
   - apt-cache search qt5
   - sudo apt-get install -y qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev libqt5quick5
   - sudo apt-get install -y qt5-default qttools5-dev-tools 
-  - sudo apt-get install -y libqt5gui5 libqt5multimedia5 libqt5multimediawidgets5 libqt5script5 libqt5scripttools5 libqt5svg5 libqt5svg5-dev libqt5gui5 
+  - sudo apt-get install -y libqt5gui5 libqt5multimedia5 libqt5multimediawidgets5 libqt5script5 libqt5scripttools5 libqt5svg5 libqt5svg5-dev 
+  - sudo apt-get install -y libqt5gui5 libqt5sql5 libqt5widgets5 libqt5svg5 libqt5svg5-dev libqt5printsupport5 libqt5multimedia5 libqt5multimediawidgets5
+  # neutrino
   - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
   - apt-cache search qt5
   - sudo updatedb
@@ -36,6 +39,7 @@ before_install:
   - qmake --version
   - /usr/lib/x86_64-linux-gnu/qt5/bin/qmake --version
   
+#  Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets
 
 script:
   - git checkout -b travis
