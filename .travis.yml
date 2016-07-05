@@ -1,8 +1,11 @@
 language: cpp
 
+sudo: required
+
 os:
   - linux
 #  - osx
+
 
 env:
   - CONFIG=Release
@@ -31,10 +34,6 @@ install:
     fi
 
 script:
-  # Note: Travis CI uses Ubuntu 12.04 LTS while we use Ubuntu 14.04 LTS, and
-  #       this causes problems when we try to use our prebuilt version of
-  #       libgit2 (because of its need of libc). So, to 'fix' this, we ask for
-  #       libgit2 to be built on Linux...
   -    mkdir -p build
     && cd build
     && if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
