@@ -12,6 +12,7 @@ before_install:
   - sudo apt-add-repository -y ppa:beineri/opt-qt57-trusty
   - sudo apt-get -qq update
   - sudo apt-get install -y libcfitsio3-dev libhdf5-serial-dev libtiff4-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
+  - apt-cache search qt5
   - sudo apt-get -qq install g++-4.8 libc6-i386 qt57tools qt57svg qt57webkit
   - find /usr/local/opt/qt* -type d
 
