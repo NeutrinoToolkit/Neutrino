@@ -9,14 +9,14 @@ sudo: required
 dist: trusty
 
 compiler: gcc
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-5
-      
-env: COMPILER=g++-5
+#addons:
+#  apt:
+#    sources:
+#      - ubuntu-toolchain-r-test
+#    packages:
+#      - g++-5
+#      
+#env: COMPILER=g++-5
           
 before_install:
   - cat .travis.yml
@@ -39,6 +39,6 @@ script:
   - git tag -a v1.0 -m "travis 1.0"
   - mkdir build
   - cd build
-  - cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu/qt5/ -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+  - cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu/qt5 .. && make
 
 install:
