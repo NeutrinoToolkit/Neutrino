@@ -36,13 +36,12 @@ before_install:
   # neutrino
   - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
   - apt-cache search qt5
-  - sudo updatedb
-  - locate qmake
-  - locate Qt5Config.cmake
-  - locate .cmake
+#  - sudo updatedb
+#  - locate qmake
+#  - locate Qt5Config.cmake
+#  - locate .cmake
   - qmake --version
-  - /usr/lib/x86_64-linux-gnu/qt5/bin/qmake --version
-  
+#  - /usr/lib/x86_64-linux-gnu/qt5/bin/qmake --version
 #  Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets
 
 script:
