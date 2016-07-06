@@ -9,46 +9,17 @@ sudo: required
 dist: trusty
 
 compiler: gcc
-#addons:
-#  apt:
-#    sources:
-#      - ubuntu-toolchain-r-test
-#    packages:
-#      - g++-5
-#      
-#env: COMPILER=g++-5
           
 before_install:
+  - git fetch -t
   - cat .travis.yml
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
-#  - sudo apt-get remove -y '^qt4.*'
-#  - sudo apt-get autoremove -y
-#  - apt-cache search qt5
-#  - sudo apt-get install -y qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev libqt5quick5
-#  - sudo apt-get install -y qt5-default qttools5-dev-tools 
-#  - sudo apt-get install -y libqt5gui5 libqt5multimedia5 libqt5multimediawidgets5 libqt5script5 libqt5scripttools5 libqt5svg5 libqt5svg5-dev 
-#  - sudo apt-get install -y libqt5gui5 libqt5sql5 libqt5widgets5 libqt5svg5
-#  - sudo apt-get install -y libqt5svg5-dev libqt5printsupport5 libqt5multimedia5 libqt5multimediawidgets5 libphonon4qt5-4 libphonon4qt5-dev libpoppler-qt5-1 libpoppler-qt5-dev libqscintilla2-doc libqt53d5 libqt5bluetooth5 libqt5clucene5 libqt5concurrent5 libqt5contacts5 libqt5core5a libqt5dbus5 libqt5declarative5 libqt5designer5 libqt5designercomponents5 libqt5feedback5 libqt5gui5 libqt5help5 libqt5location5 libqt5location5-plugins libqt5multimedia5 libqt5multimedia5-plugins libqt5multimedia5-touch libqt5multimedia5-touch-plugins libqt5multimediaquick-p5 libqt5multimediaquick-p5-touch libqt5multimediawidgets5 libqt5network5 
-#  - sudo apt-get install -y libqt5nfc5 libqt5opengl5 libqt5opengl5-dev libqt5organizer5 libqt5positioning5 libqt5positioning5-plugins libqt5printsupport5 libqt5publishsubscribe5 libqt5qml-graphicaleffects libqt5qml-quickcontrols libqt5qml5 libqt5quick5 libqt5quickparticles5 libqt5quicktest5 libqt5scintilla2-11 libqt5scintilla2-dev libqt5scintilla2-l10n libqt5script5 
-#  - sudo apt-get install -y libqt5scripttools5 libqt5sensors5 libqt5sensors5-dev libqt5serialport5 libqt5serialport5-dev libqt5serviceframework5 libqt5sql5 libqt5sql5-mysql libqt5sql5-odbc libqt5sql5-psql libqt5sql5-sqlite libqt5sql5-tds libqt5svg5 libqt5svg5-dev libqt5svg5-private-dev libqt5systeminfo5 libqt5test5 libqt5versit5 libqt5versitorganizer5 libqt5webkit5 libqt5webkit5-dbg libqt5webkit5-dev libqt5webkit5-qmlwebkitplugin libqt5widgets5 
-#  - sudo apt-get install -y libqt5x11extras5 libqt5x11extras5-dev libqt5xml5 libqt5xmlpatterns5 libqt5xmlpatterns5-dev libqt5xmlpatterns5-private-dev qt5-default qt5-doc qt5-doc-html qt5-image-formats-plugins qt5-qmake qtchooser qtdeclarative5-poppler1.0 qtdeclarative5-u1db1.0 qtmultimedia5-examples qtsensors5-dev 
   # neutrino
-  - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
+  - sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential
   - apt-cache search qt5
-#  - sudo updatedb
-#  - locate qmake
-#  - locate Qt5Config.cmake
-#  - locate .cmake
-  - qmake --version
-#  - /usr/lib/x86_64-linux-gnu/qt5/bin/qmake --version
-#  Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets
 
 script:
-  - git checkout -b travis
-  - git tag -a v1.0 -m "travis 1.0"
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_PREFIX=/usr/lib/x86_64-linux-gnu/cmake/Qt5 -DQt5_DIR=/usr/lib/x86_64-linux-gnu/qt5 .. && make
+  - make
 
 install:
