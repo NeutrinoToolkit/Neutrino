@@ -40,7 +40,7 @@ protected:
 
 
 public slots:
-#ifdef USE_QT5
+#if defined(USE_QT5) && defined(HAVE_PYTHONQT)
     void toggleLog();
 #endif
     QList<neutrino*> neus();

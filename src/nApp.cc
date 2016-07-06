@@ -189,7 +189,7 @@ bool NApplication::notify(QObject *rec, QEvent *ev)
     return false;
 }
 
-#ifdef USE_QT5
+#if defined(USE_QT5) && defined(HAVE_PYTHONQT)
 void NApplication::toggleLog() {
     logWin->setWindowState(logWin->windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
     logWin->raise();  // for MacOS
