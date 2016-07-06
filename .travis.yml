@@ -20,12 +20,12 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt55 cfitsio cmake hdf4 hdf5 gsl; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
   # pythonqt
-#  - git clone https://github.com/iltommi/PythonQt.git
-#  - cd PythonQt
-#  - mkdir -p compile && cd compile
-#  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export QTDIR=/usr/local/opt/qt5/lib; cmake -DQt5_DIR=${QTDIR}/lib/cmake/Qt5 -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
-#  - cd ../..
+  - git clone https://github.com/iltommi/PythonQt.git
+  - cd PythonQt
+  - mkdir -p compile && cd compile
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
+  - cd ../..
 
 script:
   - make
