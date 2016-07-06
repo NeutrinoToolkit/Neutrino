@@ -102,7 +102,7 @@ NApplication::NApplication( int &argc, char **argv ) :
     setProperty("nHash", hh.c_str());
 #endif
 
-#ifdef USE_QT5
+#if defined(USE_QT5) && defined(HAVE_PYTHONQT)
     qInstallMessageHandler(myMessageOutput);
     setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
