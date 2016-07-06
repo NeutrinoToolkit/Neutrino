@@ -5,9 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Neutrino by aflux</title>
 
-    <link rel="stylesheet" href="/stylesheets/styles.css">
-    <link rel="stylesheet" href="/stylesheets/github-light.css">
-    <script src="/javascripts/scale.fix.js"></script>
+{% include base.html %}
+	<link rel="stylesheet" href="{{base}}/stylesheets/styles.css">
+	<link rel="stylesheet" href="{{base}}/stylesheets/github-light.css">
+	<script src="{{base}}/javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -17,7 +18,7 @@
     <div class="wrapper">
       <header>
         <h1 class="header">Neutrino</h1>
-	      <p class=header><img src="/images/icon.svg" style="width:100%"><p> 
+	<p class=header><img src="{{base}}/images/icon.svg" style="width:100%"><p> 
         <!--<p class="header">A light, expandable and full featured image analysis tool for
 		research</p>-->
 
