@@ -31,7 +31,8 @@ static void s_TiffWarningHandler(const char* module, const char* fmt, va_list ar
 #endif
 
 
-#ifdef USE_QT5
+#if defined(USE_QT5) && defined(HAVE_PYTHONQT)
+
 #include <QtDebug>
 #include "codeeditor.h"
 

@@ -18,6 +18,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew info fftw; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew list; fi
 
 script:
   - git checkout -b travis
