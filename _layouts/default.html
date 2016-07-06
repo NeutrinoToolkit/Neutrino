@@ -1,29 +1,46 @@
-<!DOCTYPE html>
-	<html>
-		<head>
-			<title>{{ page.title }}</title>
-			<!-- link to main stylesheet -->
-			<link rel="stylesheet" type="text/css" href="/css/main.css">
-		</head>
-		<body>
-			<nav>
-	    		<ul>
-	        		<li><a href="/">Home</a></li>
-		        	<li><a href="/about">About</a></li>
-	        		<li><a href="/cv">CV</a></li>
-	        		<li><a href="/blog">Blog</a></li>
-	    		</ul>
-			</nav>
-			<div class="container">
-			
-			{{ content }}
-			
-			</div><!-- /.container -->
-			<footer>
-	    		<ul>
-	        		<li><a href="mailto:alessandro.flacco@polytechnique.edu">email</a></li>
-	        		<li><a href="https://github.com/aflux">github.com/aflux</a></li>
-				</ul>
-			</footer>
-		</body>
-	</html>
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Neutrino by aflux</title>
+
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+    <link rel="stylesheet" href="/stylesheets/github-light.css">
+    <script src="/javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Neutrino</h1>
+	      <p class=header><img src="/images/icon.svg" style="width:100%"><p> 
+        <!--<p class="header">A light, expandable and full featured image analysis tool for
+		research</p>-->
+
+        <ul>
+        <!--  <li class="download"><a class="buttons" href="https://github.com/aflux/neutrino/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/aflux/neutrino/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/aflux/neutrino">View On
+	  GitHub</a></li> -->
+        </ul>
+
+        <!--<p class="header">This project is maintained by <a class="header name"
+		href="https://github.com/aflux">aflux</a></p>-->
+
+
+      </header>
+      <section>
+	      {{ content }}
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
