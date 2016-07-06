@@ -12,6 +12,8 @@ compiler: gcc
           
 before_install:
   - git fetch -t
+  - git checkout -b travis
+  - git tag -a v1.0 -m "travis 1.0"
   - cat .travis.yml
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
