@@ -21,6 +21,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew tap homebrew/science; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo updatedb; locate qabstractprintdialog.h fi
   # pythonqt
   - git clone https://github.com/iltommi/PythonQt.git
   - qmake --version
