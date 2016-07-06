@@ -27,6 +27,7 @@ before_install:
   - git clone https://github.com/iltommi/PythonQt.git
   - qmake --version
   - cd PythonQt
+  - sed -i -e 's/5.3.0/5.2.0/g' CMakeLists.txt
   - mkdir -p compile && cd compile
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
