@@ -31,8 +31,6 @@ before_install:
   - cd ../..
 
 script:
-  - git checkout -b travis
-  - git tag -a v1.0 -m "travis 1.0"
   - make || cat */CMakeCache.txt
 
 install:
