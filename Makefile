@@ -35,19 +35,19 @@ Darwin::
 	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
 	rm -rf macdeployqtfix
 	git clone git@github.com:iltommi/macdeployqtfix.git
-	python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local/Cellar/qt5/5.6.1/
-	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3.3.dylib
-	install_name_tool -change /usr/local/Cellar/fftw/3.3.4_1/lib/libfftw3.3.dylib \@executable_path/../Frameworks/libfftw3.3.dylib Neutrino.app/Contents/Frameworks/libfftw3_threads.3.dylib
-	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3_threads.3.dylib
-	install_name_tool -change /usr/local/Cellar/fftw/3.3.4_1/lib/libfftw3.3.dylib \@executable_path/../Frameworks/libfftw3.3.dylib Neutrino.app/Contents/Frameworks/libfftw3_omp.3.dylib
-	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3_omp.3.dylib
-	install_name_tool -change /usr/local/Cellar/hdf4/4.2.11/lib/libdf.4.2.11.dylib \@executable_path/../Frameworks/libdf.4.2.11.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
-	install_name_tool -change /usr/local/lib/libjpeg.8.dylib \@executable_path/../Frameworks/libjpeg.8.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
-	install_name_tool -change /usr/local/lib/libsz.2.dylib \@executable_path/../Frameworks/libsz.2.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
-	install_name_tool -change /usr/local/Cellar/hdf5/1.8.16_1/lib/libhdf5.10.dylib \@executable_path/../Frameworks/libhdf5.10.dylib Neutrino.app/Contents/Frameworks/libhdf5_hl.10.dylib
-	install_name_tool -change /usr/local/lib/libjpeg.8.dylib \@executable_path/../Frameworks/libjpeg.8.dylib Neutrino.app/Contents/Frameworks/libdf.4.2.11.dylib
-	install_name_tool -change /usr/local/lib/libsz.2.dylib \@executable_path/../Frameworks/libsz.2.dylib Neutrino.app/Contents/Frameworks/libdf.4.2.11.dylib
-	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libgomp.1.dylib
+	python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
+# 	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3.3.dylib
+# 	install_name_tool -change /usr/local/Cellar/fftw/3.3.4_1/lib/libfftw3.3.dylib \@executable_path/../Frameworks/libfftw3.3.dylib Neutrino.app/Contents/Frameworks/libfftw3_threads.3.dylib
+# 	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3_threads.3.dylib
+# 	install_name_tool -change /usr/local/Cellar/fftw/3.3.4_1/lib/libfftw3.3.dylib \@executable_path/../Frameworks/libfftw3.3.dylib Neutrino.app/Contents/Frameworks/libfftw3_omp.3.dylib
+# 	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3_omp.3.dylib
+# 	install_name_tool -change /usr/local/Cellar/hdf4/4.2.11/lib/libdf.4.2.11.dylib \@executable_path/../Frameworks/libdf.4.2.11.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
+# 	install_name_tool -change /usr/local/lib/libjpeg.8.dylib \@executable_path/../Frameworks/libjpeg.8.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
+# 	install_name_tool -change /usr/local/lib/libsz.2.dylib \@executable_path/../Frameworks/libsz.2.dylib Neutrino.app/Contents/Frameworks/libmfhdf.4.2.11.dylib
+# 	install_name_tool -change /usr/local/Cellar/hdf5/1.8.16_1/lib/libhdf5.10.dylib \@executable_path/../Frameworks/libhdf5.10.dylib Neutrino.app/Contents/Frameworks/libhdf5_hl.10.dylib
+# 	install_name_tool -change /usr/local/lib/libjpeg.8.dylib \@executable_path/../Frameworks/libjpeg.8.dylib Neutrino.app/Contents/Frameworks/libdf.4.2.11.dylib
+# 	install_name_tool -change /usr/local/lib/libsz.2.dylib \@executable_path/../Frameworks/libsz.2.dylib Neutrino.app/Contents/Frameworks/libdf.4.2.11.dylib
+# 	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libgomp.1.dylib
 	/usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString ${VERSION}" Neutrino.app/Contents/Info.plist
 	/usr/libexec/PlistBuddy -c "Add NSPrincipalClass string NSApplication" Neutrino.app/Contents/Info.plist
 	/usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
