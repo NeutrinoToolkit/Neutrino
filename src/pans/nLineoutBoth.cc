@@ -40,7 +40,6 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
     connect(parent, SIGNAL(nZoom(double)), this, SLOT(updateLastPoint(void)));
 
     connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
-    setBehaviour();
 
     connect(my_w.autoScale, SIGNAL(toggled(bool)), my_w.lockColors, SLOT(setEnabled(bool)));
 
@@ -54,6 +53,7 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
     my_w.plot->graph(1)->setName("Vertical");
 
     decorate();
+    setBehaviour();
 	updateLastPoint();
     
 }
