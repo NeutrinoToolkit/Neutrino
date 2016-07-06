@@ -33,7 +33,7 @@ static void s_TiffWarningHandler(const char* module, const char* fmt, va_list ar
 
 #ifdef USE_QT5
 #include <QtDebug>
-#include <codeeditor.h>
+#include "codeeditor.h"
 
 QPointer<QMainWindow> logWin;
 QPointer<CodeEditor> logText;
