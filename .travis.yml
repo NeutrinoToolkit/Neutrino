@@ -14,23 +14,24 @@ osx_image: xcode7.2
           
 before_install:
   - git fetch -t
+  - git describe
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-cache search 'qt.*5'; fi
-  # neutrino
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install qt5-default qtbase5-dev libqt5svg5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev libqt5multimediawidgets5 libqt5clucene5 libqt5designer5 libqt5designercomponents5 libqt5help5; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew upgrade && brew tap homebrew/science; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew tap homebrew/science; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew info fftw; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew list; fi
   # pythonqt
-  - git clone https://github.com/commontk/PythonQt.git
+  - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
   - mkdir -p compile && cd compile
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .. && make && make install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=/usr/lib/x86_64-linux-gnu -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -DPythonQt_Wrap_QtAll=TRUE .. && make && make install; fi
   - cd ../..
 
 script:
-  - make || cat */CMakeCache.txt
+  - git checkout -b travis
+  - git tag -a v1.0 -m "travis 1.0"
+  - make
 
 install:
