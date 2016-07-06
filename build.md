@@ -6,6 +6,7 @@ title: Building Neutrino
 # Building for GNU/Linux (Debian)
 
 The following packages are needed: 
+
 * qt5 dev components: `qtbase5-dev` `qtmultimedia5-dev` `qttools5-dev` `libqt5svg5-dev`
 
 (work in progress)
@@ -30,13 +31,14 @@ The biggest issue is qt5 (and still not that painful). I suggest you create a fo
 qt5base and modules:
 
 
-1. Compile qtbase
+### Compile qtbase
 
 The delicate step is with the configure script. Notice that the CROSS_COMPILE option ends with a `-`
 and it is correct this way (it's a prefix). Building of examples is disabled (it is broken as of
-qt 5.3).\\
+qt 5.3).
 
 Get the sources: 
+
 ~~~
 cd <your qt compile folder>
 apt-get source qtbase-opensource-src
@@ -54,13 +56,15 @@ same source tree. Should your build fail, should you want to change the `--prefi
 recommended to delete the qtbase source tree and start over.
 
 Build and install:
+
 ~~~
 make && make install
 ~~~
 
-2. Build qt components
+### Build qt components
 
 Get the sources for needed qt5 components:
+
 ~~~
 cd <your qt compile folder>
 apt-get source qtsvg-opensource-src qttools-opensource-src qtmultimedia-opensource-src
@@ -74,10 +78,10 @@ cd <component source folder>
 <absolute path to your xcompiled binaries>/qmake && make && make install
 ~~~
 
-3. GNU Dependencies
+### GNU Dependencies
 
-The needed dependencies from GNU can be found already in binary form from [gnuwin32]:
-http://gnuwin32.sourceforge.net/packages.html "GnuWin32". You will need the following
+The needed dependencies from GNU can be found already in binary form from 
+[gnuwin32]: http://gnuwin32.sourceforge.net/packages.html "GnuWin32". You will need the following
 
 * Jpeg
 * LibTiff
@@ -95,10 +99,10 @@ runtime.  Neutrino build process expects
 
 Runtime libraries found in `<>/bin` will be included in the installer during deploy.
 
-4. FFTW3
+### FFTW3
 
-Same applies for the **FFTW3** libraries; win32 binaries can be found [fftw]:
-http://www.fftw.org/install/windows.html "here".
+Same applies for the **FFTW3** libraries; win32 binaries can be found 
+[fftw]: http://www.fftw.org/install/windows.html "here".
 
 ## Compile Neutrino
 
