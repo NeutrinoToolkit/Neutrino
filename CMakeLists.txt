@@ -131,20 +131,21 @@ endif()
 
 
 if(APPLE)
-     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
-     set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
+    set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
 
-     set(CPACK_BUNDLE_NAME "Neutrino")
-     set(CPACK_BUNDLE_ICON "${ICONS_DIR}/icon.icns")
-     set(CPACK_BUNDLE_PLIST "${ICONS_DIR}/../neutrino.plist")
+    set(CPACK_BUNDLE_NAME "Neutrino")
+    set(CPACK_BUNDLE_ICON "${ICONS_DIR}/icon.icns")
+    set(CPACK_BUNDLE_PLIST "${ICONS_DIR}/../neutrino.plist")
 
-     set(CMAKE_INSTALL_PREFIX "/Applications")
-     set(CPACK_GENERATOR "Bundle")
-     set(CPACK_DMG_FORMAT "UDBZ")
-     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
-     set(CPACK_SYSTEM_NAME "OSX")
-     set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
-     set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
+    set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(CPACK_GENERATOR "Bundle")
+    set(CPACK_DMG_FORMAT "UDBZ")
+    set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
+    set(CPACK_SYSTEM_NAME "OSX")
+    set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
+    set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
 endif()
 
 include (CPack) # this to be included LAST with resp. to its vars
