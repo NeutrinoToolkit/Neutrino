@@ -27,3 +27,11 @@ script:
   - make
 
 install:
+
+deploy:
+  provider: releases
+  api_key: $github_token
+  file: Neutrino.dmg
+  skip_cleanup: true
+  on:
+    tags: true
