@@ -66,6 +66,7 @@ if(PYTHONLIBS_FOUND)
 			set (PYTHONQT_FOUND_COMPLETE "TRUE")
 			message (STATUS "PythonQt header dir: ${PYTHONQT_INCLUDE_DIR}")
 			include_directories(${PYTHONQT_INCLUDE_DIR})
+
 		ELSE()
 			set (PYTHONQT_FOUND_COMPLETE "FALSE")
 			message(STATUS "PythonQt.h NOT FOUND (perhaps you forgot -DCMAKE_INCLUDE_PATH)")
