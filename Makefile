@@ -34,7 +34,7 @@ Darwin::
 	cp -r $@/Neutrino.app .
 	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
 	rm -rf macdeployqtfix
-	git clone git@github.com:iltommi/macdeployqtfix.git
+	git clone https://github.com/iltommi/macdeployqtfix.git
 	python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
 # 	install_name_tool -change /usr/local/lib/gcc/6/libgcc_s.1.dylib \@executable_path/../Frameworks/libgcc_s.1.dylib Neutrino.app/Contents/Frameworks/libfftw3.3.dylib
 # 	install_name_tool -change /usr/local/Cellar/fftw/3.3.4_1/lib/libfftw3.3.dylib \@executable_path/../Frameworks/libfftw3.3.dylib Neutrino.app/Contents/Frameworks/libfftw3_threads.3.dylib
