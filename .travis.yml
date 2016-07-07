@@ -15,7 +15,6 @@ branches:
     
 before_install:
   - git fetch -t
-  - git checkout $TRAVIS_BRANCH
   - git symbolic-ref $TRAVIS_BRANCH
   - git describe --abbrev=0 --tags
   - git rev-list master $(git describe --abbrev=0 --tags)^..$TRAVIS_BRANCH --count
