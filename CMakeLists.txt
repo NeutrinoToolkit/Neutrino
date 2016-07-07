@@ -4,6 +4,13 @@ cmake_minimum_required (VERSION 3.0)
 
 project (Neutrino CXX)
 
+### top level compile options
+
+option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
+option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" ON)
+
+#############################
+
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
 ## default build type is release
@@ -57,8 +64,6 @@ include(GetVersionFromGitTag)
 if (GIT_FOUND)
 	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
 	
-	# generate clean (debian-wise) tag name
-	string(REGEX REPLACE "^[a-zA-Z]" "" ${PROJECT_NAME}_VERSION_NUM ${${PROJECT_NAME}_VERSION_STRING})
 
         IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
             message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
@@ -107,9 +112,9 @@ endif()
 if (LINUX)
 
 	message("building on linux")
-    execute_process(COMMAND "lsb_release -is" OUTPUT_VARIABLE DISTRO)
+    execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
 
-    if (DISTRO STREQUAL "Debian" OR DISTRO STREQUAL "Ubuntu")
+    if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu")
 
 	message (STATUS "Using CPackDeb for packaging")
 
@@ -122,10 +127,20 @@ if (LINUX)
 	set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
 	set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 
+	# debian is picky on version numbers
+	string(REGEX REPLACE "^[a-zA-Z]" "" CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
+	message (STATUS "Debian package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
+
 	execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 	#set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
+
+	if (OPTION_INSTALL_PYTHONQT)
+		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
+		message (STATUS "conflicts ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+	endif()
+
     endif()
 endif()
 

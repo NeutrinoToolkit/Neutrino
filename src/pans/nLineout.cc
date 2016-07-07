@@ -34,7 +34,6 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
     connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint()));
 
     connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
-    setBehaviour();
 
     connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), my_w.actionLockColors, SLOT(setEnabled(bool)));
     
@@ -43,6 +42,7 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
     my_w.plot->graph(0)->setName(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
 
     decorate();
+    setBehaviour();
     updateLastPoint();
 }
 

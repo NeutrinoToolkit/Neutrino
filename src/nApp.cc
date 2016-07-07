@@ -181,9 +181,6 @@ bool NApplication::notify(QObject *rec, QEvent *ev)
     }
     catch (std::exception &e) {
         qCritical() << e.what();
-//        QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
-//        dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-//        dlg.exec();
     }
 
     return false;
