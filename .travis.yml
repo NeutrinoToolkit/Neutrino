@@ -1,8 +1,5 @@
 language: cpp
 
-git:
-  depth: 9999999
-
 os: osx
 
 sudo: required
@@ -11,12 +8,11 @@ osx_image: xcode7.2
 
           
 before_install:
-  - git fetch -t
   - git checkout $TRAVIS_BRANCH
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default qtbase5-dev libqt5svg5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev libqt5multimediawidgets5 libqt5clucene5 libqt5designer5 libqt5designercomponents5 libqt5help5 libqt5printsupport5; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew upgrade && brew tap homebrew/science; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew tap homebrew/science; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
   # pythonqt
