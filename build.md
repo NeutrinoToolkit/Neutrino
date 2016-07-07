@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: default-tutorial
 title: Building Neutrino
+author: A. Flacco
 ---
 
 # Building for GNU/Linux (Debian)
@@ -39,6 +40,8 @@ console. The options are the following:
 * `libPythonQt3.0-dev` (debian/testing): includes Qt_Bindings, linked against qt4;
 * build it your own, which is what is currently done for Neutrino deploys; an adapted fork can be
   found at <https://github.com/aflux/PythonQt>
+
+(work in progress)
 
 ## Building
 
@@ -117,7 +120,7 @@ cd <component source folder>
 ### GNU Dependencies
 
 The needed dependencies from GNU can be found already in binary form from 
-[gnuwin32]: http://gnuwin32.sourceforge.net/packages.html "GnuWin32". You will need the following
+[GnuWin32](http://gnuwin32.sourceforge.net/packages.html). You will need the following
 
 * Jpeg
 * LibTiff
@@ -137,8 +140,8 @@ Runtime libraries found in `<>/bin` will be included in the installer during dep
 
 ### FFTW3
 
-Same applies for the **FFTW3** libraries; win32 binaries can be found 
-[fftw]: http://www.fftw.org/install/windows.html "here".
+Same applies for the **FFTW3** libraries; win32 binaries can be obtained from the
+[FFTW website](http://www.fftw.org/install/windows.html).
 
 ## Compile Neutrino
 

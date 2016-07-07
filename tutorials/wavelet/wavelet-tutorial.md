@@ -1,6 +1,6 @@
 ---
 layout: default-tutorial
-title: Wavelet tutorial
+title: Wavelet analysis of an interferogram (fr)
 author: A. Depresseux
 ---
 
