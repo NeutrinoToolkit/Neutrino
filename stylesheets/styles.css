@@ -163,6 +163,12 @@ p img {
   border: none;
 }
 
+/* alex */
+.center-image {
+	margin: 0 auto;
+	display: block;
+}
+
 /* Code blocks */
 
 code, pre {
@@ -339,6 +345,10 @@ section {
   width:650px;
   float:right;
   padding-bottom:50px;
+}
+
+p.page-author {
+	float: right;
 }
 
 

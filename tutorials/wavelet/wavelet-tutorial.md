@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: default-tutorial
 title: Wavelet tutorial
+author: A. Depresseux
 ---
 
 # Traitement des interférogrammes de canal plasma avec Neutrino 
@@ -54,7 +55,7 @@ données de sortie Phase et Quality (attention à la numérotation des
 données !). Méthode : **Quality**. Puis, Calculate.
 Effectuer le calcul pour l’image et sa référence. Les donnés apparaissent dans
 la **Winlist** sous l’appellation **unwrap**...\\
-![img5](images/img5.png)
+![img5](images/img5.png){:width="40%;" : .center-image}
 
 2. Ensuite, aller dans **substract**. Deux solutions se présentent pour
 reconstruire la phase. Soit utiliser la référence expérimentale, soit générer une
