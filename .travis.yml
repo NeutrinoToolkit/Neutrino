@@ -28,7 +28,7 @@ before_install:
   - cd ../..
 
 script:
-  - make
+  - MACOSX_DEPLOYMENT_TARGET=10.6 make
 
 install:
 
