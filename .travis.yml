@@ -25,8 +25,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew tap homebrew/science; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw; fi
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw --with-openmp; fi
   # pythonqt
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
