@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: default-tutorial
 title: Wavelet tutorial
+author: A. Depresseux
 ---
 
 # Traitement des interférogrammes de canal plasma avec Neutrino 
