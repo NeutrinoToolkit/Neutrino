@@ -59,8 +59,6 @@ endif
 	mkdir -p dmg
 	cp -r Neutrino.app dmg
 	./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg && rm -rf dmg
-	mv Neutrino.dmg Neutrino-${VERSION}-${@}.dmg
-	@echo "\nBuild $@ : Neutrino-${VERSION}-${@}.dmg"
 
 
 cross::
@@ -90,7 +88,7 @@ appdir:: Linux
 	rm -rf Neutrino
 	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
 
-	zip -FSr Neutrino-${VERSION}-$(UNAME_S).zip Neutrino
+	zip -FSr Neutrino.zip Neutrino
 
 
 .PHONY: doc smonta

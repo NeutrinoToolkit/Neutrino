@@ -40,9 +40,8 @@ script:
 install:
 
 before_deploy:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_FILE=$(ls Neutrino*.dmg); fi
-  - if [[ "$TRAVIS_OS_NAME" == "Linux" ]]; then export RELEASE_FILE=$(ls Neutrino*.deb); fi
-  - echo "deploying $RELEASE_FILE to GitHub releases"
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_FILE=Neutrino.dmg; fi
+  - if [[ "$TRAVIS_OS_NAME" == "Linux" ]]; then export RELEASE_FILE=Neutrino.deb; fi
   
 deploy:
   provider: releases
