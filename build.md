@@ -5,9 +5,45 @@ title: Building Neutrino
 
 # Building for GNU/Linux (Debian)
 
+## Depends
+
 The following packages are needed: 
 
+* file formats: `libtiff5-dev` `libjpeg-dev` `libnetpbm10-dev` `libccfits-dev` `libhdf5-dev`
+* math: libgsl-dev
 * qt5 dev components: `qtbase5-dev` `qtmultimedia5-dev` `qttools5-dev` `libqt5svg5-dev`
+
+Although building Neutrino against `qt4` is still possible, there are quite a few (and growing)
+differences between the two versions. Future versions may be broken.
+
+### Python depends
+
+The python subsystem (optional) relies on standard python libs and on **pythonQt**. The first is a
+the system library and provides the python interpreter.
+
+~~~
+apt-get install libpython2.7-dev
+~~~
+
+The libPythonQt provides the connection between the python interpreter and the Qt Neutrino
+structure, and does all the interesting game (which enables to access Neutrino methods and objects
+from within the python interpreter).
+
+The library can *optionally* contain *all* of the Qt library as a subsystem: this feature enable to
+actually compose widgets runtime via python scripting to interact with the Neutrino workflow.
+Although not necessary it is obviously strongly suggested.\\
+Linking Neutrino against a libPythonQt lacking Qt_Bindings limits the interaction to the python
+console. The options are the following:
+
+* `libPythonQt2.1-dev` (debian/jessie): lacks Qt_Bindings, linked against qt4; 
+* `libPythonQt3.0-dev` (debian/testing): includes Qt_Bindings, linked against qt4;
+* build it your own, which is what is currently done for Neutrino deploys; an adapted fork can be
+  found at <https://github.com/aflux/PythonQt>
+
+## Building
+
+The build system for Neutrino uses cmake. 
+
 
 (work in progress)
 
