@@ -32,3 +32,12 @@ script:
 
 install:
 
+before_deploy:
+  - export RELEASE_FILE=$(ls Neutrino*.dmg)
+  - echo "deploying $RELEASE_FILE to GitHub releases"
+  
+deploy:
+  provider: releases
+  api_key: $github_token
+  file: "${RELEASE_FILE}"
+  skip_cleanup: true
