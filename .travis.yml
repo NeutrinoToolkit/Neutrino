@@ -32,7 +32,7 @@ before_install:
   - git push --quiet https://${github_token}@github.com/iltommi/neutrino $GIT_TAG
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget http://download.qt.io/official_releases/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run; bash ./qt-opensource-linux-x64-5.7.0.run; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget http://download.qt.io/official_releases/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git clone https://github.com/benlau/qtci.git; bash qtci/binextract-qt-installer qt-opensource-linux-x64-android-5.5.1.run ~/Qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew tap homebrew/science; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install clang-omp qt5 cfitsio cmake hdf4 hdf5 gsl; fi
