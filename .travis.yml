@@ -28,7 +28,7 @@ before_install:
   - echo $NUMBER_TAG
   - export GIT_TAG=${STUB_TAG}.${NUMBER_TAG}
   - echo $GIT_TAG
-  - git tag -a "${GIT_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
+  - git tag -fa "${GIT_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
   - git push --quiet https://${github_token}@github.com/iltommi/neutrino $GIT_TAG
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default qtbase5-dev libqt5svg5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev libqt5multimediawidgets5 libqt5clucene5 libqt5designer5 libqt5designercomponents5 libqt5help5 libqt5printsupport5; fi
