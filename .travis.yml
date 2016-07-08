@@ -15,21 +15,14 @@ branches:
     
 before_install:
   - git fetch -t
-   
+  - git checkout $TRAVIS_BRANCH
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - git fetch -t
-  - export THIS_TAG=$(git describe --abbrev=0 --tags)
-  - echo $THIS_TAG
-  - export STUB_TAG=$(echo ${THIS_TAG} | cut -d . -f 1)
-  - echo $STUB_TAG
-  - export NUMBER_TAG=$(echo ${THIS_TAG} | cut -d . -f 2)
-  - NUMBER_TAG=$((NUMBER_TAG+1))
-  - echo $NUMBER_TAG
-  - export GIT_TAG=${STUB_TAG}.${NUMBER_TAG}
-  - echo $GIT_TAG
-  - git tag -fa "${GIT_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
-  - git push --quiet https://${github_token}@github.com/iltommi/neutrino $GIT_TAG
+  - export MY_TAG="${MY_TAG}"
+  - git push --delete origin ${MY_TAG}
+  - git tag -fa "${MY_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
+  - git push --quiet https://${github_token}@github.com/iltommi/neutrino ${MY_TAG}
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget http://download.qt.io/official_releases/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run; fi
@@ -40,8 +33,9 @@ before_install:
   # pythonqt
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=~/Qt -DPythonQt_Wrap_QtAll=TRUE . && make && make install; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE . && make && make install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=~/Qt -DPythonQt_Wrap_QtAll=TRUE .; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .; fi
+  - make && make install
   - cd ..
 
 script:
