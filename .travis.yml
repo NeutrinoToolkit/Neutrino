@@ -5,13 +5,13 @@ os: osx
 osx_image: xcode7.1
 
 before_install:
-  - set -x
   - brew update
   - brew tap homebrew/science
   - brew install clang-omp qt5 cfitsio cmake hdf4 hdf5 gsl
   - brew install fftw --with-openmp
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
+  - cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
   - make 
   - make install
   - cd ..
