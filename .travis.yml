@@ -23,13 +23,13 @@ before_install:
   - echo $THIS_TAG
   - export STUB_TAG=$(echo ${THIS_TAG} | cut -d . -f 1)
   - echo $STUB_TAG
-  - export NUMBER_TAG=$(git rev-list master ${THIS_TAG}^..HEAD --count)
+  - export NUMBER_TAG=$(echo ${THIS_TAG} | cut -d . -f 2)
+  - NUMBER_TAG=$((NUMBER_TAG+1))
   - echo $NUMBER_TAG
   - export GIT_TAG=${STUB_TAG}.${NUMBER_TAG}
   - echo $GIT_TAG
-  - git tag -a $GIT_TAG -m "Travis CI https://travis-ci.org/iltommi/neutrino"
+  - git tag -a "${GIT_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
   - git push --quiet https://${github_token}@github.com/iltommi/neutrino $GIT_TAG
-    
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default qtbase5-dev libqt5svg5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev libqt5multimediawidgets5 libqt5clucene5 libqt5designer5 libqt5designercomponents5 libqt5help5 libqt5printsupport5; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
