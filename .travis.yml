@@ -15,7 +15,14 @@ branches:
     
 before_install:
   - git fetch -t
-  - git checkout $TRAVIS_BRANCH
+   
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - git fetch -t
+  - export GIT_TAG=$(git describe --abbrev=0 --tags | cut -d . -f 1).$(git rev-list master $(git describe --abbrev=0 --tags)^..HEAD --count)
+  - git tag -a $GIT_TAG -m "Travis CI https://travis-ci.org/iltommi/neutrino"
+  - git push --quiet https://${github_token}@github.com/iltommi/neutrino $GIT_TAG
+    
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default qtbase5-dev libqt5svg5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev libqt5multimediawidgets5 libqt5clucene5 libqt5designer5 libqt5designercomponents5 libqt5help5 libqt5printsupport5; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential; fi
@@ -36,7 +43,7 @@ install:
 
 before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_FILE=Neutrino.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "Linux" ]]; then export RELEASE_FILE=Neutrino.deb; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_FILE=Neutrino.deb; fi
   
 deploy:
   provider: releases
