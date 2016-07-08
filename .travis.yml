@@ -22,7 +22,7 @@ before_install:
   - git config --global user.name "Travis CI"
   - git fetch -t
   - export MY_TAG="release-${TRAVIS_OS_NAME}"
-  - git push --quiet https://${github_token}@github.com/iltommi/neutrino --delete origin ${MY_TAG}
+  - git push --quiet https://${github_token}@github.com/iltommi/neutrino --delete origin :refs/tags/${MY_TAG}
   - git tag -fa "${MY_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
   - git push --quiet https://${github_token}@github.com/iltommi/neutrino ${MY_TAG}
   - |
@@ -46,8 +46,6 @@ before_install:
   # pythonqt
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake -DQt5_DIR=~/Qt -DPythonQt_Wrap_QtAll=TRUE .; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .; fi
   - make 
   - make install
   - cd ..
@@ -63,24 +61,8 @@ script:
 install:
 
 before_deploy:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-    then 
-      export RELEASE_FILE=Neutrino.dmg
-      /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
-      git clone https://github.com/iltommi/macdeployqtfix.git
-      python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
-      /usr/libexec/PlistBuddy -c "Add NSPrincipalClass string NSApplication" Neutrino.app/Contents/Info.plist
-      /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
-      mkdir -p dmg
-      cp -r Neutrino.app dmg
-      ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg && rm -rf dmg
-    fi
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-    then 
-      export RELEASE_FILE=Neutrino.deb
-    fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_FILE=Neutrino.dmg; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_FILE=Neutrino.deb; fi
   
 deploy:
   provider: releases

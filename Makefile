@@ -33,13 +33,11 @@ Darwin::
 	cp -r Neutrino.app dmg
 	./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg && rm -rf dmg
 
-
 cross::
 	mkdir -p $@
 	cd $@ && cmake .. -DCMAKE_TOOLCHAIN_FILE=../resources/cmake/Toolchain-i686-mingw32.cmake -DNEUTRINO_CROSS_ROOT=/home/neutrino/CROSS-SOURCES
 	$(MAKE) -C $@
-	$(MAKE) -C $@ package
-	
+	$(MAKE) -C $@ package	
 
 Linux::
 	mkdir -p $@	
