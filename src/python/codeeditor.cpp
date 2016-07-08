@@ -56,9 +56,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
 int CodeEditor::lineNumberAreaWidth()
 {
-    int digits = log10(qMax(1, blockCount()))+1;
-    return 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+    int digits = 1;
+    int max = qMax(1, blockCount());
+    while (max >= 10) {
+        max /= 10;
+        ++digits;
+    }
 
+    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+
+    return space;
 }
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)

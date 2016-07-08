@@ -220,7 +220,6 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionKeyborard_shortcuts"/>
-    <addaction name="actionLog_window"/>
    </widget>
    <widget class="QMenu" name="menuPython">
     <property name="enabled">
@@ -805,7 +804,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -845,7 +844,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -858,7 +857,7 @@
   </action>
   <action name="actionPython">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
    </property>
    <property name="text">
@@ -867,7 +866,7 @@
   </action>
   <action name="actionOperator">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
    </property>
    <property name="text">
@@ -892,11 +891,6 @@
     <string>Contours</string>
    </property>
   </action>
-  <action name="actionLog_window">
-   <property name="text">
-    <string>Log window</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -906,7 +900,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../neutrino-build/src/icons.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

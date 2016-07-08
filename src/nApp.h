@@ -32,17 +32,15 @@ class neutrino;
 class NApplication : public QApplication {
     Q_OBJECT
 public:
-    NApplication( int &argc, char **argv );
+	NApplication( int &argc, char **argv ) : QApplication(argc, argv) {}
 
 protected:
     bool notify(QObject *rec, QEvent *ev);
+
     bool event(QEvent *ev);
 
 
 public slots:
-#if defined(USE_QT5) && defined(HAVE_PYTHONQT)
-    void toggleLog();
-#endif
     QList<neutrino*> neus();
 };
 #endif

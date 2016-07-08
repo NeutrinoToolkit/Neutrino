@@ -202,10 +202,6 @@ public slots:
 	void toggleRuler();
 	void toggleGrid();
 
-#ifdef USE_QT5
-    void showLogWin();
-#endif
-
 	nGenericPan* Shortcuts();
 
 	// Analysis

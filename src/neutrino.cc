@@ -258,12 +258,6 @@ neutrino::neutrino():
     connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
     connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
-#ifdef USE_QT5
-    connect(my_w.actionLog_window, SIGNAL(triggered()), this, SLOT(showLogWin()));
-#else
-    my_w.actionLog_window->setVisible(false);
-#endif
-
 #ifdef HAVE_PYTHONQT
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1629,15 +1623,6 @@ neutrino::Shortcuts() {
     if (!win) win=new nShortcuts(this,vwinname);
     return win;
 }
-
-#ifdef USE_QT5
-void neutrino::showLogWin() {
-    NApplication *napp=static_cast<NApplication*>(qApp);
-    if (napp) {
-        napp->toggleLog();
-    }
-};
-#endif
 
 nGenericPan*
 neutrino::FocalSpot() {
