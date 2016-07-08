@@ -20,7 +20,7 @@ before_install:
   - git config --global user.name "Travis CI"
   - git fetch -t
   - export MY_TAG="release-${TRAVIS_OS_NAME}"
-  - git push --quiet https://${github_token}@github.com/iltommi/neutrino --delete origin ${MY_TAG}
+  - git push --quiet https://${github_token}@github.com/iltommi/neutrino --delete origin ${MY_TAG} 2> /dev/null
   - git tag -fa "${MY_TAG}" -m "Travis CI https://travis-ci.org/iltommi/neutrino"
   - git push --quiet https://${github_token}@github.com/iltommi/neutrino ${MY_TAG}
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa; sudo apt-get update -qq; fi
