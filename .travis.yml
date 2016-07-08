@@ -16,8 +16,6 @@ branches:
     - master
     
 before_install:
-  - git fetch -t
-  - git checkout $TRAVIS_BRANCH
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" ]] 
     then 
