@@ -1,40 +1,15 @@
 language: cpp
 
-os: 
-  - linux
-  - osx
+os: osx
 
-git:
-  depth: 9999999
-
-sudo: required
-dist: trusty
 osx_image: xcode7.1
 
-branches:
-  only:
-    - master
-    
 before_install:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]] 
-    then 
-      sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
-      sudo apt-get update -qq
-      sudo apt-get install -y cmake g++ libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 libgsl0-dev gsl-bin libhdf4-dev build-essential
-      wget http://download.qt.io/official_releases/qt/5.6/5.6.0/qt-opensource-linux-x64-5.6.0.run
-      git clone https://github.com/benlau/qtci.git
-      bash qtci/bin/extract-qt-installer qt-opensource-linux-x64-5.6.0.run ~/Qt
-    fi
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-    then 
-      brew update
-      brew tap homebrew/science
-      brew install clang-omp qt5 cfitsio cmake hdf4 hdf5 gsl
-      brew install fftw --with-openmp
-    fi
-  # pythonqt
+  - set -x
+  - brew update
+  - brew tap homebrew/science
+  - brew install clang-omp qt5 cfitsio cmake hdf4 hdf5 gsl
+  - brew install fftw --with-openmp
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
   - make 
@@ -42,18 +17,13 @@ before_install:
   - cd ..
 
 script:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-    then 
-      cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .
-    fi
+  - cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .
   - make
 
 install:
 
 before_deploy:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_FILE=Neutrino.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_FILE=Neutrino.deb; fi
+  - export RELEASE_FILE=Neutrino.dmg
   
 deploy:
   provider: releases
