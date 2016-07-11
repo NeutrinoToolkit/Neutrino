@@ -7,7 +7,7 @@ project (Neutrino CXX)
 ### top level compile options
 
 option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
-option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" ON)
+option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" OFF)
 
 #############################
 
@@ -56,6 +56,7 @@ endif()
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
 
 include(FindNeutrinoDeps)
+include(FindNeutrinoGuiComponents)
 
 include(FindGit)
 set (VERSION_UPDATE_FROM_GIT ON)
@@ -84,8 +85,9 @@ add_subdirectory (src)
 #SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
 if (WIN32)
 	# use nsis
+	message (STATUS "[win32] Using NSIS for packaging")
 	list(APPEND CPACK_GENERATOR NSIS)
-	message (STATUS "NSIS compile LIBS: ${LIBS}")
+	message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
 
 	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
 	#SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
@@ -111,12 +113,12 @@ endif()
 
 if (LINUX)
 
-	message("building on linux")
+	#message("building on linux")
     execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
 
     if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu")
 
-	message (STATUS "Using CPackDeb for packaging")
+	message (STATUS "[debian] Using CPackDeb for packaging")
 
 	set(CPACK_INSTALL_PREFIX "/usr")
 	set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
@@ -129,16 +131,16 @@ if (LINUX)
 
 	# debian is picky on version numbers
 	string(REGEX REPLACE "^[a-zA-Z]" "" CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
-	message (STATUS "Debian package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
+	message (STATUS "[debian] Debian package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
 
 	execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 	#set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 
-	if (OPTION_INSTALL_PYTHONQT)
+	if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
 		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
-		message (STATUS "conflicts ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+		message (STATUS "[debian] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
 	endif()
 
     endif()

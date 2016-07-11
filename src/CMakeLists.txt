@@ -85,7 +85,8 @@ list (APPEND SOURCES
 
 file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 
-include(FindNeutrinoGuiComponents)
+#moving it to main file
+#include(FindNeutrinoGuiComponents)
 
 if (PYTHONQT_FOUND_COMPLETE)
     MESSAGE(STATUS "adding python wrappers")
