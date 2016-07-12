@@ -83,6 +83,10 @@ add_subdirectory (src)
 #SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Neutrino")
 #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
 #SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+
+# goodies for everybody
+file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
+
 if (WIN32)
 	# use nsis
 	message (STATUS "[win32] Using NSIS for packaging")
@@ -107,6 +111,9 @@ if (WIN32)
 	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
 	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
 
+	if (PYTHONQT_FOUND_COMPLETE)
+		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+	endif()
 endif()
 
 
@@ -147,6 +154,10 @@ if (LINUX)
 	if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
 		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
 		message (STATUS "[debian] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+	endif()
+
+	if (PYTHONQT_FOUND_COMPLETE)
+		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
 	endif()
 
     endif()
