@@ -18,7 +18,7 @@ before_install:
   - brew install fftw --with-openmp
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
-  - cmake -DCMAKE_CXX_COMPILER=$(COMPILER) -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
   - make 
   - make install
   - cd ..
