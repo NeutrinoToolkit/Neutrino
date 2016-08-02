@@ -5,7 +5,7 @@ os: osx
 osx_image: xcode7.1
 
 env:
-- COMPILER=/usr/local/bin/g++-6
+- COMPILER=g++-6
 
 
 before_install:
@@ -24,7 +24,7 @@ before_install:
   - cd ..
 
 script:
-  - cmake -DCMAKE_CXX_COMPILER=$(COMPILER) -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .
   - make
 
 install:
