@@ -417,7 +417,7 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
 
 unsigned int opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
-    // REMEMber to use clfft 2.12 to support radix 11 and 13!
+    // REMEMBER to use clfft 2.12 to support radix 11 and 13!
     for (unsigned int i13=0; i13<=log(num)/log(13); i13++ ) {
         for (unsigned int i11=0; i11<=log(num)/log(11); i11++ ) {
             for (unsigned int i7=0; i7<=log(num)/log(7); i7++ ) {
