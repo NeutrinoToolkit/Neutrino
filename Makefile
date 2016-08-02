@@ -17,7 +17,7 @@ colormaps:
 
 Darwin:: 
 	mkdir -p $@
-	cd $@ && cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang-omp++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cd $@ && cmake -DCMAKE_CXX_COMPILER=clang++ -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	$(MAKE) -C $@
 	rm -rf Neutrino.app
 	cp -r $@/Neutrino.app .
