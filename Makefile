@@ -9,18 +9,12 @@ ifeq (,$(findstring debug,$(config)))
 	CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Debug
 endif
 
-MY_TAG=$(shell git describe --abbrev=0 --tags upstream/master)-$(UNAME_S)
-
 all: $(UNAME_S)
 
 colormaps:
 	cd resources/colormaps && /usr/local/opt/qt5/bin/qmake -spec macx-g++-5 && make && ./colormaps
 
 Darwin:: 
-	git tag --delete ${MY_TAG}
-	git push --delete origin ${MY_TAG}
-	git tag -a ${MY_TAG} -m "Latest osx version"
-	git push origin --tags
 	mkdir -p $@
 	cd $@ && cmake -DCMAKE_CXX_COMPILER=g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
 	$(MAKE) -C $@

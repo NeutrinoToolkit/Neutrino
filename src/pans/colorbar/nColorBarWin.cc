@@ -79,6 +79,8 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
     palettes->addItems(nparent->nPalettes.keys());
     palettes->setCurrentIndex(nparent->nPalettes.keys().indexOf(parent->colorTable));
     connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
+
     my_w.toolBar->insertWidget(my_w.actionInvert,palettes);
 
     decorate();
