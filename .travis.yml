@@ -5,6 +5,8 @@ os:
  - linux
  
 matrix:
+  exclude:
+    - os: osx
   allow_failures:
     - os: linux
   
