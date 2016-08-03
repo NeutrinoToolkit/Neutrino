@@ -1,7 +1,7 @@
 language: cpp
 
 os: 
-  - osx
+#  - osx
   - linux
  
 matrix:
@@ -34,6 +34,10 @@ before_install:
         brew update; brew tap homebrew/science
         brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl
         brew install fftw --with-openmp; 
+    elif [[ "$TRAVIS_OS_NAME" == "linux" ]]
+        sudo apt-get update
+        sudo apt-get upgrade
+        sudo apt-get install qt5
     fi
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
