@@ -23,7 +23,7 @@ before_install:
         brew update; brew tap homebrew/science
         brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl
         brew install fftw --with-openmp; 
-    elif [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    else
         sudo apt-get update
         sudo apt-get upgrade
         sudo apt-get install cmake qt5
