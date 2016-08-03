@@ -4,10 +4,6 @@ os: linux
     env: 
       - COMPILER=g++
       - Qt5_DIR=/usr/lib/cmake/Qt5
-
-#matrix:
-#  allow_failures:
-#    - os: linux
  
 sudo: required
 dist: trusty
