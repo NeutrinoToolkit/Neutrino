@@ -71,7 +71,8 @@ before_deploy:
     then
       export RELEASE_FILE=(Neutrino*.tar.gz)
       sudo apt-get install -y dh-make devscripts fakeroot
-      make package
+      make package VERBOSE=1
+      cpack --debug --verbose
       ls -la
     fi
 
