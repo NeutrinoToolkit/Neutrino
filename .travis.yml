@@ -50,6 +50,15 @@ before_install:
 script:
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR .
   - make
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    then
+      sudo apt-get install -y dh-make devscripts fakeroot
+      make package VERBOSE=1
+      cpack --debug --verbose
+      grep -Inr dh_shlibdeps .
+      ls -la
+    fi
 
 install:
 
