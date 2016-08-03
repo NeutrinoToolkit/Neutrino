@@ -16,6 +16,7 @@ dist: trusty
 osx_image: xcode7.1
 
 before_install:
+  - set -v
   - echo $COMPILER
   - echo $Qt5_DIR
   - |
@@ -42,14 +43,16 @@ before_install:
         export Qt5_DIR=/usr/share/qt5/lib/cmake/Qt5
         sudo apt-get -qq update
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo updatedb; locate Qt5Config.cmake; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qtbase5-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libfftw3-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libnetpbm10-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libgsl0-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libhdf5-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libhdf4-dev; fi
+  - sudo updatedb
+  - locate Qt5Config.cmake
+  - sudo apt-get install -y qt5-default
+  - sudo apt-get install -y qtbase5-dev
+  - sudo apt-get install -y libfftw3-dev
+  - sudo apt-get install -y libnetpbm10-dev
+  - sudo apt-get install -y libgsl0-dev
+  - sudo apt-get install -y libhdf5-dev
+  - sudo apt-get install -y libhdf4-dev
+  - sudo apt-get install -y libpython-dev
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
