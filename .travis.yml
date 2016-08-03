@@ -31,7 +31,7 @@ before_install:
         sudo apt-get install -yy build-essential
         git clone https://github.com/Kitware/CMake.git
         cd CMake
-        ./configure
+        ./configure --quiet
         make
         sudo make install
         echo $PATH
@@ -39,10 +39,14 @@ before_install:
         sudo updatedb
         locate Qt5Config.cmake
         export Qt5_DIR=/usr/share/qt5/lib/cmake/Qt5
-        sudo apt-get -yy update
+        sudo apt-get -qq update
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -yy install qt5-default; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -yy install fftw; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libfftw3-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libnetpbm10-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libgsl0-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libhdf5-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libhdf4-dev; fi
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
