@@ -22,17 +22,19 @@ before_install:
       brew update; brew tap homebrew/science
       brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl
       brew install fftw --with-openmp; 
-    else
+    fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    then
       export COMPILER=g++
       export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
       sudo apt-get install -yy build-essential
       git clone https://github.com/Kitware/CMake.git
       cd CMake
-      ./configure > cmake-configure.log
+      ./configure --prefix=/usr > cmake-configure.log
       make
       sudo make install
       cd ..
-      export PATH=/usr/local/bin:$PATH
       sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
       sudo apt-get update -qy
       sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools
@@ -63,7 +65,10 @@ before_deploy:
       mkdir dmg
       mv Neutrino.app dmg
       ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
-    else
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    then
+      export RELEASE_FILE=(Neutrino*.tar.gz)
       make package
       ls -la
     fi
@@ -73,5 +78,5 @@ deploy:
   api_key: $github_token
   file: "${RELEASE_FILE}"
   skip_cleanup: true
-  on:
-    tags: true
+#  on:
+#    tags: true
