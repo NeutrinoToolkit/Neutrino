@@ -1,9 +1,10 @@
 language: cpp
 
 os: linux
- - env: 
-   - COMPILER=g++
-   - Qt5_DIR=/usr/lib/cmake/Qt5
+
+env: 
+ - COMPILER=g++
+ - Qt5_DIR=/usr/lib/cmake/Qt5
  
 sudo: required
 dist: trusty
