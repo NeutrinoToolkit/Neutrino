@@ -44,9 +44,11 @@ before_install:
         sudo apt-get -qq update
     fi
   - sudo updatedb
-  - locate Qt5Config.cmake
+  - locate -q Qt5Config.cmake
   - sudo apt-get install -y qt5-default
+  - locate -q Qt5Config.cmake
   - sudo apt-get install -y qtbase5-dev
+  - locate -q Qt5Config.cmake
   - sudo apt-get install -y libfftw3-dev
   - sudo apt-get install -y libnetpbm10-dev
   - sudo apt-get install -y libgsl0-dev
