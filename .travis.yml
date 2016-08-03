@@ -1,30 +1,49 @@
 language: cpp
 
-os: osx
+os: 
+  - osx
+  - linux
+ 
+matrix:
+  allow_failures:
+    - os: linux
+ 
+sudo: required
+dist: trusty
 
 osx_image: xcode7.1
 
 env:
-- COMPILER=g++-6
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+    then 
+        COMPILER=g++-6
+        Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
+    else 
+        COMPILER=g++
+        Qt5_DIR=/usr/lib/cmake/Qt5
+    fi
 
 
 before_install:
-  - brew update
-  - brew tap homebrew/science
-#  - travis_wait 60 brew install gcc --without-multilib
-  - brew install gcc
-  - brew install qt5 cfitsio cmake hdf4 hdf5 gsl
-  - ls -la /usr/local/bin
-  - brew install fftw --with-openmp
+  - echo $COMPILER
+  - echo $Qt5_DIR
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+    then
+        brew update; brew tap homebrew/science
+        brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl
+        brew install fftw --with-openmp; 
+    fi
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
   - make 
   - make install
   - cd ..
 
 script:
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 .
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR .
   - make
 
 install:
