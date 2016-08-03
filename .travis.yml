@@ -52,7 +52,7 @@ before_install:
   - cd PythonQt
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
   - make 
-  - make install
+  - sudo make install
   - cd ..
 
 script:
