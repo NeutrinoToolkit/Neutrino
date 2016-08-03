@@ -31,9 +31,10 @@ before_install:
         sudo apt-get install -yy build-essential
         git clone https://github.com/Kitware/CMake.git
         cd CMake
-        ./configure --quiet
+        ./configure > cmake-configure.log
         make
         sudo make install
+        cd ..
         echo $PATH
         export PATH=/usr/local/bin:$PATH
         sudo updatedb
@@ -41,6 +42,7 @@ before_install:
         export Qt5_DIR=/usr/share/qt5/lib/cmake/Qt5
         sudo apt-get -qq update
     fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo updatedb; locate Qt5Config.cmake; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y qt5-default; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libfftw3-dev; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libnetpbm10-dev; fi
