@@ -36,6 +36,7 @@ before_install:
         cd ..
         echo $PATH
         export PATH=/usr/local/bin:$PATH
+        which cmake
     fi
   - sudo add-apt-repository -y ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
