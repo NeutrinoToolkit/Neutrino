@@ -37,7 +37,7 @@ before_install:
       cd ..
       sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
       sudo apt-get update -qy
-      sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools
+      sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
       sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
     fi
   - git clone https://github.com/iltommi/PythonQt.git
@@ -69,6 +69,7 @@ before_deploy:
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]
     then
       export RELEASE_FILE=(Neutrino*.tar.gz)
+      sudo apt-get install -y dh-make devscripts fakeroot
       make package
       ls -la
     fi
