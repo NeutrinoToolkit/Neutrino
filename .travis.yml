@@ -1,8 +1,6 @@
 language: cpp
 
-os: 
-#  - osx
-  - linux
+os: linux
     env: 
       - COMPILER=g++
       - Qt5_DIR=/usr/lib/cmake/Qt5
