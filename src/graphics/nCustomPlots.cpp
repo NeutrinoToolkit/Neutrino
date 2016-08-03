@@ -55,16 +55,14 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     setProperty("panName", "orphan graph");
 
-    QObject *this_widget = dynamic_cast<QObject*>(this);
-    while (this_widget && this_widget->parent()) {
-        this_widget=this_widget->parent();
-        nGenericPan* this_pan = dynamic_cast<nGenericPan*>(this_widget);
+    QObject *this_widget = qobject_cast<QObject*>(this);
+    do{
+        nGenericPan* this_pan = qobject_cast<nGenericPan*>(this_widget);
         if (this_pan) {
             setProperty("panName", this_pan->panName);
             break;
         }
-    }
-
+    } while ((this_widget=this_widget->parent())!=nullptr);
 
     connect(this, SIGNAL(axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
