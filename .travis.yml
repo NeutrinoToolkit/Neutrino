@@ -1,11 +1,13 @@
 language: cpp
 
-os: linux
-
-env: 
- - COMPILER=g++
- - Qt5_DIR=/usr/lib/cmake/Qt5
+os: 
+ - osx
+ - linux
  
+matrix:
+  allow_failures:
+    - os: linux
+  
 sudo: required
 dist: trusty
 
@@ -17,10 +19,23 @@ before_install:
   - |
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]
     then
+        export COMPILER=g++-6
+        export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
         brew update; brew tap homebrew/science
         brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl
         brew install fftw --with-openmp; 
     else
+        export COMPILER=g++
+        sudo apt-get install build-essential
+        wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
+        tar xf cmake-3.2.2.tar.gz
+        cd cmake-3.2.2
+        ./configure
+        make
+        make install
+        sudo updatedb
+        locate Qt5Config.cmake
+        export Qt5_DIR=/usr/share/qt5/lib/cmake/Qt5
         sudo apt-get update
         sudo apt-get upgrade
         sudo apt-get install cmake qt5
