@@ -28,19 +28,19 @@ before_install:
         brew install fftw --with-openmp; 
     else
         export COMPILER=g++
-        sudo apt-get install build-essential
-        wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
-        tar xf cmake-3.2.2.tar.gz
-        cd cmake-3.2.2
+        sudo apt-get install -yy build-essential
+        git clone git@github.com:Kitware/CMake.git
+        cd CMake
         ./configure
         make
-        make install
+        sudo make install
         sudo updatedb
         locate Qt5Config.cmake
         export Qt5_DIR=/usr/share/qt5/lib/cmake/Qt5
-        sudo apt-get update
-        sudo apt-get upgrade
-        sudo apt-get install cmake qt5
+        sudo apt-get -yy update
+        sudo apt-get -yy upgrade
+        sudo apt-get -yy install qt5
+        sudo apt-get -yy install fftw
     fi
   - git clone https://github.com/iltommi/PythonQt.git
   - cd PythonQt
