@@ -32,7 +32,7 @@ before_install:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    wget -O- http://travis.debian.net/script.sh | sh -
+#    wget -O- http://travis.debian.net/script.sh | sh -
     export COMPILER=g++
     export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
     sudo apt-get install -yy build-essential
