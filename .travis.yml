@@ -1,7 +1,7 @@
 language: cpp
 
 os: 
-#- osx
+- osx
 - linux
 
 
@@ -67,23 +67,6 @@ script:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    mkdir -p Neutrino.AppDir/usr
-    find build_dir
-    ls -la build_dir/bin
-    cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
-    find Neutrino.AppDir/usr
-    cp -r resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
-    ls ${Qt5_DIR}/../../../
-    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/bin
-    sudo apt-get install -y pax-utils
-    set -v
-    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/bin/Neutrino
-    set +v 
-    rm -rf Neutrino
-    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-    find Neutrino.AppDir
-    zip -FSr Neutrino.zip Neutrino
   fi
 
 install:
@@ -104,6 +87,15 @@ before_deploy:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
+    mkdir -p Neutrino.AppDir/usr
+    cp -r build_dir/lib build_dir/bin AppImageKit/AppRun Neutrino.AppDir/usr
+    cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
+    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/bin
+    sudo apt-get install -y pax-utils
+    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    rm -rf Neutrino
+    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
+    zip -FSr Neutrino.zip Neutrino
     export RELEASE_FILE=Neutrino.zip
   fi
 
@@ -112,5 +104,5 @@ deploy:
   api_key: $github_token
   file: "${RELEASE_FILE}"
   skip_cleanup: true
-#  on:
-#    tags: true
+  on:
+    tags: true
