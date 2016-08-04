@@ -56,7 +56,6 @@ before_install:
     cmake .
     make
     cd ..
-    pwd
   fi
   
 
@@ -69,8 +68,11 @@ script:
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
     mkdir -p Neutrino.AppDir/usr
+    find build_dir
+    ls -la build_dir/bin
     cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
-    cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
+    find Neutrino.AppDir/usr
+    cp -r resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
     ls ${Qt5_DIR}/../../../
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/bin
     sudo apt-get install -y pax-utils
