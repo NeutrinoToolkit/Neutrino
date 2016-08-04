@@ -79,6 +79,7 @@ script:
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
+    find Neutrino.AppDir
     zip -FSr Neutrino.zip Neutrino
     export RELEASE_FILE=(Neutrino.zip)
   fi
