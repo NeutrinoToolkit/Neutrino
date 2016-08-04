@@ -51,7 +51,6 @@ before_install:
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
     sudo apt-get update ; sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse # debian, Ubuntu
-    sudo yum install git cmake binutils fuse glibc-devel glib2-devel fuse-devel gcc zlib-devel libpng12 # Fedora, RHEL, CentOS
     git clone https://github.com/probonopd/AppImageKit.git
     cd AppImageKit
     cmake .
@@ -74,7 +73,7 @@ script:
     cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
     ls ${Qt5_DIR}/../../../
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/bin
-    apt-get install -y pax-utils
+    sudo apt-get install -y pax-utils
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
