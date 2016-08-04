@@ -1,7 +1,7 @@
 language: cpp
 
 os: 
-- osx
+#- osx
 - linux
 
 
@@ -105,5 +105,5 @@ deploy:
   api_key: $github_token
   file: "${RELEASE_FILE}"
   skip_cleanup: true
-  on:
-    tags: true
+#  on:
+#    tags: true
