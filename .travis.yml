@@ -76,7 +76,9 @@ script:
     ls ${Qt5_DIR}/../../../
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/bin
     sudo apt-get install -y pax-utils
-    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    set -v
+    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    set +v
     rm -rf Neutrino
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
     find Neutrino.AppDir
