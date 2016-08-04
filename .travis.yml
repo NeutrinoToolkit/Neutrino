@@ -64,10 +64,6 @@ script:
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
 - make
 - cd ..
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-  fi
 
 install:
 
