@@ -4,18 +4,19 @@ os:
 - osx
 - linux
 
-services:
-- docker
 
 osx_image: xcode7.1
 dist: trusty
  
+#services:
+#- docker
+
 matrix:
   allow_failures:
   - os: linux
-  exclude:
-  - os: osx
-    services: docker
+#  exclude:
+#  - os: osx
+#    services: docker
     
 sudo: required
 
