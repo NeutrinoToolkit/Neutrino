@@ -1,8 +1,8 @@
 language: cpp
 
 os: 
-- osx
 - linux
+#- osx
 
 
 osx_image: xcode7.1
@@ -75,12 +75,10 @@ script:
     mkdir -p Neutrino.AppDir/usr/lib/qt5
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
     sudo apt-get install -y pax-utils
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so
     echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     find Neutrino.AppDir
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -88,6 +86,7 @@ script:
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
     zip -FSr Neutrino.zip Neutrino
     export RELEASE_FILE=Neutrino.zip
+    strace -eopen -f ./Neutrino
   fi
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
