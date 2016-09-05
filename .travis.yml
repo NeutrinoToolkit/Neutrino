@@ -78,10 +78,6 @@ script:
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so
-    sudo updatedb 
-    locate libQt5Multimedia.so.5 
-    locate libQt5Core.so.5 
     echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     find Neutrino.AppDir
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -89,7 +85,6 @@ script:
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
     zip -FSr Neutrino.zip Neutrino
     export RELEASE_FILE=Neutrino.zip
-    strace -eopen -f ./Neutrino
   fi
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
