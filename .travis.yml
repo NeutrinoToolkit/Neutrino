@@ -67,6 +67,7 @@ script:
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
     set -x
+    export LD_LIBRARY_PATH=/opt/qt56/lib/
     mkdir -p Neutrino.AppDir/usr
     cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
     cp AppImageKit/AppRun Neutrino.AppDir
