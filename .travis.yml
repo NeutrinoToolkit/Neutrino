@@ -1,9 +1,7 @@
 language: cpp
 
 os: 
-- linux
-#- osx
-
+- osx
 
 osx_image: xcode7.1
 dist: trusty
@@ -103,6 +101,7 @@ script:
     mv Neutrino.app dmg
     ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
     export RELEASE_FILE=Neutrino.dmg
+    ls -la
   fi
 
 install:
