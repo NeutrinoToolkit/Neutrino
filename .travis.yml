@@ -24,7 +24,6 @@ before_install:
   then
     export COMPILER=g++
     export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
-    sudo apt-get update
     sudo apt-get install -yy build-essential
     git clone https://github.com/Kitware/CMake.git
     cd CMake
@@ -35,7 +34,6 @@ before_install:
     sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
     sudo apt-get update -qy
     sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
-    export LD_LIBRARY_PATH=/opt/qt56/lib/
     sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
   fi
 - git clone https://github.com/iltommi/PythonQt.git
@@ -50,6 +48,7 @@ script:
 - mkdir -p build_dir && cd build_dir
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
 - make
+- cd ..
 
 install:
 
@@ -57,33 +56,36 @@ before_deploy:
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
+    cp -r build_dir/Neutrino.app .
     /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
     git clone https://github.com/iltommi/macdeployqtfix.git
     python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
     /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
     mkdir dmg
     mv Neutrino.app dmg
-    ../resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ../resources/icons/icon.icns --background ../resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
+    ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
     export RELEASE_FILE=Neutrino.dmg
-  elif [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  fi
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse
+    sudo apt-get update ; sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse # debian, Ubuntu
     git clone https://github.com/probonopd/AppImageKit.git
-    cd AppImageKit; cmake .; make; cd ..
+    cd AppImageKit && cmake . && make && cd ..
+    export LD_LIBRARY_PATH=/opt/qt56/lib/
+    mkdir -p Neutrino.AppDir/usr
+    cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
+    cp AppImageKit/AppRun Neutrino.AppDir
+    cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
     mkdir -p Neutrino.AppDir/usr/lib/qt5
-    cp -r lib bin Neutrino.AppDir/usr
-    cp ../AppImageKit/AppRun Neutrino.AppDir
-    cp ../resources/icons/icon.png ../resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
     sudo apt-get install -y pax-utils
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
-    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
-    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-    mv Neutrino $RELEASE_FILE
-    find Neutrino.AppDir
+    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino.AppDir
+    export RELEASE_FILE=Neutrino.AppDir
   fi
 
 deploy:
