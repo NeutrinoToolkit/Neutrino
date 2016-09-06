@@ -81,7 +81,9 @@ before_deploy:
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
     export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
-    ./AppImageKit/AppImageAssistant Neutrino.AppDir "${RELEASE_FILE}"
+    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
+    mv Neutrino $RELEASE_FILE
+    find Neutrino.AppDir
   fi
 
 deploy:
