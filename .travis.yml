@@ -28,6 +28,7 @@ before_install:
   then
     export COMPILER=g++
     export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
+    sudo apt-get update
     sudo apt-get install -yy build-essential
     git clone https://github.com/Kitware/CMake.git
     cd CMake
@@ -38,6 +39,7 @@ before_install:
     sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
     sudo apt-get update -qy
     sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
+    export LD_LIBRARY_PATH=/opt/qt56/lib/
     sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
   fi
 - git clone https://github.com/iltommi/PythonQt.git
@@ -46,16 +48,6 @@ before_install:
 - make 
 - sudo make install
 - cd ..
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    sudo apt-get update ; sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse # debian, Ubuntu
-    git clone https://github.com/probonopd/AppImageKit.git
-    cd AppImageKit
-    cmake .
-    make
-    cd ..
-  fi
   
 
 script:
@@ -69,7 +61,9 @@ before_deploy:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    export LD_LIBRARY_PATH=/opt/qt56/lib/
+    sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse
+    git clone https://github.com/probonopd/AppImageKit.git
+    cd AppImageKit; cmake .; make; cd ..
     mkdir -p Neutrino.AppDir/usr/lib/qt5
     cp -r lib bin Neutrino.AppDir/usr
     cp AppImageKit/AppRun Neutrino.AppDir
@@ -82,9 +76,7 @@ before_deploy:
     rm -rf Neutrino
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
     export RELEASE_FILE=Neutrino
-  fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+  elif [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
     /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
     git clone https://github.com/iltommi/macdeployqtfix.git
