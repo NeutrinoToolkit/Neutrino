@@ -7,10 +7,6 @@ os:
 osx_image: xcode7.1
 dist: trusty
  
-matrix:
-  allow_failures:
-  - os: linux
-    
 sudo: required
 
 before_install:
@@ -84,7 +80,7 @@ before_deploy:
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
-    ../AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino-`git describe --abbrev=0 --tags`.AppImage
+    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino-`git describe --abbrev=0 --tags`.AppImage
     export RELEASE_FILE=Neutrino
   fi
 
