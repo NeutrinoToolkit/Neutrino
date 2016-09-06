@@ -59,24 +59,7 @@ install:
 
 before_deploy:
 - |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse
-    git clone https://github.com/probonopd/AppImageKit.git
-    cd AppImageKit; cmake .; make; cd ..
-    mkdir -p Neutrino.AppDir/usr/lib/qt5
-    cp -r lib bin Neutrino.AppDir/usr
-    cp AppImageKit/AppRun Neutrino.AppDir
-    cp ../resources/icons/icon.png ../resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
-    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
-    sudo apt-get install -y pax-utils
-    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    rm -rf Neutrino
-    ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-    export RELEASE_FILE=Neutrino
-  elif [[ "$TRAVIS_OS_NAME" == "osx" ]]
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
     /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
     git clone https://github.com/iltommi/macdeployqtfix.git
@@ -84,8 +67,25 @@ before_deploy:
     /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
     mkdir dmg
     mv Neutrino.app dmg
-    ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
+    ../resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ../resources/icons/icon.icns --background ../resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
     export RELEASE_FILE=Neutrino.dmg
+  elif [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse
+    git clone https://github.com/probonopd/AppImageKit.git
+    cd AppImageKit; cmake .; make; cd ..
+    mkdir -p Neutrino.AppDir/usr/lib/qt5
+    cp -r lib bin Neutrino.AppDir/usr
+    cp ../AppImageKit/AppRun Neutrino.AppDir
+    cp ../resources/icons/icon.png ../resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
+    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
+    sudo apt-get install -y pax-utils
+    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    rm -rf Neutrino
+    ../AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino-`git describe --abbrev=0 --tags`.AppImage
+    export RELEASE_FILE=Neutrino
   fi
 
 deploy:
