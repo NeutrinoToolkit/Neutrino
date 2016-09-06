@@ -62,51 +62,39 @@ script:
 - mkdir -p build_dir && cd build_dir
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
 - make
-- cd ..
+
+install:
+
+before_deploy:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    set -x
     export LD_LIBRARY_PATH=/opt/qt56/lib/
-    mkdir -p Neutrino.AppDir/usr
-    cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
-    cp AppImageKit/AppRun Neutrino.AppDir
-    cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
     mkdir -p Neutrino.AppDir/usr/lib/qt5
+    cp -r lib bin Neutrino.AppDir/usr
+    cp AppImageKit/AppRun Neutrino.AppDir
+    cp ../resources/icons/icon.png ../resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
     sudo apt-get install -y pax-utils
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    find Neutrino.AppDir
-    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     rm -rf Neutrino
     ./AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-    zip -FSr Neutrino.zip Neutrino
-    export RELEASE_FILE=Neutrino.zip
+    export RELEASE_FILE=Neutrino
   fi
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
-    cp -r build_dir/Neutrino.app .
-    du -h Neutrino.app
     /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
-    du -h Neutrino.app
     git clone https://github.com/iltommi/macdeployqtfix.git
     python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
-    du -h Neutrino.app
     /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
     mkdir dmg
     mv Neutrino.app dmg
     ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
     export RELEASE_FILE=Neutrino.dmg
-    ls -la
   fi
-
-install:
-
-before_deploy:
 
 deploy:
   provider: releases
