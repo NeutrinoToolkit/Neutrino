@@ -113,5 +113,6 @@ deploy:
   api_key: $github_token
   file: "${RELEASE_FILE}"
   skip_cleanup: true
+  overwrite: true
   on:
     tags: true
