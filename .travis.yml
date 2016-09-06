@@ -84,7 +84,7 @@ before_deploy:
     lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
     rm -rf Neutrino
-    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppDir
+    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
     ./AppImageKit/AppImageAssistant Neutrino.AppDir ${RELEASE_FILE}
   fi
 
