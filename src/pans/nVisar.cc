@@ -127,7 +127,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
     decorate();
     connections();
-    my_w.tabs->setCurrentIndex(0);
+    tabChanged();
 }
 
 void nVisar::loadSettings(QString my_settings) {
@@ -179,7 +179,10 @@ void nVisar::bufferChanged(nPhysD*phys) {
 
 void nVisar::tabChanged(int k) {
     QApplication::processEvents();
-    QTabWidget *tabWidget=qobject_cast<QTabWidget *>(sender());
+    QTabWidget *tabWidget=nullptr;
+
+    if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
+
     if (!tabWidget) tabWidget=my_w.tabs;
 
     if (tabWidget==my_w.tabs) {
@@ -646,6 +649,7 @@ void nVisar::doWave() {
 
 
 void nVisar::doWave(int k) {
+    disconnections();
     if (visar[k].enableVisar->isChecked()){
         if (getPhysFromCombo(visar[k].refImage) && getPhysFromCombo(visar[k].shotImage )  &&
                 getPhysFromCombo(visar[k].refImage)->getW() == getPhysFromCombo(visar[k].shotImage)->getW() &&
@@ -757,6 +761,8 @@ void nVisar::doWave(int k) {
             statusBar()->showMessage("size mismatch",5000);
         }
     }
+    connections();
+    QApplication::processEvents();
 }
 
 void nVisar::getPhase() {
@@ -889,6 +895,7 @@ void nVisar::getPhase(int k) {
             visar[k].plotPhaseIntensity->replot();
         }
     }
+    QApplication::processEvents();
     connections();
 }
 

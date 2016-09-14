@@ -1074,7 +1074,7 @@ nPhysImageF<T>::_init_temp_pointers()
 template<class T> void
 nPhysImageF<T>::matrix_points_aligned()
 {
-	DEBUG(1,"allocate "<<width<<"x"<<height << " name: "<<getName() << " short: " << getShortName() << " from: " << getFromName());
+    DEBUG(1,(void*) this << " allocate "<<width<<"x"<<height << " name: "<<getName() << " short: " << getShortName() << " from: " << getFromName());
 
 	// check for other sessions
 	if (! _canResize())

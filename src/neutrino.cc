@@ -366,9 +366,9 @@ neutrino::neutrino():
 
     QApplication::processEvents();
 
-#ifdef  __phys_debug
-    if (numwin==1)	recentFileActs.first()->trigger();
-#endif
+//#ifdef  __phys_debug
+//    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
+//#endif
 
 
 }
@@ -911,12 +911,14 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QTemporaryFile tmpFile(this);
                                 tmpFile.open();
-                                while(!qLine.startsWith("NeutrinoPan-end") && !ifile.eof()) {
+                                while(!ifile.eof()) {
                                     getline(ifile,line);
 //                                    WARNING(line);
                                     qLine=QString::fromStdString(line);
-                                    line+="\n";
-                                    if (!qLine.startsWith("NeutrinoPan-end")) tmpFile.write(line.c_str());
+                                    if (qLine.startsWith("NeutrinoPan-end"))
+                                        break;
+                                    tmpFile.write(line.c_str());
+                                    tmpFile.write("\n");
                                 }
                                 tmpFile.flush();
                                 QApplication::processEvents();

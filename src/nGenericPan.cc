@@ -214,8 +214,10 @@ void nGenericPan::decorate() {
 		widget->setIconSize(iconSize);
 	}
 
-	loadDefaults();
-	show();
+    QApplication::processEvents();
+    loadDefaults();
+    QApplication::processEvents();
+    show();
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {
