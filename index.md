@@ -1,5 +1,6 @@
 ---
 layout: default
+title: Neutrino
 ---
 
 *Neutrino* is an image viewer/analyser meant to be a research tool for manipulating experimental images. 
