@@ -1,19 +1,21 @@
 ---
-layout: main
+layout: default
 ---
-neutrino
-========
 
-A light, expandable and full featured image analysis tool for research
+*Neutrino* is an image viewer/analyser meant to be a research tool for manipulating experimental images. 
+It has been written to: 
 
+* be *fast*: it is entirely written in C++ and makes strong use of multi-core and gpu-assisted
+  computation
 
-Rationale
----------
+* promote *interaction* of the researcher with the images (easy
+access to colormaps, contrast/gamma/cutoffs, matrix operations, real-time lineouts)
 
-*Neutrino* is an image viewer/analyser meant to be a research tool for manipulating experimental images. On a more general basis each bi-dimensional matrix of elements in the real or in the complex field can be seen as an image
+* be *accurate*: buffers are loaded and manipulated with full dynamics, integers or real numbers
 
-Features
---------
+* let python do the work: the internal *python* interpreter can access the entire code structure
+  in *runtime*, which can be used to **automate** repetitive tasks or **extend** Neutrino
+capabilities.
 
 Neutrino includes:
 
@@ -29,10 +31,16 @@ Image visualization/interaction:
 * multiple colormaps
 * powerful magnification tools
 
-Included analysis tools:
+Advanced analysis tools:
 
-* Interferometry (via 2D Wavelet analysis)
+* Interferometry (via 2D Wavelet analysis) ([tutorial](tutorials/wavelet/wavelet-tutorial))
 * VISAR analysis
-* Integral inversions
+* Integral inversions (Abel)
 * Fourier Analysis
 
+# Getting Neutrino
+
+The binary releases are available for GNU/Linux, Windows and OSX on [Neutrino Releases](https://github.com/aflux/neutrino/releases/latest).
+
+Sources are available from [GitHub Neutrino page](https://github.com/aflux/neutrino). For building
+instructions a tutorial is available [here](build)
