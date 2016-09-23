@@ -148,6 +148,7 @@ void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) 
 nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent):
     nCustomPlot(parent),
     mouseMarker(new QCPItemLine(this)) {
+    setMousePosition(0);
 }
 
 void nCustomPlotMouseX::setMousePosition(double position) {
@@ -163,7 +164,7 @@ nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent):
     nCustomPlot(parent),
     mouseMarkerX(new QCPItemLine(this)),
     mouseMarkerY(new QCPItemLine(this)) {
-
+    setMousePosition(0,0);
 }
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {

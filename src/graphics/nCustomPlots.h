@@ -32,7 +32,7 @@ class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
 private:
-    QMenu *my_menu;
+    QPointer<QMenu> my_menu;
 
 public:
     nCustomPlot(QWidget*);

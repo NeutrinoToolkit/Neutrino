@@ -83,6 +83,8 @@ nVisar::nVisar(neutrino *nparent, QString winname)
     my_w.sopPlot->yAxis->setLabel(tr("Counts"));
     my_w.sopPlot->yAxis2->setLabel(tr("Temperature"));
 
+    connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+
     //!END SOP stuff
     
     QList<QWidget*> father1, father2;
@@ -106,6 +108,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
         visar[k].plotPhaseIntensity->yAxis->setLabel(tr("FringeShift"));
         visar[k].plotPhaseIntensity->yAxis2->setLabel(tr("Intensity"));
         visar[k].plotPhaseIntensity->yAxis3->setLabel(tr("Contrast"));
+        connect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
 
         visar[k].guess->setProperty("id", k);
         visar[k].doWaveButton->setProperty("id", k);
@@ -118,6 +121,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
     my_w.plotVelocity->yAxis->setLabel(tr("Velocity"));
     my_w.plotVelocity->yAxis2->setLabel(tr("Reflectivity"));
     my_w.plotVelocity->yAxis3->setLabel(tr("Quality"));
+    connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
 
     for (int k=0;k<2;k++){
         for (int m=0;m<2;m++){
@@ -142,6 +146,22 @@ void nVisar::loadSettings(QString my_settings) {
     doWave();
     QApplication::processEvents();
 }
+
+void nVisar::mouseAtPlot(QMouseEvent* e) {
+    if (sender()) {
+        nVisarPlot *plot=qobject_cast<nVisarPlot *>(sender());
+        if(plot) {
+            QString msg;
+            QTextStream(&msg) << plot->xAxis->pixelToCoord(e->pos().x()) << ","
+                              << plot->yAxis->pixelToCoord(e->pos().y()) << " "
+                              << plot->yAxis2->pixelToCoord(e->pos().y()) << ":"
+                              << plot->yAxis3->pixelToCoord(e->pos().y());
+
+            my_w.statusbar->showMessage(msg);
+        }
+    }
+}
+
 
 void nVisar::mouseAtMatrix(QPointF p) {
     int k=0;

@@ -127,6 +127,8 @@ public slots:
 
     void mouseAtMatrix(QPointF);
 
+    void mouseAtPlot(QMouseEvent* e);
+
     void loadSettings(QString);
 
     void bufferChanged(nPhysD*);
