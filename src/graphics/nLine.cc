@@ -327,7 +327,6 @@ void nLine::updatePlot () {
                 marker->start->setCoords(dist, QCPRange::minRange);
                 marker->end->setCoords(dist, QCPRange::maxRange);
                 marker->setPen(penna);
-                my_w.plot->addItem(marker);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}

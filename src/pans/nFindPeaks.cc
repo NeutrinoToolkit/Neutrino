@@ -197,7 +197,11 @@ void nFindPeaks::updatePlot() {
         }
         fftw_execute(planC2R2);
 		
-        my_w.plot->clearItems();
+        for (int i=0; i< my_w.plot->itemCount(); i++) {
+            QCPItemEllipse *elli = qobject_cast<QCPItemEllipse *>(my_w.plot->item(i));
+            if (elli) my_w.plot->removeItem(elli);
+        }
+
 
         std::vector<double> fitx;
         std::vector<double> fity;
@@ -209,11 +213,10 @@ void nFindPeaks::updatePlot() {
                 double posy=my_w.direction->currentIndex()==0?xd[i]:yd[i];
 
                 QCPItemEllipse *marker=new QCPItemEllipse(my_w.plot);
-                marker->topLeft->setCoords(posx-1, posy-1);
-                marker->bottomRight->setCoords(posx+1, posy+1);
+                marker->topLeft->setCoords(posx-2, posy-2);
+                marker->bottomRight->setCoords(posx+2, posy+2);
 
                 marker->setPen(QPen(Qt::red));
-                my_w.plot->addItem(marker);
 
                 fitx.push_back(k);
                 fity.push_back(posx);

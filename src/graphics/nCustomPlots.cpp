@@ -102,11 +102,8 @@ void nCustomPlot::get_data(QTextStream &out) {
     out << "# " <<  property("panName").toString() << " " << graphCount() << endl;
     for (int g=0; g<graphCount(); g++) {
         out << "# " << g << " name: " << graph(g)->name() << endl;
-        const QCPDataMap *dataMap = graph(g)->data();
-        QMap<double, QCPData>::const_iterator i = dataMap->constBegin();
-        while (i != dataMap->constEnd()) {
-            out << i.value().key << " " << i.value().value << endl;
-            ++i;
+        for (QCPGraphDataContainer::const_iterator it=graph(g)->data()->begin(); it!=graph(g)->data()->end(); ++it) {
+            out << it->key << " " << it->value << endl;
         }
         out << endl << endl;
     }
@@ -135,7 +132,7 @@ void nCustomPlot::export_image(){
     QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
         setProperty("fileExport", fnametmp);
-        savePdf(fnametmp,true,0,0,"Neutrino", property("panName").toString());
+        savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", property("panName").toString());
     }
 }
 
@@ -150,27 +147,32 @@ void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) 
 // plot as nCustomPlot but with x mouse line
 nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent):
     nCustomPlot(parent),
-    mouseMarker(this) {
+    mouseMarker(new QCPItemLine(this)) {
 }
 
 void nCustomPlotMouseX::setMousePosition(double position) {
-    mouseMarker.start->setCoords(position, QCPRange::minRange);
-    mouseMarker.end->setCoords(position, QCPRange::maxRange);
+    if (mouseMarker) {
+        mouseMarker->start->setCoords(position, QCPRange::minRange);
+        mouseMarker->end->setCoords(position, QCPRange::maxRange);
+    }
     replot();
 }
 
 // plot as nCustomPlot but with x and y mouse lines
 nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent):
     nCustomPlot(parent),
-    mouseMarkerX(this),
-    mouseMarkerY(this) {
+    mouseMarkerX(new QCPItemLine(this)),
+    mouseMarkerY(new QCPItemLine(this)) {
+
 }
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
-    mouseMarkerX.start->setCoords(positionX, QCPRange::minRange);
-    mouseMarkerX.end->setCoords(positionX, QCPRange::maxRange);
-    mouseMarkerY.start->setCoords(QCPRange::minRange,positionY);
-    mouseMarkerY.end->setCoords(QCPRange::maxRange,positionY);
+    if (mouseMarkerX && mouseMarkerY) {
+        mouseMarkerX->start->setCoords(positionX, QCPRange::minRange);
+        mouseMarkerX->end->setCoords(positionX, QCPRange::maxRange);
+        mouseMarkerY->start->setCoords(QCPRange::minRange,positionY);
+        mouseMarkerY->end->setCoords(QCPRange::maxRange,positionY);
+    }
     replot();
 }
 

@@ -88,6 +88,7 @@ class nVisar : public nGenericPan {
 public:
 
     nVisar(neutrino *, QString);
+    ~nVisar();
     Ui::nVISAR1 my_w;
 
     Ui::nVISAR2 visar[2];

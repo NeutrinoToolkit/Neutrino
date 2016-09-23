@@ -25,6 +25,12 @@
 #include "nVisar.h"
 #include "neutrino.h"
 
+nVisar::~nVisar() {
+    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->itemCount());
+    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->clearItems());
+    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->clearGraphs());
+}
+
 nVisar::nVisar(neutrino *nparent, QString winname)
     : nGenericPan(nparent, winname)
 {
@@ -433,11 +439,22 @@ void nVisar::updatePlotSOP() {
 }
 
 void nVisar::updatePlot() {
+    my_w.statusbar->showMessage("Updating");
     disconnections();
 
     my_w.plotVelocity->clearGraphs();
 
-    my_w.statusbar->showMessage("Updating");
+    QList<QCPItemLine*> lines;
+    for (int i=0; i< my_w.plotVelocity->itemCount(); i++) {
+        QCPItemLine *line = qobject_cast<QCPItemLine *>(my_w.plotVelocity->item(i));
+        if (line && line->property("jump").isValid()) {
+            lines << line;
+        }
+    }
+    foreach (QCPItemLine *line, lines) {
+        my_w.plotVelocity->removeItem(line);
+    }
+
 
     for (int k=0;k<2;k++){
         if (cPhase[0][k].size()){
@@ -481,12 +498,12 @@ void nVisar::updatePlot() {
 
                 foreach (double a, tjump) {
                     QCPItemLine *my_jumpLine=new QCPItemLine(my_w.plotVelocity);
+                    my_jumpLine->setProperty("jump",true);
                     QPen pen(Qt::gray);
                     pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
                     my_jumpLine->start->setCoords(a, QCPRange::minRange);
                     my_jumpLine->end->setCoords(a, QCPRange::maxRange);
-
                 }
 
                 double offset=setvisar[k].offsetShift->value();
@@ -1030,13 +1047,13 @@ nVisar::export_pdf() {
         setProperty("fileExport", fnametmp);
         switch (my_w.tabs->currentIndex()) {
         case 0:
-            visar[my_w.tabPhase->currentIndex()].plotPhaseIntensity->savePdf(fnametmp,true,0,0,"Neutrino", panName+" "+my_w.tabPhase->tabText(my_w.tabPhase->currentIndex()));
+            visar[my_w.tabPhase->currentIndex()].plotPhaseIntensity->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" "+my_w.tabPhase->tabText(my_w.tabPhase->currentIndex()));
             break;
         case 1:
-            my_w.plotVelocity->savePdf(fnametmp,true,0,0,"Neutrino", panName+" Velocity");
+            my_w.plotVelocity->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" Velocity");
             break;
         case 2:
-            my_w.sopPlot->savePdf(fnametmp,true,0,0,"Neutrino", panName+" SOP");
+            my_w.sopPlot->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" SOP");
             break;
         default:
             break;
