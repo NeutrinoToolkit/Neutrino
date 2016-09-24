@@ -56,7 +56,7 @@
        <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="Settings">
        <attribute name="title">
@@ -638,7 +638,7 @@
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
    </property>
    <property name="text">
@@ -650,7 +650,7 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
    </property>
    <property name="text">
@@ -662,7 +662,7 @@
   </action>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -674,7 +674,7 @@
   </action>
   <action name="actionSavePDF">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
    </property>
    <property name="text">
@@ -686,7 +686,7 @@
   </action>
   <action name="actionGuess">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -698,7 +698,7 @@
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
    </property>
    <property name="text">
@@ -710,7 +710,7 @@
   </action>
   <action name="actionRect1">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -722,7 +722,7 @@
   </action>
   <action name="actionRect2">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -737,7 +737,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/noAutoRefresh.png</normaloff>
      <normalon>:/autoRefresh</normalon>:/icons/noAutoRefresh.png</iconset>
    </property>
@@ -750,7 +750,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -762,7 +762,7 @@
   </action>
   <action name="actionRect3">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -774,7 +774,7 @@
   </action>
   <action name="actionSaveTxtMultiple">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
    </property>
    <property name="text">
@@ -786,7 +786,7 @@
   </action>
   <action name="showFiltered">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
      <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
    </property>
    <property name="text">
@@ -822,7 +822,7 @@
   <tabstop>Tminmax</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../neutrino-build/src/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

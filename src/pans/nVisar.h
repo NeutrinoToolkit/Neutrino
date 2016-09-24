@@ -61,6 +61,7 @@ public:
                     yAxis3->setLabelFont(fontTmp);
             }
         }
+        show();
     };
     QCPAxis *yAxis3;
 };

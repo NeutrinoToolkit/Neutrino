@@ -26,9 +26,6 @@
 #include "neutrino.h"
 
 nVisar::~nVisar() {
-    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->itemCount());
-    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->clearItems());
-    DEBUG("<<THIS IS THE END>> " << my_w.plotVelocity->clearGraphs());
 }
 
 nVisar::nVisar(neutrino *nparent, QString winname)
@@ -229,6 +226,7 @@ void nVisar::tabChanged(int k) {
         nparent->showPhys(getPhysFromCombo(my_w.sopShot));
         updatePlotSOP();
     }
+    QApplication::processEvents();
 }
 
 void nVisar::connections() {

@@ -134,6 +134,9 @@ void nGenericPan::grabSave() {
 
 void nGenericPan::decorate() {
 
+    show();
+    repaint();
+
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
     connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
 
@@ -276,7 +279,9 @@ nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
 
 void
 nGenericPan::loadUi(QSettings *settings) {
-	foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
+    repaint();
+    QApplication::processEvents();
+    foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			widget->setText(settings->value(widget->objectName(),widget->text()).toString());
 		}
@@ -298,7 +303,7 @@ nGenericPan::loadUi(QSettings *settings) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
 	}
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
 	}
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
