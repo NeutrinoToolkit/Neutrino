@@ -47,6 +47,8 @@ public slots:
 
     void contextMenuEvent (QContextMenuEvent*) override;
 
+    void keyPressEvent(QKeyEvent *);
+
 };
 
 //plot with mouse (vertical)

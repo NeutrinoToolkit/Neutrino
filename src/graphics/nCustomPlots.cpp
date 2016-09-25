@@ -30,7 +30,7 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     QCustomPlot(parent),
     my_menu(new QMenu(this))
 {
-
+    setContentsMargins(0,0,0,0);
     QFont f = my_menu->font();
     f.setPointSize(10);
     my_menu->setFont(f);
@@ -90,7 +90,21 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     axisRect()->setRangeDrag(0);
     axisRect()->setRangeZoom(0);
+    axisRect()->setMargins(QMargins(0,0,0,0));
+    repaint();
+}
 
+void nCustomPlot::keyPressEvent(QKeyEvent *e) {
+    QCustomPlot::keyPressEvent(e);
+    if (e->modifiers() & Qt::ControlModifier) {
+        if (e->key()==Qt::Key_C) {
+            copy_data();
+        } else if (e->key()==Qt::Key_S) {
+            save_data();
+        } else if (e->key()==Qt::Key_E) {
+            export_image();
+        }
+    }
 }
 
 void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
@@ -137,6 +151,7 @@ void nCustomPlot::export_image(){
 }
 
 void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {
+    DEBUG("here");
     axisRect()->setRangeDragAxes(ax,ax);
     axisRect()->setRangeDrag(ax->orientation());
     axisRect()->setRangeZoomAxes(ax,ax);
