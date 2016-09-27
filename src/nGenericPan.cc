@@ -24,6 +24,7 @@
  */
 #include "nGenericPan.h"
 #include "neutrino.h"
+#include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
@@ -216,6 +217,30 @@ void nGenericPan::decorate() {
 	foreach (QToolBar *widget, findChildren<QToolBar *>()) {
 		widget->setIconSize(iconSize);
 	}
+
+    QSettings settings("neutrino","");
+    settings.beginGroup("Preferences");
+    QVariant fontString=settings.value("defaultFont");
+    settings.endGroup();
+
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        widget->setProperty("panName",panName);
+
+        if (fontString.isValid()) {
+            QFont fontTmp;
+            if (fontTmp.fromString(fontString.toString())) {
+                foreach (QCPAxis *axis, widget->findChildren<QCPAxis *>()) {
+                    axis->setTickLabelFont(fontTmp);
+                    axis->setLabelFont(fontTmp);
+                }
+                widget->legend->setFont(fontTmp);
+            }
+        }
+
+    }
+
+
+
 
     QApplication::processEvents();
     loadDefaults();

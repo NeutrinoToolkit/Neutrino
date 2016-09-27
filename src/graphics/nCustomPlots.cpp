@@ -53,18 +53,10 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     connect(my_act, SIGNAL(triggered()), this, SLOT(export_image()));
     my_menu->addAction(my_act);
 
-    setProperty("panName", "orphan graph");
+    connect(this, SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(my_axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
+    connect(this, SIGNAL(axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(my_axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
+    connect(this, SIGNAL(plottableDoubleClick(QCPAbstractPlottable*,int,QMouseEvent*)), this, SLOT(my_plottableDoubleClick(QCPAbstractPlottable*,int,QMouseEvent*)));
 
-    QObject *this_widget = qobject_cast<QObject*>(this);
-    do{
-        nGenericPan* this_pan = qobject_cast<nGenericPan*>(this_widget);
-        if (this_pan) {
-            setProperty("panName", this_pan->panName);
-            break;
-        }
-    } while ((this_widget=this_widget->parent())!=nullptr);
-
-    connect(this, SIGNAL(axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
     QList<QCPAxis*> all_axis({xAxis,xAxis2,yAxis,yAxis2});
@@ -73,36 +65,20 @@ nCustomPlot::nCustomPlot(QWidget* parent):
         axis->setLabelPadding(-1);
     }
 
-    QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
-    QVariant fontString=settings.value("defaultFont");
-    settings.endGroup();
-    if (fontString.isValid()) {
-        QFont fontTmp;
-        if (fontTmp.fromString(fontString.toString())) {
-            foreach(QCPAxis* axis, all_axis) {
-                axis->setTickLabelFont(fontTmp);
-                axis->setLabelFont(fontTmp);
-            }
-            legend->setFont(fontTmp);
-        }
-    }
-
     axisRect()->setRangeDrag(0);
     axisRect()->setRangeZoom(0);
     axisRect()->setMargins(QMargins(0,0,0,0));
+    setCursor(QCursor(Qt::CrossCursor));
     repaint();
 }
 
 void nCustomPlot::keyPressEvent(QKeyEvent *e) {
     QCustomPlot::keyPressEvent(e);
     if (e->modifiers() & Qt::ControlModifier) {
-        if (e->key()==Qt::Key_C) {
-            copy_data();
-        } else if (e->key()==Qt::Key_S) {
-            save_data();
-        } else if (e->key()==Qt::Key_E) {
-            export_image();
+        switch (e->key()) {
+        case Qt::Key_C: copy_data(); break;
+        case Qt::Key_S: save_data(); break;
+        case Qt::Key_E: export_image(); break;
         }
     }
 }
@@ -111,14 +87,18 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     my_menu->exec(ev->globalPos());
 }
 
+void nCustomPlot::get_data(QTextStream &out, QCPGraph *graph) {
+    out << "# " << graph->name() << endl;
+    for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
+        out << it->key << " " << it->value << endl;
+    }
+}
 
 void nCustomPlot::get_data(QTextStream &out) {
-    out << "# " <<  property("panName").toString() << " " << graphCount() << endl;
+    out << "# " <<  property("panName").toString() << " (" << graphCount() << " graphs)" << endl;
     for (int g=0; g<graphCount(); g++) {
-        out << "# " << g << " name: " << graph(g)->name() << endl;
-        for (QCPGraphDataContainer::const_iterator it=graph(g)->data()->begin(); it!=graph(g)->data()->end(); ++it) {
-            out << it->key << " " << it->value << endl;
-        }
+        out << "# " << g <<" ";
+        get_data(out,graph(g));
         out << endl << endl;
     }
 }
@@ -146,16 +126,37 @@ void nCustomPlot::export_image(){
     QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
         setProperty("fileExport", fnametmp);
-        savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", property("panName").toString());
+        if (QFileInfo(fnametmp).suffix().toLower()==QString("pdf")) {
+            savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", property("panName").toString());
+        } else if (QFileInfo(fnametmp).suffix().toLower()==QString("svg")) {
+            QSvgGenerator printer;
+            printer.setFileName(fnametmp);
+            QCPPainter qcpPainter;
+            qcpPainter.begin(&printer);
+            toPainter(&qcpPainter, 0,0);
+            qcpPainter.end();
+        }
     }
 }
 
-void nCustomPlot::my_axisClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {
-    DEBUG("here");
+void nCustomPlot::my_axisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {
+    DEBUG("here " << (void*)ax);
     axisRect()->setRangeDragAxes(ax,ax);
     axisRect()->setRangeDrag(ax->orientation());
     axisRect()->setRangeZoomAxes(ax,ax);
     axisRect()->setRangeZoom(ax->orientation());
+}
+
+void nCustomPlot::my_plottableDoubleClick(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent *e) {
+    QCPGraph *graph = qobject_cast<QCPGraph *>(plottable);
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>" << dataIndex);
+    if(graph) {
+        DEBUG("\t>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        QString t;
+        QTextStream out(&t);
+        get_data(out, graph);
+        QApplication::clipboard()->setText(t);
+    }
 }
 
 

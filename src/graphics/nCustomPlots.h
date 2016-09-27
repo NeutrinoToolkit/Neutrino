@@ -38,8 +38,9 @@ public:
     nCustomPlot(QWidget*);
 
 public slots:
-    void my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*);
-
+    void my_axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
+    void my_plottableDoubleClick(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent *e);
+    void get_data(QTextStream &, QCPGraph *graph);
     void get_data(QTextStream &);
     void save_data();
     void copy_data();

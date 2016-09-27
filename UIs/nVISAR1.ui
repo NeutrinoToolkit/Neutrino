@@ -56,7 +56,7 @@
        <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <widget class="QWidget" name="Settings">
        <attribute name="title">
