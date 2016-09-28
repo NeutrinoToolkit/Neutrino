@@ -83,7 +83,7 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 
     my_w.toolBar->insertWidget(my_w.actionInvert,palettes);
 
-    decorate();
+    show();
 
     if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
 

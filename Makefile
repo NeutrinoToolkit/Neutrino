@@ -30,8 +30,7 @@ dmg::
 	./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/icons/icon.icns --background resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg && rm -rf dmg
 
 Darwin:: 
-	mkdir -p $@
-	cd $@ && cmake -DCMAKE_CXX_COMPILER=g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 ..
+	cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -B$@ -H.
 	$(MAKE) -C $@
 	rm -rf Neutrino.app
 	cp -r $@/Neutrino.app .
@@ -54,8 +53,7 @@ cross::
 	$(MAKE) -C $@ package	
 
 Linux::
-	mkdir -p $@	
-	cd $@ && cmake ..
+	cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -B$@ -H.
 	$(MAKE) -C $@ package
 
 

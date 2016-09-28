@@ -56,8 +56,7 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
     my_w.plot->graph(0)->setPen(QPen(Qt::blue));
     my_w.plot->graph(0)->setName("FindPeaks");
 
-	decorate();
-	loadDefaults();
+    show();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
  	connect(my_w.direction, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));

@@ -61,8 +61,7 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
 
     my_w.plot->graph(0)->setName("Compare Lines");
 
-    decorate();
-    loadDefaults();
+    show();
     connect(line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
     updatePlot();

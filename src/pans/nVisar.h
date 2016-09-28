@@ -31,40 +31,6 @@
 #include "nGenericPan.h"
 
 #include "nCustomPlots.h"
-class nVisarPlot : public nCustomPlotMouseX {
-    Q_OBJECT
-public:
-    nVisarPlot(QWidget* parent):
-        nCustomPlotMouseX(parent),
-        yAxis3(axisRect(0)->addAxis(QCPAxis::atRight,0))
-    {
-        yAxis2->setVisible(true);
-
-        yAxis->setLabelColor(Qt::red);
-        yAxis->setTickLabelColor(Qt::red);
-
-        yAxis2->setLabelColor(Qt::blue);
-        yAxis2->setTickLabelColor(Qt::blue);
-
-        yAxis3->setLabelColor(Qt::darkCyan);
-        yAxis3->setTickLabelColor(Qt::darkCyan);
-
-        yAxis3->setLabelPadding(-1);
-
-        QSettings settings("neutrino","");
-        settings.beginGroup("Preferences");
-        QVariant fontString=settings.value("defaultFont");
-        if (fontString.isValid()) {
-            QFont fontTmp;
-            if (fontTmp.fromString(fontString.toString())) {
-                    yAxis3->setTickLabelFont(fontTmp);
-                    yAxis3->setLabelFont(fontTmp);
-            }
-        }
-        show();
-    };
-    QCPAxis *yAxis3;
-};
 
 #include "ui_nVISAR1.h"
 #include "ui_nVISAR2.h"

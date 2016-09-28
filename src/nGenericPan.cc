@@ -133,9 +133,10 @@ void nGenericPan::grabSave() {
 #endif
 }
 
-void nGenericPan::decorate() {
+void nGenericPan::showEvent(QShowEvent* event) {
+    DEBUG("here >>>>>>>>>>>>>>>>>>>>>")
+    QMainWindow::showEvent(event);
 
-    show();
     repaint();
 
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
@@ -225,18 +226,19 @@ void nGenericPan::decorate() {
 
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
         widget->setProperty("panName",panName);
-
+        DEBUG("<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.> " << widget->objectName().toStdString());
         if (fontString.isValid()) {
             QFont fontTmp;
             if (fontTmp.fromString(fontString.toString())) {
                 foreach (QCPAxis *axis, widget->findChildren<QCPAxis *>()) {
                     axis->setTickLabelFont(fontTmp);
                     axis->setLabelFont(fontTmp);
+                    axis->setLabelPadding(-1);
                 }
                 widget->legend->setFont(fontTmp);
+                widget->replot();
             }
         }
-
     }
 
 
@@ -245,6 +247,7 @@ void nGenericPan::decorate() {
     QApplication::processEvents();
     loadDefaults();
     QApplication::processEvents();
+    DEBUG("HERE");
     show();
 }
 
@@ -376,6 +379,11 @@ nGenericPan::loadUi(QSettings *settings) {
 		}
 	}
 
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        DEBUG(">>>>>>>>>>>>>>>>");
+        widget->loadSettings(settings);
+    }
+
 	foreach (QObject* widget, nparent->children()) {
 		nLine *linea=qobject_cast<nLine *>(widget);
 		if (linea && linea->property("parentPan").toString()==panName) {
@@ -389,11 +397,11 @@ nGenericPan::loadUi(QSettings *settings) {
 		if (point && point->property("parentPan").toString()==panName) {
 			point->loadSettings(settings);
 		}
-		nEllipse *elli=qobject_cast<nEllipse *>(widget);
-		if (elli && elli->property("parentPan").toString()==panName) {
-			elli->loadSettings(settings);
-		}
-	}
+        nEllipse *elli=qobject_cast<nEllipse *>(widget);
+        if (elli && elli->property("parentPan").toString()==panName) {
+            elli->loadSettings(settings);
+        }
+    }
 	
 }
 
@@ -461,6 +469,11 @@ nGenericPan::saveUi(QSettings *settings) {
 		}
 	}
 
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        DEBUG(">>>>>>>>>>>>>>>>");
+        widget->saveSettings(settings);
+    }
+
 	foreach (QObject* widget, nparent->children()) {
 		nLine *line=qobject_cast<nLine *>(widget);
 		if (line && line->property("parentPan").toString()==panName) {
@@ -478,7 +491,7 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (elli && elli->property("parentPan").toString()==panName) {
 			elli->saveSettings(settings);
 		}
-	}
+    }
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){

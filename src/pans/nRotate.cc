@@ -32,7 +32,7 @@ nRotate::nRotate(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 
-	decorate();
+    show();
 
 	connect(my_w.valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
 	connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doRotate()));

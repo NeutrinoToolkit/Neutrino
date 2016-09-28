@@ -36,13 +36,14 @@ nHDF5::nHDF5(neutrino *nparent, QString winname)
     my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);
 
     neutrinoProperties << "fileHDF";
-    decorate();
 
     connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
     connect(my_w.actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
     connect(my_w.treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
     connect(my_w.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
+
+    show();
 
 }
 

@@ -75,7 +75,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
 
 
-    my_w.sopPlot->yAxis3->setVisible(false);
     my_w.sopPlot->xAxis->setLabel(tr("Time"));
     my_w.sopPlot->yAxis->setLabel(tr("Counts"));
     my_w.sopPlot->yAxis2->setLabel(tr("Temperature"));
@@ -132,9 +131,9 @@ nVisar::nVisar(neutrino *nparent, QString winname)
         }
     }
 
-    decorate();
     connections();
     tabChanged();
+    show();
 }
 
 void nVisar::loadSettings(QString my_settings) {
@@ -146,7 +145,7 @@ void nVisar::loadSettings(QString my_settings) {
 
 void nVisar::mouseAtPlot(QMouseEvent* e) {
     if (sender()) {
-        nVisarPlot *plot=qobject_cast<nVisarPlot *>(sender());
+        nCustomPlotMouseX3Y *plot=qobject_cast<nCustomPlotMouseX3Y *>(sender());
         if(plot) {
             QString msg;
             QTextStream(&msg) << plot->xAxis->pixelToCoord(e->pos().x()) << ","

@@ -39,7 +39,7 @@ nContours::nContours(neutrino *nparent, QString winname)
     connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(my_w.actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
 
-    decorate();
+    show();
     on_percent_released();
     //connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
     //connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));

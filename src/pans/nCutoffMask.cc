@@ -33,7 +33,7 @@ nCutoffMask::nCutoffMask(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 
-	decorate();
+    show();
 
 	connect(my_w.cutValue,SIGNAL(editingFinished()), this, SLOT(doOperation()));
 	connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doOperation()));

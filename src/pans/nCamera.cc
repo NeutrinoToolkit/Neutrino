@@ -39,7 +39,7 @@ nCamera::nCamera(neutrino *nparent, QString winname)
 
     connect(&timeLapse, SIGNAL(timeout()), this, SLOT(on_grab_clicked()));
 
-	decorate();
+    show();
 
     cameraMenu=new QMenu(this);
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();

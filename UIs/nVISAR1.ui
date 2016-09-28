@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -157,7 +157,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
@@ -221,7 +221,11 @@
          </widget>
         </item>
         <item>
-         <widget class="nVisarPlot" name="plotVelocity" native="true"/>
+         <widget class="nCustomPlotMouseX3Y" name="plotVelocity" native="true">
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -303,7 +307,11 @@
          </widget>
         </item>
         <item row="3" column="0" colspan="3">
-         <widget class="nVisarPlot" name="sopPlot" native="true"/>
+         <widget class="nCustomPlotMouseX2Y" name="sopPlot" native="true">
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_2">
@@ -799,9 +807,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nVisarPlot</class>
+   <class>nCustomPlotMouseX3Y</class>
    <extends>QWidget</extends>
-   <header>nVisar.h</header>
+   <header>nCustomPlots.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nCustomPlotMouseX2Y</class>
+   <extends>QWidget</extends>
+   <header>nCustomPlots.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

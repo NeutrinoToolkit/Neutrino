@@ -59,12 +59,6 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    QList<QCPAxis*> all_axis({xAxis,xAxis2,yAxis,yAxis2});
-
-    foreach(QCPAxis* axis, all_axis) {
-        axis->setLabelPadding(-1);
-    }
-
     axisRect()->setRangeDrag(0);
     axisRect()->setRangeZoom(0);
     axisRect()->setMargins(QMargins(0,0,0,0));
@@ -149,14 +143,55 @@ void nCustomPlot::my_axisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEv
 
 void nCustomPlot::my_plottableDoubleClick(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent *e) {
     QCPGraph *graph = qobject_cast<QCPGraph *>(plottable);
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>" << dataIndex);
     if(graph) {
-        DEBUG("\t>>>>>>>>>>>>>>>>>>>>>>>>>>");
         QString t;
         QTextStream out(&t);
         get_data(out, graph);
         QApplication::clipboard()->setText(t);
     }
+    axisRect()->setRangeDragAxes(nullptr,nullptr);
+    axisRect()->setRangeZoomAxes(nullptr,nullptr);
+}
+
+
+// SETTINGS
+
+void
+nCustomPlot::loadSettings(QSettings *settings) {
+    DEBUG(">>>>>>>>>>>>>>>>>>"<<objectName().toStdString());
+    DEBUG(">>>>>>>>>>>>>>>>>>"<<toolTip().toStdString());
+    settings->beginGroup(objectName());
+    QStringList labels = settings->value("labels").toStringList();
+    QList<QCPAxis *> axis=findChildren<QCPAxis *>();
+    QMutableListIterator<QCPAxis *> iter(axis);
+    while (iter.hasNext()) {
+        if (!iter.next()->visible()) {
+            iter.remove();
+        }
+    }
+    if (labels.size() == axis.size()) {
+        DEBUG(">>>>>>>>>>"<<axis.size());
+        for (int i=0; i< labels.size(); i++) {
+            if(axis[i]->visible()) {
+                axis[i]->setLabel(labels[i]);
+            }
+        }
+    }
+    settings->endGroup();
+}
+
+void
+nCustomPlot::saveSettings(QSettings *settings) {
+    DEBUG(">>>>>>>>>>>>>>>>>>"<<objectName().toStdString());
+    DEBUG(">>>>>>>>>>>>>>>>>>"<<toolTip().toStdString());
+
+    settings->beginGroup(objectName());
+    QStringList labels;
+    foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+        if(axis->visible()) labels << axis->label();
+    }
+    settings->setValue("labels",labels);
+    settings->endGroup();
 }
 
 
@@ -222,4 +257,30 @@ nCustomDoublePlot::nCustomDoublePlot(QWidget* parent):
     xAxis2->setTickLabelColor(Qt::blue);
 
 }
+
+
+nCustomPlotMouseX2Y::nCustomPlotMouseX2Y(QWidget* parent):
+    nCustomPlotMouseX(parent)
+{
+    yAxis2->setVisible(true);
+
+    yAxis->setLabelColor(Qt::red);
+    yAxis->setTickLabelColor(Qt::red);
+
+    yAxis2->setLabelColor(Qt::blue);
+    yAxis2->setTickLabelColor(Qt::blue);
+
+    show();
+};
+
+nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
+    nCustomPlotMouseX2Y(parent),
+    yAxis3(axisRect(0)->addAxis(QCPAxis::atRight,0))
+{
+    yAxis3->setLabelColor(Qt::darkCyan);
+    yAxis3->setTickLabelColor(Qt::darkCyan);
+
+    show();
+};
+
 

@@ -2319,7 +2319,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
             }
 
 //            my_pan->setCentralWidget(uiwidget);
-            my_pan->decorate();
+            my_pan->show();
         }
 
     }

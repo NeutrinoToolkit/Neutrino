@@ -14622,7 +14622,7 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
       mSelectionRect->cancel();
     if (event->button() == Qt::LeftButton)
       processPointSelection(event);
-    
+
     // emit specialized click signals of QCustomPlot instance:
     if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseEventLayerable))
     {

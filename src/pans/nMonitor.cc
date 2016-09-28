@@ -29,7 +29,7 @@ nMonitor::nMonitor(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-	decorate();
+    show();
 
 	completer = new QCompleter(my_w.lineEdit);
 	completer->setModel(new QDirModel());

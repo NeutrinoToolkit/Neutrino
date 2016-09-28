@@ -43,7 +43,7 @@ nOperator::nOperator(neutrino *nparent, QString winname)
 
     my_w.operation->insertSeparator(separator[0]);
     my_w.operation->insertSeparator(separator[1]);
-    decorate();
+    show();
     enableGroups(my_w.operation->currentIndex());
 }
 

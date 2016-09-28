@@ -37,7 +37,7 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 	region->setParentPan(panName,1);
 	region->setRect(QRectF(100,100,100,100));
 	
-	decorate();
+    show();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));

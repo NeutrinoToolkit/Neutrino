@@ -77,7 +77,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 	foreach (nGenericPan* pan, nparent->getPanList()) {
 		panAdd(pan);
 	}
-	decorate();
+    show();
 }
 
 void nWinList::selectionChanged() {

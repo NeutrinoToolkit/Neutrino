@@ -51,7 +51,7 @@ nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, t
 
 	mouse=parent->my_mouse.pos();
 	updateLabels();
-	decorate();
+    show();
 }
 
 

@@ -50,6 +50,12 @@ public slots:
 
     void keyPressEvent(QKeyEvent *);
 
+    //SETTINGS
+    void loadSettings(QSettings *);
+    void saveSettings(QSettings *);
+
+
+
 };
 
 //plot with mouse (vertical)
@@ -92,6 +98,20 @@ class nCustomDoublePlot : public nCustomPlotMouseXY {
 public:
     nCustomDoublePlot(QWidget*);
 
+};
+
+class nCustomPlotMouseX2Y : public nCustomPlotMouseX {
+    Q_OBJECT
+public:
+    nCustomPlotMouseX2Y(QWidget*);
+};
+
+
+class nCustomPlotMouseX3Y : public nCustomPlotMouseX2Y {
+    Q_OBJECT
+public:
+    nCustomPlotMouseX3Y(QWidget*);
+    QPointer<QCPAxis> yAxis3;
 };
 
 

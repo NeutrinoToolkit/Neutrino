@@ -34,7 +34,7 @@ nFocalSpot::nFocalSpot(neutrino *nparent, QString winname)
 	nContour = new nLine(nparent);
 	nContour->setParentPan(panName,3);
 	
-	decorate();
+    show();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
 	connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
 	connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));

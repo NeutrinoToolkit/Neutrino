@@ -63,7 +63,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
         connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
     }
 
-    decorate();
+    show();
 
     connect(region, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
     connect(maskRegion, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
