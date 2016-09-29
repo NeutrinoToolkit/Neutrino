@@ -96,14 +96,6 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 connect(cb_log,SIGNAL(toggled(bool)),this,SLOT(setLog(bool)));
                 my_w.labels_layout->addWidget(cb_log,row,3);
 
-//                QLineEdit *minmax = new QLineEdit(this);
-//                minmax->setFont(f);
-//                QString minmaxstr;
-
-//                minmax->setText(minmaxstr);
-//                minmax->setProperty("axis",qVariantFromValue((void *) axis));
-//                my_w.labels_layout->addWidget(minmax,row,2);
-
             }
         }
         for (int g=0; g<plottableCount(); g++) {
@@ -237,44 +229,39 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 void
 nCustomPlot::loadSettings(QSettings *settings) {
     settings->beginGroup(objectName());
-    QStringList labels = settings->value("labels").toStringList();
-    QList<QVariant> grids = settings->value("grids").toList();
-    QList<QVariant> logs = settings->value("logs").toList();
+    settings->beginGroup("axes");
+    QList<QVariant> labels ,grids, logs, ticks;
+    labels = settings->value("labels").toList();
+    grids = settings->value("grids").toList();
+    logs = settings->value("logs").toList();
     QList<QCPAxis *> axis=findChildren<QCPAxis *>();
-    QMutableListIterator<QCPAxis *> iter(axis);
-    while (iter.hasNext()) {
-        if (!iter.next()->visible()) {
-            iter.remove();
-        }
-    }
     if (labels.size() == axis.size() && grids.size() == axis.size() && logs.size() == axis.size() ) {
-        DEBUG(">>>>>>>>>>"<<axis.size());
-        for (int i=0; i< labels.size(); i++) {
+        for (int i=0; i< axis.size(); i++) {
             if(axis[i]->visible()) {
-                axis[i]->setLabel(labels[i]);
+                axis[i]->setLabel(labels[i].toString());
                 axis[i]->grid()->setVisible(grids[i].toBool());
                 axis[i]->setScaleType(logs[i].toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
             }
         }
     }
     settings->endGroup();
+    settings->endGroup();
 }
 
 void
 nCustomPlot::saveSettings(QSettings *settings) {
     settings->beginGroup(objectName());
-    QStringList labels;
-    QList<QVariant> grids, logs;
+    settings->beginGroup("axes");
+    QList<QVariant> labels ,grids, logs, ticks;
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
-        if(axis->visible()) {
-            labels << axis->label();
-            grids << axis->grid()->visible();
-            logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
-        }
+        labels << axis->label();
+        grids << axis->grid()->visible();
+        logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
     }
     settings->setValue("labels",labels);
     settings->setValue("grids",grids);
     settings->setValue("logs",logs);
+    settings->endGroup();
     settings->endGroup();
 }
 
