@@ -31,31 +31,27 @@
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
-private:
-    QPointer<QMenu> my_menu;
-
 public:
     nCustomPlot(QWidget*);
 
 public slots:
-    void my_axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
-    void my_plottableDoubleClick(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent *e);
-    void get_data(QTextStream &, QCPGraph *graph);
-    void get_data(QTextStream &);
+    void myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
+    void get_data(QTextStream &, QObject *obj=nullptr);
+    void get_data_graph(QTextStream &out, QCPGraph *graph);
+
     void save_data();
     void copy_data();
     void export_image();
 
     void contextMenuEvent (QContextMenuEvent*) override;
 
-    void keyPressEvent(QKeyEvent *);
-
     //SETTINGS
     void loadSettings(QSettings *);
     void saveSettings(QSettings *);
 
-
-
+    void setLabel(QString);
+    void showGrid(bool val);
+    void setLog(bool val);
 };
 
 //plot with mouse (vertical)
