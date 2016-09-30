@@ -52,6 +52,7 @@ public slots:
     void setLabel(QString);
     void showGrid(bool val);
     void setLog(bool val);
+    void setColor();
 };
 
 //plot with mouse (vertical)

@@ -352,7 +352,7 @@ void nVisar::updatePlotSOP() {
         QCPGraph* graph;
         graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis);
         graph->setName("SOP");
-        graph->setPen(QPen(Qt::red));
+        graph->setPen(QPen(my_w.sopPlot->yAxis->labelColor()));
         graph->setData(time_sop,sopCurve[0]);
 
         // TEMPERATURE FROM REFLECTIVITY
@@ -426,17 +426,17 @@ void nVisar::updatePlotSOP() {
         }
         graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
         graph->setName("SOP 1");
-        graph->setPen(QPen(Qt::blue));
+        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor()));
         graph->setData(time_sop,sopCurve[1]);
 
         graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
         graph->setName("SOP 2");
-        graph->setPen(QPen(Qt::blue,0.3));
+        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor(),0.3));
         graph->setData(time_sop,sopCurve[2]);
 
         graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
         graph->setName("SOP 3");
-        graph->setPen(QPen(Qt::blue,0.7));
+        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor(),0.7));
         graph->setData(time_sop,sopCurve[3]);
 
         QStringList my_minmax=my_w.Tminmax->text().split(" ", QString::SkipEmptyParts);
@@ -586,7 +586,7 @@ void nVisar::updatePlot() {
                     for (int i=0;i<abs(setvisar[k].jump->value());i++) {
                         graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
                         graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
-                        QColor color(Qt::red);
+                        QColor color(my_w.plotVelocity->yAxis->labelColor());
                         color.setAlpha(100);
                         pen.setColor(color);
                         graph->setPen(pen);
@@ -596,19 +596,19 @@ void nVisar::updatePlot() {
 
                 graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
                 graph->setName("Velocity Visar "+QString::number(k+1));
-                pen.setColor(Qt::red);
+                pen.setColor(my_w.plotVelocity->yAxis->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_vel[k],velocity[k]);
 
                 graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis2);
                 graph->setName("Reflectivity Visar "+QString::number(k+1));
-                pen.setColor(Qt::blue);
+                pen.setColor(my_w.plotVelocity->yAxis2->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_vel[k],reflectivity[k]);
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->axisRect(0)->axis(QCPAxis::atRight,1));
+                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis3);
                 graph->setName("Quality Visar "+QString::number(k+1));
-                pen.setColor(Qt::darkCyan);
+                pen.setColor(my_w.plotVelocity->yAxis3->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_vel[k],quality[k]);
 
@@ -909,19 +909,19 @@ void nVisar::getPhase(int k) {
 
                 graph = visar[k].plotPhaseIntensity->addGraph(visar[k].plotPhaseIntensity->xAxis, visar[k].plotPhaseIntensity->yAxis);
                 graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(Qt::red);
+                pen.setColor(visar[k].plotPhaseIntensity->yAxis->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cPhase[m][k]);
 
                 graph = visar[k].plotPhaseIntensity->addGraph(visar[k].plotPhaseIntensity->xAxis, visar[k].plotPhaseIntensity->yAxis2);
                 graph->setName("Intensity Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(Qt::blue);
+                pen.setColor(visar[k].plotPhaseIntensity->yAxis2->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cIntensity[m][k]);
 
-                graph = visar[k].plotPhaseIntensity->addGraph(visar[k].plotPhaseIntensity->xAxis, visar[k].plotPhaseIntensity->axisRect(0)->axis(QCPAxis::atRight,1));
+                graph = visar[k].plotPhaseIntensity->addGraph(visar[k].plotPhaseIntensity->xAxis, visar[k].plotPhaseIntensity->yAxis3);
                 graph->setName("Contrast Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(Qt::darkCyan);
+                pen.setColor(visar[k].plotPhaseIntensity->yAxis3->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cContrast[m][k]);
             }

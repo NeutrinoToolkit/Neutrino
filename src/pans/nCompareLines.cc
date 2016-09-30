@@ -144,7 +144,7 @@ void nCompareLines::updatePlot() {
                 }
                 QCPGraph* graph=my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
                 graph->setName(QString::fromStdString(phys->getName()));
-                graph->setPen(QPen((phys==currentBuffer?Qt::blue:Qt::red)));
+                graph->setPen(QPen((phys==currentBuffer?my_w.plot->yAxis->labelColor():Qt::red)));
                 graph->setData(toPlotx,toPloty);
             }
 
