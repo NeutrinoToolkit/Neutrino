@@ -33,7 +33,6 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     setContentsMargins(0,0,0,0);
 
     connect(this, SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
-    connect(this, SIGNAL(plottableDoubleClick(QCPAbstractPlottable*,int,QMouseEvent*)), this, SLOT(myPlottableDoubleClick(QCPAbstractPlottable*,int,QMouseEvent*)));
 
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
@@ -162,7 +161,6 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
 }
 
 void nCustomPlot::save_data(){
-    DEBUG("here");
     QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("fileTxt", fnametmp);
@@ -175,7 +173,6 @@ void nCustomPlot::save_data(){
 }
 
 void nCustomPlot::copy_data(){
-    DEBUG("here");
     QString t;
     QTextStream out(&t);
     get_data(out,sender());
@@ -183,7 +180,6 @@ void nCustomPlot::copy_data(){
 }
 
 void nCustomPlot::export_image(){
-    DEBUG(viewport().width() << " x " << viewport().height());
     QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
         setProperty("fileExport", fnametmp);
@@ -262,7 +258,6 @@ void nCustomPlot::setColor() {
 
 
 void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEvent*) {
-    DEBUG("here " << (void*)ax);
     axisRect()->setRangeDragAxes(ax,ax);
     axisRect()->setRangeDrag(ax->orientation());
     axisRect()->setRangeZoomAxes(ax,ax);
@@ -272,7 +267,6 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 // SETTINGS
 void
 nCustomPlot::loadSettings(QSettings *settings) {
-    DEBUG(":-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-");
     settings->beginGroup(objectName());
     settings->beginGroup("axes");
     QList<QVariant> labels ,grids, logs, ticks, colors;

@@ -185,30 +185,7 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QDoubleSpinBox" name="physScale">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="suffix">
-            <string/>
-           </property>
-           <property name="decimals">
-            <number>8</number>
-           </property>
-           <property name="minimum">
-            <double>-9999999.990000000223517</double>
-           </property>
-           <property name="maximum">
-            <double>9999999.990000000223517</double>
-           </property>
-           <property name="singleStep">
-            <double>0.001000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
+          <widget class="QLineEdit" name="physScale">
            <property name="neutrinoSave" stdset="0">
             <bool>true</bool>
            </property>
@@ -449,7 +426,6 @@
   <tabstop>sensitivity</tabstop>
   <tabstop>physOrigin</tabstop>
   <tabstop>offsetTime</tabstop>
-  <tabstop>physScale</tabstop>
   <tabstop>offsetShift</tabstop>
   <tabstop>reflOffset</tabstop>
   <tabstop>reflRef</tabstop>

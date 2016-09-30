@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -246,12 +246,12 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="2" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_8">
+        <item row="2" column="2">
+         <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
-           <string>SOP calibration T0 A</string>
+           <string>min max</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_14">
+          <layout class="QGridLayout" name="gridLayout_12">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -265,118 +265,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QDoubleSpinBox" name="sopCalibT0">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="decimals">
-              <number>7</number>
-             </property>
-             <property name="maximum">
-              <double>999999.989999999990687</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sopCalibA">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="decimals">
-              <number>7</number>
-             </property>
-             <property name="minimum">
-              <double>-99999999.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>99999999.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="3">
-         <widget class="nCustomPlotMouseX2Y" name="sopPlot" native="true">
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Time zero and delta t</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_10">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QSpinBox" name="sopOrigin">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="suffix">
-              <string> [px]</string>
-             </property>
-             <property name="minimum">
-              <number>-99999</number>
-             </property>
-             <property name="maximum">
-              <number>99999</number>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sopTimeOffset">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="suffix">
-              <string> [t]</string>
-             </property>
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>-9999999.990000000223517</double>
-             </property>
-             <property name="maximum">
-              <double>9999999.990000000223517</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.000000000000000</double>
-             </property>
+            <widget class="QLineEdit" name="Tminmax">
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
@@ -479,30 +368,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QDoubleSpinBox" name="sopScale">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="suffix">
-              <string> [t/px]</string>
-             </property>
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>-9999999.990000000223517</double>
-             </property>
-             <property name="maximum">
-              <double>9999999.990000000223517</double>
-             </property>
-             <property name="singleStep">
-              <double>0.001000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
+            <widget class="QLineEdit" name="sopScale">
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
@@ -572,12 +438,12 @@
           </layout>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QGroupBox" name="groupBox_3">
+        <item row="2" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_8">
           <property name="title">
-           <string>min max</string>
+           <string>SOP calibration T0 A</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_12">
+          <layout class="QGridLayout" name="gridLayout_14">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -591,13 +457,124 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QLineEdit" name="Tminmax">
+            <widget class="QDoubleSpinBox" name="sopCalibT0">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="decimals">
+              <number>7</number>
+             </property>
+             <property name="maximum">
+              <double>999999.989999999990687</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sopCalibA">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="decimals">
+              <number>7</number>
+             </property>
+             <property name="minimum">
+              <double>-99999999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>99999999.000000000000000</double>
+             </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Time zero and delta t</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QSpinBox" name="sopOrigin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="minimum">
+              <number>-99999</number>
+             </property>
+             <property name="maximum">
+              <number>99999</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sopTimeOffset">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [t]</string>
+             </property>
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>-9999999.990000000223517</double>
+             </property>
+             <property name="maximum">
+              <double>9999999.990000000223517</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <widget class="nCustomPlotMouseX2Y" name="sopPlot" native="true">
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -829,7 +806,6 @@
   <tabstop>sopOrigin</tabstop>
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>whichRefl</tabstop>
-  <tabstop>sopScale</tabstop>
   <tabstop>sopDirection</tabstop>
   <tabstop>sopCalibT0</tabstop>
   <tabstop>sopCalibA</tabstop>

@@ -61,6 +61,10 @@ public:
     Ui::nVISAR2 visar[2];
     Ui::nVISAR3 setvisar[2];
 
+    double getTime(int k,double p);
+
+    std::vector<double> sweepCoeff[3];
+
 public slots:
 
     void doWave();
@@ -100,7 +104,8 @@ public slots:
 
     void bufferChanged(nPhysD*);
 
-    
+    void sweepChanged(QLineEdit*line=nullptr);
+
 private:
 
     QVector<double> cPhase[2][2], cIntensity[2][2], cContrast[2][2];

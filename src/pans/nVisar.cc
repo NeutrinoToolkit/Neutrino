@@ -79,8 +79,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
     my_w.sopPlot->yAxis->setLabel(tr("Counts"));
     my_w.sopPlot->yAxis2->setLabel(tr("Temperature"));
 
-    connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-
     //!END SOP stuff
     
     QList<QWidget*> father1, father2;
@@ -104,20 +102,17 @@ nVisar::nVisar(neutrino *nparent, QString winname)
         visar[k].plotPhaseIntensity->yAxis->setLabel(tr("FringeShift"));
         visar[k].plotPhaseIntensity->yAxis2->setLabel(tr("Intensity"));
         visar[k].plotPhaseIntensity->yAxis3->setLabel(tr("Contrast"));
-        connect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
 
         visar[k].guess->setProperty("id", k);
         visar[k].doWaveButton->setProperty("id", k);
         setvisar[k].physScale->setProperty("id", k);
-
     }
-
+    my_w.sopScale->setProperty("id", 2);
 
     my_w.plotVelocity->xAxis->setLabel(tr("Position [time]"));
     my_w.plotVelocity->yAxis->setLabel(tr("Velocity"));
     my_w.plotVelocity->yAxis2->setLabel(tr("Reflectivity"));
     my_w.plotVelocity->yAxis3->setLabel(tr("Quality"));
-    connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
 
     for (int k=0;k<2;k++){
         for (int m=0;m<2;m++){
@@ -133,12 +128,14 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
     connections();
     tabChanged();
+    sweepChanged();
     show();
 }
 
 void nVisar::loadSettings(QString my_settings) {
     nGenericPan::loadSettings(my_settings);
     QApplication::processEvents();
+    sweepChanged();
     doWave();
     QApplication::processEvents();
 }
@@ -158,20 +155,58 @@ void nVisar::mouseAtPlot(QMouseEvent* e) {
     }
 }
 
+void nVisar::sweepChanged(QLineEdit *line) {
+    if(line && line->property("id").isValid()) {
+        int k=line->property("id").toInt();
+        bool ok;
+        sweepCoeff[k].clear();
+        foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
+            double coeff=QLocale().toDouble(str,&ok);
+            if(ok) {
+                sweepCoeff[k].push_back(coeff);
+            } else {
+                my_w.statusbar->showMessage("Cannot understant sweep coefficint "+str);
+                break;
+            }
+        }
+    } else {
+        if (sender()) {
+            QLineEdit *line=qobject_cast<QLineEdit *>(sender());
+            sweepChanged(line);
+        } else {
+            sweepChanged(setvisar[0].physScale);
+            sweepChanged(setvisar[1].physScale);
+            sweepChanged(my_w.sopScale);
+        }
+    }
+    getPhase();
+    updatePlot();
+    updatePlotSOP();
+}
+
+double nVisar::getTime(int k, double p) {
+    double time=0;
+    for (unsigned int i=0;i<sweepCoeff[k].size();i++) {
+        time+=p*sweepCoeff[k][i];
+    }
+    return time;
+}
 
 void nVisar::mouseAtMatrix(QPointF p) {
     int k=0;
     double position=0.0;
     if (my_w.tabs->currentIndex()==0) {
         k=my_w.tabPhase->currentIndex();
-        position=(direction(k)==0) ? p.y() : p.x();
+        position=(direction(k)==0 ? p.y() : p.x());
         visar[k].plotPhaseIntensity->setMousePosition(position);
     } else if (my_w.tabs->currentIndex()==1) {
         k=my_w.tabVelocity->currentIndex();
-        position=((direction(k)==0 ? p.y() : p.x() )-setvisar[k].physOrigin->value())*setvisar[k].physScale->value()+setvisar[k].offsetTime->value();
+        double pos=direction(k)==0 ? p.y() : p.x();
+        position=getTime(k,pos) - getTime(k,setvisar[k].physOrigin->value()) + setvisar[k].offsetTime->value();
         my_w.plotVelocity->setMousePosition(position);
     } else {
-        position=((my_w.sopDirection->currentIndex()==0 ? p.y() : p.x() )-my_w.sopOrigin->value())*my_w.sopScale->value()+my_w.sopTimeOffset->value();
+        double pos=my_w.sopDirection->currentIndex()==0 ? p.y() : p.x();
+        position=getTime(2,pos) - getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
         my_w.sopPlot->setMousePosition(position);
     }
     my_w.statusbar->showMessage("Postion : "+QString::number(position));
@@ -238,7 +273,6 @@ void nVisar::connections() {
         connect(setvisar[k].reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         connect(setvisar[k].jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
 
-        connect(setvisar[k].physScale, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
         connect(setvisar[k].physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
         connect(setvisar[k].offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 
@@ -251,6 +285,10 @@ void nVisar::connections() {
         connect(visar[k].intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 
         connect(visar[k].enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+
+        connect(setvisar[k].physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+
+        connect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
     connect(my_w.sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
@@ -259,11 +297,15 @@ void nVisar::connections() {
     connect(my_w.sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopScale, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
+
+    connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(my_w.sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+
 }
 
 void nVisar::disconnections() {
@@ -276,7 +318,6 @@ void nVisar::disconnections() {
         disconnect(setvisar[k].reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         disconnect(setvisar[k].jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
 
-        disconnect(setvisar[k].physScale, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
         disconnect(setvisar[k].physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
         disconnect(setvisar[k].offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 
@@ -297,7 +338,6 @@ void nVisar::disconnections() {
     disconnect(my_w.sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopScale, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
@@ -317,10 +357,8 @@ void nVisar::updatePlotSOP() {
             my_w.statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
             return;
         }
-
         int dx=geom2.width();
         int dy=geom2.height();
-
         QVector<double> sopData(dir==0?dy:dx);
         for (int j=0;j<dy;j++){
             for (int i=0;i<dx; i++) {
@@ -329,20 +367,19 @@ void nVisar::updatePlotSOP() {
                 sopData[dir==0?j:i]+=val;
             }
         }
-
         time_sop.resize(sopData.size());
         sopCurve[0].resize(sopData.size());
 
         switch (dir) {
         case 0:
             for (int j=0;j<dy;j++) {
-                time_sop[j]=(geom2.y()+j-my_w.sopOrigin->value())*my_w.sopScale->value()+my_w.sopTimeOffset->value();
+                time_sop[j]=getTime(2,geom2.y()+j)-getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
                 sopCurve[0][j]=sopData[j]/dx-my_w.sopOffset->value();
             }
             break;
         case 1:
             for (int i=0;i<dx;i++) {
-                time_sop[i]=(geom2.x()+i-my_w.sopOrigin->value())*my_w.sopScale->value()+my_w.sopTimeOffset->value();
+                time_sop[i]=getTime(2,geom2.x()+i)-getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
                 sopCurve[0][i]=sopData[i]/dy-my_w.sopOffset->value();
             }
             break;
@@ -479,8 +516,7 @@ void nVisar::updatePlot() {
             if (visar[k].enableVisar->isChecked()) {
 
                 double sensitivity=setvisar[k].sensitivity->value();
-                double scale=setvisar[k].physScale->value();
-                double origin=setvisar[k].physOrigin->value();
+                double deltat=setvisar[k].offsetTime->value()-getTime(k,setvisar[k].physOrigin->value());
 
                 QVector<double> tjump,njump,rjump;
                 QStringList jumpt=setvisar[k].jumpst->text().split(";", QString::SkipEmptyParts);
@@ -524,7 +560,6 @@ void nVisar::updatePlot() {
                 }
 
                 double offset=setvisar[k].offsetShift->value();
-                double offsetTime=setvisar[k].offsetTime->value();
 
                 QVector<QVector< double > > velJump_array(abs(setvisar[k].jump->value()));
                 for (int i=0;i<abs(setvisar[k].jump->value());i++) {
@@ -537,9 +572,7 @@ void nVisar::updatePlot() {
                 quality[k].resize(time_phase[k].size());
 
                 for (int j=0;j<time_phase[k].size();j++) {
-                    double time=(time_phase[k][j]-origin)*scale+offsetTime;
-
-                    time_vel[k][j] = time;
+                    time_vel[k][j] = getTime(k,time_phase[k][j])+deltat;
 
                     double fRef=cPhase[0][k][j];
                     double fShot=cPhase[1][k][j];
@@ -553,7 +586,7 @@ void nVisar::updatePlot() {
                     int njumps=0;
                     double refr_index=1.0;
                     for (int i=0;i<tjump.size();i++) {
-                        if (time>tjump.at(i)) {
+                        if (time_vel[k][j]>tjump.at(i)) {
                             njumps+=njump.at(i);
                             refr_index=rjump.at(i);
                         }
@@ -869,24 +902,26 @@ void nVisar::getPhase(int k) {
 
                 double buffer,bufferold,dummy=0.0;
                 double offsetShift=0;
-                if (setvisar[k].physScale->value() > 0) {
-                    bufferold=cPhase[m][k].first();
-                    for (int j=1;j<cPhase[m][k].size();j++){
-                        buffer=cPhase[m][k][j];
-                        if (fabs(buffer-bufferold)>0.5) dummy+=SIGN(bufferold-buffer);
-                        bufferold=buffer;
-                        cPhase[m][k][j]+=dummy;
+                if(cPhase[m][k].size()) {
+                    if (sweepCoeff[k].size() && sweepCoeff[k].front()>0) {
+                        bufferold=cPhase[m][k].first();
+                        for (int j=1;j<cPhase[m][k].size();j++){
+                            buffer=cPhase[m][k][j];
+                            if (fabs(buffer-bufferold)>0.5) dummy+=SIGN(bufferold-buffer);
+                            bufferold=buffer;
+                            cPhase[m][k][j]+=dummy;
+                        }
+                        offsetShift=cPhase[m][k].first();
+                    } else {
+                        bufferold=cPhase[m][k].last();
+                        for (int j=cPhase[m][k].size()-2;j>=0;j--){
+                            buffer=cPhase[m][k][j];
+                            if (fabs(buffer-bufferold)>0.5) dummy+=SIGN(bufferold-buffer);
+                            bufferold=buffer;
+                            cPhase[m][k][j]+=dummy;
+                        }
+                        offsetShift=cPhase[m][k].last();
                     }
-                    offsetShift=cPhase[m][k].first();
-                } else {
-                    bufferold=cPhase[m][k].last();
-                    for (int j=cPhase[m][k].size()-2;j>=0;j--){
-                        buffer=cPhase[m][k][j];
-                        if (fabs(buffer-bufferold)>0.5) dummy+=SIGN(bufferold-buffer);
-                        bufferold=buffer;
-                        cPhase[m][k][j]+=dummy;
-                    }
-                    offsetShift=cPhase[m][k].last();
                 }
                 setvisar[k].offset->setTitle("Offset "+QString::number(offsetShift));
                 for (int j=0;j<cPhase[m][k].size();j++){
@@ -1014,7 +1049,7 @@ QString nVisar::export_sop() {
     QString out;
     out += QString("#SOP Origin       : %L1\n").arg(my_w.sopOrigin->value());
     out += QString("#SOP Offset       : %L1\n").arg(my_w.sopTimeOffset->value());
-    out += QString("#SOP Time scale   : %L1\n").arg(my_w.sopScale->value());
+    out += QString("#SOP Time scale   : %L1\n").arg(my_w.sopScale->text());
     out += QString("#SOP Direction    : %L1\n").arg(my_w.sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
     out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
