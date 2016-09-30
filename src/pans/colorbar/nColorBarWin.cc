@@ -121,7 +121,7 @@ void nColorBarWin::minChanged (QString value) {
 	if (currentBuffer) {
         my_w.sliderMin->setValue(sliderValues().first());
         vec2f minmax=currentBuffer->property["display_range"];
-        minmax.set_first(value.toDouble());
+        minmax.set_first(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
 	}
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
@@ -134,7 +134,7 @@ void nColorBarWin::maxChanged (QString value) {
 	if (currentBuffer) {
         my_w.sliderMax->setValue(sliderValues().second());
         vec2f minmax=currentBuffer->property["display_range"];
-        minmax.set_second(value.toDouble());
+        minmax.set_second(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
 	}
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));

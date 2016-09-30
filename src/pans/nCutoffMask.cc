@@ -69,7 +69,7 @@ void nCutoffMask::sliderChanged(int val) {
 
 void nCutoffMask::doOperation () {
 	bool ok;
-	double val=my_w.cutValue->text().toDouble(&ok);
+    double val=QLocale().toDouble(my_w.cutValue->text(),&ok);
 	if (ok) {
 		nPhysD *image1=getPhysFromCombo(my_w.image1);
 		nPhysD *image2=getPhysFromCombo(my_w.image2);

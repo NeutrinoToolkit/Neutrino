@@ -180,8 +180,8 @@ nWinList::changeProperties() {
 				QStringList lista=text.split(' ', QString::SkipEmptyParts);
 				if (lista.size()==2) {
 					bool ok1,ok2;
-					int xOrigin=lista.at(0).toDouble(&ok1);
-					int yOrigin=lista.at(1).toDouble(&ok2);
+                    int xOrigin=QLocale().toDouble(lista.at(0),&ok1);
+                    int yOrigin=QLocale().toDouble(lista.at(1),&ok2);
 
 					// also update ref. origin (in case button was toggled)
 					frOrigin = vec2f(xOrigin, yOrigin);
@@ -207,7 +207,7 @@ nWinList::changeProperties() {
 				switch (lista.size()) {
 					case 1: {
 						bool ok1;
-						double val=lista.at(0).toDouble(&ok1);
+                        double val=QLocale().toDouble(lista.at(0),&ok1);
 						
 
 						if (ok1) {
@@ -226,8 +226,8 @@ nWinList::changeProperties() {
 						break;
 					}
 					case 2: {
-						double xVal=lista.at(0).toDouble(&ok1);
-						double yVal=lista.at(1).toDouble(&ok2);
+                        double xVal=QLocale().toDouble(lista.at(0),&ok1);
+                        double yVal=QLocale().toDouble(lista.at(1),&ok2);
 						if (ok1 && ok2) {
 							// also update ref. scale (in case button was toggled)
 							frScale = vec2f(xVal, yVal);

@@ -98,13 +98,13 @@ void nOperator::doOperation () {
         }
 
         if (my_w.radioNumber1->isChecked()) {
-            operand1=new nPhysD(image2->getW(),image2->getH(),my_w.num1->text().toDouble(),my_w.num1->text().toStdString());
+            operand1=new nPhysD(image2->getW(),image2->getH(),QLocale().toDouble(my_w.num1->text()),my_w.num1->text().toStdString());
             operand1->set_origin(image2->get_origin());
             operand1->set_scale(image2->get_scale());
             operand2=new nPhysD();
             *operand2=*image2;
         } else if (my_w.radioNumber2->isChecked()) {
-            operand2=new nPhysD(image1->getW(),image1->getH(),my_w.num2->text().toDouble(),my_w.num2->text().toStdString());
+            operand2=new nPhysD(image1->getW(),image1->getH(),QLocale().toDouble(my_w.num2->text()),my_w.num2->text().toStdString());
             operand2->set_origin(image1->get_origin());
             operand2->set_scale(image1->get_scale());
             operand1=new nPhysD();
@@ -174,7 +174,7 @@ void nOperator::doOperation () {
         if (image1) {
             if (my_w.operation->currentIndex()==separator[0]+1) {
                 bool ok;
-                double scalar=my_w.num2->text().toDouble(&ok);
+                double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
                     phys_pow(*myresult, scalar);
@@ -185,7 +185,7 @@ void nOperator::doOperation () {
                 QStringList scalars=my_w.num2->text().split(" ");
                 if  (scalars.size()==1){
                     bool ok;
-                    double scalar=my_w.num2->text().toDouble(&ok);
+                    double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
                         myresult=new nPhysD(*image1);
                         phys_fast_gaussian_blur(*myresult, scalar);
@@ -194,8 +194,8 @@ void nOperator::doOperation () {
                     }
                 } else if (scalars.size()==2) {
                     bool ok1, ok2;
-                    double scalar1=scalars.at(0).toDouble(&ok1);
-                    double scalar2=scalars.at(1).toDouble(&ok2);
+                    double scalar1=QLocale().toDouble(scalars.at(0),&ok1);
+                    double scalar2=QLocale().toDouble(scalars.at(1),&ok2);
                     if(ok1 && ok2) {
                         myresult=new nPhysD(*image1);
                         phys_fast_gaussian_blur(*myresult, scalar1, scalar2);
@@ -217,7 +217,7 @@ void nOperator::doOperation () {
                 }
             } else if (my_w.operation->currentIndex()==separator[0]+4) {
                 bool ok;
-                double scalar=my_w.num2->text().toDouble(&ok);
+                double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=image1->rotated(scalar);
                 } else {
@@ -225,7 +225,7 @@ void nOperator::doOperation () {
                 }
             } else if (my_w.operation->currentIndex()==separator[0]+5) {
                 bool ok;
-                double scalar=my_w.num2->text().toDouble(&ok);
+                double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
                     phys_gauss_laplace(*myresult,scalar);
@@ -234,7 +234,7 @@ void nOperator::doOperation () {
                 }
             } else if (my_w.operation->currentIndex()==separator[0]+6) {
                 bool ok;
-                double scalar=my_w.num2->text().toDouble(&ok);
+                double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
                     phys_gauss_sobel(*myresult,scalar);

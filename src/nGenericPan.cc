@@ -326,7 +326,8 @@ nGenericPan::loadUi(QSettings *settings) {
 		}
 	}
 	foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
+        // do not use Locale for storing values
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
@@ -695,7 +696,8 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 	foreach (QDoubleSpinBox *obj, findChildren<QDoubleSpinBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
-				double val=my_val.toDouble(&ok);
+                // do not use Locale for reading values
+                double val=my_val.toDouble(&ok);
 				if (ok) {
 					obj->setValue(val);
 					return;

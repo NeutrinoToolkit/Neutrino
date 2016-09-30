@@ -1708,7 +1708,7 @@ bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
             QStringList colorValueName=paletteList.at(i).split(" ",QString::SkipEmptyParts);
             if (colorValueName.size()==2) {
                 bool ok;
-                double my_val=colorValueName.first().toDouble(&ok);
+                double my_val=QLocale().toDouble(colorValueName.first(),&ok);
                 QColor my_color(colorValueName.last());
                 if (ok && my_color.isValid()) {
                     listDoubleColor.append(qMakePair(my_val,my_color));

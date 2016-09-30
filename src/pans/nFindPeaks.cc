@@ -69,9 +69,9 @@ void nFindPeaks::setOrigin() {
 	if (currentBuffer) {
 		bool ok=true;
 		double originOffset=0.0;
-		if (!my_w.originOffset->text().isEmpty()) originOffset=my_w.originOffset->text().toDouble(&ok);
+        if (!my_w.originOffset->text().isEmpty()) originOffset=QLocale().toDouble(my_w.originOffset->text(),&ok);
 		if (ok) {
-			double origin=my_w.origin->text().toDouble(&ok)-originOffset;
+            double origin=QLocale().toDouble(my_w.origin->text(),&ok)-originOffset;
 			if (ok) {
 				if (my_w.direction->currentIndex()==0) {
 					currentBuffer->set_origin(origin,currentBuffer->get_origin().y());
@@ -88,9 +88,9 @@ void nFindPeaks::setScale() {
 	if (currentBuffer) {
 		bool ok=true;
 		double scaleMult=1.0;
-		if (!my_w.scaleOffset->text().isEmpty()) scaleMult=my_w.scaleOffset->text().toDouble(&ok);
+        if (!my_w.scaleOffset->text().isEmpty()) scaleMult=QLocale().toDouble(my_w.scaleOffset->text(),&ok);
 		if (ok) {
-			double scale=scaleMult/my_w.scale->text().toDouble(&ok);
+            double scale=scaleMult/QLocale().toDouble(my_w.scale->text(),&ok);
 			if (ok) {
 				if (my_w.direction->currentIndex()==0) {
 					currentBuffer->set_scale(scale,currentBuffer->get_scale().y());

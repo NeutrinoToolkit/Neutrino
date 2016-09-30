@@ -658,8 +658,8 @@ void nInterferometry::doPlasma(){
                 intNe->property["unitsCB"]="cm-2";
             }
             bool ok1,ok2;
-            double mini=my_w.cutoffMin->text().toDouble(&ok1);
-            double maxi=my_w.cutoffMax->text().toDouble(&ok2);
+            double mini=QLocale().toDouble(my_w.cutoffMin->text(),&ok1);
+            double maxi=QLocale().toDouble(my_w.cutoffMax->text(),&ok2);
             if (!ok1) mini=intNe->get_min();
             if (!ok2) maxi=intNe->get_max();
             if (ok1||ok2) {

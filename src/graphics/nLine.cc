@@ -298,7 +298,6 @@ void nLine::updatePlot () {
 		}
 
 
-
 		QPolygonF my_poly=poly(numPoints);
 
         my_w.plot->clearItems();
@@ -437,8 +436,8 @@ nLine::setOrder (double w) {
 void
 nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-	p.rx()=my_w.points->item(item->row(),0)->text().toDouble();
-	p.ry()=my_w.points->item(item->row(),1)->text().toDouble();
+    p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
 	changeP(item->row(),p, true);
 }
 

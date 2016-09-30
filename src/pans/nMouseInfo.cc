@@ -107,8 +107,8 @@ void nMouseInfo::setColorMouse() {
 void nMouseInfo::updateOrigin() {
 	if (currentBuffer) {
 		bool ok1, ok2;
-		double valx=my_w.rx->text().toDouble(&ok1);
-		double valy=my_w.ry->text().toDouble(&ok2);
+        double valx=QLocale().toDouble(my_w.rx->text(),&ok1);
+        double valy=QLocale().toDouble(my_w.ry->text(),&ok2);
 		if (ok1&&ok2) {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
@@ -119,8 +119,8 @@ void nMouseInfo::updateOrigin() {
 void nMouseInfo::updateScale() {
 	if (currentBuffer) {
 		bool ok1, ok2;
-		double valx=my_w.sc_x->text().toDouble(&ok1);
-		double valy=my_w.sc_y->text().toDouble(&ok2);
+        double valx=QLocale().toDouble(my_w.sc_x->text(),&ok1);
+        double valy=QLocale().toDouble(my_w.sc_y->text(),&ok2);
 		if (ok1&&ok2) {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}

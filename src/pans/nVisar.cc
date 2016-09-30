@@ -444,8 +444,8 @@ void nVisar::updatePlotSOP() {
         if (my_minmax.size()==2) {
             bool ok1, ok2;
             double my_min,my_max;
-            my_min=my_minmax[0].toDouble(&ok1);
-            my_max=my_minmax[1].toDouble(&ok2);
+            my_min=QLocale().toDouble(my_minmax[0],&ok1);
+            my_max=QLocale().toDouble(my_minmax[1],&ok2);
             if (ok1 && ok2) {
                 my_w.sopPlot->yAxis2->setRange(my_min,my_max);
             }
@@ -489,11 +489,11 @@ void nVisar::updatePlot() {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
                         if (my_jumps.size()>1 && my_jumps.size()<=3) {
                             bool ok1, ok2, ok3=true;
-                            double valdt=my_jumps.at(0).toDouble(&ok1);
-                            double valdn=my_jumps.at(1).toDouble(&ok2);
+                            double valdt=QLocale().toDouble(my_jumps.at(0),&ok1);
+                            double valdn=QLocale().toDouble(my_jumps.at(1),&ok2);
                             double valdrefr_index=1.0;
                             if (my_jumps.size()==3) {
-                                valdrefr_index=my_jumps.at(2).toDouble(&ok3);
+                                valdrefr_index=QLocale().toDouble(my_jumps.at(2),&ok3);
                             }
                             if (sensitivity<0) valdn*=-1.0;
                             if (ok1 && ok2) {

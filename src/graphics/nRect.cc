@@ -248,8 +248,8 @@ nRect::setOrder (double w) {
 void
 nRect::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-	p.rx()=my_w.tableWidget->item(item->row(),0)->text().toDouble();
-	p.ry()=my_w.tableWidget->item(item->row(),1)->text().toDouble();
+    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
 
 	changeP(item->row(),p, false);
 	itemChanged();
@@ -394,7 +394,7 @@ void nRect::changeWidth () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
 		bool ok;
-		rect.setWidth(my_w.sizeWidth->text().toDouble(&ok));
+        rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -406,7 +406,7 @@ void nRect::changeHeight () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
 		bool ok;
-		rect.setHeight(my_w.sizeHeight->text().toDouble(&ok));
+        rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
