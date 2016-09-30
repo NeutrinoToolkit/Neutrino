@@ -324,7 +324,7 @@ void nLine::updatePlot () {
             }
 			if (my_points.contains(p) && nSizeHolder>0.0) {
                 QCPItemLine *marker=new QCPItemLine(my_w.plot);
-                marker->start->setCoords(dist, QCPRange::minRange);
+                marker->start->setCoords(dist, -QCPRange::maxRange);
                 marker->end->setCoords(dist, QCPRange::maxRange);
                 marker->setPen(penna);
 			}

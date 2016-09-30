@@ -59,12 +59,6 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
         foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
             if (axis->visible()) {
-                my_w.labels_layout->addWidget(new QLabel("Side",this),0,0);
-                my_w.labels_layout->addWidget(new QLabel("Text",this),0,1);
-                my_w.labels_layout->addWidget(new QLabel("Grid",this),0,2);
-                my_w.labels_layout->addWidget(new QLabel("Log",this),0,3);
-                my_w.labels_layout->addWidget(new QLabel("Color",this),0,4);
-
                 int row=my_w.labels_layout->rowCount();
                 QLabel *la = new QLabel(this);
                 QFont f = la->font();
@@ -345,7 +339,7 @@ nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent):
 
 void nCustomPlotMouseX::setMousePosition(double position) {
     if (mouseMarker) {
-        mouseMarker->start->setCoords(position, QCPRange::minRange);
+        mouseMarker->start->setCoords(position, -QCPRange::maxRange);
         mouseMarker->end->setCoords(position, QCPRange::maxRange);
     }
     replot();
@@ -361,9 +355,9 @@ nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent):
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
     if (mouseMarkerX && mouseMarkerY) {
-        mouseMarkerX->start->setCoords(positionX, QCPRange::minRange);
+        mouseMarkerX->start->setCoords(positionX, -QCPRange::maxRange);
         mouseMarkerX->end->setCoords(positionX, QCPRange::maxRange);
-        mouseMarkerY->start->setCoords(QCPRange::minRange,positionY);
+        mouseMarkerY->start->setCoords(-QCPRange::maxRange,positionY);
         mouseMarkerY->end->setCoords(QCPRange::maxRange,positionY);
     }
     replot();

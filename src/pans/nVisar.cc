@@ -519,7 +519,7 @@ void nVisar::updatePlot() {
                     QPen pen(Qt::gray);
                     pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
-                    my_jumpLine->start->setCoords(a, QCPRange::minRange);
+                    my_jumpLine->start->setCoords(a, -QCPRange::maxRange);
                     my_jumpLine->end->setCoords(a, QCPRange::maxRange);
                 }
 
