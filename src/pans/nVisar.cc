@@ -132,8 +132,8 @@ void nVisar::loadSettings(QString my_settings) {
     nGenericPan::loadSettings(my_settings);
     connections();
     QApplication::processEvents();
-    doWave();
     sweepChanged();
+    doWave();
     QApplication::processEvents();
 }
 
@@ -737,10 +737,13 @@ void nVisar::doWave(int k) {
                 getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
             
             int counter=0;
-            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 11, this);
+            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 12, this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
+            sweepChanged(setvisar[k].physScale);
+            progress.setValue(++counter);
+            QApplication::processEvents();
             nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
             progress.setValue(++counter);
             QApplication::processEvents();

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>297</width>
+    <width>395</width>
     <height>272</height>
    </rect>
   </property>
@@ -91,7 +91,7 @@
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>Title</string>
+       <string>Title label and font</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
@@ -247,7 +247,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Subgrid</string>
+            <string>grid</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -332,10 +332,17 @@
     <string>Export</string>
    </property>
    <property name="toolTip">
-    <string>Export image to file</string>
+    <string>Export plot to file</string>
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>plotTitle</tabstop>
+  <tabstop>fontTitle</tabstop>
+  <tabstop>plotName</tabstop>
+  <tabstop>saveData</tabstop>
+  <tabstop>copyData</tabstop>
+ </tabstops>
  <resources>
   <include location="../../neutrino-build/src/icons.qrc"/>
  </resources>
