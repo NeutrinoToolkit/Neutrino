@@ -28,7 +28,8 @@
 #include "ui_nCustomPlot.h"
 
 nCustomPlot::nCustomPlot(QWidget* parent):
-    QCustomPlot(parent)
+    QCustomPlot(parent),
+     title(new QCPTextElement(this))
 {
     setContentsMargins(0,0,0,0);
 
@@ -58,6 +59,12 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
         connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
         connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
+        if (!title.isNull()) {
+            my_w.plotTitle->setText(title->text());
+        }
+        connect(my_w.plotTitle, SIGNAL(textEdited(QString)), this, SLOT(setTitle(QString)));
+        connect(my_w.fontTitle,SIGNAL(released()),this,SLOT(changeTitleFont()));
+
         foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
             if (axis->visible()) {
                 int row=my_w.labels_layout->rowCount();
@@ -115,6 +122,12 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 tb_color->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(tb_color,SIGNAL(released()),this,SLOT(setColor()));
                 my_w.labels_layout->addWidget(tb_color,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_font = new QToolButton(this);
+                tb_font->setIcon(QIcon(":icons/font"));
+                tb_font->setProperty("axis",qVariantFromValue((void *) axis));
+                connect(tb_font,SIGNAL(released()),this,SLOT(changeAxisFont()));
+                my_w.labels_layout->addWidget(tb_font,row,col++,Qt::AlignCenter);
 
             }
         }
@@ -208,6 +221,46 @@ void nCustomPlot::export_image(){
     }
 }
 
+void nCustomPlot::setTitle (QString my_title) {
+    if (my_title.isEmpty()) {
+        if (!title->text().isEmpty()) {
+            plotLayout()->take(title);
+        }
+    } else {
+        if (title->text().isEmpty()) {
+            plotLayout()->insertRow(0);
+            plotLayout()->addElement(0, 0, title);
+        }
+    }
+    title->setText(my_title);
+    plotLayout()->simplify();
+    replot();
+}
+
+void nCustomPlot::changeTitleFont() {
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, title->font(), this);
+    if (ok) {
+        title->setFont(font);
+        replot();
+    }
+}
+
+void nCustomPlot::changeAxisFont() {
+    if (sender() && sender()->property("axis").isValid()) {
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        if (axis) {
+            bool ok;
+            QFont font = QFontDialog::getFont(&ok, axis->labelFont(), this);
+            if (ok) {
+                axis->setLabelFont(font);
+                replot();
+            }
+        }
+    }
+
+}
+
 void nCustomPlot::showGrid(bool val) {
     if (sender() && sender()->property("grid").isValid()) {
         QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<void *>();
@@ -285,21 +338,24 @@ void
 nCustomPlot::loadSettings(QSettings *settings) {
     settings->beginGroup(objectName());
     settings->beginGroup("axes");
-    QList<QVariant> labels ,grids, logs, ticks, colors;
+    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts;
     labels = settings->value("labels").toList();
     grids = settings->value("grids").toList();
     logs = settings->value("logs").toList();
     colors = settings->value("colors").toList();
+    labelfonts = settings->value("labelfonts").toList();
     QList<QCPAxis *> axis=findChildren<QCPAxis *>();
     if (    axis.size() == labels.size() &&
             axis.size() == grids.size() &&
             axis.size() == logs.size() &&
-            axis.size() == colors.size())
+            axis.size() == colors.size() &&
+            axis.size() == labelfonts.size())
     {
         for (int i=0; i< axis.size(); i++) {
             if(axis[i]->visible()) {
                 axis[i]->setLabel(labels[i].toString());
                 axis[i]->setLabelColor(colors[i].value<QColor>());
+                axis[i]->setLabelFont(labelfonts[i].value<QFont>());
                 axis[i]->setTickLabelColor(colors[i].value<QColor>());
                 axis[i]->grid()->setVisible(grids[i].toBool());
                 axis[i]->setScaleType(logs[i].toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
@@ -317,6 +373,8 @@ nCustomPlot::loadSettings(QSettings *settings) {
         }
     }
     settings->endGroup();
+    title->setFont(qvariant_cast<QFont>(settings->value("titleFont",title->font())));
+    setTitle(settings->value("title",title->text()).toString());
     settings->endGroup();
 }
 
@@ -324,22 +382,26 @@ void
 nCustomPlot::saveSettings(QSettings *settings) {
     settings->beginGroup(objectName());
     settings->beginGroup("axes");
-    QList<QVariant> labels ,grids, logs, ticks, colors;
+    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts;
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         labels << axis->label();
         grids << axis->grid()->visible();
         logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
         colors << axis->labelColor();
+        labelfonts << axis->labelFont();
     }
     settings->setValue("labels",labels);
     settings->setValue("grids",grids);
     settings->setValue("logs",logs);
     settings->setValue("colors",colors);
+    settings->setValue("labelfonts",labelfonts);
     settings->endGroup();
+    settings->setValue("titleFont",title->font());
+    settings->setValue("title",title->text());
     settings->endGroup();
 }
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // plot as nCustomPlot but with x mouse line
 nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 }

@@ -31,6 +31,9 @@
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
+private:
+    QPointer<QCPTextElement> title;
+
 public:
     nCustomPlot(QWidget*);
 
@@ -53,6 +56,10 @@ public slots:
     void showGrid(bool val);
     void setLog(bool val);
     void setColor();
+    void setTitle(QString);
+    void changeTitleFont();
+    void changeAxisFont();
+
 };
 
 //plot with mouse (vertical)
