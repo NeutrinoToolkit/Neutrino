@@ -33,7 +33,7 @@
    </property>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -72,7 +72,7 @@
             </font>
            </property>
            <property name="suffix">
-            <string> [v/fringe]</string>
+            <string> [v/fr]</string>
            </property>
            <property name="decimals">
             <number>5</number>
@@ -100,7 +100,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox">
         <property name="title">
-         <string>Time 0</string>
+         <string>Time 0 &amp;&amp; delay</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="leftMargin">
@@ -169,7 +169,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="title">
-         <string>Time scale [time/px]</string>
+         <string>Sweep time</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <property name="leftMargin">
@@ -185,29 +185,9 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QDoubleSpinBox" name="physScale">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="suffix">
-            <string/>
-           </property>
-           <property name="decimals">
-            <number>8</number>
-           </property>
-           <property name="minimum">
-            <double>-9999999.990000000223517</double>
-           </property>
-           <property name="maximum">
-            <double>9999999.990000000223517</double>
-           </property>
-           <property name="singleStep">
-            <double>0.001000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
+          <widget class="QLineEdit" name="physScale">
+           <property name="toolTip">
+            <string>Sweep time (polynomial expansion)</string>
            </property>
            <property name="neutrinoSave" stdset="0">
             <bool>true</bool>
@@ -222,7 +202,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
       <property name="leftMargin">
        <number>0</number>
       </property>

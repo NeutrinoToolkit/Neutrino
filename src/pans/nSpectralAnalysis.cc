@@ -30,7 +30,7 @@ nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent, QString winname)
 {
     my_w.setupUi(this);
     my_w.direction->setIcon(my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
-    decorate();
+    show();
 }
 
 void nSpectralAnalysis::on_direction_toggled(bool val) {

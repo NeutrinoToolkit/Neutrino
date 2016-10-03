@@ -273,7 +273,9 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 
 
 void nLine::updatePlot () {
-    if (my_w.plot->isVisible() && parent()->currentBuffer) {
+
+    nPhysD *my_phys=parent()->currentBuffer;
+    if (my_w.plot->isVisible() && my_phys) {
 
         if (my_w.plot->graphCount()==0) {
             my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
@@ -282,19 +284,18 @@ void nLine::updatePlot () {
             my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
             my_w.plot->xAxis->setLabelPadding(-1);
             my_w.plot->yAxis->setLabelPadding(-1);
+            my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
+            my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
         }
 
 		double colore;
         QVector<double> toPlotx;
         QVector<double> toPloty;
 
-		nPhysD *mat=parent()->currentBuffer;
-
 		QPolygonF my_points;
 		foreach(QGraphicsEllipseItem *item, ref){
 			my_points<<item->pos();
 		}
-
 
 
 		QPolygonF my_poly=poly(numPoints);
@@ -304,7 +305,7 @@ void nLine::updatePlot () {
 		QPen penna;
 		penna.setColor(ref[0]->brush().color());
 
-		vec2f orig = mat->get_origin();
+        vec2f orig = my_phys->get_origin();
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
@@ -312,9 +313,9 @@ void nLine::updatePlot () {
 			if (antialias) {
 				// points in poly are NOT translated with origin
 				// (hence a correction must apply)
-				colore=mat->getPoint(p.x()+orig.x(),p.y()+orig.y());
+                colore=my_phys->getPoint(p.x()+orig.x(),p.y()+orig.y());
 			} else {
-				colore=mat->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
+                colore=my_phys->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
 			}
             if (std::isfinite(colore)) {
                 toPlotx << dist;
@@ -322,31 +323,27 @@ void nLine::updatePlot () {
             }
 			if (my_points.contains(p) && nSizeHolder>0.0) {
                 QCPItemLine *marker=new QCPItemLine(my_w.plot);
-                marker->start->setCoords(dist, QCPRange::minRange);
+                marker->start->setCoords(dist, -QCPRange::maxRange);
                 marker->end->setCoords(dist, QCPRange::maxRange);
                 marker->setPen(penna);
-                my_w.plot->addItem(marker);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
 		if (antialias) {
-			colore=mat->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
+            colore=my_phys->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
 		} else {
-			colore=mat->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
+            colore=my_phys->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
 		}
         if (std::isfinite(colore)) {
             toPlotx << dist;
             toPloty << colore;
 		}
 
-        my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
-        my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
 
         my_w.plot->graph(0)->setData(toPlotx,toPloty);
         my_w.plot->rescaleAxes();
         my_w.plot->replot();
-	}
-
+    }
 }
 
 void nLine::toggleBezier () {
@@ -439,8 +436,8 @@ nLine::setOrder (double w) {
 void
 nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-	p.rx()=my_w.points->item(item->row(),0)->text().toDouble();
-	p.ry()=my_w.points->item(item->row(),1)->text().toDouble();
+    p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
 	changeP(item->row(),p, true);
 }
 

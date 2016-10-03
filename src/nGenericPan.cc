@@ -24,6 +24,7 @@
  */
 #include "nGenericPan.h"
 #include "neutrino.h"
+#include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
@@ -92,6 +93,7 @@ void nGenericPan::physAdd(nPhysD *buffer) {
 
 void nGenericPan::help() {
     QString helpfile(":/help/"+panName+"/index.html");
+    DEBUG("<<<<<<<<<<<<<<<<<<<<<<<<<< " << helpfile.toStdString());
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -132,7 +134,11 @@ void nGenericPan::grabSave() {
 #endif
 }
 
-void nGenericPan::decorate() {
+void nGenericPan::showEvent(QShowEvent* event) {
+    DEBUG("here >>>>>>>>>>>>>>>>>>>>>")
+    QMainWindow::showEvent(event);
+
+    repaint();
 
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
     connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
@@ -214,8 +220,36 @@ void nGenericPan::decorate() {
 		widget->setIconSize(iconSize);
 	}
 
-	loadDefaults();
-	show();
+    QSettings settings("neutrino","");
+    settings.beginGroup("Preferences");
+    QVariant fontString=settings.value("defaultFont");
+    settings.endGroup();
+
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        widget->setProperty("panName",panName);
+        DEBUG("<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.> " << widget->objectName().toStdString());
+        if (fontString.isValid()) {
+            QFont fontTmp;
+            if (fontTmp.fromString(fontString.toString())) {
+                foreach (QCPAxis *axis, widget->findChildren<QCPAxis *>()) {
+                    axis->setTickLabelFont(fontTmp);
+                    axis->setLabelFont(fontTmp);
+                    axis->setLabelPadding(-1);
+                }
+                widget->legend->setFont(fontTmp);
+                widget->replot();
+            }
+        }
+    }
+
+
+
+
+    QApplication::processEvents();
+    loadDefaults();
+    QApplication::processEvents();
+    DEBUG("HERE");
+    show();
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {
@@ -269,12 +303,17 @@ void nGenericPan::comboChanged(int k) {
 }
 
 nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
-	return (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+    nPhysD* retVal=nullptr;
+    if (combo->count())
+         retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+    return retVal;
 }
 
 void
 nGenericPan::loadUi(QSettings *settings) {
-	foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
+    repaint();
+    QApplication::processEvents();
+    foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			widget->setText(settings->value(widget->objectName(),widget->text()).toString());
 		}
@@ -290,13 +329,14 @@ nGenericPan::loadUi(QSettings *settings) {
 		}
 	}
 	foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
+        // do not use Locale for storing values
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
 	}
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
 	}
 	foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings->value(widget->objectName(),widget->isChecked()).toBool());
@@ -344,6 +384,11 @@ nGenericPan::loadUi(QSettings *settings) {
 		}
 	}
 
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        DEBUG(">>>>>>>>>>>>>>>>");
+        widget->loadSettings(settings);
+    }
+
 	foreach (QObject* widget, nparent->children()) {
 		nLine *linea=qobject_cast<nLine *>(widget);
 		if (linea && linea->property("parentPan").toString()==panName) {
@@ -357,11 +402,11 @@ nGenericPan::loadUi(QSettings *settings) {
 		if (point && point->property("parentPan").toString()==panName) {
 			point->loadSettings(settings);
 		}
-		nEllipse *elli=qobject_cast<nEllipse *>(widget);
-		if (elli && elli->property("parentPan").toString()==panName) {
-			elli->loadSettings(settings);
-		}
-	}
+        nEllipse *elli=qobject_cast<nEllipse *>(widget);
+        if (elli && elli->property("parentPan").toString()==panName) {
+            elli->loadSettings(settings);
+        }
+    }
 	
 }
 
@@ -429,6 +474,11 @@ nGenericPan::saveUi(QSettings *settings) {
 		}
 	}
 
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        DEBUG(">>>>>>>>>>>>>>>>");
+        widget->saveSettings(settings);
+    }
+
 	foreach (QObject* widget, nparent->children()) {
 		nLine *line=qobject_cast<nLine *>(widget);
 		if (line && line->property("parentPan").toString()==panName) {
@@ -446,7 +496,7 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (elli && elli->property("parentPan").toString()==panName) {
 			elli->saveSettings(settings);
 		}
-	}
+    }
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
@@ -649,7 +699,8 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 	foreach (QDoubleSpinBox *obj, findChildren<QDoubleSpinBox *>()) {
 		if (obj->objectName()==name) {
 			if (my_occurrence==occurrence) {
-				double val=my_val.toDouble(&ok);
+                // do not use Locale for reading values
+                double val=my_val.toDouble(&ok);
 				if (ok) {
 					obj->setValue(val);
 					return;

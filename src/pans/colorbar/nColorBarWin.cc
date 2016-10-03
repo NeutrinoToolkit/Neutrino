@@ -79,9 +79,11 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
     palettes->addItems(nparent->nPalettes.keys());
     palettes->setCurrentIndex(nparent->nPalettes.keys().indexOf(parent->colorTable));
     connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
+//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
+
     my_w.toolBar->insertWidget(my_w.actionInvert,palettes);
 
-    decorate();
+    show();
 
     if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
 
@@ -119,7 +121,7 @@ void nColorBarWin::minChanged (QString value) {
 	if (currentBuffer) {
         my_w.sliderMin->setValue(sliderValues().first());
         vec2f minmax=currentBuffer->property["display_range"];
-        minmax.set_first(value.toDouble());
+        minmax.set_first(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
 	}
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
@@ -132,7 +134,7 @@ void nColorBarWin::maxChanged (QString value) {
 	if (currentBuffer) {
         my_w.sliderMax->setValue(sliderValues().second());
         vec2f minmax=currentBuffer->property["display_range"];
-        minmax.set_second(value.toDouble());
+        minmax.set_second(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
 	}
 	connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));

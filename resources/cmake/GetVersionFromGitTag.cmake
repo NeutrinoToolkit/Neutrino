@@ -2,16 +2,19 @@
 # variables by analysing the git tag and commit history.
 
 if (GIT_FOUND)
-
     if (VERSION_UPDATE_FROM_GIT)
         # Get branch 
-        execute_process(COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD 
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE ${PROJECT_NAME}_PARTIAL_BRANCH
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    
-        string(REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH})
-        unset(${PROJECT_NAME}_PARTIAL_BRANCH)
+        if(DEFINED ENV{TRAVIS_BRANCH})
+            set(${PROJECT_NAME}_PARTIAL_BRANCH $ENV{TRAVIS_BRANCH})
+        else()
+            execute_process(COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD 
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                OUTPUT_VARIABLE ${PROJECT_NAME}_PARTIAL_BRANCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+            string(REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH})
+            unset(${PROJECT_NAME}_PARTIAL_BRANCH)
+        endif()
 
 
         # Get last tag from git
