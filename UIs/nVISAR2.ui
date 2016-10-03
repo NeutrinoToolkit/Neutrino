@@ -219,6 +219,9 @@
          </item>
          <item row="0" column="4">
           <widget class="QDoubleSpinBox" name="angle">
+           <property name="toolTip">
+            <string>Fringes orientation</string>
+           </property>
            <property name="suffix">
             <string>˚</string>
            </property>
@@ -257,8 +260,11 @@
       </item>
       <item>
        <widget class="QGroupBox" name="groupBox_4">
+        <property name="toolTip">
+         <string>Sweep speed (if multiple values take the polynome)</string>
+        </property>
         <property name="title">
-         <string>Time res.</string>
+         <string>Time resolution</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <property name="leftMargin">
@@ -313,7 +319,7 @@
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="offRef">
         <property name="toolTip">
-         <string>offset reference</string>
+         <string>offset reference (dark value)</string>
         </property>
         <property name="suffix">
          <string> [counts]</string>
@@ -329,7 +335,7 @@
       <item row="0" column="2">
        <widget class="QDoubleSpinBox" name="offShot">
         <property name="toolTip">
-         <string>offset shot</string>
+         <string>offset shot (dark value)</string>
         </property>
         <property name="suffix">
          <string> [counts]</string>
@@ -345,7 +351,7 @@
       <item row="0" column="3">
        <widget class="QSpinBox" name="intensityShift">
         <property name="toolTip">
-         <string>Pixel delay of intensity between probe and shot</string>
+         <string>Pixel time delay of intensity between probe and shot</string>
         </property>
         <property name="suffix">
          <string> [px]</string>
@@ -364,7 +370,7 @@
       <item row="0" column="4">
        <widget class="QDoubleSpinBox" name="multRef">
         <property name="toolTip">
-         <string>Reference multiplication factor</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference multiplication factor:&lt;/p&gt;&lt;p&gt;Fix jitter between ref. and shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="suffix">
          <string> X</string>

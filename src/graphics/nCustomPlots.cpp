@@ -46,19 +46,22 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     QMainWindow *my_pad=nullptr;
     foreach (my_pad, findChildren<QMainWindow *>()) {
-        if(my_pad->windowTitle()=="Plot Preferences") break;
+        if(my_pad->property("Preferences").isValid() && my_pad->property("Preferences").toBool()) break;
     }
     if (!my_pad) {
         my_pad=new QMainWindow(this);
         my_pad->setWindowFlags(Qt::Tool);
         Ui::nCustomPlot my_w;
         my_w.setupUi(my_pad);
+        my_pad->setProperty("Preferences",true);
+        my_pad->setWindowTitle("Plot "+objectName());
         connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
         connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
         connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
         foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
             if (axis->visible()) {
                 int row=my_w.labels_layout->rowCount();
+                int col=0;
                 QLabel *la = new QLabel(this);
                 QFont f = la->font();
                 f.setPointSize(10);
@@ -72,29 +75,38 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 }
 
                 la->setText(ax_pos);
-                my_w.labels_layout->addWidget(la,row,0);
+                my_w.labels_layout->addWidget(la,row,col++,Qt::AlignCenter);
 
                 QLineEdit *le = new QLineEdit(this);
                 le->setFont(f);
                 le->setText(axis->label());
                 le->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
-                my_w.labels_layout->addWidget(le,row,1);
+                my_w.labels_layout->addWidget(le,row,col++);
 
                 QCheckBox *cb_grid = new QCheckBox("", this);
                 QCPGrid *grid = axis->grid();
                 cb_grid->setChecked(grid->visible());
                 cb_grid->setFont(f);
                 cb_grid->setProperty("grid",qVariantFromValue((void *) grid));
+                cb_grid->setProperty("major",true);
                 connect(cb_grid,SIGNAL(toggled(bool)),this,SLOT(showGrid(bool)));
-                my_w.labels_layout->addWidget(cb_grid,row,2);
+                my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
+
+                QCheckBox *cb_subgrid = new QCheckBox("", this);
+                cb_subgrid->setChecked(grid->subGridVisible());
+                cb_subgrid->setFont(f);
+                cb_subgrid->setProperty("grid",qVariantFromValue((void *) grid));
+                cb_subgrid->setProperty("major",false);
+                connect(cb_subgrid,SIGNAL(toggled(bool)),this,SLOT(showGrid(bool)));
+                my_w.labels_layout->addWidget(cb_subgrid,row,col++,Qt::AlignCenter);
 
                 QCheckBox *cb_log = new QCheckBox("", this);
                 cb_log->setChecked(axis->scaleType()==QCPAxis::stLogarithmic);
                 cb_log->setFont(f);
                 cb_log->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(cb_log,SIGNAL(toggled(bool)),this,SLOT(setLog(bool)));
-                my_w.labels_layout->addWidget(cb_log,row,3);
+                my_w.labels_layout->addWidget(cb_log,row,col++,Qt::AlignCenter);
 
                 QToolButton *tb_color = new QToolButton(this);
                 QPixmap px(20, 20);
@@ -102,7 +114,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 tb_color->setIcon(px);
                 tb_color->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(tb_color,SIGNAL(released()),this,SLOT(setColor()));
-                my_w.labels_layout->addWidget(tb_color,row,4);
+                my_w.labels_layout->addWidget(tb_color,row,col++,Qt::AlignCenter);
 
             }
         }
@@ -200,7 +212,11 @@ void nCustomPlot::showGrid(bool val) {
     if (sender() && sender()->property("grid").isValid()) {
         QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<void *>();
         if (grid) {
-            grid->setVisible(val);
+            if (sender()->property("major").toBool()) {
+                grid->setVisible(val);
+            } else {
+                grid->setSubGridVisible(val);
+            }
             replot();
         }
     }
@@ -325,13 +341,11 @@ nCustomPlot::saveSettings(QSettings *settings) {
 
 
 // plot as nCustomPlot but with x mouse line
-nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent):
-    nCustomPlot(parent),
-    mouseMarker(new QCPItemLine(this)) {
-    setMousePosition(0);
+nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 }
 
 void nCustomPlotMouseX::setMousePosition(double position) {
+    if (!mouseMarker) mouseMarker = new QCPItemLine(this);
     if (mouseMarker) {
         mouseMarker->start->setCoords(position, -QCPRange::maxRange);
         mouseMarker->end->setCoords(position, QCPRange::maxRange);
@@ -340,14 +354,14 @@ void nCustomPlotMouseX::setMousePosition(double position) {
 }
 
 // plot as nCustomPlot but with x and y mouse lines
-nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent):
-    nCustomPlot(parent),
-    mouseMarkerX(new QCPItemLine(this)),
-    mouseMarkerY(new QCPItemLine(this)) {
+nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent): nCustomPlot(parent) {
     setMousePosition(0,0);
 }
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
+    if (!mouseMarkerX) mouseMarkerX = new QCPItemLine(this);
+    if (!mouseMarkerY) mouseMarkerY = new QCPItemLine(this);
+
     if (mouseMarkerX && mouseMarkerY) {
         mouseMarkerX->start->setCoords(positionX, -QCPRange::maxRange);
         mouseMarkerX->end->setCoords(positionX, QCPRange::maxRange);

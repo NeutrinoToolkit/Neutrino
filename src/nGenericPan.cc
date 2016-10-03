@@ -303,7 +303,10 @@ void nGenericPan::comboChanged(int k) {
 }
 
 nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
-	return (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+    nPhysD* retVal=nullptr;
+    if (combo->count())
+         retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+    return retVal;
 }
 
 void

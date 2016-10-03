@@ -37,7 +37,7 @@
 #include "ui_nVISAR3.h"
 
 #include "nPhysWave.h"
-
+#include <array>
 
 class neutrino;
 class nLine;
@@ -58,12 +58,12 @@ public:
     ~nVisar();
     Ui::nVISAR1 my_w;
 
-    Ui::nVISAR2 visar[2];
-    Ui::nVISAR3 setvisar[2];
+    std::array<Ui::nVISAR2,2> visar;
+    std::array<Ui::nVISAR3,2> setvisar;
 
     double getTime(int k,double p);
 
-    std::vector<double> sweepCoeff[3];
+    std::array<std::vector<double>, 3> sweepCoeff;
 
 public slots:
 
@@ -108,21 +108,20 @@ public slots:
 
 private:
 
-    QVector<double> cPhase[2][2], cIntensity[2][2], cContrast[2][2];
-    QVector<double> time_phase[2];
+    std::array<std::array<QVector<double>,2>,2> cPhase, cIntensity, cContrast;
+    std::array<QVector<double>,2> time_phase;
 
-    QVector<double> velocity[2], reflectivity[2], quality[2];
-    QVector<double> time_vel[2];
+    std::array<QVector<double>,2> velocity, reflectivity, quality, time_vel;
 
-    QVector<double> sopCurve[4];
+    std::array<QVector<double>,4> sopCurve;
     QVector<double> time_sop;
 
-    nPhysD phase[2][2];
-    nPhysD contrast[2][2];
-    nPhysD intensity[2][2];
+    std::array<std::array<nPhysD,2>,2> phase;
+    std::array<std::array<nPhysD,2>,2> contrast;
+    std::array<std::array<nPhysD,2>,2> intensity;
 
-    QPointer<nLine> fringeLine[2];
-    QPointer<nRect> fringeRect[2];
+    std::array<QPointer<nLine>,2> fringeLine;
+    std::array<QPointer<nRect>,2> fringeRect;
     QPointer<nRect> sopRect;
 };
 

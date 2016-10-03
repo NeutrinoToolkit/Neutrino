@@ -31,7 +31,7 @@
      <number>4</number>
     </property>
     <item row="2" column="0">
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="groupBox_1">
       <property name="title">
        <string>Export data</string>
       </property>
@@ -102,7 +102,12 @@
      </spacer>
     </item>
     <item row="0" column="0">
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <property name="leftMargin">
         <number>0</number>
@@ -117,16 +122,16 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="labels_layout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
+        <layout class="QGridLayout" name="labels_layout" columnstretch="0,1,0,0,0,0">
+         <item row="0" column="4">
+          <widget class="QLabel" name="label_4">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Axes</string>
+            <string>Log</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -148,6 +153,21 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="label_5">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Colour</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QLabel" name="label_2">
            <property name="font">
@@ -163,30 +183,30 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="QLabel" name="label_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Log</string>
+            <string>Axes</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="4">
-          <widget class="QLabel" name="label_5">
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_6">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Colour</string>
+            <string>Subgrid</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

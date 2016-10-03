@@ -29,7 +29,8 @@ nVisar::~nVisar() {
 }
 
 nVisar::nVisar(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+    : nGenericPan(nparent, winname),
+      sweepCoeff{std::vector<double>(),std::vector<double>(),std::vector<double>()}
 {
     my_w.setupUi(this);
 
@@ -81,9 +82,8 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
     //!END SOP stuff
     
-    QList<QWidget*> father1, father2;
-    father1<< my_w.wvisar1 <<my_w.wvisar2;
-    father2<<my_w.setVisar1<<my_w.setVisar2;
+    QList<QWidget*> father1{my_w.wvisar1, my_w.wvisar2};
+    QList<QWidget*> father2{my_w.setVisar1, my_w.setVisar2};
     for (int k=0;k<2;k++){
         visar[k].setupUi(father1.at(k));
         father1.at(k)->show();
@@ -91,11 +91,9 @@ nVisar::nVisar(neutrino *nparent, QString winname)
         father2.at(k)->show();
 
         //hack to save diffrent uis!!!
-        foreach (QWidget *obj, father1.at(k)->findChildren<QWidget*>()) {
+        foreach (QWidget *obj, father1.at(k)->findChildren<QWidget*>()+father2.at(k)->findChildren<QWidget*>()) {
             obj->setObjectName(obj->objectName()+"-VISAR"+QString::number(k+1));
-        }
-        foreach (QWidget *obj, father2.at(k)->findChildren<QWidget*>()) {
-            obj->setObjectName(obj->objectName()+"-VISAR"+QString::number(k+1));
+            obj->setProperty("id", k);
         }
 
         visar[k].plotPhaseIntensity->xAxis->setLabel(tr("Position [px]"));
@@ -103,9 +101,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
         visar[k].plotPhaseIntensity->yAxis2->setLabel(tr("Intensity"));
         visar[k].plotPhaseIntensity->yAxis3->setLabel(tr("Contrast"));
 
-        visar[k].guess->setProperty("id", k);
-        visar[k].doWaveButton->setProperty("id", k);
-        setvisar[k].physScale->setProperty("id", k);
     }
     my_w.sopScale->setProperty("id", 2);
 
@@ -133,10 +128,12 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 }
 
 void nVisar::loadSettings(QString my_settings) {
+    disconnections();
     nGenericPan::loadSettings(my_settings);
+    connections();
     QApplication::processEvents();
-    sweepChanged();
     doWave();
+    sweepChanged();
     QApplication::processEvents();
 }
 
@@ -156,38 +153,47 @@ void nVisar::mouseAtPlot(QMouseEvent* e) {
 }
 
 void nVisar::sweepChanged(QLineEdit *line) {
-    if(line && line->property("id").isValid()) {
-        int k=line->property("id").toInt();
-        bool ok;
-        sweepCoeff[k].clear();
-        foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
-            double coeff=QLocale().toDouble(str,&ok);
-            if(ok) {
-                sweepCoeff[k].push_back(coeff);
-            } else {
-                my_w.statusbar->showMessage("Cannot understant sweep coefficint "+str);
-                break;
-            }
-        }
-    } else {
+    DEBUG("here");
+    if(line==nullptr) {
         if (sender()) {
+            DEBUG("here");
             QLineEdit *line=qobject_cast<QLineEdit *>(sender());
             sweepChanged(line);
         } else {
+            DEBUG("here");
             sweepChanged(setvisar[0].physScale);
             sweepChanged(setvisar[1].physScale);
             sweepChanged(my_w.sopScale);
         }
+    } else {
+        if (line->property("id").isValid()) {
+            int k=line->property("id").toInt();
+            DEBUG("here " << k);
+            bool ok;
+            sweepCoeff[k].clear();
+            foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
+                double coeff=QLocale().toDouble(str,&ok);
+                if(ok) {
+                    sweepCoeff[k].push_back(coeff);
+                } else {
+                    my_w.statusbar->showMessage("Cannot understant sweep coefficint "+str);
+                    break;
+                }
+            }
+            if (k<2) {
+                getPhase(k);
+                updatePlot();
+            } else {
+                updatePlotSOP();
+            }
+        }
     }
-    getPhase();
-    updatePlot();
-    updatePlotSOP();
 }
 
 double nVisar::getTime(int k, double p) {
     double time=0;
     for (unsigned int i=0;i<sweepCoeff[k].size();i++) {
-        time+=p*sweepCoeff[k][i];
+        time+=sweepCoeff[k][i]/(i+1.0)*pow(p,i+1);
     }
     return time;
 }
@@ -330,6 +336,10 @@ void nVisar::disconnections() {
         disconnect(visar[k].intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 
         disconnect(visar[k].enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+
+        disconnect(setvisar[k].physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+
+        disconnect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     disconnect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
@@ -342,6 +352,10 @@ void nVisar::disconnections() {
     disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
+
+    disconnect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    disconnect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    disconnect(my_w.sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 }
 
 void nVisar::updatePlotSOP() {
@@ -848,9 +862,8 @@ void nVisar::getPhase(int k) {
     disconnections();
     if (visar[k].enableVisar->isChecked()) {
         visar[k].plotPhaseIntensity->clearGraphs();
-        if (visar[k].refImage->currentIndex()!=-1 && visar[k].shotImage->currentIndex()!=-1) {
-            QList<nPhysD*> imageList;
-            imageList << getPhysFromCombo(visar[k].refImage) << getPhysFromCombo(visar[k].shotImage);
+        QList<nPhysD*> imageList{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)};
+        if (!imageList.contains(nullptr)) {
             for (int m=0;m<2;m++) {
                 QRect geom2=fringeRect[k]->getRect(imageList[m]);
                 time_phase[k].clear();
