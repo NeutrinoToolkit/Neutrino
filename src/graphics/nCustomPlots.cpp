@@ -262,15 +262,16 @@ void nCustomPlot::changeAxisFont() {
 }
 
 void nCustomPlot::rescaleAxes(bool onlyVisiblePlottables) {
-    DEBUG("<<<<<<<<<<<<<<<< axis >>>>>>>>>>>>>>>>");
+    DEBUG("axis >>>>>>>>>>>>>>>>");
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         DEBUG(axis->range().lower << " " << axis->range().upper);
     }
+    DEBUG("=====================");
     QCustomPlot::rescaleAxes(onlyVisiblePlottables);
-    DEBUG("<<<<<<<<<<<<<<<< axis >>>>>>>>>>>>>>>>");
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         DEBUG(axis->range().lower << " " << axis->range().upper);
     }
+    DEBUG("<<<<<<<<<<<<<<<< axis");
 }
 
 void nCustomPlot::showGrid(bool val) {
