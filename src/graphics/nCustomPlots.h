@@ -59,7 +59,7 @@ public slots:
     void setTitle(QString);
     void changeTitleFont();
     void changeAxisFont();
-
+    void rescaleAxes(bool onlyVisiblePlottables=false);
 };
 
 //plot with mouse (vertical)

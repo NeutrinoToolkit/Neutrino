@@ -98,7 +98,7 @@ nLineout::updatePlot(QPointF p) {
             }
         }
         my_w.plot->graph(0)->setData(x,y);
-        my_w.plot->graph(0)->keyAxis()->setRange(x.first(), x.last());
+        my_w.plot->graph(0)->rescaleKeyAxis();
 
         if(!my_w.actionAutoscale->isChecked()) {
             my_w.plot->graph(0)->rescaleValueAxis();
