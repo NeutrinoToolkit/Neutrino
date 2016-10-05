@@ -14180,7 +14180,6 @@ void QCustomPlot::rescaleAxes(bool onlyVisiblePlottables)
   
   foreach (QCPAxis *axis, allAxes)
     axis->rescale(onlyVisiblePlottables);
-  qDebug() << "here";
 }
 
 /*!

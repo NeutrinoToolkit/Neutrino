@@ -47,16 +47,15 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 
     if(my_axis->property("lock").isValid() ) {
         my_lock->setChecked(my_axis->property("lock").toBool());
-    } else {
-        my_axis->setProperty("lock",false);
     }
-    my_min->setText(QLocale().toString(my_axis->range().lower));
-    my_max->setText(QLocale().toString(my_axis->range().upper));
+    setLock(my_lock->isChecked());
+    rangeChanged(my_axis->range());
 
     connect(my_axis,SIGNAL(rangeChanged(QCPRange)),this,SLOT(rangeChanged(QCPRange)));
     connect(my_min,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
     connect(my_max,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
     connect(my_lock,SIGNAL(toggled(bool)),this,SLOT(setLock(bool)));
+
     setProperty("fileIni",objectName()+".ini");
 
     QHBoxLayout* gridLayout = new QHBoxLayout(this);
@@ -69,7 +68,9 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 }
 
 void nCustomRangeLineEdit::setLock(bool check) {
-    if(my_axis) my_axis->setProperty("lock",check);
+    if (my_axis) my_axis->setProperty("lock",check);
+    my_min->setReadOnly(!check);
+    my_max->setReadOnly(!check);
 }
 
 void nCustomRangeLineEdit::rangeChanged(const QCPRange& newrange) {
@@ -408,20 +409,22 @@ nCustomPlot::loadSettings(QSettings *my_set) {
     } else {
         my_set->beginGroup(objectName());
         my_set->beginGroup("axes");
-        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, axislock;
+        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
         labels = my_set->value("labels").toList();
         grids = my_set->value("grids").toList();
         logs = my_set->value("logs").toList();
         colors = my_set->value("colors").toList();
         labelfonts = my_set->value("labelfonts").toList();
-        axislock = my_set->value("axislock").toList();
+        lock = my_set->value("lock").toList();
+        range = my_set->value("range").toList();
         QList<QCPAxis *> axis=findChildren<QCPAxis *>();
         if (    axis.size() == labels.size() &&
                 axis.size() == grids.size() &&
                 axis.size() == logs.size() &&
                 axis.size() == colors.size()  &&
                 axis.size() == labelfonts.size() &&
-                axis.size() == axislock.size())
+                axis.size() == lock.size() &&
+                axis.size() == range.size())
         {
             for (int i=0; i< axis.size(); i++) {
                 if(axis.at(i)->visible()) {
@@ -433,8 +436,9 @@ nCustomPlot::loadSettings(QSettings *my_set) {
                     axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
                     axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
                     axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
-                    axis.at(i)->setProperty("lock",axislock.at(i).toBool());
-
+                    axis.at(i)->setProperty("lock",lock.at(i).toBool());
+                    QPointF prange=range.at(i).toPointF();
+                    axis.at(i)->setRange(prange.x(),prange.y());
                     for (int g=0; g<plottableCount(); g++) {
                         QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
                         if(graph && graph->valueAxis()==axis.at(i)) {
@@ -466,21 +470,23 @@ nCustomPlot::saveSettings(QSettings *my_set) {
     } else {
         my_set->beginGroup(objectName());
         my_set->beginGroup("axes");
-        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, axislock;
+        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
         foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
             labels << axis->label();
             grids << (axis->grid()->visible() && axis->grid()->subGridVisible()?2:(axis->grid()->visible()?1:0));
             logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
             colors << axis->labelColor();
             labelfonts << axis->labelFont();
-            axislock << (axis->property("lock").isValid()?axis->property("lock").toBool():false);
+            lock << (axis->property("lock").isValid()?axis->property("lock").toBool():false);
+            range << QPointF(axis->range().lower,axis->range().upper);
         }
         my_set->setValue("labels",labels);
         my_set->setValue("grids",grids);
         my_set->setValue("logs",logs);
         my_set->setValue("colors",colors);
         my_set->setValue("labelfonts",labelfonts);
-        my_set->setValue("axislock",axislock);
+        my_set->setValue("lock",lock);
+        my_set->setValue("range",range);
         my_set->endGroup();
         my_set->setValue("titleFont",title->font());
         my_set->setValue("title",title->text());

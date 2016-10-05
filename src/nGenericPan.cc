@@ -91,7 +91,6 @@ void nGenericPan::physAdd(nPhysD *buffer) {
 
 void nGenericPan::help() {
     QString helpfile(":/help/"+panName+"/index.html");
-    DEBUG("<<<<<<<<<<<<<<<<<<<<<<<<<< " << helpfile.toStdString());
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -133,7 +132,6 @@ void nGenericPan::grabSave() {
 }
 
 void nGenericPan::showEvent(QShowEvent* event) {
-    DEBUG("here >>>>>>>>>>>>>>>>>>>>>")
     QMainWindow::showEvent(event);
 
     repaint();
@@ -225,7 +223,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
 
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
         widget->setProperty("panName",panName);
-        DEBUG("<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.>.<.> " << widget->objectName().toStdString());
         if (fontString.isValid()) {
             QFont fontTmp;
             if (fontTmp.fromString(fontString.toString())) {
@@ -246,7 +243,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QApplication::processEvents();
     loadDefaults();
     QApplication::processEvents();
-    DEBUG("HERE");
     show();
 }
 
@@ -383,7 +379,6 @@ nGenericPan::loadUi(QSettings *settings) {
 	}
 
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
-        DEBUG(">>>>>>>>>>>>>>>>");
         widget->loadSettings(settings);
     }
 
@@ -473,7 +468,6 @@ nGenericPan::saveUi(QSettings *settings) {
 	}
 
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
-        DEBUG(">>>>>>>>>>>>>>>>");
         widget->saveSettings(settings);
     }
 
