@@ -29,20 +29,18 @@
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
-    DEBUG("panName " << panName.toStdString());
 	setProperty("panName",panName);
 	int panNum=0;
 	foreach (QWidget *widget, QApplication::allWidgets()) {
 		nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
 		if (pan && pan != this && pan->nparent == nparent) {
-			if (pan->panName.contains(panName)) {
+            if (pan->panName.startsWith(panName)) {
                 panNum=std::max(pan->property("panNum").toInt(),panNum);
 			}
 		}
 	}
 	panNum++;
 	if (panNum>1) panName.append(QString::number(panNum));
-	setProperty("panNum",panNum);
 	
 	setAttribute(Qt::WA_DeleteOnClose);
 
