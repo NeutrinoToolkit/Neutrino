@@ -113,7 +113,7 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="labels_layout" columnstretch="3,0,0,0,0,0">
+        <layout class="QGridLayout" name="labels_layout" columnstretch="1,0,0,0,0,1">
          <property name="horizontalSpacing">
           <number>2</number>
          </property>

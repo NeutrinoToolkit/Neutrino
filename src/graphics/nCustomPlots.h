@@ -40,7 +40,6 @@ private:
 public slots:
     void rangeChanged(const QCPRange& );
     void setRange(QString minmax_str);
-    QSize sizeHint() const;
     void setLock(bool check);
 };
 
@@ -75,7 +74,6 @@ public slots:
     void setTitle(QString);
     void changeTitleFont();
     void changeAxisFont();
-    void rescaleAxes(bool onlyVisiblePlottables=false);
 };
 
 //plot with mouse (vertical)

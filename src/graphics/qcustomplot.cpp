@@ -8388,6 +8388,7 @@ void QCPAxis::setScaleRatio(const QCPAxis *otherAxis, double ratio)
 */
 void QCPAxis::rescale(bool onlyVisiblePlottables)
 {
+  if (property("lock").isValid() && property("lock").toBool()) return;
   QList<QCPAbstractPlottable*> p = plottables();
   QCPRange newRange;
   bool haveRange = false;
@@ -14179,6 +14180,7 @@ void QCustomPlot::rescaleAxes(bool onlyVisiblePlottables)
   
   foreach (QCPAxis *axis, allAxes)
     axis->rescale(onlyVisiblePlottables);
+  qDebug() << "here";
 }
 
 /*!
