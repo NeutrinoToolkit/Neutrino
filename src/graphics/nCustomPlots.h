@@ -28,6 +28,22 @@
 #include "qcustomplot.h"
 #include <QMenu>
 
+class nCustomRangeLineEdit : public QWidget {
+    Q_OBJECT
+public:
+    nCustomRangeLineEdit(QCPAxis*);
+
+private:
+    QPointer<QLineEdit> my_min, my_max;
+    QPointer<QCPAxis> my_axis;
+
+public slots:
+    void rangeChanged(const QCPRange& );
+    void setRange(QString minmax_str);
+    QSize sizeHint() const;
+    void setLock(bool check);
+};
+
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
@@ -49,11 +65,11 @@ public slots:
     void contextMenuEvent (QContextMenuEvent*) override;
 
     //SETTINGS
-    void loadSettings(QSettings *);
-    void saveSettings(QSettings *);
+    void loadSettings(QSettings* = nullptr);
+    void saveSettings(QSettings* = nullptr);
 
     void setLabel(QString);
-    void showGrid(bool val);
+    void showGrid(int val);
     void setLog(bool val);
     void setColor();
     void setTitle(QString);

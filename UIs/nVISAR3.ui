@@ -187,7 +187,7 @@
          <item row="0" column="0">
           <widget class="QLineEdit" name="physScale">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion:&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="neutrinoSave" stdset="0">
             <bool>true</bool>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>272</height>
+    <width>372</width>
+    <height>259</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,10 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+    <property name="spacing">
+     <number>4</number>
+    </property>
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -30,12 +33,12 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="4" column="0">
-     <widget class="QGroupBox" name="groupBox_1">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>Export data</string>
+       <string/>
       </property>
-      <layout class="QGridLayout" name="gridLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -48,65 +51,19 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="0" column="1">
-        <widget class="QToolButton" name="saveData">
-         <property name="toolTip">
-          <string>Save Data</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../neutrino-build/src/icons.qrc">
-           <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QToolButton" name="copyData">
-         <property name="toolTip">
-          <string>Copy Data</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../neutrino-build/src/icons.qrc">
-           <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="plotName">
+       <item>
+        <widget class="QLabel" name="label_6">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
+         <property name="text">
+          <string>Title</string>
+         </property>
         </widget>
        </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Title label and font</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item row="1" column="0">
+       <item>
         <widget class="QLineEdit" name="plotTitle">
          <property name="font">
           <font>
@@ -115,7 +72,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item>
         <widget class="QToolButton" name="fontTitle">
          <property name="text">
           <string>...</string>
@@ -129,25 +86,15 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="0">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="2" column="0">
+    <item>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
        </font>
+      </property>
+      <property name="title">
+       <string>Axis</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <property name="leftMargin">
@@ -162,39 +109,33 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <property name="verticalSpacing">
+        <number>0</number>
+       </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="labels_layout" columnstretch="0,1,0,0,0,0,0">
+        <layout class="QGridLayout" name="labels_layout" columnstretch="3,0,0,0,0,0">
+         <property name="horizontalSpacing">
+          <number>2</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
          <item row="0" column="4">
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="label_7">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Log</string>
+            <string>Font</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="label_3">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Grid</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
+         <item row="0" column="3">
           <widget class="QLabel" name="label_5">
            <property name="font">
             <font>
@@ -202,14 +143,14 @@
             </font>
            </property>
            <property name="text">
-            <string>Colour</string>
+            <string>Color</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="font">
             <font>
@@ -220,53 +161,131 @@
             <string>Label</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_4">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Axes</string>
+            <string>Log</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="QLabel" name="label_6">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_3">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>grid</string>
+            <string>Grid</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="6">
-          <widget class="QLabel" name="label_7">
+         <item row="0" column="5">
+          <widget class="QLabel" name="label_9">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Font</string>
+            <string>Range</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignBottom|Qt::AlignHCenter</set>
            </property>
           </widget>
          </item>
         </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_1">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Export</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="plotName">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="saveData">
+         <property name="toolTip">
+          <string>Save Data</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../neutrino-build/src/icons.qrc">
+           <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="copyData">
+         <property name="toolTip">
+          <string>Copy Data</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../neutrino-build/src/icons.qrc">
+           <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -295,6 +314,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionLoadPref"/>
+   <addaction name="actionSavePref"/>
+   <addaction name="separator"/>
    <addaction name="actionSave"/>
    <addaction name="actionCopy"/>
    <addaction name="actionExport"/>
@@ -333,6 +355,30 @@
    </property>
    <property name="toolTip">
     <string>Export plot to file</string>
+   </property>
+  </action>
+  <action name="actionLoadPref">
+   <property name="icon">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
+     <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
+   </property>
+   <property name="text">
+    <string>loadPref</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Preferences</string>
+   </property>
+  </action>
+  <action name="actionSavePref">
+   <property name="icon">
+    <iconset resource="../../neutrino-build/src/icons.qrc">
+     <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
+   </property>
+   <property name="text">
+    <string>savePref</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Preferences</string>
    </property>
   </action>
  </widget>

@@ -314,7 +314,10 @@ neutrino::neutrino():
     my_set.setValue("paletteFilesNames",paletteFilesNameClean);
     my_set.endGroup();
 
-    changeColorTable(nPalettes.keys().first());
+    if (nPalettes.keys().contains("Neutrino"))
+        changeColorTable("Neutrino");
+    else
+        changeColorTable(nPalettes.keys().first());
 
     //recent file stuff
 
