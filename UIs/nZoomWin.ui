@@ -104,7 +104,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -116,7 +116,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

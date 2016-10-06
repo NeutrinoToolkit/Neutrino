@@ -657,7 +657,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/icons/icons.qrc">
+              <iconset resource="../qrc/icons.qrc">
                <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
              </property>
             </widget>
@@ -1132,7 +1132,7 @@
   </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -1144,7 +1144,7 @@
   </action>
   <action name="actionDoAll">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -1192,7 +1192,7 @@
   <tabstop>erasePreviuos</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

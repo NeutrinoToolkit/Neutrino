@@ -317,12 +317,17 @@ nGenericPan::loadUi(QSettings *settings) {
 			widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
 		}
 	}
-	foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
-			widget->setPlainText(settings->value(widget->objectName(),widget->toPlainText()).toString());
-		}
-	}
-	foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
+    foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            widget->setPlainText(settings->value(widget->objectName(),widget->toPlainText()).toString());
+        }
+    }
+    foreach (QTextEdit *widget, findChildren<QTextEdit *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            widget->insertHtml(settings->value(widget->objectName(),widget->toHtml()).toString());
+        }
+    }
+    foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
         // do not use Locale for storing values
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
 	}
@@ -420,7 +425,12 @@ nGenericPan::saveUi(QSettings *settings) {
 			settings->setValue(widget->objectName(),widget->toPlainText());
 		}
 	}
-	foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
+    foreach (QTextEdit *widget, findChildren<QTextEdit *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            settings->setValue(widget->objectName(),widget->toHtml());
+        }
+    }
+    foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {

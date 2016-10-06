@@ -86,7 +86,7 @@
   </widget>
   <action name="actionHome">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
    </property>
    <property name="text">
@@ -95,7 +95,7 @@
   </action>
   <action name="actionBack">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
@@ -107,7 +107,7 @@
   </action>
   <action name="actionForward">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -119,7 +119,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

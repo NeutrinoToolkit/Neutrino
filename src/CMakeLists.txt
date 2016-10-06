@@ -109,51 +109,62 @@ if (GENERATE_NHASH)
 endif()
 
 
+set(QRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/../qrc)
+file(MAKE_DIRECTORY ${QRCDIR})
+
 # write automatically the qrc file for icons
 set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
 file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
-set(ICONS_QRC ${PROJECT_BINARY_DIR}/src/icons.qrc)
+set(ICONS_QRC ${QRCDIR}/icons.qrc)
 file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
 foreach(my_file ${ICONS})
-    file(RELATIVE_PATH my_file_relative_path ${PROJECT_BINARY_DIR}/src ${my_file})
+    file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
     file(APPEND ${ICONS_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
+list(LENGTH ICONS LIST_LENGTH)
+message(STATUS "${LIST_LENGTH} icon files: ${ICONS_QRC}")
 
 # write automatically the qrc file for html
 set(HTMLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/html)
 file(GLOB HTMLS ${HTMLDIR}/*.html)
-set(HTML_QRC ${PROJECT_BINARY_DIR}/src/html.qrc)
+set(HTML_QRC ${QRCDIR}/html.qrc)
 file(WRITE ${HTML_QRC} "<RCC>\n    <qresource prefix=\"/html/\">\n")
 foreach(my_file ${HTMLS})
-    file(RELATIVE_PATH my_file_relative_path ${PROJECT_BINARY_DIR}/src ${my_file})
+    file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
     file(APPEND ${HTML_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
+list(LENGTH HTMLS LIST_LENGTH)
+message(STATUS "${LIST_LENGTH} html files: ${HTML_QRC}")
 
 file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
-set(LICENSES_QRC ${PROJECT_BINARY_DIR}/src/licenses.qrc)
+set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})
-    file(RELATIVE_PATH my_file_relative_path ${PROJECT_BINARY_DIR}/src ${my_file})
+    file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
     file(APPEND ${LICENSES_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
+list(LENGTH HTMLLICENSES LIST_LENGTH)
+message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
 
 file(GLOB_RECURSE HTMLHELP ${HTMLDIR}/help/*)
-set(HELP_QRC ${PROJECT_BINARY_DIR}/src/help.qrc)
+set(HELP_QRC ${QRCDIR}/help.qrc)
 file(WRITE ${HELP_QRC} "<RCC>\n    <qresource prefix=\"/help/\">\n")
 foreach(my_file ${HTMLHELP})
-    file(RELATIVE_PATH my_file_relative_path ${PROJECT_BINARY_DIR}/src ${my_file})
+    file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
     GET_FILENAME_COMPONENT(my_file_dir ${my_file} DIRECTORY)
     GET_FILENAME_COMPONENT(my_file_dir_clean ${my_file_dir} NAME)
     file(APPEND ${HELP_QRC} "        <file alias=\"${my_file_dir_clean}/${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${HELP_QRC} "    </qresource>\n</RCC>")
+list(LENGTH HTMLHELP LIST_LENGTH)
+message(STATUS "${LIST_LENGTH} help files: ${HELP_QRC}")
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
@@ -187,10 +198,6 @@ endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/colorbar pans/winlist)
-
-
-message(STATUS "Adding qrcs: ${RES_SOURCES}")
-
 
 
 list(APPEND CMAKE_MODULE_PATH "../lib")

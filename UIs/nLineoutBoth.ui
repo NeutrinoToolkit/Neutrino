@@ -54,7 +54,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../resources/icons/icons.qrc">
+       <iconset resource="../qrc/icons.qrc">
         <normaloff>:/icons/lockColor.png</normaloff>:/icons/lockColor.png</iconset>
       </property>
       <property name="iconSize">
@@ -80,7 +80,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../resources/icons/icons.qrc">
+       <iconset resource="../qrc/icons.qrc">
         <normaloff>:/icons/lockOpen.png</normaloff>
         <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
       </property>
@@ -107,7 +107,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../resources/icons/icons.qrc">
+       <iconset resource="../qrc/icons.qrc">
         <normaloff>:/icons/autoRefresh.png</normaloff>
         <normalon>:/icons/center.png</normalon>:/icons/autoRefresh.png</iconset>
       </property>
@@ -144,7 +144,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

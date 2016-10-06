@@ -209,7 +209,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../resources/icons/icons.qrc">
+          <iconset resource="../qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -220,7 +220,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../resources/icons/icons.qrc">
+          <iconset resource="../qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -329,7 +329,7 @@
   <tabstop>B12</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
