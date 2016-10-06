@@ -1832,8 +1832,8 @@ protected:
 /* end of 'src/axis/axistickerlog.h' */
 
 
-/* including file 'src/axis/axis.h', size 20230                              */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/axis/axis.h', size 20408                              */
+/* commit 27849a09494da15940427d10de7c01c2486ff557 2016-10-06 16:00:34 +0200 */
 
 class QCP_LIB_DECL QCPGrid :public QCPLayerable
 {
@@ -1895,6 +1895,7 @@ class QCP_LIB_DECL QCPAxis : public QCPLayerable
   Q_PROPERTY(ScaleType scaleType READ scaleType WRITE setScaleType NOTIFY scaleTypeChanged)
   Q_PROPERTY(QCPRange range READ range WRITE setRange NOTIFY rangeChanged)
   Q_PROPERTY(bool rangeReversed READ rangeReversed WRITE setRangeReversed)
+  Q_PROPERTY(bool rangeLocked READ rangeLocked WRITE setRangeLocked)
   Q_PROPERTY(QSharedPointer<QCPAxisTicker> ticker READ ticker WRITE setTicker)
   Q_PROPERTY(bool ticks READ ticks WRITE setTicks)
   Q_PROPERTY(bool tickLabels READ tickLabels WRITE setTickLabels)
@@ -1986,6 +1987,7 @@ public:
   ScaleType scaleType() const { return mScaleType; }
   const QCPRange range() const { return mRange; }
   bool rangeReversed() const { return mRangeReversed; }
+  bool rangeLocked() const { return mRangeLocked; }
   QSharedPointer<QCPAxisTicker> ticker() const { return mTicker; }
   bool ticks() const { return mTicks; }
   bool tickLabels() const { return mTickLabels; }
@@ -2033,6 +2035,7 @@ public:
   void setRangeLower(double lower);
   void setRangeUpper(double upper);
   void setRangeReversed(bool reversed);
+  void setRangeLocked(bool locked);
   void setTicker(QSharedPointer<QCPAxisTicker> ticker);
   void setTicks(bool show);
   void setTickLabels(bool show);
@@ -2135,6 +2138,7 @@ protected:
   // scale and range:
   QCPRange mRange;
   bool mRangeReversed;
+  bool mRangeLocked;
   ScaleType mScaleType;
   
   // non-property members:

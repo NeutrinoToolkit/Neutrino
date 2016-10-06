@@ -20,7 +20,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
    <property name="spacing">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="leftMargin">
     <number>0</number>

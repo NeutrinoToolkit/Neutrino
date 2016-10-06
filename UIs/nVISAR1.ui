@@ -139,6 +139,9 @@
         <string>Velocity</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+        <property name="spacing">
+         <number>1</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -245,6 +248,9 @@
         </property>
         <property name="bottomMargin">
          <number>0</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>1</number>
         </property>
         <item row="0" column="0" colspan="4">
          <widget class="QGroupBox" name="groupBox">

@@ -7015,8 +7015,8 @@ QVector<double> QCPAxisTickerLog::createTickVector(double tickStep, const QCPRan
 /* end of 'src/axis/axistickerlog.cpp' */
 
 
-/* including file 'src/axis/axis.cpp', size 94458                            */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/axis/axis.cpp', size 94746                            */
+/* commit 023fb5016a22e67bca0861ae51325ea1089a5e40 2016-10-06 16:17:02 +0200 */
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7415,6 +7415,7 @@ QCPAxis::QCPAxis(QCPAxisRect *parent, AxisType type) :
   // scale and range:
   mRange(0, 5),
   mRangeReversed(false),
+  mRangeLocked(false),
   mScaleType(stLinear),
   // internal members:
   mGrid(new QCPGrid(this)),
@@ -7565,8 +7566,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
 */
 void QCPAxis::setRange(const QCPRange &range)
 {
-    if (property("lock").isValid() && property("lock").toBool()) return;
-  if (range.lower == mRange.lower && range.upper == mRange.upper)
+  if (mRangeLocked || (range.lower == mRange.lower && range.upper == mRange.upper))
     return;
   
   if (!QCPRange::validRange(range)) return;
@@ -7636,7 +7636,7 @@ void QCPAxis::setSelectedParts(const SelectableParts &selected)
 */
 void QCPAxis::setRange(double lower, double upper)
 {
-  if (lower == mRange.lower && upper == mRange.upper)
+  if (mRangeLocked || (lower == mRange.lower && upper == mRange.upper))
     return;
   
   if (!QCPRange::validRange(lower, upper)) return;
@@ -7667,6 +7667,7 @@ void QCPAxis::setRange(double lower, double upper)
 */
 void QCPAxis::setRange(double position, double size, Qt::AlignmentFlag alignment)
 {
+  if(mRangeLocked) return;
   if (alignment == Qt::AlignLeft)
     setRange(position, position+size);
   else if (alignment == Qt::AlignRight)
@@ -7681,7 +7682,7 @@ void QCPAxis::setRange(double position, double size, Qt::AlignmentFlag alignment
 */
 void QCPAxis::setRangeLower(double lower)
 {
-  if (mRange.lower == lower)
+  if (mRangeLocked || mRange.lower == lower)
     return;
   
   QCPRange oldRange = mRange;
@@ -7703,7 +7704,7 @@ void QCPAxis::setRangeLower(double lower)
 */
 void QCPAxis::setRangeUpper(double upper)
 {
-  if (mRange.upper == upper)
+  if (mRangeLocked || mRange.upper == upper)
     return;
   
   QCPRange oldRange = mRange;
@@ -7731,6 +7732,14 @@ void QCPAxis::setRangeUpper(double upper)
 void QCPAxis::setRangeReversed(bool reversed)
 {
   mRangeReversed = reversed;
+}
+
+/*!
+  Sets whether the axis range (direction) is locked (i.e the setRange will not take place)
+*/
+void QCPAxis::setRangeLocked(bool locked)
+{
+  mRangeLocked = locked;
 }
 
 /*!
@@ -8326,6 +8335,7 @@ void QCPAxis::scaleRange(double factor)
 */
 void QCPAxis::scaleRange(double factor, double center)
 {
+  if (mRangeLocked) return;
   QCPRange oldRange = mRange;
   if (mScaleType == stLinear)
   {
@@ -14623,7 +14633,7 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
       mSelectionRect->cancel();
     if (event->button() == Qt::LeftButton)
       processPointSelection(event);
-
+    
     // emit specialized click signals of QCustomPlot instance:
     if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseEventLayerable))
     {

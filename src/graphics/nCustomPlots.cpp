@@ -43,14 +43,10 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     QToolButton *my_lock = new QToolButton(this);
     my_lock->setToolTip("Lock axis range");
     my_lock->setCheckable(true);
-    my_lock->setIcon(QIcon(":icons/lockOpen"));
+    my_lock->setChecked(my_axis->rangeLocked());
+    my_lock->setIcon(QIcon(my_axis->rangeLocked()?":icons/lockClose":":icons/lockOpen"));
 
-    // to enable lock of axis, I added this line at the beginning of void QCPAxis::rescale(bool onlyVisiblePlottables)
-    // if (property("lock").isValid() && property("lock").toBool()) return;
-    if(my_axis->property("lock").isValid() ) {
-        my_lock->setChecked(my_axis->property("lock").toBool());
-    }
-    setLock(my_lock->isChecked());
+    setLock(my_axis->rangeLocked());
     rangeChanged(my_axis->range());
 
     connect(my_axis,SIGNAL(rangeChanged(QCPRange)),this,SLOT(rangeChanged(QCPRange)));
@@ -69,13 +65,19 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 }
 
 void nCustomRangeLineEdit::setLock(bool check) {
-    if (my_axis) my_axis->setProperty("lock",check);
-    my_min->setEnabled(check);
-    my_max->setEnabled(check);
-    if(sender()) {
-        QToolButton *my_lock = qobject_cast<QToolButton *>(sender());
-        if (my_lock) {
-            my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
+    if (my_axis) {
+        my_axis->setRangeLocked(check);
+        if (!check) {
+            my_axis->rescale(true);
+            if (my_axis->parentPlot()) my_axis->parentPlot()->replot();
+        }
+        my_min->setEnabled(check);
+        my_max->setEnabled(check);
+        if(sender()) {
+            QToolButton *my_lock = qobject_cast<QToolButton *>(sender());
+            if (my_lock) {
+                my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
+            }
         }
     }
 }
@@ -94,7 +96,7 @@ void nCustomRangeLineEdit::setRange(QString minmax_str){
             if (ok) {
                 if (line==my_min) my_axis->setRangeLower(my_min_dbl);
                 if (line==my_max) my_axis->setRangeUpper(my_min_dbl);
-                my_axis->parentPlot()->replot();
+                if (my_axis->parentPlot()) my_axis->parentPlot()->replot();
             }
         }
     }
@@ -443,7 +445,7 @@ nCustomPlot::loadSettings(QSettings *my_set) {
                     axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
                     axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
                     axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
-                    axis.at(i)->setProperty("lock",lock.at(i).toBool());
+                    axis.at(i)->setRangeLocked(lock.at(i).toBool());
                     QPointF prange=range.at(i).toPointF();
                     axis.at(i)->setRange(prange.x(),prange.y());
                     for (int g=0; g<plottableCount(); g++) {
@@ -484,7 +486,7 @@ nCustomPlot::saveSettings(QSettings *my_set) {
             logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
             colors << axis->labelColor();
             labelfonts << axis->labelFont();
-            lock << (axis->property("lock").isValid()?axis->property("lock").toBool():false);
+            lock << axis->rangeLocked();
             range << QPointF(axis->range().lower,axis->range().upper);
         }
         my_set->setValue("labels",labels);
