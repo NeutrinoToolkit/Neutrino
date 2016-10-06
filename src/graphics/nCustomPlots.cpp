@@ -39,12 +39,14 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     my_min->setFont(f);
     my_max->setFont(f);
     my_min->setAlignment(Qt::AlignRight);
-    QCheckBox *my_lock=new QCheckBox(this);
+
+    QToolButton *my_lock = new QToolButton(this);
     my_lock->setToolTip("Lock axis range");
+    my_lock->setCheckable(true);
+    my_lock->setIcon(QIcon(":icons/lockOpen"));
 
     // to enable lock of axis, I added this line at the beginning of void QCPAxis::rescale(bool onlyVisiblePlottables)
     // if (property("lock").isValid() && property("lock").toBool()) return;
-
     if(my_axis->property("lock").isValid() ) {
         my_lock->setChecked(my_axis->property("lock").toBool());
     }
@@ -60,7 +62,6 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 
     QHBoxLayout* gridLayout = new QHBoxLayout(this);
     gridLayout->setMargin(0);
-    gridLayout->setSpacing(2);
     gridLayout->addWidget(my_min);
     gridLayout->addWidget(new QLabel(":",this));
     gridLayout->addWidget(my_max);
@@ -69,8 +70,14 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 
 void nCustomRangeLineEdit::setLock(bool check) {
     if (my_axis) my_axis->setProperty("lock",check);
-    my_min->setReadOnly(!check);
-    my_max->setReadOnly(!check);
+    my_min->setEnabled(check);
+    my_max->setEnabled(check);
+    if(sender()) {
+        QToolButton *my_lock = qobject_cast<QToolButton *>(sender());
+        if (my_lock) {
+            my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
+        }
+    }
 }
 
 void nCustomRangeLineEdit::rangeChanged(const QCPRange& newrange) {
