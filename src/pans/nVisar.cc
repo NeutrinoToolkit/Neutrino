@@ -43,7 +43,6 @@ nVisar::nVisar(neutrino *nparent, QString winname)
 
     connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
     connect(my_w.actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
-    connect(my_w.actionSavePDF, SIGNAL(triggered()), this, SLOT(export_pdf()));
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
 
     connect(my_w.actionGuess, SIGNAL(triggered()), this, SLOT(getCarrier()));
@@ -306,7 +305,6 @@ void nVisar::connections() {
     connect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
 
     connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -351,7 +349,6 @@ void nVisar::disconnections() {
     disconnect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.Tminmax, SIGNAL(editingFinished()), this, SLOT(updatePlotSOP()));
 
     disconnect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     disconnect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -490,17 +487,6 @@ void nVisar::updatePlotSOP() {
         graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor(),0.7));
         graph->setData(time_sop,sopCurve[3]);
 
-        QStringList my_minmax=my_w.Tminmax->text().split(" ", QString::SkipEmptyParts);
-        my_w.sopPlot->rescaleAxes();
-        if (my_minmax.size()==2) {
-            bool ok1, ok2;
-            double my_min,my_max;
-            my_min=QLocale().toDouble(my_minmax[0],&ok1);
-            my_max=QLocale().toDouble(my_minmax[1],&ok2);
-            if (ok1 && ok2) {
-                my_w.sopPlot->yAxis2->setRange(my_min,my_max);
-            }
-        }
         my_w.sopPlot->replot();
     }
     connections();
@@ -1067,12 +1053,15 @@ QString nVisar::export_sop() {
     out += QString("#SOP Offset       : %L1\n").arg(my_w.sopTimeOffset->value());
     out += QString("#SOP Time scale   : %L1\n").arg(my_w.sopScale->text());
     out += QString("#SOP Direction    : %L1\n").arg(my_w.sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
+    out += QString("#Reflectivity     : %L1\n").arg(my_w.whichRefl->currentText());
+    out += QString("#Calib            : %L1 %L2\n").arg(my_w.sopCalibT0->value()).arg(my_w.sopCalibA->value());
     out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
     for (int i=0;i<time_sop.size();i++) {
-        out += QString::number(time_sop[i]);
+        out += QLocale().toString(time_sop[i]);
         for (int j=0;j<4;j++) {
-            out += " " + QString::number(sopCurve[j][i]);
+            double val=sopCurve[j][i];
+            out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
         }
         out += "\n";
     }
@@ -1086,49 +1075,25 @@ QString nVisar::export_one(int k) {
             out += "#VISAR " + QString::number(k+1) + "\n";
             out += QString("#Offset shift       : %L1\n").arg(setvisar[k].offsetShift->value());
             out += QString("#Sensitivity        : %L1\n").arg(setvisar[k].sensitivity->value());
-            out += QString("#Reflectivity       : %L1 %L3\n").arg(setvisar[k].reflOffset->value()).arg(setvisar[k].reflRef->value());
+            out += QString("#Reflectivity       : %L1 %L2\n").arg(setvisar[k].reflOffset->value()).arg(setvisar[k].reflRef->value());
+            out += QString("#Sweep Time         : %L1\n").arg(setvisar[k].physScale->text());
+            out += QString("#Time zero & delay  : %L1 %L2\n").arg(setvisar[k].physOrigin->value()).arg(setvisar[k].offsetTime->value());
             out += QString("#Jumps              : %L1\n").arg(setvisar[k].jumpst->text());
-            out += QString("#Time\tVelocity\tReflectivity\tPixel\tRefShift\tShotShift\tRefInt\tShotInt\tRefContrast\tShotContrast\n");
+            out += QString("# Time       Velocity    Reflect.    Quality     Pixel       RefShift    ShotShift   RefInt      ShotInt     RefContr.           ShotContr.\n");
             for (int j=0;j<time_phase[k].size();j++) {
-                out += QString("%L1\t%L2\t%L3\t%L4\t%L5\t%L6\t%L7\t%L8\t%L9\t%L10\t%L11\n")
-                        .arg(time_vel[k][j],10,'E',3)
-                        .arg(velocity[k][j],10,'E',3)
-                        .arg(reflectivity[k][j],10,'E',3)
-                        .arg(quality[k][j],10,'E',3)
-                        .arg(time_phase[k][j])
-                        .arg(cPhase[0][k][j],10,'E',3)
-                        .arg(cPhase[1][k][j],10,'E',3)
-                        .arg(cIntensity[0][k][j],10,'E',3)
-                        .arg(cIntensity[1][k][j],10,'E',3)
-                        .arg(cContrast[0][k][j],10,'E',3)
-                        .arg(cContrast[1][k][j],10,'E',3);
+                QVector<double> values {time_vel[k][j],velocity[k][j],
+                                        reflectivity[k][j],quality[k][j],
+                                        time_phase[k][j],
+                                        cPhase[0][k][j],cPhase[1][k][j],
+                                        cIntensity[0][k][j],cIntensity[1][k][j],
+                                        cContrast[0][k][j],cContrast[1][k][j]};
+                foreach (double val, values) {
+                    out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
+                }
+                out += '\n';
             }
         }
     }
     return out;
 }
-
-void
-nVisar::export_pdf() {
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
-    if (!fnametmp.isEmpty()) {
-        setProperty("fileExport", fnametmp);
-        switch (my_w.tabs->currentIndex()) {
-        case 0:
-            visar[my_w.tabPhase->currentIndex()].plotPhaseIntensity->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" "+my_w.tabPhase->tabText(my_w.tabPhase->currentIndex()));
-            break;
-        case 1:
-            my_w.plotVelocity->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" Velocity");
-            break;
-        case 2:
-            my_w.sopPlot->savePdf(fnametmp,0,0,QCP::epAllowCosmetic,"Neutrino", panName+" SOP");
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-
-
 

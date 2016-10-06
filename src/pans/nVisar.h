@@ -86,7 +86,6 @@ public slots:
     QString export_one(int);
     QString export_sop();
 
-    void export_pdf();
     void export_clipboard();
 
     void connections();

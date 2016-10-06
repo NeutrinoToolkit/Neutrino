@@ -203,7 +203,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
 void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
     out << "# " << graph->name() << endl;
     for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
-        out << it->key << " " << it->value << endl;
+        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << endl;
     }
 }
 

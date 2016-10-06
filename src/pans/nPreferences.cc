@@ -110,6 +110,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	my_w.labelFont->setFont(nparent->my_w.my_view->font());
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
+    my_w.useDot->setChecked(QLocale().language()==QLocale::English && QLocale().country()==QLocale::UnitedStates);
 	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
