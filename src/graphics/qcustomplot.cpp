@@ -7565,6 +7565,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
 */
 void QCPAxis::setRange(const QCPRange &range)
 {
+    if (property("lock").isValid() && property("lock").toBool()) return;
   if (range.lower == mRange.lower && range.upper == mRange.upper)
     return;
   
@@ -8388,7 +8389,6 @@ void QCPAxis::setScaleRatio(const QCPAxis *otherAxis, double ratio)
 */
 void QCPAxis::rescale(bool onlyVisiblePlottables)
 {
-  if (property("lock").isValid() && property("lock").toBool()) return;
   QList<QCPAbstractPlottable*> p = plottables();
   QCPRange newRange;
   bool haveRange = false;
