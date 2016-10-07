@@ -84,7 +84,7 @@ public:
     nCustomPlotMouseX(QWidget*);
 
 private:
-    QPointer<QCPItemLine> mouseMarker;
+    QPointer<QCPItemStraightLine> mouseMarker;
 
 public slots:
     void setMousePosition(double);
@@ -100,8 +100,8 @@ public:
     nCustomPlotMouseXY(QWidget*);
 
 private:
-    QPointer<QCPItemLine> mouseMarkerX;
-    QPointer<QCPItemLine> mouseMarkerY;
+    QPointer<QCPItemStraightLine> mouseMarkerX;
+    QPointer<QCPItemStraightLine> mouseMarkerY;
 
 public slots:
     void setMousePosition(double,double);

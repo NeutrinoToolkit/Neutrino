@@ -497,18 +497,7 @@ void nVisar::updatePlot() {
     disconnections();
 
     my_w.plotVelocity->clearGraphs();
-
-    QList<QCPItemLine*> lines;
-    for (int i=0; i< my_w.plotVelocity->itemCount(); i++) {
-        QCPItemLine *line = qobject_cast<QCPItemLine *>(my_w.plotVelocity->item(i));
-        if (line && line->property("jump").isValid()) {
-            lines << line;
-        }
-    }
-    foreach (QCPItemLine *line, lines) {
-        my_w.plotVelocity->removeItem(line);
-    }
-
+    my_w.plotVelocity->clearItems();
 
     for (int k=0;k<2;k++){
         if (cPhase[0][k].size()){
@@ -550,13 +539,12 @@ void nVisar::updatePlot() {
                 }
 
                 foreach (double a, tjump) {
-                    QCPItemLine *my_jumpLine=new QCPItemLine(my_w.plotVelocity);
-                    my_jumpLine->setProperty("jump",true);
+                    QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(my_w.plotVelocity);
                     QPen pen(Qt::gray);
                     pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
-                    my_jumpLine->start->setCoords(a, -QCPRange::maxRange);
-                    my_jumpLine->end->setCoords(a, QCPRange::maxRange);
+                    my_jumpLine->point1->setCoords(a,0);
+                    my_jumpLine->point2->setCoords(a,1);
                 }
 
                 double offset=setvisar[k].offsetShift->value();
@@ -627,11 +615,11 @@ void nVisar::updatePlot() {
                     }
                 }
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
-                graph->setName("Velocity Visar "+QString::number(k+1));
-                pen.setColor(my_w.plotVelocity->yAxis->labelColor());
+                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis3);
+                graph->setName("Quality Visar "+QString::number(k+1));
+                pen.setColor(my_w.plotVelocity->yAxis3->labelColor());
                 graph->setPen(pen);
-                graph->setData(time_vel[k],velocity[k]);
+                graph->setData(time_vel[k],quality[k]);
 
                 graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis2);
                 graph->setName("Reflectivity Visar "+QString::number(k+1));
@@ -639,11 +627,11 @@ void nVisar::updatePlot() {
                 graph->setPen(pen);
                 graph->setData(time_vel[k],reflectivity[k]);
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis3);
-                graph->setName("Quality Visar "+QString::number(k+1));
-                pen.setColor(my_w.plotVelocity->yAxis3->labelColor());
+                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
+                graph->setName("Velocity Visar "+QString::number(k+1));
+                pen.setColor(my_w.plotVelocity->yAxis->labelColor());
                 graph->setPen(pen);
-                graph->setData(time_vel[k],quality[k]);
+                graph->setData(time_vel[k],velocity[k]);
 
             }
         }

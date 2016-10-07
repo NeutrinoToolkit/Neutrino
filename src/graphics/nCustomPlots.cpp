@@ -510,10 +510,10 @@ nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 }
 
 void nCustomPlotMouseX::setMousePosition(double position) {
-    if (!mouseMarker) mouseMarker = new QCPItemLine(this);
+    if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
     if (mouseMarker) {
-        mouseMarker->start->setCoords(position, -QCPRange::maxRange);
-        mouseMarker->end->setCoords(position, QCPRange::maxRange);
+        mouseMarker->point1->setCoords(position,0);
+        mouseMarker->point2->setCoords(position,1);
     }
     replot();
 }
@@ -524,14 +524,14 @@ nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent): nCustomPlot(parent) {
 }
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
-    if (!mouseMarkerX) mouseMarkerX = new QCPItemLine(this);
-    if (!mouseMarkerY) mouseMarkerY = new QCPItemLine(this);
+    if (!mouseMarkerX) mouseMarkerX = new QCPItemStraightLine(this);
+    if (!mouseMarkerY) mouseMarkerY = new QCPItemStraightLine(this);
 
     if (mouseMarkerX && mouseMarkerY) {
-        mouseMarkerX->start->setCoords(positionX, -QCPRange::maxRange);
-        mouseMarkerX->end->setCoords(positionX, QCPRange::maxRange);
-        mouseMarkerY->start->setCoords(-QCPRange::maxRange,positionY);
-        mouseMarkerY->end->setCoords(QCPRange::maxRange,positionY);
+        mouseMarkerX->point1->setCoords(positionX,0);
+        mouseMarkerX->point2->setCoords(positionX,1);
+        mouseMarkerY->point1->setCoords(0,positionY);
+        mouseMarkerY->point2->setCoords(1,positionY);
     }
     replot();
 }
