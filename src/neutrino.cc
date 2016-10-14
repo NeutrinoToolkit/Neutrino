@@ -105,11 +105,11 @@ neutrino::neutrino():
     my_w.setupUi(this);
     setAcceptDrops(true);
 
-// this below works if there is just one neutrino win open
-//#ifdef Q_OS_MAC
-//	DEBUG("command to have the main menu always visible!!! http://qt-project.org/doc/qt-4.8/mac-differences.html#menu-bar");
-//	my_w.menubar->setParent(NULL);
-//#endif
+    // this below works if there is just one neutrino win open
+    //#ifdef Q_OS_MAC
+    //	DEBUG("command to have the main menu always visible!!! http://qt-project.org/doc/qt-4.8/mac-differences.html#menu-bar");
+    //	my_w.menubar->setParent(NULL);
+    //#endif
 
 
     currentBuffer=NULL;
@@ -369,9 +369,9 @@ neutrino::neutrino():
 
     QApplication::processEvents();
 
-//#ifdef  __phys_debug
-//    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
-//#endif
+    //#ifdef  __phys_debug
+    //    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
+    //#endif
 
 
 }
@@ -379,8 +379,14 @@ neutrino::neutrino():
 void neutrino::processEvents()
 { QApplication::processEvents(); }
 
-void neutrino::contextMenuEvent (QContextMenuEvent *) {
-    my_w.menuImage->exec(QCursor::pos());
+void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
+    QMenu *my_menu=new QMenu(this);
+    my_menu->setAttribute(Qt::WA_DeleteOnClose);
+    foreach(QAction *act, my_w.menubar->actions()) {
+        my_menu->addAction(act);
+    }
+    my_menu->exec(ev->pos());
+
 }
 
 void neutrino::menuPaths() {
@@ -453,12 +459,12 @@ neutrino::scanPlugins()
     QDir pluginsDir(qApp->applicationDirPath());
 #if defined(Q_OS_WIN)
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-            pluginsDir.cdUp();
+        pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
     if (pluginsDir.dirName() == "MacOS") {
-            pluginsDir.cdUp();
-            pluginsDir.cdUp();
-            pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
     }
 #endif
     pluginsDir.cd("plugins");
@@ -480,21 +486,21 @@ neutrino::scanPlugins()
 
 void
 neutrino::loadPlugin()
- {
-//     QDir pluginsDir(qApp->applicationDirPath());
-// #if defined(Q_OS_WIN)
-//     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-//         pluginsDir.cdUp();
-// #elif defined(Q_OS_MAC)
-//     if (pluginsDir.dirName() == "MacOS") {
-//         pluginsDir.cdUp();
-//         pluginsDir.cdUp();
-//         pluginsDir.cdUp();
-//     }
-// #endif
-//     pluginsDir.cd("plugins");
-//     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-//       QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+{
+    //     QDir pluginsDir(qApp->applicationDirPath());
+    // #if defined(Q_OS_WIN)
+    //     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+    //         pluginsDir.cdUp();
+    // #elif defined(Q_OS_MAC)
+    //     if (pluginsDir.dirName() == "MacOS") {
+    //         pluginsDir.cdUp();
+    //         pluginsDir.cdUp();
+    //         pluginsDir.cdUp();
+    //     }
+    // #endif
+    //     pluginsDir.cd("plugins");
+    //     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    //       QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
 
 
     QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
@@ -526,12 +532,12 @@ neutrino::loadPlugin()
                 }
             } else {
                 DEBUG("plugin load fail");
-                }
+            }
         } else {
             DEBUG("plugin cannot be loaded (linking problems?)");
         }
     }
- }
+}
 
 void neutrino::emitBufferChanged(nPhysD *phys) {
     if (!phys) phys=currentBuffer;
@@ -662,10 +668,10 @@ nGenericPan* neutrino::existsPan(QString name) {
 
 
 neutrino* neutrino::fileNew() {
-//	QThread *m_thread = new QThread();
+    //	QThread *m_thread = new QThread();
     return new neutrino();
-//	my_neu->moveToThread(m_thread);
-//	m_thread->start();
+    //	my_neu->moveToThread(m_thread);
+    //	m_thread->start();
 }
 
 void
@@ -796,57 +802,57 @@ void neutrino::saveSession (QString fname) {
     } else {
         QFileInfo file_info(fname);
         if (file_info.suffix()=="neus") {
-        setProperty("fileOpen", fname);
-//            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
+            setProperty("fileOpen", fname);
+            //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
             QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.show();
+            progress.setWindowModality(Qt::WindowModal);
+            progress.show();
 
             std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
             ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
 
-        for (int i=0;i<physList.size(); i++) {
-            if (progress.wasCanceled()) break;
-            progress.setValue(i);
-            progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
-            QApplication::processEvents();
-                ofile << "NeutrinoImage" << std::endl;
-            phys_dump_binary(physList.at(i),ofile);
-            physList.at(i)->setType(PHYS_FILE);
-        }
-        for (int i=0;i<panList.size(); i++) {
-            QString namePan=panList.at(i)->property("panName").toString();
-            QTemporaryFile tmpFile(this);
-            if (tmpFile.open()) {
-                QString tmp_filename=tmpFile.fileName();
+            for (int i=0;i<physList.size(); i++) {
+                if (progress.wasCanceled()) break;
+                progress.setValue(i);
+                progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
                 QApplication::processEvents();
-                QSettings my_set(tmp_filename,QSettings::IniFormat);
-                my_set.clear();
-                panList.at(i)->saveSettings(&my_set);
-                my_set.sync();
-                tmpFile.close();
-                QFile file(tmp_filename);
-                if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                        ofile << "NeutrinoPan-begin " << namePan.toStdString() << std::endl;
-                    ofile.flush();
-                    while (!file.atEnd()) {
-                        QByteArray line = file.readLine();
-                        ofile << line.constData();
-                    }
-                    file.close();
-                    file.remove();
-                        ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
-                    ofile.flush();
-                } else {
-                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
-                }
-            } else {
-                QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName, QMessageBox::Ok);
+                ofile << "NeutrinoImage" << std::endl;
+                phys_dump_binary(physList.at(i),ofile);
+                physList.at(i)->setType(PHYS_FILE);
             }
-        }
+            for (int i=0;i<panList.size(); i++) {
+                QString namePan=panList.at(i)->property("panName").toString();
+                QTemporaryFile tmpFile(this);
+                if (tmpFile.open()) {
+                    QString tmp_filename=tmpFile.fileName();
+                    QApplication::processEvents();
+                    QSettings my_set(tmp_filename,QSettings::IniFormat);
+                    my_set.clear();
+                    panList.at(i)->saveSettings(&my_set);
+                    my_set.sync();
+                    tmpFile.close();
+                    QFile file(tmp_filename);
+                    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        ofile << "NeutrinoPan-begin " << namePan.toStdString() << std::endl;
+                        ofile.flush();
+                        while (!file.atEnd()) {
+                            QByteArray line = file.readLine();
+                            ofile << line.constData();
+                        }
+                        file.close();
+                        file.remove();
+                        ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
+                        ofile.flush();
+                    } else {
+                        QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
+                    }
+                } else {
+                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName, QMessageBox::Ok);
+                }
+            }
             progress.setValue(physList.size()+1);
-        ofile.close();
+            ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
             std::vector <nPhysD *> vecPhys;
             foreach (nPhysD * my_phys, physList) {
@@ -892,13 +898,13 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         counter++;
                         progress.setValue(counter);
                         nPhysD *my_phys=new nPhysD();
-                            int ret=phys_resurrect_binary(my_phys,ifile);
-                            if (ret>=0 && my_phys->getSurf()>0) {
-                                addPhys(my_phys);
-                                imagelist.push_back(my_phys);
-                            } else {
-                                delete my_phys;
-                            }
+                        int ret=phys_resurrect_binary(my_phys,ifile);
+                        if (ret>=0 && my_phys->getSurf()>0) {
+                            addPhys(my_phys);
+                            imagelist.push_back(my_phys);
+                        } else {
+                            delete my_phys;
+                        }
 
                         progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
@@ -916,7 +922,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                 tmpFile.open();
                                 while(!ifile.eof()) {
                                     getline(ifile,line);
-//                                    WARNING(line);
+                                    //                                    WARNING(line);
                                     qLine=QString::fromStdString(line);
                                     if (qLine.startsWith("NeutrinoPan-end"))
                                         break;
@@ -927,7 +933,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                                 QApplication::processEvents();
-//                                my_pan->loadSettings(tmpFile.fileName());
+                                //                                my_pan->loadSettings(tmpFile.fileName());
                                 tmpFile.close(); // this should also remove it...
                             }
                         }
@@ -951,7 +957,7 @@ void neutrino::addPhys(nPhysD* datamatrix) {
     if (datamatrix && !physList.contains(datamatrix))	{
         physList << datamatrix;
 
-//        datamatrix->property["display_range"]= datamatrix->get_min_max();
+        //        datamatrix->property["display_range"]= datamatrix->get_min_max();
 
         addMenuBuffers(datamatrix);
         emit physAdd(datamatrix);
@@ -987,7 +993,7 @@ nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //T
         }
         if (show || redisplay) {
             showPhys(newPhys);
-    }
+        }
     }
     emit physMod(std::make_pair(oldPhys, newPhys));
     return newPhys;
@@ -1242,17 +1248,17 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Less:
         if (currentBuffer) {
-             setGamma(int(currentBuffer->property["gamma"])-1);
+            setGamma(int(currentBuffer->property["gamma"])-1);
         }
         break;
     case Qt::Key_Greater:
         if (currentBuffer) {
-             setGamma(int(currentBuffer->property["gamma"])+1);
+            setGamma(int(currentBuffer->property["gamma"])+1);
         }
         break;
     case Qt::Key_Period:
         if (currentBuffer) {
-             setGamma(1);
+            setGamma(1);
         }
         break;
     case Qt::Key_Question:
@@ -1275,11 +1281,11 @@ void neutrino::keyPressEvent (QKeyEvent *e)
                 emit bufferChanged(phys);
             }
         } else {
-        if (currentBuffer) {
-            currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+            if (currentBuffer) {
+                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
                 setGamma(1);
-            emit updatecolorbar();
-        }
+                emit updatecolorbar();
+            }
         }
         createQimage();
         break;
@@ -1346,10 +1352,10 @@ void neutrino::keyPressEvent (QKeyEvent *e)
             bool ok;
             QString text = QInputDialog::getText(this,"","Open", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
             if (ok && !text.isEmpty()) {
-                     nGenericPan *my_pan= openPan(text,false);
-                     if(!my_pan) {
-                         statusBar()->showMessage(tr("Can't find ")+text, 2000);
-                     }
+                nGenericPan *my_pan= openPan(text,false);
+                if(!my_pan) {
+                    statusBar()->showMessage(tr("Can't find ")+text, 2000);
+                }
             }
         }
         break;
@@ -1503,13 +1509,13 @@ void neutrino::fileSave(QString fname) {
                 int res=QMessageBox::warning(this,tr("Attention"), fname+QString("\n")+tr("exists. Overwrite?"),
                                              QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
                 switch (res) {
-                    case QMessageBox::No:
-                        fileSave();
-                        return;
-                        break;
-                    case QMessageBox::Cancel:
-                        return;
-                        break;
+                case QMessageBox::No:
+                    fileSave();
+                    return;
+                    break;
+                case QMessageBox::Cancel:
+                    return;
+                    break;
                 }
             }
 
@@ -1541,12 +1547,12 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
         } else {
             my_pixitem.pixmap().save(fname);
         }
-            phys->setType(PHYS_FILE);
-            phys->setShortName(QFileInfo(fname).fileName().toStdString());
-            phys->setName(phys->getShortName());
-            phys->setFromName(fname.toStdString());
-        }
+        phys->setType(PHYS_FILE);
+        phys->setShortName(QFileInfo(fname).fileName().toStdString());
+        phys->setName(phys->getShortName());
+        phys->setFromName(fname.toStdString());
     }
+}
 
 bool
 neutrino::fileClose() {
@@ -1564,15 +1570,15 @@ neutrino::fileClose() {
                                              tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
                                              QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
                 switch (res) {
-                    case QMessageBox::Yes:
-                        fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
-                        break;
-                    case QMessageBox::NoToAll:
-                        askAll=false;
-                        break;
-                    case QMessageBox::Cancel:
-                        return false;
-                        break;
+                case QMessageBox::Yes:
+                    fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
+                    break;
+                case QMessageBox::NoToAll:
+                    askAll=false;
+                    break;
+                case QMessageBox::Cancel:
+                    return false;
+                    break;
                 }
             }
         }
@@ -1586,9 +1592,9 @@ neutrino::fileClose() {
         foreach (nPhysD *phys, physList) {
             delete phys;
         }
-    #ifdef HAVE_PYTHONQT
+#ifdef HAVE_PYTHONQT
         PythonQt::self()->getMainModule().removeVariable(objectName());
-    #endif
+#endif
 
         deleteLater();
         return true;
@@ -1607,12 +1613,12 @@ neutrino::closeCurrentBuffer() {
                                          tr("The image")+QString("\n")+QString::fromUtf8(currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             switch (res) {
-                case QMessageBox::Yes:
-                    fileSave(currentBuffer); // TODO: add here a check for a cancel to avoid exiting
-                    break;
-                case QMessageBox::No:
-                    removePhys(currentBuffer);
-                    break;
+            case QMessageBox::Yes:
+                fileSave(currentBuffer); // TODO: add here a check for a cancel to avoid exiting
+                break;
+            case QMessageBox::No:
+                removePhys(currentBuffer);
+                break;
             }
         } else {
             removePhys(currentBuffer);
@@ -2187,7 +2193,7 @@ void neutrino::about() {
     connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
     connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-     my_about.version->setText(QString(__VER));
+    my_about.version->setText(QString(__VER));
 #ifdef __neutrino_key
     QString serial(qApp->property("nHash").toString());
     // copy serial to clipboard
@@ -2229,8 +2235,8 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
         QString m_sig = QString::fromLatin1(metaObject->method(i).signature());
 #endif
         if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-            metaObject->method(i).parameterTypes().empty() &&
-            m_sig ==panName+"()") {
+                metaObject->method(i).parameterTypes().empty() &&
+                m_sig ==panName+"()") {
             QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
         }
     }
@@ -2274,10 +2280,10 @@ nGenericPan* neutrino::newPan(QString my_string) {
         name=QString::fromLatin1(metaObject->method(i).signature());
 #endif
         if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-            metaObject->method(i).parameterTypes().empty() &&
-            name==my_string+"()") {
-		QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-	}
+                metaObject->method(i).parameterTypes().empty() &&
+                name==my_string+"()") {
+            QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+        }
     }
     if (!my_pan) {
         QString panName;
@@ -2321,7 +2327,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
                 QVariant value = uiwidget->property(name);
             }
 
-//            my_pan->setCentralWidget(uiwidget);
+            //            my_pan->setCentralWidget(uiwidget);
             my_pan->show();
         }
 
