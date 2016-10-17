@@ -2128,13 +2128,14 @@ void neutrino::saveDefaults(){
     my_set.setValue("gridVisible", my_tics.gridVisible);
     my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("colorTable", colorTable);
-    my_set.setValue("fileExport", property("fileExport"));
-    my_set.setValue("fileOpen", property("fileOpen"));
     my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
-    my_set.setValue("physNameLength", property("physNameLength"));
-    if (currentBuffer) {
-        my_set.setValue("gamma",property("gamma"));
+
+    my_set.beginGroup("Properties");
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        my_set.setValue(ba, property(ba));
     }
+    my_set.endGroup();
+
     my_set.endGroup();
 }
 
@@ -2167,13 +2168,11 @@ void neutrino::loadDefaults(){
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
 
-    setProperty("physNameLength", my_set.value("physNameLength", 35));
-
-    setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
-
-    setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
-    setProperty("fileOpen", my_set.value("fileOpen",""));
-    setProperty("gamma", my_set.value("gamma",1));
+    my_set.beginGroup("Properties");
+    foreach(QString my_key, my_set.allKeys()) {
+        setProperty(my_key.toUtf8().constData(), my_set.value(my_key));
+    }
+    my_set.endGroup();
 
     my_set.endGroup();
 }

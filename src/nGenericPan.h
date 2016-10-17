@@ -56,8 +56,6 @@ public:
 	QString panName;
 	nPhysD *currentBuffer;
 	
-	QStringList neutrinoProperties;
-
 	// thread stuff
 	panThread nThread;
 

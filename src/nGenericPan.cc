@@ -161,7 +161,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("fileTxt", QString(panName+".txt"));
 	setProperty("fileExport", QString(panName+".svg"));
 	setProperty("fileIni", QString(panName+".ini"));
-	neutrinoProperties << "fileTxt" << "fileExport" << "fileIni";
 
 	setWindowTitle(nparent->property("winId").toString()+": "+panName);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
@@ -563,7 +562,7 @@ void nGenericPan::loadSettings(QString settingsFile) {
 }
 
 void nGenericPan::saveSettings() {
-	QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property(" ").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
 		setProperty("fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
@@ -589,25 +588,23 @@ void nGenericPan::saveDefaults() {
 /// THESE are specialized
 void nGenericPan::loadSettings(QSettings *settings) {
 	loadUi(settings);
-	int size = settings->beginReadArray("neutrinoProperties");
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		QString prop=settings->value("property").toString();
-		QString valu=settings->value("value").toString();
-		setProperty(prop.toUtf8().constData(),valu);
+    settings->beginGroup("Properties");
+    foreach(QString my_key, settings->allKeys()) {
+        qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+        setProperty(my_key.toStdString().c_str(), settings->value(my_key));
     }
-	settings->endArray();
+    settings->endGroup();
+
 }
 
 void nGenericPan::saveSettings(QSettings *settings) {
 	saveUi(settings);
-	settings->beginWriteArray("neutrinoProperties");
-	for (int i = 0; i < neutrinoProperties.size(); ++i) {
-		settings->setArrayIndex(i);
-		settings->setValue("property", neutrinoProperties.at(i));
-		settings->setValue("value", property(neutrinoProperties.at(i).toUtf8().constData()).toString());
-   }
-	settings->endArray();
+    settings->beginGroup("Properties");
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        qDebug() << "save" << ba << " : " << property(ba);
+        settings->setValue(ba, property(ba));
+    }
+    settings->endGroup();
 }
 
 // thread run

@@ -417,17 +417,21 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
 
 unsigned int opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
+    unsigned int i13, i11, i7, i5, i3, i2;
     // REMEMBER to use clfft 2.12 to support radix 11 and 13!
-    for (unsigned int i13=0; i13<=log(num)/log(13); i13++ ) {
-        for (unsigned int i11=0; i11<=log(num)/log(11); i11++ ) {
-            for (unsigned int i7=0; i7<=log(num)/log(7); i7++ ) {
-                for (unsigned int i5=0; i5<=log(num)/log(5); i5++ ) {
-                    for (unsigned int i3=0; i3<=log(num)/log(3); i3++ ) {
-                        for (unsigned int i2=0; i2<=log(num)/log(2); i2++ ) {
+    for (i13=0; i13<=log(num)/log(13); i13++ ) {
+        for (i11=0; i11<=log(num)/log(11); i11++ ) {
+            for (i7=0; i7<=log(num)/log(7); i7++ ) {
+                for (i5=0; i5<=log(num)/log(5); i5++ ) {
+                    for (i3=0; i3<=log(num)/log(3); i3++ ) {
+                        for (i2=0; i2<=log(num)/log(2); i2++ ) {
                             unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
                             if (test_val>=num && test_val<closest) {
                                 closest=test_val;
-                                if (closest==num) return num;
+                                if (closest==num) {
+                                    DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
+                                    return num;
+                                }
                             }
                         }
                     }
@@ -435,6 +439,7 @@ unsigned int opencl_closest_size(unsigned int num) {
             }
         }
     }
+    DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
     return closest;
 }
 

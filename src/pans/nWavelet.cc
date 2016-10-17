@@ -146,6 +146,7 @@ void nWavelet::guessCarrier() {
 }
 
 void nWavelet::doWavelet () {
+    setEnabled(false);
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		QTime timer;
@@ -266,7 +267,8 @@ void nWavelet::doWavelet () {
     } else {
         my_w.statusbar->showMessage("Canceled", 5000);
     }
-    
+    QApplication::processEvents();
+    setEnabled(true);
 }
 
 

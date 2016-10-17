@@ -35,8 +35,6 @@ nHDF5::nHDF5(neutrino *nparent, QString winname)
     my_w.setupUi(this);
     my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);
 
-    neutrinoProperties << "fileHDF";
-
     connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
     connect(my_w.actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));

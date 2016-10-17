@@ -305,6 +305,7 @@ void nVisar::connections() {
     connect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(my_w.enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
 
     connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -349,6 +350,7 @@ void nVisar::disconnections() {
     disconnect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(my_w.enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
 
     disconnect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     disconnect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -356,6 +358,7 @@ void nVisar::disconnections() {
 }
 
 void nVisar::updatePlotSOP() {
+    if (!my_w.enableSOP->isChecked()) return;
     disconnections();
     nPhysD *shot=getPhysFromCombo(my_w.sopShot);
     nPhysD *ref=getPhysFromCombo(my_w.sopRef);

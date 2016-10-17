@@ -7015,8 +7015,8 @@ QVector<double> QCPAxisTickerLog::createTickVector(double tickStep, const QCPRan
 /* end of 'src/axis/axistickerlog.cpp' */
 
 
-/* including file 'src/axis/axis.cpp', size 94746                            */
-/* commit 023fb5016a22e67bca0861ae51325ea1089a5e40 2016-10-06 16:17:02 +0200 */
+/* including file 'src/axis/axis.cpp', size 94742                            */
+/* commit 297a9c785b22f674956ad65e91aba6e60f101b7a 2016-10-17 14:17:03 +0200 */
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7682,7 +7682,7 @@ void QCPAxis::setRange(double position, double size, Qt::AlignmentFlag alignment
 */
 void QCPAxis::setRangeLower(double lower)
 {
-  if (mRangeLocked || mRange.lower == lower)
+  if (mRange.lower == lower)
     return;
   
   QCPRange oldRange = mRange;
@@ -7704,7 +7704,7 @@ void QCPAxis::setRangeLower(double lower)
 */
 void QCPAxis::setRangeUpper(double upper)
 {
-  if (mRangeLocked || mRange.upper == upper)
+  if (mRange.upper == upper)
     return;
   
   QCPRange oldRange = mRange;
@@ -9578,8 +9578,8 @@ void QCPAxisPainterPrivate::getMaxTickLabelSize(const QFont &font, const QString
 /* end of 'src/axis/axis.cpp' */
 
 
-/* including file 'src/scatterstyle.cpp', size 17420                         */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/scatterstyle.cpp', size 17451                         */
+/* commit 316cd896a868d2569e96a9472dfa3a32aaf41d38 2016-09-15 14:25:45 +0200 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPScatterStyle
@@ -9957,10 +9957,11 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     }
     case ssDiamond:
     {
-      painter->drawLine(QLineF(x-w,   y,   x, y-w));
-      painter->drawLine(QLineF(  x, y-w, x+w,   y));
-      painter->drawLine(QLineF(x+w,   y,   x, y+w));
-      painter->drawLine(QLineF(  x, y+w, x-w,   y));
+      QPointF lineArray[4] = {QPointF(x-w,   y),
+                              QPointF(  x, y-w),
+                              QPointF(x+w,   y),
+                              QPointF(  x, y+w)};
+      painter->drawPolygon(lineArray, 4);
       break;
     }
     case ssStar:
@@ -9973,52 +9974,54 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     }
     case ssTriangle:
     {
-       painter->drawLine(QLineF(x-w, y+0.755*w, x+w, y+0.755*w));
-       painter->drawLine(QLineF(x+w, y+0.755*w,   x, y-0.977*w));
-       painter->drawLine(QLineF(  x, y-0.977*w, x-w, y+0.755*w));
+      QPointF lineArray[3] = {QPointF(x-w, y+0.755*w),
+                              QPointF(x+w, y+0.755*w),
+                              QPointF(  x, y-0.977*w)};
+      painter->drawPolygon(lineArray, 3);
       break;
     }
     case ssTriangleInverted:
     {
-       painter->drawLine(QLineF(x-w, y-0.755*w, x+w, y-0.755*w));
-       painter->drawLine(QLineF(x+w, y-0.755*w,   x, y+0.977*w));
-       painter->drawLine(QLineF(  x, y+0.977*w, x-w, y-0.755*w));
+      QPointF lineArray[3] = {QPointF(x-w, y-0.755*w),
+                              QPointF(x+w, y-0.755*w),
+                              QPointF(  x, y+0.977*w)};
+      painter->drawPolygon(lineArray, 3);
       break;
     }
     case ssCrossSquare:
     {
-       painter->drawLine(QLineF(x-w, y-w, x+w*0.95, y+w*0.95));
-       painter->drawLine(QLineF(x-w, y+w*0.95, x+w*0.95, y-w));
-       painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawLine(QLineF(x-w, y-w, x+w*0.95, y+w*0.95));
+      painter->drawLine(QLineF(x-w, y+w*0.95, x+w*0.95, y-w));
       break;
     }
     case ssPlusSquare:
     {
-       painter->drawLine(QLineF(x-w,   y, x+w*0.95,   y));
-       painter->drawLine(QLineF(  x, y+w,        x, y-w));
-       painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawLine(QLineF(x-w,   y, x+w*0.95,   y));
+      painter->drawLine(QLineF(  x, y+w,        x, y-w));
       break;
     }
     case ssCrossCircle:
     {
-       painter->drawLine(QLineF(x-w*0.707, y-w*0.707, x+w*0.670, y+w*0.670));
-       painter->drawLine(QLineF(x-w*0.707, y+w*0.670, x+w*0.670, y-w*0.707));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x-w*0.707, y-w*0.707, x+w*0.670, y+w*0.670));
+      painter->drawLine(QLineF(x-w*0.707, y+w*0.670, x+w*0.670, y-w*0.707));
       break;
     }
     case ssPlusCircle:
     {
-       painter->drawLine(QLineF(x-w,   y, x+w,   y));
-       painter->drawLine(QLineF(  x, y+w,   x, y-w));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x-w,   y, x+w,   y));
+      painter->drawLine(QLineF(  x, y+w,   x, y-w));
       break;
     }
     case ssPeace:
     {
-       painter->drawLine(QLineF(x, y-w,         x,       y+w));
-       painter->drawLine(QLineF(x,   y, x-w*0.707, y+w*0.707));
-       painter->drawLine(QLineF(x,   y, x+w*0.707, y+w*0.707));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x, y-w,         x,       y+w));
+      painter->drawLine(QLineF(x,   y, x-w*0.707, y+w*0.707));
+      painter->drawLine(QLineF(x,   y, x+w*0.707, y+w*0.707));
       break;
     }
     case ssPixmap:
