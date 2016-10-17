@@ -74,6 +74,7 @@ public slots:
     void setTitle(QString);
     void changeTitleFont();
     void changeAxisFont();
+    void showAxis(bool);
 };
 
 //plot with mouse (vertical)

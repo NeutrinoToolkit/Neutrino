@@ -148,14 +148,24 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
             if (axis->visible()) {
                 int row=my_w.labels_layout->rowCount();
                 int col=0;
+
+                QCheckBox *cb_axis = new QCheckBox("", this);
+                QFont f = cb_axis->font();
+                cb_axis->setChecked(true);
+                cb_axis->setFont(f);
+                cb_axis->setProperty("axis",qVariantFromValue((void *) axis));
+                connect(cb_axis,SIGNAL(toggled(bool)),this,SLOT(showAxis(bool)));
+                my_w.labels_layout->addWidget(cb_axis,row,col++,Qt::AlignCenter);
+
+
                 QLineEdit *le = new QLineEdit(this);
-                QFont f = le->font();
                 f.setPointSize(10);
                 le->setFont(f);
                 le->setText(axis->label());
                 le->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
                 my_w.labels_layout->addWidget(le,row,col++);
+
 
                 QCheckBox *cb_grid = new QCheckBox("", this);
                 cb_grid->setTristate(true);
@@ -208,6 +218,20 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         my_pad->raise();
     }
 }
+
+void nCustomPlot::showAxis(bool val) {
+    if (sender() && sender()->property("axis").isValid()) {
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        if (axis) {
+            foreach (QCPAbstractPlottable* my_graph, axis->plottables() ) {
+                my_graph->setVisible(val);
+            }
+            axis->setVisible(val);
+            replot();
+        }
+    }
+}
+
 
 void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
     out << "# " << graph->name() << endl;
@@ -320,7 +344,6 @@ void nCustomPlot::changeAxisFont() {
             }
         }
     }
-
 }
 
 void nCustomPlot::showGrid(int val) {
