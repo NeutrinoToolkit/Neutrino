@@ -78,7 +78,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../neutrino-build/src/icons.qrc">
+          <iconset resource="../qrc/icons.qrc">
            <normaloff>:/icons/font.png</normaloff>:/icons/font.png</iconset>
          </property>
         </widget>
@@ -323,7 +323,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../neutrino-build/src/icons.qrc">
+          <iconset resource="../qrc/icons.qrc">
            <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
          </property>
         </widget>
@@ -337,7 +337,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../neutrino-build/src/icons.qrc">
+          <iconset resource="../qrc/icons.qrc">
            <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
          </property>
         </widget>
@@ -378,7 +378,7 @@
   </widget>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -390,7 +390,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -402,7 +402,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
    </property>
    <property name="text">
@@ -414,7 +414,7 @@
   </action>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
    </property>
    <property name="text">
@@ -426,7 +426,7 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../../neutrino-build/src/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
    </property>
    <property name="text">
@@ -445,7 +445,7 @@
   <tabstop>copyData</tabstop>
  </tabstops>
  <resources>
-  <include location="../../neutrino-build/src/icons.qrc"/>
+  <include location="../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
