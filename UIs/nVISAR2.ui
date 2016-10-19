@@ -396,7 +396,7 @@
     </widget>
    </item>
    <item>
-    <widget class="nCustomPlotMouseX3Y" name="plotPhaseIntensity" native="true">
+    <widget class="nVisarPhasePlot" name="plotPhaseIntensity" native="true">
      <property name="mouseTracking">
       <bool>true</bool>
      </property>
@@ -406,9 +406,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nCustomPlotMouseX3Y</class>
+   <class>nVisarPhasePlot</class>
    <extends>QWidget</extends>
-   <header>nCustomPlots.h</header>
+   <header>nVisar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

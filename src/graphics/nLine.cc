@@ -60,6 +60,9 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 		setToolTip(tr("line"));
 	}
 
+    setProperty("NeuSave-fileIni",toolTip()+".ini");
+    setProperty("NeuSave-fileTxt",toolTip()+".txt");
+
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -141,9 +144,9 @@ void nLine::copy_points() {
 }
 
 void nLine::save_points() {
-    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
+        setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
@@ -1056,12 +1059,9 @@ bool orderMonotone_y(const QPointF &p1, const QPointF &p2)
 
 void
 nLine::loadSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		loadSettings(&settings);
 	}
@@ -1069,12 +1069,9 @@ nLine::loadSettings() {
 
 void
 nLine::saveSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
@@ -1111,6 +1108,16 @@ nLine::loadSettings(QSettings *settings) {
 	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
 	changeColorHolder(settings->value("colorHolder",colorHolder).value<QColor>());
 	setNumPoints(settings->value("samplePoints",numPoints).toInt());
+
+    if (settings->childGroups().contains("Properties")) {
+        settings->beginGroup("Properties");
+        foreach(QString my_key, settings->allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+        }
+        settings->endGroup();
+    }
+
 	settings->endGroup();
 }
 
@@ -1139,6 +1146,19 @@ nLine::saveSettings(QSettings *settings) {
 	settings->setValue("sizeHolder",nSizeHolder);
 	if (ref.size()>0)	settings->setValue("colorHolder",ref[0]->brush().color());
 	settings->setValue("samplePoints",numPoints);
+
+    settings->beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        qDebug() << "save" << ba << " : " << property(ba);
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            settings->setValue(ba, property(ba));
+        }
+    }
+    settings->endGroup();
+
+
 	settings->endGroup();
 }
 

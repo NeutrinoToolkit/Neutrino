@@ -102,15 +102,9 @@ neutrino::neutrino():
     my_tics(this)
 {
 
+
     my_w.setupUi(this);
     setAcceptDrops(true);
-
-    // this below works if there is just one neutrino win open
-    //#ifdef Q_OS_MAC
-    //	DEBUG("command to have the main menu always visible!!! http://qt-project.org/doc/qt-4.8/mac-differences.html#menu-bar");
-    //	my_w.menubar->setParent(NULL);
-    //#endif
-
 
     currentBuffer=NULL;
 
@@ -120,6 +114,8 @@ neutrino::neutrino():
     int numwin=qApp->property("numWin").toInt()+1;
     qApp->setProperty("numWin",numwin);
     setProperty("winId",numwin);
+
+    setProperty("neuSave-gamma",1);
 
     setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
@@ -385,7 +381,7 @@ void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
     foreach(QAction *act, my_w.menubar->actions()) {
         my_menu->addAction(act);
     }
-    my_menu->exec(ev->pos());
+    my_menu->exec(ev->globalPos());
 
 }
 
@@ -502,8 +498,11 @@ neutrino::loadPlugin()
     //     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
     //       QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
 
+    if (!property("NeuSave-loadPlugin").isValid()) {
+        setProperty("NeuSave-loadPlugin",QString("plugin.so"));
+    }
 
-    QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+    QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
 
     if (!pname.isEmpty()) {
 
@@ -528,6 +527,7 @@ neutrino::loadPlugin()
                 DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
 
                 if (plug_iface->instantiate(this)) {
+                    setProperty("NeuSave-loadPlugin",pname);
                     DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
                 }
             } else {
@@ -570,7 +570,7 @@ void neutrino::openRecentFile()
     if (action) {
         QString fname=action->data().toString();
         fileOpen(fname);
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
     }
 }
 
@@ -626,7 +626,7 @@ void neutrino::setGamma(int value) {
     if (currentBuffer) {
         currentBuffer->property["gamma"]=value;
         createQimage();
-        setProperty("gamma",value);
+        setProperty("neuSave-gamma",value);
         emitBufferChanged();
     }
 }
@@ -694,12 +694,12 @@ void neutrino::fileOpen()
     formats+=");;";
     formats+=("Any files (*)");
 
-    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),formats);
+    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
     fileOpen(fnames);
 }
 
 void neutrino::fileOpen(QStringList fnames) {
-    setProperty("fileOpen", fnames);
+    setProperty("NeuSave-fileOpen", fnames);
     foreach (QString fname, fnames) {
         QList<nPhysD *> imagelist = fileOpen(fname);
         if (imagelist.size()==0 && QFileInfo(fname).suffix().toLower()!="h5"){
@@ -795,14 +795,14 @@ void neutrino::saveSession (QString fname) {
 #ifdef HAVE_LIBTIFF
         extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
 #endif
-        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Open Session"),property("fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
+        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Open Session"),property("NeuSave-fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
         }
     } else {
         QFileInfo file_info(fname);
         if (file_info.suffix()=="neus") {
-            setProperty("fileOpen", fname);
+            setProperty("NeuSave-fileOpen", fname);
             //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
             QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
@@ -870,7 +870,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
     QList <nPhysD *> imagelist;
     if (!fname.isEmpty()) {
         updateRecentFileActions(fname);
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
         if (physList.size()!=0) {
             QThread *m_thread = new QThread();
             neutrino*my_neu= new neutrino();
@@ -900,12 +900,11 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         nPhysD *my_phys=new nPhysD();
                         int ret=phys_resurrect_binary(my_phys,ifile);
                         if (ret>=0 && my_phys->getSurf()>0) {
-                            addPhys(my_phys);
+                            addShowPhys(my_phys);
                             imagelist.push_back(my_phys);
                         } else {
                             delete my_phys;
                         }
-
                         progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
@@ -1081,7 +1080,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
                 datamatrix->property["gamma"]=currentBuffer->property["gamma"];
             } else {
                 if (!datamatrix->property.have("gamma")) {
-                    datamatrix->property["gamma"]=property("gamma").toInt();
+                    datamatrix->property["gamma"]=property("neuSave-gamma").toInt();
                 }
             }
         }
@@ -1140,26 +1139,26 @@ neutrino::createQimage() {
 
 void neutrino::exportGraphics () {
     QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-    QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),ftypes);
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty())
         exportGraphics(fout);
 }
 
 void neutrino::exportAllGraphics () {
     QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("fileExport").toString(),ftypes);
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty()) {
         for (int i=0;i<physList.size() ; i++) {
             actionNextBuffer();
             QFileInfo fi(fout);
             exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
         }
-        setProperty("fileExport",fout);
+        setProperty("NeuSave-fileExport",fout);
     }
 }
 
 void neutrino::exportGraphics (QString fout) {
-    setProperty("fileExport",fout);
+    setProperty("NeuSave-fileExport",fout);
     bool resetmouse=my_mouse.isVisible();
     my_mouse.setVisible(false);
     QSize my_size=QSize(my_s.width(), my_s.height());
@@ -1485,7 +1484,7 @@ QString neutrino::getFileSave() {
     formats.chop(1);
     formats+=");;";
     formats+=("Any files (*)");
-    return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),formats);
+    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileOpen").toString(),formats);
 }
 
 void
@@ -1499,7 +1498,7 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
     if (!fname.isEmpty()) {
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.isEmpty()) {
             fname+=".neus";
@@ -1556,6 +1555,7 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 
 bool
 neutrino::fileClose() {
+    saveDefaults();
     if (QApplication::activeWindow() == this) {
         bool askAll=true;
         foreach (nGenericPan* pan, panList) {
@@ -1583,7 +1583,6 @@ neutrino::fileClose() {
             }
         }
 
-        saveDefaults();
         foreach (nGenericPan *pan, panList) {
             pan->deleteLater();
         }
@@ -2117,8 +2116,9 @@ neutrino::Monitor() {
     return ret;
 }
 
-//save and load across restar
+//save and load across restart
 void neutrino::saveDefaults(){
+    qDebug() << "here";
     QSettings my_set("neutrino","");
     my_set.beginGroup("Preferences");
     my_set.setValue("geometry", pos());
@@ -2131,11 +2131,17 @@ void neutrino::saveDefaults(){
     my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
 
     my_set.beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
     foreach(QByteArray ba, dynamicPropertyNames()) {
-        my_set.setValue(ba, property(ba));
+        qDebug() << "save" << ba << " : " << property(ba);
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            my_set.setValue(ba, property(ba));
+        }
     }
     my_set.endGroup();
 
+    qDebug() << "here";
     my_set.endGroup();
 }
 
@@ -2167,12 +2173,13 @@ void neutrino::loadDefaults(){
     if (my_set.value("useDot",false).toBool()) {
         QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     }
-
-    my_set.beginGroup("Properties");
-    foreach(QString my_key, my_set.allKeys()) {
-        setProperty(my_key.toUtf8().constData(), my_set.value(my_key));
+    if (my_set.childGroups().contains("Properties")) {
+        my_set.beginGroup("Properties");
+        foreach(QString my_key, my_set.allKeys()) {
+            setProperty(my_key.toUtf8().constData(), my_set.value(my_key));
+        }
+        my_set.endGroup();
     }
-    my_set.endGroup();
 
     my_set.endGroup();
 }

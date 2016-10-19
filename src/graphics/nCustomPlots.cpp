@@ -34,6 +34,7 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     my_max(new QLineEdit(qobject_cast<QWidget *>(axis))),
     my_axis(axis)
 {
+
     QFont f=my_min->font();
     f.setPointSize(10);
     my_min->setFont(f);
@@ -53,8 +54,6 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     connect(my_min,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
     connect(my_max,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
     connect(my_lock,SIGNAL(toggled(bool)),this,SLOT(setLock(bool)));
-
-    setProperty("fileIni",objectName()+".ini");
 
     QHBoxLayout* gridLayout = new QHBoxLayout(this);
     gridLayout->setMargin(0);
@@ -107,6 +106,11 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     QCustomPlot(parent),
      title(new QCPTextElement(this))
 {
+
+    setProperty("NeuSave-fileIni",objectName()+".ini");
+    setProperty("NeuSave-fileTxt",objectName()+".txt");
+    setProperty("NeuSave-fileExport",objectName()+".pdf");
+
     setContentsMargins(0,0,0,0);
 
     connect(this, SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
@@ -135,6 +139,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         my_pad->setWindowTitle("Plot "+objectName());
         connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
         connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
+        connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
         connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
         connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
         connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
@@ -204,14 +209,48 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         for (int g=0; g<plottableCount(); g++) {
             QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
             if(graph) {
-                my_w.plotName->addItem(graph->name(), qVariantFromValue((void *) graph));
+                int row=my_w.graphs_layout->rowCount();
+                int col=0;
+                QCheckBox *cb_graph = new QCheckBox("", this)   ;
+                QFont f = cb_graph->font();
+
+                cb_graph->setChecked(true);
+                cb_graph->setFont(f);
+                cb_graph->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+                my_w.graphs_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
+
+                QLabel *le = new QLabel(graph->name(),this);
+                f.setPointSize(10);
+                le->setFont(f);
+                my_w.graphs_layout->addWidget(le,row,col++);
+
+
+                QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
+                sb_thick->setFont(f);
+                sb_thick->setRange(0,99);
+                sb_thick->setDecimals(1);
+                sb_thick->setSingleStep(0.1);
+                sb_thick->setValue(graph->pen().widthF());
+                sb_thick->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+                my_w.graphs_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_copy = new QToolButton(this);
+                tb_copy->setIcon(QIcon(":icons/saveClipboard"));
+                tb_copy->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+                my_w.graphs_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_save = new QToolButton(this);
+                tb_save->setIcon(QIcon(":icons/saveTxt"));
+                tb_save->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+                my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
+
             }
-            my_w.copyData->setProperty("combo",qVariantFromValue((void *) my_w.plotName));
-            my_w.saveData->setProperty("combo",qVariantFromValue((void *) my_w.plotName));
         }
 
-        connect(my_w.copyData,SIGNAL(released()),this,SLOT(copy_data()));
-        connect(my_w.saveData,SIGNAL(released()),this,SLOT(save_data()));
     }
     if (my_pad) {
         my_pad->show();
@@ -219,13 +258,34 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     }
 }
 
+
+void nCustomPlot::showGraph(bool val) {
+    if (sender() && sender()->property("graph").isValid()) {
+        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+        if(hasPlottable(graph)) {
+             graph->setVisible(val);
+             replot();
+        }
+    }
+}
+
+void nCustomPlot::changeGraphThickness(double val) {
+    if (sender() && sender()->property("graph").isValid()) {
+        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+        if(hasPlottable(graph)) {
+            QPen p=graph->pen();
+            p.setWidthF(val);
+            graph->setPen(p);
+            replot();
+        }
+    }
+}
+
+
 void nCustomPlot::showAxis(bool val) {
     if (sender() && sender()->property("axis").isValid()) {
         QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
         if (axis) {
-            foreach (QCPAbstractPlottable* my_graph, axis->plottables() ) {
-                my_graph->setVisible(val);
-            }
             axis->setVisible(val);
             replot();
         }
@@ -246,16 +306,11 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
         if (graph) {
             get_data_graph(out,graph);
         } else {
-            if (obj->property("combo").isValid()) {
-                QComboBox *combo = (QComboBox *) obj->property("combo").value<void *>();
-                if (combo) {
-                    QCPGraph *graph = (QCPGraph *) combo->currentData().value<void *>();
-                    if (graph) {
-                        get_data_graph(out, graph);
-                    } else {
-                        get_data(out);
-                    }
-                }
+            if (obj->property("graph").isValid()) {
+                graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            }
+            if (graph) {
+                get_data_graph(out, graph);
             } else {
                 get_data(out);
             }
@@ -263,17 +318,19 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
     } else {
         out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << endl;
         for (int g=0; g<graphCount(); g++) {
-            out << "# " << g <<" ";
-            get_data_graph(out,graph(g));
-            out << endl << endl;
+            if(graph(g)->visible()) {
+                out << "# " << g <<" ";
+                get_data_graph(out,graph(g));
+                out << endl << endl;
+            }
         }
     }
 }
 
 void nCustomPlot::save_data(){
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
+        setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
@@ -290,9 +347,9 @@ void nCustomPlot::copy_data(){
 }
 
 void nCustomPlot::export_image(){
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
+    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("NeuSave-fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
-        setProperty("fileExport", fnametmp);
+        setProperty("NeuSave-fileExport", fnametmp);
         if (QFileInfo(fnametmp).suffix().toLower()==QString("pdf")) {
             savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", objectName());
         } else if (QFileInfo(fnametmp).suffix().toLower()==QString("svg")) {
@@ -322,12 +379,16 @@ void nCustomPlot::setTitle (QString my_title) {
     replot();
 }
 
+void nCustomPlot::setTitleFont (QFont myfont) {
+    title->setFont(myfont);
+    replot();
+}
+
 void nCustomPlot::changeTitleFont() {
     bool ok;
-    QFont myfont = QFontDialog::getFont(&ok, title->font(), this, "Title Font", QFontDialog::DontUseNativeDialog);
+    QFont myfont = QFontDialog::getFont(&ok, title->font(), this, "Title Font");
     if (ok) {
-        title->setFont(myfont);
-        replot();
+        setTitleFont(myfont);
     }
 }
 
@@ -403,7 +464,7 @@ void nCustomPlot::setColor() {
                 if (colordial.result() && colordial.currentColor().isValid()) {
                     for (int g=0; g<plottableCount(); g++) {
                         QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-                        if(graph && graph->valueAxis()==axis) {
+                        if(hasPlottable(graph) && graph->valueAxis()==axis) {
                             QPen p=graph->pen();
                             p.setColor(colordial.currentColor());
                             graph->setPen(p);
@@ -432,10 +493,12 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 // SETTINGS
 void
 nCustomPlot::loadSettings(QSettings *my_set) {
+    qDebug() << __FUNCTION__ << objectName() << metaObject()->className();
+
     if (my_set==nullptr) {
-        QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+        QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
         if (!fnametmp.isEmpty()) {
-            setProperty("fileIni",fnametmp);
+            setProperty("NeuSave-fileIni",fnametmp);
             loadSettings(new QSettings(fnametmp,QSettings::IniFormat));
         }
     } else {
@@ -473,7 +536,7 @@ nCustomPlot::loadSettings(QSettings *my_set) {
                     axis.at(i)->setRange(prange.x(),prange.y());
                     for (int g=0; g<plottableCount(); g++) {
                         QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-                        if(graph && graph->valueAxis()==axis.at(i)) {
+                        if(hasPlottable(graph) && graph->valueAxis()==axis.at(i)) {
                             QPen p=graph->pen();
                             p.setColor(colors.at(i).value<QColor>());
                             graph->setPen(p);
@@ -486,17 +549,28 @@ nCustomPlot::loadSettings(QSettings *my_set) {
         my_set->endGroup();
         title->setFont(qvariant_cast<QFont>(my_set->value("titleFont",title->font())));
         setTitle(my_set->value("title",title->text()).toString());
-        setProperty("fileini",my_set->value("fileini",property("fileini").toString()));
+
+        if (my_set->childGroups().contains("Properties")) {
+            my_set->beginGroup("Properties");
+            foreach(QString my_key, my_set->allKeys()) {
+                qDebug() << "load" <<  my_key << " : " << my_set->value(my_key);
+                setProperty(my_key.toStdString().c_str(), my_set->value(my_key));
+            }
+            my_set->endGroup();
+        }
+
+
         my_set->endGroup();
     }
 }
 
 void
 nCustomPlot::saveSettings(QSettings *my_set) {
+    qDebug() << "save settings" << objectName();
     if (my_set==nullptr) {
-        QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property(" ").toString(), tr("INI Files (*.ini *.conf)"));
+        QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
         if (!fnametmp.isEmpty()) {
-            setProperty("fileIni",fnametmp);
+            setProperty("NeuSave-fileIni",fnametmp);
             saveSettings(new QSettings(fnametmp,QSettings::IniFormat));
         }
     } else {
@@ -522,7 +596,17 @@ nCustomPlot::saveSettings(QSettings *my_set) {
         my_set->endGroup();
         my_set->setValue("titleFont",title->font());
         my_set->setValue("title",title->text());
-        my_set->setValue("fileini",property("fileini").toString());
+
+        my_set->beginGroup("Properties");
+        foreach(QByteArray ba, dynamicPropertyNames()) {
+            qDebug() << "save" << ba << " : " << property(ba);
+            if(ba.startsWith("NeuSave")) {
+                qDebug() << "write" << ba << " : " << property(ba);
+                my_set->setValue(ba, property(ba));
+            }
+        }
+        my_set->endGroup();
+
         my_set->endGroup();
     }
 }
@@ -597,7 +681,6 @@ nCustomPlotMouseX2Y::nCustomPlotMouseX2Y(QWidget* parent):
     yAxis2->setLabelColor(Qt::blue);
     yAxis2->setTickLabelColor(Qt::blue);
 
-    show();
 };
 
 nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
@@ -607,7 +690,6 @@ nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
     yAxis3->setLabelColor(Qt::darkCyan);
     yAxis3->setTickLabelColor(Qt::darkCyan);
 
-    show();
 };
 
 

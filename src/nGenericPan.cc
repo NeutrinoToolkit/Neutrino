@@ -30,6 +30,7 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
 	setProperty("panName",panName);
+
 	int panNum=0;
 	foreach (QWidget *widget, QApplication::allWidgets()) {
 		nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
@@ -132,12 +133,13 @@ void nGenericPan::grabSave() {
 }
 
 void nGenericPan::showEvent(QShowEvent* event) {
-    QMainWindow::showEvent(event);
-
-    repaint();
-
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
     connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
+
+    // these properties will be automatically saved
+    setProperty("NeuSave-fileIni",panName+".ini");
+    setProperty("NeuSave-fileTxt",panName+".txt");
+    setProperty("NeuSave-fileExport",panName+".txt");
 
 
     QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
@@ -157,10 +159,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
             break;
         }
     }
-
-    setProperty("fileTxt", QString(panName+".txt"));
-	setProperty("fileExport", QString(panName+".svg"));
-	setProperty("fileIni", QString(panName+".ini"));
 
 	setWindowTitle(nparent->property("winId").toString()+": "+panName);
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
@@ -220,24 +218,27 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QVariant fontString=settings.value("defaultFont");
     settings.endGroup();
 
-    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
-        widget->setProperty("panName",panName);
-        if (fontString.isValid()) {
-            QFont fontTmp;
-            if (fontTmp.fromString(fontString.toString())) {
-                foreach (QCPAxis *axis, widget->findChildren<QCPAxis *>()) {
-                    axis->setTickLabelFont(fontTmp);
-                    axis->setLabelFont(fontTmp);
-                    axis->setLabelPadding(-1);
+    if (fontString.isValid()) {
+        QFont fontTmp;
+        if (fontTmp.fromString(fontString.toString())) {
+            foreach (nCustomPlot *my_plot, findChildren<nCustomPlot *>()) {
+                qDebug() << my_plot->objectName() << my_plot->metaObject()->className();
+                my_plot->setProperty("panName",panName);
+                qDebug() << "--------------------------------->>>>>>";
+                foreach (QCPAxisRect *re, my_plot->axisRects()) {
+                    qDebug() << "--------------------------------->>>>>>" << re;
+                    foreach (QCPAxis *axis, re->axes()) {
+                        qDebug() << axis;
+                        axis->setLabelFont(fontTmp);
+                        axis->setTickLabelFont(fontTmp);
+                    }
                 }
-                widget->legend->setFont(fontTmp);
-                widget->replot();
+                my_plot->setTitleFont(fontTmp);
+                my_plot->legend->setFont(fontTmp);
+                my_plot->replot();
             }
         }
     }
-
-
-
 
     QApplication::processEvents();
     loadDefaults();
@@ -409,6 +410,7 @@ nGenericPan::loadUi(QSettings *settings) {
 
 void
 nGenericPan::saveUi(QSettings *settings) {
+    qDebug() << "here";
 	foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			settings->setValue(widget->objectName(),widget->text());
@@ -587,22 +589,28 @@ void nGenericPan::saveDefaults() {
 
 /// THESE are specialized
 void nGenericPan::loadSettings(QSettings *settings) {
-	loadUi(settings);
-    settings->beginGroup("Properties");
-    foreach(QString my_key, settings->allKeys()) {
-        qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
-        setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+    loadUi(settings);
+    if (settings->childGroups().contains("Properties")) {
+        settings->beginGroup("Properties");
+        foreach(QString my_key, settings->allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+        }
+        settings->endGroup();
     }
-    settings->endGroup();
 
 }
 
 void nGenericPan::saveSettings(QSettings *settings) {
 	saveUi(settings);
     settings->beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
     foreach(QByteArray ba, dynamicPropertyNames()) {
         qDebug() << "save" << ba << " : " << property(ba);
-        settings->setValue(ba, property(ba));
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            settings->setValue(ba, property(ba));
+        }
     }
     settings->endGroup();
 }

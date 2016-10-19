@@ -50,6 +50,8 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 	nparent->setProperty("nunPoint",num);
 	setProperty("nunPoint",num);
 
+    setProperty("NeuSave-fileIni",metaObject()->className()+QString::number(num)+".ini");
+
 	setOrder(0.0);
 	setToolTip(tr("point")+QString(" ")+QString::number(num));
 
@@ -376,12 +378,9 @@ void nPoint::itemChanged() {
 
 void
 nPoint::loadSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		loadSettings(&settings);
 	}
@@ -389,12 +388,9 @@ nPoint::loadSettings() {
 
 void
 nPoint::saveSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
@@ -411,7 +407,17 @@ nPoint::loadSettings(QSettings *settings) {
 	setWidthF(settings->value("width",nWidth).toDouble());
 	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
 	changeColorHolder(settings->value("colorHolder",ref.brush().color()).value<QColor>());
-	settings->endGroup();
+
+    if (settings->childGroups().contains("Properties")) {
+        settings->beginGroup("Properties");
+        foreach(QString my_key, settings->allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+        }
+        settings->endGroup();
+    }
+
+    settings->endGroup();
 }
 
 void
@@ -427,7 +433,19 @@ nPoint::saveSettings(QSettings *settings) {
 	settings->setValue("colorLine",nColor);
 	settings->setValue("sizeHolder",nSizeHolder);
 	settings->setValue("colorHolder",ref.brush().color());
-	settings->endGroup();
+
+    settings->beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        qDebug() << "save" << ba << " : " << property(ba);
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            settings->setValue(ba, property(ba));
+        }
+    }
+    settings->endGroup();
+
+    settings->endGroup();
 }
 
 

@@ -41,6 +41,8 @@ nHDF5::nHDF5(neutrino *nparent, QString winname)
     connect(my_w.treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
     connect(my_w.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
 
+    setProperty("NeuSave-fileHDF","nHDF.h5");
+
     show();
 
 }
@@ -110,11 +112,11 @@ void nHDF5::showFile(QString fname) {
 }
 
 void nHDF5::showFile() {
-    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any files")+QString(" (*)"));
+    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any files")+QString(" (*)"));
     foreach (QString fname, fnames) {
         showFile(fname);
     }
-    if (!fnames.isEmpty()) setProperty("fileHDF", fnames);
+    if (!fnames.isEmpty()) setProperty("NeuSave-fileHDF", fnames);
 }
 
 void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {

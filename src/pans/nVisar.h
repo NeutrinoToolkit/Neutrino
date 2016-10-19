@@ -25,6 +25,7 @@
 #ifndef __nVisar
 #define __nVisar
 
+#include <array>
 #include <QtGui>
 #include <QWidget>
 
@@ -32,12 +33,31 @@
 
 #include "nCustomPlots.h"
 
+#include "nPhysWave.h"
+
+class nVisarPhasePlot : public nCustomPlotMouseX3Y {
+    Q_OBJECT
+
+public:
+    nVisarPhasePlot(QWidget*);
+};
+
+class nVisarPlot : public nCustomPlotMouseX3Y {
+    Q_OBJECT
+
+public:
+    nVisarPlot(QWidget*);
+};
+
+class nSOPPlot : public nCustomPlotMouseX2Y {
+    Q_OBJECT
+public:
+    nSOPPlot(QWidget*);
+};
+
 #include "ui_nVISAR1.h"
 #include "ui_nVISAR2.h"
 #include "ui_nVISAR3.h"
-
-#include "nPhysWave.h"
-#include <array>
 
 class neutrino;
 class nLine;
@@ -46,6 +66,9 @@ class nRect;
 
 template<class T>
 inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
+
+
+
 
 class nVisar : public nGenericPan {
     Q_OBJECT

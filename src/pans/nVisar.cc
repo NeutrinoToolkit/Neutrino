@@ -25,6 +25,90 @@
 #include "nVisar.h"
 #include "neutrino.h"
 
+
+nVisarPhasePlot::nVisarPhasePlot(QWidget* parent):
+    nCustomPlotMouseX3Y(parent)
+{
+
+    xAxis->setLabel(tr("Pixel"));
+    yAxis->setLabel(tr("Fringeshift"));
+    yAxis2->setLabel(tr("Intensity"));
+    yAxis3->setLabel(tr("Contrast"));
+
+    QPen pen;
+    for (unsigned int k=0; k<2; k++) {
+        QString my_type(k==0?"reference":"shot");
+        QCPGraph* graph;
+        graph = addGraph(xAxis, yAxis3);
+        graph->setName("Contrast "+my_type);
+        pen.setColor(yAxis3->labelColor());
+        graph->setPen(pen);
+
+        graph = addGraph(xAxis, yAxis2);
+        graph->setName("Intensity "+my_type);
+        pen.setColor(yAxis2->labelColor());
+        graph->setPen(pen);
+
+        graph = addGraph(xAxis, yAxis);
+        graph->setName("Fringeshift "+my_type);
+        pen.setColor(yAxis->labelColor());
+        graph->setPen(pen);
+    }
+}
+
+nVisarPlot::nVisarPlot(QWidget* parent):
+    nCustomPlotMouseX3Y(parent)
+{
+    xAxis->setLabel(tr("Position [time]"));
+    yAxis->setLabel(tr("Velocity"));
+    yAxis2->setLabel(tr("Reflectivity"));
+    yAxis3->setLabel(tr("Quality"));
+
+    QPen pen;
+    for (unsigned int k=0; k<2; k++) {
+        QCPGraph* graph;
+        graph = addGraph(xAxis, yAxis3);
+        graph->setName("Quality Visar "+QString::number(k+1));
+        pen.setColor(yAxis3->labelColor());
+        graph->setPen(pen);
+
+        graph = addGraph(xAxis, yAxis2);
+        graph->setName("Reflectivity Visar "+QString::number(k+1));
+        pen.setColor(yAxis2->labelColor());
+        graph->setPen(pen);
+
+        graph = addGraph(xAxis, yAxis);
+        graph->setName("Velocity Visar "+QString::number(k+1));
+        pen.setColor(yAxis->labelColor());
+        graph->setPen(pen);
+    }
+}
+
+
+nSOPPlot::nSOPPlot(QWidget* parent):
+    nCustomPlotMouseX2Y(parent)
+{
+    QCPGraph* graph;
+    graph = addGraph(xAxis, yAxis);
+    graph->setName("SOP");
+    graph->setPen(QPen(yAxis->labelColor()));
+
+    graph = addGraph(xAxis, yAxis2);
+    graph->setName("SOP 1");
+    graph->setPen(QPen(yAxis2->labelColor()));
+
+    graph = addGraph(xAxis, yAxis2);
+    graph->setName("SOP 2");
+    graph->setPen(QPen(yAxis2->labelColor(),0.3));
+
+    graph = addGraph(xAxis, yAxis2);
+    graph->setName("SOP 3");
+    graph->setPen(QPen(yAxis2->labelColor(),0.7));
+
+};
+
+
+
 nVisar::~nVisar() {
 }
 
@@ -95,18 +179,8 @@ nVisar::nVisar(neutrino *nparent, QString winname)
             obj->setProperty("id", k);
         }
 
-        visar[k].plotPhaseIntensity->xAxis->setLabel(tr("Position [px]"));
-        visar[k].plotPhaseIntensity->yAxis->setLabel(tr("FringeShift"));
-        visar[k].plotPhaseIntensity->yAxis2->setLabel(tr("Intensity"));
-        visar[k].plotPhaseIntensity->yAxis3->setLabel(tr("Contrast"));
-
     }
     my_w.sopScale->setProperty("id", 2);
-
-    my_w.plotVelocity->xAxis->setLabel(tr("Position [time]"));
-    my_w.plotVelocity->yAxis->setLabel(tr("Velocity"));
-    my_w.plotVelocity->yAxis2->setLabel(tr("Reflectivity"));
-    my_w.plotVelocity->yAxis3->setLabel(tr("Quality"));
 
     for (int k=0;k<2;k++){
         for (int m=0;m<2;m++){
@@ -119,6 +193,7 @@ nVisar::nVisar(neutrino *nparent, QString winname)
             intensity[k][m].setShortName("intensity");
         }
     }
+    QApplication::processEvents();
 
     connections();
     tabChanged();
@@ -130,10 +205,8 @@ void nVisar::loadSettings(QString my_settings) {
     disconnections();
     nGenericPan::loadSettings(my_settings);
     connections();
-    QApplication::processEvents();
     sweepChanged();
     doWave();
-    QApplication::processEvents();
 }
 
 void nVisar::mouseAtPlot(QMouseEvent* e) {
@@ -240,7 +313,6 @@ void nVisar::bufferChanged(nPhysD*phys) {
 }
 
 void nVisar::tabChanged(int k) {
-    QApplication::processEvents();
     QTabWidget *tabWidget=nullptr;
 
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
@@ -265,7 +337,6 @@ void nVisar::tabChanged(int k) {
         nparent->showPhys(getPhysFromCombo(my_w.sopShot));
         updatePlotSOP();
     }
-    QApplication::processEvents();
 }
 
 void nVisar::connections() {
@@ -363,7 +434,6 @@ void nVisar::updatePlotSOP() {
     nPhysD *shot=getPhysFromCombo(my_w.sopShot);
     nPhysD *ref=getPhysFromCombo(my_w.sopRef);
     int dir=my_w.sopDirection->currentIndex();
-    my_w.sopPlot->clearGraphs();
     if (shot) {
         QRect geom2=sopRect->getRect(shot);
         if (ref) geom2=geom2.intersected(QRect(0,0,ref->getW(),ref->getH()));
@@ -400,11 +470,7 @@ void nVisar::updatePlotSOP() {
         default:
             break;
         }
-        QCPGraph* graph;
-        graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis);
-        graph->setName("SOP");
-        graph->setPen(QPen(my_w.sopPlot->yAxis->labelColor()));
-        graph->setData(time_sop,sopCurve[0]);
+        my_w.sopPlot->graph(0)->setData(time_sop,sopCurve[0]);
 
         // TEMPERATURE FROM REFLECTIVITY
         QVector<int> reflList;
@@ -475,21 +541,13 @@ void nVisar::updatePlotSOP() {
                 sopCurve[3][i]=0.0;
             }
         }
-        graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
-        graph->setName("SOP 1");
-        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor()));
-        graph->setData(time_sop,sopCurve[1]);
+        my_w.sopPlot->graph(1)->setData(time_sop,sopCurve[1]);
 
-        graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
-        graph->setName("SOP 2");
-        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor(),0.3));
-        graph->setData(time_sop,sopCurve[2]);
+        my_w.sopPlot->graph(2)->setData(time_sop,sopCurve[2]);
 
-        graph = my_w.sopPlot->addGraph(my_w.sopPlot->xAxis, my_w.sopPlot->yAxis2);
-        graph->setName("SOP 3");
-        graph->setPen(QPen(my_w.sopPlot->yAxis2->labelColor(),0.7));
-        graph->setData(time_sop,sopCurve[3]);
+        my_w.sopPlot->graph(3)->setData(time_sop,sopCurve[3]);
 
+        my_w.sopPlot->rescaleAxes();
         my_w.sopPlot->replot();
     }
     connections();
@@ -499,8 +557,13 @@ void nVisar::updatePlot() {
     my_w.statusbar->showMessage("Updating");
     disconnections();
 
-    my_w.plotVelocity->clearGraphs();
     my_w.plotVelocity->clearItems();
+
+    for (int g=0; g<my_w.plotVelocity->plottableCount(); g++) {
+        if (my_w.plotVelocity->plottable(g)->property("JumpGraph").toBool()) {
+            my_w.plotVelocity->removePlottable(my_w.plotVelocity->plottable(g));
+        }
+    }
 
     for (int k=0;k<2;k++){
         if (cPhase[0][k].size()){
@@ -602,39 +665,37 @@ void nVisar::updatePlot() {
                     }
                 }
 
-                QCPGraph* graph;
                 QPen pen;
                 pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
 
                 if (setvisar[k].jump->value()!=0) {
                     for (int i=0;i<abs(setvisar[k].jump->value());i++) {
-                        graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
+                        QCPGraph* graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
+                        graph->setProperty("JumpGraph",true);
                         graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
                         QColor color(my_w.plotVelocity->yAxis->labelColor());
                         color.setAlpha(100);
                         pen.setColor(color);
                         graph->setPen(pen);
+
                         graph->setData(time_vel[k],velJump_array[i]);
                     }
                 }
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis3);
-                graph->setName("Quality Visar "+QString::number(k+1));
-                pen.setColor(my_w.plotVelocity->yAxis3->labelColor());
-                graph->setPen(pen);
-                graph->setData(time_vel[k],quality[k]);
+                pen=my_w.plotVelocity->graph(3*k+0)->pen();
+                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                my_w.plotVelocity->graph(3*k+0)->setPen(pen);
+                my_w.plotVelocity->graph(3*k+0)->setData(time_vel[k],quality[k]);
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis2);
-                graph->setName("Reflectivity Visar "+QString::number(k+1));
-                pen.setColor(my_w.plotVelocity->yAxis2->labelColor());
-                graph->setPen(pen);
-                graph->setData(time_vel[k],reflectivity[k]);
+                pen=my_w.plotVelocity->graph(3*k+1)->pen();
+                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                my_w.plotVelocity->graph(3*k+1)->setPen(pen);
+                my_w.plotVelocity->graph(3*k+1)->setData(time_vel[k],reflectivity[k]);
 
-                graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
-                graph->setName("Velocity Visar "+QString::number(k+1));
-                pen.setColor(my_w.plotVelocity->yAxis->labelColor());
-                graph->setPen(pen);
-                graph->setData(time_vel[k],velocity[k]);
+                pen=my_w.plotVelocity->graph(3*k+2)->pen();
+                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                my_w.plotVelocity->graph(3*k+2)->setPen(pen);
+                my_w.plotVelocity->graph(3*k+2)->setData(time_vel[k],velocity[k]);
 
             }
         }
@@ -690,7 +751,6 @@ void nVisar::getCarrier(int k) {
             }
         }
     }
-    QApplication::processEvents();
     connections();
 }
 
@@ -718,16 +778,17 @@ void nVisar::doWave(int k) {
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             sweepChanged(setvisar[k].physScale);
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
             progress.setValue(++counter);
-            QApplication::processEvents();
-            
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
             size_t dx=physfftRef.getW();
             size_t dy=physfftRef.getH();
             
@@ -749,20 +810,20 @@ void nVisar::doWave(int k) {
             }
             
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 #pragma omp parallel for
             for (size_t kk=0; kk<dx*dy; kk++) {
                 intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));
                 intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));
             }
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
             phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
             
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double cr = cos((visar[k].angle->value()) * _phys_deg);
             double sr = sin((visar[k].angle->value()) * _phys_deg);
             double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
@@ -787,16 +848,16 @@ void nVisar::doWave(int k) {
             }
             
             progress.setValue(++counter);
-            QApplication::processEvents();
-            
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
             physfftRef = zz_morletRef.ft2(PHYS_BACKWARD);
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             physfftShot = zz_morletShot.ft2(PHYS_BACKWARD);
             
             progress.setValue(++counter);
-            QApplication::processEvents();
-            
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
 #pragma omp parallel for
             for (size_t kk=0; kk<dx*dy; kk++) {
                 phase[k][0].Timg_buffer[kk] = -physfftRef.Timg_buffer[kk].arg()/(2*M_PI);
@@ -808,22 +869,21 @@ void nVisar::doWave(int k) {
                 intensity[k][1].Timg_buffer[kk] -= contrast[k][1].point(kk)*cos(2*M_PI*phase[k][1].point(kk));
             }
             progress.setValue(++counter);
-            QApplication::processEvents();
-            
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
             getPhase(k);
 
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             updatePlot();
             progress.setValue(++counter);
-            QApplication::processEvents();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         } else {
             statusBar()->showMessage("size mismatch",5000);
         }
     }
     connections();
-    QApplication::processEvents();
 }
 
 void nVisar::getPhase() {
@@ -957,15 +1017,14 @@ void nVisar::getPhase(int k) {
             visar[k].plotPhaseIntensity->replot();
         }
     }
-    QApplication::processEvents();
     connections();
 }
 
 void
 nVisar::export_txt_multiple() {
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
+        setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
@@ -993,9 +1052,9 @@ nVisar::export_txt() {
         title=tr("SOP");
         break;
     }
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save ")+title,property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save ")+title,property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
+        setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);

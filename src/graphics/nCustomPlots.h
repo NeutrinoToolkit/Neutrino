@@ -72,9 +72,14 @@ public slots:
     void setLog(bool val);
     void setColor();
     void setTitle(QString);
+    void setTitleFont(QFont);
     void changeTitleFont();
     void changeAxisFont();
     void showAxis(bool);
+
+    void showGraph(bool);
+    void changeGraphThickness(double);
+
 };
 
 //plot with mouse (vertical)

@@ -29,8 +29,6 @@
 nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, title)
 {
 
-	setProperty("fileTxt",QString("Data.txt"));
-
 	my_w.setupUi(this);
 
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(remove_point()));
@@ -189,9 +187,9 @@ void nMouseInfo::copyPoints() {
 
 void
 nMouseInfo::export_txt() {
-	QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileTxt",fnametmp);
+        setProperty("NeuSave-fileTxt",fnametmp);
 		QFile t(fnametmp);
 		t.open(QIODevice::WriteOnly| QIODevice::Text);
 		QTextStream out(&t);

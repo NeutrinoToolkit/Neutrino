@@ -34,8 +34,6 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
 
     PythonQt::self()->getMainModule().addObject("neu", nparent);
 
-    setProperty("fileTxt","test.py");
-
     show();
     
     connect(my_w.changeScriptsFolder, SIGNAL(released()), this, SLOT(changeScriptsFolder()));
@@ -56,9 +54,9 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
 
 void nPython::loadScript(void) {
 	QString fname;
-    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
+    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("NeuSave-fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
 	if (!fname.isEmpty()) {
-        setProperty("fileTxt",fname);
+        setProperty("NeuSave-fileTxt",fname);
         QFile t(fname);
         t.open(QIODevice::ReadOnly| QIODevice::Text);
         QTextStream out(&t);
