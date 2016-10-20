@@ -49,10 +49,12 @@ public slots:
 	void changeFont();
 	void hideEvent(QHideEvent*);
 	void showEvent(QShowEvent*);
-	void useDot();
     void askCloseUnsaved();
     void changephysNameLength(int);
     void on_openclUnit_valueChanged(int);
+    void resetSettings();
+    void changeLanguage(int);
+    static void changeLanguage(QLocale::Language language);
 };
 
 #endif

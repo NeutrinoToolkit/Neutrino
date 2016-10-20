@@ -5,6 +5,11 @@
 #include "nHash.h"
 #endif
 
+
+NApplication::NApplication( int &argc, char **argv ) : QApplication(argc, argv) {
+}
+
+
 #ifdef HAVE_PYTHONQT
 QList<neutrino*> NApplication::neus() {
     QList<neutrino*> retList;

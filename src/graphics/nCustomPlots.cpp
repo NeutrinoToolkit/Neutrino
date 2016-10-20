@@ -139,6 +139,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
         my_pad->setWindowTitle("Plot "+objectName());
         connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
         connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
+        connect(my_w.actionChangeFonts, SIGNAL(triggered()), this, SLOT(changeAllFonts()));
         connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
         connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
         connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
@@ -379,6 +380,19 @@ void nCustomPlot::setTitle (QString my_title) {
     replot();
 }
 
+void nCustomPlot::changeAllFonts() {
+    bool ok;
+    QFont myfont = QFontDialog::getFont(&ok, title->font(), this, "Title Font");
+    if (ok) {
+        setTitleFont(myfont);
+        foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+            axis->setLabelFont(myfont);
+            axis->setTickLabelFont(myfont);
+        }
+        replot();
+    }
+}
+
 void nCustomPlot::setTitleFont (QFont myfont) {
     title->setFont(myfont);
     replot();
@@ -397,10 +411,10 @@ void nCustomPlot::changeAxisFont() {
         QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
         if (axis) {
             bool ok;
-            QFont font = QFontDialog::getFont(&ok, axis->labelFont(), this, axis->label()+" Font", QFontDialog::DontUseNativeDialog);
+            QFont myfont = QFontDialog::getFont(&ok, axis->labelFont(), this, axis->label()+" Font");
             if (ok) {
-                axis->setLabelFont(font);
-                axis->setTickLabelFont(font);
+                axis->setLabelFont(myfont);
+                axis->setTickLabelFont(myfont);
                 replot();
             }
         }

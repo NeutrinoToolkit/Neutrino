@@ -77,6 +77,8 @@ public slots:
     void changeAxisFont();
     void showAxis(bool);
 
+    void changeAllFonts();
+
     void showGraph(bool);
     void changeGraphThickness(double);
 

@@ -77,8 +77,6 @@ void nPython::runScript(void) {
     runScript(my_w.script->toPlainText());
 }
 
-
-
 void nPython::changeScriptsFolder() {
     QString dirName = QFileDialog::getExistingDirectory(this,tr("Python scripts directory"),my_w.changeScriptsFolder->text());
     if (QFileInfo(dirName).isDir()) {

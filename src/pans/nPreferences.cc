@@ -95,28 +95,56 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
 	loadDefaults();
     show();
-	
-    DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
-    
+	    
     my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
 
 	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
 	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+    connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+
 
     connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
 
 	my_w.labelFont->setFont(nparent->my_w.my_view->font());
 	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
-    my_w.useDot->setChecked(QLocale().language()==QLocale::English && QLocale().country()==QLocale::UnitedStates);
-	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
     connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
+    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
+
+    for(const QLocale &locale : allLocales) {
+        QLocale::Language language=locale.language();
+        if (my_w.localeCombo->findData(language)==-1)
+            my_w.localeCombo->addItem(QLocale::languageToString(language),language);
+    }
+
+    my_w.decimal->setText(QLocale().decimalPoint());
+    my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale().language()));
+
+    connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLanguage(int)));
+
 }
+
+void nPreferences::changeLanguage(int num) {
+    QLocale::Language language=qvariant_cast<QLocale::Language>(my_w.localeCombo->itemData(num));
+    changeLanguage(language);
+    my_w.decimal->setText(QLocale().decimalPoint());
+    QSettings("neutrino","").setValue("locale",language);
+    my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
+}
+
+void nPreferences::changeLanguage(QLocale::Language language) {
+    qDebug() << QLocale(language).decimalPoint() << QLocale().decimalPoint();
+    QLocale loc = QLocale();
+    loc.setNumberOptions(QLocale(language).numberOptions());
+    QLocale().setDefault(QLocale(language));
+    qDebug() << QLocale(language).decimalPoint() << QLocale().decimalPoint();
+}
+
 
 void nPreferences::on_openclUnit_valueChanged(int num) {
 my_w.openclDescription->clear();
@@ -182,6 +210,15 @@ saveDefaults();
 #endif
 }
 
+void nPreferences::resetSettings() {
+    int res=QMessageBox::warning(this,tr("Attention"), tr("Are you sure you want to remove Settings?"),
+                                 QMessageBox::Yes | QMessageBox::No);
+    if (res==QMessageBox::Yes) {
+        QSettings my_settings("neutrino","");
+        my_settings.clear();
+    }
+}
+
 void nPreferences::changeThreads(int num) {
     if (num<=1) {
         fftw_cleanup_threads();
@@ -195,15 +232,6 @@ void nPreferences::changeThreads(int num) {
     settings.setValue("threads",num);
     settings.endGroup();
     DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
-}
-
-void nPreferences::useDot() {
-    if (my_w.useDot->isChecked()) {
-        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-    } else {
-        QLocale::setDefault(QLocale::system());
-    }
-    my_w.statusBar->showMessage(QLocale::countryToString(QLocale().country()), 5000);
 }
 
 void nPreferences::askCloseUnsaved() {

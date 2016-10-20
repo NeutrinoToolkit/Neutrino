@@ -132,8 +132,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>375</width>
-             <height>146</height>
+             <width>391</width>
+             <height>162</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout">
@@ -428,6 +428,7 @@
    <addaction name="actionLoadPref"/>
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
+   <addaction name="actionChangeFonts"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionCopy"/>
    <addaction name="actionSave"/>
@@ -503,6 +504,18 @@
    </property>
    <property name="toolTip">
     <string>Refresh plot</string>
+   </property>
+  </action>
+  <action name="actionChangeFonts">
+   <property name="icon">
+    <iconset resource="../qrc/icons.qrc">
+     <normaloff>:/icons/font.png</normaloff>:/icons/font.png</iconset>
+   </property>
+   <property name="text">
+    <string>Change all fonts</string>
+   </property>
+   <property name="toolTip">
+    <string>Change all fonts</string>
    </property>
   </action>
  </widget>
