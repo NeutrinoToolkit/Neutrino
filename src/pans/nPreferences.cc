@@ -116,35 +116,42 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
     QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
 
+    if(!allLocales.contains(QLocale())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("Current: ")+QLocale::languageToString(QLocale().language())+ " " +QLocale::scriptToString(QLocale().script())+ " " +QLocale::countryToString(QLocale().country())+ " " +QString(QLocale().decimalPoint()),QLocale());
+    }
+
+    if(!allLocales.contains(QLocale::system())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("System: ")+QLocale::languageToString(QLocale::system().language())+ " " +QLocale::scriptToString(QLocale::system().script())+ " " +QLocale::countryToString(QLocale::system().country())+ " " +QString(QLocale::system().decimalPoint()),QLocale::system());
+    }
+
     for(const QLocale &locale : allLocales) {
-        QLocale::Language language=locale.language();
-        if (my_w.localeCombo->findData(language)==-1)
-            my_w.localeCombo->addItem(QLocale::languageToString(language),language);
+        my_w.localeCombo->addItem(QLocale::languageToString(locale.language())+ " " +QLocale::scriptToString(locale.script())+ " " +QLocale::countryToString(locale.country())+ " " +QString(locale.decimalPoint()),locale);
     }
 
     my_w.decimal->setText(QLocale().decimalPoint());
-    my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale().language()));
-
-    connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLanguage(int)));
+    my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
+    connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
 
 }
 
-void nPreferences::changeLanguage(int num) {
-    QLocale::Language language=qvariant_cast<QLocale::Language>(my_w.localeCombo->itemData(num));
-    changeLanguage(language);
-    my_w.decimal->setText(QLocale().decimalPoint());
-    QSettings("neutrino","").setValue("locale",language);
-    my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
-}
+void nPreferences::changeLocale(int num) {
+    QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
+    if (locale!=QLocale()) {
 
-void nPreferences::changeLanguage(QLocale::Language language) {
-    qDebug() << QLocale(language).decimalPoint() << QLocale().decimalPoint();
-    QLocale loc = QLocale();
-    loc.setNumberOptions(QLocale(language).numberOptions());
-    QLocale().setDefault(QLocale(language));
-    qDebug() << QLocale(language).decimalPoint() << QLocale().decimalPoint();
-}
+        qDebug() << QLocale::languageToString(locale.language()) <<
+                    QLocale::scriptToString(locale.script()) <<
+                    QLocale::countryToString(locale.country()) <<
+                    locale.decimalPoint();
 
+        QLocale().setDefault(locale);
+        my_w.decimal->setText(QLocale().decimalPoint());
+        QSettings settings("neutrino","");
+        settings.beginGroup("Preferences");
+        settings.setValue("locale",locale);
+        settings.endGroup();
+        my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
+    }
+}
 
 void nPreferences::on_openclUnit_valueChanged(int num) {
 my_w.openclDescription->clear();

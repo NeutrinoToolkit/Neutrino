@@ -102,15 +102,6 @@ neutrino::neutrino():
     my_tics(this)
 {
 
-    qDebug() << QLocale();
-    qDebug() << QLocale().system();
-    qDebug() << QLocale::system();
-    qDebug() << QLocale().decimalPoint();
-    qDebug() << QLocale().system().decimalPoint();
-    qDebug() << QLocale::system().decimalPoint();
-
-
-
     my_w.setupUi(this);
     setAcceptDrops(true);
 
@@ -2178,7 +2169,7 @@ void neutrino::loadDefaults(){
         }
     }
 
-    nPreferences::changeLanguage(qvariant_cast<QLocale::Language>(my_set.value("locale",QLocale().language())));
+    QLocale().setDefault(my_set.value("locale",QLocale()).toLocale());
 
     if (my_set.childGroups().contains("Properties")) {
         my_set.beginGroup("Properties");
