@@ -2169,8 +2169,6 @@ void neutrino::loadDefaults(){
         }
     }
 
-    QLocale().setDefault(my_set.value("locale",QLocale()).toLocale());
-
     if (my_set.childGroups().contains("Properties")) {
         my_set.beginGroup("Properties");
         foreach(QString my_key, my_set.allKeys()) {

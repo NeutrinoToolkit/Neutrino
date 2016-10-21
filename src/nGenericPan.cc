@@ -29,6 +29,7 @@
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
+
 	setProperty("panName",panName);
 
 	int panNum=0;

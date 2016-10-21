@@ -54,6 +54,8 @@ public slots:
     void on_openclUnit_valueChanged(int);
     void resetSettings();
     void changeLocale(int);
+
+    static void changeLocale(QLocale locale);
 };
 
 #endif

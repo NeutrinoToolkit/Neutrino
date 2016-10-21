@@ -12,6 +12,7 @@ add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
 set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
+
 if (APPLE)
     message(STATUS "Apple : remember to use brew !")
     SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
@@ -178,6 +179,7 @@ if (USE_QT5)
     qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
     qt5_add_resources(RES_SOURCES ${HELP_QRC})
 
+
     if (PYTHONQT_FOUND_COMPLETE)
         qt5_add_resources(RES_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/python/python.qrc)
     endif()
@@ -200,6 +202,47 @@ endif()
 include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
+#translate ui
+if (APPLE)
+  SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
+endif(APPLE)
+
+find_package(Qt5LinguistTools)
+
+if (Qt5LinguistTools_FOUND)
+  SET(LANGUAGES fr_FR)
+
+  SET(LANGUAGE_TS_FILES)
+  FOREACH(LANGUAGE ${LANGUAGES})
+    message(STATUS "Language : add ${LANGUAGE}")
+    SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
+    message(STATUS "Language : ${TS_FILE}")
+    SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
+  ENDFOREACH(LANGUAGE ${LANGUAGES})
+  IF(LANGUAGE_TS_FILES)
+    qt5_create_translation(qm_files ${SRCS} ${LANGUAGE_TS_FILES})
+  ENDIF(LANGUAGE_TS_FILES)
+
+  message(STATUS "qm_files : ${qm_files}")
+  qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
+
+  set(TRANSL_QRC ${QRCDIR}/translations.qrc)
+  file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
+  foreach(my_file ${qm_files})
+      file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
+      GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
+      file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+  endforeach()
+  file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
+  list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
+  message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
+
+  qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
+
+endif(Qt5LinguistTools_FOUND)
+
+
+
 list(APPEND CMAKE_MODULE_PATH "../lib")
 
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
@@ -209,17 +252,17 @@ set(LIBS ${LIBS} "nPhysImageF")
 add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
 if(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} ${qm_files})
 endif()
 
 if(LINUX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC})
+    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 endif()
 
 

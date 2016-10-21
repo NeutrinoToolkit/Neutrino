@@ -29,6 +29,8 @@
 #include <QtGui>
 //#include <QtSql>
 
+#include "nPreferences.h"
+
 #include "neutrino.h"
 #include "nApp.h"
 
@@ -42,10 +44,17 @@
 #include "nPython.h"
 #endif
 
+#include <QTranslator>
+
 int main(int argc, char **argv)
 {
 
     NApplication qapp(argc,argv);
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("Preferences");
+    nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
+    my_set.endGroup();
 
 #ifdef USE_QT5
     qapp.setAttribute(Qt::AA_UseHighDpiPixmaps);

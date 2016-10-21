@@ -98,17 +98,18 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	    
     my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
 
+    changeFont();
+
 	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
-	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+    connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
+    connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
+    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
 
     connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
 
-	my_w.labelFont->setFont(nparent->my_w.my_view->font());
-	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
 	
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
@@ -134,23 +135,45 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
 }
 
-void nPreferences::changeLocale(int num) {
-    QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
+void nPreferences::changeLocale(QLocale locale) {
     if (locale!=QLocale()) {
 
         qDebug() << QLocale::languageToString(locale.language()) <<
                     QLocale::scriptToString(locale.script()) <<
                     QLocale::countryToString(locale.country()) <<
+                    locale.bcp47Name() <<
+                    locale.country() <<
+                    locale.name() <<
                     locale.decimalPoint();
 
         QLocale().setDefault(locale);
-        my_w.decimal->setText(QLocale().decimalPoint());
         QSettings settings("neutrino","");
         settings.beginGroup("Preferences");
         settings.setValue("locale",locale);
         settings.endGroup();
-        my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
+
+
+        QDirIterator it(":translations/", QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            QString fname=it.next();
+            qDebug() << fname;
+            if (fname.contains(locale.name())) {
+                QTranslator *translator=new QTranslator(qApp);
+                bool ok=translator->load(fname);
+                if (ok) {
+                    qApp->installTranslator(translator);
+                    qDebug() << "installing translator" << fname;
+                }
+            }
+        }
     }
+}
+
+void nPreferences::changeLocale(int num) {
+    QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
+    changeLocale(locale);
+    my_w.decimal->setText(QLocale().decimalPoint());
+    my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
 }
 
 void nPreferences::on_openclUnit_valueChanged(int num) {
@@ -251,18 +274,20 @@ void nPreferences::changeShowDimPixel() {
 }
 
 void nPreferences::changeFont() {
-	bool ok;
-	QFont font = QFontDialog::getFont(&ok, nparent->my_w.my_view->font(), this);
-	if (ok) {
-		nparent->my_w.my_view->setFont(font);
-		my_w.labelFont->setFont(font);
-		my_w.labelFont->setText(font.family()+" "+QString::number(font.pointSize()));
-		QSettings settings("neutrino","");
-		settings.beginGroup("Preferences");
-		settings.setValue("defaultFont",font.toString());
-		settings.endGroup();
-		nparent->my_w.my_view->setSize();
-	}
+    QFont font=nparent->my_w.my_view->font();
+    if (sender()) {
+        font=my_w.fontFace->currentFont();
+        font.setPointSize(my_w.fontSize->value());
+    } else {
+        my_w.fontFace->setCurrentFont(font);
+        my_w.fontSize->setValue(font.pointSize());
+    }
+    nparent->my_w.my_view->setFont(font);
+    QSettings settings("neutrino","");
+    settings.beginGroup("Preferences");
+    settings.setValue("defaultFont",font.toString());
+    settings.endGroup();
+    nparent->my_w.my_view->setSize();
 }
 
 void nPreferences::changeIconSize(int val) {
