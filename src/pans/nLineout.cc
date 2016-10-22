@@ -97,7 +97,7 @@ nLineout::updatePlot(QPointF p) {
                 y[i]=currentBuffer->point(b_p(other_dir),i+lat_skip);
             }
         }
-        my_w.plot->graph(0)->setData(x,y);
+        my_w.plot->graph(0)->setData(x,y,true);
         my_w.plot->graph(0)->rescaleKeyAxis();
 
         if(!my_w.actionAutoscale->isChecked()) {
