@@ -90,6 +90,8 @@ before_deploy:
 
 deploy:
   provider: releases
+  edge:
+    branch: releases-fix
   api_key: $github_token
   file: "${RELEASE_FILE}"
   skip_cleanup: true
