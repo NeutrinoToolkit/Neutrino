@@ -12294,8 +12294,8 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 /* end of 'src/item.cpp' */
 
 
-/* including file 'src/core.cpp', size 124243                                */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/core.cpp', size 124668                                */
+/* commit 29aafbce469a36d175d4fb32cbfd1f50a6072890 2016-10-12 19:21:24 +0200 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCustomPlot
@@ -12629,6 +12629,7 @@ QCustomPlot::QCustomPlot(QWidget *parent) :
   mOpenGl(false),
   mMouseHasMoved(false),
   mMouseEventLayerable(0),
+  mMouseSignalLayerable(0),
   mReplotting(false),
   mReplotQueued(false),
   mOpenGlMultisamples(16),
@@ -14566,12 +14567,18 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
       mSelectionRect->startSelection(event);
   } else
   {
-    // no selection rect interaction, so forward event to layerable under the cursor:
+    // no selection rect interaction, prepare for click signal emission and forward event to layerable under the cursor:
     QList<QVariant> details;
     QList<QCPLayerable*> candidates = layerableListAt(mMousePressPos, false, &details);
+    if (!candidates.isEmpty())
+    {
+      mMouseSignalLayerable = candidates.first(); // candidate for signal emission is always topmost hit layerable (signal emitted in release event)
+      mMouseSignalLayerableDetails = details.first();
+    }
+    // forward event to topmost candidate which accepts the event:
     for (int i=0; i<candidates.size(); ++i)
     {
-      event->accept(); // default impl of QCPLayerable's mouse events ignore the event, in that case propagate to next candidate in list
+      event->accept(); // default impl of QCPLayerable's mouse events call ignore() on the event, in that case propagate to next candidate in list
       candidates.at(i)->mousePressEvent(event, details.at(i));
       if (event->isAccepted())
       {
@@ -14638,20 +14645,21 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
       processPointSelection(event);
     
     // emit specialized click signals of QCustomPlot instance:
-    if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseEventLayerable))
+    if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseSignalLayerable))
     {
       int dataIndex = 0;
-      if (!mMouseEventLayerableDetails.value<QCPDataSelection>().isEmpty())
-        dataIndex = mMouseEventLayerableDetails.value<QCPDataSelection>().dataRange().begin();
+      if (!mMouseSignalLayerableDetails.value<QCPDataSelection>().isEmpty())
+        dataIndex = mMouseSignalLayerableDetails.value<QCPDataSelection>().dataRange().begin();
       emit plottableClick(ap, dataIndex, event);
-    } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseEventLayerable))
-      emit axisClick(ax, mMouseEventLayerableDetails.value<QCPAxis::SelectablePart>(), event);
-    else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseEventLayerable))
+    } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseSignalLayerable))
+      emit axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
+    else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseSignalLayerable))
       emit itemClick(ai, event);
-    else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseEventLayerable))
+    else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseSignalLayerable))
       emit legendClick(lg, 0, event);
-    else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseEventLayerable))
+    else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseSignalLayerable))
       emit legendClick(li->parentLegend(), li, event);
+    mMouseSignalLayerable = 0;
   }
   
   if (mSelectionRect && mSelectionRect->isActive()) // Note: if a click was detected above, the selection rect is canceled there
@@ -21344,8 +21352,8 @@ int QCPGraph::findIndexBelowY(const QVector<QPointF> *data, double y) const
 /* end of 'src/plottables/plottable-graph.cpp' */
 
 
-/* including file 'src/plottables/plottable-curve.cpp', size 60009           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/plottables/plottable-curve.cpp', size 60030           */
+/* commit cd1f5d347b8a9cc21f357f08a207d58618fc4cba 2016-10-20 19:47:06 +0200 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPCurveData
@@ -21511,6 +21519,7 @@ QCPCurve::QCPCurve(QCPAxis *keyAxis, QCPAxis *valueAxis) :
   
   setScatterStyle(QCPScatterStyle());
   setLineStyle(lsLine);
+  setScatterSkip(0);
 }
 
 QCPCurve::~QCPCurve()

@@ -3549,8 +3549,8 @@ private:
 /* end of 'src/item.h' */
 
 
-/* including file 'src/core.h', size 14797                                   */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file 'src/core.h', size 14886                                   */
+/* commit 29aafbce469a36d175d4fb32cbfd1f50a6072890 2016-10-12 19:21:24 +0200 */
 
 class QCP_LIB_DECL QCustomPlot : public QWidget
 {
@@ -3755,7 +3755,9 @@ protected:
   QPoint mMousePressPos;
   bool mMouseHasMoved;
   QPointer<QCPLayerable> mMouseEventLayerable;
+  QPointer<QCPLayerable> mMouseSignalLayerable;
   QVariant mMouseEventLayerableDetails;
+  QVariant mMouseSignalLayerableDetails;
   bool mReplotting;
   bool mReplotQueued;
   int mOpenGlMultisamples;
