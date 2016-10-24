@@ -49,7 +49,9 @@ public:
 	
 public slots:
 	void paintEvent(QPaintEvent *);
-	void mouseMoveEvent (QMouseEvent *);
+    void mousePressEvent (QMouseEvent *);
+    void mouseReleaseEvent (QMouseEvent *);
+    void mouseMoveEvent (QMouseEvent *);
 
     void drawPicture (QPainter&);
 	void colorValue(double);

@@ -80,7 +80,7 @@
            </font>
           </property>
           <property name="cursor">
-           <cursorShape>CrossCursor</cursorShape>
+           <cursorShape>SplitHCursor</cursorShape>
           </property>
           <property name="mouseTracking">
            <bool>true</bool>
