@@ -210,7 +210,7 @@ endif(APPLE)
 find_package(Qt5LinguistTools)
 
 if (Qt5LinguistTools_FOUND)
-  SET(LANGUAGES fr_FR)
+  SET(LANGUAGES fr_FR it_IT)
 
   SET(LANGUAGE_TS_FILES)
   FOREACH(LANGUAGE ${LANGUAGES})

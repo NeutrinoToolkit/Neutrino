@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
+    <width>380</width>
     <height>424</height>
    </rect>
   </property>
@@ -499,7 +499,7 @@
     <string>Reset settings</string>
    </property>
    <property name="toolTip">
-    <string>eset Settings (require restart)</string>
+    <string>Reset Settings (require restart)</string>
    </property>
   </action>
  </widget>

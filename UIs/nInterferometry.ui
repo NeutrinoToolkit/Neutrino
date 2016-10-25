@@ -673,7 +673,7 @@
        <item>
         <widget class="QCheckBox" name="useInterpolate">
          <property name="toolTip">
-          <string>Enable Abel</string>
+          <string>Enable Interpolation</string>
          </property>
          <property name="text">
           <string/>
@@ -968,7 +968,7 @@
     <string>rect</string>
    </property>
    <property name="toolTip">
-    <string>Show wavelet region</string>
+    <string>Show region</string>
    </property>
   </action>
   <action name="actionSavePref">

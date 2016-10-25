@@ -155,6 +155,9 @@
         <pointsize>10</pointsize>
        </font>
       </property>
+      <property name="suffix">
+       <string>b</string>
+      </property>
       <property name="maximum">
        <number>99999999</number>
       </property>

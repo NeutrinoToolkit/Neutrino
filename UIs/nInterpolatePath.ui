@@ -174,19 +174,7 @@
     <string>line</string>
    </property>
    <property name="toolTip">
-    <string>Show axis window</string>
-   </property>
-  </action>
-  <action name="actionFlipline">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//flipline.png</normaloff>:icons//flipline.png</iconset>
-   </property>
-   <property name="text">
-    <string>flipline</string>
-   </property>
-   <property name="toolTip">
-    <string>Flip Monotone</string>
+    <string>Show line window</string>
    </property>
   </action>
  </widget>

@@ -114,7 +114,7 @@
       </font>
      </property>
      <property name="suffix">
-      <string> deg</string>
+      <string>˚</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -186,7 +186,7 @@
       </font>
      </property>
      <property name="suffix">
-      <string> deg</string>
+      <string>˚</string>
      </property>
      <property name="decimals">
       <number>3</number>

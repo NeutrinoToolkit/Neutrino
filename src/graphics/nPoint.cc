@@ -125,7 +125,7 @@ void nPoint::bufferChanged(nPhysD* my_phys) {
 }
 
 void nPoint::interactive ( ) {
-	showMessage(tr("Click for the first point of the rectangle"));
+    showMessage(tr("Click for the first point"));
 	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 

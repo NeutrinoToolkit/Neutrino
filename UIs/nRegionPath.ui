@@ -226,7 +226,7 @@
     <string>line</string>
    </property>
    <property name="toolTip">
-    <string>Show axis window</string>
+    <string>Show line window</string>
    </property>
   </action>
   <action name="actionFlipline">
