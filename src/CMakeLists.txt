@@ -224,7 +224,6 @@ if (Qt5LinguistTools_FOUND)
   ENDIF(LANGUAGE_TS_FILES)
 
   message(STATUS "qm_files : ${qm_files}")
-  qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
 
   set(TRANSL_QRC ${QRCDIR}/translations.qrc)
   file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
@@ -237,6 +236,7 @@ if (Qt5LinguistTools_FOUND)
   list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
   message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
 
+  qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
   qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
 
 endif(Qt5LinguistTools_FOUND)
