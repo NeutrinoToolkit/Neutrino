@@ -261,7 +261,7 @@
     <string>rect</string>
    </property>
    <property name="toolTip">
-    <string>Show wavelet region</string>
+    <string>Show region</string>
    </property>
   </action>
   <action name="actionSavePref">

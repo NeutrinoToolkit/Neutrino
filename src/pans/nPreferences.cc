@@ -110,7 +110,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
     connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
 
-	
+
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
     connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
@@ -125,8 +125,10 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
         my_w.localeCombo->addItem(tr("System: ")+QLocale::languageToString(QLocale::system().language())+ " " +QLocale::scriptToString(QLocale::system().script())+ " " +QLocale::countryToString(QLocale::system().country())+ " " +QString(QLocale::system().decimalPoint()),QLocale::system());
     }
 
-    for(const QLocale &locale : allLocales) {
-        my_w.localeCombo->addItem(QLocale::languageToString(locale.language())+ " " +QLocale::scriptToString(locale.script())+ " " +QLocale::countryToString(locale.country())+ " " +QString(locale.decimalPoint()),locale);
+    for(auto &locale : allLocales) {
+        QString my_str=QLocale::countryToString(locale.country())+ " " +QLocale::languageToString(locale.language())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
+        qDebug() << my_str << locale.name();
+        my_w.localeCombo->addItem(my_str,locale);
     }
 
     my_w.decimal->setText(QLocale().decimalPoint());

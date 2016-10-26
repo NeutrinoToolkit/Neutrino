@@ -1327,8 +1327,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../../UIs/nGhost.ui" line="264"/>
-        <source>Show wavelet region</source>
-        <translation>Mostra regione</translation>
+        <source>Show region</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../UIs/nGhost.ui" line="273"/>
@@ -1843,8 +1843,13 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="676"/>
-        <source>Enable Abel</source>
-        <translation>Attiva l&apos;interpolazione</translation>
+        <source>Enable Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nInterferometry.ui" line="971"/>
+        <source>Show region</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="713"/>
@@ -1896,11 +1901,6 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <location filename="../../UIs/nInterferometry.ui" line="968"/>
         <source>rect</source>
         <translation>regione</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nInterferometry.ui" line="971"/>
-        <source>Show wavelet region</source>
-        <translation>Mostra regione</translation>
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="980"/>
@@ -1995,8 +1995,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nInterferometry1.ui" line="117"/>
         <location filename="../../UIs/nInterferometry1.ui" line="189"/>
-        <source> deg</source>
-        <translation>˚</translation>
+        <source>˚</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2063,18 +2063,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/nInterpolatePath.ui" line="177"/>
-        <source>Show axis window</source>
-        <translation>Mostra la finestra della linea</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nInterpolatePath.ui" line="186"/>
-        <source>flipline</source>
-        <translation>scambiaLinea</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nInterpolatePath.ui" line="189"/>
-        <source>Flip Monotone</source>
-        <translation>Rendi monotona</translation>
+        <source>Show line window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2738,37 +2728,42 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Salta</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="177"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="159"/>
+        <source>b</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nOpenRAW.ui" line="180"/>
         <source>Swap Endianness</source>
         <translation>Scambia orine dei byte</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="195"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="198"/>
         <source>Open</source>
         <translation>Apri</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="203"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="206"/>
         <source>toolBar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="226"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="229"/>
         <source>loadPref</source>
         <translation>Carica preferenze</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="229"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="232"/>
         <source>Load Preferences</source>
         <translation>Carica preferenze</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="238"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="241"/>
         <source>savePref</source>
         <translation>Salva preferenze</translation>
     </message>
     <message>
-        <location filename="../../UIs/nOpenRAW.ui" line="241"/>
+        <location filename="../../UIs/nOpenRAW.ui" line="244"/>
         <source>Save Preferences</source>
         <translation>Salva preferenze</translation>
     </message>
@@ -3065,8 +3060,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../src/graphics/nPoint.cc" line="128"/>
-        <source>Click for the first point of the rectangle</source>
-        <translation>Clicca per il primo punto</translation>
+        <source>Click for the first point</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/graphics/nPoint.cc" line="134"/>
@@ -3194,8 +3189,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/nPreferences.ui" line="502"/>
-        <source>eset Settings (require restart)</source>
-        <translation>Rimuovi impostazioni (richiede un rilancio)</translation>
+        <source>Reset Settings (require restart)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/pans/nPreferences.cc" line="121"/>
@@ -3208,17 +3203,17 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Sistema:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="176"/>
+        <location filename="../../src/pans/nPreferences.cc" line="178"/>
         <source>Decimal separator: </source>
         <translation>Separatore dei decimali:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="244"/>
+        <location filename="../../src/pans/nPreferences.cc" line="246"/>
         <source>Attention</source>
         <translation>Attenzione</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="244"/>
+        <location filename="../../src/pans/nPreferences.cc" line="246"/>
         <source>Are you sure you want to remove Settings?</source>
         <translation>Sicuro di voler rimuovere le impostazioni?</translation>
     </message>
@@ -3450,8 +3445,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/nRegionPath.ui" line="229"/>
-        <source>Show axis window</source>
-        <translation>Mostra la finestra della linea</translation>
+        <source>Show line window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../UIs/nRegionPath.ui" line="238"/>
@@ -4043,8 +4038,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/nVISAR2.ui" line="264"/>
-        <source>Sweep speed (if multiple values take the polynome)</source>
-        <translation>Risoluzione temporale in pixel</translation>
+        <source>Time resolution in pixel</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../UIs/nVISAR2.ui" line="267"/>

@@ -210,7 +210,8 @@ endif(APPLE)
 find_package(Qt5LinguistTools)
 
 if (Qt5LinguistTools_FOUND)
-  SET(LANGUAGES fr_FR it_IT)
+  option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" on)
+  SET(LANGUAGES fr_FR it_IT ko_KP)
 
   SET(LANGUAGE_TS_FILES)
   FOREACH(LANGUAGE ${LANGUAGES})
@@ -219,25 +220,34 @@ if (Qt5LinguistTools_FOUND)
     message(STATUS "Language : ${TS_FILE}")
     SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
   ENDFOREACH(LANGUAGE ${LANGUAGES})
+
   IF(LANGUAGE_TS_FILES)
-    qt5_create_translation(qm_files ${SRCS} ${LANGUAGE_TS_FILES})
+
+    if (UPDATE_TRANSLATIONS)
+      qt5_create_translation(qm_files ${SOURCES} ${UIS} ${LANGUAGE_TS_FILES})
+      message(STATUS "qm_files created: ${qm_files}")
+    else (UPDATE_TRANSLATIONS)
+      qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
+       message(STATUS "qm_files added : ${qm_files}")
+    endif (UPDATE_TRANSLATIONS) 
+
+
+    set(TRANSL_QRC ${QRCDIR}/translations.qrc)
+    file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
+    foreach(my_file ${qm_files})
+        file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
+        GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
+        file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    endforeach()
+    file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
+    list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
+    message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
+
+
+
+    qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
   ENDIF(LANGUAGE_TS_FILES)
 
-  message(STATUS "qm_files : ${qm_files}")
-
-  set(TRANSL_QRC ${QRCDIR}/translations.qrc)
-  file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
-  foreach(my_file ${qm_files})
-      file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
-      GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-      file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
-  endforeach()
-  file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-  list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
-  message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
-
-  qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
-  qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
 
 endif(Qt5LinguistTools_FOUND)
 
