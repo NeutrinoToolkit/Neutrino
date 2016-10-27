@@ -49,12 +49,15 @@
 int main(int argc, char **argv)
 {
 
+    qSetMessagePattern("%{function}:%{line} : %{message}");
+
     NApplication qapp(argc,argv);
 
     QSettings my_set("neutrino","");
     my_set.beginGroup("Preferences");
     nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
     my_set.endGroup();
+
 
 #ifdef USE_QT5
     qapp.setAttribute(Qt::AA_UseHighDpiPixmaps);

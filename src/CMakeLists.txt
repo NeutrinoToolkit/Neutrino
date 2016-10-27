@@ -210,7 +210,7 @@ endif(APPLE)
 find_package(Qt5LinguistTools)
 
 if (Qt5LinguistTools_FOUND)
-  option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" on)
+  option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" off)
   SET(LANGUAGES fr_FR it_IT ko_KP)
 
   SET(LANGUAGE_TS_FILES)
@@ -375,4 +375,10 @@ elseif(WIN32)
 else()
     set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
+
+if (APPLE)
+set (CMAKE_INSTALL_RPATH "/usr/local/lib")
+set (CMAKE_MACOSX_RPATH off)
+endif()
+
 

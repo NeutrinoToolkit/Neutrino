@@ -1328,7 +1328,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../UIs/nGhost.ui" line="264"/>
         <source>Show region</source>
-        <translation type="unfinished"></translation>
+        <translation>Région</translation>
     </message>
     <message>
         <location filename="../../UIs/nGhost.ui" line="273"/>
@@ -1848,7 +1848,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6</translation>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="971"/>
         <source>Show region</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Région</translation>
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="713"/>
@@ -3060,7 +3060,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6</translation>
     <message>
         <location filename="../../src/graphics/nPoint.cc" line="128"/>
         <source>Click for the first point</source>
-        <translation type="unfinished"></translation>
+        <translation>Clque pour le prémier point</translation>
     </message>
     <message>
         <location filename="../../src/graphics/nPoint.cc" line="134"/>
@@ -5153,7 +5153,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6</translation>
     <message>
         <location filename="../../UIs/neutrino.ui" line="630"/>
         <source>Preferences...</source>
-        <translation>Preférences...</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../UIs/neutrino.ui" line="635"/>
@@ -5432,7 +5432,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6</translation>
     <message>
         <location filename="../../src/neutrino.cc" line="847"/>
         <source>Contact dev team.</source>
-        <translation>Contact des développeurs</translation>
+        <translation>Contact des développeurs.</translation>
     </message>
     <message>
         <location filename="../../src/neutrino.cc" line="862"/>

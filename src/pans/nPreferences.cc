@@ -37,6 +37,7 @@
 #include "clFFT.h"
 #endif
 
+
 nPreferences::nPreferences(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname) {
 	my_w.setupUi(this);
@@ -117,16 +118,18 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 
     QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
 
-    if(!allLocales.contains(QLocale())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("Current: ")+QLocale::languageToString(QLocale().language())+ " " +QLocale::scriptToString(QLocale().script())+ " " +QLocale::countryToString(QLocale().country())+ " " +QString(QLocale().decimalPoint()),QLocale());
+    if(!allLocales.contains(QLocale::system())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("System: ")+localeToString(QLocale::system()),QLocale::system());
     }
 
-    if(!allLocales.contains(QLocale::system())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("System: ")+QLocale::languageToString(QLocale::system().language())+ " " +QLocale::scriptToString(QLocale::system().script())+ " " +QLocale::countryToString(QLocale::system().country())+ " " +QString(QLocale::system().decimalPoint()),QLocale::system());
+    if(!allLocales.contains(QLocale())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("Current: ")+localeToString(QLocale()),QLocale());
     }
+
+    qSort(allLocales.begin(),allLocales.end(), nPreferences::localeLessThan);
 
     for(auto &locale : allLocales) {
-        QString my_str=QLocale::countryToString(locale.country())+ " " +QLocale::languageToString(locale.language())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
+        QString my_str=localeToString(locale);
         qDebug() << my_str << locale.name();
         my_w.localeCombo->addItem(my_str,locale);
     }
@@ -136,6 +139,17 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
 
 }
+
+
+QString nPreferences::localeToString(const QLocale &locale) {
+    return QLocale::languageToString(locale.language())+ " " +QLocale::countryToString(locale.country())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
+}
+
+bool nPreferences::localeLessThan(const QLocale &loc1, const QLocale &loc2)
+{
+    return localeToString(loc1) < localeToString(loc2);
+}
+
 
 void nPreferences::changeLocale(QLocale locale) {
     if (locale!=QLocale()) {
