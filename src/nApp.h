@@ -40,8 +40,10 @@ protected:
     bool event(QEvent *ev);
 
 
+#ifdef HAVE_PYTHONQT
 public slots:
     QList<neutrino*> neus();
+#endif
 };
 #endif
 
