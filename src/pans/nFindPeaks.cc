@@ -56,8 +56,7 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
     my_w.plot->graph(0)->setPen(QPen(Qt::blue));
     my_w.plot->graph(0)->setName("FindPeaks");
 
-	decorate();
-	loadDefaults();
+    show();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
  	connect(my_w.direction, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
@@ -70,9 +69,9 @@ void nFindPeaks::setOrigin() {
 	if (currentBuffer) {
 		bool ok=true;
 		double originOffset=0.0;
-		if (!my_w.originOffset->text().isEmpty()) originOffset=my_w.originOffset->text().toDouble(&ok);
+        if (!my_w.originOffset->text().isEmpty()) originOffset=QLocale().toDouble(my_w.originOffset->text(),&ok);
 		if (ok) {
-			double origin=my_w.origin->text().toDouble(&ok)-originOffset;
+            double origin=QLocale().toDouble(my_w.origin->text(),&ok)-originOffset;
 			if (ok) {
 				if (my_w.direction->currentIndex()==0) {
 					currentBuffer->set_origin(origin,currentBuffer->get_origin().y());
@@ -89,9 +88,9 @@ void nFindPeaks::setScale() {
 	if (currentBuffer) {
 		bool ok=true;
 		double scaleMult=1.0;
-		if (!my_w.scaleOffset->text().isEmpty()) scaleMult=my_w.scaleOffset->text().toDouble(&ok);
+        if (!my_w.scaleOffset->text().isEmpty()) scaleMult=QLocale().toDouble(my_w.scaleOffset->text(),&ok);
 		if (ok) {
-			double scale=scaleMult/my_w.scale->text().toDouble(&ok);
+            double scale=scaleMult/QLocale().toDouble(my_w.scale->text(),&ok);
 			if (ok) {
 				if (my_w.direction->currentIndex()==0) {
 					currentBuffer->set_scale(scale,currentBuffer->get_scale().y());
@@ -197,7 +196,11 @@ void nFindPeaks::updatePlot() {
         }
         fftw_execute(planC2R2);
 		
-        my_w.plot->clearItems();
+        for (int i=0; i< my_w.plot->itemCount(); i++) {
+            QCPItemEllipse *elli = qobject_cast<QCPItemEllipse *>(my_w.plot->item(i));
+            if (elli) my_w.plot->removeItem(elli);
+        }
+
 
         std::vector<double> fitx;
         std::vector<double> fity;
@@ -209,11 +212,10 @@ void nFindPeaks::updatePlot() {
                 double posy=my_w.direction->currentIndex()==0?xd[i]:yd[i];
 
                 QCPItemEllipse *marker=new QCPItemEllipse(my_w.plot);
-                marker->topLeft->setCoords(posx-1, posy-1);
-                marker->bottomRight->setCoords(posx+1, posy+1);
+                marker->topLeft->setCoords(posx-2, posy-2);
+                marker->bottomRight->setCoords(posx+2, posy+2);
 
                 marker->setPen(QPen(Qt::red));
-                my_w.plot->addItem(marker);
 
                 fitx.push_back(k);
                 fity.push_back(posx);

@@ -41,7 +41,7 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 	QPolygonF poly;
 	poly << QPointF(0,0) << QPointF(100,100);
 	linebarrier->setPoints(poly);
-	decorate();
+    show();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));

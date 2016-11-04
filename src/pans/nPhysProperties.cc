@@ -37,7 +37,6 @@ nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
     bufferChanged(nparent->currentBuffer);
 
 	show();
-	decorate();
 }
 
 void

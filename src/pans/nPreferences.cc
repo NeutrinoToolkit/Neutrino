@@ -94,7 +94,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     my_w.openclUnit->setMaximum(openclEnabled());
 
 	loadDefaults();
-	decorate();
+    show();
 	
     DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
     

@@ -38,7 +38,7 @@ nInterpolatePath::nInterpolatePath(neutrino *nparent, QString winname)
 	region->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
 	region->toggleClosedLine(true);
 
-	decorate();
+    show();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));

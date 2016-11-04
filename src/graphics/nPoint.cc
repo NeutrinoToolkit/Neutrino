@@ -232,7 +232,7 @@ nPoint::setPoint (QPointF p) {
 
 void nPoint::changePos(QString valStr) {
 	bool ok;
-	double val=valStr.toDouble(&ok);
+    double val=QLocale().toDouble(valStr,&ok);
 	if (ok) {
 		disconnect(sender(), SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
 		if (sender()==my_w.xPos) {

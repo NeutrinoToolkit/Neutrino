@@ -32,20 +32,33 @@ class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
 private:
-    QMenu *my_menu;
+    QPointer<QCPTextElement> title;
 
 public:
     nCustomPlot(QWidget*);
 
 public slots:
-    void my_axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*);
+    void myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
+    void get_data(QTextStream &, QObject *obj=nullptr);
+    void get_data_graph(QTextStream &out, QCPGraph *graph);
 
-    void get_data(QTextStream &);
     void save_data();
     void copy_data();
     void export_image();
 
     void contextMenuEvent (QContextMenuEvent*) override;
+
+    //SETTINGS
+    void loadSettings(QSettings *);
+    void saveSettings(QSettings *);
+
+    void setLabel(QString);
+    void showGrid(bool val);
+    void setLog(bool val);
+    void setColor();
+    void setTitle(QString);
+    void changeTitleFont();
+    void changeAxisFont();
 
 };
 
@@ -57,7 +70,7 @@ public:
     nCustomPlotMouseX(QWidget*);
 
 private:
-    QCPItemLine mouseMarker;
+    QPointer<QCPItemLine> mouseMarker;
 
 public slots:
     void setMousePosition(double);
@@ -73,8 +86,8 @@ public:
     nCustomPlotMouseXY(QWidget*);
 
 private:
-    QCPItemLine mouseMarkerX;
-    QCPItemLine mouseMarkerY;
+    QPointer<QCPItemLine> mouseMarkerX;
+    QPointer<QCPItemLine> mouseMarkerY;
 
 public slots:
     void setMousePosition(double,double);
@@ -89,6 +102,20 @@ class nCustomDoublePlot : public nCustomPlotMouseXY {
 public:
     nCustomDoublePlot(QWidget*);
 
+};
+
+class nCustomPlotMouseX2Y : public nCustomPlotMouseX {
+    Q_OBJECT
+public:
+    nCustomPlotMouseX2Y(QWidget*);
+};
+
+
+class nCustomPlotMouseX3Y : public nCustomPlotMouseX2Y {
+    Q_OBJECT
+public:
+    nCustomPlotMouseX3Y(QWidget*);
+    QPointer<QCPAxis> yAxis3;
 };
 
 

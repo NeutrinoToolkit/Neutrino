@@ -31,46 +31,13 @@
 #include "nGenericPan.h"
 
 #include "nCustomPlots.h"
-class nVisarPlot : public nCustomPlotMouseX {
-    Q_OBJECT
-public:
-    nVisarPlot(QWidget* parent):
-        nCustomPlotMouseX(parent),
-        yAxis3(axisRect(0)->addAxis(QCPAxis::atRight,0))
-    {
-        yAxis2->setVisible(true);
-
-        yAxis->setLabelColor(Qt::red);
-        yAxis->setTickLabelColor(Qt::red);
-
-        yAxis2->setLabelColor(Qt::blue);
-        yAxis2->setTickLabelColor(Qt::blue);
-
-        yAxis3->setLabelColor(Qt::darkCyan);
-        yAxis3->setTickLabelColor(Qt::darkCyan);
-
-        yAxis3->setLabelPadding(-1);
-
-        QSettings settings("neutrino","");
-        settings.beginGroup("Preferences");
-        QVariant fontString=settings.value("defaultFont");
-        if (fontString.isValid()) {
-            QFont fontTmp;
-            if (fontTmp.fromString(fontString.toString())) {
-                    yAxis3->setTickLabelFont(fontTmp);
-                    yAxis3->setLabelFont(fontTmp);
-            }
-        }
-    };
-    QCPAxis *yAxis3;
-};
 
 #include "ui_nVISAR1.h"
 #include "ui_nVISAR2.h"
 #include "ui_nVISAR3.h"
 
 #include "nPhysWave.h"
-
+#include <array>
 
 class neutrino;
 class nLine;
@@ -88,10 +55,15 @@ class nVisar : public nGenericPan {
 public:
 
     nVisar(neutrino *, QString);
+    ~nVisar();
     Ui::nVISAR1 my_w;
 
-    Ui::nVISAR2 visar[2];
-    Ui::nVISAR3 setvisar[2];
+    std::array<Ui::nVISAR2,2> visar;
+    std::array<Ui::nVISAR3,2> setvisar;
+
+    double getTime(int k,double p);
+
+    std::array<std::vector<double>, 3> sweepCoeff;
 
 public slots:
 
@@ -126,28 +98,30 @@ public slots:
 
     void mouseAtMatrix(QPointF);
 
+    void mouseAtPlot(QMouseEvent* e);
+
     void loadSettings(QString);
 
     void bufferChanged(nPhysD*);
 
-    
+    void sweepChanged(QLineEdit*line=nullptr);
+
 private:
 
-    QVector<double> cPhase[2][2], cIntensity[2][2], cContrast[2][2];
-    QVector<double> time_phase[2];
+    std::array<std::array<QVector<double>,2>,2> cPhase, cIntensity, cContrast;
+    std::array<QVector<double>,2> time_phase;
 
-    QVector<double> velocity[2], reflectivity[2], quality[2];
-    QVector<double> time_vel[2];
+    std::array<QVector<double>,2> velocity, reflectivity, quality, time_vel;
 
-    QVector<double> sopCurve[4];
+    std::array<QVector<double>,4> sopCurve;
     QVector<double> time_sop;
 
-    nPhysD phase[2][2];
-    nPhysD contrast[2][2];
-    nPhysD intensity[2][2];
+    std::array<std::array<nPhysD,2>,2> phase;
+    std::array<std::array<nPhysD,2>,2> contrast;
+    std::array<std::array<nPhysD,2>,2> intensity;
 
-    QPointer<nLine> fringeLine[2];
-    QPointer<nRect> fringeRect[2];
+    std::array<QPointer<nLine>,2> fringeLine;
+    std::array<QPointer<nRect>,2> fringeRect;
     QPointer<nRect> sopRect;
 };
 

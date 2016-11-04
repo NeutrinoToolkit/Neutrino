@@ -87,14 +87,14 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 	my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
-    connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
+	connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
+	connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
+	connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
 
-    connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+	connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
 	connect(my_w.actionAntialias, SIGNAL(triggered()), this, SLOT(toggleAntialias()));
 
@@ -111,8 +111,8 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
-    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
+	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+	connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -128,28 +128,28 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
 }
 
 QString nLine::getPointsStr(){
-    QString str_points;
-    foreach(QPointF p, poly(1)) {
-        str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
-    }
-    DEBUG(str_points.toStdString());
-    return str_points;
+	QString str_points;
+	foreach(QPointF p, poly(1)) {
+		str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+	}
+	DEBUG(str_points.toStdString());
+	return str_points;
 }
 
 void nLine::copy_points() {
-    QApplication::clipboard()->setText(getPointsStr());
+	QApplication::clipboard()->setText(getPointsStr());
 }
 
 void nLine::save_points() {
-    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-    if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
-        QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
-        QTextStream out(&t);
-        out << getPointsStr();
-        t.close();
-    }
+	QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+	if (!fnametmp.isEmpty()) {
+		setProperty("fileTxt", fnametmp);
+		QFile t(fnametmp);
+		t.open(QIODevice::WriteOnly| QIODevice::Text);
+		QTextStream out(&t);
+		out << getPointsStr();
+		t.close();
+	}
 
 }
 
@@ -251,9 +251,9 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 	nodeSelected=-1;
 	if (moveRef.contains(ref.size())) {
 		QPointF delta=e->pos()-click_pos;
-	    moveBy(delta);
+		moveBy(delta);
 	}
-    click_pos=e->pos();
+	click_pos=e->pos();
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
@@ -273,22 +273,24 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 
 
 void nLine::updatePlot () {
-    if (my_w.plot->isVisible() && parent()->currentBuffer) {
 
-        if (my_w.plot->graphCount()==0) {
-            my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
-            my_w.plot->graph(0)->setPen(QPen(Qt::blue));
-            my_w.plot->xAxis->setLabel(tr("distance"));
-            my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-            my_w.plot->xAxis->setLabelPadding(-1);
-            my_w.plot->yAxis->setLabelPadding(-1);
-        }
+	nPhysD *my_phys=parent()->currentBuffer;
+	if (my_w.plot->isVisible() && my_phys) {
+
+		if (my_w.plot->graphCount()==0) {
+			my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+			my_w.plot->graph(0)->setPen(QPen(Qt::blue));
+			my_w.plot->xAxis->setLabel(tr("distance"));
+			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+			my_w.plot->xAxis->setLabelPadding(-1);
+			my_w.plot->yAxis->setLabelPadding(-1);
+			my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
+			my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
+		}
 
 		double colore;
-        QVector<double> toPlotx;
-        QVector<double> toPloty;
-
-		nPhysD *mat=parent()->currentBuffer;
+		QVector<double> toPlotx;
+		QVector<double> toPloty;
 
 		QPolygonF my_points;
 		foreach(QGraphicsEllipseItem *item, ref){
@@ -296,57 +298,52 @@ void nLine::updatePlot () {
 		}
 
 
-
 		QPolygonF my_poly=poly(numPoints);
 
-        my_w.plot->clearItems();
+		my_w.plot->clearItems();
 
 		QPen penna;
 		penna.setColor(ref[0]->brush().color());
 
-		vec2f orig = mat->get_origin();
+		vec2f orig = my_phys->get_origin();
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
-//            DEBUG(p.x() << " " << p.y() << " " << dist);
+			//            DEBUG(p.x() << " " << p.y() << " " << dist);
 			if (antialias) {
 				// points in poly are NOT translated with origin
 				// (hence a correction must apply)
-				colore=mat->getPoint(p.x()+orig.x(),p.y()+orig.y());
+				colore=my_phys->getPoint(p.x()+orig.x(),p.y()+orig.y());
 			} else {
-				colore=mat->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
+				colore=my_phys->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
 			}
-            if (std::isfinite(colore)) {
-                toPlotx << dist;
-                toPloty << colore;
-            }
+			if (std::isfinite(colore)) {
+				toPlotx << dist;
+				toPloty << colore;
+			}
 			if (my_points.contains(p) && nSizeHolder>0.0) {
-                QCPItemLine *marker=new QCPItemLine(my_w.plot);
-                marker->start->setCoords(dist, QCPRange::minRange);
-                marker->end->setCoords(dist, QCPRange::maxRange);
-                marker->setPen(penna);
-                my_w.plot->addItem(marker);
+				QCPItemLine *marker=new QCPItemLine(my_w.plot);
+				marker->start->setCoords(dist, -QCPRange::maxRange);
+				marker->end->setCoords(dist, QCPRange::maxRange);
+				marker->setPen(penna);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
 		if (antialias) {
-			colore=mat->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
+			colore=my_phys->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
 		} else {
-			colore=mat->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
+			colore=my_phys->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
 		}
-        if (std::isfinite(colore)) {
-            toPlotx << dist;
-            toPloty << colore;
+		if (std::isfinite(colore)) {
+			toPlotx << dist;
+			toPloty << colore;
 		}
 
-        my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
-        my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
 
-        my_w.plot->graph(0)->setData(toPlotx,toPloty);
-        my_w.plot->rescaleAxes();
-        my_w.plot->replot();
+		my_w.plot->graph(0)->setData(toPlotx,toPloty);
+		my_w.plot->rescaleAxes();
+		my_w.plot->replot();
 	}
-
 }
 
 void nLine::toggleBezier () {
@@ -362,7 +359,7 @@ void nLine::toggleBezier ( bool val ) {
 		showMessage(tr("Line is a polygonal chain"));
 	}
 	updatePlot();
-    itemChanged();
+	itemChanged();
 }
 
 void nLine::toggleClosedLine () {
@@ -439,8 +436,8 @@ nLine::setOrder (double w) {
 void
 nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-	p.rx()=my_w.points->item(item->row(),0)->text().toDouble();
-	p.ry()=my_w.points->item(item->row(),1)->text().toDouble();
+    p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
 	changeP(item->row(),p, true);
 }
 
@@ -646,18 +643,24 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_B:
 			toggleBezier();
-			updatePlot();
+			// .alex. 
+			//redundant
+			//updatePlot();
 			break;
 		case Qt::Key_S:
 			toggleAntialias();
-			updatePlot();
+			// .alex. 
+			//redundant
+			//updatePlot();
 			break;
 		case Qt::Key_C:
             if (e->modifiers() & Qt::ShiftModifier) {
                 centerOnImage();
             } else {
                 toggleClosedLine();
-                updatePlot();
+		// .alex. 
+		//redundant
+                //updatePlot();
             }
 			break;
 		case Qt::Key_A:

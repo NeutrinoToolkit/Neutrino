@@ -26,18 +26,19 @@
 #define nApp_H
 
 #include <QApplication>
-#include <QtGui>
-#include "neutrino.h"
+
+class neutrino;
 
 class NApplication : public QApplication {
     Q_OBJECT
 public:
 	NApplication( int &argc, char **argv ) : QApplication(argc, argv) {}
-protected:
 
+protected:
     bool notify(QObject *rec, QEvent *ev);
 
     bool event(QEvent *ev);
+
 
 #ifdef HAVE_PYTHONQT
 public slots:

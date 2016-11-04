@@ -52,7 +52,7 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
     my_w.plot->graph(0)->setName("Horizontal");
     my_w.plot->graph(1)->setName("Vertical");
 
-    decorate();
+    show();
     setBehaviour();
 	updateLastPoint();
     

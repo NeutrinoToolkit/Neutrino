@@ -1,33 +1,98 @@
-os: linux
-
-install: make get-deps
-
 language: cpp
 
+os: 
+- linux
+- osx
+
+osx_image: xcode7.1
+dist: trusty
+ 
 sudo: required
 
-dist: trusty
-
-compiler: gcc
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-5
-      
-env: COMPILER=g++-5
-          
 before_install:
-  - cat .travis.yml
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libcfitsio3-dev libhdf5-dev libtiff5-dev libfftw3-dev libfftw3-3 cmake g++ libgsl0-dev gsl-bin libhdf4-dev build-essential
+- |
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+  then
+    export COMPILER=g++-6
+    export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
+    brew update; brew tap homebrew/science
+    brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
+    brew install fftw --with-openmp; 
+  fi
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    export COMPILER=g++
+    export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
+    sudo apt-get install -yy build-essential
+    git clone https://github.com/Kitware/CMake.git
+    cd CMake
+    ./configure --prefix=/usr > cmake-configure.log
+    make
+    sudo make install
+    cd ..
+    sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
+    sudo apt-get update -qy
+    sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
+    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
+  fi
+- git clone https://github.com/iltommi/PythonQt.git
+- cd PythonQt
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
+- make 
+- sudo make install
+- cd ..
+  
 
 script:
-  - git checkout -b travis
-  - git tag -a v1.0 -m "travis 1.0"
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+- mkdir -p build_dir && cd build_dir
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
+- make
+- cd ..
 
 install:
+
+before_deploy:
+- |
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+  then
+    cp -r build_dir/Neutrino.app .
+    /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
+    git clone https://github.com/iltommi/macdeployqtfix.git
+    python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
+    /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
+    mkdir dmg
+    mv Neutrino.app dmg
+    export RELEASE_FILE=Neutrino.dmg
+    ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 ${RELEASE_FILE} dmg
+  fi
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    sudo apt-get update ; sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse # debian, Ubuntu
+    git clone https://github.com/probonopd/AppImageKit.git
+    cd AppImageKit && cmake . && make && cd ..
+    export LD_LIBRARY_PATH=/opt/qt56/lib/
+    mkdir -p Neutrino.AppDir/usr
+    cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
+    cp AppImageKit/AppRun Neutrino.AppDir
+    cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
+    mkdir -p Neutrino.AppDir/usr/lib/qt5
+    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
+    sudo apt-get install -y pax-utils
+    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    rm -rf Neutrino
+    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
+    ./AppImageKit/AppImageAssistant Neutrino.AppDir ${RELEASE_FILE}
+  fi
+
+deploy:
+  provider: releases
+  api_key: $github_token
+  file: "${RELEASE_FILE}"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true

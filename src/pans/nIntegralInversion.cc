@@ -26,7 +26,8 @@
 #include "neutrino.h"
 
 nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+: nGenericPan(nparent, winname) ,
+  invertedPhys(nullptr)
 {
 
 	my_w.setupUi(this);
@@ -59,8 +60,7 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
     
 	refphase_checkbChanged(my_w.refphase_checkb->checkState());
-	decorate();
-	invertedPhys=NULL;
+    show();
 }
 
 void nIntegralInversion::physDel(nPhysD* buf) {
@@ -223,8 +223,8 @@ QVariant nIntegralInversion::doInversion() {
 			//		}
 
             bool ok1,ok2;
-            double mini=my_w.minCut->text().toDouble(&ok1);
-            double maxi=my_w.maxCut->text().toDouble(&ok2);
+            double mini=QLocale().toDouble(my_w.minCut->text(),&ok1);
+            double maxi=QLocale().toDouble(my_w.maxCut->text(),&ok2);
             if (ok1 || ok2) {
                 phys_cutoff(*inv_image, 
                             ok1?mini:inv_image->get_min(), 

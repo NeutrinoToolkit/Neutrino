@@ -87,8 +87,6 @@ public slots:
 
 	virtual void bufferChanged(nPhysD *);
 
-	void decorate();
-
 	// threads
     void runThread(void *iparams, ifunc, QString=QString("Calculating"), int=0);
     
@@ -120,7 +118,10 @@ public slots:
 	void set(QString, QVariant, int=1);
 	QVariant get(QString, int=1);
 	QList<QList<qreal> >  getData(QString, int=1);
-	void button(QString, int=1);	
+    void button(QString, int=1);
+
+protected:
+    void showEvent( QShowEvent* event );
 
 };
 

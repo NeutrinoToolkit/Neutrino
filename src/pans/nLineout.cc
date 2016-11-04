@@ -41,7 +41,7 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
     my_w.plot->graph(0)->setName(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
 
-    decorate();
+    show();
     setBehaviour();
     updateLastPoint();
 }

@@ -50,7 +50,9 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
         //        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
 
         if (e->pos().y()<dyColorBar + 4*offsety) {
-            colorvalue=parentPan->my_w.lineMin->text().toDouble()+frac_value*(parentPan->my_w.lineMax->text().toDouble()-parentPan->my_w.lineMin->text().toDouble());
+            double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
+            double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
+            colorvalue=my_min+frac_value*(my_max-my_min);
         } else {
             colorvalue=parentPan->currentBuffer->get_min()+frac_value*(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
         }
@@ -69,8 +71,10 @@ void nHistogram::paintEvent(QPaintEvent *)
     drawPicture(p);
 
     if (parentPan->currentBuffer) {
-        if (parentPan->my_w.lineMax->text().toDouble() != parentPan->my_w.lineMin->text().toDouble()) {
-            int position=offsetx+dx*(colorvalue-parentPan->my_w.lineMin->text().toDouble())/(parentPan->my_w.lineMax->text().toDouble()-parentPan->my_w.lineMin->text().toDouble());
+        double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
+        double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
+        if (my_max != my_min) {
+            int position=offsetx+dx*(colorvalue-my_min)/(my_max-my_min);
             position=std::min(std::max(position,offsetx),width()-offsetx);
             p.drawLine(position,2*offsety,position,2*offsety+dyColorBar);
         }
@@ -142,8 +146,11 @@ void nHistogram::drawPicture (QPainter &p) {
         p.setBrush(QColor(0,0,0,127));
         p.setPen(QColor(0,0,0,127));
 
-        double mini=dx*(parentPan->my_w.lineMin->text().toDouble()-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
-        double maxi=dx*(parentPan->my_w.lineMax->text().toDouble()-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
+        double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
+        double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
+
+        double mini=dx*(my_min-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
+        double maxi=dx*(my_max-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
         p.drawLine(offsetx,2*offsety+dyColorBar,offsetx+mini,dyHisto);
         p.drawLine(dx+offsetx,2*offsety+dyColorBar,offsetx+maxi,dyHisto);
 

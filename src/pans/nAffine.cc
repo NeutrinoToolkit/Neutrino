@@ -62,7 +62,7 @@ nAffine::nAffine(neutrino *nparent, QString winname)
 	
 	
 	Affined=NULL;
-	decorate();
+    show();
 	apply();
 	
 }

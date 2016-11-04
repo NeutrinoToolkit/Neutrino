@@ -34,19 +34,19 @@
 class neutrino;
 
 class nLine : public QGraphicsObject {
- Q_OBJECT
+Q_OBJECT
+
 public:
-		
 	nLine(neutrino * = NULL);
 	~nLine();
-		
+
 	neutrino *parent(){
 		return (neutrino *) QGraphicsObject::parent();
 	};
-	
+
 	enum { Type = QGraphicsItem::UserType + 1 };
 	int type() const { return Type;}
-	
+
 	void mousePressEvent ( QGraphicsSceneMouseEvent * );
 	void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
 	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
@@ -58,52 +58,52 @@ public:
 	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
 	void focusInEvent(QFocusEvent * event);
 	void focusOutEvent(QFocusEvent * event);
-    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
-    
+	void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+
 	void moveBy(QPointF);
-	
+
 	qreal nWidth;
 	qreal nSizeHolder;
 	int numPoints;
 	QColor colorLine, colorHolder;
-	
+
 	// pure virtuals in QGraphicsObjec
 	QRectF boundingRect() const;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-		
+
 	QList<QGraphicsEllipseItem*> ref;
 	QList<int> moveRef;
 	int nodeSelected;
 	QPointF click_pos;
 
-	
+
 	bool bezier;
 	bool closedLine;
 	bool antialias;
 	bool forceMonotone, forceInverseOrdering;
-	
+
 	double zoom;
 
 	// roba da padelle
 	QMainWindow my_pad;
 	Ui::nLine my_w;
-	
+
 	QPainterPath path() const;
 	QPolygonF poly(int) const;
 	QPainterPath shape() const;
-	
+
 	void selectThis(bool);
 
 public slots:
-	
+
 	void interactive();
 	void togglePadella();
 
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
 	QPolygonF getLine(int np=1);
-    void bufferChanged(nPhysD*);
-    
+	void bufferChanged(nPhysD*);
+
 	void zoomChanged(double);
 	void showMessage(QString);
 	void changePointPad(int);
@@ -125,7 +125,7 @@ public slots:
 	void toggleAntialias(bool);
 
 
-    void centerOnImage();
+	void centerOnImage();
 
 	void changeP(int,QPointF, bool isLocal=false);
 
@@ -135,7 +135,7 @@ public slots:
 	void switchOrdering();
 	void rearrange_monotone();
 
-	void updatePlot();
+	virtual void updatePlot();
 
 	void movePoints(QPointF);
 
@@ -147,32 +147,32 @@ public slots:
 	void removePoint();// this is for the tablewidge
 
 	void addPointAfterClick(QPointF);
-	
-    void contextAppendPoint();
-    void contextPrependPoint();
-    void contextRemovePoint();
 
-    void makeHorizontal();
-    void makeVertical();
-    void makeRectangle();
-    
+	void contextAppendPoint();
+	void contextPrependPoint();
+	void contextRemovePoint();
+
+	void makeHorizontal();
+	void makeVertical();
+	void makeRectangle();
+
 	void itemChanged();
 
 	void setParentPan(QString,int);
 
-    QString getPointsStr();
-    void copy_points();
-    void save_points();
+	QString getPointsStr();
+	void copy_points();
+	void save_points();
 
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();
 	void loadSettings(QSettings *);
 	void saveSettings(QSettings *);
-	
+
 signals:
 	void sceneChanged();
-    void key_pressed(int);
+	void key_pressed(int);
 };
 
 bool orderMonotone_x(const QPointF &, const QPointF &);

@@ -33,7 +33,7 @@ nOpenRAW::nOpenRAW(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 	connect(my_w.okButton, SIGNAL(pressed()), this, SLOT(doOpen()));
-	decorate();
+    show();
 }
 
 void nOpenRAW::checkStringList() {

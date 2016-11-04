@@ -38,7 +38,7 @@ nZoomWin::nZoomWin(neutrino *nparent, QString winname)
     connect(my_w.my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
 
     setBehaviour();
-    decorate();
+    show();
     my_w.my_view->setScene(&(nparent->my_s));
     my_w.my_view->scale(2,2);
 

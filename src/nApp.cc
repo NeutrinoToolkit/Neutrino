@@ -1,4 +1,9 @@
 #include "nApp.h"
+#include "neutrino.h"
+
+#ifdef __neutrino_key
+#include "nHash.h"
+#endif
 
 #ifdef HAVE_PYTHONQT
 QList<neutrino*> NApplication::neus() {

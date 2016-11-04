@@ -27,6 +27,7 @@
 #include <QList>
 
 #include "neutrino.h"
+#include "nApp.h"
 
 #include <QMetaObject>
 #include <QtSvg>
@@ -257,7 +258,6 @@ neutrino::neutrino():
     connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
     connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
-
 #ifdef HAVE_PYTHONQT
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -366,9 +366,9 @@ neutrino::neutrino():
 
     QApplication::processEvents();
 
-#ifdef  __phys_debug
-    if (numwin==1)	recentFileActs.first()->trigger();
-#endif
+//#ifdef  __phys_debug
+//    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
+//#endif
 
 
 }
@@ -911,12 +911,14 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QTemporaryFile tmpFile(this);
                                 tmpFile.open();
-                                while(!qLine.startsWith("NeutrinoPan-end") && !ifile.eof()) {
+                                while(!ifile.eof()) {
                                     getline(ifile,line);
 //                                    WARNING(line);
                                     qLine=QString::fromStdString(line);
-                                    line+="\n";
-                                    if (!qLine.startsWith("NeutrinoPan-end")) tmpFile.write(line.c_str());
+                                    if (qLine.startsWith("NeutrinoPan-end"))
+                                        break;
+                                    tmpFile.write(line.c_str());
+                                    tmpFile.write("\n");
                                 }
                                 tmpFile.flush();
                                 QApplication::processEvents();
@@ -1706,7 +1708,7 @@ bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
             QStringList colorValueName=paletteList.at(i).split(" ",QString::SkipEmptyParts);
             if (colorValueName.size()==2) {
                 bool ok;
-                double my_val=colorValueName.first().toDouble(&ok);
+                double my_val=QLocale().toDouble(colorValueName.first(),&ok);
                 QColor my_color(colorValueName.last());
                 if (ok && my_color.isValid()) {
                     listDoubleColor.append(qMakePair(my_val,my_color));
@@ -2317,7 +2319,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
             }
 
 //            my_pan->setCentralWidget(uiwidget);
-            my_pan->decorate();
+            my_pan->show();
         }
 
     }

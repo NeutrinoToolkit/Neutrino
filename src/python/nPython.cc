@@ -36,7 +36,7 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
 
     setProperty("fileTxt","test.py");
 
-	decorate();
+    show();
     
     connect(my_w.changeScriptsFolder, SIGNAL(released()), this, SLOT(changeScriptsFolder()));
     connect(my_w.changeSiteFolder, SIGNAL(released()), this, SLOT(changeSiteFolder()));
