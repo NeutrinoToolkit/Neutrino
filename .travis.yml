@@ -69,23 +69,15 @@ before_deploy:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    sudo apt-get update ; sudo apt-get -y install libfuse-dev libglib2.0-dev cmake git libc6-dev binutils fuse # debian, Ubuntu
-    git clone https://github.com/probonopd/AppImageKit.git
-    cd AppImageKit && cmake . && make && cd ..
+    wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
+    chmod +x linuxdeployqt-*-x86_64.AppImage
     export LD_LIBRARY_PATH=/opt/qt56/lib/
-    mkdir -p Neutrino.AppDir/usr
-    cp -r build_dir/lib build_dir/bin Neutrino.AppDir/usr
-    cp AppImageKit/AppRun Neutrino.AppDir
-    cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
-    mkdir -p Neutrino.AppDir/usr/lib/qt5
-    cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
-    sudo apt-get install -y pax-utils
-    lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/lib/qt5/plugins/platforms/libqxcb.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-    lddtree Neutrino.AppDir/usr/lib/libPythonQt.so | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+    export PATH=/opt/qt56/bin:$PATH
     rm -rf Neutrino
+    find .
     export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
-    ./AppImageKit/AppImageAssistant Neutrino.AppDir ${RELEASE_FILE}
+    ./linuxdeployqt-*-x86_64.AppImage build_dir/bin/Neutrino -appimage -always-overwrite
+    ls -la
   fi
 
 deploy:
