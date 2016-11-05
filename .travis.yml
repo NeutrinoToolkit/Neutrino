@@ -30,13 +30,8 @@ before_install:
     sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
     source /opt/qt56/bin/qt56-env.sh
 
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
     sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
+
     git clone https://github.com/Kitware/CMake.git
     cd CMake
     ./configure --prefix=/usr > cmake-configure.log
