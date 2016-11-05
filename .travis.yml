@@ -2,7 +2,7 @@ language: cpp
 
 os: 
 - linux
-- osx
+#- osx
 
 osx_image: xcode7.1
 dist: trusty
@@ -25,16 +25,22 @@ before_install:
     export COMPILER=g++
     export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
     sudo apt-get install -yy build-essential
+    sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
+    sudo apt-get update -qy
+    sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
+    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
+    apt-get install apt-file
+    apt-file update
+    apt-file find Qt5LinguistToolsConfig.cmake
+    apt-file find Qt5LinguistToolsConfigVersion.cmake
+    apt-file find Qt5LinguistToolsMacros.cmake
+
     git clone https://github.com/Kitware/CMake.git
     cd CMake
     ./configure --prefix=/usr > cmake-configure.log
     make
     sudo make install
     cd ..
-    sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
-    sudo apt-get update -qy
-    sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
-    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
   fi
 - git clone https://github.com/iltommi/PythonQt.git
 - cd PythonQt
@@ -70,6 +76,7 @@ before_deploy:
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
     wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
+    ls -la
     chmod +x linuxdeployqt-*-x86_64.AppImage
     export LD_LIBRARY_PATH=/opt/qt56/lib/
     export PATH=/opt/qt56/bin:$PATH
