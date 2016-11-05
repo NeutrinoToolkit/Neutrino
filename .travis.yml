@@ -23,13 +23,14 @@ before_install:
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
     export COMPILER=g++
-    export Qt5_DIR=/opt/qt56/lib/cmake/Qt5/
+    export Qt5_DIR=/opt/qt57/lib/cmake/Qt5/
     sudo apt-get install -yy build-essential
-    sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
+    sudo add-apt-repository -y ppa:beineri/opt-qt57-trusty
     sudo apt-get update -qy
-    sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
-    source /opt/qt56/bin/qt56-env.sh
-
+    sudo apt-get install -y qt57base qt57multimedia qt57script qt57svg qt57tools 
+    source /opt/qt57/bin/qt57-env.sh
+    cat /opt/qt57/bin/qt57-env.sh
+    echo '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
     sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
 
     git clone https://github.com/Kitware/CMake.git
@@ -58,10 +59,7 @@ script:
     wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
     ls -la
     chmod +x linuxdeployqt-*-x86_64.AppImage
-    export LD_LIBRARY_PATH=/opt/qt56/lib/
-    export PATH=/opt/qt56/bin:$PATH
     rm -rf Neutrino
-    find .
     export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
     ./linuxdeployqt-*-x86_64.AppImage build_dir/bin/Neutrino -appimage -always-overwrite
     ls -la
