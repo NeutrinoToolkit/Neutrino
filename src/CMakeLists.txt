@@ -203,9 +203,7 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 #translate ui
-if (APPLE)
-  SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
-endif(APPLE)
+SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 
 find_package(Qt5LinguistTools)
 
