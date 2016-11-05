@@ -9,6 +9,7 @@ if(DEFINED QTDIR)
 endif()
 
 #libhdf5_hl
+ENABLE_LANGUAGE(C)
 find_package(HDF5)
 if (HDF5_FOUND)
 
