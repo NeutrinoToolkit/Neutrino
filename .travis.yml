@@ -28,13 +28,15 @@ before_install:
     sudo add-apt-repository -y ppa:beineri/opt-qt561-trusty
     sudo apt-get update -qy
     sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
-    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
-    sudo apt-get install apt-file
-    sudo apt-file update
-    apt-file find Qt5LinguistToolsConfig.cmake
-    apt-file find Qt5LinguistToolsConfigVersion.cmake
-    apt-file find Qt5LinguistToolsMacros.cmake
+    source /opt/qt56/bin/qt56-env.sh
 
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
     git clone https://github.com/Kitware/CMake.git
     cd CMake
     ./configure --prefix=/usr > cmake-configure.log
@@ -55,6 +57,20 @@ script:
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
 - make
 - cd ..
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
+    ls -la
+    chmod +x linuxdeployqt-*-x86_64.AppImage
+    export LD_LIBRARY_PATH=/opt/qt56/lib/
+    export PATH=/opt/qt56/bin:$PATH
+    rm -rf Neutrino
+    find .
+    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
+    ./linuxdeployqt-*-x86_64.AppImage build_dir/bin/Neutrino -appimage -always-overwrite
+    ls -la
+  fi
 
 install:
 
@@ -72,20 +88,6 @@ before_deploy:
     export RELEASE_FILE=Neutrino.dmg
     ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 ${RELEASE_FILE} dmg
   fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
-    ls -la
-    chmod +x linuxdeployqt-*-x86_64.AppImage
-    export LD_LIBRARY_PATH=/opt/qt56/lib/
-    export PATH=/opt/qt56/bin:$PATH
-    rm -rf Neutrino
-    find .
-    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
-    ./linuxdeployqt-*-x86_64.AppImage build_dir/bin/Neutrino -appimage -always-overwrite
-    ls -la
-  fi
 
 deploy:
   provider: releases
@@ -95,5 +97,5 @@ deploy:
   file: "${RELEASE_FILE}"
   skip_cleanup: true
   overwrite: true
-  on:
-    tags: true
+#  on:
+#    tags: true
