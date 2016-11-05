@@ -29,7 +29,7 @@ before_install:
     sudo apt-get update -qy
     sudo apt-get install -y qt56base qt56multimedia qt56script qt56svg qt56tools 
     sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
-    apt-get install apt-file
+    sudo apt-get install apt-file
     apt-file update
     apt-file find Qt5LinguistToolsConfig.cmake
     apt-file find Qt5LinguistToolsConfigVersion.cmake
