@@ -50,17 +50,6 @@ script:
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
 - make
 - cd ..
-#- |
-#  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-#  then
-#    wget https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage
-#    ls -la
-#    chmod +x linuxdeployqt-*-x86_64.AppImage
-#    rm -rf Neutrino
-#    export RELEASE_FILE=Neutrino-`git describe --abbrev=0 --tags`.AppImage
-#    ./linuxdeployqt-*-x86_64.AppImage build_dir/bin/Neutrino -appimage -always-overwrite
-#    ls -la
-#  fi
 
 install:
 
@@ -89,6 +78,11 @@ before_deploy:
     cp AppImageKit/AppRun Neutrino.AppDir
     cp resources/icons/icon.png resources/linuxPackage/Neutrino.desktop Neutrino.AppDir
     mkdir -p Neutrino.AppDir/usr/lib/qt5
+  fi
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    set -v
     cp -r ${Qt5_DIR}/../../../plugins Neutrino.AppDir/usr/lib/qt5
     sudo apt-get install -y pax-utils
     lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $3}' | xargs cp -t Neutrino.AppDir/usr/lib/
