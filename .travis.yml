@@ -107,5 +107,5 @@ deploy:
   file: "${RELEASE_FILE}"
   skip_cleanup: true
   overwrite: true
-#  on:
-#    tags: true
+  on:
+    tags: true
