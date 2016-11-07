@@ -203,51 +203,56 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 #translate ui
-SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
+option (TRANSLATE "use resources/translations/*.ts" off)
 
-find_package(Qt5LinguistTools)
+if (TRANSLATE)
 
-if (Qt5LinguistTools_FOUND)
-  option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" off)
-  SET(LANGUAGES fr_FR it_IT ko_KP)
+  SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 
-  SET(LANGUAGE_TS_FILES)
-  FOREACH(LANGUAGE ${LANGUAGES})
-    message(STATUS "Language : add ${LANGUAGE}")
-    SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
-    message(STATUS "Language : ${TS_FILE}")
-    SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
-  ENDFOREACH(LANGUAGE ${LANGUAGES})
+  find_package(Qt5LinguistTools)
 
-  IF(LANGUAGE_TS_FILES)
+  if (Qt5LinguistTools_FOUND)
+    option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" off)
+    SET(LANGUAGES fr_FR it_IT ko_KP)
 
-    if (UPDATE_TRANSLATIONS)
-      qt5_create_translation(qm_files ${SOURCES} ${UIS} ${LANGUAGE_TS_FILES})
-      message(STATUS "qm_files created: ${qm_files}")
-    else (UPDATE_TRANSLATIONS)
-      qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
-       message(STATUS "qm_files added : ${qm_files}")
-    endif (UPDATE_TRANSLATIONS) 
+    SET(LANGUAGE_TS_FILES)
+    FOREACH(LANGUAGE ${LANGUAGES})
+      message(STATUS "Language : add ${LANGUAGE}")
+      SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
+      message(STATUS "Language : ${TS_FILE}")
+      SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
+    ENDFOREACH(LANGUAGE ${LANGUAGES})
 
+    IF(LANGUAGE_TS_FILES)
 
-    set(TRANSL_QRC ${QRCDIR}/translations.qrc)
-    file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
-    foreach(my_file ${qm_files})
-        file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
-        GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-        file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
-    endforeach()
-    file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-    list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
-    message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
+      if (UPDATE_TRANSLATIONS)
+        qt5_create_translation(qm_files ${SOURCES} ${UIS} ${LANGUAGE_TS_FILES})
+        message(STATUS "qm_files created: ${qm_files}")
+      else (UPDATE_TRANSLATIONS)
+        qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
+         message(STATUS "qm_files added : ${qm_files}")
+      endif (UPDATE_TRANSLATIONS) 
 
 
+      set(TRANSL_QRC ${QRCDIR}/translations.qrc)
+      file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
+      foreach(my_file ${qm_files})
+          file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_SOURCE_DIR}/../src ${my_file})
+          GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
+          file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+      endforeach()
+      file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
+      list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
+      message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
 
-    qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
-  ENDIF(LANGUAGE_TS_FILES)
 
 
-endif(Qt5LinguistTools_FOUND)
+      qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
+    ENDIF(LANGUAGE_TS_FILES)
+
+
+  endif(Qt5LinguistTools_FOUND)
+endif(TRANSLATE)
 
 
 

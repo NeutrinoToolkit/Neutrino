@@ -189,7 +189,7 @@ void nPreferences::changeLocale(int num) {
     QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
     changeLocale(locale);
     my_w.decimal->setText(QLocale().decimalPoint());
-    my_w.statusBar->showMessage(tr("Decimal separator: ")+QString(QLocale().decimalPoint()), 5000);
+    my_w.statusBar->showMessage(localeToString(QLocale()), 5000);
 }
 
 void nPreferences::on_openclUnit_valueChanged(int num) {

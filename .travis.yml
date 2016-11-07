@@ -47,7 +47,7 @@ before_install:
 
 script:
 - mkdir -p build_dir && cd build_dir
-- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR ..
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR  -DTRANSLATE=ON ..
 - make
 - cd ..
 
