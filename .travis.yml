@@ -14,32 +14,34 @@ before_install:
   then
     export COMPILER=g++-6
     export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
+    export TRANSLATE=ON
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
     brew install fftw --with-openmp
   fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    export COMPILER=g++
-    export Qt5_DIR=/opt/qt57/lib/cmake/Qt5/
-    sudo apt-get install -yy build-essential
-    sudo add-apt-repository -y ppa:beineri/opt-qt57-trusty
-    sudo apt-get update -qy
-    sudo apt-get install -y qt57base qt57multimedia qt57script qt57svg qt57tools 
-    source /opt/qt57/bin/qt57-env.sh
-    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
-
-    git clone https://github.com/Kitware/CMake.git
-    cd CMake
-    ./configure --prefix=/usr > cmake-configure.log
-    make
-    sudo make install
-    cd ..
-  fi
+#- |
+#  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+#  then
+#    export COMPILER=g++
+#    export Qt5_DIR=/opt/qt57/lib/cmake/Qt5/
+#    export TRANSLATE=ON
+#    sudo apt-get install -yy build-essential
+#    sudo add-apt-repository -y ppa:beineri/opt-qt57-trusty
+#    sudo apt-get update -qy
+#    sudo apt-get install -y qt57base qt57multimedia qt57script qt57svg qt57tools 
+#    source /opt/qt57/bin/qt57-env.sh
+#    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
+#
+#    git clone https://github.com/Kitware/CMake.git
+#    cd CMake
+#    ./configure --prefix=/usr > cmake-configure.log
+#    make
+#    sudo make install
+#    cd ..
+#  fi
 - git clone https://github.com/iltommi/PythonQt.git
 - cd PythonQt
-- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
+- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
 - make 
 - sudo make install
 - cd ..
@@ -47,7 +49,7 @@ before_install:
 
 script:
 - mkdir -p build_dir && cd build_dir
-- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DQt5_DIR=$Qt5_DIR  -DTRANSLATE=ON ..
+- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR}  -DTRANSLATE=${TRANSLATE} ..
 - make
 - cd ..
 
