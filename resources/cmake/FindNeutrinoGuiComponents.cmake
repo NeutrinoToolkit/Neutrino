@@ -80,7 +80,7 @@ else()
 endif()
 
 ## find qt -- search for 5.x first, fallback to 4.x
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets QUIET)
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets MacExtras QUIET)
 if (Qt5_FOUND)
 	# qt5
 	SET (USE_QT5 True)

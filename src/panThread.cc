@@ -3,11 +3,15 @@
 #include "panThread.h"
 #include "nPhysImageF.h"
 
+#include <QMessageBox>
+#include <QApplication>
 
 panThread::panThread() : 
 params(NULL), 
 calculation_function(NULL), 
-n_iter(-1) {
+n_iter(-1),
+err_message("Error in thread")
+{
     DEBUG("creator");   
 }
 
@@ -22,7 +26,12 @@ void panThread::run() {
         return;
     }
     DEBUG("[nGenericPan] pan thread running...");
-    (*calculation_function)(params, n_iter);
+    try {
+        (*calculation_function)(params, n_iter);
+    } catch (std::exception &e) {
+        err_message=QString(e.what());
+        stop();
+    }
     DEBUG("[nGenericPan] pan thread finished");
 }
 

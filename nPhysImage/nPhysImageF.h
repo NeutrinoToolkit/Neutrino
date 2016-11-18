@@ -150,18 +150,18 @@ class phys_fileerror: public std::exception
 {
 
 public:
-	phys_fileerror(std::string str = std::string("(undefined file error"))
-		: msg(str)
-	{ }
+    phys_fileerror(std::string str = std::string("(undefined file error"))
+        : msg(str)
+    { }
 
-	~phys_fileerror() throw()
-	{ }
+    ~phys_fileerror() throw()
+    { }
 
-	virtual const char* what() const throw()
-	{ return msg.c_str(); }
+    virtual const char* what() const throw()
+    { return msg.c_str(); }
 
 private:
-	std::string msg;
+    std::string msg;
 
 };
 

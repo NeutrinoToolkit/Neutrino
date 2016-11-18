@@ -217,7 +217,6 @@ if (TRANSLATE)
 
     SET(LANGUAGE_TS_FILES)
     FOREACH(LANGUAGE ${LANGUAGES})
-      message(STATUS "Language : add ${LANGUAGE}")
       SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
       message(STATUS "Language : ${TS_FILE}")
       SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
@@ -227,10 +226,10 @@ if (TRANSLATE)
 
       if (UPDATE_TRANSLATIONS)
         qt5_create_translation(qm_files ${SOURCES} ${UIS} ${LANGUAGE_TS_FILES})
-        message(STATUS "qm_files created: ${qm_files}")
+        message(STATUS "qm_files created")
       else (UPDATE_TRANSLATIONS)
         qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
-         message(STATUS "qm_files added : ${qm_files}")
+         message(STATUS "qm_files added")
       endif (UPDATE_TRANSLATIONS) 
 
 
@@ -266,7 +265,7 @@ add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
-    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
+    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation" Qt5::MacExtras)
 endif()
 
 if(WIN32)

@@ -418,27 +418,42 @@ void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
 unsigned int opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
     unsigned int i13, i11, i7, i5, i3, i2;
+    i13 = i11 = i7 = i5 = i3 = i2 = 0;
     // REMEMBER to use clfft 2.12 to support radix 11 and 13!
-    for (i13=0; i13<=log(num)/log(13); i13++ ) {
-        for (i11=0; i11<=log(num)/log(11); i11++ ) {
-            for (i7=0; i7<=log(num)/log(7); i7++ ) {
-                for (i5=0; i5<=log(num)/log(5); i5++ ) {
-                    for (i3=0; i3<=log(num)/log(3); i3++ ) {
-                        for (i2=0; i2<=log(num)/log(2); i2++ ) {
-                            unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
-                            if (test_val>=num && test_val<closest) {
-                                closest=test_val;
-                                if (closest==num) {
-                                    DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
-                                    return num;
-                                }
-                            }
-                        }
-                    }
+//    for (i13=0; i13<=log(num)/log(13); i13++ ) {
+//        for (i11=0; i11<=log(num)/log(11); i11++ ) {
+//            for (i7=0; i7<=log(num)/log(7); i7++ ) {
+//                for (i5=0; i5<=log(num)/log(5); i5++ ) {
+//                    for (i3=0; i3<=log(num)/log(3); i3++ ) {
+//                        for (i2=0; i2<=log(num)/log(2); i2++ ) {
+//                            unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
+//                            if (test_val>=num && test_val<closest) {
+//                                closest=test_val;
+//                                if (closest==num) {
+//                                    DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
+//                                    return num;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+    for (i3=0; i3<=log(num)/log(3); i3++ ) {
+        for (i2=0; i2<=log(num)/log(2); i2++ ) {
+            unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
+            if (test_val>=num && test_val<closest) {
+                closest=test_val;
+                if (closest==num) {
+                    DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
+                    return num;
                 }
             }
         }
     }
+
+
     DEBUG("Factorization (" << closest << ") " << num << " : " << i2 << " " << i3 << " " <<  i5 << " " <<  i7 << " " <<  i11 << " " <<  i13);
     return closest;
 }
@@ -636,7 +651,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         cl_mem tmpBuffer = 0;
         if ((err == 0) && (tmpBufferSize > 0)) {
           tmpBuffer = clCreateBuffer(ctx, CL_MEM_READ_WRITE, tmpBufferSize, 0, &err);
-          check_opencl_error(err, "tmpBuffer clCreateBuffer " << tmpBufferSize);
+          check_opencl_error(err, "tmpBuffer clCreateBuffer ");
           DEBUG("intermediate buffer needed");
         }
 
@@ -726,7 +741,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         /* Temporary buffer. */
         if ((err == 0) && (tmpBufferSize > 0)) {
           tmpBuffer = clCreateBuffer(ctx, CL_MEM_READ_WRITE, tmpBufferSize, 0, &err);
-          check_opencl_error(err, "tmpBuffer clCreateBuffer " << tmpBufferSize);
+          check_opencl_error(err, "tmpBuffer clCreateBuffer ");
           DEBUG("intermediate buffer needed");
         }
 

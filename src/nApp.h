@@ -37,7 +37,7 @@ public:
     NApplication( int &argc, char **argv );
 
 protected:
-    bool notify(QObject *rec, QEvent *ev);
+    virtual bool notify(QObject *rec, QEvent *ev) override;
 
     bool event(QEvent *ev);
 

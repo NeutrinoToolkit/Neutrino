@@ -30,6 +30,8 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
 
+    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
+
 	setProperty("panName",panName);
 
 	int panNum=0;
@@ -639,12 +641,11 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
         }
         QApplication::processEvents();
 		sleeper_thread::msleep(100);
-	}
-    
+    }
     progress.setValue(0);
     progress.hide();
     if (nThread.n_iter==0) {
-        QMessageBox::critical(this, tr("Thread problems"),tr("Thread didn't work"),QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }
     
 }

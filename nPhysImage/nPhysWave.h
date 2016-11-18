@@ -53,7 +53,7 @@
 #define __nPhysWave_h
 
 #ifdef HAVE_LIBCLFFT
-#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << __err_msg);};
+#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << __err_msg); throw phys_fileerror(__err_msg);};
 #endif
 
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};

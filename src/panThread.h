@@ -14,6 +14,7 @@ public:
 
 
 class panThread : public QThread {
+    Q_OBJECT
 public:
 	panThread();
 	~panThread(){};
@@ -25,6 +26,8 @@ public:
 	void *params;
 	void (*calculation_function)(void *, int &);
 
-	int n_iter;	
+    int n_iter;
+    QString err_message;
+
 };
 #endif
