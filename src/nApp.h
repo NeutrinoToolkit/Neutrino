@@ -36,6 +36,7 @@ class NApplication : public QApplication {
 public:
     NApplication( int &argc, char **argv );
 
+
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
 

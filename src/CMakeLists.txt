@@ -265,7 +265,7 @@ add_definitions(-DHAVE_NPHYSIMAGE)
 
 if(APPLE) 
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
-    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation" Qt5::MacExtras)
+    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
 if(WIN32)

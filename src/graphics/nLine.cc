@@ -277,23 +277,23 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 
 void nLine::updatePlot () {
 
-    nPhysD *my_phys=parent()->currentBuffer;
-    if (my_w.plot->isVisible() && my_phys) {
+	nPhysD *my_phys=parent()->currentBuffer;
+	if (my_w.plot->isVisible() && my_phys) {
 
-        if (my_w.plot->graphCount()==0) {
-            my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
-            my_w.plot->graph(0)->setPen(QPen(Qt::blue));
-            my_w.plot->xAxis->setLabel(tr("distance"));
-            my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-            my_w.plot->xAxis->setLabelPadding(-1);
-            my_w.plot->yAxis->setLabelPadding(-1);
-            my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
-            my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
-        }
+		if (my_w.plot->graphCount()==0) {
+			my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+			my_w.plot->graph(0)->setPen(QPen(Qt::blue));
+			my_w.plot->xAxis->setLabel(tr("distance"));
+			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+			my_w.plot->xAxis->setLabelPadding(-1);
+			my_w.plot->yAxis->setLabelPadding(-1);
+			my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
+			my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
+		}
 
 		double colore;
-        QVector<double> toPlotx;
-        QVector<double> toPloty;
+		QVector<double> toPlotx;
+		QVector<double> toPloty;
 
 		QPolygonF my_points;
 		foreach(QGraphicsEllipseItem *item, ref){
@@ -303,50 +303,50 @@ void nLine::updatePlot () {
 
 		QPolygonF my_poly=poly(numPoints);
 
-        my_w.plot->clearItems();
+		my_w.plot->clearItems();
 
 		QPen penna;
 		penna.setColor(ref[0]->brush().color());
 
-        vec2f orig = my_phys->get_origin();
+		vec2f orig = my_phys->get_origin();
 		double dist=0.0;
 		for(int i=0;i<my_poly.size()-1;i++) {
 			QPointF p=my_poly.at(i);
-//            DEBUG(p.x() << " " << p.y() << " " << dist);
+			//            DEBUG(p.x() << " " << p.y() << " " << dist);
 			if (antialias) {
 				// points in poly are NOT translated with origin
 				// (hence a correction must apply)
-                colore=my_phys->getPoint(p.x()+orig.x(),p.y()+orig.y());
+				colore=my_phys->getPoint(p.x()+orig.x(),p.y()+orig.y());
 			} else {
-                colore=my_phys->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
+				colore=my_phys->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
 			}
-            if (std::isfinite(colore)) {
-                toPlotx << dist;
-                toPloty << colore;
-            }
+			if (std::isfinite(colore)) {
+				toPlotx << dist;
+				toPloty << colore;
+			}
 			if (my_points.contains(p) && nSizeHolder>0.0) {
-                QCPItemLine *marker=new QCPItemLine(my_w.plot);
-                marker->start->setCoords(dist, -QCPRange::maxRange);
-                marker->end->setCoords(dist, QCPRange::maxRange);
-                marker->setPen(penna);
+				QCPItemLine *marker=new QCPItemLine(my_w.plot);
+				marker->start->setCoords(dist, -QCPRange::maxRange);
+				marker->end->setCoords(dist, QCPRange::maxRange);
+				marker->setPen(penna);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
 		if (antialias) {
-            colore=my_phys->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
+			colore=my_phys->getPoint(my_poly.last().x()+orig.x(),my_poly.last().y()+orig.y());
 		} else {
-            colore=my_phys->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
+			colore=my_phys->point((int)(my_poly.last().x()+orig.x()),(int)(my_poly.last().y()+orig.y()));
 		}
-        if (std::isfinite(colore)) {
-            toPlotx << dist;
-            toPloty << colore;
+		if (std::isfinite(colore)) {
+			toPlotx << dist;
+			toPloty << colore;
 		}
 
 
-        my_w.plot->graph(0)->setData(toPlotx,toPloty);
-        my_w.plot->rescaleAxes();
-        my_w.plot->replot();
-    }
+		my_w.plot->graph(0)->setData(toPlotx,toPloty);
+		my_w.plot->rescaleAxes();
+		my_w.plot->replot();
+	}
 }
 
 void nLine::toggleBezier () {
@@ -362,7 +362,7 @@ void nLine::toggleBezier ( bool val ) {
 		showMessage(tr("Line is a polygonal chain"));
 	}
 	updatePlot();
-    itemChanged();
+	itemChanged();
 }
 
 void nLine::toggleClosedLine () {
@@ -646,18 +646,24 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_B:
 			toggleBezier();
-			updatePlot();
+			// .alex. 
+			//redundant
+			//updatePlot();
 			break;
 		case Qt::Key_S:
 			toggleAntialias();
-			updatePlot();
+			// .alex. 
+			//redundant
+			//updatePlot();
 			break;
 		case Qt::Key_C:
             if (e->modifiers() & Qt::ShiftModifier) {
                 centerOnImage();
             } else {
                 toggleClosedLine();
-                updatePlot();
+		// .alex. 
+		//redundant
+                //updatePlot();
             }
 			break;
 		case Qt::Key_A:

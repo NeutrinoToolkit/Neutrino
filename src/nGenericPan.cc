@@ -95,6 +95,7 @@ void nGenericPan::physAdd(nPhysD *buffer) {
 
 void nGenericPan::help() {
     QString helpfile(":/help/"+panName+"/index.html");
+    DEBUG("<<<<<<<<<<<<<<<<<<<<<<<<<< " << helpfile.toStdString());
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -246,6 +247,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QApplication::processEvents();
     loadDefaults();
     QApplication::processEvents();
+
     show();
 }
 

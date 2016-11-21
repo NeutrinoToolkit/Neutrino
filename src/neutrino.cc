@@ -90,7 +90,6 @@
 #include "nOpenRAW.h"
 
 #include "nPhysFormats.h"
-#include <QMacToolBar>
 
 neutrino::~neutrino()
 {
@@ -364,20 +363,6 @@ neutrino::neutrino():
     scanPlugins();
 
     loadDefaults();
-
-//    QMacToolBar *my_toolBar = new QMacToolBar(this);
-
-//    foreach(QAction *act, my_w.toolBar->actions()) {
-//        QMacToolBarItem *toolBarItem = my_toolBar->addItem(QIcon(act->icon()), act->text());
-//        connect(toolBarItem, SIGNAL(activated()), act, SLOT(trigger()));
-//        qDebug() << act->objectName();
-//    }
-//    this->window()->winId(); // create window->windowhandle()
-//    my_toolBar->attachToWindow(this->window()->windowHandle());
-//    my_w.toolBar->deleteLater();
-//    QApplication::processEvents();
-
-
     show();
 
     QApplication::processEvents();
@@ -2347,7 +2332,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
                 QVariant value = uiwidget->property(name);
             }
 
-            //            my_pan->setCentralWidget(uiwidget);
+//            my_pan->setCentralWidget(uiwidget);
             my_pan->show();
         }
 
