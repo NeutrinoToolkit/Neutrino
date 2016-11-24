@@ -61,9 +61,7 @@ mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
 	
 	// you probably want to instantiate the widget from Ui::
 	my_w.setupUi(this);
-
-	decorate();
+	show();
 
 }
 
-Q_EXPORT_PLUGIN2(test_plugin, test_plugin)
