@@ -135,6 +135,7 @@ if (LINUX)
 	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
 		message (STATUS "PythonQt lib is copied along")
 		install (FILES ${PYTHONQT} DESTINATION lib)
+		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
 	endif()
 endif()
 
