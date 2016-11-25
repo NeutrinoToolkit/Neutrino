@@ -205,10 +205,6 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 #translate ui
-option (TRANSLATE "use resources/translations/*.ts" off)
-
-if (TRANSLATE)
-
   SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 
   find_package(Qt5LinguistTools)
@@ -253,7 +249,7 @@ if (TRANSLATE)
 
 
   endif(Qt5LinguistTools_FOUND)
-endif(TRANSLATE)
+
 
 
 
