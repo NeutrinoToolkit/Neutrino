@@ -4,52 +4,38 @@ matrix:
   include:
     - os: osx
       osx_image: xcode7.3
-#    - os: linux
-#      dist: trusty
-#      sudo: required
+    - os: linux
+      dist: trusty
+      sudo: required
 
 before_install:
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
-    export COMPILER=g++-6
+    export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=${Qt5_DIR}'
     export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
-    export TRANSLATE=ON
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
     brew install fftw --with-openmp
+    git clone https://github.com/iltommi/PythonQt.git
+    cd PythonQt
+    cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
+    make 
+    sudo make install
+    cd ..
   fi
-#- |
-#  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-#  then
-#    export COMPILER=g++
-#    export Qt5_DIR=/opt/qt57/lib/cmake/Qt5/
-#    export TRANSLATE=ON
-#    sudo apt-get install -yy build-essential
-#    sudo add-apt-repository -y ppa:beineri/opt-qt57-trusty
-#    sudo apt-get update -qy
-#    sudo apt-get install -y qt57base qt57multimedia qt57script qt57svg qt57tools 
-#    source /opt/qt57/bin/qt57-env.sh
-#    sudo apt-get install -y libfftw3-dev libnetpbm10-dev libgsl0-dev libhdf5-dev libhdf4-dev libpython-dev
-#
-#    git clone https://github.com/Kitware/CMake.git
-#    cd CMake
-#    ./configure --prefix=/usr > cmake-configure.log
-#    make
-#    sudo make install
-#    cd ..
-#  fi
-- git clone https://github.com/iltommi/PythonQt.git
-- cd PythonQt
-- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
-- make 
-- sudo make install
-- cd ..
-  
+- |
+ if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+ then
+    export CMAKE_FLAGS=''
+    sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
+    sudo apt-get update -qy
+    sudo apt-get -yy install cmake qt5-default libnetpbm10-dev libhdf5-dev libfftw3-dev python-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl0-dev qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5multimediawidgets5 qttools5-dev-tools
+ fi
 
 script:
 - mkdir -p build_dir && cd build_dir
-- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR}  -DTRANSLATE=${TRANSLATE} ..
+- cmake ${CMAKE_FLAGS} ..
 - make
 - cd ..
 
@@ -69,7 +55,11 @@ before_deploy:
     export RELEASE_FILE=Neutrino.dmg
     ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon ./resources/icons/icon.icns --background ./resources/macPackage/sfondo.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 ${RELEASE_FILE} dmg
   fi
-
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    export RELEASE_FILE=Neutrino*.deb
+  fi
+  
 deploy:
   provider: releases
   edge:
