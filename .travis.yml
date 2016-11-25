@@ -69,6 +69,7 @@ deploy:
   edge:
     branch: releases-fix
   api_key: $github_token
+  file_glob: true
   file: "${RELEASE_FILE}"
   skip_cleanup: true
   overwrite: true
