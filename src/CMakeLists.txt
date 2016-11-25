@@ -171,8 +171,10 @@ message(STATUS "${LIST_LENGTH} help files: ${HELP_QRC}")
 # (see neutrino cmake resources folder)
 if (USE_QT5)
     # add here QT5 only sources
+	if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
     list (APPEND SOURCES pans/nCamera.cc)
     list (APPEND UIS ../UIs/nCamera.ui)
+    endif()
 
     qt5_add_resources(RES_SOURCES ${ICONS_QRC})
     qt5_add_resources(RES_SOURCES ${HTML_QRC})
@@ -203,10 +205,6 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 #translate ui
-option (TRANSLATE "use resources/translations/*.ts" off)
-
-if (TRANSLATE)
-
   SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 
   find_package(Qt5LinguistTools)
@@ -251,7 +249,7 @@ if (TRANSLATE)
 
 
   endif(Qt5LinguistTools_FOUND)
-endif(TRANSLATE)
+
 
 
 
