@@ -57,6 +57,7 @@ before_deploy:
   fi
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
     export RELEASE_FILE=Neutrino*.deb
   fi
   
