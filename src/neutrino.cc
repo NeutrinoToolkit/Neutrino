@@ -58,7 +58,7 @@
 #include "nShortcuts.h"
 #include "nAffine.h"
 
-#ifdef USE_QT5
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
 #include "nCamera.h"
 #endif
 
@@ -156,7 +156,7 @@ neutrino::neutrino():
     connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
     connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
-#ifdef USE_QT5
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
     my_w.actionCamera->setEnabled(false);
@@ -2092,7 +2092,7 @@ neutrino::Affine() {
 /// camera
 nGenericPan*
 neutrino::Camera() {
-#ifdef USE_QT5
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     QString vwinname=tr("Camera");
     nGenericPan *ret=existsPan(vwinname);
     if (!ret) ret = new nCamera(this, vwinname);
