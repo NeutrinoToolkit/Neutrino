@@ -61,6 +61,7 @@ before_deploy:
     make -C build_dir package
     ls -l build_dir
     export RELEASE_FILE=build_dir/Neutrino*.deb
+    echo ${RELEASE_FILE}
   fi
   
 deploy:
