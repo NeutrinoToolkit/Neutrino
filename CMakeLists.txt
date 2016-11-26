@@ -56,6 +56,7 @@ endif()
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
 set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 
 include(FindNeutrinoDeps)
 include(FindNeutrinoGuiComponents)
