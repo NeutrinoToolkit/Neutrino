@@ -124,8 +124,10 @@ endif()
 
 if (LINUX)
 
-	#message("building on linux")
-    execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
+#message("building on linux")
+	execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
+	execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
+	string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
     if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu")
 
@@ -145,7 +147,7 @@ if (LINUX)
 	message (STATUS "[debian] Debian package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
 
 	execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
-	set (CPACK_SYSTEM_NAME ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
+	set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
 	# triggers
