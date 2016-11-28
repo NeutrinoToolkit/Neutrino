@@ -28,7 +28,7 @@ before_install:
  fi
 - git clone https://github.com/iltommi/PythonQt.git
 - cd PythonQt
-- mkdir _my_build && cd my_build
+- mkdir my_build && cd my_build
 - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
 - make 
 - |
