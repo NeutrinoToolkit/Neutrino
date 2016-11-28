@@ -19,13 +19,13 @@ before_install:
     brew install fftw --with-openmp
   fi
 - |
- if [[ "$TRAVIS_OS_NAME" == "linux" ]]
- then
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
     export CMAKE_FLAGS=''
     sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
     sudo apt-get update -qy
     sudo apt-get -yy install cmake qt5-default libnetpbm10-dev libhdf5-dev libfftw3-dev python-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl0-dev qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5multimediawidgets5 qttools5-dev-tools
- fi
+  fi
 - git clone https://github.com/iltommi/PythonQt.git
 - cd PythonQt
 - mkdir my_build && cd my_build
@@ -33,11 +33,13 @@ before_install:
 - make 
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-    sudo make install
+  then
+    make install
   fi
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-    make install
+  then
+    sudo make install
   fi
 - cd ../..
 
