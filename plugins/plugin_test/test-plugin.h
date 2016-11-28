@@ -43,6 +43,8 @@ class neutrino;
 class test_plugin : public QObject, nPlug {
 Q_OBJECT
 Q_INTERFACES(nPlug)
+Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+
 
 public:
 	test_plugin();
@@ -78,7 +80,7 @@ Q_OBJECT
 public:
 	mySkelGUI(neutrino *, QString);
 
-	Ui::test_plugin_objectName my_w;
+	Ui::test_plugin my_w;
 
 public slots:
 

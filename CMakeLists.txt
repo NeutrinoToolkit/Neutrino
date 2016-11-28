@@ -54,6 +54,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
+set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
+set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 
 include(FindNeutrinoDeps)
 include(FindNeutrinoGuiComponents)
@@ -78,6 +81,7 @@ endif()
 # targets
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
+add_subdirectory (plugins)
 
 ## cpack definitions
 #SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Neutrino")

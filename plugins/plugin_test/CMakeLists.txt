@@ -1,6 +1,6 @@
 # tp-plugin CMakeLists.txt
 
-PROJECT (the_plugin_name CXX C)
+PROJECT (testPlugin CXX C)
 
 cmake_minimum_required (VERSION 3.0)
 
@@ -48,14 +48,14 @@ include_directories(${NEUTRINO_ROOT}/src/graphics) # for nLine
 include_directories(${NEUTRINO_ROOT}/src/pans/colorbar)
 
 # add needed UIs here
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPoint.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nObject.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nColorBarWin.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nSbarra.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
-QT4_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPoint.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nObject.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nColorBarWin.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nSbarra.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
 # add sources here
 add_library (${PROJECT_NAME} SHARED test-plugin.cc test-plugin.h ${nUIs})
