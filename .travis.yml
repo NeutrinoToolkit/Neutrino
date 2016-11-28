@@ -17,12 +17,6 @@ before_install:
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
     brew install fftw --with-openmp
-    git clone https://github.com/iltommi/PythonQt.git
-    cd PythonQt
-    cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE .
-    make 
-    sudo make install
-    cd ..
   fi
 - |
  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
@@ -32,6 +26,20 @@ before_install:
     sudo apt-get update -qy
     sudo apt-get -yy install cmake qt5-default libnetpbm10-dev libhdf5-dev libfftw3-dev python-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl0-dev qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5multimediawidgets5 qttools5-dev-tools
  fi
+- git clone https://github.com/iltommi/PythonQt.git
+- cd PythonQt
+- mkdir _my_build && cd my_build
+- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
+- make 
+- |
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
+    sudo make install
+  fi
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+    make install
+  fi
+- cd ../..
 
 script:
 - mkdir -p build_dir && cd build_dir
