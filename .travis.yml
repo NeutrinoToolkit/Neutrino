@@ -21,7 +21,7 @@ before_install:
 - |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]
   then
-    export CMAKE_FLAGS=''
+    export CMAKE_FLAGS='-DOPTION_INSTALL_PYTHONQT=ON'
     sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
     sudo apt-get update -qy
     sudo apt-get -yy install cmake qt5-default libnetpbm10-dev libhdf5-dev libfftw3-dev python-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl0-dev qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5multimediawidgets5 qttools5-dev-tools
