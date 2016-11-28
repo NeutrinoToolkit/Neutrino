@@ -61,7 +61,16 @@ set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neu
 include(FindNeutrinoDeps)
 include(FindNeutrinoGuiComponents)
 
+if (LINUX)
+	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
+		message (STATUS "PythonQt lib is copied along")
+		install (FILES ${PYTHONQT} DESTINATION lib)
+		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
+	endif()
+endif()
+
 include(FindGit)
+
 set (VERSION_UPDATE_FROM_GIT ON)
 include(GetVersionFromGitTag)
 
