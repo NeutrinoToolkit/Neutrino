@@ -5,7 +5,7 @@ if (GIT_FOUND)
     if (VERSION_UPDATE_FROM_GIT)
         # Get branch 
         if(DEFINED ENV{TRAVIS_BRANCH})
-            set(${PROJECT_NAME}_PARTIAL_BRANCH $ENV{TRAVIS_BRANCH})
+            set(${PROJECT_NAME}_VERSION_BRANCH $ENV{TRAVIS_BRANCH})
         else()
             execute_process(COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD 
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -15,6 +15,9 @@ if (GIT_FOUND)
             string(REPLACE "refs/heads/" "" ${PROJECT_NAME}_VERSION_BRANCH ${${PROJECT_NAME}_PARTIAL_BRANCH})
             unset(${PROJECT_NAME}_PARTIAL_BRANCH)
         endif()
+message ("${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE} > ${${PROJECT_NAME}_PARTIAL_BRANCH} : ${${PROJECT_NAME}_VERSION_BRANCH}")
+
+		
 
 
         # Get last tag from git
@@ -81,3 +84,8 @@ set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_V
 if (${PROJECT_NAME}_VERSION_TWEAK)
 	set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION}-${${PROJECT_NAME}_VERSION_TWEAK})
 endif()
+
+message ("${CMAKE_CURRENT_LIST_FILE}:${CMAKE_CURRENT_LIST_LINE} > ${${PROJECT_NAME}_VERSION}")
+
+
+
