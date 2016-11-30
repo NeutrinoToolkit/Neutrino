@@ -1,22 +1,22 @@
 # tp-plugin CMakeLists.txt
 
-PROJECT (testPlugin CXX C)
+PROJECT (testPlugin CXX)
 
 cmake_minimum_required (VERSION 3.0)
 
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
-add_compile_options(-std=c++0x)
+add_compile_options(-std=c++11)
 
 
 # check for neutrino root
 if (NOT DEFINED NEUTRINO_ROOT)
-	set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
+    set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
 endif()
 
 if (NOT IS_ABSOLUTE ${NEUTRINO_ROOT})
-	message (STATUS "NEUTRINO_ROOT is not absolute, fixing")
-	set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
+    message (STATUS "NEUTRINO_ROOT is not absolute, fixing")
+    set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
 endif()
 message (STATUS "neutrino root ${NEUTRINO_ROOT}" )
 
@@ -27,8 +27,8 @@ message (STATUS "Building with Neutrino root: ${NEUTRINO_ROOT}")
 
 # check for nphys
 if (NOT ${NPHYS_PATH} STREQUAL "" AND NOT IS_ABSOLUTE ${NPHYS_PATH})
-	message (STATUS "NPHYS_PATH is not absolute, fixing")
-	set (ABS_NPHYS_PATH "${CMAKE_BINARY_DIR}/${NPHYS_PATH}")
+    message (STATUS "NPHYS_PATH is not absolute, fixing")
+    set (ABS_NPHYS_PATH "${CMAKE_BINARY_DIR}/${NPHYS_PATH}")
 endif()
 
 # find goodies
@@ -59,5 +59,18 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
 # add sources here
 add_library (${PROJECT_NAME} SHARED test-plugin.cc test-plugin.h ${nUIs})
-target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${LIBS})
+
+IF(APPLE)
+    set (CMAKE_SHARED_LINKER_FLAGS "-single_module -undefined dynamic_lookup")
+ENDIF()
+
+
+if (USE_QT5)
+    qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
+elseif(USE_QT4)
+    target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
+endif()
+
+
+
 message(STATUS ${QT_LIBRARIES})

@@ -508,6 +508,7 @@ neutrino::loadPlugin()
 
     if (!pname.isEmpty()) {
 
+        setProperty("NeuSave-loadPlugin",pname);
         DEBUG(10, "loading plugin "<<pname.toStdString());
 
 
@@ -520,23 +521,22 @@ neutrino::loadPlugin()
         plug_loader = new QPluginLoader(pname);
         QObject *plugin = plug_loader->instance();
 
-        DEBUG("got plugin instance "<<(void *)plugin);
 
 
         if (plugin) {
+            qDebug() << "got plugin instance "<< plugin;
             nPlug *plug_iface = qobject_cast<nPlug *>(plugin);
             if (plug_iface) {
                 DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
 
                 if (plug_iface->instantiate(this)) {
-                    setProperty("NeuSave-loadPlugin",pname);
                     DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
                 }
             } else {
                 DEBUG("plugin load fail");
             }
         } else {
-            DEBUG("plugin cannot be loaded (linking problems?)");
+            qDebug() << "FAIL LOADING PLUGIN\n\n" << plug_loader->errorString() << "\n\n" ;
         }
     }
 }
@@ -721,7 +721,14 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     if (suffix=="neus") {
         imagelist=openSession(fname);
     } else {
-        std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
+        std::vector<nPhysD*> my_vec;
+        try {
+            my_vec=phys_open(fname.toUtf8().constData());
+        } catch (std::exception &e) {
+            QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+            dlg.exec();
+        }
         for(std::vector<nPhysD*>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
             imagelist.push_back(*it);
         }
@@ -2120,7 +2127,6 @@ neutrino::Monitor() {
 
 //save and load across restart
 void neutrino::saveDefaults(){
-    qDebug() << "here";
     QSettings my_set("neutrino","");
     my_set.beginGroup("Preferences");
     my_set.setValue("geometry", pos());
@@ -2133,17 +2139,12 @@ void neutrino::saveDefaults(){
     my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
 
     my_set.beginGroup("Properties");
-    qDebug() << dynamicPropertyNames().size();
     foreach(QByteArray ba, dynamicPropertyNames()) {
-        qDebug() << "save" << ba << " : " << property(ba);
         if(ba.startsWith("NeuSave")) {
-            qDebug() << "write" << ba << " : " << property(ba);
             my_set.setValue(ba, property(ba));
         }
     }
     my_set.endGroup();
-
-    qDebug() << "here";
     my_set.endGroup();
 }
 

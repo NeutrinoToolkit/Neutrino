@@ -115,7 +115,6 @@ int main(int argc, char **argv)
     foreach (QString spath, settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"))) {
         if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
     }
-    PythonQt::self()->getMainModule().evalScript(settings.value("initScript").toString());
     settings.endGroup();
 
     PythonQt::self()->getMainModule().addObject("nApp", &qapp);

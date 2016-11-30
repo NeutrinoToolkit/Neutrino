@@ -43,6 +43,7 @@ test_plugin::instantiate(neutrino *neu)
 	my_GP = new mySkelGUI(nparent, QString("This test_plugin is a test_plugin"));
 
 	connect(my_GP, SIGNAL(destroyed(QObject *)), this, SLOT(pan_closed(QObject *)));
+    return true;
 }
 
 void

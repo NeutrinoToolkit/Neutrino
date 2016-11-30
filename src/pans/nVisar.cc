@@ -114,7 +114,7 @@ nVisar::~nVisar() {
 
 nVisar::nVisar(neutrino *nparent, QString winname)
     : nGenericPan(nparent, winname),
-      sweepCoeff{std::vector<double>(),std::vector<double>(),std::vector<double>()}
+      sweepCoeff{{std::vector<double>(),std::vector<double>(),std::vector<double>()}}
 {
     my_w.setupUi(this);
 

@@ -57,8 +57,8 @@ public:
 
 	bool instantiate(neutrino *); // where the construction is performed
 
-	bool unload() // where we dismantle everything when politely asked to
-	{ }
+    bool unload() // where we dismantle everything when politely asked to
+    { return true;}
 	
 	nGenericPan *my_GP;
 

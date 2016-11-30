@@ -84,8 +84,6 @@ list (APPEND SOURCES
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc pans/nZoomWin.cc
 )
 
-file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
-
 #moving it to main file
 #include(FindNeutrinoGuiComponents)
 
@@ -259,9 +257,8 @@ list(APPEND CMAKE_MODULE_PATH "../lib")
 include_directories(../nPhysImage)
 
 set(LIBS ${LIBS} "nPhysImageF") 
-add_definitions(-DHAVE_NPHYSIMAGE)
 
-if(APPLE) 
+if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
@@ -281,7 +278,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 target_link_libraries(Neutrino ${LIBS})
 
 if (USE_QT5)
-        qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
+    qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
     target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
 endif()
@@ -324,15 +321,6 @@ else()
     set(BIN_INSTALL_DIR ".")
     set(DOC_INSTALL_DIR ".")
 endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
-    #add_definitions(-Wall -Wextra)
-    # -Wxx are compiler flags and NOT definitions (otherwise: messes up resource compiler)
-    if(CMAKE_BUILD_RELEASE)
-#        add_definitions(-Werror)
-    endif()
-endif()
-
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
