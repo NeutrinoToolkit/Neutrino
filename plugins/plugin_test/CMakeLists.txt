@@ -57,8 +57,10 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
+set (SOURCES test-plugin.cc test-plugin.h)
+
 # add sources here
-add_library (${PROJECT_NAME} SHARED test-plugin.cc test-plugin.h ${nUIs})
+add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs})
 
 IF(APPLE)
     set (CMAKE_SHARED_LINKER_FLAGS "-single_module -undefined dynamic_lookup")

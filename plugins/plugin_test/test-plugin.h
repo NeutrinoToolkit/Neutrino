@@ -23,6 +23,9 @@
  *
  */
 
+#ifndef __test_plugin_plugin
+#define __test_plugin_plugin
+
 
 #include <QtGui>
 #include <QWidget>
@@ -32,9 +35,6 @@
 
 // you should include here the relevant (if any) ui_??.h
 #include "ui_test-plugin.h"
-
-#ifndef __test_plugin_plugin
-#define __test_plugin_plugin
 
 class neutrino;
 

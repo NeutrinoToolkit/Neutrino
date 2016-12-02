@@ -43,6 +43,9 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	my_w.setupUi(this);
 
 	int coreNum =1;
+
+#ifdef HAVE_OPENMP
+
 #ifdef	__WIN32
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
@@ -51,6 +54,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 #else
 	coreNum=sysconf( _SC_NPROCESSORS_ONLN );
 #endif
+
 
     int nthreads, procs, maxt, inpar, dynamic, nested;
 #pragma omp parallel private(nthreads)
@@ -77,6 +81,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     
     
 	my_w.threads->setMaximum(coreNum);
+#endif
 
 	if (coreNum==1) {
 		my_w.threads->hide();
@@ -272,7 +277,9 @@ void nPreferences::changeThreads(int num) {
         fftw_init_threads();
         fftw_plan_with_nthreads(num);
     }
+#ifdef HAVE_OPENMP
     omp_set_num_threads(num);
+#endif
     QSettings settings("neutrino","");
     settings.beginGroup("Preferences");
     settings.setValue("threads",num);
