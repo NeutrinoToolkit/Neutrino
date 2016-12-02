@@ -23,17 +23,18 @@
  *
  */
 
-#ifndef __test_plugin_plugin
-#define __test_plugin_plugin
-
 
 #include <QtGui>
 #include <QWidget>
 
 #include "nPlug.h"
+#include "nGenericPan.h"
 
 // you should include here the relevant (if any) ui_??.h
 #include "ui_test-plugin.h"
+
+#ifndef __test_plugin_plugin
+#define __test_plugin_plugin
 
 class neutrino;
 
@@ -59,7 +60,7 @@ public:
     bool unload() // where we dismantle everything when politely asked to
     { return true;}
 	
-	QMainWindow *my_GP;
+	nGenericPan *my_GP;
 
 public slots:
 	void pan_closed(QObject *);
@@ -74,16 +75,17 @@ private:
 
 
 // This object does the real work, here you write a nGenericPan as if it were in the main tree
-class mySkelGUI : public QMainWindow {
+class mySkelGUI : public nGenericPan {
 Q_OBJECT
 public:
-	mySkelGUI(QWidget *);
+	mySkelGUI(neutrino *, QString);
 
 	Ui::test_plugin my_w;
 
 public slots:
 
 	// here the GUI slots
+    void mouseAtMatrix(QPointF);
 
 private:
 

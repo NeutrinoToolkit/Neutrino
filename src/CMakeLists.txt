@@ -14,9 +14,10 @@ set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 
 if (APPLE)
+
     message(STATUS "Apple : remember to use brew !")
-    SET (CMAKE_EXE_LINKER_FLAGS  "-headerpad_max_install_names" )
-    add_compile_options(-fvisibility=hidden)
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -headerpad_max_install_names")
 
     set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
 

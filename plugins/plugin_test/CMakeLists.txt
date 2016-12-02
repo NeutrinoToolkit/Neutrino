@@ -63,7 +63,7 @@ set (SOURCES test-plugin.cc test-plugin.h)
 add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs})
 
 IF(APPLE)
-    set (CMAKE_SHARED_LINKER_FLAGS "-export_dynamic -undefined dynamic_lookup")
+     set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
 ENDIF()
 
 
