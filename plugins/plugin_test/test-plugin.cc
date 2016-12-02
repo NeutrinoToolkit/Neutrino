@@ -40,9 +40,8 @@ test_plugin::instantiate(neutrino *neu)
 	} else
 		return false;
 
-	my_GP = new mySkelGUI(nparent, QString("This test_plugin is a test_plugin"));
+	my_GP = new mySkelGUI(nparent);
 
-	connect(my_GP, SIGNAL(destroyed(QObject *)), this, SLOT(pan_closed(QObject *)));
     return true;
 }
 
@@ -55,8 +54,8 @@ test_plugin::pan_closed(QObject *qobj)
 
 // ------------------------------------------------------------------------------
 
-mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
-	: nGenericPan(nparent, winname)
+mySkelGUI::mySkelGUI(QWidget *ceppa)
+	: QMainWindow(ceppa)
 {
 	// here my pan creator
 	

@@ -31,7 +31,6 @@
 #include <QWidget>
 
 #include "nPlug.h"
-#include "nGenericPan.h"
 
 // you should include here the relevant (if any) ui_??.h
 #include "ui_test-plugin.h"
@@ -60,7 +59,7 @@ public:
     bool unload() // where we dismantle everything when politely asked to
     { return true;}
 	
-	nGenericPan *my_GP;
+	QMainWindow *my_GP;
 
 public slots:
 	void pan_closed(QObject *);
@@ -75,10 +74,10 @@ private:
 
 
 // This object does the real work, here you write a nGenericPan as if it were in the main tree
-class mySkelGUI : public nGenericPan {
+class mySkelGUI : public QMainWindow {
 Q_OBJECT
 public:
-	mySkelGUI(neutrino *, QString);
+	mySkelGUI(QWidget *);
 
 	Ui::test_plugin my_w;
 
