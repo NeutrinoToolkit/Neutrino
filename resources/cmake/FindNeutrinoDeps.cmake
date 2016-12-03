@@ -2,6 +2,10 @@
 # CAVEAT: source inclusion must not be done here (but in FindNeutrinoGuiComponents.cmake or
 # in src/CMakeLists.txt)
 
+if(APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
