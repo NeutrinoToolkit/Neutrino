@@ -57,7 +57,7 @@ before_deploy:
   then
     cp -r build_dir/Neutrino.app .
     /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
-    cp -r build_dir/bin/plugins/ Neutrino.app/Contents/Resources/
+    cp -r build_dir/bin/plugins Neutrino.app/Contents/Resources/
     git clone https://github.com/iltommi/macdeployqtfix.git
     python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
     /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
