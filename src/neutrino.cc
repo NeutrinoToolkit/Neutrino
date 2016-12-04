@@ -455,14 +455,14 @@ void
 neutrino::scanPlugins()
 {
     QDir pluginsDir(qApp->applicationDirPath());
+    qDebug() << pluginsDir.absolutePath();
 #if defined(Q_OS_WIN)
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
         pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
     if (pluginsDir.dirName() == "MacOS") {
         pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
+        pluginsDir.cd("Resources");
     }
 #endif
     pluginsDir.cd("plugins");
