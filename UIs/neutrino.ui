@@ -196,7 +196,6 @@
     <addaction name="actionWavelet"/>
     <addaction name="actionInterferometry"/>
     <addaction name="actionInversions"/>
-    <addaction name="actionVisar"/>
     <addaction name="actionGhost"/>
     <addaction name="actionContours"/>
     <addaction name="actionFocal_Spot"/>
@@ -349,11 +348,6 @@
   <action name="actionWavelet">
    <property name="text">
     <string>Wavelet</string>
-   </property>
-  </action>
-  <action name="actionVisar">
-   <property name="text">
-    <string>Visar</string>
    </property>
   </action>
   <action name="actionPolarigrams">
@@ -639,11 +633,6 @@
     <string>Ctrl+M</string>
    </property>
   </action>
-  <action name="actionBlur">
-   <property name="text">
-    <string>Blur</string>
-   </property>
-  </action>
   <action name="actionExport">
    <property name="text">
     <string>Export</string>
@@ -676,15 +665,6 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionDrawLine">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Line Pan</string>
-   </property>
-  </action>
   <action name="actionFind_Peaks">
    <property name="text">
     <string>Find Peaks</string>
@@ -695,19 +675,9 @@
     <string>HDF5 file open</string>
    </property>
   </action>
-  <action name="actionAuto_align">
-   <property name="text">
-    <string>Auto align</string>
-   </property>
-  </action>
   <action name="actionSpectral_Analysis">
    <property name="text">
     <string>Spectral Analysis</string>
-   </property>
-  </action>
-  <action name="actionVisar_Wavelet">
-   <property name="text">
-    <string>Visar Wavelet</string>
    </property>
   </action>
   <action name="actionFlipRotate">
@@ -890,6 +860,15 @@
   <action name="actionPlugin">
    <property name="text">
     <string>Load...</string>
+   </property>
+  </action>
+  <action name="actionDrawLine">
+   <property name="icon">
+    <iconset>
+     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Line Pan</string>
    </property>
   </action>
  </widget>

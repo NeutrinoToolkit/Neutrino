@@ -46,7 +46,6 @@
 #include "nBoxLineout.h"
 #include "nFindPeaks.h"
 #include "nCompareLines.h"
-#include "nVisar.h"
 #include "nWavelet.h"
 #include "nInterferometry.h"
 #include "nGhost.h"
@@ -242,7 +241,6 @@ neutrino::neutrino():
     connect(my_w.actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
     connect(my_w.actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
-    connect(my_w.actionVisar, SIGNAL(triggered()), this, SLOT(Visar()));
     connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
     connect(my_w.actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
     connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
@@ -1987,11 +1985,6 @@ neutrino::SpectralAnalysis() {
     return win;
 }
 
-nGenericPan*
-neutrino::Visar() {
-    QString vwinname=tr("Visar");
-    return new nVisar(this, vwinname);
-}
 
 /// Wavelet analysis window
 nGenericPan*

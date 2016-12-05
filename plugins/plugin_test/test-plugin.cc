@@ -41,3 +41,6 @@ void mySkelGUI::mouseAtMatrix(QPointF p) {
 }
 
 
+
+
+

@@ -266,10 +266,7 @@ public slots:
 
 	nGenericPan* openRAW();
 	
-	// VISAR STUFF
 	nGenericPan* Colorbar();
-
-	nGenericPan* Visar();
 	
 	// WAVELET STUFF
 	nGenericPan* Wavelet();
