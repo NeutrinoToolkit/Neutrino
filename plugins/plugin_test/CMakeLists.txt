@@ -57,6 +57,8 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
+QT5_WRAP_UI(nUIs test-plugin.ui)
+
 set (SOURCES test-plugin.cc test-plugin.h)
 
 # add sources here

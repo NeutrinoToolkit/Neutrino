@@ -130,7 +130,7 @@ public slots:
 	
 	void menuPaths();
 	
-	void loadPlugin();
+    void loadPlugin();
     void scanPlugins();
     void scanPlugins(QString);
     void scanPlugins(QDir);

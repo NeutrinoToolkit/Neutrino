@@ -29,7 +29,7 @@
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
 {	
-
+    if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
 	setProperty("panName",panName);

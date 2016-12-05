@@ -38,6 +38,26 @@
 
 class neutrino;
 
+// This object does the real work, here you write a nGenericPan as if it were in the main tree
+
+class mySkelGUI : public nGenericPan {
+Q_OBJECT
+public:
+    mySkelGUI(neutrino *, QString);
+
+    Ui::test_plugin my_w;
+
+public slots:
+
+    // here the GUI slots
+    void mouseAtMatrix(QPointF);
+
+private:
+
+    // here your private stuff
+
+};
+
 // the test_plugin object is in charge of reconstructing connections (runtime) with neutrino. It is in charge
 // of the real object instantiation.
 class test_plugin : public QObject, nPlug {
@@ -45,52 +65,25 @@ Q_OBJECT
 Q_INTERFACES(nPlug)
 Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
-
 public:
-	test_plugin();
+    // The following methods are virtual and can be redifined:
 
-	~test_plugin()
-	{ std::cerr<<"~test_plugin"<<  std::endl; }
-	
-	QString name()
-	{ return QString("My test_plugin plugin"); }
+//    test_plugin() { }
+//    ~test_plugin() { std::cerr<<"~test_plugin"<<  std::endl; }
+//    bool unload(){ return true;} // where we dismantle everything when politely asked to
+//    QString name() { return QString("Analysis;My test_plugin plugin"); } // this plugin is added to the Analysis menu
 
-	bool instantiate(neutrino *); // where the construction is performed
+    // The following methods are pure virtual and must be redifined:
 
-    bool unload() // where we dismantle everything when politely asked to
-    { return true;}
-	
-	nGenericPan *my_GP;
+    // where the construction is performed
+    bool instantiate(neutrino *neu) {
+        my_GP = new mySkelGUI(neu, QString("This test_plugin is a test_plugin"));
+        return true;
+    }
 
-public slots:
-	void pan_closed(QObject *);
-
-signals:
-	void plugin_died(QObject *);
-
-private:
-	neutrino *nparent;
+    nGenericPan *my_GP;
 
 };
 
-
-// This object does the real work, here you write a nGenericPan as if it were in the main tree
-class mySkelGUI : public nGenericPan {
-Q_OBJECT
-public:
-	mySkelGUI(neutrino *, QString);
-
-	Ui::test_plugin my_w;
-
-public slots:
-
-	// here the GUI slots
-    void mouseAtMatrix(QPointF);
-
-private:
-
-	// here your private stuff
-
-};
 
 #endif

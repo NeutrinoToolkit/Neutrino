@@ -38,7 +38,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -56,6 +56,9 @@
         </property>
         <property name="rightMargin">
          <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
         </property>
         <item row="1" column="1">
          <widget class="QWidget" name="widget" native="true">
@@ -450,6 +453,89 @@
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="plugins">
+       <attribute name="title">
+        <string>Plugins</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <item row="3" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QListView" name="pluginList"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="systemPlugins">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>System dir:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>User dirs:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="lineEdit"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QToolButton" name="addPluginDirs">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../qrc/icons.qrc">
+            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
          </widget>
         </item>

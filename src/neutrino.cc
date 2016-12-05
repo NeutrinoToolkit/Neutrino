@@ -111,7 +111,6 @@ neutrino::neutrino():
     currentBuffer=NULL;
 
     follower=NULL;
-    plug_loader = NULL;
 
     int numwin=qApp->property("numWin").toInt()+1;
     qApp->setProperty("numWin",numwin);
@@ -464,14 +463,7 @@ neutrino::scanPlugins(QDir pluginsDir)
     if (pluginsDir.exists()) {
         foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
             DEBUG(10, "found plugin "<<fileName.toStdString());
-            nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
-            if (my_npl->ok()) {
-                // I will probably need to leave a copy of the pointer as a QVariant inside the action
-                QAction *action = new QAction(this);
-                action->setText(my_npl->name());
-                connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
-                my_w.menuPlugins->addAction(action);
-            }
+            new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
         }
     }
 }
@@ -490,8 +482,9 @@ neutrino::scanPlugins()
         pluginsDir.cd("Resources");
     }
 #endif
-    pluginsDir.cd("plugins");
-    scanPlugins(pluginsDir);
+    if (pluginsDir.cd("plugins")) {
+        scanPlugins(pluginsDir);
+    }
 }
 
 void
@@ -509,33 +502,8 @@ neutrino::loadPlugin()
         setProperty("NeuSave-loadPlugin",pname);
         DEBUG(10, "loading plugin "<<pname.toStdString());
 
-
-        if (plug_loader) {
-            plug_loader->unload();
-            delete plug_loader;
-        }
-
-
-        plug_loader = new QPluginLoader(pname);
-        QObject *plugin = plug_loader->instance();
-
-
-
-        if (plugin) {
-            qDebug() << "got plugin instance "<< plugin;
-            nPlug *plug_iface = qobject_cast<nPlug *>(plugin);
-            if (plug_iface) {
-                DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
-
-                if (plug_iface->instantiate(this)) {
-                    DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
-                }
-            } else {
-                DEBUG("plugin load fail");
-            }
-        } else {
-            qDebug() << "FAIL LOADING PLUGIN\n\n" << plug_loader->errorString() << "\n\n" ;
-        }
+        nPluginLoader *my_npl = new nPluginLoader(pname, this);
+        my_npl->launch();
     }
 }
 

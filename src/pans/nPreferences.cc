@@ -349,3 +349,10 @@ void nPreferences::changephysNameLength(int k) {
 }
 
 
+void nPreferences::addPlugin(QString) {
+    qDebug() << "implement me or kill me !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+}
+
+
+
+

@@ -60,14 +60,14 @@ class neutrino;
 class nPlug {
 	
 public:
-	virtual ~nPlug() { }
+    virtual ~nPlug() { }
 
 public slots:
-	virtual QString name() = 0;
+    virtual QString name() { return QString(); }
 
 	virtual bool instantiate(neutrino *) = 0;
 
-	virtual bool unload() = 0;
+    virtual bool unload() { return true; }
 
 };
 

@@ -189,6 +189,8 @@
       <string>Plugins</string>
      </property>
      <addaction name="separator"/>
+     <addaction name="actionPlugin"/>
+     <addaction name="separator"/>
     </widget>
     <addaction name="actionSpectral_Analysis"/>
     <addaction name="actionWavelet"/>
@@ -212,7 +214,6 @@
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
     <addaction name="menuPlugins"/>
-    <addaction name="actionPlugin"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -787,11 +788,6 @@
     <string>Open Session</string>
    </property>
   </action>
-  <action name="actionPlugin">
-   <property name="text">
-    <string>Plugin...</string>
-   </property>
-  </action>
   <action name="actionKeyborard_shortcuts">
    <property name="text">
     <string>Keyborard shortcuts</string>
@@ -889,6 +885,11 @@
   <action name="actionContours">
    <property name="text">
     <string>Contours</string>
+   </property>
+  </action>
+  <action name="actionPlugin">
+   <property name="text">
+    <string>Load...</string>
    </property>
   </action>
  </widget>
