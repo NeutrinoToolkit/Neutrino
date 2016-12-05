@@ -131,8 +131,10 @@ public slots:
 	void menuPaths();
 	
 	void loadPlugin();
-	void scanPlugins();
-	
+    void scanPlugins();
+    void scanPlugins(QString);
+    void scanPlugins(QDir);
+
 	void openRecentFile();
 	void clearRecentFile();
 	void openRecentBuffer();

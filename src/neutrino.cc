@@ -452,6 +452,31 @@ nPhysD* neutrino::getBuffer(int i, bool returnCurrent) {
 // ------------------ PLUGINS -----------------------
 
 void
+neutrino::scanPlugins(QString pluginsDirStr)
+{
+    QDir pluginsDir(pluginsDirStr);
+    scanPlugins(pluginsDir);
+}
+
+void
+neutrino::scanPlugins(QDir pluginsDir)
+{
+    if (pluginsDir.exists()) {
+        foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+            DEBUG(10, "found plugin "<<fileName.toStdString());
+            nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+            if (my_npl->ok()) {
+                // I will probably need to leave a copy of the pointer as a QVariant inside the action
+                QAction *action = new QAction(this);
+                action->setText(my_npl->name());
+                connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
+                my_w.menuPlugins->addAction(action);
+            }
+        }
+    }
+}
+
+void
 neutrino::scanPlugins()
 {
     QDir pluginsDir(qApp->applicationDirPath());
@@ -466,39 +491,12 @@ neutrino::scanPlugins()
     }
 #endif
     pluginsDir.cd("plugins");
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-        DEBUG(10, "found plugin "<<fileName.toStdString());
-
-        nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
-        if (my_npl->ok()) {
-            // I will probably need to leave a copy of the pointer as a QVariant inside the action
-            QAction *action = new QAction(this);
-            action->setText(my_npl->name());
-            connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
-            my_w.menuPlugins->addAction(action);
-
-
-        }
-    }
+    scanPlugins(pluginsDir);
 }
 
 void
 neutrino::loadPlugin()
 {
-    //     QDir pluginsDir(qApp->applicationDirPath());
-    // #if defined(Q_OS_WIN)
-    //     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-    //         pluginsDir.cdUp();
-    // #elif defined(Q_OS_MAC)
-    //     if (pluginsDir.dirName() == "MacOS") {
-    //         pluginsDir.cdUp();
-    //         pluginsDir.cdUp();
-    //         pluginsDir.cdUp();
-    //     }
-    // #endif
-    //     pluginsDir.cd("plugins");
-    //     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-    //       QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
 
     if (!property("NeuSave-loadPlugin").isValid()) {
         setProperty("NeuSave-loadPlugin",QString("plugin.so"));
