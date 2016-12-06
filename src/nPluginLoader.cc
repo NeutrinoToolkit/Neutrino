@@ -32,7 +32,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 QStringList my_list=name_plugin.split(";");
 
                 if (my_list.size()>1) {
-                    pname=my_list.takeLast();
+                    name_plugin=my_list.takeLast();
                     QWidget *parentMenu=nParent->my_w.menubar;
                     unsigned int i=0;
                     while (i<my_list.size()) {
