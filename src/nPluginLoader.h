@@ -18,8 +18,17 @@ public:
 	{ if (iface) return iface->name();
 	else return QString(""); }
 
-	bool ok()
-	{ if (iface) return true; else return false; }
+    bool ok()
+    { if (iface) return true; else return false; }
+
+    bool unload() {
+        qDebug() << "killing me soflty" << iface;
+        if (iface) {
+            delete iface;
+            iface=nullptr;
+        }
+        return QPluginLoader::unload();
+    }
 
 public slots:
 	
@@ -27,8 +36,8 @@ public slots:
 
 
 private:
-	nPlug *iface;
-	neutrino *nParent;
+    nPlug *iface;
+    neutrino *nParent;
 	
 };
 
