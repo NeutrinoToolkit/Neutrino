@@ -148,33 +148,23 @@ private:
 };
 
 
-#include "nPlug.h"
-// the nVisarPlug object is in charge of reconstructing connections (runtime) with neutrino. It is in charge
-// of the real object instantiation.
-class nVisarPlug : public QObject, nPlug {
+#include "nPanPlug.h"
+
+class nVisarPlug : public QObject, nPanPlug {
 Q_OBJECT
-Q_INTERFACES(nPlug)
+Q_INTERFACES(nPanPlug)
 Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
 public:
-    // The following methods are virtual and can be redifined:
-
-//    nVisarPlug() { }
-//    ~nVisarPlug() { std::cerr<<"~nVisarPlug"<<  std::endl; }
-//    bool unload(){ return true;} // where we dismantle everything when politely asked to
     QString name() { return QString("Analysis;Visar"); } // this plugin is added to the Analysis menu
 
-    // The following methods are pure virtual and must be redifined:
-
-    // where the construction is performed
     bool instantiate(neutrino *neu) {
-        my_GP = new nVisar(neu, "Visar");
+        my_pan = new nVisar(neu, "Visar");
         return true;
     }
 
-    nGenericPan *my_GP;
-
 };
+
 
 
 #endif

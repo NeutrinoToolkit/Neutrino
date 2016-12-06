@@ -480,7 +480,20 @@ neutrino::scanPlugins()
         pluginsDir.cd("Resources");
     }
 #endif
-    if (pluginsDir.cd("plugins")) {
+    pluginsDir.cd("plugins");
+
+    if (!pluginsDir.cd("plugins")) {
+        pluginsDir.setPath(qApp->applicationDirPath());
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cd("bin");
+        pluginsDir.cd("plugins");
+
+        qDebug() << pluginsDir.absolutePath();
+    }
+
+    if (pluginsDir.exists()) {
         scanPlugins(pluginsDir);
     }
 }
@@ -501,6 +514,7 @@ neutrino::loadPlugin()
         DEBUG(10, "loading plugin "<<pname.toStdString());
 
         nPluginLoader *my_npl = new nPluginLoader(pname, this);
+        qDebug() << "here" << my_npl->ok();
         my_npl->launch();
     }
 }
@@ -905,9 +919,12 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                 QApplication::processEvents();
                                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                                 QApplication::processEvents();
-                                //                                my_pan->loadSettings(tmpFile.fileName());
                                 tmpFile.close(); // this should also remove it...
                             }
+                        } else {
+                            QMessageBox dlg(QMessageBox::Critical, tr("Session error"),tr("Cannot find method")+panName);
+                            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+                            dlg.exec();
                         }
                     }
                     progress.setValue(counter++);

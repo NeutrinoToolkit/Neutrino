@@ -63,7 +63,9 @@ file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 
 list (APPEND SOURCES
     neutrino.cc
-    nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nApp.cc main.cc
+    nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nPanPlug.cc
+    
+    nApp.cc main.cc
 
     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 

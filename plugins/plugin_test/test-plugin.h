@@ -77,6 +77,7 @@ public:
 
     // where the construction is performed
     bool instantiate(neutrino *neu) {
+        qDebug() << "we arrived here";
         my_GP = new mySkelGUI(neu, QString("This test_plugin is a test_plugin"));
         return true;
     }

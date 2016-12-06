@@ -22,6 +22,5 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nPlug.h"
-
+#include "nPanPlug.h"
 
