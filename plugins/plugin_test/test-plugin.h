@@ -70,8 +70,8 @@ public:
 
 //    test_plugin() { }
 //    ~test_plugin() { std::cerr<<"~test_plugin"<<  std::endl; }
-//    bool unload(){ return true;} // where we dismantle everything when politely asked to
-//    QString name() { return QString("Analysis;My test_plugin plugin"); } // this plugin is added to the Analysis menu
+    bool unload(){ if(my_GP) my_GP->deleteLater(); return true;} // where we dismantle everything when politely asked to
+    QString name() { return QString("Analysis;ceppa;My test_plugin plugin"); } // this plugin is added to the Analysis menu
 
     // The following methods are pure virtual and must be redifined:
 

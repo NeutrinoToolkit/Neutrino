@@ -10,10 +10,14 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 	  QObject *p_obj = instance();
 
+      qDebug() << "here";
+
       if (p_obj) {
-		  iface = qobject_cast<nPlug *>(p_obj);
+          qDebug() << "here";
+          iface = qobject_cast<nPlug *>(p_obj);
 			if (iface) {
 
+                qDebug() << "here";
 
                 QString name_plugin=iface->name();
                 QPointer<QMenu> my_menu=nParent->my_w.menuPlugins;
@@ -28,7 +32,6 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     }
                     #endif
                 } else {
-
                     QStringList my_list=name_plugin.split(";");
 
                     if (my_list.size()>1) {
@@ -62,32 +65,53 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     }
                 }
 
-                QPointer<QAction>  my_action;
                 foreach (QAction *action, my_menu->actions()) {
-                    if (!(action->isSeparator() || action->menu())) {
-                        if (action->text()==name_plugin) {
-                            my_action=action;
-                            nPluginLoader *my_npl=action->data().value<nPluginLoader*>();
-                            qDebug() << action->data() << my_npl;
-                            if (my_npl && my_npl->unload()) {
-                                qDebug() << my_npl->isLoaded();
-                                delete action;
-                                delete my_npl;
-                            } else {
-                                QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" already loaded and can't be unloaded"));
-                                dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-                                dlg.exec();
+                    if (!(action->isSeparator() || action->menu()) && action->text()==name_plugin && action->isEnabled()) {
+                        qDebug() << "here" << action->data();
+                        if (!action->data().isNull()) {
+                            QPluginLoader *my_qplugin=action->data().value<QPluginLoader*>();
+                            qDebug() << action->data() << my_qplugin;
+                            if (my_qplugin!=nullptr) {
+                                if(my_qplugin->instance()){
+                                    my_qplugin->instance()->deleteLater();
+                                    qDebug() << "instance removed";
+                                }
+                                QApplication::processEvents();
+
+                                delete iface;
+                                iface=nullptr;
+                                bool res= my_qplugin->unload();
+                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
+                                if (!res) res= my_qplugin->unload();
+                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
+                                qDebug() << my_qplugin->staticInstances();
+                                qDebug() << my_qplugin->instance();
+                                if (my_qplugin->instance()) my_qplugin->instance()->deleteLater();
+                                if (!res) res= my_qplugin->unload();
+                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
+                                my_menu->removeAction(action);
+                                my_qplugin->deleteLater();
+                                QApplication::processEvents();
+                                my_qplugin=new QPluginLoader(pname);
+                                p_obj = my_qplugin->instance();
+                                if (p_obj) {
+                                    iface = qobject_cast<nPlug *>(p_obj);
+                                    if (iface) {
+                                        qDebug() << "reloaded";
+                                    }
+                                }
                             }
+                        } else {
+                            QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" already loaded and can't be unloaded"));
+                            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+                            dlg.exec();
                         }
                     }
                 }
 
-                qDebug() << "here";
+                QApplication::processEvents();
 
-                if (my_action.isNull()) {
-                    qDebug() << "here";
-                    my_action = new QAction(nParent);
-                }
+                QPointer<QAction>  my_action = new QAction(nParent);
                 my_action->setText(name_plugin);
                 my_action->setProperty("neuPlugin",true);
                 QVariant v;
@@ -95,19 +119,17 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 my_action->setData(v);
                 connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
                 my_menu->addAction(my_action);
-                qDebug() << "here";
 
-			} else {
+            } else {
                 QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));
                 dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
                 dlg.exec();
-			}
-		} else {
+            }
+      } else {
           QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a plugin"));
           dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
           dlg.exec();
-		}
-      qDebug() << "here";
+      }
 }
 
 void

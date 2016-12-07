@@ -19,13 +19,14 @@ public:
 	else return QString(""); }
 
     bool ok()
-    { if (iface) return true; else return false; }
+    { return iface!=nullptr; }
 
     bool unload() {
         qDebug() << "killing me soflty" << iface;
         if (iface) {
             delete iface;
             iface=nullptr;
+            nParent=nullptr;
         }
         return QPluginLoader::unload();
     }

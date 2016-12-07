@@ -45,7 +45,10 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
     if (my_phys) {
         std::string currentProperty("");
         if (my_w.propertyList->selectedItems().size() >0) {
+            qDebug() << "here";
+            qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
             currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
+            qDebug() << "here";
         }
         my_w.propertyList->clear();
         my_w.propertyValue->clear();
@@ -81,12 +84,22 @@ void nPhysProperties::on_changePhysProperty_pressed() {
     DEBUG("Do something");
     QVariant pippo(my_w.propertyValue->toPlainText());
     DEBUG(pippo.toString().toStdString());
-    std::string item=  my_w.propertyList->currentItem()->text().toStdString();
+    std::string item("");
+    if(my_w.propertyList->currentItem()) {
+        qDebug() << "here";
+        item =  my_w.propertyList->currentItem()->text().toStdString();
+    } else if (my_w.propertyList->selectedItems().size() >0) {
+        qDebug() << "here";
+        qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
+        item =  my_w.propertyList->selectedItems().first()->text().toStdString();
+        qDebug() << "here";
+    }
     if (currentBuffer) {
         anydata my_val=toAnydata(pippo);
         currentBuffer->property[item]=my_val;
         nparent->showPhys(currentBuffer);
     }
+    qDebug() << "here";
 }
 
 
