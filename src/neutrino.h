@@ -40,9 +40,6 @@
 #include <QPrinter>
 #include <QMap>
 
-// plugins
-#include <QPluginLoader>
-
 #include "nGenericPan.h"
 #include "nPlug.h"
 #include "nView.h"
@@ -70,6 +67,7 @@
 
 #include "nTics.h"
 
+
 class neutrino : public QMainWindow {
 
 Q_OBJECT
@@ -87,8 +85,7 @@ public:
     Ui::nSbarra my_sbarra;
     Ui::nAbout my_about;
 
-	QPluginLoader *plug_loader;
-	//nPlug *plug_iface;
+    //nPlug *plug_iface;
 	
 	static const int MaxRecentFiles=20;
 

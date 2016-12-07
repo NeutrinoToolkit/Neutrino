@@ -60,7 +60,7 @@ class neutrino;
 class nPlug {
 	
 public:
-    virtual ~nPlug() { }
+    virtual ~nPlug() { qDebug() << "here"; }
 
 public slots:
     virtual QString name() { return QString(); }

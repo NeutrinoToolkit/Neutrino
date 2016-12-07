@@ -63,6 +63,8 @@ class nPanPlug : public nPlug {
 public slots:
     nGenericPan* pan() {return my_pan;}
 
+    bool unload() { my_pan->deleteLater(); return true; }
+
 protected:
     QPointer<nGenericPan> my_pan;
 

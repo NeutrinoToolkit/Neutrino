@@ -37,7 +37,7 @@ mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
 }
 
 void mySkelGUI::mouseAtMatrix(QPointF p) {
-    my_w.label->setText(QString::number(p.x())+ " " +QString::number(p.y()));
+    my_w.label->setText(QString::number(p.x())+ " : " +QString::number(p.y()));
 }
 
 

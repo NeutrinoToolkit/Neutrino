@@ -3,9 +3,19 @@ cmake_minimum_required (VERSION 3.0)
 
 message(STATUS "Scanning plugins directory")
 
-file(GLOB plugins_list LIST_DIRECTORIES true "plugin_*")
+SET(plugins_list "")
+FILE(GLOB allfiles "*")
+FOREACH(onefile ${allfiles})
+  IF(IS_DIRECTORY ${onefile})
+    get_filename_component(namedir ${onefile} NAME)
+    if(NOT ( ${namedir} STREQUAL "skel"))
+      LIST(APPEND plugins_list ${onefile})
+    endif()
+  ENDIF()
+ENDFOREACH()
 
 message(STATUS "Found plugins: ${plugins_list}")
+
 set (LIBRARY_OUTPUT_PATH "../../bin/plugins")
 
 foreach (plugin_name ${plugins_list})

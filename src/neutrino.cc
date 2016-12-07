@@ -42,7 +42,7 @@
 #include "nMouseInfo.h"
 #include "nZoomWin.h"
 #include "nPluginLoader.h"
-
+#include "nPanPlug.h"
 #include "nBoxLineout.h"
 #include "nFindPeaks.h"
 #include "nCompareLines.h"
@@ -898,34 +898,67 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         QStringList listLine=qLine.split(" ");
                         QString panName=listLine.at(1);
                         QApplication::processEvents();
+
+                        for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i)
+                            qDebug() << "method:" << metaObject()->method(i).methodSignature();
+
+                        nGenericPan *my_pan=nullptr;
+
                         if (metaObject()->indexOfMethod((panName+"()").toLatin1().constData())>0) {
-                            nGenericPan *my_pan=NULL;
                             QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-                            QApplication::processEvents();
-                            if (my_pan) {
-                                QApplication::processEvents();
-                                QTemporaryFile tmpFile(this);
-                                tmpFile.open();
-                                while(!ifile.eof()) {
-                                    getline(ifile,line);
-                                    //                                    WARNING(line);
-                                    qLine=QString::fromStdString(line);
-                                    if (qLine.startsWith("NeutrinoPan-end"))
-                                        break;
-                                    tmpFile.write(line.c_str());
-                                    tmpFile.write("\n");
-                                }
-                                tmpFile.flush();
-                                QApplication::processEvents();
-                                QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
-                                QApplication::processEvents();
-                                tmpFile.close(); // this should also remove it...
-                            }
                         } else {
-                            QMessageBox dlg(QMessageBox::Critical, tr("Session error"),tr("Cannot find method")+panName);
-                            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-                            dlg.exec();
+                            bool found=false;
+                            foreach (QAction *my_action, findChildren<QAction *>()) {
+                                if (!my_action->data().isNull()) {
+                                    nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
+                                    qDebug() << my_action->data() << my_qplugin;
+                                    if (my_qplugin!=nullptr) {
+                                        qDebug() << "plugin action" << my_qplugin->name();
+                                        if (panName==my_qplugin->name().split(";").takeLast()) {
+                                            my_qplugin->launch();
+                                            QApplication::processEvents();
+                                            found=true;
+                                            QObject *p_obj = my_qplugin->instance();
+                                            if (p_obj) {
+                                                nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
+                                                if (iface) {
+                                                    qDebug() << "reloaded";
+                                                    my_pan=iface->pan();
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (!found) {
+                                QMessageBox dlg(QMessageBox::Critical, tr("Session error"),tr("Cannot find method ")+panName);
+                                dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+                                dlg.exec();
+                            }
                         }
+                        QApplication::processEvents();
+                        if (my_pan) {
+                            QApplication::processEvents();
+                            QTemporaryFile tmpFile(this);
+                            tmpFile.open();
+                            while(!ifile.eof()) {
+                                getline(ifile,line);
+                                // WARNING(line);
+                                qLine=QString::fromStdString(line);
+                                if (qLine.startsWith("NeutrinoPan-end"))
+                                    break;
+                                tmpFile.write(line.c_str());
+                                tmpFile.write("\n");
+                            }
+                            tmpFile.flush();
+                            QApplication::processEvents();
+                            QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
+                            QApplication::processEvents();
+                            tmpFile.close(); // this should also remove it...
+                        }
+
                     }
                     progress.setValue(counter++);
                     QApplication::processEvents();
@@ -1923,7 +1956,7 @@ neutrino::Vlineout() {
 
 nGenericPan*
 neutrino::bothLineout() {
-    QString namepad=tr("Bothlineout");
+    QString namepad=tr("bothLineout");
     nGenericPan *win = existsPan(namepad);
     if (!win) win = new nLineoutBoth(this, namepad);
     return win;
