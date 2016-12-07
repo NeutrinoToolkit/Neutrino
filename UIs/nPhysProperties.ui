@@ -50,6 +50,9 @@
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
       </widget>
       <widget class="QPlainTextEdit" name="propertyValue">
        <property name="font">

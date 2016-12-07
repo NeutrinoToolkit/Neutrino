@@ -22,7 +22,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 QString name_plugin=iface->name();
                 QPointer<QMenu> my_menu=nParent->my_w.menuPlugins;
 
-                // in case the interface returns an empty name (default if methon not overridden), pick up the name of the file
+                // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
                 if (name_plugin.isEmpty()) {
                     name_plugin=QFileInfo(pname).baseName();
 
@@ -37,14 +37,13 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     if (my_list.size()>1) {
                         name_plugin=my_list.takeLast();
                         QWidget *parentMenu=nParent->my_w.menubar;
-                        unsigned int i=0;
+                        int i=0;
                         while (i<my_list.size()) {
                             bool found=false;
                             foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
                                 if (menu->title()==my_list.at(i)) {
                                     found=true;
                                     if (i<my_list.size()) {
-                                        i++;
                                         parentMenu=menu;
                                         my_menu=menu;
                                         break;
@@ -59,8 +58,8 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                                 }
                                 my_menu->setTitle(my_list.at(i));
                                 parentMenu=my_menu;
-                                i++;
                             }
+                            i++;
                         }
                     }
                 }
@@ -73,25 +72,10 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                             qDebug() << action->data() << my_qplugin;
                             if (my_qplugin!=nullptr) {
                                 if(my_qplugin->instance()){
-                                    my_qplugin->instance()->deleteLater();
+                                    delete my_qplugin;
                                     qDebug() << "instance removed";
                                 }
-                                QApplication::processEvents();
-
-                                delete iface;
-                                iface=nullptr;
-                                bool res= my_qplugin->unload();
-                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
-                                if (!res) res= my_qplugin->unload();
-                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
-                                qDebug() << my_qplugin->staticInstances();
-                                qDebug() << my_qplugin->instance();
-                                if (my_qplugin->instance()) my_qplugin->instance()->deleteLater();
-                                if (!res) res= my_qplugin->unload();
-                                qDebug() << "----->>>>> unload:" << res << " isloaded:" << my_qplugin->isLoaded();
                                 my_menu->removeAction(action);
-                                my_qplugin->deleteLater();
-                                QApplication::processEvents();
                                 my_qplugin=new QPluginLoader(pname);
                                 p_obj = my_qplugin->instance();
                                 if (p_obj) {
