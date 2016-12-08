@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nVisar
-#define __nVisar
+#ifndef __Visar
+#define __Visar
 
 #include <array>
 #include <QtGui>
@@ -35,18 +35,18 @@
 
 #include "nPhysWave.h"
 
-class nVisarPhasePlot : public nCustomPlotMouseX3Y {
+class VisarPhasePlot : public nCustomPlotMouseX3Y {
     Q_OBJECT
 
 public:
-    nVisarPhasePlot(QWidget*);
+    VisarPhasePlot(QWidget*);
 };
 
-class nVisarPlot : public nCustomPlotMouseX3Y {
+class VisarPlot : public nCustomPlotMouseX3Y {
     Q_OBJECT
 
 public:
-    nVisarPlot(QWidget*);
+    VisarPlot(QWidget*);
 };
 
 class nSOPPlot : public nCustomPlotMouseX2Y {
@@ -55,9 +55,9 @@ public:
     nSOPPlot(QWidget*);
 };
 
-#include "ui_nVISAR1.h"
-#include "ui_nVISAR2.h"
-#include "ui_nVISAR3.h"
+#include "ui_Visar1.h"
+#include "ui_Visar2.h"
+#include "ui_Visar3.h"
 
 class neutrino;
 class nLine;
@@ -70,19 +70,19 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 
 
 
-class nVisar : public nGenericPan {
+class Visar : public nGenericPan {
     Q_OBJECT
 
     using nGenericPan::loadSettings;
 
 public:
 
-    nVisar(neutrino *, QString);
-    ~nVisar();
-    Ui::nVISAR1 my_w;
+    Visar(neutrino *, QString);
+    ~Visar();
+    Ui::Visar1 my_w;
 
-    std::array<Ui::nVISAR2,2> visar;
-    std::array<Ui::nVISAR3,2> setvisar;
+    std::array<Ui::Visar2,2> visar;
+    std::array<Ui::Visar3,2> setvisar;
 
     double getTime(int k,double p);
 
@@ -150,19 +150,20 @@ private:
 
 #include "nPanPlug.h"
 
-class nVisarPlug : public QObject, nPanPlug {
+class VisarPlug : public QObject, nPanPlug {
 Q_OBJECT
 Q_INTERFACES(nPanPlug)
 Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
 public:
-    QString name() { return QString("Analysis;Visar"); } // this plugin is added to the Analysis menu
+    QString menuEntryPoint() { return QString("Analysis"); }
+
+    QString name() { return "Visar";}
 
     bool instantiate(neutrino *neu) {
-        my_pan = new nVisar(neu, "Visar");
+        my_pan = new Visar(neu, name());
         return true;
     }
-
 };
 
 

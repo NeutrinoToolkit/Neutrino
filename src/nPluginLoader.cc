@@ -20,6 +20,8 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 qDebug() << "here";
 
                 QString name_plugin=iface->name();
+                QString menuEntry=iface->menuEntryPoint();
+
                 QPointer<QMenu> my_menu=nParent->my_w.menuPlugins;
 
                 // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
@@ -31,36 +33,31 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                         name_plugin.remove(0,3);
                     }
                     #endif
-                } else {
-                    QStringList my_list=name_plugin.split(";");
+                }
 
-                    if (my_list.size()>1) {
-                        name_plugin=my_list.takeLast();
-                        // need a QWidget because it might be a QToolBar or QMenu
-                        QWidget *parentMenu=nParent->my_w.menubar;
-                        int i=0;
-                        while (i<my_list.size()) {
-                            bool found=false;
-                            foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
-                                if (menu->title()==my_list.at(i)) {
-                                    found=true;
-                                    if (i<my_list.size()) {
-                                        parentMenu = my_menu = menu;
-                                        break;
-                                    }
-                                }
+                QStringList my_list=menuEntry.split(";");
+
+                // need a QWidget because it might be a QToolBar or QMenu
+                QWidget *parentMenu=nParent->my_w.menubar;
+                for (int i=0; i<my_list.size() i++) {
+                    bool found=false;
+                    foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                        if (menu->title()==my_list.at(i)) {
+                            found=true;
+                            if (i<my_list.size()) {
+                                parentMenu = my_menu = menu;
+                                break;
                             }
-                            if (!found) {
-                                if (qobject_cast<QMenuBar*>(parentMenu)) {
-                                    my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
-                                } else if(qobject_cast<QMenu*>(parentMenu)) {
-                                    my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
-                                }
-                                my_menu->setTitle(my_list.at(i));
-                                parentMenu = my_menu;
-                            }
-                            i++;
                         }
+                    }
+                    if (!found) {
+                        if (qobject_cast<QMenuBar*>(parentMenu)) {
+                            my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                        } else if(qobject_cast<QMenu*>(parentMenu)) {
+                            my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
+                        }
+                        my_menu->setTitle(my_list.at(i));
+                        parentMenu = my_menu;
                     }
                 }
 

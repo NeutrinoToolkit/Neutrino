@@ -63,6 +63,8 @@ public:
     virtual ~nPlug() { qDebug() << "here"; }
 
 public slots:
+    virtual QString menuEntryPoint() {return QString();}
+
     virtual QString name() { return QString(); }
 
 	virtual bool instantiate(neutrino *) = 0;

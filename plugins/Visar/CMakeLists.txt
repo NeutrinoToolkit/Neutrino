@@ -57,11 +57,11 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
-QT5_WRAP_UI(nUIs nVISAR1.ui)
-QT5_WRAP_UI(nUIs nVISAR2.ui)
-QT5_WRAP_UI(nUIs nVISAR3.ui)
+QT5_WRAP_UI(nUIs Visar1.ui)
+QT5_WRAP_UI(nUIs Visar2.ui)
+QT5_WRAP_UI(nUIs Visar3.ui)
 
-set (SOURCES nVisar.cc nVisar.h)
+set (SOURCES Visar.cc Visar.h)
 
 # add sources here
 add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs})

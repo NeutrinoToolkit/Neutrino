@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nVISAR2</class>
- <widget class="QWidget" name="nVISAR2">
+ <class>Visar2</class>
+ <widget class="QWidget" name="Visar2">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -114,7 +114,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../qrc/icons.qrc">
+         <iconset resource="../../qrc/icons.qrc">
           <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
         </property>
         <property name="neutrinoSave" stdset="0">
@@ -192,7 +192,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../qrc/icons.qrc">
+            <iconset resource="../../qrc/icons.qrc">
              <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
            </property>
            <property name="neutrinoSave" stdset="0">
@@ -396,7 +396,7 @@
     </widget>
    </item>
    <item>
-    <widget class="nVisarPhasePlot" name="plotPhaseIntensity" native="true">
+    <widget class="VisarPhasePlot" name="plotPhaseIntensity" native="true">
      <property name="mouseTracking">
       <bool>true</bool>
      </property>
@@ -406,9 +406,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nVisarPhasePlot</class>
+   <class>VisarPhasePlot</class>
    <extends>QWidget</extends>
-   <header>nVisar.h</header>
+   <header>Visar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -429,7 +429,7 @@
   <tabstop>multRef</tabstop>
  </tabstops>
  <resources>
-  <include location="../qrc/icons.qrc"/>
+  <include location="../../qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
