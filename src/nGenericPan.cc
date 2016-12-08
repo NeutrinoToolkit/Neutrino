@@ -28,24 +28,24 @@
 
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
-{	
+{
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
-	setProperty("panName",panName);
+    setProperty("panName",panName);
 
-	int panNum=0;
-	foreach (QWidget *widget, QApplication::allWidgets()) {
-		nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-		if (pan && pan != this && pan->nparent == nparent) {
+    int panNum=0;
+    foreach (QWidget *widget, QApplication::allWidgets()) {
+        nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
+        if (pan && pan != this && pan->nparent == nparent) {
             if (pan->panName.startsWith(panName)) {
                 panNum=std::max(pan->property("panNum").toInt(),panNum);
-			}
-		}
-	}
-	panNum++;
-	if (panNum>1) panName.append(QString::number(panNum));
-	
+            }
+        }
+    }
+    panNum++;
+    if (panNum>1) panName.append(QString::number(panNum));
+
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
@@ -137,6 +137,8 @@ void nGenericPan::grabSave() {
 }
 
 void nGenericPan::showEvent(QShowEvent* event) {
+    qDebug() << metaObject()->className();
+
     QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
     connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
 

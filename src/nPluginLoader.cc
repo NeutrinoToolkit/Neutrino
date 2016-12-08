@@ -39,7 +39,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                 // need a QWidget because it might be a QToolBar or QMenu
                 QWidget *parentMenu=nParent->my_w.menubar;
-                for (int i=0; i<my_list.size() i++) {
+                for (int i=0; i<my_list.size(); i++) {
                     bool found=false;
                     foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
                         if (menu->title()==my_list.at(i)) {
