@@ -902,35 +902,8 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i)
                             qDebug() << "method:" << metaObject()->method(i).methodSignature();
 
-                        nGenericPan *my_pan=nullptr;
+                        nGenericPan *my_pan=openPan(panName, false);
 
-                        if (metaObject()->indexOfMethod((panName+"()").toLatin1().constData())>0) {
-                            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-                        } else {
-                            foreach (QAction *my_action, findChildren<QAction *>()) {
-                                if (!my_action->data().isNull()) {
-                                    nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
-                                    qDebug() << my_action->data() << my_qplugin;
-                                    if (my_qplugin!=nullptr) {
-                                        qDebug() << "plugin action" << my_qplugin->name();
-                                        if (panName==my_qplugin->name()) {
-                                            my_qplugin->launch();
-                                            QApplication::processEvents();
-                                            QObject *p_obj = my_qplugin->instance();
-                                            if (p_obj) {
-                                                nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
-                                                if (iface) {
-                                                    qDebug() << "reloaded";
-                                                    my_pan=iface->pan();
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        QApplication::processEvents();
                         if (my_pan) {
                             QApplication::processEvents();
                             QTemporaryFile tmpFile(this);
@@ -2232,29 +2205,6 @@ void neutrino::about() {
     myabout.exec();
 }
 
-nGenericPan* neutrino::openPan(QString panName, bool force) {
-    nGenericPan *my_pan=NULL;
-
-    const QMetaObject* metaObject = this->metaObject();
-    for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
-        // frigging method name change between qt4.x and qt5.x
-#ifdef USE_QT5
-        QString m_sig = QString::fromLatin1(metaObject->method(i).methodSignature());
-#else
-        QString m_sig = QString::fromLatin1(metaObject->method(i).signature());
-#endif
-        if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-                metaObject->method(i).parameterTypes().empty() &&
-                m_sig ==panName+"()") {
-            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-        }
-    }
-    if (force && my_pan==nullptr) {
-        my_pan=new nGenericPan(this,panName);
-    }
-    return my_pan;
-}
-
 nLine* neutrino::line(QString name) {
     foreach (QObject* widget, children()) {
         nLine *linea=qobject_cast<nLine *>(widget);
@@ -2266,6 +2216,56 @@ nLine* neutrino::line(QString name) {
 }
 
 #ifdef HAVE_PYTHONQT
+
+nGenericPan* neutrino::openPan(QString panName, bool force) {
+
+    nGenericPan *my_pan=nullptr;
+
+    int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
+    if (methodIdx>0) {
+#ifdef USE_QT5
+        QString m_sig = QString::fromLatin1(metaObject()->method(methodIdx).methodSignature());
+#else
+        QString m_sig = QString::fromLatin1(metaObject()->method(methodIdx).signature());
+#endif
+        if (!strcmp(metaObject()->method(methodIdx).typeName(),"nGenericPan*") &&
+                metaObject()->method(methodIdx).parameterTypes().empty()) {
+            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+        }
+    }
+    if (my_pan==nullptr) {
+        foreach (QAction *my_action, findChildren<QAction *>()) {
+            if (!my_action->data().isNull()) {
+                nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
+                qDebug() << my_action->data() << my_qplugin;
+                if (my_qplugin!=nullptr) {
+                    qDebug() << "plugin action" << my_qplugin->name();
+                    if (panName==my_qplugin->name()) {
+                        my_qplugin->launch();
+                        QApplication::processEvents();
+                        QObject *p_obj = my_qplugin->instance();
+                        if (p_obj) {
+                            nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
+                            if (iface) {
+                                qDebug() << "reloaded";
+                                my_pan=iface->pan();
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    QApplication::processEvents();
+
+    if (force && my_pan==nullptr) {
+        my_pan=new nGenericPan(this,panName);
+    }
+    return my_pan;
+}
+
+
 // ----------------------------------- scripting --------------------------------------
 
 nGenericPan* neutrino::getPan(QString name) {
