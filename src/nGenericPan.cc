@@ -50,8 +50,6 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
 
 	connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
 
-	my_s=nparent->getScene();
-
 	connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
 	connect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
 

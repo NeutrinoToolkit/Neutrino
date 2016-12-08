@@ -50,7 +50,6 @@ public:
 	nGenericPan(){};
 	nGenericPan(neutrino *, QString);
 	~nGenericPan(){};
-	QGraphicsScene *my_s;
 
 	neutrino *nparent;
 	QString panName;
