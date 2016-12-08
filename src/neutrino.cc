@@ -809,7 +809,7 @@ void neutrino::saveSession (QString fname) {
                 physList.at(i)->setType(PHYS_FILE);
             }
             for (int i=0;i<panList.size(); i++) {
-                QString namePan=panList.at(i)->property("panName").toString();
+                QString namePan=panList.at(i)->metaObject()->className();
                 QTemporaryFile tmpFile(this);
                 if (tmpFile.open()) {
                     QString tmp_filename=tmpFile.fileName();
@@ -907,17 +907,15 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         if (metaObject()->indexOfMethod((panName+"()").toLatin1().constData())>0) {
                             QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
                         } else {
-                            bool found=false;
                             foreach (QAction *my_action, findChildren<QAction *>()) {
                                 if (!my_action->data().isNull()) {
                                     nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
                                     qDebug() << my_action->data() << my_qplugin;
                                     if (my_qplugin!=nullptr) {
                                         qDebug() << "plugin action" << my_qplugin->name();
-                                        if (panName==my_qplugin->name().split(";").takeLast()) {
+                                        if (panName==my_qplugin->name()) {
                                             my_qplugin->launch();
                                             QApplication::processEvents();
-                                            found=true;
                                             QObject *p_obj = my_qplugin->instance();
                                             if (p_obj) {
                                                 nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
@@ -930,12 +928,6 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                                         }
                                     }
                                 }
-                            }
-
-                            if (!found) {
-                                QMessageBox dlg(QMessageBox::Critical, tr("Session error"),tr("Cannot find method ")+panName);
-                                dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-                                dlg.exec();
                             }
                         }
                         QApplication::processEvents();
@@ -957,6 +949,8 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                             QApplication::processEvents();
                             tmpFile.close(); // this should also remove it...
+                        } else {
+                            QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+panName,  QMessageBox::Ok);
                         }
 
                     }

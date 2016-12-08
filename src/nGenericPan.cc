@@ -32,8 +32,6 @@ nGenericPan::nGenericPan(neutrino *myparent, QString name)
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
-    setProperty("panName",panName);
-
     int panNum=0;
     foreach (QWidget *widget, QApplication::allWidgets()) {
         nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
@@ -143,8 +141,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
     // these properties will be automatically saved
     setProperty("NeuSave-fileIni",panName+".ini");
     setProperty("NeuSave-fileTxt",panName+".txt");
-    setProperty("NeuSave-fileExport",panName+".txt");
-
 
     QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
     foreach (QToolBar *my_tool, my_toolbars) {
@@ -227,7 +223,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
         if (fontTmp.fromString(fontString.toString())) {
             foreach (nCustomPlot *my_plot, findChildren<nCustomPlot *>()) {
                 qDebug() << my_plot->objectName() << my_plot->metaObject()->className();
-                my_plot->setProperty("panName",panName);
                 qDebug() << "--------------------------------->>>>>>";
                 foreach (QCPAxisRect *re, my_plot->axisRects()) {
                     qDebug() << "--------------------------------->>>>>>" << re;
@@ -556,9 +551,9 @@ void nGenericPan::closeEvent(QCloseEvent*){
 
 //////////////////// SETTINGS
 void nGenericPan::loadSettings() {
-	QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+    QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		loadSettings(fnametmp);
 	}
 }
@@ -569,9 +564,9 @@ void nGenericPan::loadSettings(QString settingsFile) {
 }
 
 void nGenericPan::saveSettings() {
-    QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
