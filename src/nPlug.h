@@ -65,7 +65,7 @@ public:
 public slots:
     virtual QString menuEntryPoint() {return QString();}
 
-    virtual QString name() { return QString(); }
+    virtual QByteArray name() { return QByteArray(); }
 
 	virtual bool instantiate(neutrino *) = 0;
 

@@ -19,7 +19,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                 qDebug() << "here";
 
-                QString name_plugin=iface->name();
+                QString name_plugin(iface->name());
                 QString menuEntry=iface->menuEntryPoint();
 
                 QPointer<QMenu> my_menu=nParent->my_w.menuPlugins;

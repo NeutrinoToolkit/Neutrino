@@ -71,7 +71,7 @@ public slots:
     }
 
     bool instantiate(neutrino *neu) {
-        const QByteArray className((name()+"*").toLatin1());
+        const QByteArray className(name()+"*");
         const int type = QMetaType::type( className );
         if(type != QMetaType::UnknownType) {
             const QMetaObject *mo = QMetaType::metaObjectForType(type);

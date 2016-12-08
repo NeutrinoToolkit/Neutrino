@@ -155,9 +155,9 @@ Q_INTERFACES(nPanPlug)
 Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
 public:
-    VisarPlug() {qRegisterMetaType<Visar*>(name().toLatin1()+"*");}
+    VisarPlug() {qRegisterMetaType<Visar*>(name()+"*");}
     QString menuEntryPoint() { return QString("Analysis"); }
-    QString name() {return "Visar";}
+    QByteArray name() {return "Visar";}
 
 };
 
