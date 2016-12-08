@@ -507,8 +507,6 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 // SETTINGS
 void
 nCustomPlot::loadSettings(QSettings *my_set) {
-    qDebug() << __FUNCTION__ << objectName() << metaObject()->className();
-
     if (my_set==nullptr) {
         QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
         if (!fnametmp.isEmpty()) {
@@ -567,7 +565,6 @@ nCustomPlot::loadSettings(QSettings *my_set) {
         if (my_set->childGroups().contains("Properties")) {
             my_set->beginGroup("Properties");
             foreach(QString my_key, my_set->allKeys()) {
-                qDebug() << "load" <<  my_key << " : " << my_set->value(my_key);
                 setProperty(my_key.toStdString().c_str(), my_set->value(my_key));
             }
             my_set->endGroup();
@@ -613,7 +610,6 @@ nCustomPlot::saveSettings(QSettings *my_set) {
 
         my_set->beginGroup("Properties");
         foreach(QByteArray ba, dynamicPropertyNames()) {
-            qDebug() << "save" << ba << " : " << property(ba);
             if(ba.startsWith("NeuSave")) {
                 qDebug() << "write" << ba << " : " << property(ba);
                 my_set->setValue(ba, property(ba));

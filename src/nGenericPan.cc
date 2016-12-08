@@ -222,12 +222,8 @@ void nGenericPan::showEvent(QShowEvent* event) {
         QFont fontTmp;
         if (fontTmp.fromString(fontString.toString())) {
             foreach (nCustomPlot *my_plot, findChildren<nCustomPlot *>()) {
-                qDebug() << my_plot->objectName() << my_plot->metaObject()->className();
-                qDebug() << "--------------------------------->>>>>>";
                 foreach (QCPAxisRect *re, my_plot->axisRects()) {
-                    qDebug() << "--------------------------------->>>>>>" << re;
                     foreach (QCPAxis *axis, re->axes()) {
-                        qDebug() << axis;
                         axis->setLabelFont(fontTmp);
                         axis->setTickLabelFont(fontTmp);
                     }

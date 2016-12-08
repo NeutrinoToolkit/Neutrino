@@ -34,6 +34,7 @@
 #include "nCustomPlots.h"
 
 #include "nPhysWave.h"
+#include "neutrino.h"
 
 class VisarPhasePlot : public nCustomPlotMouseX3Y {
     Q_OBJECT
@@ -59,7 +60,6 @@ public:
 #include "ui_Visar2.h"
 #include "ui_Visar3.h"
 
-class neutrino;
 class nLine;
 class nRect;
 
@@ -77,7 +77,7 @@ class Visar : public nGenericPan {
 
 public:
 
-    Visar(neutrino *, QString);
+    Q_INVOKABLE Visar(neutrino *);
     ~Visar();
     Ui::Visar1 my_w;
 
@@ -155,27 +155,10 @@ Q_INTERFACES(nPanPlug)
 Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
 public:
+    VisarPlug() {qRegisterMetaType<Visar*>(name().toLatin1()+"*");}
     QString menuEntryPoint() { return QString("Analysis"); }
-
     QString name() {return "Visar";}
 
-    bool instantiate(neutrino *neu) {
-//        QByteArray pippo((name()+"*").toLatin1());
-
-//        qRegisterMetaType<Visar*>(pippo);
-
-//        int id = QMetaType::type(pippo);
-//        qDebug() << name().toStdString().c_str()<< name()<<"\n*\n*\n*\n*\n*\n*\n*\n*\n*\n*\n*" << id;
-//        if (id != QMetaType::UnknownType) {
-//            void *myClassPtr = QMetaType::create(id);
-//            QMetaType::destroy(id, myClassPtr);
-//            myClassPtr = 0;
-//        }
-
-
-        my_pan = new Visar(neu, name());
-        return true;
-    }
 };
 
 

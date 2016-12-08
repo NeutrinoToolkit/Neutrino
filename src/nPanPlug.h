@@ -70,6 +70,22 @@ public slots:
         return true;
     }
 
+    bool instantiate(neutrino *neu) {
+        const QByteArray className((name()+"*").toLatin1());
+        const int type = QMetaType::type( className );
+        if(type != QMetaType::UnknownType) {
+            const QMetaObject *mo = QMetaType::metaObjectForType(type);
+            if(mo) {
+                QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
+                if(objectPtr) {
+                    my_pan=qobject_cast<nGenericPan*>(objectPtr);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 protected:
     QPointer<nGenericPan> my_pan;
 
