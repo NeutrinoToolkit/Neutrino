@@ -77,7 +77,7 @@ class Visar : public nGenericPan {
 
 public:
 
-    Q_INVOKABLE Visar(neutrino *);
+    Q_INVOKABLE Visar(neutrino *,QString);
     ~Visar();
     Ui::Visar1 my_w;
 
@@ -147,8 +147,9 @@ private:
     QPointer<nRect> sopRect;
 };
 
-#include "nPanPlug.h"
 
+
+#include "nPanPlug.h"
 class VisarPlug : public QObject, nPanPlug {
 Q_OBJECT
 Q_INTERFACES(nPanPlug)
@@ -156,8 +157,8 @@ Q_PLUGIN_METADATA(IID "org.neutrino.plug")
 
 public:
     VisarPlug() {qRegisterMetaType<Visar*>(name()+"*");}
-    QString menuEntryPoint() { return QString("Analysis"); }
     QByteArray name() {return "Visar";}
+    QString menuEntryPoint() { return QString("Analysis"); }
 
 };
 

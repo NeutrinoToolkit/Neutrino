@@ -112,8 +112,8 @@ nSOPPlot::nSOPPlot(QWidget* parent):
 Visar::~Visar() {
 }
 
-Visar::Visar(neutrino *nparent)
-    : nGenericPan(nparent, "Visar"),
+Visar::Visar(neutrino *nparent, QString winname)
+    : nGenericPan(nparent, winname),
       sweepCoeff{{std::vector<double>(),std::vector<double>(),std::vector<double>()}}
 {
     my_w.setupUi(this);

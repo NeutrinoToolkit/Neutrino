@@ -76,7 +76,7 @@ public slots:
         if(type != QMetaType::UnknownType) {
             const QMetaObject *mo = QMetaType::metaObjectForType(type);
             if(mo) {
-                QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
+                QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu),Q_ARG(QString,name()));
                 if(objectPtr) {
                     my_pan=qobject_cast<nGenericPan*>(objectPtr);
                     return true;
