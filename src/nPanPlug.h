@@ -56,7 +56,7 @@
 #define __npanplug
 
 class neutrino;
-#include "nGenericPan.h"
+class nGenericPan;
 
 class nPanPlug : public nPlug {
 
@@ -64,27 +64,9 @@ public slots:
 
     nGenericPan* pan() { return my_pan;}
 
-    bool unload() {
-        if (my_pan) my_pan->deleteLater();
-        QApplication::processEvents();
-        return true;
-    }
+    bool unload();
 
-    bool instantiate(neutrino *neu) {
-        const QByteArray className(name()+"*");
-        const int type = QMetaType::type( className );
-        if(type != QMetaType::UnknownType) {
-            const QMetaObject *mo = QMetaType::metaObjectForType(type);
-            if(mo) {
-                QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu),Q_ARG(QString,name()));
-                if(objectPtr) {
-                    my_pan=qobject_cast<nGenericPan*>(objectPtr);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    bool instantiate(neutrino *neu);
 
 protected:
     QPointer<nGenericPan> my_pan;
@@ -93,6 +75,8 @@ protected:
 
 Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 
+#define NEUTRINO_PLUGIN_BASE(__class_name,__menu_entry,__appendix) class __class_name##__appendix : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.plug")  public: __class_name##__appendix() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } };
+#define NEUTRINO_PLUGIN(__class_name,__menu_entry) NEUTRINO_PLUGIN_BASE(__class_name,__menu_entry,Plug)
 
 
 #endif

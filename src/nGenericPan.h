@@ -39,6 +39,8 @@
 #ifndef __generic_pan
 #define __generic_pan
 
+#include "nPanPlug.h"
+
 class neutrino;
 
 typedef void (*ifunc)(void *, int &); 
