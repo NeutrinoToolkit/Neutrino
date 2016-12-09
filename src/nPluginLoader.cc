@@ -13,16 +13,13 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
       qDebug() << "here";
 
       if (p_obj) {
-          qDebug() << "here";
           iface = qobject_cast<nPlug *>(p_obj);
 			if (iface) {
-
-                qDebug() << "here";
 
                 QString name_plugin(iface->name());
                 QString menuEntry=iface->menuEntryPoint();
 
-                QPointer<QMenu> my_menu=nParent->my_w.menuPlugins;
+                QPointer<QMenu> my_menu;
 
                 // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
                 if (name_plugin.isEmpty()) {
@@ -35,32 +32,34 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     #endif
                 }
 
-                QStringList my_list=menuEntry.split(";");
-
-                // need a QWidget because it might be a QToolBar or QMenu
-                QWidget *parentMenu=nParent->my_w.menubar;
-                for (int i=0; i<my_list.size(); i++) {
-                    bool found=false;
-                    foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
-                        if (menu->title()==my_list.at(i)) {
-                            found=true;
-                            if (i<my_list.size()) {
-                                parentMenu = my_menu = menu;
-                                break;
+                if (menuEntry.isEmpty()) {
+                    my_menu=nParent->my_w.menuPlugins;
+                } else {
+                    QStringList my_list=menuEntry.split(";");
+                    // need a QWidget because it might be a QToolBar or QMenu
+                    QWidget *parentMenu=nParent->my_w.menubar;
+                    for (int i=0; i<my_list.size(); i++) {
+                        bool found=false;
+                        foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                            if (menu->title()==my_list.at(i)) {
+                                found=true;
+                                if (i<my_list.size()) {
+                                    parentMenu = my_menu = menu;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (!found) {
-                        if (qobject_cast<QMenuBar*>(parentMenu)) {
-                            my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
-                        } else if(qobject_cast<QMenu*>(parentMenu)) {
-                            my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
+                        if (!found) {
+                            if (qobject_cast<QMenuBar*>(parentMenu)) {
+                                my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                            } else if(qobject_cast<QMenu*>(parentMenu)) {
+                                my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
+                            }
+                            my_menu->setTitle(my_list.at(i));
+                            parentMenu = my_menu;
                         }
-                        my_menu->setTitle(my_list.at(i));
-                        parentMenu = my_menu;
                     }
                 }
-
                 foreach (QAction *my_action, my_menu->actions()) {
                     if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
                         qDebug() << "here" << my_action->data();
@@ -96,7 +95,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 my_action->setData(v);
                 connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
                 my_menu->addAction(my_action);
-                qDebug() << "here";
+                qDebug() << "here" << my_menu;
 
             } else {
                 QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));

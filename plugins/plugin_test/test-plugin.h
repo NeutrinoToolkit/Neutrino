@@ -23,33 +23,25 @@
  *
  */
 
-
-#include <QtGui>
-#include <QWidget>
-
-#include "nPlug.h"
 #include "nGenericPan.h"
-
-// you should include here the relevant (if any) ui_??.h
-#include "ui_test-plugin.h"
 
 #ifndef __test_plugin_plugin
 #define __test_plugin_plugin
 
-class neutrino;
+// you should include here the relevant (if any) ui_??.h
+#include "ui_test-plugin.h"
 
 // This object does the real work, here you write a nGenericPan as if it were in the main tree
-
 class mySkelGUI : public nGenericPan {
 Q_OBJECT
 public:
-    mySkelGUI(neutrino *, QString);
+    Q_INVOKABLE mySkelGUI(neutrino *, QString);
 
     Ui::test_plugin my_w;
 
 public slots:
 
-    // here the GUI slots
+    // here the GUI slots example:
     void mouseAtMatrix(QPointF);
 
 private:
@@ -58,33 +50,6 @@ private:
 
 };
 
-// the test_plugin object is in charge of reconstructing connections (runtime) with neutrino. It is in charge
-// of the real object instantiation.
-class test_plugin : public QObject, nPlug {
-Q_OBJECT
-Q_INTERFACES(nPlug)
-Q_PLUGIN_METADATA(IID "org.neutrino.plug")
-
-public:
-    // The following methods are virtual and can be redifined:
-
-//    test_plugin() { }
-//    ~test_plugin() { std::cerr<<"~test_plugin"<<  std::endl; }
-    bool unload(){ if(my_GP) my_GP->deleteLater(); return true;} // where we dismantle everything when politely asked to
-//    QString name() { return QString("My test_plugin plugin"); } // this plugin is added to the Analysis menu
-
-    // The following methods are pure virtual and must be redifined:
-
-    // where the construction is performed
-    bool instantiate(neutrino *neu) {
-        qDebug() << "we arrived here";
-        my_GP = new mySkelGUI(neu, QString("This test_plugin is a test_plugin"));
-        return true;
-    }
-
-    nGenericPan *my_GP;
-
-};
-
+NEUTRINO_PLUGIN(mySkelGUI,)
 
 #endif

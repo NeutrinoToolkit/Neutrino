@@ -75,8 +75,7 @@ protected:
 
 Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 
-#define NEUTRINO_PLUGIN_BASE(__class_name,__menu_entry,__appendix) class __class_name##__appendix : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.plug")  public: __class_name##__appendix() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } };
-#define NEUTRINO_PLUGIN(__class_name,__menu_entry) NEUTRINO_PLUGIN_BASE(__class_name,__menu_entry,Plug)
+#define NEUTRINO_PLUGIN(__class_name,__menu_entry) class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.plug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } };
 
 
 #endif

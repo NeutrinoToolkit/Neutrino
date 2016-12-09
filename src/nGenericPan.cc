@@ -91,7 +91,6 @@ void nGenericPan::physAdd(nPhysD *buffer) {
 
 void nGenericPan::help() {
     QString helpfile(":/help/"+panName+"/index.html");
-    DEBUG("<<<<<<<<<<<<<<<<<<<<<<<<<< " << helpfile.toStdString());
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -406,7 +405,6 @@ nGenericPan::loadUi(QSettings *settings) {
 
 void
 nGenericPan::saveUi(QSettings *settings) {
-    qDebug() << "here";
 	foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
 			settings->setValue(widget->objectName(),widget->text());
@@ -589,7 +587,6 @@ void nGenericPan::loadSettings(QSettings *settings) {
     if (settings->childGroups().contains("Properties")) {
         settings->beginGroup("Properties");
         foreach(QString my_key, settings->allKeys()) {
-            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
             setProperty(my_key.toStdString().c_str(), settings->value(my_key));
         }
         settings->endGroup();
@@ -600,11 +597,8 @@ void nGenericPan::loadSettings(QSettings *settings) {
 void nGenericPan::saveSettings(QSettings *settings) {
 	saveUi(settings);
     settings->beginGroup("Properties");
-    qDebug() << dynamicPropertyNames().size();
     foreach(QByteArray ba, dynamicPropertyNames()) {
-        qDebug() << "save" << ba << " : " << property(ba);
         if(ba.startsWith("NeuSave")) {
-            qDebug() << "write" << ba << " : " << property(ba);
             settings->setValue(ba, property(ba));
         }
     }
