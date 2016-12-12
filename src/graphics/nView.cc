@@ -23,6 +23,7 @@
  *
  */
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include "nView.h"
 
 nView::~nView ()
@@ -201,7 +202,7 @@ void nView::keyPressEvent (QKeyEvent *e)
         parent()->keyPressEvent(e);
     }
     update();
-    if (parent()->follower) parent()->follower->my_w.my_view->keyPressEvent(e);
+    if (parent()->follower) parent()->follower->my_w->my_view->keyPressEvent(e);
 }
 
 
@@ -225,18 +226,18 @@ void nView::wheelEvent(QWheelEvent *e) {
         break;
     }
     if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+        QPoint posFollow= parent()->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QWheelEvent eFollow(posFollow,e->delta(),e->buttons(),e->modifiers(),e->orientation());
-        parent()->follower->my_w.my_view->wheelEvent(&eFollow);
+        parent()->follower->my_w->my_view->wheelEvent(&eFollow);
     }
 }
 
 void nView::mouseDoubleClickEvent (QMouseEvent *e) {
     QGraphicsView::mousePressEvent(e);
     if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+        QPoint posFollow= parent()->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+        parent()->follower->my_w->my_view->mousePressEvent(&eFollow);
     }
     emit mouseDoubleClickEvent_sig(mapToScene(e->pos()));
 }
@@ -245,9 +246,9 @@ void nView::mousePressEvent (QMouseEvent *e)
 {
     QGraphicsView::mousePressEvent(e);
     if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+        QPoint posFollow= parent()->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+        parent()->follower->my_w->my_view->mousePressEvent(&eFollow);
     }
     if (e->modifiers()&Qt::ControlModifier && parent()->currentBuffer) {
         minMax=parent()->currentBuffer->get_min_max().swap();
@@ -260,9 +261,9 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+        QPoint posFollow= parent()->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
+        parent()->follower->my_w->my_view->mouseReleaseEvent(&eFollow);
     }
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
         parent()->changeColorMinMax(minMax);
@@ -278,9 +279,9 @@ void nView::mouseMoveEvent (QMouseEvent *e)
         }
     }
     if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+        QPoint posFollow= parent()->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mouseMoveEvent(&eFollow);
+        parent()->follower->my_w->my_view->mouseMoveEvent(&eFollow);
     }
 
     QPointF pos_mouse=mapToScene(e->pos());

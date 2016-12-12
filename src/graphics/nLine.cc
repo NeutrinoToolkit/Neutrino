@@ -24,6 +24,7 @@
  */
 #include "nLine.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include <iostream>
 
 //https://github.com/graiola/spline
@@ -46,7 +47,7 @@ nLine::nLine(neutrino *nparent) : QGraphicsObject()
         setProperty("numLine",num);
         setToolTip(tr("line")+QString::number(num));
         connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
         zoom=nparent->getZoom();
@@ -212,7 +213,7 @@ QPolygonF nLine::getLine(int np) {
 
 void nLine::interactive ( ) {
 	showMessage(tr("Click for first point, press Esc to finish"));
-	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -287,8 +288,8 @@ void nLine::updatePlot () {
 			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 			my_w.plot->xAxis->setLabelPadding(-1);
 			my_w.plot->yAxis->setLabelPadding(-1);
-			my_w.plot->xAxis->setTickLabelFont(parent()->my_w.my_view->font());
-			my_w.plot->yAxis->setTickLabelFont(parent()->my_w.my_view->font());
+            my_w.plot->xAxis->setTickLabelFont(parent()->my_w->my_view->font());
+            my_w.plot->yAxis->setTickLabelFont(parent()->my_w->my_view->font());
 		}
 
 		double colore;
@@ -621,7 +622,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
             break;            
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-			if (disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+            if (disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
                 ungrabKeyboard();
@@ -859,10 +860,10 @@ nLine::selectThis(bool val) {
 	}
 	if (val) {
         grabKeyboard();
-        parent()->my_w.statusbar->showMessage(toolTip());
+        parent()->my_w->statusbar->showMessage(toolTip());
     } else {
         ungrabKeyboard();
-        parent()->my_w.statusbar->clearMessage();
+        parent()->my_w->statusbar->clearMessage();
     }
 }
 

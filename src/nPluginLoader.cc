@@ -1,5 +1,6 @@
 #include "nPluginLoader.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include <QMenu>
 
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
@@ -33,11 +34,11 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 }
 
                 if (menuEntry.isEmpty()) {
-                    my_menu=nParent->my_w.menuPlugins;
+                    my_menu=nParent->my_w->menuPlugins;
                 } else {
                     QStringList my_list=menuEntry.split(";");
                     // need a QWidget because it might be a QToolBar or QMenu
-                    QWidget *parentMenu=nParent->my_w.menubar;
+                    QWidget *parentMenu=nParent->my_w->menubar;
                     for (int i=0; i<my_list.size(); i++) {
                         bool found=false;
                         foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {

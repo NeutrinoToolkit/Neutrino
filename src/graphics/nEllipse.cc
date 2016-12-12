@@ -24,6 +24,7 @@
  */
 #include "nEllipse.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 #include "ui_nObject.h"
 #include <iostream>
@@ -70,7 +71,7 @@ nEllipse::nEllipse(neutrino *nparent) :
 
 	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 
-	connect(parent()->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(parent()->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 	zoom=parent()->getZoom();
 
@@ -152,7 +153,7 @@ void nEllipse::bufferChanged(nPhysD* my_phys) {
 
 void nEllipse::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -160,7 +161,7 @@ void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nEllipse::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -512,7 +513,7 @@ nEllipse::selectThis(bool val) {
 	for (int i =0; i<ref.size(); i++) {
 		ref[i]->setVisible(val);
 	}
-	parent()->my_w.statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
+    parent()->my_w->statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
 }
 
 // reimplementation

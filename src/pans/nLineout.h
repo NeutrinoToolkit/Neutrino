@@ -35,7 +35,7 @@
 #include "nPhysImageF.h"
 #include "nPhysMaths.h"
 
-#include "neutrino.h"
+class neutrino;
 
 class nLineout : public nGenericPan {
 	Q_OBJECT

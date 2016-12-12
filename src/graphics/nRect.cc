@@ -25,6 +25,7 @@
 #include "nRect.h"
 #include "ui_nObject.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include <iostream>
 
 nRect::~nRect() {
@@ -45,7 +46,7 @@ nRect::nRect(neutrino *nparent) :
         setProperty("numRect",num);
         setToolTip(tr("rect")+QString(" ")+QString::number(num));
         connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
         zoom=nparent->getZoom();
         if (nparent->currentBuffer) {
@@ -157,7 +158,7 @@ void nRect::bufferChanged(nPhysD* my_phys) {
 
 void nRect::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-    connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -165,7 +166,7 @@ void nRect::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-    disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nRect::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -516,9 +517,9 @@ nRect::selectThis(bool val) {
 	}
 	update();
 	if (val) {
-        parent()->my_w.statusbar->showMessage(toolTip());
+        parent()->my_w->statusbar->showMessage(toolTip());
 	} else {
-        parent()->my_w.statusbar->showMessage("");
+        parent()->my_w->statusbar->showMessage("");
 	}
 }
 

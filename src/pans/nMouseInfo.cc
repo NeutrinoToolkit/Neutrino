@@ -23,6 +23,7 @@
  *
  */
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include "nMouseInfo.h"
 
 
@@ -43,7 +44,7 @@ nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, t
 
 	connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
 	connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
-	connect(parent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
+    connect(parent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
 
@@ -111,7 +112,7 @@ void nMouseInfo::updateOrigin() {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
 	}
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->update();
 }
 
 void nMouseInfo::updateScale() {
@@ -123,7 +124,7 @@ void nMouseInfo::updateScale() {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}
 	}
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->update();
 }
 
 void nMouseInfo::setMouse(QPointF pos) {

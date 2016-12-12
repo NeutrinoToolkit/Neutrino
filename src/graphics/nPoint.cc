@@ -24,6 +24,7 @@
  */
 #include "nPoint.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include "ui_nPoint.h"
 #include <iostream>
 
@@ -60,7 +61,7 @@ nPoint::nPoint(neutrino *nparent) :
 
 	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoint(QPointF)));
 
-	connect(parent()->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(parent()->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 	zoom=parent()->getZoom();
 
@@ -129,13 +130,13 @@ void nPoint::bufferChanged(nPhysD* my_phys) {
 
 void nPoint::interactive ( ) {
     showMessage(tr("Click for the first point"));
-	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nPoint::addPointAfterClick ( QPointF p) {
 	setPoint(p);
 	showMessage(tr("Point added"));
-	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nPoint::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -324,9 +325,9 @@ nPoint::selectThis(bool val) {
 	ref.setVisible(val);
 	update();
 	if (val) {
-		parent()->my_w.statusbar->showMessage(toolTip());
+        parent()->my_w->statusbar->showMessage(toolTip());
 	} else {
-		parent()->my_w.statusbar->showMessage("");
+        parent()->my_w->statusbar->showMessage("");
 	}
 }
 

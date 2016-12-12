@@ -23,6 +23,8 @@
  *
  */
 #include "nLineout.h"
+#include "neutrino.h"
+#include "ui_neutrino.h"
 
 nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_dir)
 : nGenericPan(parent, win_name), cut_dir(plot_dir)
@@ -48,11 +50,11 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
 
 void nLineout::setBehaviour() {
     if (my_w.actionLockClick->isChecked()) {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
 }
 
@@ -68,8 +70,8 @@ nLineout::updatePlot(QPointF p) {
         //get bounds from view
         QPointF orig,corner;
         if (my_w.actionToggleZoom->isChecked()) {
-            orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
-            corner = nparent->my_w.my_view->mapToScene(QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height()));
+            orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
+            corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
         } else {
             orig = QPoint(0,0);
             corner = QPoint(currentBuffer->getW(),currentBuffer->getH());

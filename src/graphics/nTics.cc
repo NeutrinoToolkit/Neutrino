@@ -24,6 +24,7 @@
  */
 #include "nTics.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 nTics::nTics(neutrino *neu) : QGraphicsItem(),
     nparent(neu),
@@ -35,7 +36,7 @@ nTics::nTics(neutrino *neu) : QGraphicsItem(),
 
 // reimplementation
 QRectF nTics::boundingRect() const {
-    return nparent->my_w.my_view->sceneRect();
+    return nparent->my_w->my_view->sceneRect();
 }
 
 void nTics::changeColor() {
@@ -54,12 +55,12 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 // enable this for testing 
         //p->drawRect(boundingRect());
         p->setClipRect( option->exposedRect );
-		p->setFont(nparent->my_w.my_view->scaledFont);
+        p->setFont(nparent->my_w->my_view->scaledFont);
 		vec2f my_or=nparent->currentBuffer->get_origin();
 		vec2f my_sc=nparent->currentBuffer->get_scale();
 		QPen pen;
 		pen.setColor(color);
-		double factor=1.0/nparent->my_w.my_view->transform().m11();
+        double factor=1.0/nparent->my_w->my_view->transform().m11();
 		pen.setWidthF(factor);
 		p->setPen(pen);
 				
@@ -219,7 +220,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 		
         QString labelDim=QLocale().toString((int)nparent->currentBuffer->getW())+" x "+QLocale().toString((int)nparent->currentBuffer->getH());
 		QSizeF labelDimSize=QSizeF(p->fontMetrics().width(labelDim), p->fontMetrics().height());
-		if (nparent->my_w.my_view->showDimPixel) {
+        if (nparent->my_w->my_view->showDimPixel) {
 			p->drawText(QRectF((size.height()-labelDimSize.width())/2.0,-size.width()-labelDimSize.height(),labelDimSize.width(),labelDimSize.height()),Qt::AlignTop|Qt::AlignHCenter,labelDim);
 		}
 		

@@ -26,6 +26,7 @@
 
 #include "nContours.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 nContours::nContours(neutrino *nparent, QString winname)
     : nGenericPan(nparent, winname)
@@ -56,9 +57,9 @@ nContours::on_percent_released() {
 void
 nContours::on_actionCenter_toggled(bool check) {
     if (check) {
-        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
     }
 }
 

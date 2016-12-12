@@ -24,6 +24,7 @@
  */
 #include "nInterferometry.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 // physWavelets
 
@@ -157,9 +158,9 @@ void nInterferometry::physDel(nPhysD* buf) {
 void nInterferometry::getPosZero(bool check) {
     if (check) {
         nparent->showPhys(getPhysFromCombo(my_image[1].image));
-        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     }
 }
 

@@ -27,6 +27,7 @@
 
 #include "nPreferences.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 
 #ifdef	__WIN32
@@ -102,7 +103,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 	loadDefaults();
     show();
 	    
-    my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
+    my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
     changeFont();
 
@@ -114,7 +115,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
 
-    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
+    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
 
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
@@ -292,12 +293,12 @@ void nPreferences::askCloseUnsaved() {
 }
 
 void nPreferences::changeShowDimPixel() {
-	nparent->my_w.my_view->showDimPixel=my_w.showDimPixel->isChecked();
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
+    nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeFont() {
-    QFont font=nparent->my_w.my_view->font();
+    QFont font=nparent->my_w->my_view->font();
     if (sender()) {
         font=my_w.fontFace->currentFont();
         font.setPointSize(my_w.fontSize->value());
@@ -305,12 +306,12 @@ void nPreferences::changeFont() {
         my_w.fontFace->setCurrentFont(font);
         my_w.fontSize->setValue(font.pointSize());
     }
-    nparent->my_w.my_view->setFont(font);
+    nparent->my_w->my_view->setFont(font);
     QSettings settings("neutrino","");
     settings.beginGroup("Preferences");
     settings.setValue("defaultFont",font.toString());
     settings.endGroup();
-    nparent->my_w.my_view->setSize();
+    nparent->my_w->my_view->setSize();
 }
 
 void nPreferences::changeIconSize(int val) {

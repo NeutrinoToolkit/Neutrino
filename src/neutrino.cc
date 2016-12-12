@@ -92,8 +92,10 @@
 
 #include "nPhysFormats.h"
 
+#include "ui_neutrino.h"
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
+
 neutrino::~neutrino()
 {
 }
@@ -101,13 +103,14 @@ neutrino::~neutrino()
 /// Creator
 neutrino::neutrino():
     my_s(this),
+    my_w(new Ui::neutrino),
     my_sbarra(new Ui::nSbarra),
     my_about(new Ui::nAbout),
     my_mouse(this),
     my_tics(this)
 {
 
-    my_w.setupUi(this);
+    my_w->setupUi(this);
     setAcceptDrops(true);
 
 
@@ -126,162 +129,162 @@ neutrino::neutrino():
     setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
     QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
-    foreach (QAction * act, my_w.menuTransformation->actions()) {
+    foreach (QAction * act, my_w->menuTransformation->actions()) {
         if (!menuTransformationDefault.isEmpty()) {
             if (act->text()==menuTransformationDefault) {
-                my_w.menuTransformation->setDefaultAction(act);
-                my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+                my_w->menuTransformation->setDefaultAction(act);
+                my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
             }
-        } else if (act->icon().cacheKey()==my_w.actionFlipRotate->icon().cacheKey()) {
-            my_w.menuTransformation->setDefaultAction(act);
+        } else if (act->icon().cacheKey()==my_w->actionFlipRotate->icon().cacheKey()) {
+            my_w->menuTransformation->setDefaultAction(act);
         }
     }
-    connect(my_w.actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
+    connect(my_w->actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
 
 
     QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
-    foreach (QAction * act, my_w.menuPaths->actions()) {
+    foreach (QAction * act, my_w->menuPaths->actions()) {
         if (!defualtActionPath.isEmpty()) {
             if (act->text()==defualtActionPath) {
-                my_w.menuPaths->setDefaultAction(act);
-                my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
+                my_w->menuPaths->setDefaultAction(act);
+                my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
             }
-        } else if (act->icon().cacheKey()==my_w.actionPaths->icon().cacheKey()) {
-            my_w.menuPaths->setDefaultAction(act);
+        } else if (act->icon().cacheKey()==my_w->actionPaths->icon().cacheKey()) {
+            my_w->menuPaths->setDefaultAction(act);
         }
     }
-    connect(my_w.actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
+    connect(my_w->actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
 
 
-    connect(my_w.actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
-    connect(my_w.actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
+    connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
 
-    connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
-    connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
+    connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w->actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
 #if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-    connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
+    connect(my_w->actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
-    my_w.actionCamera->setEnabled(false);
+    my_w->actionCamera->setEnabled(false);
 #endif
 
-    connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
-    connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
-    connect(my_w.actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
-    connect(my_w.actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
-    connect(my_w.actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w.actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
+    connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
+    connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
+    connect(my_w->actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
+    connect(my_w->actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
+    connect(my_w->actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
+    connect(my_w->actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
 
-    connect(my_w.actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
-    connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
-    connect(my_w.actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
+    connect(my_w->actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
+    connect(my_w->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
+    connect(my_w->actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
 #ifdef HAVE_HDF5
-    connect(my_w.actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
+    connect(my_w->actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
 #endif
-    connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
+    connect(my_w->actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
 
-    connect(my_w.actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
-
-
-
-    connect(my_w.actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
-
-    connect(my_w.actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
-
-    connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
-    connect(my_w.actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
-
-    connect(my_w.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-
-    connect(my_w.actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
-
-    connect(my_w.actionClose, SIGNAL(triggered()), this, SLOT(fileClose()));
-    connect(my_w.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(my_w.actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
+    connect(my_w->actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
 
 
-    connect(my_w.actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
-    connect(my_w.actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
-    connect(my_w.actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
-    connect(my_w.actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
 
-    connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
-    connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
-    connect(my_w.actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
+    connect(my_w->actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
 
-    connect(my_w.actionMouse_Zoom, SIGNAL(triggered()), this, SLOT(ZoomWin()));
+    connect(my_w->actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
 
-    connect(my_w.actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
-    connect(my_w.actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
-    connect(my_w.actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
-    connect(my_w.actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
+    connect(my_w->actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
+    connect(my_w->actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
 
-    connect(my_w.actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
+    connect(my_w->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+
+    connect(my_w->actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+
+    connect(my_w->actionClose, SIGNAL(triggered()), this, SLOT(fileClose()));
+    connect(my_w->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(my_w->actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
 
 
-    connect(my_w.actionZoom_in, SIGNAL(triggered()), my_w.my_view, SLOT(zoomIn()));
-    connect(my_w.actionZoom_out, SIGNAL(triggered()), my_w.my_view, SLOT(zoomOut()));
-    connect(my_w.actionZoom_eq, SIGNAL(triggered()), my_w.my_view, SLOT(zoomEq()));
+    connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
+    connect(my_w->actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
+    connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
+    connect(my_w->actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
 
-    connect(my_w.actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w->actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
+    connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
+    connect(my_w->actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
 
-    connect(my_w.actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
-    connect(my_w.actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
+    connect(my_w->actionMouse_Zoom, SIGNAL(triggered()), this, SLOT(ZoomWin()));
 
-    connect(my_w.actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
-    connect(my_w.actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
+    connect(my_w->actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
+    connect(my_w->actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
+    connect(my_w->actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
+    connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
 
-    connect(my_w.actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
-    connect(my_w.actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
-    connect(my_w.actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
 
-    connect(my_w.actionDrawLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
 
-    connect(my_w.actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w.actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
-    connect(my_w.actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
-    connect(my_w.actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
-    connect(my_w.actionFind_Peaks, SIGNAL(triggered()), this, SLOT(FindPeaks()));
-    connect(my_w.actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
-    connect(my_w.actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
+    connect(my_w->actionZoom_in, SIGNAL(triggered()), my_w->my_view, SLOT(zoomIn()));
+    connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
+    connect(my_w->actionZoom_eq, SIGNAL(triggered()), my_w->my_view, SLOT(zoomEq()));
 
-    connect(my_w.actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
-    connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
-    connect(my_w.actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
-    connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
-    connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
-    connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
-    connect(my_w.actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
+    connect(my_w->actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
-    connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
-    connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
-    connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
-    connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
+    connect(my_w->actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
+    connect(my_w->actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
+
+    connect(my_w->actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
+    connect(my_w->actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
+
+    connect(my_w->actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
+    connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
+    connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
+
+    connect(my_w->actionDrawLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
+
+    connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
+    connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
+    connect(my_w->actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
+    connect(my_w->actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
+    connect(my_w->actionFind_Peaks, SIGNAL(triggered()), this, SLOT(FindPeaks()));
+    connect(my_w->actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
+    connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
+
+    connect(my_w->actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
+    connect(my_w->actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
+    connect(my_w->actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
+    connect(my_w->actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
+    connect(my_w->actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
+    connect(my_w->actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
+    connect(my_w->actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
+
+    connect(my_w->actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
+    connect(my_w->actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
+    connect(my_w->actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
+    connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
 #ifdef HAVE_PYTHONQT
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    my_w.toolBar->addWidget(spacer);
+    my_w->toolBar->addWidget(spacer);
 
-    my_w.toolBar->addAction(QIcon(":icons/python.png"),tr("Python shell"),this,SLOT(Python()));
-    connect(my_w.actionPython, SIGNAL(triggered()), this, SLOT(Python()));
+    my_w->toolBar->addAction(QIcon(":icons/python.png"),tr("Python shell"),this,SLOT(Python()));
+    connect(my_w->actionPython, SIGNAL(triggered()), this, SLOT(Python()));
     loadPyScripts();
 #else
-    my_w.menuPython->menuAction()->setVisible(false);
+    my_w->menuPython->menuAction()->setVisible(false);
 #endif
 
     // ---------------------------------------------------------------------------------------------
 
     QWidget *sbarra=new QWidget(this);
     my_sbarra->setupUi(sbarra);
-    my_w.statusbar->addPermanentWidget(sbarra, 0);
+    my_w->statusbar->addPermanentWidget(sbarra, 0);
 
     setAttribute(Qt::WA_DeleteOnClose);
-    setCentralWidget(my_w.centralwidget);
+    setCentralWidget(my_w->centralwidget);
 
-    connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-    connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 
     build_colormap();
@@ -326,19 +329,19 @@ neutrino::neutrino():
         QAction *act = new QAction(this);
         act->setVisible(false);
         connect(act, SIGNAL(triggered()),this, SLOT(openRecentFile()));
-        my_w.menuOpen_Recent->addAction(act);
+        my_w->menuOpen_Recent->addAction(act);
         recentFileActs << act;
     }
-    my_w.menuOpen_Recent->addSeparator();
+    my_w->menuOpen_Recent->addSeparator();
     QAction *act = new QAction("Clear Menu", this);
     act->setVisible(true);
     connect(act, SIGNAL(triggered()),this, SLOT(clearRecentFile()));
-    my_w.menuOpen_Recent->addAction(act);
+    my_w->menuOpen_Recent->addAction(act);
 
     // lasciamo questo per ultimo
-    //	my_w.scrollArea->setWidget(my_view);
+    //	my_w->scrollArea->setWidget(my_view);
 
-    my_w.my_view->setScene(&my_s);
+    my_w->my_view->setScene(&my_s);
 
 
     my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
@@ -353,11 +356,11 @@ neutrino::neutrino():
 
     my_s.addItem(&my_mouse);
 
-    my_w.my_view->setSize();
+    my_w->my_view->setSize();
     my_s.addItem(&my_tics);
 
     my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
-    my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
+    my_w->my_view->setCursor(QCursor(Qt::CrossCursor));
 
 
     updateRecentFileActions();
@@ -383,7 +386,7 @@ void neutrino::processEvents()
 void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
     QMenu *my_menu=new QMenu(this);
     my_menu->setAttribute(Qt::WA_DeleteOnClose);
-    foreach(QAction *act, my_w.menubar->actions()) {
+    foreach(QAction *act, my_w->menubar->actions()) {
         my_menu->addAction(act);
     }
     my_menu->exec(ev->globalPos());
@@ -392,59 +395,59 @@ void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
 
 void neutrino::menuPaths() {
     if ( QApplication::keyboardModifiers()!=Qt::NoModifier) {
-        my_w.menuPaths->exec(QCursor::pos());
+        my_w->menuPaths->exec(QCursor::pos());
     } else {
-        my_w.menuPaths->defaultAction()->trigger();
+        my_w->menuPaths->defaultAction()->trigger();
     }
 }
 
 void neutrino::menuFlipRotate() {
     if ( QApplication::keyboardModifiers()!=Qt::NoModifier) {
-        my_w.menuTransformation->exec(QCursor::pos());
+        my_w->menuTransformation->exec(QCursor::pos());
     } else {
-        my_w.menuTransformation->defaultAction()->trigger();
+        my_w->menuTransformation->defaultAction()->trigger();
     }
 }
 
 void neutrino::rotateLeft() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionRotate_left);
+    my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
     if (currentBuffer) {
         phys_rotate_left(*currentBuffer);
         createQimage();
     }
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 
 }
 
 void neutrino::rotateRight() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionRotate_right);
+    my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
     if (currentBuffer) {
         phys_rotate_right(*currentBuffer);
         createQimage();
     }
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 }
 
 void neutrino::flipUpDown() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionFlip_up_down);
+    my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
     if (currentBuffer) {
         phys_flip_ud(*currentBuffer);
         createQimage();
     }
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
 void neutrino::flipLeftRight() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionFlip_left_right);
+    my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
     if (currentBuffer) {
         phys_flip_lr(*currentBuffer);
         createQimage();
     }
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
 nPhysD* neutrino::getBuffer(int i, bool returnCurrent) {
@@ -527,7 +530,7 @@ neutrino::loadPlugin()
 
 void neutrino::emitBufferChanged(nPhysD *phys) {
     if (!phys) phys=currentBuffer;
-    my_w.my_view->update();
+    my_w->my_view->update();
     emit bufferChanged(phys);
 }
 
@@ -970,7 +973,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
     }
     action->setData(qVariantFromValue((void*) datamatrix));
     connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
-    my_w.menuBuffers->addAction(action);
+    my_w->menuBuffers->addAction(action);
 }
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
@@ -1009,12 +1012,12 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 setWindowFilePath("");
                 zoomChanged(1);
                 my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-                my_w.my_view->setSize();
+                my_w->my_view->setSize();
             }
-            QList<QAction *> lista=my_w.menuBuffers->actions();
-            foreach (QAction* action, my_w.menuBuffers->actions()) {
+            QList<QAction *> lista=my_w->menuBuffers->actions();
+            foreach (QAction* action, my_w->menuBuffers->actions()) {
                 if (action->data() == qVariantFromValue((void*) datamatrix)) {
-                    my_w.menuBuffers->removeAction(action);
+                    my_w->menuBuffers->removeAction(action);
                 }
             }
             delete datamatrix;
@@ -1071,7 +1074,7 @@ neutrino::showPhys(nPhysD* datamatrix) {
         if (!physList.contains(datamatrix)) addPhys(datamatrix);
 
         if (currentBuffer) {
-            if (my_w.actionLockColors->isChecked()) {
+            if (my_w->actionLockColors->isChecked()) {
                 datamatrix->property["display_range"]=currentBuffer->property["display_range"];
                 datamatrix->property["gamma"]=currentBuffer->property["gamma"];
             } else {
@@ -1130,7 +1133,7 @@ neutrino::createQimage() {
 
     QApplication::processEvents();
 
-    my_w.my_view->setSize();
+    my_w->my_view->setSize();
 }
 
 void neutrino::exportGraphics () {
@@ -1184,7 +1187,7 @@ void neutrino::exportGraphics (QString fout) {
         QPainter painter( &svgGen );
         my_s.render(&painter);
     } else {
-        QPixmap::grabWidget(my_w.my_view).save(fout);
+        QPixmap::grabWidget(my_w->my_view).save(fout);
     }
     my_mouse.setVisible(resetmouse);
 }
@@ -1198,10 +1201,10 @@ void neutrino::toggleMouse(bool stat) {
     QCursor cur;
     if (stat) {
         cur=QCursor(Qt::BlankCursor);
-        my_w.actionShow_mouse->setText("Hide mouse");
+        my_w->actionShow_mouse->setText("Hide mouse");
     } else {
         cur=QCursor(Qt::CrossCursor);
-        my_w.actionShow_mouse->setText("Show mouse");
+        my_w->actionShow_mouse->setText("Show mouse");
     }
     my_pixitem.setCursor(cur);
 }
@@ -1209,9 +1212,9 @@ void neutrino::toggleMouse(bool stat) {
 void neutrino::toggleRuler() {
     my_tics.rulerVisible=!my_tics.rulerVisible;
     if (my_tics.rulerVisible) {
-        my_w.actionShow_ruler->setText("Hide ruler");
+        my_w->actionShow_ruler->setText("Hide ruler");
     } else {
-        my_w.actionShow_ruler->setText("Show ruler");
+        my_w->actionShow_ruler->setText("Show ruler");
     }
     my_tics.update();
 }
@@ -1219,21 +1222,21 @@ void neutrino::toggleRuler() {
 void neutrino::toggleGrid() {
     my_tics.gridVisible=!my_tics.gridVisible;
     if (my_tics.gridVisible) {
-        my_w.actionShow_grid->setText("Hide grid");
+        my_w->actionShow_grid->setText("Hide grid");
     } else {
-        my_w.actionShow_grid->setText("Show grid");
+        my_w->actionShow_grid->setText("Show grid");
     }
     my_tics.update();
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
-    disconnect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     if (fileClose()) {
         saveDefaults();
         e->accept();
     } else {
         e->ignore();
-        connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     }
 }
 
@@ -1260,13 +1263,13 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         Shortcuts();
         break;
     case Qt::Key_Plus:
-        my_w.my_view->zoomIn();
+        my_w->my_view->zoomIn();
         break;
     case Qt::Key_Minus:
-        my_w.my_view->zoomOut();
+        my_w->my_view->zoomOut();
         break;
     case Qt::Key_Equal:
-        my_w.my_view->zoomEq();
+        my_w->my_view->zoomEq();
         break;
     case Qt::Key_A: {
         if (e->modifiers() & Qt::ShiftModifier) {
@@ -1444,7 +1447,7 @@ neutrino::zoomChanged(double zoom) {
 
 double
 neutrino::getZoom() const {
-    return my_w.my_view->transform().m11();
+    return my_w->my_view->transform().m11();
 }
 
 void
@@ -1855,13 +1858,13 @@ neutrino::nextColorTable () {
 // testing
 void
 neutrino::createDrawLine() {
-    my_w.menuPaths->setDefaultAction(my_w.actionLine);
+    my_w->menuPaths->setDefaultAction(my_w->actionLine);
     statusBar()->showMessage(tr("Click for points, press Esc to finish"),5000);
     nLine *item = new nLine(this);
     item->interactive();
     if (follower) follower->createDrawLine();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 QString
@@ -1880,35 +1883,35 @@ neutrino::newRect(QRectF rectangle, QString name) {
 
 void
 neutrino::createDrawRect() {
-    my_w.menuPaths->setDefaultAction(my_w.actionRect);
+    my_w->menuPaths->setDefaultAction(my_w->actionRect);
     statusBar()->showMessage(tr("Click for the first point of the rectangle"),5000);
     nRect *item = new nRect(this);
     item->interactive();
     if (follower) follower->createDrawRect();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 void
 neutrino::createDrawPoint() {
-    my_w.menuPaths->setDefaultAction(my_w.actionPoint);
+    my_w->menuPaths->setDefaultAction(my_w->actionPoint);
     statusBar()->showMessage(tr("Click for the point"),5000);
     nPoint *item = new nPoint(this);
     item->interactive();
     if (follower) follower->createDrawPoint();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 void
 neutrino::createDrawEllipse() {
-    my_w.menuPaths->setDefaultAction(my_w.actionEllipse);
+    my_w->menuPaths->setDefaultAction(my_w->actionEllipse);
     statusBar()->showMessage(tr("Click and release to create the ellipse"),5000);
     nEllipse *item = new nEllipse(this);
     item->interactive();
     if (follower) follower->createDrawEllipse();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 nGenericPan*
@@ -2118,7 +2121,7 @@ void neutrino::saveDefaults(){
     my_set.setValue("gridVisible", my_tics.gridVisible);
     my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("colorTable", colorTable);
-    my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
+    my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
 
     my_set.beginGroup("Properties");
     foreach(QByteArray ba, dynamicPropertyNames()) {
@@ -2144,7 +2147,7 @@ void neutrino::loadDefaults(){
     my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
     my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
     changeColorTable(my_set.value("colorTable",colorTable).toString());
-    int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1).toInt();
+    int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 
     QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
     foreach (QToolBar *obj, findChildren<QToolBar *>()) {
@@ -2368,9 +2371,9 @@ neutrino::loadPyScripts() {
         //	.split(QRegExp("\\s*,\\s*"));
 
         if (scriptlist.size() > 0) {
-            foreach (QAction* myaction, my_w.menuPython->actions()) {
+            foreach (QAction* myaction, my_w->menuPython->actions()) {
                 if (QFileInfo(myaction->data().toString()).suffix()=="py")
-                    my_w.menuPython->removeAction(myaction);
+                    my_w->menuPython->removeAction(myaction);
             }
         }
 
@@ -2379,7 +2382,7 @@ neutrino::loadPyScripts() {
             action->setText(QFileInfo(sname).baseName());
             connect(action, SIGNAL(triggered()), this, SLOT(runPyScript()));
             action->setData(scriptdir.filePath(sname));
-            my_w.menuPython->addAction(action);
+            my_w->menuPython->addAction(action);
         }
     }
 }

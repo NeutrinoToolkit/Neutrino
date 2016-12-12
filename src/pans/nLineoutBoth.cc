@@ -24,6 +24,7 @@
  */
 #include "nLineoutBoth.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 : nGenericPan(parent, win_name)
@@ -60,11 +61,11 @@ nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
 
 void nLineoutBoth::setBehaviour() {
     if (my_w.lockClick->isChecked()) {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
 }
 
@@ -75,8 +76,8 @@ void nLineoutBoth::updatePlot(QPointF p) {
         vec2 b_p(p.x(),p.y());
 
         //get bounds from view
-        QPointF orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
-        QPointF corner = nparent->my_w.my_view->mapToScene(QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height()));
+        QPointF orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
+        QPointF corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
 
         vec2 b_o((int)orig.x(),(int)orig.y());
         vec2 b_c((int)corner.x(),(int)corner.y());
