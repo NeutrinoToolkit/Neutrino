@@ -57,11 +57,12 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
-QT5_WRAP_UI(nUIs test-plugin.ui)
 
-set (SOURCES test-plugin.cc test-plugin.h)
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
+file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 
-# add sources here
+QT5_WRAP_UI(nUIs ${UIS})
+
 add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs})
 
 IF(APPLE)

@@ -28,28 +28,39 @@
 #ifndef __test_plugin_plugin
 #define __test_plugin_plugin
 
-// you should include here the relevant (if any) ui_??.h
-#include "ui_test-plugin.h"
+// this includes the tests  .ui designer file
+#include "ui_test.h"
 
-// This object does the real work, here you write a nGenericPan as if it were in the main tree
-class mySkelGUI : public nGenericPan {
+// this is a nGenericPan (note the Q_INVOKABLE beforre ctor)
+class test : public nGenericPan {
 Q_OBJECT
 public:
-    Q_INVOKABLE mySkelGUI(neutrino *, QString);
 
-    Ui::test_plugin my_w;
+    Q_INVOKABLE test(neutrino *nparent, QString winname)
+        : nGenericPan(nparent, winname)
+    {
+        // you probably want to instantiate the widget from Ui::
+        my_w.setupUi(this);
+        show();
+
+    }
 
 public slots:
 
-    // here the GUI slots example:
-    void mouseAtMatrix(QPointF);
+    // here the reiplemneted nGenericPan slots example:
+    void mouseAtMatrix(QPointF p) {
+        my_w.label->setText(QString::number(p.x())+ " : " +QString::number(p.y()));
+    }
 
 private:
-
-    // here your private stuff
+    Ui::test_plugin my_w;
 
 };
 
-NEUTRINO_PLUGIN(mySkelGUI)
+// this is going to declare a plugin interface registered to neutrino
+NEUTRINO_PLUGIN(test)
+
+// same as above but will add th entry in the menu Analysis
+// NEUTRINO_PLUGIN(test,Analysis)
 
 #endif

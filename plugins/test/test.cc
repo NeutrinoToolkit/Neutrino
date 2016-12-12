@@ -23,22 +23,8 @@
  *
  */
 
-#include "test-plugin.h"
-#include "neutrino.h"
+#include "test.h"
 
-
-mySkelGUI::mySkelGUI(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
-{
-    // you probably want to instantiate the widget from Ui::
-    my_w.setupUi(this);
-    show();
-
-}
-
-void mySkelGUI::mouseAtMatrix(QPointF p) {
-    my_w.label->setText(QString::number(p.x())+ " : " +QString::number(p.y()));
-}
 
 
 
