@@ -46,11 +46,7 @@
 
 // base ui
 #include "ui_neutrino.h"
-#include "ui_nSbarra.h"
-#include "ui_nAbout.h"
 
-//#include "nColorBar.h"
-#include "nColorBarWin.h"
 
 // physImage
 #include "nPhysImageF.h"
@@ -67,6 +63,10 @@
 
 #include "nTics.h"
 
+namespace Ui {
+class nSbarra;
+class nAbout;
+}
 
 class neutrino : public QMainWindow {
 
@@ -82,8 +82,9 @@ public:
 
     QGraphicsScene my_s;
 
-    Ui::nSbarra my_sbarra;
-    Ui::nAbout my_about;
+
+    Ui::nSbarra *my_sbarra;
+    Ui::nAbout *my_about;
 
     //nPlug *plug_iface;
 	

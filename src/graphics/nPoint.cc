@@ -24,9 +24,12 @@
  */
 #include "nPoint.h"
 #include "neutrino.h"
+#include "ui_nPoint.h"
 #include <iostream>
 
-nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
+nPoint::nPoint(neutrino *nparent) :
+    QGraphicsObject(),
+    my_w(new Ui::nPoint)
 {
 	nparent->my_s.addItem(this);
 	setParent(nparent);
@@ -65,22 +68,22 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 	// PADELLA
 	my_pad.setWindowTitle(toolTip());
 	my_pad.setWindowIcon(QIcon(":center"));
-	my_w.setupUi(&my_pad);
+    my_w->setupUi(&my_pad);
 
-	connect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    connect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
 
-	my_w.name->setText(toolTip());
-	my_w.spinSizeHolder->setValue(nSizeHolder);
-	my_w.colorHolderLabel->setPalette(QPalette(holderColor));
+    my_w->name->setText(toolTip());
+    my_w->spinSizeHolder->setValue(nSizeHolder);
+    my_w->colorHolderLabel->setPalette(QPalette(holderColor));
 
-	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-	connect(my_w.colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
+    connect(my_w->colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
+    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
 	
-	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
 
-	connect(my_w.xPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
-	connect(my_w.yPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
+    connect(my_w->xPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
+    connect(my_w->yPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
 	
 	QBrush refBrush;
 	refBrush.setStyle(Qt::SolidPattern);
@@ -99,12 +102,12 @@ nPoint::nPoint(neutrino *nparent) : QGraphicsObject()
 }
 
 void nPoint::setParentPan(QString winname, int level) {
-	my_w.name->setText(winname+"Point");
+    my_w->name->setText(winname+"Point");
 	setProperty("parentPan",winname);
 	setProperty("parentPanControlLevel",level);
 	if (level>0) {
-		my_w.name->setReadOnly(true);
-		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+        my_w->name->setReadOnly(true);
+        disconnect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
 	}
 }
 
@@ -206,7 +209,7 @@ nPoint::setOrder (double w) {
 void
 nPoint::changeColorHolder () {
 	QColor color;
-	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorHolderLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -216,7 +219,7 @@ nPoint::changeColorHolder () {
 
 void
 nPoint::changeColorHolder (QColor color) {
-	my_w.colorHolderLabel->setPalette(QPalette(color));
+    my_w->colorHolderLabel->setPalette(QPalette(color));
 	QBrush brush=ref.brush();
 	brush.setColor(color);
 	ref.setBrush(brush);
@@ -226,8 +229,8 @@ void
 nPoint::setPoint (QPointF p) {
 	prepareGeometryChange();
 	ref.setPos(p);
-	my_w.xPos->setText(QString::number(p.x()));
-	my_w.yPos->setText(QString::number(p.y()));
+    my_w->xPos->setText(QString::number(p.x()));
+    my_w->yPos->setText(QString::number(p.y()));
 	ref.setVisible(true);
 	itemChanged();
 }
@@ -237,9 +240,9 @@ void nPoint::changePos(QString valStr) {
     double val=QLocale().toDouble(valStr,&ok);
 	if (ok) {
 		disconnect(sender(), SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
-		if (sender()==my_w.xPos) {
+        if (sender()==my_w->xPos) {
 			setPoint(QPointF(val,ref.pos().y()));
-		} else if (sender()==my_w.yPos) {
+        } else if (sender()==my_w->yPos) {
 			setPoint(QPointF(ref.pos().x(),val));
 		}
 		connect(sender(), SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));

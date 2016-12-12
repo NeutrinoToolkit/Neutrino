@@ -1,6 +1,5 @@
-# tp-plugin CMakeLists.txt
-
-PROJECT (VISAR CXX)
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+PROJECT (${PROJECT_NAME}Plugin CXX)
 
 cmake_minimum_required (VERSION 3.0)
 
@@ -35,7 +34,6 @@ endif()
 set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
 include(FindNeutrinoGuiComponents)
 add_definitions(-DQT_PLUGIN)
-add_definitions(-DQT_SHARED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -44,24 +42,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # add neutrino deps
 include_directories(${NEUTRINO_ROOT}/nPhysImage)
 include_directories(${NEUTRINO_ROOT}/src) # for base stuff
-include_directories(${NEUTRINO_ROOT}/src/graphics) # for nLine
-include_directories(${NEUTRINO_ROOT}/src/pans/colorbar)
-
-# add needed UIs here
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPoint.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nObject.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nColorBarWin.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nSbarra.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nPanHelp.ui)
-QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
-QT5_WRAP_UI(nUIs Visar1.ui)
-QT5_WRAP_UI(nUIs Visar2.ui)
-QT5_WRAP_UI(nUIs Visar3.ui)
+# visar needs to borrow some stuff from neutrino tree
+include_directories(${NEUTRINO_ROOT}/src/graphics) 
+QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
 
-set (SOURCES Visar.cc Visar.h)
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
+file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+
+QT5_WRAP_UI(nUIs ${UIS})
 
 # add sources here
 add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs})

@@ -37,12 +37,9 @@ Q_OBJECT
 public:
 
     Q_INVOKABLE test(neutrino *nparent, QString winname)
-        : nGenericPan(nparent, winname)
-    {
-        // you probably want to instantiate the widget from Ui::
+        : nGenericPan(nparent, winname) {
         my_w.setupUi(this);
         show();
-
     }
 
 public slots:

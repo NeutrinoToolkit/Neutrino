@@ -23,11 +23,13 @@
  *
  */
 #include "nGenericPan.h"
+#include "ui_nPanHelp.h"
+
 #include "neutrino.h"
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
-: QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL)
+: QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL), my_help(new Ui::PanHelp)
 {
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
@@ -101,14 +103,15 @@ void nGenericPan::help() {
             }
         }
         if (!helpwin) {
-            helpwin=new QMainWindow(this);
-            my_help.setupUi(helpwin);
+
+            helpwin=new QMainWindow();
+            my_help->setupUi(helpwin);
             helpwin->setWindowTitle(panName+" help");
             helpwin->setProperty("NeutrinoHelp",true);
-            my_help.help->setSource(QUrl("qrc"+helpfile));
-            connect(my_help.actionHome, SIGNAL(triggered()), my_help.help, SLOT(home()));
-            connect(my_help.actionBack, SIGNAL(triggered()), my_help.help, SLOT(backward()));
-            connect(my_help.actionForward, SIGNAL(triggered()), my_help.help, SLOT(forward()));
+            my_help->help->setSource(QUrl("qrc"+helpfile));
+            connect(my_help->actionHome, SIGNAL(triggered()), my_help->help, SLOT(home()));
+            connect(my_help->actionBack, SIGNAL(triggered()), my_help->help, SLOT(backward()));
+            connect(my_help->actionForward, SIGNAL(triggered()), my_help->help, SLOT(forward()));
 
             helpwin->show();
         }

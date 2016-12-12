@@ -34,14 +34,16 @@
 #include "nPhysImageF.h"
 #include "panThread.h"
 
-#include "ui_nPanHelp.h"
-
 #ifndef __generic_pan
 #define __generic_pan
 
 #include "nPanPlug.h"
 
 class neutrino;
+
+namespace Ui {
+class PanHelp;
+}
 
 typedef void (*ifunc)(void *, int &); 
 
@@ -60,7 +62,7 @@ public:
 	// thread stuff
 	panThread nThread;
 
-    Ui::PanHelp my_help;
+    Ui::PanHelp *my_help;
 
 signals:
 	void changeCombo(QComboBox*);

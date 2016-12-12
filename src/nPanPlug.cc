@@ -22,6 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include <QApplication>
 #include "nPanPlug.h"
 #include "nGenericPan.h"
 

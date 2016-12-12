@@ -36,8 +36,10 @@
 #include <QtUiTools>
 #endif
 
-
 #include <QPrintDialog>
+
+#include "nColorBarWin.h"
+
 
 #include "nMouseInfo.h"
 #include "nZoomWin.h"
@@ -90,6 +92,8 @@
 
 #include "nPhysFormats.h"
 
+#include "ui_nSbarra.h"
+#include "ui_nAbout.h"
 neutrino::~neutrino()
 {
 }
@@ -97,6 +101,8 @@ neutrino::~neutrino()
 /// Creator
 neutrino::neutrino():
     my_s(this),
+    my_sbarra(new Ui::nSbarra),
+    my_about(new Ui::nAbout),
     my_mouse(this),
     my_tics(this)
 {
@@ -268,7 +274,7 @@ neutrino::neutrino():
     // ---------------------------------------------------------------------------------------------
 
     QWidget *sbarra=new QWidget(this);
-    my_sbarra.setupUi(sbarra);
+    my_sbarra->setupUi(sbarra);
     my_w.statusbar->addPermanentWidget(sbarra, 0);
 
     setAttribute(Qt::WA_DeleteOnClose);
@@ -1119,7 +1125,7 @@ neutrino::createQimage() {
 
         my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
         double gamma_val=currentBuffer->gamma();
-        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
+        my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
     }
 
     QApplication::processEvents();
@@ -1443,22 +1449,22 @@ neutrino::getZoom() const {
 
 void
 neutrino::mouseposition(QPointF pos_mouse) {
-    my_sbarra.pos_x->setNum((int)pos_mouse.x());
-    my_sbarra.pos_y->setNum((int)pos_mouse.y());
+    my_sbarra->pos_x->setNum((int)pos_mouse.x());
+    my_sbarra->pos_y->setNum((int)pos_mouse.y());
 
 
     if (currentBuffer) {
         vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
         QPointF pos=QPointF(vec.x(),vec.y());
-        my_sbarra.dx->setNum(pos.x());
-        my_sbarra.dy->setNum(pos.y());
+        my_sbarra->dx->setNum(pos.x());
+        my_sbarra->dy->setNum(pos.y());
         double val=currentBuffer->point(pos_mouse.x(),pos_mouse.y());
-        my_sbarra.pos_z->setNum(val);
+        my_sbarra->pos_z->setNum(val);
         emit colorValue(val);
         emit mouseAtWorld(pos);
     } else {
-        my_sbarra.dx->setText("");
-        my_sbarra.dy->setText("");
+        my_sbarra->dx->setText("");
+        my_sbarra->dy->setText("");
     }
 
     emit mouseAtMatrix(pos_mouse);
@@ -2171,11 +2177,11 @@ neutrino::Preferences() {
 void neutrino::about() {
 
     QDialog myabout(this);
-    my_about.setupUi(&myabout);
-    connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
-    connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
+    my_about->setupUi(&myabout);
+    connect(my_about->buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
+    connect(my_about->buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-    my_about.version->setText(QString(__VER));
+    my_about->version->setText(QString(__VER));
 #ifdef __neutrino_key
     QString serial(qApp->property("nHash").toString());
     // copy serial to clipboard
@@ -2183,9 +2189,9 @@ void neutrino::about() {
     QApplication::clipboard()->setText(serial);
 #endif
 
-    my_about.creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
-    my_about.creditsText->setLineWrapColumnOrWidth(80);
-    QScrollBar *vScrollBar = my_about.creditsText->verticalScrollBar();
+    my_about->creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
+    my_about->creditsText->setLineWrapColumnOrWidth(80);
+    QScrollBar *vScrollBar = my_about->creditsText->verticalScrollBar();
     vScrollBar->triggerAction(QScrollBar::SliderToMinimum);
     QApplication::processEvents();
 
@@ -2196,9 +2202,9 @@ void neutrino::about() {
         if (lic.open(QFile::ReadOnly | QFile::Text)) {
             QString licenseText=QTextStream(&lic).readAll();
             if (!licenseText.isEmpty()) {
-                my_about.creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
-                my_about.creditsText->insertPlainText(licenseText);
-                my_about.creditsText->insertHtml("</PRE><br><hr><br>");
+                my_about->creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
+                my_about->creditsText->insertPlainText(licenseText);
+                my_about->creditsText->insertHtml("</PRE><br><hr><br>");
             }
         }
     }
