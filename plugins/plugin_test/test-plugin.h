@@ -50,6 +50,6 @@ private:
 
 };
 
-NEUTRINO_PLUGIN(mySkelGUI,)
+NEUTRINO_PLUGIN(mySkelGUI)
 
 #endif
