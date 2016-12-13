@@ -28,8 +28,7 @@
 #include "neutrino.h"
 #include "ui_neutrino.h"
 
-nContours::nContours(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+nContours::nContours(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     my_c = new nLine(this,3);

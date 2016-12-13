@@ -26,8 +26,7 @@
 
 #include <gsl/gsl_fit.h>
 
-nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nFindPeaks::nFindPeaks(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 

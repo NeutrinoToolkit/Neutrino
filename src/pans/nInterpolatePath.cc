@@ -26,8 +26,7 @@
 #include "neutrino.h"
 
 
-nInterpolatePath::nInterpolatePath(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nInterpolatePath::nInterpolatePath(neutrino *nparent) : nGenericPan(nparent)
 {
 
 	my_w.setupUi(this);

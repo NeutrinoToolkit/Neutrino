@@ -27,8 +27,7 @@
 
 // physWavelets
 
-nWavelet::nWavelet(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nWavelet::nWavelet(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 

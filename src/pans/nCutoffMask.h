@@ -37,7 +37,7 @@ class nCutoffMask : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nCutoffMask(neutrino *, QString);
+    nCutoffMask(neutrino *);
 	
 	Ui::nCutoffMask my_w;
 	nPhysD *cutoffPhys;

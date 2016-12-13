@@ -45,7 +45,7 @@ private:
 	
 public:
 	
-	nColorBarWin (neutrino *, QString);
+    nColorBarWin (neutrino *);
 	neutrino *parent(){
 		return (neutrino *) QWidget::parent();
 	};

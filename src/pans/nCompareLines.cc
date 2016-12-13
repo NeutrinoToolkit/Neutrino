@@ -24,8 +24,7 @@
  */
 #include "nCompareLines.h"
 
-nCompareLines::nCompareLines(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+nCompareLines::nCompareLines(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
 

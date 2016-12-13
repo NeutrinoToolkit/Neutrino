@@ -26,7 +26,7 @@
 #include "nColorBarWin.h"
 #include "neutrino.h"
 
-nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(parent, title)
+nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 {
 	my_w.setupUi(this);
 	

@@ -27,8 +27,7 @@
 
 // physWavelets
 
-nRotate::nRotate(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nRotate::nRotate(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 

@@ -37,7 +37,7 @@ class nRotate : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nRotate(neutrino *, QString);
+    nRotate(neutrino *);
 	
 	Ui::nRotate my_w;
 	nPhysD *rotated;

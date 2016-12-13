@@ -25,8 +25,7 @@
 #include "nRegionPath.h"
 #include "neutrino.h"
 
-nRegionPath::nRegionPath(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nRegionPath::nRegionPath(neutrino *nparent) : nGenericPan(nparent)
 {
 
 	my_w.setupUi(this);

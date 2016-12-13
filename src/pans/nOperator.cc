@@ -27,8 +27,7 @@
 
 // physWavelets
 
-nOperator::nOperator(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname),
+nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
       separator(2)
 {
     my_w.setupUi(this);

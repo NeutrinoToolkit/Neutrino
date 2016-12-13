@@ -36,7 +36,7 @@ class neutrino;
 class nSpectralAnalysis : public nGenericPan {
 	Q_OBJECT
 public:
-	nSpectralAnalysis(neutrino *, QString);
+    nSpectralAnalysis(neutrino *);
 
 	Ui::nSpectralAnalysis my_w;
 

@@ -24,7 +24,7 @@ class nPython : public nGenericPan {
 	
 public:
 	
-	nPython(neutrino *, QString);
+    nPython(neutrino *);
 	Ui::nPython my_w;
 
 public slots:

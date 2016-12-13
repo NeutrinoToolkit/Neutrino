@@ -25,8 +25,8 @@
 #include "nIntegralInversion.h"
 #include "neutrino.h"
 
-nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) ,
+nIntegralInversion::nIntegralInversion(neutrino *nparent)
+: nGenericPan(nparent),
   invertedPhys(nullptr)
 {
 

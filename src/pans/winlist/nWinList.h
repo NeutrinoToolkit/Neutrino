@@ -40,7 +40,7 @@ class nWinList : public nGenericPan {
 Q_OBJECT
 	
 public:
-	nWinList(neutrino*, QString);	
+    nWinList(neutrino*);
 
 	Ui::nWinList my_w;
 

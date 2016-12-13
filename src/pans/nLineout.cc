@@ -26,8 +26,8 @@
 #include "neutrino.h"
 #include "ui_neutrino.h"
 
-nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_dir)
-: nGenericPan(parent, win_name), cut_dir(plot_dir)
+nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan(parent),
+  cut_dir(plot_dir)
 {
 	my_w.setupUi(this);
 

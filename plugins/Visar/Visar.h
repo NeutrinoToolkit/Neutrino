@@ -77,7 +77,7 @@ class Visar : public nGenericPan {
 
 public:
 
-    Q_INVOKABLE Visar(neutrino *,QString);
+    Q_INVOKABLE Visar(neutrino *);
     ~Visar();
     Ui::Visar1 my_w;
 

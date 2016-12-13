@@ -40,7 +40,7 @@ class nZoomWin : public nGenericPan {
     Q_OBJECT
 
 public:
-    nZoomWin(neutrino *, QString);
+    nZoomWin(neutrino *);
 
     Ui::nZoomWin my_w;
 

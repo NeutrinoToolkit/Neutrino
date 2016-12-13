@@ -28,8 +28,8 @@
 
 // physWavelets
 
-nInterferometry::nInterferometry(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname), my_image(2)
+nInterferometry::nInterferometry(neutrino *nparent) : nGenericPan(nparent),
+    my_image(2)
 {
 	my_w.setupUi(this);
 	
@@ -54,7 +54,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
         my_image[k].setupUi(my_w.images->widget(k));
         foreach (QWidget *my_obj,  my_w.images->widget(k)->findChildren<QWidget *>()) {
             if (!my_obj->objectName().isEmpty()) {
-                my_obj->setObjectName(my_obj->objectName()+winname+QString::number(k));
+                my_obj->setObjectName(my_obj->objectName()+panName()+QString::number(k));
                 my_obj->setProperty("id",k);
             }
         }

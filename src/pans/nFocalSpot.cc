@@ -27,8 +27,7 @@
 #include "nFocalSpot.h"
 #include "neutrino.h"
 
-nFocalSpot::nFocalSpot(neutrino *nparent, QString winname)
-	: nGenericPan(nparent, winname)
+nFocalSpot::nFocalSpot(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
     nContour = new nLine(this,3);

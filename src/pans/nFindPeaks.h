@@ -39,7 +39,7 @@ class nFindPeaks : public nGenericPan {
 	
 public:
 	
-	nFindPeaks(neutrino *, QString);
+    nFindPeaks(neutrino *);
 	Ui::nFindPeaks my_w;
 	
 	public slots:

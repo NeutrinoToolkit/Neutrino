@@ -39,7 +39,7 @@ class nCamera : public nGenericPan {
 	Q_OBJECT
 
 public:	
-    nCamera(neutrino *, QString);
+    nCamera(neutrino *);
     ~nCamera();
 
     Ui::nCamera my_w;

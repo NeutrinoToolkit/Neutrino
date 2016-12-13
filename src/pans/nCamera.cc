@@ -27,8 +27,8 @@
 #include <QCameraInfo>
 #include <QCameraImageCapture>
 
-nCamera::nCamera(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname),
+nCamera::nCamera(neutrino *nparent)
+: nGenericPan(nparent),
   camera(NULL),
   imageCapture(NULL),
   imgGray(NULL),

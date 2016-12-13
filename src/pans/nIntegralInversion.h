@@ -47,7 +47,7 @@ class nIntegralInversion : public nGenericPan {
 	Q_OBJECT
 
 public:
-	nIntegralInversion(neutrino *, QString);
+    nIntegralInversion(neutrino *);
 	
 	Ui::nIntegralInversion my_w;
 

@@ -29,7 +29,7 @@
 #include "ui_neutrino.h"
 #include <QtSvg>
 
-nGenericPan::nGenericPan(neutrino *myparent, QString name)
+nGenericPan::nGenericPan(neutrino *myparent)
 : QMainWindow(myparent), nparent(myparent), currentBuffer(NULL), my_help(new Ui::PanHelp)
 {
     if (nparent==nullptr) return;

@@ -40,7 +40,7 @@ class nRegionPath : public nGenericPan {
 	Q_OBJECT
 
 public:
-	nRegionPath(neutrino *, QString);
+    nRegionPath(neutrino *);
 	
 	Ui::nRegionPath my_w;
 

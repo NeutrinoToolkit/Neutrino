@@ -38,7 +38,7 @@ class nMonitor : public nGenericPan {
 	Q_OBJECT
 
 public:
-	nMonitor(neutrino *, QString);
+    nMonitor(neutrino *);
 	Ui::nMonitor my_w;
 	QFileSystemModel *fileModel, *dirModel;
 	QCompleter *completer;

@@ -40,7 +40,7 @@ class nWavelet : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nWavelet(neutrino *, QString);
+    nWavelet(neutrino *);
 	
 	Ui::nWavelet my_w;
 

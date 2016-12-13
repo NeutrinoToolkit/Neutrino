@@ -43,7 +43,7 @@ class nAffine : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nAffine(neutrino *, QString);
+    nAffine(neutrino *);
 	
 	Ui::nAffine my_w;
 	

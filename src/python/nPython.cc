@@ -4,8 +4,8 @@
 #include <QThread>
 #include <QFont>
 
-nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winname) {
-
+nPython::nPython(neutrino *nparent) : nGenericPan(nparent)
+{
 	my_w.setupUi(this);
 
 #ifdef USE_QT5

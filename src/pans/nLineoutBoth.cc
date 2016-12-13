@@ -26,8 +26,7 @@
 #include "neutrino.h"
 #include "ui_neutrino.h"
 
-nLineoutBoth::nLineoutBoth(neutrino *parent, QString win_name)
-: nGenericPan(parent, win_name)
+nLineoutBoth::nLineoutBoth(neutrino *parent) : nGenericPan(parent)
 {
 	my_w.setupUi(this);
 

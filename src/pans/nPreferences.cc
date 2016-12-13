@@ -39,8 +39,7 @@
 #endif
 
 
-nPreferences::nPreferences(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
+nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	my_w.setupUi(this);
 
 	int coreNum =1;

@@ -38,7 +38,7 @@ class nShortcuts : public nGenericPan
 	Q_OBJECT
 	
 public:	
-	nShortcuts(neutrino*,QString);
+    nShortcuts(neutrino*);
 	Ui::nShortcuts my_w;
 	
 };

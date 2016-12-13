@@ -40,7 +40,7 @@ class nInterpolatePath : public nGenericPan {
 	Q_OBJECT
 
 public:
-	nInterpolatePath(neutrino *, QString);
+    nInterpolatePath(neutrino *);
 	
 	Ui::nInterpolatePath my_w;
 

@@ -28,8 +28,7 @@
 
 // physGhosts
 
-nZoomWin::nZoomWin(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nZoomWin::nZoomWin(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
 

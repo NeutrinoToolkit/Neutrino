@@ -39,7 +39,7 @@ class nOperator : public nGenericPan {
     std::vector<int> separator;
 
 public:	
-	nOperator(neutrino *, QString);
+    nOperator(neutrino *);
 	
 	Ui::nOperator my_w;
 	nPhysD *operatorResult;

@@ -29,8 +29,7 @@
 
 #define HDF5_MAX_NAME 2048
 
-nHDF5::nHDF5(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+nHDF5::nHDF5(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);

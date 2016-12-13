@@ -41,7 +41,7 @@ class nInterferometry : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nInterferometry(neutrino *, QString);
+    nInterferometry(neutrino *);
 	
 	Ui::nInterferometry my_w;
     std::vector<Ui::nInterferometry1> my_image;

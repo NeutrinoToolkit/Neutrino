@@ -24,8 +24,7 @@
  */
 #include "nBoxLineout.h"
     
-nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nBoxLineout::nBoxLineout(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 	

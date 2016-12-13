@@ -38,7 +38,7 @@ bool nPanPlug::instantiate(neutrino *neu) {
     if(type != QMetaType::UnknownType) {
         const QMetaObject *mo = QMetaType::metaObjectForType(type);
         if(mo) {
-            QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu),Q_ARG(QString,name()));
+            QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
             if(objectPtr) {
                 my_pan=qobject_cast<nGenericPan*>(objectPtr);
                 return true;

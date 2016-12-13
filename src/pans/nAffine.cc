@@ -27,8 +27,7 @@
 
 // physWavelets
 
-nAffine::nAffine(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nAffine::nAffine(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
     l1 =  new nLine(this,1);

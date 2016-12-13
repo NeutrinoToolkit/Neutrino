@@ -52,7 +52,7 @@ class nGenericPan : public QMainWindow {
 
 public:
 	nGenericPan(){};
-	nGenericPan(neutrino *, QString);
+    nGenericPan(neutrino *);
 	~nGenericPan(){};
 
 	neutrino *nparent;
@@ -132,9 +132,9 @@ class nPanPyWrapper : public QObject {
     Q_OBJECT
 
     public slots:
-    nGenericPan* new_nPan(neutrino* neu, QString name) {
-        DEBUG("here "<< name.toStdString());
-        return new nGenericPan(neu,name);
+    nGenericPan* new_nPan(neutrino* neu) {
+        DEBUG("here");
+        return new nGenericPan(neu);
     }; // opens new neutrino with that image
 
     void delete_nPan(nGenericPan* pan) {

@@ -41,7 +41,7 @@ class nMouseInfo : public nGenericPan {
 	
 public:
 	
-	nMouseInfo (neutrino *parent=0, QString=QString(""));
+    nMouseInfo (neutrino *parent);
 	neutrino *parent(){
 		return (neutrino *) QWidget::parent();
 	};

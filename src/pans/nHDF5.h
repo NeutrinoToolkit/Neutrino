@@ -40,7 +40,7 @@ class nHDF5 : public nGenericPan {
 	Q_OBJECT
 
 public:
-	nHDF5(neutrino *, QString);
+    nHDF5(neutrino *);
 	Ui::nHDF5 my_w;
 	
 public slots:

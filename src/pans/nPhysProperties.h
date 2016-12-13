@@ -40,7 +40,7 @@ class nPhysProperties : public nGenericPan {
 Q_OBJECT
 	
 public:
-	nPhysProperties(neutrino*, QString);	
+    nPhysProperties(neutrino*);
 	Ui::nPhysProperties my_w;
 
 public slots:

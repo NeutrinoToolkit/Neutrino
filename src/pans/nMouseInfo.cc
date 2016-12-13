@@ -27,7 +27,7 @@
 #include "nMouseInfo.h"
 
 
-nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, title)
+nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
 {
 
 	my_w.setupUi(this);

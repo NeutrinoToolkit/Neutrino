@@ -40,7 +40,7 @@ class nBoxLineout : public nGenericPan {
 	
 public:
 	
-	nBoxLineout(neutrino *, QString);
+    nBoxLineout(neutrino *);
 	Ui::nBoxLineout my_w;
 	
 	public slots:

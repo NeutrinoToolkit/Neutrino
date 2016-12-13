@@ -37,7 +37,7 @@ class nOpenRAW : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nOpenRAW(neutrino *, QString);
+    nOpenRAW(neutrino *);
 	Ui::nOpenRAW my_w;
 public slots:
 	void add(QString);

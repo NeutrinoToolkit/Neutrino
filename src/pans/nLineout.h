@@ -40,7 +40,7 @@ class neutrino;
 class nLineout : public nGenericPan {
 	Q_OBJECT
 public:
-	nLineout(neutrino *, QString, enum phys_direction);
+    nLineout(neutrino *, enum phys_direction);
 
 public slots:
 	void updatePlot(QPointF);

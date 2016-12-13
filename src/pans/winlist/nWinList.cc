@@ -24,8 +24,9 @@
  */
 #include "neutrino.h"
 #include "nWinList.h"
-nWinList::nWinList(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname), freezedFrame(false), frScale(1,1), frOrigin(0,0) {
+nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
+    freezedFrame(false), frScale(1,1), frOrigin(0,0)
+{
 	my_w.setupUi(this);
 
     // qt4.8->qt5.5

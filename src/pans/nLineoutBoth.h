@@ -34,7 +34,7 @@
 class nLineoutBoth : public nGenericPan {
 	Q_OBJECT
 public:
-	nLineoutBoth(neutrino *, QString);
+    nLineoutBoth(neutrino *);
 	
 public slots:
 	void updatePlot(QPointF);

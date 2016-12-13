@@ -38,7 +38,7 @@ class nLine;
 class nContours : public nGenericPan {
 	Q_OBJECT
 public:
-	nContours(neutrino*, QString);
+    nContours(neutrino*);
 	
 	Ui::nContours my_w;
 

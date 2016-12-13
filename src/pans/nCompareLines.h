@@ -39,7 +39,7 @@ class nCompareLines : public nGenericPan {
 	
 public:
 	
-	nCompareLines(neutrino *, QString);
+    nCompareLines(neutrino *);
 	Ui::nCompareLines my_w;
 	
 public slots:

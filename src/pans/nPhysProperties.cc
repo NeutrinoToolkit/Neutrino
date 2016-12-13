@@ -24,8 +24,8 @@
  */
 #include "neutrino.h"
 #include "nPhysProperties.h"
-nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
+nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
+{
 	my_w.setupUi(this);
 
 	my_w.splitter->setStretchFactor(0, 1);

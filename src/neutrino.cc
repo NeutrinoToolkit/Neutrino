@@ -695,7 +695,8 @@ void neutrino::fileOpen(QStringList fnames) {
             QString vwinname="OpenRaw";
             nOpenRAW *openRAW=(nOpenRAW *)existsPan(vwinname);
             if (!openRAW) {
-                openRAW = new nOpenRAW(this, vwinname);	}
+                openRAW = new nOpenRAW(this);
+            }
             openRAW->add(fname);
         }
     }
@@ -1429,10 +1430,7 @@ void neutrino::actionNextBuffer() {
 
 nGenericPan*
 neutrino::ZoomWin() {
-    QString namepad=tr("Zoom Win");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nZoomWin(this, namepad);
-    return win;
+    return new nZoomWin(this);
 }
 
 
@@ -1627,77 +1625,50 @@ neutrino::closeCurrentBuffer() {
 
 nGenericPan*
 neutrino::Shortcuts() {
-    QString vwinname=tr("Shortcuts");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nShortcuts(this,vwinname);
-    return win;
+    return new nShortcuts(this);
 }
 
 nGenericPan*
 neutrino::FocalSpot() {
-    QString vwinname=tr("FocalSpot");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nFocalSpot(this,vwinname);
-    return win;
+    return new nFocalSpot(this);
 }
 
 nGenericPan*
 neutrino::Contours() {
-    QString vwinname=tr("Contours");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nContours(this,vwinname);
-    return win;
+    return new nContours(this);
 }
 
 nGenericPan*
 neutrino::MathOperations() {
-    QString vwinname=tr("MathOperations");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nOperator(this,vwinname);
-    return win;
+    return new nOperator(this);
 }
 
 nGenericPan*
 neutrino::CutoffImage() {
-    QString vwinname=tr("CutoffImage");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nCutoffMask(this,vwinname);
-    return win;
+    return new nCutoffMask(this);
 }
 
 // Window List pan
 nGenericPan*
 neutrino::WinList() {
-    QString namepad=tr("WinList");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nWinList (this, namepad);
-    return win;
+    return new nWinList(this);
 }
 
 nGenericPan*
 neutrino::Properties() {
-    QString namepad=tr("Properties");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nPhysProperties (this, namepad);
-    return win;
+    return new nPhysProperties(this);
 }
 
 nGenericPan*
 neutrino::MouseInfo() {
-    QString namepad=tr("MouseInfo");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nMouseInfo (this, namepad);
-    return win;
+    return new nMouseInfo(this);
 }
 
 // colortables
 
 nGenericPan*
 neutrino::Colorbar() {
-    QString namepad=tr("Colorbar");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nColorBarWin (this, namepad);
-    return win;
+    return new nColorBarWin(this);
 }
 
 struct QPairFirstComparer {
@@ -1916,26 +1887,17 @@ neutrino::createDrawEllipse() {
 
 nGenericPan*
 neutrino::Hlineout() {
-    QString namepad=tr("Hlineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineout(this, namepad, PHYS_X);
-    return win;
+    return new nLineout(this, PHYS_X);
 }
 
 nGenericPan*
 neutrino::Vlineout() {
-    QString namepad=tr("Vlineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineout(this, namepad, PHYS_Y);
-    return win;
+    return new nLineout(this, PHYS_Y);
 }
 
 nGenericPan*
 neutrino::bothLineout() {
-    QString namepad=tr("bothLineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineoutBoth(this, namepad);
-    return win;
+    return new nLineoutBoth(this);
 }
 
 void neutrino::print()
@@ -1960,10 +1922,7 @@ void neutrino::print()
 #ifdef HAVE_HDF5
 nGenericPan*
 neutrino::openHDF5() {
-    QString namepad=tr("HDF5");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nHDF5(this, namepad);
-    return win;
+    return new nHDF5(this);
 }
 #endif
 
@@ -1971,19 +1930,19 @@ neutrino::openHDF5() {
 /// rectangle lineout
 nGenericPan*
 neutrino::BoxLineout() {
-    return new nBoxLineout(this, "BoxLineout");
+    return new nBoxLineout(this);
 }
 
 /// Find peaks
 nGenericPan*
 neutrino::FindPeaks() {
-    return new nFindPeaks(this, "FindPeaks");
+    return new nFindPeaks(this);
 }
 
 /// compare lines between images
 nGenericPan*
 neutrino::CompareLines() {
-    return new nCompareLines(this, "CompareLines");
+    return new nCompareLines(this);
 }
 
 /// Open raw window
@@ -1993,9 +1952,8 @@ neutrino::openRAW() {
     nGenericPan *win = NULL;
     fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),NULL,tr("Any files")+QString(" (*)"));
     if (fnames.size()) {
-        QString vwinname="OpenRaw";
-        win=existsPan(vwinname);
-        if (!win) win= new nOpenRAW(this, vwinname);
+        win=existsPan("nOpenRAW");
+        if (!win) win= new nOpenRAW(this);
         nOpenRAW *winRAW=qobject_cast<nOpenRAW*>(win);
         if (winRAW) winRAW->add(fnames);
     }
@@ -2005,90 +1963,64 @@ neutrino::openRAW() {
 /// Spectral Analysis (FT, filtering and stuff)
 nGenericPan*
 neutrino::SpectralAnalysis() {
-    QString namepad=tr("SpectralAnalysis");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nSpectralAnalysis(this, namepad);
-    return win;
+    return new nSpectralAnalysis(this);
 }
 
 
 /// Wavelet analysis window
 nGenericPan*
 neutrino::Wavelet() {
-    QString vwinname=tr("Wavelet");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nWavelet(this, vwinname);
-    return ret;
+    return new nWavelet(this);
 }
 
 /// Interferometry analysis window
 nGenericPan*
 neutrino::Interferometry() {
-    QString vwinname=tr("Interferometry");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nInterferometry(this, vwinname);
-    return ret;
+    return new nInterferometry(this);
 }
 
 /// Remove Ghost fringes from Visar data
 nGenericPan*
 neutrino::Ghost() {
-    QString vwinname=tr("Ghost");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nGhost(this, vwinname);
-    return ret;
+    return new nGhost(this);
 }
 
 /// Integral inversion (Abel etc...)
 nGenericPan*
 neutrino::Inversions() {
-    QString vwinname=tr("Inversions");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nIntegralInversion(this, vwinname);
-    return ret;
+    return new nIntegralInversion(this);
 }
 
 /// Region Path
 nGenericPan*
 neutrino::RegionPath() {
-    QString vwinname=tr("RegionPath");
-    return new nRegionPath(this, "RegionPath");
+    return new nRegionPath(this);
 }
 
 /// Region Path
 nGenericPan*
 neutrino::InterpolatePath() {
-    QString vwinname=tr("InterpolatePath");
-    return new nInterpolatePath(this, "InterpolatePath");
+    return new nInterpolatePath(this);
 }
 
 
 /// ROTATE STUFF
 nGenericPan*
 neutrino::Rotate() {
-    QString vwinname=tr("Rotate");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nRotate(this, vwinname);
-    return ret;
+    return new nRotate(this);
 }
 
 /// Affine STUFF
 nGenericPan*
 neutrino::Affine() {
-    QString vwinname=tr("Affine");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nAffine(this, vwinname);
-    return ret;
+    return new nAffine(this);
 }
 
 /// camera
 nGenericPan*
 neutrino::Camera() {
 #if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-    QString vwinname=tr("Camera");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nCamera(this, vwinname);
-    return ret;
+   return new nCamera(this);
 #else
     return NULL;
 #endif
@@ -2104,10 +2036,7 @@ neutrino::createFollower() {
 // MONIOR DIRECTORY
 nGenericPan*
 neutrino::Monitor() {
-    QString vwinname=tr("Monitor");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nMonitor(this, vwinname);
-    return ret;
+    return new nMonitor(this);
 }
 
 //save and load across restart
@@ -2171,10 +2100,7 @@ void neutrino::loadDefaults(){
 
 nGenericPan*
 neutrino::Preferences() {
-    QString vwinname=tr("Preferences");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nPreferences(this, vwinname);
-    return ret;
+    return new nPreferences(this);
 }
 
 void neutrino::about() {
@@ -2269,7 +2195,7 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
     QApplication::processEvents();
 
     if (force && my_pan==nullptr) {
-        my_pan=new nGenericPan(this,panName);
+        my_pan=new nGenericPan(this);
     }
     return my_pan;
 }
@@ -2321,7 +2247,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
         if (panName.isEmpty())
             panName.sprintf("n%03d pan",property("winId").toInt());
 
-        my_pan=new nGenericPan(this,panName);
+        my_pan=new nGenericPan(this);
 
         if (uiwidget) {
 
@@ -2356,8 +2282,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
 
 nGenericPan* neutrino::Python()
 {
-    QString vwinname=tr("Python");
-    return new nPython(this, vwinname);
+    return new nPython(this);
 }
 
 void

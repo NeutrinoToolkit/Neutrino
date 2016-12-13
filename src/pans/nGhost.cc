@@ -27,8 +27,7 @@
 
 // physGhosts
 
-nGhost::nGhost(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname),
+nGhost::nGhost(neutrino *nparent) : nGenericPan(nparent),
   ghostBusted(NULL)
 {
 	my_w.setupUi(this);

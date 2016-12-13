@@ -38,7 +38,7 @@ class nLine;
 class nFocalSpot : public nGenericPan {
 	Q_OBJECT
 public:
-	nFocalSpot(neutrino *, QString);
+    nFocalSpot(neutrino *);
 
 	Ui::nFocalSpot my_w;
 

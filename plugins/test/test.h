@@ -36,8 +36,8 @@ class test : public nGenericPan {
 Q_OBJECT
 public:
 
-    Q_INVOKABLE test(neutrino *nparent, QString winname)
-        : nGenericPan(nparent, winname) {
+    Q_INVOKABLE test(neutrino *nparent)
+        : nGenericPan(nparent) {
         my_w.setupUi(this);
         show();
     }

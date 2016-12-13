@@ -40,7 +40,7 @@ class nGhost : public nGenericPan {
 	Q_OBJECT
 
 public:	
-	nGhost(neutrino *, QString);
+    nGhost(neutrino *);
 	
 	Ui::nGhost my_w;
 

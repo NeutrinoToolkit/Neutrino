@@ -28,8 +28,7 @@
 
 // physWavelets
 
-nOpenRAW::nOpenRAW(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nOpenRAW::nOpenRAW(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 	connect(my_w.okButton, SIGNAL(pressed()), this, SLOT(doOpen()));
