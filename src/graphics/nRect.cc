@@ -39,8 +39,8 @@ nRect::~nRect() {
 
 nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
 {
-    my_w->name->setText(parentPan->panName+"Rect");
-    setProperty("parentPan",parentPan->panName);
+    my_w->name->setText(parentPan->panName()+"Rect");
+    setProperty("parentPan", QVariant::fromValue(parentPan));
     setProperty("parentPanControlLevel",level);
     if (level>0) {
         my_w->name->setReadOnly(true);

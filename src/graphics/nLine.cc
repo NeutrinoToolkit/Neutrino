@@ -41,8 +41,8 @@ nLine::~nLine() {
 
 nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 {
-    my_w.name->setText(parentPan->panName+"Line");
-    setProperty("parentPan",parentPan->panName);
+    my_w.name->setText(parentPan->panName()+"Line");
+    setProperty("parentPan", QVariant::fromValue(parentPan));
     setProperty("parentPanControlLevel",level);
     if (level>0) {
         my_w.name->setReadOnly(true);

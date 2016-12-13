@@ -267,8 +267,8 @@ void nWinList::keyPressEvent(QKeyEvent *e){
 
 void
 nWinList::panAdd(nGenericPan *pan) {
-	if (pan->panName!=panName) {
-		QListWidgetItem *item=new QListWidgetItem(pan->panName,my_w.pans);
+    if (pan->panName()!=panName()) {
+        QListWidgetItem *item=new QListWidgetItem(pan->panName(),my_w.pans);
 		item->setData(Qt::UserRole,qVariantFromValue((void*)pan));
 		my_w.pans->addItem(item);
 	}
@@ -276,7 +276,7 @@ nWinList::panAdd(nGenericPan *pan) {
 
 void
 nWinList::panDel(nGenericPan *pan) {
-	foreach (QListWidgetItem * item,my_w.pans->findItems(pan->panName,Qt::MatchExactly)) {
+    foreach (QListWidgetItem * item,my_w.pans->findItems(pan->panName(),Qt::MatchExactly)) {
 		delete item;
 	}
 }

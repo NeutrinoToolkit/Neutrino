@@ -56,7 +56,6 @@ public:
 	~nGenericPan(){};
 
 	neutrino *nparent;
-    QString panName;
     nPhysD *currentBuffer;
 	
 	// thread stuff
@@ -70,6 +69,7 @@ signals:
 
 public slots:
 
+    QString panName() {return QString(metaObject()->className());}
     void grabSave();
     void help();
 
@@ -134,9 +134,11 @@ class nPanPyWrapper : public QObject {
     public slots:
     nGenericPan* new_nPan(neutrino* neu, QString name) {
         DEBUG("here "<< name.toStdString());
-        return new nGenericPan(neu,name);}; // opens new neutrino with that image
+        return new nGenericPan(neu,name);
+    }; // opens new neutrino with that image
+
     void delete_nPan(nGenericPan* pan) {
-        DEBUG("here "<< pan->panName.toStdString());
+        DEBUG("here "<< pan->panName().toStdString());
         pan->deleteLater();
     };
 
