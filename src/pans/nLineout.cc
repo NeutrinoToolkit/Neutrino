@@ -41,9 +41,11 @@ nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan
     
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
-    my_w.plot->graph(0)->setName(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
+    QString namedirection(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
+    my_w.plot->graph(0)->setName(namedirection);
 
     show();
+    setWindowTitle(windowTitle()+" "+namedirection);
     setBehaviour();
     updateLastPoint();
 }
