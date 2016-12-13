@@ -32,8 +32,7 @@ nContours::nContours(neutrino *nparent, QString winname)
     : nGenericPan(nparent, winname)
 {
     my_w.setupUi(this);
-    my_c = new nLine(nparent);
-    my_c->setParentPan(panName,3);
+    my_c = new nLine(this,3);
     my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
     connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));

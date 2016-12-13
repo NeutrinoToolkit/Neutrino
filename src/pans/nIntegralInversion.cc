@@ -32,8 +32,7 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
 
 	my_w.setupUi(this);
 
-	axis =  new nLine(nparent);
-	axis->setParentPan(panName,1);
+    axis =  new nLine(this,1);
 	axis->forceMonotone = true;
 	axis->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(50, 50));
 

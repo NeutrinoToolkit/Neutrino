@@ -34,6 +34,7 @@
 #define __nRect
 
 class neutrino;
+class nGenericPan;
 
 namespace Ui {
 class nObject;
@@ -43,8 +44,9 @@ class nRect : public QGraphicsObject {
 	Q_OBJECT
 public:
 	
-	nRect(neutrino *);
-	~nRect();
+    nRect(neutrino *);
+    nRect(nGenericPan *, int level);
+    ~nRect();
 	
 	neutrino *parent(){
 		return (neutrino *) QGraphicsObject::parent();
@@ -134,8 +136,6 @@ public slots:
 	
 	void addPointAfterClick(QPointF);
 
-	void setParentPan(QString,int);
-	
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();

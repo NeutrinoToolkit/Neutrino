@@ -30,8 +30,7 @@ nBoxLineout::nBoxLineout(neutrino *nparent, QString winname)
 	my_w.setupUi(this);
 	
 	// signals
-	box =  new nRect(nparent);
-	box->setParentPan(panName,1);
+    box =  new nRect(this,1);
 	box->setRect(QRectF(0,0,100,100));
 	connect(my_w.actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 

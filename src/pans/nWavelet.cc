@@ -32,12 +32,10 @@ nWavelet::nWavelet(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 
-	region =  new nRect(nparent);
-	region->setParentPan(panName,1);
+    region =  new nRect(this,1);
 	region->setRect(QRectF(100,100,100,100));
 	
-	linebarrier =  new nLine(nparent);
-	linebarrier->setParentPan(panName,1);
+    linebarrier =  new nLine(this,1);
 	QPolygonF poly;
 	poly << QPointF(0,0) << QPointF(100,100);
 	linebarrier->setPoints(poly);

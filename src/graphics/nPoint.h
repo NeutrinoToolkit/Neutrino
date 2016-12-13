@@ -116,8 +116,6 @@ public slots:
 	void movePoint(QPointF);
 	
 	void addPointAfterClick(QPointF);
-
-	void setParentPan(QString,int);
 	
 	//SETTINGS
 	void loadSettings();

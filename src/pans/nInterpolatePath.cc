@@ -32,8 +32,7 @@ nInterpolatePath::nInterpolatePath(neutrino *nparent, QString winname)
 
 	my_w.setupUi(this);
 
-	region =  new nLine(nparent);
-	region->setParentPan(panName,1);
+    region =  new nLine(this,1);
 	// TODO: create something better to avoid line removal
 	region->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
 	region->toggleClosedLine(true);

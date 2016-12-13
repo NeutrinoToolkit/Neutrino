@@ -33,20 +33,17 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 	
-	region =  new nRect(nparent);
-	region->setParentPan(panName,1);
+    region =  new nRect(this,1);
 	region->setRect(QRectF(100,100,100,100));
 	
-    maskRegion =  new nLine(nparent);
-    maskRegion->setParentPan(panName,1);
+    maskRegion =  new nLine(this,1);
     maskRegion->changeToolTip("MaskLine");
 	QPolygonF poly;
 	poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
     maskRegion->setPoints(poly);
     maskRegion->toggleClosedLine(true);
 
-	unwrapBarrier =  new nLine(nparent);
-	unwrapBarrier->setParentPan(panName,1);
+    unwrapBarrier =  new nLine(this,1);
     unwrapBarrier->changeToolTip("BarrierLine");
     poly.clear();
 	poly << QPointF(0,0) << QPointF(100,100);
@@ -606,8 +603,7 @@ void nInterferometry::addShape(){
 }
 
 void nInterferometry::addShape(QString name){
-    nLine *my_l=new nLine(nparent);
-    my_l->setParentPan(panName,0);
+    nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
         poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);

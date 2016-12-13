@@ -32,13 +32,15 @@
 #include "ui_nLine.h"
 
 class neutrino;
+class nGenericPan;
 
 class nLine : public QGraphicsObject {
 Q_OBJECT
 
 public:
-	nLine(neutrino * = NULL);
-	~nLine();
+    nLine(neutrino * = NULL);
+    nLine(nGenericPan *, int level);
+    ~nLine();
 
 	neutrino *parent(){
 		return (neutrino *) QGraphicsObject::parent();
@@ -157,8 +159,6 @@ public slots:
 	void makeRectangle();
 
 	void itemChanged();
-
-	void setParentPan(QString,int);
 
 	QString getPointsStr();
 	void copy_points();

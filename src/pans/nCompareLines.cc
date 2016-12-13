@@ -30,8 +30,7 @@ nCompareLines::nCompareLines(neutrino *nparent, QString winname)
     my_w.setupUi(this);
 
     // signals
-    line =  new nLine(nparent);
-    line->setParentPan(panName,1);
+    line =  new nLine(this,1);
     QPolygonF poly;
     poly << QPointF(0,0) << QPointF(100,100);
     line->setPoints(poly);

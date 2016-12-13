@@ -31,8 +31,7 @@ nFocalSpot::nFocalSpot(neutrino *nparent, QString winname)
 	: nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-	nContour = new nLine(nparent);
-	nContour->setParentPan(panName,3);
+    nContour = new nLine(this,3);
 	
     show();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));

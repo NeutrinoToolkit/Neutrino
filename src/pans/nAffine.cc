@@ -31,8 +31,7 @@ nAffine::nAffine(neutrino *nparent, QString winname)
 : nGenericPan(nparent, winname)
 {
 	my_w.setupUi(this);
-	l1 =  new nLine(nparent);
-	l1->setParentPan(panName,1);
+    l1 =  new nLine(this,1);
 	l1->changeToolTip(panName+"Line 1");
 	l1->changeColorHolder("red");
 	QPolygonF poly;
@@ -40,8 +39,7 @@ nAffine::nAffine(neutrino *nparent, QString winname)
 	l1->setPoints(poly);
 	
 
-	l2 =  new nLine(nparent);
-	l2->setParentPan(panName,1);
+    l2 =  new nLine(this,1);
 	l2->changeToolTip(panName+"Line 2");
 	l2->changeColorHolder("blue");
 	poly.clear();

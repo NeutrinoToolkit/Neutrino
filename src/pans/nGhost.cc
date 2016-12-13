@@ -33,8 +33,7 @@ nGhost::nGhost(neutrino *nparent, QString winname)
 {
 	my_w.setupUi(this);
 
-	region =  new nRect(nparent);
-	region->setParentPan(panName,1);
+    region =  new nRect(this,1);
 	region->setRect(QRectF(100,100,100,100));
 	
     show();

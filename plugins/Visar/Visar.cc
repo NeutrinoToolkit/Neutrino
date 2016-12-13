@@ -137,22 +137,19 @@ Visar::Visar(neutrino *nparent, QString winname)
     QList<QAction*> actionRects;
     actionRects << my_w.actionRect1 << my_w.actionRect2;
     for (int k=0;k<2;k++){
-        fringeLine[k] = new nLine(nparent);
-        fringeLine[k]->setParentPan(panName,3);
+        fringeLine[k] = new nLine(this,3);
         fringeLine[k]->changeToolTip(tr("Fringeshift Visar ")+QString::number(k+1));
 
-        fringeRect[k] =  new nRect(nparent);
+        fringeRect[k] =  new nRect(this,1);
         fringeRect[k]->setProperty("id", k);
 
-        fringeRect[k]->setParentPan(panName,1);
         fringeRect[k]->changeToolTip(tr("Visar region ")+QString::number(k+1));
         fringeRect[k]->setRect(QRectF(0,0,100,100));
         connect(actionRects[k], SIGNAL(triggered()), fringeRect[k], SLOT(togglePadella()));
     }
 
     //!START SOP stuff
-    sopRect =  new nRect(nparent);
-    sopRect->setParentPan(panName,1);
+    sopRect =  new nRect(this,1);
     sopRect->changeToolTip(tr("SOP region"));
     sopRect->setRect(QRectF(0,0,100,100));
     connect(my_w.actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));

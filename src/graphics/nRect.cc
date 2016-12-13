@@ -26,6 +26,8 @@
 #include "ui_nObject.h"
 #include "neutrino.h"
 #include "ui_neutrino.h"
+#include "nGenericPan.h"
+
 #include <iostream>
 
 nRect::~nRect() {
@@ -33,6 +35,20 @@ nRect::~nRect() {
 		delete item;
 	}
 }
+
+
+nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
+{
+    my_w->name->setText(parentPan->panName+"Rect");
+    setProperty("parentPan",parentPan->panName);
+    setProperty("parentPanControlLevel",level);
+    if (level>0) {
+        my_w->name->setReadOnly(true);
+        disconnect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    }
+
+}
+
 
 nRect::nRect(neutrino *nparent) :
     QGraphicsObject(),
@@ -111,16 +127,6 @@ void nRect::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
     QAction *expandy = menu.addAction("Expand height (y)");
     connect(expandy, SIGNAL(triggered()), this, SLOT(expandY()));
     menu.exec(e->screenPos());
-}
-
-void nRect::setParentPan(QString winname, int level) {
-    my_w->name->setText(winname+"Rect");
-	setProperty("parentPan",winname);
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-        my_w->name->setReadOnly(true);
-        disconnect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
 }
 
 void nRect::setRect(QRectF rect) {

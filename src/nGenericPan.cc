@@ -32,6 +32,7 @@
 nGenericPan::nGenericPan(neutrino *myparent, QString name)
 : QMainWindow(myparent), nparent(myparent), panName(name), currentBuffer(NULL), my_help(new Ui::PanHelp)
 {
+    qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 

@@ -131,9 +131,7 @@ public:
 	void addPoint(int);
 	
 	void addPointAfterClick(QPointF);
-	
-	void setParentPan(QString,int);
-	
+		
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();

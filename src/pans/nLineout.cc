@@ -59,7 +59,7 @@ void nLineout::setBehaviour() {
 }
 
 
-// mouse movemen
+// mouse movement
 void
 nLineout::updatePlot(QPointF p) {
 

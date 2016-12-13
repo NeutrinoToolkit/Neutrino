@@ -24,6 +24,8 @@
  */
 #include "nLine.h"
 #include "neutrino.h"
+#include "nGenericPan.h"
+
 #include "ui_neutrino.h"
 #include <iostream>
 
@@ -34,6 +36,25 @@ nLine::~nLine() {
 	foreach (QGraphicsEllipseItem* item, ref) {
 		delete item;
 	}
+}
+
+
+nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
+{
+    my_w.name->setText(parentPan->panName+"Line");
+    setProperty("parentPan",parentPan->panName);
+    setProperty("parentPanControlLevel",level);
+    if (level>0) {
+        my_w.name->setReadOnly(true);
+        disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    }
+    if (level>1) {
+        sizeHolder(0.0);
+    }
+    if (level>2) {
+        my_w.cutPoints->setValue(1);
+    }
+
 }
 
 nLine::nLine(neutrino *nparent) : QGraphicsObject()
@@ -155,22 +176,6 @@ void nLine::save_points() {
         t.close();
     }
 
-}
-
-void nLine::setParentPan(QString winname, int level) {
-	my_w.name->setText(winname+"Line");
-	setProperty("parentPan",winname);
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-		my_w.name->setReadOnly(true);
-		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
-	if (level>1) {
-		sizeHolder(0.0);
-	}
-	if (level>2) {
-		my_w.cutPoints->setValue(1);
-	}
 }
 
 

@@ -56,8 +56,8 @@ public:
 	~nGenericPan(){};
 
 	neutrino *nparent;
-	QString panName;
-	nPhysD *currentBuffer;
+    QString panName;
+    nPhysD *currentBuffer;
 	
 	// thread stuff
 	panThread nThread;

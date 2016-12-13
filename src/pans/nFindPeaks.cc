@@ -32,8 +32,7 @@ nFindPeaks::nFindPeaks(neutrino *nparent, QString winname)
 	my_w.setupUi(this);
 
 	// signals
-	box =  new nRect(nparent);
-	box->setParentPan(panName,1);
+    box =  new nRect(this,1);
 	box->setRect(QRectF(0,0,100,100));
 
 

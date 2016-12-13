@@ -49,8 +49,6 @@ nEllipse::nEllipse(neutrino *nparent) :
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
-	setProperty("parentPan",QString(""));
-	setProperty("parentPanControlLevel",0);
 
 	nodeSelected=-1;
 
@@ -107,16 +105,6 @@ nEllipse::nEllipse(neutrino *nparent) :
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
-}
-
-void nEllipse::setParentPan(QString winname, int level) {
-    my_w->name->setText(winname+"Ellipse");
-	setProperty("parentPan",winname);
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-        my_w->name->setReadOnly(true);
-        disconnect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
 }
 
 void nEllipse::setRect(QRectF rect) {
