@@ -59,7 +59,8 @@ public slots:
     static bool localeLessThan(const QLocale&, const QLocale&);
     static QString localeToString(const QLocale &);
 
-    static void addPlugin(QString);
+    void on_addPlugin_released();
+    void on_removePlugin_released();
 
 };
 

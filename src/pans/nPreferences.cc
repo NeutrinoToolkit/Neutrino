@@ -349,10 +349,26 @@ void nPreferences::changephysNameLength(int k) {
 }
 
 
-void nPreferences::addPlugin(QString) {
-    qDebug() << "implement me or kill me !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+void nPreferences::on_addPlugin_released() {
+    qDebug() << "here" ;
+
+    QString extension;
+#if defined(Q_OS_WIN)
+    extension="dll";
+#elif defined(Q_OS_MAC)
+    extension="dylib";
+#elif defined(Q_OS_LINUX)
+    extension="so";
+#endif
+
+    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open Plugin"),property("NeuSave-filePlugin").toString(),tr("Plugins")+QString(" (*.")+extension+QString(");;")+tr("Any files")+QString(" (*)"));
+    foreach (QString fname, fnames) {
+        nparent->loadPlugin(fname,false);
+    }
 }
 
 
-
+void nPreferences::on_removePlugin_released() {
+    qDebug() << "here" ;
+}
 

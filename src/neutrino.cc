@@ -500,21 +500,25 @@ neutrino::scanPlugins()
 void
 neutrino::loadPlugin()
 {
+    QString pname=QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+    loadPlugin(pname,true);
 
+}
+
+void
+neutrino::loadPlugin(QString pname, bool launch)
+{
     if (!property("NeuSave-loadPlugin").isValid()) {
         setProperty("NeuSave-loadPlugin",QString("plugin.so"));
     }
 
-    QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
-
-    if (!pname.isEmpty()) {
-
+    if (QFileInfo(pname).exists()) {
         setProperty("NeuSave-loadPlugin",pname);
         DEBUG(10, "loading plugin "<<pname.toStdString());
 
         nPluginLoader *my_npl = new nPluginLoader(pname, this);
         qDebug() << "here" << my_npl->ok();
-        my_npl->launch();
+        if (launch) my_npl->launch();
     }
 }
 

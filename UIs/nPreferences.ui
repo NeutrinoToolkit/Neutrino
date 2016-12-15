@@ -475,21 +475,49 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <item row="3" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="0" colspan="3">
-         <widget class="QListView" name="pluginList"/>
+        <item row="1" column="0" colspan="2">
+         <widget class="QWidget" name="widget_4" native="true">
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="1" rowspan="3">
+            <widget class="QListWidget" name="pluginList"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QToolButton" name="addPlugin">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/icons/icons.qrc">
+               <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="0">
+            <widget class="QToolButton" name="removePlugin">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/icons/icons.qrc">
+               <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLineEdit" name="systemPlugins">
@@ -509,33 +537,7 @@
            </font>
           </property>
           <property name="text">
-           <string>System dir:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>User dirs:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="QToolButton" name="addPluginDirs">
-          <property name="text">
-           <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../qrc/icons.qrc">
-            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+           <string>Default dir:</string>
           </property>
          </widget>
         </item>
@@ -578,7 +580,7 @@
   </widget>
   <action name="actionReset_settings">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
    </property>
    <property name="text">

@@ -31,8 +31,8 @@ if (NOT ${NPHYS_PATH} STREQUAL "" AND NOT IS_ABSOLUTE ${NPHYS_PATH})
 endif()
 
 # find goodies
-#set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
-#include(FindNeutrinoGuiComponents)
+set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
+include(FindNeutrinoGuiComponents)
 add_definitions(-DQT_PLUGIN)
 
 set(CMAKE_AUTOMOC ON)
