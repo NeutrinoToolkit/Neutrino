@@ -491,17 +491,7 @@ neutrino::scanPlugins()
 #endif
     pluginsDir.cd("plugins");
 
-    if (!pluginsDir.cd("plugins")) {
-        pluginsDir.setPath(qApp->applicationDirPath());
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cd("bin");
-        pluginsDir.cd("plugins");
-
-        qDebug() << pluginsDir.absolutePath();
-    }
-
+    qDebug() << pluginsDir.absolutePath();
     if (pluginsDir.exists()) {
         scanPlugins(pluginsDir);
     }
