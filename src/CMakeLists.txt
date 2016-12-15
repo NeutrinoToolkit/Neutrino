@@ -166,9 +166,9 @@ message(STATUS "${LIST_LENGTH} help files: ${HELP_QRC}")
 # (see neutrino cmake resources folder)
 if (USE_QT5)
     # add here QT5 only sources
-	if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
-    list (APPEND SOURCES pans/nCamera.cc)
-    list (APPEND UIS ../UIs/nCamera.ui)
+    if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
+        list (APPEND SOURCES pans/nCamera.cc)
+        list (APPEND UIS ../UIs/nCamera.ui)
     endif()
 
     qt5_add_resources(RES_SOURCES ${ICONS_QRC})
