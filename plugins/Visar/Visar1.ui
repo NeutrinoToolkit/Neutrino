@@ -894,7 +894,7 @@
   <tabstop>sopCalibA</tabstop>
  </tabstops>
  <resources>
-  <include location="../qrc/icons.qrc"/>
+  <include location="../../resources/icons/"/>
  </resources>
  <connections/>
 </ui>

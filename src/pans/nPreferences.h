@@ -39,7 +39,7 @@ class nPreferences : public nGenericPan
     Q_OBJECT
 
 public:
-    nPreferences(neutrino*);
+    Q_INVOKABLE nPreferences(neutrino*);
     Ui::nPreferences my_w;
 
 public slots:

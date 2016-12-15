@@ -14,7 +14,9 @@ FOREACH(onefile ${allfiles})
   ENDIF()
 ENDFOREACH()
 
-message(STATUS "Found plugins: ${plugins_list}")
+list(LENGTH plugins_list plugins_list_len)
+
+message(STATUS "Found ${plugins_list_len} plugins")
 
 set (LIBRARY_OUTPUT_PATH "../../bin/plugins")
 

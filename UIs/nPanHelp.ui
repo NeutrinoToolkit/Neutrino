@@ -119,7 +119,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../qrc/icons.qrc"/>
+  <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

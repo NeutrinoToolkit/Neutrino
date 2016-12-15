@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -37,29 +37,29 @@
 class neutrino;
 
 class nHDF5 : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-    nHDF5(neutrino *);
-	Ui::nHDF5 my_w;
-	
+    Q_INVOKABLE nHDF5(neutrino *);
+    Ui::nHDF5 my_w;
+
 public slots:
-	QString getFilename(QTreeWidgetItem*);
-	
-	void itemEntered(QTreeWidgetItem*, int=-1);
-	void openData(QTreeWidgetItem*, int=-1);
-	void removeFile();
-	void showFile();
-	void showFile(QString);
-	void scanGroup(hid_t, QTreeWidgetItem *);
-	void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = NULL);
-	void scanDataset(hid_t, QTreeWidgetItem *);
+    QString getFilename(QTreeWidgetItem*);
+
+    void itemEntered(QTreeWidgetItem*, int=-1);
+    void openData(QTreeWidgetItem*, int=-1);
+    void removeFile();
+    void showFile();
+    void showFile(QString);
+    void scanGroup(hid_t, QTreeWidgetItem *);
+    void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = NULL);
+    void scanDataset(hid_t, QTreeWidgetItem *);
 
     int phys_write_HDF5(nPhysD *phys, std::string fname);
     nPhysD* phys_open_HDF5(std::string fileName, std::string dataName);
     void scan_hdf5_attributes(hid_t aid, nPhysD *my_data);
-         
-	void copyPath();
+
+    void copyPath();
 };
 
 #endif

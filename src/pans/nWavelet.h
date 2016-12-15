@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -37,43 +37,43 @@
 class neutrino;
 
 class nWavelet : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
 
 public:	
-    nWavelet(neutrino *);
-	
-	Ui::nWavelet my_w;
+    Q_INVOKABLE nWavelet(neutrino *);
 
-	QPointer<nRect> region;
-	
-	QPointer<nLine> linebarrier;
-	
-	std::map<std::string, nPhysD *> waveletPhys;
-	nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
+    Ui::nWavelet my_w;
+
+    QPointer<nRect> region;
+
+    QPointer<nLine> linebarrier;
+
+    std::map<std::string, nPhysD *> waveletPhys;
+    nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
 private:
-	wavelet_params my_params;
+    wavelet_params my_params;
 
 public slots:
-		
-	void useBarrierToggled(bool);
-	void guessCarrier();
 
-	void doWavelet();
-	void doUnwrap();
-	void doRemove();
-	void doRemoveCarrier();
-	void doRemoveReference();
-	
-	void bufferChanged(nPhysD*);
+    void useBarrierToggled(bool);
+    void guessCarrier();
+
+    void doWavelet();
+    void doUnwrap();
+    void doRemove();
+    void doRemoveCarrier();
+    void doRemoveReference();
+
+    void bufferChanged(nPhysD*);
     void physDel(nPhysD*);
-	void checkChangeCombo(QComboBox *);
-	
+    void checkChangeCombo(QComboBox *);
+
     void on_relative_toggled(bool);
 
-	void doAll();
+    void doAll();
 
-	
+
 };
 
 #endif

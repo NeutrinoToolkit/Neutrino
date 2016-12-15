@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -38,25 +38,25 @@
 class neutrino;
 
 class nInterferometry : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
 
 public:	
-    nInterferometry(neutrino *);
-	
-	Ui::nInterferometry my_w;
+    Q_INVOKABLE nInterferometry(neutrino *);
+
+    Ui::nInterferometry my_w;
     std::vector<Ui::nInterferometry1> my_image;
 
     QPointer<nRect> region;
-	QPointer<nLine> unwrapBarrier;
+    QPointer<nLine> unwrapBarrier;
     QPointer<nLine> maskRegion;
-	
+
     std::map<std::string, nPhysD *> localPhys;
 
     void loadSettings(QSettings *);
     void saveSettings(QSettings *);
 
 private:
-	wavelet_params my_params;
+    wavelet_params my_params;
 
     std::map<QToolButton*, nLine *> my_shapes;
 
@@ -66,22 +66,22 @@ public slots:
     void on_actionDelete_triggered();
 
     void physDel(nPhysD*);
-	void useBarrierToggled(bool);
-	void maskRegionToggled(bool);
-	void interpolateToggled(bool);
+    void useBarrierToggled(bool);
+    void maskRegionToggled(bool);
+    void interpolateToggled(bool);
     
-	void guessCarrier();
+    void guessCarrier();
 
-	void doWavelet();
-	void doWavelet(int);
-	void doUnwrap();
-	void doUnwrap(int);
-	void doSubtract();
-	void doMaskCutoff();
-	void getPosZero(bool);
-	void setPosZero(QPointF);
+    void doWavelet();
+    void doWavelet(int);
+    void doUnwrap();
+    void doUnwrap(int);
+    void doSubtract();
+    void doMaskCutoff();
+    void getPosZero(bool);
+    void setPosZero(QPointF);
 
-	void line_key_pressed(int);
+    void line_key_pressed(int);
     
     void addShape();
     void addShape(QString);
@@ -90,8 +90,8 @@ public slots:
 
     void doPlasma();
     
-	void bufferChanged(nPhysD*);
-	void checkChangeCombo(QComboBox *);
+    void bufferChanged(nPhysD*);
+    void checkChangeCombo(QComboBox *);
 
 };
 

@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -37,37 +37,37 @@
 class neutrino;
 
 class nWinList : public nGenericPan {
-Q_OBJECT
-	
+    Q_OBJECT
+
 public:
-    nWinList(neutrino*);
+    Q_INVOKABLE nWinList(neutrino*);
 
-	Ui::nWinList my_w;
+    Ui::nWinList my_w;
 
 
-	// stuff for static scale/origin
-	// (should pass to nPhysProperties once this has been merged to nWinList)
-	bool freezedFrame;
-	vec2f frScale, frOrigin;
+    // stuff for static scale/origin
+    // (should pass to nPhysProperties once this has been merged to nWinList)
+    bool freezedFrame;
+    vec2f frScale, frOrigin;
 
 
 public slots:
     void selectionChanged();
 
-	void updatePad(nPhysD* = NULL);
-	void physAdd(nPhysD*);
-	void physDel(nPhysD*);
-	void buttonRemovePhys();
-	void buttonCopyPhys();
-	
-	nPhysD*	getPhys(QTreeWidgetItem*);
-	void changeProperties();
-	void panAdd(nGenericPan*);
-	void panDel(nGenericPan*);
-	void panClicked(QListWidgetItem*);
+    void updatePad(nPhysD* = NULL);
+    void physAdd(nPhysD*);
+    void physDel(nPhysD*);
+    void buttonRemovePhys();
+    void buttonCopyPhys();
 
-	void setFreezed(bool);
-	void originChanged();
+    nPhysD*	getPhys(QTreeWidgetItem*);
+    void changeProperties();
+    void panAdd(nGenericPan*);
+    void panDel(nGenericPan*);
+    void panClicked(QListWidgetItem*);
+
+    void setFreezed(bool);
+    void originChanged();
 
     void keyPressEvent(QKeyEvent *);
 
