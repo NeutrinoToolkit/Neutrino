@@ -30,6 +30,16 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	message (STATUS "using gsl: ${GSL}")
 	set(LIBS ${LIBS} ${GSL}) 
 	add_definitions(-DHAVE_LIBGSL)
+
+	FIND_PATH(GSL_INCLUDE_DIR gsl/gsl.h
+  		/usr/local/include
+  		/usr/include
+  	)
+    IF (GSL_INCLUDE_DIR)
+      message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}")
+      include_directories(${GSL_INCLUDE_DIR})
+    ENDIF (GSL_INCLUDE_DIR)
+	
 endif()
 
 # gslcblas
@@ -77,10 +87,10 @@ if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
   		/usr/local/include/netpbm
   		/usr/include
   	)
-  IF (NETPBM_INCLUDE_DIR)
-	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
-	include_directories(${NETPBM_INCLUDE_DIR})
-  ENDIF (NETPBM_INCLUDE_DIR)
+    IF (NETPBM_INCLUDE_DIR)
+      message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
+      include_directories(${NETPBM_INCLUDE_DIR})
+    ENDIF (NETPBM_INCLUDE_DIR)
 
 endif()
 
