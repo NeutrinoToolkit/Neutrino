@@ -13,7 +13,7 @@ before_install:
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
     export MACOSX_DEPLOYMENT_TARGET=10.10
-    export CMAKE_FLAGS='VERBOSE=1 -DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=${Qt5_DIR}'
+    export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=${Qt5_DIR}'
     export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
@@ -49,7 +49,7 @@ before_install:
 script:
 - mkdir -p build_dir && cd build_dir
 - cmake ${CMAKE_FLAGS} ..
-- make
+- make VERBOSE=1
 - cd ..
 
 install:
