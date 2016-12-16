@@ -64,6 +64,8 @@ if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
 	FIND_PATH(HDF4_INCLUDE_DIR hdf.h
   		/usr/local/include/
   		/usr/include
+  		/usr/local/include/hdf
+  		/usr/include/hdf
   	)
     IF (HDF4_INCLUDE_DIR)
       message (STATUS "hdf4 header dir: ${HDF4_INCLUDE_DIR}")
