@@ -43,8 +43,8 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
   		/usr/include
   	)
     IF (GSL_INCLUDE_DIR)
-      message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}/..")
-      include_directories("${GSL_INCLUDE_DIR}/..")
+      message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}")
+      include_directories("${GSL_INCLUDE_DIR}")
     ENDIF (GSL_INCLUDE_DIR)
 	
 endif()
@@ -59,6 +59,7 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 else()
 	message(FATAL_ERROR "Missing libgsl. Stop.")
 endif()
+
 # hdf4
 find_library (HDF4 NAMES mfhdf)
 if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
@@ -67,8 +68,6 @@ if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
 	include_directories(BEFORE "/usr/include/hdf")
 	add_definitions(-DHAVE_LIBMFHDF)
 endif()
-
-
 find_library (DF NAMES df)
 if (NOT ${DF} STREQUAL "DF-NOTFOUND")
 	message (STATUS "using df: ${DF}")

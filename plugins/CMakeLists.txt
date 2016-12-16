@@ -18,7 +18,13 @@ list(LENGTH plugins_list plugins_list_len)
 
 message(STATUS "Found ${plugins_list_len} plugins")
 
-set (LIBRARY_OUTPUT_PATH "../../bin/plugins")
+if (NOT DEFINED LIBRARY_OUTPUT_PATH)
+    if (APPLE)
+        set (LIBRARY_OUTPUT_PATH "../../Neutrino.app/Contents/Resources/plugins")
+    else()
+        set (LIBRARY_OUTPUT_PATH "../../bin/plugins")
+    endif(APPLE)
+endif()
 
 foreach (plugin_name ${plugins_list})
 	if (EXISTS "${plugin_name}/CMakeLists.txt")
