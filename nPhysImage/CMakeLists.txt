@@ -31,7 +31,7 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	set(LIBS ${LIBS} ${GSL}) 
 	add_definitions(-DHAVE_LIBGSL)
 
-	FIND_PATH(GSL_INCLUDE_DIR gsl/gsl.h
+	FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_math.h
   		/usr/local/include
   		/usr/include
   	)
