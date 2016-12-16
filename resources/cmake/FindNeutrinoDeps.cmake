@@ -32,13 +32,23 @@ if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
 	add_definitions(-DHAVE_LIBFFTW)
 endif()
 
-# gsl
 find_library(GSL NAMES gsl)
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	message (STATUS "using gsl: ${GSL}")
 	set(LIBS ${LIBS} ${GSL}) 
 	add_definitions(-DHAVE_LIBGSL)
+
+	FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_math.h
+  		/usr/local/include/
+  		/usr/include
+  	)
+    IF (GSL_INCLUDE_DIR)
+      message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}/..")
+      include_directories("${GSL_INCLUDE_DIR}/..")
+    ENDIF (GSL_INCLUDE_DIR)
+	
 endif()
+
 
 # gslcblas
 find_library(GSLCBLAS NAMES gslcblas)

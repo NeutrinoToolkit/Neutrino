@@ -4,9 +4,9 @@ matrix:
   include:
     - os: osx
       osx_image: xcode6.4
-#    - os: linux
-#      dist: trusty
-#      sudo: required
+    - os: linux
+      dist: trusty
+      sudo: required
 
 before_install:
 - |
