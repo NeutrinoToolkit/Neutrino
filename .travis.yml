@@ -18,7 +18,7 @@ before_install:
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
     ln -sf /usr/lib/libnetpbm.11.75.dylib /usr/lib/libnetpbm.dylib
-    rm /usr/lib/libnetpbm.a    
+    rm /usr/local/lib/libnetpbm.a    
     brew install fftw --with-openmp
   fi
 - |
