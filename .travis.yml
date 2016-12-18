@@ -17,7 +17,7 @@ before_install:
     export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm
-    ln -sf /usr/lib/libnetpbm.11.75.dylib /usr/lib/libnetpbm.dylib
+    ln -sf /usr/local/lib/libnetpbm.11.75.dylib /usr/local/lib/libnetpbm.dylib
     rm /usr/local/lib/libnetpbm.a    
     brew install fftw --with-openmp
   fi
