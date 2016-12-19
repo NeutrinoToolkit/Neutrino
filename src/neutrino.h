@@ -227,7 +227,6 @@ public slots:
 	nGenericPan* openHDF5();
 #endif
 	nGenericPan* BoxLineout();
-	nGenericPan* FindPeaks();
 	nGenericPan* CompareLines();
 
 	void createDrawLine();

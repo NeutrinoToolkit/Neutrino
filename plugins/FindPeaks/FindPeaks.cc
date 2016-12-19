@@ -22,11 +22,11 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nFindPeaks.h"
+#include "FindPeaks.h"
 
 #include <gsl/gsl_fit.h>
 
-nFindPeaks::nFindPeaks(neutrino *nparent) : nGenericPan(nparent)
+FindPeaks::FindPeaks(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 
@@ -50,11 +50,18 @@ nFindPeaks::nFindPeaks(neutrino *nparent) : nGenericPan(nparent)
 	my_w.toolBar->addWidget(my_w.direction);
 	my_w.toolBar->addWidget(my_w.param);
 
+    show();
+
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::blue));
     my_w.plot->graph(0)->setName("FindPeaks");
 
-    show();
+    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+    QPen pen;
+    pen.setColor(Qt::green);
+    my_w.plot->graph(1)->setPen(pen);
+    my_w.plot->graph(1)->setName("Blurred");
+
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
  	connect(my_w.direction, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
@@ -63,7 +70,7 @@ nFindPeaks::nFindPeaks(neutrino *nparent) : nGenericPan(nparent)
 }
 
 
-void nFindPeaks::setOrigin() {
+void FindPeaks::setOrigin() {
 	if (currentBuffer) {
 		bool ok=true;
 		double originOffset=0.0;
@@ -82,7 +89,7 @@ void nFindPeaks::setOrigin() {
 	}
 }
 
-void nFindPeaks::setScale() {
+void FindPeaks::setScale() {
 	if (currentBuffer) {
 		bool ok=true;
 		double scaleMult=1.0;
@@ -101,7 +108,7 @@ void nFindPeaks::setScale() {
 	}
 }
 
-void nFindPeaks::mouseAtMatrix(QPointF p) {
+void FindPeaks::mouseAtMatrix(QPointF p) {
 	if (currentBuffer) {
         if (my_w.direction->currentIndex()==0) {
             my_w.plot->setMousePosition(p.x());
@@ -111,7 +118,7 @@ void nFindPeaks::mouseAtMatrix(QPointF p) {
     }
 }
 
-void nFindPeaks::updatePlot() {
+void FindPeaks::updatePlot() {
 	if (currentBuffer && isVisible()) {
         saveDefaults();
         QRect geom2=box->getRect(currentBuffer);
@@ -143,7 +150,7 @@ void nFindPeaks::updatePlot() {
         for (int j=0;j<dy;j++) ydata[j]=j+geom2.y();
 
 
-        std::vector<double> myData;
+        QVector<double> myData;
 
         if (my_w.direction->currentIndex()==0) {
             my_w.plot->graph(0)->setData(xdata,xd);
@@ -161,31 +168,16 @@ void nFindPeaks::updatePlot() {
         fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
         fftw_complex *myDataC2=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
         fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
-        fftw_plan planC2R=fftw_plan_dft_c2r_1d(sizeCut, myDataC, &myData[0], FFTW_ESTIMATE);
         fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC2, &myData[0], FFTW_ESTIMATE);
 		
         fftw_execute(planR2C);
-		
+
         for (int i=0;i<sizeCut/2+1;i++) {
             myDataC2[i][0]=myDataC[i][0];
             myDataC2[i][1]=myDataC[i][1];
-            double aR=myDataC[i][0];
-            double aI=myDataC[i][1];
-            myDataC[i][0]=aR*aR+aI*aI;
-            myDataC[i][1]=0.0;
-        }
-		
-        fftw_execute(planC2R);
-		
-        double cutoff=1.0;
-        for (int i=1;i<sizeCut/2;i++) {
-            if (myData[i+1]>myData[i] && myData[i-1]>myData[i]){
-                cutoff=M_PI*i/2.0;
-                break;
-            }
         }
 
-        double sx=my_w.param->value()*pow(sizeCut/cutoff,2);
+        double sx=my_w.param->value()*sqrt(sizeCut);
 		
         for (int i=0;i<sizeCut/2+1;i++) {
             double blur=exp(-i*i/sx);
@@ -195,23 +187,28 @@ void nFindPeaks::updatePlot() {
         fftw_execute(planC2R2);
 		
         for (int i=0; i< my_w.plot->itemCount(); i++) {
-            QCPItemEllipse *elli = qobject_cast<QCPItemEllipse *>(my_w.plot->item(i));
-            if (elli) my_w.plot->removeItem(elli);
+            QCPItemStraightLine *marker = qobject_cast<QCPItemStraightLine *>(my_w.plot->item(i));
+            if (marker && marker->property(panName().toLatin1()).isValid()) my_w.plot->removeItem(marker);
         }
-
 
         std::vector<double> fitx;
         std::vector<double> fity;
+
+        if (my_w.direction->currentIndex()==0) {
+            my_w.plot->graph(1)->setData(xdata,myData);
+        } else {
+            my_w.plot->graph(1)->setData(ydata,myData);
+        }
 
         int k=0;
         for (int i=1;i<sizeCut-1;i++) {
             if (myData[i]>myData[i-1] && myData[i]>myData[i+1]){
                 double posx=i+(my_w.direction->currentIndex()==0?geom2.x():geom2.y());
-                double posy=my_w.direction->currentIndex()==0?xd[i]:yd[i];
 
-                QCPItemEllipse *marker=new QCPItemEllipse(my_w.plot);
-                marker->topLeft->setCoords(posx-2, posy-2);
-                marker->bottomRight->setCoords(posx+2, posy+2);
+                QCPItemStraightLine *marker=new QCPItemStraightLine(my_w.plot);
+                marker->point1->setCoords(posx,0);
+                marker->point2->setCoords(posx,1);
+                marker->setProperty(panName().toLatin1(),true);
 
                 marker->setPen(QPen(Qt::red));
 
@@ -224,13 +221,12 @@ void nFindPeaks::updatePlot() {
         if (fitx.size()>2) {
             double c0, c1, cov00, cov01, cov11, sumsq;
             gsl_fit_linear (&fitx[0], 1, &fity[0], 1, fitx.size(), &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
-            my_w.statusBar->showMessage(QString::number(cutoff)+" c00:"+QString::number(cov00)+" c01:"+QString::number(cov01)+" c11:"+QString::number(cov11)+" sq:"+QString::number(sqrt(sumsq)/fitx.size()));
+            my_w.statusBar->showMessage(" c00:"+QString::number(cov00)+" c01:"+QString::number(cov01)+" c11:"+QString::number(cov11)+" sq:"+QString::number(sqrt(sumsq)/fitx.size()));
             my_w.origin->setText(QString::number(c0));
             my_w.scale->setText(QString::number(c1));
         }
 		
         fftw_destroy_plan(planR2C);
-        fftw_destroy_plan(planC2R);
         fftw_destroy_plan(planC2R2);
         fftw_free(myDataC);
         fftw_free(myDataC2);

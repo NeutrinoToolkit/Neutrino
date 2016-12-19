@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nFindPeaks</class>
- <widget class="QMainWindow" name="nFindPeaks">
+ <class>FindPeaks</class>
+ <widget class="QMainWindow" name="FindPeaks">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -200,9 +200,6 @@
          </property>
          <property name="maximum">
           <double>1000.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
          </property>
          <property name="value">
           <double>1.000000000000000</double>

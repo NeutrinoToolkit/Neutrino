@@ -46,7 +46,6 @@
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
 #include "nBoxLineout.h"
-#include "nFindPeaks.h"
 #include "nCompareLines.h"
 #include "nWavelet.h"
 #include "nInterferometry.h"
@@ -245,7 +244,6 @@ neutrino::neutrino():
     connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
     connect(my_w->actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
     connect(my_w->actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
-    connect(my_w->actionFind_Peaks, SIGNAL(triggered()), this, SLOT(FindPeaks()));
     connect(my_w->actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
     connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
@@ -1925,12 +1923,6 @@ neutrino::openHDF5() {
 nGenericPan*
 neutrino::BoxLineout() {
     return new nBoxLineout(this);
-}
-
-/// Find peaks
-nGenericPan*
-neutrino::FindPeaks() {
-    return new nFindPeaks(this);
 }
 
 /// compare lines between images

@@ -25,22 +25,22 @@
 #include <QtGui>
 #include <QWidget>
 
-#ifndef __nFindPeaks
-#define __nFindPeaks
+#ifndef __FindPeaks
+#define __FindPeaks
 
 #include "nGenericPan.h"
-#include "ui_nFindPeaks.h"
+#include "ui_FindPeaks.h"
 #include "neutrino.h"
 
 class nRect;
 
-class nFindPeaks : public nGenericPan {
+class FindPeaks : public nGenericPan {
     Q_OBJECT
 
 public:
 
-    Q_INVOKABLE nFindPeaks(neutrino *);
-    Ui::nFindPeaks my_w;
+    Q_INVOKABLE FindPeaks(neutrino *);
+    Ui::FindPeaks my_w;
 
 public slots:
 
@@ -53,5 +53,8 @@ public slots:
 private:
     QPointer<nRect> box;
 };
+
+NEUTRINO_PLUGIN(FindPeaks,Analysis)
+
 
 #endif
