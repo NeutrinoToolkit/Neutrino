@@ -49,6 +49,10 @@ public slots:
 
     void setOrigin();
     void setScale();
+    void on_actionClipboard_triggered();
+    void on_actionTxt_triggered();
+
+    QString getPoints();
 
 private:
     QPointer<nRect> box;

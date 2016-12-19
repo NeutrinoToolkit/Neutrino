@@ -169,7 +169,7 @@ void nMouseInfo::updateLabels() {
 }
 
 QString 
-nMouseInfo::getPointText(){
+nMouseInfo::getPointText() {
 	QString retText;
 	for (int i=0; i<my_w.points->rowCount(); i++) {
 		for (int j=0; j<my_w.points->columnCount();j++) {
