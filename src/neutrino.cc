@@ -658,7 +658,7 @@ neutrino::fileReopen() {
 void neutrino::fileOpen()
 {
     QString formats("");
-    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
     formats+="Images (";
     foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
         formats+="*."+format+" ";
@@ -675,7 +675,7 @@ void neutrino::fileOpen(QStringList fnames) {
     setProperty("NeuSave-fileOpen", fnames);
     foreach (QString fname, fnames) {
         QList<nPhysD *> imagelist = fileOpen(fname);
-        if (imagelist.size()==0 && QFileInfo(fname).suffix().toLower()!="h5"){
+        if (imagelist.size()==0){
             QString vwinname="OpenRaw";
             nOpenRAW *openRAW=(nOpenRAW *)existsPan(vwinname);
             if (!openRAW) {
