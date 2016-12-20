@@ -41,7 +41,6 @@
 #include <QMap>
 
 #include "nGenericPan.h"
-#include "nPlug.h"
 #include "nView.h"
 
 // physImage
@@ -84,9 +83,7 @@ public:
     Ui::nSbarra *my_sbarra;
     Ui::nAbout *my_about;
 
-    //nPlug *plug_iface;
-	
-	static const int MaxRecentFiles=20;
+    static const int MaxRecentFiles=20;
 
 	QList <QAction *> recentFileActs;
 	void updateRecentFileActions(QString=QString());

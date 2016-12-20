@@ -1,4 +1,5 @@
 #libhdf5_hl
+
 find_package(HDF5 COMPONENTS CXX)
 if (HDF5_FOUND)
   # IF HDF5 is there, THEN look for hl...
@@ -11,12 +12,12 @@ if (HDF5_FOUND)
 
           #hdf5 libs
           include_directories(${HDF5_INCLUDE_DIRS})
-          set(${PROJECT_NAME}_LIBS ${${PROJECT_NAME}_LIBS} ${HDF5_LIBRARIES})
+          set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5_LIBRARIES})
           add_definitions(-DHAVE_HDF5)
 
           # hdf5_hl
           message (STATUS "using libhdf5_hl: ${HDF5HL}")
-          set(${PROJECT_NAME}_LIBS ${${PROJECT_NAME}_LIBS} ${HDF5HL})
+          set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5HL})
           add_definitions(-DHAVE_LIBHDF5HL)
 
           set (HDF5_FOUND_COMPLETE "TRUE")
@@ -86,7 +87,7 @@ if (HDF5_FOUND_COMPLETE)
          set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
     ENDIF()
 
-    target_link_libraries(${PROJECT_NAME} ${${PROJECT_NAME}_LIBS})
+    target_link_libraries(${PROJECT_NAME} ${LOCAL_LIBS})
 
 
     if (USE_QT5)
@@ -95,7 +96,4 @@ if (HDF5_FOUND_COMPLETE)
         target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
     endif()
 
-
-
-    message(STATUS ${QT_LIBRARIES})
 endif()

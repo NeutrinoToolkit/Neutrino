@@ -11,7 +11,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 	  QObject *p_obj = instance();
 
-      qDebug() << "here";
+      qDebug() <<errorString();
 
       if (p_obj) {
           iface = qobject_cast<nPlug *>(p_obj);
@@ -104,7 +104,8 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 dlg.exec();
             }
       } else {
-          QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a plugin"));
+          QMessageBox dlg(QMessageBox::Warning, tr("Plugin error"),tr("Error loading plugin ")+QFileInfo(fileName()).fileName());
+          dlg.setDetailedText(errorString());
           dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
           dlg.exec();
       }
@@ -112,13 +113,15 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 void
 nPluginLoader::launch() {
-    qDebug() << "here";
     qDebug() << iface->name();
 
     if (iface && nParent) {
-        qDebug() << "here";
-        iface->instantiate(nParent);
-        qDebug() << "here";
+        bool retval = iface->instantiate(nParent);
+        if (!retval) {
+            QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),iface->name()+tr(" cannot be instantiated"));
+            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+            dlg.exec();
+        }
     }
-    qDebug() << "here";
+    qDebug() << "end";
 }

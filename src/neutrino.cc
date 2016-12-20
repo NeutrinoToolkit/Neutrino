@@ -40,7 +40,6 @@
 
 #include "nColorBarWin.h"
 
-
 #include "nMouseInfo.h"
 #include "nZoomWin.h"
 #include "nPluginLoader.h"

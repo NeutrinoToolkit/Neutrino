@@ -26,12 +26,6 @@
 #include "nPanPlug.h"
 #include "nGenericPan.h"
 
-bool nPanPlug::unload() {
-    if (my_pan) my_pan->deleteLater();
-    QApplication::processEvents();
-    return true;
-}
-
 bool nPanPlug::instantiate(neutrino *neu) {
     const QByteArray className(name()+"*");
     const int type = QMetaType::type( className );
@@ -47,3 +41,14 @@ bool nPanPlug::instantiate(neutrino *neu) {
     }
     return false;
 }
+
+bool nPanPlug::unload() {
+    if (my_pan) {
+        my_pan->deleteLater();
+        QApplication::processEvents();
+        return true;
+    } else {
+        return false;
+    }
+}
+

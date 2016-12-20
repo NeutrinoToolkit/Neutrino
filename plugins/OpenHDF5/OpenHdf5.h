@@ -26,22 +26,22 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_HDF5.h"
+#include "ui_OpenHdf5.h"
 
-#ifndef __HDF5
-#define __HDF5
+#ifndef __OpenHdf5
+#define __OpenHdf5
 
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
-class neutrino;
+#include "neutrino.h"
 
-class HDF5 : public nGenericPan {
+class OpenHdf5 : public nGenericPan {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE HDF5(neutrino *);
-    Ui::HDF5 my_w;
+    Q_INVOKABLE OpenHdf5(neutrino *);
+    Ui::OpenHdf5 my_w;
 
 public slots:
     QString getFilename(QTreeWidgetItem*);
@@ -55,13 +55,21 @@ public slots:
     void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = NULL);
     void scanDataset(hid_t, QTreeWidgetItem *);
 
-    int phys_write_HDF5(nPhysD *phys, std::string fname);
-    nPhysD* phys_open_HDF5(std::string fileName, std::string dataName);
-    void scan_hdf5_attributes(hid_t aid, nPhysD *my_data);
+    int phys_write_Hdf5(nPhysD *phys, std::string fname);
+    nPhysD* phys_open_Hdf5(std::string fileName, std::string dataName);
+    void scan_attributes(hid_t aid, nPhysD *my_data);
 
     void copyPath();
 };
 
-NEUTRINO_PLUGIN(HDF5,Analysis)
+class OpenHdf5Plug : public QObject, nPanPlug {
+    Q_OBJECT
+    Q_INTERFACES(nPanPlug)
+    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+public:
+    OpenHdf5Plug() {qRegisterMetaType<OpenHdf5 *>(name()+"*");}
+    QByteArray name() {return "OpenHdf5";}
+    QString menuEntryPoint() { return QString("Analysis"); }
+};
 
 #endif

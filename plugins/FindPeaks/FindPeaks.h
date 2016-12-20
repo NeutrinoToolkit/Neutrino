@@ -58,7 +58,15 @@ private:
     QPointer<nRect> box;
 };
 
-NEUTRINO_PLUGIN(FindPeaks,Analysis)
+class FindPeaksPlug : public QObject, nPanPlug {
+    Q_OBJECT
+    Q_INTERFACES(nPanPlug)
+    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+public:
+    FindPeaksPlug() {qRegisterMetaType<FindPeaks *>(name()+"*");}
+    QByteArray name() {return "FindPeaks";}
+    QString menuEntryPoint() { return QString("Analysis"); }
+};
 
 
 #endif

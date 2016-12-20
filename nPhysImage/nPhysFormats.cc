@@ -431,7 +431,7 @@ physShort_b16::physShort_b16(const char *ifilename)
 {
 	
 	char *ptr = new char[3], tempch;
-	char *readb;
+    char *readb=nullptr;
 	char revision;
 	
 	int header_size=0; // cambia con la revision del file

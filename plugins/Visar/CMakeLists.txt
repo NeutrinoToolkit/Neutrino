@@ -67,6 +67,3 @@ elseif(USE_QT4)
     target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 endif()
 
-
-
-message(STATUS ${QT_LIBRARIES})

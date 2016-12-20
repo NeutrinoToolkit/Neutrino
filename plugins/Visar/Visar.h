@@ -147,6 +147,14 @@ private:
     QPointer<nRect> sopRect;
 };
 
-NEUTRINO_PLUGIN(Visar,Analysis)
+class VisarPlug : public QObject, nPanPlug {
+    Q_OBJECT
+    Q_INTERFACES(nPanPlug)
+    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+public:
+    VisarPlug() {qRegisterMetaType<Visar *>(name()+"*");}
+    QByteArray name() {return "Visar";}
+    QString menuEntryPoint() { return QString("Analysis"); }
+};
 
 #endif

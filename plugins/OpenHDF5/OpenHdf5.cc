@@ -22,15 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "HDF5.h"
-#include "neutrino.h"
-#include "nPhysFormats.h"
+#include "OpenHdf5.h"
 #include <QtGui>
 
 
 #define HDF5_MAX_NAME 2048
 
-HDF5::HDF5(neutrino *nparent) : nGenericPan(nparent)
+OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);
@@ -47,7 +45,7 @@ HDF5::HDF5(neutrino *nparent) : nGenericPan(nparent)
 
 }
 
-void HDF5::copyPath(){
+void OpenHdf5::copyPath(){
     QString clipText;
     foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
         clipText+="fileOpen(\""+getFilename(item)+"\",\""+item->data(3,0).toString()+"\") ";
@@ -55,7 +53,7 @@ void HDF5::copyPath(){
     QApplication::clipboard()->setText(clipText);
 }
 
-void HDF5::removeFile(){
+void OpenHdf5::removeFile(){
     foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
         while (item->parent()) {
             item=item->parent();
@@ -64,23 +62,23 @@ void HDF5::removeFile(){
     }
 }
 
-void HDF5::itemEntered(QTreeWidgetItem *item, int) {
+void OpenHdf5::itemEntered(QTreeWidgetItem *item, int) {
     my_w.statusBar->showMessage(item->data(3,0).toString(),5000);
 }
 
-QString HDF5::getFilename(QTreeWidgetItem *item) {
+QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
     while (item->parent()) {
         item=item->parent();
     }
     return item->data(3,0).toString();
 }
 
-void HDF5::openData(QTreeWidgetItem *item, int) {
+void OpenHdf5::openData(QTreeWidgetItem *item, int) {
     QString dataName=item->data(3,0).toString();
-    nparent->showPhys(phys_open_HDF5(getFilename(item).toStdString(),dataName.toStdString()));
+    nparent->showPhys(phys_open_Hdf5(getFilename(item).toStdString(),dataName.toStdString()));
 }
 
-void HDF5::showFile(QString fname) {
+void OpenHdf5::showFile(QString fname) {
     my_w.statusBar->showMessage("Parsing "+fname);
     QApplication::processEvents();
     for (int i=0;i<my_w.treeWidget->topLevelItemCount();i++) {
@@ -111,7 +109,7 @@ void HDF5::showFile(QString fname) {
     }
 }
 
-void HDF5::showFile() {
+void OpenHdf5::showFile() {
     QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any files")+QString(" (*)"));
     foreach (QString fname, fnames) {
         showFile(fname);
@@ -119,7 +117,7 @@ void HDF5::showFile() {
     if (!fnames.isEmpty()) setProperty("NeuSave-fileHDF", fnames);
 }
 
-void HDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
+void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     for (int i = 0; i < H5Aget_num_attrs(did); i++) {
         hid_t aid =	H5Aopen_idx(did, (unsigned int)i );
         scanAttribute(aid, item2);
@@ -280,7 +278,7 @@ void HDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     H5Sclose(sid);
 }
 
-void HDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
+void OpenHdf5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
     std::vector<char> attrName(len);
     H5Aget_name(aid, len, &attrName[0] );
@@ -355,7 +353,7 @@ void HDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data
     H5Sclose(aspace);
 }
 
-void HDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
+void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
     ssize_t sizeName=1+H5Iget_name(gid, NULL,0);
     char *group_name=new char[sizeName];
     H5Iget_name(gid, group_name,sizeName);
@@ -412,7 +410,7 @@ void HDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 }
 
 
-nPhysD* HDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
+nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
     nPhysD *my_data=NULL;
     hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     if (fid >= 0) {
@@ -469,7 +467,7 @@ nPhysD* HDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
 
                 for (int i = 0; i < H5Aget_num_attrs(did); i++) {
                     hid_t aid =	H5Aopen_idx(did, (unsigned int)i );
-                    scan_hdf5_attributes(aid, my_data);
+                    scan_attributes(aid, my_data);
                     H5Aclose(aid);
                 }
 
@@ -518,7 +516,7 @@ nPhysD* HDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
 }
 
 
-int HDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
+int OpenHdf5::phys_write_Hdf5(nPhysImageF<double> *phys, std::string fname) {
     if (phys) {
         if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
             unsigned int	filter_info;
@@ -560,7 +558,7 @@ int HDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
     return -1;
 }
 
-void HDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
+void OpenHdf5::scan_attributes(hid_t aid, nPhysImageF<double> *my_data){
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
     char *attrName=new char[len];
     H5Aget_name(aid, len, attrName );
