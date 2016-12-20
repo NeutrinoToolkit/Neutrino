@@ -206,7 +206,6 @@
     <addaction name="actionRegionPath"/>
     <addaction name="actionInterpolate_Path"/>
     <addaction name="actionFind_Peaks"/>
-    <addaction name="actionOpen_HDF5"/>
     <addaction name="actionPolarigrams"/>
     <addaction name="actionThomson_P"/>
     <addaction name="separator"/>
@@ -670,11 +669,6 @@
     <string>Find Peaks</string>
    </property>
   </action>
-  <action name="actionOpen_HDF5">
-   <property name="text">
-    <string>HDF5 file open</string>
-   </property>
-  </action>
   <action name="actionSpectral_Analysis">
    <property name="text">
     <string>Spectral Analysis</string>
@@ -770,7 +764,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -810,7 +804,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -823,7 +817,7 @@
   </action>
   <action name="actionPython">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
    </property>
    <property name="text">
@@ -832,7 +826,7 @@
   </action>
   <action name="actionOperator">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
    </property>
    <property name="text">

@@ -26,22 +26,22 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nHDF5.h"
+#include "ui_HDF5.h"
 
-#ifndef __nHDF5
-#define __nHDF5
+#ifndef __HDF5
+#define __HDF5
 
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
 class neutrino;
 
-class nHDF5 : public nGenericPan {
+class HDF5 : public nGenericPan {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE nHDF5(neutrino *);
-    Ui::nHDF5 my_w;
+    Q_INVOKABLE HDF5(neutrino *);
+    Ui::HDF5 my_w;
 
 public slots:
     QString getFilename(QTreeWidgetItem*);
@@ -61,5 +61,7 @@ public slots:
 
     void copyPath();
 };
+
+NEUTRINO_PLUGIN(HDF5,Analysis)
 
 #endif

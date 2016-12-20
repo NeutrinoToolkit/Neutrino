@@ -22,14 +22,15 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nHDF5.h"
+#include "HDF5.h"
 #include "neutrino.h"
 #include "nPhysFormats.h"
+#include <QtGui>
 
 
 #define HDF5_MAX_NAME 2048
 
-nHDF5::nHDF5(neutrino *nparent) : nGenericPan(nparent)
+HDF5::HDF5(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);
@@ -46,7 +47,7 @@ nHDF5::nHDF5(neutrino *nparent) : nGenericPan(nparent)
 
 }
 
-void nHDF5::copyPath(){
+void HDF5::copyPath(){
     QString clipText;
     foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
         clipText+="fileOpen(\""+getFilename(item)+"\",\""+item->data(3,0).toString()+"\") ";
@@ -54,7 +55,7 @@ void nHDF5::copyPath(){
     QApplication::clipboard()->setText(clipText);
 }
 
-void nHDF5::removeFile(){
+void HDF5::removeFile(){
     foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
         while (item->parent()) {
             item=item->parent();
@@ -63,23 +64,23 @@ void nHDF5::removeFile(){
     }
 }
 
-void nHDF5::itemEntered(QTreeWidgetItem *item, int) {
+void HDF5::itemEntered(QTreeWidgetItem *item, int) {
     my_w.statusBar->showMessage(item->data(3,0).toString(),5000);
 }
 
-QString nHDF5::getFilename(QTreeWidgetItem *item) {
+QString HDF5::getFilename(QTreeWidgetItem *item) {
     while (item->parent()) {
         item=item->parent();
     }
     return item->data(3,0).toString();
 }
 
-void nHDF5::openData(QTreeWidgetItem *item, int) {
+void HDF5::openData(QTreeWidgetItem *item, int) {
     QString dataName=item->data(3,0).toString();
     nparent->showPhys(phys_open_HDF5(getFilename(item).toStdString(),dataName.toStdString()));
 }
 
-void nHDF5::showFile(QString fname) {
+void HDF5::showFile(QString fname) {
     my_w.statusBar->showMessage("Parsing "+fname);
     QApplication::processEvents();
     for (int i=0;i<my_w.treeWidget->topLevelItemCount();i++) {
@@ -110,7 +111,7 @@ void nHDF5::showFile(QString fname) {
     }
 }
 
-void nHDF5::showFile() {
+void HDF5::showFile() {
     QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any files")+QString(" (*)"));
     foreach (QString fname, fnames) {
         showFile(fname);
@@ -118,7 +119,7 @@ void nHDF5::showFile() {
     if (!fnames.isEmpty()) setProperty("NeuSave-fileHDF", fnames);
 }
 
-void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
+void HDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     for (int i = 0; i < H5Aget_num_attrs(did); i++) {
         hid_t aid =	H5Aopen_idx(did, (unsigned int)i );
         scanAttribute(aid, item2);
@@ -279,7 +280,7 @@ void nHDF5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     H5Sclose(sid);
 }
 
-void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
+void HDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
     std::vector<char> attrName(len);
     H5Aget_name(aid, len, &attrName[0] );
@@ -354,7 +355,7 @@ void nHDF5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_dat
     H5Sclose(aspace);
 }
 
-void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
+void HDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
     ssize_t sizeName=1+H5Iget_name(gid, NULL,0);
     char *group_name=new char[sizeName];
     H5Iget_name(gid, group_name,sizeName);
@@ -411,7 +412,7 @@ void nHDF5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 }
 
 
-nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
+nPhysD* HDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
     nPhysD *my_data=NULL;
     hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     if (fid >= 0) {
@@ -517,7 +518,7 @@ nPhysD* nHDF5::phys_open_HDF5(std::string fileName, std::string dataName) {
 }
 
 
-int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
+int HDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
     if (phys) {
         if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
             unsigned int	filter_info;
@@ -536,7 +537,7 @@ int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
                 hid_t dset = H5Dcreate (file_id, "/neutrino", H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT);
                 H5Dwrite (dset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, phys->Timg_buffer);
 
-                H5LTset_attribute_string(file_id,"/","version", __VER);
+                H5LTset_attribute_string(file_id,"/","version", qApp->applicationVersion().toStdString().c_str());
                 double data[2];
                 data[0]=phys->get_origin().x();
                 data[1]=phys->get_origin().y();
@@ -559,7 +560,7 @@ int nHDF5::phys_write_HDF5(nPhysImageF<double> *phys, std::string fname) {
     return -1;
 }
 
-void nHDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
+void HDF5::scan_hdf5_attributes(hid_t aid, nPhysImageF<double> *my_data){
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
     char *attrName=new char[len];
     H5Aget_name(aid, len, attrName );

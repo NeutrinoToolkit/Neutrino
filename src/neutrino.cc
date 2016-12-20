@@ -72,10 +72,6 @@
 
 #include "nMonitor.h"
 
-#ifdef HAVE_HDF5
-#include "nHDF5.h"
-#endif
-
 #ifdef HAVE_PYTHONQT
 #include <QUiLoader>
 #include "nPython.h"
@@ -178,9 +174,6 @@ neutrino::neutrino():
     connect(my_w->actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
     connect(my_w->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
     connect(my_w->actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
-#ifdef HAVE_HDF5
-    connect(my_w->actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
-#endif
     connect(my_w->actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
 
     connect(my_w->actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
@@ -714,52 +707,46 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         }
     }
     if (imagelist.size()==0) {
-        if (QFileInfo(fname).suffix().toLower()=="h5") {
-#ifdef HAVE_HDF5
-            static_cast<nHDF5*>(openHDF5())->showFile(fname);
-#endif
-        } else {
-            QImage image(fname);
-            if (!image.isNull()) {
-                if (image.isGrayscale()) {
-                    nPhysD *datamatrix = new nPhysD(fname.toStdString());
-                    datamatrix->resize(image.width(), image.height());
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
-                        }
+        QImage image(fname);
+        if (!image.isNull()) {
+            if (image.isGrayscale()) {
+                nPhysD *datamatrix = new nPhysD(fname.toStdString());
+                datamatrix->resize(image.width(), image.height());
+                for (int i=0;i<image.height();i++) {
+                    for (int j=0;j<image.width();j++) {
+                        datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
                     }
-                    imagelist.push_back(datamatrix);
-                } else {
-                    nPhysD *datamatrix[3];
-                    std::string name[3];
-                    name[0]="Red";
-                    name[1]="Green";
-                    name[2]="Blue";
-                    for (int k=0;k<3;k++) {
-                        datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setShortName(name[k]);
-                        datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setFromName(fname.toStdString());
-                        datamatrix[k]->resize(image.width(), image.height());
-                        imagelist.push_back(datamatrix[k]);
-                    }
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            QRgb px = image.pixel(j,i);
-                            datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-                            datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-                            datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
-                        }
-                    }
-
                 }
-                for (int k=0;k<imagelist.size();k++) {
-                    imagelist[k]->TscanBrightness();
-                    imagelist[k]->setType(PHYS_FILE);
+                imagelist.push_back(datamatrix);
+            } else {
+                nPhysD *datamatrix[3];
+                std::string name[3];
+                name[0]="Red";
+                name[1]="Green";
+                name[2]="Blue";
+                for (int k=0;k<3;k++) {
+                    datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
+                    datamatrix[k]->setShortName(name[k]);
+                    datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
+                    datamatrix[k]->setFromName(fname.toStdString());
+                    datamatrix[k]->resize(image.width(), image.height());
+                    imagelist.push_back(datamatrix[k]);
+                }
+                for (int i=0;i<image.height();i++) {
+                    for (int j=0;j<image.width();j++) {
+                        QRgb px = image.pixel(j,i);
+                        datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
+                        datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
+                        datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
+                    }
                 }
 
             }
+            for (int k=0;k<imagelist.size();k++) {
+                imagelist[k]->TscanBrightness();
+                imagelist[k]->setType(PHYS_FILE);
+            }
+
         }
     }
 
@@ -1909,15 +1896,6 @@ void neutrino::print()
         my_mouse.setVisible(true);
     }
 }
-
-/// HDF5 treeview
-#ifdef HAVE_HDF5
-nGenericPan*
-neutrino::openHDF5() {
-    return new nHDF5(this);
-}
-#endif
-
 
 /// rectangle lineout
 nGenericPan*

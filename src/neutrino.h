@@ -223,9 +223,6 @@ public slots:
 	nGenericPan* Hlineout();
 	nGenericPan* Vlineout();
 	nGenericPan* bothLineout();
-#ifdef HAVE_HDF5
-	nGenericPan* openHDF5();
-#endif
 	nGenericPan* BoxLineout();
 	nGenericPan* CompareLines();
 
