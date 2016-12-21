@@ -37,7 +37,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QTextBrowser" name="help">
+     <widget class="nHelpTextBrowser" name="help">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
@@ -83,6 +83,7 @@
    <addaction name="actionBack"/>
    <addaction name="actionHome"/>
    <addaction name="actionForward"/>
+   <addaction name="separator"/>
    <addaction name="actionPrint"/>
   </widget>
   <action name="actionHome">
@@ -128,6 +129,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nHelpTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>nGenericPan.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/icons/icons.qrc"/>
  </resources>

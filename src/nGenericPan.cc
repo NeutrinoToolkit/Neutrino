@@ -80,6 +80,18 @@ void nGenericPan::physAdd(nPhysD *buffer) {
     QApplication::processEvents();
 }
 
+void nHelpTextBrowser::print() {
+    qDebug() << "here";
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintDialog *dialog = new QPrintDialog(&printer,this);
+    dialog->setWindowTitle(tr("Send to printer"));
+    if (dialog->exec() == QDialog::Accepted) {
+        printer.setFullPage(true);
+        printer.setPageSize(QPrinter::A4);
+        document()->print(&printer);
+    }
+}
+
 void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
@@ -95,7 +107,6 @@ void nGenericPan::help() {
             }
         }
         if (!helpwin) {
-
             helpwin=new QMainWindow();
             my_help->setupUi(helpwin);
             helpwin->setWindowTitle(panName()+" help");
@@ -104,6 +115,8 @@ void nGenericPan::help() {
             connect(my_help->actionHome, SIGNAL(triggered()), my_help->help, SLOT(home()));
             connect(my_help->actionBack, SIGNAL(triggered()), my_help->help, SLOT(backward()));
             connect(my_help->actionForward, SIGNAL(triggered()), my_help->help, SLOT(forward()));
+
+            connect(my_help->actionPrint, SIGNAL(triggered()), my_help->help, SLOT(print()));
 
             helpwin->show();
         }

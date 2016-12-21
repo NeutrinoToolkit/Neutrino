@@ -30,6 +30,10 @@
 #include <QGraphicsScene>
 #include <QMainWindow>
 
+#include <QTextBrowser>
+#include <QPrinter>
+#include <QPrintDialog>
+
 #include <iostream>
 #include "nPhysImageF.h"
 #include "panThread.h"
@@ -46,6 +50,15 @@ class PanHelp;
 }
 
 typedef void (*ifunc)(void *, int &); 
+
+class nHelpTextBrowser : public QTextBrowser {
+    Q_OBJECT
+public:
+    nHelpTextBrowser(QWidget* parent) : QTextBrowser(parent) {}
+
+public slots:
+    void print();
+};
 
 class nGenericPan : public QMainWindow {
 	Q_OBJECT
