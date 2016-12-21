@@ -766,70 +766,58 @@ void Visar::doWave() {
 void Visar::doWave(int k) {
     disconnections();
     if (visar[k].enableVisar->isChecked()){
-        if (getPhysFromCombo(visar[k].refImage) && getPhysFromCombo(visar[k].shotImage )  &&
-                getPhysFromCombo(visar[k].refImage)->getW() == getPhysFromCombo(visar[k].shotImage)->getW() &&
-                getPhysFromCombo(visar[k].refImage)->getH() == getPhysFromCombo(visar[k].shotImage)->getH()) {
+        std::array<nPhysD*,2> imgs={{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)}};
+        if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
             
             int counter=0;
-            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 12, this);
+            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 16, this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             sweepChanged(setvisar[k].physScale);
-            progress.setValue(++counter);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            nPhysC physfftRef=getPhysFromCombo(visar[k].refImage)->ft2(PHYS_FORWARD);
-            progress.setValue(++counter);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            nPhysC physfftShot=getPhysFromCombo(visar[k].shotImage)->ft2(PHYS_FORWARD);
+
+            std::array<nPhysC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-            size_t dx=physfftRef.getW();
-            size_t dy=physfftRef.getH();
-            
-            
-            nPhysImageF<mcomplex> zz_morletRef("Ref"), zz_morletShot("Shot");
-            zz_morletRef.resize(dx,dy);
-            zz_morletShot.resize(dx,dy);
-            
-            std::vector<int> xx(dx), yy(dy);
-#pragma omp parallel for
-            for (size_t i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-#pragma omp parallel for
-            for (size_t i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
-            
+            vec2 dim(imgs[0]->getSize());
+
+            std::array<nPhysC,2> zz_morlet;
+            progress.setValue(++counter);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
             for (int m=0;m<2;m++) {
-                phase[k][m].resize(dx, dy);
-                contrast[k][m].resize(dx, dy);
-                intensity[k][m].resize(dx, dy);
+                phase[k][m].resize(dim.x(), dim.y());
+                contrast[k][m].resize(dim.x(), dim.y());
+                intensity[k][m]= *(imgs[m]);
+                progress.setValue(++counter);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+                phys_fast_gaussian_blur(intensity[k][m], visar[k].resolution->value());
+                progress.setValue(++counter);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+                zz_morlet[m].resize(dim.x(),dim.y());
+                progress.setValue(++counter);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
             
-            progress.setValue(++counter);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            std::vector<int> xx(dim.x()), yy(dim.y());
 #pragma omp parallel for
-            for (size_t kk=0; kk<dx*dy; kk++) {
-                intensity[k][0].set(kk,getPhysFromCombo(visar[k].refImage)->point(kk));
-                intensity[k][1].set(kk,getPhysFromCombo(visar[k].shotImage)->point(kk));
-            }
-            progress.setValue(++counter);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            for (size_t i=0;i<dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
+#pragma omp parallel for
+            for (size_t i=0;i<dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
 
-            phys_fast_gaussian_blur(intensity[k][0], visar[k].resolution->value());
-            phys_fast_gaussian_blur(intensity[k][1], visar[k].resolution->value());
-            
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double cr = cos((visar[k].angle->value()) * _phys_deg);
             double sr = sin((visar[k].angle->value()) * _phys_deg);
-            double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+            double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
             double damp_norm=M_PI;
             
-            double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+            double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
 #pragma omp parallel for collapse(2)
-            for (size_t x=0;x<dx;x++) {
-                for (size_t y=0;y<dy;y++) {
+            for (size_t x=0;x<dim.x();x++) {
+                for (size_t y=0;y<dim.y();y++) {
                     double xr = xx[x]*cr - yy[y]*sr; //rotate
                     double yr = xx[x]*sr + yy[y]*cr;
                     
@@ -838,32 +826,29 @@ void Visar::doWave(int k) {
                     
                     double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
                     
-                    zz_morletRef.Timg_matrix[y][x]=physfftRef.Timg_matrix[y][x]*gauss;
-                    zz_morletShot.Timg_matrix[y][x]=physfftShot.Timg_matrix[y][x]*gauss;
-                    
+                    for (unsigned int m=0;m<2;m++) {
+                        zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
+                    }
                 }
             }
             
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-            physfftRef = zz_morletRef.ft2(PHYS_BACKWARD);
-            progress.setValue(++counter);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            physfftShot = zz_morletShot.ft2(PHYS_BACKWARD);
-            
+            for (unsigned int m=0;m<2;m++) {
+                physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
+                progress.setValue(++counter);
+            }
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
+            for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for
-            for (size_t kk=0; kk<dx*dy; kk++) {
-                phase[k][0].Timg_buffer[kk] = -physfftRef.Timg_buffer[kk].arg()/(2*M_PI);
-                contrast[k][0].Timg_buffer[kk] = 2.0*physfftRef.Timg_buffer[kk].mod()/(dx*dy);
-                intensity[k][0].Timg_buffer[kk] -= contrast[k][0].point(kk)*cos(2*M_PI*phase[k][0].point(kk));
-                
-                phase[k][1].Timg_buffer[kk] = -physfftShot.Timg_buffer[kk].arg()/(2*M_PI);
-                contrast[k][1].Timg_buffer[kk] = 2.0*physfftShot.Timg_buffer[kk].mod()/(dx*dy);
-                intensity[k][1].Timg_buffer[kk] -= contrast[k][1].point(kk)*cos(2*M_PI*phase[k][1].point(kk));
+                for (size_t kk=0; kk<dim.x()*dim.y(); kk++) {
+                    phase[k][m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
+                    contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
+                    intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));
+                }
             }
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -876,6 +861,7 @@ void Visar::doWave(int k) {
             updatePlot();
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            qDebug() << "\n\n\n\n\n\n\n\n Visar counter: " << counter << "\n\n\n\n";
         } else {
             statusBar()->showMessage("size mismatch",5000);
         }
@@ -899,10 +885,11 @@ void Visar::getPhase(int k) {
     disconnections();
     if (visar[k].enableVisar->isChecked()) {
         visar[k].plotPhaseIntensity->clearGraphs();
-        QList<nPhysD*> imageList{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)};
-        if (!imageList.contains(nullptr)) {
+        std::array<nPhysD*,2> imgs={{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)}};
+
+        if (imgs[0] && imgs[1] && imgs[0]->getSize() == imgs[1]->getSize()) {
             for (int m=0;m<2;m++) {
-                QRect geom2=fringeRect[k]->getRect(imageList[m]);
+                QRect geom2=fringeRect[k]->getRect(imgs[m]);
                 time_phase[k].clear();
                 cPhase[m][k].clear();
                 cIntensity[m][k].clear();
@@ -1129,11 +1116,11 @@ QString Visar::export_one(int k) {
             out += QString("# Time       Velocity    Reflect.    Quality     Pixel       RefShift    ShotShift   RefInt      ShotInt     RefContr.           ShotContr.\n");
             for (int j=0;j<time_phase[k].size();j++) {
                 QVector<double> values {time_vel[k][j],velocity[k][j],
-                                        reflectivity[k][j],quality[k][j],
-                                        time_phase[k][j],
-                                        cPhase[0][k][j],cPhase[1][k][j],
-                                        cIntensity[0][k][j],cIntensity[1][k][j],
-                                        cContrast[0][k][j],cContrast[1][k][j]};
+                            reflectivity[k][j],quality[k][j],
+                            time_phase[k][j],
+                            cPhase[0][k][j],cPhase[1][k][j],
+                            cIntensity[0][k][j],cIntensity[1][k][j],
+                            cContrast[0][k][j],cContrast[1][k][j]};
                 foreach (double val, values) {
                     out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
                 }

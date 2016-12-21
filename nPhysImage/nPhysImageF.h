@@ -380,9 +380,11 @@ public:
 		nPhysImageF<U> lhs;
 //		lhs = new nPhysImageF<U>;
 		lhs.resize(width, height);
+#pragma omp parallel for
         for (size_t i=0; i<getSurf(); i++)
 			lhs.Timg_buffer[i] = U(Timg_buffer[i]);	
-		lhs.TscanBrightness();
+
+        lhs.TscanBrightness();
 		
 		//lhs->object_name = object_name;
 		//lhs->filename=filename;
