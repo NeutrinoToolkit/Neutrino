@@ -55,18 +55,18 @@ private:
 };
 
 // this is going to declare a plugin interface registered to neutrino
-// NEUTRINO_PLUGIN(test)
+NEUTRINO_PLUGIN(test)
 // same as above but will add th entry in the menu Analysis
 // NEUTRINO_PLUGIN(test,Analysis)
 
-class testPlug : public QObject, nPanPlug {
-    Q_OBJECT
-    Q_INTERFACES(nPanPlug)
-    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
-public:
-    testPlug() {qRegisterMetaType<test *>(name()+"*");}
-    QByteArray name() {return "test";}
-    QString menuEntryPoint() { return QString(""); }
-};
+//class testPlug : public QObject, nPanPlug {
+//    Q_OBJECT
+//    Q_INTERFACES(nPanPlug)
+//    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+//public:
+//    testPlug() {qRegisterMetaType<test *>(name()+"*");}
+//    QByteArray name() {return "test";}
+//    QString menuEntryPoint() { return QString(""); }
+//};
 
 #endif

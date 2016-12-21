@@ -62,14 +62,17 @@ public slots:
     void copyPath();
 };
 
-class OpenHdf5Plug : public QObject, nPanPlug {
-    Q_OBJECT
-    Q_INTERFACES(nPanPlug)
-    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
-public:
-    OpenHdf5Plug() {qRegisterMetaType<OpenHdf5 *>(name()+"*");}
-    QByteArray name() {return "OpenHdf5";}
-    QString menuEntryPoint() { return QString("Analysis"); }
-};
+NEUTRINO_PLUGIN(OpenHdf5,Analysis);
+
+//// ai posteri
+//class OpenHdf5Plug : public QObject, nPanPlug {
+//    Q_OBJECT
+//    Q_INTERFACES(nPanPlug)
+//    Q_PLUGIN_METADATA(IID "org.neutrino.plug")
+//public:
+//    OpenHdf5Plug() {qRegisterMetaType<OpenHdf5 *>(name()+"*");}
+//    QByteArray name() {return "OpenHdf5";}
+//    QString menuEntryPoint() { return QString("Analysis"); }
+//};
 
 #endif
