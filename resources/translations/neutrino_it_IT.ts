@@ -236,7 +236,7 @@
 <context>
     <name>NApplication</name>
     <message>
-        <location filename="../../src/nApp.cc" line="30"/>
+        <location filename="../../src/nApp.cc" line="29"/>
         <source>Exception</source>
         <translation>Errore</translation>
     </message>
@@ -254,21 +254,26 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/nPanHelp.ui" line="93"/>
+        <location filename="../../UIs/nPanHelp.ui" line="95"/>
         <source>Home</source>
         <translation>Inizio</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPanHelp.ui" line="102"/>
-        <location filename="../../UIs/nPanHelp.ui" line="105"/>
+        <location filename="../../UIs/nPanHelp.ui" line="104"/>
+        <location filename="../../UIs/nPanHelp.ui" line="107"/>
         <source>Back</source>
         <translation>Indietro</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPanHelp.ui" line="114"/>
-        <location filename="../../UIs/nPanHelp.ui" line="117"/>
+        <location filename="../../UIs/nPanHelp.ui" line="116"/>
+        <location filename="../../UIs/nPanHelp.ui" line="119"/>
         <source>Forward</source>
         <translation>Avanti</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nPanHelp.ui" line="128"/>
+        <source>Print</source>
+        <translation>Stampa</translation>
     </message>
 </context>
 <context>
@@ -464,9 +469,9 @@ p, li { white-space: pre-wrap; }
         <translation>Mostra regione</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nBoxLineout.cc" line="69"/>
+        <location filename="../../src/pans/nBoxLineout.cc" line="67"/>
         <source>Attention: the region is outside the image!</source>
-        <translation>Attenzione la regione è fuori dall&apos;immagine</translation>
+        <translation>Attenzione la regione è fuori dall&apos;immagine!</translation>
     </message>
 </context>
 <context>
@@ -619,12 +624,12 @@ p, li { white-space: pre-wrap; }
         <translation>Rimuovi tutte le immagini</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nCompareLines.cc" line="59"/>
+        <location filename="../../src/pans/nCompareLines.cc" line="57"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nCompareLines.cc" line="60"/>
+        <location filename="../../src/pans/nCompareLines.cc" line="58"/>
         <source>Value</source>
         <translation>Valore</translation>
     </message>
@@ -698,12 +703,12 @@ p, li { white-space: pre-wrap; }
         <translation>Setta l&apos;origine</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nContours.cc" line="121"/>
+        <location filename="../../src/pans/nContours.cc" line="120"/>
         <source>points</source>
         <translation>Punti</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nContours.cc" line="123"/>
+        <location filename="../../src/pans/nContours.cc" line="122"/>
         <source> cannot trace contour</source>
         <translation> non riesco a tracciare</translation>
     </message>
@@ -711,22 +716,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>nCustomDoublePlot</name>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="670"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="666"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="671"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="667"/>
         <source>X value</source>
         <translation>Valore X</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="674"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="670"/>
         <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="675"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="671"/>
         <source>Y value</source>
         <translation>Valore Y</translation>
     </message>
@@ -893,22 +898,22 @@ p, li { white-space: pre-wrap; }
         <translation>Salva disegno</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="513"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="511"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="513"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="511"/>
         <source>INI Files (*.ini *.conf);; Any files (*.*)</source>
         <translation>File INI (*.ini *.conf);; Tutti tipi (*.*)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="585"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="582"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nCustomPlots.cpp" line="585"/>
+        <location filename="../../src/graphics/nCustomPlots.cpp" line="582"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
@@ -974,48 +979,48 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>nEllipse</name>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="65"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="68"/>
         <source>ellipse</source>
         <translation>ellisse</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="150"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="143"/>
         <source>Click for the first point of the rectangle</source>
         <translation>Clicca per il primo punto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="156"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="149"/>
         <source>Point added, click for the second point</source>
         <translation>Punto aggiunto, clicca per il secondo</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="172"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="165"/>
         <source>Moving node </source>
         <translation>Nodo in movimento</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="176"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="169"/>
         <source>Moving object</source>
         <translation>Oggetto in movimento</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="565"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="558"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="565"/>
-        <location filename="../../src/graphics/nEllipse.cc" line="575"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="558"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="568"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="575"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="568"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nEllipse.cc" line="599"/>
+        <location filename="../../src/graphics/nEllipse.cc" line="592"/>
         <source>Error reading from file</source>
         <translation>Errore leggendo il file</translation>
     </message>
@@ -1031,120 +1036,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../../UIs/nFileInfo.ui" line="46"/>
         <source>Name</source>
         <translation>Nome</translation>
-    </message>
-</context>
-<context>
-    <name>nFindPeaks</name>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="14"/>
-        <source>MainWindow</source>
-        <translation>Finestra principale</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="76"/>
-        <source>Scale</source>
-        <translation>Scala</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="91"/>
-        <source>0</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="106"/>
-        <location filename="../../UIs/nFindPeaks.ui" line="157"/>
-        <source>Set</source>
-        <translation>Fissa</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="118"/>
-        <source>1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="142"/>
-        <source>Origin</source>
-        <translation>Origine</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="183"/>
-        <source>H</source>
-        <translation>H</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="188"/>
-        <source>V</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="225"/>
-        <source>toolBar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="262"/>
-        <source>loadPref</source>
-        <translation>Carica preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="265"/>
-        <source>Load Preferences</source>
-        <translation>Carica preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="274"/>
-        <source>savePref</source>
-        <translation>Salva preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="277"/>
-        <source>Save Preferences</source>
-        <translation>Salva preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="286"/>
-        <source>saveClipboard</source>
-        <translation>copiaClipboard</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="289"/>
-        <source>Copy to Clipboard</source>
-        <translation>Copia negli appunti</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="298"/>
-        <source>saveTxt</source>
-        <translation>salvaTxt</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="301"/>
-        <source>Export TXT</source>
-        <translation>Esporta testo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="310"/>
-        <source>savePDF</source>
-        <translation>salvaPDF</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="313"/>
-        <source>Export PDF or SVG</source>
-        <translation>Salva PDF o SVG</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="322"/>
-        <source>rect</source>
-        <translation>regione</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nFindPeaks.ui" line="325"/>
-        <source>Show Region</source>
-        <translation>Mostra regione</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nFindPeaks.cc" line="121"/>
-        <source>Attention: the region is outside the image!</source>
-        <translation>Attenzione la regione è fuori dall&apos;immagine!</translation>
     </message>
 </context>
 <context>
@@ -1233,39 +1124,34 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>nGenericPan</name>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="157"/>
+        <location filename="../../src/nGenericPan.cc" line="151"/>
         <source>Help</source>
         <translation>Aiuto</translation>
     </message>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="555"/>
+        <location filename="../../src/nGenericPan.cc" line="550"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="555"/>
+        <location filename="../../src/nGenericPan.cc" line="550"/>
         <source>INI Files (*.ini *.conf);; Any files (*.*)</source>
         <translation>File INI (*.ini *.conf);; Tutti tipi (*.*)</translation>
     </message>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="568"/>
+        <location filename="../../src/nGenericPan.cc" line="563"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="568"/>
+        <location filename="../../src/nGenericPan.cc" line="563"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
     <message>
-        <location filename="../../src/nGenericPan.cc" line="647"/>
+        <location filename="../../src/nGenericPan.cc" line="637"/>
         <source>Thread problems</source>
         <translation>Problemi con i thread</translation>
-    </message>
-    <message>
-        <location filename="../../src/nGenericPan.cc" line="647"/>
-        <source>Thread didn&apos;t work</source>
-        <translation>I Thread non hanno funzionato</translation>
     </message>
 </context>
 <context>
@@ -1328,7 +1214,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../UIs/nGhost.ui" line="264"/>
         <source>Show region</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra regione</translation>
     </message>
     <message>
         <location filename="../../UIs/nGhost.ui" line="273"/>
@@ -1361,73 +1247,17 @@ p, li { white-space: pre-wrap; }
         <translation>Trova innterfrangia media e orientamento</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nGhost.cc" line="60"/>
+        <location filename="../../src/pans/nGhost.cc" line="58"/>
         <source>ERROR: Problem finding the carrier</source>
         <translation>ERRORE: non riesco a trovare l&apos;nterfrangia media</translation>
     </message>
 </context>
 <context>
-    <name>nHDF5</name>
+    <name>nHelpTextBrowser</name>
     <message>
-        <location filename="../../UIs/nHDF5.ui" line="14"/>
-        <location filename="../../src/pans/nHDF5.cc" line="115"/>
-        <source>HDF5</source>
-        <translation>HDF5</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="60"/>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="65"/>
-        <source>Type</source>
-        <translation>Tipo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="70"/>
-        <source>Data</source>
-        <translation>Dati</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="75"/>
-        <source>Hidden</source>
-        <translation>Nascosto</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="99"/>
-        <source>toolBar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="130"/>
-        <source>Open</source>
-        <translation>Apri</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="139"/>
-        <source>Close</source>
-        <translation>Chiudi</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="148"/>
-        <source>Copy</source>
-        <translation>Copia</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nHDF5.ui" line="151"/>
-        <source>Copy path</source>
-        <translation>Copia percorso</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nHDF5.cc" line="115"/>
-        <source>Open HDF file source</source>
-        <translation>Apri file HDF5</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nHDF5.cc" line="115"/>
-        <source>Any files</source>
-        <translation>Tutti file</translation>
+        <location filename="../../src/nGenericPan.h" line="63"/>
+        <source>Print Help</source>
+        <translation>Stampa l&apos;aiuto</translation>
     </message>
 </context>
 <context>
@@ -1844,12 +1674,12 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="676"/>
         <source>Enable Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Attiva l&apos;interpolazione</translation>
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="971"/>
         <source>Show region</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra regione</translation>
     </message>
     <message>
         <location filename="../../UIs/nInterferometry.ui" line="713"/>
@@ -1964,12 +1794,12 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Itera di seguito</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nInterferometry.cc" line="231"/>
+        <location filename="../../src/pans/nInterferometry.cc" line="229"/>
         <source>ERROR: Problem finding the carrier</source>
         <translation>ERRORE: non riesco a trovare l&apos;nterfrangia media</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nInterferometry.cc" line="233"/>
+        <location filename="../../src/pans/nInterferometry.cc" line="231"/>
         <source>Carrier: </source>
         <translation>Portante: </translation>
     </message>
@@ -1996,7 +1826,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <location filename="../../UIs/nInterferometry1.ui" line="117"/>
         <location filename="../../UIs/nInterferometry1.ui" line="189"/>
         <source>˚</source>
-        <translation type="unfinished"></translation>
+        <translation>˚</translation>
     </message>
 </context>
 <context>
@@ -2064,7 +1894,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nInterpolatePath.ui" line="177"/>
         <source>Show line window</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra la finestra della linea</translation>
     </message>
 </context>
 <context>
@@ -2248,125 +2078,125 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>salvaPDF</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="47"/>
-        <location filename="../../src/graphics/nLine.cc" line="60"/>
+        <location filename="../../src/graphics/nLine.cc" line="69"/>
+        <location filename="../../src/graphics/nLine.cc" line="82"/>
         <source>line</source>
         <translation>Linea</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="147"/>
+        <location filename="../../src/graphics/nLine.cc" line="169"/>
         <source>Save data in text</source>
         <translation>Salva dati in testo</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="147"/>
+        <location filename="../../src/graphics/nLine.cc" line="169"/>
         <source>Text files (*.txt *.csv);;Any files (*)</source>
         <translation>File di testo (*.txt *.csv);; Tutti tipi (*)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="214"/>
+        <location filename="../../src/graphics/nLine.cc" line="220"/>
         <source>Click for first point, press Esc to finish</source>
         <translation>Clicca per il primo punto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="220"/>
+        <location filename="../../src/graphics/nLine.cc" line="226"/>
         <source>Point added, press ESC to finish</source>
         <translation>Punto aggiunto, ESC per terminare</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="237"/>
+        <location filename="../../src/graphics/nLine.cc" line="243"/>
         <source>Moving node </source>
         <translation>Nodo in movimento</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="240"/>
+        <location filename="../../src/graphics/nLine.cc" line="246"/>
         <source>Moving object</source>
         <translation>Oggetto in movimento</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="286"/>
+        <location filename="../../src/graphics/nLine.cc" line="292"/>
         <source>distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="360"/>
+        <location filename="../../src/graphics/nLine.cc" line="366"/>
         <source>Line is Bezier curve</source>
         <translation>Linea di Bezier</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="362"/>
+        <location filename="../../src/graphics/nLine.cc" line="368"/>
         <source>Line is a polygonal chain</source>
         <translation>Linea a segmenti</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="376"/>
+        <location filename="../../src/graphics/nLine.cc" line="382"/>
         <source>Line is closed</source>
         <translation>Linea chiusa</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="378"/>
+        <location filename="../../src/graphics/nLine.cc" line="384"/>
         <source>Line is open</source>
         <translation>linea aperta</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="392"/>
-        <location filename="../../src/graphics/nLine.cc" line="394"/>
+        <location filename="../../src/graphics/nLine.cc" line="398"/>
+        <location filename="../../src/graphics/nLine.cc" line="400"/>
         <source>Line is antialiased</source>
         <translation>linea in antialiasing</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="523"/>
+        <location filename="../../src/graphics/nLine.cc" line="529"/>
         <source>Added point:</source>
         <translation>Punto aggiunto:</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="576"/>
+        <location filename="../../src/graphics/nLine.cc" line="582"/>
         <source>Can&apos;t remove </source>
         <translation>Non posso rimuovere</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="603"/>
+        <location filename="../../src/graphics/nLine.cc" line="609"/>
         <source>Removed Rows:</source>
         <translation>Linee Rimosse:</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="626"/>
+        <location filename="../../src/graphics/nLine.cc" line="632"/>
         <source>Adding points ended</source>
         <translation>Fine aggiunta punti</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="825"/>
+        <location filename="../../src/graphics/nLine.cc" line="837"/>
         <source>Append to point </source>
         <translation>Aggiungi punto successivo</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="830"/>
+        <location filename="../../src/graphics/nLine.cc" line="842"/>
         <source>Prepend to point </source>
         <translation>Aggiungi punto precedente</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="835"/>
+        <location filename="../../src/graphics/nLine.cc" line="847"/>
         <source>Delete point </source>
         <translation>Rimuovi punto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="1062"/>
+        <location filename="../../src/graphics/nLine.cc" line="1074"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="1062"/>
-        <location filename="../../src/graphics/nLine.cc" line="1072"/>
+        <location filename="../../src/graphics/nLine.cc" line="1074"/>
+        <location filename="../../src/graphics/nLine.cc" line="1084"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="1072"/>
+        <location filename="../../src/graphics/nLine.cc" line="1084"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nLine.cc" line="1098"/>
+        <location filename="../../src/graphics/nLine.cc" line="1110"/>
         <source>Error reading from file</source>
         <translation>Errore leggendo il file</translation>
     </message>
@@ -2444,7 +2274,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Blocca la scal sugli estremi della barra di colori</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nLineout.cc" line="111"/>
+        <location filename="../../src/pans/nLineout.cc" line="115"/>
         <source>Point (</source>
         <translation>Punto (</translation>
     </message>
@@ -2507,32 +2337,32 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="75"/>
+        <location filename="../../src/pans/nMonitor.cc" line="74"/>
         <source>Kb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="75"/>
+        <location filename="../../src/pans/nMonitor.cc" line="74"/>
         <source>Mb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="75"/>
+        <location filename="../../src/pans/nMonitor.cc" line="74"/>
         <source>Gb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="75"/>
+        <location filename="../../src/pans/nMonitor.cc" line="74"/>
         <source>Tb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="78"/>
+        <location filename="../../src/pans/nMonitor.cc" line="77"/>
         <source>bytes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMonitor.cc" line="100"/>
+        <location filename="../../src/pans/nMonitor.cc" line="99"/>
         <source>Change monitor directory</source>
         <translation>Cambia cartella</translation>
     </message>
@@ -2540,42 +2370,42 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
 <context>
     <name>nMouseInfo</name>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="87"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="88"/>
         <source>Added point </source>
         <translation>Punto aggiunto </translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="185"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="186"/>
         <source>Point values copied</source>
         <translation>Valore del punto copiato</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="190"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="191"/>
         <source>Save data</source>
         <translation>Salva dati</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="190"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="191"/>
         <source>Text files (*.txt *.csv);;Any files (*)</source>
         <translation>File di testo (*.txt *.csv);; Tutti tipi (*)</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="198"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="199"/>
         <source>Export in file:</source>
         <translation>Esporta in file di testo:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="200"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="201"/>
         <source>Export canceled</source>
         <translation>Cancellato</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="214"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="215"/>
         <source>No row was selected</source>
         <translation>Nessuna rigaselezionata</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nMouseInfo.cc" line="216"/>
+        <location filename="../../src/pans/nMouseInfo.cc" line="217"/>
         <source>Removed Rows:</source>
         <translation>Righe cancellate:</translation>
     </message>
@@ -2730,7 +2560,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nOpenRAW.ui" line="159"/>
         <source>b</source>
-        <translation type="unfinished"></translation>
+        <translation>b</translation>
     </message>
     <message>
         <location filename="../../UIs/nOpenRAW.ui" line="180"/>
@@ -2768,22 +2598,22 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Salva preferenze</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOpenRAW.cc" line="42"/>
+        <location filename="../../src/pans/nOpenRAW.cc" line="41"/>
         <source>Open </source>
         <translation>Apri</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOpenRAW.cc" line="42"/>
+        <location filename="../../src/pans/nOpenRAW.cc" line="41"/>
         <source> image</source>
         <translation>Immagine</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOpenRAW.cc" line="42"/>
+        <location filename="../../src/pans/nOpenRAW.cc" line="41"/>
         <source>s</source>
         <translation> </translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOpenRAW.cc" line="44"/>
+        <location filename="../../src/pans/nOpenRAW.cc" line="43"/>
         <source>No image</source>
         <translation>Nessuna immagine</translation>
     </message>
@@ -2953,39 +2783,39 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Fai l&apos;operazione</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="120"/>
+        <location filename="../../src/pans/nOperator.cc" line="119"/>
         <source>Scale problem</source>
         <translation>Problema di scala</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="120"/>
+        <location filename="../../src/pans/nOperator.cc" line="119"/>
         <source>The images do not have the same scale</source>
         <translation>Le immagini non hanno la stessa scala</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="182"/>
+        <location filename="../../src/pans/nOperator.cc" line="181"/>
         <source>ERROR: Expected 2 values</source>
         <translation>ERRORE: servono due valori</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="193"/>
+        <location filename="../../src/pans/nOperator.cc" line="192"/>
         <source>ERROR: Exepcted a float radius</source>
         <translation>ERRORE: serve un raggio</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="203"/>
+        <location filename="../../src/pans/nOperator.cc" line="202"/>
         <source>ERROR: Exepcted 2 values</source>
         <translation>ERRORE: servono due valori</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="215"/>
+        <location filename="../../src/pans/nOperator.cc" line="214"/>
         <source>ERROR: Scalar should be an integer</source>
         <translation>ERRORE: serve un intero</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nOperator.cc" line="224"/>
-        <location filename="../../src/pans/nOperator.cc" line="233"/>
-        <location filename="../../src/pans/nOperator.cc" line="242"/>
+        <location filename="../../src/pans/nOperator.cc" line="223"/>
+        <location filename="../../src/pans/nOperator.cc" line="232"/>
+        <location filename="../../src/pans/nOperator.cc" line="241"/>
         <source>ERROR: Value should be a float</source>
         <translation>ERRORE: serve un reale</translation>
     </message>
@@ -2998,7 +2828,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Proprietà immagine</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPhysProperties.ui" line="71"/>
+        <location filename="../../UIs/nPhysProperties.ui" line="74"/>
         <source>Change property</source>
         <translation>Cambia proprietà</translation>
     </message>
@@ -3009,6 +2839,31 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <location filename="../../src/python/nPhysPyWrapper.cc" line="23"/>
         <source>Open Image(s)</source>
         <translation>Apri immagini</translation>
+    </message>
+</context>
+<context>
+    <name>nPluginLoader</name>
+    <message>
+        <location filename="../../src/nPluginLoader.cc" line="102"/>
+        <location filename="../../src/nPluginLoader.cc" line="107"/>
+        <location filename="../../src/nPluginLoader.cc" line="121"/>
+        <source>Plugin error</source>
+        <translation>Errore plugin</translation>
+    </message>
+    <message>
+        <location filename="../../src/nPluginLoader.cc" line="102"/>
+        <source> does not look like a Neutrino plugin</source>
+        <translation> non sembra un plugin per Neutrino</translation>
+    </message>
+    <message>
+        <location filename="../../src/nPluginLoader.cc" line="107"/>
+        <source>Error loading plugin </source>
+        <translation>Errore nel caricare il plugin</translation>
+    </message>
+    <message>
+        <location filename="../../src/nPluginLoader.cc" line="121"/>
+        <source> cannot be instantiated</source>
+        <translation> non riesco instanziare</translation>
     </message>
 </context>
 <context>
@@ -3054,33 +2909,33 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Centro</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="56"/>
+        <location filename="../../src/graphics/nPoint.cc" line="58"/>
         <source>point</source>
         <translation>punto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="128"/>
+        <location filename="../../src/graphics/nPoint.cc" line="120"/>
         <source>Click for the first point</source>
-        <translation type="unfinished"></translation>
+        <translation>Clicca per il primo punto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="134"/>
+        <location filename="../../src/graphics/nPoint.cc" line="126"/>
         <source>Point added</source>
         <translation>Punto aggiunto</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="381"/>
+        <location filename="../../src/graphics/nPoint.cc" line="373"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="381"/>
-        <location filename="../../src/graphics/nPoint.cc" line="391"/>
+        <location filename="../../src/graphics/nPoint.cc" line="373"/>
+        <location filename="../../src/graphics/nPoint.cc" line="383"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nPoint.cc" line="391"/>
+        <location filename="../../src/graphics/nPoint.cc" line="383"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
@@ -3098,124 +2953,145 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Decorazioni</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="107"/>
+        <location filename="../../UIs/nPreferences.ui" line="110"/>
         <source>Language</source>
         <translation>Lingua</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="122"/>
+        <location filename="../../UIs/nPreferences.ui" line="125"/>
         <source>Decimal number separator</source>
         <translation>Separatore di numeri decimali</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="140"/>
+        <location filename="../../UIs/nPreferences.ui" line="143"/>
         <source>Image name length</source>
         <translation>Lunghezza nome</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="162"/>
+        <location filename="../../UIs/nPreferences.ui" line="165"/>
         <source>Small</source>
         <translation>Piccola</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="167"/>
+        <location filename="../../UIs/nPreferences.ui" line="170"/>
         <source>Normal</source>
         <translation>Normale</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="172"/>
+        <location filename="../../UIs/nPreferences.ui" line="175"/>
         <source>Large</source>
         <translation>Grande</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="196"/>
+        <location filename="../../UIs/nPreferences.ui" line="199"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="220"/>
+        <location filename="../../UIs/nPreferences.ui" line="223"/>
         <source>Icon size</source>
         <translation>Dimensioni icone</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="235"/>
+        <location filename="../../UIs/nPreferences.ui" line="238"/>
         <source>Zoom increment</source>
         <translation>incremento zoom</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="250"/>
+        <location filename="../../UIs/nPreferences.ui" line="253"/>
         <source>Ask before closing unsaved buffer</source>
         <translation>Chiedi prima di salvare un immagine non salvata</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="268"/>
+        <location filename="../../UIs/nPreferences.ui" line="271"/>
         <source>Global font</source>
         <translation>Carattere globale</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="293"/>
+        <location filename="../../UIs/nPreferences.ui" line="296"/>
         <source>Show image size in pixels</source>
         <translation>Mostra dimensioni immagine a lato</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="310"/>
+        <location filename="../../UIs/nPreferences.ui" line="313"/>
         <source>Computation</source>
         <translation>Calcolo</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="355"/>
+        <location filename="../../UIs/nPreferences.ui" line="358"/>
         <source>Threads</source>
         <translation>Threads</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="410"/>
+        <location filename="../../UIs/nPreferences.ui" line="413"/>
         <source>OpenCL unit</source>
         <translation>Unità OpenCL</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="449"/>
+        <location filename="../../UIs/nPreferences.ui" line="452"/>
         <source>Use Cuda</source>
         <translation>Usa CUDA</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="471"/>
+        <location filename="../../UIs/nPreferences.ui" line="463"/>
+        <source>Plugins</source>
+        <translation>Plugins</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nPreferences.ui" line="481"/>
+        <source>add plugin directory</source>
+        <translation>Aggiungi una cartella di plugin</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nPreferences.ui" line="484"/>
+        <location filename="../../UIs/nPreferences.ui" line="511"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nPreferences.ui" line="508"/>
+        <source>remove selected plugin directory</source>
+        <translation>Rimuovi la directory selezionata</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/nPreferences.ui" line="543"/>
         <source>toolBar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="499"/>
+        <location filename="../../UIs/nPreferences.ui" line="571"/>
         <source>Reset settings</source>
         <translation>Rimuovi impostazioni</translation>
     </message>
     <message>
-        <location filename="../../UIs/nPreferences.ui" line="502"/>
+        <location filename="../../UIs/nPreferences.ui" line="574"/>
         <source>Reset Settings (require restart)</source>
-        <translation type="unfinished"></translation>
+        <translation>Reset dei settings (dopo chiusura)</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="121"/>
+        <location filename="../../src/pans/nPreferences.cc" line="131"/>
         <source>Current: </source>
         <translation>Corrente: </translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="125"/>
+        <location filename="../../src/pans/nPreferences.cc" line="127"/>
         <source>System: </source>
         <translation>Sistema:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="178"/>
-        <source>Decimal separator: </source>
-        <translation>Separatore dei decimali:</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nPreferences.cc" line="246"/>
+        <location filename="../../src/pans/nPreferences.cc" line="268"/>
         <source>Attention</source>
         <translation>Attenzione</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nPreferences.cc" line="246"/>
+        <location filename="../../src/pans/nPreferences.cc" line="268"/>
         <source>Are you sure you want to remove Settings?</source>
         <translation>Sicuro di voler rimuovere le impostazioni?</translation>
+    </message>
+    <message>
+        <location filename="../../src/pans/nPreferences.cc" line="356"/>
+        <source>Open Plugin Directory</source>
+        <translation>Apri directory plugin</translation>
     </message>
 </context>
 <context>
@@ -3310,38 +3186,38 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
 <context>
     <name>nRect</name>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="43"/>
+        <location filename="../../src/graphics/nRect.cc" line="63"/>
         <source>rect</source>
         <translation>regione</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="156"/>
+        <location filename="../../src/graphics/nRect.cc" line="166"/>
         <source>Click for the first point of the rectangle</source>
         <translation>Clicca per il primo punto del rettangolo</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="162"/>
+        <location filename="../../src/graphics/nRect.cc" line="172"/>
         <source>Point added, click for the second point</source>
         <translation>Punto aggiunto, clicca per il secondo</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="582"/>
+        <location filename="../../src/graphics/nRect.cc" line="592"/>
         <source>Open INI File</source>
         <translation>Apri impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="582"/>
         <location filename="../../src/graphics/nRect.cc" line="592"/>
+        <location filename="../../src/graphics/nRect.cc" line="602"/>
         <source>INI Files (*.ini *.conf)</source>
         <translation>File INI (*.ini *.conf)</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="592"/>
+        <location filename="../../src/graphics/nRect.cc" line="602"/>
         <source>Save INI File</source>
         <translation>Salva impostazioni</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nRect.cc" line="616"/>
+        <location filename="../../src/graphics/nRect.cc" line="626"/>
         <source>Error reading from file</source>
         <translation>Errore leggendo il file</translation>
     </message>
@@ -3446,7 +3322,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nRegionPath.ui" line="229"/>
         <source>Show line window</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra la finestra della linea</translation>
     </message>
     <message>
         <location filename="../../UIs/nRegionPath.ui" line="238"/>
@@ -3712,635 +3588,16 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
 </context>
 <context>
-    <name>nVISAR1</name>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="14"/>
-        <source>VISAR analysis</source>
-        <translation>Analisi VISAR</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="63"/>
-        <source>Settings</source>
-        <translation>Impostazioni</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="91"/>
-        <location filename="../../UIs/nVISAR1.ui" line="170"/>
-        <source>Visar 1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="113"/>
-        <location filename="../../UIs/nVISAR1.ui" line="198"/>
-        <source>Visar 2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="139"/>
-        <source>Velocity</source>
-        <translation>Velocità</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="237"/>
-        <source>Temperature</source>
-        <translation>Temperatura</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="263"/>
-        <source>Reference and Shot</source>
-        <translation>Riferimento e tiro</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="310"/>
-        <source>Enable SOP</source>
-        <translation>Attiva la SOP</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="334"/>
-        <source>Offset</source>
-        <translation>Compenso</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="357"/>
-        <source>Background value</source>
-        <translation>Valore del nero</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="360"/>
-        <source> [counts]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="381"/>
-        <source>Time zero and delta t</source>
-        <translation>Tempo zero e ritardo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="404"/>
-        <source> [px]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="425"/>
-        <source> [t]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="458"/>
-        <source>Refl.</source>
-        <translation>Riflettitità</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="485"/>
-        <source>Visar1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="490"/>
-        <source>Visar2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="495"/>
-        <source>Mean</source>
-        <translation>Media</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="500"/>
-        <source>Zero</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="516"/>
-        <source>SOP calibration T0 A</source>
-        <translation>Calibrazione SOP: T0 e A</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="581"/>
-        <source>Sweep time and direction</source>
-        <translation>Tempo di spazzata e direzione</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="604"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tempo si spazzata: espansione polinomiale Hamamatsu A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="623"/>
-        <source>V</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="628"/>
-        <source>H</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="655"/>
-        <source>Notes</source>
-        <translation>Appunti</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="692"/>
-        <source>toolBar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="726"/>
-        <location filename="../../UIs/nVISAR1.ui" line="826"/>
-        <source>loadPref</source>
-        <translation>Carica preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="729"/>
-        <source>Load Preferences</source>
-        <translation>Carica preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="738"/>
-        <source>savePref</source>
-        <translation>Salva preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="741"/>
-        <source>Save Preferences</source>
-        <translation>Salva preferenze</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="750"/>
-        <source>saveTxt</source>
-        <translation>salvaTxt</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="753"/>
-        <source>Export TXT</source>
-        <translation>Esporta testo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="762"/>
-        <source>refresh2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="765"/>
-        <source>Guess both intefringes</source>
-        <translation>Trova le innterfrange medie e l&apos;orientamento</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="774"/>
-        <source>refresh</source>
-        <translation>ricarica</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="777"/>
-        <source>Calculate both phases</source>
-        <translation>Calcola entrambe le fasi</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="786"/>
-        <source>rect1</source>
-        <translation>regione1</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="789"/>
-        <source>Rectangle Visar 1</source>
-        <translation>Regione Visar 1</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="798"/>
-        <source>rect2</source>
-        <translation>regione2</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="801"/>
-        <source>Rectangle Visar 2</source>
-        <translation>Regione Visar 2</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="814"/>
-        <source>autoRefresh</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="817"/>
-        <source>Auto refreh when moving rectangles</source>
-        <translation>Ricalcola automaticamente</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="829"/>
-        <source>Copy to clipboard</source>
-        <translation>Copia negli appunti</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="838"/>
-        <source>rect3</source>
-        <translation>regione3</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="841"/>
-        <source>Rectangle SOP</source>
-        <translation>Regione SOP</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="850"/>
-        <source>saveTxtMultiple</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="853"/>
-        <source>Export all curves in TXT</source>
-        <translation>Esporta tutti i valore in file di testo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="862"/>
-        <source>showFiltered</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR1.ui" line="865"/>
-        <source>Show filtered images</source>
-        <translation>Mostra immagini filtrate</translation>
-    </message>
-</context>
-<context>
-    <name>nVISAR2</name>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="19"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="55"/>
-        <source>Reference and Shot</source>
-        <translation>Riferimento e tiro</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="73"/>
-        <source>Enable visar</source>
-        <translation>Attiva VISAR</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="111"/>
-        <source>Do filter on this Visar</source>
-        <translation>Attiva questo VISAR</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="146"/>
-        <source>Carrier :  intefringe and orientation</source>
-        <translation>Portante: interfrangia e orientamento</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="164"/>
-        <source>Frequency weight (&lt;0 for lower freq; &gt;0 for higher freq)</source>
-        <translation>Peso per il calcolo dell&apos;interfrangia (&lt;0 per frequenze basse; &gt;0 per frequenze alte)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="189"/>
-        <source>Calculate interfringe</source>
-        <translation>Calcola l&apos;interfrangia</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="192"/>
-        <source>...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="210"/>
-        <source>Ref</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="215"/>
-        <source>Shot</source>
-        <translation>Tiro</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="223"/>
-        <source>Fringes orientation</source>
-        <translation>Orientamento delle frange</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="226"/>
-        <source>˚</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="242"/>
-        <source>Interfringe (px)</source>
-        <translation>Interfrangia (px)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="245"/>
-        <location filename="../../UIs/nVISAR2.ui" line="285"/>
-        <location filename="../../UIs/nVISAR2.ui" line="357"/>
-        <source> [px]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="264"/>
-        <source>Time resolution in pixel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="267"/>
-        <source>Time resolution</source>
-        <translation>Risoluzione temporale</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="304"/>
-        <source>Intensity parameters: </source>
-        <translation>Parametri di intensità:</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="322"/>
-        <source>offset reference (dark value)</source>
-        <translation>Compenso riferimento (valore di buio)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="325"/>
-        <location filename="../../UIs/nVISAR2.ui" line="341"/>
-        <source> [counts]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="338"/>
-        <source>offset shot (dark value)</source>
-        <translation>Compenso tiro (valore di buio)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="354"/>
-        <source>Pixel time delay of intensity between probe and shot</source>
-        <translation>Ritardo in pixel della sonda tra riferimento e tiro</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="373"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference multiplication factor:&lt;/p&gt;&lt;p&gt;Fix jitter between ref. and shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fattore moltiplicativo del riferimento:&lt;/p&gt;&lt;p&gt;Fissa jitter tra rif. e tiro&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR2.ui" line="376"/>
-        <source> X</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nVISAR3</name>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="19"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="62"/>
-        <source>Sensitivity</source>
-        <translation>Sensibilità VISAR</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="85"/>
-        <source> [v/fr]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="118"/>
-        <source>Time 0 &amp;&amp; delay</source>
-        <translation>Tempo zero e ritardo</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="192"/>
-        <source>Sweep time</source>
-        <translation>Tempo di spazzata</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="215"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tempo si spazzata: espansione polinomiale Hamamatsu A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="256"/>
-        <source>Offset Shift</source>
-        <translation>Comp. frange</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="282"/>
-        <source>Vertical offset (in fraction of fringe)</source>
-        <translation>Compenso velocità (in frazioni di frangia)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="309"/>
-        <source>Tweak the reflectivity: R= ratio*Ishot/Iref+offset</source>
-        <translation>Modifica la riflettività: R= ratio*Ishot/Iref+offset</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="312"/>
-        <source>Reflectvity (ghost &amp;&amp; material)</source>
-        <translation>Riflettività (fantasma e materiale)</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="338"/>
-        <source>Offset of the reflectivity</source>
-        <translation>Riflettività residua</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="368"/>
-        <source>Multiplication correction for the intensity ratio</source>
-        <translation>Riflettività del materiale</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="401"/>
-        <source>Jumps: t i [n0]; </source>
-        <translation>Salti: t i [n0];</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/nVISAR3.ui" line="442"/>
-        <source>show jumps</source>
-        <translation>mostra salti</translation>
-    </message>
-</context>
-<context>
     <name>nView</name>
     <message>
-        <location filename="../../src/graphics/nView.cc" line="164"/>
+        <location filename="../../src/graphics/nView.cc" line="165"/>
         <source>Removed </source>
         <translation>Rimosso</translation>
     </message>
     <message>
-        <location filename="../../src/graphics/nView.cc" line="167"/>
+        <location filename="../../src/graphics/nView.cc" line="168"/>
         <source>Can&apos;t remove </source>
         <translation>Non riesco a rimuovere</translation>
-    </message>
-</context>
-<context>
-    <name>nVisar</name>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="142"/>
-        <source>Fringeshift Visar </source>
-        <translation>Spostamento frange</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="148"/>
-        <source>Visar region </source>
-        <translation>Regione Visar </translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="156"/>
-        <source>SOP region</source>
-        <translation>Regione SOP</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="162"/>
-        <source>Time</source>
-        <translation>Tempo</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="163"/>
-        <source>Counts</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="164"/>
-        <source>Temperature</source>
-        <translation>Temperatura</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="441"/>
-        <source>Attention: the region is outside the image!</source>
-        <translation>Attenzione la regione è fuori dall&apos;immagine!</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="594"/>
-        <location filename="../../src/pans/nVisar.cc" line="603"/>
-        <source>Skipped unreadable jump &apos;</source>
-        <translation>ignoro salto illeggibile. &apos;</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="724"/>
-        <source>Carrier (</source>
-        <translation>Portante (</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="724"/>
-        <location filename="../../src/pans/nVisar.cc" line="750"/>
-        <source>px, </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="724"/>
-        <source>deg) - (</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="724"/>
-        <source>deg)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="750"/>
-        <source>Carrier :</source>
-        <translation>Portante: </translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="750"/>
-        <source>deg</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1025"/>
-        <source>Save VISARs and SOP</source>
-        <translation>Salve i VISAR e la SOP</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1025"/>
-        <location filename="../../src/pans/nVisar.cc" line="1055"/>
-        <source>Text files (*.txt *.csv);;Any files (*)</source>
-        <translation>File di testo (*.txt *.csv);; Tutti tipi (*)</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1037"/>
-        <location filename="../../src/pans/nVisar.cc" line="1075"/>
-        <source>Export in file:</source>
-        <translation>Esporta in file di testo:</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1043"/>
-        <source>Export </source>
-        <translation>Esporta</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1046"/>
-        <location filename="../../src/pans/nVisar.cc" line="1049"/>
-        <source>VISAR</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1052"/>
-        <source>SOP</source>
-        <translation>SOP</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1055"/>
-        <source>Save </source>
-        <translation>Salva</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1085"/>
-        <source>Points copied to clipboard </source>
-        <translation>Punti copiati negli appunti</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1089"/>
-        <source>Points copied to clipboard both visars</source>
-        <translation>Punti copiati negli appunti (entrambi i visar)</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="1093"/>
-        <source>Points copied to clipboard SOP</source>
-        <translation>Punti copiati negli appunti (SOP)</translation>
-    </message>
-</context>
-<context>
-    <name>nVisarPhasePlot</name>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="33"/>
-        <source>Pixel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="34"/>
-        <source>Fringeshift</source>
-        <translation>Spostamento di frangia</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="35"/>
-        <source>Intensity</source>
-        <translation>Intensità</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="36"/>
-        <source>Contrast</source>
-        <translation>Contrasto</translation>
-    </message>
-</context>
-<context>
-    <name>nVisarPlot</name>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="62"/>
-        <source>Position [time]</source>
-        <translation>Posizione [tempo]</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="63"/>
-        <source>Velocity</source>
-        <translation>Velocità</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="64"/>
-        <source>Reflectivity</source>
-        <translation>Riflettività</translation>
-    </message>
-    <message>
-        <location filename="../../src/pans/nVisar.cc" line="65"/>
-        <source>Quality</source>
-        <translation>Qualità</translation>
     </message>
 </context>
 <context>
@@ -4388,7 +3645,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     <message>
         <location filename="../../UIs/nWavelet.ui" line="222"/>
         <source>number</source>
-        <translation>num.</translation>
+        <translation>numero</translation>
     </message>
     <message>
         <location filename="../../UIs/nWavelet.ui" line="232"/>
@@ -4584,12 +3841,12 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Wavelet, srotolamento</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nWavelet.cc" line="131"/>
+        <location filename="../../src/pans/nWavelet.cc" line="128"/>
         <source>ERROR: Problem finding the carrier</source>
         <translation>ERRORE: non riesco a trovare l&apos;nterfrangia media</translation>
     </message>
     <message>
-        <location filename="../../src/pans/nWavelet.cc" line="133"/>
+        <location filename="../../src/pans/nWavelet.cc" line="130"/>
         <source>Carrier: </source>
         <translation>Portante: </translation>
     </message>
@@ -4696,47 +3953,47 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation>Fissa origine/scale alle immagini nuove</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="156"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="157"/>
         <source>Change Short Name</source>
         <translation>Cambia nome corto</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="156"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="157"/>
         <source>Short name:</source>
         <translation>Nome corto:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="167"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="168"/>
         <source>Change Name</source>
         <translation>Cambia nome</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="167"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="168"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="178"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="179"/>
         <source>Change Origin</source>
         <translation>Cambia origine</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="178"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="179"/>
         <source>Origin:</source>
         <translation>Origine:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="203"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="204"/>
         <source>Change Scale</source>
         <translation>Cambia scala</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="203"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="204"/>
         <source>Scale:</source>
         <translation>Scala:</translation>
     </message>
     <message>
-        <location filename="../../src/pans/winlist/nWinList.cc" line="322"/>
+        <location filename="../../src/pans/winlist/nWinList.cc" line="323"/>
         <source>No image</source>
         <translation>Nessuna immagine</translation>
     </message>
@@ -4788,8 +4045,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
     </message>
     <message>
         <location filename="../../UIs/neutrino.ui" line="137"/>
-        <location filename="../../UIs/neutrino.ui" line="766"/>
-        <location filename="../../UIs/neutrino.ui" line="769"/>
+        <location filename="../../UIs/neutrino.ui" line="731"/>
+        <location filename="../../UIs/neutrino.ui" line="734"/>
         <source>Paths</source>
         <translation>Linee</translation>
     </message>
@@ -4814,792 +4071,682 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="219"/>
+        <location filename="../../UIs/neutrino.ui" line="218"/>
         <source>Help</source>
         <translation>Aiuto</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="229"/>
-        <location filename="../../src/neutrino.cc" line="2343"/>
+        <location filename="../../UIs/neutrino.ui" line="228"/>
         <source>Python</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="248"/>
+        <location filename="../../UIs/neutrino.ui" line="247"/>
         <source>toolBar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="282"/>
+        <location filename="../../UIs/neutrino.ui" line="281"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="285"/>
+        <location filename="../../UIs/neutrino.ui" line="284"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="290"/>
+        <location filename="../../UIs/neutrino.ui" line="289"/>
         <source>Open ...</source>
         <translation>Apri ...</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="293"/>
+        <location filename="../../UIs/neutrino.ui" line="292"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="298"/>
+        <location filename="../../UIs/neutrino.ui" line="297"/>
         <source>Save Image</source>
         <translation>Salva l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="301"/>
+        <location filename="../../UIs/neutrino.ui" line="300"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="306"/>
+        <location filename="../../UIs/neutrino.ui" line="305"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="309"/>
+        <location filename="../../UIs/neutrino.ui" line="308"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="314"/>
+        <location filename="../../UIs/neutrino.ui" line="313"/>
         <source>Next Buffer</source>
         <translation>Immagine successiva</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="317"/>
+        <location filename="../../UIs/neutrino.ui" line="316"/>
         <source>Ctrl+Down</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="322"/>
+        <location filename="../../UIs/neutrino.ui" line="321"/>
         <source>Prev Buffer</source>
         <translation>Immagine precedente</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="325"/>
+        <location filename="../../UIs/neutrino.ui" line="324"/>
         <source>Ctrl+Up</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="330"/>
-        <location filename="../../src/neutrino.cc" line="1679"/>
+        <location filename="../../UIs/neutrino.ui" line="329"/>
         <source>Properties</source>
         <translation>Proprietà immagine</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="335"/>
+        <location filename="../../UIs/neutrino.ui" line="334"/>
         <source>Zoom +</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="340"/>
+        <location filename="../../UIs/neutrino.ui" line="339"/>
         <source>Zoom =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="345"/>
+        <location filename="../../UIs/neutrino.ui" line="344"/>
         <source>Zoom -</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="350"/>
-        <location filename="../../src/neutrino.cc" line="2023"/>
+        <location filename="../../UIs/neutrino.ui" line="349"/>
         <source>Wavelet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="355"/>
-        <location filename="../../src/neutrino.cc" line="2016"/>
-        <source>Visar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="363"/>
+        <location filename="../../UIs/neutrino.ui" line="357"/>
         <source>Polarigrams</source>
         <translation>Polarigrammi</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="371"/>
+        <location filename="../../UIs/neutrino.ui" line="365"/>
         <source>Thomson P.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="380"/>
+        <location filename="../../UIs/neutrino.ui" line="374"/>
         <source>About</source>
         <translation>Approposito</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="385"/>
+        <location filename="../../UIs/neutrino.ui" line="379"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="388"/>
+        <location filename="../../UIs/neutrino.ui" line="382"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="393"/>
+        <location filename="../../UIs/neutrino.ui" line="387"/>
         <source>Next</source>
         <translation>Successivo</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="396"/>
+        <location filename="../../UIs/neutrino.ui" line="390"/>
         <source>Ctrl+Right</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="401"/>
+        <location filename="../../UIs/neutrino.ui" line="395"/>
         <source>Previous</source>
         <translation>Precedente</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="404"/>
+        <location filename="../../UIs/neutrino.ui" line="398"/>
         <source>Ctrl+Left</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="413"/>
+        <location filename="../../UIs/neutrino.ui" line="407"/>
         <source>Show colortable</source>
         <translation>Mostra colori</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="422"/>
-        <location filename="../../UIs/neutrino.ui" line="425"/>
+        <location filename="../../UIs/neutrino.ui" line="416"/>
+        <location filename="../../UIs/neutrino.ui" line="419"/>
         <source>Window List</source>
         <translation>Lista Finestre</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="430"/>
+        <location filename="../../UIs/neutrino.ui" line="424"/>
         <source>Cycle over paths</source>
         <translation>Cicla tra le linee</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="433"/>
+        <location filename="../../UIs/neutrino.ui" line="427"/>
         <source>Tab</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="438"/>
+        <location filename="../../UIs/neutrino.ui" line="432"/>
         <source>Focal Spot</source>
         <translation>Macchia focale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="443"/>
+        <location filename="../../UIs/neutrino.ui" line="437"/>
         <source>Print</source>
         <translation>Stampa</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="446"/>
+        <location filename="../../UIs/neutrino.ui" line="440"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="455"/>
+        <location filename="../../UIs/neutrino.ui" line="449"/>
         <source>Mouse Info</source>
         <translation>Informazioni mouse</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="460"/>
+        <location filename="../../UIs/neutrino.ui" line="454"/>
         <source>Follower</source>
         <translation>Controlla finestra</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="463"/>
+        <location filename="../../UIs/neutrino.ui" line="457"/>
         <source>Control another window</source>
         <translation>Controlla finestra</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="472"/>
+        <location filename="../../UIs/neutrino.ui" line="466"/>
         <source>Horizontal</source>
         <translation>Orizzontale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="481"/>
+        <location filename="../../UIs/neutrino.ui" line="475"/>
         <source>Vertical</source>
         <translation>Verticale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="486"/>
+        <location filename="../../UIs/neutrino.ui" line="480"/>
         <source>Both</source>
         <translation>Entrambi i lineout</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="491"/>
+        <location filename="../../UIs/neutrino.ui" line="485"/>
         <source>Box lineout</source>
         <translation>Lineout rettangolare</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="496"/>
-        <location filename="../../UIs/neutrino.ui" line="876"/>
+        <location filename="../../UIs/neutrino.ui" line="490"/>
+        <location filename="../../UIs/neutrino.ui" line="836"/>
         <source>Math operations</source>
         <translation>Operazioni</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="501"/>
+        <location filename="../../UIs/neutrino.ui" line="495"/>
         <source>Cutoff Mask</source>
         <translation>Maschera di taglio</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="506"/>
-        <location filename="../../src/neutrino.cc" line="2074"/>
+        <location filename="../../UIs/neutrino.ui" line="500"/>
         <source>Rotate</source>
         <translation>Ruota</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="511"/>
+        <location filename="../../UIs/neutrino.ui" line="505"/>
         <source>Reopen saved</source>
         <translation>Riapri da file</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="514"/>
+        <location filename="../../UIs/neutrino.ui" line="508"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="519"/>
-        <location filename="../../src/neutrino.cc" line="2050"/>
+        <location filename="../../UIs/neutrino.ui" line="513"/>
         <source>Inversions</source>
         <translation>Inversioni integrali</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="524"/>
+        <location filename="../../UIs/neutrino.ui" line="518"/>
         <source>Show ruler</source>
         <translation>Mostra righello</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="529"/>
+        <location filename="../../UIs/neutrino.ui" line="523"/>
         <source>Show mouse</source>
         <translation>Mostra mouse</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="538"/>
+        <location filename="../../UIs/neutrino.ui" line="532"/>
         <source>winlist</source>
         <translation>Lista Finestre</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="541"/>
+        <location filename="../../UIs/neutrino.ui" line="535"/>
         <source>Window list</source>
         <translation>Lista Finestre</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="550"/>
+        <location filename="../../UIs/neutrino.ui" line="544"/>
         <source>colors</source>
         <translation>colori</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="553"/>
+        <location filename="../../UIs/neutrino.ui" line="547"/>
         <source>Color table</source>
         <translation>Lista colori</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="562"/>
+        <location filename="../../UIs/neutrino.ui" line="556"/>
         <source>ruler</source>
         <translation>righello</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="565"/>
+        <location filename="../../UIs/neutrino.ui" line="559"/>
         <source>Point Info</source>
         <translation>Info punti</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="574"/>
+        <location filename="../../UIs/neutrino.ui" line="568"/>
         <source>lineoutH</source>
         <translation>Taglio orizzontale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="577"/>
+        <location filename="../../UIs/neutrino.ui" line="571"/>
         <source>Horizontal lineout</source>
         <translation>Taglio orizzontale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="586"/>
+        <location filename="../../UIs/neutrino.ui" line="580"/>
         <source>lineoutV</source>
         <translation>Taglio verticale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="589"/>
+        <location filename="../../UIs/neutrino.ui" line="583"/>
         <source>Vertical lineout</source>
         <translation>Lineout verticale</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="598"/>
+        <location filename="../../UIs/neutrino.ui" line="592"/>
         <source>Line</source>
         <translation>Linea</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="607"/>
+        <location filename="../../UIs/neutrino.ui" line="601"/>
         <source>Rectangle</source>
         <translation>Rettangolo</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="616"/>
+        <location filename="../../UIs/neutrino.ui" line="610"/>
         <source>Ellipse</source>
         <translation>Ellisse</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="621"/>
+        <location filename="../../UIs/neutrino.ui" line="615"/>
         <source>Region from path</source>
         <translation>Ritaglia da linea</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="630"/>
+        <location filename="../../UIs/neutrino.ui" line="624"/>
         <source>Preferences...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="635"/>
+        <location filename="../../UIs/neutrino.ui" line="629"/>
         <source>Monitor Directory</source>
         <translation>Controllo cartella</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="638"/>
+        <location filename="../../UIs/neutrino.ui" line="632"/>
         <source>Ctrl+M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="643"/>
-        <source>Blur</source>
-        <translation>Sfuma</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="648"/>
+        <location filename="../../UIs/neutrino.ui" line="637"/>
         <source>Export</source>
         <translation>Esporta</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="651"/>
+        <location filename="../../UIs/neutrino.ui" line="640"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="656"/>
+        <location filename="../../UIs/neutrino.ui" line="645"/>
         <source>Close Buffer</source>
         <translation>Chiudi immagine</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="659"/>
+        <location filename="../../UIs/neutrino.ui" line="648"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="664"/>
+        <location filename="../../UIs/neutrino.ui" line="653"/>
         <source>Compare lines</source>
         <translation>Compara linee</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="669"/>
-        <location filename="../../src/neutrino.cc" line="1994"/>
+        <location filename="../../UIs/neutrino.ui" line="658"/>
+        <location filename="../../src/neutrino.cc" line="1929"/>
         <source>Open RAW</source>
         <translation>Apri file RAW</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="672"/>
+        <location filename="../../UIs/neutrino.ui" line="661"/>
         <source>Ctrl+Shift+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="684"/>
+        <location filename="../../UIs/neutrino.ui" line="856"/>
+        <source>Load...</source>
+        <translation>Carica...</translation>
+    </message>
+    <message>
+        <location filename="../../UIs/neutrino.ui" line="865"/>
         <source>Draw Line Pan</source>
         <translation>Finestra disegno</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="689"/>
+        <location filename="../../UIs/neutrino.ui" line="669"/>
         <source>Find Peaks</source>
         <translation>Trova picchi</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="694"/>
-        <source>HDF5 file open</source>
-        <translation>Apri file HDF5</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="699"/>
-        <source>Auto align</source>
-        <translation>Auto allineamento</translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="704"/>
+        <location filename="../../UIs/neutrino.ui" line="674"/>
         <source>Spectral Analysis</source>
         <translation>Analisi Fourier</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="709"/>
-        <source>Visar Wavelet</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="718"/>
+        <location filename="../../UIs/neutrino.ui" line="683"/>
         <source>FlipRotate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="721"/>
+        <location filename="../../UIs/neutrino.ui" line="686"/>
         <source>Flip and Rotate</source>
         <translation>Specchia e ruota</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="730"/>
+        <location filename="../../UIs/neutrino.ui" line="695"/>
         <source>Rotate left</source>
         <translation>Ruota a sinistra</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="739"/>
+        <location filename="../../UIs/neutrino.ui" line="704"/>
         <source>Rotate right</source>
         <translation>Ruota a destra</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="748"/>
+        <location filename="../../UIs/neutrino.ui" line="713"/>
         <source>Flip up-down</source>
         <translation>Specchia alto/basso</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="757"/>
+        <location filename="../../UIs/neutrino.ui" line="722"/>
         <source>Flip left-right</source>
         <translation>Specchia sx/dx</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="774"/>
+        <location filename="../../UIs/neutrino.ui" line="739"/>
         <source>Palettes</source>
         <translation>Palette</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="779"/>
+        <location filename="../../UIs/neutrino.ui" line="744"/>
         <source>Save Session</source>
         <translation>Salva la sessione</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="782"/>
+        <location filename="../../UIs/neutrino.ui" line="747"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="787"/>
-        <location filename="../../src/neutrino.cc" line="797"/>
+        <location filename="../../UIs/neutrino.ui" line="752"/>
+        <location filename="../../src/neutrino.cc" line="786"/>
         <source>Open Session</source>
         <translation>Apri sessione</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="792"/>
-        <source>Plugin...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../UIs/neutrino.ui" line="797"/>
+        <location filename="../../UIs/neutrino.ui" line="757"/>
         <source>Keyborard shortcuts</source>
         <translation>Scorciatoie da tastiera</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="802"/>
+        <location filename="../../UIs/neutrino.ui" line="762"/>
         <source>Show grid</source>
         <translation>Mostra griglia</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="811"/>
+        <location filename="../../UIs/neutrino.ui" line="771"/>
         <source>Point</source>
         <translation>Punto</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="816"/>
+        <location filename="../../UIs/neutrino.ui" line="776"/>
         <source>Affine Transform</source>
         <translation>Trasformazioni affini</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="821"/>
-        <location filename="../../src/neutrino.cc" line="2032"/>
+        <location filename="../../UIs/neutrino.ui" line="781"/>
         <source>Interferometry</source>
         <translation>Interferometria</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="826"/>
-        <location filename="../../src/neutrino.cc" line="2041"/>
+        <location filename="../../UIs/neutrino.ui" line="786"/>
         <source>Ghost</source>
         <translation>Frange fantasma</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="831"/>
+        <location filename="../../UIs/neutrino.ui" line="791"/>
         <source>Export all</source>
         <translation>Esporta tutto</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="834"/>
+        <location filename="../../UIs/neutrino.ui" line="794"/>
         <source>Ctrl+Shift+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="839"/>
+        <location filename="../../UIs/neutrino.ui" line="799"/>
         <source>Interpolate Path</source>
         <translation>Interpola su cammino</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="852"/>
+        <location filename="../../UIs/neutrino.ui" line="812"/>
         <source>lockColors</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="855"/>
+        <location filename="../../UIs/neutrino.ui" line="815"/>
         <source>Lock colorbar</source>
         <translation>Blocca colori</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="864"/>
+        <location filename="../../UIs/neutrino.ui" line="824"/>
         <source>Shell</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="873"/>
+        <location filename="../../UIs/neutrino.ui" line="833"/>
         <source>Operator</source>
         <translation>Operazione</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="881"/>
-        <location filename="../../src/neutrino.cc" line="2093"/>
+        <location filename="../../UIs/neutrino.ui" line="841"/>
         <source>Camera</source>
         <translation>Webcam</translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="886"/>
+        <location filename="../../UIs/neutrino.ui" line="846"/>
         <source>Mouse Zoom</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../UIs/neutrino.ui" line="891"/>
-        <location filename="../../src/neutrino.cc" line="1646"/>
+        <location filename="../../UIs/neutrino.ui" line="851"/>
         <source>Contours</source>
         <translation>Curve di livello</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="261"/>
+        <location filename="../../src/neutrino.cc" line="260"/>
         <source>Python shell</source>
         <translation>Shell Python</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="504"/>
+        <location filename="../../src/neutrino.cc" line="506"/>
         <source>Load Plugin</source>
         <translation>Apri plugin</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="504"/>
+        <location filename="../../src/neutrino.cc" line="506"/>
         <source>Neutrino Plugins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="504"/>
-        <location filename="../../src/neutrino.cc" line="797"/>
-        <location filename="../../src/neutrino.cc" line="1994"/>
+        <location filename="../../src/neutrino.cc" line="506"/>
+        <location filename="../../src/neutrino.cc" line="786"/>
+        <location filename="../../src/neutrino.cc" line="1929"/>
         <source>Any files</source>
         <translation>Tutti file</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="696"/>
+        <location filename="../../src/neutrino.cc" line="683"/>
         <source>Open Image(s)</source>
         <translation>Apri immagini</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="793"/>
+        <location filename="../../src/neutrino.cc" line="713"/>
+        <source>Exception</source>
+        <translation>Errore</translation>
+    </message>
+    <message>
+        <location filename="../../src/neutrino.cc" line="782"/>
         <source>Neutrino session</source>
         <translation>Sessione neutrino</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="795"/>
+        <location filename="../../src/neutrino.cc" line="784"/>
         <source>Tiff session</source>
         <translation>Sessione tiff</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="847"/>
-        <location filename="../../src/neutrino.cc" line="850"/>
-        <location filename="../../src/neutrino.cc" line="862"/>
-        <location filename="../../src/neutrino.cc" line="1507"/>
-        <location filename="../../src/neutrino.cc" line="1568"/>
-        <location filename="../../src/neutrino.cc" line="1610"/>
+        <location filename="../../src/neutrino.cc" line="836"/>
+        <location filename="../../src/neutrino.cc" line="839"/>
+        <location filename="../../src/neutrino.cc" line="851"/>
+        <location filename="../../src/neutrino.cc" line="1496"/>
+        <location filename="../../src/neutrino.cc" line="1557"/>
+        <location filename="../../src/neutrino.cc" line="1599"/>
         <source>Attention</source>
         <translation>Attenzione</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="847"/>
-        <location filename="../../src/neutrino.cc" line="850"/>
+        <location filename="../../src/neutrino.cc" line="836"/>
+        <location filename="../../src/neutrino.cc" line="839"/>
         <source>Cannot write values for </source>
         <translation>Non riesco a scrivere i valori per</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="847"/>
+        <location filename="../../src/neutrino.cc" line="836"/>
         <source>Contact dev team.</source>
         <translation>Contatta il team di sviluppo.</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="862"/>
+        <location filename="../../src/neutrino.cc" line="851"/>
         <source>Unknown extension: </source>
         <translation>Tipo sconosciuto: </translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="888"/>
+        <location filename="../../src/neutrino.cc" line="877"/>
         <source>Load Session </source>
         <translation>Apri sessione</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1141"/>
+        <location filename="../../src/neutrino.cc" line="927"/>
+        <source>Session error</source>
+        <translation>Errore nella sessione</translation>
+    </message>
+    <message>
+        <location filename="../../src/neutrino.cc" line="927"/>
+        <source>Cannot find method or plugin for </source>
+        <translation>Non riesco a trovare una funzione o un plugin per</translation>
+    </message>
+    <message>
+        <location filename="../../src/neutrino.cc" line="1133"/>
         <source>Save Drawing</source>
         <translation>Salva il disegno</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1148"/>
+        <location filename="../../src/neutrino.cc" line="1140"/>
         <source>Save All Drawings</source>
         <translation>Salva i disegni</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1355"/>
+        <location filename="../../src/neutrino.cc" line="1347"/>
         <source>Can&apos;t find </source>
         <translation>Non riesco a trovare </translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1378"/>
+        <location filename="../../src/neutrino.cc" line="1370"/>
         <source>Drop content</source>
         <translation>Deposita contenuto</translation>
     </message>
     <message>
         <location filename="../../src/neutrino.cc" line="1432"/>
-        <source>Zoom Win</source>
-        <translation>Finestra zoom</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1443"/>
         <source>Zoom :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1507"/>
+        <location filename="../../src/neutrino.cc" line="1496"/>
         <source>exists. Overwrite?</source>
         <translation>esiste. Sovrascrivere?</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1569"/>
-        <location filename="../../src/neutrino.cc" line="1611"/>
+        <location filename="../../src/neutrino.cc" line="1558"/>
+        <location filename="../../src/neutrino.cc" line="1600"/>
         <source>The image</source>
         <translation>L&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1569"/>
+        <location filename="../../src/neutrino.cc" line="1558"/>
         <source>has not been saved. Do you want to save it now?</source>
         <translation>non è stata salvata. Vuoi salvarla ora?</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1611"/>
+        <location filename="../../src/neutrino.cc" line="1600"/>
         <source>has not been saved. Do you vant to save it now?</source>
         <translation>non è stata salvata. Vuoi salvarla ora?</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1630"/>
-        <source>Shortcuts</source>
-        <translation>Scorciatoie</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1638"/>
-        <source>FocalSpot</source>
-        <translation>Macchia focale</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1654"/>
-        <source>MathOperations</source>
-        <translation>Operazioni</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1662"/>
-        <source>CutoffImage</source>
-        <translation>Immagine da tagliare</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1671"/>
-        <source>WinList</source>
-        <translation>Lista Finestre</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1687"/>
-        <source>MouseInfo</source>
-        <translation>Info mouse</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1697"/>
-        <source>Colorbar</source>
-        <translation>Colori</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1862"/>
+        <location filename="../../src/neutrino.cc" line="1824"/>
         <source>Click for points, press Esc to finish</source>
         <translation>Clicca per i punti, premi ESC per finire</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1887"/>
+        <location filename="../../src/neutrino.cc" line="1849"/>
         <source>Click for the first point of the rectangle</source>
         <translation>Clicca per il primo punto del rettangolo</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1898"/>
+        <location filename="../../src/neutrino.cc" line="1860"/>
         <source>Click for the point</source>
         <translation>Clicca per il punto</translation>
     </message>
     <message>
-        <location filename="../../src/neutrino.cc" line="1909"/>
+        <location filename="../../src/neutrino.cc" line="1871"/>
         <source>Click and release to create the ellipse</source>
         <translation>Clicca sull&apos;immagine per creare l&apos;ellisse</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1919"/>
-        <source>Hlineout</source>
-        <translation>Taglio orizzontale</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1927"/>
-        <source>Vlineout</source>
-        <translation>Taglio verticale</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1935"/>
-        <source>Bothlineout</source>
-        <translation>Entrambi i lineout</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="1963"/>
-        <source>HDF5</source>
-        <translation>HDF5</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2008"/>
-        <source>SpectralAnalysis</source>
-        <translation>Analisi Fourier</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2059"/>
-        <source>RegionPath</source>
-        <translation>Ritaglia da linea</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2066"/>
-        <source>InterpolatePath</source>
-        <translation>Interpola su cammino</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2083"/>
-        <source>Affine</source>
-        <translation>Affine</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2112"/>
-        <source>Monitor</source>
-        <translation>Controllo cartella</translation>
-    </message>
-    <message>
-        <location filename="../../src/neutrino.cc" line="2185"/>
-        <source>Preferences</source>
-        <translation>Impostazioni</translation>
     </message>
 </context>
 </TS>
