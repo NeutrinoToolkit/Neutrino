@@ -28,52 +28,52 @@
 
 FindPeaks::FindPeaks(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
     // signals
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
 
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+    connect(actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+    connect(actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.setOrigin, SIGNAL(pressed()), this, SLOT(setOrigin()));
-    connect(my_w.setScale, SIGNAL(pressed()), this, SLOT(setScale()));
+    connect(setOrigin, SIGNAL(pressed()), this, SLOT(setOrigin()));
+    connect(setScale, SIGNAL(pressed()), this, SLOT(setScale()));
 
-    connect(my_w.actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
+    connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 
-    my_w.toolBar->addWidget(my_w.direction);
-    my_w.toolBar->addWidget(my_w.param);
+    toolBar->addWidget(direction);
+    toolBar->addWidget(param);
 
     show();
 
-    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
-    my_w.plot->graph(0)->setName("FindPeaks");
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph(0)->setName("FindPeaks");
 
-    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
-    my_w.plot->graph(1)->setName("Blurred");
-    QPen p=my_w.plot->graph(1)->pen();
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph(1)->setName("Blurred");
+    QPen p=plot->graph(1)->pen();
     p.setStyle(Qt::DashLine);
-    my_w.plot->graph(1)->setPen(p);
+    plot->graph(1)->setPen(p);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
-    connect(my_w.direction, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
-    connect(my_w.param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(direction, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
+    connect(param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
     updatePlot();
 }
 
 
-void FindPeaks::setOrigin() {
+void FindPeaks::set_origin() {
     if (currentBuffer) {
         bool ok=true;
-        double originOffset=0.0;
-        if (!my_w.originOffset->text().isEmpty()) originOffset=QLocale().toDouble(my_w.originOffset->text(),&ok);
+        double my_origin=0.0;
+        if (!originOffset->text().isEmpty()) my_origin=QLocale().toDouble(originOffset->text(),&ok);
         if (ok) {
-            double origin=QLocale().toDouble(my_w.origin->text(),&ok)-originOffset;
+            double origin=QLocale().toDouble(originOffset->text(),&ok)-my_origin;
             if (ok) {
-                if (my_w.direction->isChecked()) {
+                if (direction->isChecked()) {
                     currentBuffer->set_origin(currentBuffer->get_origin().x(),origin);
                 } else {
                     currentBuffer->set_origin(origin,currentBuffer->get_origin().y());
@@ -84,18 +84,18 @@ void FindPeaks::setOrigin() {
     }
 }
 
-void FindPeaks::setScale() {
+void FindPeaks::set_scale() {
     if (currentBuffer) {
         bool ok=true;
         double scaleMult=1.0;
-        if (!my_w.scaleOffset->text().isEmpty()) scaleMult=QLocale().toDouble(my_w.scaleOffset->text(),&ok);
+        if (!scaleOffset->text().isEmpty()) scaleMult=QLocale().toDouble(scaleOffset->text(),&ok);
         if (ok) {
-            double scale=scaleMult/QLocale().toDouble(my_w.scale->text(),&ok);
+            double my_scale=scaleMult/QLocale().toDouble(scale->text(),&ok);
             if (ok) {
-                if (my_w.direction->isChecked()) {
-                    currentBuffer->set_scale(currentBuffer->get_scale().x(),scale);
+                if (direction->isChecked()) {
+                    currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
                 } else {
-                    currentBuffer->set_scale(scale,currentBuffer->get_scale().y());
+                    currentBuffer->set_scale(my_scale,currentBuffer->get_scale().y());
                 }
                 nparent->my_tics.update();
             }
@@ -105,10 +105,10 @@ void FindPeaks::setScale() {
 
 void FindPeaks::mouseAtMatrix(QPointF p) {
     if (currentBuffer) {
-        if (my_w.direction->isChecked()) {
-            my_w.plot->setMousePosition(p.y());
+        if (direction->isChecked()) {
+            plot->setMousePosition(p.y());
         } else {
-            my_w.plot->setMousePosition(p.x());
+            plot->setMousePosition(p.x());
         }
     }
 }
@@ -118,7 +118,7 @@ void FindPeaks::updatePlot() {
         saveDefaults();
         QRect geom2=box->getRect(currentBuffer);
         if (geom2.isEmpty()) {
-            my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
+            statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
             return;
         }
 
@@ -147,12 +147,12 @@ void FindPeaks::updatePlot() {
 
         QVector<double> myData;
 
-        if (my_w.direction->isChecked()) {
-            my_w.plot->graph(0)->setData(ydata,yd);
+        if (direction->isChecked()) {
+            plot->graph(0)->setData(ydata,yd);
             myData.resize(yd.size());
             std::copy ( yd.begin(), yd.end(), myData.begin() );
         } else {
-            my_w.plot->graph(0)->setData(xdata,xd);
+            plot->graph(0)->setData(xdata,xd);
             myData.resize(xd.size());
             std::copy ( xd.begin(), xd.end(), myData.begin() );
         }
@@ -171,7 +171,7 @@ void FindPeaks::updatePlot() {
             myDataC[i][1]=myDataC[i][1];
         }
 
-        double sx=pow(sizeCut/my_w.param->value(),2)/2.0;
+        double sx=pow(sizeCut/param->value(),2)/2.0;
 
         for (int i=0;i<sizeCut/2+1;i++) {
             double blur=exp(-i*i/sx);
@@ -184,17 +184,17 @@ void FindPeaks::updatePlot() {
         std::vector<double> fity;
         std::vector<double> fitz;
 
-        if (my_w.direction->isChecked()) {
-            my_w.plot->graph(1)->setData(ydata,myData);
+        if (direction->isChecked()) {
+            plot->graph(1)->setData(ydata,myData);
         } else {
-            my_w.plot->graph(1)->setData(xdata,myData);
+            plot->graph(1)->setData(xdata,myData);
         }
 
 
         int k=0;
         for (int i=1;i<sizeCut-1;i++) {
             if (myData[i]>myData[i-1] && myData[i]>myData[i+1]){
-                double posx=i+(my_w.direction->isChecked()?geom2.y():geom2.x());
+                double posx=i+(direction->isChecked()?geom2.y():geom2.x());
 
                 fitx.push_back(k);
                 fity.push_back(posx);
@@ -215,39 +215,39 @@ void FindPeaks::updatePlot() {
                     " c11:"+QString::number(cov11)+
                     " sq:"+QString::number(sqrt(sum_square)/fitx.size())+
                     "]";
-            my_w.statusBar->showMessage(msg);
-            my_w.origin->setText(QLocale().toString(c0));
-            my_w.scale->setText(QLocale().toString(c1));
+            statusbar->showMessage(msg);
+            origin->setText(QLocale().toString(c0));
+            scale->setText(QLocale().toString(c1));
         }
 
-        for (int i=0; i< my_w.plot->itemCount(); i++) {
-            if (my_w.plot->item(i)->property(panName().toLatin1()).isValid()) my_w.plot->removeItem(my_w.plot->item(i));
+        for (int i=0; i< plot->itemCount(); i++) {
+            if (plot->item(i)->property(panName().toLatin1()).isValid()) plot->removeItem(plot->item(i));
         }
-        my_w.points->setRowCount(0);
+        points->setRowCount(0);
         for (unsigned int i=0;i<fitx.size();i++) {
-            QCPItemStraightLine *marker=new QCPItemStraightLine(my_w.plot);
+            QCPItemStraightLine *marker=new QCPItemStraightLine(plot);
             marker->point1->setCoords(fity[i],0);
             marker->point2->setCoords(fity[i],1);
             marker->setProperty(panName().toLatin1(),true);
             marker->setPen(QPen(Qt::red));
 
-            int pos=my_w.points->rowCount();
-            my_w.points->insertRow(pos);
+            int pos=points->rowCount();
+            points->insertRow(pos);
             QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(fity[i]));
             QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(fitz[i]));
             xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
             yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-            my_w.points->setItem(pos, 0, xitem);
-            my_w.points->setItem(pos, 1, yitem);
-            my_w.points->resizeRowToContents(pos);
+            points->setItem(pos, 0, xitem);
+            points->setItem(pos, 1, yitem);
+            points->resizeRowToContents(pos);
         }
 
         fftw_destroy_plan(planR2C);
         fftw_destroy_plan(planC2R2);
         fftw_free(myDataC);
 
-        my_w.plot->rescaleAxes();
-        my_w.plot->replot();
+        plot->rescaleAxes();
+        plot->replot();
 
     }
 
@@ -256,7 +256,7 @@ void FindPeaks::updatePlot() {
 void FindPeaks::on_actionClipboard_triggered() {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(getPoints());
-    statusBar()->showMessage(tr("Point values copied"),2000);
+    statusbar->showMessage(tr("Point values copied"),2000);
 }
 
 void FindPeaks::on_actionTxt_triggered() {
@@ -268,18 +268,18 @@ void FindPeaks::on_actionTxt_triggered() {
         QTextStream out(&t);
         out << getPoints();
         t.close();
-        statusBar()->showMessage(tr("Export in file:")+fnametmp,2000);
+        statusbar->showMessage(tr("Export in file:")+fnametmp,2000);
     } else {
-        statusBar()->showMessage(tr("Export canceled"),2000);
+        statusbar->showMessage(tr("Export canceled"),2000);
     }
 }
 
 QString FindPeaks::getPoints() {
     QString retText;
-    for (int i=0; i<my_w.points->rowCount(); i++) {
+    for (int i=0; i<points->rowCount(); i++) {
         retText += QLocale().toString(i) + "\t";
-        for (int j=0; j<my_w.points->columnCount();j++) {
-            retText += my_w.points->item(i, j)->text() + "\t";
+        for (int j=0; j<points->columnCount();j++) {
+            retText += points->item(i, j)->text() + "\t";
         }
         retText += "\n";
     }

@@ -32,13 +32,12 @@
 #include "ui_test.h"
 
 // this is a nGenericPan (note the Q_INVOKABLE beforre ctor)
-class test : public nGenericPan {
+class test : public nGenericPan, private Ui::test_plugin {
 Q_OBJECT
 public:
 
-    Q_INVOKABLE test(neutrino *nparent)
-        : nGenericPan(nparent) {
-        my_w.setupUi(this);
+    Q_INVOKABLE test(neutrino *nparent) : nGenericPan(nparent) {
+        setupUi(this);
         show();
     }
 
@@ -46,11 +45,8 @@ public slots:
 
     // here the reiplemneted nGenericPan slots example:
     void mouseAtMatrix(QPointF p) {
-        my_w.label->setText(QString::number(p.x())+ " : " +QString::number(p.y()));
+        label->setText(QString::number(p.x())+ " : " +QString::number(p.y()));
     }
-
-private:
-    Ui::test_plugin my_w;
 
 };
 

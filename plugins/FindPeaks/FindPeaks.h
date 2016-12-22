@@ -34,21 +34,20 @@
 
 class nRect;
 
-class FindPeaks : public nGenericPan {
+class FindPeaks : public nGenericPan, private Ui::FindPeaks {
     Q_OBJECT
 
 public:
 
     Q_INVOKABLE FindPeaks(neutrino *);
-    Ui::FindPeaks my_w;
 
 public slots:
 
     void mouseAtMatrix(QPointF);
     void updatePlot();
 
-    void setOrigin();
-    void setScale();
+    void set_origin();
+    void set_scale();
     void on_actionClipboard_triggered();
     void on_actionTxt_triggered();
 

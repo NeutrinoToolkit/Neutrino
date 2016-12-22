@@ -57,7 +57,14 @@ public:
     nHelpTextBrowser(QWidget* parent) : QTextBrowser(parent) {}
 
 public slots:
-    void print();
+    void print() {
+        QPrinter printer(QPrinter::HighResolution);
+        QPrintDialog dialog(&printer,this);
+        dialog.setWindowTitle(tr("Print Help"));
+        if (dialog.exec() == QDialog::Accepted) {
+            document()->print(&printer);
+        }
+    }
 };
 
 class nGenericPan : public QMainWindow {

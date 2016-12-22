@@ -80,18 +80,6 @@ void nGenericPan::physAdd(nPhysD *buffer) {
     QApplication::processEvents();
 }
 
-void nHelpTextBrowser::print() {
-    qDebug() << "here";
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(&printer,this);
-    dialog->setWindowTitle(tr("Send to printer"));
-    if (dialog->exec() == QDialog::Accepted) {
-        printer.setFullPage(true);
-        printer.setPageSize(QPrinter::A4);
-        document()->print(&printer);
-    }
-}
-
 void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";

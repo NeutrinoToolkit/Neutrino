@@ -70,7 +70,7 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 
 
 
-class Visar : public nGenericPan {
+class Visar : public nGenericPan, private Ui::Visar1 {
     Q_OBJECT
 
     using nGenericPan::loadSettings;
@@ -79,7 +79,6 @@ public:
 
     Q_INVOKABLE Visar(neutrino *);
     ~Visar();
-    Ui::Visar1 my_w;
 
     std::array<Ui::Visar2,2> visar;
     std::array<Ui::Visar3,2> setvisar;

@@ -116,26 +116,26 @@ Visar::Visar(neutrino *nparent)
     : nGenericPan(nparent),
       sweepCoeff{{std::vector<double>(),std::vector<double>(),std::vector<double>()}}
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
-    connect(my_w.tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(my_w.tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(my_w.tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+    connect(actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+    connect(actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-    connect(my_w.actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
-    connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
+    connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
+    connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
+    connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
 
-    connect(my_w.actionGuess, SIGNAL(triggered()), this, SLOT(getCarrier()));
-    connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
+    connect(actionGuess, SIGNAL(triggered()), this, SLOT(getCarrier()));
+    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
     
     QList<QAction*> actionRects;
-    actionRects << my_w.actionRect1 << my_w.actionRect2;
+    actionRects << actionRect1 << actionRect2;
     for (int k=0;k<2;k++){
         fringeLine[k] = new nLine(this,3);
         fringeLine[k]->changeToolTip(tr("Fringeshift Visar ")+QString::number(k+1));
@@ -152,18 +152,18 @@ Visar::Visar(neutrino *nparent)
     sopRect =  new nRect(this,1);
     sopRect->changeToolTip(tr("SOP region"));
     sopRect->setRect(QRectF(0,0,100,100));
-    connect(my_w.actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
+    connect(actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
 
 
 
-    my_w.sopPlot->xAxis->setLabel(tr("Time"));
-    my_w.sopPlot->yAxis->setLabel(tr("Counts"));
-    my_w.sopPlot->yAxis2->setLabel(tr("Temperature"));
+    sopPlot->xAxis->setLabel(tr("Time"));
+    sopPlot->yAxis->setLabel(tr("Counts"));
+    sopPlot->yAxis2->setLabel(tr("Temperature"));
 
     //!END SOP stuff
     
-    QList<QWidget*> father1{my_w.wvisar1, my_w.wvisar2};
-    QList<QWidget*> father2{my_w.setVisar1, my_w.setVisar2};
+    QList<QWidget*> father1{wvisar1, wvisar2};
+    QList<QWidget*> father2{setVisar1, setVisar2};
     for (int k=0;k<2;k++){
         visar[k].setupUi(father1.at(k));
         father1.at(k)->show();
@@ -177,7 +177,7 @@ Visar::Visar(neutrino *nparent)
         }
 
     }
-    my_w.sopScale->setProperty("id", 2);
+    sopScale->setProperty("id", 2);
 
     for (int k=0;k<2;k++){
         for (int m=0;m<2;m++){
@@ -216,7 +216,7 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
                               << plot->yAxis2->pixelToCoord(e->pos().y()) << ":"
                               << plot->yAxis3->pixelToCoord(e->pos().y());
 
-            my_w.statusbar->showMessage(msg);
+            statusbar->showMessage(msg);
         }
     }
 }
@@ -232,7 +232,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             DEBUG("here");
             sweepChanged(setvisar[0].physScale);
             sweepChanged(setvisar[1].physScale);
-            sweepChanged(my_w.sopScale);
+            sweepChanged(sopScale);
         }
     } else {
         if (line->property("id").isValid()) {
@@ -245,7 +245,7 @@ void Visar::sweepChanged(QLineEdit *line) {
                 if(ok) {
                     sweepCoeff[k].push_back(coeff);
                 } else {
-                    my_w.statusbar->showMessage("Cannot understant sweep coefficint "+str);
+                    statusbar->showMessage("Cannot understant sweep coefficint "+str);
                     break;
                 }
             }
@@ -270,21 +270,21 @@ double Visar::getTime(int k, double p) {
 void Visar::mouseAtMatrix(QPointF p) {
     int k=0;
     double position=0.0;
-    if (my_w.tabs->currentIndex()==0) {
-        k=my_w.tabPhase->currentIndex();
+    if (tabs->currentIndex()==0) {
+        k=tabPhase->currentIndex();
         position=(direction(k)==0 ? p.y() : p.x());
         visar[k].plotPhaseIntensity->setMousePosition(position);
-    } else if (my_w.tabs->currentIndex()==1) {
-        k=my_w.tabVelocity->currentIndex();
+    } else if (tabs->currentIndex()==1) {
+        k=tabVelocity->currentIndex();
         double pos=direction(k)==0 ? p.y() : p.x();
         position=getTime(k,pos) - getTime(k,setvisar[k].physOrigin->value()) + setvisar[k].offsetTime->value();
-        my_w.plotVelocity->setMousePosition(position);
+        plotVelocity->setMousePosition(position);
     } else {
-        double pos=my_w.sopDirection->currentIndex()==0 ? p.y() : p.x();
-        position=getTime(2,pos) - getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
-        my_w.sopPlot->setMousePosition(position);
+        double pos=sopDirection->currentIndex()==0 ? p.y() : p.x();
+        position=getTime(2,pos) - getTime(2,sopOrigin->value()) + sopTimeOffset->value();
+        sopPlot->setMousePosition(position);
     }
-    my_w.statusbar->showMessage("Postion : "+QString::number(position));
+    statusbar->showMessage("Postion : "+QString::number(position));
 }
 
 int Visar::direction(int k) {
@@ -302,8 +302,8 @@ void Visar::bufferChanged(nPhysD*phys) {
             fringeLine[k]->show();
         }
         sopRect->hide();
-        if (phys==getPhysFromCombo(my_w.sopShot) ||
-                phys==getPhysFromCombo(my_w.sopRef) ) {
+        if (phys==getPhysFromCombo(sopShot) ||
+                phys==getPhysFromCombo(sopRef) ) {
             sopRect->show();
         }
     }
@@ -314,24 +314,24 @@ void Visar::tabChanged(int k) {
 
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
 
-    if (!tabWidget) tabWidget=my_w.tabs;
+    if (!tabWidget) tabWidget=tabs;
 
-    if (tabWidget==my_w.tabs) {
+    if (tabWidget==tabs) {
         if (k==0) {
-            tabWidget=my_w.tabPhase;
+            tabWidget=tabPhase;
         } else if (k==1) {
-            tabWidget=my_w.tabVelocity;
+            tabWidget=tabVelocity;
         }
     }
     
     if (k<2) {
         int visnum=tabWidget->currentIndex();
         nparent->showPhys(getPhysFromCombo(visar[visnum].shotImage));
-        if (tabWidget==my_w.tabVelocity) {
+        if (tabWidget==tabVelocity) {
             updatePlot();
         }
     } else if (k==2){
-        nparent->showPhys(getPhysFromCombo(my_w.sopShot));
+        nparent->showPhys(getPhysFromCombo(sopShot));
         updatePlotSOP();
     }
 }
@@ -364,20 +364,20 @@ void Visar::connections() {
         connect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(my_w.enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
+    connect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
 
-    connect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    connect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    connect(my_w.sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+    connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
 }
 
@@ -409,33 +409,33 @@ void Visar::disconnections() {
         disconnect(visar[k].plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     disconnect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(my_w.enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
+    disconnect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    disconnect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    disconnect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    disconnect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    disconnect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    disconnect(enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
 
-    disconnect(my_w.plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    disconnect(my_w.sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    disconnect(my_w.sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+    disconnect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    disconnect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    disconnect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 }
 
 void Visar::updatePlotSOP() {
-    if (!my_w.enableSOP->isChecked()) return;
+    if (!enableSOP->isChecked()) return;
     disconnections();
-    nPhysD *shot=getPhysFromCombo(my_w.sopShot);
-    nPhysD *ref=getPhysFromCombo(my_w.sopRef);
-    int dir=my_w.sopDirection->currentIndex();
+    nPhysD *shot=getPhysFromCombo(sopShot);
+    nPhysD *ref=getPhysFromCombo(sopRef);
+    int dir=sopDirection->currentIndex();
     if (shot) {
         QRect geom2=sopRect->getRect(shot);
         if (ref) geom2=geom2.intersected(QRect(0,0,ref->getW(),ref->getH()));
         if (geom2.isEmpty()) {
-            my_w.statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
+            statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
             return;
         }
         int dx=geom2.width();
@@ -454,24 +454,24 @@ void Visar::updatePlotSOP() {
         switch (dir) {
         case 0:
             for (int j=0;j<dy;j++) {
-                time_sop[j]=getTime(2,geom2.y()+j)-getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
-                sopCurve[0][j]=sopData[j]/dx-my_w.sopOffset->value();
+                time_sop[j]=getTime(2,geom2.y()+j)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
+                sopCurve[0][j]=sopData[j]/dx-sopOffset->value();
             }
             break;
         case 1:
             for (int i=0;i<dx;i++) {
-                time_sop[i]=getTime(2,geom2.x()+i)-getTime(2,my_w.sopOrigin->value()) + my_w.sopTimeOffset->value();
-                sopCurve[0][i]=sopData[i]/dy-my_w.sopOffset->value();
+                time_sop[i]=getTime(2,geom2.x()+i)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
+                sopCurve[0][i]=sopData[i]/dy-sopOffset->value();
             }
             break;
         default:
             break;
         }
-        my_w.sopPlot->graph(0)->setData(time_sop,sopCurve[0]);
+        sopPlot->graph(0)->setData(time_sop,sopCurve[0]);
 
         // TEMPERATURE FROM REFLECTIVITY
         QVector<int> reflList;
-        switch (my_w.whichRefl->currentIndex()) {
+        switch (whichRefl->currentIndex()) {
         case 0:
             reflList << 0;
             break;
@@ -489,8 +489,8 @@ void Visar::updatePlotSOP() {
         sopCurve[2].resize(time_sop.size());
         sopCurve[3].resize(time_sop.size());
 
-        double my_T0=my_w.sopCalibT0->value();
-        double my_A=my_w.sopCalibA->value();
+        double my_T0=sopCalibT0->value();
+        double my_A=sopCalibA->value();
         
         for (int i=0; i<time_sop.size(); i++) {
             double my_reflectivity=0;
@@ -538,27 +538,27 @@ void Visar::updatePlotSOP() {
                 sopCurve[3][i]=0.0;
             }
         }
-        my_w.sopPlot->graph(1)->setData(time_sop,sopCurve[1]);
+        sopPlot->graph(1)->setData(time_sop,sopCurve[1]);
 
-        my_w.sopPlot->graph(2)->setData(time_sop,sopCurve[2]);
+        sopPlot->graph(2)->setData(time_sop,sopCurve[2]);
 
-        my_w.sopPlot->graph(3)->setData(time_sop,sopCurve[3]);
+        sopPlot->graph(3)->setData(time_sop,sopCurve[3]);
 
-        my_w.sopPlot->rescaleAxes();
-        my_w.sopPlot->replot();
+        sopPlot->rescaleAxes();
+        sopPlot->replot();
     }
     connections();
 }
 
 void Visar::updatePlot() {
-    my_w.statusbar->showMessage("Updating");
+    statusbar->showMessage("Updating");
     disconnections();
 
-    my_w.plotVelocity->clearItems();
+    plotVelocity->clearItems();
 
-    for (int g=0; g<my_w.plotVelocity->plottableCount(); g++) {
-        if (my_w.plotVelocity->plottable(g)->property("JumpGraph").toBool()) {
-            my_w.plotVelocity->removePlottable(my_w.plotVelocity->plottable(g));
+    for (int g=0; g<plotVelocity->plottableCount(); g++) {
+        if (plotVelocity->plottable(g)->property("JumpGraph").toBool()) {
+            plotVelocity->removePlottable(plotVelocity->plottable(g));
         }
     }
 
@@ -588,7 +588,7 @@ void Visar::updatePlot() {
                                 tjump << valdt;
                                 njump << valdn;
                             } else {
-                                my_w.statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
+                                statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
                             }
                             if (ok3) {
                                 rjump << valdrefr_index;
@@ -597,14 +597,14 @@ void Visar::updatePlot() {
                             }
                         }
                     } else {
-                        my_w.statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
+                        statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
                     }
                 }
 
                 foreach (double a, tjump) {
-                    QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(my_w.plotVelocity);
+                    QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(plotVelocity);
                     QPen pen(Qt::gray);
-                    pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                    pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
                     my_jumpLine->point1->setCoords(a,0);
                     my_jumpLine->point2->setCoords(a,1);
@@ -663,14 +663,14 @@ void Visar::updatePlot() {
                 }
 
                 QPen pen;
-                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
 
                 if (setvisar[k].jump->value()!=0) {
                     for (int i=0;i<abs(setvisar[k].jump->value());i++) {
-                        QCPGraph* graph = my_w.plotVelocity->addGraph(my_w.plotVelocity->xAxis, my_w.plotVelocity->yAxis);
+                        QCPGraph* graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
                         graph->setProperty("JumpGraph",true);
                         graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
-                        QColor color(my_w.plotVelocity->yAxis->labelColor());
+                        QColor color(plotVelocity->yAxis->labelColor());
                         color.setAlpha(100);
                         pen.setColor(color);
                         graph->setPen(pen);
@@ -679,29 +679,29 @@ void Visar::updatePlot() {
                     }
                 }
 
-                pen=my_w.plotVelocity->graph(3*k+0)->pen();
-                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
-                my_w.plotVelocity->graph(3*k+0)->setPen(pen);
-                my_w.plotVelocity->graph(3*k+0)->setData(time_vel[k],quality[k]);
+                pen=plotVelocity->graph(3*k+0)->pen();
+                pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                plotVelocity->graph(3*k+0)->setPen(pen);
+                plotVelocity->graph(3*k+0)->setData(time_vel[k],quality[k]);
 
-                pen=my_w.plotVelocity->graph(3*k+1)->pen();
-                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
-                my_w.plotVelocity->graph(3*k+1)->setPen(pen);
-                my_w.plotVelocity->graph(3*k+1)->setData(time_vel[k],reflectivity[k]);
+                pen=plotVelocity->graph(3*k+1)->pen();
+                pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                plotVelocity->graph(3*k+1)->setPen(pen);
+                plotVelocity->graph(3*k+1)->setData(time_vel[k],reflectivity[k]);
 
-                pen=my_w.plotVelocity->graph(3*k+2)->pen();
-                pen.setStyle((k==my_w.tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
-                my_w.plotVelocity->graph(3*k+2)->setPen(pen);
-                my_w.plotVelocity->graph(3*k+2)->setData(time_vel[k],velocity[k]);
+                pen=plotVelocity->graph(3*k+2)->pen();
+                pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                plotVelocity->graph(3*k+2)->setPen(pen);
+                plotVelocity->graph(3*k+2)->setData(time_vel[k],velocity[k]);
 
             }
         }
     }
-    my_w.plotVelocity->rescaleAxes();
-    my_w.plotVelocity->replot();
+    plotVelocity->rescaleAxes();
+    plotVelocity->replot();
 
 
-    my_w.statusbar->showMessage("");
+    statusbar->showMessage("");
 
     updatePlotSOP();
 
@@ -717,8 +717,8 @@ void Visar::getCarrier() {
             getCarrier(k);
         }
     }
-    if (my_w.tabs->currentIndex()==1) {
-        my_w.statusbar->showMessage(tr("Carrier (")+QString::number(visar[0].interfringe->value())+tr("px, ")+visar[0].angle->value()+tr("deg) - (")+QString::number(visar[1].interfringe->value())+tr("px, ")+visar[1].angle->value()+tr("deg)"));
+    if (tabs->currentIndex()==1) {
+        statusbar->showMessage(tr("Carrier (")+QString::number(visar[0].interfringe->value())+tr("px, ")+visar[0].angle->value()+tr("deg) - (")+QString::number(visar[1].interfringe->value())+tr("px, ")+visar[1].angle->value()+tr("deg)"));
     }
 }
 
@@ -739,12 +739,12 @@ void Visar::getCarrier(int k) {
         vec2f vecCarr=phys_guess_carrier(datamatrix, visar[k].guessWeight->value());
 
         if (vecCarr.first()==0) {
-            my_w.statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
+            statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
         } else {
             visar[k].interfringe->setValue(vecCarr.first());
             visar[k].angle->setValue(vecCarr.second());
-            if (my_w.tabPhase->currentIndex()==k) {
-                my_w.statusbar->showMessage(tr("Carrier :")+QString::number(vecCarr.first())+tr("px, ")+QString::number(vecCarr.second())+tr("deg"));
+            if (tabPhase->currentIndex()==k) {
+                statusbar->showMessage(tr("Carrier :")+QString::number(vecCarr.first())+tr("px, ")+QString::number(vecCarr.second())+tr("deg"));
             }
         }
     }
@@ -790,7 +790,7 @@ void Visar::doWave(int k) {
             for (int m=0;m<2;m++) {
                 phase[k][m].resize(dim.x(), dim.y());
                 contrast[k][m].resize(dim.x(), dim.y());
-                intensity[k][m]= *(imgs[m]);
+                intensity[k][m]= imgs[m]->copy();
                 progress.setValue(++counter);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 phys_fast_gaussian_blur(intensity[k][m], visar[k].resolution->value());
@@ -977,7 +977,7 @@ void Visar::getPhase(int k) {
 
                 QCPGraph* graph;
                 QPen pen;
-                pen.setStyle((m==my_w.tabPhase->currentIndex()?Qt::SolidLine : Qt::DashLine));
+                pen.setStyle((m==tabPhase->currentIndex()?Qt::SolidLine : Qt::DashLine));
 
                 graph = visar[k].plotPhaseIntensity->addGraph(visar[k].plotPhaseIntensity->xAxis, visar[k].plotPhaseIntensity->yAxis);
                 graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
@@ -1025,12 +1025,12 @@ Visar::export_txt_multiple() {
 void
 Visar::export_txt() {
     QString title=tr("Export ");
-    switch (my_w.tabs->currentIndex()) {
+    switch (tabs->currentIndex()) {
     case 0:
-        title=tr("VISAR")+QString(" ")+QString::number(my_w.tabPhase->currentIndex()+1);
+        title=tr("VISAR")+QString(" ")+QString::number(tabPhase->currentIndex()+1);
         break;
     case 1:
-        title=tr("VISAR")+QString(" ")+QString::number(my_w.tabVelocity->currentIndex()+1);
+        title=tr("VISAR")+QString(" ")+QString::number(tabVelocity->currentIndex()+1);
         break;
     case 2:
         title=tr("SOP");
@@ -1042,12 +1042,12 @@ Visar::export_txt() {
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
-        switch (my_w.tabs->currentIndex()) {
+        switch (tabs->currentIndex()) {
         case 0:
-            out << export_one(my_w.tabPhase->currentIndex());
+            out << export_one(tabPhase->currentIndex());
             break;
         case 1:
-            out << export_one(my_w.tabVelocity->currentIndex());
+            out << export_one(tabVelocity->currentIndex());
             break;
         case 2:
             out << export_sop();
@@ -1063,18 +1063,18 @@ Visar::export_txt() {
 void
 Visar::export_clipboard() {
     QClipboard *clipboard = QApplication::clipboard();
-    switch (my_w.tabs->currentIndex()) {
+    switch (tabs->currentIndex()) {
     case 0:
-        clipboard->setText(export_one(my_w.tabPhase->currentIndex()));
-        my_w.statusbar->showMessage(tr("Points copied to clipboard ")+my_w.tabPhase->tabText(my_w.tabPhase->currentIndex()));
+        clipboard->setText(export_one(tabPhase->currentIndex()));
+        statusbar->showMessage(tr("Points copied to clipboard ")+tabPhase->tabText(tabPhase->currentIndex()));
         break;
     case 1:
         clipboard->setText(export_one(0)+"\n\n"+export_one(1));
-        my_w.statusbar->showMessage(tr("Points copied to clipboard both visars"));
+        statusbar->showMessage(tr("Points copied to clipboard both visars"));
         break;
     case 2:
         clipboard->setText(export_sop());
-        my_w.statusbar->showMessage(tr("Points copied to clipboard SOP"));
+        statusbar->showMessage(tr("Points copied to clipboard SOP"));
         break;
     default:
         break;
@@ -1083,12 +1083,12 @@ Visar::export_clipboard() {
 
 QString Visar::export_sop() {
     QString out;
-    out += QString("#SOP Origin       : %L1\n").arg(my_w.sopOrigin->value());
-    out += QString("#SOP Offset       : %L1\n").arg(my_w.sopTimeOffset->value());
-    out += QString("#SOP Time scale   : %L1\n").arg(my_w.sopScale->text());
-    out += QString("#SOP Direction    : %L1\n").arg(my_w.sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
-    out += QString("#Reflectivity     : %L1\n").arg(my_w.whichRefl->currentText());
-    out += QString("#Calib            : %L1 %L2\n").arg(my_w.sopCalibT0->value()).arg(my_w.sopCalibA->value());
+    out += QString("#SOP Origin       : %L1\n").arg(sopOrigin->value());
+    out += QString("#SOP Offset       : %L1\n").arg(sopTimeOffset->value());
+    out += QString("#SOP Time scale   : %L1\n").arg(sopScale->text());
+    out += QString("#SOP Direction    : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
+    out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
+    out += QString("#Calib            : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
     out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
     for (int i=0;i<time_sop.size();i++) {

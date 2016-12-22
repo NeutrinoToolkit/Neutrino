@@ -36,12 +36,11 @@
 
 #include "neutrino.h"
 
-class OpenHdf5 : public nGenericPan {
+class OpenHdf5 : public nGenericPan, private Ui::OpenHdf5 {
     Q_OBJECT
 
 public:
     Q_INVOKABLE OpenHdf5(neutrino *);
-    Ui::OpenHdf5 my_w;
 
 public slots:
     QString getFilename(QTreeWidgetItem*);

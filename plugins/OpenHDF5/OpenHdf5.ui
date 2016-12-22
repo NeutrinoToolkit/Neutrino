@@ -79,7 +79,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
+  <widget class="QStatusBar" name="statusbar">
    <property name="font">
     <font>
      <pointsize>10</pointsize>

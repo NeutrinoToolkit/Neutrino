@@ -30,14 +30,14 @@
 
 OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
-    my_w.treeWidget->setColumnHidden((my_w.treeWidget->columnCount()-1),true);
+    setupUi(this);
+    treeWidget->setColumnHidden((treeWidget->columnCount()-1),true);
 
-    connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
-    connect(my_w.actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
-    connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
-    connect(my_w.treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
-    connect(my_w.treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
+    connect(actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
+    connect(actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
+    connect(actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
+    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
+    connect(treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
 
     setProperty("NeuSave-fileHDF","nHDF.h5");
 
@@ -47,14 +47,14 @@ OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
 
 void OpenHdf5::copyPath(){
     QString clipText;
-    foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
+    foreach(QTreeWidgetItem *item, treeWidget->selectedItems()) {
         clipText+="fileOpen(\""+getFilename(item)+"\",\""+item->data(3,0).toString()+"\") ";
     }
     QApplication::clipboard()->setText(clipText);
 }
 
 void OpenHdf5::removeFile(){
-    foreach(QTreeWidgetItem *item, my_w.treeWidget->selectedItems()) {
+    foreach(QTreeWidgetItem *item, treeWidget->selectedItems()) {
         while (item->parent()) {
             item=item->parent();
         }
@@ -63,7 +63,7 @@ void OpenHdf5::removeFile(){
 }
 
 void OpenHdf5::itemEntered(QTreeWidgetItem *item, int) {
-    my_w.statusBar->showMessage(item->data(3,0).toString(),5000);
+    statusbar->showMessage(item->data(3,0).toString(),5000);
 }
 
 QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
@@ -79,10 +79,10 @@ void OpenHdf5::openData(QTreeWidgetItem *item, int) {
 }
 
 void OpenHdf5::showFile(QString fname) {
-    my_w.statusBar->showMessage("Parsing "+fname);
+    statusbar->showMessage("Parsing "+fname);
     QApplication::processEvents();
-    for (int i=0;i<my_w.treeWidget->topLevelItemCount();i++) {
-        QTreeWidgetItem *item=my_w.treeWidget->topLevelItem(i);
+    for (int i=0;i<treeWidget->topLevelItemCount();i++) {
+        QTreeWidgetItem *item=treeWidget->topLevelItem(i);
         if (item->data(3,0).toString()==fname) {
             delete item;
         }
@@ -92,20 +92,20 @@ void OpenHdf5::showFile(QString fname) {
     if (file_id>0) {
         nparent->updateRecentFileActions(fname);
         hid_t grp = H5Gopen(file_id,"/", H5P_DEFAULT);
-        QTreeWidgetItem *item=new QTreeWidgetItem(my_w.treeWidget,QStringList(QFileInfo(fname).fileName()));
+        QTreeWidgetItem *item=new QTreeWidgetItem(treeWidget,QStringList(QFileInfo(fname).fileName()));
         item->setData(1,0,"File");
         item->setData(3,0,fname);
         scanGroup(grp,item);
 #ifdef USE_QT5
-        my_w.treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 #else
-        my_w.treeWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
+        treeWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
 #endif
         H5Gclose(grp);
         H5Fclose(file_id);
-        my_w.statusBar->showMessage("Done",2000);
+        statusbar->showMessage("Done",2000);
     } else {
-        statusBar()->showMessage("Problem opening file",5000);
+        statusbar->showMessage("Problem opening file",5000);
     }
 }
 
