@@ -355,10 +355,11 @@ neutrino::neutrino():
 
     updateRecentFileActions();
 
+    loadDefaults();
+
     // plugins
     scanPlugins();
 
-    loadDefaults();
     show();
 
     QApplication::processEvents();
@@ -455,34 +456,46 @@ neutrino::scanPlugins(QString pluginsDirStr)
 }
 
 void
-neutrino::scanPlugins(QDir pluginsDir)
-{
+neutrino::scanPlugins(QDir pluginsDir) {
     if (pluginsDir.exists()) {
         foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-            DEBUG(10, "found plugin "<<fileName.toStdString());
-            new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+            if (QFileInfo(fileName).suffix() == nPlug::extension()) {
+                loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
+            }
         }
+        setProperty("NeuSave-lastplugindir",pluginsDir.absolutePath());
+        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
+        if (!listdirPlugins.contains(pluginsDir.absolutePath()))
+            listdirPlugins.append(pluginsDir.absolutePath());
+        setProperty("NeuSave-plugindirs",listdirPlugins);
+
     }
 }
 
 void
-neutrino::scanPlugins()
-{
-    QDir pluginsDir(qApp->applicationDirPath());
-    qDebug() << pluginsDir.absolutePath();
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cd("Resources");
-    }
-#endif
-    pluginsDir.cd("plugins");
-
-    qDebug() << pluginsDir.absolutePath();
-    if (pluginsDir.exists()) {
+neutrino::scanPlugins() {
+    if (property("NeuSave-plugindirs").isValid()) {
+        for (auto& d : property("NeuSave-plugindirs").toStringList()) {
+            if (QFileInfo(d).isDir()) {
+                scanPlugins(QDir(d));
+            }
+        }
+    } else {
+        QDir pluginsDir(qApp->applicationDirPath());
+    #if defined(Q_OS_WIN)
+        if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+            pluginsDir.cdUp();
+    #elif defined(Q_OS_MAC)
+        if (pluginsDir.dirName() == "MacOS") {
+            pluginsDir.cdUp();
+            pluginsDir.cd("Resources");
+        }
+    #endif
+        pluginsDir.cd("plugins");
+        if (!pluginsDir.exists()) {
+            pluginsDir = QDir(qApp->applicationDirPath());
+        }
+        qDebug() << pluginsDir.absolutePath();
         scanPlugins(pluginsDir);
     }
 }
@@ -2019,6 +2032,7 @@ void neutrino::saveDefaults(){
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
             my_set.setValue(ba, property(ba));
+            qDebug() << ba;
         }
     }
     my_set.endGroup();
@@ -2054,6 +2068,7 @@ void neutrino::loadDefaults(){
         my_set.beginGroup("Properties");
         foreach(QString my_key, my_set.allKeys()) {
             setProperty(my_key.toUtf8().constData(), my_set.value(my_key));
+            qDebug() << my_key;
         }
         my_set.endGroup();
     }

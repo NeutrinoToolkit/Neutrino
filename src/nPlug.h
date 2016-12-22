@@ -71,6 +71,17 @@ public slots:
 
     virtual bool unload() { return true; }
 
+    static QString extension() {
+    #if defined(Q_OS_WIN)
+        return QString("dll");
+    #elif defined(Q_OS_MAC)
+        return QString("dylib");
+    #elif defined(Q_OS_LINUX)
+        return QString("so");
+    #endif
+        return QString("");
+    }
+
 };
 
 Q_DECLARE_INTERFACE(nPlug, "org.neutrino.plug")

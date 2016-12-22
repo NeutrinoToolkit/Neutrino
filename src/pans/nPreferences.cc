@@ -143,6 +143,9 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
     connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
 
+    for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
+        my_w.pluginList->addItem(d);
+    }
 }
 
 
@@ -350,25 +353,20 @@ void nPreferences::changephysNameLength(int k) {
 
 
 void nPreferences::on_addPlugin_released() {
-    qDebug() << "here" ;
-
-    QString extension;
-#if defined(Q_OS_WIN)
-    extension="dll";
-#elif defined(Q_OS_MAC)
-    extension="dylib";
-#elif defined(Q_OS_LINUX)
-    extension="so";
-#endif
-
-    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open Plugin"),property("NeuSave-filePlugin").toString(),tr("Plugins")+QString(" (*.")+extension+QString(");;")+tr("Any files")+QString(" (*)"));
-    foreach (QString fname, fnames) {
-        nparent->loadPlugin(fname,false);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
+    if (QFileInfo(dir).exists()) {
+        nparent->scanPlugins(QDir(dir));
+        my_w.pluginList->addItem(dir);
+        nparent->setProperty("NeuSave-lastplugindir",dir);
     }
 }
 
-
 void nPreferences::on_removePlugin_released() {
-    qDebug() << "here" ;
+    qDeleteAll(my_w.pluginList->selectedItems());
+    QStringList pluginList;
+    for(int i = 0; i < my_w.pluginList->count(); ++i) {
+        pluginList.append(my_w.pluginList->item(i)->text());
+    }
+    nparent->setProperty("NeuSave-plugindirs",pluginList);
 }
 
