@@ -27,6 +27,14 @@
 #include "nGenericPan.h"
 
 bool nPanPlug::instantiate(neutrino *neu) {
+    QPointer<QTranslator> translator(new QTranslator(qApp));
+    if (translator->load(QLocale(), QLatin1String(name()), QLatin1String("_"), QLatin1String(":/translations"))) {
+        qDebug() << "installed translation";
+        qApp->installTranslator(translator);
+    } else {
+        delete translator;
+    }
+
     const QByteArray className(name()+"*");
     const int type = QMetaType::type( className );
     if(type != QMetaType::UnknownType) {

@@ -89,6 +89,8 @@ signals:
 
 public slots:
 
+    void changeEvent(QEvent *e);
+
     QString panName() {return QString(metaObject()->className());}
     void grabSave();
     void help();

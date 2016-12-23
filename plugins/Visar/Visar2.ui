@@ -51,6 +51,11 @@
       </property>
       <item>
        <widget class="QGroupBox" name="groupBox">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="title">
          <string>Reference and Shot</string>
         </property>
@@ -114,7 +119,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
         </property>
         <property name="neutrinoSave" stdset="0">
@@ -142,6 +147,11 @@
       </property>
       <item>
        <widget class="QGroupBox" name="groupBox_5">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="title">
          <string>Carrier :  intefringe and orientation</string>
         </property>
@@ -192,7 +202,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../qrc/icons.qrc">
+            <iconset resource="../../resources/icons/icons.qrc">
              <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
            </property>
            <property name="neutrinoSave" stdset="0">
@@ -260,6 +270,11 @@
       </item>
       <item>
        <widget class="QGroupBox" name="groupBox_4">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="toolTip">
          <string>Time resolution in pixel</string>
         </property>
@@ -300,6 +315,11 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="title">
       <string>Intensity parameters: </string>
      </property>
@@ -429,7 +449,7 @@
   <tabstop>multRef</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/icons/"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

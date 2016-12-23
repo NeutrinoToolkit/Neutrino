@@ -54,7 +54,7 @@ FindPeaks::FindPeaks(neutrino *nparent) : nGenericPan(nparent)
     plot->addGraph(plot->xAxis, plot->yAxis);
     plot->graph(1)->setName("Blurred");
     QPen p=plot->graph(1)->pen();
-    p.setStyle(Qt::DashLine);
+    p.setStyle(Qt::DotLine);
     plot->graph(1)->setPen(p);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));

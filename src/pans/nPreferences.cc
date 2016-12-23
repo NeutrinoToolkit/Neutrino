@@ -176,18 +176,14 @@ void nPreferences::changeLocale(QLocale locale) {
         settings.setValue("locale",locale);
         settings.endGroup();
 
-
-        QDirIterator it(":translations/", QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            QString fname=it.next();
-            qDebug() << fname;
-            if (fname.contains(locale.name())) {
-                QTranslator *translator=new QTranslator(qApp);
-                bool ok=translator->load(fname);
-                if (ok) {
-                    qApp->installTranslator(translator);
-                    qDebug() << "installing translator" << fname;
-                }
+        QString fileTransl(":translations/neutrino_"+locale.name()+".qm");
+        if(QFileInfo(fileTransl).exists()) {
+            QPointer<QTranslator> translator(new QTranslator(qApp));
+            if (translator->load(fileTransl)) {
+                qApp->installTranslator(translator);
+                qDebug() << "installing translator" << fileTransl;
+            } else {
+                delete translator;
             }
         }
     }

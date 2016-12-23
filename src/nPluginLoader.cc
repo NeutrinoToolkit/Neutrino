@@ -11,8 +11,6 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 	  QObject *p_obj = instance();
 
-      qDebug() <<errorString();
-
       if (p_obj) {
           iface = qobject_cast<nPlug *>(p_obj);
 			if (iface) {
@@ -42,7 +40,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     for (int i=0; i<my_list.size(); i++) {
                         bool found=false;
                         foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
-                            if (menu->title()==my_list.at(i)) {
+                            if (menu->title()==my_list.at(i) || menu->objectName()==QString("menu"+my_list.at(i))) {
                                 found=true;
                                 if (i<my_list.size()) {
                                     parentMenu = my_menu = menu;
@@ -96,7 +94,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 my_action->setData(v);
                 connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
                 my_menu->addAction(my_action);
-                qDebug() << "here" << my_menu;
+                qDebug() << "found menu:" << my_menu;
 
             } else {
                 QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));

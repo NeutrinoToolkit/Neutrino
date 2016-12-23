@@ -103,12 +103,24 @@ void nGenericPan::help() {
             connect(my_help->actionHome, SIGNAL(triggered()), my_help->help, SLOT(home()));
             connect(my_help->actionBack, SIGNAL(triggered()), my_help->help, SLOT(backward()));
             connect(my_help->actionForward, SIGNAL(triggered()), my_help->help, SLOT(forward()));
-
             connect(my_help->actionPrint, SIGNAL(triggered()), my_help->help, SLOT(print()));
-
             helpwin->show();
         }
     }
+}
+
+void nGenericPan::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        for(int i =  0; i < metaObject()->methodCount(); ++i)
+            qDebug() << panName() << i << metaObject()->method(i).methodSignature();
+
+        break;
+    default:
+        break;
+   }
 }
 
 void nGenericPan::grabSave() {

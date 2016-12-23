@@ -205,7 +205,6 @@
     <addaction name="actionRotate"/>
     <addaction name="actionRegionPath"/>
     <addaction name="actionInterpolate_Path"/>
-    <addaction name="actionFind_Peaks"/>
     <addaction name="actionPolarigrams"/>
     <addaction name="actionThomson_P"/>
     <addaction name="separator"/>
@@ -662,11 +661,6 @@
    </property>
    <property name="neutrinoSave" stdset="0">
     <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionFind_Peaks">
-   <property name="text">
-    <string>Find Peaks</string>
    </property>
   </action>
   <action name="actionSpectral_Analysis">

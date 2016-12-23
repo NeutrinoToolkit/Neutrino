@@ -205,7 +205,6 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
   find_package(Qt5LinguistTools)
 
   if (Qt5LinguistTools_FOUND)
-    option (UPDATE_TRANSLATIONS "Update source translation translations/*.ts" off)
     SET(LANGUAGES fr_FR it_IT ko_KP)
 
     SET(LANGUAGE_TS_FILES)
@@ -213,18 +212,16 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
       SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
       message(STATUS "Language : ${TS_FILE}")
       SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
+
+      if(EXISTS ${TS_FILE})
+        qt5_add_translation(qm_files ${TS_FILE})
+      else ()
+        qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
+      endif ()
+
     ENDFOREACH(LANGUAGE ${LANGUAGES})
 
     IF(LANGUAGE_TS_FILES)
-
-      if (UPDATE_TRANSLATIONS)
-        qt5_create_translation(qm_files ${SOURCES} ${UIS} ${LANGUAGE_TS_FILES})
-        message(STATUS "qm_files created")
-      else (UPDATE_TRANSLATIONS)
-        qt5_add_translation(qm_files ${LANGUAGE_TS_FILES})
-         message(STATUS "qm_files added")
-      endif (UPDATE_TRANSLATIONS) 
-
 
       set(TRANSL_QRC ${QRCDIR}/translations.qrc)
       file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
@@ -236,8 +233,6 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
       file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
       list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
       message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
-
-
 
       qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
     ENDIF(LANGUAGE_TS_FILES)
