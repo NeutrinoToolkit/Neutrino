@@ -133,7 +133,7 @@ Visar::Visar(neutrino *nparent)
     connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-    
+
     QList<QAction*> actionRects;
     actionRects << actionRect1 << actionRect2;
     for (int k=0;k<2;k++){
@@ -161,7 +161,7 @@ Visar::Visar(neutrino *nparent)
     sopPlot->yAxis2->setLabel(tr("Temperature"));
 
     //!END SOP stuff
-    
+
     QList<QWidget*> father1{wvisar1, wvisar2};
     QList<QWidget*> father2{setVisar1, setVisar2};
     for (int k=0;k<2;k++){
@@ -323,7 +323,7 @@ void Visar::tabChanged(int k) {
             tabWidget=tabVelocity;
         }
     }
-    
+
     if (k<2) {
         int visnum=tabWidget->currentIndex();
         nparent->showPhys(getPhysFromCombo(visar[visnum].shotImage));
@@ -484,18 +484,18 @@ void Visar::updatePlotSOP() {
         default:
             break;
         }
-        
+
         sopCurve[1].resize(time_sop.size());
         sopCurve[2].resize(time_sop.size());
         sopCurve[3].resize(time_sop.size());
 
         double my_T0=sopCalibT0->value();
         double my_A=sopCalibA->value();
-        
+
         for (int i=0; i<time_sop.size(); i++) {
             double my_reflectivity=0;
             double my_velocity=0;
-            
+
             int numrefl=0;
             for (int numk=0;numk<reflList.size();numk++) {
                 int k=reflList[numk];
@@ -504,17 +504,17 @@ void Visar::updatePlotSOP() {
                     for (int j=1;j<time_vel[k].size();j++) {
                         double t_j1=time_vel[k][j-1];
                         double t_j=time_vel[k][j];
-                        
+
                         if (time_sop[i]>t_j1 && time_sop[i]<=t_j ) {
                             double valRj_1=reflectivity[k][j-1];
                             double valRj=reflectivity[k][j];
 
                             double valVj_1=velocity[k][j-1];
                             double valVj=velocity[k][j];
-                            
+
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
                             my_velocity+=valVj_1+(time_sop[i]-t_j1)*(valVj-valVj_1)/(t_j-t_j1);
-                            
+
                             numrefl++;
                         }
                     }
@@ -527,7 +527,7 @@ void Visar::updatePlotSOP() {
 
             my_reflectivity=std::min(std::max(my_reflectivity,0.0),1.0);
             double my_temp=my_T0/log(1.0+(1.0-my_reflectivity)*my_A/sopCurve[0][i]);
-            
+
             if (numrefl) {
                 sopCurve[1][i]=my_temp;
                 sopCurve[2][i]=0.0;
@@ -768,7 +768,7 @@ void Visar::doWave(int k) {
     if (visar[k].enableVisar->isChecked()){
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)}};
         if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
-            
+
             int counter=0;
             QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 16, this);
             progress.setCancelButton(0);
@@ -800,7 +800,7 @@ void Visar::doWave(int k) {
                 progress.setValue(++counter);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
-            
+
             std::vector<int> xx(dim.x()), yy(dim.y());
 #pragma omp parallel for
             for (size_t i=0;i<dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
@@ -813,25 +813,25 @@ void Visar::doWave(int k) {
             double sr = sin((visar[k].angle->value()) * _phys_deg);
             double thick_norm=visar[k].resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
             double damp_norm=M_PI;
-            
+
             double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
 #pragma omp parallel for collapse(2)
             for (size_t x=0;x<dim.x();x++) {
                 for (size_t y=0;y<dim.y();y++) {
                     double xr = xx[x]*cr - yy[y]*sr; //rotate
                     double yr = xx[x]*sr + yy[y]*cr;
-                    
+
                     double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
                     double e_y = -pow(yr*thick_norm, 2);
-                    
+
                     double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
-                    
+
                     for (unsigned int m=0;m<2;m++) {
                         zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
                     }
                 }
             }
-            
+
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 

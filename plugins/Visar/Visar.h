@@ -74,7 +74,7 @@ class Visar : public nGenericPan, private Ui::Visar1 {
     Q_OBJECT
 
     using nGenericPan::loadSettings;
-
+    using Ui::Visar1::retranslateUi;
 public:
 
     Q_INVOKABLE Visar(neutrino *);
@@ -126,6 +126,22 @@ public slots:
     void bufferChanged(nPhysD*);
 
     void sweepChanged(QLineEdit*line=nullptr);
+
+    void changeEvent(QEvent *e)
+    {
+        qDebug() << panName() << e;
+
+        QWidget::changeEvent(e);
+        switch (e->type()) {
+        case QEvent::LanguageChange: {
+            retranslateUi(this);
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
 
 private:
 

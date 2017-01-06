@@ -20,7 +20,7 @@ endif()
 message (STATUS "neutrino root ${NEUTRINO_ROOT}" )
 
 if (NOT EXISTS ${NEUTRINO_ROOT}/src/neutrino.h)
-	message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
+    message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
 endif()
 message (STATUS "Building with Neutrino root: ${NEUTRINO_ROOT}")
 
@@ -57,10 +57,10 @@ SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 find_package(Qt5LinguistTools)
 
 if (Qt5LinguistTools_FOUND)
-  SET(LANGUAGES fr_FR it_IT ko_KP)
+    SET(LANGUAGES fr_FR it_IT ko_KP)
 
-  SET(LANGUAGE_TS_FILES)
-  FOREACH(LANGUAGE ${LANGUAGES})
+    SET(LANGUAGE_TS_FILES)
+    FOREACH(LANGUAGE ${LANGUAGES})
     SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${MY_PROJECT_NAME}_${LANGUAGE}.ts")
     message(STATUS "Language : ${TS_FILE}")
     SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
@@ -69,11 +69,11 @@ if (Qt5LinguistTools_FOUND)
         qt5_add_translation(qm_files ${TS_FILE})
     else ()
         qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
-    endif ()
+    endif()
 
-  ENDFOREACH()
+    ENDFOREACH()
 
-  IF(LANGUAGE_TS_FILES)
+    IF(LANGUAGE_TS_FILES)
     set(TRANSL_QRC ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
     file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
     foreach(my_file ${qm_files})
@@ -85,10 +85,12 @@ if (Qt5LinguistTools_FOUND)
     message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
 
     qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
-  ENDIF(LANGUAGE_TS_FILES)
-
+    ENDIF(LANGUAGE_TS_FILES)
 
 endif(Qt5LinguistTools_FOUND)
+
+
+
 
 QT5_WRAP_UI(nUIs ${UIS})
 
@@ -99,7 +101,7 @@ QT5_WRAP_UI(nUIs ${UIS})
 add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES})
 
 IF(APPLE)
-     set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
 ENDIF()
 
 
@@ -107,5 +109,36 @@ if (USE_QT5)
     qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 elseif(USE_QT4)
     target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
+endif()
+
+if(PANDOC)
+    FILE(GLOB allfiles "*.md")
+    if(allfiles)
+
+        set(PANDOC_QRC ${CMAKE_CURRENT_BINARY_DIR}/pandoc.qrc)
+        file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/pandoc/\">\n")
+
+
+        FOREACH(onefile ${allfiles})
+            get_filename_component(pandocdir ${onefile} DIRECTORY)
+
+            file(RELATIVE_PATH my_file_relative_path ${CMAKE_CURRENT_BINARY_DIR} ${onefile})
+            file(APPEND ${PANDOC_QRC} "        <file>${my_file_relative_path}</file>\n")
+
+            message(STATUS "pandoc : ${onefile}")
+            set (outfile ${onefile}.html)
+            add_custom_command(
+                OUTPUT ${onefile}.html
+                COMMAND ${PANDOC} -s -S ${onefile} --self-contained -o ${outfile}
+                MAIN_DEPENDENCY ${onefile}
+                WORKING_DIRECTORY ${pandocdir}
+                )
+
+            add_custom_target(pandoc ALL DEPENDS ${outfile} SOURCES ${onefile})
+        ENDFOREACH()
+        file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
+
+        ADD_DEPENDENCIES(${PROJECT_NAME} pandoc)
+    endif()
 endif()
 

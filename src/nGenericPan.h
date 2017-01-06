@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -49,7 +49,7 @@ namespace Ui {
 class PanHelp;
 }
 
-typedef void (*ifunc)(void *, int &); 
+typedef void (*ifunc)(void *, int &);
 
 class nHelpTextBrowser : public QTextBrowser {
     Q_OBJECT
@@ -67,24 +67,25 @@ public slots:
     }
 };
 
+
 class nGenericPan : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	nGenericPan(){};
+    nGenericPan(){};
     nGenericPan(neutrino *);
-	~nGenericPan(){};
+    ~nGenericPan(){};
 
-	neutrino *nparent;
+    neutrino *nparent;
     nPhysD *currentBuffer;
-	
-	// thread stuff
-	panThread nThread;
+
+    // thread stuff
+    panThread nThread;
 
     Ui::PanHelp *my_help;
 
 signals:
-	void changeCombo(QComboBox*);
+    void changeCombo(QComboBox*);
 
 
 public slots:
@@ -95,52 +96,52 @@ public slots:
     void grabSave();
     void help();
 
-	void showMessage(QString);
-	void showMessage(QString,int);
-	virtual void mouseAtMatrix(QPointF) { }
-	virtual void mouseAtWorld(QPointF) { }
+    void showMessage(QString);
+    void showMessage(QString,int);
+    virtual void mouseAtMatrix(QPointF) { }
+    virtual void mouseAtWorld(QPointF) { }
 
-	virtual void nZoom(double) { }
+    virtual void nZoom(double) { }
 
-	virtual void imageMousePress(QPointF) { }
-	virtual void imageMouseRelease(QPointF) { }
+    virtual void imageMousePress(QPointF) { }
+    virtual void imageMouseRelease(QPointF) { }
 
-	void physAdd(nPhysD *);
-	void physDel(nPhysD *);
+    void physAdd(nPhysD *);
+    void physDel(nPhysD *);
 
-	virtual void bufferChanged(nPhysD *);
+    virtual void bufferChanged(nPhysD *);
 
-	// threads
+    // threads
     void runThread(void *iparams, ifunc, QString=QString("Calculating"), int=0);
-    
-	// to sync image list on combos on the widget
-	void comboChanged(int);
-	nPhysD* getPhysFromCombo(QComboBox*);
 
-	QString getNameForCombo(QComboBox*,nPhysD *);
+    // to sync image list on combos on the widget
+    void comboChanged(int);
+    nPhysD* getPhysFromCombo(QComboBox*);
 
-	void loadUi(QSettings*);
-	void saveUi(QSettings*);
+    QString getNameForCombo(QComboBox*,nPhysD *);
 
-	void closeEvent(QCloseEvent*);
+    void loadUi(QSettings*);
+    void saveUi(QSettings*);
 
-	//settings
+    void closeEvent(QCloseEvent*);
 
-	void loadDefaults();
-	void saveDefaults();
+    //settings
 
-	void loadSettings();
-	void loadSettings(QString);
-	virtual void loadSettings(QSettings *);
-	void saveSettings();
-	virtual void saveSettings(QSettings *);
-	
+    void loadDefaults();
+    void saveDefaults();
+
+    void loadSettings();
+    void loadSettings(QString);
+    virtual void loadSettings(QSettings *);
+    void saveSettings();
+    virtual void saveSettings(QSettings *);
+
     bool nPhysExists(nPhysD*);
-    
-	// python stuff
-	void set(QString, QVariant, int=1);
-	QVariant get(QString, int=1);
-	QList<QList<qreal> >  getData(QString, int=1);
+
+    // python stuff
+    void set(QString, QVariant, int=1);
+    QVariant get(QString, int=1);
+    QList<QList<qreal> >  getData(QString, int=1);
     void button(QString, int=1);
 
 protected:

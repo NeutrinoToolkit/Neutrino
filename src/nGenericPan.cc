@@ -111,16 +111,27 @@ void nGenericPan::help() {
 
 void nGenericPan::changeEvent(QEvent *e)
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        for(int i =  0; i < metaObject()->methodCount(); ++i)
-            qDebug() << panName() << i << metaObject()->method(i).methodSignature();
+    qDebug() << panName() << e;
 
-        break;
-    default:
-        break;
-   }
+//    QWidget::changeEvent(e);
+//    switch (e->type()) {
+//    case QEvent::LanguageChange: {
+//        QMainWindow *my_mainWindow=qobject_cast<QMainWindow *>(nparent);
+//        if(my_mainWindow) {
+//            qDebug() << "found!";
+//            for(auto& pan: nparent->getPanList())
+//                for(int i =  0; i < pan->metaObject()->methodCount(); ++i) {
+//                    if (pan->metaObject()->method(i).methodSignature() == "retranslateUi(QMainWindow*)") {
+//                        qDebug() << "found retranslateUi";
+//                        QMetaObject::invokeMethod(pan,"retranslateUi",Q_ARG(QMainWindow *,my_mainWindow));
+//                    }
+//                }
+//        }
+//        break;
+//    }
+//    default:
+//        break;
+//    }
 }
 
 void nGenericPan::grabSave() {

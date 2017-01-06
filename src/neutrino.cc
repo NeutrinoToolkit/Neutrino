@@ -90,6 +90,27 @@
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
 
+void neutrino::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange: {
+        for(auto& pan: getPanList())
+            for(int i =  0; i < pan->metaObject()->methodCount(); ++i) {
+                if (pan->metaObject()->method(i).methodSignature() == "retranslateUi(QMainWindow*)") {
+                    qDebug() << "found retranslateUi";
+                    QMetaObject::invokeMethod(pan,"retranslateUi",Q_ARG(QMainWindow *,pan));
+                }
+            }
+        my_w->retranslateUi(this);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+
 neutrino::~neutrino()
 {
 }

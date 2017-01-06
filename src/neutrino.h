@@ -316,6 +316,8 @@ public slots:
     nGenericPan* getPan(QString);
 #endif
 
+    void changeEvent(QEvent *e);
+
 signals:
 	void updatecolorbar();
     void colorValue(double);

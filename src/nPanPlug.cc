@@ -29,7 +29,7 @@
 bool nPanPlug::instantiate(neutrino *neu) {
     QPointer<QTranslator> translator(new QTranslator(qApp));
     if (translator->load(QLocale(), QLatin1String(name()), QLatin1String("_"), QLatin1String(":/translations"))) {
-        qDebug() << "installed translation";
+        qDebug() << "installed translation" << QLocale() << name();
         qApp->installTranslator(translator);
     } else {
         delete translator;

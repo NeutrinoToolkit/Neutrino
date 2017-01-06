@@ -43,6 +43,17 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	
 endif()
 
+if(NOT DEFINED PANDOC)
+  message(STATUS "Looking for pandoc")
+  find_program(PANDOC pandoc)
+  if(PANDOC)
+    message(STATUS "Looking for pandoc - found")
+  else(PANDOC)
+    message(STATUS "Looking for pandoc - not found")
+  endif(PANDOC)
+  mark_as_advanced(PANDOC)
+endif(NOT DEFINED PANDOC)
+
 
 # gslcblas
 find_library(GSLCBLAS NAMES gslcblas)
