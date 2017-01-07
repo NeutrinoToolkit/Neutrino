@@ -196,7 +196,6 @@
     <addaction name="actionWavelet"/>
     <addaction name="actionInterferometry"/>
     <addaction name="actionInversions"/>
-    <addaction name="actionGhost"/>
     <addaction name="actionContours"/>
     <addaction name="actionFocal_Spot"/>
     <addaction name="actionCutoff_Mask"/>
@@ -773,11 +772,6 @@
   <action name="actionInterferometry">
    <property name="text">
     <string>Interferometry</string>
-   </property>
-  </action>
-  <action name="actionGhost">
-   <property name="text">
-    <string>Ghost</string>
    </property>
   </action>
   <action name="actionExport_all">
