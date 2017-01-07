@@ -148,20 +148,6 @@ file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLLICENSES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
 
-file(GLOB_RECURSE HTMLHELP ${HTMLDIR}/help/*)
-set(HELP_QRC ${QRCDIR}/help.qrc)
-file(WRITE ${HELP_QRC} "<RCC>\n    <qresource prefix=\"/help/\">\n")
-foreach(my_file ${HTMLHELP})
-    file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
-    GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-    GET_FILENAME_COMPONENT(my_file_dir ${my_file} DIRECTORY)
-    GET_FILENAME_COMPONENT(my_file_dir_clean ${my_file_dir} NAME)
-    file(APPEND ${HELP_QRC} "        <file alias=\"${my_file_dir_clean}/${my_file_basename}\">${my_file_relative_path}</file>\n")
-endforeach()
-file(APPEND ${HELP_QRC} "    </qresource>\n</RCC>")
-list(LENGTH HTMLHELP LIST_LENGTH)
-message(STATUS "${LIST_LENGTH} help files: ${HELP_QRC}")
-
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
 if (USE_QT5)
@@ -174,7 +160,6 @@ if (USE_QT5)
     qt5_add_resources(RES_SOURCES ${ICONS_QRC})
     qt5_add_resources(RES_SOURCES ${HTML_QRC})
     qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
-    qt5_add_resources(RES_SOURCES ${HELP_QRC})
 
 
     if (PYTHONQT_FOUND_COMPLETE)
