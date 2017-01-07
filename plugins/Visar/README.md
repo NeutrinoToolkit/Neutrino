@@ -94,7 +94,7 @@ Temperaure:
      4. *Zero*: no reflectivity (Blackbody temperature)
  4. **Sweep Time**: conversion px to time (same as above)
  5. Direction: **H**orizontal or **V**ertical
- 6. SOP calibration: *$T_0$ and A* : calibration values ($T_0$ is
+ 6. SOP calibration: **$T_0$** and **A** : calibration values ($T_0$ is
     the color temperature of the light collected by optical system and
     "A" is the efficiency of the streak).
  7. *min max* : restrain the temperature scale (right axis) between

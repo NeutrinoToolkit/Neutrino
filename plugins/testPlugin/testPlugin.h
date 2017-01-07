@@ -29,14 +29,14 @@
 #define __test_plugin_plugin
 
 // this includes the tests  .ui designer file
-#include "ui_test.h"
+#include "ui_testPlugin.h"
 
 // this is a nGenericPan (note the Q_INVOKABLE beforre ctor)
-class test : public nGenericPan, private Ui::test_plugin {
+class testPlugin : public nGenericPan, private Ui::test_plugin {
 Q_OBJECT
 public:
 
-    Q_INVOKABLE test(neutrino *nparent) : nGenericPan(nparent) {
+    Q_INVOKABLE testPlugin(neutrino *nparent) : nGenericPan(nparent) {
         setupUi(this);
         show();
     }
@@ -51,7 +51,7 @@ public slots:
 };
 
 // this is going to declare a plugin interface registered to neutrino
-NEUTRINO_PLUGIN(test)
+NEUTRINO_PLUGIN(testPlugin)
 // same as above but will add th entry in the menu Analysis
 // NEUTRINO_PLUGIN(test,Analysis)
 

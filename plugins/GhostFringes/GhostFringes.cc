@@ -22,12 +22,12 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nGhost.h"
+#include "GhostFringes.h"
 #include "neutrino.h"
 
 // physGhosts
 
-nGhost::nGhost(neutrino *nparent) : nGenericPan(nparent),
+GhostFringes::GhostFringes(neutrino *nparent) : nGenericPan(nparent),
   ghostBusted(NULL)
 {
 	my_w.setupUi(this);
@@ -46,7 +46,7 @@ nGhost::nGhost(neutrino *nparent) : nGenericPan(nparent),
 
 }
 
-void nGhost::guessCarrier() {
+void GhostFringes::guessCarrier() {
     nPhysD *image=getPhysFromCombo(my_w.ref);
 	if (image) {
         QRect geom2=region->getRect(image);
@@ -63,7 +63,7 @@ void nGhost::guessCarrier() {
 	}
 }
 
-void nGhost::doGhost () {
+void GhostFringes::doGhost () {
 	nPhysD *imageShot=getPhysFromCombo(my_w.shot);
     if (imageShot) {
         saveDefaults();

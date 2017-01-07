@@ -26,23 +26,23 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nGhost.h"
+#include "ui_GhostFringes.h"
 
-#ifndef __nGhost
-#define __nGhost
+#ifndef __GhostFringes
+#define __GhostFringes
 #include "nPhysWave.h"
 #include "nLine.h"
 #include "nRect.h"
 
 class neutrino;
 
-class nGhost : public nGenericPan {
+class GhostFringes : public nGenericPan {
     Q_OBJECT
 
 public:	
-    Q_INVOKABLE nGhost(neutrino *);
+    Q_INVOKABLE GhostFringes(neutrino *);
 
-    Ui::nGhost my_w;
+    Ui::GhostFringes my_w;
 
     QPointer<nRect> region;
 
@@ -55,5 +55,7 @@ public slots:
     void doGhost();
 
 };
+
+NEUTRINO_PLUGIN(GhostFringes,Analysis);
 
 #endif

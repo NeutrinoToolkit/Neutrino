@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nGhost</class>
- <widget class="QMainWindow" name="nGhost">
+ <class>GhostFringes</class>
+ <widget class="QMainWindow" name="GhostFringes">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -290,7 +290,7 @@
   </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -309,7 +309,7 @@
   <tabstop>erasePrevious</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

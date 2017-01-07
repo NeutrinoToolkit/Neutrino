@@ -279,9 +279,6 @@ public slots:
 	// Affine STUFF
 	nGenericPan* Affine();
 	
-	// remove ghost Fringes
-	nGenericPan* Ghost();
-    
 	// grab picture from camera
     nGenericPan* Camera();
 

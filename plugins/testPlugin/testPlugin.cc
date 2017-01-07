@@ -23,7 +23,7 @@
  *
  */
 
-#include "test.h"
+#include "testPlugin.h"
 
 
 

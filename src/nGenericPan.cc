@@ -84,7 +84,7 @@ void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
 
-    QString helpfile(":/help/"+panName()+"/index.html");
+    QString helpfile(":/pandoc/"+panName()+"/README.html");
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -163,16 +163,13 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
     foreach (QToolBar *my_tool, my_toolbars) {
         if (my_tool->objectName() == "toolBar") {
-            QDirIterator it(":/help");
-            while (it.hasNext()) {
-                QDir helpdir(it.next());
-                QString indexName=helpdir.canonicalPath()+"/index.html";
-                if (helpdir.exists() && helpdir.dirName() == panName() && QFileInfo(indexName).exists()) {
-                    QWidget* spacer = new QWidget();
-                    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-                    my_tool->addWidget(spacer);
-                    my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
-                }
+            QFile helpFile(":/pandoc/"+panName()+"/README.html");
+            qDebug() << helpFile.fileName() << helpFile.exists();
+            if (helpFile.exists()) {
+                QWidget* spacer = new QWidget();
+                spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                my_tool->addWidget(spacer);
+                my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
             }
             break;
         }
