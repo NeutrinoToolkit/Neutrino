@@ -54,6 +54,26 @@ if(NOT DEFINED PANDOC)
   mark_as_advanced(PANDOC)
 endif(NOT DEFINED PANDOC)
 
+MACRO(ADD_HELP)
+    if(PANDOC AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md"))
+
+        set(PANDOC_QRC ${CMAKE_CURRENT_BINARY_DIR}/pandoc.qrc)
+        file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/${MY_PROJECT_NAME}/\">\n")
+        file(APPEND ${PANDOC_QRC} "        <file>README.html</file>\n")
+        file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
+
+        qt5_add_resources(RES_SOURCES ${PANDOC_QRC})
+
+        add_custom_command(
+            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/README.html
+            COMMAND ${PANDOC} -f markdown -t html -s -S README.md --self-contained -o ${CMAKE_CURRENT_BINARY_DIR}/README.html
+            MAIN_DEPENDENCY "README.md"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+
+        add_custom_target(pandoc${MY_PROJECT_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/README.html SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+    endif()
+ENDMACRO()
 
 # gslcblas
 find_library(GSLCBLAS NAMES gslcblas)

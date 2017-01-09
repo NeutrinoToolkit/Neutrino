@@ -89,38 +89,7 @@ if (Qt5LinguistTools_FOUND)
 
 endif(Qt5LinguistTools_FOUND)
 
-if(PANDOC)
-    FILE(GLOB all_md_files "*.md")
-    if(all_md_files)
-
-        set(PANDOC_QRC ${CMAKE_CURRENT_BINARY_DIR}/pandoc.qrc)
-        file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/pandoc/${MY_PROJECT_NAME}/\">\n")
-
-
-        FOREACH(onefile ${all_md_files})
-            get_filename_component(pandocdir ${onefile} DIRECTORY)
-
-            get_filename_component(onefile_noext ${onefile} NAME_WE)
-            set (outfile ${onefile_noext}.html)
-            file(APPEND ${PANDOC_QRC} "        <file>${outfile}</file>\n")
-
-            message(STATUS "pandoc : ${onefile}")
-            set (all_md_html ${all_md_html} ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
-            add_custom_command(
-                OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${outfile}
-                COMMAND ${PANDOC} -f markdown -t html -s -S ${onefile} --self-contained -o ${CMAKE_CURRENT_BINARY_DIR}/${outfile}
-                MAIN_DEPENDENCY ${onefile}
-                WORKING_DIRECTORY ${pandocdir}
-                )
-
-        ENDFOREACH()
-        add_custom_target(pandoc${MY_PROJECT_NAME} ALL DEPENDS ${all_md_html} SOURCES ${all_md_files})
-        file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
-
-        qt5_add_resources(RES_SOURCES ${PANDOC_QRC})
-    endif()
-endif()
-
+ADD_HELP()
 
 QT5_WRAP_UI(nUIs ${UIS})
 

@@ -84,7 +84,7 @@ void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
 
-    QString helpfile(":/pandoc/"+panName()+"/README.html");
+    QString helpfile(":/"+panName()+"/README.html");
     if (QFileInfo(helpfile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
@@ -163,7 +163,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
     foreach (QToolBar *my_tool, my_toolbars) {
         if (my_tool->objectName() == "toolBar") {
-            QFile helpFile(":/pandoc/"+panName()+"/README.html");
+            QFile helpFile(":/"+panName()+"/README.html");
             qDebug() << helpFile.fileName() << helpFile.exists();
             if (helpFile.exists()) {
                 QWidget* spacer = new QWidget();
