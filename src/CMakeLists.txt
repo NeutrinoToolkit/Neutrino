@@ -185,9 +185,6 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 
 #translate ui
-  SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
-
-  find_package(Qt5LinguistTools)
 
   if (Qt5LinguistTools_FOUND)
     SET(LANGUAGES fr_FR it_IT ko_KP)
