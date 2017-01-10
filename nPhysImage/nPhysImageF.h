@@ -573,6 +573,8 @@ public:
             DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
             uchar_buf.resize(getSurf()*3);
 
+#pragma omp parallel
+{
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
@@ -587,7 +589,7 @@ public:
                     uchar_buf[i*3+2] = 255;
 				}
 			}
-
+}
             display_property["palette_name"]=palette_name;
             display_property["gamma"]=property["gamma"].get_i();
             display_property["display_range"]=property["display_range"];

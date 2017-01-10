@@ -1209,12 +1209,10 @@ std::vector <nPhysD *> phys_open_inf(std::string ifilename) {
 			linearized->setType(PHYS_FILE);
 			linearized->setFromName(ifilename);
 			linearized->setShortName("(linearized)");
-			imagelist.push_back(linearized);
             nPhysD *original = new nPhysD(w,h,0.0,ifilename.c_str());
 			original->setType(PHYS_FILE);
 			original->setFromName(ifilename);
 			original->setShortName("(original)");
-			imagelist.push_back(original);
 			getline(ifile,line);
 			double sensitivity=atoi(line.c_str());
 			getline(ifile,line);
@@ -1248,7 +1246,13 @@ std::vector <nPhysD *> phys_open_inf(std::string ifilename) {
 			linearized->set_scale(resx,resy);
 			linearized->TscanBrightness();
 			original->TscanBrightness();
-		}
+            imagelist.push_back(linearized);
+#ifdef __phys_debug
+            imagelist.push_back(original);
+#else
+            delete original;
+#endif
+        }
 		ifileimg.close();
 	}
 	ifile.close();
