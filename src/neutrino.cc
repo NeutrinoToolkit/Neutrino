@@ -493,29 +493,30 @@ neutrino::scanPlugins(QDir pluginsDir) {
 
 void
 neutrino::scanPlugins() {
+    QDir pluginsDir(qApp->applicationDirPath());
+#if defined(Q_OS_WIN)
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cd("Resources");
+    }
+#endif
+    pluginsDir.cd("plugins");
+    if (!pluginsDir.exists()) {
+        pluginsDir = QDir(qApp->applicationDirPath());
+    }
+    qDebug() << pluginsDir.absolutePath();
+    scanPlugins(pluginsDir);
+
     if (property("NeuSave-plugindirs").isValid()) {
         for (auto& d : property("NeuSave-plugindirs").toStringList()) {
-            if (QFileInfo(d).isDir()) {
+            qDebug() << pluginsDir.absolutePath() << QFileInfo(d).absolutePath() ;
+            if (QFileInfo(d).isDir() && pluginsDir.absolutePath()!=QFileInfo(d).absolutePath()) {
                 scanPlugins(QDir(d));
             }
         }
-    } else {
-        QDir pluginsDir(qApp->applicationDirPath());
-    #if defined(Q_OS_WIN)
-        if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-            pluginsDir.cdUp();
-    #elif defined(Q_OS_MAC)
-        if (pluginsDir.dirName() == "MacOS") {
-            pluginsDir.cdUp();
-            pluginsDir.cd("Resources");
-        }
-    #endif
-        pluginsDir.cd("plugins");
-        if (!pluginsDir.exists()) {
-            pluginsDir = QDir(qApp->applicationDirPath());
-        }
-        qDebug() << pluginsDir.absolutePath();
-        scanPlugins(pluginsDir);
     }
 }
 
