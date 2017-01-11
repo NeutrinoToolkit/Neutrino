@@ -13,9 +13,7 @@ if (HDF5_FOUND AND NOT ${HDF5HL} STREQUAL "HDF5HL-NOTFOUND")
     message (STATUS "using libhdf5_hl: ${HDF5HL}")
     set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5HL})
     add_definitions(-DHAVE_LIBHDF5HL)
-else()
-    message (FATAL_ERROR "Cannot find HDF5_HL: disabling HDF5 support ${HDF5_LIBRARY_DIRS}")
-endif()
+
 
 # check for neutrino root
 if (NOT DEFINED NEUTRINO_ROOT)
@@ -29,4 +27,9 @@ endif()
 set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
 include(NeutrinoPlugin)
 ADD_NEUTRINO_PLUGIN()
+
+else()
+    message (STATUS "Cannot find HDF5_HL: disabling HDF5 support ${HDF5_LIBRARY_DIRS}")
+endif()
+
 

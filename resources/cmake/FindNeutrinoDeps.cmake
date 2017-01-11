@@ -17,14 +17,31 @@ if (TIFF_FOUND)
 endif()
 
 # fftw_threads
-find_package(FFTW REQUIRED)
-if (FFTW_FOUND AND FFTW_THREADS_LIB)
-	include_directories(${FFTW_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${FFTW_LIBRARIES} ${FFTW_THREADS_LIB})
+#find_package(FFTW REQUIRED)
+#if (FFTW_FOUND AND FFTW_THREADS_LIB)
+#	include_directories(${FFTW_INCLUDE_DIRS})
+#	set(LIBS ${LIBS} ${FFTW_LIBRARIES} ${FFTW_THREADS_LIB})
+#	add_definitions(-DHAVE_LIBFFTW_THREADS)
+#else()
+#    message( FATAL_ERROR "You need fftw_threads library" )
+#endif()
+
+# fftw_threads
+find_library(FFTW_THREADS NAMES fftw3_threads)
+if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
+	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
+	set(LIBS ${LIBS} ${FFTW_THREADS}) 
 	add_definitions(-DHAVE_LIBFFTW_THREADS)
-else()
-    message( FATAL_ERROR "You need fftw_threads library" )
 endif()
+
+#fftw
+find_library(FFTW NAMES fftw3 fftw3-3)
+if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
+	message (STATUS "using FFTW: ${FFTW}")
+	set(LIBS ${LIBS} ${FFTW}) 
+	add_definitions(-DHAVE_LIBFFTW)
+endif()	
+
 
 find_library(GSL NAMES gsl)
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")

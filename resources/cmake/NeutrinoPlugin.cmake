@@ -109,8 +109,12 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES})
 
     IF(APPLE)
-    set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+        set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
     ENDIF()
+
+    if(WIN32)
+	set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--allow-shlib-undefined")
+    endif()
 
     if (DEFINED LOCAL_LIBS)
         target_link_libraries(${PROJECT_NAME} ${LOCAL_LIBS})

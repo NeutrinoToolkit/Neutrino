@@ -54,6 +54,7 @@ void my_handler(int s){
 
 int main(int argc, char **argv)
 {
+#ifndef __WIN32
     struct sigaction sigIntHandler;
 
     sigIntHandler.sa_handler = my_handler;
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
     sigIntHandler.sa_flags = 0;
 
     sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
 
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
