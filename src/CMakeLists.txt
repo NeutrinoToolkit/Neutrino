@@ -82,7 +82,7 @@ list (APPEND SOURCES
 )
 
 #moving it to main file
-#include(FindNeutrinoGuiComponents)
+include(FindNeutrinoGuiComponents)
 
 if (PYTHONQT_FOUND_COMPLETE)
     MESSAGE(STATUS "adding python wrappers")

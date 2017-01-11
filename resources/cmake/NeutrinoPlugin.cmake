@@ -1,6 +1,8 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
     include(FindNeutrinoGuiComponents)
 
+    message(STATUS ">>>>>>>>>>> ${CMAKE_CXX_FLAGS}")
+
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
     message (STATUS "${NEUTRINO_ROOT} : Adding plugin ${MY_PROJECT_NAME}")
     PROJECT (${MY_PROJECT_NAME} CXX)
@@ -109,11 +111,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES})
 
     IF(APPLE)
-        set (CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+        set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
     ENDIF()
 
     if(WIN32)
-	set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--allow-shlib-undefined")
+	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
     endif()
 
     if (DEFINED LOCAL_LIBS)

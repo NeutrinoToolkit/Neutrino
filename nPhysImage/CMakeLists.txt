@@ -24,7 +24,7 @@ message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 add_definitions(-DHAVE_LIBPTHREAD)
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake)
-include(FindNeutrinoGuiComponents)
+include(FindNeutrinoDeps)
 
 
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
