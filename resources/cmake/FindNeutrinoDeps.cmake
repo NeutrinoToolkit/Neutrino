@@ -26,23 +26,25 @@ endif()
 #    message( FATAL_ERROR "You need fftw_threads library" )
 #endif()
 
-# fftw_threads
-find_library(FFTW_THREADS NAMES fftw3_threads)
-if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
-	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
-	set(LIBS ${LIBS} ${FFTW_THREADS}) 
-	add_definitions(-DHAVE_LIBFFTW_THREADS)
+#fftw
+find_library(FFTW NAMES fftw3 fftw3-3 REQUIRED)
+if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
+        message (STATUS "using FFTW: ${FFTW}")
+        set(LIBS ${LIBS} ${FFTW})
+        add_definitions(-DHAVE_LIBFFTW)
 endif()
 
-#fftw
-find_library(FFTW NAMES fftw3 fftw3-3)
-if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
-	message (STATUS "using FFTW: ${FFTW}")
-	set(LIBS ${LIBS} ${FFTW}) 
-	add_definitions(-DHAVE_LIBFFTW)
-endif()	
+#in precompiled win dlls the threads are included
+if(NOT WIN32)
+    # fftw_threads
+    find_library(FFTW_THREADS NAMES fftw3_threads REQUIRED)
+    if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
+            message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
+            set(LIBS ${LIBS} ${FFTW_THREADS})
+    endif()
+endif()
 
-
+#gsl
 find_library(GSL NAMES gsl)
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	message (STATUS "using gsl: ${GSL}")
