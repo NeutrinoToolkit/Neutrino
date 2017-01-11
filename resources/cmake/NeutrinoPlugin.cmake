@@ -1,8 +1,6 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
     include(FindNeutrinoGuiComponents)
 
-    message(STATUS ">>>>>>>>>>> ${CMAKE_CXX_FLAGS}")
-
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
     message (STATUS "${NEUTRINO_ROOT} : Adding plugin ${MY_PROJECT_NAME}")
     PROJECT (${MY_PROJECT_NAME} CXX)

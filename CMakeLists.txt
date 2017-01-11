@@ -58,6 +58,12 @@ set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 
+add_subdirectory (nPhysImage)
+add_subdirectory (src)
+add_subdirectory (plugins)
+
+message(STATUS ">>>>>>>>>>>>>>>>>>>>>>>> ${PYTHONQT}")
+
 if (LINUX)
 	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
 		message (STATUS "PythonQt lib is copied along")
@@ -83,9 +89,6 @@ if (GIT_FOUND)
 endif()
 
 # targets
-add_subdirectory (nPhysImage)
-add_subdirectory (src)
-add_subdirectory (plugins)
 
 ## cpack definitions
 #SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Neutrino")
