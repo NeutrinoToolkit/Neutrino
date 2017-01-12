@@ -117,7 +117,7 @@ void nLineoutBoth::updatePlot(QPointF p) {
             }
 
             vec2f phys_origin=currentBuffer->get_origin();
-            my_w.plot->setMousePosition(p.x()-phys_origin.x(),p.y()-phys_origin.y());
+            my_w.plot->setMousePosition((p.x()-phys_origin.x())*currentBuffer->get_scale(cut_dir),(p.y()-phys_origin.y())*currentBuffer->get_scale(cut_dir));
         }
 
 

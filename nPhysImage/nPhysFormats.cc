@@ -1181,80 +1181,90 @@ std::vector <nPhysD *> phys_open_inf(std::string ifilename) {
     std::vector <nPhysD *> imagelist;
 	ifstream ifile(ifilename.c_str(), ios::in);
 	if (ifile) {
-		string ifilenameimg=ifilename;
-		ifilenameimg.resize(ifilenameimg.size()-3);
-		ifilenameimg = ifilenameimg+"img";
-		ifstream ifileimg(ifilenameimg.c_str(), ios::in);
-		if (ifileimg) {
-			DEBUG("start");
-			string line;
-			getline(ifile,line);
-			if (line.compare(string("BAS_IMAGE_FILE"))!=0) {
-                throw phys_fileerror("File does not start with BAS_IMAGE_FILE");
-				return imagelist;
-			}
-			getline(ifile,line); //this is the basename
-			getline(ifile,line); //this we don't know what it is
-			getline(ifile,line);
-			double resx=atoi(line.c_str());
-			getline(ifile,line);
-			double resy=atoi(line.c_str());
-			getline(ifile,line);
-			int bit=atoi(line.c_str());
-			getline(ifile,line);
-			int w=atoi(line.c_str());
-			getline(ifile,line);
-			int h=atoi(line.c_str());
-            nPhysD *linearized = new nPhysD(w,h,0.0,(string("(linearized)")+ifilename).c_str());
-			linearized->setType(PHYS_FILE);
-			linearized->setFromName(ifilename);
-			linearized->setShortName("(linearized)");
-            nPhysD *original = new nPhysD(w,h,0.0,ifilename.c_str());
-			original->setType(PHYS_FILE);
-			original->setFromName(ifilename);
-			original->setShortName("(original)");
-			getline(ifile,line);
-			double sensitivity=atoi(line.c_str());
-			getline(ifile,line);
-			double latitude=atoi(line.c_str());
-			// FIXME: this is awful
-			switch (bit) {
-				case 8: {
-					vector<char> buf(original->getSurf());
-					ifileimg.read(&buf[0], original->getSurf());
-					for (size_t i=0;i<original->getSurf();i++) {
-						original->set(i,swap_endian<char>(buf[i]));
-						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
-					}
-					break;
-				}
-				case 16: {
-					vector<unsigned short> buf(original->getSurf());
-					ifileimg.read((char*)(&buf[0]), sizeof(unsigned short)*original->getSurf());
-					for (size_t i=0;i<original->getSurf();i++) {
-						original->set(i,swap_endian<unsigned short>(buf[i]));
-						linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
-					}
-					break;
-				}
-			}
-			original->property["resx"] = linearized->property["resx"] = resx;
-			original->property["resy"] = linearized->property["resy"] = resy;
-			original->property["bits"] = linearized->property["bits"] = bit;
-			original->property["sens"] = linearized->property["sens"] = sensitivity;
-			original->property["lati"] = linearized->property["lati"] = latitude;
-			linearized->set_scale(resx,resy);
-			linearized->TscanBrightness();
-			original->TscanBrightness();
-            imagelist.push_back(linearized);
-#ifdef __phys_debug
-            imagelist.push_back(original);
-#else
-            delete original;
-#endif
+        string ifilenameimg=ifilename;
+        ifilenameimg.replace(ifilenameimg.size()-3,3,"img");
+//        ifilenameimg.resize(ifilenameimg.size()-3);
+//        ifilenameimg = ifilenameimg+"img";
+        DEBUG(">>>>>>>>>>>>>>>>>>>" <<ifilenameimg);
+        string line;
+        getline(ifile,line);
+        if (line.compare(string("BAS_IMAGE_FILE"))!=0) {
+            throw phys_fileerror("File does not start with BAS_IMAGE_FILE");
+            return imagelist;
         }
-		ifileimg.close();
-	}
+        getline(ifile,line); //this is the basename
+        DEBUG("basename: " << line);
+        getline(ifile,line); //this we don't know what it is
+        DEBUG("unknown : " << line);
+        getline(ifile,line);
+        double resx=atoi(line.c_str());
+        getline(ifile,line);
+        double resy=atoi(line.c_str());
+        getline(ifile,line);
+        int bit=atoi(line.c_str());
+        getline(ifile,line);
+        int w=atoi(line.c_str());
+        getline(ifile,line);
+        int h=atoi(line.c_str());
+        nPhysD *linearized = new nPhysD(w,h,0.0,ifilename);
+        linearized->setType(PHYS_FILE);
+        linearized->setShortName("linearized");
+        nPhysD *original = new nPhysD(w,h,0.0,ifilenameimg.c_str());
+        original->setType(PHYS_FILE);
+        original->setShortName("original");
+
+        phys_open_RAW(original,bit==8?0:2,0,true);
+
+        linearized->property["inf-resx"] = original->property["inf-resx"] = resx;
+        linearized->property["inf-resy"] = original->property["inf-resy"] = resy;
+        linearized->set_scale(resx/1000.,resy/1000.);
+        linearized->property["unitsX"] = original->property["unitsX"] = "mm";
+        linearized->property["unitsY"] = original->property["unitsY"] = "mm";
+
+        getline(ifile,line);
+        double sensitivity=atoi(line.c_str());
+        linearized->property["inf-sens"] = original->property["inf-sens"] = sensitivity;
+        getline(ifile,line);
+        double latitude=atoi(line.c_str());
+        linearized->property["inf-lati"] = original->property["inf-lati"] = latitude;
+        getline(ifile,line);
+        linearized->property["inf-date"] = original->property["inf-date"] = line;
+        getline(ifile,line);
+        linearized->property["inf-number"] = original->property["inf-number"] = line;
+        getline(ifile,line); //empty line
+        getline(ifile,line);
+        if (line.compare(string("FLA-7000"))!=0) {
+            throw phys_fileerror("File does not have FLA-7000");
+            return imagelist;
+        }
+        getline(ifile,line); //empty line
+        getline(ifile,line);
+        if (line.compare(string("*** more info ***"))!=0) {
+            throw phys_fileerror("File does not have *** more info ***");
+            return imagelist;
+        }
+        getline(ifile,line);
+        int properties=atoi(line.c_str());
+        for (size_t i=0;i<properties;i++) {
+            getline(ifile,line); //empty line
+            stringstream ss;
+            ss << "inf-" << setw(3) << setfill('0') << i;
+            linearized->property[ss.str()] = original->property[ss.str()] = line;
+        }
+
+#pragma omp parallel for
+        for (size_t i=0;i<original->getSurf();i++) {
+            linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
+        }
+        linearized->TscanBrightness();
+        imagelist.push_back(linearized);
+#ifdef __phys_debug
+        original->TscanBrightness();
+        imagelist.push_back(original);
+#else
+        delete original;
+#endif
+    }
 	ifile.close();
 	return imagelist;
 }

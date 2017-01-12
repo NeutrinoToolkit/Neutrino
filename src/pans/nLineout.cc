@@ -63,11 +63,11 @@ void nLineout::setBehaviour() {
 
 // mouse movement
 void
-nLineout::updatePlot(QPointF p) {
+nLineout::updatePlot(QPointF my_point) {
 
     if (currentBuffer != NULL) {
 
-        vec2 b_p(p.x(),p.y());
+        vec2 b_p(my_point.x(),my_point.y());
 
         //get bounds from view
         QPointF orig,corner;
@@ -112,8 +112,8 @@ nLineout::updatePlot(QPointF p) {
                 my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
             }
         }
-        statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
-        my_w.plot->setMousePosition(b_p(cut_dir)-currentBuffer->get_origin(cut_dir));
+        statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
+        my_w.plot->setMousePosition((b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir));
     }
 
 }
