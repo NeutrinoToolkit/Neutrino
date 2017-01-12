@@ -803,9 +803,9 @@ void Visar::doWave(int k) {
 
             std::vector<int> xx(dim.x()), yy(dim.y());
 #pragma omp parallel for
-            for (size_t i=0;i<dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
+            for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
 #pragma omp parallel for
-            for (size_t i=0;i<dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
+            for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
 
             progress.setValue(++counter);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -816,8 +816,8 @@ void Visar::doWave(int k) {
 
             double lambda_norm=visar[k].interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
 #pragma omp parallel for collapse(2)
-            for (size_t x=0;x<dim.x();x++) {
-                for (size_t y=0;y<dim.y();y++) {
+            for (size_t x=0;x<(size_t)dim.x();x++) {
+                for (size_t y=0;y<(size_t)dim.y();y++) {
                     double xr = xx[x]*cr - yy[y]*sr; //rotate
                     double yr = xx[x]*sr + yy[y]*cr;
 
@@ -844,7 +844,7 @@ void Visar::doWave(int k) {
 
             for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for
-                for (size_t kk=0; kk<dim.x()*dim.y(); kk++) {
+                for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
                     phase[k][m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
                     contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
                     intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));

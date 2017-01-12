@@ -1245,7 +1245,7 @@ std::vector <nPhysD *> phys_open_inf(std::string ifilename) {
         }
         getline(ifile,line);
         int properties=atoi(line.c_str());
-        for (size_t i=0;i<properties;i++) {
+        for (int i=0;i<properties;i++) {
             getline(ifile,line); //empty line
             stringstream ss;
             ss << "inf-" << setw(3) << setfill('0') << i;

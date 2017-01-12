@@ -36,7 +36,8 @@ MadLab ; defined (1 "#00008f", 8 "#0000ff", 24 "#00ffff", 40 "#ffff00", 56 "#ff0
 MadLab print ; defined (1 "white", 1 "#00008f", 8 "#0000ff", 24 "#00ffff", 40 "#ffff00", 56 "#ff0000", 64 "#800000")
 JR ; defined (0 "white", 1 "blue", 2 "cyan" , 3 "green", 4 "yellow", 5 "red")
 Stacked white ; defined (0 "red", 1 "white", 1 "green", 2 "white", 2 "yellow", 3 "white", 3 "blue", 4 "white", 4 "magenta", 5 "white") model RGB
-Neutrino ; defined (0 "black", 0.05 "red", 0.4 "yellow", 0.6 "cyan", 0.95 "blue", 1 "white")
+Neutrino ; defined (0 "white", 0.05 "blue", 0.4 "cyan", 0.6 "yellow", 0.95 "red", 1 "black")
+Neutrino2 ; defined (0 "black", 0.05 "red", 0.4 "yellow", 0.6 "cyan", 0.95 "blue", 1 "white")
 BrBG ; defined ( 0 '#8C510A', 1 '#BF812D', 2 '#DFC27D', 3 '#F6E8C3', 4 '#C7EAE5', 5 '#80CDC1', 6 '#35978F', 7 '#01665E' )
 PRGn ; defined ( 0 '#762A83', 1 '#9970AB', 2 '#C2A5CF', 3 '#E7D4E8', 4 '#D9F0D3', 5 '#A6DBA0', 6 '#5AAE61', 7 '#1B7837' )
 PiYG ; defined ( 0 '#C51B7D', 1 '#DE77AE', 2 '#F1B6DA', 3 '#FDE0EF', 4 '#E6F5D0', 5 '#B8E186', 6 '#7FBC41', 7 '#4D9221' )
