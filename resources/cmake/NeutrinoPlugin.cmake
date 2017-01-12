@@ -126,5 +126,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
     endif()
 
+#	set(my_output_file "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+#    message(STATUS ${my_output_file})	
+
+	install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+
+
 ENDMACRO()
 

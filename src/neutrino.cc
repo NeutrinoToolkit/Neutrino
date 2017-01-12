@@ -2142,12 +2142,12 @@ nLine* neutrino::line(QString name) {
     return NULL;
 }
 
-#ifdef HAVE_PYTHONQT
 
 nGenericPan* neutrino::openPan(QString panName, bool force) {
 
     nGenericPan *my_pan=nullptr;
 
+#ifdef HAVE_PYTHONQT
     int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
     if (methodIdx>0) {
 #ifdef USE_QT5
@@ -2185,6 +2185,7 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
         }
     }
     QApplication::processEvents();
+#endif
 
     if (force && my_pan==nullptr) {
         my_pan=new nGenericPan(this);
@@ -2195,6 +2196,7 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
 
 // ----------------------------------- scripting --------------------------------------
 
+#ifdef HAVE_PYTHONQT
 nGenericPan* neutrino::getPan(QString name) {
     foreach(nGenericPan* pan, getPanList()) {
         if(pan->panName()==name) return pan;

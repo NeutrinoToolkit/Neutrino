@@ -62,8 +62,6 @@ add_subdirectory (nPhysImage)
 add_subdirectory (src)
 add_subdirectory (plugins)
 
-message(STATUS ">>>>>>>>>>>>>>>>>>>>>>>> ${PYTHONQT}")
-
 if (LINUX)
 	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
 		message (STATUS "PythonQt lib is copied along")
@@ -145,7 +143,8 @@ if (LINUX)
 
 	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
-	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "alessandro.flacco@polytechnique.edu")
+	set(CPACK_PACKAGE_CONTACT "alessandro.flacco@polytechnique.edu")
+	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alessandro Flacco")
 	set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
 	set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 
