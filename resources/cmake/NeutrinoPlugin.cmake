@@ -129,7 +129,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 #	set(my_output_file "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 #    message(STATUS ${my_output_file})	
 
-	install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+IF(LINUX)
+     install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+ENDIF()
 
 
 ENDMACRO()

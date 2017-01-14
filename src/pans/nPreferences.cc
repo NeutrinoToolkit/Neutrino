@@ -96,6 +96,8 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 		my_w.useCuda->setEnabled(true);
 	}
 
+    my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
+
 
     my_w.openclUnit->setMaximum(openclEnabled());
 
@@ -351,9 +353,8 @@ void nPreferences::changephysNameLength(int k) {
 void nPreferences::on_addPlugin_released() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
     if (QFileInfo(dir).exists()) {
-        nparent->scanPlugins(QDir(dir));
+        nparent->scanPlugins(dir);
         my_w.pluginList->addItem(dir);
-        nparent->setProperty("NeuSave-lastplugindir",dir);
     }
 }
 

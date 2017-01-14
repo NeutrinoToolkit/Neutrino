@@ -470,8 +470,7 @@ nPhysD* neutrino::getBuffer(int i, bool returnCurrent) {
 void
 neutrino::scanPlugins(QString pluginsDirStr)
 {
-    QDir pluginsDir(pluginsDirStr);
-    scanPlugins(pluginsDir);
+    scanPlugins(QDir(pluginsDirStr));
 }
 
 void
@@ -482,40 +481,35 @@ neutrino::scanPlugins(QDir pluginsDir) {
                 loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
             }
         }
-        setProperty("NeuSave-lastplugindir",pluginsDir.absolutePath());
         QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
-        if (!listdirPlugins.contains(pluginsDir.absolutePath()))
+        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
+        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
             listdirPlugins.append(pluginsDir.absolutePath());
         setProperty("NeuSave-plugindirs",listdirPlugins);
-
     }
 }
 
 void
 neutrino::scanPlugins() {
-    QDir pluginsDir(qApp->applicationDirPath());
+    QDir pluginsDir;
 #if defined(Q_OS_WIN)
+    pluginsDir.setPath(qApp->applicationDirPath());
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
         pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cd("Resources");
-    }
+    pluginsDir.setPath(qApp->applicationDirPath());
+    pluginsDir.cdUp();
+    pluginsDir.cd("Resources");
+#elif defined(Q_OS_LINUX)
+    pluginsDir.setPath("/usr/share/neutrino/plugins");
 #endif
-    pluginsDir.cd("plugins");
-    if (!pluginsDir.exists()) {
-        pluginsDir = QDir(qApp->applicationDirPath());
-    }
-    qDebug() << pluginsDir.absolutePath();
+    setProperty("defaultPluginDir",pluginsDir.absolutePath());
     scanPlugins(pluginsDir);
 
     if (property("NeuSave-plugindirs").isValid()) {
         for (auto& d : property("NeuSave-plugindirs").toStringList()) {
-            qDebug() << pluginsDir.absolutePath() << QFileInfo(d).absolutePath() ;
-            if (QFileInfo(d).isDir() && pluginsDir.absolutePath()!=QFileInfo(d).absolutePath()) {
-                scanPlugins(QDir(d));
-            }
+            if (d!=pluginsDir.absolutePath())
+                scanPlugins(d);
         }
     }
 }

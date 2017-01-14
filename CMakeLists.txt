@@ -15,7 +15,7 @@ set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
 ## default build type is release
 if (CMAKE_BUILD_TYPE STREQUAL "")
-	set (CMAKE_BUILD_TYPE "Release")
+        set (CMAKE_BUILD_TYPE "Release")
 endif()
 
 message(STATUS "Neutrino build type: ${CMAKE_BUILD_TYPE}")
@@ -29,8 +29,8 @@ set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 if (GENERATE_NHASH)
-	message (STATUS "Compiling neutrino with serial number/key protection")
-	add_definitions(-D__neutrino_key)
+        message (STATUS "Compiling neutrino with serial number/key protection")
+        add_definitions(-D__neutrino_key)
 endif()
 
 ## ADD DYNAMIC VERSIONING!
@@ -63,11 +63,11 @@ add_subdirectory (src)
 add_subdirectory (plugins)
 
 if (LINUX)
-	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
-		message (STATUS "PythonQt lib is copied along")
-		install (FILES ${PYTHONQT} DESTINATION lib)
-		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
-	endif()
+        if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
+                message (STATUS "PythonQt lib is copied along")
+                install (FILES ${PYTHONQT} DESTINATION lib)
+                list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
+        endif()
 endif()
 
 include(FindGit)
@@ -76,14 +76,15 @@ set (VERSION_UPDATE_FROM_GIT ON)
 include(GetVersionFromGitTag)
 
 if (GIT_FOUND)
-	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-        IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
-            message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
-	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
-        ELSE()
-            set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}-${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
-	message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
-        ENDIF()
+    set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
+    IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
+        message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
+        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+    ELSE()
+        message(STATUS "${${PROJECT_NAME}_VERSION_BRANCH} : ${${PROJECT_NAME}_VERSION_STRING} : ${${PROJECT_NAME}_VERSION_AHEAD}")
+        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}-${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+        message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
+    ENDIF()
 endif()
 
 # targets
@@ -97,32 +98,32 @@ endif()
 file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
 
 if (WIN32)
-	# use nsis
-	message (STATUS "[win32] Using NSIS for packaging")
-	list(APPEND CPACK_GENERATOR NSIS)
-	message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
+        # use nsis
+        message (STATUS "[win32] Using NSIS for packaging")
+        list(APPEND CPACK_GENERATOR NSIS)
+        message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
 
-	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
-	#SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
-	set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
-	set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
-	SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Neutrino")
-	#SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
-	#SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
-	#SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
-	SET(CPACK_NSIS_MODIFY_PATH ON)
+        SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
+        #SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
+        set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
+        set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
+        SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Neutrino")
+        #SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
+        #SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
+        #SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
+        SET(CPACK_NSIS_MODIFY_PATH ON)
 
-	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
-	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
-	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
+        # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
+        file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
+        file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
 
-	#message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
-	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
-	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
+        #message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+        install (FILES ${RUNTIME_DEPS} DESTINATION bin)
+        install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
 
-	if (PYTHONQT_FOUND_COMPLETE)
-		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
-	endif()
+        if (PYTHONQT_FOUND_COMPLETE)
+                install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+        endif()
 endif()
 
 
@@ -130,47 +131,47 @@ endif()
 if (LINUX)
 
 #message("building on linux")
-	execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
-	execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
-	string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
+        execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
+        execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
+        string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
     if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu")
 
-	message (STATUS "[debian] Using CPackDeb for packaging")
+        message (STATUS "[${DISTRO}] Using CPackDeb for packaging")
 
-	set(CPACK_INSTALL_PREFIX "/usr")
-	set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
+        set(CPACK_INSTALL_PREFIX "/usr")
+        set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ STGZ DEB)
 
-	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
-	set(CPACK_PACKAGE_CONTACT "alessandro.flacco@polytechnique.edu")
-	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alessandro Flacco")
-	set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
-	set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+        set(CPACK_PACKAGE_CONTACT "alessandro.flacco@polytechnique.edu")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alessandro Flacco <alessandro.flacco@polytechnique.edu>")
+        set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
+        set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 
-	# debian is picky on version numbers
-	string(REGEX REPLACE "^[a-zA-Z]" "" CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
-	message (STATUS "[debian] Debian package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
+        # debian is picky on version numbers
+        string(REGEX REPLACE "^[a-zA-Z]" "" CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
+        message (STATUS "[${DISTRO}] package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
 
-	execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
-	set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-	message(STATUS "[debian] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+        execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
+        set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+        message(STATUS "[${DISTRO}] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
-	# triggers
-	set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
+        # triggers
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
-	# install goodies
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
+        # install goodies
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
 
-	if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
-		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
-		message (STATUS "[debian] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
-	endif()
+        if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
+                list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
+                message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+        endif()
 
-	if (PYTHONQT_FOUND_COMPLETE)
-		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
-	endif()
+        if (PYTHONQT_FOUND_COMPLETE)
+                install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
+        endif()
 
     endif()
 endif()
