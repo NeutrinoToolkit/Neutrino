@@ -44,6 +44,12 @@ else()
 
 endif()
 
+if (NOT DEFINED Qt5_DIR)
+    if (APPLE)
+        set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+    endif()
+endif()
+
 ## find qt -- search for 5.x first, fallback to 4.x
 find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL)
 if (Qt5_FOUND)

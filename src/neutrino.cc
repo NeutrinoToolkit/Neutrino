@@ -500,10 +500,11 @@ neutrino::scanPlugins() {
     pluginsDir.setPath(qApp->applicationDirPath());
     pluginsDir.cdUp();
     pluginsDir.cd("Resources");
-    pluginsDir.cd("plugins");
 #elif defined(Q_OS_LINUX)
-    pluginsDir.setPath("/usr/share/neutrino/plugins");
+    pluginsDir.setPath("/usr/share/neutrino");
 #endif
+    pluginsDir.cd("plugins");
+    qDebug() << "defaultPluginDir:" << pluginsDir.absolutePath();
     setProperty("defaultPluginDir",pluginsDir.absolutePath());
     scanPlugins(pluginsDir);
 

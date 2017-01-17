@@ -129,8 +129,12 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 #	set(my_output_file "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 #    message(STATUS ${my_output_file})	
 
-IF(LINUX)
-     install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+IF (DEFINED LIBRARY_OUTPUT_PATH)
+    IF(LINUX)
+        install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+    ELSEIF(APPLE)
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
+    ENDIF()
 ENDIF()
 
 

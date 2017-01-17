@@ -258,13 +258,6 @@ elseif(USE_QT4)
 endif()
 
 
-# output paths
-if (APPLE)
-    set (EXECUTABLE_OUTPUT_PATH "..")
-else()
-    set (EXECUTABLE_OUTPUT_PATH "../bin")
-    install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
-endif()
 
 
 if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
@@ -339,8 +332,17 @@ else()
 endif()
 
 if (APPLE)
-set (CMAKE_INSTALL_RPATH "/usr/local/lib")
-set (CMAKE_MACOSX_RPATH off)
+    set (CMAKE_INSTALL_RPATH "/usr/local/lib")
+    set (CMAKE_MACOSX_RPATH off)
+endif()
+
+# output paths
+if (APPLE)
+    set (EXECUTABLE_OUTPUT_PATH "..")
+    install (TARGETS Neutrino BUNDLE DESTINATION "../.." COMPONENT binary)
+else()
+    set (EXECUTABLE_OUTPUT_PATH "../bin")
+    install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
 endif()
 
 
