@@ -447,6 +447,7 @@ vec2 opencl_closest_size(vec2 num){
     return vec2(opencl_closest_size(num.x()),opencl_closest_size(num.y()));
 }
 
+#define NEUTRINO_OPENCL CL_DEVICE_TYPE_DEFAULT
 int openclEnabled() {
     int found_GPU=0;
 #ifdef HAVE_LIBCLFFT
@@ -457,7 +458,7 @@ int openclEnabled() {
     clGetPlatformIDs(platformCount, &platforms[0], NULL);
     for (unsigned int i = 0; i < platformCount; i++) {
         cl_uint deviceCount=0;
-        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &deviceCount);
+        clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, 0, NULL, &deviceCount);
         found_GPU+=deviceCount;
     }
 #endif
@@ -475,9 +476,9 @@ pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
 
     for (unsigned int i = 0; i < platformCount; i++) {
         cl_uint deviceCount=0;
-        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &deviceCount);
+        clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, 0, NULL, &deviceCount);
         vector<cl_device_id> devices(deviceCount);
-        clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, deviceCount, &devices[0], NULL);
+        clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, deviceCount, &devices[0], NULL);
 
         for (int j = 0; j < (int) deviceCount; j++) {
             found_GPU++;
@@ -800,8 +801,10 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         err = clFinish(queue);
         check_opencl_error(err, "clFinish");
 
-        err=clReleaseMemObject(tmpBuffer);
-        check_opencl_error(err, "clReleaseMemObject tmpBuffer");
+        if (tmpBufferSize > 0) {
+            err=clReleaseMemObject(tmpBuffer);
+            check_opencl_error(err, "clReleaseMemObject tmpBuffer");
+        }
 
         /* Release the plan. */
         err = clfftDestroyPlan(&planHandle);
@@ -835,7 +838,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             DEBUG("intermediate buffer needed");
         }
 
-
+        DEBUG("kernel Gabor");
         cl_kernel kernelGabor = clCreateKernel(program, "gabor", &err);
         check_opencl_error(err, "clCreateKernel");
 
