@@ -164,7 +164,7 @@ void nWavelet::doWavelet () {
 		//qCalculation_th my_qt;
 
 		QSettings settings("neutrino","");
-		settings.beginGroup("Preferences");
+        settings.beginGroup("nPreferences");
 
 
 		//my_qt.useCuda=settings.value("useCuda").toBool();
@@ -193,20 +193,20 @@ void nWavelet::doWavelet () {
 
         QString out;
 
+        qDebug() << cudaEnabled() << openclEnabled() << settings.value("openclUnit").toInt();
+
         if (cudaEnabled() && settings.value("useCuda").toBool()) {
 			// use cuda
             out="CUDA: ";
             phys_wavelet_field_2D_morlet_cuda(my_params);
-			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, phys_wavelet_trasl_cuda, "CUDA wavelet", my_params.n_angles*my_params.n_lambdas);
         } else if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
-            DEBUG("Ready to run on OpenCL");
             out="OpenCL: ";
             my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas);
         } else {
             out="CPU: ";
-            //            phys_wavelet_field_2D_morlet(my_params);
-            runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, phys_wavelet_trasl_nocuda, "CPU wavelet", my_params.n_angles*my_params.n_lambdas);
         }
 
 

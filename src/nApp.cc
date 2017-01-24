@@ -7,6 +7,20 @@
 
 
 NApplication::NApplication( int &argc, char **argv ) : QApplication(argc, argv) {
+#ifdef USE_QT5
+    setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+
+    setOrganizationName("ParisTech");
+    setOrganizationDomain("edu");
+    setApplicationName("Neutrino");
+    setApplicationVersion(__VER);
+
+#ifdef __neutrino_key
+    std::string hh = getNHash();
+    qDebug() << "got nHash: "<< hh << std::endl;
+    setProperty("nHash", hh.c_str());
+#endif
 }
 
 

@@ -2,12 +2,15 @@
 
 cmake_minimum_required (VERSION 3.0)
 
-project (Neutrino CXX)
-
 ### top level compile options
 
 option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
 option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" OFF)
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7" CACHE STRING "Minimum OS X deployment version")
+
+project (Neutrino CXX)
+
 
 #############################
 
@@ -178,7 +181,7 @@ endif()
 
 
 if(APPLE)
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
     set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
 

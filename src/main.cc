@@ -73,22 +73,6 @@ int main(int argc, char **argv)
     nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
     my_set.endGroup();
 
-
-#ifdef USE_QT5
-    qapp.setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-    qapp.setOrganizationName("ParisTech");
-    qapp.setOrganizationDomain("edu");
-    qapp.setApplicationName("Neutrino");
-    qapp.setApplicationVersion(__VER);
-
-#ifdef __neutrino_key
-    std::string hh = getNHash();
-    std::cerr<<"got nHash: "<<hh<<std::endl;
-    qapp.setProperty("nHash", hh.c_str());
-#endif
-
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
     bool somethingDone=false;
