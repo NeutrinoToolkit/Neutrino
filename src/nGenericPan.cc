@@ -330,11 +330,13 @@ nGenericPan::loadUi(QSettings *settings) {
 	}
     foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            widget->clear();
             widget->setPlainText(settings->value(widget->objectName(),widget->toPlainText()).toString());
         }
     }
     foreach (QTextEdit *widget, findChildren<QTextEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            widget->clear();
             widget->insertHtml(settings->value(widget->objectName(),widget->toHtml()).toString());
         }
     }
