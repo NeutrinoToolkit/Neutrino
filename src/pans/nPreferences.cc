@@ -88,14 +88,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 		my_w.labelThreads->hide();
 	}
 
-    if (!cudaEnabled()) {
-		DEBUG("cuda not enabled");
-		my_w.useCuda->setChecked(false);
-		my_w.useCuda->setEnabled(false);
-	} else {
-		my_w.useCuda->setEnabled(true);
-	}
-
     my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 

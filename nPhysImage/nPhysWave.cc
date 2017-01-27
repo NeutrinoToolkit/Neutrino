@@ -24,13 +24,6 @@
  */
 #include "nPhysWave.h"
 
-#ifdef HAVE_CUDA
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <cufft.h>
-#include "nCuda.h"
-#endif
-
 #include "unwrapping/unwrap_simple.h"
 #include "unwrapping/unwrap_goldstein.h"
 #include "unwrapping/unwrap_quality.h"
@@ -185,233 +178,6 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
         }
 
     }
-    DEBUG("Out of here");
-}
-
-bool cudaEnabled() {
-#ifdef HAVE_CUDA
-    DEBUG("HAVE_CUDA");
-    int device_count = 0;
-    cudaGetDeviceCount( &device_count );
-    DEBUG("cuda device count "<< device_count);
-    if (device_count>0) return true;
-#endif
-    return false;
-}
-
-void phys_wavelet_field_2D_morlet_cuda(wavelet_params &params) {
-#ifdef HAVE_CUDA
-    if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
-
-        params.olist.clear();
-
-        params.iter=0;
-        *params.iter_ptr = 0;
-
-        DEBUG(5,"start");
-
-        int device_count = 0;
-        cudaGetDeviceCount( &device_count );
-        if (device_count<1) {
-            WARNING("Problem To use CUDA you need an NVIDIA card. You also need to install the driver\nwww.nvidia.com/page/drivers.html");
-            return;
-        }
-
-
-        cudaDeviceProp device_properties;
-        int max_gflops_device = 0;
-        int max_gflops = 0;
-
-        int current_device = 0;
-        cudaGetDeviceProperties( &device_properties, current_device );
-        max_gflops = device_properties.multiProcessorCount * device_properties.clockRate;
-        ++current_device;
-
-        while( current_device < device_count )
-        {
-            cudaGetDeviceProperties( &device_properties, current_device );
-            int gflops = device_properties.multiProcessorCount * device_properties.clockRate;
-            if( gflops > max_gflops )
-            {
-                max_gflops        = gflops;
-                max_gflops_device = current_device;
-
-                if (device_properties.major>=1 && device_properties.minor>=3) {
-                    DEBUG("This graphic card could do double precision... please contact developer");
-                }
-
-            }
-            ++current_device;
-        }
-        cudaSetDevice( max_gflops_device );
-
-        int cubuf_size = sizeof(cufftComplex)*params.data->getSurf();
-
-        cufftHandle plan;
-        cufftComplex *cub1, *cub2, *cub3, *cuc1, *cuc2;
-
-        vector<cufftComplex> b1(params.data->getSurf());
-        vector<cufftComplex> b2(params.data->getSurf());
-
-        for (size_t j = 0; j < params.data->getH(); j++){
-            for (size_t i = 0; i < params.data->getW(); i++) {
-                b1[i+j*params.data->getW()].x = std::isfinite(params.data->Timg_matrix[j][i]) ? params.data->Timg_matrix[j][i]:0;
-                b1[i+j*params.data->getW()].y=0.0;
-            }
-        }
-
-        cudaMalloc((void**)&cub1, cubuf_size);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot allocate");
-            return;
-        }
-        cudaMalloc((void**)&cub2, cubuf_size);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot allocate");
-            return;
-        }
-        cudaMalloc((void**)&cub3, cubuf_size);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot allocate");
-            return;
-        }
-        cudaMalloc((void**)&cuc1, cubuf_size);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot allocate");
-            return;
-        }
-        cudaMalloc((void**)&cuc2, cubuf_size);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot allocate");
-            return;
-        }
-
-        cudaMemset(cub1, 0, cubuf_size );
-        cudaMemset(cub2, 0, cubuf_size );
-        cudaMemset(cub3, 0, cubuf_size );
-        cudaMemset(cuc1, 0, cubuf_size );
-        cudaMemset(cuc2, 0, cubuf_size );
-
-        // Create a 2D FFT plan.
-        cufftPlan2d(&plan, params.data->getH(), params.data->getW(), CUFFT_C2C);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot create plan");
-            return;
-        }
-
-        cudaMemcpy(cub1, &b1[0], cubuf_size, cudaMemcpyHostToDevice);
-
-        cufftExecC2C(plan, cub1, cub2, CUFFT_FORWARD);
-        if (cudaGetLastError()!=cudaSuccess) {
-            WARNING("cannot do FFT");
-            return;
-        }
-        //	cudaThreadSynchronize();
-
-        if ((params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
-
-            int dx=params.data->getW();
-            int dy=params.data->getH();
-
-            vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
-
-            nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
-            qmap = new nPhysD(dx, dy, 0.0, "quality");
-
-            wphase = new nPhysD("phase/2pi");
-            wphase->resize(dx, dy);
-            lambda = new nPhysD("lambda");
-            lambda->resize(dx, dy);
-            angle = new nPhysD("angle");
-            angle->resize(dx, dy);
-            intensity = new nPhysD("intensity");
-            intensity->resize(dx, dy);
-
-
-            if (params.n_angles==1) {
-                angles[0]=0.5*(params.end_angle+params.init_angle);
-            } else {
-                for (size_t i=0; i<params.n_angles; i++)
-                    angles[i] = params.init_angle + i*(params.end_angle-params.init_angle)/(params.n_angles-1);
-            }
-            if (params.n_lambdas==1) {
-                lambdas[0]=0.5*(params.end_lambda+params.init_lambda);
-            } else {
-                for (size_t i=0; i<params.n_lambdas; i++)
-                    lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
-            }
-
-            for (size_t i=0; i<lambdas.size(); i++) {
-                for (size_t j=0; j<angles.size(); j++) {
-
-                    if ((*params.iter_ptr)==-1) {
-                        DEBUG("aborting");
-                        break;
-                    }
-                    params.iter++;
-                    (*params.iter_ptr)++;
-                    DEBUG((100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
-
-                    gabor(cub2, cub1, dx, dy, angles[j]/180.*M_PI, lambdas[i], (float)params.damp, (float)params.thickness);
-                    cufftExecC2C(plan, cub1, cub3, CUFFT_INVERSE);
-                    fase(cub3, cuc1, cuc2, params.data->getSurf(), angles[j], lambdas[i]);
-                    cudaThreadSynchronize();
-
-                }
-                //! todo: this is awful: add exception?
-                if ((*params.iter_ptr)==-1) {
-                    DEBUG("aborting");
-                    break;
-                }
-            }
-            DEBUG(PRINTVAR(*params.iter_ptr));
-            cudaThreadSynchronize();
-
-            if ((*params.iter_ptr)!=-1) {
-                cudaMemcpy(&b1[0], cuc1, cubuf_size, cudaMemcpyDeviceToHost);
-                cudaMemcpy(&b2[0], cuc2, cubuf_size, cudaMemcpyDeviceToHost);
-                cudaThreadSynchronize();
-
-                phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
-
-                wphase->property["unitsCB"]="2pi";
-                params.olist["phase_2pi"] = wphase;
-                params.olist["contrast"] = qmap;
-                lambda->property["unitsCB"]="px";
-                params.olist["lambda"] = lambda;
-                angle->property["unitsCB"]="deg";
-                params.olist["angle"] = angle;
-                params.olist["intensity"] = intensity;
-
-                map<string, nPhysD *>::const_iterator itr;
-                for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                    itr->second->TscanBrightness();
-                    itr->second->set_origin(params.data->get_origin());
-                    itr->second->set_scale(params.data->get_scale());
-                    itr->second->setFromName(params.data->getFromName());
-                    itr->second->setShortName(itr->first);
-                    itr->second->setName(itr->first+ " "+params.data->getName());
-                    for (size_t k=0; k<params.data->getSurf(); k++) {
-                        if(!std::isfinite(params.data->Timg_buffer[k])){
-                            itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
-                        }
-                    }
-                }
-            }
-            
-            cudaFree(cub1);
-            cudaFree(cub2);
-            cudaFree(cub3);
-            cudaFree(cuc1);
-            cudaFree(cuc2);
-
-            cufftDestroy (plan);
-            cudaThreadSynchronize();
-            cudaThreadExit();
-
-        }
-    }
-#endif
     DEBUG("Out of here");
 }
 
@@ -1046,19 +812,13 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 // ---------------------- thread transport functions ------------------------
 
-void phys_wavelet_trasl_cuda(void *params, int &iter) {
-    DEBUG("Enter here");
-    ((wavelet_params *)params)->iter_ptr = &iter;
-    phys_wavelet_field_2D_morlet_cuda(*((wavelet_params *)params));
-}
-
 void phys_wavelet_trasl_opencl(void *params, int &iter) {
     DEBUG("Enter here");
     ((wavelet_params *)params)->iter_ptr = &iter;
     phys_wavelet_field_2D_morlet_opencl(*((wavelet_params *)params));
 }
 
-void phys_wavelet_trasl_nocuda(void *params, int &iter) {
+void phys_wavelet_trasl_cpu(void *params, int &iter) {
     DEBUG("Enter here");
     ((wavelet_params *)params)->iter_ptr = &iter;
     phys_wavelet_field_2D_morlet(*((wavelet_params *)params));

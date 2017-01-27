@@ -916,8 +916,9 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         QString panName=listLine.at(1);
                         QApplication::processEvents();
 
-                        for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i)
+                        for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i) {
                             qDebug() << "method:" << metaObject()->method(i).methodSignature();
+                        }
 
                         nGenericPan *my_pan=openPan(panName, false);
 
@@ -2146,13 +2147,18 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
     nGenericPan *my_pan=nullptr;
 
 #ifdef HAVE_PYTHONQT
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << panName;
     int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
-    if (methodIdx>0) {
-#ifdef USE_QT5
-        QString m_sig = QString::fromLatin1(metaObject()->method(methodIdx).methodSignature());
-#else
-        QString m_sig = QString::fromLatin1(metaObject()->method(methodIdx).signature());
-#endif
+    qDebug() << "methodIdx" << methodIdx;
+    if (methodIdx<0 && panName.size()>1) {
+        panName=panName.remove(0,1);
+        qDebug() << "methodIdx" << methodIdx << panName;
+        methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
+        qDebug() << "methodIdx" << methodIdx;
+    }
+    qDebug() << "methodIdx" << methodIdx;
+
+    if (methodIdx>=0) {
         if (!strcmp(metaObject()->method(methodIdx).typeName(),"nGenericPan*") &&
                 metaObject()->method(methodIdx).parameterTypes().empty()) {
             QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));

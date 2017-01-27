@@ -124,14 +124,11 @@ typedef struct wavelet_params_str wavelet_params;
 
 // std::list<nPhysImageF<double> *> phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
 void phys_wavelet_field_2D_morlet(wavelet_params &);
-bool cudaEnabled();
-void phys_wavelet_field_2D_morlet_cuda(wavelet_params &);
 
 void phys_wavelet_field_2D_morlet_opencl(wavelet_params &);
 
 // traslation functions
-void phys_wavelet_trasl_cuda(void *, int &);
-void phys_wavelet_trasl_nocuda(void *, int &);
+void phys_wavelet_trasl_cpu(void *, int &);
 
 int openclEnabled();
 
