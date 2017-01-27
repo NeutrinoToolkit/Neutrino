@@ -540,6 +540,12 @@ std::string get_platform_device_info_opencl(int num){
 
     desc+="\nDouble support : ";
     desc+=((value.find("cl_khr_fp64") != std::string::npos) ? "Yes":"No");
+
+    cl_device_fp_config cfg;
+      clGetDeviceInfo(device, CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(cfg), &cfg, NULL);
+      desc+="\nCL_DEVICE_DOUBLE_FP_CONFIG : "+std::to_string(cfg);
+
+
     return desc;
 }
 

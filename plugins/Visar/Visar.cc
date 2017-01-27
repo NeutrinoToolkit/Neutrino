@@ -217,6 +217,16 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
                               << plot->yAxis3->pixelToCoord(e->pos().y());
 
             statusbar->showMessage(msg);
+        } else {
+            nSOPPlot *plot=qobject_cast<nSOPPlot *>(sender());
+            if(plot) {
+                QString msg;
+                QTextStream(&msg) << plot->xAxis->pixelToCoord(e->pos().x()) << ","
+                                  << plot->yAxis->pixelToCoord(e->pos().y()) << " "
+                                  << plot->yAxis2->pixelToCoord(e->pos().y());
+
+                statusbar->showMessage(msg);
+            }
         }
     }
 }

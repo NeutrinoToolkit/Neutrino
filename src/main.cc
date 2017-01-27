@@ -97,8 +97,9 @@ int main(int argc, char **argv)
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
 
     QSettings settings("neutrino","");
-    settings.beginGroup("Python");
+    settings.beginGroup("nPython");
     foreach (QString spath, settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"))) {
+        qDebug() << "Python site folder " << spath;
         if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
     }
     settings.endGroup();

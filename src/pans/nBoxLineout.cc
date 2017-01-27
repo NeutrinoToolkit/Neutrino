@@ -73,13 +73,17 @@ void nBoxLineout::updatePlot() {
 
         QVector<double> xd(dx);
         QVector<double> yd(dy);
+        double mean=0;
         for (int j=0;j<dy;j++){
 			for (int i=0;i<dx; i++) {
 				double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
 				xd[i]+=val;
 				yd[j]+=val;
+                mean+=val;
 			}
 		}
+        mean/=geomBox.width()*geomBox.height();
+        statusBar()->showMessage(tr("Mean ")+QString::number(mean));
 
 		transform(xd.begin(), xd.end(), xd.begin(),bind2nd(std::divides<double>(), dy));
 		transform(yd.begin(), yd.end(), yd.begin(),bind2nd(std::divides<double>(), dx));

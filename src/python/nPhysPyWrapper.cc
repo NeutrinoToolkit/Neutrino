@@ -73,6 +73,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
  nPhysD Destructor
  */
 void nPhysPyWrapper::delete_nPhysD(nPhysD* obj) {
+    DEBUG("here");
     delete obj;
 }
 

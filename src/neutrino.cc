@@ -955,6 +955,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 }
 
 void neutrino::addShowPhys(nPhysD* datamatrix) {
+    qDebug() << "here";
     addPhys(datamatrix);
     showPhys(datamatrix);
 }
@@ -1047,6 +1048,7 @@ void neutrino::showPhys(nPhysD& datamatrixRef) {
 }
 
 void neutrino::addShowPhys(nPhysD& datamatrixRef) {
+    qDebug() << "there";
     bool found=false;
     foreach (nPhysD* datamatrix, physList) {
         if (*datamatrix == datamatrixRef) found=true;

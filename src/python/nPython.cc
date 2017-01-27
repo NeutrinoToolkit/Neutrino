@@ -47,6 +47,8 @@ nPython::nPython(neutrino *nparent) : nGenericPan(nparent)
         t.close();    
         my_w.initScript->insertPlainText(initScript);
         runScript(initScript);
+    } else {
+        runScript(my_w.initScript->toPlainText());
     }
 
     console->setFocus();

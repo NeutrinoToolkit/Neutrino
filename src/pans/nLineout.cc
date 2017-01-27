@@ -38,7 +38,9 @@ nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan
     connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
 
     connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), my_w.actionLockColors, SLOT(setEnabled(bool)));
-    
+    connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
+    connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
+
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
     QString namedirection(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
@@ -58,6 +60,7 @@ void nLineout::setBehaviour() {
         disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
+    updateLastPoint();
 }
 
 

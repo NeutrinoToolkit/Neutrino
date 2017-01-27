@@ -138,7 +138,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/center.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -160,7 +160,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/lockColor.png</normaloff>
      <normalon>:/icons/lockColor.png</normalon>:/icons/lockColor.png</iconset>
    </property>
@@ -183,8 +183,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/icons/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
