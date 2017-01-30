@@ -30,7 +30,7 @@
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)
-: QMainWindow(myparent), nparent(myparent), currentBuffer(NULL), my_help(new Ui::PanHelp)
+: QMainWindow(myparent), nparent(myparent), currentBuffer(nullptr), my_help(new Ui::PanHelp)
 {
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));

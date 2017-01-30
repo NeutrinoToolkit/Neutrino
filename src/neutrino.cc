@@ -85,7 +85,6 @@
 
 #include "nPhysFormats.h"
 
-#include "ui_neutrino.h"
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
 

@@ -63,6 +63,8 @@ public:
 	physDouble_img(std::string);
 };
 
+bool fits_check_error (int status);
+
 void phys_write_fits(nPhysD*phys, const char * fname, float compression=0);
 
 std::vector <nPhysD*> phys_open_fits(std::string);

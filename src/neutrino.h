@@ -58,10 +58,11 @@
 
 #include "nTics.h"
 
+#include "ui_neutrino.h"
+
 namespace Ui {
 class nSbarra;
 class nAbout;
-class neutrino;
 }
 
 class neutrino : public QMainWindow {

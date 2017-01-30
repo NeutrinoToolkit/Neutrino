@@ -57,6 +57,7 @@ nCompareLines::nCompareLines(neutrino *nparent) : nGenericPan(nparent)
     my_w.plot->xAxis->setLabel(tr("Distance"));
     my_w.plot->yAxis->setLabel(tr("Value"));
 
+    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setName("Compare Lines");
 
     show();

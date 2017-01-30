@@ -1269,8 +1269,8 @@ std::vector <nPhysD *> phys_open_inf(std::string ifilename) {
 	return imagelist;
 }
 
-#ifdef HAVE_LIBCFITSIO
 bool fits_check_error (int status) {
+#ifdef HAVE_LIBCFITSIO
     if (status) {
         char status_char[FLEN_STATUS], errmsg_char[FLEN_ERRMSG];
 
@@ -1284,9 +1284,9 @@ bool fits_check_error (int status) {
         throw phys_fileerror(ss.str());
         return true;
     }
+#endif
     return false;
 }
-#endif
 
 void phys_write_fits(nPhysD *phys, const char * fname, float compression) {
 #ifdef HAVE_LIBCFITSIO
@@ -1349,7 +1349,7 @@ std::vector <nPhysD *> phys_open_fits(std::string ifilename) {
 #ifdef HAVE_LIBCFITSIO
 	fitsfile *fptr;
 	char card[FLEN_CARD];
-	int status = 0,  nkeys, ii;
+    int status = 0, ii;
 	
 	fits_open_file(&fptr, ifilename.c_str(), READONLY, &status);
 	int bitpix;
@@ -1364,10 +1364,8 @@ std::vector <nPhysD *> phys_open_fits(std::string ifilename) {
     if (fits_check_error(status)) return retVec;
 
     DEBUG("fits_get_hdu_num " << hdupos);
-	int single = (hdupos != 1) ? 1 : 0;
-	DEBUG("single " << single);
-	
-	for (; !status; hdupos++)  {
+
+    for (; !status; hdupos++)  {
  		DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		
 		nPhysD *myphys=new nPhysD(ifilename,PHYS_FILE);
@@ -1377,7 +1375,7 @@ std::vector <nPhysD *> phys_open_fits(std::string ifilename) {
         fits_get_hdu_type(fptr, &hdutype, &status);
         if (fits_check_error(status)) return retVec;
 
-        // 		DEBUG("fits_get_hdu_type " << hdutype);
+        DEBUG("fits_get_hdu_type " << hdutype);
         
         
         // 		if (hdutype == IMAGE_HDU) {
@@ -1392,22 +1390,25 @@ std::vector <nPhysD *> phys_open_fits(std::string ifilename) {
         // 		}
         
 		fits_get_img_type(fptr,&bitpix,&status);
-        // 		DEBUG(5,"fits_get_img_type " << bitpix);
+        DEBUG(5,"fits_get_img_type " << bitpix);
         
 		fits_get_img_dim(fptr,&anaxis,&status);
-        // 		DEBUG(5,"fits_get_img_dim " << anaxis);
+        DEBUG(5,"fits_get_img_dim " << anaxis);
 		vec2f orig=myphys->get_origin();
 		vec2f scale=myphys->get_scale();
         
+        int nkeys;
 		fits_get_hdrspace(fptr, &nkeys, NULL, &status);
+        DEBUG(5,"nkeys " << nkeys);
+
 		for (ii = 1; ii <= nkeys; ii++)  {
             fits_read_record(fptr, ii, card, &status);
             if (fits_check_error(status)) return retVec;
 
             string cardStr=string(card);
+            DEBUG("key " << ii << " : "  << cardStr);
             // 			transform(cardStr.begin(), cardStr.end(), cardStr.begin(), ::tolower);
 			if (fits_get_keyclass(card)==TYP_USER_KEY) {
-                // 				DEBUG(cardStr);
 				string ctrl="ORIGIN_X";
 				if (cardStr.compare(0,ctrl.length(),ctrl)==0) {
 					char dtype;
@@ -1457,37 +1458,50 @@ std::vector <nPhysD *> phys_open_fits(std::string ifilename) {
 		myphys->set_scale(scale);
         // 		property.dumper(std::cerr);
         
-        
-		if (anaxis==2) {
-			long axissize[2], fpixel[2];
-            
-            fits_get_img_size(fptr,anaxis,axissize,&status);
-            if (fits_check_error(status)) return retVec;
+        DEBUG("here");
 
-			long totalsize=axissize[0]*axissize[1];
-			fpixel[0]=fpixel[1]=1;
-            
+        std::vector<long> axissize(anaxis,0),fpixel(anaxis,1);
+
+        fits_get_img_size(fptr,anaxis,&axissize[0],&status);
+        if (fits_check_error(status)) return retVec;
+
+        long totalsize=1;
+        for(int i=0; i<anaxis; i++) {
+            totalsize*=axissize[i];
+        }
+        DEBUG("totalsize " << totalsize);
+
+		if (anaxis==2) {
 			myphys->resize(axissize[0],axissize[1]);
             
-            fits_read_pix(fptr, TDOUBLE, fpixel, totalsize, NULL, (void *)myphys->Timg_buffer, NULL, &status);
+            fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)myphys->Timg_buffer, NULL, &status);
             if (fits_check_error(status)) return retVec;
 
 			myphys->TscanBrightness();
-            
-		}
-		if (myphys->getSurf()) {
+        }
+
+        if (myphys->getSurf()) {
 			retVec.push_back(myphys);
 		} else {
 			delete myphys;
 		}
-		if (single) break;
+
 		fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
-        if (fits_check_error(status)) return retVec;
+
+        if (status == END_OF_FILE) {
+            status=0;
+            break;
+        }
+
+        if (fits_check_error(status)) {
+            return retVec;
+        }
     }
-	
 	fits_close_file(fptr, &status);
+    fits_check_error(status);
 #endif
-	return retVec;
+    DEBUG("out of here");
+    return retVec;
 }
 
 vector <nPhysD *> phys_resurrect_binary(std::string fname) {
