@@ -47,6 +47,7 @@ public slots:
 
     void on_actionMode_toggled();
     void on_slices_valueChanged(int i);
+    void on_actionFFT_triggered();
 
     void updateLastPoint();
 

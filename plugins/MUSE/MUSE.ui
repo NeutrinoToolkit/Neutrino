@@ -125,6 +125,7 @@
    <addaction name="actionClose"/>
    <addaction name="separator"/>
    <addaction name="actionMode"/>
+   <addaction name="actionFFT"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -160,6 +161,18 @@
    </property>
    <property name="neutrinoSave" stdset="0">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFFT">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="toolTip">
+    <string>FFT find peaks</string>
    </property>
   </action>
  </widget>

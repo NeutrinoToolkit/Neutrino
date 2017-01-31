@@ -783,6 +783,7 @@ void Visar::doWave(int k) {
             QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 16, this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
+            progress.setValue(0);
             progress.show();
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             sweepChanged(setvisar[k].physScale);

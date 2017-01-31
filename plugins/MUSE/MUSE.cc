@@ -52,6 +52,94 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 
 }
 
+void MUSE::on_actionFFT_triggered() {
+
+    int counter=0;
+    QProgressDialog progress("Copy", "Cancel", 0, 6, this);
+    progress.setCancelButton(0);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.show();
+
+
+    int nx=cubesize[0];
+    int ny=cubesize[1];
+    int nz=cubesize[2];
+
+    if (cubesize.size()==3) {
+        std::vector<double> cube(cubevect.size(),0);
+#pragma omp parallel for
+        for (size_t i=0; i< cubevect.size(); i++) {
+            if (isfinite(cubevect[i]))
+                cube[i]=cubevect[i];
+        }
+        progress.setLabelText("Allocate");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+        fftw_complex *cubeFFT = fftw_alloc_complex(nx*ny*(nz/2+1));
+
+        progress.setLabelText("Plan");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+        fftw_plan forw_blur = fftw_plan_dft_r2c_3d(nx, ny, nz,&cube[0],cubeFFT,FFTW_ESTIMATE);
+        fftw_plan back_blur = fftw_plan_dft_c2r_3d(nx, ny, nz,cubeFFT,&cube[0],FFTW_ESTIMATE);
+
+        progress.setLabelText("Forward");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+        fftw_execute(forw_blur);
+
+        progress.setLabelText("Blur");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+        double gx=pow(nx/(radius->value()),2)/2.0;
+        double gy=pow(ny/(radius->value()),2)/2.0;
+        double gz=pow(nz/(radius->value()),2)/2.0;
+
+#pragma omp parallel for collapse(3) shared(cubeFFT)
+        for (int iz = 0 ; iz < nz/2+1; iz++) {
+            for (int iy = 0 ; iy < ny; iy++) {
+                for (int ix = 0 ; ix < nx ; ix++) {
+
+                    int xs(ix>nx/2+1?ix-nx:ix);
+                    int ys(iy>ny/2+1?iy-ny:iy);
+                    int zs(iz>nz/2+1?iz-nz:iz);
+
+                    double blur=exp(-(pow(xs,2)/gx+pow(ys,2)/gy+pow(zs,2)/gz));
+
+                    int k=ix + iy*nx + iz*nx*ny ;
+
+                    cubeFFT[k][0]*=blur;
+                    cubeFFT[k][1]*=blur;
+                }
+            }
+        }
+        progress.setLabelText("Backward");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+        fftw_execute(back_blur);
+
+        progress.setLabelText("Copy back");
+        progress.setValue(counter++);
+        QApplication::processEvents();
+
+#pragma omp parallel for
+        for (size_t i=0; i< cubevect.size(); i++) {
+            if (isfinite(cubevect[i])) {
+                cubevect[i]=cube[i]/cubevect.size();
+            }
+        }
+
+        fftw_destroy_plan(forw_blur);
+        fftw_destroy_plan(back_blur);
+        fftw_free(cubeFFT);
+
+        on_slices_valueChanged(slices->value());
+
+        statusbar->showMessage(QString::number(counter));
+
+    }
+}
+
 void MUSE::plotClick(QMouseEvent* e) {
     int nslice=xvals.size()*(plot->xAxis->pixelToCoord(e->pos().x())-wavelen.first())/(wavelen.second()-wavelen.first());
     slices->setValue(nslice);
@@ -75,7 +163,7 @@ void MUSE::doSpectrum(QPointF point) {
         for (int xx=std::max((int)0,p.x()-radius->value());xx<=std::min((int)(cubesize[0]),p.x()+radius->value()); xx++) {
             for (int yy=std::max((int)0,p.y()-radius->value());yy<=std::min((int)(cubesize[1]),p.y()+radius->value()); yy++) {
                 for (unsigned int zz=0; zz< cubesize[2]; zz++) {
-                    yvals[zz]+=cubevect[zz*surf + xx+yy*cubesize[0]];
+                    yvals[zz]+=cubevect[xx+yy*cubesize[0]+zz*surf];
                 }
             }
         }
@@ -116,9 +204,12 @@ void MUSE::on_actionMode_toggled() {
 }
 
 void MUSE::loadCube() {
-    QString ifilename=QFileDialog::getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
+    QFileDialog fd;
+    QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
 
     if (!ifilename.isEmpty()) {
+        fd.close();
+        QApplication::processEvents();
         setProperty("NeuSave-fileMUSE", ifilename);
 
 
@@ -173,16 +264,16 @@ void MUSE::loadCube() {
                 if (fits_check_error(status)) return;
 
                 std::string cardStr(card);
-                QStringList pippo(QString(card).split("=",QString::SkipEmptyParts));
-                if (pippo.size()>1) {
-                    if(wavelfound==false && (pippo.first()=="WAVELMIN" || pippo.first()=="WAVELMAX")) {
-                        QStringList pippo2(pippo.at(1).split("/",QString::SkipEmptyParts));
-                        qDebug() << pippo2;
-                        if (pippo2.size()>1) {
+                QStringList wavelist1(QString(card).split("=",QString::SkipEmptyParts));
+                if (wavelist1.size()>1) {
+                    if(wavelfound==false && (wavelist1.first()=="WAVELMIN" || wavelist1.first()=="WAVELMAX")) {
+                        QStringList wavelist2(wavelist1.at(1).split("/",QString::SkipEmptyParts));
+                        qDebug() << wavelist2;
+                        if (wavelist2.size()>1) {
                             bool ok;
-                            double val=pippo2.first().toDouble(&ok);
+                            double val=wavelist2.first().toDouble(&ok);
                             if (ok) {
-                                if(pippo.first()=="WAVELMIN") {
+                                if(wavelist1.first()=="WAVELMIN") {
                                     wavelen.set_first(val);
                                 } else {
                                     wavelen.set_second(val);
@@ -190,7 +281,7 @@ void MUSE::loadCube() {
                             }
                         }
                     } else {
-                        cube_prop["fits-"+pippo.first().toStdString()]=pippo.at(1).toStdString();
+                        cube_prop["fits-"+wavelist1.first().toStdString()]=wavelist1.at(1).toStdString();
                     }
                 }
                 std::stringstream ss; ss << std::setw(log10(nkeys)+1) << std::setfill('0') << ii;
@@ -227,7 +318,6 @@ void MUSE::loadCube() {
                 ymean.resize(cubesize[2]);
                 for (int zz=0; zz< xvals.size(); zz++) {
                     xvals[zz]=wavelen.first()+zz*(wavelen.second()-wavelen.first())/xvals.size();
-                    qDebug() << zz << " " << xvals[zz];
                     ymean[zz]=0;
                 }
                 int surf=cubesize[0]*cubesize[1];
@@ -250,8 +340,7 @@ void MUSE::loadCube() {
                 slices->setMaximum(axissize[2]);
                 slicesSlider->setMaximum(axissize[2]);
 
-                return;
-
+                break;
             }
 
             fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
