@@ -186,6 +186,9 @@ void nView::keyPressEvent (QKeyEvent *e)
         case Qt::Key_Right:
             delta=QPointF(+1,0);
             break;
+        case Qt::Key_Return:
+            emit mousePressEvent_sig(parent()->my_mouse.pos());
+            break;
         default:
             break;
         }

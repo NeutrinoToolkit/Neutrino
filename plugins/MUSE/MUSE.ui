@@ -31,7 +31,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="nCustomPlotMouseX" name="plot" native="true"/>
+     <widget class="nCustomPlotMouseX2Y" name="plot" native="true"/>
     </item>
     <item row="1" column="0">
      <widget class="QWidget" name="widget" native="true">
@@ -48,7 +48,23 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="0" column="2">
+       <item row="0" column="0">
+        <widget class="QSlider" name="slicesSlider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="slices">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
         <widget class="QSpinBox" name="radius">
          <property name="font">
           <font>
@@ -63,19 +79,18 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="slices">
+       <item row="0" column="2">
+        <widget class="QSpinBox" name="radiusLambda">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QSlider" name="slicesSlider">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -121,30 +136,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpen"/>
-   <addaction name="actionClose"/>
-   <addaction name="separator"/>
    <addaction name="actionMode"/>
+   <addaction name="actionExport"/>
    <addaction name="actionFFT"/>
   </widget>
-  <action name="actionOpen">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
-   </property>
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
-  <action name="actionClose">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
-   </property>
-   <property name="text">
-    <string>Close</string>
-   </property>
-  </action>
   <action name="actionMode">
    <property name="checkable">
     <bool>true</bool>
@@ -175,10 +170,25 @@
     <string>FFT find peaks</string>
    </property>
   </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export film</string>
+   </property>
+   <property name="toolTip">
+    <string>Export png sequence</string>
+   </property>
+   <property name="neutrinoSave" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nCustomPlotMouseX</class>
+   <class>nCustomPlotMouseX2Y</class>
    <extends>QWidget</extends>
    <header>nCustomPlots.h</header>
    <container>1</container>

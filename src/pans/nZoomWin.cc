@@ -37,8 +37,8 @@ nZoomWin::nZoomWin(neutrino *nparent) : nGenericPan(nparent)
     my_w.my_view->setInteractive(true);
     connect(my_w.my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
 
-    setBehaviour();
     show();
+    setBehaviour();
     my_w.my_view->setScene(&(nparent->my_s));
     my_w.my_view->scale(2,2);
 

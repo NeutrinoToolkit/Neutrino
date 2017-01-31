@@ -46,8 +46,9 @@ public slots:
     void doSpectrum(QPointF p);
 
     void on_actionMode_toggled();
-    void on_slices_valueChanged(int i);
     void on_actionFFT_triggered();
+    void on_actionExport_triggered();
+    void showImagePlane(int z);
 
     void updateLastPoint();
 
@@ -62,6 +63,8 @@ private:
     std::vector<unsigned int> cubesize;
 
     nPhysD *cubeSlice;
+    nPhysD *meanSlice;
+
     phys_properties cube_prop;
     vec2f wavelen;
 
