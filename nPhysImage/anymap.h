@@ -74,12 +74,10 @@ public:
 
 	// extr. ops
 	operator int() const { 
-		if (!is_i()) WARNING("wrong datatype (int) required for map member!!");
 		return get_i();
 	}
 
 	operator double() const { 
-		if (!is_d()) WARNING("wrong datatype (double) required for map member!!");
 		return get_d();
 	}
 
@@ -100,16 +98,34 @@ public:
 
 	enum anydata_type {any_int, any_double, any_str, any_vec, any_none} ddescr;
 
-	bool is_d() const { return ddescr == any_double; }
-	bool is_i() const { return ddescr == any_int; }
-	bool is_str() const { return ddescr == any_str; }
-	bool is_vec() const { return ddescr == any_vec; }
-	bool is_none() const {return ddescr==any_none;}
+	inline bool is_d() const { return ddescr == any_double; }
+	inline bool is_i() const { return ddescr == any_int; }
+	inline bool is_str() const { return ddescr == any_str; }
+	inline bool is_vec() const { return ddescr == any_vec; }
+	inline bool is_none() const {return ddescr==any_none;}
 
-	double get_d() const { return (ddescr == any_double) ? d : 0; }
-	int get_i() const { return (ddescr == any_int) ? i : 0; }
+	double get_d() const { if (ddescr == any_double) return d; else if (ddescr == any_int) return i; else return 0; }
+
+	int get_i() const { 
+		if (ddescr == any_int) 
+			return i;
+		else if (ddescr == any_double) {
+		       	WARNING("double to int conversion");
+			return (int)d;
+		} else return 0;
+	}
+
 	template<class T> bidimvec<T> get_vec() const { return (ddescr == any_vec) ? bidimvec<T>(str) : bidimvec<T>("(0:0)"); }
-	std::string get_str() const { return (ddescr == any_str || ddescr == any_vec) ? str : std::string("[empty]"); }
+	std::string get_str() const { 
+		if (ddescr == any_str || ddescr == any_vec) return str; 
+		else {
+			std::stringstream ss;
+			if (is_d()) ss<<d;
+			else if (is_i()) ss<<i;
+
+			return ss.str();
+		}
+	}
 
 private:
 	double d;
