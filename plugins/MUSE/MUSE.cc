@@ -49,7 +49,6 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 
     connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
 
-    connect(nparent,SIGNAL(mouseAtWorld(QPointF)), this, SLOT(setSpectrumTitle(QPointF)));
 
     setProperty("NeuSave-fileMUSE","myfile.fits");
     plot->addGraph(plot->xAxis, plot->yAxis2);
@@ -93,6 +92,20 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
         } else if (currentBuffer==meanSlice) {
             nparent->showPhys(cubeSlice);
         }
+        break;
+    case Qt::Key_S: {
+        int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
+        QString fname(QString("%1%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
+        qDebug() << fname;
+        QFile t(fname);
+        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (t.isOpen()) {
+            QTextStream out(&t);
+            plot->get_data_graph(out, plot->graph(1));
+            t.close();
+        }
+        break;
+    }
     default:
         break;
     }
@@ -224,11 +237,10 @@ void MUSE::doSpectrum(QPointF point) {
             yvals[zz]=yvals[zz]/(1+2*radius->value()*radius->value());
         }
         plot->graph(1)->setData(xvals,yvals,true);
-        if (currentBuffer) {
-            QString spec_name("Ra:" + QString::number(preal.x(),'g',8)+" Dec:" +QString::number(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
-            qDebug() << point << spec_name;
-            plot->setTitle(spec_name);
-        }
+        QString spec_name("Ra:" + QString::number(preal.x(),'g',8)+" Dec:" +QString::number(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
+        qDebug() << point << spec_name;
+        plot->graph(1)->setName(spec_name);
+        plot->setTitle(spec_name);
         plot->replot();
 
     }
@@ -279,7 +291,7 @@ void MUSE::on_actionExport_triggered () {
         for (int i=0;i<slices->maximum() ; i++) {
             showImagePlane(i);
             QFileInfo fi(fout);
-            nparent->exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
+            nparent->exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+"."+fi.completeSuffix());
         }
         setProperty("NeuSave-fileExport",fout);
     }
@@ -376,6 +388,7 @@ void MUSE::loadCube() {
 
             }
             cube_prop["fits-header"]=desc.join('\n').toStdString();
+            DEBUG("Fits header:\n" << cube_prop["fits-header"]);
 
             bool ok1,ok2;
             double val_dbl1,val_dbl2;

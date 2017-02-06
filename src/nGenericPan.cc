@@ -958,7 +958,18 @@ QVariant nGenericPan::get(QString name, int occurrence) {
             my_occurrence++;
         }
     }
-	return QVariant();
+    my_occurrence=1;
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        qDebug() << "here" << widget;
+        if (widget->objectName()==name) {
+            qDebug() << widget << my_occurrence;
+            if (my_occurrence==occurrence) {
+                return QVariant::fromValue(widget);
+            }
+            my_occurrence++;
+        }
+    }
+    return QVariant();
 }
 
 QList<QList<qreal> >  nGenericPan::getData(QString name, int occurrence) {

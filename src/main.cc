@@ -35,10 +35,6 @@
 #include "neutrino.h"
 #include "nApp.h"
 
-#ifdef __neutrino_key
-#include "nHash.h"
-#endif
-
 #ifdef HAVE_PYTHONQT
 #include "PythonQt_QtBindings.h"
 #include "nPhysPyWrapper.h"
@@ -92,6 +88,8 @@ int main(int argc, char **argv)
 
     PythonQt::self()->addDecorators(new nPanPyWrapper());
     PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
+
+    PythonQt::self()->registerClass(& nCustomPlot::staticMetaObject, "nPlot");
 
     PythonQt::self()->addDecorators(new nPyWrapper());
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);

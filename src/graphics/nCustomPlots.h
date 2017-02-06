@@ -56,6 +56,7 @@ public slots:
     void myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
     void get_data(QTextStream &, QObject *obj=nullptr);
     void get_data_graph(QTextStream &out, QCPGraph *graph);
+    QString get_data(int g=-1);
 
     void save_data();
     void copy_data();
@@ -76,6 +77,7 @@ public slots:
     void changeTitleFont();
     void changeAxisFont();
     void showAxis(bool);
+    inline QString getTitle() {if (title) {return title->text();} else {return QString();} };
 
     void changeAllFonts();
 

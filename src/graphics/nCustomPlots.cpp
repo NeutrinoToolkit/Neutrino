@@ -104,7 +104,7 @@ void nCustomRangeLineEdit::setRange(QString minmax_str){
 ///////////////////////////////////////////////////////////////////////////////
 nCustomPlot::nCustomPlot(QWidget* parent):
     QCustomPlot(parent),
-     title(new QCPTextElement(this))
+    title(new QCPTextElement(this))
 {
 
     setProperty("NeuSave-fileIni",objectName()+".ini");
@@ -264,8 +264,8 @@ void nCustomPlot::showGraph(bool val) {
     if (sender() && sender()->property("graph").isValid()) {
         QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
         if(hasPlottable(graph)) {
-             graph->setVisible(val);
-             replot();
+            graph->setVisible(val);
+            replot();
         }
     }
 }
@@ -301,7 +301,21 @@ void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
     }
 }
 
+QString nCustomPlot::get_data(int g) {
+    QString retstr;
+    QTextStream out(&retstr);
+    if (g==-1) {
+        get_data(out);
+    } else if (g<graphCount()) {
+        get_data_graph(out,graph(g));
+    }
+    out << endl;
+    out.flush();
+    return retstr;
+}
+
 void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
+    qDebug() << "here" << obj;
     if (obj) {
         QCPGraph *graph = qobject_cast<QCPGraph *>(obj);
         if (graph) {
@@ -317,6 +331,7 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
             }
         }
     } else {
+        out << "# " <<  title->text() << endl;
         out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << endl;
         for (int g=0; g<graphCount(); g++) {
             if(graph(g)->visible()) {
