@@ -648,13 +648,15 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         size_t totalJobs=N;
 
-        for (unsigned char nangle=0; nangle <params.n_angles; nangle++) {
+        for (size_t nangle=0; nangle <params.n_angles; nangle++) {
 
-            for (unsigned char nlambda=0; nlambda <params.n_lambdas; nlambda++) {
+            for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
 
                 if ((*params.iter_ptr)==-1) {
                     DEBUG("Aborting");
                     break;
+                } else {
+                    (*params.iter_ptr)++;
                 }
 
                 DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] );
@@ -696,7 +698,6 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 err = clFinish(queue);
                 check_opencl_error(err, "clFinish");
                 params.iter++;
-                (*params.iter_ptr)++;
 
             }
         }

@@ -199,8 +199,8 @@ void MUSE::updateLastPoint() {
 
 void MUSE::doSpectrum(QPointF point) {
 
-    double prealx=(point.x()+1.0-my_offset.x())*my_scale.x()+my_offset_val.x();
-    double prealy=(point.y()+1.0-my_offset.y())*my_scale.y()+my_offset_val.y();
+    double prealx=(floor(point.x())+1.0-my_offset.x())*my_scale.x()+my_offset_val.x();
+    double prealy=(floor(point.y())+1.0-my_offset.y())*my_scale.y()+my_offset_val.y();
 
     QPointF preal=QPointF(prealx,prealy);
     if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
