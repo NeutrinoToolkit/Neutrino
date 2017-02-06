@@ -54,7 +54,16 @@ public slots:
 
     void plotClick(QMouseEvent*);
 
+    void horzScrollBarChanged(int value);
+    void xAxisChanged(QCPRange range);
+
+    void keyPressEvent (QKeyEvent *e);
+
 private:
+    QPointF my_offset;
+    QPointF my_offset_val;
+    QPointF my_scale;
+
     QVector<double> xvals;
     QVector<double> yvals;
     QVector<double> ymean;
@@ -67,6 +76,11 @@ private:
 
     phys_properties cube_prop;
     vec2f wavelen;
+    QPoint lastpoint;
+
+    QVariant extractData(QString key, QStringList values);
+
+    QString to_min_sec(double val);
 
 };
 

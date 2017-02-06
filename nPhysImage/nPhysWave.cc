@@ -105,21 +105,18 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                 double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
                 //				double thick_norm=wave_params.thickness*M_PI/dy;
                 //				double lambda_norm=lambdas[i]/dx;
-                size_t x,y;
-#pragma omp parallel for collapse(2)
-                for (x=0;x<zz_morlet.getW();x++) {
-                    for (y=0;y<zz_morlet.getH();y++) {
-                        double xr = xx[x]*cr - yy[y]*sr; //rotate
-                        double yr = xx[x]*sr + yy[y]*cr;
+#pragma omp parallel for
+                for (size_t k=0;k<zz_morlet.getSurf();k++) {
+                    size_t x=k/zz_morlet.getW();
+                    size_t y=k%zz_morlet.getW();
+                    double xr = xx[x]*cr - yy[y]*sr; //rotate
+                    double yr = xx[x]*sr + yy[y]*cr;
 
-                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-                        double e_y = -pow(yr*thick_norm, 2.);
+                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+                    double e_y = -pow(yr*thick_norm, 2.);
 
-                        double gauss = exp(e_x)*exp(e_y);
-
-                        zz_morlet.Timg_matrix[y][x]=Fmain_window.Timg_matrix[y][x]*gauss;
-
-                    }
+                    double gauss = exp(e_x)*exp(e_y);
+                    zz_morlet.Timg_buffer[k]=Fmain_window.Timg_buffer[k]*gauss;
                 }
                 nPhysImageF<mcomplex> zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
 

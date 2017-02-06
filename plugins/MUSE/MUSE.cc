@@ -31,10 +31,16 @@
 #define HDF5_MAX_NAME 2048
 
 MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
+    my_offset(0,0),
+    my_offset_val(0,0),
+    my_scale(1,1),
     cubeSlice(nullptr),
     meanSlice(nullptr)
 {
     setupUi(this);
+
+    connect(horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
+    connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
 
     connect(radius,SIGNAL(valueChanged(int)),this,SLOT(updateLastPoint()));
 
@@ -42,6 +48,8 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
     connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 
     connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
+
+    connect(nparent,SIGNAL(mouseAtWorld(QPointF)), this, SLOT(setSpectrumTitle(QPointF)));
 
     setProperty("NeuSave-fileMUSE","myfile.fits");
     plot->addGraph(plot->xAxis, plot->yAxis2);
@@ -55,6 +63,41 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 
     loadCube();
 }
+
+void MUSE::horzScrollBarChanged(int value)
+{
+    if (qAbs(plot->xAxis->range().center()) > 0.01)
+    {
+        plot->xAxis->setRange(value, plot->xAxis->range().size(), Qt::AlignCenter);
+        plot->replot();
+    }
+}
+
+void MUSE::xAxisChanged(QCPRange range)
+{
+    horizontalScrollBar->setValue(qRound(range.center()));
+    horizontalScrollBar->setPageStep(qRound(range.size()));
+}
+
+void MUSE::keyPressEvent (QKeyEvent *e) {
+    switch (e->key()) {
+    case Qt::Key_Left:
+        slices->setValue(slices->value()-1);
+        break;
+    case Qt::Key_Right:
+        slices->setValue(slices->value()+1);
+        break;
+    case Qt::Key_M:
+        if (currentBuffer==cubeSlice) {
+            nparent->showPhys(meanSlice);
+        } else if (currentBuffer==meanSlice) {
+            nparent->showPhys(cubeSlice);
+        }
+    default:
+        break;
+    }
+}
+
 
 void MUSE::on_actionFFT_triggered() {
 
@@ -143,7 +186,6 @@ void MUSE::on_actionFFT_triggered() {
 
 void MUSE::plotClick(QMouseEvent* e) {
     QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
-
     if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
         int nslice=xvals.size()*(plot->xAxis->pixelToCoord(e->pos().x())-wavelen.first())/(wavelen.second()-wavelen.first());
         slices->setValue(nslice);
@@ -152,11 +194,17 @@ void MUSE::plotClick(QMouseEvent* e) {
 
 
 void MUSE::updateLastPoint() {
-    doSpectrum(nparent->my_mouse.pos());
+    doSpectrum(lastpoint);
 }
 
 void MUSE::doSpectrum(QPointF point) {
+
+    double prealx=(point.x()+1.0-my_offset.x())*my_scale.x()+my_offset_val.x();
+    double prealy=(point.y()+1.0-my_offset.y())*my_scale.y()+my_offset_val.y();
+
+    QPointF preal=QPointF(prealx,prealy);
     if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
+        lastpoint=point.toPoint();
         vec2 p(point.x(),point.y());
         for (int zz=0; zz< yvals.size(); zz++) {
             yvals[zz]=0;
@@ -175,10 +223,12 @@ void MUSE::doSpectrum(QPointF point) {
         for (unsigned int zz=0; zz< cubesize[2]; zz++) {
             yvals[zz]=yvals[zz]/(1+2*radius->value()*radius->value());
         }
-        plot->setTitle(QString::number(p.x())+" " +QString::number(p.y()) + " " + QLocale().toString(xvals[slices->value()]));
         plot->graph(1)->setData(xvals,yvals,true);
-
-
+        if (currentBuffer) {
+            QString spec_name("Ra:" + QString::number(preal.x(),'g',8)+" Dec:" +QString::number(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
+            qDebug() << point << spec_name;
+            plot->setTitle(spec_name);
+        }
         plot->replot();
 
     }
@@ -236,6 +286,35 @@ void MUSE::on_actionExport_triggered () {
 
 }
 
+QVariant MUSE::extractData(QString key, QStringList values) {
+    //    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << key;
+    key=key.leftJustified(8,' ',true);
+    QVariant retval;
+    for(auto &my_str: values) {
+        //        qDebug() << "\t " << my_str;
+        QStringList wavelist1(QString(my_str).split("=",QString::SkipEmptyParts));
+        if (wavelist1.size()>1) {
+            //            qDebug() << "here" << wavelist1.first();
+            if(wavelist1.first()==key) {
+                QStringList wavelist2(wavelist1.at(1).split(' ',QString::SkipEmptyParts));
+                //                qDebug() << wavelist2;
+                if (wavelist2.size()>1) {
+                    bool ok;
+                    QVariant val=wavelist2.first().toDouble(&ok);
+                    if (ok) {
+                        retval=QVariant::fromValue(val);
+                    } else {
+                        retval=wavelist2.first();
+                    }
+                } else {
+                    retval=wavelist1.at(1);
+                }
+            }
+        }
+    }
+    return retval;
+}
+
 void MUSE::loadCube() {
     QFileDialog fd;
     QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
@@ -262,7 +341,6 @@ void MUSE::loadCube() {
         if (fits_check_error(status)) return;
 
 
-        bool wavelfound=false;
         wavelen=vec2f(0,1);
 
         for (; !status; hdupos++)  {
@@ -290,40 +368,56 @@ void MUSE::loadCube() {
             int nkeys;
             fits_get_hdrspace(fptr, &nkeys, NULL, &status);
 
-            std::string desc;
+            QStringList desc;
             for (ii = 1; ii <= nkeys; ii++)  {
                 fits_read_record(fptr, ii, card, &status);
                 if (fits_check_error(status)) return;
+                desc << QString(card);
 
-                std::string cardStr(card);
-                desc+=cardStr+"\n";
+            }
+            cube_prop["fits-header"]=desc.join('\n').toStdString();
 
-                QStringList wavelist1(QString(card).split("=",QString::SkipEmptyParts));
-                if (wavelist1.size()>1) {
-                    if(wavelfound==false && (wavelist1.first()=="WAVELMIN" || wavelist1.first()=="WAVELMAX")) {
-                        QStringList wavelist2(wavelist1.at(1).split("/",QString::SkipEmptyParts));
-                        qDebug() << wavelist2;
-                        if (wavelist2.size()>1) {
-                            bool ok;
-                            double val=wavelist2.first().toDouble(&ok);
-                            if (ok) {
-                                if(wavelist1.first()=="WAVELMIN") {
-                                    wavelen.set_first(val*10);
-                                } else {
-                                    wavelen.set_second(val*10);
-                                }
-                            }
-                        }
+            bool ok1,ok2;
+            double val_dbl1,val_dbl2;
+            val_dbl1=extractData("WAVELMIN",desc).toDouble(&ok1);
+            val_dbl2=extractData("WAVELMAX",desc).toDouble(&ok2);
+            if(ok1 && ok2) {
+                wavelen.set_first(val_dbl1*10);
+                wavelen.set_second(val_dbl2*10);
+                DEBUG("wavelen " << wavelen);
+            }
+
+            QString val_str1=extractData("CTYPE1",desc).toString();
+            QString val_str2=extractData("CTYPE2",desc).toString();
+            qDebug() << val_str1 << val_str2;
+            if (val_str1=="'RA---TAN'" && val_str2=="'DEC--TAN'") {
+                DEBUG("here ");
+                val_dbl1=extractData("CRPIX1",desc).toDouble(&ok1);
+                val_dbl2=extractData("CRPIX2",desc).toDouble(&ok2);
+                if(ok1 && ok2) {
+                    qDebug() << "CRPIX1" << val_dbl1 << val_dbl2;
+                    my_offset=QPointF(val_dbl1,val_dbl2);
+                }
+                val_dbl1=extractData("CD1_2",desc).toDouble(&ok1);
+                val_dbl2=extractData("CD2_1",desc).toDouble(&ok2);
+                if(ok1 && ok2 && val_dbl1==0 && val_dbl2==0) {
+                    val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
+                    val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
+                    if(ok1 && ok2) {
+                        qDebug() << "CD1_1" << val_dbl1 << val_dbl2;
+                        my_scale=QPointF(val_dbl1,val_dbl2);
                     }
                 }
+                val_dbl1=extractData("CRVAL1",desc).toDouble(&ok1);
+                val_dbl2=extractData("CRVAL2",desc).toDouble(&ok2);
+                if(ok1 && ok2) {
+                    qDebug() << "CRVAL1" << val_dbl1 << val_dbl2;
+                    my_offset_val=QPointF(val_dbl1,val_dbl2);
+                }
             }
-            cube_prop["fits-header"]=desc;
 
-            if (wavelen!=vec2f(0,1)) {
-                wavelfound=true;
-            }
 
-            DEBUG("here " << wavelen);
+            horizontalScrollBar->setRange(wavelen.x(),wavelen.y());
 
             std::vector<long> axissize(anaxis,0),fpixel(anaxis,1);
 
@@ -347,6 +441,7 @@ void MUSE::loadCube() {
                     progress.setWindowModality(Qt::WindowModal);
                     progress.setValue(progress.value()+1);
                     progress.show();
+                    QApplication::processEvents();
 
                     cubevect.resize(totalsize);
                     cubesize.resize(anaxis);
@@ -408,6 +503,7 @@ void MUSE::loadCube() {
                     meanSlice->TscanBrightness();
                     nparent->addShowPhys(meanSlice);
 
+                    plot->graph(0)->setName("Mean spectrum");
                     plot->graph(0)->setData(xvals,ymean,true);
 
                     plot->rescaleAxes();
