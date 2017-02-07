@@ -95,7 +95,7 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
         break;
     case Qt::Key_S: {
         int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
-        QString fname(QString("%1%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
+        QString fname(QString("spec_%1%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
         qDebug() << fname;
         QFile t(fname);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
