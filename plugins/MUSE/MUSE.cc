@@ -49,6 +49,7 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 
     connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
 
+    new QShortcut(QKeySequence( Qt::Key_S),this, SLOT(on_actionExportTxt_triggered()));
 
     setProperty("NeuSave-fileMUSE","myfile.fits");
     plot->addGraph(plot->xAxis, plot->yAxis2);
@@ -61,6 +62,7 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
     on_actionMode_toggled();
 
     loadCube();
+    setProperty("NeuSave-MUSEprefix","spec_");
 }
 
 void MUSE::horzScrollBarChanged(int value)
@@ -78,6 +80,38 @@ void MUSE::xAxisChanged(QCPRange range)
     horizontalScrollBar->setPageStep(qRound(range.size()));
 }
 
+
+void MUSE::on_actionMean_triggered() {
+    if (actionMean->isChecked()) {
+        nparent->showPhys(meanSlice);
+    } else {
+        nparent->showPhys(cubeSlice);
+    }
+}
+
+void MUSE::on_actionExportTxt_triggered() {
+    QString prefix=property("NeuSave-MUSEprefix").toString();
+    if (sender() && sender()->objectName()=="actionExportTxt") {
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Prefix"),tr("Spectrum File prefix:"), QLineEdit::Normal, prefix, &ok);
+        if (ok) {
+            setProperty("NeuSave-MUSEprefix",text);
+        } else {
+            return;
+        }
+    }
+    int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
+    QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
+    qDebug() << fname;
+    QFile t(fname);
+    t.open(QIODevice::WriteOnly| QIODevice::Text);
+    if (t.isOpen()) {
+        QTextStream out(&t);
+        plot->get_data_graph(out, plot->graph(1));
+        t.close();
+    }
+}
+
 void MUSE::keyPressEvent (QKeyEvent *e) {
     switch (e->key()) {
     case Qt::Key_Left:
@@ -86,26 +120,6 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
     case Qt::Key_Right:
         slices->setValue(slices->value()+1);
         break;
-    case Qt::Key_M:
-        if (currentBuffer==cubeSlice) {
-            nparent->showPhys(meanSlice);
-        } else if (currentBuffer==meanSlice) {
-            nparent->showPhys(cubeSlice);
-        }
-        break;
-    case Qt::Key_S: {
-        int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
-        QString fname(QString("spec_%1%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
-        qDebug() << fname;
-        QFile t(fname);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
-        if (t.isOpen()) {
-            QTextStream out(&t);
-            plot->get_data_graph(out, plot->graph(1));
-            t.close();
-        }
-        break;
-    }
     default:
         break;
     }
@@ -126,12 +140,20 @@ void MUSE::on_actionFFT_triggered() {
     int ny=cubesize[1];
     int nz=cubesize[0];
 
+    int surf=nz*ny;
+
     if (cubesize.size()==3) {
         std::vector<double> cube(cubevect.size(),0);
 #pragma omp parallel for
         for (size_t i=0; i< cubevect.size(); i++) {
-            if (isfinite(cubevect[i]))
+            if (isfinite(cubevect[i])) {
                 cube[i]=cubevect[i];
+            } else {
+                int kk=i/surf;
+                if (isfinite(ymean[kk]))
+                    cube[i]=ymean[kk];
+            }
+
         }
         int surf=nx*ny;
         int fftSize=surf*(nz/2+1);
@@ -355,6 +377,7 @@ void MUSE::loadCube() {
 
         wavelen=vec2f(0,1);
 
+        int ncubes=0;
         for (; !status; hdupos++)  {
 
 

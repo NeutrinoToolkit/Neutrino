@@ -164,6 +164,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionMean"/>
+   <addaction name="actionExportTxt"/>
    <addaction name="actionMode"/>
    <addaction name="actionExport"/>
    <addaction name="actionFFT"/>
@@ -182,6 +184,9 @@
    <property name="toolTip">
     <string>Real time / click</string>
    </property>
+   <property name="shortcut">
+    <string>C</string>
+   </property>
    <property name="neutrinoSave" stdset="0">
     <bool>true</bool>
    </property>
@@ -195,7 +200,7 @@
     <string>Find</string>
    </property>
    <property name="toolTip">
-    <string>FFT find peaks</string>
+    <string>3D fft blur</string>
    </property>
   </action>
   <action name="actionExport">
@@ -211,6 +216,39 @@
    </property>
    <property name="neutrinoSave" stdset="0">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionExportTxt">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export txt</string>
+   </property>
+   <property name="toolTip">
+    <string>Save current spectrum in txt file</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+S</string>
+   </property>
+  </action>
+  <action name="actionMean">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Switch</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch mean/plane</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
    </property>
   </action>
  </widget>

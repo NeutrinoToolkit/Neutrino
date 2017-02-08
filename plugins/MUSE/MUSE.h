@@ -48,6 +48,9 @@ public slots:
     void on_actionMode_toggled();
     void on_actionFFT_triggered();
     void on_actionExport_triggered();
+    void on_actionMean_triggered();
+    void on_actionExportTxt_triggered();
+
     void showImagePlane(int z);
 
     void updateLastPoint();
@@ -58,6 +61,7 @@ public slots:
     void xAxisChanged(QCPRange range);
 
     void keyPressEvent (QKeyEvent *e);
+
 
 private:
     QPointF my_offset;
