@@ -52,7 +52,7 @@ bool nPanPlug::instantiate(neutrino *neu) {
 
 bool nPanPlug::unload() {
     if (my_pan) {
-        my_pan->deleteLater();
+        my_pan->close();
         QApplication::processEvents();
         return true;
     } else {

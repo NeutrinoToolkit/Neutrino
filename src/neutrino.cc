@@ -1564,10 +1564,10 @@ neutrino::fileClose() {
     saveDefaults();
     if (QApplication::activeWindow() == this) {
         bool askAll=true;
+        QApplication::processEvents();
         foreach (nGenericPan* pan, panList) {
             pan->hide();
             pan->close();
-            pan->deleteLater();
             QApplication::processEvents();
         }
         foreach (nPhysD *phys, physList) {
@@ -1590,7 +1590,7 @@ neutrino::fileClose() {
         }
 
         foreach (nGenericPan *pan, panList) {
-            pan->deleteLater();
+            pan->close();
         }
         QApplication::processEvents();
         currentBuffer=NULL;

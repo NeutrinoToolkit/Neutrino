@@ -209,7 +209,7 @@
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
-    <string>Export film</string>
+    <string>Export PNG sequence</string>
    </property>
    <property name="toolTip">
     <string>Export png sequence</string>

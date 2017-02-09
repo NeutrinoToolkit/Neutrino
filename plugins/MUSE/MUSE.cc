@@ -353,7 +353,9 @@ void MUSE::loadCube() {
     QFileDialog fd;
     QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
 
-    if (!ifilename.isEmpty()) {
+    if (ifilename.isEmpty()) {
+        close();
+    } else {
         fd.close();
         QApplication::processEvents();
         setProperty("NeuSave-fileMUSE", ifilename);
@@ -377,7 +379,6 @@ void MUSE::loadCube() {
 
         wavelen=vec2f(0,1);
 
-        int ncubes=0;
         for (; !status; hdupos++)  {
 
 

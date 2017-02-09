@@ -520,7 +520,7 @@ nGenericPan::saveUi(QSettings *settings) {
 
 void nGenericPan::closeEvent(QCloseEvent*){
     nparent->emitPanDel(this);
-	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
+    foreach (QComboBox *combo, findChildren<QComboBox *>()) {
 		if (combo->property("neutrinoImage").isValid()) {			
 			if (combo->property("neutrinoImage").toBool()) {
 				disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
