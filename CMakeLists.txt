@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.0)
 ### top level compile options
 
 option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
-option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" OFF)
+option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 

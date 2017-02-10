@@ -13,8 +13,7 @@ before_install:
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
     export MACOSX_DEPLOYMENT_TARGET=10.11
-    export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=${Qt5_DIR}'
-    export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
+    export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5'
     brew update; brew tap homebrew/science
     brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm clfft pandoc
     rm /usr/local/lib/libnetpbm.a    
@@ -31,7 +30,7 @@ before_install:
 - git clone https://github.com/iltommi/PythonQt.git
 - cd PythonQt
 - mkdir my_build && cd my_build
-- cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DQt5_DIR=${Qt5_DIR} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
+- cmake ${CMAKE_FLAGS} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
 - make 
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
