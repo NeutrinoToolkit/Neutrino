@@ -65,11 +65,12 @@ int main(int argc, char **argv)
     NApplication qapp(argc,argv);
 
     QSettings my_set("neutrino","");
-    my_set.beginGroup("Preferences");
+    my_set.beginGroup("nPreferences");
     nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
-    my_set.endGroup();
 
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<< my_set.value("threads",1);
     nPreferences::changeThreads(my_set.value("threads",1).toInt());
+    my_set.endGroup();
 
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 

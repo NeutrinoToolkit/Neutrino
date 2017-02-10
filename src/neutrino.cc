@@ -2030,7 +2030,7 @@ neutrino::Monitor() {
 //save and load across restart
 void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
-    my_set.beginGroup("Preferences");
+    my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
     my_set.setValue("mouseVisible", my_mouse.isVisible());
     my_set.setValue("mouseColor", my_mouse.color);
@@ -2053,12 +2053,9 @@ void neutrino::saveDefaults(){
 
 void neutrino::loadDefaults(){
     QSettings my_set("neutrino","");
-    my_set.beginGroup("Preferences");
+    my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
     toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
-
-    nPreferences::changeThreads(my_set.value("threads",1).toInt());
-
 
     my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
     my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();

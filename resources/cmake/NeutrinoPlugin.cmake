@@ -35,7 +35,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
     # visar needs to borrow some stuff from neutrino tree
-    include_directories(${NEUTRINO_ROOT}/src/graphics) 
+    include_directories(${NEUTRINO_ROOT}/src/graphics)
     QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
 
     file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
@@ -113,7 +113,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     ENDIF()
 
     if(WIN32)
-	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
+        set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
     endif()
 
     if (DEFINED LOCAL_LIBS)
@@ -127,15 +127,15 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     endif()
 
 #	set(my_output_file "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-#    message(STATUS ${my_output_file})	
+#    message(STATUS ${my_output_file})
 
-    IF (DEFINED LIBRARY_OUTPUT_PATH)
-        IF(LINUX)
-            install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
-        ELSEIF(APPLE)
-            install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
-        ENDIF()
+IF (DEFINED LIBRARY_OUTPUT_PATH)
+    IF(LINUX)
+        install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
+    ELSEIF(APPLE)
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
     ENDIF()
+ENDIF()
 
 
 ENDMACRO()

@@ -12,6 +12,8 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
     set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
     include(NeutrinoPlugin)
     ADD_NEUTRINO_PLUGIN()
+else()
+    message (STATUS "Cannot find FITS: plugin discarded")
 endif()
 
 

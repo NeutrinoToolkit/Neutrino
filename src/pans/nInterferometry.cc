@@ -286,7 +286,7 @@ void nInterferometry::doWavelet (int iimage) {
         int niter=my_params.n_angles*my_params.n_lambdas+1;
 
         QSettings settings("neutrino","");
-        settings.beginGroup("Preferences");
+        settings.beginGroup("nPreferences");
         if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             DEBUG("Ready to run on OpenCL");
             my_params.opencl_unit=settings.value("openclUnit").toInt();

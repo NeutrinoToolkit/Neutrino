@@ -93,10 +93,11 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     my_w.openclUnit->setMaximum(openclEnabled());
 
-    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
-    loadDefaults();
     show();
-	    
+
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
+    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+
     my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
     changeFont();
@@ -129,7 +130,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     for(auto &locale : allLocales) {
         QString my_str=localeToString(locale);
-        qDebug() << my_str << locale.name();
+//        qDebug() << my_str << locale.name();
         my_w.localeCombo->addItem(my_str,locale);
     }
 
@@ -166,7 +167,7 @@ void nPreferences::changeLocale(QLocale locale) {
 
         QLocale().setDefault(locale);
         QSettings settings("neutrino","");
-        settings.beginGroup("Preferences");
+        settings.beginGroup("nPreferences");
         settings.setValue("locale",locale);
         settings.endGroup();
 
@@ -190,13 +191,12 @@ void nPreferences::changeLocale(int num) {
     my_w.statusBar->showMessage(localeToString(QLocale()), 5000);
 }
 
-void nPreferences::on_openclUnit_valueChanged(int num) {
+void nPreferences::openclUnitValueChange(int num) {
     my_w.openclDescription->clear();
 #ifdef HAVE_LIBCLFFT
     if (num>0) {
         my_w.openclDescription->setPlainText(QString::fromStdString(get_platform_device_info_opencl(num)));
         setProperty("openclUnit",num);
-        saveDefaults();
     }
 #endif
     saveDefaults();
@@ -222,7 +222,7 @@ void nPreferences::changeThreads(int num) {
     omp_set_num_threads(num);
 #endif
     QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
+    settings.beginGroup("nPreferences");
     settings.setValue("threads",num);
     settings.endGroup();
     DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
@@ -248,7 +248,7 @@ void nPreferences::changeFont() {
     }
     nparent->my_w->my_view->setFont(font);
     QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
+    settings.beginGroup("nPreferences");
     settings.setValue("defaultFont",font.toString());
     settings.endGroup();
     nparent->my_w->my_view->setSize();

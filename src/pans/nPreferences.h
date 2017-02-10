@@ -51,7 +51,7 @@ public slots:
     void showEvent(QShowEvent*);
     void askCloseUnsaved();
     void changephysNameLength(int);
-    void on_openclUnit_valueChanged(int);
+    void openclUnitValueChange(int);
     void resetSettings();
     void changeLocale(int);
 

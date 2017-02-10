@@ -229,7 +229,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
 	}
 
     QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
+    settings.beginGroup("nPreferences");
     QVariant fontString=settings.value("defaultFont");
     settings.endGroup();
 
@@ -345,7 +345,7 @@ nGenericPan::loadUi(QSettings *settings) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
 	}
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
@@ -449,8 +449,8 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
-		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
-	}
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
+    }
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->currentIndex());
 	}

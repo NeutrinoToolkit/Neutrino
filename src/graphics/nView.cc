@@ -38,7 +38,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
     setInteractive(true);
     grabGesture(Qt::SwipeGesture);
     QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
+    settings.beginGroup("nPreferences");
     QVariant fontString=settings.value("defaultFont");
     if (fontString.isValid()) {
         QFont fontTmp;
