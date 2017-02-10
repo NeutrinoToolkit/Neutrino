@@ -12,7 +12,7 @@ before_install:
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]
   then
-    export MACOSX_DEPLOYMENT_TARGET=10.10
+    export MACOSX_DEPLOYMENT_TARGET=10.11
     export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=${Qt5_DIR}'
     export Qt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5
     brew update; brew tap homebrew/science

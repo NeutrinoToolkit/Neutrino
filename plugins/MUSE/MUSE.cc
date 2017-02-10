@@ -35,7 +35,8 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
     my_offset_val(0,0),
     my_scale(1,1),
     cubeSlice(nullptr),
-    meanSlice(nullptr)
+    meanSlice(nullptr),
+    wavelen(0,1)
 {
     setupUi(this);
 
@@ -375,9 +376,7 @@ void MUSE::loadCube() {
         int hdupos=0;
         fits_get_hdu_num(fptr, &hdupos);
         if (fits_check_error(status)) return;
-
-
-        wavelen=vec2f(0,1);
+        DEBUG(hdupos);
 
         for (; !status; hdupos++)  {
 
@@ -410,8 +409,10 @@ void MUSE::loadCube() {
                 desc << QString(card);
 
             }
-            cube_prop["fits-header"]=desc.join('\n').toStdString();
-            DEBUG("Fits header:\n" << cube_prop["fits-header"]);
+            std::stringstream ss;
+            ss << "fits-header" << std::setfill('0') << std::setw(2) << hdupos;
+            cube_prop[ss.str()]=desc.join('\n').toStdString();
+            DEBUG("Fits header:\n" << cube_prop[ss.str()]);
 
             bool ok1,ok2;
             double val_dbl1,val_dbl2;

@@ -93,14 +93,14 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     my_w.openclUnit->setMaximum(openclEnabled());
 
-	loadDefaults();
+    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+    loadDefaults();
     show();
 	    
     my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
     changeFont();
 
-	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
     connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
     connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
@@ -275,14 +275,16 @@ void nPreferences::changeIconSize(int val) {
 	}
 }
 
-void nPreferences::hideEvent(QHideEvent*){
+void nPreferences::hideEvent(QHideEvent*e){
 	disconnect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	saveDefaults();
+    nGenericPan::hideEvent(e);
 }
 
-void nPreferences::showEvent(QShowEvent*){
+void nPreferences::showEvent(QShowEvent*e){
 	loadDefaults();
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    nGenericPan::showEvent(e);
 }
 
 void nPreferences::changephysNameLength(int k) {

@@ -69,6 +69,8 @@ int main(int argc, char **argv)
     nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
     my_set.endGroup();
 
+    nPreferences::changeThreads(my_set.value("threads",1).toInt());
+
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
     bool somethingDone=false;
