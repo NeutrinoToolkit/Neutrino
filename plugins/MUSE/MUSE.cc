@@ -386,16 +386,15 @@ void MUSE::loadCube() {
             fits_get_hdu_type(fptr, &hdutype, &status);
             if (fits_check_error(status)) return;
 
-            // 		if (hdutype == IMAGE_HDU) {
-            // 			long naxes[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-            // 			for (ii = 0; ii < 9; ii++)
-            // 				naxes[ii] = 1;
-            // 			  int naxis = 0;
-            // 			fits_get_img_param(fptr, 9, &bitpix, &naxis, naxes, &status);
-            //
-            // 			long totpix = naxes[0] * naxes[1] * naxes[2] * naxes[3] * naxes[4] * naxes[5] * naxes[6] * naxes[7] * naxes[8];
-            // // 			DEBUG("totpix " << totpix);
-            // 		}
+            if (hdutype == IMAGE_HDU) {
+                std::array<long,9> naxes={1, 1, 1, 1, 1, 1, 1, 1, 1};
+                int naxis = 0;
+                fits_get_img_param(fptr, 9, &bitpix, &naxis, &naxes[0], &status);
+                DEBUG("IMAGE_HDU " << naxis);
+                for (ii = 0; ii < 9; ii++) {
+                    DEBUG(ii << " " << naxes[ii]);
+                }
+            }
 
             fits_get_img_type(fptr,&bitpix,&status);
 
