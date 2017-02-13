@@ -230,23 +230,24 @@ void nLine::addPointAfterClick (QPointF) {
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
-	click_pos=e->pos();
-	for (int i=0;i<ref.size();i++) {
-		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-			moveRef.append(i);
-		}
-	}
-	if (moveRef.size()>0) { // if more that one just pick the las
-		int keeplast=moveRef.last();
-		moveRef.clear();
-		moveRef.append(keeplast);
-		showMessage(tr("Moving node ")+QString::number(keeplast+1));
-	} else { // if none is selected, append ref.size() to move the whole objec
-		moveRef.append(ref.size());
-		showMessage(tr("Moving object"));
-	}
-
-	QGraphicsItem::mousePressEvent(e);
+    if(property("parentPanControlLevel").toInt()<2) {
+        click_pos=e->pos();
+        for (int i=0;i<ref.size();i++) {
+            if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+                moveRef.append(i);
+            }
+        }
+        if (moveRef.size()>0) { // if more that one just pick the las
+            int keeplast=moveRef.last();
+            moveRef.clear();
+            moveRef.append(keeplast);
+            showMessage(tr("Moving node ")+QString::number(keeplast+1));
+        } else { // if none is selected, append ref.size() to move the whole objec
+            moveRef.append(ref.size());
+            showMessage(tr("Moving object"));
+        }
+    }
+    QGraphicsItem::mousePressEvent(e);
 
 }
 
@@ -702,7 +703,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 
 
 void nLine::makeHorizontal() {
-    if (parent()->currentBuffer) {
+    if (parent()->currentBuffer && property("parentPanControlLevel").toInt()<2) {
         QPointF p(0,0);
         foreach (QGraphicsEllipseItem *item, ref){
             p-=item->pos();
@@ -723,7 +724,7 @@ void nLine::makeHorizontal() {
 }
 
 void nLine::makeVertical() {
-    if (parent()->currentBuffer) {
+    if (parent()->currentBuffer && property("parentPanControlLevel").toInt()<2) {
         QPointF p(0,0);
         foreach (QGraphicsEllipseItem *item, ref){
             p-=item->pos();
@@ -742,19 +743,20 @@ void nLine::makeVertical() {
 }
 
 void nLine::makeRectangle() {
-    QRectF my_rect=path().boundingRect();
+    if(property("parentPanControlLevel").toInt()<2) {
+        QRectF my_rect=path().boundingRect();
 
-    while (ref.size()<4) appendPoint();
-    while (ref.size()>4) removePoint(4);
-    
-    QPointF p1=my_rect.topLeft();
-    QPointF p2=my_rect.bottomRight();
-    
-    changeP(0, p1);
-    changeP(1, QPointF(p1.x(),p2.y()));
-    changeP(2, p2);
-    changeP(3, QPointF(p2.x(),p1.y()));
-    
+        while (ref.size()<4) appendPoint();
+        while (ref.size()>4) removePoint(4);
+
+        QPointF p1=my_rect.topLeft();
+        QPointF p2=my_rect.bottomRight();
+
+        changeP(0, p1);
+        changeP(1, QPointF(p1.x(),p2.y()));
+        changeP(2, p2);
+        changeP(3, QPointF(p2.x(),p1.y()));
+    }
 }
 
 void
