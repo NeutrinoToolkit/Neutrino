@@ -796,7 +796,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             itr->second->setName(itr->first+ " "+params.data->getName());
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                if (isnan(params.data->point(k))) {
+                if (std::isnan(params.data->point(k))) {
                     itr->second->set(k,numeric_limits<double>::quiet_NaN());
                 }
             }
