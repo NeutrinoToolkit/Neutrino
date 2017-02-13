@@ -2147,10 +2147,13 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
     int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
     qDebug() << "methodIdx" << methodIdx;
     if (methodIdx<0 && panName.size()>1) {
-        panName=panName.remove(0,1);
-        qDebug() << "methodIdx" << methodIdx << panName;
-        methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
-        qDebug() << "methodIdx" << methodIdx;
+        QString other_panName=panName;
+        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
+        methodIdx=metaObject()->indexOfMethod((other_panName.remove(0,1)+"()").toLatin1().constData());
+        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
+        if (methodIdx>=0) {
+            panName=other_panName;
+        }
     }
     qDebug() << "methodIdx" << methodIdx;
 
