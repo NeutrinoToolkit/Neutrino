@@ -779,8 +779,8 @@ void Visar::doWave(int k) {
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(visar[k].refImage),getPhysFromCombo(visar[k].shotImage)}};
         if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
-            int counter=0;
-            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, 16, this);
+
+            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
             progress.setValue(0);
@@ -789,26 +789,26 @@ void Visar::doWave(int k) {
             sweepChanged(setvisar[k].physScale);
 
             std::array<nPhysC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             vec2 dim(imgs[0]->getSize());
 
             std::array<nPhysC,2> zz_morlet;
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (int m=0;m<2;m++) {
                 phase[k][m].resize(dim.x(), dim.y());
                 contrast[k][m].resize(dim.x(), dim.y());
                 intensity[k][m]= imgs[m]->copy();
-                progress.setValue(++counter);
+                progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 phys_fast_gaussian_blur(intensity[k][m], visar[k].resolution->value());
-                progress.setValue(++counter);
+                progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 zz_morlet[m].resize(dim.x(),dim.y());
-                progress.setValue(++counter);
+                progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
 
@@ -818,7 +818,7 @@ void Visar::doWave(int k) {
 #pragma omp parallel for
             for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
 
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double cr = cos((visar[k].angle->value()) * _phys_deg);
             double sr = sin((visar[k].angle->value()) * _phys_deg);
@@ -843,14 +843,14 @@ void Visar::doWave(int k) {
                 }
             }
 
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (unsigned int m=0;m<2;m++) {
                 physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
-                progress.setValue(++counter);
+                progress.setValue(progress.value()+1);
             }
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (unsigned int m=0;m<2;m++) {
@@ -861,18 +861,19 @@ void Visar::doWave(int k) {
                     intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));
                 }
             }
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             getPhase(k);
 
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             updatePlot();
-            progress.setValue(++counter);
+            progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            qDebug() << "\n\n\n\n\n\n\n\n Visar counter: " << counter << "\n\n\n\n";
+            setProperty("NeuSave-VisarCounter",progress.value()+1);
+            qDebug() << "\n\n\n\n\n\n\n\n Visar counter: " << progress.value() << "\n\n\n\n";
         } else {
             statusBar()->showMessage("size mismatch",5000);
         }

@@ -93,16 +93,17 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     my_w.openclUnit->setMaximum(openclEnabled());
 
-    show();
 
     connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
     connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+
+    show();
 
     my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
     changeFont();
 
-	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
     connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
     connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
     connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
@@ -199,7 +200,6 @@ void nPreferences::openclUnitValueChange(int num) {
         setProperty("openclUnit",num);
     }
 #endif
-    saveDefaults();
 }
 
 void nPreferences::resetSettings() {
@@ -221,11 +221,7 @@ void nPreferences::changeThreads(int num) {
 #ifdef HAVE_OPENMP
     omp_set_num_threads(num);
 #endif
-    QSettings settings("neutrino","");
-    settings.beginGroup("nPreferences");
-    settings.setValue("threads",num);
-    settings.endGroup();
-    DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
+    DEBUG("\n\nTHREADS THREADS THREADS THREADS THREADS THREADS " << num << "\n\n");
 }
 
 void nPreferences::askCloseUnsaved() {
@@ -277,12 +273,10 @@ void nPreferences::changeIconSize(int val) {
 
 void nPreferences::hideEvent(QHideEvent*e){
 	disconnect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-	saveDefaults();
     nGenericPan::hideEvent(e);
 }
 
 void nPreferences::showEvent(QShowEvent*e){
-	loadDefaults();
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
     nGenericPan::showEvent(e);
 }

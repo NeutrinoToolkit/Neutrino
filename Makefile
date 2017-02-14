@@ -23,6 +23,13 @@ dmg::
 	python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
 	/usr/libexec/PlistBuddy -c "Add NSPrincipalClass string NSApplication" Neutrino.app/Contents/Info.plist
 	/usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes array" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0 dict" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeName string Neutrino session" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeRole string Viewer" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeIconFile string icon.icns" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions array" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string neus" Neutrino.app/Contents/Info.plist
 	-diskutil eject /Volumes/Neutrino 2> /dev/null
 	rm -rf Neutrino.dmg rw.Neutrino.dmg dmg
 	mkdir -p dmg
@@ -40,6 +47,14 @@ Darwin::
 	python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
 	/usr/libexec/PlistBuddy -c "Add NSPrincipalClass string NSApplication" Neutrino.app/Contents/Info.plist
 	/usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes array" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0 dict" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeName string Neutrino session" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeRole string Viewer" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeIconFile string icon.icns" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions array" Neutrino.app/Contents/Info.plist
+	/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string neus" Neutrino.app/Contents/Info.plist
+	
 	-diskutil eject /Volumes/Neutrino 2> /dev/null
 	rm -rf Neutrino.dmg rw.Neutrino.dmg dmg
 	mkdir -p dmg

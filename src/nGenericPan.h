@@ -146,6 +146,7 @@ public slots:
 
 protected:
     void showEvent( QShowEvent* event );
+    void focusOutEvent(QFocusEvent *event);
 
 };
 

@@ -108,7 +108,10 @@ void MUSE::on_actionExportTxt_triggered() {
     t.open(QIODevice::WriteOnly| QIODevice::Text);
     if (t.isOpen()) {
         QTextStream out(&t);
-        plot->get_data_graph(out, plot->graph(1));
+        out << "# " << QLocale().toString(lastpoint.x()) << " " << QLocale().toString(lastpoint.y()) << " " << plot->graph(1)->name() << endl;
+        for (int xx=0; xx< xvals.size(); xx++) {
+            out << QLocale().toString(xvals[xx],'g',6) << " "<< QLocale().toString(yvals[xx],'g',6) << " "<< QLocale().toString(ymean[xx],'g',6) << endl;
+        }
         t.close();
     }
 }
@@ -215,7 +218,7 @@ void MUSE::on_actionFFT_triggered() {
 
         showImagePlane(slices->value());
 
-        statusbar->showMessage(QString::number(progress.value()));
+        statusbar->showMessage(QLocale().toString(progress.value()));
 
     }
 }
@@ -260,7 +263,7 @@ void MUSE::doSpectrum(QPointF point) {
             yvals[zz]=yvals[zz]/(1+2*radius->value()*radius->value());
         }
         plot->graph(1)->setData(xvals,yvals,true);
-        QString spec_name("Ra:" + QString::number(preal.x(),'g',8)+" Dec:" +QString::number(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
+        QString spec_name("Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
         qDebug() << point << spec_name;
         plot->graph(1)->setName(spec_name);
         plot->setTitle(spec_name);
@@ -276,7 +279,7 @@ void MUSE::showImagePlane(int z) {
     slices->setValue(z);
     slicesSlider->setValue(z);
     if (cubesize.size()==3 && z < (int)cubesize[2]) {
-        nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QString::number(z).toStdString());
+        nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
         my_phys->property=cube_prop;
         //        std::copy(cubevect.begin()+z*my_phys->getSurf(), cubevect.begin()+(z+1)*my_phys->getSurf(), my_phys->Timg_buffer);
         int rl=radiusLambda->value();

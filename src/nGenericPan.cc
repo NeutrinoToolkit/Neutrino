@@ -345,7 +345,10 @@ nGenericPan::loadUi(QSettings *settings) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toDouble());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            qDebug() << widget << settings->value(widget->objectName());
+            widget->setValue(settings->value(widget->objectName(),widget->value()).toInt());
+        }
 	}
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings->value(widget->objectName(),widget->currentIndex()).toInt());
@@ -449,7 +452,10 @@ nGenericPan::saveUi(QSettings *settings) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
 	}
 	foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->value());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            qDebug() << widget->objectName() << widget->value() ;
+            settings->setValue(widget->objectName(),widget->value());
+        }
     }
 	foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
 		if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings->setValue(widget->objectName(),widget->currentIndex());
@@ -565,6 +571,11 @@ void nGenericPan::closeEvent(QCloseEvent*){
 			disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
 		}
 	}
+}
+
+void nGenericPan::focusOutEvent(QFocusEvent *event) {
+    saveDefaults();
+    QMainWindow::focusOutEvent(event);
 }
 
 //////////////////// SETTINGS
