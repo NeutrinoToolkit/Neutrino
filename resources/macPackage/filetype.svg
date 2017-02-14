@@ -6467,28 +6467,41 @@
        scale_y_rel="false"
        vertical="false" />
   </defs>
-  <rect
-     style="fill:#dcdcdc;fill-opacity:0.86274511;stroke:#000000;stroke-width:8;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="rect8097"
-     width="342.67035"
-     height="434.43634"
-     x="68.664825"
-     y="22.78183"
-     ry="25.52776" />
   <g
      id="g3414"
      transform="matrix(1,0,0,-1,-158.29841,495.80289)" />
   <g
+     id="g8090"
+     transform="scale(0.8,0.8)"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none">
+    <g
+       transform="matrix(1.1180662,0,0,1.1180662,-88.063767,14.595732)"
+       id="g7063"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:8.94401423;stroke-miterlimit:4;stroke-dasharray:none">
+      <path
+         inkscape:connector-curvature="0"
+         id="rect6587"
+         d="m 165.65967,16.315827 c -14.70871,0 -26.55002,11.841307 -26.55002,26.550017 l 0,424.800276 c 0,14.70871 11.84131,26.55002 26.55002,26.55002 l 362.85024,0 c 14.70871,0 26.55001,-11.84131 26.55001,-26.55002 l 0,-274.35018 -177.00011,0 c -14.70871,0 -26.55002,-11.84131 -26.55002,-26.55001 l 0,-150.450103 -185.85012,0 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:8.94401423;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         sodipodi:nodetypes="csscc"
+         inkscape:connector-curvature="0"
+         id="rect6587-3-2-9-2"
+         d="m 369.2098,16.315827 0,132.750083 c 0,14.70871 11.84131,26.55002 26.55002,26.55002 l 159.3001,0 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:8.94401423;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+  </g>
+  <g
      id="g14679"
-     transform="matrix(1.2945095,0,0,1.2945095,-76.685717,10.101876)">
+     transform="matrix(1.1178038,0,0,1.1178038,-33.456857,54.084941)">
     <polygon
        transform="matrix(0.3876975,0,0,0.39454993,122.66122,117.45192)"
        id="polygon2288"
        style="fill:#000000"
-       points="93.581,485.725 535.637,485.725 314.611,102.892 93.581,485.725 " />
+       points="314.611,102.892 93.581,485.725 93.581,485.725 535.637,485.725 " />
     <polygon
        transform="matrix(0.3876975,0,0,0.39454993,122.66122,117.45192)"
-       points="535.635,485.725 93.58,485.725 93.58,485.725 314.61,102.892 "
+       points="93.58,485.725 314.61,102.892 535.635,485.725 93.58,485.725 "
        style="fill:#ffff00"
        id="polygon2293" />
     <path
