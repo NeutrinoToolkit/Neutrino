@@ -48,7 +48,7 @@ nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
 
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
 
-	mouse=parent->my_mouse.pos();
+    mouse=parent->my_w->my_view->my_mouse.pos();
 	updateLabels();
     show();
 }
@@ -90,17 +90,17 @@ void nMouseInfo::addPoint(QPointF position) {
 }
 
 void nMouseInfo::setColorRuler() {
-	QColorDialog colordial(nparent->my_tics.rulerColor,this);
+    QColorDialog colordial(nparent->my_w->my_view->my_tics.rulerColor,this);
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
-		nparent->my_tics.rulerColor=colordial.currentColor();
-		nparent->my_tics.update();
+        nparent->my_w->my_view->my_tics.rulerColor=colordial.currentColor();
+        nparent->my_w->my_view->my_tics.update();
 	}
 }
 
 void nMouseInfo::setColorMouse() {
-	nparent->my_mouse.changeColor();
+    nparent->my_w->my_view->my_mouse.changeColor();
 }
 
 void nMouseInfo::updateOrigin() {

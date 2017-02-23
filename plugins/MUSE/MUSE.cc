@@ -108,9 +108,10 @@ void MUSE::on_actionExportTxt_triggered() {
     t.open(QIODevice::WriteOnly| QIODevice::Text);
     if (t.isOpen()) {
         QTextStream out(&t);
-        out << "# " << QLocale().toString(lastpoint.x()) << " " << QLocale().toString(lastpoint.y()) << " " << plot->graph(1)->name() << endl;
+        QLocale loc("C");
+        out << "# " << loc.toString(lastpoint.x()) << " " << loc.toString(lastpoint.y()) << " " << plot->graph(1)->name() << endl;
         for (int xx=0; xx< xvals.size(); xx++) {
-            out << QLocale().toString(xvals[xx],'g',6) << " "<< QLocale().toString(yvals[xx],'g',6) << " "<< QLocale().toString(ymean[xx],'g',6) << endl;
+            out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << endl;
         }
         t.close();
     }
@@ -150,11 +151,11 @@ void MUSE::on_actionFFT_triggered() {
         std::vector<double> cube(cubevect.size(),0);
 #pragma omp parallel for
         for (size_t i=0; i< cubevect.size(); i++) {
-            if (isfinite(cubevect[i])) {
+            if (std::isfinite(cubevect[i])) {
                 cube[i]=cubevect[i];
             } else {
                 int kk=i/surf;
-                if (isfinite(ymean[kk]))
+                if (std::isfinite(ymean[kk]))
                     cube[i]=ymean[kk];
             }
 
@@ -207,7 +208,7 @@ void MUSE::on_actionFFT_triggered() {
 
 #pragma omp parallel for
         for (size_t i=0; i< cubevect.size(); i++) {
-            if (isfinite(cubevect[i])) {
+            if (std::isfinite(cubevect[i])) {
                 cubevect[i]=cube[i]/cubevect.size();
             }
         }

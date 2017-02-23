@@ -28,7 +28,6 @@
 #include "unwrapping/unwrap_goldstein.h"
 #include "unwrapping/unwrap_quality.h"
 
-using namespace std;
 
 /*! \addtogroup nPhysWave
  * @{
@@ -46,7 +45,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
         int dx=params.data->getW();
         int dy=params.data->getH();
 
-        vector<int> xx(dx), yy(dy);
+        std::vector<int> xx(dx), yy(dy);
 
         nPhysImageF<mcomplex> zz_morlet("zz_morlet");
 
@@ -68,7 +67,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
         intensity->resize(dx, dy);
 
 
-        vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
+        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
@@ -157,7 +156,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
             params.olist["angle"] = angle;
             params.olist["intensity"] = intensity;
 
-            map<string, nPhysD *>::const_iterator itr;
+            std::map<std::string, nPhysD *>::const_iterator itr;
             for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
                 itr->second->TscanBrightness();
                 itr->second->set_origin(params.data->get_origin());
@@ -168,7 +167,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 #pragma omp parallel for
                 for (size_t k=0; k<params.data->getSurf(); k++) {
                     if(!std::isfinite(params.data->Timg_buffer[k])){
-                        itr->second->Timg_buffer[k]   = numeric_limits<double>::quiet_NaN();
+                        itr->second->Timg_buffer[k]   = std::numeric_limits<double>::quiet_NaN();
                     }
                 }
             }
@@ -217,7 +216,7 @@ int openclEnabled() {
     // get all platforms
     cl_uint platformCount;
     clGetPlatformIDs(0, NULL, &platformCount);
-    vector<cl_platform_id> platforms(platformCount);
+    std::vector<cl_platform_id> platforms(platformCount);
     clGetPlatformIDs(platformCount, &platforms[0], NULL);
     for (unsigned int i = 0; i < platformCount; i++) {
         cl_uint deviceCount=0;
@@ -229,28 +228,28 @@ int openclEnabled() {
 }
 
 #ifdef HAVE_LIBCLFFT
-pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
+std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
     int found_GPU=0;
 
     cl_uint platformCount=0;
     clGetPlatformIDs(0, NULL, &platformCount);
-    vector<cl_platform_id> platforms(platformCount);
+    std::vector<cl_platform_id> platforms(platformCount);
     clGetPlatformIDs(platformCount, &platforms[0], NULL);
 
     for (unsigned int i = 0; i < platformCount; i++) {
         cl_uint deviceCount=0;
         clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, 0, NULL, &deviceCount);
-        vector<cl_device_id> devices(deviceCount);
+        std::vector<cl_device_id> devices(deviceCount);
         clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, deviceCount, &devices[0], NULL);
 
         for (int j = 0; j < (int) deviceCount; j++) {
             found_GPU++;
             if (found_GPU==num) {
-                return make_pair(platforms[i],devices[j]);
+                return std::make_pair(platforms[i],devices[j]);
             }
         }
     }
-    return make_pair(nullptr,nullptr);
+    return std::make_pair(nullptr,nullptr);
 }
 
 std::string get_platform_device_info_opencl(int num){
@@ -312,7 +311,7 @@ std::string get_platform_device_info_opencl(int num){
     return desc;
 }
 
-string CHECK_OPENCL_ERROR(cl_int err) {
+std::string CHECK_OPENCL_ERROR(cl_int err) {
     if (err != CL_SUCCESS) {
         switch (err) {
         case CL_DEVICE_NOT_FOUND:                           return "CL_DEVICE_NOT_FOUND";
@@ -376,7 +375,7 @@ string CHECK_OPENCL_ERROR(cl_int err) {
         default: return "Unknown error";
         }
     }
-    return string();
+    return std::string();
 }
 
 #endif
@@ -413,7 +412,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         cl_int err;
 
-        pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(params.opencl_unit);
+        std::pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(params.opencl_unit);
         cl_platform_id platform = my_pair.first;
         cl_device_id device=my_pair.second;
 
@@ -427,7 +426,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 
         // KERNEL
-        string textkernel=
+        std::string textkernel=
                 "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy,  const float sr,  const float cr, const float lambda_norm, const float damp_norm,  const float thick_norm){\n"
                 "    size_t id = get_global_id(0);\n"
                 "    int i = id%dx;\n"
@@ -483,7 +482,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         /* Create a default plan for a complex FFT. */
         clfftPlanHandle planHandle;
-        vector<size_t> clLengths =  {(size_t)dx, (size_t)dy};
+        std::vector<size_t> clLengths =  {(size_t)dx, (size_t)dy};
         err = clfftCreateDefaultPlan(&planHandle, ctx, CLFFT_2D, &clLengths[0]);
         check_opencl_error(err, "clfftCreateDefaultPlan");
 
@@ -501,8 +500,8 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         /* Real and Imaginary arrays. */
         cl_uint N = dx*dy;
-        vector<cl_float> inReal(N,0);
-        vector<cl_float> inImag(N,0);
+        std::vector<cl_float> inReal(N,0);
+        std::vector<cl_float> inImag(N,0);
 
         /* Initialization of inReal*/
         for(cl_uint j=0; j<dy; j++) {
@@ -631,7 +630,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 
 
-        vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
+        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
@@ -702,15 +701,15 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             }
         }
 
-        vector<float> quality_sqr(N,0);
+        std::vector<float> quality_sqr(N,0);
         err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality_sqr[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
-        vector<float> phase(N,0);
+        std::vector<float> phase(N,0);
         err = clEnqueueReadBuffer(queue, best[1], CL_TRUE, 0, N * sizeof(float), &phase[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
-        vector<unsigned int> lambdaangle(N,0);
+        std::vector<unsigned int> lambdaangle(N,0);
         err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
@@ -786,7 +785,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         }
 
 
-        map<string, nPhysD *>::const_iterator itr;
+        std::map<std::string, nPhysD *>::const_iterator itr;
         for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
             itr->second->TscanBrightness();
             itr->second->set_origin(params.data->get_origin());
@@ -797,7 +796,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
                 if (std::isnan(params.data->point(k))) {
-                    itr->second->set(k,numeric_limits<double>::quiet_NaN());
+                    itr->second->set(k,std::numeric_limits<double>::quiet_NaN());
                 }
             }
         }
@@ -999,7 +998,7 @@ void phys_invert_abel(abel_params &params)
     if (params.iimage->getSurf() == 0)
         return;
 
-    params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),numeric_limits<double>::quiet_NaN(),"Inverted");
+    params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),std::numeric_limits<double>::quiet_NaN(),"Inverted");
     params.oimage->set_origin(params.iimage->get_origin());
     params.oimage->set_scale(params.iimage->get_scale());
 
@@ -1094,10 +1093,10 @@ void phys_invert_abel(abel_params &params)
 
         }
 
-        params.oimage->setName(string("ABEL ")+params.oimage->getName());
+        params.oimage->setName(std::string("ABEL ")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
 
-        //params.oimage->setName(string("Inverted (ABEL) ")+string(params.iimage->getShortName()));
+        //params.oimage->setName(std::string("Inverted (ABEL) ")+std::string(params.iimage->getShortName()));
     } else if (ialgo == ABEL_HF) {
         DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
         // testing purposes only! Many problems in this one:
@@ -1171,7 +1170,7 @@ void phys_invert_abel(abel_params &params)
 
             DEBUG(10,"step: "<<ii);
         }
-        params.oimage->setName(string("ABEL")+params.oimage->getName());
+        params.oimage->setName(std::string("ABEL")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
     } else {
         DEBUG(1, "Unknown inversion type: "<<(int)ialgo);

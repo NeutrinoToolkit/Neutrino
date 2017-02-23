@@ -49,7 +49,7 @@ nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
 	my_w.lineMin->setValidator(dVal);
-	my_w.lineMax->setValidator(dVal);
+    my_w.lineMax->setValidator(dVal);
 
 	if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
@@ -85,7 +85,7 @@ nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 
     show();
 
-    if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
+    if (currentBuffer) my_w.gamma->setValue(currentBuffer->property["gamma"]);
 
     loadPalettes();
 

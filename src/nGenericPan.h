@@ -151,23 +151,4 @@ protected:
 };
 
 
-#ifdef HAVE_PYTHONQT
-class nPanPyWrapper : public QObject {
-    Q_OBJECT
-
-    public slots:
-    nGenericPan* new_nPan(neutrino* neu) {
-        DEBUG("here");
-        return new nGenericPan(neu);
-    }; // opens new neutrino with that image
-
-    void delete_nPan(nGenericPan* pan) {
-        DEBUG("here "<< pan->panName().toStdString());
-        pan->deleteLater();
-    };
-
-};
-#endif
-
-
 #endif

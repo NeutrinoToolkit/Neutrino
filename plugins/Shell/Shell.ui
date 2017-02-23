@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nPython</class>
- <widget class="QMainWindow" name="nPython">
+ <class>Shell</class>
+ <widget class="QMainWindow" name="Shell">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -273,7 +273,7 @@
   </widget>
   <action name="actionRun_script">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="Shell.qrc">
      <normaloff>:/icons/filePy.png</normaloff>:/icons/filePy.png</iconset>
    </property>
    <property name="text">
@@ -289,7 +289,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="Shell.qrc"/>
  </resources>
  <connections/>
 </ui>

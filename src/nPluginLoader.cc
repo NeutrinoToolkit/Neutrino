@@ -16,9 +16,6 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 			if (iface) {
 
                 QString name_plugin(iface->name());
-                QString menuEntry=iface->menuEntryPoint();
-
-                QPointer<QMenu> my_menu;
 
                 // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
                 if (name_plugin.isEmpty()) {
@@ -31,34 +28,8 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     #endif
                 }
 
-                if (menuEntry.isEmpty()) {
-                    my_menu=nParent->my_w->menuPlugins;
-                } else {
-                    QStringList my_list=menuEntry.split(";");
-                    // need a QWidget because it might be a QToolBar or QMenu
-                    QWidget *parentMenu=nParent->my_w->menubar;
-                    for (int i=0; i<my_list.size(); i++) {
-                        bool found=false;
-                        foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
-                            if (menu->title()==my_list.at(i) || menu->objectName()==QString("menu"+my_list.at(i))) {
-                                found=true;
-                                if (i<my_list.size()) {
-                                    parentMenu = my_menu = menu;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!found) {
-                            if (qobject_cast<QMenuBar*>(parentMenu)) {
-                                my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
-                            } else if(qobject_cast<QMenu*>(parentMenu)) {
-                                my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
-                            }
-                            my_menu->setTitle(my_list.at(i));
-                            parentMenu = my_menu;
-                        }
-                    }
-                }
+                QPointer<QMenu> my_menu=getMenu(iface->menuEntryPoint(),nParent);
+
                 foreach (QAction *my_action, my_menu->actions()) {
                     if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
                         qDebug() << "here" << my_action->data();
@@ -107,6 +78,40 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
           dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
           dlg.exec();
       }
+}
+
+QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
+    QPointer<QMenu> my_menu;
+
+    if (menuEntry.isEmpty()) {
+        my_menu=neu->my_w->menuPlugins;
+    } else {
+        QStringList my_list=menuEntry.split(";");
+        // need a QWidget because it might be a QToolBar or QMenu
+        QWidget *parentMenu=neu->my_w->menubar;
+        for (int i=0; i<my_list.size(); i++) {
+            bool found=false;
+            foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                if (menu->title()==my_list.at(i) || menu->objectName()==QString("menu"+my_list.at(i))) {
+                    found=true;
+                    if (i<my_list.size()) {
+                        parentMenu = my_menu = menu;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                if (qobject_cast<QMenuBar*>(parentMenu)) {
+                    my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                } else if(qobject_cast<QMenu*>(parentMenu)) {
+                    my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
+                }
+                my_menu->setTitle(my_list.at(i));
+                parentMenu = my_menu;
+            }
+        }
+    }
+    return my_menu;
 }
 
 void

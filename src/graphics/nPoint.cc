@@ -32,10 +32,10 @@ nPoint::nPoint(neutrino *nparent) :
     QGraphicsObject(),
     my_w(new Ui::nPoint)
 {
-	nparent->my_s.addItem(this);
+    nparent->getScene().addItem(this);
 	setParent(nparent);
-    if (nparent->currentBuffer) {
-        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    if (nparent->getCurrentBuffer()) {
+        setPos(nparent->getCurrentBuffer()->get_origin().x(),nparent->getCurrentBuffer()->get_origin().y());
     }
     
 	setAcceptHoverEvents(true);

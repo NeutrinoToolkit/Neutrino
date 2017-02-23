@@ -7,7 +7,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
-    set (CMAKE_CXX_FLAGS_RELEASE "-O3")
+    set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
     add_compile_options(-std=c++11)
 
 
@@ -40,6 +40,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+    file(GLOB QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+
+    foreach(my_file ${QRCS})
+        qt5_add_resources(RES_SOURCES ${my_file})
+    endforeach()
 
 
     ## add help

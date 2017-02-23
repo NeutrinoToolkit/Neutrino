@@ -38,6 +38,8 @@
 
 #include <QPrintDialog>
 
+#include "nView.h"
+
 #include "nColorBarWin.h"
 
 #include "nMouseInfo.h"
@@ -70,10 +72,6 @@
 
 #include "nMonitor.h"
 
-#ifdef HAVE_PYTHONQT
-#include <QUiLoader>
-#include "nPython.h"
-#endif
 
 #include "nPreferences.h"
 #include "nWinList.h"
@@ -115,12 +113,9 @@ neutrino::~neutrino()
 
 /// Creator
 neutrino::neutrino():
-    my_s(this),
     my_w(new Ui::neutrino),
     my_sbarra(new Ui::nSbarra),
-    my_about(new Ui::nAbout),
-    my_mouse(this),
-    my_tics(this)
+    my_about(new Ui::nAbout)
 {
 
     my_w->setupUi(this);
@@ -217,9 +212,7 @@ neutrino::neutrino():
     connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
     connect(my_w->actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
     connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
-    connect(my_w->actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
 
-    connect(my_w->actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
     connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
     connect(my_w->actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
 
@@ -231,7 +224,6 @@ neutrino::neutrino():
     connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
 
     connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
-
 
     connect(my_w->actionZoom_in, SIGNAL(triggered()), my_w->my_view, SLOT(zoomIn()));
     connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
@@ -248,8 +240,6 @@ neutrino::neutrino():
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
     connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
     connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
-
-    connect(my_w->actionDrawLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
 
     connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
     connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
@@ -270,17 +260,6 @@ neutrino::neutrino():
     connect(my_w->actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
     connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
-#ifdef HAVE_PYTHONQT
-    QWidget* spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    my_w->toolBar->addWidget(spacer);
-
-    my_w->toolBar->addAction(QIcon(":icons/python.png"),tr("Python shell"),this,SLOT(Python()));
-    connect(my_w->actionPython, SIGNAL(triggered()), this, SLOT(Python()));
-    loadPyScripts();
-#else
-    my_w->menuPython->menuAction()->setVisible(false);
-#endif
 
     // ---------------------------------------------------------------------------------------------
 
@@ -349,26 +328,6 @@ neutrino::neutrino():
     // lasciamo questo per ultimo
     //	my_w->scrollArea->setWidget(my_view);
 
-    my_w->my_view->setScene(&my_s);
-
-
-    my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-    //	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
-
-    my_s.addItem(&my_pixitem);
-    my_pixitem.setEnabled(true);
-    my_pixitem.setZValue(-1);
-
-    my_tics.rulerVisible=false;
-    my_tics.gridVisible=false;
-
-    my_s.addItem(&my_mouse);
-
-    my_w->my_view->setSize();
-    my_s.addItem(&my_tics);
-
-    my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
-    my_w->my_view->setCursor(QCursor(Qt::CrossCursor));
 
 
     updateRecentFileActions();
@@ -459,9 +418,8 @@ void neutrino::flipLeftRight() {
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
-nPhysD* neutrino::getBuffer(int i, bool returnCurrent) {
-    if (i>=0 && i<physList.size()) return physList.at(i);
-    return (returnCurrent?currentBuffer:nullptr);
+nPhysD* neutrino::getBuffer(int i) {
+    return physList.value(i);
 }
 
 // ------------------ PLUGINS -----------------------
@@ -559,9 +517,9 @@ void neutrino::emitPanDel(nGenericPan* pan) {
 
 
 /// Returns the QT drawings area
-QGraphicsScene *
-neutrino::getScene () {
-    return &my_s;
+QGraphicsScene&
+neutrino::getScene() {
+    return my_w->my_view->my_scene;
 }
 
 /// This is called form a Open recent file menu.
@@ -632,25 +590,6 @@ void neutrino::setGamma(int value) {
     }
 }
 
-/// Using TAB you can cycle over the items in the canvas (lines, rectangles, ovals)
-void neutrino::cycleOverItems() {
-    QList<QGraphicsItem *> lista;
-    foreach (QGraphicsItem *oggetto, my_s.items() ) {
-        if (oggetto->type() > QGraphicsItem::UserType) {
-            if (oggetto->isVisible()) lista << oggetto;
-        }
-    }
-    my_s.clearSelection();
-    if (lista.size()>0) {
-        int found=0;
-        for (int i=lista.size()-1; i >=0; i-- ) {
-            if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
-        }
-
-        lista.at(found)->setFocus(Qt::TabFocusReason);
-    }
-}
-
 nGenericPan* neutrino::existsPan(QString name) {
     foreach (nGenericPan *pan, panList) {
         if (pan->panName()==name) {
@@ -716,6 +655,11 @@ void neutrino::fileOpen(QStringList fnames) {
 
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    bool separate_rgb= my_set.value("separateRGB",false).toBool();
+    my_set.endGroup();
+
     QList <nPhysD *> imagelist;
     QString suffix=QFileInfo(fname).suffix().toLower();
     if (suffix=="neus") {
@@ -723,7 +667,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     } else {
         std::vector<nPhysD*> my_vec;
         try {
-            my_vec=phys_open(fname.toUtf8().constData());
+            my_vec=phys_open(fname.toUtf8().constData(),separate_rgb);
         } catch (std::exception &e) {
             QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
             dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -736,18 +680,18 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     if (imagelist.size()==0) {
         QImage image(fname);
         if (!image.isNull()) {
-            if (image.isGrayscale()) {
+            if (image.isGrayscale() || !separate_rgb) {
                 nPhysD *datamatrix = new nPhysD(fname.toStdString());
                 datamatrix->resize(image.width(), image.height());
                 for (int i=0;i<image.height();i++) {
                     for (int j=0;j<image.width();j++) {
-                        datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
+                        datamatrix->Timg_matrix[i][j]= qGray(image.pixel(j,i));
                     }
                 }
                 imagelist.push_back(datamatrix);
             } else {
-                nPhysD *datamatrix[3];
-                std::string name[3];
+                std::array<nPhysD*,3> datamatrix;
+                std::array<std::string,3> name;
                 name[0]="Red";
                 name[1]="Green";
                 name[2]="Blue";
@@ -767,7 +711,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                         datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
                     }
                 }
-
             }
             for (int k=0;k<imagelist.size();k++) {
                 imagelist[k]->TscanBrightness();
@@ -1020,7 +963,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 setWindowTitle(property("winId").toString()+QString(": Neutrino"));
                 setWindowFilePath("");
                 zoomChanged(1);
-                my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+                my_w->my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
                 my_w->my_view->setSize();
             }
             QList<QAction *> lista=my_w->menuBuffers->actions();
@@ -1136,7 +1079,7 @@ neutrino::createQimage() {
                                currentBuffer->getW()*3,
                                QImage::Format_RGB888);
 
-        my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+        my_w->my_view->my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
         double gamma_val=currentBuffer->gamma();
         my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
     }
@@ -1168,9 +1111,9 @@ void neutrino::exportAllGraphics () {
 
 void neutrino::exportGraphics (QString fout) {
     setProperty("NeuSave-fileExport",fout);
-    bool resetmouse=my_mouse.isVisible();
-    my_mouse.setVisible(false);
-    QSize my_size=QSize(my_s.width(), my_s.height());
+    bool resetmouse=my_w->my_view->my_mouse.isVisible();
+    my_w->my_view->my_mouse.setVisible(false);
+    QSize my_size=QSize(getScene().width(), getScene().height());
     if (QFileInfo(fout).suffix().toLower()==QString("pdf")) {
         QPrinter myPrinter(QPrinter::ScreenResolution);
         myPrinter.setOutputFileName(fout);
@@ -1185,58 +1128,41 @@ void neutrino::exportGraphics (QString fout) {
 
         QPainter myPainter(&myPrinter);
         myPainter.setViewport(0, 0, myPrinter.width(), myPrinter.height());
-        my_s.render(&myPainter);
+        getScene().render(&myPainter);
     } else if (QFileInfo(fout).suffix().toLower()==QString("svg")) {
         QSvgGenerator svgGen;
         svgGen.setFileName(fout);
         svgGen.setSize(my_size);
-        QRect my_rect(0,0,my_tics.boundingRect().width(),my_tics.boundingRect().height());
+        QRect my_rect(0,0,my_w->my_view->my_tics.boundingRect().width(),my_w->my_view->my_tics.boundingRect().height());
         svgGen.setViewBox(my_rect);
         svgGen.setTitle("Neutrino");
         svgGen.setDescription(windowFilePath());
         QPainter painter( &svgGen );
-        my_s.render(&painter);
+        getScene().render(&painter);
     } else {
         QPixmap::grabWidget(my_w->my_view).save(fout);
     }
-    my_mouse.setVisible(resetmouse);
-}
-
-void neutrino::toggleMouse() {
-    toggleMouse(!my_mouse.isVisible());
-}
-
-void neutrino::toggleMouse(bool stat) {
-    my_mouse.setVisible(stat);
-    QCursor cur;
-    if (stat) {
-        cur=QCursor(Qt::BlankCursor);
-        my_w->actionShow_mouse->setText("Hide mouse");
-    } else {
-        cur=QCursor(Qt::CrossCursor);
-        my_w->actionShow_mouse->setText("Show mouse");
-    }
-    my_pixitem.setCursor(cur);
+    my_w->my_view->my_mouse.setVisible(resetmouse);
 }
 
 void neutrino::toggleRuler() {
-    my_tics.rulerVisible=!my_tics.rulerVisible;
-    if (my_tics.rulerVisible) {
+    my_w->my_view->my_tics.rulerVisible=!my_w->my_view->my_tics.rulerVisible;
+    if (my_w->my_view->my_tics.rulerVisible) {
         my_w->actionShow_ruler->setText("Hide ruler");
     } else {
         my_w->actionShow_ruler->setText("Show ruler");
     }
-    my_tics.update();
+    my_w->my_view->my_tics.update();
 }
 
 void neutrino::toggleGrid() {
-    my_tics.gridVisible=!my_tics.gridVisible;
-    if (my_tics.gridVisible) {
+    my_w->my_view->my_tics.gridVisible=!my_w->my_view->my_tics.gridVisible;
+    if (my_w->my_view->my_tics.gridVisible) {
         my_w->actionShow_grid->setText("Hide grid");
     } else {
         my_w->actionShow_grid->setText("Show grid");
     }
-    my_tics.update();
+    my_w->my_view->my_tics.update();
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
@@ -1272,15 +1198,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     case Qt::Key_Question:
         Shortcuts();
         break;
-    case Qt::Key_Plus:
-        my_w->my_view->zoomIn();
-        break;
-    case Qt::Key_Minus:
-        my_w->my_view->zoomOut();
-        break;
-    case Qt::Key_Equal:
-        my_w->my_view->zoomEq();
-        break;
     case Qt::Key_A: {
         if (e->modifiers() & Qt::ShiftModifier) {
             foreach (nPhysD* phys, physList) {
@@ -1301,14 +1218,14 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     case Qt::Key_O:
         if (e->modifiers() & Qt::ShiftModifier) {
             foreach (nPhysD* phys, physList) {
-                phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+                phys->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
                 emit bufferChanged(phys);
             }
         } else {
-            if (currentBuffer) currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+            if (currentBuffer) currentBuffer->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
         }
-        mouseposition(my_mouse.pos());
-        my_tics.update();
+        mouseposition(my_w->my_view->my_mouse.pos());
+        my_w->my_view->my_tics.update();
         emitBufferChanged();
 
         // I need a signal to communicate explicit origin change not to
@@ -1340,11 +1257,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         if (!(e->modifiers() & Qt::ShiftModifier))
             toggleGrid();
         break;
-    case Qt::Key_M: {
-        if (!(e->modifiers() & Qt::ShiftModifier))
-            toggleMouse();
-        break;
-    }
     case Qt::Key_V: {
         if (!(e->modifiers() & Qt::ShiftModifier))
             Vlineout();
@@ -1370,10 +1282,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     }
     default:
         break;
-    }
-
-    if (follower) {
-        follower->keyPressEvent(e);
     }
 }
 
@@ -1550,7 +1458,7 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
         } else if (suffix.startsWith("txt") || suffix.startsWith("dat")) {
             phys->writeASC(fname.toUtf8().constData());
         } else {
-            my_pixitem.pixmap().save(fname);
+            my_w->my_view->my_pixitem.pixmap().save(fname);
         }
         phys->setType(PHYS_FILE);
         phys->setShortName(QFileInfo(fname).fileName().toStdString());
@@ -1597,9 +1505,9 @@ neutrino::fileClose() {
         foreach (nPhysD *phys, physList) {
             delete phys;
         }
-#ifdef HAVE_PYTHONQT
-        PythonQt::self()->getMainModule().removeVariable(objectName());
-#endif
+//#ifdef HAVE_PYTHONQT
+//        PythonQt::self()->getMainModule().removeVariable(objectName());
+//#endif
 
         deleteLater();
         return true;
@@ -1802,7 +1710,7 @@ void
 neutrino::changeColorTable () {
     createQimage();
     statusBar()->showMessage(colorTable, 1500);
-    my_tics.update();
+    my_w->my_view->my_tics.update();
     emit updatecolorbar();
 }
 
@@ -1914,16 +1822,16 @@ void neutrino::print()
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog *printDialog = new QPrintDialog(&printer, this);
     if (printDialog->exec() == QDialog::Accepted) {
-        my_mouse.setVisible(false);
+        my_w->my_view->my_mouse.hide();
         QPainter painter(&printer);
-        foreach (QGraphicsItem *oggetto, my_s.items() ) {
+        foreach (QGraphicsItem *oggetto, getScene().items() ) {
             if (qgraphicsitem_cast<nLine *>(oggetto)) {
                 nLine *my_nline = (nLine *)oggetto;
                 my_nline->selectThis(false);
             }
         }
-        my_s.render(&painter);
-        my_mouse.setVisible(true);
+        getScene().render(&painter);
+        my_w->my_view->my_mouse.show();
     }
 }
 
@@ -2008,7 +1916,7 @@ neutrino::Affine() {
 nGenericPan*
 neutrino::Camera() {
 #if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-   return new nCamera(this);
+    return new nCamera(this);
 #else
     return NULL;
 #endif
@@ -2018,7 +1926,6 @@ neutrino::Camera() {
 void
 neutrino::createFollower() {
     follower = new neutrino ();
-    follower->toggleMouse(true);
 }
 
 // MONIOR DIRECTORY
@@ -2032,11 +1939,6 @@ void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
-    my_set.setValue("mouseVisible", my_mouse.isVisible());
-    my_set.setValue("mouseColor", my_mouse.color);
-    my_set.setValue("rulerVisible", my_tics.rulerVisible);
-    my_set.setValue("gridVisible", my_tics.gridVisible);
-    my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("colorTable", colorTable);
     my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
 
@@ -2055,13 +1957,9 @@ void neutrino::loadDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
-    toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
 
-    my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
-    my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
-    my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
-    my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
     changeColorTable(my_set.value("colorTable",colorTable).toString());
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 
     QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
@@ -2093,11 +1991,12 @@ neutrino::Preferences() {
 void neutrino::about() {
 
     QDialog myabout(this);
-    my_about->setupUi(&myabout);
-    connect(my_about->buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
-    connect(my_about->buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
+    Ui::nAbout my_about;
+    my_about.setupUi(&myabout);
+    connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
+    connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-    my_about->version->setText(QString(__VER));
+    my_about.version->setText(QString(__VER));
 #ifdef __neutrino_key
     QString serial(qApp->property("nHash").toString());
     // copy serial to clipboard
@@ -2105,9 +2004,9 @@ void neutrino::about() {
     QApplication::clipboard()->setText(serial);
 #endif
 
-    my_about->creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
-    my_about->creditsText->setLineWrapColumnOrWidth(80);
-    QScrollBar *vScrollBar = my_about->creditsText->verticalScrollBar();
+    my_about.creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
+    my_about.creditsText->setLineWrapColumnOrWidth(80);
+    QScrollBar *vScrollBar = my_about.creditsText->verticalScrollBar();
     vScrollBar->triggerAction(QScrollBar::SliderToMinimum);
     QApplication::processEvents();
 
@@ -2118,9 +2017,9 @@ void neutrino::about() {
         if (lic.open(QFile::ReadOnly | QFile::Text)) {
             QString licenseText=QTextStream(&lic).readAll();
             if (!licenseText.isEmpty()) {
-                my_about->creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
-                my_about->creditsText->insertPlainText(licenseText);
-                my_about->creditsText->insertHtml("</PRE><br><hr><br>");
+                my_about.creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
+                my_about.creditsText->insertPlainText(licenseText);
+                my_about.creditsText->insertHtml("</PRE><br><hr><br>");
             }
         }
     }
@@ -2142,7 +2041,6 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
 
     nGenericPan *my_pan=nullptr;
 
-#ifdef HAVE_PYTHONQT
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << panName;
     int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
     qDebug() << "methodIdx" << methodIdx;
@@ -2188,7 +2086,6 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
         }
     }
     QApplication::processEvents();
-#endif
 
     if (force && my_pan==nullptr) {
         my_pan=new nGenericPan(this);
@@ -2199,7 +2096,6 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
 
 // ----------------------------------- scripting --------------------------------------
 
-#ifdef HAVE_PYTHONQT
 nGenericPan* neutrino::getPan(QString name) {
     foreach(nGenericPan* pan, getPanList()) {
         if(pan->panName()==name) return pan;
@@ -2241,9 +2137,6 @@ nGenericPan* neutrino::newPan(QString my_string) {
             panName=QFileInfo(my_string).baseName();
         }
 
-        if (panName.isEmpty())
-            panName.sprintf("n%03d pan",property("winId").toInt());
-
         my_pan=new nGenericPan(this);
 
         if (uiwidget) {
@@ -2268,7 +2161,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
                 QVariant value = uiwidget->property(name);
             }
 
-//            my_pan->setCentralWidget(uiwidget);
+            //            my_pan->setCentralWidget(uiwidget);
             my_pan->show();
         }
 
@@ -2277,57 +2170,8 @@ nGenericPan* neutrino::newPan(QString my_string) {
     return my_pan;
 }
 
-nGenericPan* neutrino::Python()
-{
-    return new nPython(this);
-}
 
-void
-neutrino::loadPyScripts() {
-    QSettings settings("neutrino","");
-    settings.beginGroup("Python");
-    QDir scriptdir(settings.value("scriptsFolder").toString());
-    if (scriptdir.exists()) {
-        //		PythonQt::self()->addSysPath(scriptdir.dirName());
-        QStringList scriptlist = scriptdir.entryList(QStringList("*.py"));
-        //	.split(QRegExp("\\s*,\\s*"));
-
-        if (scriptlist.size() > 0) {
-            foreach (QAction* myaction, my_w->menuPython->actions()) {
-                if (QFileInfo(myaction->data().toString()).suffix()=="py")
-                    my_w->menuPython->removeAction(myaction);
-            }
-        }
-
-        foreach (QString sname, scriptlist) {
-            QAction *action = new QAction(this);
-            action->setText(QFileInfo(sname).baseName());
-            connect(action, SIGNAL(triggered()), this, SLOT(runPyScript()));
-            action->setData(scriptdir.filePath(sname));
-            my_w->menuPython->addAction(action);
-        }
-    }
-}
-
-void
-neutrino::runPyScript() {
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action) {
-        runPyScript(action->data().toString());
-    }
-}
-
-void
-neutrino::runPyScript(QString fname) {
-    QFile t(fname);
-    t.open(QIODevice::ReadOnly| QIODevice::Text);
-    PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
-    t.close();
-}
-
-#endif
-
-// col functions outside neutrino....
+// cool functions outside neutrino....
 QVariant toVariant(anydata &my_data) {
     if (my_data.is_i()) {
         return QVariant::fromValue((int)my_data);

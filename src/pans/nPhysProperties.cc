@@ -34,7 +34,7 @@ nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
 	
 	connect(my_w.propertyList, SIGNAL(itemSelectionChanged()), this, SLOT(showProperty()));
 
-    bufferChanged(nparent->currentBuffer);
+    bufferChanged(currentBuffer);
 
 	show();
 }

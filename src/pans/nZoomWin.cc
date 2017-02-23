@@ -39,7 +39,8 @@ nZoomWin::nZoomWin(neutrino *nparent) : nGenericPan(nparent)
 
     show();
     setBehaviour();
-    my_w.my_view->setScene(&(nparent->my_s));
+
+    my_w.my_view->setScene(&(nparent->getScene()));
     my_w.my_view->scale(2,2);
 
 }

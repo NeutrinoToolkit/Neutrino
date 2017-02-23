@@ -53,7 +53,7 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
 
 
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
-	updatePad(nparent->currentBuffer);
+    updatePad(currentBuffer);
 
 	QWidget* empty = new QWidget(this);
 	empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -192,7 +192,7 @@ nWinList::changeProperties() {
 							phys->set_origin(xOrigin,yOrigin);
 							nparent->emitBufferChanged(phys);
 						}
-						nparent->my_tics.update();
+                        nparent->my_w->my_view->my_tics.update();
 						foreach (QTreeWidgetItem* item, itemsSelected) {
 							item->setData(3,0,lista.at(0)+" "+lista.at(1));
 						}
@@ -222,7 +222,7 @@ nWinList::changeProperties() {
 							foreach (QTreeWidgetItem* item, itemsSelected) {
 								item->setData(4,0,lista.at(0));
 							}
-							nparent->my_tics.update();
+                            nparent->my_w->my_view->my_tics.update();
 						}
 						break;
 					}
@@ -240,7 +240,7 @@ nWinList::changeProperties() {
 							foreach (QTreeWidgetItem* item, itemsSelected) {
 								item->setData(4,0,lista.at(0)+" "+lista.at(1));
 							}
-							nparent->my_tics.update();
+                            nparent->my_w->my_view->my_tics.update();
 						}
 						break;
 					}

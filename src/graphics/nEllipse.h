@@ -45,10 +45,8 @@ public:
 	nEllipse(neutrino *);
 	~nEllipse();
 	
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
-	
+    neutrino *nparent;
+
 	enum { Type = QGraphicsItem::UserType + 3 };
 	int type() const { return Type;}
 	

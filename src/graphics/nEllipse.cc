@@ -35,15 +35,16 @@ nEllipse::~nEllipse() {
 	}
 }
 
-nEllipse::nEllipse(neutrino *nparent) :
+nEllipse::nEllipse(neutrino *my_parent) :
     QGraphicsObject(),
+    nparent(my_parent),
     my_w(new Ui::nObject)
 {
-	nparent->my_s.addItem(this);
-	setParent(nparent);
+    my_parent->getScene().addItem(this);
+    setParent(my_parent);
 
-    if (nparent->currentBuffer) {
-        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    if (my_parent->getCurrentBuffer()) {
+        setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
     }
     
 	setAcceptHoverEvents(true);
@@ -52,14 +53,14 @@ nEllipse::nEllipse(neutrino *nparent) :
 
 	nodeSelected=-1;
 
-	nWidth=1.0;
+    nWidth=1.0;
 	nSizeHolder=5.0;
 
 	nColor=QColor(Qt::black);
 	holderColor=QColor(0,255,0,200);
 
-	int num=nparent->property("numEllipse").toInt()+1;
-	nparent->setProperty("numEllipse",num);
+    int num=my_parent->property("numEllipse").toInt()+1;
+    my_parent->setProperty("numEllipse",num);
 	setProperty("numEllipse",num);
 
     setProperty("NeuSave-fileIni",metaObject()->className()+QString::number(num)+".ini");
@@ -67,11 +68,11 @@ nEllipse::nEllipse(neutrino *nparent) :
 	setOrder(0.0);
 	setToolTip(tr("ellipse")+QString(" ")+QString::number(num));
 
-	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 
-    connect(parent()->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
-	zoom=parent()->getZoom();
+    zoom=nparent->getZoom();
 
 
 	// PADELLA
@@ -102,7 +103,7 @@ nEllipse::nEllipse(neutrino *nparent) :
     connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
     connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+    connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
 }
@@ -141,7 +142,7 @@ void nEllipse::bufferChanged(nPhysD* my_phys) {
 
 void nEllipse::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -149,7 +150,7 @@ void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nEllipse::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -346,25 +347,25 @@ void nEllipse::appendPoint () {
 }
 
 void nEllipse::expandX() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(0,rect.top()),true);
-		changeP(1,QPointF(parent()->currentBuffer->getW(),rect.bottom()),true);
+        changeP(1,QPointF(nparent->getCurrentBuffer()->getW(),rect.bottom()),true);
 		itemChanged();
 	}
 }
 
 void nEllipse::expandY() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(rect.left(),0),true);
-		changeP(1,QPointF(rect.right(),parent()->currentBuffer->getH()),true);
+        changeP(1,QPointF(rect.right(),nparent->getCurrentBuffer()->getH()),true);
 		itemChanged();
 	}
 }
 
 void nEllipse::changeWidth () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
         rect.setWidth(QLocale().toDouble(my_w->sizeWidth->text(),&ok));
@@ -376,7 +377,7 @@ void nEllipse::changeWidth () {
 }
 
 void nEllipse::changeHeight () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
         rect.setHeight(QLocale().toDouble(my_w->sizeHeight->text(),&ok));
@@ -398,7 +399,7 @@ void nEllipse::updateSize() {
 
 void
 nEllipse::showMessage ( QString s ) {
-	parent()->statusBar()->showMessage(s,2000);
+    nparent->statusBar()->showMessage(s,2000);
 	my_pad.statusBar()->showMessage(s,2000);
 }
 
@@ -442,10 +443,10 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			expandY();
 			break;
 		case Qt::Key_S:
-			if (parent()->currentBuffer) {
-				nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-				parent()->showPhys(subPhys);
-//				parent()->showPhys(parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+            if (nparent->getCurrentBuffer()) {
+                nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+                nparent->showPhys(subPhys);
+//				nparent->showPhys(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
 			}
 			break;
 		default:
@@ -501,7 +502,7 @@ nEllipse::selectThis(bool val) {
 	for (int i =0; i<ref.size(); i++) {
 		ref[i]->setVisible(val);
 	}
-    parent()->my_w->statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
+    nparent->my_w->statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
 }
 
 // reimplementation

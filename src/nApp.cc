@@ -24,7 +24,6 @@ NApplication::NApplication( int &argc, char **argv ) : QApplication(argc, argv) 
 }
 
 
-#ifdef HAVE_PYTHONQT
 QList<neutrino*> NApplication::neus() {
     QList<neutrino*> retList;
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
@@ -33,7 +32,6 @@ QList<neutrino*> NApplication::neus() {
     }
     return retList;
 }
-#endif
 
 bool NApplication::notify(QObject *rec, QEvent *ev)
 {

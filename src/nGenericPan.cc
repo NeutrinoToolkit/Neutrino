@@ -30,7 +30,10 @@
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)
-: QMainWindow(myparent), nparent(myparent), currentBuffer(nullptr), my_help(new Ui::PanHelp)
+: QMainWindow(myparent),
+  nparent(myparent),
+  currentBuffer(myparent->getCurrentBuffer()),
+  my_help(new Ui::PanHelp)
 {
     if (nparent==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
@@ -52,7 +55,7 @@ nGenericPan::nGenericPan(neutrino *myparent)
 	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
 	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
-	bufferChanged(nparent->currentBuffer);
+    bufferChanged(nparent->getCurrentBuffer());
     nparent->emitPanAdd(this);
 }
 
@@ -193,9 +196,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
             }
 		}
 	}
-#ifdef HAVE_PYTHONQT
     int occurrency=0;
-#endif
     foreach (QWidget *wdgt, findChildren<QWidget *>()) {
 
 		if (wdgt->property("neutrinoSave").isValid() || 
@@ -203,20 +204,16 @@ void nGenericPan::showEvent(QShowEvent* event) {
                 qobject_cast<QPushButton*>(wdgt) ||
                 qobject_cast<QToolButton*>(wdgt)
             ) {
-#ifdef HAVE_PYTHONQT
             if (wdgt->objectName().isEmpty()) {
                 wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
             }
             wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
-#endif
 		}
 	}
 
-#ifdef HAVE_PYTHONQT
     foreach (QAction *wdgt, findChildren<QAction *>()) {
         wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
     }
-#endif
 
 	QSize iconSize;
 	foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {

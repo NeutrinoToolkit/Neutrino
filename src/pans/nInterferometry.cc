@@ -611,7 +611,7 @@ void nInterferometry::addShape(QString name){
     my_l->changeToolTip(name);
     my_l->toggleClosedLine(true);
     QToolButton *my_b=new QToolButton(this);
-    my_b->setIcon(QIcon(":icons/line"));
+    my_b->setIcon(QIcon(":icons/region"));
     my_b->setToolTip(name+my_b->toolTip());
     my_shapes[my_b]=my_l;
     my_w.shapes->layout()->addWidget(my_b);
@@ -688,7 +688,7 @@ void nInterferometry::loadSettings(QSettings *settings){
 
     settings->beginGroup("localPhys");
     foreach (const QString &childKey, settings->childKeys()) {
-        nPhysD *my_phys=nparent->getBuffer(settings->value(childKey).toInt(),false);
+        nPhysD *my_phys=nparent->getBuffer(settings->value(childKey).toInt());
         if (my_phys) {
             localPhys[childKey.toStdString()]=my_phys;
             DEBUG("found " << childKey.toStdString());

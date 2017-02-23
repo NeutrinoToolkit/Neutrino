@@ -126,7 +126,7 @@ void nLineout::nZoom(double d) {
 }
 
 void nLineout::updateLastPoint() {
-    updatePlot(nparent->my_mouse.pos());
+    updatePlot(nparent->my_w->my_view->my_mouse.pos());
 }
 
 

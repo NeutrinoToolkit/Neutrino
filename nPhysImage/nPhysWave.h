@@ -46,9 +46,6 @@
 #include "clFFT.h"
 #endif
 
-
-//using namespace std;
-
 #ifndef __nPhysWave_h
 #define __nPhysWave_h
 

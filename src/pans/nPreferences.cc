@@ -109,6 +109,8 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
+    connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
     connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 

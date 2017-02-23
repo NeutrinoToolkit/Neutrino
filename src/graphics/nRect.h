@@ -48,9 +48,7 @@ public:
     nRect(nGenericPan *, int level);
     ~nRect();
 	
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
+    neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 2 };
 	int type() const { return Type;}

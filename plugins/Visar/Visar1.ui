@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -364,6 +364,9 @@
              </property>
              <property name="maximum">
               <double>99999999.989999994635582</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

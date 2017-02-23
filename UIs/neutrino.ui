@@ -160,7 +160,6 @@
     <addaction name="actionMouse_Zoom"/>
     <addaction name="separator"/>
     <addaction name="menuPaths"/>
-    <addaction name="actionCycle_over_paths"/>
     <addaction name="separator"/>
     <addaction name="actionFollower"/>
     <addaction name="actionShow_mouse"/>
@@ -218,19 +217,9 @@
     <addaction name="actionAbout"/>
     <addaction name="actionKeyborard_shortcuts"/>
    </widget>
-   <widget class="QMenu" name="menuPython">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Python</string>
-    </property>
-    <addaction name="actionPython"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
    <addaction name="menuAnalysis"/>
-   <addaction name="menuPython"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -403,26 +392,6 @@
    </property>
    <property name="text">
     <string>Show colortable</string>
-   </property>
-  </action>
-  <action name="actionWindow_list">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//info.png</normaloff>:icons//info.png</iconset>
-   </property>
-   <property name="text">
-    <string>Window List</string>
-   </property>
-   <property name="toolTip">
-    <string>Window List</string>
-   </property>
-  </action>
-  <action name="actionCycle_over_paths">
-   <property name="text">
-    <string>Cycle over paths</string>
-   </property>
-   <property name="shortcut">
-    <string>Tab</string>
    </property>
   </action>
   <action name="actionFocal_Spot">
@@ -727,22 +696,12 @@
     <string>Paths</string>
    </property>
   </action>
-  <action name="actionPalettes">
-   <property name="text">
-    <string>Palettes</string>
-   </property>
-  </action>
   <action name="actionSave_Session">
    <property name="text">
     <string>Save Session</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
-   </property>
-  </action>
-  <action name="actionOpen_Session">
-   <property name="text">
-    <string>Open Session</string>
    </property>
   </action>
   <action name="actionKeyborard_shortcuts">
@@ -805,7 +764,7 @@
   </action>
   <action name="actionPython">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../plugins/nPython/python.qrc">
      <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
    </property>
    <property name="text">
@@ -844,15 +803,6 @@
     <string>Load...</string>
    </property>
   </action>
-  <action name="actionDrawLine">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
-   </property>
-   <property name="text">
-    <string>Draw Line Pan</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -862,6 +812,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../plugins/nPython/python.qrc"/>
   <include location="../resources/icons/icons.qrc"/>
  </resources>
  <connections/>

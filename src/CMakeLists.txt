@@ -84,12 +84,6 @@ list (APPEND SOURCES
 #moving it to main file
 include(FindNeutrinoGuiComponents)
 
-if (PYTHONQT_FOUND_COMPLETE)
-    MESSAGE(STATUS "adding python wrappers")
-    include_directories(python)
-    list (APPEND SOURCES python/nPhysPyWrapper.cc python/nPython.cc python/codeeditor.cpp)
-endif()
-
 
 ## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
 ## add relevant sources
@@ -162,9 +156,6 @@ if (USE_QT5)
     qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
 
 
-    if (PYTHONQT_FOUND_COMPLETE)
-        qt5_add_resources(RES_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/python/python.qrc)
-    endif()
 
     QT5_WRAP_UI( UI_HEADERS ${UIS} )
 elseif (USE_QT4)
@@ -172,10 +163,6 @@ elseif (USE_QT4)
     qt4_add_resources(RES_SOURCES ${HTML_QRC})
     qt4_add_resources(RES_SOURCES ${LICENSES_QRC})
     qt4_add_resources(RES_SOURCES ${HELP_QRC})
-
-    if (PYTHONQT_FOUND_COMPLETE)
-        qt4_add_resources(RES_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/python/python.qrc)
-    endif()
 
     QT4_WRAP_UI( UI_HEADERS ${UIS} )
 endif()

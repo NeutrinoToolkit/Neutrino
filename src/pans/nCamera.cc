@@ -110,8 +110,13 @@ void nCamera::setupCam (const QCameraInfo &cameraInfo) {
 }
 
 void nCamera::giveNeutrino(const QImage& image) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    bool separate_rgb= my_set.value("separateRGB",false).toBool();
+    my_set.endGroup();
+
     if(!image.isNull()) {
-        if (my_w.gray->isChecked()) {
+        if (!separate_rgb) {
             nPhysD *datamatrix = new nPhysD(image.width(), image.height(),0,"Camera gray");
             datamatrix->setShortName("gray");
             for (int i=0;i<image.height();i++) {

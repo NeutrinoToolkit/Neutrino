@@ -39,7 +39,6 @@
 
 #define _phys_deg (0.017453f)
 
-//using namespace std;
 
 #ifndef __physMaths_h
 #define __physMaths_h

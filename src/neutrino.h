@@ -41,7 +41,6 @@
 #include <QMap>
 
 #include "nGenericPan.h"
-#include "nView.h"
 
 // physImage
 #include "nPhysImageF.h"
@@ -53,10 +52,6 @@
 #include "nRect.h"
 #include "nEllipse.h"
 #include "nPoint.h"
-
-#include "nMouse.h"
-
-#include "nTics.h"
 
 #include "ui_neutrino.h"
 
@@ -74,11 +69,7 @@ public:
 	neutrino();
 	~neutrino();
 	
-    QGraphicsScene* getScene();
-
-
-    QGraphicsScene my_s;
-
+    QGraphicsScene& getScene();
 
     Ui::neutrino *my_w;
     Ui::nSbarra *my_sbarra;
@@ -89,20 +80,13 @@ public:
 	QList <QAction *> recentFileActs;
 	void updateRecentFileActions(QString=QString());
 
-
-	QGraphicsPixmapItem my_pixitem;
-	
-	nMouse my_mouse;
-	
-	nTics my_tics;
-
-	nPhysD* currentBuffer;
 	QPointer<neutrino> follower;
 
 	QString colorTable;
     QMap<QString, std::vector<unsigned char>> nPalettes;
 
 private:
+    nPhysD* currentBuffer;
     QList<nGenericPan*> panList;
 	QList<nPhysD*> physList;
 
@@ -158,7 +142,8 @@ public slots:
 	void showPhys(nPhysD&);
 	void addShowPhys(nPhysD*);
 	void addShowPhys(nPhysD&);
-    nPhysD* getBuffer(int=-1,bool=true);
+    nPhysD* getBuffer(int);
+    inline nPhysD* getCurrentBuffer() {return currentBuffer;};
 
 	inline QList<nPhysD *> getBufferList() {return physList;};
     inline QList<nGenericPan*> getPanList() {return panList;};
@@ -194,8 +179,6 @@ public slots:
 	// Image
 	void createQimage();
 	
-	void toggleMouse();
-	void toggleMouse(bool);
 	void toggleRuler();
 	void toggleGrid();
 
@@ -214,9 +197,6 @@ public slots:
 	nGenericPan* WinList();
 	
 	nGenericPan* Properties();
-
-	void cycleOverItems();
-//	void setItemSelect(QGraphicsItem *, bool);
 
 	nGenericPan* Hlineout();
 	nGenericPan* Vlineout();
@@ -304,15 +284,8 @@ public slots:
 	void dragMoveEvent(QDragMoveEvent *);
 	void dropEvent(QDropEvent *);
 
-#ifdef HAVE_PYTHONQT
-    void loadPyScripts();
-    void runPyScript();
-    void runPyScript(QString);
-    // pythonqt STUFF
-    nGenericPan* Python();
     nGenericPan* newPan(QString=QString());
     nGenericPan* getPan(QString);
-#endif
 
     void changeEvent(QEvent *e);
 
@@ -331,8 +304,6 @@ signals:
 	void physAdd(nPhysD*);
 	void physDel(nPhysD*);
     void physMod(std::pair<nPhysD*,nPhysD*>);
-    
-    
 
 	void keyPressEvent();
 	void closeAll();
@@ -344,17 +315,6 @@ signals:
 QVariant toVariant(anydata &my_data);
 
 anydata toAnydata(QVariant &my_variant);
-
-#ifdef HAVE_PYTHONQT
-class nPyWrapper : public QObject {
-    Q_OBJECT
-
-    public slots:
-    neutrino* new_neutrino() {return new neutrino();};
-    void delete_neutrino(neutrino* neu) {neu->deleteLater();};
-
-};
-#endif
 
 Q_DECLARE_METATYPE(nPhysD);
 

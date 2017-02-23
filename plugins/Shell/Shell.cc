@@ -1,10 +1,10 @@
-#include "nPython.h"
+#include "Shell.h"
 #include "gui/PythonQtScriptingConsole.h"
 #include "neutrino.h"
 #include <QThread>
 #include <QFont>
 
-nPython::nPython(neutrino *nparent) : nGenericPan(nparent)
+Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 
@@ -25,7 +25,7 @@ nPython::nPython(neutrino *nparent) : nGenericPan(nparent)
 	console->show();
 
     QKeySequence key_seq=QKeySequence(Qt::CTRL + Qt::Key_Return);
-    my_w.script->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute");
+    my_w.script->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute "+toolTip());
     QShortcut* my_shortcut = new QShortcut(key_seq, my_w.script);
     connect(my_shortcut, SIGNAL(activated()), this, SLOT(runScript()));
 
@@ -54,7 +54,7 @@ nPython::nPython(neutrino *nparent) : nGenericPan(nparent)
     console->setFocus();
 }
 
-void nPython::loadScript(void) {
+void Shell::loadScript(void) {
 	QString fname;
     fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("NeuSave-fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
 	if (!fname.isEmpty()) {
@@ -68,25 +68,25 @@ void nPython::loadScript(void) {
 	}
 }
 
-void nPython::runScript(QString cmd) {
+void Shell::runScript(QString cmd) {
     saveDefaults();
     DEBUG("\n" << cmd.toStdString());
     QVariant res=PythonQt::self()->getMainModule().evalScript(cmd);
-    DEBUG("result" << res.type() << "\n" << res.toString().toStdString());
+    DEBUG("result " << res.type() << "\n" << res.toString().toStdString());
 }
 
-void nPython::runScript(void) {
+void Shell::runScript(void) {
     runScript(my_w.script->toPlainText());
 }
 
-void nPython::changeScriptsFolder() {
+void Shell::changeScriptsFolder() {
     QString dirName = QFileDialog::getExistingDirectory(this,tr("Python scripts directory"),my_w.changeScriptsFolder->text());
     if (QFileInfo(dirName).isDir()) {
-        my_w.scriptsFolder->setText(my_w.scriptsFolder->text()+":"+dirName);
+        my_w.scriptsFolder->setText(dirName);
     }
 }
 
-void nPython::changeSiteFolder() {
+void Shell::changeSiteFolder() {
     QString dirName = QFileDialog::getExistingDirectory(this,tr("Python site directory"),my_w.changeSiteFolder->text());
     if (QFileInfo(dirName).isDir()) {
         my_w.siteFolder->setText(dirName);

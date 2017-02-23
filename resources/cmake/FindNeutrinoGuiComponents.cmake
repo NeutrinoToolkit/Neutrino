@@ -10,40 +10,6 @@ if(DEFINED QTDIR)
   set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
 endif()
 
-if (OPTION_USE_PYTHON)
-	include(FindPythonLibs)
-else()
-	message(STATUS "Python disabled")
-endif()
-
-if(PYTHONLIBS_FOUND)
-	list(APPEND LIBS ${PYTHON_LIBRARIES})
-	include_directories(${PYTHON_INCLUDE_DIRS})
-
-	find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
-
-	if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
-
-	    	list(APPEND LIBS ${PYTHONQT})    	
-
-		FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h PATH_SUFFIXES PythonQt)
-		IF (NOT ${PYTHONQT_INCLUDE_DIR} STREQUAL "PYTHONQT_INCLUDE_DIR-NOTFOUND")
-                        set (PYTHONQT_FOUND_COMPLETE "TRUE")
-    			add_definitions(-DHAVE_PYTHONQT)
-                        include_directories(${PYTHONQT_INCLUDE_DIR})
-
-		ELSE()
-			set (PYTHONQT_FOUND_COMPLETE "FALSE")
-			message(STATUS "PythonQt.h NOT FOUND (perhaps you forgot -DCMAKE_INCLUDE_PATH)")
-		ENDIF ()
-	else()
-		message(STATUS "PythonQt NOT FOUND (perhaps you forgot -DCMAKE_LIBRARY_PATH)")
-	endif()
-else()
-	message(STATUS "No python libraries found: python subsystem is DISABLED!")
-
-endif()
-
 if (NOT DEFINED Qt5_DIR AND APPLE)
     set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
 endif()

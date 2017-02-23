@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QMenu>
 
 #include "nPlug.h"
 
@@ -27,6 +28,8 @@ public:
         }
         return QPluginLoader::unload();
     }
+
+    static QPointer<QMenu> getMenu(QString entryPoint, neutrino* neu);
 
 public slots:
 	

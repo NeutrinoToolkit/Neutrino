@@ -50,23 +50,24 @@ nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
 }
 
 
-nRect::nRect(neutrino *nparent) :
+nRect::nRect(neutrino *my_parent) :
     QGraphicsObject(),
+    nparent(my_parent),
     my_w(new Ui::nObject)
 {
-    if (nparent) {
-        nparent->my_s.addItem(this);
-        setParent(nparent);
-        int num=nparent->property("numRect").toInt()+1;
-        nparent->setProperty("numRect",num);
+    if (my_parent) {
+        my_parent->getScene().addItem(this);
+        setParent(my_parent);
+        int num=my_parent->property("numRect").toInt()+1;
+        my_parent->setProperty("numRect",num);
         setProperty("numRect",num);
         setToolTip(tr("rect")+QString(" ")+QString::number(num));
-        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-        zoom=nparent->getZoom();
-        if (nparent->currentBuffer) {
-            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+        connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+        connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        zoom=my_parent->getZoom();
+        if (my_parent->getCurrentBuffer()) {
+            setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
         }
     }
     
@@ -139,8 +140,8 @@ void nRect::setRect(QRectF rect) {
 
 QRect nRect::getRect(nPhysD* image) {
     QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
-    if (image && parent()->currentBuffer) {
-        vec2f dx(image->get_origin()-parent()->currentBuffer->get_origin());
+    if (image && nparent->getCurrentBuffer()) {
+        vec2f dx(image->get_origin()-nparent->getCurrentBuffer()->get_origin());
         geom2.translate(dx.x(),dx.y());        
     }
     return geom2;
@@ -164,7 +165,7 @@ void nRect::bufferChanged(nPhysD* my_phys) {
 
 void nRect::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -172,7 +173,7 @@ void nRect::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nRect::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -369,41 +370,41 @@ void nRect::appendPoint () {
 }
 
 void nRect::expandX() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(0,rect.top()),true);
-		changeP(1,QPointF(parent()->currentBuffer->getW(),rect.bottom()),true);
+        changeP(1,QPointF(nparent->getCurrentBuffer()->getW(),rect.bottom()),true);
 		itemChanged();
 	}
 }
 
 void nRect::expandY() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(rect.left(),0),true);
-		changeP(1,QPointF(rect.right(),parent()->currentBuffer->getH()),true);
+        changeP(1,QPointF(rect.right(),nparent->getCurrentBuffer()->getH()),true);
 		itemChanged();
 	}
 }
 
 void nRect::intersection() {
-	if (parent()->currentBuffer) {
-		//QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersect(getRectF());
+    if (nparent->getCurrentBuffer()) {
+        //QRectF rect=QRectF(0,0,nparent->getCurrentBuffer()->getW(),nparent->getCurrentBuffer()->getH()).intersect(getRectF());
 		//obsolete
-		QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersected(getRectF());
+        QRectF rect=QRectF(0,0,nparent->getCurrentBuffer()->getW(),nparent->getCurrentBuffer()->getH()).intersected(getRectF());
 		setRect(rect);
 	}
 }
 
 void nRect::submatrix() {
-    if (parent()->currentBuffer) {
-        nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-        parent()->showPhys(subPhys);
+    if (nparent->getCurrentBuffer()) {
+        nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+        nparent->showPhys(subPhys);
     }
 }
 
 void nRect::changeWidth () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
         rect.setWidth(QLocale().toDouble(my_w->sizeWidth->text(),&ok));
@@ -415,7 +416,7 @@ void nRect::changeWidth () {
 }
 
 void nRect::changeHeight () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
         rect.setHeight(QLocale().toDouble(my_w->sizeHeight->text(),&ok));
@@ -437,7 +438,7 @@ void nRect::updateSize() {
 
 void
 nRect::showMessage ( QString s ) {
-	parent()->statusBar()->showMessage(s);
+    nparent->statusBar()->showMessage(s);
 	my_pad.statusBar()->showMessage(s);
 }
 
@@ -523,9 +524,9 @@ nRect::selectThis(bool val) {
 	}
 	update();
 	if (val) {
-        parent()->my_w->statusbar->showMessage(toolTip());
+        nparent->my_w->statusbar->showMessage(toolTip());
 	} else {
-        parent()->my_w->statusbar->showMessage("");
+        nparent->my_w->statusbar->showMessage("");
 	}
 }
 

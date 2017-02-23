@@ -42,9 +42,7 @@ public:
     nLine(nGenericPan *, int level);
     ~nLine();
 
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
+    neutrino *nparent;
 
 	enum { Type = QGraphicsItem::UserType + 1 };
 	int type() const { return Type;}

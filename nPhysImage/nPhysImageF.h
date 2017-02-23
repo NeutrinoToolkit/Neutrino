@@ -76,17 +76,6 @@
 
 #include "bidimvec.h"
 
-// .alex. finally getting rid of this
-// using namespace std;
-
-// check for c++0x
-#if __cplusplus == 201103L
-#define _std0x
-#endif
-
-#ifndef __deg
-#define __deg (0.017453f)
-#endif
 
 #include <gsl/gsl_math.h>
 

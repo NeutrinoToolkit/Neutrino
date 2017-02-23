@@ -128,7 +128,7 @@ void nLineoutBoth::updatePlot(QPointF p) {
 
 void nLineoutBoth::updateLastPoint() {
     if (!my_w.lockClick->isChecked()) {
-        updatePlot(nparent->my_mouse.pos());
+        updatePlot(nparent->my_w->my_view->my_mouse.pos());
     }
 }
 

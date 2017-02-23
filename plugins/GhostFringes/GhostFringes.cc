@@ -32,15 +32,20 @@ GhostFringes::GhostFringes(neutrino *nparent) : nGenericPan(nparent),
 {
 	my_w.setupUi(this);
 
-    region =  new nRect(this,1);
-	region->setRect(QRectF(100,100,100,100));
-	
+    maskRegion =  new nLine(this,1);
+    maskRegion->changeToolTip("MaskLine");
+    QPolygonF poly;
+    poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
+    maskRegion->setPoints(poly);
+    maskRegion->toggleClosedLine(true);
+
+
     show();
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
+    connect(my_w.actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
 	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
@@ -49,7 +54,7 @@ GhostFringes::GhostFringes(neutrino *nparent) : nGenericPan(nparent),
 void GhostFringes::guessCarrier() {
     nPhysD *image=getPhysFromCombo(my_w.ref);
 	if (image) {
-        QRect geom2=region->getRect(image);
+        QRect geom2=maskRegion->path().boundingRect().toRect();
 		nPhysD datamatrix;
         datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
@@ -88,6 +93,8 @@ void GhostFringes::doGhost () {
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*my_w.widthCarrier->value());
 
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
+
+
         for (size_t x=0;x<dx;x++) {
             for (size_t y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
@@ -103,10 +110,23 @@ void GhostFringes::doGhost () {
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+")");
         
-        QRect geom=region->getRect(imageShot);
+        QRect geom=maskRegion->path().boundingRect().toRect();
+
+
+
+        QPolygonF regionPoly=maskRegion->poly(1);
+        regionPoly=regionPoly.translated(imageShot->get_origin().x(),imageShot->get_origin().y());
+        std::vector<vec2f> vecPoints(regionPoly.size());
+        for(int k=0;k<regionPoly.size();k++) {
+            vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
+        }
+
         for(int i=geom.left();i<geom.right(); i++) {
             for(int j=geom.top();j<geom.bottom(); j++) {
-                deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                vec2f pp(i,j);
+                if (point_inside_poly(pp,vecPoints)==true) {
+                    deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                }
             }
         }
         deepcopy->TscanBrightness();

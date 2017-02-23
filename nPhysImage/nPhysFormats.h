@@ -177,7 +177,7 @@ std::vector <nPhysD*> phys_resurrect_binary(std::string);
 //generic raw open
 void phys_open_RAW(nPhysD*, int, int, bool);
 
-std::vector <nPhysD*> phys_open_tiff(std::string);
+std::vector <nPhysD*> phys_open_tiff(std::string, bool separate_rgb);
 
 //write neutrino tiff files
 void phys_write_tiff(std::vector<nPhysD*>, std::string);
@@ -196,7 +196,7 @@ std::vector <nPhysD*> phys_open_spe(std::string);
 
 std::vector <nPhysD*> phys_open_pcoraw(std::string);
 
-std::vector <nPhysD*> phys_open(std::string);
+std::vector <nPhysD*> phys_open(std::string, bool separate_rgb=false);
 
 std::string gunzip(std::string);
 

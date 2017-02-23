@@ -57,25 +57,26 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 
 }
 
-nLine::nLine(neutrino *nparent) : QGraphicsObject()
+nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
+    nparent(my_parent)
 {
 
-    if (nparent) {
-        nparent->my_s.addItem(this);
-        setParent(nparent);
-        int num=nparent->property("numLine").toInt()+1;
-        nparent->setProperty("numLine",num);
+    if (my_parent) {
+        my_parent->getScene().addItem(this);
+        setParent(my_parent);
+        int num=my_parent->property("numLine").toInt()+1;
+        my_parent->setProperty("numLine",num);
         setProperty("numLine",num);
         setToolTip(tr("line")+QString::number(num));
-        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+        connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-        zoom=nparent->getZoom();
+        zoom=my_parent->getZoom();
 
-        if (nparent->currentBuffer) {
+        if (my_parent->getCurrentBuffer()) {
 
-	    		setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+                setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
 		}
 
 	} else {
@@ -218,7 +219,7 @@ QPolygonF nLine::getLine(int np) {
 
 void nLine::interactive ( ) {
 	showMessage(tr("Click for first point, press Esc to finish"));
-    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -284,7 +285,7 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 
 void nLine::updatePlot () {
 
-	nPhysD *my_phys=parent()->currentBuffer;
+    nPhysD *my_phys=nparent->getCurrentBuffer();
 	if (my_w.plot->isVisible() && my_phys) {
 
 		if (my_w.plot->graphCount()==0) {
@@ -294,8 +295,8 @@ void nLine::updatePlot () {
 			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 			my_w.plot->xAxis->setLabelPadding(-1);
 			my_w.plot->yAxis->setLabelPadding(-1);
-            my_w.plot->xAxis->setTickLabelFont(parent()->my_w->my_view->font());
-            my_w.plot->yAxis->setTickLabelFont(parent()->my_w->my_view->font());
+            my_w.plot->xAxis->setTickLabelFont(nparent->my_w->my_view->font());
+            my_w.plot->yAxis->setTickLabelFont(nparent->my_w->my_view->font());
 		}
 
 		double colore;
@@ -612,7 +613,7 @@ nLine::removePoint() {
 
 void
 nLine::showMessage (QString s) {
-	parent()->statusBar()->showMessage(s,2000);
+    nparent->statusBar()->showMessage(s,2000);
 	my_pad.statusBar()->showMessage(s,2000);
 }
 
@@ -628,7 +629,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
             break;            
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-            if (disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+            if (disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
                 ungrabKeyboard();
@@ -703,19 +704,19 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 
 
 void nLine::makeHorizontal() {
-    if (parent()->currentBuffer && property("parentPanControlLevel").toInt()<2) {
+    if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
         QPointF p(0,0);
         foreach (QGraphicsEllipseItem *item, ref){
             p-=item->pos();
         }
         p/=ref.size();
-        vec2f p1=parent()->currentBuffer->getSize()-parent()->currentBuffer->get_origin();
+        vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
         p+=QPointF(p1.x(),p1.y());
 
         while (ref.size()>2) removePoint(2);
 
         changeP(0, QPointF(0.0,p.y()));
-        changeP(1, QPointF(parent()->currentBuffer->getW(),p.y()));
+        changeP(1, QPointF(nparent->getCurrentBuffer()->getW(),p.y()));
         
 
         itemChanged();
@@ -724,19 +725,19 @@ void nLine::makeHorizontal() {
 }
 
 void nLine::makeVertical() {
-    if (parent()->currentBuffer && property("parentPanControlLevel").toInt()<2) {
+    if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
         QPointF p(0,0);
         foreach (QGraphicsEllipseItem *item, ref){
             p-=item->pos();
         }
         p/=ref.size();
-        vec2f p1=parent()->currentBuffer->getSize()-parent()->currentBuffer->get_origin();
+        vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
         p+=QPointF(p1.x(),p1.y());
         
         while (ref.size()>2) removePoint(2);
 
         changeP(0, QPointF(p.x(),0.0));
-        changeP(1, QPointF(p.x(),parent()->currentBuffer->getH()));
+        changeP(1, QPointF(p.x(),nparent->getCurrentBuffer()->getH()));
         
         itemChanged();
     }
@@ -867,10 +868,10 @@ nLine::selectThis(bool val) {
 	}
 	if (val) {
         grabKeyboard();
-        parent()->my_w->statusbar->showMessage(toolTip());
+        nparent->my_w->statusbar->showMessage(toolTip());
     } else {
         ungrabKeyboard();
-        parent()->my_w->statusbar->clearMessage();
+        nparent->my_w->statusbar->clearMessage();
     }
 }
 
@@ -925,13 +926,14 @@ QPolygonF nLine::poly(int steps) const {
 
             std::vector<double> T,X,Y;
             if (closedLine)  {
-                T.resize(my_poly.size()+4);
-                X.resize(my_poly.size()+4);
-                Y.resize(my_poly.size()+4);
-                for (unsigned int i = 0; i < T.size(); i++ ) {
-                    T[i]=i-2;
-                    X[i]=my_poly[(i+ref.size()-2)%ref.size()].x();
-                    Y[i]=my_poly[(i+ref.size()-2)%ref.size()].y();
+                const int guard=2;
+                T.resize(my_poly.size()+2*guard,0);
+                X.resize(my_poly.size()+2*guard,0);
+                Y.resize(my_poly.size()+2*guard,0);
+                for (int i = 0; i < (int) T.size(); i++ ) {
+                    T[i]=i-guard;
+                    X[i]=my_poly[(i+ref.size()-guard)%ref.size()].x();
+                    Y[i]=my_poly[(i+ref.size()-guard)%ref.size()].y();
                 }
             } else {
                 T.resize(my_poly.size());
@@ -944,10 +946,7 @@ QPolygonF nLine::poly(int steps) const {
                 }
             }
 
-            tk::spline sX, sY;
-
-            sX.set_points(T,X);
-            sY.set_points(T,Y);
+            spline::spline sX(T,X), sY(T,Y);
 
             steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
             int size=steps*(my_poly.size()-(closedLine?0:1));
@@ -974,13 +973,13 @@ QPolygonF nLine::poly(int steps) const {
 
 void nLine::centerOnImage(){
     
-    if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
         QPointF p(0,0);
         foreach (QGraphicsEllipseItem *item, ref){
             p-=item->pos();
         }
         p/=ref.size();
-        vec2f p1=parent()->currentBuffer->getSize()/2.0-parent()->currentBuffer->get_origin();
+        vec2f p1=nparent->getCurrentBuffer()->getSize()/2.0-nparent->getCurrentBuffer()->get_origin();
         p+=QPointF(p1.x(),p1.y());
         moveBy(p);
     }
@@ -1006,11 +1005,11 @@ nLine::rearrange_monotone() {
 
 	if (horizontal) {
 		qSort(my_poly.begin(),my_poly.end(), orderMonotone_x);
-		parent()->statusBar()->showMessage("Axis is HORIZONTAL");
+        nparent->statusBar()->showMessage("Axis is HORIZONTAL");
 		//std::cerr<<"[nLine] axis is horizontal"<<std::endl;
 	} else {
 		qSort(my_poly.begin(),my_poly.end(), orderMonotone_y);
-		parent()->statusBar()->showMessage("Axis is VERTICAL");
+        nparent->statusBar()->showMessage("Axis is VERTICAL");
 		//std::cerr<<"[nLine] axis is vertical"<<std::endl;
 	}
 

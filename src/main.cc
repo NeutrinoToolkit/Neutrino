@@ -35,12 +35,6 @@
 #include "neutrino.h"
 #include "nApp.h"
 
-#ifdef HAVE_PYTHONQT
-#include "PythonQt_QtBindings.h"
-#include "nPhysPyWrapper.h"
-#include "nPython.h"
-#endif
-
 #include <QTranslator>
 
 void my_handler(int s){
@@ -74,55 +68,11 @@ int main(int argc, char **argv)
 
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
-    bool somethingDone=false;
-
     QStringList args=QCoreApplication::arguments();
     args.removeFirst();
 
-#ifdef HAVE_PYTHONQT
-
-    PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
-
-    //PythonQt_QtAll::init();
-    PythonQt_init_QtBindings();
-
-    PythonQt::self()->addDecorators(new nPhysPyWrapper());
-    PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
-
-    PythonQt::self()->addDecorators(new nPanPyWrapper());
-    PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
-
-    PythonQt::self()->registerClass(& nCustomPlot::staticMetaObject, "nPlot");
-
-    PythonQt::self()->addDecorators(new nPyWrapper());
-    PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
-
-    QSettings settings("neutrino","");
-    settings.beginGroup("nPython");
-    foreach (QString spath, settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"))) {
-        qDebug() << "Python site folder " << spath;
-        if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
-    }
-    settings.endGroup();
-
-    PythonQt::self()->getMainModule().addObject("nApp", &qapp);
-    foreach (QString filename, args) {
-        QFileInfo my_file(filename);
-        if (my_file.exists() && my_file.suffix()=="py") {
-            somethingDone=true;
-            QFile t(filename);
-            t.open(QIODevice::ReadOnly| QIODevice::Text);
-            PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
-            t.close();
-        }
-    }
-#endif
-
-
-    if (!somethingDone) {
-        neutrino *neu = new neutrino();
-        neu->fileOpen(args);
-    }
+    neutrino *neu = new neutrino();
+    neu->fileOpen(args);
 
     return qapp.exec();
 }

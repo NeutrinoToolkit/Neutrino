@@ -29,8 +29,6 @@
 
 #include <fftw3.h>
 
-//using namespace std;
-
 #pragma once
 
 #ifndef __mcomplex_h

@@ -39,7 +39,7 @@ nRegionPath::nRegionPath(neutrino *nparent) : nGenericPan(nparent)
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionLine, SIGNAL(triggered()), region, SLOT(togglePadella()));
+    connect(my_w.actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
 	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));

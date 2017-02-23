@@ -32,7 +32,6 @@
 #define __GhostFringes
 #include "nPhysWave.h"
 #include "nLine.h"
-#include "nRect.h"
 
 class neutrino;
 
@@ -44,7 +43,7 @@ public:
 
     Ui::GhostFringes my_w;
 
-    QPointer<nRect> region;
+    QPointer<nLine> maskRegion;
 
     nPhysD *ghostBusted;
 

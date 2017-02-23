@@ -1104,7 +1104,7 @@ QString Visar::export_sop() {
     out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
     for (int i=0;i<time_sop.size();i++) {
-        out += QLocale().toString(time_sop[i]);
+        out += QLocale().toString(time_sop[i])+ " ";
         for (int j=0;j<4;j++) {
             double val=sopCurve[j][i];
             out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>268</width>
+    <width>278</width>
     <height>243</height>
    </rect>
   </property>
@@ -248,17 +248,17 @@
    <addaction name="actionLoadPref"/>
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
-   <addaction name="actionRect"/>
+   <addaction name="actionRegion"/>
    <addaction name="separator"/>
    <addaction name="actionCarrier"/>
   </widget>
-  <action name="actionRect">
+  <action name="actionRegion">
    <property name="icon">
-    <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
-    <string>rect</string>
+    <string>region</string>
    </property>
    <property name="toolTip">
     <string>Show region</string>

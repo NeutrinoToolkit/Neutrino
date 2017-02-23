@@ -1,8 +1,7 @@
 #include "nPhysPyWrapper.h"
 #include "nPhysWave.h"
 #include "nPhysFormats.h"
-//#include "numpy/arrayobject.h"
-//#include "numpy/npy_common.h"
+#include "nApp.h"
 
 /**
  nPhysD "creator" set a new nPhysD from array and shape data, usually to push data from Python
@@ -72,9 +71,22 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 /**
  nPhysD Destructor
  */
-void nPhysPyWrapper::delete_nPhysD(nPhysD* obj) {
+void nPhysPyWrapper::delete_nPhysD(nPhysD* phys) {
     DEBUG("here");
-    delete obj;
+    NApplication* my_app=qobject_cast<NApplication*> (qApp);
+    bool found=false;
+    if (my_app) {
+        DEBUG("and here");
+        for(auto& neu: my_app->neus()) {
+            if (neu->getBufferList().contains(phys)) {
+                neu->removePhys(phys);
+                found=true;
+            }
+        }
+    }
+    if (!found) {
+        delete phys;
+    }
 }
 
 QString nPhysPyWrapper::getName(nPhysD* phys) {
@@ -93,10 +105,9 @@ double nPhysPyWrapper::get(nPhysD* phys, QPointF p){
 	return get(phys, p.x(), p.y());
 }
 
-QVector<double> nPhysPyWrapper::getMinMax(nPhysD* phys){
-	QVector<double> vec;
-	vec << phys->get_min() <<  phys->get_max();
-	return vec;
+QPair<double, double> nPhysPyWrapper::getMinMax(nPhysD* phys){
+    QPair<double, double> vec;
+    return qMakePair(phys->get_min(), phys->get_max());
 }
 
 double nPhysPyWrapper::getMin(nPhysD* phys){
