@@ -27,17 +27,14 @@
 
 // physWavelets
 
-nWavelet::nWavelet(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nWavelet::nWavelet(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 
-	region =  new nRect(nparent);
-	region->setParentPan(panName,1);
+    region =  new nRect(this,1);
 	region->setRect(QRectF(100,100,100,100));
 	
-	linebarrier =  new nLine(nparent);
-	linebarrier->setParentPan(panName,1);
+    linebarrier =  new nLine(this,1);
 	QPolygonF poly;
 	poly << QPointF(0,0) << QPointF(100,100);
 	linebarrier->setPoints(poly);
@@ -146,6 +143,7 @@ void nWavelet::guessCarrier() {
 }
 
 void nWavelet::doWavelet () {
+    setEnabled(false);
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		QTime timer;
@@ -166,10 +164,7 @@ void nWavelet::doWavelet () {
 		//qCalculation_th my_qt;
 
 		QSettings settings("neutrino","");
-		settings.beginGroup("Preferences");
-
-
-		//my_qt.useCuda=settings.value("useCuda").toBool();
+        settings.beginGroup("nPreferences");
 
 		if (my_w.numAngle->value()==0) {
 			my_params.init_angle=my_w.angleCarrier->value();
@@ -195,20 +190,15 @@ void nWavelet::doWavelet () {
 
         QString out;
 
-        if (cudaEnabled() && settings.value("useCuda").toBool()) {
-			// use cuda
-            out="CUDA: ";
-            phys_wavelet_field_2D_morlet_cuda(my_params);
-			runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
-        } else if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
-            DEBUG("Ready to run on OpenCL");
+        qDebug() << openclEnabled() << settings.value("openclUnit").toInt();
+
+        if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             out="OpenCL: ";
             my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas);
         } else {
             out="CPU: ";
-            //            phys_wavelet_field_2D_morlet(my_params);
-            runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet...", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas);
         }
 
 
@@ -266,7 +256,8 @@ void nWavelet::doWavelet () {
     } else {
         my_w.statusbar->showMessage("Canceled", 5000);
     }
-    
+    QApplication::processEvents();
+    setEnabled(true);
 }
 
 

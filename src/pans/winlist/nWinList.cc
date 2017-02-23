@@ -24,8 +24,9 @@
  */
 #include "neutrino.h"
 #include "nWinList.h"
-nWinList::nWinList(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname), freezedFrame(false), frScale(1,1), frOrigin(0,0) {
+nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
+    freezedFrame(false), frScale(1,1), frOrigin(0,0)
+{
 	my_w.setupUi(this);
 
     // qt4.8->qt5.5
@@ -52,7 +53,7 @@ nWinList::nWinList(neutrino *nparent, QString winname)
 
 
 	foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
-	updatePad(nparent->currentBuffer);
+    updatePad(currentBuffer);
 
 	QWidget* empty = new QWidget(this);
 	empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -191,7 +192,7 @@ nWinList::changeProperties() {
 							phys->set_origin(xOrigin,yOrigin);
 							nparent->emitBufferChanged(phys);
 						}
-						nparent->my_tics.update();
+                        nparent->my_w->my_view->my_tics.update();
 						foreach (QTreeWidgetItem* item, itemsSelected) {
 							item->setData(3,0,lista.at(0)+" "+lista.at(1));
 						}
@@ -221,7 +222,7 @@ nWinList::changeProperties() {
 							foreach (QTreeWidgetItem* item, itemsSelected) {
 								item->setData(4,0,lista.at(0));
 							}
-							nparent->my_tics.update();
+                            nparent->my_w->my_view->my_tics.update();
 						}
 						break;
 					}
@@ -239,7 +240,7 @@ nWinList::changeProperties() {
 							foreach (QTreeWidgetItem* item, itemsSelected) {
 								item->setData(4,0,lista.at(0)+" "+lista.at(1));
 							}
-							nparent->my_tics.update();
+                            nparent->my_w->my_view->my_tics.update();
 						}
 						break;
 					}
@@ -267,8 +268,8 @@ void nWinList::keyPressEvent(QKeyEvent *e){
 
 void
 nWinList::panAdd(nGenericPan *pan) {
-	if (pan->panName!=panName) {
-		QListWidgetItem *item=new QListWidgetItem(pan->panName,my_w.pans);
+    if (pan->panName()!=panName()) {
+        QListWidgetItem *item=new QListWidgetItem(pan->panName(),my_w.pans);
 		item->setData(Qt::UserRole,qVariantFromValue((void*)pan));
 		my_w.pans->addItem(item);
 	}
@@ -276,7 +277,7 @@ nWinList::panAdd(nGenericPan *pan) {
 
 void
 nWinList::panDel(nGenericPan *pan) {
-	foreach (QListWidgetItem * item,my_w.pans->findItems(pan->panName,Qt::MatchExactly)) {
+    foreach (QListWidgetItem * item,my_w.pans->findItems(pan->panName(),Qt::MatchExactly)) {
 		delete item;
 	}
 }

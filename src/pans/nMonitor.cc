@@ -25,8 +25,7 @@
 #include "nMonitor.h"
 #include "neutrino.h"
 
-nMonitor::nMonitor(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nMonitor::nMonitor(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
     show();

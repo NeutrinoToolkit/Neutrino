@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2014 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -36,24 +36,25 @@ class neutrino;
 class nLine;
 
 class nFocalSpot : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	nFocalSpot(neutrino *, QString);
+    Q_INVOKABLE nFocalSpot(neutrino *);
 
-	Ui::nFocalSpot my_w;
+    Ui::nFocalSpot my_w;
 
-	QPointer<nLine> nContour;
+    QPointer<nLine> nContour;
 
 public slots:
-	void calculate_stats();
-	QList<double> find_contour(double);
+    void calculate_stats();
+    QList<double> find_contour(double);
 
-	void bufferChanged(nPhysD*);
+    void bufferChanged(nPhysD*);
 
 private:
-	// blurred image for easier calculations
-	nPhysD decimated;
-	
+    // blurred image for easier calculations
+    nPhysD decimated;
+
 };
 
 #endif

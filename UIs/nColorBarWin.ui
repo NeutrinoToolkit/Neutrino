@@ -80,7 +80,7 @@
            </font>
           </property>
           <property name="cursor">
-           <cursorShape>CrossCursor</cursorShape>
+           <cursorShape>SplitHCursor</cursorShape>
           </property>
           <property name="mouseTracking">
            <bool>true</bool>
@@ -517,7 +517,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/invert_colorbar.png</normaloff>:/icons/invert_colorbar.png</iconset>
    </property>
    <property name="text">
@@ -529,7 +529,7 @@
   </action>
   <action name="actionCutoff">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/expand.png</normaloff>:/icons/expand.png</iconset>
    </property>
    <property name="text">
@@ -544,7 +544,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/histoNorm.png</normaloff>
      <normalon>:/icons/histolog.png</normalon>:/icons/histoNorm.png</iconset>
    </property>

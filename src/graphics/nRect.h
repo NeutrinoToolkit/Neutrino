@@ -23,25 +23,32 @@
  *
  */
 #include <QtGui>
+#include <QWidget>
+#include <QMainWindow>
 #include <QGraphicsObject>
-#include "ui_nObject.h"
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include "nPhysImageF.h"
 
 #ifndef __nRect
 #define __nRect
 
 class neutrino;
+class nGenericPan;
+
+namespace Ui {
+class nObject;
+}
 
 class nRect : public QGraphicsObject {
 	Q_OBJECT
 public:
 	
-	nRect(neutrino *);
-	~nRect();
+    nRect(neutrino *);
+    nRect(nGenericPan *, int level);
+    ~nRect();
 	
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
+    neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 2 };
 	int type() const { return Type;}
@@ -75,7 +82,7 @@ public:
 	double zoom;
 	// roba da padelle
 	QMainWindow my_pad;
-	Ui::nObject my_w;
+    Ui::nObject *my_w;
 	
 	QPainterPath path() const;
 	QPainterPath shape() const;
@@ -127,8 +134,6 @@ public slots:
 	
 	void addPointAfterClick(QPointF);
 
-	void setParentPan(QString,int);
-	
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();

@@ -289,7 +289,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>

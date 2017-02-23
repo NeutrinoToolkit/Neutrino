@@ -27,6 +27,7 @@
 
 #include "nPreferences.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 
 #ifdef	__WIN32
@@ -37,11 +38,14 @@
 #include "clFFT.h"
 #endif
 
-nPreferences::nPreferences(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
+
+nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	my_w.setupUi(this);
 
 	int coreNum =1;
+
+#ifdef HAVE_OPENMP
+
 #ifdef	__WIN32
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
@@ -50,6 +54,7 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
 #else
 	coreNum=sysconf( _SC_NPROCESSORS_ONLN );
 #endif
+
 
     int nthreads, procs, maxt, inpar, dynamic, nested;
 #pragma omp parallel private(nthreads)
@@ -76,109 +81,136 @@ nPreferences::nPreferences(neutrino *nparent, QString winname)
     
     
 	my_w.threads->setMaximum(coreNum);
+#endif
 
 	if (coreNum==1) {
 		my_w.threads->hide();
 		my_w.labelThreads->hide();
 	}
 
-    if (!cudaEnabled()) {
-		DEBUG("cuda not enabled");
-		my_w.useCuda->setChecked(false);
-		my_w.useCuda->setEnabled(false);
-	} else {
-		my_w.useCuda->setEnabled(true);
-	}
+    my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
     my_w.openclUnit->setMaximum(openclEnabled());
 
-	loadDefaults();
+
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
+    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+
     show();
-	
-    DEBUG(nparent->my_w.toolBar->iconSize().width()/10-1);
-    
-    my_w.comboIconSize->setCurrentIndex(nparent->my_w.toolBar->iconSize().width()/10-1);
 
-	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
-	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-	connect(my_w.chooseFont, SIGNAL(pressed()), this, SLOT(changeFont()));
-	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+    my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
-    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w.my_view,SLOT(setZoomFactor(int)));
+    changeFont();
 
-	my_w.labelFont->setFont(nparent->my_w.my_view->font());
-	my_w.labelFont->setText(nparent->my_w.my_view->font().family()+" "+QString::number(nparent->my_w.my_view->font().pointSize()));
-	
-	connect(my_w.useDot, SIGNAL(released()), this, SLOT(useDot()));
+    connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
+    connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
+    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+    connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+
+    connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+
+    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+
+
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
     
     connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
-}
+    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
 
-void nPreferences::on_openclUnit_valueChanged(int num) {
-my_w.openclDescription->clear();
-saveDefaults();
-
-#ifdef HAVE_LIBCLFFT
-    if (num>0) {
-        std::string desc;
-        std::pair<cl_platform_id,cl_device_id> my_pair = get_platform_device_opencl(num);
-        cl_device_id device=my_pair.second;
-
-        size_t valueSize;
-        clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &valueSize);
-        std::string value;
-
-        value.resize(valueSize);
-        clGetDeviceInfo(device, CL_DEVICE_NAME, valueSize, &value[0], NULL);
-        desc+="Device : "+value;
-
-        // print hardware device version
-        clGetDeviceInfo(device, CL_DEVICE_VERSION, 0, NULL, &valueSize);
-        value.resize(valueSize);
-        clGetDeviceInfo(device, CL_DEVICE_VERSION, valueSize, &value[0], NULL);
-        desc+="\nHardware version : "+value;
-
-        // print software driver version
-        clGetDeviceInfo(device, CL_DRIVER_VERSION, 0, NULL, &valueSize);
-        value.resize(valueSize);
-        clGetDeviceInfo(device, CL_DRIVER_VERSION, valueSize, &value[0], NULL);
-        desc+="\nSoftware version : "+value;
-
-        // print c version supported by compiler for device
-        clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, 0, NULL, &valueSize);
-        value.resize(valueSize);
-        clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, valueSize, &value[0], NULL);
-        desc+="\nOpenCL C version : "+value;
-
-        // print parallel compute units
-        cl_uint int_val;
-        clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS,sizeof(int_val), &int_val, NULL);
-        desc+="\nParallel compute units : "+std::to_string(int_val);
-
-        clGetDeviceInfo(device,  CL_DEVICE_MAX_CLOCK_FREQUENCY ,sizeof(int_val), &int_val, NULL);
-        desc+="\nClock frequency : "+std::to_string(int_val);
-
-        cl_ulong ulong_val;
-        clGetDeviceInfo(device,  CL_DEVICE_MAX_MEM_ALLOC_SIZE ,sizeof(ulong_val), &ulong_val, NULL);
-        desc+="\nAllocatable Memory : "+std::to_string(ulong_val) +"bytes";
-        DEBUG(desc);
-
-        clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, 0, NULL, &valueSize );
-        value.resize(valueSize);
-        clGetDeviceInfo( device, CL_DEVICE_EXTENSIONS, valueSize, &value[0], NULL );
-        desc+="\nExtensions : "+value;
-
-        desc+="\nDouble support : ";
-        desc+=((value.find("cl_khr_fp64") != std::string::npos) ? "Yes":"No");
-
-        my_w.openclDescription->setPlainText(QString::fromStdString(desc));
-
+    if(!allLocales.contains(QLocale::system())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("System: ")+localeToString(QLocale::system()),QLocale::system());
     }
 
+    if(!allLocales.contains(QLocale())) { // custom locale defined
+        my_w.localeCombo->addItem(tr("Current: ")+localeToString(QLocale()),QLocale());
+    }
+
+    qSort(allLocales.begin(),allLocales.end(), nPreferences::localeLessThan);
+
+    for(auto &locale : allLocales) {
+        QString my_str=localeToString(locale);
+//        qDebug() << my_str << locale.name();
+        my_w.localeCombo->addItem(my_str,locale);
+    }
+
+    my_w.decimal->setText(QLocale().decimalPoint());
+    my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
+    connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
+
+    for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
+        my_w.pluginList->addItem(d);
+    }
+}
+
+
+QString nPreferences::localeToString(const QLocale &locale) {
+    return QLocale::languageToString(locale.language())+ " " +QLocale::countryToString(locale.country())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
+}
+
+bool nPreferences::localeLessThan(const QLocale &loc1, const QLocale &loc2)
+{
+    return localeToString(loc1) < localeToString(loc2);
+}
+
+
+void nPreferences::changeLocale(QLocale locale) {
+    if (locale!=QLocale()) {
+
+        qDebug() << QLocale::languageToString(locale.language()) <<
+                    QLocale::scriptToString(locale.script()) <<
+                    QLocale::countryToString(locale.country()) <<
+                    locale.bcp47Name() <<
+                    locale.country() <<
+                    locale.name() <<
+                    locale.decimalPoint();
+
+        QLocale().setDefault(locale);
+        QSettings settings("neutrino","");
+        settings.beginGroup("nPreferences");
+        settings.setValue("locale",locale);
+        settings.endGroup();
+
+        QString fileTransl(":translations/neutrino_"+locale.name()+".qm");
+        if(QFileInfo(fileTransl).exists()) {
+            QPointer<QTranslator> translator(new QTranslator(qApp));
+            if (translator->load(fileTransl)) {
+                qApp->installTranslator(translator);
+                qDebug() << "installing translator" << fileTransl;
+            } else {
+                delete translator;
+            }
+        }
+    }
+}
+
+void nPreferences::changeLocale(int num) {
+    QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
+    changeLocale(locale);
+    my_w.decimal->setText(QLocale().decimalPoint());
+    my_w.statusBar->showMessage(localeToString(QLocale()), 5000);
+}
+
+void nPreferences::openclUnitValueChange(int num) {
+    my_w.openclDescription->clear();
+#ifdef HAVE_LIBCLFFT
+    if (num>0) {
+        my_w.openclDescription->setPlainText(QString::fromStdString(get_platform_device_info_opencl(num)));
+        setProperty("openclUnit",num);
+    }
 #endif
+}
+
+void nPreferences::resetSettings() {
+    int res=QMessageBox::warning(this,tr("Attention"), tr("Are you sure you want to remove Settings?"),
+                                 QMessageBox::Yes | QMessageBox::No);
+    if (res==QMessageBox::Yes) {
+        QSettings my_settings("neutrino","");
+        my_settings.clear();
+    }
 }
 
 void nPreferences::changeThreads(int num) {
@@ -188,21 +220,10 @@ void nPreferences::changeThreads(int num) {
         fftw_init_threads();
         fftw_plan_with_nthreads(num);
     }
+#ifdef HAVE_OPENMP
     omp_set_num_threads(num);
-    QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
-    settings.setValue("threads",num);
-    settings.endGroup();
-    DEBUG("THREADS THREADS THREADS THREADS THREADS THREADS " << num);
-}
-
-void nPreferences::useDot() {
-    if (my_w.useDot->isChecked()) {
-        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-    } else {
-        QLocale::setDefault(QLocale::system());
-    }
-    my_w.statusBar->showMessage(QLocale::countryToString(QLocale().country()), 5000);
+#endif
+    DEBUG("\n\nTHREADS THREADS THREADS THREADS THREADS THREADS " << num << "\n\n");
 }
 
 void nPreferences::askCloseUnsaved() {
@@ -210,23 +231,25 @@ void nPreferences::askCloseUnsaved() {
 }
 
 void nPreferences::changeShowDimPixel() {
-	nparent->my_w.my_view->showDimPixel=my_w.showDimPixel->isChecked();
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
+    nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeFont() {
-	bool ok;
-	QFont font = QFontDialog::getFont(&ok, nparent->my_w.my_view->font(), this);
-	if (ok) {
-		nparent->my_w.my_view->setFont(font);
-		my_w.labelFont->setFont(font);
-		my_w.labelFont->setText(font.family()+" "+QString::number(font.pointSize()));
-		QSettings settings("neutrino","");
-		settings.beginGroup("Preferences");
-		settings.setValue("defaultFont",font.toString());
-		settings.endGroup();
-		nparent->my_w.my_view->setSize();
-	}
+    QFont font=nparent->my_w->my_view->font();
+    if (sender()) {
+        font=my_w.fontFace->currentFont();
+        font.setPointSize(my_w.fontSize->value());
+    } else {
+        my_w.fontFace->setCurrentFont(font);
+        my_w.fontSize->setValue(font.pointSize());
+    }
+    nparent->my_w->my_view->setFont(font);
+    QSettings settings("neutrino","");
+    settings.beginGroup("nPreferences");
+    settings.setValue("defaultFont",font.toString());
+    settings.endGroup();
+    nparent->my_w->my_view->setSize();
 }
 
 void nPreferences::changeIconSize(int val) {
@@ -250,18 +273,35 @@ void nPreferences::changeIconSize(int val) {
 	}
 }
 
-void nPreferences::hideEvent(QHideEvent*){
+void nPreferences::hideEvent(QHideEvent*e){
 	disconnect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-	saveDefaults();
+    nGenericPan::hideEvent(e);
 }
 
-void nPreferences::showEvent(QShowEvent*){
-	loadDefaults();
+void nPreferences::showEvent(QShowEvent*e){
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    nGenericPan::showEvent(e);
 }
 
 void nPreferences::changephysNameLength(int k) {
     nparent->setProperty("physNameLength",k);
 }
 
+
+void nPreferences::on_addPlugin_released() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
+    if (QFileInfo(dir).exists()) {
+        nparent->scanPlugins(dir);
+        my_w.pluginList->addItem(dir);
+    }
+}
+
+void nPreferences::on_removePlugin_released() {
+    qDeleteAll(my_w.pluginList->selectedItems());
+    QStringList pluginList;
+    for(int i = 0; i < my_w.pluginList->count(); ++i) {
+        pluginList.append(my_w.pluginList->item(i)->text());
+    }
+    nparent->setProperty("NeuSave-plugindirs",pluginList);
+}
 

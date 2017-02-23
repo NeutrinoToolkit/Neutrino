@@ -46,14 +46,13 @@
 #include "clFFT.h"
 #endif
 
-
-//using namespace std;
-
 #ifndef __nPhysWave_h
 #define __nPhysWave_h
 
+
 #ifdef HAVE_LIBCLFFT
-#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << __err_msg);};
+std::string CHECK_OPENCL_ERROR(cl_int err);
+#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << CHECK_OPENCL_ERROR(__err_num) << " " << __err_msg); throw phys_fileerror(__err_msg);};
 #endif
 
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
@@ -122,14 +121,11 @@ typedef struct wavelet_params_str wavelet_params;
 
 // std::list<nPhysImageF<double> *> phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
 void phys_wavelet_field_2D_morlet(wavelet_params &);
-bool cudaEnabled();
-void phys_wavelet_field_2D_morlet_cuda(wavelet_params &);
 
 void phys_wavelet_field_2D_morlet_opencl(wavelet_params &);
 
 // traslation functions
-void phys_wavelet_trasl_cuda(void *, int &);
-void phys_wavelet_trasl_nocuda(void *, int &);
+void phys_wavelet_trasl_cpu(void *, int &);
 
 int openclEnabled();
 
@@ -139,6 +135,7 @@ vec2 opencl_closest_size(vec2);
 
 #ifdef HAVE_LIBCLFFT
 std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int);
+std::string get_platform_device_info_opencl(int);
 #endif
 
 void phys_wavelet_trasl_opencl(void *, int &);

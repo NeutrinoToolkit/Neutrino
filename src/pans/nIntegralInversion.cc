@@ -25,15 +25,14 @@
 #include "nIntegralInversion.h"
 #include "neutrino.h"
 
-nIntegralInversion::nIntegralInversion(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) ,
+nIntegralInversion::nIntegralInversion(neutrino *nparent)
+: nGenericPan(nparent),
   invertedPhys(nullptr)
 {
 
 	my_w.setupUi(this);
 
-	axis =  new nLine(nparent);
-	axis->setParentPan(panName,1);
+    axis =  new nLine(this,1);
 	axis->forceMonotone = true;
 	axis->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(50, 50));
 

@@ -3,9 +3,10 @@
 # in src/CMakeLists.txt)
 
 find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+if (OPENMP_FOUND AND NOT "${CMAKE_CXX_FLAGS}" MATCHES "^(${OpenMP_CXX_FLAGS})")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
+    add_definitions(-DHAVE_OPENMP)
 endif()
 
 find_package(TIFF REQUIRED)
@@ -16,27 +17,49 @@ if (TIFF_FOUND)
 endif()
 
 # fftw_threads
-find_library(FFTW_THREADS NAMES fftw3_threads)
-if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
-	message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
-	set(LIBS ${LIBS} ${FFTW_THREADS}) 
-	add_definitions(-DHAVE_LIBFFTW_THREADS)
-endif()
+#find_package(FFTW REQUIRED)
+#if (FFTW_FOUND AND FFTW_THREADS_LIB)
+#	include_directories(${FFTW_INCLUDE_DIRS})
+#	set(LIBS ${LIBS} ${FFTW_LIBRARIES} ${FFTW_THREADS_LIB})
+#	add_definitions(-DHAVE_LIBFFTW_THREADS)
+#else()
+#    message( FATAL_ERROR "You need fftw_threads library" )
+#endif()
 
 #fftw
-find_library(FFTW NAMES fftw3)
+find_library(FFTW NAMES fftw3 fftw3-3 REQUIRED)
 if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
-	message (STATUS "using FFTW: ${FFTW}")
-	set(LIBS ${LIBS} ${FFTW}) 
-	add_definitions(-DHAVE_LIBFFTW)
+        message (STATUS "using FFTW: ${FFTW}")
+        set(LIBS ${LIBS} ${FFTW})
+        add_definitions(-DHAVE_LIBFFTW)
 endif()
 
-# gsl
+#in precompiled win dlls the threads are included
+if(NOT WIN32)
+    # fftw_threads
+    find_library(FFTW_THREADS NAMES fftw3_threads REQUIRED)
+    if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
+            message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
+            set(LIBS ${LIBS} ${FFTW_THREADS})
+    endif()
+endif()
+
+#gsl
 find_library(GSL NAMES gsl)
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	message (STATUS "using gsl: ${GSL}")
 	set(LIBS ${LIBS} ${GSL}) 
 	add_definitions(-DHAVE_LIBGSL)
+
+	FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_math.h
+  		/usr/local/include/
+  		/usr/include
+  	)
+    IF (GSL_INCLUDE_DIR)
+      message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}")
+      include_directories(BEFORE "${GSL_INCLUDE_DIR}")
+    ENDIF (GSL_INCLUDE_DIR)
+	
 endif()
 
 # gslcblas
@@ -48,16 +71,25 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 else()
 	message(FATAL_ERROR "Missing libgsl. Stop.")
 endif()
+
 # hdf4
 find_library (HDF4 NAMES mfhdf)
 if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
 	message (STATUS "using hdf4: ${HDF4}")
 	set(LIBS ${LIBS} ${HDF4})
-	include_directories(BEFORE "/usr/include/hdf")
 	add_definitions(-DHAVE_LIBMFHDF)
+	
+	FIND_PATH(HDF4_INCLUDE_DIR hdf.h
+  		/usr/local/include/
+  		/usr/include
+  		/usr/local/include/hdf
+  		/usr/include/hdf
+  	)
+    IF (HDF4_INCLUDE_DIR)
+      message (STATUS "hdf4 header dir: ${HDF4_INCLUDE_DIR}")
+      include_directories(BEFORE "${HDF4_INCLUDE_DIR}")
+    ENDIF (HDF4_INCLUDE_DIR)
 endif()
-
-
 find_library (DF NAMES df)
 if (NOT ${DF} STREQUAL "DF-NOTFOUND")
 	message (STATUS "using df: ${DF}")
@@ -81,7 +113,7 @@ if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
   )
   IF (NETPBM_INCLUDE_DIR)
 	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
-	include_directories(${NETPBM_INCLUDE_DIR})
+	include_directories(BEFORE ${NETPBM_INCLUDE_DIR})
   ENDIF (NETPBM_INCLUDE_DIR)
 
 endif()

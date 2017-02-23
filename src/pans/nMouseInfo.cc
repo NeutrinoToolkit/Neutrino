@@ -23,13 +23,12 @@
  *
  */
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include "nMouseInfo.h"
 
 
-nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, title)
+nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
 {
-
-	setProperty("fileTxt",QString("Data.txt"));
 
 	my_w.setupUi(this);
 
@@ -45,11 +44,11 @@ nMouseInfo::nMouseInfo (neutrino *parent, QString title) : nGenericPan(parent, t
 
 	connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
 	connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
-	connect(parent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
+    connect(parent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
 	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
 
-	mouse=parent->my_mouse.pos();
+    mouse=parent->my_w->my_view->my_mouse.pos();
 	updateLabels();
     show();
 }
@@ -91,17 +90,17 @@ void nMouseInfo::addPoint(QPointF position) {
 }
 
 void nMouseInfo::setColorRuler() {
-	QColorDialog colordial(nparent->my_tics.rulerColor,this);
+    QColorDialog colordial(nparent->my_w->my_view->my_tics.rulerColor,this);
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
-		nparent->my_tics.rulerColor=colordial.currentColor();
-		nparent->my_tics.update();
+        nparent->my_w->my_view->my_tics.rulerColor=colordial.currentColor();
+        nparent->my_w->my_view->my_tics.update();
 	}
 }
 
 void nMouseInfo::setColorMouse() {
-	nparent->my_mouse.changeColor();
+    nparent->my_w->my_view->my_mouse.changeColor();
 }
 
 void nMouseInfo::updateOrigin() {
@@ -113,7 +112,7 @@ void nMouseInfo::updateOrigin() {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
 	}
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->update();
 }
 
 void nMouseInfo::updateScale() {
@@ -125,7 +124,7 @@ void nMouseInfo::updateScale() {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}
 	}
-	nparent->my_w.my_view->update();
+    nparent->my_w->my_view->update();
 }
 
 void nMouseInfo::setMouse(QPointF pos) {
@@ -170,7 +169,7 @@ void nMouseInfo::updateLabels() {
 }
 
 QString 
-nMouseInfo::getPointText(){
+nMouseInfo::getPointText() {
 	QString retText;
 	for (int i=0; i<my_w.points->rowCount(); i++) {
 		for (int j=0; j<my_w.points->columnCount();j++) {
@@ -189,9 +188,9 @@ void nMouseInfo::copyPoints() {
 
 void
 nMouseInfo::export_txt() {
-	QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileTxt",fnametmp);
+        setProperty("NeuSave-fileTxt",fnametmp);
 		QFile t(fnametmp);
 		t.open(QIODevice::WriteOnly| QIODevice::Text);
 		QTextStream out(&t);

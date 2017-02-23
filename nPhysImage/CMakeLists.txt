@@ -14,6 +14,7 @@ target_link_libraries(nPhysImageF "-lm")
 
 message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 
+
 #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
@@ -22,97 +23,9 @@ message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 # force necessary defines on config.h
 add_definitions(-DHAVE_LIBPTHREAD)
 
+set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake)
+include(FindNeutrinoDeps)
 
-# gsl
-find_library(GSL NAMES gsl)
-if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
-	message (STATUS "using gsl: ${GSL}")
-	set(LIBS ${LIBS} ${GSL}) 
-	add_definitions(-DHAVE_LIBGSL)
-endif()
-
-# gslcblas
-find_library(GSLCBLAS NAMES gslcblas)
-if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
-	message (STATUS "using gslcblas: ${GSL}")
-	set(LIBS ${LIBS} ${GSLCBLAS}) 
-	add_definitions(-DHAVE_LIBGSLCBLAS)
-endif()
-
-# fftw_threads
-find_library(FFTW_THREADS NAMES fftw3_threads)
-if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
-        message (STATUS "using FFTW_THREADS: ${FFTW_THREADS}")
-        set(LIBS ${LIBS} ${FFTW_THREADS})
-        add_definitions(-DHAVE_LIBFFTW_THREADS)
-endif()
-
-# fftw_openmp
-find_library(FFTW_OPENMP NAMES fftw3_omp)
-if (NOT ${FFTW_OPENMP} STREQUAL "FFTW_OPENMP-NOTFOUND")
-        message (STATUS "using FFTW_OPENMP: ${FFTW_OPENMP}")
-        set(LIBS ${LIBS} ${FFTW_OPENMP})
-        add_definitions(-DHAVE_LIBFFTW_OPENMP)
-endif()
-
-#fftw
-find_library(FFTW NAMES fftw3 fftw3-3)
-if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
-	message (STATUS "using FFTW: ${FFTW}")
-	set(LIBS ${LIBS} ${FFTW}) 
-	add_definitions(-DHAVE_LIBFFTW)
-endif()
-
-
-# pgm
-find_library(NETPBM NAMES netpbm)
-if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
-	message (STATUS "using netpbm: ${NETPBM}")
-	set(LIBS ${LIBS} ${NETPBM}) 
-	add_definitions(-DHAVE_LIBNETPBM)
-      
-	FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
-  		/usr/local/include
-  		/usr/local/include/netpbm
-  		/usr/include
-  	)
-  IF (NETPBM_INCLUDE_DIR)
-	message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
-	include_directories(${NETPBM_INCLUDE_DIR})
-  ENDIF (NETPBM_INCLUDE_DIR)
-
-endif()
-
-# hdf4
-find_library (HDF4 NAMES mfhdf)
-if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
-	message (STATUS "using hdf4: ${HDF4}")
-	set(LIBS ${LIBS} ${HDF4})
-	include_directories(BEFORE "/usr/include/hdf")
-	add_definitions(-DHAVE_LIBMFHDF)
-endif()
-
-find_package(JPEG REQUIRED)
-if (JPEG_FOUND)
-	include_directories(${JPEG_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${JPEG_LIBRARIES})
-	add_definitions(-DHAVE_JPEG)
-endif()
-
-find_package(ZLIB REQUIRED)
-if (ZLIB_FOUND)
-	include_directories(${ZLIB_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${ZLIB_LIBRARIES})
-	add_definitions(-DHAVE_ZLIB)
-endif()
-
-
-find_package(TIFF REQUIRED)
-if (TIFF_FOUND)
-	include_directories(${TIFF_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${TIFF_LIBRARIES})
-	add_definitions(-DHAVE_LIBTIFF)
-endif()
 
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 
@@ -129,14 +42,6 @@ if (WIN32)
 	install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)
 else()
 	install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
-endif()
-
-if (LINUX)
-	if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
-		message (STATUS "PythonQt lib is copied along")
-		install (FILES ${PYTHONQT} DESTINATION lib)
-		list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
-	endif()
 endif()
 
 if (APPLE)

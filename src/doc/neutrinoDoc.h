@@ -49,7 +49,7 @@
 
  - Open files of various formats (.img .sif .b16 .jpg .png .pgm) (contact us if yours is still not supported).
  - Modern GUI to analyze data.
- - Bleeding edge of algorithms all rewritten in fast C/C++ code usin parallel threading and CUDA.
+ - Bleeding edge of algorithms all rewritten in fast C/C++ code usin parallel threading and OpenCL.
 
  \page GUI GUI features
  - \ref Keyboard

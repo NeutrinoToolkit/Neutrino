@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -25,7 +25,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -58,16 +58,29 @@
 class neutrino;
 
 class nPlug {
-	
+
 public:
-	virtual ~nPlug() { }
+    virtual ~nPlug() { qDebug() << "here"; }
 
 public slots:
-	virtual QString name() = 0;
+    virtual QString menuEntryPoint() {return QString();}
 
-	virtual bool instantiate(neutrino *) = 0;
+    virtual QByteArray name() { return QByteArray(); }
 
-	virtual bool unload() = 0;
+    virtual bool instantiate(neutrino *) = 0;
+
+    virtual bool unload() { return true; }
+
+    static QString extension() {
+    #if defined(Q_OS_WIN)
+        return QString("dll");
+    #elif defined(Q_OS_MAC)
+        return QString("dylib");
+    #elif defined(Q_OS_LINUX)
+        return QString("so");
+    #endif
+        return QString("");
+    }
 
 };
 

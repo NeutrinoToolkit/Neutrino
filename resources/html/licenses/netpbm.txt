@@ -1,0 +1,10 @@
+Netpbm consists of code contributed by many authors and most of them have copyright in at least the code they wrote, and maybe larger parts derived from it. All authors have granted you the right to use and distribute their code without having to pay them, as long as you meet some simple requirements. All of these public licenses are "open source" licenses as defined by SourceForge (SourceForge makes that a condition of distributing the code).
+
+You can generally find an offer of a copyright license within the source code files. GPL, BSD, MIT, and BSD licenses are among those offered. Steve McIntyre did a survey of the source code in 2001 for the purpose of determining what could be included in Debian and summarized what he found in the file copyright_summary in the source tree.
+
+Of course, with Netpbm as with most open source software, you can't be sure who wrote the code or if the license offers you find are actually from the people who hold the copyright. Someone at some time may have copied code without permission and contributed it to Netpbm, which means if you copy it further, you could owe the copyright owner royalties. However, the risk of this should be small because no contributions to Netpbm are valuable enough that such a copyright owner would bother enforcing the copyright.
+
+The Netpbm maintainer has not received any warranties that the code is licensed and does not offer any such warranties to anyone else.
+
+There could be patents practiced by Netpbm code, which would make a user of the code liable for royalties to the patent holder. The Netpbm maintainer has no license to use any patents. What is known about patents affecting Netpbm is in the file patent_summary in the source tree.
+

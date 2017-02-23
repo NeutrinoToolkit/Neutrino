@@ -24,11 +24,11 @@
  */
 #include "nZoomWin.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 // physGhosts
 
-nZoomWin::nZoomWin(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nZoomWin::nZoomWin(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
 
@@ -37,9 +37,10 @@ nZoomWin::nZoomWin(neutrino *nparent, QString winname)
     my_w.my_view->setInteractive(true);
     connect(my_w.my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
 
-    setBehaviour();
     show();
-    my_w.my_view->setScene(&(nparent->my_s));
+    setBehaviour();
+
+    my_w.my_view->setScene(&(nparent->getScene()));
     my_w.my_view->scale(2,2);
 
 }
@@ -56,10 +57,10 @@ void nZoomWin::changeZoom(double val) {
 
 void nZoomWin::setBehaviour() {
     if (my_w.actionLockClick->isChecked()) {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
 }

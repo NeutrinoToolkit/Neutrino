@@ -178,7 +178,7 @@
    <addaction name="actionLoadPref"/>
    <addaction name="actionSavePref"/>
    <addaction name="separator"/>
-   <addaction name="actionLine"/>
+   <addaction name="actionRegion"/>
    <addaction name="actionBezier"/>
   </widget>
   <action name="actionLoadPref">
@@ -217,16 +217,16 @@
     <string>Switch Bezier</string>
    </property>
   </action>
-  <action name="actionLine">
+  <action name="actionRegion">
    <property name="icon">
-    <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
-    <string>line</string>
+    <string>region</string>
    </property>
    <property name="toolTip">
-    <string>Show axis window</string>
+    <string>Show region window</string>
    </property>
   </action>
   <action name="actionFlipline">
@@ -245,6 +245,8 @@
  <tabstops>
   <tabstop>image</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

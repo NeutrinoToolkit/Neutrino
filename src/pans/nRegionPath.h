@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -37,23 +37,23 @@ class neutrino;
 class nLine;
 
 class nRegionPath : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	nRegionPath(neutrino *, QString);
-	
-	Ui::nRegionPath my_w;
+    Q_INVOKABLE nRegionPath(neutrino *);
 
-	QPointer<nLine> region;
-	
-	nPhysD *regionPhys;
+    Ui::nRegionPath my_w;
+
+    QPointer<nLine> region;
+
+    nPhysD *regionPhys;
 public slots:
-	void doIt();
-	void duplicate();
-	
+    void doIt();
+    void duplicate();
+
 private:
-	double getReplaceVal();
-	
+    double getReplaceVal();
+
 };
 
 #endif

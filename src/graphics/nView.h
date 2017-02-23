@@ -31,6 +31,9 @@
 
 #include "nGenericPan.h"
 
+#include "nMouse.h"
+#include "nTics.h"
+
 #ifndef __nView_h
 #define __nView_h
 
@@ -43,11 +46,7 @@ public:
 	nView (QWidget *parent=0);
 	~nView ();
 
-	neutrino *parent(){
-		return (neutrino *) (QWidget::parent())->parent();
-	};
-
-	QSizeF my_size;
+    neutrino *nparent;
 	void resizeEvent (QResizeEvent *);
 
 	// events
@@ -64,13 +63,18 @@ public:
 
 	vec2f minMax;
 
-	QFont scaledFont;
-
 	// painter
 	bool show_mouse;	
 	
 	bool showDimPixel;
 	
+    QGraphicsScene my_scene;
+
+    nMouse my_mouse;
+    nTics my_tics;
+
+    QGraphicsPixmapItem my_pixitem;
+
 public slots:
 
     void zoomOut();
@@ -86,6 +90,9 @@ public slots:
 	void emitMouseposition (QPointF);
 
     void setZoomFactor(int val);
+
+    void setMouseShape(int);
+
 
 private:
     bool gestureEvent(QGestureEvent *event);

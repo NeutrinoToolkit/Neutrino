@@ -23,7 +23,11 @@
  *
  */
 #include "nRect.h"
+#include "ui_nObject.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
+#include "nGenericPan.h"
+
 #include <iostream>
 
 nRect::~nRect() {
@@ -32,21 +36,38 @@ nRect::~nRect() {
 	}
 }
 
-nRect::nRect(neutrino *nparent) : QGraphicsObject()
+
+nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
 {
-    if (nparent) {
-        nparent->my_s.addItem(this);
-        setParent(nparent);
-        int num=nparent->property("numRect").toInt()+1;
-        nparent->setProperty("numRect",num);
+    my_w->name->setText(parentPan->panName()+"Rect");
+    setProperty("parentPan", QVariant::fromValue(parentPan));
+    setProperty("parentPanControlLevel",level);
+    if (level>0) {
+        my_w->name->setReadOnly(true);
+        disconnect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    }
+
+}
+
+
+nRect::nRect(neutrino *my_parent) :
+    QGraphicsObject(),
+    nparent(my_parent),
+    my_w(new Ui::nObject)
+{
+    if (my_parent) {
+        my_parent->getScene().addItem(this);
+        setParent(my_parent);
+        int num=my_parent->property("numRect").toInt()+1;
+        my_parent->setProperty("numRect",num);
         setProperty("numRect",num);
         setToolTip(tr("rect")+QString(" ")+QString::number(num));
-        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(nparent->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-        zoom=nparent->getZoom();
-        if (nparent->currentBuffer) {
-            setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+        connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+        connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        zoom=my_parent->getZoom();
+        if (my_parent->getCurrentBuffer()) {
+            setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
         }
     }
     
@@ -56,7 +77,9 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	setProperty("parentPan",QString(""));
 	setProperty("parentPanControlLevel",0);
 
-	nWidth=1.0;
+    setProperty("NeuSave-fileIni",toolTip()+".ini");
+
+    nWidth=1.0;
 	nSizeHolder=5.0;
 
 	nColor=QColor(Qt::black);
@@ -67,31 +90,31 @@ nRect::nRect(neutrino *nparent) : QGraphicsObject()
 	// PADELLA
 	my_pad.setWindowTitle(toolTip());
 	my_pad.setWindowIcon(QIcon(":rect"));
-	my_w.setupUi(&my_pad);
+    my_w->setupUi(&my_pad);
 
-	my_w.spinWidth->setValue(nWidth);
-	my_w.spinDepth->setValue(zValue());
-	my_w.colorLabel->setPalette(QPalette(nColor));
+    my_w->spinWidth->setValue(nWidth);
+    my_w->spinDepth->setValue(zValue());
+    my_w->colorLabel->setPalette(QPalette(nColor));
 
-	connect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    connect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
 
-	my_w.name->setText(toolTip());
-	my_w.spinSizeHolder->setValue(nSizeHolder);
-	my_w.colorHolderLabel->setPalette(QPalette(holderColor));
+    my_w->name->setText(toolTip());
+    my_w->spinSizeHolder->setValue(nSizeHolder);
+    my_w->colorHolderLabel->setPalette(QPalette(holderColor));
 
-	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
-	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-	connect(my_w.colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
-	connect(my_w.colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
-	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    connect(my_w->spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
+    connect(my_w->spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
+    connect(my_w->colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
+    connect(my_w->colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
+    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 
-	connect(my_w.expandX, SIGNAL(pressed()), this, SLOT(expandX()));
-	connect(my_w.expandY, SIGNAL(pressed()), this, SLOT(expandY()));
-	connect(my_w.intersection, SIGNAL(pressed()), this, SLOT(intersection()));
+    connect(my_w->expandX, SIGNAL(pressed()), this, SLOT(expandX()));
+    connect(my_w->expandY, SIGNAL(pressed()), this, SLOT(expandY()));
+    connect(my_w->intersection, SIGNAL(pressed()), this, SLOT(intersection()));
 
-	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
 	updateSize();
 }
@@ -107,16 +130,6 @@ void nRect::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
     menu.exec(e->screenPos());
 }
 
-void nRect::setParentPan(QString winname, int level) {
-	my_w.name->setText(winname+"Rect");
-	setProperty("parentPan",winname);
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-		my_w.name->setReadOnly(true);
-		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
-}
-
 void nRect::setRect(QRectF rect) {
 	while (ref.size()<2) appendPoint();
 	moveRef.clear();
@@ -127,8 +140,8 @@ void nRect::setRect(QRectF rect) {
 
 QRect nRect::getRect(nPhysD* image) {
     QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
-    if (image && parent()->currentBuffer) {
-        vec2f dx(image->get_origin()-parent()->currentBuffer->get_origin());
+    if (image && nparent->getCurrentBuffer()) {
+        vec2f dx(image->get_origin()-nparent->getCurrentBuffer()->get_origin());
         geom2.translate(dx.x(),dx.y());        
     }
     return geom2;
@@ -152,7 +165,7 @@ void nRect::bufferChanged(nPhysD* my_phys) {
 
 void nRect::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -160,7 +173,7 @@ void nRect::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nRect::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -248,8 +261,8 @@ nRect::setOrder (double w) {
 void
 nRect::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
-    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
+    p.rx()=QLocale().toDouble(my_w->tableWidget->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w->tableWidget->item(item->row(),1)->text());
 
 	changeP(item->row(),p, false);
 	itemChanged();
@@ -257,7 +270,7 @@ nRect::tableUpdated (QTableWidgetItem * item) {
 
 void
 nRect::changeColor () {
-	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -269,13 +282,13 @@ nRect::changeColor () {
 void
 nRect::changeColor (QColor col) {
 	nColor=col;
-	my_w.colorLabel->setPalette(QPalette(nColor));
+    my_w->colorLabel->setPalette(QPalette(nColor));
 }
 
 void
 nRect::changeColorHolder () {
 	QColor color;
-	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorHolderLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -285,7 +298,7 @@ nRect::changeColorHolder () {
 
 void
 nRect::changeColorHolder (QColor color) {
-	my_w.colorHolderLabel->setPalette(QPalette(color));
+    my_w->colorHolderLabel->setPalette(QPalette(color));
 	QBrush brush=ref[0]->brush();
 	brush.setColor(color);
 	foreach (QGraphicsRectItem *item, ref){
@@ -303,16 +316,16 @@ nRect::changeP (int np, QPointF p, bool updatepad) {
 }
 
 void nRect::changePointPad(int nrow) {
-	disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    disconnect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 	QPointF p=ref[nrow]->pos();
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(p.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(p.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.tableWidget->setItem(nrow, 0, xitem);
-	my_w.tableWidget->setItem(nrow, 1, yitem);
-	my_w.tableWidget->resizeRowToContents(nrow);
-	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    my_w->tableWidget->setItem(nrow, 0, xitem);
+    my_w->tableWidget->setItem(nrow, 1, yitem);
+    my_w->tableWidget->resizeRowToContents(nrow);
+    connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
 void nRect::addPoint (int pos) {
@@ -340,16 +353,16 @@ void nRect::addPoint (int pos) {
 	ref[pos]->setVisible(false);
 	ref[pos]->setParentItem(this);
 	sizeHolder(nSizeHolder);
-	disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
-	my_w.tableWidget->insertRow(pos);
+    disconnect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    my_w->tableWidget->insertRow(pos);
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.tableWidget->setItem(pos, 0, xitem);
-	my_w.tableWidget->setItem(pos, 1, yitem);
-	my_w.tableWidget->resizeRowToContents(pos);
-	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    my_w->tableWidget->setItem(pos, 0, xitem);
+    my_w->tableWidget->setItem(pos, 1, yitem);
+    my_w->tableWidget->resizeRowToContents(pos);
+    connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
 void nRect::appendPoint () {
@@ -357,44 +370,44 @@ void nRect::appendPoint () {
 }
 
 void nRect::expandX() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(0,rect.top()),true);
-		changeP(1,QPointF(parent()->currentBuffer->getW(),rect.bottom()),true);
+        changeP(1,QPointF(nparent->getCurrentBuffer()->getW(),rect.bottom()),true);
 		itemChanged();
 	}
 }
 
 void nRect::expandY() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(rect.left(),0),true);
-		changeP(1,QPointF(rect.right(),parent()->currentBuffer->getH()),true);
+        changeP(1,QPointF(rect.right(),nparent->getCurrentBuffer()->getH()),true);
 		itemChanged();
 	}
 }
 
 void nRect::intersection() {
-	if (parent()->currentBuffer) {
-		//QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersect(getRectF());
+    if (nparent->getCurrentBuffer()) {
+        //QRectF rect=QRectF(0,0,nparent->getCurrentBuffer()->getW(),nparent->getCurrentBuffer()->getH()).intersect(getRectF());
 		//obsolete
-		QRectF rect=QRectF(0,0,parent()->currentBuffer->getW(),parent()->currentBuffer->getH()).intersected(getRectF());
+        QRectF rect=QRectF(0,0,nparent->getCurrentBuffer()->getW(),nparent->getCurrentBuffer()->getH()).intersected(getRectF());
 		setRect(rect);
 	}
 }
 
 void nRect::submatrix() {
-    if (parent()->currentBuffer) {
-        nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-        parent()->showPhys(subPhys);
+    if (nparent->getCurrentBuffer()) {
+        nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+        nparent->showPhys(subPhys);
     }
 }
 
 void nRect::changeWidth () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
+        rect.setWidth(QLocale().toDouble(my_w->sizeWidth->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -403,10 +416,10 @@ void nRect::changeWidth () {
 }
 
 void nRect::changeHeight () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
+        rect.setHeight(QLocale().toDouble(my_w->sizeHeight->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -415,17 +428,17 @@ void nRect::changeHeight () {
 }
 
 void nRect::updateSize() {
-	disconnect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	disconnect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
-	my_w.sizeWidth->setText(QString::number(getRectF().width()));
-	my_w.sizeHeight->setText(QString::number(getRectF().height()));
-	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    disconnect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    disconnect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    my_w->sizeWidth->setText(QString::number(getRectF().width()));
+    my_w->sizeHeight->setText(QString::number(getRectF().height()));
+    connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 }
 
 void
 nRect::showMessage ( QString s ) {
-	parent()->statusBar()->showMessage(s);
+    nparent->statusBar()->showMessage(s);
 	my_pad.statusBar()->showMessage(s);
 }
 
@@ -511,9 +524,9 @@ nRect::selectThis(bool val) {
 	}
 	update();
 	if (val) {
-		parent()->my_w.statusbar->showMessage(toolTip());
+        nparent->my_w->statusbar->showMessage(toolTip());
 	} else {
-		parent()->my_w.statusbar->showMessage("");
+        nparent->my_w->statusbar->showMessage("");
 	}
 }
 
@@ -577,12 +590,9 @@ void nRect::itemChanged() {
 
 void
 nRect::loadSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		loadSettings(&settings);
 	}
@@ -590,12 +600,9 @@ nRect::loadSettings() {
 
 void
 nRect::saveSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
@@ -625,7 +632,17 @@ nRect::loadSettings(QSettings *settings) {
 	changeColor(settings->value("colorLine",nColor).value<QColor>());
 	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
 	changeColorHolder(settings->value("colorHolder",ref[0]->brush().color()).value<QColor>());
-	settings->endGroup();
+
+    if (settings->childGroups().contains("Properties")) {
+        settings->beginGroup("Properties");
+        foreach(QString my_key, settings->allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+        }
+        settings->endGroup();
+    }
+
+    settings->endGroup();
 }
 
 void
@@ -647,6 +664,18 @@ nRect::saveSettings(QSettings *settings) {
 	settings->setValue("colorLine",nColor);
 	settings->setValue("sizeHolder",nSizeHolder);
 	settings->setValue("colorHolder",ref[0]->brush().color());
-	settings->endGroup();
+
+    settings->beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        qDebug() << "save" << ba << " : " << property(ba);
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            settings->setValue(ba, property(ba));
+        }
+    }
+    settings->endGroup();
+
+    settings->endGroup();
 }
 

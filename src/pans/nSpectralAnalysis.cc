@@ -25,8 +25,7 @@
 #include "nSpectralAnalysis.h"
 #include "neutrino.h"
 
-nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+nSpectralAnalysis::nSpectralAnalysis(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     my_w.direction->setIcon(my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));

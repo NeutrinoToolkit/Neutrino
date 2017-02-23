@@ -26,8 +26,9 @@
 #include "qcustomplot.h"
 
 
-/* including file 'src/vector2d.cpp', size 7340                              */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/vector2d.cpp'              */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPVector2D
@@ -256,11 +257,13 @@ QCPVector2D &QCPVector2D::operator-=(const QCPVector2D &vector)
   mY -= vector.mY;
   return *this;
 }
-/* end of 'src/vector2d.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/vector2d.cpp' */
 
 
-/* including file 'src/painter.cpp', size 8670                               */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/painter.cpp'               */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPPainter
@@ -474,11 +477,14 @@ void QCPPainter::makeNonCosmetic()
     QPainter::setPen(p);
   }
 }
-/* end of 'src/painter.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/painter.cpp' */
 
 
-/* including file 'src/paintbuffer.cpp', size 18502                          */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/paintbuffer.cpp'           */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAbstractPaintBuffer
@@ -947,11 +953,13 @@ void QCPPaintBufferGlFbo::reallocateBuffer()
 #endif
 }
 #endif // QCP_OPENGL_FBO
-/* end of 'src/paintbuffer.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/paintbuffer.cpp' */
 
 
-/* including file 'src/layer.cpp', size 37064                                */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/layer.cpp'                 */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPLayer
@@ -1800,11 +1808,12 @@ void QCPLayerable::wheelEvent(QWheelEvent *event)
 {
   event->ignore();
 }
-/* end of 'src/layer.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/layer.cpp' */
 
 
-/* including file 'src/axis/range.cpp', size 12221                           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/range.cpp'            */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPRange
@@ -2122,11 +2131,12 @@ bool QCPRange::validRange(const QCPRange &range)
           !(range.lower > 0 && qIsInf(range.upper/range.lower)) &&
           !(range.upper < 0 && qIsInf(range.lower/range.upper)));
 }
-/* end of 'src/axis/range.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/range.cpp' */
 
 
-/* including file 'src/selection.cpp', size 21898                            */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/selection.cpp'             */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPDataRange
@@ -2722,11 +2732,17 @@ QCPDataSelection QCPDataSelection::inverse(const QCPDataRange &outerRange) const
   result.simplify();
   return result;
 }
-/* end of 'src/selection.cpp' */
 
 
-/* including file 'src/selectionrect.cpp', size 9224                         */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+
+
+/* end of '/Users/tommaso/qcustomplot/src/selection.cpp' */
+
+
+/* including file '/Users/tommaso/qcustomplot/src/selectionrect.cpp'         */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPSelectionRect
@@ -2951,11 +2967,13 @@ void QCPSelectionRect::draw(QCPPainter *painter)
     painter->drawRect(mRect);
   }
 }
-/* end of 'src/selectionrect.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/selectionrect.cpp' */
 
 
-/* including file 'src/layout.cpp', size 74302                               */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/layout.cpp'                */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPMarginGroup
@@ -5004,11 +5022,13 @@ void QCPLayoutInset::addElement(QCPLayoutElement *element, const QRectF &rect)
   } else
     qDebug() << Q_FUNC_INFO << "Can't add null element";
 }
-/* end of 'src/layout.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/layout.cpp' */
 
 
-/* including file 'src/lineending.cpp', size 11536                           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/lineending.cpp'            */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPLineEnding
@@ -5303,11 +5323,12 @@ void QCPLineEnding::draw(QCPPainter *painter, const QCPVector2D &pos, double ang
 {
   draw(painter, pos, QCPVector2D(qCos(angle), qSin(angle)));
 }
-/* end of 'src/lineending.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/lineending.cpp' */
 
 
-/* including file 'src/axis/axisticker.cpp', size 18664                      */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axisticker.cpp'       */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTicker
@@ -5723,11 +5744,12 @@ double QCPAxisTicker::cleanMantissa(double input) const
   }
   return input;
 }
-/* end of 'src/axis/axisticker.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axisticker.cpp' */
 
 
-/* including file 'src/axis/axistickerdatetime.cpp', size 14443              */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerdatetime.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerDateTime
@@ -6020,11 +6042,12 @@ double QCPAxisTickerDateTime::dateTimeToKey(const QDate date)
   return QDateTime(date).toMSecsSinceEpoch()/1000.0;
 # endif
 }
-/* end of 'src/axis/axistickerdatetime.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerdatetime.cpp' */
 
 
-/* including file 'src/axis/axistickertime.cpp', size 11747                  */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickertime.cpp'   */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerTime
@@ -6269,11 +6292,14 @@ void QCPAxisTickerTime::replaceUnit(QString &text, QCPAxisTickerTime::TimeUnit u
   
   text.replace(mFormatPattern.value(unit), valueStr);
 }
-/* end of 'src/axis/axistickertime.cpp' */
 
 
-/* including file 'src/axis/axistickerfixed.cpp', size 5583                  */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickertime.cpp' */
+
+
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerfixed.cpp'  */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerFixed
@@ -6371,11 +6397,12 @@ double QCPAxisTickerFixed::getTickStep(const QCPRange &range)
   }
   return mTickStep;
 }
-/* end of 'src/axis/axistickerfixed.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerfixed.cpp' */
 
 
-/* including file 'src/axis/axistickertext.cpp', size 8653                   */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickertext.cpp'   */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerText
@@ -6584,11 +6611,12 @@ QVector<double> QCPAxisTickerText::createTickVector(double tickStep, const QCPRa
   
   return result;
 }
-/* end of 'src/axis/axistickertext.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickertext.cpp' */
 
 
-/* including file 'src/axis/axistickerpi.cpp', size 11170                    */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerpi.cpp'     */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerPi
@@ -6871,11 +6899,12 @@ QString QCPAxisTickerPi::unicodeSubscript(int number) const
   }
   return result;
 }
-/* end of 'src/axis/axistickerpi.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerpi.cpp' */
 
 
-/* including file 'src/axis/axistickerlog.cpp', size 7106                    */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerlog.cpp'    */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAxisTickerLog
@@ -7012,11 +7041,13 @@ QVector<double> QCPAxisTickerLog::createTickVector(double tickStep, const QCPRan
   
   return result;
 }
-/* end of 'src/axis/axistickerlog.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerlog.cpp' */
 
 
-/* including file 'src/axis/axis.cpp', size 94458                            */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/axis/axis.cpp'             */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7415,6 +7446,7 @@ QCPAxis::QCPAxis(QCPAxisRect *parent, AxisType type) :
   // scale and range:
   mRange(0, 5),
   mRangeReversed(false),
+  mRangeLocked(false),
   mScaleType(stLinear),
   // internal members:
   mGrid(new QCPGrid(this)),
@@ -7565,7 +7597,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
 */
 void QCPAxis::setRange(const QCPRange &range)
 {
-  if (range.lower == mRange.lower && range.upper == mRange.upper)
+  if (mRangeLocked || (range.lower == mRange.lower && range.upper == mRange.upper))
     return;
   
   if (!QCPRange::validRange(range)) return;
@@ -7635,7 +7667,7 @@ void QCPAxis::setSelectedParts(const SelectableParts &selected)
 */
 void QCPAxis::setRange(double lower, double upper)
 {
-  if (lower == mRange.lower && upper == mRange.upper)
+  if (mRangeLocked || (lower == mRange.lower && upper == mRange.upper))
     return;
   
   if (!QCPRange::validRange(lower, upper)) return;
@@ -7666,6 +7698,7 @@ void QCPAxis::setRange(double lower, double upper)
 */
 void QCPAxis::setRange(double position, double size, Qt::AlignmentFlag alignment)
 {
+  if(mRangeLocked) return;
   if (alignment == Qt::AlignLeft)
     setRange(position, position+size);
   else if (alignment == Qt::AlignRight)
@@ -7730,6 +7763,14 @@ void QCPAxis::setRangeUpper(double upper)
 void QCPAxis::setRangeReversed(bool reversed)
 {
   mRangeReversed = reversed;
+}
+
+/*!
+  Sets whether the axis range (direction) is locked (i.e the setRange will not take place)
+*/
+void QCPAxis::setRangeLocked(bool locked)
+{
+  mRangeLocked = locked;
 }
 
 /*!
@@ -8325,6 +8366,7 @@ void QCPAxis::scaleRange(double factor)
 */
 void QCPAxis::scaleRange(double factor, double center)
 {
+  if (mRangeLocked) return;
   QCPRange oldRange = mRange;
   if (mScaleType == stLinear)
   {
@@ -9564,11 +9606,14 @@ void QCPAxisPainterPrivate::getMaxTickLabelSize(const QFont &font, const QString
   if (finalSize.height() > tickLabelsSize->height())
     tickLabelsSize->setHeight(finalSize.height());
 }
-/* end of 'src/axis/axis.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/axis/axis.cpp' */
 
 
-/* including file 'src/scatterstyle.cpp', size 17420                         */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/scatterstyle.cpp'          */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPScatterStyle
@@ -9946,10 +9991,11 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     }
     case ssDiamond:
     {
-      painter->drawLine(QLineF(x-w,   y,   x, y-w));
-      painter->drawLine(QLineF(  x, y-w, x+w,   y));
-      painter->drawLine(QLineF(x+w,   y,   x, y+w));
-      painter->drawLine(QLineF(  x, y+w, x-w,   y));
+      QPointF lineArray[4] = {QPointF(x-w,   y),
+                              QPointF(  x, y-w),
+                              QPointF(x+w,   y),
+                              QPointF(  x, y+w)};
+      painter->drawPolygon(lineArray, 4);
       break;
     }
     case ssStar:
@@ -9962,52 +10008,54 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     }
     case ssTriangle:
     {
-       painter->drawLine(QLineF(x-w, y+0.755*w, x+w, y+0.755*w));
-       painter->drawLine(QLineF(x+w, y+0.755*w,   x, y-0.977*w));
-       painter->drawLine(QLineF(  x, y-0.977*w, x-w, y+0.755*w));
+      QPointF lineArray[3] = {QPointF(x-w, y+0.755*w),
+                              QPointF(x+w, y+0.755*w),
+                              QPointF(  x, y-0.977*w)};
+      painter->drawPolygon(lineArray, 3);
       break;
     }
     case ssTriangleInverted:
     {
-       painter->drawLine(QLineF(x-w, y-0.755*w, x+w, y-0.755*w));
-       painter->drawLine(QLineF(x+w, y-0.755*w,   x, y+0.977*w));
-       painter->drawLine(QLineF(  x, y+0.977*w, x-w, y-0.755*w));
+      QPointF lineArray[3] = {QPointF(x-w, y-0.755*w),
+                              QPointF(x+w, y-0.755*w),
+                              QPointF(  x, y+0.977*w)};
+      painter->drawPolygon(lineArray, 3);
       break;
     }
     case ssCrossSquare:
     {
-       painter->drawLine(QLineF(x-w, y-w, x+w*0.95, y+w*0.95));
-       painter->drawLine(QLineF(x-w, y+w*0.95, x+w*0.95, y-w));
-       painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawLine(QLineF(x-w, y-w, x+w*0.95, y+w*0.95));
+      painter->drawLine(QLineF(x-w, y+w*0.95, x+w*0.95, y-w));
       break;
     }
     case ssPlusSquare:
     {
-       painter->drawLine(QLineF(x-w,   y, x+w*0.95,   y));
-       painter->drawLine(QLineF(  x, y+w,        x, y-w));
-       painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawRect(QRectF(x-w, y-w, mSize, mSize));
+      painter->drawLine(QLineF(x-w,   y, x+w*0.95,   y));
+      painter->drawLine(QLineF(  x, y+w,        x, y-w));
       break;
     }
     case ssCrossCircle:
     {
-       painter->drawLine(QLineF(x-w*0.707, y-w*0.707, x+w*0.670, y+w*0.670));
-       painter->drawLine(QLineF(x-w*0.707, y+w*0.670, x+w*0.670, y-w*0.707));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x-w*0.707, y-w*0.707, x+w*0.670, y+w*0.670));
+      painter->drawLine(QLineF(x-w*0.707, y+w*0.670, x+w*0.670, y-w*0.707));
       break;
     }
     case ssPlusCircle:
     {
-       painter->drawLine(QLineF(x-w,   y, x+w,   y));
-       painter->drawLine(QLineF(  x, y+w,   x, y-w));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x-w,   y, x+w,   y));
+      painter->drawLine(QLineF(  x, y+w,   x, y-w));
       break;
     }
     case ssPeace:
     {
-       painter->drawLine(QLineF(x, y-w,         x,       y+w));
-       painter->drawLine(QLineF(x,   y, x-w*0.707, y+w*0.707));
-       painter->drawLine(QLineF(x,   y, x+w*0.707, y+w*0.707));
-       painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawEllipse(QPointF(x, y), w, w);
+      painter->drawLine(QLineF(x, y-w,         x,       y+w));
+      painter->drawLine(QLineF(x,   y, x-w*0.707, y+w*0.707));
+      painter->drawLine(QLineF(x,   y, x+w*0.707, y+w*0.707));
       break;
     }
     case ssPixmap:
@@ -10034,12 +10082,13 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     }
   }
 }
-/* end of 'src/scatterstyle.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/scatterstyle.cpp' */
 
-//amalgamation: add datacontainer.cpp
 
-/* including file 'src/plottable.cpp', size 38861                            */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottable.cpp'             */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPSelectionDecorator
@@ -11006,11 +11055,13 @@ void QCPAbstractPlottable::deselectEvent(bool *selectionStateChanged)
       *selectionStateChanged = mSelection != selectionBefore;
   }
 }
-/* end of 'src/plottable.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/plottable.cpp' */
 
 
-/* including file 'src/item.cpp', size 49269                                 */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/item.cpp'                  */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemAnchor
@@ -12277,11 +12328,15 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 {
   return QCP::iSelectItems;
 }
-/* end of 'src/item.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/item.cpp' */
 
 
-/* including file 'src/core.cpp', size 124243                                */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/core.cpp'                  */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+/*! \file */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCustomPlot
@@ -12615,6 +12670,7 @@ QCustomPlot::QCustomPlot(QWidget *parent) :
   mOpenGl(false),
   mMouseHasMoved(false),
   mMouseEventLayerable(0),
+  mMouseSignalLayerable(0),
   mReplotting(false),
   mReplotQueued(false),
   mOpenGlMultisamples(16),
@@ -14552,12 +14608,18 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
       mSelectionRect->startSelection(event);
   } else
   {
-    // no selection rect interaction, so forward event to layerable under the cursor:
+    // no selection rect interaction, prepare for click signal emission and forward event to layerable under the cursor:
     QList<QVariant> details;
     QList<QCPLayerable*> candidates = layerableListAt(mMousePressPos, false, &details);
+    if (!candidates.isEmpty())
+    {
+      mMouseSignalLayerable = candidates.first(); // candidate for signal emission is always topmost hit layerable (signal emitted in release event)
+      mMouseSignalLayerableDetails = details.first();
+    }
+    // forward event to topmost candidate which accepts the event:
     for (int i=0; i<candidates.size(); ++i)
     {
-      event->accept(); // default impl of QCPLayerable's mouse events ignore the event, in that case propagate to next candidate in list
+      event->accept(); // default impl of QCPLayerable's mouse events call ignore() on the event, in that case propagate to next candidate in list
       candidates.at(i)->mousePressEvent(event, details.at(i));
       if (event->isAccepted())
       {
@@ -14622,22 +14684,23 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
       mSelectionRect->cancel();
     if (event->button() == Qt::LeftButton)
       processPointSelection(event);
-
+    
     // emit specialized click signals of QCustomPlot instance:
-    if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseEventLayerable))
+    if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseSignalLayerable))
     {
       int dataIndex = 0;
-      if (!mMouseEventLayerableDetails.value<QCPDataSelection>().isEmpty())
-        dataIndex = mMouseEventLayerableDetails.value<QCPDataSelection>().dataRange().begin();
+      if (!mMouseSignalLayerableDetails.value<QCPDataSelection>().isEmpty())
+        dataIndex = mMouseSignalLayerableDetails.value<QCPDataSelection>().dataRange().begin();
       emit plottableClick(ap, dataIndex, event);
-    } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseEventLayerable))
-      emit axisClick(ax, mMouseEventLayerableDetails.value<QCPAxis::SelectablePart>(), event);
-    else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseEventLayerable))
+    } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseSignalLayerable))
+      emit axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
+    else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseSignalLayerable))
       emit itemClick(ai, event);
-    else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseEventLayerable))
+    else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseSignalLayerable))
       emit legendClick(lg, 0, event);
-    else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseEventLayerable))
+    else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseSignalLayerable))
       emit legendClick(li->parentLegend(), li, event);
+    mMouseSignalLayerable = 0;
   }
   
   if (mSelectionRect && mSelectionRect->isActive()) // Note: if a click was detected above, the selection rect is canceled there
@@ -15442,12 +15505,12 @@ void QCustomPlot::toPainter(QCPPainter *painter, int width, int height)
   } else
     qDebug() << Q_FUNC_INFO << "Passed painter is not active";
 }
-/* end of 'src/core.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/core.cpp' */
 
-//amalgamation: add plottable1d.cpp
 
-/* including file 'src/colorgradient.cpp', size 24646                        */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/colorgradient.cpp'         */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16083,11 +16146,13 @@ void QCPColorGradient::updateColorBuffer()
   }
   mColorBufferInvalidated = false;
 }
-/* end of 'src/colorgradient.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/colorgradient.cpp' */
 
 
-/* including file 'src/selectiondecorator-bracket.cpp', size 12313           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/selectiondecorator-bracket.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPSelectionDecoratorBracket
@@ -16369,11 +16434,21 @@ QPointF QCPSelectionDecoratorBracket::getPixelCoordinates(const QCPPlottableInte
   else
     return QPointF(valueAxis->coordToPixel(interface1d->dataMainValue(dataIndex)), keyAxis->coordToPixel(interface1d->dataMainKey(dataIndex)));
 }
-/* end of 'src/selectiondecorator-bracket.cpp' */
 
 
-/* including file 'src/layoutelements/layoutelement-axisrect.cpp', size 47509 */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200  */
+
+
+
+
+
+
+/* end of '/Users/tommaso/qcustomplot/src/selectiondecorator-bracket.cpp' */
+
+
+/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-axisrect.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17643,11 +17718,23 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
     }
   }
 }
-/* end of 'src/layoutelements/layoutelement-axisrect.cpp' */
 
 
-/* including file 'src/layoutelements/layoutelement-legend.cpp', size 30933  */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+
+
+
+
+
+
+
+
+/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-axisrect.cpp' */
+
+
+/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-legend.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPAbstractLegendItem
@@ -18555,11 +18642,13 @@ void QCPLegend::parentPlotInitialized(QCustomPlot *parentPlot)
   if (parentPlot && !parentPlot->legend)
     parentPlot->legend = this;
 }
-/* end of 'src/layoutelements/layoutelement-legend.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-legend.cpp' */
 
 
-/* including file 'src/layoutelements/layoutelement-textelement.cpp', size 12759 */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200     */
+/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-textelement.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPTextElement
@@ -18959,11 +19048,14 @@ QColor QCPTextElement::mainTextColor() const
 {
   return mSelected ? mSelectedTextColor : mTextColor;
 }
-/* end of 'src/layoutelements/layoutelement-textelement.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-textelement.cpp' */
 
 
-/* including file 'src/layoutelements/layoutelement-colorscale.cpp', size 25910 */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200    */
+/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-colorscale.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19619,11 +19711,13 @@ void QCPColorScaleAxisRectPrivate::axisSelectableChanged(QCPAxis::SelectablePart
     }
   }
 }
-/* end of 'src/layoutelements/layoutelement-colorscale.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-colorscale.cpp' */
 
 
-/* including file 'src/plottables/plottable-graph.cpp', size 72363           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-graph.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPGraphData
@@ -21327,11 +21421,13 @@ int QCPGraph::findIndexBelowY(const QVector<QPointF> *data, double y) const
   }
   return -1;
 }
-/* end of 'src/plottables/plottable-graph.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-graph.cpp' */
 
 
-/* including file 'src/plottables/plottable-curve.cpp', size 60009           */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-curve.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPCurveData
@@ -21497,6 +21593,7 @@ QCPCurve::QCPCurve(QCPAxis *keyAxis, QCPAxis *valueAxis) :
   
   setScatterStyle(QCPScatterStyle());
   setLineStyle(lsLine);
+  setScatterSkip(0);
 }
 
 QCPCurve::~QCPCurve()
@@ -22742,11 +22839,13 @@ double QCPCurve::pointDistance(const QPointF &pixelPoint, QCPCurveDataContainer:
   
   return qSqrt(minDistSqr);
 }
-/* end of 'src/plottables/plottable-curve.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-curve.cpp' */
 
 
-/* including file 'src/plottables/plottable-bars.cpp', size 43512            */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-bars.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23910,11 +24009,15 @@ void QCPBars::connectBars(QCPBars *lower, QCPBars *upper)
     upper->mBarBelow = lower;
   }
 }
-/* end of 'src/plottables/plottable-bars.cpp' */
 
 
-/* including file 'src/plottables/plottable-statisticalbox.cpp', size 28622  */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-bars.cpp' */
+
+
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-statisticalbox.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPStatisticalBoxData
@@ -24564,11 +24667,14 @@ QVector<QLineF> QCPStatisticalBox::getWhiskerBarLines(QCPStatisticalBoxDataConta
   result[1].setPoints(coordsToPixels(it->key-mWhiskerWidth*0.5, it->maximum), coordsToPixels(it->key+mWhiskerWidth*0.5, it->maximum)); // max bar
   return result;
 }
-/* end of 'src/plottables/plottable-statisticalbox.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-statisticalbox.cpp' */
 
 
-/* including file 'src/plottables/plottable-colormap.cpp', size 47531        */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-colormap.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPColorMapData
@@ -25225,6 +25331,7 @@ QCPColorMap::QCPColorMap(QCPAxis *keyAxis, QCPAxis *valueAxis) :
   QCPAbstractPlottable(keyAxis, valueAxis),
   mDataScaleType(QCPAxis::stLinear),
   mMapData(new QCPColorMapData(10, 10, QCPRange(0, 5), QCPRange(0, 5))),
+  mGradient(QCPColorGradient::gpCold),
   mInterpolate(true),
   mTightBoundary(false),
   mMapImageInvalidated(true)
@@ -25690,11 +25797,14 @@ void QCPColorMap::drawLegendIcon(QCPPainter *painter, const QRectF &rect) const
   painter->drawRect(rect.adjusted(1, 1, 0, 0));
   */
 }
-/* end of 'src/plottables/plottable-colormap.cpp' */
+
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-colormap.cpp' */
 
 
-/* including file 'src/plottables/plottable-financial.cpp', size 42610       */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-financial.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPFinancialData
@@ -26645,11 +26755,13 @@ QRectF QCPFinancial::selectionHitBox(QCPFinancialDataContainer::const_iterator i
   else
     return QRectF(highPixel, keyPixel-keyWidthPixels, lowPixel-highPixel, keyWidthPixels*2).normalized();
 }
-/* end of 'src/plottables/plottable-financial.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-financial.cpp' */
 
 
-/* including file 'src/plottables/plottable-errorbar.cpp', size 37210        */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-errorbar.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPErrorBarsData
@@ -27601,11 +27713,13 @@ bool QCPErrorBars::rectIntersectsLine(const QRectF &pixelRect, const QLineF &lin
   else
     return true;
 }
-/* end of 'src/plottables/plottable-errorbar.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-errorbar.cpp' */
 
 
-/* including file 'src/items/item-straightline.cpp', size 7592               */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-straightline.cpp'*/
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemStraightLine
@@ -27782,11 +27896,13 @@ QPen QCPItemStraightLine::mainPen() const
 {
   return mSelected ? mSelectedPen : mPen;
 }
-/* end of 'src/items/item-straightline.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-straightline.cpp' */
 
 
-/* including file 'src/items/item-line.cpp', size 8498                       */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-line.cpp'       */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemLine
@@ -28013,11 +28129,13 @@ QPen QCPItemLine::mainPen() const
 {
   return mSelected ? mSelectedPen : mPen;
 }
-/* end of 'src/items/item-line.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-line.cpp' */
 
 
-/* including file 'src/items/item-curve.cpp', size 7159                      */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-curve.cpp'      */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemCurve
@@ -28178,11 +28296,13 @@ QPen QCPItemCurve::mainPen() const
 {
   return mSelected ? mSelectedPen : mPen;
 }
-/* end of 'src/items/item-curve.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-curve.cpp' */
 
 
-/* including file 'src/items/item-rect.cpp', size 6479                       */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-rect.cpp'       */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemRect
@@ -28335,11 +28455,13 @@ QBrush QCPItemRect::mainBrush() const
 {
   return mSelected ? mSelectedBrush : mBrush;
 }
-/* end of 'src/items/item-rect.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-rect.cpp' */
 
 
-/* including file 'src/items/item-text.cpp', size 13338                      */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-text.cpp'       */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemText
@@ -28683,11 +28805,13 @@ QBrush QCPItemText::mainBrush() const
 {
   return mSelected ? mSelectedBrush : mBrush;
 }
-/* end of 'src/items/item-text.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-text.cpp' */
 
 
-/* including file 'src/items/item-ellipse.cpp', size 7863                    */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-ellipse.cpp'    */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemEllipse
@@ -28871,11 +28995,13 @@ QBrush QCPItemEllipse::mainBrush() const
 {
   return mSelected ? mSelectedBrush : mBrush;
 }
-/* end of 'src/items/item-ellipse.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-ellipse.cpp' */
 
 
-/* including file 'src/items/item-pixmap.cpp', size 10615                    */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-pixmap.cpp'     */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemPixmap
@@ -29141,11 +29267,13 @@ QPen QCPItemPixmap::mainPen() const
 {
   return mSelected ? mSelectedPen : mPen;
 }
-/* end of 'src/items/item-pixmap.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-pixmap.cpp' */
 
 
-/* including file 'src/items/item-tracer.cpp', size 14624                    */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-tracer.cpp'     */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemTracer
@@ -29511,11 +29639,13 @@ QBrush QCPItemTracer::mainBrush() const
 {
   return mSelected ? mSelectedBrush : mBrush;
 }
-/* end of 'src/items/item-tracer.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-tracer.cpp' */
 
 
-/* including file 'src/items/item-bracket.cpp', size 10687                   */
-/* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
+/* including file '/Users/tommaso/qcustomplot/src/items/item-bracket.cpp'    */
+/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPItemBracket
@@ -29751,6 +29881,6 @@ QPen QCPItemBracket::mainPen() const
 {
     return mSelected ? mSelectedPen : mPen;
 }
-/* end of 'src/items/item-bracket.cpp' */
+/* end of '/Users/tommaso/qcustomplot/src/items/item-bracket.cpp' */
 
 

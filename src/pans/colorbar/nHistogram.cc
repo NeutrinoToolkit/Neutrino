@@ -28,12 +28,15 @@
 
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
+    qDebug() << parent;
     setMouseTracking(true);
     offsety=8;
     dyColorBar=offsety*3/2;
     offsetx=6;
     setMinimumHeight(200);
     parentPan=NULL;
+    colorvalue=0;
+    setProperty("mousepress",QVariant());
 }
 
 
@@ -48,15 +51,37 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
         double  frac_value=(e->pos().x()-offsetx)/((double) width()-2*offsetx);
         frac_value=std::max(0.0,std::min(1.0, frac_value));
         //        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
-
+        double my_min,my_max;
         if (e->pos().y()<dyColorBar + 4*offsety) {
-            double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
-            double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
-            colorvalue=my_min+frac_value*(my_max-my_min);
+            my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
+            my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
         } else {
-            colorvalue=parentPan->currentBuffer->get_min()+frac_value*(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
+            my_min=parentPan->currentBuffer->get_min();
+            my_max=parentPan->currentBuffer->get_max();
         }
-        parentPan->my_w.statusbar->showMessage(tr("Value : ")+QString::number(colorvalue),2000);
+        colorvalue=my_min+frac_value*(my_max-my_min);
+        parentPan->my_w.statusbar->showMessage(tr("Value : ")+QLocale().toString(colorvalue),2000);
+        repaint();
+    }
+}
+
+void nHistogram::mousePressEvent (QMouseEvent *) {
+    if (parentPan->currentBuffer && !property("mousepress").isValid()){
+        setProperty("mousepress",colorvalue);
+    }
+}
+
+void nHistogram::mouseReleaseEvent (QMouseEvent *){
+    if (parentPan->currentBuffer && property("mousepress").isValid()){
+        double oldcolor=property("mousepress").toDouble();
+        if (oldcolor!=colorvalue) {
+            parentPan->currentBuffer->property["display_range"]=vec2f(oldcolor,colorvalue);
+        } else {
+           parentPan->currentBuffer->property["display_range"]=parentPan->currentBuffer->get_min_max();
+        }
+        parentPan->nparent->createQimage();
+        parentPan->updatecolorbar();
+        setProperty("mousepress",QVariant());
     }
 }
 
@@ -172,7 +197,7 @@ void nHistogram::drawPicture (QPainter &p) {
             too_big=false;
             for (int i=0; i<=num_labels; i++) {
                 double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                if (p.fontMetrics().width(QString::number(val))>double(dx)/(1.5*num_labels)) {
+                if (p.fontMetrics().width(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
                     too_big=true;
                 }
             }
@@ -181,7 +206,7 @@ void nHistogram::drawPicture (QPainter &p) {
                 for (int i=0; i<=num_labels; i++) {
                     p.drawLine(offsetx+i*dx/num_labels,offsety+4,offsetx+i*dx/num_labels,2*offsety);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                    QString str1=QString::number(val);
+                    QString str1=QLocale().toString(val);
                     QRectF rect1(0,2,p.fontMetrics().width(str1),offsety);
 
                     int align= Qt::AlignVCenter;
@@ -208,7 +233,7 @@ void nHistogram::drawPicture (QPainter &p) {
             too_big=false;
             for (int i=0; i<=num_labels; i++) {
                 double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                if (p.fontMetrics().width(QString::number(val))>double(dx)/(1.5*num_labels)) {
+                if (p.fontMetrics().width(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
                     too_big=true;
                 }
             }
@@ -217,7 +242,7 @@ void nHistogram::drawPicture (QPainter &p) {
                 for (int i=0; i<=num_labels; i++) {
                     p.drawLine(offsetx+i*dx/num_labels,height()-2*offsety,offsetx+i*dx/num_labels,height()-offsety-4);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                    QString str1=QString::number(val);
+                    QString str1=QLocale().toString(val);
                     QRectF rect1(0,height()-(offsety+2),p.fontMetrics().width(str1),offsety);
 
                     int align= Qt::AlignVCenter;

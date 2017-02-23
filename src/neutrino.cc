@@ -36,20 +36,20 @@
 #include <QtUiTools>
 #endif
 
-
 #include <QPrintDialog>
+
+#include "nView.h"
+
+#include "nColorBarWin.h"
 
 #include "nMouseInfo.h"
 #include "nZoomWin.h"
 #include "nPluginLoader.h"
-
+#include "nPanPlug.h"
 #include "nBoxLineout.h"
-#include "nFindPeaks.h"
 #include "nCompareLines.h"
-#include "nVisar.h"
 #include "nWavelet.h"
 #include "nInterferometry.h"
-#include "nGhost.h"
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
 #include "nRotate.h"
@@ -58,7 +58,7 @@
 #include "nShortcuts.h"
 #include "nAffine.h"
 
-#ifdef USE_QT5
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
 #include "nCamera.h"
 #endif
 
@@ -72,14 +72,6 @@
 
 #include "nMonitor.h"
 
-#ifdef HAVE_HDF5
-#include "nHDF5.h"
-#endif
-
-#ifdef HAVE_PYTHONQT
-#include <QUiLoader>
-#include "nPython.h"
-#endif
 
 #include "nPreferences.h"
 #include "nWinList.h"
@@ -91,196 +83,195 @@
 
 #include "nPhysFormats.h"
 
+#include "ui_nSbarra.h"
+#include "ui_nAbout.h"
+
+void neutrino::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange: {
+        for(auto& pan: getPanList())
+            for(int i =  0; i < pan->metaObject()->methodCount(); ++i) {
+                if (pan->metaObject()->method(i).methodSignature() == "retranslateUi(QMainWindow*)") {
+                    qDebug() << "found retranslateUi";
+                    QMetaObject::invokeMethod(pan,"retranslateUi",Q_ARG(QMainWindow *,pan));
+                }
+            }
+        my_w->retranslateUi(this);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+
 neutrino::~neutrino()
 {
 }
 
 /// Creator
 neutrino::neutrino():
-    my_s(this),
-    my_mouse(this),
-    my_tics(this)
+    my_w(new Ui::neutrino),
+    my_sbarra(new Ui::nSbarra),
+    my_about(new Ui::nAbout)
 {
 
-    my_w.setupUi(this);
+    my_w->setupUi(this);
     setAcceptDrops(true);
 
-// this below works if there is just one neutrino win open
-//#ifdef Q_OS_MAC
-//	DEBUG("command to have the main menu always visible!!! http://qt-project.org/doc/qt-4.8/mac-differences.html#menu-bar");
-//	my_w.menubar->setParent(NULL);
-//#endif
 
+    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
     currentBuffer=NULL;
 
     follower=NULL;
-    plug_loader = NULL;
 
     int numwin=qApp->property("numWin").toInt()+1;
     qApp->setProperty("numWin",numwin);
     setProperty("winId",numwin);
 
+    setProperty("neuSave-gamma",1);
+
     setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
     QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
-    foreach (QAction * act, my_w.menuTransformation->actions()) {
+    foreach (QAction * act, my_w->menuTransformation->actions()) {
         if (!menuTransformationDefault.isEmpty()) {
             if (act->text()==menuTransformationDefault) {
-                my_w.menuTransformation->setDefaultAction(act);
-                my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+                my_w->menuTransformation->setDefaultAction(act);
+                my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
             }
-        } else if (act->icon().cacheKey()==my_w.actionFlipRotate->icon().cacheKey()) {
-            my_w.menuTransformation->setDefaultAction(act);
+        } else if (act->icon().cacheKey()==my_w->actionFlipRotate->icon().cacheKey()) {
+            my_w->menuTransformation->setDefaultAction(act);
         }
     }
-    connect(my_w.actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
+    connect(my_w->actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
 
 
     QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
-    foreach (QAction * act, my_w.menuPaths->actions()) {
+    foreach (QAction * act, my_w->menuPaths->actions()) {
         if (!defualtActionPath.isEmpty()) {
             if (act->text()==defualtActionPath) {
-                my_w.menuPaths->setDefaultAction(act);
-                my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
+                my_w->menuPaths->setDefaultAction(act);
+                my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
             }
-        } else if (act->icon().cacheKey()==my_w.actionPaths->icon().cacheKey()) {
-            my_w.menuPaths->setDefaultAction(act);
+        } else if (act->icon().cacheKey()==my_w->actionPaths->icon().cacheKey()) {
+            my_w->menuPaths->setDefaultAction(act);
         }
     }
-    connect(my_w.actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
+    connect(my_w->actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
 
 
-    connect(my_w.actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
-    connect(my_w.actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
+    connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
 
-    connect(my_w.actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
-    connect(my_w.actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
+    connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w->actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
-#ifdef USE_QT5
-    connect(my_w.actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
+    connect(my_w->actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
 #else
-    my_w.actionCamera->setEnabled(false);
+    my_w->actionCamera->setEnabled(false);
 #endif
 
-    connect(my_w.actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
-    connect(my_w.actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
-    connect(my_w.actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
-    connect(my_w.actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
-    connect(my_w.actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w.actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
+    connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
+    connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
+    connect(my_w->actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
+    connect(my_w->actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
+    connect(my_w->actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
+    connect(my_w->actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
 
-    connect(my_w.actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
-    connect(my_w.actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
-    connect(my_w.actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
-#ifdef HAVE_HDF5
-    connect(my_w.actionOpen_HDF5, SIGNAL(triggered()), this, SLOT(openHDF5()));
-#endif
-    connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
+    connect(my_w->actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
+    connect(my_w->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
+    connect(my_w->actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
+    connect(my_w->actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
 
-    connect(my_w.actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
+    connect(my_w->actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
 
 
 
-    connect(my_w.actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
+    connect(my_w->actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
 
-    connect(my_w.actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
+    connect(my_w->actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
 
-    connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
-    connect(my_w.actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
+    connect(my_w->actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
+    connect(my_w->actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
 
-    connect(my_w.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+    connect(my_w->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
-    connect(my_w.actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+    connect(my_w->actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
 
-    connect(my_w.actionClose, SIGNAL(triggered()), this, SLOT(fileClose()));
-    connect(my_w.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(my_w.actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
-
-
-    connect(my_w.actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
-    connect(my_w.actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
-    connect(my_w.actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
-    connect(my_w.actionCycle_over_paths, SIGNAL(triggered()), this, SLOT(cycleOverItems()));
-
-    connect(my_w.actionShow_mouse, SIGNAL(triggered()), this, SLOT(toggleMouse()));
-    connect(my_w.actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
-    connect(my_w.actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
-
-    connect(my_w.actionMouse_Zoom, SIGNAL(triggered()), this, SLOT(ZoomWin()));
-
-    connect(my_w.actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
-    connect(my_w.actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
-    connect(my_w.actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
-    connect(my_w.actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
-
-    connect(my_w.actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
+    connect(my_w->actionClose, SIGNAL(triggered()), this, SLOT(fileClose()));
+    connect(my_w->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(my_w->actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
 
 
-    connect(my_w.actionZoom_in, SIGNAL(triggered()), my_w.my_view, SLOT(zoomIn()));
-    connect(my_w.actionZoom_out, SIGNAL(triggered()), my_w.my_view, SLOT(zoomOut()));
-    connect(my_w.actionZoom_eq, SIGNAL(triggered()), my_w.my_view, SLOT(zoomEq()));
+    connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
+    connect(my_w->actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
+    connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 
-    connect(my_w.actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
+    connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
+    connect(my_w->actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
 
-    connect(my_w.actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
-    connect(my_w.actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
+    connect(my_w->actionMouse_Zoom, SIGNAL(triggered()), this, SLOT(ZoomWin()));
 
-    connect(my_w.actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
-    connect(my_w.actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
+    connect(my_w->actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
+    connect(my_w->actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
+    connect(my_w->actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
+    connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
 
-    connect(my_w.actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
-    connect(my_w.actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
-    connect(my_w.actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
 
-    connect(my_w.actionDrawLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
+    connect(my_w->actionZoom_in, SIGNAL(triggered()), my_w->my_view, SLOT(zoomIn()));
+    connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
+    connect(my_w->actionZoom_eq, SIGNAL(triggered()), my_w->my_view, SLOT(zoomEq()));
 
-    connect(my_w.actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w.actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
-    connect(my_w.actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
-    connect(my_w.actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
-    connect(my_w.actionFind_Peaks, SIGNAL(triggered()), this, SLOT(FindPeaks()));
-    connect(my_w.actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
-    connect(my_w.actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
+    connect(my_w->actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
-    connect(my_w.actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
-    connect(my_w.actionVisar, SIGNAL(triggered()), this, SLOT(Visar()));
-    connect(my_w.actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
-    connect(my_w.actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
-    connect(my_w.actionGhost, SIGNAL(triggered()), this, SLOT(Ghost()));
-    connect(my_w.actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
-    connect(my_w.actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
-    connect(my_w.actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
+    connect(my_w->actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
+    connect(my_w->actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
 
-    connect(my_w.actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
-    connect(my_w.actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
-    connect(my_w.actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
-    connect(my_w.actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
+    connect(my_w->actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
+    connect(my_w->actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
 
-#ifdef HAVE_PYTHONQT
-    QWidget* spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    my_w.toolBar->addWidget(spacer);
+    connect(my_w->actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
+    connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
+    connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
 
-    my_w.toolBar->addAction(QIcon(":icons/python.png"),tr("Python shell"),this,SLOT(Python()));
-    connect(my_w.actionPython, SIGNAL(triggered()), this, SLOT(Python()));
-    loadPyScripts();
-#else
-    my_w.menuPython->menuAction()->setVisible(false);
-#endif
+    connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
+    connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
+    connect(my_w->actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
+    connect(my_w->actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
+    connect(my_w->actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
+    connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
+
+    connect(my_w->actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
+    connect(my_w->actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
+    connect(my_w->actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
+    connect(my_w->actionInversions, SIGNAL(triggered()), this, SLOT(Inversions()));
+    connect(my_w->actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
+    connect(my_w->actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
+
+    connect(my_w->actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
+    connect(my_w->actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
+    connect(my_w->actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
+    connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
+
 
     // ---------------------------------------------------------------------------------------------
 
     QWidget *sbarra=new QWidget(this);
-    my_sbarra.setupUi(sbarra);
-    my_w.statusbar->addPermanentWidget(sbarra, 0);
+    my_sbarra->setupUi(sbarra);
+    my_w->statusbar->addPermanentWidget(sbarra, 0);
 
     setAttribute(Qt::WA_DeleteOnClose);
-    setCentralWidget(my_w.centralwidget);
+    setCentralWidget(my_w->centralwidget);
 
-    connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-    connect(my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
 
     build_colormap();
@@ -314,7 +305,10 @@ neutrino::neutrino():
     my_set.setValue("paletteFilesNames",paletteFilesNameClean);
     my_set.endGroup();
 
-    changeColorTable(nPalettes.keys().first());
+    if (nPalettes.keys().contains("Neutrino"))
+        changeColorTable("Neutrino");
+    else
+        changeColorTable(nPalettes.keys().first());
 
     //recent file stuff
 
@@ -322,53 +316,34 @@ neutrino::neutrino():
         QAction *act = new QAction(this);
         act->setVisible(false);
         connect(act, SIGNAL(triggered()),this, SLOT(openRecentFile()));
-        my_w.menuOpen_Recent->addAction(act);
+        my_w->menuOpen_Recent->addAction(act);
         recentFileActs << act;
     }
-    my_w.menuOpen_Recent->addSeparator();
+    my_w->menuOpen_Recent->addSeparator();
     QAction *act = new QAction("Clear Menu", this);
     act->setVisible(true);
     connect(act, SIGNAL(triggered()),this, SLOT(clearRecentFile()));
-    my_w.menuOpen_Recent->addAction(act);
+    my_w->menuOpen_Recent->addAction(act);
 
     // lasciamo questo per ultimo
-    //	my_w.scrollArea->setWidget(my_view);
+    //	my_w->scrollArea->setWidget(my_view);
 
-    my_w.my_view->setScene(&my_s);
-
-
-    my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-    //	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
-
-    my_s.addItem(&my_pixitem);
-    my_pixitem.setEnabled(true);
-    my_pixitem.setZValue(-1);
-
-    my_tics.rulerVisible=false;
-    my_tics.gridVisible=false;
-
-    my_s.addItem(&my_mouse);
-
-    my_w.my_view->setSize();
-    my_s.addItem(&my_tics);
-
-    my_s.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
-    my_w.my_view->setCursor(QCursor(Qt::CrossCursor));
 
 
     updateRecentFileActions();
 
+    loadDefaults();
+
     // plugins
     scanPlugins();
 
-    loadDefaults();
     show();
 
     QApplication::processEvents();
 
-//#ifdef  __phys_debug
-//    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
-//#endif
+    //#ifdef  __phys_debug
+    //    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
+    //#endif
 
 
 }
@@ -376,163 +351,156 @@ neutrino::neutrino():
 void neutrino::processEvents()
 { QApplication::processEvents(); }
 
-void neutrino::contextMenuEvent (QContextMenuEvent *) {
-    my_w.menuImage->exec(QCursor::pos());
+void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
+    QMenu *my_menu=new QMenu(this);
+    my_menu->setAttribute(Qt::WA_DeleteOnClose);
+    foreach(QAction *act, my_w->menubar->actions()) {
+        my_menu->addAction(act);
+    }
+    my_menu->exec(ev->globalPos());
+
 }
 
 void neutrino::menuPaths() {
     if ( QApplication::keyboardModifiers()!=Qt::NoModifier) {
-        my_w.menuPaths->exec(QCursor::pos());
+        my_w->menuPaths->exec(QCursor::pos());
     } else {
-        my_w.menuPaths->defaultAction()->trigger();
+        my_w->menuPaths->defaultAction()->trigger();
     }
 }
 
 void neutrino::menuFlipRotate() {
     if ( QApplication::keyboardModifiers()!=Qt::NoModifier) {
-        my_w.menuTransformation->exec(QCursor::pos());
+        my_w->menuTransformation->exec(QCursor::pos());
     } else {
-        my_w.menuTransformation->defaultAction()->trigger();
+        my_w->menuTransformation->defaultAction()->trigger();
     }
 }
 
 void neutrino::rotateLeft() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionRotate_left);
+    my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
     if (currentBuffer) {
         phys_rotate_left(*currentBuffer);
         createQimage();
     }
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 
 }
 
 void neutrino::rotateRight() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionRotate_right);
+    my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
     if (currentBuffer) {
         phys_rotate_right(*currentBuffer);
         createQimage();
     }
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 }
 
 void neutrino::flipUpDown() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionFlip_up_down);
+    my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
     if (currentBuffer) {
         phys_flip_ud(*currentBuffer);
         createQimage();
     }
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
 void neutrino::flipLeftRight() {
-    my_w.menuTransformation->setDefaultAction(my_w.actionFlip_left_right);
+    my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
     if (currentBuffer) {
         phys_flip_lr(*currentBuffer);
         createQimage();
     }
-    QSettings("neutrino","").setValue("menuTransformationDefault",my_w.menuTransformation->defaultAction()->text());
-    my_w.actionFlipRotate->setIcon(my_w.menuTransformation->defaultAction()->icon());
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
-nPhysD* neutrino::getBuffer(int i, bool returnCurrent) {
-    if (i>=0 && i<physList.size()) return physList.at(i);
-    return (returnCurrent?currentBuffer:nullptr);
+nPhysD* neutrino::getBuffer(int i) {
+    return physList.value(i);
 }
 
 // ------------------ PLUGINS -----------------------
 
 void
-neutrino::scanPlugins()
+neutrino::scanPlugins(QString pluginsDirStr)
 {
-    QDir pluginsDir(qApp->applicationDirPath());
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-            pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-            pluginsDir.cdUp();
-            pluginsDir.cdUp();
-            pluginsDir.cdUp();
+    scanPlugins(QDir(pluginsDirStr));
+}
+
+void
+neutrino::scanPlugins(QDir pluginsDir) {
+    if (pluginsDir.exists()) {
+        foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+            if (QFileInfo(fileName).suffix() == nPlug::extension()) {
+                loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
+            }
+        }
+        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
+        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
+        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
+            listdirPlugins.append(pluginsDir.absolutePath());
+        setProperty("NeuSave-plugindirs",listdirPlugins);
     }
+}
+
+void
+neutrino::scanPlugins() {
+    QDir pluginsDir;
+#if defined(Q_OS_WIN)
+    pluginsDir.setPath(qApp->applicationDirPath());
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    pluginsDir.setPath(qApp->applicationDirPath());
+    pluginsDir.cdUp();
+    pluginsDir.cd("Resources");
+#elif defined(Q_OS_LINUX)
+    pluginsDir.setPath("/usr/share/neutrino");
 #endif
     pluginsDir.cd("plugins");
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-        DEBUG(10, "found plugin "<<fileName.toStdString());
+    qDebug() << "defaultPluginDir:" << pluginsDir.absolutePath();
+    setProperty("defaultPluginDir",pluginsDir.absolutePath());
+    scanPlugins(pluginsDir);
 
-        nPluginLoader *my_npl = new nPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
-        if (my_npl->ok()) {
-            // I will probably need to leave a copy of the pointer as a QVariant inside the action
-            QAction *action = new QAction(this);
-            action->setText(my_npl->name());
-            connect (action, SIGNAL(triggered()), my_npl, SLOT(launch()));
-            my_w.menuPlugins->addAction(action);
-
-
+    if (property("NeuSave-plugindirs").isValid()) {
+        for (auto& d : property("NeuSave-plugindirs").toStringList()) {
+            if (d!=pluginsDir.absolutePath())
+                scanPlugins(d);
         }
     }
 }
 
 void
 neutrino::loadPlugin()
- {
-//     QDir pluginsDir(qApp->applicationDirPath());
-// #if defined(Q_OS_WIN)
-//     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-//         pluginsDir.cdUp();
-// #elif defined(Q_OS_MAC)
-//     if (pluginsDir.dirName() == "MacOS") {
-//         pluginsDir.cdUp();
-//         pluginsDir.cdUp();
-//         pluginsDir.cdUp();
-//     }
-// #endif
-//     pluginsDir.cd("plugins");
-//     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-//       QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+{
+    QString pname=QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+    loadPlugin(pname,true);
 
+}
 
-    QString pname = QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+void
+neutrino::loadPlugin(QString pname, bool launch)
+{
+    if (!property("NeuSave-loadPlugin").isValid()) {
+        setProperty("NeuSave-loadPlugin",QString("plugin.so"));
+    }
 
-    if (!pname.isEmpty()) {
-
+    if (QFileInfo(pname).exists()) {
+        setProperty("NeuSave-loadPlugin",pname);
         DEBUG(10, "loading plugin "<<pname.toStdString());
 
-
-        if (plug_loader) {
-            plug_loader->unload();
-            delete plug_loader;
-        }
-
-
-        plug_loader = new QPluginLoader(pname);
-        QObject *plugin = plug_loader->instance();
-
-        DEBUG("got plugin instance "<<(void *)plugin);
-
-
-        if (plugin) {
-            nPlug *plug_iface = qobject_cast<nPlug *>(plugin);
-            if (plug_iface) {
-                DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" cast success");
-
-                if (plug_iface->instantiate(this)) {
-                    DEBUG("plugin \""<<plug_iface->name().toStdString()<<"\" instantiate success");
-                }
-            } else {
-                DEBUG("plugin load fail");
-                }
-        } else {
-            DEBUG("plugin cannot be loaded (linking problems?)");
-        }
+        nPluginLoader *my_npl = new nPluginLoader(pname, this);
+        qDebug() << "here" << my_npl->ok();
+        if (launch) my_npl->launch();
     }
- }
+}
 
 void neutrino::emitBufferChanged(nPhysD *phys) {
     if (!phys) phys=currentBuffer;
-    my_w.my_view->update();
+    my_w->my_view->update();
     emit bufferChanged(phys);
 }
 
@@ -549,9 +517,9 @@ void neutrino::emitPanDel(nGenericPan* pan) {
 
 
 /// Returns the QT drawings area
-QGraphicsScene *
-neutrino::getScene () {
-    return &my_s;
+QGraphicsScene&
+neutrino::getScene() {
+    return my_w->my_view->my_scene;
 }
 
 /// This is called form a Open recent file menu.
@@ -561,7 +529,7 @@ void neutrino::openRecentFile()
     if (action) {
         QString fname=action->data().toString();
         fileOpen(fname);
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
     }
 }
 
@@ -617,33 +585,14 @@ void neutrino::setGamma(int value) {
     if (currentBuffer) {
         currentBuffer->property["gamma"]=value;
         createQimage();
-        setProperty("gamma",value);
+        setProperty("neuSave-gamma",value);
         emitBufferChanged();
-    }
-}
-
-/// Using TAB you can cycle over the items in the canvas (lines, rectangles, ovals)
-void neutrino::cycleOverItems() {
-    QList<QGraphicsItem *> lista;
-    foreach (QGraphicsItem *oggetto, my_s.items() ) {
-        if (oggetto->type() > QGraphicsItem::UserType) {
-            if (oggetto->isVisible()) lista << oggetto;
-        }
-    }
-    my_s.clearSelection();
-    if (lista.size()>0) {
-        int found=0;
-        for (int i=lista.size()-1; i >=0; i-- ) {
-            if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
-        }
-
-        lista.at(found)->setFocus(Qt::TabFocusReason);
     }
 }
 
 nGenericPan* neutrino::existsPan(QString name) {
     foreach (nGenericPan *pan, panList) {
-        if (pan->panName.startsWith(name)) {
+        if (pan->panName()==name) {
             pan->show();
             pan->raise();
             return pan;
@@ -659,10 +608,10 @@ nGenericPan* neutrino::existsPan(QString name) {
 
 
 neutrino* neutrino::fileNew() {
-//	QThread *m_thread = new QThread();
+    //	QThread *m_thread = new QThread();
     return new neutrino();
-//	my_neu->moveToThread(m_thread);
-//	m_thread->start();
+    //	my_neu->moveToThread(m_thread);
+    //	m_thread->start();
 }
 
 void
@@ -676,7 +625,7 @@ neutrino::fileReopen() {
 void neutrino::fileOpen()
 {
     QString formats("");
-    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.h5 *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
     formats+="Images (";
     foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
         formats+="*."+format+" ";
@@ -685,19 +634,20 @@ void neutrino::fileOpen()
     formats+=");;";
     formats+=("Any files (*)");
 
-    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("fileOpen").toString(),formats);
+    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
     fileOpen(fnames);
 }
 
 void neutrino::fileOpen(QStringList fnames) {
-    setProperty("fileOpen", fnames);
+    setProperty("NeuSave-fileOpen", fnames);
     foreach (QString fname, fnames) {
         QList<nPhysD *> imagelist = fileOpen(fname);
-        if (imagelist.size()==0 && QFileInfo(fname).suffix().toLower()!="h5"){
+        if (imagelist.size()==0){
             QString vwinname="OpenRaw";
             nOpenRAW *openRAW=(nOpenRAW *)existsPan(vwinname);
             if (!openRAW) {
-                openRAW = new nOpenRAW(this, vwinname);	}
+                openRAW = new nOpenRAW(this);
+            }
             openRAW->add(fname);
         }
     }
@@ -705,63 +655,68 @@ void neutrino::fileOpen(QStringList fnames) {
 
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    bool separate_rgb= my_set.value("separateRGB",false).toBool();
+    my_set.endGroup();
+
     QList <nPhysD *> imagelist;
     QString suffix=QFileInfo(fname).suffix().toLower();
     if (suffix=="neus") {
         imagelist=openSession(fname);
     } else {
-        std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
+        std::vector<nPhysD*> my_vec;
+        try {
+            my_vec=phys_open(fname.toUtf8().constData(),separate_rgb);
+        } catch (std::exception &e) {
+            QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+            dlg.exec();
+        }
         for(std::vector<nPhysD*>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
             imagelist.push_back(*it);
         }
     }
     if (imagelist.size()==0) {
-        if (QFileInfo(fname).suffix().toLower()=="h5") {
-#ifdef HAVE_HDF5
-            static_cast<nHDF5*>(openHDF5())->showFile(fname);
-#endif
-        } else {
-            QImage image(fname);
-            if (!image.isNull()) {
-                if (image.isGrayscale()) {
-                    nPhysD *datamatrix = new nPhysD(fname.toStdString());
-                    datamatrix->resize(image.width(), image.height());
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            datamatrix->Timg_matrix[i][j]= qRed(image.pixel(j,i));
-                        }
+        QImage image(fname);
+        if (!image.isNull()) {
+            if (image.isGrayscale() || !separate_rgb) {
+                nPhysD *datamatrix = new nPhysD(fname.toStdString());
+                datamatrix->resize(image.width(), image.height());
+                for (int i=0;i<image.height();i++) {
+                    for (int j=0;j<image.width();j++) {
+                        datamatrix->Timg_matrix[i][j]= qGray(image.pixel(j,i));
                     }
-                    imagelist.push_back(datamatrix);
-                } else {
-                    nPhysD *datamatrix[3];
-                    std::string name[3];
-                    name[0]="Red";
-                    name[1]="Green";
-                    name[2]="Blue";
-                    for (int k=0;k<3;k++) {
-                        datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setShortName(name[k]);
-                        datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setFromName(fname.toStdString());
-                        datamatrix[k]->resize(image.width(), image.height());
-                        imagelist.push_back(datamatrix[k]);
-                    }
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            QRgb px = image.pixel(j,i);
-                            datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-                            datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-                            datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
-                        }
-                    }
-
                 }
-                for (int k=0;k<imagelist.size();k++) {
-                    imagelist[k]->TscanBrightness();
-                    imagelist[k]->setType(PHYS_FILE);
+                imagelist.push_back(datamatrix);
+            } else {
+                std::array<nPhysD*,3> datamatrix;
+                std::array<std::string,3> name;
+                name[0]="Red";
+                name[1]="Green";
+                name[2]="Blue";
+                for (int k=0;k<3;k++) {
+                    datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
+                    datamatrix[k]->setShortName(name[k]);
+                    datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
+                    datamatrix[k]->setFromName(fname.toStdString());
+                    datamatrix[k]->resize(image.width(), image.height());
+                    imagelist.push_back(datamatrix[k]);
                 }
-
+                for (int i=0;i<image.height();i++) {
+                    for (int j=0;j<image.width();j++) {
+                        QRgb px = image.pixel(j,i);
+                        datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
+                        datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
+                        datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
+                    }
+                }
             }
+            for (int k=0;k<imagelist.size();k++) {
+                imagelist[k]->TscanBrightness();
+                imagelist[k]->setType(PHYS_FILE);
+            }
+
         }
     }
 
@@ -786,64 +741,64 @@ void neutrino::saveSession (QString fname) {
 #ifdef HAVE_LIBTIFF
         extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
 #endif
-        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Open Session"),property("fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
+        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Open Session"),property("NeuSave-fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
         }
     } else {
         QFileInfo file_info(fname);
         if (file_info.suffix()=="neus") {
-        setProperty("fileOpen", fname);
-//            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
+            setProperty("NeuSave-fileOpen", fname);
+            //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
             QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.show();
+            progress.setWindowModality(Qt::WindowModal);
+            progress.show();
 
             std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
             ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
 
-        for (int i=0;i<physList.size(); i++) {
-            if (progress.wasCanceled()) break;
-            progress.setValue(i);
-            progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
-            QApplication::processEvents();
-                ofile << "NeutrinoImage" << std::endl;
-            phys_dump_binary(physList.at(i),ofile);
-            physList.at(i)->setType(PHYS_FILE);
-        }
-        for (int i=0;i<panList.size(); i++) {
-            QString namePan=panList.at(i)->property("panName").toString();
-            QTemporaryFile tmpFile(this);
-            if (tmpFile.open()) {
-                QString tmp_filename=tmpFile.fileName();
+            for (int i=0;i<physList.size(); i++) {
+                if (progress.wasCanceled()) break;
+                progress.setValue(i);
+                progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
                 QApplication::processEvents();
-                QSettings my_set(tmp_filename,QSettings::IniFormat);
-                my_set.clear();
-                panList.at(i)->saveSettings(&my_set);
-                my_set.sync();
-                tmpFile.close();
-                QFile file(tmp_filename);
-                if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                        ofile << "NeutrinoPan-begin " << namePan.toStdString() << std::endl;
-                    ofile.flush();
-                    while (!file.atEnd()) {
-                        QByteArray line = file.readLine();
-                        ofile << line.constData();
-                    }
-                    file.close();
-                    file.remove();
-                        ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
-                    ofile.flush();
-                } else {
-                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
-                }
-            } else {
-                QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName, QMessageBox::Ok);
+                ofile << "NeutrinoImage" << std::endl;
+                phys_dump_binary(physList.at(i),ofile);
+                physList.at(i)->setType(PHYS_FILE);
             }
-        }
+            for (int i=0;i<panList.size(); i++) {
+                QString namePan=panList.at(i)->metaObject()->className();
+                QTemporaryFile tmpFile(this);
+                if (tmpFile.open()) {
+                    QString tmp_filename=tmpFile.fileName();
+                    QApplication::processEvents();
+                    QSettings my_set(tmp_filename,QSettings::IniFormat);
+                    my_set.clear();
+                    panList.at(i)->saveSettings(&my_set);
+                    my_set.sync();
+                    tmpFile.close();
+                    QFile file(tmp_filename);
+                    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        ofile << "NeutrinoPan-begin " << namePan.toStdString() << std::endl;
+                        ofile.flush();
+                        while (!file.atEnd()) {
+                            QByteArray line = file.readLine();
+                            ofile << line.constData();
+                        }
+                        file.close();
+                        file.remove();
+                        ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
+                        ofile.flush();
+                    } else {
+                        QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
+                    }
+                } else {
+                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName(), QMessageBox::Ok);
+                }
+            }
             progress.setValue(physList.size()+1);
-        ofile.close();
+            ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
             std::vector <nPhysD *> vecPhys;
             foreach (nPhysD * my_phys, physList) {
@@ -861,7 +816,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
     QList <nPhysD *> imagelist;
     if (!fname.isEmpty()) {
         updateRecentFileActions(fname);
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
         if (physList.size()!=0) {
             QThread *m_thread = new QThread();
             neutrino*my_neu= new neutrino();
@@ -889,45 +844,48 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         counter++;
                         progress.setValue(counter);
                         nPhysD *my_phys=new nPhysD();
-                            int ret=phys_resurrect_binary(my_phys,ifile);
-                            if (ret>=0 && my_phys->getSurf()>0) {
-                                addPhys(my_phys);
-                                imagelist.push_back(my_phys);
-                            } else {
-                                delete my_phys;
-                            }
-
+                        int ret=phys_resurrect_binary(my_phys,ifile);
+                        if (ret>=0 && my_phys->getSurf()>0) {
+                            addShowPhys(my_phys);
+                            imagelist.push_back(my_phys);
+                        } else {
+                            delete my_phys;
+                        }
                         progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
                         QStringList listLine=qLine.split(" ");
                         QString panName=listLine.at(1);
                         QApplication::processEvents();
-                        if (metaObject()->indexOfMethod((panName+"()").toLatin1().constData())>0) {
-                            nGenericPan *my_pan=NULL;
-                            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-                            QApplication::processEvents();
-                            if (my_pan) {
-                                QApplication::processEvents();
-                                QTemporaryFile tmpFile(this);
-                                tmpFile.open();
-                                while(!ifile.eof()) {
-                                    getline(ifile,line);
-//                                    WARNING(line);
-                                    qLine=QString::fromStdString(line);
-                                    if (qLine.startsWith("NeutrinoPan-end"))
-                                        break;
-                                    tmpFile.write(line.c_str());
-                                    tmpFile.write("\n");
-                                }
-                                tmpFile.flush();
-                                QApplication::processEvents();
-                                QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
-                                QApplication::processEvents();
-//                                my_pan->loadSettings(tmpFile.fileName());
-                                tmpFile.close(); // this should also remove it...
-                            }
+
+                        for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i) {
+                            qDebug() << "method:" << metaObject()->method(i).methodSignature();
                         }
+
+                        nGenericPan *my_pan=openPan(panName, false);
+
+                        if (my_pan) {
+                            QApplication::processEvents();
+                            QTemporaryFile tmpFile(this);
+                            tmpFile.open();
+                            while(!ifile.eof()) {
+                                getline(ifile,line);
+                                // WARNING(line);
+                                qLine=QString::fromStdString(line);
+                                if (qLine.startsWith("NeutrinoPan-end"))
+                                    break;
+                                tmpFile.write(line.c_str());
+                                tmpFile.write("\n");
+                            }
+                            tmpFile.flush();
+                            QApplication::processEvents();
+                            QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
+                            QApplication::processEvents();
+                            tmpFile.close(); // this should also remove it...
+                        } else {
+                            QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+panName,  QMessageBox::Ok);
+                        }
+
                     }
                     progress.setValue(counter++);
                     QApplication::processEvents();
@@ -940,6 +898,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 }
 
 void neutrino::addShowPhys(nPhysD* datamatrix) {
+    qDebug() << "here";
     addPhys(datamatrix);
     showPhys(datamatrix);
 }
@@ -948,7 +907,7 @@ void neutrino::addPhys(nPhysD* datamatrix) {
     if (datamatrix && !physList.contains(datamatrix))	{
         physList << datamatrix;
 
-//        datamatrix->property["display_range"]= datamatrix->get_min_max();
+        //        datamatrix->property["display_range"]= datamatrix->get_min_max();
 
         addMenuBuffers(datamatrix);
         emit physAdd(datamatrix);
@@ -966,7 +925,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
     }
     action->setData(qVariantFromValue((void*) datamatrix));
     connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
-    my_w.menuBuffers->addAction(action);
+    my_w->menuBuffers->addAction(action);
 }
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
@@ -984,7 +943,7 @@ nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //T
         }
         if (show || redisplay) {
             showPhys(newPhys);
-    }
+        }
     }
     emit physMod(std::make_pair(oldPhys, newPhys));
     return newPhys;
@@ -1004,13 +963,13 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 setWindowTitle(property("winId").toString()+QString(": Neutrino"));
                 setWindowFilePath("");
                 zoomChanged(1);
-                my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-                my_w.my_view->setSize();
+                my_w->my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+                my_w->my_view->setSize();
             }
-            QList<QAction *> lista=my_w.menuBuffers->actions();
-            foreach (QAction* action, my_w.menuBuffers->actions()) {
+            QList<QAction *> lista=my_w->menuBuffers->actions();
+            foreach (QAction* action, my_w->menuBuffers->actions()) {
                 if (action->data() == qVariantFromValue((void*) datamatrix)) {
-                    my_w.menuBuffers->removeAction(action);
+                    my_w->menuBuffers->removeAction(action);
                 }
             }
             delete datamatrix;
@@ -1032,6 +991,7 @@ void neutrino::showPhys(nPhysD& datamatrixRef) {
 }
 
 void neutrino::addShowPhys(nPhysD& datamatrixRef) {
+    qDebug() << "there";
     bool found=false;
     foreach (nPhysD* datamatrix, physList) {
         if (*datamatrix == datamatrixRef) found=true;
@@ -1067,12 +1027,12 @@ neutrino::showPhys(nPhysD* datamatrix) {
         if (!physList.contains(datamatrix)) addPhys(datamatrix);
 
         if (currentBuffer) {
-            if (my_w.actionLockColors->isChecked()) {
+            if (my_w->actionLockColors->isChecked()) {
                 datamatrix->property["display_range"]=currentBuffer->property["display_range"];
                 datamatrix->property["gamma"]=currentBuffer->property["gamma"];
             } else {
                 if (!datamatrix->property.have("gamma")) {
-                    datamatrix->property["gamma"]=property("gamma").toInt();
+                    datamatrix->property["gamma"]=property("neuSave-gamma").toInt();
                 }
             }
         }
@@ -1119,41 +1079,41 @@ neutrino::createQimage() {
                                currentBuffer->getW()*3,
                                QImage::Format_RGB888);
 
-        my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+        my_w->my_view->my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
         double gamma_val=currentBuffer->gamma();
-        my_sbarra.gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
+        my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
     }
 
     QApplication::processEvents();
 
-    my_w.my_view->setSize();
+    my_w->my_view->setSize();
 }
 
 void neutrino::exportGraphics () {
     QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-    QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),ftypes);
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty())
         exportGraphics(fout);
 }
 
 void neutrino::exportAllGraphics () {
     QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("fileExport").toString(),ftypes);
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty()) {
         for (int i=0;i<physList.size() ; i++) {
             actionNextBuffer();
             QFileInfo fi(fout);
             exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
         }
-        setProperty("fileExport",fout);
+        setProperty("NeuSave-fileExport",fout);
     }
 }
 
 void neutrino::exportGraphics (QString fout) {
-    setProperty("fileExport",fout);
-    bool resetmouse=my_mouse.isVisible();
-    my_mouse.setVisible(false);
-    QSize my_size=QSize(my_s.width(), my_s.height());
+    setProperty("NeuSave-fileExport",fout);
+    bool resetmouse=my_w->my_view->my_mouse.isVisible();
+    my_w->my_view->my_mouse.setVisible(false);
+    QSize my_size=QSize(getScene().width(), getScene().height());
     if (QFileInfo(fout).suffix().toLower()==QString("pdf")) {
         QPrinter myPrinter(QPrinter::ScreenResolution);
         myPrinter.setOutputFileName(fout);
@@ -1168,68 +1128,51 @@ void neutrino::exportGraphics (QString fout) {
 
         QPainter myPainter(&myPrinter);
         myPainter.setViewport(0, 0, myPrinter.width(), myPrinter.height());
-        my_s.render(&myPainter);
+        getScene().render(&myPainter);
     } else if (QFileInfo(fout).suffix().toLower()==QString("svg")) {
         QSvgGenerator svgGen;
         svgGen.setFileName(fout);
         svgGen.setSize(my_size);
-        QRect my_rect(0,0,my_tics.boundingRect().width(),my_tics.boundingRect().height());
+        QRect my_rect(0,0,my_w->my_view->my_tics.boundingRect().width(),my_w->my_view->my_tics.boundingRect().height());
         svgGen.setViewBox(my_rect);
         svgGen.setTitle("Neutrino");
         svgGen.setDescription(windowFilePath());
         QPainter painter( &svgGen );
-        my_s.render(&painter);
+        getScene().render(&painter);
     } else {
-        QPixmap::grabWidget(my_w.my_view).save(fout);
+        QPixmap::grabWidget(my_w->my_view).save(fout);
     }
-    my_mouse.setVisible(resetmouse);
-}
-
-void neutrino::toggleMouse() {
-    toggleMouse(!my_mouse.isVisible());
-}
-
-void neutrino::toggleMouse(bool stat) {
-    my_mouse.setVisible(stat);
-    QCursor cur;
-    if (stat) {
-        cur=QCursor(Qt::BlankCursor);
-        my_w.actionShow_mouse->setText("Hide mouse");
-    } else {
-        cur=QCursor(Qt::CrossCursor);
-        my_w.actionShow_mouse->setText("Show mouse");
-    }
-    my_pixitem.setCursor(cur);
+    my_w->my_view->my_mouse.setVisible(resetmouse);
 }
 
 void neutrino::toggleRuler() {
-    my_tics.rulerVisible=!my_tics.rulerVisible;
-    if (my_tics.rulerVisible) {
-        my_w.actionShow_ruler->setText("Hide ruler");
+    my_w->my_view->my_tics.rulerVisible=!my_w->my_view->my_tics.rulerVisible;
+    if (my_w->my_view->my_tics.rulerVisible) {
+        my_w->actionShow_ruler->setText("Hide ruler");
     } else {
-        my_w.actionShow_ruler->setText("Show ruler");
+        my_w->actionShow_ruler->setText("Show ruler");
     }
-    my_tics.update();
+    my_w->my_view->my_tics.update();
 }
 
 void neutrino::toggleGrid() {
-    my_tics.gridVisible=!my_tics.gridVisible;
-    if (my_tics.gridVisible) {
-        my_w.actionShow_grid->setText("Hide grid");
+    my_w->my_view->my_tics.gridVisible=!my_w->my_view->my_tics.gridVisible;
+    if (my_w->my_view->my_tics.gridVisible) {
+        my_w->actionShow_grid->setText("Hide grid");
     } else {
-        my_w.actionShow_grid->setText("Show grid");
+        my_w->actionShow_grid->setText("Show grid");
     }
-    my_tics.update();
+    my_w->my_view->my_tics.update();
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
-    disconnect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     if (fileClose()) {
         saveDefaults();
         e->accept();
     } else {
         e->ignore();
-        connect(my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     }
 }
 
@@ -1239,30 +1182,21 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Less:
         if (currentBuffer) {
-             setGamma(int(currentBuffer->property["gamma"])-1);
+            setGamma(int(currentBuffer->property["gamma"])-1);
         }
         break;
     case Qt::Key_Greater:
         if (currentBuffer) {
-             setGamma(int(currentBuffer->property["gamma"])+1);
+            setGamma(int(currentBuffer->property["gamma"])+1);
         }
         break;
     case Qt::Key_Period:
         if (currentBuffer) {
-             setGamma(1);
+            setGamma(1);
         }
         break;
     case Qt::Key_Question:
         Shortcuts();
-        break;
-    case Qt::Key_Plus:
-        my_w.my_view->zoomIn();
-        break;
-    case Qt::Key_Minus:
-        my_w.my_view->zoomOut();
-        break;
-    case Qt::Key_Equal:
-        my_w.my_view->zoomEq();
         break;
     case Qt::Key_A: {
         if (e->modifiers() & Qt::ShiftModifier) {
@@ -1272,11 +1206,11 @@ void neutrino::keyPressEvent (QKeyEvent *e)
                 emit bufferChanged(phys);
             }
         } else {
-        if (currentBuffer) {
-            currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+            if (currentBuffer) {
+                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
                 setGamma(1);
-            emit updatecolorbar();
-        }
+                emit updatecolorbar();
+            }
         }
         createQimage();
         break;
@@ -1284,14 +1218,14 @@ void neutrino::keyPressEvent (QKeyEvent *e)
     case Qt::Key_O:
         if (e->modifiers() & Qt::ShiftModifier) {
             foreach (nPhysD* phys, physList) {
-                phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+                phys->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
                 emit bufferChanged(phys);
             }
         } else {
-            if (currentBuffer) currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+            if (currentBuffer) currentBuffer->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
         }
-        mouseposition(my_mouse.pos());
-        my_tics.update();
+        mouseposition(my_w->my_view->my_mouse.pos());
+        my_w->my_view->my_tics.update();
         emitBufferChanged();
 
         // I need a signal to communicate explicit origin change not to
@@ -1323,11 +1257,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         if (!(e->modifiers() & Qt::ShiftModifier))
             toggleGrid();
         break;
-    case Qt::Key_M: {
-        if (!(e->modifiers() & Qt::ShiftModifier))
-            toggleMouse();
-        break;
-    }
     case Qt::Key_V: {
         if (!(e->modifiers() & Qt::ShiftModifier))
             Vlineout();
@@ -1343,20 +1272,16 @@ void neutrino::keyPressEvent (QKeyEvent *e)
             bool ok;
             QString text = QInputDialog::getText(this,"","Open", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
             if (ok && !text.isEmpty()) {
-                     nGenericPan *my_pan= openPan(text,false);
-                     if(!my_pan) {
-                         statusBar()->showMessage(tr("Can't find ")+text, 2000);
-                     }
+                nGenericPan *my_pan= openPan(text,false);
+                if(!my_pan) {
+                    statusBar()->showMessage(tr("Can't find ")+text, 2000);
+                }
             }
         }
         break;
     }
     default:
         break;
-    }
-
-    if (follower) {
-        follower->keyPressEvent(e);
     }
 }
 
@@ -1422,10 +1347,7 @@ void neutrino::actionNextBuffer() {
 
 nGenericPan*
 neutrino::ZoomWin() {
-    QString namepad=tr("Zoom Win");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nZoomWin(this, namepad);
-    return win;
+    return new nZoomWin(this);
 }
 
 
@@ -1440,27 +1362,27 @@ neutrino::zoomChanged(double zoom) {
 
 double
 neutrino::getZoom() const {
-    return my_w.my_view->transform().m11();
+    return my_w->my_view->transform().m11();
 }
 
 void
 neutrino::mouseposition(QPointF pos_mouse) {
-    my_sbarra.pos_x->setNum((int)pos_mouse.x());
-    my_sbarra.pos_y->setNum((int)pos_mouse.y());
+    my_sbarra->pos_x->setNum((int)pos_mouse.x());
+    my_sbarra->pos_y->setNum((int)pos_mouse.y());
 
 
     if (currentBuffer) {
         vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
         QPointF pos=QPointF(vec.x(),vec.y());
-        my_sbarra.dx->setNum(pos.x());
-        my_sbarra.dy->setNum(pos.y());
+        my_sbarra->dx->setNum(pos.x());
+        my_sbarra->dy->setNum(pos.y());
         double val=currentBuffer->point(pos_mouse.x(),pos_mouse.y());
-        my_sbarra.pos_z->setNum(val);
+        my_sbarra->pos_z->setNum(val);
         emit colorValue(val);
         emit mouseAtWorld(pos);
     } else {
-        my_sbarra.dx->setText("");
-        my_sbarra.dy->setText("");
+        my_sbarra->dx->setText("");
+        my_sbarra->dy->setText("");
     }
 
     emit mouseAtMatrix(pos_mouse);
@@ -1476,7 +1398,7 @@ QString neutrino::getFileSave() {
     formats.chop(1);
     formats+=");;";
     formats+=("Any files (*)");
-    return QFileDialog::getSaveFileName(this, "Save to...",property("fileOpen").toString(),formats);
+    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileOpen").toString(),formats);
 }
 
 void
@@ -1490,7 +1412,7 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
     if (!fname.isEmpty()) {
-        setProperty("fileOpen", fname);
+        setProperty("NeuSave-fileOpen", fname);
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.isEmpty()) {
             fname+=".neus";
@@ -1500,13 +1422,13 @@ void neutrino::fileSave(QString fname) {
                 int res=QMessageBox::warning(this,tr("Attention"), fname+QString("\n")+tr("exists. Overwrite?"),
                                              QMessageBox::Yes | QMessageBox::No  | QMessageBox::Cancel);
                 switch (res) {
-                    case QMessageBox::No:
-                        fileSave();
-                        return;
-                        break;
-                    case QMessageBox::Cancel:
-                        return;
-                        break;
+                case QMessageBox::No:
+                    fileSave();
+                    return;
+                    break;
+                case QMessageBox::Cancel:
+                    return;
+                    break;
                 }
             }
 
@@ -1536,23 +1458,24 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
         } else if (suffix.startsWith("txt") || suffix.startsWith("dat")) {
             phys->writeASC(fname.toUtf8().constData());
         } else {
-            my_pixitem.pixmap().save(fname);
+            my_w->my_view->my_pixitem.pixmap().save(fname);
         }
-            phys->setType(PHYS_FILE);
-            phys->setShortName(QFileInfo(fname).fileName().toStdString());
-            phys->setName(phys->getShortName());
-            phys->setFromName(fname.toStdString());
-        }
+        phys->setType(PHYS_FILE);
+        phys->setShortName(QFileInfo(fname).fileName().toStdString());
+        phys->setName(phys->getShortName());
+        phys->setFromName(fname.toStdString());
     }
+}
 
 bool
 neutrino::fileClose() {
+    saveDefaults();
     if (QApplication::activeWindow() == this) {
         bool askAll=true;
+        QApplication::processEvents();
         foreach (nGenericPan* pan, panList) {
             pan->hide();
             pan->close();
-            pan->deleteLater();
             QApplication::processEvents();
         }
         foreach (nPhysD *phys, physList) {
@@ -1561,31 +1484,30 @@ neutrino::fileClose() {
                                              tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
                                              QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
                 switch (res) {
-                    case QMessageBox::Yes:
-                        fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
-                        break;
-                    case QMessageBox::NoToAll:
-                        askAll=false;
-                        break;
-                    case QMessageBox::Cancel:
-                        return false;
-                        break;
+                case QMessageBox::Yes:
+                    fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
+                    break;
+                case QMessageBox::NoToAll:
+                    askAll=false;
+                    break;
+                case QMessageBox::Cancel:
+                    return false;
+                    break;
                 }
             }
         }
 
-        saveDefaults();
         foreach (nGenericPan *pan, panList) {
-            pan->deleteLater();
+            pan->close();
         }
         QApplication::processEvents();
         currentBuffer=NULL;
         foreach (nPhysD *phys, physList) {
             delete phys;
         }
-    #ifdef HAVE_PYTHONQT
-        PythonQt::self()->getMainModule().removeVariable(objectName());
-    #endif
+//#ifdef HAVE_PYTHONQT
+//        PythonQt::self()->getMainModule().removeVariable(objectName());
+//#endif
 
         deleteLater();
         return true;
@@ -1604,12 +1526,12 @@ neutrino::closeCurrentBuffer() {
                                          tr("The image")+QString("\n")+QString::fromUtf8(currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             switch (res) {
-                case QMessageBox::Yes:
-                    fileSave(currentBuffer); // TODO: add here a check for a cancel to avoid exiting
-                    break;
-                case QMessageBox::No:
-                    removePhys(currentBuffer);
-                    break;
+            case QMessageBox::Yes:
+                fileSave(currentBuffer); // TODO: add here a check for a cancel to avoid exiting
+                break;
+            case QMessageBox::No:
+                removePhys(currentBuffer);
+                break;
             }
         } else {
             removePhys(currentBuffer);
@@ -1620,77 +1542,50 @@ neutrino::closeCurrentBuffer() {
 
 nGenericPan*
 neutrino::Shortcuts() {
-    QString vwinname=tr("Shortcuts");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nShortcuts(this,vwinname);
-    return win;
+    return new nShortcuts(this);
 }
 
 nGenericPan*
 neutrino::FocalSpot() {
-    QString vwinname=tr("FocalSpot");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nFocalSpot(this,vwinname);
-    return win;
+    return new nFocalSpot(this);
 }
 
 nGenericPan*
 neutrino::Contours() {
-    QString vwinname=tr("Contours");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nContours(this,vwinname);
-    return win;
+    return new nContours(this);
 }
 
 nGenericPan*
 neutrino::MathOperations() {
-    QString vwinname=tr("MathOperations");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nOperator(this,vwinname);
-    return win;
+    return new nOperator(this);
 }
 
 nGenericPan*
 neutrino::CutoffImage() {
-    QString vwinname=tr("CutoffImage");
-    nGenericPan* win=existsPan(vwinname);
-    if (!win) win=new nCutoffMask(this,vwinname);
-    return win;
+    return new nCutoffMask(this);
 }
 
 // Window List pan
 nGenericPan*
 neutrino::WinList() {
-    QString namepad=tr("WinList");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nWinList (this, namepad);
-    return win;
+    return new nWinList(this);
 }
 
 nGenericPan*
 neutrino::Properties() {
-    QString namepad=tr("Properties");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nPhysProperties (this, namepad);
-    return win;
+    return new nPhysProperties(this);
 }
 
 nGenericPan*
 neutrino::MouseInfo() {
-    QString namepad=tr("MouseInfo");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nMouseInfo (this, namepad);
-    return win;
+    return new nMouseInfo(this);
 }
 
 // colortables
 
 nGenericPan*
 neutrino::Colorbar() {
-    QString namepad=tr("Colorbar");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nColorBarWin (this, namepad);
-    return win;
+    return new nColorBarWin(this);
 }
 
 struct QPairFirstComparer {
@@ -1815,7 +1710,7 @@ void
 neutrino::changeColorTable () {
     createQimage();
     statusBar()->showMessage(colorTable, 1500);
-    my_tics.update();
+    my_w->my_view->my_tics.update();
     emit updatecolorbar();
 }
 
@@ -1851,13 +1746,13 @@ neutrino::nextColorTable () {
 // testing
 void
 neutrino::createDrawLine() {
-    my_w.menuPaths->setDefaultAction(my_w.actionLine);
+    my_w->menuPaths->setDefaultAction(my_w->actionLine);
     statusBar()->showMessage(tr("Click for points, press Esc to finish"),5000);
     nLine *item = new nLine(this);
     item->interactive();
     if (follower) follower->createDrawLine();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 QString
@@ -1876,59 +1771,50 @@ neutrino::newRect(QRectF rectangle, QString name) {
 
 void
 neutrino::createDrawRect() {
-    my_w.menuPaths->setDefaultAction(my_w.actionRect);
+    my_w->menuPaths->setDefaultAction(my_w->actionRect);
     statusBar()->showMessage(tr("Click for the first point of the rectangle"),5000);
     nRect *item = new nRect(this);
     item->interactive();
     if (follower) follower->createDrawRect();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 void
 neutrino::createDrawPoint() {
-    my_w.menuPaths->setDefaultAction(my_w.actionPoint);
+    my_w->menuPaths->setDefaultAction(my_w->actionPoint);
     statusBar()->showMessage(tr("Click for the point"),5000);
     nPoint *item = new nPoint(this);
     item->interactive();
     if (follower) follower->createDrawPoint();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 void
 neutrino::createDrawEllipse() {
-    my_w.menuPaths->setDefaultAction(my_w.actionEllipse);
+    my_w->menuPaths->setDefaultAction(my_w->actionEllipse);
     statusBar()->showMessage(tr("Click and release to create the ellipse"),5000);
     nEllipse *item = new nEllipse(this);
     item->interactive();
     if (follower) follower->createDrawEllipse();
-    my_w.actionPaths->setIcon(my_w.menuPaths->defaultAction()->icon());
-    QSettings("neutrino","").setValue("defualtActionPath",my_w.menuPaths->defaultAction()->text());
+    my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
+    QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
 
 nGenericPan*
 neutrino::Hlineout() {
-    QString namepad=tr("Hlineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineout(this, namepad, PHYS_X);
-    return win;
+    return new nLineout(this, PHYS_X);
 }
 
 nGenericPan*
 neutrino::Vlineout() {
-    QString namepad=tr("Vlineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineout(this, namepad, PHYS_Y);
-    return win;
+    return new nLineout(this, PHYS_Y);
 }
 
 nGenericPan*
 neutrino::bothLineout() {
-    QString namepad=tr("Bothlineout");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nLineoutBoth(this, namepad);
-    return win;
+    return new nLineoutBoth(this);
 }
 
 void neutrino::print()
@@ -1936,47 +1822,29 @@ void neutrino::print()
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog *printDialog = new QPrintDialog(&printer, this);
     if (printDialog->exec() == QDialog::Accepted) {
-        my_mouse.setVisible(false);
+        my_w->my_view->my_mouse.hide();
         QPainter painter(&printer);
-        foreach (QGraphicsItem *oggetto, my_s.items() ) {
+        foreach (QGraphicsItem *oggetto, getScene().items() ) {
             if (qgraphicsitem_cast<nLine *>(oggetto)) {
                 nLine *my_nline = (nLine *)oggetto;
                 my_nline->selectThis(false);
             }
         }
-        my_s.render(&painter);
-        my_mouse.setVisible(true);
+        getScene().render(&painter);
+        my_w->my_view->my_mouse.show();
     }
 }
-
-/// HDF5 treeview
-#ifdef HAVE_HDF5
-nGenericPan*
-neutrino::openHDF5() {
-    QString namepad=tr("HDF5");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nHDF5(this, namepad);
-    return win;
-}
-#endif
-
 
 /// rectangle lineout
 nGenericPan*
 neutrino::BoxLineout() {
-    return new nBoxLineout(this, "BoxLineout");
-}
-
-/// Find peaks
-nGenericPan*
-neutrino::FindPeaks() {
-    return new nFindPeaks(this, "FindPeaks");
+    return new nBoxLineout(this);
 }
 
 /// compare lines between images
 nGenericPan*
 neutrino::CompareLines() {
-    return new nCompareLines(this, "CompareLines");
+    return new nCompareLines(this);
 }
 
 /// Open raw window
@@ -1986,9 +1854,8 @@ neutrino::openRAW() {
     nGenericPan *win = NULL;
     fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),NULL,tr("Any files")+QString(" (*)"));
     if (fnames.size()) {
-        QString vwinname="OpenRaw";
-        win=existsPan(vwinname);
-        if (!win) win= new nOpenRAW(this, vwinname);
+        win=existsPan("nOpenRAW");
+        if (!win) win= new nOpenRAW(this);
         nOpenRAW *winRAW=qobject_cast<nOpenRAW*>(win);
         if (winRAW) winRAW->add(fnames);
     }
@@ -1998,95 +1865,58 @@ neutrino::openRAW() {
 /// Spectral Analysis (FT, filtering and stuff)
 nGenericPan*
 neutrino::SpectralAnalysis() {
-    QString namepad=tr("SpectralAnalysis");
-    nGenericPan *win = existsPan(namepad);
-    if (!win) win = new nSpectralAnalysis(this, namepad);
-    return win;
+    return new nSpectralAnalysis(this);
 }
 
-nGenericPan*
-neutrino::Visar() {
-    QString vwinname=tr("Visar");
-    return new nVisar(this, vwinname);
-}
 
 /// Wavelet analysis window
 nGenericPan*
 neutrino::Wavelet() {
-    QString vwinname=tr("Wavelet");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nWavelet(this, vwinname);
-    return ret;
+    return new nWavelet(this);
 }
 
 /// Interferometry analysis window
 nGenericPan*
 neutrino::Interferometry() {
-    QString vwinname=tr("Interferometry");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nInterferometry(this, vwinname);
-    return ret;
-}
-
-/// Remove Ghost fringes from Visar data
-nGenericPan*
-neutrino::Ghost() {
-    QString vwinname=tr("Ghost");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nGhost(this, vwinname);
-    return ret;
+    return new nInterferometry(this);
 }
 
 /// Integral inversion (Abel etc...)
 nGenericPan*
 neutrino::Inversions() {
-    QString vwinname=tr("Inversions");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nIntegralInversion(this, vwinname);
-    return ret;
+    return new nIntegralInversion(this);
 }
 
 /// Region Path
 nGenericPan*
 neutrino::RegionPath() {
-    QString vwinname=tr("RegionPath");
-    return new nRegionPath(this, "RegionPath");
+    return new nRegionPath(this);
 }
 
 /// Region Path
 nGenericPan*
 neutrino::InterpolatePath() {
-    QString vwinname=tr("InterpolatePath");
-    return new nInterpolatePath(this, "InterpolatePath");
+    return new nInterpolatePath(this);
 }
 
 
 /// ROTATE STUFF
 nGenericPan*
 neutrino::Rotate() {
-    QString vwinname=tr("Rotate");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nRotate(this, vwinname);
-    return ret;
+    return new nRotate(this);
 }
 
 /// Affine STUFF
 nGenericPan*
 neutrino::Affine() {
-    QString vwinname=tr("Affine");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nAffine(this, vwinname);
-    return ret;
+    return new nAffine(this);
 }
 
 /// camera
 nGenericPan*
 neutrino::Camera() {
-#ifdef USE_QT5
-    QString vwinname=tr("Camera");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nCamera(this, vwinname);
-    return ret;
+#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
+    return new nCamera(this);
 #else
     return NULL;
 #endif
@@ -2096,54 +1926,41 @@ neutrino::Camera() {
 void
 neutrino::createFollower() {
     follower = new neutrino ();
-    follower->toggleMouse(true);
 }
 
 // MONIOR DIRECTORY
 nGenericPan*
 neutrino::Monitor() {
-    QString vwinname=tr("Monitor");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nMonitor(this, vwinname);
-    return ret;
+    return new nMonitor(this);
 }
 
-//save and load across restar
+//save and load across restart
 void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
-    my_set.beginGroup("Preferences");
+    my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
-    my_set.setValue("mouseVisible", my_mouse.isVisible());
-    my_set.setValue("mouseColor", my_mouse.color);
-    my_set.setValue("rulerVisible", my_tics.rulerVisible);
-    my_set.setValue("gridVisible", my_tics.gridVisible);
-    my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("colorTable", colorTable);
-    my_set.setValue("fileExport", property("fileExport"));
-    my_set.setValue("fileOpen", property("fileOpen"));
-    my_set.setValue("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1);
-    my_set.setValue("physNameLength", property("physNameLength"));
-    if (currentBuffer) {
-        my_set.setValue("gamma",property("gamma"));
+    my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
+
+    my_set.beginGroup("Properties");
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        if(ba.startsWith("NeuSave")) {
+            my_set.setValue(ba, property(ba));
+            qDebug() << ba;
+        }
     }
+    my_set.endGroup();
     my_set.endGroup();
 }
 
 void neutrino::loadDefaults(){
     QSettings my_set("neutrino","");
-    my_set.beginGroup("Preferences");
+    my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
-    toggleMouse(my_set.value("mouseVisible",my_mouse.isVisible()).toBool());
 
-    nPreferences::changeThreads(my_set.value("threads",1).toInt());
-
-
-    my_mouse.color=my_set.value("mouseColor",my_mouse.color).value<QColor>();
-    my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
-    my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
-    my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
     changeColorTable(my_set.value("colorTable",colorTable).toString());
-    int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w.toolBar->iconSize().width()/10-1).toInt();
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
+    int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 
     QSize mysize=QSize(10*(comboIconSizeDefault+1),10*(comboIconSizeDefault+1));
     foreach (QToolBar *obj, findChildren<QToolBar *>()) {
@@ -2154,37 +1971,32 @@ void neutrino::loadDefaults(){
         }
     }
 
-    if (my_set.value("useDot",false).toBool()) {
-        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    if (my_set.childGroups().contains("Properties")) {
+        my_set.beginGroup("Properties");
+        foreach(QString my_key, my_set.allKeys()) {
+            setProperty(my_key.toUtf8().constData(), my_set.value(my_key));
+            qDebug() << my_key;
+        }
+        my_set.endGroup();
     }
-
-    setProperty("physNameLength", my_set.value("physNameLength", 35));
-
-    setProperty("askCloseUnsaved", my_set.value("askCloseUnsaved", true));
-
-    setProperty("fileExport", my_set.value("fileExport", "Untitled.pdf"));
-    setProperty("fileOpen", my_set.value("fileOpen",""));
-    setProperty("gamma", my_set.value("gamma",1));
 
     my_set.endGroup();
 }
 
 nGenericPan*
 neutrino::Preferences() {
-    QString vwinname=tr("Preferences");
-    nGenericPan *ret=existsPan(vwinname);
-    if (!ret) ret = new nPreferences(this, vwinname);
-    return ret;
+    return new nPreferences(this);
 }
 
 void neutrino::about() {
 
     QDialog myabout(this);
+    Ui::nAbout my_about;
     my_about.setupUi(&myabout);
     connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
     connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-     my_about.version->setText(QString(__VER));
+    my_about.version->setText(QString(__VER));
 #ifdef __neutrino_key
     QString serial(qApp->property("nHash").toString());
     // copy serial to clipboard
@@ -2214,29 +2026,6 @@ void neutrino::about() {
     myabout.exec();
 }
 
-nGenericPan* neutrino::openPan(QString panName, bool force) {
-    nGenericPan *my_pan=NULL;
-
-    const QMetaObject* metaObject = this->metaObject();
-    for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
-        // frigging method name change between qt4.x and qt5.x
-#ifdef USE_QT5
-        QString m_sig = QString::fromLatin1(metaObject->method(i).methodSignature());
-#else
-        QString m_sig = QString::fromLatin1(metaObject->method(i).signature());
-#endif
-        if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-            metaObject->method(i).parameterTypes().empty() &&
-            m_sig ==panName+"()") {
-            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-        }
-    }
-    if (force && my_pan==nullptr) {
-        my_pan=new nGenericPan(this,panName);
-    }
-    return my_pan;
-}
-
 nLine* neutrino::line(QString name) {
     foreach (QObject* widget, children()) {
         nLine *linea=qobject_cast<nLine *>(widget);
@@ -2247,12 +2036,69 @@ nLine* neutrino::line(QString name) {
     return NULL;
 }
 
-#ifdef HAVE_PYTHONQT
+
+nGenericPan* neutrino::openPan(QString panName, bool force) {
+
+    nGenericPan *my_pan=nullptr;
+
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << panName;
+    int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
+    qDebug() << "methodIdx" << methodIdx;
+    if (methodIdx<0 && panName.size()>1) {
+        QString other_panName=panName;
+        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
+        methodIdx=metaObject()->indexOfMethod((other_panName.remove(0,1)+"()").toLatin1().constData());
+        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
+        if (methodIdx>=0) {
+            panName=other_panName;
+        }
+    }
+    qDebug() << "methodIdx" << methodIdx;
+
+    if (methodIdx>=0) {
+        if (!strcmp(metaObject()->method(methodIdx).typeName(),"nGenericPan*") &&
+                metaObject()->method(methodIdx).parameterTypes().empty()) {
+            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+        }
+    }
+    if (my_pan==nullptr) {
+        foreach (QAction *my_action, findChildren<QAction *>()) {
+            if (!my_action->data().isNull()) {
+                nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
+                qDebug() << my_action->data() << my_qplugin;
+                if (my_qplugin!=nullptr) {
+                    qDebug() << "plugin action" << my_qplugin->name();
+                    if (panName==my_qplugin->name()) {
+                        my_qplugin->launch();
+                        QApplication::processEvents();
+                        QObject *p_obj = my_qplugin->instance();
+                        if (p_obj) {
+                            nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
+                            if (iface) {
+                                qDebug() << "reloaded";
+                                my_pan=iface->pan();
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    QApplication::processEvents();
+
+    if (force && my_pan==nullptr) {
+        my_pan=new nGenericPan(this);
+    }
+    return my_pan;
+}
+
+
 // ----------------------------------- scripting --------------------------------------
 
 nGenericPan* neutrino::getPan(QString name) {
     foreach(nGenericPan* pan, getPanList()) {
-        if(pan->panName==name) return pan;
+        if(pan->panName()==name) return pan;
     }
     return nullptr;
 }
@@ -2271,10 +2117,10 @@ nGenericPan* neutrino::newPan(QString my_string) {
         name=QString::fromLatin1(metaObject->method(i).signature());
 #endif
         if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-            metaObject->method(i).parameterTypes().empty() &&
-            name==my_string+"()") {
-		QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-	}
+                metaObject->method(i).parameterTypes().empty() &&
+                name==my_string+"()") {
+            QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+        }
     }
     if (!my_pan) {
         QString panName;
@@ -2291,10 +2137,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
             panName=QFileInfo(my_string).baseName();
         }
 
-        if (panName.isEmpty())
-            panName.sprintf("n%03d pan",property("winId").toInt());
-
-        my_pan=new nGenericPan(this,panName);
+        my_pan=new nGenericPan(this);
 
         if (uiwidget) {
 
@@ -2318,7 +2161,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
                 QVariant value = uiwidget->property(name);
             }
 
-//            my_pan->setCentralWidget(uiwidget);
+            //            my_pan->setCentralWidget(uiwidget);
             my_pan->show();
         }
 
@@ -2327,58 +2170,8 @@ nGenericPan* neutrino::newPan(QString my_string) {
     return my_pan;
 }
 
-nGenericPan* neutrino::Python()
-{
-    QString vwinname=tr("Python");
-    return new nPython(this, vwinname);
-}
 
-void
-neutrino::loadPyScripts() {
-    QSettings settings("neutrino","");
-    settings.beginGroup("Python");
-    QDir scriptdir(settings.value("scriptsFolder").toString());
-    if (scriptdir.exists()) {
-        //		PythonQt::self()->addSysPath(scriptdir.dirName());
-        QStringList scriptlist = scriptdir.entryList(QStringList("*.py"));
-        //	.split(QRegExp("\\s*,\\s*"));
-
-        if (scriptlist.size() > 0) {
-            foreach (QAction* myaction, my_w.menuPython->actions()) {
-                if (QFileInfo(myaction->data().toString()).suffix()=="py")
-                    my_w.menuPython->removeAction(myaction);
-            }
-        }
-
-        foreach (QString sname, scriptlist) {
-            QAction *action = new QAction(this);
-            action->setText(QFileInfo(sname).baseName());
-            connect(action, SIGNAL(triggered()), this, SLOT(runPyScript()));
-            action->setData(scriptdir.filePath(sname));
-            my_w.menuPython->addAction(action);
-        }
-    }
-}
-
-void
-neutrino::runPyScript() {
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action) {
-        runPyScript(action->data().toString());
-    }
-}
-
-void
-neutrino::runPyScript(QString fname) {
-    QFile t(fname);
-    t.open(QIODevice::ReadOnly| QIODevice::Text);
-    PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
-    t.close();
-}
-
-#endif
-
-// col functions outside neutrino....
+// cool functions outside neutrino....
 QVariant toVariant(anydata &my_data) {
     if (my_data.is_i()) {
         return QVariant::fromValue((int)my_data);

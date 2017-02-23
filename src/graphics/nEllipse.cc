@@ -24,6 +24,9 @@
  */
 #include "nEllipse.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
+
+#include "ui_nObject.h"
 #include <iostream>
 
 nEllipse::~nEllipse() {
@@ -32,84 +35,77 @@ nEllipse::~nEllipse() {
 	}
 }
 
-nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
+nEllipse::nEllipse(neutrino *my_parent) :
+    QGraphicsObject(),
+    nparent(my_parent),
+    my_w(new Ui::nObject)
 {
-	nparent->my_s.addItem(this);
-	setParent(nparent);
+    my_parent->getScene().addItem(this);
+    setParent(my_parent);
 
-    if (nparent->currentBuffer) {
-        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+    if (my_parent->getCurrentBuffer()) {
+        setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
     }
     
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
-	setProperty("parentPan",QString(""));
-	setProperty("parentPanControlLevel",0);
 
 	nodeSelected=-1;
 
-	nWidth=1.0;
+    nWidth=1.0;
 	nSizeHolder=5.0;
 
 	nColor=QColor(Qt::black);
 	holderColor=QColor(0,255,0,200);
 
-	int num=nparent->property("numEllipse").toInt()+1;
-	nparent->setProperty("numEllipse",num);
+    int num=my_parent->property("numEllipse").toInt()+1;
+    my_parent->setProperty("numEllipse",num);
 	setProperty("numEllipse",num);
+
+    setProperty("NeuSave-fileIni",metaObject()->className()+QString::number(num)+".ini");
 
 	setOrder(0.0);
 	setToolTip(tr("ellipse")+QString(" ")+QString::number(num));
 
-	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 
-	connect(parent()->my_w.my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
-	zoom=parent()->getZoom();
+    zoom=nparent->getZoom();
 
 
 	// PADELLA
 	my_pad.setWindowTitle(toolTip());
 	my_pad.setWindowIcon(QIcon(":ellipse"));
-	my_w.setupUi(&my_pad);
+    my_w->setupUi(&my_pad);
 
-	my_w.spinWidth->setValue(nWidth);
-	my_w.spinDepth->setValue(zValue());
-	my_w.colorLabel->setPalette(QPalette(nColor));
+    my_w->spinWidth->setValue(nWidth);
+    my_w->spinDepth->setValue(zValue());
+    my_w->colorLabel->setPalette(QPalette(nColor));
 
-	connect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    connect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
 
-	my_w.name->setText(toolTip());
-	my_w.spinSizeHolder->setValue(nSizeHolder);
-	my_w.colorHolderLabel->setPalette(QPalette(holderColor));
+    my_w->name->setText(toolTip());
+    my_w->spinSizeHolder->setValue(nSizeHolder);
+    my_w->colorHolderLabel->setPalette(QPalette(holderColor));
 
-	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
-	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-	connect(my_w.colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
-	connect(my_w.colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
-	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    connect(my_w->spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
+    connect(my_w->spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
+    connect(my_w->colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
+    connect(my_w->colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
+    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 
-	connect(my_w.expandX, SIGNAL(pressed()), this, SLOT(expandX()));
-	connect(my_w.expandY, SIGNAL(pressed()), this, SLOT(expandY()));
+    connect(my_w->expandX, SIGNAL(pressed()), this, SLOT(expandX()));
+    connect(my_w->expandY, SIGNAL(pressed()), this, SLOT(expandY()));
 
-	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+    connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
-}
-
-void nEllipse::setParentPan(QString winname, int level) {
-	my_w.name->setText(winname+"Ellipse");
-	setProperty("parentPan",winname);
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-		my_w.name->setReadOnly(true);
-		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
 }
 
 void nEllipse::setRect(QRectF rect) {
@@ -146,7 +142,7 @@ void nEllipse::bufferChanged(nPhysD* my_phys) {
 
 void nEllipse::interactive ( ) {
 	showMessage(tr("Click for the first point of the rectangle"));
-	connect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -154,7 +150,7 @@ void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
     moveRef.clear();
 	appendPoint();
-	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nEllipse::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -244,8 +240,8 @@ nEllipse::setOrder (double w) {
 void
 nEllipse::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
-    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
+    p.rx()=QLocale().toDouble(my_w->tableWidget->item(item->row(),0)->text());
+    p.ry()=QLocale().toDouble(my_w->tableWidget->item(item->row(),1)->text());
 
 	changeP(item->row(),p, false);
 	itemChanged();
@@ -253,7 +249,7 @@ nEllipse::tableUpdated (QTableWidgetItem * item) {
 
 void
 nEllipse::changeColor () {
-	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -265,13 +261,13 @@ nEllipse::changeColor () {
 void
 nEllipse::changeColor (QColor col) {
 	nColor=col;
-	my_w.colorLabel->setPalette(QPalette(nColor));
+    my_w->colorLabel->setPalette(QPalette(nColor));
 }
 
 void
 nEllipse::changeColorHolder () {
 	QColor color;
-	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorHolderLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -281,7 +277,7 @@ nEllipse::changeColorHolder () {
 
 void
 nEllipse::changeColorHolder (QColor color) {
-	my_w.colorHolderLabel->setPalette(QPalette(color));
+    my_w->colorHolderLabel->setPalette(QPalette(color));
 	QBrush brush=ref[0]->brush();
 	brush.setColor(color);
 	foreach (QGraphicsRectItem *item, ref){
@@ -304,9 +300,9 @@ void nEllipse::changePointPad(int nrow) {
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(p.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.tableWidget->setItem(nrow, 0, xitem);
-	my_w.tableWidget->setItem(nrow, 1, yitem);
-	my_w.tableWidget->resizeRowToContents(nrow);
+    my_w->tableWidget->setItem(nrow, 0, xitem);
+    my_w->tableWidget->setItem(nrow, 1, yitem);
+    my_w->tableWidget->resizeRowToContents(nrow);
 }
 
 void nEllipse::addPoint (int pos) {
@@ -334,16 +330,16 @@ void nEllipse::addPoint (int pos) {
 	ref[pos]->setVisible(false);
 	ref[pos]->setParentItem(this);
 	sizeHolder(nSizeHolder);
-	disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
-	my_w.tableWidget->insertRow(pos);
+    disconnect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    my_w->tableWidget->insertRow(pos);
 	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	my_w.tableWidget->setItem(pos, 0, xitem);
-	my_w.tableWidget->setItem(pos, 1, yitem);
-	my_w.tableWidget->resizeRowToContents(pos);
-	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    my_w->tableWidget->setItem(pos, 0, xitem);
+    my_w->tableWidget->setItem(pos, 1, yitem);
+    my_w->tableWidget->resizeRowToContents(pos);
+    connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
 void nEllipse::appendPoint () {
@@ -351,28 +347,28 @@ void nEllipse::appendPoint () {
 }
 
 void nEllipse::expandX() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(0,rect.top()),true);
-		changeP(1,QPointF(parent()->currentBuffer->getW(),rect.bottom()),true);
+        changeP(1,QPointF(nparent->getCurrentBuffer()->getW(),rect.bottom()),true);
 		itemChanged();
 	}
 }
 
 void nEllipse::expandY() {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		changeP(0,QPointF(rect.left(),0),true);
-		changeP(1,QPointF(rect.right(),parent()->currentBuffer->getH()),true);
+        changeP(1,QPointF(rect.right(),nparent->getCurrentBuffer()->getH()),true);
 		itemChanged();
 	}
 }
 
 void nEllipse::changeWidth () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
+        rect.setWidth(QLocale().toDouble(my_w->sizeWidth->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -381,10 +377,10 @@ void nEllipse::changeWidth () {
 }
 
 void nEllipse::changeHeight () {
-	if (parent()->currentBuffer) {
+    if (nparent->getCurrentBuffer()) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
+        rect.setHeight(QLocale().toDouble(my_w->sizeHeight->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -393,17 +389,17 @@ void nEllipse::changeHeight () {
 }
 
 void nEllipse::updateSize() {
-	disconnect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	disconnect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
-	my_w.sizeWidth->setText(QString::number(getRectF().width()));
-	my_w.sizeHeight->setText(QString::number(getRectF().height()));
-	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    disconnect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    disconnect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    my_w->sizeWidth->setText(QString::number(getRectF().width()));
+    my_w->sizeHeight->setText(QString::number(getRectF().height()));
+    connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
+    connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 }
 
 void
 nEllipse::showMessage ( QString s ) {
-	parent()->statusBar()->showMessage(s,2000);
+    nparent->statusBar()->showMessage(s,2000);
 	my_pad.statusBar()->showMessage(s,2000);
 }
 
@@ -447,10 +443,10 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			expandY();
 			break;
 		case Qt::Key_S:
-			if (parent()->currentBuffer) {
-				nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-				parent()->showPhys(subPhys);
-//				parent()->showPhys(parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+            if (nparent->getCurrentBuffer()) {
+                nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
+                nparent->showPhys(subPhys);
+//				nparent->showPhys(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
 			}
 			break;
 		default:
@@ -506,7 +502,7 @@ nEllipse::selectThis(bool val) {
 	for (int i =0; i<ref.size(); i++) {
 		ref[i]->setVisible(val);
 	}
-	parent()->my_w.statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
+    nparent->my_w->statusbar->showMessage(toolTip()+": "+QString::number(getRectF().width())+"x"+QString::number(getRectF().height()));
 }
 
 // reimplementation
@@ -560,12 +556,9 @@ void nEllipse::itemChanged() {
 
 void
 nEllipse::loadSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		loadSettings(&settings);
 	}
@@ -573,12 +566,9 @@ nEllipse::loadSettings() {
 
 void
 nEllipse::saveSettings() {
-	if (!property("fileIni").isValid()) {
-		setProperty("fileIni",QString("line.ini"));
-	}
-	QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-		setProperty("fileIni",fnametmp);
+        setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
@@ -608,7 +598,17 @@ nEllipse::loadSettings(QSettings *settings) {
 	changeColor(settings->value("colorLine",nColor).value<QColor>());
 	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
 	changeColorHolder(settings->value("colorHolder",ref[0]->brush().color()).value<QColor>());
-	settings->endGroup();
+
+    if (settings->childGroups().contains("Properties")) {
+        settings->beginGroup("Properties");
+        foreach(QString my_key, settings->allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+        }
+        settings->endGroup();
+    }
+
+    settings->endGroup();
 }
 
 void
@@ -629,6 +629,18 @@ nEllipse::saveSettings(QSettings *settings) {
 	settings->setValue("colorLine",nColor);
 	settings->setValue("sizeHolder",nSizeHolder);
 	settings->setValue("colorHolder",ref[0]->brush().color());
-	settings->endGroup();
+
+    settings->beginGroup("Properties");
+    qDebug() << dynamicPropertyNames().size();
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        qDebug() << "save" << ba << " : " << property(ba);
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            settings->setValue(ba, property(ba));
+        }
+    }
+    settings->endGroup();
+
+    settings->endGroup();
 }
 

@@ -23,9 +23,11 @@
  *
  */
 #include "nLineout.h"
+#include "neutrino.h"
+#include "ui_neutrino.h"
 
-nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_dir)
-: nGenericPan(parent, win_name), cut_dir(plot_dir)
+nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan(parent),
+  cut_dir(plot_dir)
 {
 	my_w.setupUi(this);
 
@@ -36,40 +38,45 @@ nLineout::nLineout(neutrino *parent, QString win_name, enum phys_direction plot_
     connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
 
     connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), my_w.actionLockColors, SLOT(setEnabled(bool)));
-    
+    connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
+    connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
+
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
-    my_w.plot->graph(0)->setName(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
+    QString namedirection(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
+    my_w.plot->graph(0)->setName(namedirection);
 
     show();
+    setWindowTitle(windowTitle()+" "+namedirection);
     setBehaviour();
     updateLastPoint();
 }
 
 void nLineout::setBehaviour() {
     if (my_w.actionLockClick->isChecked()) {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w.my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
+    updateLastPoint();
 }
 
 
-// mouse movemen
+// mouse movement
 void
-nLineout::updatePlot(QPointF p) {
+nLineout::updatePlot(QPointF my_point) {
 
     if (currentBuffer != NULL) {
 
-        vec2 b_p(p.x(),p.y());
+        vec2 b_p(my_point.x(),my_point.y());
 
         //get bounds from view
         QPointF orig,corner;
         if (my_w.actionToggleZoom->isChecked()) {
-            orig = nparent->my_w.my_view->mapToScene(QPoint(0,0));
-            corner = nparent->my_w.my_view->mapToScene(QPoint(nparent->my_w.my_view->width(), nparent->my_w.my_view->height()));
+            orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
+            corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
         } else {
             orig = QPoint(0,0);
             corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
@@ -97,8 +104,8 @@ nLineout::updatePlot(QPointF p) {
                 y[i]=currentBuffer->point(b_p(other_dir),i+lat_skip);
             }
         }
-        my_w.plot->graph(0)->setData(x,y);
-        my_w.plot->graph(0)->keyAxis()->setRange(x.first(), x.last());
+        my_w.plot->graph(0)->setData(x,y,true);
+        my_w.plot->graph(0)->rescaleKeyAxis();
 
         if(!my_w.actionAutoscale->isChecked()) {
             my_w.plot->graph(0)->rescaleValueAxis();
@@ -108,8 +115,8 @@ nLineout::updatePlot(QPointF p) {
                 my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
             }
         }
-        statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
-        my_w.plot->setMousePosition(b_p(cut_dir)-currentBuffer->get_origin(cut_dir));
+        statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
+        my_w.plot->setMousePosition((b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir));
     }
 
 }
@@ -119,7 +126,7 @@ void nLineout::nZoom(double d) {
 }
 
 void nLineout::updateLastPoint() {
-    updatePlot(nparent->my_mouse.pos());
+    updatePlot(nparent->my_w->my_view->my_mouse.pos());
 }
 
 

@@ -28,6 +28,21 @@
 #include "qcustomplot.h"
 #include <QMenu>
 
+class nCustomRangeLineEdit : public QWidget {
+    Q_OBJECT
+public:
+    nCustomRangeLineEdit(QCPAxis*);
+
+private:
+    QPointer<QLineEdit> my_min, my_max;
+    QPointer<QCPAxis> my_axis;
+
+public slots:
+    void rangeChanged(const QCPRange& );
+    void setRange(QString minmax_str);
+    void setLock(bool check);
+};
+
 class nCustomPlot : public QCustomPlot {
     Q_OBJECT
 
@@ -41,6 +56,7 @@ public slots:
     void myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*e);
     void get_data(QTextStream &, QObject *obj=nullptr);
     void get_data_graph(QTextStream &out, QCPGraph *graph);
+    QString get_data(int g=-1);
 
     void save_data();
     void copy_data();
@@ -49,16 +65,24 @@ public slots:
     void contextMenuEvent (QContextMenuEvent*) override;
 
     //SETTINGS
-    void loadSettings(QSettings *);
-    void saveSettings(QSettings *);
+    void loadSettings(QSettings* = nullptr);
+    void saveSettings(QSettings* = nullptr);
 
     void setLabel(QString);
-    void showGrid(bool val);
+    void showGrid(int val);
     void setLog(bool val);
     void setColor();
     void setTitle(QString);
+    void setTitleFont(QFont);
     void changeTitleFont();
     void changeAxisFont();
+    void showAxis(bool);
+    inline QString getTitle() {if (title) {return title->text();} else {return QString();} };
+
+    void changeAllFonts();
+
+    void showGraph(bool);
+    void changeGraphThickness(double);
 
 };
 
@@ -70,7 +94,7 @@ public:
     nCustomPlotMouseX(QWidget*);
 
 private:
-    QPointer<QCPItemLine> mouseMarker;
+    QPointer<QCPItemStraightLine> mouseMarker;
 
 public slots:
     void setMousePosition(double);
@@ -86,8 +110,8 @@ public:
     nCustomPlotMouseXY(QWidget*);
 
 private:
-    QPointer<QCPItemLine> mouseMarkerX;
-    QPointer<QCPItemLine> mouseMarkerY;
+    QPointer<QCPItemStraightLine> mouseMarkerX;
+    QPointer<QCPItemStraightLine> mouseMarkerY;
 
 public slots:
     void setMousePosition(double,double);

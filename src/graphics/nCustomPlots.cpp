@@ -24,13 +24,93 @@
  */
 
 #include "nCustomPlots.h"
-#include "neutrino.h"
 #include "ui_nCustomPlot.h"
+#include <QtSvg>
 
+
+nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
+    QWidget(qobject_cast<QWidget *>(axis)),
+    my_min(new QLineEdit(qobject_cast<QWidget *>(axis))),
+    my_max(new QLineEdit(qobject_cast<QWidget *>(axis))),
+    my_axis(axis)
+{
+
+    QFont f=my_min->font();
+    f.setPointSize(10);
+    my_min->setFont(f);
+    my_max->setFont(f);
+    my_min->setAlignment(Qt::AlignRight);
+
+    QToolButton *my_lock = new QToolButton(this);
+    my_lock->setToolTip("Lock axis range");
+    my_lock->setCheckable(true);
+    my_lock->setChecked(my_axis->rangeLocked());
+    my_lock->setIcon(QIcon(my_axis->rangeLocked()?":icons/lockClose":":icons/lockOpen"));
+
+    setLock(my_axis->rangeLocked());
+    rangeChanged(my_axis->range());
+
+    connect(my_axis,SIGNAL(rangeChanged(QCPRange)),this,SLOT(rangeChanged(QCPRange)));
+    connect(my_min,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
+    connect(my_max,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
+    connect(my_lock,SIGNAL(toggled(bool)),this,SLOT(setLock(bool)));
+
+    QHBoxLayout* gridLayout = new QHBoxLayout(this);
+    gridLayout->setMargin(0);
+    gridLayout->addWidget(my_min);
+    gridLayout->addWidget(new QLabel(":",this));
+    gridLayout->addWidget(my_max);
+    gridLayout->addWidget(my_lock);
+}
+
+void nCustomRangeLineEdit::setLock(bool check) {
+    if (my_axis) {
+        my_axis->setRangeLocked(check);
+        if (!check) {
+            my_axis->rescale(true);
+            if (my_axis->parentPlot()) my_axis->parentPlot()->replot();
+        }
+        my_min->setEnabled(check);
+        my_max->setEnabled(check);
+        if(sender()) {
+            QToolButton *my_lock = qobject_cast<QToolButton *>(sender());
+            if (my_lock) {
+                my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
+            }
+        }
+    }
+}
+
+void nCustomRangeLineEdit::rangeChanged(const QCPRange& newrange) {
+    my_min->setText(QLocale().toString(newrange.lower));
+    my_max->setText(QLocale().toString(newrange.upper));
+}
+
+void nCustomRangeLineEdit::setRange(QString minmax_str){
+    if (my_axis && sender()) {
+        QLineEdit *line = qobject_cast<QLineEdit *>(sender());
+        if (line) {
+            bool ok;
+            double my_min_dbl=QLocale().toDouble(minmax_str,&ok);
+            if (ok) {
+                if (line==my_min) my_axis->setRangeLower(my_min_dbl);
+                if (line==my_max) my_axis->setRangeUpper(my_min_dbl);
+                if (my_axis->parentPlot()) my_axis->parentPlot()->replot();
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 nCustomPlot::nCustomPlot(QWidget* parent):
     QCustomPlot(parent),
-     title(new QCPTextElement(this))
+    title(new QCPTextElement(this))
 {
+
+    setProperty("NeuSave-fileIni",objectName()+".ini");
+    setProperty("NeuSave-fileTxt",objectName()+".txt");
+    setProperty("NeuSave-fileExport",objectName()+".pdf");
+
     setContentsMargins(0,0,0,0);
 
     connect(this, SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
@@ -47,15 +127,20 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     QMainWindow *my_pad=nullptr;
     foreach (my_pad, findChildren<QMainWindow *>()) {
-        if(my_pad->property("Preferences").isValid() && my_pad->property("Preferences").toBool()) break;
+        if(my_pad->objectName() == "Preferences") break;
     }
     if (!my_pad) {
-        my_pad=new QMainWindow(this);
-        my_pad->setWindowFlags(Qt::Tool);
+        my_pad=new QMainWindow(this,Qt::Tool);
+        my_pad->setObjectName("Preferences");
+        my_pad->setAttribute(Qt::WA_DeleteOnClose);
         Ui::nCustomPlot my_w;
         my_w.setupUi(my_pad);
         my_pad->setProperty("Preferences",true);
         my_pad->setWindowTitle("Plot "+objectName());
+        connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
+        connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
+        connect(my_w.actionChangeFonts, SIGNAL(triggered()), this, SLOT(changeAllFonts()));
+        connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
         connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
         connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
         connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
@@ -69,44 +154,32 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
             if (axis->visible()) {
                 int row=my_w.labels_layout->rowCount();
                 int col=0;
-                QLabel *la = new QLabel(this);
-                QFont f = la->font();
-                f.setPointSize(10);
-                la->setFont(f);
-                QString ax_pos;
-                switch (axis->axisType()) {
-                case QCPAxis::atLeft : ax_pos="Left"; break;
-                case QCPAxis::atRight : ax_pos="Right"; break;
-                case QCPAxis::atTop : ax_pos="Top"; break;
-                case QCPAxis::atBottom : ax_pos="Bottom"; break;
-                }
 
-                la->setText(ax_pos);
-                my_w.labels_layout->addWidget(la,row,col++,Qt::AlignCenter);
+                QCheckBox *cb_axis = new QCheckBox("", this);
+                QFont f = cb_axis->font();
+                cb_axis->setChecked(true);
+                cb_axis->setFont(f);
+                cb_axis->setProperty("axis",qVariantFromValue((void *) axis));
+                connect(cb_axis,SIGNAL(toggled(bool)),this,SLOT(showAxis(bool)));
+                my_w.labels_layout->addWidget(cb_axis,row,col++,Qt::AlignCenter);
+
 
                 QLineEdit *le = new QLineEdit(this);
+                f.setPointSize(10);
                 le->setFont(f);
                 le->setText(axis->label());
                 le->setProperty("axis",qVariantFromValue((void *) axis));
                 connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
                 my_w.labels_layout->addWidget(le,row,col++);
 
-                QCheckBox *cb_grid = new QCheckBox("", this);
-                QCPGrid *grid = axis->grid();
-                cb_grid->setChecked(grid->visible());
-                cb_grid->setFont(f);
-                cb_grid->setProperty("grid",qVariantFromValue((void *) grid));
-                cb_grid->setProperty("major",true);
-                connect(cb_grid,SIGNAL(toggled(bool)),this,SLOT(showGrid(bool)));
-                my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
 
-                QCheckBox *cb_subgrid = new QCheckBox("", this);
-                cb_subgrid->setChecked(grid->subGridVisible());
-                cb_subgrid->setFont(f);
-                cb_subgrid->setProperty("grid",qVariantFromValue((void *) grid));
-                cb_subgrid->setProperty("major",false);
-                connect(cb_subgrid,SIGNAL(toggled(bool)),this,SLOT(showGrid(bool)));
-                my_w.labels_layout->addWidget(cb_subgrid,row,col++,Qt::AlignCenter);
+                QCheckBox *cb_grid = new QCheckBox("", this);
+                cb_grid->setTristate(true);
+                cb_grid->setCheckState(axis->grid()->visible() && axis->grid()->subGridVisible()?Qt::Checked:(axis->grid()->visible()?Qt::PartiallyChecked:Qt::Unchecked));
+                cb_grid->setFont(f);
+                cb_grid->setProperty("grid",qVariantFromValue((void *) axis->grid()));
+                connect(cb_grid,SIGNAL(stateChanged(int)),this,SLOT(showGrid(int)));
+                my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
 
                 QCheckBox *cb_log = new QCheckBox("", this);
                 cb_log->setChecked(axis->scaleType()==QCPAxis::stLogarithmic);
@@ -129,18 +202,56 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 connect(tb_font,SIGNAL(released()),this,SLOT(changeAxisFont()));
                 my_w.labels_layout->addWidget(tb_font,row,col++,Qt::AlignCenter);
 
+                nCustomRangeLineEdit *minmax = new nCustomRangeLineEdit(axis);
+                minmax->setFont(f);
+                my_w.labels_layout->addWidget(minmax,row,col++);
             }
         }
         for (int g=0; g<plottableCount(); g++) {
             QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
             if(graph) {
-                my_w.plotName->addItem(graph->name(), qVariantFromValue((void *) graph));
+                int row=my_w.graphs_layout->rowCount();
+                int col=0;
+                QCheckBox *cb_graph = new QCheckBox("", this)   ;
+                QFont f = cb_graph->font();
+
+                cb_graph->setChecked(true);
+                cb_graph->setFont(f);
+                cb_graph->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+                my_w.graphs_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
+
+                QLabel *le = new QLabel(graph->name(),this);
+                f.setPointSize(10);
+                le->setFont(f);
+                my_w.graphs_layout->addWidget(le,row,col++);
+
+
+                QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
+                sb_thick->setFont(f);
+                sb_thick->setRange(0,99);
+                sb_thick->setDecimals(1);
+                sb_thick->setSingleStep(0.1);
+                sb_thick->setValue(graph->pen().widthF());
+                sb_thick->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+                my_w.graphs_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_copy = new QToolButton(this);
+                tb_copy->setIcon(QIcon(":icons/saveClipboard"));
+                tb_copy->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+                my_w.graphs_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_save = new QToolButton(this);
+                tb_save->setIcon(QIcon(":icons/saveTxt"));
+                tb_save->setProperty("graph",qVariantFromValue((void *) graph));
+                connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+                my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
+
             }
-            my_w.copyData->setProperty("combo",qVariantFromValue((void *) my_w.plotName));
-            my_w.saveData->setProperty("combo",qVariantFromValue((void *) my_w.plotName));
         }
-        connect(my_w.copyData,SIGNAL(released()),this,SLOT(copy_data()));
-        connect(my_w.saveData,SIGNAL(released()),this,SLOT(save_data()));
+
     }
     if (my_pad) {
         my_pad->show();
@@ -148,47 +259,94 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     }
 }
 
-void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
-    out << "# " << graph->name() << endl;
-    for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
-        out << it->key << " " << it->value << endl;
+
+void nCustomPlot::showGraph(bool val) {
+    if (sender() && sender()->property("graph").isValid()) {
+        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+        if(hasPlottable(graph)) {
+            graph->setVisible(val);
+            replot();
+        }
     }
 }
 
+void nCustomPlot::changeGraphThickness(double val) {
+    if (sender() && sender()->property("graph").isValid()) {
+        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+        if(hasPlottable(graph)) {
+            QPen p=graph->pen();
+            p.setWidthF(val);
+            graph->setPen(p);
+            replot();
+        }
+    }
+}
+
+
+void nCustomPlot::showAxis(bool val) {
+    if (sender() && sender()->property("axis").isValid()) {
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        if (axis) {
+            axis->setVisible(val);
+            replot();
+        }
+    }
+}
+
+
+void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
+    out << "# " << graph->name() << endl;
+    for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
+        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << endl;
+    }
+}
+
+QString nCustomPlot::get_data(int g) {
+    QString retstr;
+    QTextStream out(&retstr);
+    if (g==-1) {
+        get_data(out);
+    } else if (g<graphCount()) {
+        get_data_graph(out,graph(g));
+    }
+    out << endl;
+    out.flush();
+    return retstr;
+}
+
 void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
+    qDebug() << "here" << obj;
     if (obj) {
         QCPGraph *graph = qobject_cast<QCPGraph *>(obj);
         if (graph) {
             get_data_graph(out,graph);
         } else {
-            if (obj->property("combo").isValid()) {
-                QComboBox *combo = (QComboBox *) obj->property("combo").value<void *>();
-                if (combo) {
-                    QCPGraph *graph = (QCPGraph *) combo->currentData().value<void *>();
-                    if (graph) {
-                        get_data_graph(out, graph);
-                    } else {
-                        get_data(out);
-                    }
-                }
+            if (obj->property("graph").isValid()) {
+                graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            }
+            if (graph) {
+                get_data_graph(out, graph);
             } else {
                 get_data(out);
             }
         }
     } else {
-        out << "# " <<  property("panName").toString() << " (" << graphCount() << " graphs)" << endl;
+        out << "# " <<  title->text() << endl;
+        out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << endl;
         for (int g=0; g<graphCount(); g++) {
-            out << "# " << g <<" ";
-            get_data_graph(out,graph(g));
-            out << endl << endl;
+            if(graph(g)->visible()) {
+                out << "# " << g <<" ";
+                get_data_graph(out,graph(g));
+                out << endl << endl;
+            }
         }
     }
 }
 
 void nCustomPlot::save_data(){
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
-        setProperty("fileTxt", fnametmp);
+        setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
@@ -205,11 +363,11 @@ void nCustomPlot::copy_data(){
 }
 
 void nCustomPlot::export_image(){
-    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("fileExport").toString(),"Vector files (*.pdf,*.svg)");
+    QString fnametmp = QFileDialog::getSaveFileName(this,tr("Save Drawing"),property("NeuSave-fileExport").toString(),"Vector files (*.pdf,*.svg)");
     if (!fnametmp.isEmpty()) {
-        setProperty("fileExport", fnametmp);
+        setProperty("NeuSave-fileExport", fnametmp);
         if (QFileInfo(fnametmp).suffix().toLower()==QString("pdf")) {
-            savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", property("panName").toString());
+            savePdf(fnametmp, 0, 0, QCP::epAllowCosmetic, "Neutrino", objectName());
         } else if (QFileInfo(fnametmp).suffix().toLower()==QString("svg")) {
             QSvgGenerator printer;
             printer.setFileName(fnametmp);
@@ -237,12 +395,29 @@ void nCustomPlot::setTitle (QString my_title) {
     replot();
 }
 
+void nCustomPlot::changeAllFonts() {
+    bool ok;
+    QFont myfont = QFontDialog::getFont(&ok, title->font(), this, "Title Font");
+    if (ok) {
+        setTitleFont(myfont);
+        foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+            axis->setLabelFont(myfont);
+            axis->setTickLabelFont(myfont);
+        }
+        replot();
+    }
+}
+
+void nCustomPlot::setTitleFont (QFont myfont) {
+    title->setFont(myfont);
+    replot();
+}
+
 void nCustomPlot::changeTitleFont() {
     bool ok;
-    QFont font = QFontDialog::getFont(&ok, title->font(), this);
+    QFont myfont = QFontDialog::getFont(&ok, title->font(), this, "Title Font");
     if (ok) {
-        title->setFont(font);
-        replot();
+        setTitleFont(myfont);
     }
 }
 
@@ -251,24 +426,35 @@ void nCustomPlot::changeAxisFont() {
         QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
         if (axis) {
             bool ok;
-            QFont font = QFontDialog::getFont(&ok, axis->labelFont(), this);
+            QFont myfont = QFontDialog::getFont(&ok, axis->labelFont(), this, axis->label()+" Font");
             if (ok) {
-                axis->setLabelFont(font);
+                axis->setLabelFont(myfont);
+                axis->setTickLabelFont(myfont);
                 replot();
             }
         }
     }
-
 }
 
-void nCustomPlot::showGrid(bool val) {
+void nCustomPlot::showGrid(int val) {
     if (sender() && sender()->property("grid").isValid()) {
         QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<void *>();
         if (grid) {
-            if (sender()->property("major").toBool()) {
-                grid->setVisible(val);
-            } else {
-                grid->setSubGridVisible(val);
+            switch (val) {
+            case Qt::Unchecked:
+                grid->setVisible(false);
+                grid->setSubGridVisible(false);
+                break;
+            case Qt::PartiallyChecked:
+                grid->setVisible(true);
+                grid->setSubGridVisible(false);
+                break;
+            case Qt::Checked:
+                grid->setVisible(true);
+                grid->setSubGridVisible(true);
+                break;
+            default:
+                break;
             }
             replot();
         }
@@ -307,7 +493,7 @@ void nCustomPlot::setColor() {
                 if (colordial.result() && colordial.currentColor().isValid()) {
                     for (int g=0; g<plottableCount(); g++) {
                         QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-                        if(graph && graph->valueAxis()==axis) {
+                        if(hasPlottable(graph) && graph->valueAxis()==axis) {
                             QPen p=graph->pen();
                             p.setColor(colordial.currentColor());
                             graph->setPen(p);
@@ -335,70 +521,119 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 
 // SETTINGS
 void
-nCustomPlot::loadSettings(QSettings *settings) {
-    settings->beginGroup(objectName());
-    settings->beginGroup("axes");
-    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts;
-    labels = settings->value("labels").toList();
-    grids = settings->value("grids").toList();
-    logs = settings->value("logs").toList();
-    colors = settings->value("colors").toList();
-    labelfonts = settings->value("labelfonts").toList();
-    QList<QCPAxis *> axis=findChildren<QCPAxis *>();
-    if (    axis.size() == labels.size() &&
-            axis.size() == grids.size() &&
-            axis.size() == logs.size() &&
-            axis.size() == colors.size() &&
-            axis.size() == labelfonts.size())
-    {
-        for (int i=0; i< axis.size(); i++) {
-            if(axis[i]->visible()) {
-                axis[i]->setLabel(labels[i].toString());
-                axis[i]->setLabelColor(colors[i].value<QColor>());
-                axis[i]->setLabelFont(labelfonts[i].value<QFont>());
-                axis[i]->setTickLabelColor(colors[i].value<QColor>());
-                axis[i]->grid()->setVisible(grids[i].toBool());
-                axis[i]->setScaleType(logs[i].toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
-
-                for (int g=0; g<plottableCount(); g++) {
-                    QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-                    if(graph && graph->valueAxis()==axis[i]) {
-                        QPen p=graph->pen();
-                        p.setColor(colors[i].value<QColor>());
-                        graph->setPen(p);
+nCustomPlot::loadSettings(QSettings *my_set) {
+    if (my_set==nullptr) {
+        QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+        if (!fnametmp.isEmpty()) {
+            setProperty("NeuSave-fileIni",fnametmp);
+            loadSettings(new QSettings(fnametmp,QSettings::IniFormat));
+        }
+    } else {
+        my_set->beginGroup(objectName());
+        my_set->beginGroup("axes");
+        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
+        labels = my_set->value("labels").toList();
+        grids = my_set->value("grids").toList();
+        logs = my_set->value("logs").toList();
+        colors = my_set->value("colors").toList();
+        labelfonts = my_set->value("labelfonts").toList();
+        lock = my_set->value("lock").toList();
+        range = my_set->value("range").toList();
+        QList<QCPAxis *> axis=findChildren<QCPAxis *>();
+        if (    axis.size() == labels.size() &&
+                axis.size() == grids.size() &&
+                axis.size() == logs.size() &&
+                axis.size() == colors.size()  &&
+                axis.size() == labelfonts.size() &&
+                axis.size() == lock.size() &&
+                axis.size() == range.size())
+        {
+            for (int i=0; i< axis.size(); i++) {
+                if(axis.at(i)->visible()) {
+                    axis.at(i)->setLabel(labels.at(i).toString());
+                    axis.at(i)->setLabelColor(colors.at(i).value<QColor>());
+                    axis.at(i)->setLabelFont(labelfonts.at(i).value<QFont>());
+                    axis.at(i)->setTickLabelFont(labelfonts.at(i).value<QFont>());
+                    axis.at(i)->setTickLabelColor(colors.at(i).value<QColor>());
+                    axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
+                    axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
+                    axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
+                    axis.at(i)->setRangeLocked(lock.at(i).toBool());
+                    QPointF prange=range.at(i).toPointF();
+                    axis.at(i)->setRange(prange.x(),prange.y());
+                    for (int g=0; g<plottableCount(); g++) {
+                        QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
+                        if(hasPlottable(graph) && graph->valueAxis()==axis.at(i)) {
+                            QPen p=graph->pen();
+                            p.setColor(colors.at(i).value<QColor>());
+                            graph->setPen(p);
+                        }
                     }
-                }
 
+                }
             }
         }
+        my_set->endGroup();
+        title->setFont(qvariant_cast<QFont>(my_set->value("titleFont",title->font())));
+        setTitle(my_set->value("title",title->text()).toString());
+
+        if (my_set->childGroups().contains("Properties")) {
+            my_set->beginGroup("Properties");
+            foreach(QString my_key, my_set->allKeys()) {
+                setProperty(my_key.toStdString().c_str(), my_set->value(my_key));
+            }
+            my_set->endGroup();
+        }
+
+
+        my_set->endGroup();
     }
-    settings->endGroup();
-    title->setFont(qvariant_cast<QFont>(settings->value("titleFont",title->font())));
-    setTitle(settings->value("title",title->text()).toString());
-    settings->endGroup();
 }
 
 void
-nCustomPlot::saveSettings(QSettings *settings) {
-    settings->beginGroup(objectName());
-    settings->beginGroup("axes");
-    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts;
-    foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
-        labels << axis->label();
-        grids << axis->grid()->visible();
-        logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
-        colors << axis->labelColor();
-        labelfonts << axis->labelFont();
+nCustomPlot::saveSettings(QSettings *my_set) {
+    qDebug() << "save settings" << objectName();
+    if (my_set==nullptr) {
+        QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+        if (!fnametmp.isEmpty()) {
+            setProperty("NeuSave-fileIni",fnametmp);
+            saveSettings(new QSettings(fnametmp,QSettings::IniFormat));
+        }
+    } else {
+        my_set->beginGroup(objectName());
+        my_set->beginGroup("axes");
+        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
+        foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+            labels << axis->label();
+            grids << (axis->grid()->visible() && axis->grid()->subGridVisible()?2:(axis->grid()->visible()?1:0));
+            logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
+            colors << axis->labelColor();
+            labelfonts << axis->labelFont();
+            lock << axis->rangeLocked();
+            range << QPointF(axis->range().lower,axis->range().upper);
+        }
+        my_set->setValue("labels",labels);
+        my_set->setValue("grids",grids);
+        my_set->setValue("logs",logs);
+        my_set->setValue("colors",colors);
+        my_set->setValue("labelfonts",labelfonts);
+        my_set->setValue("lock",lock);
+        my_set->setValue("range",range);
+        my_set->endGroup();
+        my_set->setValue("titleFont",title->font());
+        my_set->setValue("title",title->text());
+
+        my_set->beginGroup("Properties");
+        foreach(QByteArray ba, dynamicPropertyNames()) {
+            if(ba.startsWith("NeuSave")) {
+                qDebug() << "write" << ba << " : " << property(ba);
+                my_set->setValue(ba, property(ba));
+            }
+        }
+        my_set->endGroup();
+
+        my_set->endGroup();
     }
-    settings->setValue("labels",labels);
-    settings->setValue("grids",grids);
-    settings->setValue("logs",logs);
-    settings->setValue("colors",colors);
-    settings->setValue("labelfonts",labelfonts);
-    settings->endGroup();
-    settings->setValue("titleFont",title->font());
-    settings->setValue("title",title->text());
-    settings->endGroup();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,10 +642,10 @@ nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 }
 
 void nCustomPlotMouseX::setMousePosition(double position) {
-    if (!mouseMarker) mouseMarker = new QCPItemLine(this);
+    if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
     if (mouseMarker) {
-        mouseMarker->start->setCoords(position, -QCPRange::maxRange);
-        mouseMarker->end->setCoords(position, QCPRange::maxRange);
+        mouseMarker->point1->setCoords(position,0);
+        mouseMarker->point2->setCoords(position,1);
     }
     replot();
 }
@@ -421,14 +656,14 @@ nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent): nCustomPlot(parent) {
 }
 
 void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
-    if (!mouseMarkerX) mouseMarkerX = new QCPItemLine(this);
-    if (!mouseMarkerY) mouseMarkerY = new QCPItemLine(this);
+    if (!mouseMarkerX) mouseMarkerX = new QCPItemStraightLine(this);
+    if (!mouseMarkerY) mouseMarkerY = new QCPItemStraightLine(this);
 
     if (mouseMarkerX && mouseMarkerY) {
-        mouseMarkerX->start->setCoords(positionX, -QCPRange::maxRange);
-        mouseMarkerX->end->setCoords(positionX, QCPRange::maxRange);
-        mouseMarkerY->start->setCoords(-QCPRange::maxRange,positionY);
-        mouseMarkerY->end->setCoords(QCPRange::maxRange,positionY);
+        mouseMarkerX->point1->setCoords(positionX,0);
+        mouseMarkerX->point2->setCoords(positionX,1);
+        mouseMarkerY->point1->setCoords(0,positionY);
+        mouseMarkerY->point2->setCoords(1,positionY);
     }
     replot();
 }
@@ -471,7 +706,6 @@ nCustomPlotMouseX2Y::nCustomPlotMouseX2Y(QWidget* parent):
     yAxis2->setLabelColor(Qt::blue);
     yAxis2->setTickLabelColor(Qt::blue);
 
-    show();
 };
 
 nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
@@ -481,7 +715,6 @@ nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
     yAxis3->setLabelColor(Qt::darkCyan);
     yAxis3->setTickLabelColor(Qt::darkCyan);
 
-    show();
 };
 
 

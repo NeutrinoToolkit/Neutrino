@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>init.py</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>python.png</file>
+        <file>filePy.png</file>
+    </qresource>
+</RCC>

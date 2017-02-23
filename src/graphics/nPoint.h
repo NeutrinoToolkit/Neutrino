@@ -23,14 +23,20 @@
  *
  */
 #include <QtGui>
+#include <QMainWindow>
 #include <QGraphicsObject>
-#include "ui_nPoint.h"
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include "nPhysImageF.h"
 
 #ifndef __nPoint
 #define __nPoint
 
 class neutrino;
+
+namespace Ui {
+class nPoint;
+}
 
 class nPoint : public QGraphicsObject {
 	Q_OBJECT
@@ -74,7 +80,7 @@ public:
 	double zoom;
 	// roba da padelle
 	QMainWindow my_pad;
-	Ui::nPoint my_w;
+    Ui::nPoint *my_w;
 	
 	QPainterPath path() const;
 	QPainterPath shape() const;
@@ -110,8 +116,6 @@ public slots:
 	void movePoint(QPointF);
 	
 	void addPointAfterClick(QPointF);
-
-	void setParentPan(QString,int);
 	
 	//SETTINGS
 	void loadSettings();

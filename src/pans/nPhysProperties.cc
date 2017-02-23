@@ -24,8 +24,8 @@
  */
 #include "neutrino.h"
 #include "nPhysProperties.h"
-nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname) {
+nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
+{
 	my_w.setupUi(this);
 
 	my_w.splitter->setStretchFactor(0, 1);
@@ -34,7 +34,7 @@ nPhysProperties::nPhysProperties(neutrino *nparent, QString winname)
 	
 	connect(my_w.propertyList, SIGNAL(itemSelectionChanged()), this, SLOT(showProperty()));
 
-    bufferChanged(nparent->currentBuffer);
+    bufferChanged(currentBuffer);
 
 	show();
 }
@@ -45,7 +45,10 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
     if (my_phys) {
         std::string currentProperty("");
         if (my_w.propertyList->selectedItems().size() >0) {
+            qDebug() << "here";
+            qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
             currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
+            qDebug() << "here";
         }
         my_w.propertyList->clear();
         my_w.propertyValue->clear();
@@ -81,12 +84,22 @@ void nPhysProperties::on_changePhysProperty_pressed() {
     DEBUG("Do something");
     QVariant pippo(my_w.propertyValue->toPlainText());
     DEBUG(pippo.toString().toStdString());
-    std::string item=  my_w.propertyList->currentItem()->text().toStdString();
+    std::string item("");
+    if(my_w.propertyList->currentItem()) {
+        qDebug() << "here";
+        item =  my_w.propertyList->currentItem()->text().toStdString();
+    } else if (my_w.propertyList->selectedItems().size() >0) {
+        qDebug() << "here";
+        qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
+        item =  my_w.propertyList->selectedItems().first()->text().toStdString();
+        qDebug() << "here";
+    }
     if (currentBuffer) {
         anydata my_val=toAnydata(pippo);
         currentBuffer->property[item]=my_val;
         nparent->showPhys(currentBuffer);
     }
+    qDebug() << "here";
 }
 
 

@@ -48,6 +48,7 @@
 #define Tools_h
 
 #include <csignal>
+#include <iostream>
 
 #define PRINTVAR(x) #x"=" << x
 #define __MSG  __FILE__ << ":" << __LINE__ << " (" << __FUNCTION__ << ") "

@@ -25,14 +25,12 @@
 #include "nRegionPath.h"
 #include "neutrino.h"
 
-nRegionPath::nRegionPath(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nRegionPath::nRegionPath(neutrino *nparent) : nGenericPan(nparent)
 {
 
 	my_w.setupUi(this);
 
-	region =  new nLine(nparent);
-	region->setParentPan(panName,1);
+    region =  new nLine(this,1);
 	// TODO: create something better to avoid line removal
 	region->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
 	region->toggleClosedLine(true);
@@ -41,7 +39,7 @@ nRegionPath::nRegionPath(neutrino *nparent, QString winname)
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
 	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionLine, SIGNAL(triggered()), region, SLOT(togglePadella()));
+    connect(my_w.actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
 	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));

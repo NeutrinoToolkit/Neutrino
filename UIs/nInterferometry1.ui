@@ -62,7 +62,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/icons/icons.qrc">
+         <iconset resource="../qrc/icons.qrc">
           <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
         </property>
        </widget>
@@ -114,7 +114,7 @@
       </font>
      </property>
      <property name="suffix">
-      <string> deg</string>
+      <string>˚</string>
      </property>
      <property name="decimals">
       <number>3</number>
@@ -186,7 +186,7 @@
       </font>
      </property>
      <property name="suffix">
-      <string> deg</string>
+      <string>˚</string>
      </property>
      <property name="decimals">
       <number>3</number>

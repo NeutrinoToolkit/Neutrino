@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -36,23 +36,32 @@
 
 class nPreferences : public nGenericPan
 {
-	Q_OBJECT
-	
-public:	
-	nPreferences(neutrino*,QString);
-	Ui::nPreferences my_w;
+    Q_OBJECT
+
+public:
+    Q_INVOKABLE nPreferences(neutrino*);
+    Ui::nPreferences my_w;
 
 public slots:
-	void changeShowDimPixel();
-	void changeIconSize(int);
+    void changeShowDimPixel();
+    void changeIconSize(int);
     static void changeThreads(int);
-	void changeFont();
-	void hideEvent(QHideEvent*);
-	void showEvent(QShowEvent*);
-	void useDot();
+    void changeFont();
+    void hideEvent(QHideEvent*);
+    void showEvent(QShowEvent*);
     void askCloseUnsaved();
     void changephysNameLength(int);
-    void on_openclUnit_valueChanged(int);
+    void openclUnitValueChange(int);
+    void resetSettings();
+    void changeLocale(int);
+
+    static void changeLocale(QLocale locale);
+    static bool localeLessThan(const QLocale&, const QLocale&);
+    static QString localeToString(const QLocale &);
+
+    void on_addPlugin_released();
+    void on_removePlugin_released();
+
 };
 
 #endif

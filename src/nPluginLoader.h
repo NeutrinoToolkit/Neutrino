@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QMenu>
 
 #include "nPlug.h"
 
@@ -14,22 +15,29 @@ class nPluginLoader : public QPluginLoader {
 public:
 	nPluginLoader(QString, neutrino *);
 
-	QString name()
-	{ if (iface) return iface->name();
-	else return QString(""); }
+    QString name() {return (iface ? iface->name() : QString("")); }
 
-	bool ok()
-	{ if (iface) return true; else return false; }
+    bool ok() { return iface!=nullptr; }
+
+    bool unload() {
+        qDebug() << "killing me soflty" << iface;
+        if (iface) {
+            delete iface;
+            iface=nullptr;
+            nParent=nullptr;
+        }
+        return QPluginLoader::unload();
+    }
+
+    static QPointer<QMenu> getMenu(QString entryPoint, neutrino* neu);
 
 public slots:
 	
 	void launch(void);
 
-
 private:
-	nPlug *iface;
-	neutrino *nParent;
-	
+    nPlug *iface;
+    neutrino *nParent;
 };
 
 #endif

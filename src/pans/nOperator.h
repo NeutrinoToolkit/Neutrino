@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -34,20 +34,20 @@
 class neutrino;
 
 class nOperator : public nGenericPan {
-	Q_OBJECT
+    Q_OBJECT
 
     std::vector<int> separator;
 
 public:	
-	nOperator(neutrino *, QString);
-	
-	Ui::nOperator my_w;
-	nPhysD *operatorResult;
-	
+    Q_INVOKABLE nOperator(neutrino *);
+
+    Ui::nOperator my_w;
+    nPhysD *operatorResult;
+
 public slots:
-	void doOperation();
-	void copyResult();
-	void enableGroups(int);
+    void doOperation();
+    void copyResult();
+    void enableGroups(int);
 };
 
 #endif

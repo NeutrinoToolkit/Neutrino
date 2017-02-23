@@ -26,13 +26,12 @@
 
 #include "nContours.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
-nContours::nContours(neutrino *nparent, QString winname)
-    : nGenericPan(nparent, winname)
+nContours::nContours(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
-    my_c = new nLine(nparent);
-    my_c->setParentPan(panName,3);
+    my_c = new nLine(this,3);
     my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
     connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
@@ -56,17 +55,16 @@ nContours::on_percent_released() {
 void
 nContours::on_actionCenter_toggled(bool check) {
     if (check) {
-        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
     }
 }
 
 void
 nContours::setOrigin(QPointF p) {
-    nPhysD *cur = nparent->getBuffer(-1);
-    if (cur) {
-        cur->set_origin(p.x(),p.y());
+    if (currentBuffer) {
+        currentBuffer->set_origin(p.x(),p.y());
         nparent->createQimage();
     }
     my_w.actionCenter->setChecked(false);
@@ -76,22 +74,21 @@ void
 nContours::draw()
 {
     saveDefaults();
-    nPhysD *cur = nparent->getBuffer(-1);
-    if (!cur)
+    if (currentBuffer)
         return;
 
     // 0. build decimated
-    decimated = nPhysD(*cur);
+    decimated = nPhysD(*currentBuffer);
     if(my_w.blur_radius_sb->value()>0) {
         phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
     }
 
     // 1. find centroid
     vec2 centr;
-    if (cur->get_origin() == vec2(0,0)) {
+    if (currentBuffer->get_origin() == vec2(0,0)) {
         centr = decimated.max_Tv;
     } else {
-        centr = cur->get_origin();
+        centr = currentBuffer->get_origin();
     }
     decimated.set_origin(centr);
 
@@ -116,7 +113,7 @@ nContours::draw()
             myp<<QPointF(p.x(), p.y());
         }
         my_c->setPoints(myp);
-        cur->set_origin(centr);
+        currentBuffer->set_origin(centr);
         //my_w.statusBar->showMessage("Contour ok");
         my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
     } else {

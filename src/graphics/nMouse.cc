@@ -25,19 +25,17 @@
 #include "nMouse.h"
 #include "neutrino.h"
 
-nMouse::nMouse(neutrino *neu) : QGraphicsItem()
+nMouse::nMouse() : QGraphicsItem(),
+    my_shape(0),
+    size(100,100)
 {
-    nparent=neu;
-    size=QSize(100,100);
-    color=QColor(Qt::black);
-    color.setAlpha(255);
 }
 
 // reimplementation
 QRectF nMouse::boundingRect() const {
-//	QRectF bbox(-pos().x(),-1,size.width(),3);
-//	return bbox;
-    return shape().boundingRect();
+    //	QRectF bbox(-pos().x(),-1,size.width(),3);
+    //	return bbox;
+    return shape().boundingRect().adjusted(-pen.widthF(),-pen.widthF(),pen.widthF(),pen.widthF());
 }
 
 void nMouse::setSize(QSize my_size) {
@@ -45,11 +43,11 @@ void nMouse::setSize(QSize my_size) {
 }
 
 void nMouse::changeColor() {
-    QColorDialog colordial(color);
+    QColorDialog colordial(pen.color());
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        color=colordial.currentColor();
+        pen.setColor(colordial.currentColor());
         update();
     }
 }
@@ -57,29 +55,57 @@ void nMouse::changeColor() {
 
 QPainterPath nMouse::shape() const {
     QPainterPath my_path;
+    const double r=4.0;
+    const int len=15*r;
 
-//    double r=4.0/nparent->my_w.my_view->transform().m11();
-//    my_path.moveTo(0,-5*r);
-//    my_path.lineTo(0,-r);
-//    my_path.moveTo(0,r);
-//    my_path.lineTo(0,5*r);
+    switch (my_shape) {
+    case 1:
+        my_path.moveTo(0,-pos().y());
+        my_path.lineTo(0,size.height()-pos().y());
+        my_path.moveTo(-pos().x(),0);
+        my_path.lineTo(size.width()-pos().x(),0);
 
-//    my_path.moveTo(-5*r,0);
-//    my_path.lineTo(-r,0);
-//    my_path.moveTo(r,0);
-//    my_path.lineTo(5*r,0);
-//    my_path.addEllipse(-r, -r, 2*r, 2*r);
-    my_path.moveTo(0,-pos().y());
-    my_path.lineTo(0,size.height()-pos().y());
-    my_path.moveTo(-pos().x(),0);
-    my_path.lineTo(size.width()-pos().x(),0);
+        break;
+    case 2:
+        my_path.moveTo(0,-len);
+        my_path.lineTo(0,-r);
+        my_path.moveTo(0,r);
+        my_path.lineTo(0,len);
+
+        my_path.moveTo(-len,0);
+        my_path.lineTo(-r,0);
+        my_path.moveTo(r,0);
+        my_path.lineTo(len,0);
+        my_path.addEllipse(-r, -r, 2*r, 2*r);
+        break;
+
+    case 3:
+        my_path.moveTo(-len,-len);
+        my_path.lineTo(-r,-r);
+        my_path.moveTo(r,r);
+        my_path.lineTo(len,len);
+
+        my_path.moveTo(-len,len);
+        my_path.lineTo(-r,r);
+        my_path.moveTo(r,-r);
+        my_path.lineTo(len,-len);
+        my_path.addEllipse(-r, -r, 2*r, 2*r);
+        break;
+    case 4:
+        int dx=std::max(1.0,pen.widthF());
+        for (int i=1;i<5;i++)
+            my_path.addEllipse(-i*dx*r, -i*dx*r, 2*i*dx*r, 2*i*dx*r);
+        break;
+    }
+
+
     return my_path;
 }
 
 void
 nMouse::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
     p->setClipRect( option->exposedRect );
-    p->setPen(QPen(color));
+    p->setPen(pen);
     p->drawPath(shape());
 }
 

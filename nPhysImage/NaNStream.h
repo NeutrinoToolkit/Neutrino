@@ -28,8 +28,6 @@
 #include <sstream>
 #include <algorithm>
 
-//using namespace std;
-
 #ifndef __nanstream
 #define __nanstream
 

@@ -29,7 +29,8 @@
 #include "neutrino.h"
 
 
-nShortcuts::nShortcuts(neutrino *nparent, QString winname): nGenericPan(nparent, winname) {
+nShortcuts::nShortcuts(neutrino *nparent): nGenericPan(nparent)
+{
 	my_w.setupUi(this);
 	setWindowFlags(Qt::Tool);
     my_w.textBrowser->setSource(QUrl("qrc:/html/shortcuts.html"));

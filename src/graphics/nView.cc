@@ -23,21 +23,56 @@
  *
  */
 #include "neutrino.h"
+#include "ui_neutrino.h"
 #include "nView.h"
 
 nView::~nView ()
 {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");    
+    my_set.setValue("mouseShape", my_mouse.my_shape);
+    my_set.setValue("mouseColor", my_mouse.pen.color());
+    my_set.setValue("rulerVisible", my_tics.rulerVisible);
+    my_set.setValue("gridVisible", my_tics.gridVisible);
+    my_set.setValue("rulerColor", my_tics.rulerColor);
+    my_set.endGroup();
 }
 
-nView::nView (QWidget *parent) : QGraphicsView (parent)
+nView::nView (QWidget *parent) : QGraphicsView (parent),
+    nparent(qobject_cast<neutrino *>(parent->parent())),
+    my_scene(this),
+    my_tics(this)
 {
+    setScene(&my_scene);
+
+    my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+    //	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
+
+    my_pixitem.setEnabled(true);
+    my_pixitem.setZValue(-1);
+
+    setSize();
+
+    my_scene.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
+    setCursor(QCursor(Qt::CrossCursor));
+
+
+
+    if (!nparent) ERROREXIT("nView problem");
+
+    DEBUG(qobject_cast<neutrino *>(parent));
+
+    my_scene.addItem(&my_pixitem);
+    my_scene.addItem(&my_mouse);
+    my_scene.addItem(&my_tics);
+
     trasformazione.reset();
     fillimage=true;
     setMouseTracking(true);
     setInteractive(true);
     grabGesture(Qt::SwipeGesture);
     QSettings settings("neutrino","");
-    settings.beginGroup("Preferences");
+    settings.beginGroup("nPreferences");
     QVariant fontString=settings.value("defaultFont");
     if (fontString.isValid()) {
         QFont fontTmp;
@@ -51,6 +86,14 @@ nView::nView (QWidget *parent) : QGraphicsView (parent)
 
     setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    setMouseShape(my_set.value("mouseShape",my_mouse.my_shape).toInt());
+    my_mouse.pen.setColor(my_set.value("mouseColor",my_mouse.pen.color()).value<QColor>());
+    my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
+    my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
+    my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
+    my_set.endGroup();
 }
 
 void nView::setZoomFactor(int val) {
@@ -77,16 +120,16 @@ void nView::swipeTriggered(QSwipeGesture *gesture)
         //		qDebug() << "angle" << gesture->swipeAngle() << gesture->horizontalDirection() + gesture->verticalDirection();
         switch (gesture->horizontalDirection() + gesture->verticalDirection()) {
         case QSwipeGesture::Left:
-            parent()->previousColorTable();
+            nparent->previousColorTable();
             break;
         case QSwipeGesture::Right:
-            parent()->nextColorTable();
+            nparent->nextColorTable();
             break;
         case QSwipeGesture::Up:
-            parent()->actionPrevBuffer();
+            nparent->actionPrevBuffer();
             break;
         case QSwipeGesture::Down:
-            parent()->actionNextBuffer();
+            nparent->actionNextBuffer();
             break;
         }
         update();
@@ -94,7 +137,7 @@ void nView::swipeTriggered(QSwipeGesture *gesture)
 }
 
 void nView::focusInEvent (QFocusEvent *) {
-    //	((neutrino *) parent())->emitBufferChanged();
+    //	((neutrino *) nparent)->emitBufferChanged();
 }
 
 void nView::zoomEq() {
@@ -120,25 +163,13 @@ void nView::incrzoom(double incr)
 
 void
 nView::setSize() {
-    QSize my_size=parent()->my_pixitem.pixmap().size();
-    QRectF bBox;
-    if (parent()->currentBuffer) {
-        scaledFont=font();
-        if (fillimage) {
-            double ratioFont=std::min(((double)width())/my_size.width(),((double)height())/my_size.height());
-            scaledFont.setPointSizeF(std::max(6.0,font().pointSizeF()/ratioFont));
-        }
-        double fSize=QFontMetrics(scaledFont).size(Qt::TextSingleLine,"M").height();
-        bBox=QRectF(-2.1*fSize,-2.2*fSize,my_size.width()+4.2*fSize, my_size.height()+5.1*fSize);
-    } else {
-        bBox=QRectF(0,0,my_size.width(),my_size.height());
-    }
+    QRectF bBox=my_tics.boundingRect();
     setSceneRect(bBox);
     if (fillimage) {
         fitInView(bBox, Qt::KeepAspectRatio);
     }
-    //	qDebug() << "nView::setSize" << bBox << font() << scaledFont << transform().m11();
-    parent()->my_mouse.setSize(my_size);
+    my_mouse.setSize(my_pixitem.pixmap().size());
+    my_mouse.pen.setWidthF(1.0/transform().m11());
     repaint();
     emit zoomChanged(transform().m11());
 }
@@ -146,7 +177,7 @@ nView::setSize() {
 void
 nView::resizeEvent(QResizeEvent *e) {
     QGraphicsView::resizeEvent(e);
-    //qDebug() << "nView::resizeEvent" << e->size() << parent()->my_pixitem.pixmap().size() << transform().m11();
+    //qDebug() << "nView::resizeEvent" << e->size() << nparent->my_pixitem.pixmap().size() << transform().m11();
     setSize();
 }
 
@@ -161,10 +192,10 @@ void nView::keyPressEvent (QKeyEvent *e)
         switch (e->key()) {
         case Qt::Key_Backspace: {
             if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
-                parent()->statusBar()->showMessage(tr("Removed ")+item->toolTip(),2000);
+                nparent->statusBar()->showMessage(tr("Removed ")+item->toolTip(),2000);
                 itemObj->deleteLater();
             } else {
-                parent()->statusBar()->showMessage(tr("Can't remove ")+item->toolTip(),2000);
+                nparent->statusBar()->showMessage(tr("Can't remove ")+item->toolTip(),2000);
             }
             break;
         }
@@ -185,25 +216,83 @@ void nView::keyPressEvent (QKeyEvent *e)
         case Qt::Key_Right:
             delta=QPointF(+1,0);
             break;
+        case Qt::Key_Return:
+            emit mousePressEvent_sig(my_mouse.pos());
+            break;
         default:
             break;
         }
         if (delta!=QPointF(0,0)) {
             if (e->modifiers() & Qt::ShiftModifier) delta*=5;
-            QPointF pos_mouse=parent()->my_mouse.pos()+delta;
-            parent()->my_mouse.setPos(pos_mouse);
+            QPointF pos_mouse=my_mouse.pos()+delta;
+            my_mouse.setPos(pos_mouse);
             emitMouseposition(pos_mouse);
         }
-        //		QPoint posCursor=mapFromScene(pos_mouse)+mapToGlobal(QPoint(0,0));
-        //		QCursor::setPos(posCursor);
-        //		qDebug() << delta << pos_mouse << posCursor << mapToGlobal(QPoint(0,0));
+
     } else {
-        parent()->keyPressEvent(e);
+        nparent->keyPressEvent(e);
     }
+
+    // cycle over items
+    switch (e->key()) {
+    case Qt::Key_Tab: {
+        QList<QGraphicsItem *> lista;
+        foreach (QGraphicsItem *oggetto, scene()->items() ) {
+            if (oggetto->type() > QGraphicsItem::UserType) {
+                if (oggetto->isVisible()) lista << oggetto;
+            }
+        }
+        scene()->clearSelection();
+        if (lista.size()>0) {
+            int found=0;
+            for (int i=lista.size()-1; i >=0; i-- ) {
+                if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
+            }
+
+            lista.at(found)->setFocus(Qt::TabFocusReason);
+        }
+        break;
+    }
+    case Qt::Key_Plus:
+        zoomIn();
+        break;
+    case Qt::Key_Minus:
+        zoomOut();
+        break;
+    case Qt::Key_Equal:
+        zoomEq();
+        break;
+    case Qt::Key_M: {
+        if (!(e->modifiers() & Qt::ShiftModifier)) {
+            setMouseShape(my_mouse.my_shape+1);
+        }
+        break;
+    }
+    case Qt::Key_C:
+        if ((e->modifiers() & Qt::ControlModifier))
+            QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard)   ;
+        break;
+    }
+
     update();
-    if (parent()->follower) parent()->follower->my_w.my_view->keyPressEvent(e);
+    if (nparent->follower) nparent->follower->my_w->my_view->keyPressEvent(e);
 }
 
+void nView::setMouseShape(int num) {
+    num%=my_mouse.num_shape;
+    my_mouse.hide();
+    update();
+    setSize();
+    QCursor cur;
+    if (num==0) {
+        my_pixitem.setCursor(Qt::CrossCursor);
+    } else {
+        my_pixitem.setCursor(Qt::BlankCursor);
+        my_mouse.show();
+    }
+    my_mouse.my_shape=num;
+    my_mouse.update();
+}
 
 void nView::keyReleaseEvent (QKeyEvent *e) {
     QGraphicsView::keyReleaseEvent(e);
@@ -224,19 +313,19 @@ void nView::wheelEvent(QWheelEvent *e) {
         QGraphicsView::wheelEvent(e);
         break;
     }
-    if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+    if (nparent->follower) {
+        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QWheelEvent eFollow(posFollow,e->delta(),e->buttons(),e->modifiers(),e->orientation());
-        parent()->follower->my_w.my_view->wheelEvent(&eFollow);
+        nparent->follower->my_w->my_view->wheelEvent(&eFollow);
     }
 }
 
 void nView::mouseDoubleClickEvent (QMouseEvent *e) {
     QGraphicsView::mousePressEvent(e);
-    if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+    if (nparent->follower) {
+        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+        nparent->follower->my_w->my_view->mousePressEvent(&eFollow);
     }
     emit mouseDoubleClickEvent_sig(mapToScene(e->pos()));
 }
@@ -244,13 +333,13 @@ void nView::mouseDoubleClickEvent (QMouseEvent *e) {
 void nView::mousePressEvent (QMouseEvent *e)
 {
     QGraphicsView::mousePressEvent(e);
-    if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+    if (nparent->follower) {
+        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mousePressEvent(&eFollow);
+        nparent->follower->my_w->my_view->mousePressEvent(&eFollow);
     }
-    if (e->modifiers()&Qt::ControlModifier && parent()->currentBuffer) {
-        minMax=parent()->currentBuffer->get_min_max().swap();
+    if (e->modifiers()&Qt::ControlModifier && nparent->getCurrentBuffer()) {
+        minMax=nparent->getCurrentBuffer()->get_min_max().swap();
     }
     emit mousePressEvent_sig(mapToScene(e->pos()));
 }
@@ -259,13 +348,13 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 {
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
-    if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+    if (nparent->follower) {
+        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mouseReleaseEvent(&eFollow);
+        nparent->follower->my_w->my_view->mouseReleaseEvent(&eFollow);
     }
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        parent()->changeColorMinMax(minMax);
+        nparent->changeColorMinMax(minMax);
     }
 }
 
@@ -274,19 +363,19 @@ void nView::mouseMoveEvent (QMouseEvent *e)
     QGraphicsView::mouseMoveEvent(e);
     if (QGraphicsItem *item = itemAt(e->pos())) {
         if (item->flags()&&QGraphicsItem::ItemIsFocusable) {
-            parent()->statusBar()->showMessage(item->toolTip(),2000);
+            nparent->statusBar()->showMessage(item->toolTip(),2000);
         }
     }
-    if (parent()->follower) {
-        QPoint posFollow= parent()->follower->my_w.my_view->mapFromScene(mapToScene(e->pos()));
+    if (nparent->follower) {
+        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
         QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        parent()->follower->my_w.my_view->mouseMoveEvent(&eFollow);
+        nparent->follower->my_w->my_view->mouseMoveEvent(&eFollow);
     }
 
     QPointF pos_mouse=mapToScene(e->pos());
-    parent()->my_mouse.setPos(pos_mouse);
-    if (e->modifiers()==Qt::ControlModifier && parent()->currentBuffer) {
-        double val=parent()->currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
+    my_mouse.setPos(pos_mouse);
+    if (e->modifiers()==Qt::ControlModifier && nparent->getCurrentBuffer()) {
+        double val=nparent->getCurrentBuffer()->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
         minMax=vec2f(std::min(minMax.x(),val),std::max(minMax.y(),val));
     }
     emitMouseposition(pos_mouse);

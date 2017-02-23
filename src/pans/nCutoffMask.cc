@@ -28,8 +28,7 @@
 
 // physWavelets
 
-nCutoffMask::nCutoffMask(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nCutoffMask::nCutoffMask(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 

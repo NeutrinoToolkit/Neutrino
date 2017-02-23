@@ -24,27 +24,27 @@
  */
 #include <QtGui>
 #include <QGraphicsObject>
-#include "ui_nObject.h"
 
 #ifndef __nTics
 #define __nTics
 
-class neutrino;
+class nView;
 
 class nTics : public QGraphicsItem {
 public:
-	
-	neutrino* nparent;
-	
-	nTics(neutrino*);
+
+    nView* my_view;
+
+    nTics(nView*);
 	
 	QColor color, rulerColor;
 	bool rulerVisible,gridVisible;
 
 	void changeColor();
 	
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+    QRectF boundingRect() const;
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+
 
 };
 

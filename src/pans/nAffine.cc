@@ -27,22 +27,19 @@
 
 // physWavelets
 
-nAffine::nAffine(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname)
+nAffine::nAffine(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
-	l1 =  new nLine(nparent);
-	l1->setParentPan(panName,1);
-	l1->changeToolTip(panName+"Line 1");
+    l1 =  new nLine(this,1);
+    l1->changeToolTip(panName()+"Line 1");
 	l1->changeColorHolder("red");
 	QPolygonF poly;
 	poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
 	l1->setPoints(poly);
 	
 
-	l2 =  new nLine(nparent);
-	l2->setParentPan(panName,1);
-	l2->changeToolTip(panName+"Line 2");
+    l2 =  new nLine(this,1);
+    l2->changeToolTip(panName()+"Line 2");
 	l2->changeColorHolder("blue");
 	poly.clear();
 	poly << QPointF(150,50) << QPointF(50,50) << QPointF(50,150);

@@ -24,28 +24,26 @@
  */
 #include "nInterferometry.h"
 #include "neutrino.h"
+#include "ui_neutrino.h"
 
 // physWavelets
 
-nInterferometry::nInterferometry(neutrino *nparent, QString winname)
-: nGenericPan(nparent, winname), my_image(2)
+nInterferometry::nInterferometry(neutrino *nparent) : nGenericPan(nparent),
+    my_image(2)
 {
 	my_w.setupUi(this);
 	
-	region =  new nRect(nparent);
-	region->setParentPan(panName,1);
+    region =  new nRect(this,1);
 	region->setRect(QRectF(100,100,100,100));
 	
-    maskRegion =  new nLine(nparent);
-    maskRegion->setParentPan(panName,1);
+    maskRegion =  new nLine(this,1);
     maskRegion->changeToolTip("MaskLine");
 	QPolygonF poly;
 	poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
     maskRegion->setPoints(poly);
     maskRegion->toggleClosedLine(true);
 
-	unwrapBarrier =  new nLine(nparent);
-	unwrapBarrier->setParentPan(panName,1);
+    unwrapBarrier =  new nLine(this,1);
     unwrapBarrier->changeToolTip("BarrierLine");
     poly.clear();
 	poly << QPointF(0,0) << QPointF(100,100);
@@ -56,7 +54,7 @@ nInterferometry::nInterferometry(neutrino *nparent, QString winname)
         my_image[k].setupUi(my_w.images->widget(k));
         foreach (QWidget *my_obj,  my_w.images->widget(k)->findChildren<QWidget *>()) {
             if (!my_obj->objectName().isEmpty()) {
-                my_obj->setObjectName(my_obj->objectName()+winname+QString::number(k));
+                my_obj->setObjectName(my_obj->objectName()+panName()+QString::number(k));
                 my_obj->setProperty("id",k);
             }
         }
@@ -157,9 +155,9 @@ void nInterferometry::physDel(nPhysD* buf) {
 void nInterferometry::getPosZero(bool check) {
     if (check) {
         nparent->showPhys(getPhysFromCombo(my_image[1].image));
-        connect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     } else {
-        disconnect(nparent->my_w.my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        disconnect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     }
 }
 
@@ -288,17 +286,14 @@ void nInterferometry::doWavelet (int iimage) {
         int niter=my_params.n_angles*my_params.n_lambdas+1;
 
         QSettings settings("neutrino","");
-        settings.beginGroup("Preferences");
-        if (settings.value("useCuda").toBool() && cudaEnabled()) {
-//            phys_wavelet_field_2D_morlet_cuda(my_params);
-            runThread(&my_params, phys_wavelet_trasl_cuda, "Wavelet"+QString(suffix.c_str()), niter);
-        } else if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
+        settings.beginGroup("nPreferences");
+        if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             DEBUG("Ready to run on OpenCL");
             my_params.opencl_unit=settings.value("openclUnit").toInt();
             runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet"+QString(suffix.c_str()), niter);
         } else {
 //            phys_wavelet_field_2D_morlet(my_params);
-            runThread(&my_params, phys_wavelet_trasl_nocuda, "Wavelet"+QString(suffix.c_str()), niter);
+            runThread(&my_params, phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
         }
 
         std::map<std::string,nPhysD *> retList = my_params.olist;
@@ -591,7 +586,7 @@ void nInterferometry::addShape(){
         bool found =false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->property("parentPan").toString()==panName) {
+            if (line && line->property("parentPan").toString()==panName()) {
                 if (line->toolTip()=="interpolateShape"+QString::number(num)) {
                     found=true;
                 }
@@ -605,8 +600,7 @@ void nInterferometry::addShape(){
 }
 
 void nInterferometry::addShape(QString name){
-    nLine *my_l=new nLine(nparent);
-    my_l->setParentPan(panName,0);
+    nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
         poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
@@ -617,7 +611,7 @@ void nInterferometry::addShape(QString name){
     my_l->changeToolTip(name);
     my_l->toggleClosedLine(true);
     QToolButton *my_b=new QToolButton(this);
-    my_b->setIcon(QIcon(":icons/line"));
+    my_b->setIcon(QIcon(":icons/region"));
     my_b->setToolTip(name+my_b->toolTip());
     my_shapes[my_b]=my_l;
     my_w.shapes->layout()->addWidget(my_b);
@@ -685,7 +679,7 @@ void nInterferometry::loadSettings(QSettings *settings){
         bool found=false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->property("parentPan").toString()==panName) {
+            if (line && line->property("parentPan").toString()==panName()) {
                 if (line->toolTip()==name) found=true;
             }
         }            
@@ -694,7 +688,7 @@ void nInterferometry::loadSettings(QSettings *settings){
 
     settings->beginGroup("localPhys");
     foreach (const QString &childKey, settings->childKeys()) {
-        nPhysD *my_phys=nparent->getBuffer(settings->value(childKey).toInt(),false);
+        nPhysD *my_phys=nparent->getBuffer(settings->value(childKey).toInt());
         if (my_phys) {
             localPhys[childKey.toStdString()]=my_phys;
             DEBUG("found " << childKey.toStdString());

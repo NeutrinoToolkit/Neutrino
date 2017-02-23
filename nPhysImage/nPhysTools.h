@@ -34,9 +34,6 @@
 #include "bidimvec.h"
 #include "nPhysImageF.h"
 
-
-//using namespace std;
-
 #ifndef __nPhysTools
 #define __nPhysTools
 

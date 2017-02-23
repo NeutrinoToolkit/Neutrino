@@ -23,14 +23,20 @@
  *
  */
 #include <QtGui>
+#include <QMainWindow>
 #include <QGraphicsObject>
-#include "ui_nObject.h"
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include "nPhysImageF.h"
 
 #ifndef __nEllipse
 #define __nEllipse
 
 class neutrino;
+
+namespace Ui {
+class nObject;
+}
 
 class nEllipse : public QGraphicsObject {
 	Q_OBJECT
@@ -39,10 +45,8 @@ public:
 	nEllipse(neutrino *);
 	~nEllipse();
 	
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
-	
+    neutrino *nparent;
+
 	enum { Type = QGraphicsItem::UserType + 3 };
 	int type() const { return Type;}
 	
@@ -77,7 +81,7 @@ public:
 	double zoom;
 	// roba da padelle
 	QMainWindow my_pad;
-	Ui::nObject my_w;
+    Ui::nObject *my_w;
 	
 	QPainterPath path() const;
 	QPainterPath shape() const;
@@ -125,9 +129,7 @@ public:
 	void addPoint(int);
 	
 	void addPointAfterClick(QPointF);
-	
-	void setParentPan(QString,int);
-	
+		
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();

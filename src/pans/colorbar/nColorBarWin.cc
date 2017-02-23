@@ -26,7 +26,7 @@
 #include "nColorBarWin.h"
 #include "neutrino.h"
 
-nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(parent, title)
+nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 {
 	my_w.setupUi(this);
 	
@@ -49,15 +49,15 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
 	my_w.lineMin->setValidator(dVal);
-	my_w.lineMax->setValidator(dVal);
+    my_w.lineMax->setValidator(dVal);
 
 	if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
-		my_w.lineMin->setText(QString::number(minmax.first()));
-		my_w.lineMax->setText(QString::number(minmax.second()));
+        my_w.lineMin->setText(QLocale().toString(minmax.first()));
+        my_w.lineMax->setText(QLocale().toString(minmax.second()));
 	}
-	connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
-	connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+    connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
+    connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
 
 	connect(my_w.setToMin,SIGNAL(pressed()),this,SLOT(setToMin()));
 	connect(my_w.setToMax,SIGNAL(pressed()),this,SLOT(setToMax()));
@@ -85,14 +85,14 @@ nColorBarWin::nColorBarWin (neutrino *parent, QString title) : nGenericPan(paren
 
     show();
 
-    if (nparent->currentBuffer) my_w.gamma->setValue(nparent->currentBuffer->property["gamma"]);
+    if (currentBuffer) my_w.gamma->setValue(currentBuffer->property["gamma"]);
 
     loadPalettes();
 
 	
 
 	updatecolorbar();
-	cutOffPhys=NULL;
+    cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
 }
@@ -106,13 +106,13 @@ void nColorBarWin::on_gamma_valueChanged(int val) {
 
 void nColorBarWin::setToMin () {
 	if (currentBuffer) {
-		my_w.lineMin->setText(QString::number(currentBuffer->get_min()));
+        my_w.lineMin->setText(QLocale().toString(currentBuffer->get_min()));
 	}
 }
 
 void nColorBarWin::setToMax () {
 	if (currentBuffer) {
-		my_w.lineMax->setText(QString::number(currentBuffer->get_max()));
+        my_w.lineMax->setText(QLocale().toString(currentBuffer->get_max()));
 	}
 }
 
@@ -153,8 +153,9 @@ void nColorBarWin::bufferChanged(nPhysD *phys) {
     nGenericPan::bufferChanged(phys);
     if (phys) {
         vec2f minmax=phys->property["display_range"];
-        my_w.lineMin->setText(QString::number(minmax.first()));
-        my_w.lineMax->setText(QString::number(minmax.second()));
+        DEBUG(minmax);
+        my_w.lineMin->setText(QLocale().toString(minmax.first()));
+        my_w.lineMax->setText(QLocale().toString(minmax.second()));
         my_w.gamma->setValue(phys->property["gamma"]);
     } else{
         my_w.lineMin->setText("");
@@ -185,8 +186,8 @@ void nColorBarWin::updatecolorbar() {
 	
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
-        my_w.lineMin->setText(QString::number(minmax.first()));
-        my_w.lineMax->setText(QString::number(minmax.second()));
+        my_w.lineMin->setText(QLocale().toString(minmax.first()));
+        my_w.lineMax->setText(QLocale().toString(minmax.second()));
         my_w.sliderMin->setValue(sliderValues().first());
         my_w.sliderMax->setValue(sliderValues().second());
     }
@@ -201,14 +202,14 @@ void nColorBarWin::slider_min_changed(int val)
 {
 	double doubleVal=0.0;
 	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
- 	my_w.lineMin->setText(QString::number(doubleVal, 'g'));
+    my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
 }
 
 void nColorBarWin::slider_max_changed(int val)
 {
 	double doubleVal=1.0;
 	if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
- 	my_w.lineMax->setText(QString::number(doubleVal, 'g'));
+    my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
 }
 
 void nColorBarWin::cutOff() {

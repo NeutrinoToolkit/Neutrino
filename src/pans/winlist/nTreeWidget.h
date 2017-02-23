@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -37,21 +37,21 @@ class nWinList;
 class neutrino;
 
 class nTreeWidget : public QTreeWidget {
-	Q_OBJECT
+    Q_OBJECT
 public:	
-    nTreeWidget(QWidget *parent):QTreeWidget(parent){};
+    Q_INVOKABLE nTreeWidget(QWidget *parent):QTreeWidget(parent){};
     ~nTreeWidget(){};
-	QPoint dragposition;
+    QPoint dragposition;
     QList<QTreeWidgetItem*> dragitems;
-	QTime dragtime;
-	
+    QTime dragtime;
+
 public slots:
-	void dropEvent(QDropEvent *);
-	void dragEnterEvent(QDragEnterEvent *);
-	void dragMoveEvent(QDragMoveEvent *);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
+    void dropEvent(QDropEvent *);
+    void dragEnterEvent(QDragEnterEvent *);
+    void dragMoveEvent(QDragMoveEvent *);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 };
 

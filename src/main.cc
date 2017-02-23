@@ -25,92 +25,54 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <signal.h>
 
 #include <QtGui>
 //#include <QtSql>
 
+#include "nPreferences.h"
+
 #include "neutrino.h"
 #include "nApp.h"
 
-#ifdef __neutrino_key
-#include "nHash.h"
-#endif
+#include <QTranslator>
 
-#ifdef HAVE_PYTHONQT
-#include "PythonQt_QtBindings.h"
-#include "nPhysPyWrapper.h"
-#include "nPython.h"
-#endif
+void my_handler(int s){
+    printf("Caught signal %d\n",s);
+    QCoreApplication::quit();
+}
 
 int main(int argc, char **argv)
 {
+#ifndef __WIN32
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = my_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
+
+    qSetMessagePattern("%{function}:%{line} : %{message}");
 
     NApplication qapp(argc,argv);
 
-#ifdef USE_QT5
-    qapp.setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
 
-    qapp.setOrganizationName("ParisTech");
-    qapp.setOrganizationDomain("edu");
-    qapp.setApplicationName("Neutrino");
-    qapp.setApplicationVersion(__VER);
-
-#ifdef __neutrino_key
-    std::string hh = getNHash();
-    std::cerr<<"got nHash: "<<hh<<std::endl;
-    qapp.setProperty("nHash", hh.c_str());
-#endif
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<< my_set.value("threads",1);
+    nPreferences::changeThreads(my_set.value("threads",1).toInt());
+    my_set.endGroup();
 
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
-
-    bool somethingDone=false;
 
     QStringList args=QCoreApplication::arguments();
     args.removeFirst();
 
-#ifdef HAVE_PYTHONQT
-
-    PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
-
-    //PythonQt_QtAll::init();
-    PythonQt_init_QtBindings();
-
-    PythonQt::self()->addDecorators(new nPhysPyWrapper());
-    PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
-
-    PythonQt::self()->addDecorators(new nPanPyWrapper());
-    PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
-
-    PythonQt::self()->addDecorators(new nPyWrapper());
-    PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
-
-    QSettings settings("neutrino","");
-    settings.beginGroup("Python");
-    foreach (QString spath, settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"))) {
-        if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
-    }
-    PythonQt::self()->getMainModule().evalScript(settings.value("initScript").toString());
-    settings.endGroup();
-
-    PythonQt::self()->getMainModule().addObject("nApp", &qapp);
-    foreach (QString filename, args) {
-        QFileInfo my_file(filename);
-        if (my_file.exists() && my_file.suffix()=="py") {
-            somethingDone=true;
-            QFile t(filename);
-            t.open(QIODevice::ReadOnly| QIODevice::Text);
-            PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
-            t.close();
-        }
-    }
-#endif
-
-
-    if (!somethingDone) {
-        neutrino *neu = new neutrino();
-        neu->fileOpen(args);
-    }
+    neutrino *neu = new neutrino();
+    neu->fileOpen(args);
 
     return qapp.exec();
 }

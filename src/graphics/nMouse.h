@@ -24,23 +24,25 @@
  */
 #include <QtGui>
 #include <QGraphicsItem>
-#include "ui_nObject.h"
 
 #ifndef __nMouse
 #define __nMouse
 
-class neutrino;
 
 class nMouse : public QGraphicsItem {
 public:
 	
-	nMouse(neutrino*);
-	
-	neutrino *nparent;
+    nMouse();
+
+    int my_shape;
+    const int num_shape=5;
+
+
 	QSize size;
-	QColor color;
-	void setSize(QSize);
-	void changeColor();
+    QPen pen;
+
+    void setSize(QSize);
+    void changeColor();
 	
 	QRectF boundingRect() const;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);

@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -30,117 +30,125 @@
 #include <QGraphicsScene>
 #include <QMainWindow>
 
+#include <QTextBrowser>
+#include <QPrinter>
+#include <QPrintDialog>
+
 #include <iostream>
 #include "nPhysImageF.h"
 #include "panThread.h"
 
-#include "ui_nPanHelp.h"
-
 #ifndef __generic_pan
 #define __generic_pan
 
+#include "nPanPlug.h"
+
 class neutrino;
 
-typedef void (*ifunc)(void *, int &); 
+namespace Ui {
+class PanHelp;
+}
+
+typedef void (*ifunc)(void *, int &);
+
+class nHelpTextBrowser : public QTextBrowser {
+    Q_OBJECT
+public:
+    nHelpTextBrowser(QWidget* parent) : QTextBrowser(parent) {}
+
+public slots:
+    void print() {
+        QPrinter printer(QPrinter::HighResolution);
+        QPrintDialog dialog(&printer,this);
+        dialog.setWindowTitle(tr("Print Help"));
+        if (dialog.exec() == QDialog::Accepted) {
+            document()->print(&printer);
+        }
+    }
+};
+
 
 class nGenericPan : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	nGenericPan(){};
-	nGenericPan(neutrino *, QString);
-	~nGenericPan(){};
-	QGraphicsScene *my_s;
+    nGenericPan(){};
+    nGenericPan(neutrino *);
+    ~nGenericPan(){};
 
-	neutrino *nparent;
-	QString panName;
-	nPhysD *currentBuffer;
-	
-	QStringList neutrinoProperties;
+    neutrino *nparent;
+    nPhysD *currentBuffer;
 
-	// thread stuff
-	panThread nThread;
+    // thread stuff
+    panThread nThread;
 
-    Ui::PanHelp my_help;
+    Ui::PanHelp *my_help;
 
 signals:
-	void changeCombo(QComboBox*);
+    void changeCombo(QComboBox*);
 
 
 public slots:
 
+    void changeEvent(QEvent *e);
+
+    QString panName() {return QString(metaObject()->className());}
     void grabSave();
     void help();
 
-	void showMessage(QString);
-	void showMessage(QString,int);
-	virtual void mouseAtMatrix(QPointF) { }
-	virtual void mouseAtWorld(QPointF) { }
+    void showMessage(QString);
+    void showMessage(QString,int);
+    virtual void mouseAtMatrix(QPointF) { }
+    virtual void mouseAtWorld(QPointF) { }
 
-	virtual void nZoom(double) { }
+    virtual void nZoom(double) { }
 
-	virtual void imageMousePress(QPointF) { }
-	virtual void imageMouseRelease(QPointF) { }
+    virtual void imageMousePress(QPointF) { }
+    virtual void imageMouseRelease(QPointF) { }
 
-	void physAdd(nPhysD *);
-	void physDel(nPhysD *);
+    void physAdd(nPhysD *);
+    void physDel(nPhysD *);
 
-	virtual void bufferChanged(nPhysD *);
+    virtual void bufferChanged(nPhysD *);
 
-	// threads
+    // threads
     void runThread(void *iparams, ifunc, QString=QString("Calculating"), int=0);
-    
-	// to sync image list on combos on the widget
-	void comboChanged(int);
-	nPhysD* getPhysFromCombo(QComboBox*);
 
-	QString getNameForCombo(QComboBox*,nPhysD *);
+    // to sync image list on combos on the widget
+    void comboChanged(int);
+    nPhysD* getPhysFromCombo(QComboBox*);
 
-	void loadUi(QSettings*);
-	void saveUi(QSettings*);
+    QString getNameForCombo(QComboBox*,nPhysD *);
 
-	void closeEvent(QCloseEvent*);
+    void loadUi(QSettings*);
+    void saveUi(QSettings*);
 
-	//settings
+    void closeEvent(QCloseEvent*);
 
-	void loadDefaults();
-	void saveDefaults();
+    //settings
 
-	void loadSettings();
-	void loadSettings(QString);
-	virtual void loadSettings(QSettings *);
-	void saveSettings();
-	virtual void saveSettings(QSettings *);
-	
+    void loadDefaults();
+    void saveDefaults();
+
+    void loadSettings();
+    void loadSettings(QString);
+    virtual void loadSettings(QSettings *);
+    void saveSettings();
+    virtual void saveSettings(QSettings *);
+
     bool nPhysExists(nPhysD*);
-    
-	// python stuff
-	void set(QString, QVariant, int=1);
-	QVariant get(QString, int=1);
-	QList<QList<qreal> >  getData(QString, int=1);
+
+    // python stuff
+    void set(QString, QVariant, int=1);
+    QVariant get(QString, int=1);
+    QList<QList<qreal> >  getData(QString, int=1);
     void button(QString, int=1);
 
 protected:
     void showEvent( QShowEvent* event );
+    void focusOutEvent(QFocusEvent *event);
 
 };
-
-
-#ifdef HAVE_PYTHONQT
-class nPanPyWrapper : public QObject {
-    Q_OBJECT
-
-    public slots:
-    nGenericPan* new_nPan(neutrino* neu, QString name) {
-        DEBUG("here "<< name.toStdString());
-        return new nGenericPan(neu,name);}; // opens new neutrino with that image
-    void delete_nPan(nGenericPan* pan) {
-        DEBUG("here "<< pan->panName.toStdString());
-        pan->deleteLater();
-    };
-
-};
-#endif
 
 
 #endif

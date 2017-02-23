@@ -7,3 +7,4 @@ run:
 	qmake
 	make
 	./colormaps
+	

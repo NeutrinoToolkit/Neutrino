@@ -57,7 +57,9 @@
 #include <assert.h>
 #include <fftw3.h>
 
+#ifdef HAVE_OPENMP
 #include <omp.h>
+#endif
 
 #include <time.h>
 
@@ -74,17 +76,6 @@
 
 #include "bidimvec.h"
 
-// .alex. finally getting rid of this
-// using namespace std;
-
-// check for c++0x
-#if __cplusplus == 201103L
-#define _std0x
-#endif
-
-#ifndef __deg
-#define __deg (0.017453f)
-#endif
 
 #include <gsl/gsl_math.h>
 
@@ -150,18 +141,18 @@ class phys_fileerror: public std::exception
 {
 
 public:
-	phys_fileerror(std::string str = std::string("(undefined file error"))
-		: msg(str)
-	{ }
+    phys_fileerror(std::string str = std::string("(undefined file error"))
+        : msg(str)
+    { }
 
-	~phys_fileerror() throw()
-	{ }
+    ~phys_fileerror() throw()
+    { }
 
-	virtual const char* what() const throw()
-	{ return msg.c_str(); }
+    virtual const char* what() const throw()
+    { return msg.c_str(); }
 
 private:
-	std::string msg;
+    std::string msg;
 
 };
 
@@ -378,9 +369,11 @@ public:
 		nPhysImageF<U> lhs;
 //		lhs = new nPhysImageF<U>;
 		lhs.resize(width, height);
+#pragma omp parallel for
         for (size_t i=0; i<getSurf(); i++)
 			lhs.Timg_buffer[i] = U(Timg_buffer[i]);	
-		lhs.TscanBrightness();
+
+        lhs.TscanBrightness();
 		
 		//lhs->object_name = object_name;
 		//lhs->filename=filename;
@@ -568,7 +561,6 @@ public:
 
             DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
             uchar_buf.resize(getSurf()*3);
-
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
@@ -583,7 +575,6 @@ public:
                     uchar_buf[i*3+2] = 255;
 				}
 			}
-
             display_property["palette_name"]=palette_name;
             display_property["gamma"]=property["gamma"].get_i();
             display_property["display_range"]=property["display_range"];
