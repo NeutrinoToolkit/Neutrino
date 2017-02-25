@@ -21,7 +21,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 
         fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }
-    if (!fname.isEmpty()) {
+    if (!fname.isEmpty( )) {
         std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
         for(auto it : my_vec) {
             if (it->getSurf()>0) {
@@ -63,16 +63,16 @@ nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString na
  nPhysD copy constructor
  */
 nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
-    DEBUG("here");
-	nPhysD *ret_phys = new nPhysD(*phys);
-	return ret_phys;
+    DEBUG("new_nPhysD new_nPhysD new_nPhysD new_nPhysD new_nPhysD ");
+    nPhysD *ret_phys = new nPhysD(*phys);
+    return ret_phys;
 }
 
 /**
  nPhysD Destructor
  */
 void nPhysPyWrapper::delete_nPhysD(nPhysD* phys) {
-    DEBUG("here");
+    DEBUG("delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD");
     NApplication* my_app=qobject_cast<NApplication*> (qApp);
     bool found=false;
     if (my_app) {

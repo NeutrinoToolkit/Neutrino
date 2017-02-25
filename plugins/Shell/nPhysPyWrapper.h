@@ -25,7 +25,7 @@ public slots:
 	
 	nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python")); 
 	
-	nPhysD* new_nPhysD(nPhysD*);
+    nPhysD* new_nPhysD(nPhysD*);
 
 	void delete_nPhysD(nPhysD*); // python destructor
 	

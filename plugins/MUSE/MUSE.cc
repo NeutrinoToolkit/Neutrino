@@ -91,6 +91,7 @@ void MUSE::on_actionMean_triggered() {
 }
 
 void MUSE::on_actionExportTxt_triggered() {
+    qDebug() << sender();
     QString prefix=property("NeuSave-MUSEprefix").toString();
     if (sender() && sender()->objectName()=="actionExportTxt") {
         bool ok;
@@ -109,7 +110,9 @@ void MUSE::on_actionExportTxt_triggered() {
     if (t.isOpen()) {
         QTextStream out(&t);
         QLocale loc("C");
-        out << "# " << loc.toString(lastpoint.x()) << " " << loc.toString(lastpoint.y()) << " " << plot->graph(1)->name() << endl;
+        out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << endl;
+        out << "# r = " << radius->value() << " px. Tot pixels: (2r+1)^2 = " << pow(radius->value()*2+1,2) << endl;
+        out << "# " << plot->graph(1)->name() << endl;
         for (int xx=0; xx< xvals.size(); xx++) {
             out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << endl;
         }
@@ -124,6 +127,10 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
         break;
     case Qt::Key_Right:
         slices->setValue(slices->value()+1);
+        break;
+    case Qt::Key_S:
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+        on_actionExportTxt_triggered();
         break;
     default:
         break;
@@ -237,12 +244,20 @@ void MUSE::updateLastPoint() {
     doSpectrum(lastpoint);
 }
 
-void MUSE::doSpectrum(QPointF point) {
+QString toNum(QPointF p) {
+    return "( " + QLocale().toString(p.x(),'g',9) + " ; " + QLocale().toString(p.y(),'g',9) + ") ";
+}
 
-    double prealx=(floor(point.x())+1.0-my_offset.x())*my_scale.x()+my_offset_val.x();
-    double prealy=(floor(point.y())+1.0-my_offset.y())*my_scale.y()+my_offset_val.y();
+void MUSE::doSpectrum(QPointF point) {
+    QPointF pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+
+    double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
+    double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
 
     QPointF preal=QPointF(prealx,prealy);
+
+    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
+
     if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
         lastpoint=point.toPoint();
         vec2 p(point.x(),point.y());
@@ -260,16 +275,11 @@ void MUSE::doSpectrum(QPointF point) {
                 }
             }
         }
-        for (unsigned int zz=0; zz< cubesize[2]; zz++) {
-            yvals[zz]=yvals[zz]/(1+2*radius->value()*radius->value());
-        }
         plot->graph(1)->setData(xvals,yvals,true);
-        QString spec_name("Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8) + " " + trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[slices->value()]));
-        qDebug() << point << spec_name;
+        QString spec_name("Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
         plot->graph(1)->setName(spec_name);
         plot->setTitle(spec_name);
         plot->replot();
-
     }
 }
 
@@ -295,6 +305,7 @@ void MUSE::showImagePlane(int z) {
         my_phys->TscanBrightness();
         cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
         plot->setMousePosition(xvals[z]);
+        statusbar->showMessage( trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[z]));
     }
     QApplication::processEvents();
     connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
@@ -500,7 +511,7 @@ void MUSE::loadCube() {
                     yvals.resize(cubesize[2]);
                     ymean.resize(cubesize[2]);
                     for (int zz=0; zz< xvals.size(); zz++) {
-                        xvals[zz]=wavelen.first()+zz*(wavelen.second()-wavelen.first())/xvals.size();
+                        xvals[zz]=wavelen.first()+(zz+1.0)*(wavelen.second()-wavelen.first())/xvals.size();
                         ymean[zz]=0;
                     }
                     int surf=cubesize[0]*cubesize[1];

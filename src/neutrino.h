@@ -144,6 +144,7 @@ public slots:
 	void addShowPhys(nPhysD&);
     nPhysD* getBuffer(int);
     inline nPhysD* getCurrentBuffer() {return currentBuffer;};
+    nPhysD* getShallow() {return new nPhysD(*currentBuffer);}
 
 	inline QList<nPhysD *> getBufferList() {return physList;};
     inline QList<nGenericPan*> getPanList() {return panList;};

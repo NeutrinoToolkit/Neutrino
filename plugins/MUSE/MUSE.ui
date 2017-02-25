@@ -175,7 +175,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset>
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -193,7 +193,7 @@
   </action>
   <action name="actionFFT">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset>
      <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
    </property>
    <property name="text">
@@ -205,7 +205,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset>
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -220,7 +220,7 @@
   </action>
   <action name="actionExportTxt">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset>
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -238,7 +238,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset>
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -260,8 +260,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../resources/icons/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
