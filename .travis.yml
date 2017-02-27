@@ -94,7 +94,7 @@ after_success:
   then
     git config --global user.email "builds@travis-ci.com"
     git config --global user.name "Travis CI"
-    git tag -a v${TRAVIS_BUILD_NUMBER} -m "Travis build $TRAVIS_BUILD_NUMBER pushed a tag."
+    git tag -a ${TRAVIS_BRANCH}v${TRAVIS_BUILD_NUMBER} -m "Travis build $TRAVIS_BUILD_NUMBER pushed a tag."
     git push origin --tags
     git fetch origin
   fi
@@ -111,4 +111,4 @@ deploy:
   overwrite: true
   on:
     tags: false
-    all_branches: true
+    branch: master

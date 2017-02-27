@@ -56,6 +56,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
       mark_as_advanced(PANDOC)
     endif(NOT DEFINED PANDOC)
     if(PANDOC AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md"))
+		set(README_MD "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+		set_source_files_properties( ${README_MD} PROPERTIES HEADER_FILE_ONLY TRUE)
 
         set(PANDOC_QRC ${CMAKE_CURRENT_BINARY_DIR}/pandoc.qrc)
         file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/${MY_PROJECT_NAME}/\">\n")
@@ -71,7 +73,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
 
-        add_custom_target(pandoc${MY_PROJECT_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/README.html SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+        add_custom_target(pandoc${MY_PROJECT_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/README.html SOURCES ${README_MD})
     endif()
 
     ## add translations
@@ -79,7 +81,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     find_package(Qt5LinguistTools)
     if (Qt5LinguistTools_FOUND)
         SET(LANGUAGES fr_FR it_IT ko_KP)
-
+		
         SET(LANGUAGE_TS_FILES)
         FOREACH(LANGUAGE ${LANGUAGES})
         SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${MY_PROJECT_NAME}_${LANGUAGE}.ts")
@@ -111,7 +113,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     QT5_WRAP_UI(nUIs ${UIS})
 
     # add sources here
-    add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES})
+
+    add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES} ${README_MD})
 
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
