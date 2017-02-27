@@ -45,25 +45,46 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QSlider" name="slicesSlider">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QSpinBox" name="radiusLambda">
+       <item row="0" column="3">
+        <widget class="QSpinBox" name="percentMin">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="minimum">
-          <number>1</number>
+         <property name="suffix">
+          <string>%</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>0</number>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QSpinBox" name="radius">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="suffix">
+          <string>px</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QSlider" name="slicesSlider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -76,15 +97,21 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QSpinBox" name="radius">
+       <item row="0" column="4">
+        <widget class="QSpinBox" name="percentMax">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="suffix">
-          <string>px</string>
+          <string>%</string>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>100</number>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -167,8 +194,7 @@
    <addaction name="actionMean"/>
    <addaction name="actionExportTxt"/>
    <addaction name="actionMode"/>
-   <addaction name="actionExport"/>
-   <addaction name="actionFFT"/>
+   <addaction name="actionMovie"/>
   </widget>
   <action name="actionMode">
    <property name="checkable">
@@ -191,31 +217,19 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionFFT">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
+  <action name="actionMovie">
+   <property name="checkable">
+    <bool>true</bool>
    </property>
-   <property name="text">
-    <string>Find</string>
-   </property>
-   <property name="toolTip">
-    <string>3D fft blur</string>
-   </property>
-  </action>
-  <action name="actionExport">
    <property name="icon">
     <iconset>
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
-    <string>Export PNG sequence</string>
+    <string>Start movie</string>
    </property>
    <property name="toolTip">
-    <string>Export png sequence</string>
-   </property>
-   <property name="neutrinoSave" stdset="0">
-    <bool>true</bool>
+    <string>Start</string>
    </property>
   </action>
   <action name="actionExportTxt">

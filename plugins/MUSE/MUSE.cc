@@ -22,6 +22,9 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+
+
+#include <algorithm>
 #include "MUSE.h"
 #include <QtGui>
 
@@ -56,14 +59,39 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
     plot->addGraph(plot->xAxis, plot->yAxis2);
     plot->addGraph(plot->xAxis, plot->yAxis);
 
-    toolBar->addWidget(radiusLambda);
     toolBar->addWidget(radius);
+
+    setProperty("NeuSave-MUSEprefix","spec_");
+    my_timer.setInterval(property("NeuSave-interval").toInt());
+    connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
     show();
     on_actionMode_toggled();
 
     loadCube();
-    setProperty("NeuSave-MUSEprefix","spec_");
+}
+
+void MUSE::on_actionMovie_triggered() {
+    DEBUG("here");
+    if (actionMovie->isChecked()) {
+        my_timer.start();
+    } else {
+        my_timer.stop();
+    }
+}
+
+void MUSE::nextPlane(){
+    DEBUG("here" << slices->value());
+
+    slices->setValue((slices->value()+1)%slices->maximum());
+}
+
+void MUSE::on_percentMin_valueChanged(int) {
+    showImagePlane(slices->value());
+}
+
+void MUSE::on_percentMax_valueChanged(int) {
+    showImagePlane(slices->value());
 }
 
 void MUSE::horzScrollBarChanged(int value)
@@ -121,16 +149,28 @@ void MUSE::on_actionExportTxt_triggered() {
 }
 
 void MUSE::keyPressEvent (QKeyEvent *e) {
+    int delta = (e->modifiers() & Qt::ShiftModifier) ? 10 : 1;
     switch (e->key()) {
     case Qt::Key_Left:
-        slices->setValue(slices->value()-1);
+        slices->setValue((slices->maximum()+slices->value()-delta)%slices->maximum());
         break;
     case Qt::Key_Right:
-        slices->setValue(slices->value()+1);
+        slices->setValue((slices->maximum()+slices->value()+delta)%slices->maximum());
         break;
     case Qt::Key_S:
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
         on_actionExportTxt_triggered();
+        break;
+    case Qt::Key_P:
+        actionMovie->trigger();
+        break;
+    case Qt::Key_Plus:
+        if (my_timer.interval()>=50)
+            my_timer.setInterval(my_timer.interval()-50);
+        setProperty("NeuSave-interval",my_timer.interval());
+        break;
+    case Qt::Key_Minus:
+        my_timer.setInterval(my_timer.interval()+50);
+        setProperty("NeuSave-interval",my_timer.interval());
         break;
     default:
         break;
@@ -138,98 +178,98 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
 }
 
 
-void MUSE::on_actionFFT_triggered() {
+//void MUSE::on_actionFFT_triggered() {
 
-    QProgressDialog progress("Copy data", "Cancel", 0, 5, this);
-    progress.setCancelButton(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.show();
-    progress.setValue(progress.value()+1);
-    QApplication::processEvents();
+//    QProgressDialog progress("Copy data", "Cancel", 0, 5, this);
+//    progress.setCancelButton(0);
+//    progress.setWindowModality(Qt::WindowModal);
+//    progress.show();
+//    progress.setValue(progress.value()+1);
+//    QApplication::processEvents();
 
 
-    int nx=cubesize[2];
-    int ny=cubesize[1];
-    int nz=cubesize[0];
+//    int nx=cubesize[0];
+//    int ny=cubesize[1];
+//    int nz=cubesize[2];
 
-    int surf=nz*ny;
+//    int surf=nx*ny;
 
-    if (cubesize.size()==3) {
-        std::vector<double> cube(cubevect.size(),0);
-#pragma omp parallel for
-        for (size_t i=0; i< cubevect.size(); i++) {
-            if (std::isfinite(cubevect[i])) {
-                cube[i]=cubevect[i];
-            } else {
-                int kk=i/surf;
-                if (std::isfinite(ymean[kk]))
-                    cube[i]=ymean[kk];
-            }
+//    if (cubesize.size()==3) {
+//        std::vector<double> cube(cubevect.size(),0);
+//#pragma omp parallel for
+//        for (size_t i=0; i< cubevect.size(); i++) {
+//            if (std::isfinite(cubevect[i])) {
+//                cube[i]=cubevect[i];
+//            } else {
+//                int kk=i/surf;
+//                if (std::isfinite(ymean[kk]))
+//                    cube[i]=ymean[kk];
+//            }
 
-        }
-        int surf=nx*ny;
-        int fftSize=surf*(nz/2+1);
+//        }
+//        int surf=nz*ny;
+//        int fftSize=surf*(nx/2+1);
 
-        fftw_complex *cubeFFT = fftw_alloc_complex(fftSize);
+//        fftw_complex *cubeFFT = fftw_alloc_complex(fftSize);
 
-        fftw_plan forw_blur = fftw_plan_dft_r2c_3d(nx, ny, nz, &cube[0], cubeFFT, FFTW_ESTIMATE);
-        fftw_plan back_blur = fftw_plan_dft_c2r_3d(nx, ny, nz, cubeFFT, &cube[0], FFTW_ESTIMATE);
+//        fftw_plan forw_blur = fftw_plan_dft_r2c_3d(nz, ny, nx, &cube[0], cubeFFT, FFTW_ESTIMATE);
+//        fftw_plan back_blur = fftw_plan_dft_c2r_3d(nz, ny, nx, cubeFFT, &cube[0], FFTW_ESTIMATE);
 
-        progress.setLabelText("FFT Forward");
-        progress.setValue(progress.value()+1);
-        QApplication::processEvents();
-        fftw_execute(forw_blur);
+//        progress.setLabelText("FFT Forward");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        fftw_execute(forw_blur);
 
-        progress.setLabelText("Blur");
-        progress.setValue(progress.value()+1);
-        QApplication::processEvents();
-        double gx=1.0/pow(nx/(radiusLambda->value()),2);
-        double gy=1.0/pow(ny/(radius->value()+1),2);
-        double gz=1.0/pow(nz/(radius->value()+1),2);
+//        progress.setLabelText("Blur");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        double gx=1.0/pow(nx/(radius->value()+1),2);
+//        double gy=1.0/pow(ny/(radius->value()+1),2);
+//        double gz=1.0/pow(nz/(radiusLambda->value()),2);
 
-#pragma omp parallel for collapse(3)
-        for (int iz = 0 ; iz < nz/2+1; iz++) {
-            for (int iy = 0 ; iy < ny; iy++) {
-                for (int ix = 0 ; ix < nx ; ix++) {
-                    int kx = (ix<nx/2+1) ? ix : ix-nx;
-                    int ky = (iy<ny/2+1) ? iy : iy-ny;
-                    int kz = iz;
+//#pragma omp parallel for collapse(3)
+//        for (int ix = 0 ; ix < nx/2+1; ix++) {
+//            for (int iy = 0 ; iy < ny; iy++) {
+//                for (int iz = 0 ; iz < nz ; iz++) {
+//                    int kx = ix;
+//                    int ky = (iy<ny/2+1) ? iy : iy-ny;
+//                    int kz = (iz<nz/2+1) ? iz : iz-nz;
 
-                    double blur=exp(-(pow(kx,2)*gx+pow(ky,2)*gy+pow(kz,2)*gz));
-                    int kk = iz+(nz/2+1)*(iy+ny*ix);
-                    cubeFFT[kk][0]*=blur;
-                    cubeFFT[kk][1]*=blur;
-                }
-            }
-        }
-        progress.setLabelText("Backward");
-        progress.setValue(progress.value()+1);
-        QApplication::processEvents();
-        fftw_execute(back_blur);
+//                    double blur=exp(-(pow(kz,2)*gz+pow(ky,2)*gy+pow(kx,2)*gx));
+//                    int kk = ix+(nx/2+1)*(iy+ny*iz);
+//                    cubeFFT[kk][0]*=blur;
+//                    cubeFFT[kk][1]*=blur;
+//                }
+//            }
+//        }
+//        progress.setLabelText("Backward");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        fftw_execute(back_blur);
 
-        progress.setLabelText("Copy back");
-        qDebug() << progress.value();
-        progress.setValue(progress.value()+1);
-        QApplication::processEvents();
-        qDebug() << progress.value();
+//        progress.setLabelText("Copy back");
+//        qDebug() << progress.value();
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        qDebug() << progress.value();
 
-#pragma omp parallel for
-        for (size_t i=0; i< cubevect.size(); i++) {
-            if (std::isfinite(cubevect[i])) {
-                cubevect[i]=cube[i]/cubevect.size();
-            }
-        }
+//#pragma omp parallel for
+//        for (size_t i=0; i< cubevect.size(); i++) {
+//            if (std::isfinite(cubevect[i])) {
+//                cubevect[i]=cube[i]/cubevect.size();
+//            }
+//        }
 
-        fftw_destroy_plan(forw_blur);
-        fftw_destroy_plan(back_blur);
-        fftw_free(cubeFFT);
+//        fftw_destroy_plan(forw_blur);
+//        fftw_destroy_plan(back_blur);
+//        fftw_free(cubeFFT);
 
-        showImagePlane(slices->value());
+//        showImagePlane(slices->value());
 
-        statusbar->showMessage(QLocale().toString(progress.value()));
+//        statusbar->showMessage(QLocale().toString(progress.value()));
 
-    }
-}
+//    }
+//}
 
 void MUSE::plotClick(QMouseEvent* e) {
     QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
@@ -292,17 +332,32 @@ void MUSE::showImagePlane(int z) {
     if (cubesize.size()==3 && z < (int)cubesize[2]) {
         nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
         my_phys->property=cube_prop;
+
+
+
         //        std::copy(cubevect.begin()+z*my_phys->getSurf(), cubevect.begin()+(z+1)*my_phys->getSurf(), my_phys->Timg_buffer);
-        int rl=radiusLambda->value();
+        int offset=z*my_phys->getSurf();
 #pragma omp parallel for
-        for (int l=std::max(0,z-rl/2); l < std::min((int)cubesize[2],z+rl-rl/2); l++) {
-            int offset=l*my_phys->getSurf();
-            for (unsigned int k=0; k < my_phys->getSurf(); k++) {
-                my_phys->Timg_buffer[k]+=cubevect[offset+k];
-            }
+        for (unsigned int k=0; k < my_phys->getSurf(); k++) {
+            my_phys->Timg_buffer[k]+=cubevect[offset+k];
         }
-        phys_divide(*my_phys,rl);
         my_phys->TscanBrightness();
+
+        std::vector<double> tmp(my_phys->Timg_buffer,my_phys->Timg_buffer+my_phys->getSurf());
+        std::vector<double>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](double i){return !isnan(i);});
+
+        std::sort(tmp.begin(),ptr);
+
+        int notNaN = std::distance(tmp.begin(), ptr)-1;
+
+        vec2 perc(notNaN*percentMin->value()/100.0,notNaN*percentMax->value()/100.0);
+
+        my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
+
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>    " << notNaN << " " << perc << " " << my_phys->property["display_range"]);
+        if (cubeSlice) {
+            cubeSlice->property["display_range"]=my_phys->property["display_range"];
+        }
         cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
         plot->setMousePosition(xvals[z]);
         statusbar->showMessage( trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[z]));
@@ -322,19 +377,19 @@ void MUSE::on_actionMode_toggled() {
     }
 }
 
-void MUSE::on_actionExport_triggered () {
-    QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
-    if (!fout.isEmpty()) {
-        for (int i=0;i<slices->maximum() ; i++) {
-            showImagePlane(i);
-            QFileInfo fi(fout);
-            nparent->exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+"."+fi.completeSuffix());
-        }
-        setProperty("NeuSave-fileExport",fout);
-    }
+//void MUSE::on_actionExport_triggered () {
+//    QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
+//    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
+//    if (!fout.isEmpty()) {
+//        for (int i=0;i<slices->maximum() ; i++) {
+//            showImagePlane(i);
+//            QFileInfo fi(fout);
+//            nparent->exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+"."+fi.completeSuffix());
+//        }
+//        setProperty("NeuSave-fileExport",fout);
+//    }
 
-}
+//}
 
 QVariant MUSE::extractData(QString key, QStringList values) {
     //    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << key;
