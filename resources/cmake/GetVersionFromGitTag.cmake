@@ -43,17 +43,25 @@ if (GIT_FOUND)
             ${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN)
 
         # Set the version numbers
-        list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
-            0 ${PROJECT_NAME}_VERSION_MAJOR)
-        list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
-            1 ${PROJECT_NAME}_VERSION_MINOR)
+        if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 0)
+            list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
+                0 ${PROJECT_NAME}_VERSION_MAJOR)
+        else()
+            set(${PROJECT_NAME}_VERSION_MAJOR "0")
+        endif()
+
+        if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 1)
+            list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
+                1 ${PROJECT_NAME}_VERSION_MINOR)
+        else()
+            set(${PROJECT_NAME}_VERSION_MINOR "0")
+        endif()
         if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 2)
             list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
                 2 ${PROJECT_NAME}_VERSION_PATCH)
         else()
             set(${PROJECT_NAME}_VERSION_PATCH "0")
         endif()
-
 
         if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 3)
             list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3 ${PROJECT_NAME}_VERSION_TWEAK)
