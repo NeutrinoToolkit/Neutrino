@@ -42,30 +42,26 @@ if (GIT_FOUND)
         list(LENGTH ${PROJECT_NAME}_PARTIAL_VERSION_LIST
             ${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN)
 
+        set(${PROJECT_NAME}_VERSION_MAJOR "0")
+        set(${PROJECT_NAME}_VERSION_MINOR "0")
+        set(${PROJECT_NAME}_VERSION_PATCH "0")
+
         # Set the version numbers
         if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 0)
             list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
                 0 ${PROJECT_NAME}_VERSION_MAJOR)
-        else()
-            set(${PROJECT_NAME}_VERSION_MAJOR "0")
-        endif()
-
-        if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 1)
-            list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
-                1 ${PROJECT_NAME}_VERSION_MINOR)
-        else()
-            set(${PROJECT_NAME}_VERSION_MINOR "0")
-        endif()
-        if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 2)
-            list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
-                2 ${PROJECT_NAME}_VERSION_PATCH)
-        else()
-            set(${PROJECT_NAME}_VERSION_PATCH "0")
-        endif()
-
-        if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 3)
-            list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3 ${PROJECT_NAME}_VERSION_TWEAK)
-            string(SUBSTRING ${${PROJECT_NAME}_VERSION_TWEAK} 1 -1 ${PROJECT_NAME}_VERSION_TWEAK)
+            if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 1)
+                list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
+                    1 ${PROJECT_NAME}_VERSION_MINOR)
+                if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 2)
+                    list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
+                        2 ${PROJECT_NAME}_VERSION_PATCH)                        
+                    if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 3)
+                        list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3 ${PROJECT_NAME}_VERSION_TWEAK)
+                        string(SUBSTRING ${${PROJECT_NAME}_VERSION_TWEAK} 1 -1 ${PROJECT_NAME}_VERSION_TWEAK)
+                    endif()
+                endif()
+            endif()
         endif()
 
         # Unset the list
@@ -86,7 +82,7 @@ endif(GIT_FOUND)
 # Set project version (without the preceding 'v')
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 if (${PROJECT_NAME}_VERSION_TWEAK)
-	set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION}-${${PROJECT_NAME}_VERSION_TWEAK})
+    set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION}-${${PROJECT_NAME}_VERSION_TWEAK})
 endif()
 
 

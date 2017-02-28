@@ -69,25 +69,25 @@ cross::
 	$(MAKE) -C $@ package	
 
 Linux::
-	cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -B$@ -H.
+	cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -DOPTION_INSTALL_PYTHONQT=ON -B$@ -H.
 	$(MAKE) -C $@ package
 
 
-appdir:: Linux
-	mkdir -p Neutrino.AppDir/usr
-
-	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
-	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
-
-	cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins Neutrino.AppDir/usr/bin
-
-	# apt-get install pax-utils
-	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
-
-	rm -rf Neutrino
-	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
-
-	zip -FSr Neutrino.zip Neutrino
+# appdir:: Linux
+# 	mkdir -p Neutrino.AppDir/usr
+# 
+# 	cp -r Linux/lib Linux/bin Neutrino.AppDir/usr
+# 	cp resources/icons/icon.png resources/linuxPackage/*  Neutrino.AppDir
+# 
+# 	cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins Neutrino.AppDir/usr/bin
+# 
+# 	# apt-get install pax-utils
+# 	lddtree Neutrino.AppDir/usr/bin/Neutrino | grep "=>" | awk '{print $$3}' | xargs cp -t Neutrino.AppDir/usr/lib/
+# 
+# 	rm -rf Neutrino
+# 	~/AppImageKit/AppImageAssistant Neutrino.AppDir Neutrino
+# 
+# 	zip -FSr Neutrino.zip Neutrino
 
 
 .PHONY: doc 

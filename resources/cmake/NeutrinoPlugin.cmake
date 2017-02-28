@@ -2,7 +2,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     include(FindNeutrinoGuiComponents)
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-    message (STATUS "${NEUTRINO_ROOT} : Adding plugin ${MY_PROJECT_NAME}")
     PROJECT (${MY_PROJECT_NAME} CXX)
 
 
@@ -51,7 +50,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     if(NOT DEFINED PANDOC)
       find_program(PANDOC pandoc)
       if(PANDOC)
-        message(STATUS "Found pandoc")
+          if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            message(STATUS "Found pandoc")
+        endif()
       endif(PANDOC)
       mark_as_advanced(PANDOC)
     endif(NOT DEFINED PANDOC)
