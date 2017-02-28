@@ -22,14 +22,12 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-
-
-#include <algorithm>
 #include "MUSE.h"
 #include <QtGui>
 
 #include "nPhysFormats.h"
 #include "fitsio.h"
+#include "neutrino.h"
 
 #define HDF5_MAX_NAME 2048
 

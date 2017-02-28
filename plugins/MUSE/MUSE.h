@@ -31,7 +31,7 @@
 #ifndef __MUSE
 #define __MUSE
 
-#include "neutrino.h"
+class neutrino;
 
 class MUSE : public nGenericPan, private Ui::MUSE {
     Q_OBJECT
