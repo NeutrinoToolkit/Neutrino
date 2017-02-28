@@ -77,9 +77,14 @@ public:
 
 // external library formats
 #ifdef HAVE_LIBNETPBM
+#define min pbm_min
+#define max pbm_max
 extern "C" {
 #include <pgm.h>
+#include <pbm.h>
 }
+#undef min
+#undef max
 
 // external library formats
 class physInt_pgm : public nPhysImageF<int> {

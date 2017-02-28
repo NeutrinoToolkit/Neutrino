@@ -25,9 +25,9 @@
 #include "MUSE.h"
 #include <QtGui>
 
+#include "neutrino.h"
 #include "nPhysFormats.h"
 #include "fitsio.h"
-#include "neutrino.h"
 
 #define HDF5_MAX_NAME 2048
 
