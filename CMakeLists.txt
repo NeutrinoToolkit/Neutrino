@@ -88,6 +88,7 @@ if (GIT_FOUND)
         set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}")
         message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
     ENDIF()
+
 endif()
 
 # targets

@@ -122,7 +122,10 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     ENDIF()
 
     if(WIN32)
+        add_dependencies(${MY_PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
+        # to check: --enable-runtime-pseudo-reloc
     endif()
 
     if (DEFINED LOCAL_LIBS)

@@ -226,7 +226,10 @@ endif()
 
 if(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} ${qm_files})
+    list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
+    add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
+    set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
+    set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if(LINUX)

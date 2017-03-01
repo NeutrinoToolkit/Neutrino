@@ -346,7 +346,9 @@ void MUSE::showImagePlane(int z) {
 
         int notNaN = std::distance(tmp.begin(), ptr)-1;
 
-        vec2 perc(notNaN*(100.0-percent->value())/100.0,notNaN*(percent->value())/100.0);
+
+
+        vec2 perc(notNaN*(100.0-percent->value())/200.0,notNaN*(100+percent->value())/200.0);
 
         my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
 
