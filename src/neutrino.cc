@@ -523,9 +523,11 @@ neutrino::loadPlugin()
                 }
             } else {
                 DEBUG("plugin load fail");
+		throw neu_pluginerror("Plugin cannot be connected.");
                 }
         } else {
             DEBUG("plugin cannot be loaded (linking problems?)");
+	    throw neu_pluginerror("Plugin cannot be loaded (linking problems?)");
         }
     }
  }

@@ -70,6 +70,26 @@
 
 #include "nTics.h"
 
+class neu_pluginerror: public std::exception
+{
+
+public:
+	neu_pluginerror(std::string str = std::string("(undefined plugin error"))
+		: msg(str)
+	{ }
+
+	~neu_pluginerror() throw()
+	{ }
+
+	virtual const char* what() const throw()
+	{ return msg.c_str(); }
+
+private:
+	std::string msg;
+
+};
+
+
 class neutrino : public QMainWindow {
 
 Q_OBJECT
