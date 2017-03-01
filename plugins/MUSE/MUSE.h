@@ -50,8 +50,7 @@ public slots:
     void on_actionMovie_triggered();
     void on_actionMean_triggered();
     void on_actionExportTxt_triggered();
-    void on_percentMin_valueChanged(int);
-    void on_percentMax_valueChanged(int);
+    void on_percent_valueChanged(double);
 
     void showImagePlane(int z);
 

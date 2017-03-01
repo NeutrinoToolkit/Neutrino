@@ -84,13 +84,11 @@ void MUSE::nextPlane(){
     slices->setValue((slices->value()+1)%slices->maximum());
 }
 
-void MUSE::on_percentMin_valueChanged(int) {
+void MUSE::on_percent_valueChanged(double) {
+
     showImagePlane(slices->value());
 }
 
-void MUSE::on_percentMax_valueChanged(int) {
-    showImagePlane(slices->value());
-}
 
 void MUSE::horzScrollBarChanged(int value)
 {
@@ -348,7 +346,7 @@ void MUSE::showImagePlane(int z) {
 
         int notNaN = std::distance(tmp.begin(), ptr)-1;
 
-        vec2 perc(notNaN*percentMin->value()/100.0,notNaN*percentMax->value()/100.0);
+        vec2 perc(notNaN*(100.0-percent->value())/100.0,notNaN*(percent->value())/100.0);
 
         my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
 

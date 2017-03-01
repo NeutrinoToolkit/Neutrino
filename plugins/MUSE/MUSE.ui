@@ -45,24 +45,12 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="0" column="3">
-        <widget class="QSpinBox" name="percentMin">
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="slices">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
-         </property>
-         <property name="suffix">
-          <string>%</string>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -88,17 +76,8 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="slices">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QSpinBox" name="percentMax">
+       <item row="0" column="3">
+        <widget class="QDoubleSpinBox" name="percent">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -107,11 +86,11 @@
          <property name="suffix">
           <string>%</string>
          </property>
-         <property name="maximum">
-          <number>100</number>
+         <property name="decimals">
+          <number>2</number>
          </property>
-         <property name="value">
-          <number>100</number>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -201,7 +180,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -222,7 +201,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -234,7 +213,7 @@
   </action>
   <action name="actionExportTxt">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -252,7 +231,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -274,6 +253,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
