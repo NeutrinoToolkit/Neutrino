@@ -457,6 +457,8 @@ neutrino::scanPlugins()
             pluginsDir.cdUp();
             pluginsDir.cdUp();
     }
+#elif defined(Q_OS_LINUX)
+    pluginsDir.cd("../share/neutrino");
 #endif
     pluginsDir.cd("plugins");
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {

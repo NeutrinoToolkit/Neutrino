@@ -106,6 +106,7 @@ if (WIN32)
 	#SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
 	SET(CPACK_NSIS_MODIFY_PATH ON)
 
+
 	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
 	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
 	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
@@ -113,6 +114,7 @@ if (WIN32)
 	#message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
 	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
 	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
+
 
 	if (PYTHONQT_FOUND_COMPLETE)
 		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
@@ -152,6 +154,7 @@ if (LINUX)
 	# triggers
 	set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
+
 	# install goodies
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
@@ -170,21 +173,23 @@ endif()
 
 
 if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
-    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
-    set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
+	set(CPACK_PACKAGE_ICON "${ICONS_DIR}/icon.icns")
 
-    set(CPACK_BUNDLE_NAME "Neutrino")
-    set(CPACK_BUNDLE_ICON "${ICONS_DIR}/icon.icns")
-    set(CPACK_BUNDLE_PLIST "${ICONS_DIR}/../neutrino.plist")
+	set(CPACK_BUNDLE_NAME "Neutrino")
+	set(CPACK_BUNDLE_ICON "${ICONS_DIR}/icon.icns")
+	set(CPACK_BUNDLE_PLIST "${ICONS_DIR}/../neutrino.plist")
 
-    set(CMAKE_INSTALL_PREFIX "/Applications")
-    set(CPACK_GENERATOR "Bundle")
-    set(CPACK_DMG_FORMAT "UDBZ")
-    set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
-    set(CPACK_SYSTEM_NAME "OSX")
-    set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
-    set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
+	set(CMAKE_INSTALL_PREFIX "/Applications")
+	set(CPACK_GENERATOR "Bundle")
+	set(CPACK_DMG_FORMAT "UDBZ")
+	set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
+	set(CPACK_SYSTEM_NAME "OSX")
+	set(CPACK_DMG_DS_STORE "${ICONS_DIR}/../macPackage/DS_Store")
+	set(CPACK_DMG_BACKGROUND_IMAGE "${ICONS_DIR}/../macPackage/sfondo.png")
+
+
 endif()
 
 include (CPack) # this to be included LAST with resp. to its vars

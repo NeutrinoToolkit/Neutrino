@@ -68,3 +68,4 @@ if (WIN32)
 	target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
 	# to check: --enable-runtime-pseudo-reloc
 endif()
+install (TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR})
