@@ -37,6 +37,8 @@ include(FindNeutrinoGuiComponents)
 add_definitions(-DQT_PLUGIN)
 add_definitions(-DQT_SHARED)
 
+message(STATUS " Qt libraries for plugin: ${QT_LIBRARIES}")
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -58,6 +60,11 @@ QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nAbout.ui)
 QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
 # add sources here
-add_library (${PROJECT_NAME} SHARED test-plugin.cc test-plugin.h ${nUIs})
+add_library (${PROJECT_NAME} MODULE test-plugin.cc test-plugin.h ${nUIs})
+add_dependencies(${PROJECT_NAME} Neutrino)
+qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${LIBS})
-message(STATUS ${QT_LIBRARIES})
+if (WIN32)
+	target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
+	# to check: --enable-runtime-pseudo-reloc
+endif()
