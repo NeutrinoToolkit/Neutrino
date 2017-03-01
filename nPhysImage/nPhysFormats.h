@@ -48,6 +48,17 @@ extern "C" {
 #undef uint32
 #endif
 
+// external library formats
+#ifdef HAVE_LIBNETPBM
+#define min pbm_min
+#define max pbm_max
+extern "C" {
+#include <pgm.h>
+#include <pbm.h>
+}
+#undef min
+#undef max
+
 
 // standard formats
 class physDouble_txt : public nPhysImageF<double> {
@@ -74,17 +85,6 @@ public:
 	physDouble_asc(const char *);
 };
 
-
-// external library formats
-#ifdef HAVE_LIBNETPBM
-#define min pbm_min
-#define max pbm_max
-extern "C" {
-#include <pgm.h>
-#include <pbm.h>
-}
-#undef min
-#undef max
 
 // external library formats
 class physInt_pgm : public nPhysImageF<int> {

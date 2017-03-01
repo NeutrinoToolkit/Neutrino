@@ -106,6 +106,7 @@ protected:
 
 
 signals:
+    void keypressed(QKeyEvent*);
 	void mouseposition(QPointF);
 	void mousePressEvent_sig(QPointF);
 	void mouseDoubleClickEvent_sig(QPointF);

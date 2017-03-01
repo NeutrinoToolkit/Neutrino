@@ -57,11 +57,18 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
     plot->addGraph(plot->xAxis, plot->yAxis2);
     plot->addGraph(plot->xAxis, plot->yAxis);
 
+    toolBar->addWidget(percent);
     toolBar->addWidget(radius);
+    toolBar->addWidget(restLambda);
+    toolBar->addWidget(lambdaz);
 
     setProperty("NeuSave-MUSEprefix","spec_");
+    setProperty("NeuSave-MUSEdir",QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    qDebug() << property("NeuSave-MUSEdir");
     my_timer.setInterval(property("NeuSave-interval").toInt());
     connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
+
+    connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 
     show();
     on_actionMode_toggled();
@@ -84,9 +91,10 @@ void MUSE::nextPlane(){
     slices->setValue((slices->value()+1)%slices->maximum());
 }
 
-void MUSE::on_percent_valueChanged(double) {
-
-    showImagePlane(slices->value());
+void MUSE::on_percent_valueChanged(double val) {
+    if (meanSlice) setColorPrecentPixels(meanSlice,val);
+    if (cubeSlice) setColorPrecentPixels(cubeSlice,val);
+    nparent->createQimage();
 }
 
 
@@ -117,8 +125,18 @@ void MUSE::on_actionMean_triggered() {
 void MUSE::on_actionExportTxt_triggered() {
     qDebug() << sender();
     QString prefix=property("NeuSave-MUSEprefix").toString();
+    QDir dirName(property("NeuSave-MUSEdir").toString());
+    qDebug() << dirName;
     if (sender() && sender()->objectName()=="actionExportTxt") {
         bool ok;
+        QString dirNamestr = QFileDialog::getExistingDirectory(this,tr("Spectra dir"),dirName.path());
+        if (QFileInfo(dirNamestr).isDir()) {
+            setProperty("NeuSave-MUSEdir",dirNamestr);
+            dirName.setCurrent(dirNamestr);
+        } else {
+            statusbar->showMessage("Cannot change to dir "+ dirNamestr+ ". Using"+ dirName.path());
+        }
+
         QString text = QInputDialog::getText(this, tr("Prefix"),tr("Spectrum File prefix:"), QLineEdit::Normal, prefix, &ok);
         if (ok) {
             setProperty("NeuSave-MUSEprefix",text);
@@ -126,10 +144,11 @@ void MUSE::on_actionExportTxt_triggered() {
             return;
         }
     }
+
     int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
     QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
-    qDebug() << fname;
-    QFile t(fname);
+    QFile t(dirName.filePath(fname));
+    qDebug() << fname<<    t.fileName();
     t.open(QIODevice::WriteOnly| QIODevice::Text);
     if (t.isOpen()) {
         QTextStream out(&t);
@@ -173,100 +192,6 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
     }
 }
 
-
-//void MUSE::on_actionFFT_triggered() {
-
-//    QProgressDialog progress("Copy data", "Cancel", 0, 5, this);
-//    progress.setCancelButton(0);
-//    progress.setWindowModality(Qt::WindowModal);
-//    progress.show();
-//    progress.setValue(progress.value()+1);
-//    QApplication::processEvents();
-
-
-//    int nx=cubesize[0];
-//    int ny=cubesize[1];
-//    int nz=cubesize[2];
-
-//    int surf=nx*ny;
-
-//    if (cubesize.size()==3) {
-//        std::vector<double> cube(cubevect.size(),0);
-//#pragma omp parallel for
-//        for (size_t i=0; i< cubevect.size(); i++) {
-//            if (std::isfinite(cubevect[i])) {
-//                cube[i]=cubevect[i];
-//            } else {
-//                int kk=i/surf;
-//                if (std::isfinite(ymean[kk]))
-//                    cube[i]=ymean[kk];
-//            }
-
-//        }
-//        int surf=nz*ny;
-//        int fftSize=surf*(nx/2+1);
-
-//        fftw_complex *cubeFFT = fftw_alloc_complex(fftSize);
-
-//        fftw_plan forw_blur = fftw_plan_dft_r2c_3d(nz, ny, nx, &cube[0], cubeFFT, FFTW_ESTIMATE);
-//        fftw_plan back_blur = fftw_plan_dft_c2r_3d(nz, ny, nx, cubeFFT, &cube[0], FFTW_ESTIMATE);
-
-//        progress.setLabelText("FFT Forward");
-//        progress.setValue(progress.value()+1);
-//        QApplication::processEvents();
-//        fftw_execute(forw_blur);
-
-//        progress.setLabelText("Blur");
-//        progress.setValue(progress.value()+1);
-//        QApplication::processEvents();
-//        double gx=1.0/pow(nx/(radius->value()+1),2);
-//        double gy=1.0/pow(ny/(radius->value()+1),2);
-//        double gz=1.0/pow(nz/(radiusLambda->value()),2);
-
-//#pragma omp parallel for collapse(3)
-//        for (int ix = 0 ; ix < nx/2+1; ix++) {
-//            for (int iy = 0 ; iy < ny; iy++) {
-//                for (int iz = 0 ; iz < nz ; iz++) {
-//                    int kx = ix;
-//                    int ky = (iy<ny/2+1) ? iy : iy-ny;
-//                    int kz = (iz<nz/2+1) ? iz : iz-nz;
-
-//                    double blur=exp(-(pow(kz,2)*gz+pow(ky,2)*gy+pow(kx,2)*gx));
-//                    int kk = ix+(nx/2+1)*(iy+ny*iz);
-//                    cubeFFT[kk][0]*=blur;
-//                    cubeFFT[kk][1]*=blur;
-//                }
-//            }
-//        }
-//        progress.setLabelText("Backward");
-//        progress.setValue(progress.value()+1);
-//        QApplication::processEvents();
-//        fftw_execute(back_blur);
-
-//        progress.setLabelText("Copy back");
-//        qDebug() << progress.value();
-//        progress.setValue(progress.value()+1);
-//        QApplication::processEvents();
-//        qDebug() << progress.value();
-
-//#pragma omp parallel for
-//        for (size_t i=0; i< cubevect.size(); i++) {
-//            if (std::isfinite(cubevect[i])) {
-//                cubevect[i]=cube[i]/cubevect.size();
-//            }
-//        }
-
-//        fftw_destroy_plan(forw_blur);
-//        fftw_destroy_plan(back_blur);
-//        fftw_free(cubeFFT);
-
-//        showImagePlane(slices->value());
-
-//        statusbar->showMessage(QLocale().toString(progress.value()));
-
-//    }
-//}
-
 void MUSE::plotClick(QMouseEvent* e) {
     QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
     if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
@@ -285,7 +210,7 @@ QString toNum(QPointF p) {
 }
 
 void MUSE::doSpectrum(QPointF point) {
-    QPointF pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+    QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
 
     double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
     double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
@@ -295,7 +220,7 @@ void MUSE::doSpectrum(QPointF point) {
     qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
 
     if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
-        lastpoint=point.toPoint();
+        lastpoint=pFloor;
         vec2 p(point.x(),point.y());
         for (int zz=0; zz< yvals.size(); zz++) {
             yvals[zz]=0;
@@ -312,11 +237,26 @@ void MUSE::doSpectrum(QPointF point) {
             }
         }
         plot->graph(1)->setData(xvals,yvals,true);
-        QString spec_name("Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
+        QString spec_name("("+QLocale().toString(pFloor.x())+","+QLocale().toString(pFloor.y())+ ") Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
         plot->graph(1)->setName(spec_name);
         plot->setTitle(spec_name);
         plot->replot();
     }
+}
+
+void MUSE::setColorPrecentPixels(nPhysD* my_phys, double val) {
+    std::vector<double> tmp(my_phys->Timg_buffer,my_phys->Timg_buffer+my_phys->getSurf());
+    std::vector<double>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](double i){return !isnan(i);});
+
+    std::sort(tmp.begin(),ptr);
+
+    int notNaN = std::distance(tmp.begin(), ptr)-1;
+
+    vec2 perc(notNaN*(100.0-val)/200.0,notNaN*(100+val)/200.0);
+
+    my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>    " << notNaN << " " << perc << " " << my_phys->property["display_range"]);
+
 }
 
 void MUSE::showImagePlane(int z) {
@@ -329,9 +269,6 @@ void MUSE::showImagePlane(int z) {
         nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
         my_phys->property=cube_prop;
 
-
-
-        //        std::copy(cubevect.begin()+z*my_phys->getSurf(), cubevect.begin()+(z+1)*my_phys->getSurf(), my_phys->Timg_buffer);
         int offset=z*my_phys->getSurf();
 #pragma omp parallel for
         for (unsigned int k=0; k < my_phys->getSurf(); k++) {
@@ -339,30 +276,30 @@ void MUSE::showImagePlane(int z) {
         }
         my_phys->TscanBrightness();
 
-        std::vector<double> tmp(my_phys->Timg_buffer,my_phys->Timg_buffer+my_phys->getSurf());
-        std::vector<double>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](double i){return !isnan(i);});
+        setColorPrecentPixels(my_phys,percent->value());
 
-        std::sort(tmp.begin(),ptr);
-
-        int notNaN = std::distance(tmp.begin(), ptr)-1;
-
-
-
-        vec2 perc(notNaN*(100.0-percent->value())/200.0,notNaN*(100+percent->value())/200.0);
-
-        my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
-
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>    " << notNaN << " " << perc << " " << my_phys->property["display_range"]);
         if (cubeSlice) {
             cubeSlice->property["display_range"]=my_phys->property["display_range"];
         }
         cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
         plot->setMousePosition(xvals[z]);
-        statusbar->showMessage( trUtf8("\xce\xbb") + ":" + QLocale().toString(xvals[z]));
+        setstatusbar();
     }
     QApplication::processEvents();
     connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
     connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+}
+
+void MUSE::on_restLambda_valueChanged(double) {
+    setstatusbar();
+}
+
+void MUSE::setstatusbar() {
+    if (xvals.size()>slices->value()) {
+        double lambda=xvals[slices->value()];
+        double redshift=lambda/restLambda->value()-1.0;
+        lambdaz->setText(trUtf8("\xce\xbb") + ":" + QLocale().toString(lambda) + " z=" + QLocale().toString(redshift));
+    }
 }
 
 void MUSE::on_actionMode_toggled() {
@@ -639,3 +576,97 @@ void MUSE::loadCube() {
         DEBUG("out of here");
     }
 }
+
+//void MUSE::on_actionFFT_triggered() {
+
+//    QProgressDialog progress("Copy data", "Cancel", 0, 5, this);
+//    progress.setCancelButton(0);
+//    progress.setWindowModality(Qt::WindowModal);
+//    progress.show();
+//    progress.setValue(progress.value()+1);
+//    QApplication::processEvents();
+
+
+//    int nx=cubesize[0];
+//    int ny=cubesize[1];
+//    int nz=cubesize[2];
+
+//    int surf=nx*ny;
+
+//    if (cubesize.size()==3) {
+//        std::vector<double> cube(cubevect.size(),0);
+//#pragma omp parallel for
+//        for (size_t i=0; i< cubevect.size(); i++) {
+//            if (std::isfinite(cubevect[i])) {
+//                cube[i]=cubevect[i];
+//            } else {
+//                int kk=i/surf;
+//                if (std::isfinite(ymean[kk]))
+//                    cube[i]=ymean[kk];
+//            }
+
+//        }
+//        int surf=nz*ny;
+//        int fftSize=surf*(nx/2+1);
+
+//        fftw_complex *cubeFFT = fftw_alloc_complex(fftSize);
+
+//        fftw_plan forw_blur = fftw_plan_dft_r2c_3d(nz, ny, nx, &cube[0], cubeFFT, FFTW_ESTIMATE);
+//        fftw_plan back_blur = fftw_plan_dft_c2r_3d(nz, ny, nx, cubeFFT, &cube[0], FFTW_ESTIMATE);
+
+//        progress.setLabelText("FFT Forward");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        fftw_execute(forw_blur);
+
+//        progress.setLabelText("Blur");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        double gx=1.0/pow(nx/(radius->value()+1),2);
+//        double gy=1.0/pow(ny/(radius->value()+1),2);
+//        double radiusLambda=4
+//        double gz=1.0/pow(nz/(radiusLambda),2);
+
+//#pragma omp parallel for collapse(3)
+//        for (int ix = 0 ; ix < nx/2+1; ix++) {
+//            for (int iy = 0 ; iy < ny; iy++) {
+//                for (int iz = 0 ; iz < nz ; iz++) {
+//                    int kx = ix;
+//                    int ky = (iy<ny/2+1) ? iy : iy-ny;
+//                    int kz = (iz<nz/2+1) ? iz : iz-nz;
+
+//                    double blur=exp(-(pow(kz,2)*gz+pow(ky,2)*gy+pow(kx,2)*gx));
+//                    int kk = ix+(nx/2+1)*(iy+ny*iz);
+//                    cubeFFT[kk][0]*=blur;
+//                    cubeFFT[kk][1]*=blur;
+//                }
+//            }
+//        }
+//        progress.setLabelText("Backward");
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        fftw_execute(back_blur);
+
+//        progress.setLabelText("Copy back");
+//        qDebug() << progress.value();
+//        progress.setValue(progress.value()+1);
+//        QApplication::processEvents();
+//        qDebug() << progress.value();
+
+//#pragma omp parallel for
+//        for (size_t i=0; i< cubevect.size(); i++) {
+//            if (std::isfinite(cubevect[i])) {
+//                cubevect[i]=cube[i]/cubevect.size();
+//            }
+//        }
+
+//        fftw_destroy_plan(forw_blur);
+//        fftw_destroy_plan(back_blur);
+//        fftw_free(cubeFFT);
+
+//        showImagePlane(slices->value());
+
+//        statusbar->showMessage(QLocale().toString(progress.value()));
+
+//    }
+//}

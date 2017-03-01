@@ -276,6 +276,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 
     update();
     if (nparent->follower) nparent->follower->my_w->my_view->keyPressEvent(e);
+    emit keypressed(e);
 }
 
 void nView::setMouseShape(int num) {

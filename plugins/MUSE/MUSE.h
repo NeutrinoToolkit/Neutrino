@@ -51,6 +51,10 @@ public slots:
     void on_actionMean_triggered();
     void on_actionExportTxt_triggered();
     void on_percent_valueChanged(double);
+    void on_restLambda_valueChanged(double);
+    void setColorPrecentPixels(nPhysD* my_phys, double val);
+    void setstatusbar();
+
 
     void showImagePlane(int z);
 
