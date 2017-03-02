@@ -124,7 +124,13 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     if(WIN32)
         add_dependencies(${MY_PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
+        target_link_libraries(${MY_PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
+
+#        list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
+#        add_executable(${MY_PROJECT_NAME} WIN32  ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
+#        set_property(TARGET ${MY_PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
+#        set_property(TARGET ${MY_PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
         # to check: --enable-runtime-pseudo-reloc
     endif()
 
