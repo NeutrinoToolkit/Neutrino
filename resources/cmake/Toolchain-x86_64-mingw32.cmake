@@ -24,8 +24,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # dep tree to be found in cross-compile-win, one level up neutrino tree
-include_directories("${CMAKE_CURRENT_LIST_DIR}/../../../cross-compile-win/include")
-SET(CMAKE_FIND_ROOT_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../cross-compile-win)
+#include_directories("${CMAKE_CURRENT_LIST_DIR}/../../../cross-compile-win/include")
+SET(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32/sys-root/mingw)
 
 # look for qt5
 # qt subtree to be located in ${CMAKE_FIND_ROOT_PATH}

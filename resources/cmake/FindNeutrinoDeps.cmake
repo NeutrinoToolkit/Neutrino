@@ -94,7 +94,9 @@ if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
   		/usr/local/include/
   		/usr/include
   		/usr/local/include/hdf
-  		/usr/include/hdf)
+  		/usr/include/hdf
+    		${CMAKE_FIND_ROOT_PATH}/include
+    )
 
     IF (HDF4_INCLUDE_DIR)
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -128,6 +130,7 @@ if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
     /usr/include/netpbm
     /usr/local/include
     /usr/local/include/netpbm
+    ${CMAKE_FIND_ROOT_PATH}/include
     )
     IF (NETPBM_INCLUDE_DIR)
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -147,11 +150,23 @@ endif()
 
 find_library(CFITS NAMES cfitsio)
 if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(STATUS "using cfits: ${CFITS}")
+    FIND_PATH(CFITS_INCLUDE_DIR fitsio.h
+    /usr/include
+    /usr/include/netpbm
+    /usr/local/include
+    /usr/local/include/netpbm
+    ${CMAKE_FIND_ROOT_PATH}/include
+    ${CMAKE_FIND_ROOT_PATH}/include/cfitsio
+    )
+    message(STATUS ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${CMAKE_FIND_ROOT_PATH} <<")
+    IF (CFITS_INCLUDE_DIR)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            message(STATUS "using cfits: ${CFITS}")
+        endif()
+        list(APPEND LIBS ${CFITS})
+        add_definitions(-DHAVE_LIBCFITSIO)
+        include_directories(BEFORE ${CFITS_INCLUDE_DIR})
     endif()
-    list(APPEND LIBS ${CFITS})
-    add_definitions(-DHAVE_LIBCFITSIO)
 endif()
 
 # opencl
