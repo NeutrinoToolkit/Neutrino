@@ -102,32 +102,34 @@ endif()
 file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
 
 if (WIN32)
-        # use nsis
-        message (STATUS "[win32] Using NSIS for packaging")
-        list(APPEND CPACK_GENERATOR NSIS)
-        message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
+	# use nsis
+	message (STATUS "[win32] Using NSIS for packaging")
+	list(APPEND CPACK_GENERATOR NSIS)
+	message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
 
-        SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
-        #SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
-        set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
-        set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
-        SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Neutrino")
-        #SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
-        #SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
-        #SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
-        SET(CPACK_NSIS_MODIFY_PATH ON)
+	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
+	#SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
+	set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
+	set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
+	SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Neutrino")
+	#SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
+	#SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
+	#SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
+	SET(CPACK_NSIS_MODIFY_PATH ON)
 
-        # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
-        file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
-        file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
 
-        #message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
-        install (FILES ${RUNTIME_DEPS} DESTINATION bin)
-        install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
+	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
+	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
+	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/platforms/*dll)
 
-        if (PYTHONQT_FOUND_COMPLETE)
-                install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
-        endif()
+	#message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
+	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
+
+
+	if (PYTHONQT_FOUND_COMPLETE)
+		install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+	endif()
 endif()
 
 
@@ -164,9 +166,9 @@ if (LINUX)
         # triggers
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
-        # install goodies
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
+	# install goodies
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
 
         if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
                 list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
