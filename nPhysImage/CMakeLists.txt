@@ -31,12 +31,6 @@ SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}"
 
 target_link_libraries(nPhysImageF ${LIBS})
 
-# output
-set (LIBRARY_OUTPUT_PATH "../lib")
-
-#set (CMAKE_SKIP_RPATH true)
-
-
 # install
 if (WIN32)
 	install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)

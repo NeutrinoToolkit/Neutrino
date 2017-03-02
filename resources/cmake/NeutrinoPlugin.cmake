@@ -1,9 +1,10 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
-    include(FindNeutrinoGuiComponents)
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
     PROJECT (${MY_PROJECT_NAME} CXX)
 
+    MESSAGE(STATUS "PLugin ${PROJECT_NAME}")
+    include(FindNeutrinoGuiComponents)
 
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
     set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
@@ -61,7 +62,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 		set_source_files_properties( ${README_MD} PROPERTIES HEADER_FILE_ONLY TRUE)
 
         set(PANDOC_QRC ${CMAKE_CURRENT_BINARY_DIR}/pandoc.qrc)
-        file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/${MY_PROJECT_NAME}/\">\n")
+        file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource prefix=\"/${PROJECT_NAME}/\">\n")
         file(APPEND ${PANDOC_QRC} "        <file>README.html</file>\n")
         file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
 
@@ -74,7 +75,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
 
-        add_custom_target(pandoc${MY_PROJECT_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/README.html SOURCES ${README_MD})
+        add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/README.html SOURCES ${README_MD})
     endif()
 
     ## add translations
@@ -85,7 +86,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 		
         SET(LANGUAGE_TS_FILES)
         FOREACH(LANGUAGE ${LANGUAGES})
-        SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${MY_PROJECT_NAME}_${LANGUAGE}.ts")
+        SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_${LANGUAGE}.ts")
         SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
 
         if(EXISTS ${TS_FILE})
@@ -122,15 +123,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     ENDIF()
 
     if(WIN32)
-        add_dependencies(${MY_PROJECT_NAME} Neutrino)
+        add_dependencies(${PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-        target_link_libraries(${MY_PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a)
-
-#        list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
-#        add_executable(${MY_PROJECT_NAME} WIN32  ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
-#        set_property(TARGET ${MY_PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
-#        set_property(TARGET ${MY_PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a ${CMAKE_BINARY_DIR}/lib/libnPhysImageF.dll.a ${LIBS})
         # to check: --enable-runtime-pseudo-reloc
     endif()
 
@@ -148,11 +143,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 #    message(STATUS ${my_output_file})
 
 IF (DEFINED LIBRARY_OUTPUT_PATH)
-    IF(LINUX)
-        install(TARGETS ${PROJECT_NAME} DESTINATION share/neutrino/plugins)
-    ELSEIF(APPLE)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
-    ENDIF()
+MESSAGE(STATUS ">>>>><><><>>><<< ${LIBRARY_OUTPUT_PATH}")
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
 ENDIF()
 
 
