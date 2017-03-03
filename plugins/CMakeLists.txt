@@ -17,12 +17,6 @@ list(LENGTH plugins_list plugins_list_len)
 
 message(STATUS "Found ${plugins_list_len} plugins")
 
-if(APPLE)
-    set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources/plugins")
-elseif(LINUX)
-    set (LIBRARY_OUTPUT_PATH share/neutrino/plugins)
-endif()
-
 foreach (plugin_name ${plugins_list})
     if (EXISTS "${plugin_name}/CMakeLists.txt")
         add_subdirectory(${plugin_name})
@@ -31,6 +25,3 @@ foreach (plugin_name ${plugins_list})
     endif()
 endforeach()
 
-if (WIN32)
-    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins DESTINATION bin/plugins)
-endif()

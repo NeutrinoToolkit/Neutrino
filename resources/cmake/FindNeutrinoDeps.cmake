@@ -9,6 +9,13 @@ if (OPENMP_FOUND AND NOT "${CMAKE_CXX_FLAGS}" MATCHES "^(${OpenMP_CXX_FLAGS})")
     add_definitions(-DHAVE_OPENMP)
 endif()
 
+find_package( ZLIB REQUIRED )
+if ( ZLIB_FOUND )
+    include_directories( ${ZLIB_INCLUDE_DIRS} )
+    set(LIBS ${LIBS} ${ZLIB_LIBRARIES} )
+endif( ZLIB_FOUND )
+
+
 find_package(TIFF REQUIRED)
 if (TIFF_FOUND)
 	include_directories(${TIFF_INCLUDE_DIRS})
@@ -158,7 +165,6 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
     ${CMAKE_FIND_ROOT_PATH}/include
     ${CMAKE_FIND_ROOT_PATH}/include/cfitsio
     )
-    message(STATUS ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${CMAKE_FIND_ROOT_PATH} <<")
     IF (CFITS_INCLUDE_DIR)
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             message(STATUS "using cfits: ${CFITS}")
@@ -168,6 +174,8 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
         include_directories(BEFORE ${CFITS_INCLUDE_DIR})
     endif()
 endif()
+
+
 
 # opencl
 if (NOT CMAKE_MINOR_VERSION LESS "5")

@@ -3,8 +3,21 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
     PROJECT (${MY_PROJECT_NAME} CXX)
 
-    MESSAGE(STATUS "PLugin ${PROJECT_NAME}")
+    MESSAGE(STATUS "Plugin ${PROJECT_NAME}")
     include(FindNeutrinoGuiComponents)
+
+
+    if(APPLE)
+        set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources/plugins")
+    elseif(LINUX)
+        set (LIBRARY_OUTPUT_PATH share/neutrino/plugins)
+    elseif(WIN32)
+        set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../bin/plugins")
+	set (PLUGIN_INSTALL_DIR "bin/plugins")
+    endif()
+
+    MESSAGE(STATUS ">>>>>>>>>>>>>>>>>>>>> LIBRARY_OUTPUT_PATH : ${LIBRARY_OUTPUT_PATH}")
+    MESSAGE(STATUS ">>>>>>>>>>>>>>>>>>>>> PLUGIN_INSTALL_DIR  : ${PLUGIN_INSTALL_DIR}")
 
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
     set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
@@ -47,6 +60,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     endforeach()
 
 
+
     ## add help
     if(NOT DEFINED PANDOC)
       find_program(PANDOC pandoc)
@@ -83,7 +97,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     find_package(Qt5LinguistTools)
     if (Qt5LinguistTools_FOUND)
         SET(LANGUAGES fr_FR it_IT ko_KP)
-		
         SET(LANGUAGE_TS_FILES)
         FOREACH(LANGUAGE ${LANGUAGES})
         SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_${LANGUAGE}.ts")
@@ -125,7 +138,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     if(WIN32)
         add_dependencies(${PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a ${CMAKE_BINARY_DIR}/lib/libnPhysImageF.dll.a ${LIBS})
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
         # to check: --enable-runtime-pseudo-reloc
     endif()
 
@@ -139,14 +152,10 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
     endif()
 
-#	set(my_output_file "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-#    message(STATUS ${my_output_file})
-
-IF (DEFINED LIBRARY_OUTPUT_PATH)
-MESSAGE(STATUS ">>>>><><><>>><<< ${LIBRARY_OUTPUT_PATH}")
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_OUTPUT_PATH})
-ENDIF()
-
+    IF (DEFINED PLUGIN_INSTALL_DIR)
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR})
+    ENDIF()
 
 ENDMACRO()
+
 

@@ -119,11 +119,9 @@ if (WIN32)
 
 
 	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
-        MESSAGE(STATUS ">>>>>>>>>>>>>>>>>>>>>>>>>>> ${CMAKE_FIND_ROOT_PATH}")
 	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
         file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
-
-	#message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+	message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
 	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
 	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
 
