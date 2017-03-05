@@ -13,14 +13,20 @@ find_package( ZLIB REQUIRED )
 if ( ZLIB_FOUND )
     include_directories( ${ZLIB_INCLUDE_DIRS} )
     set(LIBS ${LIBS} ${ZLIB_LIBRARIES} )
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+       message (STATUS "using ZLIB: ${ZLIB_LIBRARIES}")
+    endif()
 endif( ZLIB_FOUND )
 
 
 find_package(TIFF REQUIRED)
 if (TIFF_FOUND)
-	include_directories(${TIFF_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${TIFF_LIBRARIES})
-	add_definitions(-DHAVE_LIBTIFF)
+    include_directories(${TIFF_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${TIFF_LIBRARIES})
+    add_definitions(-DHAVE_LIBTIFF)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+       message (STATUS "using TIFF: ${TIFF_LIBRARIES}")
+    endif()
 endif()
 
 # fftw_threads
