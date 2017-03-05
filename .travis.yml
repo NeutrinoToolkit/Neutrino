@@ -1,92 +1,53 @@
 language: cpp
 
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode7.3
-#    - os: linux
-#      dist: trusty
-#      sudo: required
+os: osx
+osx_image: xcode7.3
 
 before_install:
-- |
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-  then
-    export MACOSX_DEPLOYMENT_TARGET=10.11
-    export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5'
-    brew update; brew tap homebrew/science
-    brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm clfft pandoc
-    brew install fftw --with-openmp
-  fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    export CMAKE_FLAGS='-DOPTION_INSTALL_PYTHONQT=ON'
-    sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
-    sudo apt-get update -qy
-    sudo apt-get -yy install pandoc cmake qt5-default libnetpbm10-dev libhdf5-dev libfftw3-dev python-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl0-dev qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5multimediawidgets5 qttools5-dev-tools
-  fi
-- git clone https://github.com/iltommi/PythonQt.git
-- cd PythonQt
-- mkdir my_build && cd my_build
-- cmake ${CMAKE_FLAGS} -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
-- make 
-- |
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-  then
-    make install
-  fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    sudo make install
-  fi
-- cd ../..
+ - export MACOSX_DEPLOYMENT_TARGET=10.11
+ - export CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5'
+ - brew update; brew tap homebrew/science
+ - brew install gcc qt5 cfitsio cmake hdf4 hdf5 gsl netpbm clfft pandoc
+ - brew install fftw --with-openmp
+ - git clone https://github.com/iltommi/PythonQt.git
+ - cd PythonQt
+ - mkdir my_build && cd my_build
+ - cmake -DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
+ - make install
+ - cd ../..
 
 script:
-- mkdir -p build_dir && cd build_dir
-- cmake ${CMAKE_FLAGS} ..
-- make
-- cd ..
+ - mkdir -p build_dir && cd build_dir
+ - cmake -DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
+ - make
+ - cd ..
 
 install:
 
 before_deploy:
-- |
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]
-  then
-    cp -r build_dir/Neutrino.app .
-    /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
-    git clone https://github.com/iltommi/macdeployqtfix.git
-    python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
-    /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes array" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0 dict" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeName string Neutrino session" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeRole string Viewer" Neutrino.app/Contents/Info.plist
-    cp resources/macPackage/filetype.icns Neutrino.app/Contents/Resources
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeIconFile string filetype.icns" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions array" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string neus" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:1 string neu" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:2 string fits" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:3 string tiff" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:4 string hdf" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:5 string img" Neutrino.app/Contents/Info.plist
-    /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string sif" Neutrino.app/Contents/Info.plist
-    mkdir dmg
-    mv Neutrino.app dmg
-    export RELEASE_FILE=Neutrino.dmg
-    ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
-  fi
-- |
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-  then
-    make -C build_dir package
-    ls -l build_dir
-    export RELEASE_FILE=build_dir/Neutrino*.deb
-    echo ${RELEASE_FILE}
-  fi
+ - cp -r build_dir/Neutrino.app .
+ - /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
+ - git clone https://github.com/iltommi/macdeployqtfix.git
+ - python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
+ - /usr/libexec/PlistBuddy -c "Add NSHighResolutionCapable bool True" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes array" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0 dict" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeName string Neutrino session" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeRole string Viewer" Neutrino.app/Contents/Info.plist
+ - cp resources/macPackage/filetype.icns Neutrino.app/Contents/Resources
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeIconFile string filetype.icns" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions array" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string neus" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:1 string neu" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:2 string fits" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:3 string tiff" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:4 string hdf" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:5 string img" Neutrino.app/Contents/Info.plist
+ - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string sif" Neutrino.app/Contents/Info.plist
+ - mkdir dmg
+ - mv Neutrino.app dmg
+ - export RELEASE_FILE=Neutrino.dmg
+ - ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
   
 after_success:
 - |
