@@ -40,7 +40,6 @@ dmg::
 Darwin::
 	cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-6 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -B$@ -H.
 	$(MAKE) -C $@
-	cp -r plugins Neutrino.app/Contents/Resources
 	rm -rf Neutrino.app
 	cp -r Darwin/Neutrino.app .
 	/usr/local/opt/qt5/bin/macdeployqt Neutrino.app
