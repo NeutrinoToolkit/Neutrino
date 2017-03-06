@@ -130,6 +130,8 @@ public slots:
 	
     void loadPlugin();
     void loadPlugin(QString pname, bool launch);
+    void loadPlugins(QStringList);
+
     void scanPlugins();
     void scanPlugins(QString);
     void scanPlugins(QDir);

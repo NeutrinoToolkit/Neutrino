@@ -476,9 +476,18 @@ neutrino::scanPlugins() {
 void
 neutrino::loadPlugin()
 {
-    QString pname=QFileDialog::getOpenFileName(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
-    loadPlugin(pname,true);
+    QStringList pnames=QFileDialog::getOpenFileNames(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+    loadPlugins(pnames);
 
+}
+
+void
+neutrino::loadPlugins(QStringList pnames)
+{
+    bool launch(pnames.size()==1);
+    for(auto& pname: pnames) {
+          loadPlugin(pname, launch);
+    }
 }
 
 void
