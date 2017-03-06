@@ -19,10 +19,12 @@ script:
  - mkdir -p build_dir && cd build_dir
  - cmake -DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
  - make
+ - cd ..
 
 install:
 
 before_deploy:
+ - cp -r build_dir/Neutrino.app .
  - /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
  - git clone https://github.com/iltommi/macdeployqtfix.git
  - python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
