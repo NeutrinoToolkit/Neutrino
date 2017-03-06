@@ -19,12 +19,10 @@ script:
  - mkdir -p build_dir && cd build_dir
  - cmake -DCMAKE_CXX_COMPILER=g++-6  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
  - make
- - cd ..
 
 install:
 
 before_deploy:
- - cp -r build_dir/Neutrino.app .
  - /usr/local/opt/qt5/bin/macdeployqt Neutrino.app
  - git clone https://github.com/iltommi/macdeployqtfix.git
  - python macdeployqtfix/macdeployqtfix.py Neutrino.app/Contents/MacOS/Neutrino /usr/local
@@ -45,20 +43,9 @@ before_deploy:
  - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string sif" Neutrino.app/Contents/Info.plist
  - mkdir dmg
  - mv Neutrino.app dmg
- - export RELEASE_FILE=Neutrino.dmg
- - ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino.dmg dmg
-  
-after_success:
-- |
-  if [ "$TRAVIS_PULL_REQUEST" = false ]
-  then
-    git config --global user.email "builds@travis-ci.com"
-    git config --global user.name "Travis CI"
-    git push origin :refs/tags/latest && git tag -fa latest -m "Tavis auto build $TRAVIS_BUILD_NUMBER" && git push --tags
-    git fetch origin
-  fi
-  
-  
+ - export RELEASE_FILE=Neutrino-${TRAVIS_BUILD_NUMBER}.dmg
+ - ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 -${TRAVIS_BUILD_NUMBER} dmg
+    
 deploy:
   provider: releases
   edge:
@@ -69,5 +56,5 @@ deploy:
   skip_cleanup: true
   overwrite: true
   on:
-    tags: false
+    tags: true
     branch: master
