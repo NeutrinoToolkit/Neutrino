@@ -8,16 +8,15 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 
     if(APPLE)
-        set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources/plugins")
+        set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
+        set (PLUGIN_INSTALL_DIR "${LIBRARY_OUTPUT_PATH}")
     elseif(LINUX)
         set (LIBRARY_OUTPUT_PATH share/neutrino/plugins)
     elseif(WIN32)
         set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../bin/plugins")
-	set (PLUGIN_INSTALL_DIR "bin/plugins")
+        set (PLUGIN_INSTALL_DIR "bin/plugins")
     endif()
 
-    MESSAGE(STATUS ">>>>>>>>>>>>>>>>>>>>> LIBRARY_OUTPUT_PATH : ${LIBRARY_OUTPUT_PATH}")
-    MESSAGE(STATUS ">>>>>>>>>>>>>>>>>>>>> PLUGIN_INSTALL_DIR  : ${PLUGIN_INSTALL_DIR}")
 
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
     set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")

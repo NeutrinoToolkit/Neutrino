@@ -92,8 +92,8 @@ void MUSE::nextPlane(){
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-    if (meanSlice) setColorPrecentPixels(meanSlice,val);
-    if (cubeSlice) setColorPrecentPixels(cubeSlice,val);
+    if (meanSlice) setColorPrecentPixels(*meanSlice,val);
+    if (cubeSlice) setColorPrecentPixels(*cubeSlice,val);
     nparent->createQimage();
 }
 
@@ -205,9 +205,9 @@ void MUSE::updateLastPoint() {
     doSpectrum(lastpoint);
 }
 
-QString toNum(QPointF p) {
-    return "( " + QLocale().toString(p.x(),'g',9) + " ; " + QLocale().toString(p.y(),'g',9) + ") ";
-}
+//QString toNum(QPointF p) {
+//    return "( " + QLocale().toString(p.x(),'g',9) + " ; " + QLocale().toString(p.y(),'g',9) + ") ";
+//}
 
 void MUSE::doSpectrum(QPointF point) {
     QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
@@ -217,7 +217,7 @@ void MUSE::doSpectrum(QPointF point) {
 
     QPointF preal=QPointF(prealx,prealy);
 
-    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
+//    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
 
     if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
         lastpoint=pFloor;
@@ -244,21 +244,6 @@ void MUSE::doSpectrum(QPointF point) {
     }
 }
 
-void MUSE::setColorPrecentPixels(nPhysD* my_phys, double val) {
-    std::vector<double> tmp(my_phys->Timg_buffer,my_phys->Timg_buffer+my_phys->getSurf());
-    std::vector<double>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](double i){return !isnan(i);});
-
-    std::sort(tmp.begin(),ptr);
-
-    int notNaN = std::distance(tmp.begin(), ptr)-1;
-
-    vec2 perc(notNaN*(100.0-val)/200.0,notNaN*(100+val)/200.0);
-
-    my_phys->property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>    " << notNaN << " " << perc << " " << my_phys->property["display_range"]);
-
-}
-
 void MUSE::showImagePlane(int z) {
     qDebug() << z;
     disconnect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
@@ -276,7 +261,7 @@ void MUSE::showImagePlane(int z) {
         }
         my_phys->TscanBrightness();
 
-        setColorPrecentPixels(my_phys,percent->value());
+        setColorPrecentPixels(*my_phys,percent->value());
 
         if (cubeSlice) {
             cubeSlice->property["display_range"]=my_phys->property["display_range"];
