@@ -181,7 +181,7 @@ void phys_get_bbox(nPhysImageF<T>& img1, nPhysImageF<T>& img2, vec2f& ul_corner,
 //	vec2f MM(vmath::max(img1.property.origin, img2.property.origin)); 
 }
 
-template <class T> bidimvec<T> setColorPrecentPixels(nPhysImageF<T>& my_phys, vec2f val) {
+template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, vec2f val) {
 
     std::vector<T> tmp(my_phys.Timg_buffer,my_phys.Timg_buffer+my_phys.getSurf());
     typename std::vector<T>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](T i){return !isnan(i);});
@@ -193,11 +193,13 @@ template <class T> bidimvec<T> setColorPrecentPixels(nPhysImageF<T>& my_phys, ve
     bidimvec<unsigned int> perc(notNaN*(val.first())/100.0,notNaN*(val.second())/100.0);
 
     bidimvec<T> retvec (tmp[perc.first()],tmp[perc.second()]);
+
+    DEBUG(val << " " << perc << " " << retvec);
     return retvec;
 }
 
-template <class T> bidimvec<T> setColorPrecentPixels(nPhysImageF<T>& my_phys, double val) {
-    return setColorPrecentPixels(my_phys,vec2f(val/2.0,100.0-val/2.0));
+template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, double val) {
+    return getColorPrecentPixels(my_phys,vec2f((100.0-val)/2.0, (100.0+val)/2.0));
 }
 
 

@@ -100,7 +100,7 @@ nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 
 void nColorBarWin::percentChange() {
     if (currentBuffer) {
-        currentBuffer->property["display_range"]=setColorPrecentPixels(*currentBuffer,vec2f(my_w.percentMin->value(),my_w.percentMax->value()));
+        currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,vec2f(my_w.percentMin->value(),my_w.percentMax->value()));
         nparent->createQimage();
         bufferChanged(currentBuffer);
     }

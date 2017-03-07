@@ -92,8 +92,8 @@ void MUSE::nextPlane(){
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-    if (meanSlice) meanSlice->property["display_range"] = setColorPrecentPixels(*meanSlice,val);
-    if (cubeSlice) cubeSlice->property["display_range"] = setColorPrecentPixels(*cubeSlice,val);
+    if (meanSlice) meanSlice->property["display_range"] = getColorPrecentPixels(*meanSlice,val);
+    if (cubeSlice) cubeSlice->property["display_range"] = getColorPrecentPixels(*cubeSlice,val);
     nparent->createQimage();
 }
 
@@ -175,6 +175,7 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
     case Qt::Key_S:
         on_actionExportTxt_triggered();
         break;
+    case Qt::Key_Space:
     case Qt::Key_P:
         actionMovie->trigger();
         break;
@@ -261,10 +262,12 @@ void MUSE::showImagePlane(int z) {
         }
         my_phys->TscanBrightness();
 
-        setColorPrecentPixels(*my_phys,percent->value());
+        my_phys->property["display_range"]=getColorPrecentPixels(*my_phys,percent->value());
 
         if (cubeSlice) {
             cubeSlice->property["display_range"]=my_phys->property["display_range"];
+        } else {
+            cube_prop["display_range"]=my_phys->property["display_range"];
         }
         cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
         plot->setMousePosition(xvals[z]);
@@ -528,6 +531,7 @@ void MUSE::loadCube() {
                     }
 
                     meanSlice->TscanBrightness();
+                    meanSlice->property["display_range"]=getColorPrecentPixels(*meanSlice,percent->value());
                     nparent->addShowPhys(meanSlice);
 
                     plot->graph(0)->setName("Mean spectrum");
