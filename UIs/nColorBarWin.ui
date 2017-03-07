@@ -483,6 +483,24 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QDoubleSpinBox" name="percent">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="decimals">
+       <number>1</number>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>100.000000000000000</double>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -517,7 +535,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/invert_colorbar.png</normaloff>:/icons/invert_colorbar.png</iconset>
    </property>
    <property name="text">
@@ -529,7 +547,7 @@
   </action>
   <action name="actionCutoff">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/expand.png</normaloff>:/icons/expand.png</iconset>
    </property>
    <property name="text">
@@ -544,7 +562,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/histoNorm.png</normaloff>
      <normalon>:/icons/histolog.png</normalon>:/icons/histoNorm.png</iconset>
    </property>

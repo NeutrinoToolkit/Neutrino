@@ -89,12 +89,21 @@ nColorBarWin::nColorBarWin (neutrino *parent) : nGenericPan(parent)
 
     loadPalettes();
 
+    my_w.toolBar->addWidget(my_w.percent);
+
 	
 
 	updatecolorbar();
     cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
+}
+
+void nColorBarWin::on_percent_valueChanged(double val) {
+    if (currentBuffer) {
+        setColorPrecentPixels(*currentBuffer,val);
+    }
+    nparent->createQimage();
 }
 
 void nColorBarWin::on_gamma_valueChanged(int val) {
