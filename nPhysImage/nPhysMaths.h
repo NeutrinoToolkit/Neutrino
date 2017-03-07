@@ -308,7 +308,4 @@ void contour_trace(nPhysD &, std::list<vec2> &, float, bool blur=false, float bl
 std::list<double> contour_integrate(nPhysD &, std::list<vec2> &, bool integrate_boundary=false);
 
 
-void setColorPrecentPixels(nPhysD& my_phys, double val);
-
-
 #endif

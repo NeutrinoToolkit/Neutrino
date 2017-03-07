@@ -92,8 +92,8 @@ void MUSE::nextPlane(){
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-    if (meanSlice) setColorPrecentPixels(*meanSlice,val);
-    if (cubeSlice) setColorPrecentPixels(*cubeSlice,val);
+    if (meanSlice) meanSlice->property["display_range"] = setColorPrecentPixels(*meanSlice,val);
+    if (cubeSlice) cubeSlice->property["display_range"] = setColorPrecentPixels(*cubeSlice,val);
     nparent->createQimage();
 }
 

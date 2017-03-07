@@ -33,6 +33,7 @@
 
 #include "bidimvec.h"
 #include "nPhysImageF.h"
+#include <iterator>
 
 #ifndef __nPhysTools
 #define __nPhysTools
@@ -178,6 +179,25 @@ void phys_get_bbox(nPhysImageF<T>& img1, nPhysImageF<T>& img2, vec2f& ul_corner,
 //	using namespace vmath;
 //	max(vec2f(1,2), vec2f(3,4)); 
 //	vec2f MM(vmath::max(img1.property.origin, img2.property.origin)); 
+}
+
+template <class T> bidimvec<T> setColorPrecentPixels(nPhysImageF<T>& my_phys, vec2f val) {
+
+    std::vector<T> tmp(my_phys.Timg_buffer,my_phys.Timg_buffer+my_phys.getSurf());
+    typename std::vector<T>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](T i){return !isnan(i);});
+
+    std::sort(tmp.begin(),ptr);
+
+    int notNaN = std::distance(tmp.begin(), ptr)-1;
+
+    bidimvec<unsigned int> perc(notNaN*(val.first())/100.0,notNaN*(val.second())/100.0);
+
+    bidimvec<T> retvec (tmp[perc.first()],tmp[perc.second()]);
+    return retvec;
+}
+
+template <class T> bidimvec<T> setColorPrecentPixels(nPhysImageF<T>& my_phys, double val) {
+    return setColorPrecentPixels(my_phys,vec2f(val/2.0,100.0-val/2.0));
 }
 
 

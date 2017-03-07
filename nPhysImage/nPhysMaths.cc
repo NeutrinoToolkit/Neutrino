@@ -1151,20 +1151,6 @@ std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bo
 
 }
 
-void setColorPrecentPixels(nPhysD& my_phys, double val) {
-
-    std::vector<double> tmp(my_phys.Timg_buffer,my_phys.Timg_buffer+my_phys.getSurf());
-    std::vector<double>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](double i){return !isnan(i);});
-
-    std::sort(tmp.begin(),ptr);
-
-    int notNaN = std::distance(tmp.begin(), ptr)-1;
-
-    vec2 perc(notNaN*(100.0-val)/200.0,notNaN*(100+val)/200.0);
-
-    my_phys.property["display_range"]=vec2f(tmp[perc.first()],tmp[perc.second()]);
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>    " << notNaN << " " << perc << " " << my_phys.property["display_range"]);
-}
 
 
 /*!
