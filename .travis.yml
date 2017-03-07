@@ -45,7 +45,7 @@ before_deploy:
  - /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeExtensions:0 string sif" Neutrino.app/Contents/Info.plist
  - mkdir dmg
  - mv Neutrino.app dmg
- - export RELEASE_FILE=Neutrino-${TRAVIS_BUILD_NUMBER}.dmg
+ - export RELEASE_FILE=Neutrino.dmg
  - ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 ${RELEASE_FILE} dmg
     
 deploy:
