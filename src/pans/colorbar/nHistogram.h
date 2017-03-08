@@ -33,7 +33,7 @@
 
 #include "nPhysImageF.h"
 
-class nColorBarWin;
+class nColorBar;
 
 class nHistogram : public QWidget
 {
@@ -45,7 +45,7 @@ public:
 	
 	int offsety, offsetx, dyColorBar;
 	double colorvalue;
-	nColorBarWin *parentPan;
+    nColorBar *parentPan;
 	
 public slots:
 	void paintEvent(QPaintEvent *);

@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __ncolorbarwin_h
-#define __ncolorbarwin_h
+#ifndef __nColorBar_h
+#define __nColorBar_h
 
 #include <iostream>
 
@@ -31,12 +31,12 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nColorBarWin.h"
+#include "ui_nColorBar.h"
 #include "nHistogram.h"
 
 class neutrino;
 
-class nColorBarWin : public nGenericPan {
+class nColorBar : public nGenericPan {
 	Q_OBJECT
 	
 	
@@ -45,7 +45,7 @@ private:
 	
 public:
 	
-    nColorBarWin (neutrino *);
+    nColorBar (neutrino *);
 	neutrino *parent(){
 		return (neutrino *) QWidget::parent();
 	};

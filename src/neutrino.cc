@@ -40,7 +40,7 @@
 
 #include "nView.h"
 
-#include "nColorBarWin.h"
+#include "nColorBar.h"
 
 #include "nMouseInfo.h"
 #include "nZoomWin.h"
@@ -166,7 +166,7 @@ neutrino::neutrino():
 
 
     connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
-    connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
     connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
     connect(my_w->actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
@@ -239,7 +239,7 @@ neutrino::neutrino():
 
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
     connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
-    connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(Colorbar()));
+    connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
     connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
     connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
@@ -1243,7 +1243,7 @@ void neutrino::keyPressEvent (QKeyEvent *e)
         break;
     case Qt::Key_C:
         if (e->modifiers() & Qt::ShiftModifier) {
-            Colorbar();
+            ColorBar();
         }
         break;
     case Qt::Key_I:
@@ -1593,8 +1593,8 @@ neutrino::MouseInfo() {
 // colortables
 
 nGenericPan*
-neutrino::Colorbar() {
-    return new nColorBarWin(this);
+neutrino::ColorBar() {
+    return new nColorBar(this);
 }
 
 struct QPairFirstComparer {
@@ -2055,8 +2055,9 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
     qDebug() << "methodIdx" << methodIdx;
     if (methodIdx<0 && panName.size()>1) {
         QString other_panName=panName;
+        other_panName.remove(0,1);
         qDebug() << "methodIdx" << methodIdx << panName << other_panName;
-        methodIdx=metaObject()->indexOfMethod((other_panName.remove(0,1)+"()").toLatin1().constData());
+        methodIdx=metaObject()->indexOfMethod((other_panName+"()").toLatin1().constData());
         qDebug() << "methodIdx" << methodIdx << panName << other_panName;
         if (methodIdx>=0) {
             panName=other_panName;

@@ -73,7 +73,7 @@ list (APPEND SOURCES
 
     pans/nFocalSpot.cc pans/nPhysProperties.cc pans/nContours.cc
     pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
-    pans/colorbar/nHistogram.cc pans/colorbar/nColorBarWin.cc pans/nInterferometry.cc 
+    pans/colorbar/nHistogram.cc pans/colorbar/nColorBar.cc pans/nInterferometry.cc 
     pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc 
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 

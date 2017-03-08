@@ -22,7 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nColorBarWin.h"
+#include "nColorBar.h"
 #include "nHistogram.h"
 #include "neutrino.h"
 
