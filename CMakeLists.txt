@@ -71,7 +71,6 @@ endif()
 
 include(FindGit)
 
-set (VERSION_UPDATE_FROM_GIT ON)
 include(GetVersionFromGitTag)
 
 if (GIT_FOUND)

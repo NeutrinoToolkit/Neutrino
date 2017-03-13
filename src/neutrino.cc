@@ -32,9 +32,7 @@
 #include <QMetaObject>
 #include <QtSvg>
 
-#if QT_VERSION >= 0x050000
 #include <QtUiTools>
-#endif
 
 #include <QPrintDialog>
 

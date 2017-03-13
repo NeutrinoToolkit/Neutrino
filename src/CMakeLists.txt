@@ -8,8 +8,6 @@ include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
-add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
-
 set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 
@@ -80,10 +78,14 @@ list (APPEND SOURCES
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc pans/nZoomWin.cc
     pans/nCamera.cc
+
+#    nPhysD.cc
     )
 
 include(FindNeutrinoDeps)
 
+include(GetVersionFromGitTag)
+add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
 if (APPLE AND NOT DEFINED Qt5_DIR)
     set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
