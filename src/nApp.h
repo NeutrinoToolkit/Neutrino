@@ -31,10 +31,10 @@
 
 class neutrino;
 
-class NApplication : public QApplication {
+class nApp : public QApplication {
     Q_OBJECT
 public:
-    NApplication( int &argc, char **argv );
+    nApp( int &argc, char **argv );
 
 
 protected:
@@ -45,6 +45,11 @@ protected:
 
 public slots:
     QList<neutrino*> neus();
+
+    static void changeThreads(int);
+    static void changeLocale(QLocale locale);
+    static bool localeLessThan(const QLocale&, const QLocale&);
+    static QString localeToString(const QLocale &);
 };
 #endif
 

@@ -25,6 +25,8 @@
 
 #include <unistd.h>
 
+#include "nApp.h"
+
 #include "nPreferences.h"
 #include "neutrino.h"
 #include "ui_neutrino.h"
@@ -122,17 +124,17 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
 
     if(!allLocales.contains(QLocale::system())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("System: ")+localeToString(QLocale::system()),QLocale::system());
+        my_w.localeCombo->addItem(tr("System: ")+nApp::localeToString(QLocale::system()),QLocale::system());
     }
 
     if(!allLocales.contains(QLocale())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("Current: ")+localeToString(QLocale()),QLocale());
+        my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
     }
 
-    qSort(allLocales.begin(),allLocales.end(), nPreferences::localeLessThan);
+    qSort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
 
     for(auto &locale : allLocales) {
-        QString my_str=localeToString(locale);
+        QString my_str=nApp::localeToString(locale);
 //        qDebug() << my_str << locale.name();
         my_w.localeCombo->addItem(my_str,locale);
     }
@@ -146,52 +148,11 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     }
 }
 
-
-QString nPreferences::localeToString(const QLocale &locale) {
-    return QLocale::languageToString(locale.language())+ " " +QLocale::countryToString(locale.country())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
-}
-
-bool nPreferences::localeLessThan(const QLocale &loc1, const QLocale &loc2)
-{
-    return localeToString(loc1) < localeToString(loc2);
-}
-
-
-void nPreferences::changeLocale(QLocale locale) {
-    if (locale!=QLocale()) {
-
-        qDebug() << QLocale::languageToString(locale.language()) <<
-                    QLocale::scriptToString(locale.script()) <<
-                    QLocale::countryToString(locale.country()) <<
-                    locale.bcp47Name() <<
-                    locale.country() <<
-                    locale.name() <<
-                    locale.decimalPoint();
-
-        QLocale().setDefault(locale);
-        QSettings settings("neutrino","");
-        settings.beginGroup("nPreferences");
-        settings.setValue("locale",locale);
-        settings.endGroup();
-
-        QString fileTransl(":translations/neutrino_"+locale.name()+".qm");
-        if(QFileInfo(fileTransl).exists()) {
-            QPointer<QTranslator> translator(new QTranslator(qApp));
-            if (translator->load(fileTransl)) {
-                qApp->installTranslator(translator);
-                qDebug() << "installing translator" << fileTransl;
-            } else {
-                delete translator;
-            }
-        }
-    }
-}
-
 void nPreferences::changeLocale(int num) {
     QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
-    changeLocale(locale);
+    nApp::changeLocale(locale);
     my_w.decimal->setText(QLocale().decimalPoint());
-    my_w.statusBar->showMessage(localeToString(QLocale()), 5000);
+    my_w.statusBar->showMessage(nApp::localeToString(QLocale()), 5000);
 }
 
 void nPreferences::openclUnitValueChange(int num) {
@@ -211,19 +172,6 @@ void nPreferences::resetSettings() {
         QSettings my_settings("neutrino","");
         my_settings.clear();
     }
-}
-
-void nPreferences::changeThreads(int num) {
-    if (num<=1) {
-        fftw_cleanup_threads();
-    } else {
-        fftw_init_threads();
-        fftw_plan_with_nthreads(num);
-    }
-#ifdef HAVE_OPENMP
-    omp_set_num_threads(num);
-#endif
-    DEBUG("\n\nTHREADS THREADS THREADS THREADS THREADS THREADS " << num << "\n\n");
 }
 
 void nPreferences::askCloseUnsaved() {

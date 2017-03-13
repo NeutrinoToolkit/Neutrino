@@ -73,7 +73,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
  */
 void nPhysPyWrapper::delete_nPhysD(nPhysD* phys) {
     DEBUG("delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD");
-    NApplication* my_app=qobject_cast<NApplication*> (qApp);
+    nApp* my_app=qobject_cast<nApp*> (qApp);
     bool found=false;
     if (my_app) {
         DEBUG("and here");

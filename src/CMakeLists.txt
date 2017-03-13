@@ -144,28 +144,19 @@ message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
 
 # all dependencies search now moved to FindNeutrinoGuiComponents.cmake
 # (see neutrino cmake resources folder)
-if (USE_QT5)
-    # add here QT5 only sources
-    if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
-        list (APPEND SOURCES pans/nCamera.cc)
-        list (APPEND UIS ../UIs/nCamera.ui)
-    endif()
-
-    qt5_add_resources(RES_SOURCES ${ICONS_QRC})
-    qt5_add_resources(RES_SOURCES ${HTML_QRC})
-    qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
-
-
-
-    QT5_WRAP_UI( UI_HEADERS ${UIS} )
-elseif (USE_QT4)
-    qt4_add_resources(RES_SOURCES ${ICONS_QRC})
-    qt4_add_resources(RES_SOURCES ${HTML_QRC})
-    qt4_add_resources(RES_SOURCES ${LICENSES_QRC})
-    qt4_add_resources(RES_SOURCES ${HELP_QRC})
-
-    QT4_WRAP_UI( UI_HEADERS ${UIS} )
+# add here QT5 only sources
+if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
+    list (APPEND SOURCES pans/nCamera.cc)
+    list (APPEND UIS ../UIs/nCamera.ui)
 endif()
+
+qt5_add_resources(RES_SOURCES ${ICONS_QRC})
+qt5_add_resources(RES_SOURCES ${HTML_QRC})
+qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
+
+
+
+QT5_WRAP_UI( UI_HEADERS ${UIS} )
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/colorbar pans/winlist)
@@ -173,41 +164,41 @@ include_directories(graphics doc pans pans/colorbar pans/winlist)
 
 #translate ui
 
-  if (Qt5LinguistTools_FOUND)
+if (Qt5LinguistTools_FOUND)
     SET(LANGUAGES fr_FR it_IT ko_KP)
 
     SET(LANGUAGE_TS_FILES)
     FOREACH(LANGUAGE ${LANGUAGES})
-      SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
-      message(STATUS "Language : ${TS_FILE}")
-      SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
+    SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
+    message(STATUS "Language : ${TS_FILE}")
+    SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
 
-      if(EXISTS ${TS_FILE})
+    if(EXISTS ${TS_FILE})
         qt5_add_translation(qm_files ${TS_FILE})
-      else ()
+    else ()
         qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
-      endif ()
+    endif ()
 
     ENDFOREACH(LANGUAGE ${LANGUAGES})
 
     IF(LANGUAGE_TS_FILES)
 
-      set(TRANSL_QRC ${QRCDIR}/translations.qrc)
-      file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
-      foreach(my_file ${qm_files})
-          file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
-          GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-          file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
-      endforeach()
-      file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-      list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
-      message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
+    set(TRANSL_QRC ${QRCDIR}/translations.qrc)
+    file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
+    foreach(my_file ${qm_files})
+        file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
+        GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
+        file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    endforeach()
+    file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
+    list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
+    message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
 
-      qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
+    qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
     ENDIF(LANGUAGE_TS_FILES)
 
 
-  endif(Qt5LinguistTools_FOUND)
+endif(Qt5LinguistTools_FOUND)
 
 
 
@@ -241,11 +232,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 target_link_libraries(Neutrino ${LIBS})
 
-if (USE_QT5)
-    qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
-elseif(USE_QT4)
-    target_link_libraries(Neutrino ${QT_LIBRARIES} Qt4::QtCore Qt4::QtGui Qt4::QtSvg)
-endif()
+qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 
 
 

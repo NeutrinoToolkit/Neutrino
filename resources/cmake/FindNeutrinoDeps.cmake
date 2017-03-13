@@ -14,7 +14,7 @@ if ( ZLIB_FOUND )
     include_directories( ${ZLIB_INCLUDE_DIRS} )
     set(LIBS ${LIBS} ${ZLIB_LIBRARIES} )
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-       message (STATUS "using ZLIB: ${ZLIB_LIBRARIES}")
+        message (STATUS "using ZLIB: ${ZLIB_LIBRARIES}")
     endif()
 endif( ZLIB_FOUND )
 
@@ -25,7 +25,7 @@ if (TIFF_FOUND)
     set(LIBS ${LIBS} ${TIFF_LIBRARIES})
     add_definitions(-DHAVE_LIBTIFF)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-       message (STATUS "using TIFF: ${TIFF_LIBRARIES}")
+        message (STATUS "using TIFF: ${TIFF_LIBRARIES}")
     endif()
 endif()
 
@@ -73,12 +73,12 @@ if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
     FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_math.h
         /usr/local/include/
         /usr/include
-    )
+        )
     IF (GSL_INCLUDE_DIR)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}")
-        endif()
-        include_directories(BEFORE "${GSL_INCLUDE_DIR}")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message (STATUS "gsl header dir: ${GSL_INCLUDE_DIR}")
+    endif()
+    include_directories(BEFORE "${GSL_INCLUDE_DIR}")
     ENDIF (GSL_INCLUDE_DIR)
 endif()
 
@@ -91,7 +91,7 @@ if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
     set(LIBS ${LIBS} ${GSLCBLAS})
     add_definitions(-DHAVE_LIBGSLCBLAS)
 else()
-        message(FATAL_ERROR "Missing gslcblas.")
+    message(FATAL_ERROR "Missing gslcblas.")
 endif()
 
 # hdf4
@@ -102,20 +102,20 @@ if (NOT ${HDF4} STREQUAL "HDF4-NOTFOUND")
     endif()
     set(LIBS ${LIBS} ${HDF4})
     add_definitions(-DHAVE_LIBMFHDF)
-	
+
     FIND_PATH(HDF4_INCLUDE_DIR hdf.h
-  		/usr/local/include/
-  		/usr/include
-  		/usr/local/include/hdf
-  		/usr/include/hdf
-    		${CMAKE_FIND_ROOT_PATH}/include
-    )
+        /usr/local/include/
+        /usr/include
+        /usr/local/include/hdf
+        /usr/include/hdf
+        ${CMAKE_FIND_ROOT_PATH}/include
+        )
 
     IF (HDF4_INCLUDE_DIR)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            message (STATUS "hdf4 header dir: ${HDF4_INCLUDE_DIR}")
-        endif()
-        include_directories(BEFORE "${HDF4_INCLUDE_DIR}")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message (STATUS "hdf4 header dir: ${HDF4_INCLUDE_DIR}")
+    endif()
+    include_directories(BEFORE "${HDF4_INCLUDE_DIR}")
     ENDIF (HDF4_INCLUDE_DIR)
 endif()
 
@@ -139,17 +139,17 @@ if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
     add_definitions(-DHAVE_LIBNETPBM)
 
     FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
-    /usr/include
-    /usr/include/netpbm
-    /usr/local/include
-    /usr/local/include/netpbm
-    ${CMAKE_FIND_ROOT_PATH}/include
-    )
+        /usr/include
+        /usr/include/netpbm
+        /usr/local/include
+        /usr/local/include/netpbm
+        ${CMAKE_FIND_ROOT_PATH}/include
+        )
     IF (NETPBM_INCLUDE_DIR)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
-        endif()
-        include_directories(BEFORE ${NETPBM_INCLUDE_DIR})
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
+    endif()
+    include_directories(BEFORE ${NETPBM_INCLUDE_DIR})
     ENDIF (NETPBM_INCLUDE_DIR)
 
 endif()
@@ -164,21 +164,21 @@ endif()
 find_library(CFITS NAMES cfitsio)
 if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
     FIND_PATH(CFITS_INCLUDE_DIR fitsio.h
-    /usr/include
-    /usr/include/netpbm
-    /usr/local/include
-    /usr/local/include/netpbm
-    ${CMAKE_FIND_ROOT_PATH}/include
-    ${CMAKE_FIND_ROOT_PATH}/include/cfitsio
-    )
+        /usr/include
+        /usr/include/netpbm
+        /usr/local/include
+        /usr/local/include/netpbm
+        ${CMAKE_FIND_ROOT_PATH}/include
+        ${CMAKE_FIND_ROOT_PATH}/include/cfitsio
+        )
     IF (CFITS_INCLUDE_DIR)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            message(STATUS "using cfits: ${CFITS}")
-        endif()
-        list(APPEND LIBS ${CFITS})
-        add_definitions(-DHAVE_LIBCFITSIO)
-        include_directories(BEFORE ${CFITS_INCLUDE_DIR})
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "using cfits: ${CFITS}")
     endif()
+    list(APPEND LIBS ${CFITS})
+    add_definitions(-DHAVE_LIBCFITSIO)
+    include_directories(BEFORE ${CFITS_INCLUDE_DIR})
+endif()
 endif()
 
 

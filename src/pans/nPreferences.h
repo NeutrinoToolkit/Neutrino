@@ -45,7 +45,8 @@ public:
 public slots:
     void changeShowDimPixel();
     void changeIconSize(int);
-    static void changeThreads(int);
+
+
     void changeFont();
     void hideEvent(QHideEvent*);
     void showEvent(QShowEvent*);
@@ -54,10 +55,6 @@ public slots:
     void openclUnitValueChange(int);
     void resetSettings();
     void changeLocale(int);
-
-    static void changeLocale(QLocale locale);
-    static bool localeLessThan(const QLocale&, const QLocale&);
-    static QString localeToString(const QLocale &);
 
     void on_addPlugin_released();
     void on_removePlugin_released();

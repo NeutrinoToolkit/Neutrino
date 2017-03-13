@@ -8,12 +8,8 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 
-#ifdef USE_QT5
     QFont my_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-#else
-    QFont my_font;
-    my_font.setStyleHint(QFont::TypeWriter);
-#endif
+
     my_font.setPointSize(10);
 
     connect(my_w.actionRun_script, SIGNAL(triggered()), this, SLOT(loadScript()));

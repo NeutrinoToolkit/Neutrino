@@ -145,11 +145,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         target_link_libraries(${PROJECT_NAME} ${LOCAL_LIBS})
     endif()
 
-    if (USE_QT5)
-        qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
-    elseif(USE_QT4)
-        target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
-    endif()
+    qt5_use_modules(${PROJECT_NAME} Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets)
 
     IF (DEFINED PLUGIN_INSTALL_DIR)
         install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR})

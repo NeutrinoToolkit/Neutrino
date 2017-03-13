@@ -58,9 +58,7 @@
 #include "nShortcuts.h"
 #include "nAffine.h"
 
-#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
 #include "nCamera.h"
-#endif
 
 #include "nFocalSpot.h"
 #include "nContours.h"
@@ -171,11 +169,7 @@ neutrino::neutrino():
     connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
     connect(my_w->actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
-#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     connect(my_w->actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
-#else
-    my_w->actionCamera->setEnabled(false);
-#endif
 
     connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
     connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
@@ -1924,11 +1918,7 @@ neutrino::Affine() {
 /// camera
 nGenericPan*
 neutrino::Camera() {
-#if defined USE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     return new nCamera(this);
-#else
-    return NULL;
-#endif
 }
 
 // FOLLOWER
@@ -2121,11 +2111,7 @@ nGenericPan* neutrino::newPan(QString my_string) {
 
     for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
         QString name;
-#ifdef USE_QT5
         name=metaObject->method(i).name();
-#else
-        name=QString::fromLatin1(metaObject->method(i).signature());
-#endif
         if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
                 metaObject->method(i).parameterTypes().empty() &&
                 name==my_string+"()") {

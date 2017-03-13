@@ -28,9 +28,6 @@
 #include <signal.h>
 
 #include <QtGui>
-//#include <QtSql>
-
-#include "nPreferences.h"
 
 #include "neutrino.h"
 #include "nApp.h"
@@ -56,23 +53,13 @@ int main(int argc, char **argv)
 
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
-    NApplication qapp(argc,argv);
+    nApp my_app(argc,argv);
 
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
-    nPreferences::changeLocale(my_set.value("locale",QLocale()).toLocale());
-
-    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<< my_set.value("threads",1);
-    nPreferences::changeThreads(my_set.value("threads",1).toInt());
-    my_set.endGroup();
-
-    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
-
-    QStringList args=QCoreApplication::arguments();
+    QStringList args=my_app.arguments();
     args.removeFirst();
 
-    neutrino *neu = new neutrino();
-    neu->fileOpen(args);
+    neutrino *ny_neu = new neutrino();
+    ny_neu->fileOpen(args);
 
-    return qapp.exec();
+    return my_app.exec();
 }

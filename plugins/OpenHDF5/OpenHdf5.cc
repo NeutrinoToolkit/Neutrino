@@ -96,11 +96,7 @@ void OpenHdf5::showFile(QString fname) {
         item->setData(1,0,"File");
         item->setData(3,0,fname);
         scanGroup(grp,item);
-#ifdef USE_QT5
         treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-        treeWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
         H5Gclose(grp);
         H5Fclose(file_id);
         statusbar->showMessage("Done",2000);
