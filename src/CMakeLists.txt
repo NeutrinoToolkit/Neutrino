@@ -68,31 +68,24 @@ list (APPEND SOURCES
     nApp.cc main.cc
 
     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
-    graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc 
+    graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc
     graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
 
     pans/nFocalSpot.cc pans/nPhysProperties.cc pans/nContours.cc
     pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
-    pans/colorbar/nHistogram.cc pans/colorbar/nColorBar.cc pans/nInterferometry.cc 
-    pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc 
+    pans/colorbar/nHistogram.cc pans/colorbar/nColorBar.cc pans/nInterferometry.cc
+    pans/nMouseInfo.cc pans/nBoxLineout.cc pans/nPreferences.cc
     pans/nAffine.cc pans/nMonitor.cc pans/nRotate.cc pans/nWavelet.cc pans/nRegionPath.cc
-    pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
-    pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
+    pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc
+    pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc pans/nZoomWin.cc
     pans/nCamera.cc
-)
+    )
 
 include(FindNeutrinoDeps)
 
-if(DEFINED ENV{QTDIR})
-    set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
-endif()
 
-if(DEFINED QTDIR)
-    set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
-endif()
-
-if (NOT DEFINED Qt5_DIR AND APPLE)
+if (APPLE AND NOT DEFINED Qt5_DIR)
     set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
 endif()
 
@@ -285,7 +278,6 @@ set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
 
 set(CPACK_RESOURCE_FILE_README "${README_FILE}")
-
 
 if(LINUX)
     set(CPACK_GENERATOR "TBZ2")

@@ -7,15 +7,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     include(FindNeutrinoDeps)
 
-    if(DEFINED ENV{QTDIR})
-        set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
-    endif()
-
-    if(DEFINED QTDIR)
-        set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
-    endif()
-
-    if (NOT DEFINED Qt5_DIR AND APPLE)
+    if (APPLE AND NOT DEFINED Qt5_DIR)
         set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
     endif()
 

@@ -1,6 +1,3 @@
-# this macro to find libraries that trigger components in BOTH neutrino and nPhysImage
-# CAVEAT: source inclusion must not be done here (but in FindNeutrinoGuiComponents.cmake or
-# in src/CMakeLists.txt)
 
 find_package(OpenMP)
 if (OPENMP_FOUND AND NOT "${CMAKE_CXX_FLAGS}" MATCHES "^(${OpenMP_CXX_FLAGS})")
@@ -28,16 +25,6 @@ if (TIFF_FOUND)
         message (STATUS "using TIFF: ${TIFF_LIBRARIES}")
     endif()
 endif()
-
-# fftw_threads
-#find_package(FFTW REQUIRED)
-#if (FFTW_FOUND AND FFTW_THREADS_LIB)
-#	include_directories(${FFTW_INCLUDE_DIRS})
-#	set(LIBS ${LIBS} ${FFTW_LIBRARIES} ${FFTW_THREADS_LIB})
-#	add_definitions(-DHAVE_LIBFFTW_THREADS)
-#else()
-#    message( FATAL_ERROR "You need fftw_threads library" )
-#endif()
 
 #fftw
 find_library(FFTW NAMES fftw3 fftw3-3 REQUIRED)
