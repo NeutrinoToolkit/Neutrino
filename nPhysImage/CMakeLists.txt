@@ -45,6 +45,7 @@ set (CMAKE_MACOSX_RPATH off)
 set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR})
 endif()
 
+#to be removed
 if (NOT APPLE)
     install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
 endif()

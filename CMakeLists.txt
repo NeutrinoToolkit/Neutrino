@@ -77,12 +77,12 @@ include(GetVersionFromGitTag)
 if (GIT_FOUND)
     set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
     IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
-    message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
-    set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
+        message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
+        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}-${${PROJECT_NAME}_VERSION_AHEAD}")
     ELSE()
-    message(STATUS "${${PROJECT_NAME}_VERSION_BRANCH} : ${${PROJECT_NAME}_VERSION_STRING} : ${${PROJECT_NAME}_VERSION_AHEAD}")
-    set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}")
-    message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
+        message(STATUS "${${PROJECT_NAME}_VERSION_BRANCH} : ${${PROJECT_NAME}_VERSION_STRING} : ${${PROJECT_NAME}_VERSION_AHEAD}")
+        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}")
+        message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
     ENDIF()
 
 endif()
@@ -92,7 +92,7 @@ endif()
 ## cpack definitions
 #SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Neutrino")
 #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
-#SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 
 # goodies for everybody
 file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
@@ -108,10 +108,11 @@ if (WIN32)
     set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
     set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
     SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Neutrino")
-    #SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
-    #SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
-    #SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
+    SET(CPACK_NSIS_HELP_LINK "https://github.com/NeutrinoToolkit/Neutrino")
+    SET(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/NeutrinoToolkit/Neutrino")
+
     SET(CPACK_NSIS_MODIFY_PATH ON)
+    SET(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 
 
     # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
