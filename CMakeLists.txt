@@ -1,6 +1,6 @@
 # this is the frigging toplevel cmakelists
 
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.5)
 
 ### top level compile options
 
