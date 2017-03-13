@@ -47,6 +47,7 @@ before_deploy:
  - mv Neutrino.app dmg
  - export RELEASE_FILE=Neutrino.dmg
  - ./resources/macPackage/createdmg.sh --icon-size 96 --volname Neutrino --volicon resources/macPackage/dmg-icon.icns --background resources/macPackage/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 ${RELEASE_FILE} dmg
+ - find .
     
 deploy:
   provider: releases
