@@ -454,7 +454,7 @@ void MUSE::loadCube() {
             fits_get_img_size(fptr,anaxis,&axissize[0],&status);
             if (fits_check_error(status)) return;
 
-            long totalsize=1;
+            unsigned long totalsize=1;
             for(int i=0; i<anaxis; i++) {
                 totalsize*=axissize[i];
             }

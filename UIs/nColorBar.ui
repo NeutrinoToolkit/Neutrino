@@ -106,7 +106,6 @@
           <property name="focusPolicy">
            <enum>Qt::StrongFocus</enum>
           </property>
-          <zorder>widget</zorder>
          </widget>
         </item>
         <item row="2" column="0">
