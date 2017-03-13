@@ -31,10 +31,6 @@ endif()
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
 
-if (GENERATE_NHASH)
-        message (STATUS "Compiling neutrino with serial number/key protection")
-        add_definitions(-D__neutrino_key)
-endif()
 
 ## ADD DYNAMIC VERSIONING!
 ## ADD DEB DESCRIPTION

@@ -79,24 +79,28 @@ list (APPEND SOURCES
     pans/nIntegralInversion.cc pans/nLineoutBoth.cc pans/winlist/nTreeWidget.cc 
     pans/winlist/nWinList.cc pans/nCutoffMask.cc pans/nCompareLines.cc 
     pans/nShortcuts.cc pans/nOperator.cc pans/nLineout.cc pans/nZoomWin.cc
+    pans/nCamera.cc
 )
 
-#moving it to main file
-include(FindNeutrinoGuiComponents)
+include(FindNeutrinoDeps)
 
-
-## when NEUTRINO_CHECKREG, __neutrino_check_registration is defined
-## add relevant sources
-if (GENERATE_NHASH)
-    set (SOURCES ${SOURCES} neutrino-key/nHash.cc)
-
-    include_directories(neutrino-key)
-
-    if (UNIX AND (NOT APPLE))
-        add_definitions(-D__neutrino_reg_linux)
-    endif()
-
+if(DEFINED ENV{QTDIR})
+    set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 endif()
+
+if(DEFINED QTDIR)
+    set(CMAKE_PREFIX_PATH ${QTDIR} ${CMAKE_PREFIX_PATH})
+endif()
+
+if (NOT DEFINED Qt5_DIR AND APPLE)
+    set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+endif()
+
+find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL REQUIRED)
+
+add_definitions(${QT_DEFINITIONS})
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
 
 # write automatically the qrc file for icons
 set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
@@ -141,14 +145,6 @@ endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLLICENSES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
-
-# all dependencies search now moved to FindNeutrinoGuiComponents.cmake
-# (see neutrino cmake resources folder)
-# add here QT5 only sources
-if (NOT Qt5Widgets_VERSION VERSION_LESS 5.3.0)
-    list (APPEND SOURCES pans/nCamera.cc)
-    list (APPEND UIS ../UIs/nCamera.ui)
-endif()
 
 qt5_add_resources(RES_SOURCES ${ICONS_QRC})
 qt5_add_resources(RES_SOURCES ${HTML_QRC})
