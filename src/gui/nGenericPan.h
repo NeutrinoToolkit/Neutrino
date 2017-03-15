@@ -43,8 +43,6 @@
 
 #include "nPanPlug.h"
 
-class neutrino;
-
 namespace Ui {
 class PanHelp;
 }
@@ -73,11 +71,8 @@ class nGenericPan : public QMainWindow {
 
 public:
     nGenericPan(){};
-    nGenericPan(neutrino *);
+    nGenericPan();
     ~nGenericPan(){};
-
-    neutrino *nparent;
-    nPhysD *currentBuffer;
 
     // thread stuff
     panThread nThread;

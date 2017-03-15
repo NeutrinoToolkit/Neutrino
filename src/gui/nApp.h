@@ -44,7 +44,7 @@ protected:
 
 
 public slots:
-    QList<neutrino*> neus();
+//    QList<neutrino*> neus();
 
     static void changeThreads(int);
     static void changeLocale(QLocale locale);

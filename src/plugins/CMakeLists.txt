@@ -1,6 +1,16 @@
-cmake_minimum_required (VERSION 3.0)
-
 message(STATUS "Scanning plugins directory")
+
+list(APPEND CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/../resources/cmake)
+
+if (NOT DEFINED NEUTRINO_ROOT)
+    set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
+endif()
+
+if (NOT IS_ABSOLUTE ${NEUTRINO_ROOT})
+    set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
+endif()
+
+include(NeutrinoPlugin)
 
 SET(plugins_list "")
 FILE(GLOB allfiles "*")

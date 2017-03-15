@@ -94,6 +94,7 @@ class phys_properties : public anymap {
 
 };
 
+enum phys_way { PHYS_POS, PHYS_NEG };
 
 template<class T>
 class nPhysImageF {

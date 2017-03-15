@@ -25,38 +25,17 @@
 #include "nGenericPan.h"
 #include "ui_nPanHelp.h"
 
-#include "neutrino.h"
-#include "ui_neutrino.h"
 #include <QtSvg>
 
-nGenericPan::nGenericPan(neutrino *myparent)
-: QMainWindow(myparent),
-  nparent(myparent),
-  currentBuffer(myparent->getCurrentBuffer()),
-  my_help(new Ui::PanHelp)
+nGenericPan::nGenericPan() : my_help(new Ui::PanHelp)
 {
-    if (nparent==nullptr) return;
+    
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
 	setAttribute(Qt::WA_DeleteOnClose);
 
-	connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
-
-	connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
-	connect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
-
-	connect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
-
-    connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
-    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
-
-	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
-
-	connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-	connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-
-    bufferChanged(nparent->getCurrentBuffer());
-    nparent->emitPanAdd(this);
+    nHolder::getInstance().addPan(this);
+    
 }
 
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {

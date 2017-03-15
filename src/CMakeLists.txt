@@ -1,4 +1,4 @@
 
-add_subdirectory (nphys)
+# add_subdirectory (phys)
 add_subdirectory (gui)
-add_subdirectory (plugins)
+# add_subdirectory (plugins)

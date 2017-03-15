@@ -1,10 +1,4 @@
 #include "nApp.h"
-#include "neutrino.h"
-
-#ifdef __neutrino_key
-#include "nHash.h"
-#endif
-
 
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
@@ -14,12 +8,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     setOrganizationDomain("edu");
     setApplicationName("Neutrino");
     setApplicationVersion(__VER);
-
-#ifdef __neutrino_key
-    std::string hh = getNHash();
-    qDebug() << "got nHash: "<< hh << std::endl;
-    setProperty("nHash", hh.c_str());
-#endif
 
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
@@ -32,15 +20,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
 
 }
 
-
-QList<neutrino*> nApp::neus() {
-    QList<neutrino*> retList;
-    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        neutrino *my_neu=qobject_cast<neutrino *>(widget);
-        if (my_neu) retList<< my_neu;
-    }
-    return retList;
-}
 
 bool nApp::notify(QObject *rec, QEvent *ev)
 {
@@ -58,19 +37,19 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 
 bool nApp::event(QEvent *ev) {
     qDebug() << ev;
-    if (ev->type() == QEvent::FileOpen) {
-        QWidget *widget = QApplication::activeWindow();
-        neutrino *neu=qobject_cast<neutrino *>(widget);
-        if (neu == NULL) {
-            nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-            if (pan) neu = pan->nparent;
-        }
-        if (neu == NULL) neu = new neutrino();
-        neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
-    } else {
+//    if (ev->type() == QEvent::FileOpen) {
+//        QWidget *widget = QApplication::activeWindow();
+//        neutrino *neu=qobject_cast<neutrino *>(widget);
+//        if (neu == NULL) {
+//            nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
+//            if (pan) neu = pan->nparent;
+//        }
+//        if (neu == NULL) neu = new neutrino();
+//        neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
+//    } else {
         return QApplication::event(ev);
-    }
-    return true;
+//    }
+//    return true;
 }
 
 QString nApp::localeToString(const QLocale &locale) {

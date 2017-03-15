@@ -11,7 +11,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment ver
 
 project (Neutrino CXX)
 
-
 #############################
 
 set(README_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
@@ -53,7 +52,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
-set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
+set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR}/src)
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 

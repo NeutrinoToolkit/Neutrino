@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>nBoxLineout</class>
- <widget class="QMainWindow" name="nBoxLineout">
+ <widget class="QMainWindow" name="HolderGUI">
   <property name="geometry">
    <rect>
     <x>0</x>

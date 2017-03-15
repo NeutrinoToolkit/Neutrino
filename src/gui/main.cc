@@ -30,7 +30,7 @@
 #include <QtGui>
 
 #include "nApp.h"
-#include "nHolder.h"
+#include "holderGUI/holderGUI.h"
 
 #include <QTranslator>
 
@@ -51,16 +51,15 @@ int main(int argc, char **argv)
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
 
-    nHolder::getInstance();
-
-    qDebug() << (void*) &ceppa1 << " : " << (void*) &ceppa2;
-
+    
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
     nApp my_app(argc,argv);
 
     QStringList args=my_app.arguments();
     args.removeFirst();
+    
+    nHolderGui * my_gui= new nHolderGui();
 
     return my_app.exec();
 

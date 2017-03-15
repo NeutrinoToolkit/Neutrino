@@ -1,7 +1,6 @@
 #ifndef __nHolder
 #define __nHolder
 
-#include "nPhysImageF.h"
 #include "nPhysD.h"
 #include <list>
 
@@ -21,7 +20,8 @@ private:
 public:
     nHolder(nHolder const&) = delete;
     void operator=(nHolder const&)  = delete;
-
+    
+    std::list<nPhysD*> fileOpen(std::string fname);
 };
 
 

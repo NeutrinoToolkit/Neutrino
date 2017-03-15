@@ -33,8 +33,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_compile_options(-std=c++11)
 
 
-    if (NOT EXISTS ${NEUTRINO_ROOT}/src/neutrino.h)
-        message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
+    if (NOT EXISTS ${NEUTRINO_ROOT}/gui/neutrino.h)
+        message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino> ${NEUTRINO_ROOT}")
     endif()
 
     # check for nphys
@@ -52,13 +52,13 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
     # add neutrino deps
-    include_directories(${NEUTRINO_ROOT}/nPhysImage)
-    include_directories(${NEUTRINO_ROOT}/src) # for base stuff
-    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
+    include_directories(${NEUTRINO_ROOT}/phys)
+    include_directories(${NEUTRINO_ROOT}/gui) # for base stuff
+    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/gui/UIs/neutrino.ui)
 
     # visar needs to borrow some stuff from neutrino tree
     include_directories(${NEUTRINO_ROOT}/src/graphics)
-    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
+    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/gui//UIs/nLine.ui)
 
     file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
