@@ -1,6 +1,0 @@
-?package(neutrino):\
-	needs="X11"\
-	section="Applications/Science/Physics"\
-	title="Neutrino"\
-	command="neutrino"\
-	icon="/usr/share/pixmaps/neutrino.svg"

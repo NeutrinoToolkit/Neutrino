@@ -1,5 +1,0 @@
-In this folder are contained 
-
-* the static compiled plugins
-* the goodies needed to compile extern (dynamic load) plugins
-* skel dir is automatically excluded
