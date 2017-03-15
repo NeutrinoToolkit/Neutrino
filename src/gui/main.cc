@@ -29,7 +29,6 @@
 
 #include <QtGui>
 
-#include "neutrino.h"
 #include "nApp.h"
 #include "nHolder.h"
 
@@ -52,8 +51,7 @@ int main(int argc, char **argv)
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
 
-    nHolder &ceppa1 = nHolder::getInstance();
-    nHolder &ceppa2 = nHolder::getInstance();
+    nHolder::getInstance();
 
     qDebug() << (void*) &ceppa1 << " : " << (void*) &ceppa2;
 
@@ -63,9 +61,6 @@ int main(int argc, char **argv)
 
     QStringList args=my_app.arguments();
     args.removeFirst();
-
-    neutrino *ny_neu = new neutrino();
-    ny_neu->fileOpen(args);
 
     return my_app.exec();
 
