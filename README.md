@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/iltommi/neutrino.svg?branch=master)](https://travis-ci.org/iltommi/neutrino)
+[![Build Status](https://travis-ci.org/NeutrinoToolkit/Neutrino.svg?branch=master)](https://travis-ci.org/NeutrinoToolkit/Neutrino)
 
 neutrino
 ========

@@ -80,6 +80,7 @@ list (APPEND SOURCES
     pans/nCamera.cc
 
 #    nPhysD.cc
+    nHolder.cc
     )
 
 include(FindNeutrinoDeps)

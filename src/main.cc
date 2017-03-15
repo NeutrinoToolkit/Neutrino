@@ -31,6 +31,7 @@
 
 #include "neutrino.h"
 #include "nApp.h"
+#include "nHolder.h"
 
 #include <QTranslator>
 
@@ -51,6 +52,11 @@ int main(int argc, char **argv)
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
 
+    nHolder &ceppa1 = nHolder::getInstance();
+    nHolder &ceppa2 = nHolder::getInstance();
+
+    qDebug() << (void*) &ceppa1 << " : " << (void*) &ceppa2;
+
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
     nApp my_app(argc,argv);
@@ -62,4 +68,5 @@ int main(int argc, char **argv)
     ny_neu->fileOpen(args);
 
     return my_app.exec();
+
 }
