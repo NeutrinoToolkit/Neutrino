@@ -2,15 +2,16 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 int main(int , char **) {
-	QFile fileout("../../src/graphics/neutrinoPalettes.cc");
+	QFile fileout("../../src/gui/graphics/neutrinoPalettes.cc");
 	fileout.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream outs(&fileout);
     outs << "#include \"neutrino.h\"\nvoid neutrino::build_colormap() \{\n";
 	QDir::setCurrent("cmaps");
     QStringList allFiles = QDir().entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
-	unsigned char *palette = new unsigned char[256*3]();
+	std::vector<unsigned char> palette(256*3);
     foreach (QString paletteFile, allFiles) {
 		QFile filein(paletteFile);
 		if (filein.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -55,6 +56,5 @@ int main(int , char **) {
 		}   
 		filein.close();
 	}
-	delete palette;
 	outs << "}" << endl;
 }
