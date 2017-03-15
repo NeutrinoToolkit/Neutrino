@@ -350,6 +350,7 @@ namespace vmath {
 
 // typedefs
 
+typedef bidimvec<double> vec2f;
 typedef bidimvec<int> vec2;
 
 #endif

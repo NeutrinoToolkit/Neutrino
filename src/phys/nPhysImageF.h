@@ -76,12 +76,6 @@
 #ifndef __nPhysImageF_h
 #define __nPhysImageF_h
 
-typedef bidimvec<double> vec2f;
-typedef bidimvec<int> vec2;
-
-enum phys_way { PHYS_POS, PHYS_NEG };
-enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
-
 typedef std::string phys_type;
 #define PHYS_FILE "phys_file"
 #define PHYS_RFILE "phys_rfile"
@@ -99,14 +93,6 @@ class phys_properties : public anymap {
 		}
 
 };
-
-
-// coolrdinates point
-struct phys_point_str {
-	size_t x;
-	size_t y;
-};
-typedef struct phys_point_str phys_point;
 
 
 template<class T>
@@ -133,7 +119,7 @@ class nPhysImageF {
 
 		//! resize existing object. WARNING: existing data is deleted
 		void resize(size_t new_w, size_t new_h, T val=0)
-		{ sh_data->resize(new_w, new_h); }
+		{ sh_data->resize(new_w, new_h, val); }
 
 		//! re-reads buffer for minimum/maximum value
 		void TscanBrightness(void);
@@ -285,9 +271,6 @@ class nPhysImageF {
 		inline T getPoint(bidimvec<double> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
 			return getPoint(p.x(),p.y(),nan_value);
 		}
-
-
-
 
 		inline void set(T val) { //! set a value allover the matrix
 			DEBUG(PRINTVAR(val));
