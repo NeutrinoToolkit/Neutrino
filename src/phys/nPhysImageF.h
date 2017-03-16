@@ -78,6 +78,9 @@
 #ifndef __nPhysImageF_h
 #define __nPhysImageF_h
 
+enum phys_way { PHYS_POS, PHYS_NEG };
+enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
+
 typedef std::string phys_type;
 #define PHYS_FILE "phys_file"
 #define PHYS_RFILE "phys_rfile"
