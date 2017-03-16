@@ -28,7 +28,7 @@ bool GetNextOneToUnwrap(unsigned int &a, unsigned int &b, std::vector<unsigned i
 	return true;
 }
 
-void InsertList(nPhysD *soln, double val, nPhysD *qual_map, nPhysBits *bits, unsigned int index, 
+void InsertList(physD *soln, double val, physD *qual_map, nPhysBits *bits, unsigned int index, 
                 std::vector<unsigned int> &index_list, unsigned int &num_index) {
     
 	soln->set(index,val);
@@ -67,30 +67,30 @@ void InsertList(nPhysD *soln, double val, nPhysD *qual_map, nPhysBits *bits, uns
 /* Insert the four neighboring pixels of the given pixel */
 /* (x,y) into the list.  The quality value of the given  */
 /* pixel is "val".                                       */
-void UpdateList(nPhysD *qual_map, unsigned int x, unsigned int y, double val, nPhysD *phase,
-                nPhysD *soln, nPhysBits *bits, std::vector<unsigned int> &index_list, unsigned int &num_index) {
+void UpdateList(physD *qual_map, unsigned int x, unsigned int y, double val, physD *phase,
+                physD *soln, nPhysBits *bits, std::vector<unsigned int> &index_list, unsigned int &num_index) {
     unsigned int dx=phase->getW();
     unsigned int dy=phase->getH();
 
 	double  my_val;
 	
-	if (x > 0 && !(bits->point(x-1,y) & (AVOID | UNWRAPPED))) {
-		my_val = val + grad(phase->point(x-1,y), phase->point(x,y));
+	if (x > 0 && !(bits->point(x-1,y,0) & (AVOID | UNWRAPPED))) {
+		my_val = val + grad(phase->point(x-1,y,0), phase->point(x,y,0));
 		InsertList(soln, my_val, qual_map, bits, y*dx+x-1, index_list, num_index);
 	}
 	
-	if (x < dx-1  && !(bits->point(x+1,y) & (AVOID | UNWRAPPED))) {
-		my_val = val - grad(phase->point(x,y), phase->point(x+1,y));
+	if (x < dx-1  && !(bits->point(x+1,y,0) & (AVOID | UNWRAPPED))) {
+		my_val = val - grad(phase->point(x,y,0), phase->point(x+1,y,0));
 		InsertList(soln, my_val, qual_map, bits, y*dx+x+1, index_list, num_index);
 	}
 	
-	if (y > 0 && !(bits->point(x,y-1) & (AVOID | UNWRAPPED))) {
-		my_val = val + grad(phase->point(x,y-1), phase->point(x,y));
+	if (y > 0 && !(bits->point(x,y-1,0) & (AVOID | UNWRAPPED))) {
+		my_val = val + grad(phase->point(x,y-1,0), phase->point(x,y,0));
 		InsertList(soln, my_val, qual_map, bits, (y-1)*dx+x, index_list, num_index);
 	}
 	
-	if (y < dy-1 && !(bits->point(x,y+1) & (AVOID | UNWRAPPED))) {
-		my_val = val - grad(phase->point(x,y), phase->point(x,y+1));
+	if (y < dy-1 && !(bits->point(x,y+1,0) & (AVOID | UNWRAPPED))) {
+		my_val = val - grad(phase->point(x,y,0), phase->point(x,y+1,0));
 		InsertList(soln, my_val, qual_map, bits, (y+1)*dx+x, index_list, num_index);
 	}
 }
@@ -110,7 +110,7 @@ int DistToBorder(nPhysBits *bits, int a, int b, int *ra, int *rb) {
 		/* search boxes of increasing size until border pixel found */
 		for (int j=b - bs; j<=b + (int)bs; j++) {
 			for (int i=a - bs; i<=a + (int)bs; i++) {
-				if (i<=0 || i>=(int)dx - 1 || j<=0 || j>=(int)dy - 1 || (bits->point(i,j) & BORDER)) {
+				if (i<=0 || i>=(int)dx - 1 || j<=0 || j>=(int)dy - 1 || (bits->point(i,j,0) & BORDER)) {
 					found = true;
 					int dist2 = (j - b)*(j - b) + (i - a)*(i - a);
 					if (dist2 < best_dist) {
@@ -141,7 +141,7 @@ void PlaceCut(nPhysBits *bits, int a, int b, int c, int d) {
 	else if (d < b && d > 0) d++;
 	
 	if (a==c && b==d) {
-		bits->set(a,b,bits->point(a,b) | BRANCH_CUT);
+		bits->set(a,b,bits->point(a,b,0) | BRANCH_CUT);
 		return;
 	}
 	int m = (a < c) ? c - a : a - c;
@@ -151,37 +151,37 @@ void PlaceCut(nPhysBits *bits, int a, int b, int c, int d) {
 		double r = ((double)(d - b))/((double)(c - a));
 		for (int i=a; i!=c+istep; i+=istep) {
 			int j = b + (i - a)*r + 0.5;
-			bits->set(i,j,bits->point(i,j) | BRANCH_CUT);
+			bits->set(i,j,bits->point(i,j,0) | BRANCH_CUT);
 		}
 	} else {   /* n < m */
 		int jstep = (b < d) ? +1 : -1;
 		double r = ((double)(c - a))/((double)(d - b));
 		for (int j=b; j!=d+jstep; j+=jstep) {
 			int i = a + (j - b)*r + 0.5;
-			bits->set(i,j,bits->point(i,j) | BRANCH_CUT);
+			bits->set(i,j,bits->point(i,j,0) | BRANCH_CUT);
 		}
 	}
 }
 
 
-void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
+void unwrap_goldstein (physD *phase, physD *soln) {
 	unsigned int dx=phase->getW();
     unsigned int dy=phase->getH();
 
-	nPhysD qual_map(dx,dy,0.0,"qual");
+	physD qual_map(dx,dy,0.0,"qual");
 	nPhysBits bits(dx,dy,0,"bits");
 	
 	int NumRes=0;
 	for (unsigned int j=0; j<dy - 1; j++) {
 		for (unsigned int i=0; i<dx - 1; i++) {
-			if (!((bits.point(i,j) & AVOID)   || (bits.point(i+1,j) & AVOID)
-			 || (bits.point(i+1,j+1) & AVOID) || (bits.point(i,j+1) & AVOID))) {
-				double r = grad(phase->point(i+1,j), phase->point(i,j))
-						 + grad(phase->point(i+1,j+1), phase->point(i+1,j))
-						 + grad(phase->point(i,j+1), phase->point(i+1,j+1))
-						 + grad(phase->point(i,j), phase->point(i,j+1));
-				if (r > 0.01) bits.set(i,j,bits.point(i,j) | POSITIVE);
-				else if (r < -0.01) bits.set(i,j,bits.point(i,j) | NEGATIVE);
+			if (!((bits.point(i,j,0) & AVOID)   || (bits.point(i+1,j,0) & AVOID)
+			 || (bits.point(i+1,j+1,0) & AVOID) || (bits.point(i,j+1,0) & AVOID))) {
+				double r = grad(phase->point(i+1,j,0), phase->point(i,j,0))
+						 + grad(phase->point(i+1,j+1,0), phase->point(i+1,j,0))
+						 + grad(phase->point(i,j+1,0), phase->point(i+1,j+1,0))
+						 + grad(phase->point(i,j,0), phase->point(i,j+1,0));
+				if (r > 0.01) bits.set(i,j,bits.point(i,j,0) | POSITIVE);
+				else if (r < -0.01) bits.set(i,j,bits.point(i,j,0) | NEGATIVE);
 				if (r*r > 0.01) NumRes++;
 			}
 		}
@@ -192,21 +192,21 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
 			int kk = 0;
-			if ((bits.point(i,j) & POSITIVE)) {
-				if (i<dx-1 && (bits.point(i+1,j) & NEGATIVE)) kk=i+1+j*dx;
+			if ((bits.point(i,j,0) & POSITIVE)) {
+				if (i<dx-1 && (bits.point(i+1,j,0) & NEGATIVE)) kk=i+1+j*dx;
 				else if (j<dy-1) {
-					if ((bits.point(i,j+1) & NEGATIVE)) kk=i+(j+1)*dx;
+					if ((bits.point(i,j+1,0) & NEGATIVE)) kk=i+(j+1)*dx;
 				}
-			} else if ((bits.point(i,j) & NEGATIVE)) {
-				if (i<dx-1 && (bits.point(i+1,j) & POSITIVE)) kk=i+1+j*dx;
+			} else if ((bits.point(i,j,0) & NEGATIVE)) {
+				if (i<dx-1 && (bits.point(i+1,j,0) & POSITIVE)) kk=i+1+j*dx;
 				else if (j<dy-1) {
-					if ((bits.point(i,j+1) & POSITIVE)) kk=i+(j+1)*dx;
+					if ((bits.point(i,j+1,0) & POSITIVE)) kk=i+(j+1)*dx;
 				}
 			}
 			if (kk) {
 // 				DEBUG("Connecting dipoles " << i << "," << j << " " << kk%dx << "," << kk/dx);
 				PlaceCut(&bits, i, j, kk%dx, kk/dx);
-				bits.set(i,j,bits.point(i,j) & (~(RESIDUE)));
+				bits.set(i,j,bits.point(i,j,0) & (~(RESIDUE)));
 				bits.set(kk,bits.point(kk) & (~(RESIDUE)));
 			}
 		}
@@ -226,9 +226,9 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	/* branch cuts */
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
-			if ((bits.point(i,j) & RESIDUE) && !(bits.point(i,j) & DONE)) {
-				bits.set(i,j,(bits.point(i,j) | DONE) | ACTIVE);
-				int charge = (bits.point(i,j) & POSITIVE) ? 1 : -1;
+			if ((bits.point(i,j,0) & RESIDUE) && !(bits.point(i,j,0) & DONE)) {
+				bits.set(i,j,(bits.point(i,j,0) | DONE) | ACTIVE);
+				int charge = (bits.point(i,j,0) & POSITIVE) ? 1 : -1;
 				active_list[num_active++] = vec2(i,j);
 				if (num_active > max_active) {
 					DEBUG("here1 i,j " << i << " " << j);
@@ -241,7 +241,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 						int boxctr_j = active_list[ka].y();
                         for (int jj=boxctr_j - bs2; jj<=boxctr_j + bs2 && charge!=0 && jj>=0 && jj < int(dy); jj++) {
                             for (int ii=boxctr_i - bs2; ii<=boxctr_i + bs2 && charge!=0 && ii>=0 && ii < int(dx); ii++) {
-								unsigned char bit=bits.point(ii,jj);
+								unsigned char bit=bits.point(ii,jj,0);
 								if (bit & BORDER) {
 									bits.set(ii,jj,bit | DONE);
 									charge = 0;
@@ -268,7 +268,7 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 				if (charge == 0) {   /* connect branch cuts to rim */
 					/* mark all active pixels inactive */
 					for (int ka=0; ka<num_active; ka++) 
-						bits.set(active_list[ka],bits.point(active_list[ka]) & ~ACTIVE);  /* turn flag ACTIVE off */
+						bits.set(active_list[ka].x(), active_list[ka].y(), bits.point(active_list[ka]) & ~ACTIVE);  /* turn flag ACTIVE off */
 				} else {
 					int min_dist = dx + dy;  /* large value */
 					for (int ka=0; ka<num_active; ka++) {
@@ -300,17 +300,17 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	int n = 0;
 	for (unsigned int j=0; j<dy; j++) {
 		for (unsigned int i=0; i<dx; i++) {
-			if (!(bits.point(i,j) & (AVOID | UNWRAPPED))) {
-				bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+			if (!(bits.point(i,j,0) & (AVOID | UNWRAPPED))) {
+				bits.set(i,j,bits.point(i,j,0) | UNWRAPPED);
 				++num_pieces;
-				value = phase->point(i,j);
+				value = phase->point(i,j,0);
 				soln->set(i,j,value);
 				UpdateList(&qual_map, i, j, value, phase, soln, &bits, index_list, num_index);
 				while (num_index > 0) {
 					++n;
 					if (GetNextOneToUnwrap(a, b, index_list, num_index, dx)) {
-						bits.set(a,b,bits.point(a,b) | UNWRAPPED);
-						value = soln->point(a,b);        
+						bits.set(a,b,bits.point(a,b,0) | UNWRAPPED);
+						value = soln->point(a,b,0);        
 						UpdateList(&qual_map, a, b, value, phase, soln, &bits, index_list, num_index);
 					}
 				}
@@ -320,13 +320,13 @@ void unwrap_goldstein (nPhysD *phase, nPhysD *soln) {
 	/* unwrap branch cut pixels */
 	for (unsigned int j=1; j<dy; j++) {
 		for (unsigned int i=1; i<dx; i++) {
-			if (bits.point(i,j) & AVOID) {
-				if ((bits.point(i-1,j) & UNWRAPPED)) {
-					soln->set(i,j,soln->point(i-1,j)+grad(phase->point(i,j),phase->point(i-1,j)));
-					bits.set(i,j,bits.point(i,j) | UNWRAPPED);
-				} else if ((bits.point(i,j-1) & UNWRAPPED)) {
-					soln->set(i,j,soln->point(i,j-1)+grad(phase->point(i,j),phase->point(i,j-1)));
-					bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+			if (bits.point(i,j,0) & AVOID) {
+				if ((bits.point(i-1,j,0) & UNWRAPPED)) {
+					soln->set(i,j,soln->point(i-1,j,0)+grad(phase->point(i,j,0),phase->point(i-1,j,0)));
+					bits.set(i,j,bits.point(i,j,0) | UNWRAPPED);
+				} else if ((bits.point(i,j-1,0) & UNWRAPPED)) {
+					soln->set(i,j,soln->point(i,j-1,0)+grad(phase->point(i,j,0),phase->point(i,j-1,0)));
+					bits.set(i,j,bits.point(i,j,0) | UNWRAPPED);
 				}
 			}
 		}

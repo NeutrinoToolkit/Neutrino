@@ -1,4 +1,7 @@
 
+#ifndef __phys_exceptions
+#define __phys_exceptions
+
 class physData_ooAccess: public std::exception {
 	virtual const char* what() const throw()
 	{
@@ -44,3 +47,4 @@ class phys_fileerror: public std::exception
 
 };
 
+#endif

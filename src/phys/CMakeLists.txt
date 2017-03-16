@@ -6,7 +6,7 @@ if (LINUX)
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
-add_library (nPhysImageF SHARED bidimvec.cc tools.cc nPhysTools.cc anymap.cc NaNStream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
+add_library (nPhysImageF SHARED bidimvec.cc debug-messages.cc nPhysTools.cc anymap.cc nanstream.cc  nPhysFormats.cc  nPhysImageF.cc  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")
@@ -23,7 +23,7 @@ message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
 # force necessary defines on config.h
 add_definitions(-DHAVE_LIBPTHREAD)
 
-set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake)
+set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/cmake)
 include(FindNeutrinoDeps)
 
 
@@ -48,6 +48,4 @@ endif()
 if (NOT APPLE)
     install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
 endif()
-
-
 

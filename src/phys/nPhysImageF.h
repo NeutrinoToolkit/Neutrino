@@ -56,6 +56,8 @@
 #include <memory>
 
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_const_mksa.h>
+#include <gsl/gsl_const_num.h>
 #include <fftw3.h>
 #include <time.h>
 #include <assert.h>
@@ -190,9 +192,22 @@ class nPhysImageF {
 		{ return sh_data->getH(); }
 		inline size_t getSurf() const
 		{ return sh_data->getSurf(); }
+		T sum()
+		{ return sh_data->sum(); }
+
+		typename std::vector<T>::iterator buf_itr()
+		{ return sh_data->buf_itr(); }
+		const T *data_pointer()
+		{ return sh_data->data_pointer(); }
+
+		void swap_vector(size_t w, size_t h, std::vector<T> &vec) 
+		{ sh_data->swap_vector(w, h, vec); }
 
 		inline T point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
 		{ return sh_data->point(x, y, nan_value); }
+
+		inline T point(vec2 vv, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
+		{ return sh_data->point(vv.x(), vv.y(), nan_value); }
 
 		inline T point(size_t xy, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
 		{ return sh_data->point(xy, nan_value); }
@@ -201,6 +216,7 @@ class nPhysImageF {
 		{ sh_data->set(x, y, val); }
 		inline void set(size_t xy, T val)
 		{ sh_data->set(xy, val); }
+
 		// ------------------------------------------------------------------------
 		// ------------------------------------------------------------------------
 		// ------------------------------------------------------------------------
@@ -301,6 +317,9 @@ class nPhysImageF {
 		inline size_t getSizeByIndex(enum phys_direction dir)
 		{ if (dir==PHYS_X) return getW(); if (dir == PHYS_Y) return getH(); return 0; }
 
+		inline bidimvec<size_t> getSize()
+		{ return bidimvec<size_t>(getW(), getH()); }
+
 		inline bool isInside(size_t x, size_t y) {
 			if ((x < getW()) && (y < getH()))
 				return true;
@@ -372,6 +391,7 @@ class nPhysImageF {
 
 		void init_Tvariables();
 
+
 	private:
 
 		//! TODO: pass to bidimvec<T>
@@ -383,6 +403,9 @@ class nPhysImageF {
 
 
 };
+
+typedef nPhysImageF<double> physD;
+typedef nPhysImageF<mcomplex> physC;
 
 // --------------------------------------------------------------------------------------------
 

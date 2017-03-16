@@ -22,7 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "NaNStream.h"
+#include "nanstream.h"
 
 // override >> operator for float type
 template<>

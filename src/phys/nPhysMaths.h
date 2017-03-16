@@ -45,7 +45,7 @@
 
 
 
-inline void planeFit(nPhysD *pi, double *coeffs);
+inline void planeFit(physD *pi, double *coeffs);
 
 // ------------------ general purpose functions for wavelet analysis ------------------------
 inline mcomplex 
@@ -69,7 +69,7 @@ struct meshgrid_data_str {
 };
 
 inline void
-phys_generate_meshgrid(meshgrid_data *mesh, nPhysD &xx, nPhysD &yy)
+phys_generate_meshgrid(meshgrid_data *mesh, physD &xx, physD &yy)
 {
 	if (mesh==NULL)
 		return;
@@ -97,10 +97,10 @@ typedef struct morlet_data_str morlet_data;
 struct morlet_data_str { double lambda, angle, thickness, damp; };
 
 inline void 
-phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz);
+phys_generate_morlet(morlet_data *md, physD &xx, physD &yy, physC &zz);
 
 inline void 
-phys_generate_Fmorlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz)
+phys_generate_Fmorlet(morlet_data *md, physD &xx, physD &yy, physC &zz)
 {
 	if ((xx.getW() != yy.getW()) || (xx.getH() != yy.getH())) {
 		WARNING("size mismatch: op1 is: "<<xx.getW()<<"x"<<xx.getH()<<", op2 is: "<<yy.getW()<<"x"<<yy.getH());
@@ -150,83 +150,83 @@ inline void phys_reverse_vector(double *buf, int size);
 // some nice filters
 
 void
-phys_sin(nPhysD &);
+phys_sin(physD &);
 
 void
-phys_cos(nPhysD &);
+phys_cos(physD &);
 
 void
-phys_tan(nPhysD &);
+phys_tan(physD &);
 
 void
-phys_pow(nPhysD &, double);
+phys_pow(physD &, double);
 
 void
-phys_square(nPhysD &);
+phys_square(physD &);
 
 void
-phys_sqrt(nPhysD &);
+phys_sqrt(physD &);
 
 void
-phys_abs(nPhysD &);
+phys_abs(physD &);
 
 void
-phys_log(nPhysD &);
+phys_log(physD &);
 
 void
-phys_log10(nPhysD &);
+phys_log10(physD &);
 
 void
-phys_median_filter(nPhysD&, unsigned int);
+phys_median_filter(physD&, unsigned int);
 
 void
-phys_gaussian_blur(nPhysD &, double);
+phys_gaussian_blur(physD &, double);
 
 void
-phys_fast_gaussian_blur(nPhysD &, double);
+phys_fast_gaussian_blur(physD &, double);
 
 void
-phys_fast_gaussian_blur(nPhysD &, double, double);
+phys_fast_gaussian_blur(physD &, double, double);
 
 void
-phys_laplace(nPhysD&);
+phys_laplace(physD&);
 
 void
-phys_gauss_laplace(nPhysD&, double);
+phys_gauss_laplace(physD&, double);
 
 void
-phys_sobel(nPhysD&);
+phys_sobel(physD&);
 
 void
-phys_gauss_sobel(nPhysD&, double);
+phys_gauss_sobel(physD&, double);
 
 template<> void
-nPhysC::TscanBrightness();
+physC::TscanBrightness();
 
 // constant operations
-void phys_add(nPhysD &, double);
-void phys_subtract(nPhysD &, double);
-void phys_multiply(nPhysD &, double);
-void phys_divide(nPhysD &, double);
-void phys_divide(nPhysC &, double);
+void phys_add(physD &, double);
+void phys_subtract(physD &, double);
+void phys_multiply(physD &, double);
+void phys_divide(physD &, double);
+void phys_divide(physC &, double);
 
-void phys_point_add(nPhysD &, nPhysD &);
-void phys_point_subtract(nPhysD &, nPhysD &);
-void phys_point_multiply(nPhysD &, nPhysD &);
-void phys_point_divide(nPhysD &, nPhysD &);
+void phys_point_add(physD &, physD &);
+void phys_point_subtract(physD &, physD &);
+void phys_point_multiply(physD &, physD &);
+void phys_point_divide(physD &, physD &);
 
-void phys_add_noise(nPhysD &, double);
+void phys_add_noise(physD &, double);
 
-double phys_sum_points(nPhysD &);
-double phys_sum_square_points(nPhysD &);
-void phys_opposite(nPhysD &);
-void phys_inverse(nPhysD &);
+double phys_sum_points(physD &);
+double phys_sum_square_points(physD &);
+void phys_opposite(physD &);
+void phys_inverse(physD &);
 
-void phys_replace(nPhysD &, double, double);
-void phys_replace_NaN(nPhysD &, double);
-void phys_cutoff(nPhysD &, double, double);
+void phys_replace(physD &, double, double);
+void phys_replace_NaN(physD &, double);
+void phys_cutoff(physD &, double, double);
 
-std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysD*, nPhysD*);
+std::pair<double, bidimvec<int> > phys_cross_correlate(physD*, physD*);
 
 
 // crap functions
@@ -234,12 +234,16 @@ void phys_get_vec_brightness(const double *, size_t, double &, double &);
 
 
 bidimvec<size_t>
-phys_max_p(nPhysD &);
+phys_max_p(physD &);
+
+// fourier
+physC& ft2(physD&, enum phys_fft);
+physC& ft2(physC&, enum phys_fft);
 
 // complex functions
-std::map<std::string, nPhysD > to_polar(nPhysC &iphys);
-std::map<std::string, nPhysD > to_rect(const nPhysC &iphys);
-std::map<std::string, nPhysD > to_powersp(nPhysC &iphys, bool);
+std::map<std::string, physD > to_polar(physC &iphys);
+std::map<std::string, physD > to_rect(const physC &iphys);
+std::map<std::string, physD > to_powersp(physC &iphys, bool);
 
 // shift functions
 template <class T>
@@ -299,13 +303,13 @@ nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
 	return oimg;
 }
 
-nPhysC from_real_imaginary (nPhysD&, nPhysD&);
+physC from_real_imaginary (physD&, physD&);
 
-nPhysC from_real (nPhysD&, double=0.0);
+physC from_real (physD&, double=0.0);
 
 //! contour trace function
-void contour_trace(nPhysD &, std::list<vec2> &, float, bool blur=false, float blur_radius=10.);
-std::list<double> contour_integrate(nPhysD &, std::list<vec2> &, bool integrate_boundary=false);
+void contour_trace(physD &, std::list<vec2> &, float, bool blur=false, float blur_radius=10.);
+std::list<double> contour_integrate(physD &, std::list<vec2> &, bool integrate_boundary=false);
 
 
 #endif

@@ -23,6 +23,7 @@
  *
  */
 #include "nPhysImageF.h"
+#include <string.h>
 
 #ifndef n_phys_formats__
 #define n_phys_formats__
@@ -55,7 +56,7 @@ public:
 };
 
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
-std::vector <nPhysD*> phys_open_inf(std::string);
+std::vector <physD*> phys_open_inf(std::string);
 
 class physDouble_img : public nPhysImageF<double> {
 public:
@@ -64,9 +65,9 @@ public:
 
 bool fits_check_error (int status);
 
-void phys_write_fits(nPhysD*phys, const char * fname, float compression=0);
+void phys_write_fits(physD*phys, const char * fname, float compression=0);
 
-std::vector <nPhysD*> phys_open_fits(std::string);
+std::vector <physD*> phys_open_fits(std::string);
 
 class physDouble_asc : public nPhysImageF<double> {
 public:
@@ -167,40 +168,40 @@ T swap_endian(T u)
 //operator>> (std::istream &, phys_properties &);
 
 // dump out for state save
-void phys_dump_binary(nPhysD*my_phys, const char *ofile);
+void phys_dump_binary(physD*my_phys, const char *ofile);
 
-void phys_dump_binary(nPhysD*, std::ofstream &);
+void phys_dump_binary(physD*, std::ofstream &);
 
-void phys_dump_ascii(nPhysD*, std::ofstream &);
+void phys_dump_ascii(physD*, std::ofstream &);
 
 int
-phys_resurrect_binary(nPhysD*, std::ifstream &);
+phys_resurrect_binary(physD*, std::ifstream &);
 
-std::vector <nPhysD*> phys_resurrect_binary(std::string);
+std::vector <physD*> phys_resurrect_binary(std::string);
 
 //generic raw open
-void phys_open_RAW(nPhysD*, int, int, bool);
+void phys_open_RAW(physD*, int, int, bool);
 
-std::vector <nPhysD*> phys_open_tiff(std::string, bool separate_rgb);
+std::vector <physD*> phys_open_tiff(std::string, bool separate_rgb);
 
 //write neutrino tiff files
-void phys_write_tiff(std::vector<nPhysD*>, std::string);
-void phys_write_tiff(nPhysD*, std::string);
+void phys_write_tiff(std::vector<physD*>, std::string);
+void phys_write_tiff(physD*, std::string);
 
 #ifdef HAVE_LIBTIFF
-void phys_write_one_tiff(nPhysD*, TIFF*);
+void phys_write_one_tiff(physD*, TIFF*);
 #endif
 
 //! HDF stuff
-std::vector <nPhysD*> phys_open_HDF4(std::string);
-void phys_write_HDF4(nPhysD*, const char*);
+std::vector <physD*> phys_open_HDF4(std::string);
+void phys_write_HDF4(physD*, const char*);
 
 
-std::vector <nPhysD*> phys_open_spe(std::string);
+std::vector <physD*> phys_open_spe(std::string);
 
-std::vector <nPhysD*> phys_open_pcoraw(std::string);
+std::vector <physD*> phys_open_pcoraw(std::string);
 
-std::vector <nPhysD*> phys_open(std::string, bool separate_rgb=false);
+std::vector <physD*> phys_open(std::string, bool separate_rgb=false);
 
 std::string gunzip(std::string);
 
