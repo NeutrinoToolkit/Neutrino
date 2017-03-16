@@ -1,8 +1,12 @@
 #include "nHolder.h"
 
-std::list<nPhysD*> nHolder::fileOpen(std::string fname) {
+std::vector<nPhysD*> nHolder::fileOpen(std::string fname) {
     
-    std::vector<nPhysImageF<double>> retlist = phys_open(fname);
+    std::vector<nPhysD*> retlist;
+
+//    retlist= phys_open(fname);
     
     insert(end(), retlist.begin(), retlist.end());
+    
+    return retlist;
 }

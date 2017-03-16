@@ -1,5 +1,12 @@
-#include "HolderGUI.h"
+#include "holderGUI.h"
 
-HolderGUI::HolderGUI() : QMainWindow() {
+holderGUI::holderGUI() : QMainWindow() {
     DEBUG("HERE");
+    setupUi(this);
+    show();
+}
+
+
+void holderGUI::on_actionOpen_triggered() {
+
 }

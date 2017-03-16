@@ -1,3 +1,9 @@
+#include <QtGui>
+#include <QMessageBox>
+#include <fftw3.h>
+#include <omp.h>
+#include "debug-messages.h"
+
 #include "nApp.h"
 
 

@@ -50,7 +50,11 @@ endif()
 
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTOUIC ON)
+
+file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui holderGUI/*.ui)
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
@@ -147,10 +151,12 @@ qt5_add_resources(RES_SOURCES ${ICONS_QRC})
 qt5_add_resources(RES_SOURCES ${HTML_QRC})
 qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
 
+QT5_WRAP_UI( UI_HEADERS ${UIS} )
+MESSAGE(STATUS "UI files: ${UIS}\n ${UI_HEADERS}") 
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
-include_directories(graphics doc pans pans/colorbar pans/winlist)
-
+#include_directories(graphics doc pans pans/colorbar pans/winlist)
+include_directories(holderGUI)
 
 #translate ui
 
@@ -198,23 +204,23 @@ list(APPEND CMAKE_MODULE_PATH "../lib")
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../phys)
 
-set(LIBS ${LIBS} "nPhysImageF") 
+#set(LIBS ${LIBS} "nPhysImageF")
 
 if(APPLE)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 
 if(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
     list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
-    add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${MOC_SRCS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
+    add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
     set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if(LINUX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+    add_executable(${PROJECT_NAME} ${SOURCES} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 endif()
 
 

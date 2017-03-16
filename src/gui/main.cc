@@ -30,7 +30,7 @@
 #include <QtGui>
 
 #include "nApp.h"
-#include "holderGUI/holderGUI.h"
+#include "holderGUI.h"
 
 #include <QTranslator>
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     QStringList args=my_app.arguments();
     args.removeFirst();
     
-    nHolderGui * my_gui= new nHolderGui();
+    holderGUI *my_gui= new holderGUI();
 
     return my_app.exec();
 

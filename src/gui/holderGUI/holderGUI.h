@@ -2,19 +2,19 @@
 #define __HolderGUI
 
 #include "nHolder.h"
-#include "nGenericPan.h"
-#include "ui_HolderGUI.h"
+#include "ui_holderGUI.h"
 
 
-class HolderGUI: public QMainWindow, private Ui::HolderGUIs {
+class holderGUI: public QMainWindow, private Ui::holderGUI {
     Q_OBJECT
 
 public:
-	Q_INVOKABLE HolderGUI();
+	Q_INVOKABLE holderGUI();
 	
 
 public slots:
     
+    void on_actionOpen_triggered();
 //    void addPan(nGenericPan* pan) {
 //        panlist.push_back(pan);
 //    }

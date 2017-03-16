@@ -4,7 +4,7 @@
 #include "nPhysD.h"
 #include <list>
 
-class nHolder: public std::list<nPhysD*>
+class nHolder: public std::vector<nPhysD*>
 {
 public:
     static nHolder& getInstance()
@@ -21,7 +21,7 @@ public:
     nHolder(nHolder const&) = delete;
     void operator=(nHolder const&)  = delete;
     
-    std::list<nPhysD*> fileOpen(std::string fname);
+    std::vector<nPhysD*> fileOpen(std::string fname);
 };
 
 

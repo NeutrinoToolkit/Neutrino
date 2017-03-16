@@ -15,20 +15,20 @@ public:
 
     void TscanBrightness();
 private:
-    std::list<nPhysD*> physChildren;
-    std::list<nPhysD*> physParents;
+    std::vector<nPhysD*> physChildren;
+    std::vector<nPhysD*> physParents;
 
 public slots:
     void addParent(nPhysD* my_phys);
-    void addChildren(nPhysD* my_phys) {physChildren.push_back(my_phys);}
+    void addChildren(nPhysD* my_phys);
     void removeParent(nPhysD* my_phys);
-    void removeChildren(nPhysD* my_phys) {physChildren.push_back(my_phys);}
+    void removeChildren(nPhysD* my_phys);
 
-    int childCount() const;
-    int parentCount() const;
+    const int childCount();
+    const int parentCount();
 
-    nPhysD* childN(int num);
-    nPhysD* parentN(int num);
+    nPhysD* childN(unsigned int num);
+    nPhysD* parentN(unsigned int num);
 
 signals:
     void physChanged(nPhysD*);
