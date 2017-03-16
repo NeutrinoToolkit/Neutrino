@@ -28,16 +28,15 @@
 #include <QWidget>
 #include <QGraphicsView>
 #include <QGestureEvent>
+#include <QApplication>
 
-#include "nGenericPan.h"
-
+#include "nPhysImageF.h"
 #include "nMouse.h"
 #include "nTics.h"
 
 #ifndef __nView_h
 #define __nView_h
 
-class neutrino;
 
 class nView : public QGraphicsView {
     Q_OBJECT
@@ -46,7 +45,6 @@ public:
     nView (QWidget *parent=0);
     ~nView ();
 
-    neutrino *nparent;
     void resizeEvent (QResizeEvent *);
 
     // events

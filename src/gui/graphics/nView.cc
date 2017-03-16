@@ -22,8 +22,6 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "neutrino.h"
-#include "ui_neutrino.h"
 #include "nView.h"
 
 nView::~nView ()
@@ -60,11 +58,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_scene.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     setCursor(QCursor(Qt::CrossCursor));
 
-
-
     if (!parent) ERROREXIT("nView problem");
-
-    DEBUG(qobject_cast<neutrino *>(parent));
 
     my_scene.addItem(&my_pixitem);
     my_scene.addItem(&my_mouse);
