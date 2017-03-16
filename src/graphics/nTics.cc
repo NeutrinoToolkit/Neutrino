@@ -38,7 +38,7 @@ nTics::nTics(nView *view) : QGraphicsItem(),
 QRectF nTics::boundingRect() const {
     QSize my_size=my_view->my_pixitem.pixmap().size();
     QRectF bBox;
-    if (my_view->nparent->getCurrentBuffer()) {
+    if (my_view->currentBuffer) {
         QFont scaledFont=my_view->font();
         if (my_view->fillimage) {
             double ratioFont=std::min(((double)my_view->width())/my_size.width(),((double)my_view->height())/my_size.height());
@@ -65,7 +65,7 @@ void nTics::changeColor() {
 
 void
 nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
-    if (my_view->nparent->getCurrentBuffer()) {
+    if (my_view->currentBuffer) {
         // enable this for testing
 #ifdef __phys_debug
         p->drawRect(boundingRect());
@@ -78,8 +78,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             scaledFont.setPointSizeF(std::max(6.0,my_view->font().pointSizeF()/ratioFont));
         }
         p->setFont(scaledFont);
-        vec2f my_or=my_view->nparent->getCurrentBuffer()->get_origin();
-        vec2f my_sc=my_view->nparent->getCurrentBuffer()->get_scale();
+        vec2f my_or=my_view->currentBuffer->get_origin();
+        vec2f my_sc=my_view->currentBuffer->get_scale();
         QPen pen;
         pen.setColor(color);
         double factor=1.0/my_view->transform().m11();
@@ -92,7 +92,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QPainterPath allTics;
         QPainterPath allGrid;
 
-        QSizeF size(my_view->nparent->getCurrentBuffer()->getW(),my_view->nparent->getCurrentBuffer()->getH());
+        QSizeF size(my_view->currentBuffer->getW(),my_view->currentBuffer->getH());
 
         int exponentX=log10(std::abs(my_sc.x()*size.width()));
         for (int k=0;k<5;k++) {
@@ -101,9 +101,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             rects.clear();
             double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentX-1);
             if (my_sc.x()>0){
-                for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp-1;i<=5.0*(my_view->nparent->getCurrentBuffer()->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i+=1) {
+                for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp-1;i<=5.0*(my_view->currentBuffer->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i+=1) {
                     double position=(i*ticsTmp/5.0/my_sc.x()+my_or.x());
-                    if (position>=0&&position<=my_view->nparent->getCurrentBuffer()->getW()) {
+                    if (position>=0&&position<=my_view->currentBuffer->getW()) {
                         allTics.moveTo(position,0);
                         if (i%5) {
                             allTics.lineTo(position,-0.15*p->fontMetrics().height());
@@ -122,9 +122,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                     }
                 }
             } else {
-                for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp;i>5.0*(my_view->nparent->getCurrentBuffer()->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i-=1) {
+                for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp;i>5.0*(my_view->currentBuffer->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i-=1) {
                     double position=(i*ticsTmp/5.0/my_sc.x()+my_or.x());
-                    if (position>=0&&position<=my_view->nparent->getCurrentBuffer()->getW()) {
+                    if (position>=0&&position<=my_view->currentBuffer->getW()) {
                         allTics.moveTo(position,0);
                         if (i%5) {
                             allTics.lineTo(position,-0.15*p->fontMetrics().height());
@@ -159,16 +159,16 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         if (std::abs(exponentX)>2) {
             label+="x 1e"+QLocale().toString(exponentX)+" ";
         }
-        if (!my_view->nparent->getCurrentBuffer()->property["unitsX"].is_none())
-            label+=QString::fromStdString(my_view->nparent->getCurrentBuffer()->property["unitsX"]);
+        if (!my_view->currentBuffer->property["unitsX"].is_none())
+            label+=QString::fromStdString(my_view->currentBuffer->property["unitsX"]);
         QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
         //		allTics.moveTo(0,0);
-        //        allTics.lineTo(my_view->nparent->getCurrentBuffer()->getW(),0);
+        //        allTics.lineTo(my_view->currentBuffer->getW(),0);
         //        allTics.moveTo(0,0);
-        //		allTics.lineTo(0,my_view->nparent->getCurrentBuffer()->getH());
-        allTics.addRect(0,0,my_view->nparent->getCurrentBuffer()->getW(),my_view->nparent->getCurrentBuffer()->getH());
+        //		allTics.lineTo(0,my_view->currentBuffer->getH());
+        allTics.addRect(0,0,my_view->currentBuffer->getW(),my_view->currentBuffer->getH());
         p->drawPath(allTics);
 
         p->setPen(QColor(rulerColor));
@@ -184,9 +184,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             rects.clear();
             double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentY-1);
             if (my_sc.y()>0){
-                for (int i=-5.0*my_or.y()*my_sc.y()/ticsTmp-1;i<=5.0*(my_view->nparent->getCurrentBuffer()->getH()-my_or.y())*my_sc.y()/ticsTmp+1;i+=1) {
+                for (int i=-5.0*my_or.y()*my_sc.y()/ticsTmp-1;i<=5.0*(my_view->currentBuffer->getH()-my_or.y())*my_sc.y()/ticsTmp+1;i+=1) {
                     double position=(i*ticsTmp/5.0/my_sc.y()+my_or.y());
-                    if (position>=0&&position<=my_view->nparent->getCurrentBuffer()->getH()) {
+                    if (position>=0&&position<=my_view->currentBuffer->getH()) {
                         allTics.moveTo(0,position);
                         if (i%5) {
                             allTics.lineTo(-0.15*p->fontMetrics().height(),position);
@@ -205,9 +205,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                     }
                 }
             } else {
-                for (int i=-5.0*my_or.y()*my_sc.y()/ticsTmp;i>5.0*(my_view->nparent->getCurrentBuffer()->getH()-my_or.y())*my_sc.y()/ticsTmp+1;i-=1) {
+                for (int i=-5.0*my_or.y()*my_sc.y()/ticsTmp;i>5.0*(my_view->currentBuffer->getH()-my_or.y())*my_sc.y()/ticsTmp+1;i-=1) {
                     double position=(i*ticsTmp/5.0/my_sc.y()+my_or.y());
-                    if (position>=0&&position<=my_view->nparent->getCurrentBuffer()->getH()) {
+                    if (position>=0&&position<=my_view->currentBuffer->getH()) {
                         allTics.moveTo(0,position);
                         if (i%5) {
                             allTics.lineTo(-0.15*p->fontMetrics().height(),position);
@@ -240,7 +240,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             p->drawText(pair.second,Qt::AlignBottom|Qt::AlignHCenter,pair.first);
         }
 
-        QString labelDim=QLocale().toString((int)my_view->nparent->getCurrentBuffer()->getW())+" x "+QLocale().toString((int)my_view->nparent->getCurrentBuffer()->getH());
+        QString labelDim=QLocale().toString((int)my_view->currentBuffer->getW())+" x "+QLocale().toString((int)my_view->currentBuffer->getH());
 #ifdef __phys_debug
         labelDim.append(" Debug");
 #endif
@@ -254,8 +254,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         if (std::abs(exponentY)>2) {
             label+="x 1e"+QLocale().toString(exponentY)+" ";
         }
-        if (!my_view->nparent->getCurrentBuffer()->property["unitsY"].is_none())
-            label+=QString::fromStdString(my_view->nparent->getCurrentBuffer()->property["unitsY"]);
+        if (!my_view->currentBuffer->property["unitsY"].is_none())
+            label+=QString::fromStdString(my_view->currentBuffer->property["unitsY"]);
         labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
@@ -267,13 +267,13 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawPath(allGrid);
         p->setPen(QColor(color));
 
-        if (my_view->nparent->nPalettes[my_view->nparent->colorTable].size()) {
+        if (my_view->nPalettes[my_view->colorTable].size()) {
             QPen emptyPen=pen;
             emptyPen.setColor(QColor(0,0,0,0));
             emptyPen.setWidth(0);
             p->setPen(emptyPen);
             for (int i=0; i<256; i++) {
-                QColor colore=QColor((int)my_view->nparent->nPalettes[my_view->nparent->colorTable][3*i+0],(int)my_view->nparent->nPalettes[my_view->nparent->colorTable][3*i+1],(int)my_view->nparent->nPalettes[my_view->nparent->colorTable][3*i+2]);
+                QColor colore=QColor((int)my_view->nPalettes[my_view->colorTable][3*i+0],(int)my_view->nPalettes[my_view->colorTable][3*i+1],(int)my_view->nPalettes[my_view->colorTable][3*i+2]);
                 p->setBrush(colore);
                 //			p.setPen(QPen(colore));
                 double dx=((double) size.width())/256.0;
@@ -281,16 +281,16 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                 p->drawRect(colorRect);
             }
         } else {
-            //			qDebug() << my_view->nparent->colorTable << (void*)&my_view->nparent->nPalettes;
-            //			qDebug() << my_view->nparent->nPalettes;
-            //			qDebug() << (void*) my_view->nparent->nPalettes[my_view->nparent->colorTable];
+            //			qDebug() << my_view->colorTable << (void*)&my_view->nPalettes;
+            //			qDebug() << my_view->nPalettes;
+            //			qDebug() << (void*) my_view->nPalettes[my_view->colorTable];
             WARNING("problem!!!! exetern nPalettes not found");
         }
 
         p->setPen(pen);
         p->setBrush(QColor(0,0,0,0));
 
-        vec2f minmax=my_view->nparent->getCurrentBuffer()->property["display_range"];
+        vec2f minmax=my_view->currentBuffer->property["display_range"];
         double mini=minmax.first();
         double maxi=minmax.second();
 
@@ -323,7 +323,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                 allTics.moveTo(i*((double)size.width())/((double)colorTics),size.height()+3.0*p->fontMetrics().height()/4.0);
                 allTics.lineTo(i*((double)size.width())/((double)colorTics),size.height()+p->fontMetrics().height());
 
-                double number=mini+pow(double(i)/colorTics,1.0/my_view->nparent->getCurrentBuffer()->gamma())*(maxi-mini);
+                double number=mini+pow(double(i)/colorTics,1.0/my_view->currentBuffer->gamma())*(maxi-mini);
 
                 if (exponentCB!=0) number/=pow(10.0,exponentCB);
                 QString label=QLocale().toString(number,'f',2);
@@ -335,14 +335,14 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             if (std::abs(exponentCB)>2) {
                 label+="x 1e"+QLocale().toString(exponentCB)+" ";
             }
-            if (!my_view->nparent->getCurrentBuffer()->property["unitsCB"].is_none())
-                label+=QString::fromStdString(my_view->nparent->getCurrentBuffer()->property["unitsCB"]);
+            if (!my_view->currentBuffer->property["unitsCB"].is_none())
+                label+=QString::fromStdString(my_view->currentBuffer->property["unitsCB"]);
             QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
             if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
         } else {
             QString label;
-            vec2f range=my_view->nparent->getCurrentBuffer()->get_min_max();
+            vec2f range=my_view->currentBuffer->get_min_max();
             if (range.first()==range.second()) {
                 label="All image is "+QLocale().toString(range.first());
             } else {
@@ -360,10 +360,10 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         if (rulerVisible && !gridVisible) {
             p->setPen(QColor(rulerColor));
             QPainterPath ruler;
-            ruler.moveTo(0,my_view->nparent->getCurrentBuffer()->get_origin().y());
-            ruler.lineTo(my_view->nparent->getCurrentBuffer()->getW(),my_view->nparent->getCurrentBuffer()->get_origin().y());
-            ruler.moveTo(my_view->nparent->getCurrentBuffer()->get_origin().x(),0);
-            ruler.lineTo(my_view->nparent->getCurrentBuffer()->get_origin().x(),my_view->nparent->getCurrentBuffer()->getH());
+            ruler.moveTo(0,my_view->currentBuffer->get_origin().y());
+            ruler.lineTo(my_view->currentBuffer->getW(),my_view->currentBuffer->get_origin().y());
+            ruler.moveTo(my_view->currentBuffer->get_origin().x(),0);
+            ruler.lineTo(my_view->currentBuffer->get_origin().x(),my_view->currentBuffer->getH());
             p->drawPath(ruler);
         }
     }

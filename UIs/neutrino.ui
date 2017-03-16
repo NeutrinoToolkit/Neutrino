@@ -161,7 +161,6 @@
     <addaction name="separator"/>
     <addaction name="menuPaths"/>
     <addaction name="separator"/>
-    <addaction name="actionFollower"/>
     <addaction name="actionShow_mouse"/>
     <addaction name="actionShow_ruler"/>
     <addaction name="actionShow_grid"/>
@@ -414,14 +413,6 @@
    </property>
    <property name="text">
     <string>Mouse Info</string>
-   </property>
-  </action>
-  <action name="actionFollower">
-   <property name="text">
-    <string>Follower</string>
-   </property>
-   <property name="toolTip">
-    <string>Control another window</string>
    </property>
   </action>
   <action name="actionHorizontal">
@@ -764,7 +755,7 @@
   </action>
   <action name="actionPython">
    <property name="icon">
-    <iconset resource="../plugins/nPython/python.qrc">
+    <iconset>
      <normaloff>:/icons/python.png</normaloff>:/icons/python.png</iconset>
    </property>
    <property name="text">

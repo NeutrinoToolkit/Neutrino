@@ -113,16 +113,10 @@ neutrino::neutrino():
     my_sbarra(new Ui::nSbarra),
     my_about(new Ui::nAbout)
 {
-
     my_w->setupUi(this);
     setAcceptDrops(true);
 
-
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
-
-    currentBuffer=NULL;
-
-    follower=NULL;
 
     int numwin=qApp->property("numWin").toInt()+1;
     qApp->setProperty("numWin",numwin);
@@ -201,8 +195,8 @@ neutrino::neutrino():
     connect(my_w->actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
 
 
-    connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), this, SLOT(actionPrevBuffer()));
-    connect(my_w->actionNext_Buffer, SIGNAL(triggered()), this, SLOT(actionNextBuffer()));
+    connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), my_w->my_view, SLOT(prevBuffer()));
+    connect(my_w->actionNext_Buffer, SIGNAL(triggered()), my_w->my_view, SLOT(nextBuffer()));
     connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 
     connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
@@ -229,8 +223,8 @@ neutrino::neutrino():
     connect(my_w->actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
     connect(my_w->actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
 
-    connect(my_w->actionNext_LUT, SIGNAL(triggered()), this, SLOT(nextColorTable()));
-    connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), this, SLOT(previousColorTable()));
+    connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
+    connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(previousColorTable()));
     connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
     connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
@@ -249,8 +243,12 @@ neutrino::neutrino():
 
     connect(my_w->actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
     connect(my_w->actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
-    connect(my_w->actionFollower, SIGNAL(triggered()), this, SLOT(createFollower()));
     connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
+
+    connect(my_w->actionLockColors, SIGNAL(toggled(bool)), my_w->my_view, SLOT(setLockColors(bool)));
+
+    connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
+    connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
 
     // ---------------------------------------------------------------------------------------------
@@ -264,9 +262,6 @@ neutrino::neutrino():
 
     connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-
-
-    build_colormap();
 
 
     QSettings my_set("neutrino","");
@@ -297,10 +292,10 @@ neutrino::neutrino():
     my_set.setValue("paletteFilesNames",paletteFilesNameClean);
     my_set.endGroup();
 
-    if (nPalettes.keys().contains("Neutrino"))
-        changeColorTable("Neutrino");
+    if (my_w->my_view->nPalettes.keys().contains("Neutrino"))
+        my_w->my_view->changeColorTable("Neutrino");
     else
-        changeColorTable(nPalettes.keys().first());
+        my_w->my_view->changeColorTable(my_w->my_view->nPalettes.keys().first());
 
     //recent file stuff
 
@@ -371,8 +366,8 @@ void neutrino::menuFlipRotate() {
 
 void neutrino::rotateLeft() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
-    if (currentBuffer) {
-        phys_rotate_left(*currentBuffer);
+    if (my_w->my_view->currentBuffer) {
+        phys_rotate_left(*my_w->my_view->currentBuffer);
         createQimage();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -382,8 +377,8 @@ void neutrino::rotateLeft() {
 
 void neutrino::rotateRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
-    if (currentBuffer) {
-        phys_rotate_right(*currentBuffer);
+    if (my_w->my_view->currentBuffer) {
+        phys_rotate_right(*my_w->my_view->currentBuffer);
         createQimage();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -392,8 +387,8 @@ void neutrino::rotateRight() {
 
 void neutrino::flipUpDown() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
-    if (currentBuffer) {
-        phys_flip_ud(*currentBuffer);
+    if (my_w->my_view->currentBuffer) {
+        phys_flip_ud(*my_w->my_view->currentBuffer);
         createQimage();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -402,8 +397,8 @@ void neutrino::flipUpDown() {
 
 void neutrino::flipLeftRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
-    if (currentBuffer) {
-        phys_flip_lr(*currentBuffer);
+    if (my_w->my_view->currentBuffer) {
+        phys_flip_lr(*my_w->my_view->currentBuffer);
         createQimage();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -411,7 +406,7 @@ void neutrino::flipLeftRight() {
 }
 
 nPhysD* neutrino::getBuffer(int i) {
-    return physList.value(i);
+    return my_w->my_view->physList.value(i);
 }
 
 // ------------------ PLUGINS -----------------------
@@ -478,7 +473,7 @@ neutrino::loadPlugins(QStringList pnames)
 {
     bool launch(pnames.size()==1);
     for(auto& pname: pnames) {
-          loadPlugin(pname, launch);
+        loadPlugin(pname, launch);
     }
 }
 
@@ -500,7 +495,7 @@ neutrino::loadPlugin(QString pname, bool launch)
 }
 
 void neutrino::emitBufferChanged(nPhysD *phys) {
-    if (!phys) phys=currentBuffer;
+    if (!phys) phys=my_w->my_view->currentBuffer;
     my_w->my_view->update();
     emit bufferChanged(phys);
 }
@@ -583,12 +578,8 @@ void neutrino::updateRecentFileActions(QString fname)
 }
 
 void neutrino::setGamma(int value) {
-    if (currentBuffer) {
-        currentBuffer->property["gamma"]=value;
-        createQimage();
-        setProperty("neuSave-gamma",value);
-        emitBufferChanged();
-    }
+    my_w->my_view->setGamma(value);
+    setProperty("neuSave-gamma",value);
 }
 
 nGenericPan* neutrino::existsPan(QString name) {
@@ -617,8 +608,8 @@ neutrino* neutrino::fileNew() {
 
 void
 neutrino::fileReopen() {
-    if(currentBuffer && currentBuffer->getType()==PHYS_FILE) {
-        QString fname=QString::fromUtf8(currentBuffer->getFromName().c_str());
+    if(my_w->my_view->currentBuffer && my_w->my_view->currentBuffer->getType()==PHYS_FILE) {
+        QString fname=QString::fromUtf8(my_w->my_view->currentBuffer->getFromName().c_str());
         fileOpen(fname);
     }
 }
@@ -752,21 +743,21 @@ void neutrino::saveSession (QString fname) {
             setProperty("NeuSave-fileOpen", fname);
             //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
-            QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
+            QProgressDialog progress("Save session", "Cancel", 0, my_w->my_view->physList.size()+1, this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
 
             std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
-            ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
+            ofile << "Neutrino " << __VER << " " << my_w->my_view->physList.size() << " " << panList.size() << std::endl;
 
-            for (int i=0;i<physList.size(); i++) {
+            for (int i=0;i<my_w->my_view->physList.size(); i++) {
                 if (progress.wasCanceled()) break;
                 progress.setValue(i);
-                progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
+                progress.setLabelText(QString::fromUtf8(my_w->my_view->physList.at(i)->getShortName().c_str()));
                 QApplication::processEvents();
                 ofile << "NeutrinoImage" << std::endl;
-                phys_dump_binary(physList.at(i),ofile);
-                physList.at(i)->setType(PHYS_FILE);
+                phys_dump_binary(my_w->my_view->physList.at(i),ofile);
+                my_w->my_view->physList.at(i)->setType(PHYS_FILE);
             }
             for (int i=0;i<panList.size(); i++) {
                 QString namePan=panList.at(i)->metaObject()->className();
@@ -798,11 +789,11 @@ void neutrino::saveSession (QString fname) {
                     QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName(), QMessageBox::Ok);
                 }
             }
-            progress.setValue(physList.size()+1);
+            progress.setValue(my_w->my_view->physList.size()+1);
             ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
             std::vector <nPhysD *> vecPhys;
-            foreach (nPhysD * my_phys, physList) {
+            foreach (nPhysD * my_phys, my_w->my_view->physList) {
                 vecPhys.push_back(my_phys);
             }
             phys_write_tiff(vecPhys,fname.toUtf8().constData());
@@ -818,7 +809,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
     if (!fname.isEmpty()) {
         updateRecentFileActions(fname);
         setProperty("NeuSave-fileOpen", fname);
-        if (physList.size()!=0) {
+        if (my_w->my_view->physList.size()!=0) {
             QThread *m_thread = new QThread();
             neutrino*my_neu= new neutrino();
             my_neu->moveToThread(m_thread);
@@ -905,8 +896,8 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 }
 
 void neutrino::addPhys(nPhysD* datamatrix) {
-    if (datamatrix && !physList.contains(datamatrix))	{
-        physList << datamatrix;
+    if (datamatrix && !my_w->my_view->physList.contains(datamatrix))	{
+        my_w->my_view->physList << datamatrix;
 
         //        datamatrix->property["display_range"]= datamatrix->get_min_max();
 
@@ -931,8 +922,8 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 
 nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
     if (newPhys) {
-        bool redisplay = (currentBuffer==oldPhys);
-        if (physList.contains(oldPhys)) {
+        bool redisplay = (my_w->my_view->currentBuffer==oldPhys);
+        if (my_w->my_view->physList.contains(oldPhys)) {
             newPhys->property["display_range"]=oldPhys->property["display_range"];
             if (oldPhys==NULL) oldPhys=new nPhysD();
             *oldPhys=*newPhys;
@@ -955,11 +946,11 @@ void neutrino::removePhys(nPhysD* datamatrix) {
         emit physDel(datamatrix);
         int position=indexOf(datamatrix);
         if (position != -1) {
-            physList.removeAll(datamatrix);
-            if (physList.size()>0) {
-                showPhys(physList.at(std::min<int>(position,physList.size()-1)));
+            my_w->my_view->physList.removeAll(datamatrix);
+            if (my_w->my_view->physList.size()>0) {
+                showPhys(my_w->my_view->physList.at(std::min<int>(position,my_w->my_view->physList.size()-1)));
             } else {
-                currentBuffer=NULL;
+                my_w->my_view->currentBuffer=nullptr;
                 emitBufferChanged();
                 setWindowTitle(property("winId").toString()+QString(": Neutrino"));
                 setWindowFilePath("");
@@ -981,7 +972,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 
 void neutrino::showPhys(nPhysD& datamatrixRef) {
     bool found=false;
-    foreach (nPhysD* datamatrix, physList) {
+    foreach (nPhysD* datamatrix, my_w->my_view->physList) {
         if (*datamatrix == datamatrixRef) found=true;
     }
     if (!found) {
@@ -994,7 +985,7 @@ void neutrino::showPhys(nPhysD& datamatrixRef) {
 void neutrino::addShowPhys(nPhysD& datamatrixRef) {
     qDebug() << "there";
     bool found=false;
-    foreach (nPhysD* datamatrix, physList) {
+    foreach (nPhysD* datamatrix, my_w->my_view->physList) {
         if (*datamatrix == datamatrixRef) found=true;
     }
     if (!found) {
@@ -1006,7 +997,7 @@ void neutrino::addShowPhys(nPhysD& datamatrixRef) {
 
 void neutrino::addPhys(nPhysD& datamatrixRef) {
     bool found=false;
-    foreach (nPhysD* datamatrix, physList) {
+    foreach (nPhysD* datamatrix, my_w->my_view->physList) {
         if (*datamatrix == datamatrixRef) found=true;
     }
     if (!found) {
@@ -1017,77 +1008,40 @@ void neutrino::addPhys(nPhysD& datamatrixRef) {
 }
 
 void neutrino::removePhys(nPhysD& datamatrixRef) {
-    foreach (nPhysD* datamatrix, physList) {
+    foreach (nPhysD* datamatrix, my_w->my_view->physList) {
         if (*datamatrix == datamatrixRef) removePhys(datamatrix);
     }
 }
 
 void
-neutrino::showPhys(nPhysD* datamatrix) {
-    if (datamatrix) {
-        if (!physList.contains(datamatrix)) addPhys(datamatrix);
+neutrino::showPhys(nPhysD* my_phys) {
+    if (my_phys) {
+        my_w->my_view->showPhys(my_phys);
+        QString winName=QString::fromUtf8(my_phys->getShortName().c_str());
+        winName.prepend(property("winId").toString()+QString(":")+QString::number(indexOf(my_phys))+QString(" "));
 
-        if (currentBuffer) {
-            if (my_w->actionLockColors->isChecked()) {
-                datamatrix->property["display_range"]=currentBuffer->property["display_range"];
-                datamatrix->property["gamma"]=currentBuffer->property["gamma"];
-            } else {
-                if (!datamatrix->property.have("gamma")) {
-                    datamatrix->property["gamma"]=property("neuSave-gamma").toInt();
-                }
-            }
-        }
-
-        if (!datamatrix->property.have("display_range")) {
-            datamatrix->property["display_range"]= datamatrix->get_min_max();
-        }
-        currentBuffer=datamatrix;
-
-        if (!physList.contains(datamatrix)) {
-            // TODO: add memory copy...
-            physList << datamatrix;
-        }
-
-        QString winName=QString::fromUtf8(datamatrix->getShortName().c_str());
-        winName.prepend(property("winId").toString()+QString(":")+QString::number(indexOf(datamatrix))+QString(" "));
-
-        QString mypath=QString::fromUtf8(datamatrix->getFromName().c_str());
+        QString mypath=QString::fromUtf8(my_phys->getFromName().c_str());
         winName.append(QString(" ")+mypath);
         setWindowTitle(winName);
 
-        if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
+        if (my_phys->getType()==PHYS_FILE || my_phys->getType()==PHYS_RFILE) {
             setWindowFilePath(mypath);
         } else {
             setWindowFilePath("");
         }
 
-        createQimage();
-
-        emitBufferChanged();
-    } else {
-        statusBar()->showMessage("Image not valid",2000);
     }
 }
 
 void
 neutrino::createQimage() {
-    QApplication::processEvents();
-    if (currentBuffer && currentBuffer->getSurf()>0) {
-        const unsigned char *nPhys_pointer=currentBuffer->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-        const QImage tempImage(nPhys_pointer,
-                               currentBuffer->getW(),
-                               currentBuffer->getH(),
-                               currentBuffer->getW()*3,
-                               QImage::Format_RGB888);
-
-        my_w->my_view->my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-        double gamma_val=currentBuffer->gamma();
+    my_w->my_view->createQimage();
+    if (my_w->my_view->currentBuffer) {
+        double gamma_val=my_w->my_view->currentBuffer->gamma();
         my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
+    } else {
+        statusBar()->showMessage("Image not valid",2000);
     }
-
-    QApplication::processEvents();
-
-    my_w->my_view->setSize();
 }
 
 void neutrino::exportGraphics () {
@@ -1101,10 +1055,10 @@ void neutrino::exportAllGraphics () {
     QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
     QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty()) {
-        for (int i=0;i<physList.size() ; i++) {
-            actionNextBuffer();
+        for (int i=0;i<my_w->my_view->physList.size() ; i++) {
+            my_w->my_view->nextBuffer();
             QFileInfo fi(fout);
-            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
+            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(my_w->my_view->currentBuffer->getShortName())+"."+fi.completeSuffix());
         }
         setProperty("NeuSave-fileExport",fout);
     }
@@ -1181,49 +1135,17 @@ void neutrino::closeEvent (QCloseEvent *e) {
 void neutrino::keyPressEvent (QKeyEvent *e)
 {
     switch (e->key()) {
-    case Qt::Key_Less:
-        if (currentBuffer) {
-            setGamma(int(currentBuffer->property["gamma"])-1);
-        }
-        break;
-    case Qt::Key_Greater:
-        if (currentBuffer) {
-            setGamma(int(currentBuffer->property["gamma"])+1);
-        }
-        break;
-    case Qt::Key_Period:
-        if (currentBuffer) {
-            setGamma(1);
-        }
-        break;
     case Qt::Key_Question:
         Shortcuts();
         break;
-    case Qt::Key_A: {
-        if (e->modifiers() & Qt::ShiftModifier) {
-            foreach (nPhysD* phys, physList) {
-                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
-                setGamma(1);
-                emit bufferChanged(phys);
-            }
-        } else {
-            if (currentBuffer) {
-                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
-                setGamma(1);
-                emit updatecolorbar();
-            }
-        }
-        createQimage();
-        break;
-    }
     case Qt::Key_O:
         if (e->modifiers() & Qt::ShiftModifier) {
-            foreach (nPhysD* phys, physList) {
+            foreach (nPhysD* phys, my_w->my_view->physList) {
                 phys->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
                 emit bufferChanged(phys);
             }
         } else {
-            if (currentBuffer) currentBuffer->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
+            if (my_w->my_view->currentBuffer) my_w->my_view->currentBuffer->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
         }
         mouseposition(my_w->my_view->my_mouse.pos());
         my_w->my_view->my_tics.update();
@@ -1288,7 +1210,6 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 
 void neutrino::keyReleaseEvent (QKeyEvent *e)
 {
-    if (follower) follower->keyReleaseEvent(e);
 }
 
 // Drag and Drop
@@ -1311,7 +1232,7 @@ void neutrino::dropEvent(QDropEvent *e) {
             bool ok=false;
             nPhysD *my_phys=(nPhysD *) bytephys.toLongLong(&ok);
             if (ok && my_phys) {
-                if (physList.contains(my_phys)) {
+                if (my_w->my_view->physList.contains(my_phys)) {
                     showPhys(my_phys);
                 } else {
                     nPhysD *copyhere;
@@ -1331,17 +1252,6 @@ void neutrino::dropEvent(QDropEvent *e) {
             fileOpen(fileList);
         }
     }
-}
-
-// switch buffers
-void neutrino::actionPrevBuffer() {
-    int position=indexOf(currentBuffer);
-    if (position>-1) showPhys(physList.at((position+physList.size()-1)%physList.size()));
-}
-
-void neutrino::actionNextBuffer() {
-    int position=indexOf(currentBuffer);
-    if (position>-1) showPhys(physList.at((position+1)%physList.size()));
 }
 
 // zoom
@@ -1372,12 +1282,12 @@ neutrino::mouseposition(QPointF pos_mouse) {
     my_sbarra->pos_y->setNum((int)pos_mouse.y());
 
 
-    if (currentBuffer) {
-        vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
+    if (my_w->my_view->currentBuffer) {
+        vec2f vec=my_w->my_view->currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
         QPointF pos=QPointF(vec.x(),vec.y());
         my_sbarra->dx->setNum(pos.x());
         my_sbarra->dy->setNum(pos.y());
-        double val=currentBuffer->point(pos_mouse.x(),pos_mouse.y());
+        double val=my_w->my_view->currentBuffer->point(pos_mouse.x(),pos_mouse.y());
         my_sbarra->pos_z->setNum(val);
         emit colorValue(val);
         emit mouseAtWorld(pos);
@@ -1438,7 +1348,7 @@ void neutrino::fileSave(QString fname) {
         if (suffix.startsWith("neus")) {
             saveSession(fname);
         } else {
-            fileSave(currentBuffer,fname);
+            fileSave(my_w->my_view->currentBuffer,fname);
         }
     }
 }
@@ -1479,7 +1389,7 @@ neutrino::fileClose() {
             pan->close();
             QApplication::processEvents();
         }
-        foreach (nPhysD *phys, physList) {
+        foreach (nPhysD *phys, my_w->my_view->physList) {
             if (askAll && phys->getType()==	PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
                 int res=QMessageBox::warning(this,tr("Attention"),
                                              tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
@@ -1502,13 +1412,13 @@ neutrino::fileClose() {
             pan->close();
         }
         QApplication::processEvents();
-        currentBuffer=NULL;
-        foreach (nPhysD *phys, physList) {
+        my_w->my_view->currentBuffer=NULL;
+        foreach (nPhysD *phys, my_w->my_view->physList) {
             delete phys;
         }
-//#ifdef HAVE_PYTHONQT
-//        PythonQt::self()->getMainModule().removeVariable(objectName());
-//#endif
+        //#ifdef HAVE_PYTHONQT
+        //        PythonQt::self()->getMainModule().removeVariable(objectName());
+        //#endif
 
         deleteLater();
         return true;
@@ -1521,21 +1431,21 @@ neutrino::fileClose() {
 
 void
 neutrino::closeCurrentBuffer() {
-    if (currentBuffer)  {
-        if (currentBuffer->getType()==PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
+    if (my_w->my_view->currentBuffer)  {
+        if (my_w->my_view->currentBuffer->getType()==PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
             int res=QMessageBox::warning(this,tr("Attention"),
-                                         tr("The image")+QString("\n")+QString::fromUtf8(currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+                                         tr("The image")+QString("\n")+QString::fromUtf8(my_w->my_view->currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             switch (res) {
             case QMessageBox::Yes:
-                fileSave(currentBuffer); // TODO: add here a check for a cancel to avoid exiting
+                fileSave(my_w->my_view->currentBuffer); // TODO: add here a check for a cancel to avoid exiting
                 break;
             case QMessageBox::No:
-                removePhys(currentBuffer);
+                removePhys(my_w->my_view->currentBuffer);
                 break;
             }
         } else {
-            removePhys(currentBuffer);
+            removePhys(my_w->my_view->currentBuffer);
         }
     }
     QApplication::processEvents();
@@ -1636,8 +1546,8 @@ bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
 
                     while (i+1>listDoubleColor.at(counter).first) counter++;
                 }
-                nPalettes[paletteName] = palC;
-                changeColorTable(paletteName);
+                my_w->my_view->nPalettes[paletteName] = palC;
+                my_w->my_view->changeColorTable(paletteName);
                 return true;
             }
         }
@@ -1687,62 +1597,14 @@ QString neutrino::addPaletteFromFile(QString paletteFile) {
             my_set.setValue("paletteFilesNames",paletteFilesNames);
             my_set.endGroup();
 
-            nPalettes[paletteName] = palette;
-            changeColorTable(paletteName);
+            my_w->my_view->nPalettes[paletteName] = palette;
+            my_w->my_view->changeColorTable(paletteName);
         } else {
             paletteName.clear();
         }
     }
     return paletteName;
 }
-
-void
-neutrino::changeColorTable (QString ctname) {
-    if (nPalettes.contains(ctname)) {
-        colorTable=ctname;
-    } else {
-        colorTable=nPalettes.keys().first();
-    }
-    changeColorTable();
-}
-
-
-void
-neutrino::changeColorTable () {
-    createQimage();
-    statusBar()->showMessage(colorTable, 1500);
-    my_w->my_view->my_tics.update();
-    emit updatecolorbar();
-}
-
-void
-neutrino::changeColorMinMax (vec2f minmax) {
-    currentBuffer->property["display_range"]=minmax;
-    createQimage();
-    emit updatecolorbar();
-}
-
-void
-neutrino::previousColorTable () {
-    int indice=nPalettes.keys().indexOf(colorTable);
-    if (indice>0) {
-        colorTable=nPalettes.keys().at(indice-1);
-    } else {
-        colorTable=nPalettes.keys().last();
-    }
-    changeColorTable ();
-};
-
-void
-neutrino::nextColorTable () {
-    int indice=nPalettes.keys().indexOf(colorTable);
-    if (indice<nPalettes.keys().size()-1) {
-        colorTable=nPalettes.keys().at(indice+1);
-    } else {
-        colorTable=nPalettes.keys().first();
-    }
-    changeColorTable ();
-};
 
 // testing
 void
@@ -1751,7 +1613,6 @@ neutrino::createDrawLine() {
     statusBar()->showMessage(tr("Click for points, press Esc to finish"),5000);
     nLine *item = new nLine(this);
     item->interactive();
-    if (follower) follower->createDrawLine();
     my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
     QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
@@ -1776,7 +1637,6 @@ neutrino::createDrawRect() {
     statusBar()->showMessage(tr("Click for the first point of the rectangle"),5000);
     nRect *item = new nRect(this);
     item->interactive();
-    if (follower) follower->createDrawRect();
     my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
     QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
@@ -1787,7 +1647,6 @@ neutrino::createDrawPoint() {
     statusBar()->showMessage(tr("Click for the point"),5000);
     nPoint *item = new nPoint(this);
     item->interactive();
-    if (follower) follower->createDrawPoint();
     my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
     QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
@@ -1798,7 +1657,6 @@ neutrino::createDrawEllipse() {
     statusBar()->showMessage(tr("Click and release to create the ellipse"),5000);
     nEllipse *item = new nEllipse(this);
     item->interactive();
-    if (follower) follower->createDrawEllipse();
     my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
     QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
 }
@@ -1919,11 +1777,6 @@ neutrino::Camera() {
     return new nCamera(this);
 }
 
-// FOLLOWER
-void
-neutrino::createFollower() {
-    follower = new neutrino ();
-}
 
 // MONIOR DIRECTORY
 nGenericPan*
@@ -1936,7 +1789,7 @@ void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
-    my_set.setValue("colorTable", colorTable);
+    my_set.setValue("colorTable", my_w->my_view->colorTable);
     my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
 
     my_set.beginGroup("Properties");
@@ -1955,7 +1808,7 @@ void neutrino::loadDefaults(){
     my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
 
-    changeColorTable(my_set.value("colorTable",colorTable).toString());
+    my_w->my_view->changeColorTable(my_set.value("colorTable",my_w->my_view->colorTable).toString());
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 

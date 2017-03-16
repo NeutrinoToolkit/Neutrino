@@ -7,7 +7,7 @@ int main(int , char **) {
 	QFile fileout("../../src/graphics/neutrinoPalettes.cc");
 	fileout.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream outs(&fileout);
-    outs << "#include \"neutrino.h\"\nvoid neutrino::build_colormap() \{\n";
+    outs << "#include \"nView.h\"\nvoid nView::build_colormap() \{\n";
 	QDir::setCurrent("cmaps");
     QStringList allFiles = QDir().entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
 	unsigned char *palette = new unsigned char[256*3]();
