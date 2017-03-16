@@ -56,6 +56,8 @@
 #include <memory>
 
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_const_mksa.h>
+#include <gsl/gsl_const_num.h>
 #include <fftw3.h>
 #include <time.h>
 #include <assert.h>
@@ -76,6 +78,9 @@
 #ifndef __nPhysImageF_h
 #define __nPhysImageF_h
 
+enum phys_way { PHYS_POS, PHYS_NEG };
+enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
+
 typedef std::string phys_type;
 #define PHYS_FILE "phys_file"
 #define PHYS_RFILE "phys_rfile"
@@ -94,7 +99,12 @@ class phys_properties : public anymap {
 
 };
 
-enum phys_way { PHYS_POS, PHYS_NEG };
+struct phys_point_str {
+        size_t x;
+        size_t y;
+};
+typedef struct phys_point_str phys_point;
+
 
 template<class T>
 class nPhysImageF {
@@ -133,10 +143,6 @@ class nPhysImageF {
 
 		//! get row specialized function
 		void get_Trow(size_t, size_t, std::vector<T> &);
-
-		//! set row specialized function
-		void set_Trow(size_t, size_t, std::vector<T> &);
-
 
 		std::string class_name ()
 		{ return std::string(typeid(T).name()); }
@@ -177,9 +183,22 @@ class nPhysImageF {
 		{ return sh_data->getH(); }
 		inline size_t getSurf() const
 		{ return sh_data->getSurf(); }
+		T sum()
+		{ return sh_data->sum(); }
+
+		typename std::vector<T>::iterator buf_itr()
+		{ return sh_data->buf_itr(); }
+		const T *data_pointer()
+		{ return sh_data->data_pointer(); }
+
+		void swap_vector(size_t w, size_t h, std::vector<T> &vec) 
+		{ sh_data->swap_vector(w, h, vec); }
 
 		inline T point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
 		{ return sh_data->point(x, y, nan_value); }
+
+		inline T point(vec2 vv, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
+		{ return sh_data->point(vv.x(), vv.y(), nan_value); }
 
 		inline T point(size_t xy, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
 		{ return sh_data->point(xy, nan_value); }
@@ -188,6 +207,11 @@ class nPhysImageF {
 		{ sh_data->set(x, y, val); }
 		inline void set(size_t xy, T val)
 		{ sh_data->set(xy, val); }
+
+                inline void set_Trow(size_t index, size_t offset, std::vector<T> &vec)
+                { sh_data->set_Trow(index, offset, vec); }
+
+
 		// ------------------------------------------------------------------------
 		// ------------------------------------------------------------------------
 		// ------------------------------------------------------------------------
@@ -285,6 +309,9 @@ class nPhysImageF {
 		inline size_t getSizeByIndex(enum phys_direction dir)
 		{ if (dir==PHYS_X) return getW(); if (dir == PHYS_Y) return getH(); return 0; }
 
+		inline bidimvec<size_t> getSize()
+		{ return bidimvec<size_t>(getW(), getH()); }
+
 		inline bool isInside(size_t x, size_t y) {
 			if ((x < getW()) && (y < getH()))
 				return true;
@@ -356,6 +383,7 @@ class nPhysImageF {
 
 		void init_Tvariables();
 
+
 	private:
 
 		//! TODO: pass to bidimvec<T>
@@ -367,6 +395,9 @@ class nPhysImageF {
 
 
 };
+
+typedef nPhysImageF<double> physD;
+typedef nPhysImageF<mcomplex> physC;
 
 // --------------------------------------------------------------------------------------------
 
@@ -581,7 +612,7 @@ nPhysImageF<T>::set_Tvector(enum phys_direction direction, size_t index, size_t 
 			for (size_t i=0; i<copy_len; i++) {
 				sh_data->set(index, offset-i, ptr[i]);
 				//Timg_matrix[offset-i][index] = ptr[i];
-			}
+                        }
 		}
 	}
 }

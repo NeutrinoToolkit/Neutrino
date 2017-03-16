@@ -116,31 +116,6 @@ if (NOT ${DF} STREQUAL "DF-NOTFOUND")
 endif()
 
 
-# pgm
-find_library(NETPBM NAMES netpbm)
-if (NOT ${NETPBM} STREQUAL "NETPBM-NOTFOUND")
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message (STATUS "using netpbm: ${NETPBM}")
-    endif()
-    set(LIBS ${LIBS} ${NETPBM})
-    add_definitions(-DHAVE_LIBNETPBM)
-
-    FIND_PATH(NETPBM_INCLUDE_DIR pgm.h
-        /usr/include
-        /usr/include/netpbm
-        /usr/local/include
-        /usr/local/include/netpbm
-        ${CMAKE_FIND_ROOT_PATH}/include
-        )
-    IF (NETPBM_INCLUDE_DIR)
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message (STATUS "netpbm header dir: ${NETPBM_INCLUDE_DIR}")
-    endif()
-    include_directories(BEFORE ${NETPBM_INCLUDE_DIR})
-    ENDIF (NETPBM_INCLUDE_DIR)
-
-endif()
-
 find_package(JPEG REQUIRED)
 if (JPEG_FOUND)
     include_directories(${JPEG_INCLUDE_DIRS})

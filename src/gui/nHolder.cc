@@ -1,12 +1,12 @@
 #include "nHolder.h"
-
+#include "nPhysFormats.h"
 std::vector<nPhysD*> nHolder::fileOpen(std::string fname) {
     
     std::vector<nPhysD*> retlist;
-
-//    retlist= phys_open(fname);
     
-    insert(end(), retlist.begin(), retlist.end());
+    for (auto &my_phys : phys_open(fname)) {
+        retlist.push_back((nPhysD*)my_phys);
+    }
     
     return retlist;
 }

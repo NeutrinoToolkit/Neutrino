@@ -46,6 +46,10 @@ public:
 		}
 	}
 
+
+	T sum() 
+	{ T sumTot=0; for (size_t i=0; i<getSurf(); i++) sumTot+=point(i); return sumTot; }
+
 	inline void set(int x, int y, T val) {
 		if (x>width || y>height) {
 			throw physData_ooAccess();
@@ -89,6 +93,20 @@ public:
 	const T *data_pointer()
 	{ return data_ptr; }
 
+	typename std::vector<T>::iterator buf_itr()
+	{ return std::vector<T>::begin(); }
+
+	void swap_vector(size_t w, size_t h, std::vector<T> &vec)
+	{ 
+			if (width*height != vec.size()) {
+				DEBUG("WARNING: size mismatch. w:"<<width<<", h:"<<height<<", size: "<<vec.size());
+				return;
+			}
+			width = w;
+			height = h;
+			std::vector<T>::swap(vec);
+	}
+
 
 protected:
 	int width, height;
@@ -124,10 +142,10 @@ physData<T>::get_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 template<class T> void
 physData<T>::set_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 
-	T* optr;
+        typename std::vector<T>::iterator optr;
 	offset = offset%getW();
 
-	optr = std::copy(vec.end()-offset, vec.end(), this->begin()+(index%getH()));
+        optr = std::copy(vec.end()-offset, vec.end(), std::vector<T>::begin()+(index%getH()));
 	optr = std::copy(vec.begin(), vec.end()-offset, optr);
 
 }

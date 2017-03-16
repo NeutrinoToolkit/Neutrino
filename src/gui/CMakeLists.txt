@@ -70,8 +70,6 @@ list (APPEND SOURCES
     graphics/nMouse.cc
     graphics/nTics.cc
 
-    ../phys/anymap.cc
-
 #     neutrino.cc
 #     nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nPanPlug.cc
 #     
@@ -95,6 +93,7 @@ list (APPEND SOURCES
 
 list (APPEND HEADERS
     ../phys/nPhysImageF.h
+    ../phys/physData.h
     )
 
 include(FindNeutrinoDeps)
@@ -213,7 +212,7 @@ list(APPEND CMAKE_MODULE_PATH "../lib")
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../phys)
 
-#set(LIBS ${LIBS} "nPhysImageF")
+set(LIBS ${LIBS} "nPhysImageF")
 
 if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})

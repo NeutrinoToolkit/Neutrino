@@ -39,6 +39,9 @@
     <item row="0" column="0">
      <widget class="QListWidget" name="listPhys"/>
     </item>
+    <item row="1" column="0">
+     <widget class="nView" name="graphicsView"/>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -71,6 +74,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">graphics/nView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
