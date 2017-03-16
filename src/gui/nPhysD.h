@@ -12,11 +12,17 @@ public:
     nPhysD(nPhysImageF<double> *ref) {
         DEBUG("------------------>>>>>>>>>>>>>" << ref->getName());
     }
-
     void TscanBrightness();
+    phys_properties property;
+    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name);
+
+    double gamma();
+
 private:
     std::vector<nPhysD*> physChildren;
     std::vector<nPhysD*> physParents;
+    std::vector<unsigned char> uchar_buf;
+
 
 public slots:
     void addParent(nPhysD* my_phys);
@@ -29,6 +35,7 @@ public slots:
 
     nPhysD* childN(unsigned int num);
     nPhysD* parentN(unsigned int num);
+
 
 signals:
     void physChanged(nPhysD*);

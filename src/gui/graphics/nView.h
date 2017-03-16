@@ -30,7 +30,7 @@
 #include <QGestureEvent>
 #include <QApplication>
 
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 #include "nMouse.h"
 #include "nTics.h"
 

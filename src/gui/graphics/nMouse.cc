@@ -22,8 +22,10 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include <QColorDialog>
+#include <QStyleOptionGraphicsItem>
+
 #include "nMouse.h"
-#include "neutrino.h"
 
 nMouse::nMouse() : QGraphicsItem(),
     my_shape(0),

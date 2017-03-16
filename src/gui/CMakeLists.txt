@@ -61,17 +61,22 @@ set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
 list (APPEND SOURCES
     main.cc
-	nApp.cc 
+    nApp.cc
     nPhysD.cc
     nHolder.cc
     HolderGUI/HolderGUI.cc
+    graphics/nView.cc
+    graphics/neutrinoPalettes.cc
+    graphics/nMouse.cc
+    graphics/nTics.cc
 
+    ../phys/anymap.cc
 
 #     neutrino.cc
 #     nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nPanPlug.cc
 #     
 # 
-#     graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
+#     graphics/nRect.cc
 #     graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc
 #     graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
 # 
@@ -86,6 +91,10 @@ list (APPEND SOURCES
 #     pans/nCamera.cc
 # 
 #     nHolder.cc
+    )
+
+list (APPEND HEADERS
+    ../phys/nPhysImageF.h
     )
 
 include(FindNeutrinoDeps)
@@ -207,7 +216,7 @@ include_directories(../phys)
 #set(LIBS ${LIBS} "nPhysImageF")
 
 if(APPLE)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_SRCS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 endif()
 

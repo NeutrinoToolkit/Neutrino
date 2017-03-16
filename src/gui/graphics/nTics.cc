@@ -22,9 +22,10 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include <QColorDialog>
+#include <QStyleOptionGraphicsItem>
 #include "nTics.h"
 #include "nView.h"
-#include "neutrino.h"
 
 nTics::nTics(nView *view) : QGraphicsItem(),
     my_view(view),
