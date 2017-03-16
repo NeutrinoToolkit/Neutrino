@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -40,40 +40,46 @@
 class neutrino;
 
 class nView : public QGraphicsView {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	nView (QWidget *parent=0);
-	~nView ();
+    nView (QWidget *parent=0);
+    ~nView ();
 
     neutrino *nparent;
-	void resizeEvent (QResizeEvent *);
+    void resizeEvent (QResizeEvent *);
 
-	// events
-	void keyPressEvent (QKeyEvent *);
-	void keyReleaseEvent (QKeyEvent *);
+    // events
+    void keyPressEvent (QKeyEvent *);
+    void keyReleaseEvent (QKeyEvent *);
 
 
-	// zoom
-	QTransform trasformazione;
-	bool fillimage;
-	void incrzoom(double);
+    // zoom
+    QTransform trasformazione;
+    bool fillimage;
+    void incrzoom(double);
 
-	void setSize();
+    void setSize();
 
-	vec2f minMax;
+    vec2f minMax;
 
-	// painter
-	bool show_mouse;	
-	
-	bool showDimPixel;
-	
+    // painter
+    bool show_mouse;
+
+    bool showDimPixel;
+
     QGraphicsScene my_scene;
 
     nMouse my_mouse;
     nTics my_tics;
 
     QGraphicsPixmapItem my_pixitem;
+
+    QString colorTable;
+    QMap<QString, std::vector<unsigned char>> nPalettes;
+
+    nPhysD* currentBuffer;
+    QList<nPhysD*> physList;
 
 public slots:
 
@@ -82,36 +88,59 @@ public slots:
     void zoomEq();
 
     void mouseDoubleClickEvent (QMouseEvent *);
-	void mousePressEvent (QMouseEvent *);
-	void mouseReleaseEvent (QMouseEvent *);
-	void mouseMoveEvent (QMouseEvent *);
-	void wheelEvent(QWheelEvent *);
+    void mousePressEvent (QMouseEvent *);
+    void mouseReleaseEvent (QMouseEvent *);
+    void mouseMoveEvent (QMouseEvent *);
+    void wheelEvent(QWheelEvent *);
 
-	void emitMouseposition (QPointF);
+    void showPhys(nPhysD*);
+
+    void emitMouseposition (QPointF);
 
     void setZoomFactor(int val);
 
     void setMouseShape(int);
 
 
+    void changeColorTable (QString);
+    void changeColorTable ();
+
+    void previousColorTable ();
+    void nextColorTable ();
+
+    void setLockColors(bool);
+
+    void createQimage();
+
+    void setGamma(int value);
+    void prevBuffer();
+    void nextBuffer();
+
 private:
     bool gestureEvent(QGestureEvent *event);
     void swipeTriggered(QSwipeGesture*);
     unsigned int currentStepScaleFactor;
 
+    void build_colormap();
+
+    bool lockColors;
+
 protected:
-	// what does is this for??
-	void focusInEvent (QFocusEvent *);
+    // what does is this for??
+    void focusInEvent (QFocusEvent *);
     bool event(QEvent *event);
 
 
 signals:
+    void updatecolorbar();
     void keypressed(QKeyEvent*);
-	void mouseposition(QPointF);
-	void mousePressEvent_sig(QPointF);
-	void mouseDoubleClickEvent_sig(QPointF);
-	void mouseReleaseEvent_sig(QPointF);
-	void zoomChanged(double);
+    void mouseposition(QPointF);
+    void mousePressEvent_sig(QPointF);
+    void mouseDoubleClickEvent_sig(QPointF);
+    void mouseReleaseEvent_sig(QPointF);
+    void zoomChanged(double);
+    void bufferChanged(nPhysD*);
+    void logging(QString);
 };
 
 #endif

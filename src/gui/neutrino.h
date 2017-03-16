@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -64,31 +64,31 @@ class neu_pluginerror: public std::exception
 {
 
 public:
-	neu_pluginerror(std::string str = std::string("(undefined plugin error"))
-		: msg(str)
-	{ }
+    neu_pluginerror(std::string str = std::string("(undefined plugin error"))
+        : msg(str)
+    { }
 
-	~neu_pluginerror() throw()
-	{ }
+    ~neu_pluginerror() throw()
+    { }
 
-	virtual const char* what() const throw()
-	{ return msg.c_str(); }
+    virtual const char* what() const throw()
+    { return msg.c_str(); }
 
 private:
-	std::string msg;
+    std::string msg;
 
 };
 
 
 class neutrino : public QMainWindow {
 
-Q_OBJECT
+    Q_OBJECT
 
 public:
 
-	neutrino();
-	~neutrino();
-	
+    neutrino();
+    ~neutrino();
+
     QGraphicsScene& getScene();
 
     Ui::neutrino *my_w;
@@ -97,37 +97,30 @@ public:
 
     static const int MaxRecentFiles=20;
 
-	QList <QAction *> recentFileActs;
-	void updateRecentFileActions(QString=QString());
+    QList <QAction *> recentFileActs;
+    void updateRecentFileActions(QString=QString());
 
-	QPointer<neutrino> follower;
-
-	QString colorTable;
-    QMap<QString, std::vector<unsigned char>> nPalettes;
 
 private:
-    nPhysD* currentBuffer;
     QList<nGenericPan*> panList;
-	QList<nPhysD*> physList;
 
 public slots:
-    inline int indexOf(nPhysD* my_phys){return physList.indexOf(my_phys);};
+    inline int indexOf(nPhysD* my_phys){return (my_w->my_view ? my_w->my_view->physList.indexOf(my_phys) : -1);};
 
-	nGenericPan* existsPan(QString);
+    nGenericPan* existsPan(QString);
 
-	void build_colormap();
     void setGamma(int value);
 
-	void processEvents();
-	void contextMenuEvent(QContextMenuEvent *);
-	void menuFlipRotate();
-	void rotateLeft();
-	void rotateRight();
-	void flipUpDown();
-	void flipLeftRight();
-	
-	void menuPaths();
-	
+    void processEvents();
+    void contextMenuEvent(QContextMenuEvent *);
+    void menuFlipRotate();
+    void rotateLeft();
+    void rotateRight();
+    void flipUpDown();
+    void flipLeftRight();
+
+    void menuPaths();
+
     void loadPlugin();
     void loadPlugin(QString pname, bool launch);
     void loadPlugins(QStringList);
@@ -136,176 +129,167 @@ public slots:
     void scanPlugins(QString);
     void scanPlugins(QDir);
 
-	void openRecentFile();
-	void clearRecentFile();
-	void openRecentBuffer();
+    void openRecentFile();
+    void clearRecentFile();
+    void openRecentBuffer();
 
-	// save and reload across restar
-	void saveDefaults();
-	void loadDefaults();
+    // save and reload across restar
+    void saveDefaults();
+    void loadDefaults();
 
-	//colortable
-	bool addPaletteFromString(QString,QString);
-	QString addPaletteFromFile(QString);
-	
-	void changeColorTable (QString);
-	void changeColorTable ();
-	void previousColorTable ();
-	void nextColorTable ();
+    //colortable
+    bool addPaletteFromString(QString,QString);
+    QString addPaletteFromFile(QString);
 
-	void changeColorMinMax (vec2f);
 
-	void addPhys(nPhysD*);
-	void addPhys(nPhysD&);
-	nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
-	void removePhys(nPhysD*);
+    void addPhys(nPhysD*);
+    void addPhys(nPhysD&);
+    nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
+    void removePhys(nPhysD*);
     void removePhys(nPhysD&);
-	void showPhys(nPhysD*);
-	void showPhys(nPhysD&);
-	void addShowPhys(nPhysD*);
-	void addShowPhys(nPhysD&);
+    void showPhys(nPhysD*);
+    void showPhys(nPhysD&);
+    void addShowPhys(nPhysD*);
+    void addShowPhys(nPhysD&);
+
     nPhysD* getBuffer(int);
-    inline nPhysD* getCurrentBuffer() {return currentBuffer;};
-    nPhysD* getShallow() {return new nPhysD(*currentBuffer);}
 
-	inline QList<nPhysD *> getBufferList() {return physList;};
+    inline nPhysD* getCurrentBuffer() {
+        return (my_w->my_view ? my_w->my_view->currentBuffer : nullptr);
+    };
+
+    inline QList<nPhysD *> getBufferList() {return (my_w->my_view ? my_w->my_view->physList : QList<nPhysD *>() );};
     inline QList<nGenericPan*> getPanList() {return panList;};
-							
-	// menu actions
-	void addMenuBuffers(nPhysD*);
-	// File
-	neutrino* fileNew();
 
-	void fileOpen();
+    // menu actions
+    void addMenuBuffers(nPhysD*);
+    // File
+    neutrino* fileNew();
+
+    void fileOpen();
     QList<nPhysD*> fileOpen(QString);
-	void fileOpen(QStringList);
-	void fileReopen();
+    void fileOpen(QStringList);
+    void fileReopen();
 
-	QString getFileSave();
-	void fileSave();
-	void fileSave(nPhysD*);
-	void fileSave(QString);
-	void fileSave(nPhysD*,QString);
-	void closeCurrentBuffer();
-	bool fileClose();
-//	void file_quit_slot();
+    QString getFileSave();
+    void fileSave();
+    void fileSave(nPhysD*);
+    void fileSave(QString);
+    void fileSave(nPhysD*,QString);
+    void closeCurrentBuffer();
+    bool fileClose();
+    //	void file_quit_slot();
 
     QList <nPhysD *> openSession(QString);
-	void saveSession(QString=QString());
+    void saveSession(QString=QString());
 
-	void exportGraphics();
-	void exportAllGraphics();
-	void exportGraphics(QString);
+    void exportGraphics();
+    void exportAllGraphics();
+    void exportGraphics(QString);
 
-	nGenericPan* Monitor();
-	
-	// Image
-	void createQimage();
-	
-	void toggleRuler();
-	void toggleGrid();
+    nGenericPan* Monitor();
 
-	nGenericPan* Shortcuts();
+    // Image
+    void createQimage();
 
-	// Analysis
-	nGenericPan* FocalSpot();
-	nGenericPan* Contours();
-	nGenericPan* MathOperations();
-	
+    void toggleRuler();
+    void toggleGrid();
+
+    nGenericPan* Shortcuts();
+
+    // Analysis
+    nGenericPan* FocalSpot();
+    nGenericPan* Contours();
+    nGenericPan* MathOperations();
+
     nGenericPan* ZoomWin();
-	
-	// cutoff mask
-	nGenericPan* CutoffImage();
 
-	nGenericPan* WinList();
-	
-	nGenericPan* Properties();
+    // cutoff mask
+    nGenericPan* CutoffImage();
 
-	nGenericPan* Hlineout();
-	nGenericPan* Vlineout();
-	nGenericPan* bothLineout();
-	nGenericPan* BoxLineout();
-	nGenericPan* CompareLines();
+    nGenericPan* WinList();
 
-	void createDrawLine();
+    nGenericPan* Properties();
 
-	QString newRect(QRectF);
-	void newRect(QRectF,QString);
-	void createDrawRect();
+    nGenericPan* Hlineout();
+    nGenericPan* Vlineout();
+    nGenericPan* bothLineout();
+    nGenericPan* BoxLineout();
+    nGenericPan* CompareLines();
 
-	void createDrawEllipse();
+    void createDrawLine();
 
-	void createDrawPoint();
-	
-	void mouseposition(QPointF);
+    QString newRect(QRectF);
+    void newRect(QRectF,QString);
+    void createDrawRect();
 
-	void zoomChanged(double);
+    void createDrawEllipse();
 
-	void keyPressEvent (QKeyEvent *);
-	void keyReleaseEvent (QKeyEvent *);
+    void createDrawPoint();
 
-	void closeEvent(QCloseEvent *);
+    void mouseposition(QPointF);
 
-	void actionPrevBuffer();
-	void actionNextBuffer();
+    void zoomChanged(double);
 
-	void print();
+    void keyPressEvent (QKeyEvent *);
+    void keyReleaseEvent (QKeyEvent *);
 
-	double getZoom() const;
+    void closeEvent(QCloseEvent *);
 
-	void emitBufferChanged(nPhysD* = NULL);
+    void print();
 
-	// remote control of another neutrino
-	void createFollower();
+    double getZoom() const;
 
-	nGenericPan* openRAW();
-	
+    void emitBufferChanged(nPhysD* = NULL);
+
+    nGenericPan* openRAW();
+
     nGenericPan* ColorBar();
-	
-	// WAVELET STUFF
-	nGenericPan* Wavelet();
+
+    // WAVELET STUFF
+    nGenericPan* Wavelet();
     
-	// interferometry STUFF
-	nGenericPan* Interferometry();
+    // interferometry STUFF
+    nGenericPan* Interferometry();
     
-	// SPECTRAL ANALYSIS
-	nGenericPan* SpectralAnalysis();
+    // SPECTRAL ANALYSIS
+    nGenericPan* SpectralAnalysis();
 
-	// INTEGRAL INVERSION STUFF
-	nGenericPan* Inversions();
+    // INTEGRAL INVERSION STUFF
+    nGenericPan* Inversions();
 
-	// Region path
-	nGenericPan* RegionPath();
+    // Region path
+    nGenericPan* RegionPath();
 
-	// ROTATE STUFF
-	nGenericPan* Rotate();
-	
-	// Affine STUFF
-	nGenericPan* Affine();
-	
-	// grab picture from camera
+    // ROTATE STUFF
+    nGenericPan* Rotate();
+
+    // Affine STUFF
+    nGenericPan* Affine();
+
+    // grab picture from camera
     nGenericPan* Camera();
 
-	// interpolate inside path
-	nGenericPan* InterpolatePath();
+    // interpolate inside path
+    nGenericPan* InterpolatePath();
     
-	nGenericPan* MouseInfo();
+    nGenericPan* MouseInfo();
 
-	void about();
-	nGenericPan* Preferences();
+    void about();
+    nGenericPan* Preferences();
 
     nGenericPan* openPan(QString,bool=true);
 
-	void emitPanAdd(nGenericPan*);
-	void emitPanDel(nGenericPan*);
-	
-	// to python
-	
-	nLine* line(QString);
-	
+    void emitPanAdd(nGenericPan*);
+    void emitPanDel(nGenericPan*);
+
+    // to python
+
+    nLine* line(QString);
+
     void dragEnterEvent(QDragEnterEvent *);
-	void dragMoveEvent(QDragMoveEvent *);
-	void dropEvent(QDropEvent *);
+    void dragMoveEvent(QDragMoveEvent *);
+    void dropEvent(QDropEvent *);
 
     nGenericPan* newPan(QString=QString());
     nGenericPan* getPan(QString);
@@ -313,25 +297,24 @@ public slots:
     void changeEvent(QEvent *e);
 
 signals:
-	void updatecolorbar();
     void colorValue(double);
 
-	// signals for communications with pans
-	void mouseAtMatrix(QPointF);					// mouse position on the matrix, no scale
-	void mouseAtWorld(QPointF);					// mouse position with scale, relative to reference
+    // signals for communications with pans
+    void mouseAtMatrix(QPointF);					// mouse position on the matrix, no scale
+    void mouseAtWorld(QPointF);					// mouse position with scale, relative to reference
 
-	void nZoom(double);
+    void nZoom(double);
 
-	void bufferChanged(nPhysD*);						// visible image update
-	void bufferOriginChanged();
-	void physAdd(nPhysD*);
-	void physDel(nPhysD*);
+    void bufferChanged(nPhysD*);						// visible image update
+    void bufferOriginChanged();
+    void physAdd(nPhysD*);
+    void physDel(nPhysD*);
     void physMod(std::pair<nPhysD*,nPhysD*>);
 
-	void keyPressEvent();
-	void closeAll();
-	void panAdd(nGenericPan*);
-	void panDel(nGenericPan*);
+    void keyPressEvent();
+    void closeAll();
+    void panAdd(nGenericPan*);
+    void panDel(nGenericPan*);
 
 };
 

@@ -29,7 +29,7 @@
 nView::~nView ()
 {
     QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");    
+    my_set.beginGroup("nPreferences");
     my_set.setValue("mouseShape", my_mouse.my_shape);
     my_set.setValue("mouseColor", my_mouse.pen.color());
     my_set.setValue("rulerVisible", my_tics.rulerVisible);
@@ -39,10 +39,14 @@ nView::~nView ()
 }
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
-    nparent(qobject_cast<neutrino *>(parent->parent())),
     my_scene(this),
-    my_tics(this)
+    my_tics(this),
+    currentBuffer(nullptr)
 {
+    DEBUG("HERE I AM");
+
+    build_colormap();
+
     setScene(&my_scene);
 
     my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
@@ -58,7 +62,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
 
 
-    if (!nparent) ERROREXIT("nView problem");
+    if (!parent) ERROREXIT("nView problem");
 
     DEBUG(qobject_cast<neutrino *>(parent));
 
@@ -96,12 +100,91 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_set.endGroup();
 }
 
+void nView::setLockColors(bool val) {
+    lockColors=val;
+}
+
+void nView::showPhys(nPhysD *my_phys) {
+    if (my_phys) {
+        if (!physList.contains(my_phys)) physList << my_phys;
+
+        if (currentBuffer) {
+            if (lockColors) {
+                my_phys->property["display_range"]=currentBuffer->property["display_range"];
+                my_phys->property["gamma"]=currentBuffer->property["gamma"];
+            } else {
+                if (!my_phys->property.have("gamma")) {
+                    my_phys->property["gamma"]=property("neuSave-gamma").toInt();
+                }
+            }
+        }
+
+        if (!my_phys->property.have("display_range")) {
+            my_phys->property["display_range"]= my_phys->get_min_max();
+        }
+        currentBuffer=my_phys;
+
+        if (!physList.contains(my_phys)) {
+            // TODO: add memory copy...
+            physList << my_phys;
+        }
+
+        createQimage();
+
+        emit bufferChanged(my_phys);
+    }
+}
+
+
+void
+nView::createQimage() {
+    QApplication::processEvents();
+    if (currentBuffer && currentBuffer->getSurf()>0) {
+        const unsigned char *nPhys_pointer=currentBuffer->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
+        const QImage tempImage(nPhys_pointer,
+                               currentBuffer->getW(),
+                               currentBuffer->getH(),
+                               currentBuffer->getW()*3,
+                               QImage::Format_RGB888);
+
+        my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+    }
+
+    QApplication::processEvents();
+
+    setSize();
+}
+
+void
+nView::previousColorTable () {
+    int idx=nPalettes.keys().indexOf(colorTable);
+    if (idx>0) {
+        colorTable=nPalettes.keys().at(idx-1);
+    } else {
+        colorTable=nPalettes.keys().last();
+    }
+    changeColorTable ();
+};
+
+void
+nView::nextColorTable () {
+    int indice=nPalettes.keys().indexOf(colorTable);
+    if (indice<nPalettes.keys().size()-1) {
+        colorTable=nPalettes.keys().at(indice+1);
+    } else {
+        colorTable=nPalettes.keys().first();
+    }
+    changeColorTable ();
+};
+
+
 void nView::setZoomFactor(int val) {
     currentStepScaleFactor=val;
 }
 
 bool nView::event(QEvent *event)
 {
+    qDebug() << event;
     if (event->type() == QEvent::Gesture)
         return gestureEvent(static_cast<QGestureEvent*>(event));
     return QGraphicsView::event(event);
@@ -109,8 +192,11 @@ bool nView::event(QEvent *event)
 
 bool nView::gestureEvent(QGestureEvent *event)
 {
-    if (QGesture *swipe = event->gesture(Qt::SwipeGesture))
+    qDebug() << event;
+    if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
+        DEBUG("swipe");
         swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+    }
     return true;
 }
 
@@ -120,16 +206,16 @@ void nView::swipeTriggered(QSwipeGesture *gesture)
         //		qDebug() << "angle" << gesture->swipeAngle() << gesture->horizontalDirection() + gesture->verticalDirection();
         switch (gesture->horizontalDirection() + gesture->verticalDirection()) {
         case QSwipeGesture::Left:
-            nparent->previousColorTable();
+            previousColorTable();
             break;
         case QSwipeGesture::Right:
-            nparent->nextColorTable();
+            nextColorTable();
             break;
         case QSwipeGesture::Up:
-            nparent->actionPrevBuffer();
+            prevBuffer();
             break;
         case QSwipeGesture::Down:
-            nparent->actionNextBuffer();
+            nextBuffer();
             break;
         }
         update();
@@ -137,7 +223,6 @@ void nView::swipeTriggered(QSwipeGesture *gesture)
 }
 
 void nView::focusInEvent (QFocusEvent *) {
-    //	((neutrino *) nparent)->emitBufferChanged();
 }
 
 void nView::zoomEq() {
@@ -177,7 +262,6 @@ nView::setSize() {
 void
 nView::resizeEvent(QResizeEvent *e) {
     QGraphicsView::resizeEvent(e);
-    //qDebug() << "nView::resizeEvent" << e->size() << nparent->my_pixitem.pixmap().size() << transform().m11();
     setSize();
 }
 
@@ -192,10 +276,10 @@ void nView::keyPressEvent (QKeyEvent *e)
         switch (e->key()) {
         case Qt::Key_Backspace: {
             if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
-                nparent->statusBar()->showMessage(tr("Removed ")+item->toolTip(),2000);
+                emit logging(tr("Removed ")+item->toolTip());
                 itemObj->deleteLater();
             } else {
-                nparent->statusBar()->showMessage(tr("Can't remove ")+item->toolTip(),2000);
+                emit logging(tr("Can't remove ")+item->toolTip());
             }
             break;
         }
@@ -228,9 +312,6 @@ void nView::keyPressEvent (QKeyEvent *e)
             my_mouse.setPos(pos_mouse);
             emitMouseposition(pos_mouse);
         }
-
-    } else {
-        nparent->keyPressEvent(e);
     }
 
     // cycle over items
@@ -272,11 +353,69 @@ void nView::keyPressEvent (QKeyEvent *e)
         if ((e->modifiers() & Qt::ControlModifier))
             QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard)   ;
         break;
+    case Qt::Key_A: {
+        if (e->modifiers() & Qt::ShiftModifier) {
+            foreach (nPhysD* phys, physList) {
+                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+                setGamma(1);
+                emit bufferChanged(phys);
+            }
+        } else {
+            if (currentBuffer) {
+                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+                setGamma(1);
+                emit updatecolorbar();
+            }
+        }
+        createQimage();
+        break;
+    }
+    case Qt::Key_Less:
+        if (currentBuffer) {
+            setGamma(int(currentBuffer->property["gamma"])-1);
+        }
+        break;
+    case Qt::Key_Greater:
+        if (currentBuffer) {
+            setGamma(int(currentBuffer->property["gamma"])+1);
+        }
+        break;
+    case Qt::Key_Period:
+        if (currentBuffer) {
+            setGamma(1);
+        }
+        break;
     }
 
     update();
-    if (nparent->follower) nparent->follower->my_w->my_view->keyPressEvent(e);
     emit keypressed(e);
+}
+
+void nView::setGamma(int value) {
+    if (currentBuffer) {
+        currentBuffer->property["gamma"]=value;
+        createQimage();
+        emit bufferChanged(currentBuffer);
+    }
+}
+
+void
+nView::changeColorTable (QString ctname) {
+    if (nPalettes.contains(ctname)) {
+        colorTable=ctname;
+    } else {
+        colorTable=nPalettes.keys().first();
+    }
+    changeColorTable();
+}
+
+
+void
+nView::changeColorTable () {
+    createQimage();
+    emit logging(colorTable);
+    my_tics.update();
+    emit updatecolorbar();
 }
 
 void nView::setMouseShape(int num) {
@@ -314,33 +453,18 @@ void nView::wheelEvent(QWheelEvent *e) {
         QGraphicsView::wheelEvent(e);
         break;
     }
-    if (nparent->follower) {
-        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
-        QWheelEvent eFollow(posFollow,e->delta(),e->buttons(),e->modifiers(),e->orientation());
-        nparent->follower->my_w->my_view->wheelEvent(&eFollow);
-    }
 }
 
 void nView::mouseDoubleClickEvent (QMouseEvent *e) {
     QGraphicsView::mousePressEvent(e);
-    if (nparent->follower) {
-        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
-        QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        nparent->follower->my_w->my_view->mousePressEvent(&eFollow);
-    }
     emit mouseDoubleClickEvent_sig(mapToScene(e->pos()));
 }
 
 void nView::mousePressEvent (QMouseEvent *e)
 {
     QGraphicsView::mousePressEvent(e);
-    if (nparent->follower) {
-        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
-        QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        nparent->follower->my_w->my_view->mousePressEvent(&eFollow);
-    }
-    if (e->modifiers()&Qt::ControlModifier && nparent->getCurrentBuffer()) {
-        minMax=nparent->getCurrentBuffer()->get_min_max().swap();
+    if (e->modifiers()&Qt::ControlModifier && currentBuffer) {
+        minMax=currentBuffer->get_min_max().swap();
     }
     emit mousePressEvent_sig(mapToScene(e->pos()));
 }
@@ -349,13 +473,9 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 {
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
-    if (nparent->follower) {
-        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
-        QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        nparent->follower->my_w->my_view->mouseReleaseEvent(&eFollow);
-    }
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        nparent->changeColorMinMax(minMax);
+        currentBuffer->property["display_range"]=minMax;
+        createQimage();
     }
 }
 
@@ -363,20 +483,15 @@ void nView::mouseMoveEvent (QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
     if (QGraphicsItem *item = itemAt(e->pos())) {
-        if (item->flags()&&QGraphicsItem::ItemIsFocusable) {
-            nparent->statusBar()->showMessage(item->toolTip(),2000);
+        if (item->flags() && QGraphicsItem::ItemIsFocusable) {
+            emit logging (item->toolTip());
         }
-    }
-    if (nparent->follower) {
-        QPoint posFollow= nparent->follower->my_w->my_view->mapFromScene(mapToScene(e->pos()));
-        QMouseEvent eFollow(e->type(),posFollow,e->globalPos(),e->button(),e->buttons(),e->modifiers());
-        nparent->follower->my_w->my_view->mouseMoveEvent(&eFollow);
     }
 
     QPointF pos_mouse=mapToScene(e->pos());
     my_mouse.setPos(pos_mouse);
-    if (e->modifiers()==Qt::ControlModifier && nparent->getCurrentBuffer()) {
-        double val=nparent->getCurrentBuffer()->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
+    if (e->modifiers()==Qt::ControlModifier && currentBuffer) {
+        double val=currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
         minMax=vec2f(std::min(minMax.x(),val),std::max(minMax.y(),val));
     }
     emitMouseposition(pos_mouse);
@@ -386,4 +501,14 @@ void nView::emitMouseposition (QPointF p) {
     emit mouseposition(p);
 }
 
+// switch buffers
+void nView::prevBuffer() {
+    int position=physList.indexOf(currentBuffer);
+    if (position>-1) showPhys(physList.at((position+physList.size()-1)%physList.size()));
+}
+
+void nView::nextBuffer() {
+    int position=physList.indexOf(currentBuffer);
+    if (position>-1) showPhys(physList.at((position+1)%physList.size()));
+}
 
