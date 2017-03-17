@@ -160,8 +160,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         if (std::abs(exponentX)>2) {
             label+="x 1e"+QLocale().toString(exponentX)+" ";
         }
-        if (!my_view->currentBuffer->property["unitsX"].is_none())
-            label+=QString::fromStdString(my_view->currentBuffer->property["unitsX"]);
+        if (!my_view->currentBuffer->prop["unitsX"].is_none())
+            label+=QString::fromStdString(my_view->currentBuffer->prop["unitsX"]);
         QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
@@ -255,8 +255,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         if (std::abs(exponentY)>2) {
             label+="x 1e"+QLocale().toString(exponentY)+" ";
         }
-        if (!my_view->currentBuffer->property["unitsY"].is_none())
-            label+=QString::fromStdString(my_view->currentBuffer->property["unitsY"]);
+        if (!my_view->currentBuffer->prop["unitsY"].is_none())
+            label+=QString::fromStdString(my_view->currentBuffer->prop["unitsY"]);
         labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
@@ -291,7 +291,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->setPen(pen);
         p->setBrush(QColor(0,0,0,0));
 
-        vec2f minmax=my_view->currentBuffer->property["display_range"];
+        vec2f minmax=my_view->currentBuffer->prop["display_range"];
         double mini=minmax.first();
         double maxi=minmax.second();
 
@@ -336,8 +336,8 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             if (std::abs(exponentCB)>2) {
                 label+="x 1e"+QLocale().toString(exponentCB)+" ";
             }
-            if (!my_view->currentBuffer->property["unitsCB"].is_none())
-                label+=QString::fromStdString(my_view->currentBuffer->property["unitsCB"]);
+            if (!my_view->currentBuffer->prop["unitsCB"].is_none())
+                label+=QString::fromStdString(my_view->currentBuffer->prop["unitsCB"]);
             QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
             if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 

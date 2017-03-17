@@ -187,11 +187,11 @@
 	for (size_t i=0; i<3; i++) {
 		getline(ifile, temp_string);
 		ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-		property["sif-a-"+ss.str()]=temp_string;
+		prop["sif-a-"+ss.str()]=temp_string;
 	}
 	getline(ifile, temp_string);
 	ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-	property["sif-b-"+ss.str()]=temp_string;
+	prop["sif-b-"+ss.str()]=temp_string;
 
 	int w, h;
 	ss.str(temp_string);
@@ -201,7 +201,7 @@
 
 	getline(ifile, temp_string);
 	ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-	property["sif-c-"+ss.str()]=temp_string;
+	prop["sif-c-"+ss.str()]=temp_string;
 
 	getline(ifile, temp_string);
 	ss.str(temp_string);
@@ -228,7 +228,7 @@
 	while (!ifile.eof()) {
 		getline(ifile, temp_string);
 		ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-		property["sif-d-"+ss.str()]=temp_string;
+		prop["sif-d-"+ss.str()]=temp_string;
 		if (temp_string.substr(0,12) == control_string) {
 			break;
 		}
@@ -249,13 +249,13 @@
 		std::istringstream iss(temp_string);
 
 		ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-		property["sif-e-"+ss.str()]=temp_string;
+		prop["sif-e-"+ss.str()]=temp_string;
 
 		DEBUG(ss.str() << " " << temp_string.size())
 
 			// most readable ever
 			if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-				property["sif-magic_number"]=(int)magic_number;
+				prop["sif-magic_number"]=(int)magic_number;
 				break;
 			}
 	}
@@ -268,7 +268,7 @@
 		getline(ifile, temp_string);
 		std::istringstream iss(temp_string);
 		ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-		property["sif-f-"+ss.str()]=temp_string;
+		prop["sif-f-"+ss.str()]=temp_string;
 	}
 
 	// consistency check
@@ -298,7 +298,7 @@
 		ifile.seekg(init_matrix);
 		DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
 		ss.str(""); ss.clear(); ss << init_matrix << " bytes";
-		property["sif-header"]=ss.str();
+		prop["sif-header"]=ss.str();
 		std::vector<float> readb(getSurf());
 
 		ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
@@ -434,7 +434,7 @@ physDouble_img::physDouble_img(std::string ifilename)
 			buffer2.resize(skipbyte);
 			ifile.read((char *)&buffer2[0],skipbyte);
 
-			property["info"]=buffer2;
+			prop["info"]=buffer2;
 
 			switch (kind) {
 				case 2: // unsigned short int
@@ -477,8 +477,8 @@ physDouble_img::physDouble_img(std::string ifilename)
 			resize(w, h);
 			skipbyte=ifile.tellg();
 			ifile.close();
-			property["kind"]=kind;
-			property["skip bytes"]=skipbyte;
+			prop["kind"]=kind;
+			prop["skip bytes"]=skipbyte;
 
 			phys_open_RAW(this,kind,skipbyte,endian);
 		}
@@ -496,7 +496,7 @@ physUint_imd::physUint_imd(std::string ifilename)
 	unsigned short h=0;
 
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
-	property["imd-version"]=buffer_header;
+	prop["imd-version"]=buffer_header;
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
 	w=buffer_header;
 	ifile.read((char *)&buffer_header,sizeof(unsigned short));
@@ -519,7 +519,7 @@ physUint_imd::physUint_imd(std::string ifilename)
 			comment.append(temp_line);
 		}
 		ifileimg.close();
-		property["imi-info"]=comment;
+		prop["imi-info"]=comment;
 	}
 
 	TscanBrightness();
@@ -580,7 +580,7 @@ void phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
 		//int written_data = 0;
 
 		//ofile<<my_phys->property<<"\n";
-		my_phys->property.dumper(ofile);
+		my_phys->prop.dumper(ofile);
 
 		DEBUG("Starting binary dump...");
 
@@ -644,7 +644,7 @@ void phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 	if (ofile.good() && my_phys != NULL) {
 
 		std::stringstream ss;
-		my_phys->property.dumper(ss);
+		my_phys->prop.dumper(ss);
 		std::string str = ss.str(), str2;
 
 		size_t pos=0;
@@ -843,7 +843,7 @@ std::vector <physD *> phys_open_tiff(std::string ifilename, bool separate_rgb) {
 							}
 							my_phys=new physD(w,h,0.0,ss.str());
 							//my_phys->setType(PHYS_FILE);
-							my_phys->property=tiff_prop;
+							my_phys->prop=tiff_prop;
 							vecReturn.push_back(my_phys);
 						}
 
@@ -922,7 +922,7 @@ void phys_write_one_tiff(physD *my_phys, TIFF* tif) {
 	TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
 	TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
 	std::stringstream prop_ss;
-	my_phys->property.dumper(prop_ss);
+	my_phys->prop.dumper(prop_ss);
 	std::string description=prop_ss.str();
 
 	std::replace( description.begin(), description.end(), '\0', ' ');
@@ -1018,10 +1018,10 @@ std::vector <physD *> phys_open_spe(std::string ifilename) {
 
 	for (unsigned int nf=0;nf<NumFrames;nf++) {
 		physD *phys=new physD(width,height,0.0);
-		phys->property["spe-frame"]=vec2f(nf,NumFrames);
+		phys->prop["spe-frame"]=vec2f(nf,NumFrames);
 		switch (type) {
 			case 0: {
-					phys->property["spe-type"]="float";
+					phys->prop["spe-type"]="float";
 					std::vector<float> buffer(width*height);
 					ifile.read((char*) &buffer[0],width*height*sizeof(float));
 					for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -1030,7 +1030,7 @@ std::vector <physD *> phys_open_spe(std::string ifilename) {
 					break;
 				}
 			case 1: {
-					phys->property["spe-type"]="int";
+					phys->prop["spe-type"]="int";
 					std::vector<int> buffer(width*height);
 					DEBUG(sizeof(long));
 					ifile.read((char*) &buffer[0],width*height*sizeof(int));
@@ -1040,7 +1040,7 @@ std::vector <physD *> phys_open_spe(std::string ifilename) {
 					break;
 				}
 			case 2: {
-					phys->property["spe-type"]="short";
+					phys->prop["spe-type"]="short";
 					std::vector<short> buffer(width*height);
 					ifile.read((char*) &buffer[0],width*height*sizeof(short));
 					for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -1049,7 +1049,7 @@ std::vector <physD *> phys_open_spe(std::string ifilename) {
 					break;
 				}
 			case 3: {
-					phys->property["spe-type"]="unsigned short";
+					phys->prop["spe-type"]="unsigned short";
 					std::vector<unsigned short> buffer(width*height);
 					ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
 					for (unsigned int i=0; i<phys->getSurf(); i++) {
@@ -1125,22 +1125,22 @@ std::vector <physD *> phys_open_inf(std::string ifilename) {
 
 		phys_open_RAW(original,bit==8?0:2,0,true);
 
-		linearized->property["inf-resx"] = original->property["inf-resx"] = resx;
-		linearized->property["inf-resy"] = original->property["inf-resy"] = resy;
+		linearized->prop["inf-resx"] = original->prop["inf-resx"] = resx;
+		linearized->prop["inf-resy"] = original->prop["inf-resy"] = resy;
 		linearized->set_scale(resx/1000.,resy/1000.);
-		linearized->property["unitsX"] = original->property["unitsX"] = "mm";
-		linearized->property["unitsY"] = original->property["unitsY"] = "mm";
+		linearized->prop["unitsX"] = original->prop["unitsX"] = "mm";
+		linearized->prop["unitsY"] = original->prop["unitsY"] = "mm";
 
 		getline(ifile,line);
 		double sensitivity=atoi(line.c_str());
-		linearized->property["inf-sens"] = original->property["inf-sens"] = sensitivity;
+		linearized->prop["inf-sens"] = original->prop["inf-sens"] = sensitivity;
 		getline(ifile,line);
 		double latitude=atoi(line.c_str());
-		linearized->property["inf-lati"] = original->property["inf-lati"] = latitude;
+		linearized->prop["inf-lati"] = original->prop["inf-lati"] = latitude;
 		getline(ifile,line);
-		linearized->property["inf-date"] = original->property["inf-date"] = line;
+		linearized->prop["inf-date"] = original->prop["inf-date"] = line;
 		getline(ifile,line);
-		linearized->property["inf-number"] = original->property["inf-number"] = line;
+		linearized->prop["inf-number"] = original->prop["inf-number"] = line;
 		getline(ifile,line); //empty line
 		getline(ifile,line);
 		if (line.compare(std::string("FLA-7000"))!=0) {
@@ -1159,7 +1159,7 @@ std::vector <physD *> phys_open_inf(std::string ifilename) {
 			getline(ifile,line); //empty line
 			std::stringstream ss;
 			ss << "inf-" << std::setw(3) << std::setfill('0') << i;
-			linearized->property[ss.str()] = original->property[ss.str()] = line;
+			linearized->prop[ss.str()] = original->prop[ss.str()] = line;
 		}
 
 #pragma omp parallel for
@@ -1361,7 +1361,7 @@ std::vector <physD *> phys_open_fits(std::string ifilename) {
 				}
 			} else {
 				std::stringstream ss; ss << std::setw(log10(nkeys)+1) << std::setfill('0') << ii;
-				myphys->property["fits-"+ss.str()]=card;
+				myphys->prop["fits-"+ss.str()]=card;
 			}
 		}
 		myphys->set_origin(orig);
@@ -1445,7 +1445,7 @@ phys_resurrect_binary(physD * my_phys, std::ifstream &ifile) {
 		return -1;
 	}
 
-	my_phys->property.loader(ifile);
+	my_phys->prop.loader(ifile);
 
 	// w/h/size binary read
 	int my_w, my_h, buffer_size;

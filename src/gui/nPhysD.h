@@ -13,8 +13,7 @@ public:
         DEBUG("------------------>>>>>>>>>>>>>" << ref->getName());
     }
     void TscanBrightness();
-    phys_properties property;
-    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name);
+	const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name);
 
     double gamma();
 

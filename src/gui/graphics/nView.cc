@@ -100,49 +100,62 @@ void nView::setLockColors(bool val) {
 
 void nView::showPhys(nPhysD *my_phys) {
     if (my_phys) {
-        if (!physList.contains(my_phys)) physList << my_phys;
+		DEBUG("<><<><><");
+		if (!physList.contains(my_phys)) physList << my_phys;
+		DEBUG("<><<><><");
 
-        if (currentBuffer) {
-            if (lockColors) {
-                my_phys->property["display_range"]=currentBuffer->property["display_range"];
-                my_phys->property["gamma"]=currentBuffer->property["gamma"];
-            } else {
-                if (!my_phys->property.have("gamma")) {
-                    my_phys->property["gamma"]=property("neuSave-gamma").toInt();
-                }
-            }
-        }
+		if (currentBuffer) {
+			DEBUG("<><<><><");
+			if (lockColors) {
+				DEBUG("<><<><><");
+				my_phys->prop["display_range"]=currentBuffer->prop["display_range"];
+				my_phys->prop["gamma"]=currentBuffer->prop["gamma"];
+			} else {
+				DEBUG("<><<><><");
+				if (!my_phys->prop.have("gamma")) {
+					my_phys->prop["gamma"]=property("neuSave-gamma").toInt();
+				}
+				DEBUG("<><<><><");
+			}
+			DEBUG("<><<><><");
+		}
+		DEBUG("<><<><><");
 
-        if (!my_phys->property.have("display_range")) {
-            my_phys->property["display_range"]= my_phys->get_min_max();
-        }
-        currentBuffer=my_phys;
+		if (!my_phys->prop.have("display_range")) {
+			DEBUG("<><<><><");
+			my_phys->prop["display_range"]= my_phys->get_min_max();
+		} else {
+			DEBUG("<><<><><");
+		}
 
-        if (!physList.contains(my_phys)) {
-            // TODO: add memory copy...
-            physList << my_phys;
-        }
+		DEBUG("<><<><><");
+		currentBuffer=my_phys;
 
-        createQimage();
+		DEBUG("<><<><><");
+		createQimage();
 
-        emit bufferChanged(my_phys);
-    }
+		DEBUG("<><<><><");
+		emit bufferChanged(my_phys);
+		DEBUG("<><<><><");
+	}
 }
 
 
 void
 nView::createQimage() {
-    QApplication::processEvents();
-    if (currentBuffer && currentBuffer->getSurf()>0) {
+//    QApplication::processEvents();
+	DEBUG("<><<><><");
+	if (currentBuffer && currentBuffer->getSurf()>0) {
+		DEBUG("<><<><><");
         const unsigned char *nPhys_pointer=currentBuffer->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-        const QImage tempImage(nPhys_pointer,
+		const QImage tempImage(nPhys_pointer,
                                currentBuffer->getW(),
                                currentBuffer->getH(),
                                currentBuffer->getW()*3,
                                QImage::Format_RGB888);
 
         my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-    }
+	}
 
     QApplication::processEvents();
 
@@ -350,13 +363,13 @@ void nView::keyPressEvent (QKeyEvent *e)
     case Qt::Key_A: {
         if (e->modifiers() & Qt::ShiftModifier) {
             foreach (nPhysD* phys, physList) {
-                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+				currentBuffer->prop["display_range"]=currentBuffer->get_min_max();
                 setGamma(1);
                 emit bufferChanged(phys);
             }
         } else {
             if (currentBuffer) {
-                currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+				currentBuffer->prop["display_range"]=currentBuffer->get_min_max();
                 setGamma(1);
                 emit updatecolorbar();
             }
@@ -366,12 +379,12 @@ void nView::keyPressEvent (QKeyEvent *e)
     }
     case Qt::Key_Less:
         if (currentBuffer) {
-            setGamma(int(currentBuffer->property["gamma"])-1);
+			setGamma(int(currentBuffer->prop["gamma"])-1);
         }
         break;
     case Qt::Key_Greater:
         if (currentBuffer) {
-            setGamma(int(currentBuffer->property["gamma"])+1);
+			setGamma(int(currentBuffer->prop["gamma"])+1);
         }
         break;
     case Qt::Key_Period:
@@ -387,7 +400,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 
 void nView::setGamma(int value) {
     if (currentBuffer) {
-        currentBuffer->property["gamma"]=value;
+		currentBuffer->prop["gamma"]=value;
         createQimage();
         emit bufferChanged(currentBuffer);
     }
@@ -468,7 +481,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        currentBuffer->property["display_range"]=minMax;
+		currentBuffer->prop["display_range"]=minMax;
         createQimage();
     }
 }

@@ -15,6 +15,8 @@ public:
 public slots:
     
     void on_actionOpen_triggered();
+	void openFiles(QStringList fnames);
+
 //    void addPan(nGenericPan* pan) {
 //        panlist.push_back(pan);
 //    }

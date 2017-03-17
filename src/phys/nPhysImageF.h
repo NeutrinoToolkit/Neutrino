@@ -152,7 +152,7 @@ class nPhysImageF {
 
 		//phys_properties property; now on anymap
 		//anymap property; specialized class: phys_properties
-		phys_properties property;
+		phys_properties prop;
 		phys_properties display_property;
 
 		//! Exceptions (should use dException)
@@ -222,7 +222,7 @@ class nPhysImageF {
 			DEBUG(10, "shallow copy");
 
 			// copy everything
-			property = rhs.property; // probably missing DEEP operator
+			prop = rhs.prop; // probably missing DEEP operator
 
 			Tmaximum_value = rhs.Tmaximum_value;
 			Tminimum_value = rhs.Tminimum_value;
@@ -255,7 +255,7 @@ class nPhysImageF {
 
 			//lhs->object_name = object_name;
 			//lhs->filename=filename;
-			lhs.property = property;
+			lhs.prop = prop;
 			return lhs;
 		}
 
@@ -323,63 +323,63 @@ class nPhysImageF {
 
 		// getting and setting properties
 		inline std::string getName()
-		{ return property["phys_name"]; }
+		{ return prop["phys_name"]; }
 		void setName(std::string name)
-		{ property["phys_name"] = name; }
+		{ prop["phys_name"] = name; }
 
 		//tom
 		inline std::string getShortName()
-		{ return property["phys_short_name"]; }
+		{ return prop["phys_short_name"]; }
 
 		inline void setShortName(std::string name)
-		{ property["phys_short_name"] = name; }
+		{ prop["phys_short_name"] = name; }
 
 		inline std::string getFromName()
-		{ return property["phys_from_name"]; }
+		{ return prop["phys_from_name"]; }
 
 		inline void setFromName(std::string name)
-		{ property["phys_from_name"] = name; }
+		{ prop["phys_from_name"] = name; }
 
 		inline vec2f get_origin()
-		{ return property["origin"]; }
+		{ return prop["origin"]; }
 
 		inline double get_origin(enum phys_direction direction)
-		{ return (direction==PHYS_X ? vec2f(property["origin"].get_str()).x() : vec2f(property["origin"].get_str()).y()); }
+		{ return (direction==PHYS_X ? vec2f(prop["origin"].get_str()).x() : vec2f(prop["origin"].get_str()).y()); }
 
 		inline void set_origin(T val_x, T val_y)
-		{ property["origin"] = vec2f(val_x,val_y); }
+		{ prop["origin"] = vec2f(val_x,val_y); }
 
 		inline void set_origin(vec2f val) 
-		{ property["origin"] = val; }
+		{ prop["origin"] = val; }
 
 		inline vec2f get_scale()
-		{ return property["scale"]; }
+		{ return prop["scale"]; }
 
 		inline double get_scale(enum phys_direction direction)
-		{ return (direction==PHYS_X ? vec2f(property["scale"].get_str()).x() : vec2f(property["scale"].get_str()).y()); }
+		{ return (direction==PHYS_X ? vec2f(prop["scale"].get_str()).x() : vec2f(prop["scale"].get_str()).y()); }
 
 		inline void set_scale(T val_x, T val_y)
-		{ property["scale"] = vec2f(val_x,val_y); }
+		{ prop["scale"] = vec2f(val_x,val_y); }
 
 		inline void set_scale(vec2f val)
-		{ property["scale"] = val; }
+		{ prop["scale"] = val; }
 
 		inline vec2f to_real(vec2f val) { 
 			vec2f oo, ss; 
-			oo = property["origin"]; ss = property["scale"];
+			oo = prop["origin"]; ss = prop["scale"];
 			return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
 		}
 
 		inline vec2f to_pixel(vec2f val) { 
 			vec2f oo, ss; 
-			oo = property["origin"]; ss = property["scale"];
+			oo = prop["origin"]; ss = prop["scale"];
 			return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
 		}
 
 		//end
 
 		inline phys_type getType()
-		{ return property["phys_orig"]; }
+		{ return prop["phys_orig"]; }
 
 		void init_Tvariables();
 
@@ -447,7 +447,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	for (register size_t ii=0; ii<getSurf(); ii++) {
 		set(ii, oth.point(ii));
 	}
-	property = oth.property;
+	prop = oth.prop;
 
 	setShortName(sName);
 	TscanBrightness();
@@ -689,9 +689,9 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 	nPhysImageF<T> new_img;
 	new_img.resize(getW(), getH());
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+other.property.at("phys_name").get_str()+")");
+	new_img.set_origin(prop.at("origin"));
+	new_img.set_scale(prop.at("scale"));
+	new_img.setName("("+prop.at("phys_name").get_str()+")+("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
 	for (size_t i=0; i<getH()*getW(); i++)
 		new_img.set(i, (T)(point(i)) + (T)(other.point(i)));
@@ -706,7 +706,7 @@ nPhysImageF<T>::operator+ (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+	new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
 	for (size_t i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] += val;
@@ -724,9 +724,9 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 	new_img.resize(getW(), getH());
 
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")-("+other.property.at("phys_name").get_str()+")");
+	new_img.set_origin(prop.at("origin"));
+	new_img.set_scale(prop.at("scale"));
+	new_img.setName("("+prop.at("phys_name").get_str()+")-("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Subtract");
 
 	for (size_t i=0; i<getH()*getW(); i++)
@@ -742,7 +742,7 @@ nPhysImageF<T>::operator- (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+	new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
 	for (size_t i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] -= val;
@@ -758,10 +758,10 @@ nPhysImageF<T>::operator* (const nPhysImageF<T> &other) const {
 
 	nPhysImageF<T> new_img;
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+	new_img.set_origin(prop.at("origin"));
+	new_img.set_scale(prop.at("scale"));
 	new_img.resize(getW(), getH());
-	new_img.setName("("+property.at("phys_name").get_str()+")*("+other.property.at("phys_name").get_str()+")");
+	new_img.setName("("+prop.at("phys_name").get_str()+")*("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Multiply");
 
 	for (size_t i=0; i<getH()*getW(); i++)
@@ -781,10 +781,10 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 
 	nPhysImageF<T> new_img;
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+	new_img.set_origin(prop.at("origin"));
+	new_img.set_scale(prop.at("scale"));
 	new_img.resize(getW(), getH());
-	new_img.setName("("+property.at("phys_name").get_str()+")/("+other.property.at("phys_name").get_str()+")");
+	new_img.setName("("+prop.at("phys_name").get_str()+")/("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");
 
 	for (size_t i=0; i<getH()*getW(); i++)

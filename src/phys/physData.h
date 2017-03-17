@@ -22,6 +22,11 @@ public:
 		DEBUG(10, "constructor")	;
 	}
 
+	~physData()
+	{
+		DEBUG(10, "deconstructor")	;
+	}
+
 	void resize(int w, int h, T val=0)
 	{
 		std::vector<T>::resize(w*h, val);

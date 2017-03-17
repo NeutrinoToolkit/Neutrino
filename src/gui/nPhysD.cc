@@ -41,21 +41,21 @@ void nPhysD::TscanBrightness() {
 }
 
 double nPhysD::gamma() {
-    if (!property.have("gamma")) {
-        property["gamma"]=(int)1;
+	if (!prop.have("gamma")) {
+		prop["gamma"]=(int)1;
     }
-    int gamma_int= property["gamma"].get_i();
+	int gamma_int= prop["gamma"].get_i();
     return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
 }
 
 
 const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
-    bidimvec<double> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
+	bidimvec<double> minmax=prop.have("display_range") ? prop["display_range"] : get_min_max();
     double mini=minmax.first();
     double maxi=minmax.second();
 
-    if (!property.have("gamma")) {
-        property["gamma"]=(int)1;
+	if (!prop.have("gamma")) {
+		prop["gamma"]=(int)1;
     }
     double my_gamma=gamma();
 
@@ -66,10 +66,10 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palet
                 display_property.have("palette_name") &&
                 display_property["palette_name"].get_str()==palette_name &&
                 display_property.have("gamma") &&
-                display_property["gamma"].get_i()==property["gamma"].get_i()) {
+		        display_property["gamma"].get_i()==prop["gamma"].get_i()) {
 
             vec2f old_display_range=display_property["display_range"];
-            vec2f new_display_range=property["display_range"];
+			vec2f new_display_range=prop["display_range"];
 
             if (old_display_range==new_display_range) {
                 DEBUG("reusing old uchar_buf");
@@ -94,8 +94,8 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palet
             }
         }
         display_property["palette_name"]=palette_name;
-        display_property["gamma"]=property["gamma"].get_i();
-        display_property["display_range"]=property["display_range"];
+		display_property["gamma"]=prop["gamma"].get_i();
+		display_property["display_range"]=prop["display_range"];
 
         return &uchar_buf[0];
     }

@@ -60,6 +60,7 @@ int main(int argc, char **argv)
     args.removeFirst();
     
     holderGUI *my_gui= new holderGUI();
+	my_gui->openFiles(args);
 
     return my_app.exec();
 

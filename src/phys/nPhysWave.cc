@@ -879,7 +879,7 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
 			for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
 				synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
 			}
-			synthetic.property=phase_over_2pi->property;
+			synthetic.prop=phase_over_2pi->prop;
 			synthetic.setShortName("synthetic");
 			synthetic.setName("synthetic("+phase_over_2pi->getName()+","+quality->getName()+")");
 			synthetic.TscanBrightness();
@@ -957,7 +957,7 @@ phys_apply_inversion_gas(physD &invimage, double probe_wl, double res, double mo
 		//invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 		invimage.set(ii, mult*(pow(the_point/kappa + 1,2.)-1) );
 	}
-	invimage.property["unitsCB"]="m-3";
+	invimage.prop["unitsCB"]="m-3";
 	invimage.TscanBrightness();
 }
 
@@ -971,7 +971,7 @@ phys_apply_inversion_plasma(physD &invimage, double probe_wl, double res)
 		double the_point = invimage.point(ii)/res;
 		invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
 	}
-	invimage.property["unitsCB"]="m-3";
+	invimage.prop["unitsCB"]="m-3";
 	invimage.TscanBrightness();
 }
 
@@ -981,9 +981,9 @@ phys_apply_inversion_protons(physD &invimage, double energy, double res, double 
 	double mult = (2.0*GSL_CONST_MKSA_VACUUM_PERMITTIVITY*magnification*energy)/(distance*res);
 	phys_multiply(invimage,mult);
 	invimage.set_scale(res*1e2,res*1e2);
-	invimage.property["unitsX"]="cm";
-	invimage.property["unitsY"]="cm";
-	invimage.property["unitsCB"]="C/m-3";
+	invimage.prop["unitsX"]="cm";
+	invimage.prop["unitsY"]="cm";
+	invimage.prop["unitsCB"]="C/m-3";
 }
 
 

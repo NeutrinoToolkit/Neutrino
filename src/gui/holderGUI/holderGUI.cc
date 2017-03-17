@@ -21,13 +21,15 @@ void holderGUI::on_actionOpen_triggered() {
     formats+=("Any files (*)");
 
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
+	openFiles(fnames);
+}
 
-    setProperty("NeuSave-fileOpen", fnames);
-    foreach (QString fname, fnames) {
-        std::vector<nPhysD*> retlist = nHolder::getInstance().fileOpen(fname.toStdString());
-        for (auto& img: retlist) {
-            graphicsView->showPhys(img);
-        }
-    }
-
+void holderGUI::openFiles(QStringList fnames) {
+	setProperty("NeuSave-fileOpen", fnames);
+	foreach (QString fname, fnames) {
+		std::vector<nPhysD*> retlist = nHolder::getInstance().fileOpen(fname.toStdString());
+		for (auto& img: retlist) {
+			graphicsView->showPhys(img);
+		}
+	}
 }
