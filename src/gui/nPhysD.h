@@ -11,9 +11,10 @@ class nPhysD : public QObject, public nPhysImageF<double>  {
 public:
     nPhysD(nPhysImageF<double> *ref) {
         DEBUG("------------------>>>>>>>>>>>>>" << ref->getName());
+
     }
     void TscanBrightness();
-	const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name);
+	const unsigned char *to_uchar_palette(std::vector<unsigned char>  &my_palette, std::string palette_name);
 
     double gamma();
 

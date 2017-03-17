@@ -74,7 +74,7 @@ public:
     QGraphicsPixmapItem my_pixitem;
 
     QString colorTable;
-    QMap<QString, std::vector<unsigned char>> nPalettes;
+	QMap<QString, std::vector<unsigned char>> nPalettes;
 
     nPhysD* currentBuffer;
     QList<nPhysD*> physList;

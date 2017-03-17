@@ -183,6 +183,8 @@ class nPhysImageF {
 		{ return sh_data->getH(); }
 		inline size_t getSurf() const
 		{ return sh_data->getSurf(); }
+		inline vec2 vsize() const
+		{ return sh_data->vsize(); }
 		T sum()
 		{ return sh_data->sum(); }
 

@@ -22,10 +22,10 @@ public:
 		DEBUG(10, "constructor")	;
 	}
 
-	~physData()
-	{
-		DEBUG(10, "deconstructor")	;
-	}
+//	~physData()
+//	{
+//		DEBUG(10, "deconstructor")	;
+//	}
 
 	void resize(int w, int h, T val=0)
 	{

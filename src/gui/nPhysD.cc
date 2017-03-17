@@ -49,7 +49,12 @@ double nPhysD::gamma() {
 }
 
 
-const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
+const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_palette, std::string palette_name) {
+
+	std::vector<unsigned char> pippo=my_palette;
+
+	DEBUG("here " << getName() << " " << getW() << " " << getH());
+	DEBUG("here " << palette_name);
 	bidimvec<double> minmax=prop.have("display_range") ? prop["display_range"] : get_min_max();
     double mini=minmax.first();
     double maxi=minmax.second();
@@ -57,9 +62,10 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palet
 	if (!prop.have("gamma")) {
 		prop["gamma"]=(int)1;
     }
-    double my_gamma=gamma();
+	double my_gamma=gamma();
+	qDebug() << my_gamma;
 
-    if (getSurf()>0 && palette.size()==768) {
+	if (getSurf()>0 && pippo.size()==768) {
 
         if (uchar_buf.size() == getSurf()*3 &&
                 display_property.have("display_range") &&
@@ -81,17 +87,25 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &palet
         uchar_buf.resize(getSurf()*3);
 #pragma omp parallel for
         for (size_t i=0; i<getSurf(); i++) {
-            //int val = mult*(Timg_buffer[i]-lower_cut);
-            if (std::isfinite(point(i))) {
-                unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((point(i)-mini)/(maxi-mini),my_gamma))));
-                uchar_buf[i*3+0] = palette[3*val+0];
-                uchar_buf[i*3+1] = palette[3*val+1];
-                uchar_buf[i*3+2] = palette[3*val+2];
-            } else {
-                uchar_buf[i*3+0] = 255;
-                uchar_buf[i*3+1] = 255;
-                uchar_buf[i*3+2] = 255;
-            }
+//			qDebug() << i;
+			//int val = mult*(Timg_buffer[i]-lower_cut);
+			double p=point(i);
+			qDebug() << i << p << mini << maxi << my_gamma;
+
+			if (std::isfinite(p)) {
+				unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((p-mini)/(maxi-mini),my_gamma))));
+
+				qDebug() << i << val << pippo.size() << uchar_buf.size() ;
+				qDebug() << pippo[3*val+0] << pippo[3*val+1] << pippo[3*val+2];
+
+				uchar_buf[i*3+0] = pippo[3*val+0];
+				uchar_buf[i*3+1] = pippo[3*val+1];
+				uchar_buf[i*3+2] = pippo[3*val+2];
+			} else {
+				uchar_buf[i*3+0] = 255;
+				uchar_buf[i*3+1] = 255;
+				uchar_buf[i*3+2] = 255;
+			}
         }
         display_property["palette_name"]=palette_name;
 		display_property["gamma"]=prop["gamma"].get_i();
