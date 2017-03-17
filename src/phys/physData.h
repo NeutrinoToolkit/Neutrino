@@ -19,7 +19,7 @@ public:
 		height = 0;
 
 
-	       DEBUG(10, "constructor")	;
+		DEBUG(10, "constructor")	;
 	}
 
 	void resize(int w, int h, T val=0)
@@ -38,19 +38,19 @@ public:
 	{ return point(p.x(), p.y(), nan_value); }
 
 	inline T point(size_t xy, T nan_value=std::numeric_limits<T>::signaling_NaN()) const
-	{ 
+	{
 		if (xy<size()) {
-			return data_ptr[xy]; 
+			return data_ptr[xy];
 		} else {
 			return nan_value;
 		}
 	}
 
 
-	T sum() 
+	T sum()
 	{ T sumTot=0; for (size_t i=0; i<getSurf(); i++) sumTot+=point(i); return sumTot; }
 
-	inline void set(int x, int y, T val) {
+	inline void set(unsigned int x, unsigned int y, T val) {
 		if (x>width || y>height) {
 			throw physData_ooAccess();
 			return;
@@ -97,19 +97,19 @@ public:
 	{ return std::vector<T>::begin(); }
 
 	void swap_vector(size_t w, size_t h, std::vector<T> &vec)
-	{ 
-			if (width*height != vec.size()) {
-				DEBUG("WARNING: size mismatch. w:"<<width<<", h:"<<height<<", size: "<<vec.size());
-				return;
-			}
-			width = w;
-			height = h;
-			std::vector<T>::swap(vec);
+	{
+		if (width*height != vec.size()) {
+			DEBUG("WARNING: size mismatch. w:"<<width<<", h:"<<height<<", size: "<<vec.size());
+			return;
+		}
+		width = w;
+		height = h;
+		std::vector<T>::swap(vec);
 	}
 
 
 protected:
-	int width, height;
+	unsigned int width, height;
 
 private:
 	T *data_ptr;
@@ -133,19 +133,19 @@ physData<T>::get_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 
 	//vitr = std::copy(Timg_matrix[index%getH()] + offset, Timg_matrix[index%getH()] + getW(), vec.begin());
 	vitr = std::copy(begitr+(index%getH()) + offset, begitr + (index%getH()) + getW(), vec.begin());
-	if (offset > 0) 
+	if (offset > 0)
 		std::copy(begitr+(index%getH()), begitr+(index%getH()) + offset, vitr);
-		//std::copy(Timg_matrix[index%getH()], Timg_matrix[index%getH()] + offset, vitr);
+	//std::copy(Timg_matrix[index%getH()], Timg_matrix[index%getH()] + offset, vitr);
 
 }
 
 template<class T> void
 physData<T>::set_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 
-        typename std::vector<T>::iterator optr;
+	typename std::vector<T>::iterator optr;
 	offset = offset%getW();
 
-        optr = std::copy(vec.end()-offset, vec.end(), std::vector<T>::begin()+(index%getH()));
+	optr = std::copy(vec.end()-offset, vec.end(), std::vector<T>::begin()+(index%getH()));
 	optr = std::copy(vec.begin(), vec.end()-offset, optr);
 
 }

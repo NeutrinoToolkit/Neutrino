@@ -70,7 +70,7 @@ inline void planeFit(physD *pi, double *coeffs)
 }
 
 // ------------------ general purpose functions for wavelet analysis ------------------------
-	inline mcomplex 
+inline mcomplex
 morlet(double lambda, double tau, double x)
 {
 	double kappa = 2.*3.141592/lambda;
@@ -79,7 +79,7 @@ morlet(double lambda, double tau, double x)
 
 
 
-	inline mcomplex 
+inline mcomplex
 morlet(double lambda, double tau_l, double tau_v, double x, double y, double rotation)
 {
 	double kappa = 2.*3.141592/lambda;
@@ -90,7 +90,7 @@ morlet(double lambda, double tau_l, double tau_v, double x, double y, double rot
 }
 
 
-	inline void
+inline void
 phys_generate_meshgrid(int x1, int x2, int y1, int y2, nPhysImageF<int> &xx, nPhysImageF<int> &yy)
 {
 	int xsize = x2-x1+1;
@@ -112,7 +112,7 @@ phys_generate_meshgrid(int x1, int x2, int y1, int y2, nPhysImageF<int> &xx, nPh
 
 // via function pointers (via meshgrids)
 
-	inline void 
+inline void
 phys_generate_morlet(morlet_data *md, physD &xx, physD &yy, physC &zz)
 {
 
@@ -355,7 +355,7 @@ void phys_cutoff(physD &iimage, double minval, double maxval) {
 	iimage.setName(ostr.str());
 }
 
-	void 
+void
 phys_add_noise(physD &iimage, double vMax=1.0)
 {
 #pragma omp parallel for
@@ -370,7 +370,7 @@ phys_add_noise(physD &iimage, double vMax=1.0)
 
 
 
-	void
+void
 phys_sin(physD &m1)
 {
 #pragma omp parallel for
@@ -381,7 +381,7 @@ phys_sin(physD &m1)
 	m1.setName("sin("+m1.getName()+")");
 }
 
-	void
+void
 phys_cos(physD &m1)
 {
 #pragma omp parallel for
@@ -392,7 +392,7 @@ phys_cos(physD &m1)
 	m1.setName("cos("+m1.getName()+")");
 }
 
-	void
+void
 phys_tan(physD &m1)
 {
 #pragma omp parallel for
@@ -403,7 +403,7 @@ phys_tan(physD &m1)
 	m1.setName("tan("+m1.getName()+")");
 }
 
-	void
+void
 phys_pow(physD &m1, double exponent)
 {
 #pragma omp parallel for
@@ -416,7 +416,7 @@ phys_pow(physD &m1, double exponent)
 	m1.setName("("+m1.getName()+")^"+ostr.str());
 }
 
-	void
+void
 phys_square(physD &m1)
 {
 #pragma omp parallel for
@@ -427,7 +427,7 @@ phys_square(physD &m1)
 	m1.setName("("+m1.getName()+")^2");
 }
 
-	void
+void
 phys_sqrt(physD &m1)
 {
 #pragma omp parallel for
@@ -438,7 +438,7 @@ phys_sqrt(physD &m1)
 	m1.setName("sqrt("+m1.getName()+")");
 }
 
-	void
+void
 phys_abs(physD &m1)
 {
 #pragma omp parallel for
@@ -449,7 +449,7 @@ phys_abs(physD &m1)
 	m1.setName("abs("+m1.getName()+")");
 }
 
-	void
+void
 phys_log(physD &m1)
 {
 #pragma omp parallel for
@@ -460,7 +460,7 @@ phys_log(physD &m1)
 	m1.setName("ln("+m1.getName()+")");
 }
 
-	void
+void
 phys_log10(physD &m1)
 {
 #pragma omp parallel for
@@ -471,7 +471,7 @@ phys_log10(physD &m1)
 	m1.setName("log("+m1.getName()+")");
 }
 
-	void
+void
 phys_fast_gaussian_blur(physD &m1, double radius)
 {
 	phys_fast_gaussian_blur(m1,radius,radius);
@@ -572,7 +572,7 @@ void phys_median_filter(physD& image, unsigned int N){
 	image.TscanBrightness();
 }
 
-	void
+void
 phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
 {
 	std::vector<double> nan_free_phys(image.getSurf());

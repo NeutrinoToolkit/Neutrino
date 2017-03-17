@@ -7,12 +7,12 @@ if (LINUX)
 endif()
 
 add_library (nPhysImageF SHARED
-    bidimvec.cc
-    debug-messages.cc
-    nPhysTools.cc
+    bidimvec.h
+    debug-messages.h
+    nPhysTools.h
     anymap.cc nanstream.cc
     nPhysFormats.cc
-    nPhysImageF.cc
+    nPhysImageF.h
     nPhysMaths.cc
     nPhysWave.cc
     anymap.cc
