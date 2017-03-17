@@ -5,14 +5,12 @@
 #include <QtCore>
 #include <list>
 
-class nPhysD : public QObject, public nPhysImageF<double>  {
+class nPhysD : public QObject, public physD  {
     Q_OBJECT
 
 public:
-    nPhysD(nPhysImageF<double> *ref) {
-        DEBUG("------------------>>>>>>>>>>>>>" << ref->getName());
+	nPhysD(physD *ref) ;
 
-    }
     void TscanBrightness();
 	const unsigned char *to_uchar_palette(std::vector<unsigned char>  &my_palette, std::string palette_name);
 

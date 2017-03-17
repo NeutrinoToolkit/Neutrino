@@ -18,14 +18,7 @@ public:
 		width = 0;
 		height = 0;
 
-
 		DEBUG(10, "constructor")	;
-	}
-
-	~physData()
-	{
-		~std::vector<T>;
-		DEBUG(10, "deconstructor")	;
 	}
 
 	void resize(int w, int h, T val=0)

@@ -268,9 +268,6 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawPath(allGrid);
         p->setPen(QColor(color));
 
-		DEBUG("here " << my_view->colorTable.toStdString());
-
-
         if (my_view->nPalettes[my_view->colorTable].size()) {
             QPen emptyPen=pen;
             emptyPen.setColor(QColor(0,0,0,0));

@@ -1,5 +1,10 @@
 #include "nPhysD.h"
 
+nPhysD::nPhysD(physD *ref) : physD(*ref) {
+	DEBUG("\n\n\n\n\n\n------------------>>>>>>>>>>>>>" << ref->getName());
+	DEBUG("------------------>>>>>>>>>>>>>" << getName());
+}
+
 
 void nPhysD::addParent(nPhysD* my_phys) {
     physParents.push_back(my_phys);
@@ -59,9 +64,6 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_pa
     double mini=minmax.first();
     double maxi=minmax.second();
 
-	if (!prop.have("gamma")) {
-		prop["gamma"]=(int)1;
-    }
 	double my_gamma=gamma();
 	qDebug() << my_gamma;
 
@@ -86,17 +88,17 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_pa
         DEBUG(6,"8bit ["<<get_min()<<":"<<get_max() << "] from [" << mini << ":" << maxi<<"]");
         uchar_buf.resize(getSurf()*3);
 #pragma omp parallel for
-        for (size_t i=0; i<getSurf(); i++) {
+		for (size_t i=0; i<getSurf(); i++) {
 //			qDebug() << i;
 			//int val = mult*(Timg_buffer[i]-lower_cut);
 			double p=point(i);
-			qDebug() << i << p << mini << maxi << my_gamma;
+//			qDebug() << i << p << mini << maxi << my_gamma;
 
 			if (std::isfinite(p)) {
 				unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((p-mini)/(maxi-mini),my_gamma))));
 
-				qDebug() << i << val << pippo.size() << uchar_buf.size() ;
-				qDebug() << pippo[3*val+0] << pippo[3*val+1] << pippo[3*val+2];
+//				qDebug() << i << val << pippo.size() << uchar_buf.size() ;
+//				qDebug() << pippo[3*val+0] << pippo[3*val+1] << pippo[3*val+2];
 
 				uchar_buf[i*3+0] = pippo[3*val+0];
 				uchar_buf[i*3+1] = pippo[3*val+1];

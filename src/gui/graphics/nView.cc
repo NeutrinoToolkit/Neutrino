@@ -299,7 +299,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 		}
 		}
 	}
-	if (!insideItem) {
+	if (!insideItem && !(e->modifiers() & Qt::ControlModifier)) {
 		QPointF delta(0,0);
 		switch (e->key()) {
 		case Qt::Key_Up:
@@ -325,6 +325,25 @@ void nView::keyPressEvent (QKeyEvent *e)
 			QPointF pos_mouse=my_mouse.pos()+delta;
 			my_mouse.setPos(pos_mouse);
 			emitMouseposition(pos_mouse);
+		}
+	}
+
+	if (e->modifiers() & Qt::ControlModifier) {
+		switch (e->key()) {
+		case Qt::Key_Up:
+			prevBuffer();
+			break;
+		case Qt::Key_Down:
+			nextBuffer();
+			break;
+		case Qt::Key_Left:
+			previousColorTable();
+			break;
+		case Qt::Key_Right:
+			nextColorTable();
+			break;
+		default:
+			break;
 		}
 	}
 
