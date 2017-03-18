@@ -38,8 +38,8 @@
 #define ENABLE_ZLIB_GZIP 32
 #define GZIP_ENCODING 16
 
-	physDouble_txt::physDouble_txt(const char *ifilename)
-: physD(std::string(ifilename), PHYS_FILE)
+physDouble_txt::physDouble_txt(const char *ifilename)
+    : physD(std::string(ifilename), PHYS_FILE)
 {
 	std::ifstream ifile(ifilename);
 	// 1. get image statistics
@@ -88,8 +88,8 @@
 }
 
 
-	physDouble_asc::physDouble_asc(const char *ifilename)
-: physD(std::string(ifilename), PHYS_FILE)
+physDouble_asc::physDouble_asc(const char *ifilename)
+    : physD(std::string(ifilename), PHYS_FILE)
 {
 	std::ifstream ifile(ifilename);
 	// 1. get image statistics
@@ -133,42 +133,8 @@
 	TscanBrightness();
 }
 
-
-#ifdef HAVE_LIBNETPBM
-	physInt_pgm::physInt_pgm(const char *ifilename)
-: nPhysImageF<int>(std::string(ifilename), PHYS_FILE)
-{
-	int grays;
-	int **readbuf;
-	int w, h;
-
-	FILE *ifd;
-	ifd = fopen(ifilename,"rb");
-	readbuf = (int **)pgm_readpgm(ifd, &w, &h, (gray *)&grays);
-
-	this->resize(w, h);
-
-	//if (grays<256) bpp = 1;
-	//else bpp = 2;
-
-	DEBUG(5,"width: "<<getW());
-	DEBUG(5,"height: "<<getH());
-	DEBUG(5,"grays: "<<grays);
-
-	for (size_t i=0; i<getH(); i++) {
-		for (size_t j=0; j<getW(); j++) {
-			set(i,j,(int)((readbuf[i])[j]));
-		}
-	}
-
-	TscanBrightness();
-}
-#endif
-
-
-
-	physInt_sif::physInt_sif(std::string ifilename)
-: nPhysImageF<int>(ifilename, PHYS_FILE)
+physInt_sif::physInt_sif(std::string ifilename)
+    : nPhysImageF<int>(ifilename, PHYS_FILE)
 {
 	// Andor camera .sif file
 
@@ -253,11 +219,11 @@
 
 		DEBUG(ss.str() << " " << temp_string.size())
 
-			// most readable ever
-			if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-				prop["sif-magic_number"]=(int)magic_number;
-				break;
-			}
+		        // most readable ever
+		        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+			prop["sif-magic_number"]=(int)magic_number;
+			break;
+		}
 	}
 
 	DEBUG("We are at byte "<< ifile.tellg());
@@ -313,8 +279,8 @@
 
 }
 
-	physShort_b16::physShort_b16(const char *ifilename)
-: nPhysImageF<short>(std::string(ifilename), PHYS_FILE)
+physShort_b16::physShort_b16(const char *ifilename)
+    : nPhysImageF<short>(std::string(ifilename), PHYS_FILE)
 {
 
 	char *ptr = new char[3], tempch;
@@ -392,100 +358,100 @@
 
 
 physDouble_img::physDouble_img(std::string ifilename)
-	: physD(ifilename, PHYS_FILE) {
+    : physD(ifilename, PHYS_FILE) {
 
-		unsigned short buffer;
-		std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
+	unsigned short buffer;
+	std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
 
-		int w=0;
-		int h=0;
-		int skipbyte=0;
-		int kind=-1;
+	int w=0;
+	int h=0;
+	int skipbyte=0;
+	int kind=-1;
 
-		bool endian=false;
+	bool endian=false;
+
+	ifile.read((char *)&buffer,sizeof(unsigned short));
+
+	if (std::string((char *)&buffer,sizeof(unsigned short)) == "IM") { // Hamamatsu
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		skipbyte=buffer;
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		w=buffer;
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		h=buffer;
+
+		for (int i=0;i<2;i++) {
+			ifile.read((char *)&buffer,sizeof(unsigned short));
+			DEBUG(">>>>>>>>>>> " <<  i << " " << buffer);
+			if (buffer != 0)
+				throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
+		}
 
 		ifile.read((char *)&buffer,sizeof(unsigned short));
+		kind=buffer;
 
-		if (std::string((char *)&buffer,sizeof(unsigned short)) == "IM") { // Hamamatsu
+		for (int i=0;i<25;i++) {
+			ifile.read((char *)&buffer,sizeof(unsigned short));
+			if (buffer != 0)
+				throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
+		}
+
+		std::string buffer2;
+		buffer2.resize(skipbyte);
+		ifile.read((char *)&buffer2[0],skipbyte);
+
+		prop["info"]=buffer2;
+
+		switch (kind) {
+			case 2: // unsigned short int
+				kind=3;
+				break;
+			case 3: // unsigned int
+				kind=4;
+				break;
+			default:
+				break;
+		}
+
+	} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
+		ifile.read((char *)&buffer,sizeof(unsigned short));
+		if (buffer==7) {
 			ifile.read((char *)&buffer,sizeof(unsigned short));
 			skipbyte=buffer;
+			ifile.seekg(skipbyte,std::ios_base::beg);
 			ifile.read((char *)&buffer,sizeof(unsigned short));
 			w=buffer;
 			ifile.read((char *)&buffer,sizeof(unsigned short));
 			h=buffer;
-
-			for (int i=0;i<2;i++) {
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-				DEBUG(">>>>>>>>>>> " <<  i << " " << buffer);
-				if (buffer != 0)
-					throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
-			}
-
+			kind=2;
 			ifile.read((char *)&buffer,sizeof(unsigned short));
-			kind=buffer;
-
-			for (int i=0;i<25;i++) {
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-				if (buffer != 0)
-					throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
-			}
-
-			std::string buffer2;
-			buffer2.resize(skipbyte);
-			ifile.read((char *)&buffer2[0],skipbyte);
-
-			prop["info"]=buffer2;
-
-			switch (kind) {
-				case 2: // unsigned short int
-					kind=3;
-					break;
-				case 3: // unsigned int
-					kind=4;
-					break;
-				default:
-					break;
-			}
-
-		} else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
-			ifile.read((char *)&buffer,sizeof(unsigned short));
-			if (buffer==7) {
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-				skipbyte=buffer;
-				ifile.seekg(skipbyte,std::ios_base::beg);
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-				w=buffer;
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-				h=buffer;
-				kind=2;
-				ifile.read((char *)&buffer,sizeof(unsigned short));
-			}
-		} else { // LIL images
-			ifile.seekg(std::ios_base::beg);
-			std::vector<unsigned int>lil_header (4);
-			ifile.read((char *)&lil_header[0],lil_header.size()*sizeof(unsigned int));
-			if (lil_header[0]==2 && lil_header[3]==1) {
-				// lil_header[0] = dimension of the matrix
-				// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
-				w=lil_header[1];
-				h=lil_header[2];
-				kind=2;
-			}
 		}
-
-		if (kind!=-1) {
-			resize(w, h);
-			skipbyte=ifile.tellg();
-			ifile.close();
-			prop["kind"]=kind;
-			prop["skip bytes"]=skipbyte;
-
-			phys_open_RAW(this,kind,skipbyte,endian);
+	} else { // LIL images
+		ifile.seekg(std::ios_base::beg);
+		std::vector<unsigned int>lil_header (4);
+		ifile.read((char *)&lil_header[0],lil_header.size()*sizeof(unsigned int));
+		if (lil_header[0]==2 && lil_header[3]==1) {
+			// lil_header[0] = dimension of the matrix
+			// lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
+			w=lil_header[1];
+			h=lil_header[2];
+			kind=2;
 		}
 	}
 
+	if (kind!=-1) {
+		resize(w, h);
+		skipbyte=ifile.tellg();
+		ifile.close();
+		prop["kind"]=kind;
+		prop["skip bytes"]=skipbyte;
+
+		phys_open_RAW(this,kind,skipbyte,endian);
+	}
+}
+
 physUint_imd::physUint_imd(std::string ifilename)
-: nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
+    : nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
 {
 	// Optronics luli
 	// we should also check if a .imi text file exists and read it?
@@ -674,7 +640,7 @@ void phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 #define TIFFTAG_NEUTRINO  34595
 
 static const TIFFFieldInfo xtiffFieldInfo[] = {
-	{ TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
+    { TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
 };
 
 static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
@@ -1748,7 +1714,7 @@ void phys_write_HDF4(physD *phys, const char* fname) {
 			comp_info c_info;
 			c_info.deflate.level=6;
 			istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
-                        istat+=SDwritedata(sds_id, start, NULL, dimsizes, (VOIDP) phys->data_pointer());
+			istat+=SDwritedata(sds_id, start, NULL, dimsizes, (VOIDP) phys->data_pointer());
 			double data[2];
 			data[0]=phys->get_origin().x();
 			data[1]=phys->get_origin().y();
@@ -1856,7 +1822,7 @@ std::string gunzip (std::string filezipped) {
 	fclose(fileout);
 	// 	}
 	return fileunzipped;
-	}
+}
 
 std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
 	std::vector <physD *> retPhys;
@@ -1882,7 +1848,7 @@ std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
 	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
 	physD *datamatrix=NULL;
-        if (ext=="txt") {
+	if (ext=="txt") {
 		// FIXME: questo e' un baco bastardo: ATTENZIONE! no deep copy when passing reference from
 		// matrices of the same type!
 		//datamatrix = new physD;

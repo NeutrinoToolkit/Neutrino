@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of nPhysImage library.
  *
  *    nPhysImage is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -74,30 +74,6 @@ public:
 	physDouble_asc(const char *);
 };
 
-
-// external library formats
-#ifdef HAVE_LIBNETPBM
-#define min pbm_min
-#define max pbm_max
-extern "C" {
-#include <pgm.h>
-#include <pbm.h>
-}
-#undef min
-#undef max
-
-// external library formats
-class physInt_pgm : public nPhysImageF<int> {
-public:
-	physInt_pgm(const char *);
-};
-
-class physGray_pgm : public nPhysImageF<gray> {
-public:
-	physGray_pgm(const char *);
-};
-#endif
-
 // proprietary formats
 
 // Andor .SIF format
@@ -122,37 +98,37 @@ public:
 // Specialization for 2-byte types.
 inline void endian2Swap(char* dest, char const* src)
 {
-    // Use bit manipulations instead of accessing individual bytes from memory, much faster.
-    unsigned short* p_dest = reinterpret_cast< unsigned short* >(dest);
-    unsigned short const* const p_src = reinterpret_cast< unsigned short const* >(src);
-    *p_dest = (*p_src >> 8) | (*p_src << 8);
+	// Use bit manipulations instead of accessing individual bytes from memory, much faster.
+	unsigned short* p_dest = reinterpret_cast< unsigned short* >(dest);
+	unsigned short const* const p_src = reinterpret_cast< unsigned short const* >(src);
+	*p_dest = (*p_src >> 8) | (*p_src << 8);
 }
 
 // Specialization for 4-byte types.
 inline void endian4Swap(char* dest, char const* src)
 {
-    // Use bit manipulations instead of accessing individual bytes from memory, much faster.
-    unsigned int* p_dest = reinterpret_cast< unsigned int* >(dest);
-    unsigned int const* const p_src = reinterpret_cast< unsigned int const* >(src);
-    *p_dest = (*p_src >> 24) | ((*p_src & 0x00ff0000) >> 8) | ((*p_src & 0x0000ff00) << 8) | (*p_src << 24);
+	// Use bit manipulations instead of accessing individual bytes from memory, much faster.
+	unsigned int* p_dest = reinterpret_cast< unsigned int* >(dest);
+	unsigned int const* const p_src = reinterpret_cast< unsigned int const* >(src);
+	*p_dest = (*p_src >> 24) | ((*p_src & 0x00ff0000) >> 8) | ((*p_src & 0x0000ff00) << 8) | (*p_src << 24);
 }
 
 
 template <typename T>
 T swap_endian(T u)
 {
-    union
-    {
-        T u;
-        unsigned char u8[sizeof(T)];
-    } source, dest;
+	union
+	{
+		T u;
+		unsigned char u8[sizeof(T)];
+	} source, dest;
 
-    source.u = u;
+	source.u = u;
 
-    for (size_t k = 0; k < sizeof(T); k++)
-        dest.u8[k] = source.u8[sizeof(T) - k - 1];
+	for (size_t k = 0; k < sizeof(T); k++)
+		dest.u8[k] = source.u8[sizeof(T) - k - 1];
 
-    return dest.u;
+	return dest.u;
 }
 
 

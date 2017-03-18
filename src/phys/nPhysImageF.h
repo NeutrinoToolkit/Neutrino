@@ -446,7 +446,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	
 	// this is probably MUCH MUCH slower. It has to be tested
 	DEBUG(10, "my size: "<<getSurf());
-	for (register size_t ii=0; ii<getSurf(); ii++) {
+	for (size_t ii=0; ii<getSurf(); ii++) {
 		set(ii, oth.point(ii));
 	}
 	prop = oth.prop;
@@ -478,7 +478,7 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t w, size_t h, std::string obj_nam
 	resize(w, h);
 
 	//memcpy(Timg_buffer, o_buffer, getSurf()*sizeof(T));
-	for (register size_t ii=0; ii<getSurf(); ii++) {
+	for (size_t ii=0; ii<getSurf(); ii++) {
 		set(ii, o_buffer[ii]);
 	}
 

@@ -11,7 +11,7 @@ holderGUI::holderGUI() : QMainWindow() {
 
 void holderGUI::on_actionOpen_triggered() {
     QString formats("");
-    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+	formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
     formats+="Images (";
     foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
         formats+="*."+format+" ";
