@@ -29,7 +29,29 @@ void holderGUI::openFiles(QStringList fnames) {
 	foreach (QString fname, fnames) {
 		std::vector<nPhysD*> retlist = nHolder::getInstance().fileOpen(fname.toStdString());
 		for (auto& img: retlist) {
-			graphicsView->showPhys(img);
+			addPhys(img);
 		}
+	}
+}
+
+void holderGUI::addPhys(nPhysD* my_phys) {
+	graphicsView->showPhys(my_phys);
+	QListWidgetItem *pippo= new QListWidgetItem(listPhys);
+	pippo->setText(QString::fromStdString(my_phys->getName()));
+	pippo->setData(1,QVariant::fromValue(qobject_cast<QObject*>(my_phys)));
+	connect(my_phys, SIGNAL(destroyed(QObject*)), this, SLOT(delPhys(QObject*)));
+}
+
+void holderGUI::delPhys(QObject* my_obj) {
+	if (my_obj) {
+		for (int i=0; i< listPhys->count(); i++ ) {
+			qDebug() << listPhys->item(i);
+			qDebug() << my_obj;
+			qDebug() << listPhys->item(i)->data(1).value<QObject*>();
+			if (listPhys->item(i)->data(1).value<QObject*>() == my_obj) {
+				delete listPhys->takeItem(i);
+			}
+		}
+		qDebug() << my_obj << " : " << sender();
 	}
 }

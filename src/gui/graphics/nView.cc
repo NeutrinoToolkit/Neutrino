@@ -109,7 +109,10 @@ void nView::setLockColors(bool val) {
 void nView::showPhys(nPhysD *my_phys) {
 	if (my_phys) {
 		DEBUG("<><<><><");
-		if (!physList.contains(my_phys)) physList << my_phys;
+		if (!physList.contains(my_phys)) {
+			physList << my_phys;
+			connect(my_phys, SIGNAL(destroyed(QObject*)), this, SLOT(delPhys(QObject*)));
+		}
 		DEBUG("<><<><><");
 
 		if (currentBuffer) {
@@ -342,6 +345,18 @@ void nView::keyPressEvent (QKeyEvent *e)
 		case Qt::Key_Right:
 			nextColorTable();
 			break;
+		case Qt::Key_D:
+			if (currentBuffer) {
+				nextBuffer();
+				physList.removeAll(currentBuffer);
+				if (physList.size()==0) {
+					my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+				}
+				currentBuffer->deleteLater();
+				currentBuffer=nullptr;
+				setSize();
+			}
+			break;
 		default:
 			break;
 		}
@@ -541,7 +556,9 @@ void nView::prevBuffer() {
 }
 
 void nView::nextBuffer() {
-	int position=physList.indexOf(currentBuffer);
-	if (position>-1) showPhys(physList.at((position+1)%physList.size()));
+	if (physList.size()>1) {
+		int position=physList.indexOf(currentBuffer);
+		if (position>-1) showPhys(physList.at((position+1)%physList.size()));
+	}
 }
 
