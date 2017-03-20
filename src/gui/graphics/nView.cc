@@ -24,34 +24,25 @@
  */
 #include "nView.h"
 
-nView::~nView ()
-{
-	QSettings my_set("neutrino","");
-	my_set.beginGroup("nPreferences");
-	my_set.setValue("mouseShape", my_mouse.my_shape);
-	my_set.setValue("mouseColor", my_mouse.pen.color());
-	my_set.setValue("rulerVisible", my_tics.rulerVisible);
-	my_set.setValue("gridVisible", my_tics.gridVisible);
-	my_set.setValue("rulerColor", my_tics.rulerColor);
-	my_set.endGroup();
-}
-
 nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_scene(this),
     my_tics(this),
     currentBuffer(nullptr)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	DEBUG("HERE I AM");
 
 	build_colormap();
-	if(nPalettes.size())
-		colorTable=nPalettes.keys().first();
+	if(nPalettes.size()) {
+		if (nPalettes.keys().contains("Neutrino")) {
+			colorTable="Neutrino";
+		} else {
+			colorTable=nPalettes.keys().first();
+		}
+	}
 
 	DEBUG("HERE I AM " << nPalettes.size());
-
-	for (auto &k: nPalettes) {
-		qDebug() << k.size();
-	}
 
 	setScene(&my_scene);
 
@@ -92,6 +83,8 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
 	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 
+
+
 	QSettings my_set("neutrino","");
 	my_set.beginGroup("nPreferences");
 	setMouseShape(my_set.value("mouseShape",my_mouse.my_shape).toInt());
@@ -99,8 +92,23 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 	my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
 	my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
 	my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
+	changeColorTable(my_set.value("colorTable",colorTable).toString());
 	my_set.endGroup();
 }
+
+void nView::closeEvent(QCloseEvent *event) {
+	QSettings my_set("neutrino","");
+	my_set.beginGroup("nPreferences");
+	my_set.setValue("mouseShape", my_mouse.my_shape);
+	my_set.setValue("mouseColor", my_mouse.pen.color());
+	my_set.setValue("rulerVisible", my_tics.rulerVisible);
+	my_set.setValue("gridVisible", my_tics.gridVisible);
+	my_set.setValue("rulerColor", my_tics.rulerColor);
+	my_set.setValue("colorTable", colorTable);
+	my_set.endGroup();
+	event->accept();
+}
+
 
 void nView::setLockColors(bool val) {
 	lockColors=val;
@@ -139,8 +147,8 @@ void nView::showPhys(nPhysD *my_phys) {
 			DEBUG("<><<><><");
 		}
 
-		DEBUG("<><<><><");
 		currentBuffer=my_phys;
+		DEBUG("<><<><><");
 
 		createQimage();
 
@@ -347,13 +355,14 @@ void nView::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_D:
 			if (currentBuffer) {
-				nextBuffer();
 				physList.removeAll(currentBuffer);
-				if (physList.size()==0) {
-					my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-				}
 				currentBuffer->deleteLater();
 				currentBuffer=nullptr;
+				if (physList.size()==0) {
+					my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+				} else {
+					showPhys(physList.first());
+				}
 				setSize();
 			}
 			break;

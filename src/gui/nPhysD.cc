@@ -55,19 +55,13 @@ double nPhysD::gamma() {
 
 
 const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_palette, std::string palette_name) {
-
-	std::vector<unsigned char> pippo=my_palette;
-
 	DEBUG("here " << getName() << " " << getW() << " " << getH());
 	DEBUG("here " << palette_name);
 	bidimvec<double> minmax=prop.have("display_range") ? prop["display_range"] : get_min_max();
     double mini=minmax.first();
     double maxi=minmax.second();
 
-	double my_gamma=gamma();
-	qDebug() << my_gamma;
-
-	if (getSurf()>0 && pippo.size()==768) {
+	if (getSurf()>0 && my_palette.size()==768) {
 
         if (uchar_buf.size() == getSurf()*3 &&
                 display_property.have("display_range") &&
@@ -95,14 +89,14 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_pa
 //			qDebug() << i << p << mini << maxi << my_gamma;
 
 			if (std::isfinite(p)) {
-				unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((p-mini)/(maxi-mini),my_gamma))));
+				unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((p-mini)/(maxi-mini),gamma()))));
 
 //				qDebug() << i << val << pippo.size() << uchar_buf.size() ;
 //				qDebug() << pippo[3*val+0] << pippo[3*val+1] << pippo[3*val+2];
 
-				uchar_buf[i*3+0] = pippo[3*val+0];
-				uchar_buf[i*3+1] = pippo[3*val+1];
-				uchar_buf[i*3+2] = pippo[3*val+2];
+				uchar_buf[i*3+0] = my_palette[3*val+0];
+				uchar_buf[i*3+1] = my_palette[3*val+1];
+				uchar_buf[i*3+2] = my_palette[3*val+2];
 			} else {
 				uchar_buf[i*3+0] = 255;
 				uchar_buf[i*3+1] = 255;
@@ -117,5 +111,5 @@ const unsigned char* nPhysD::to_uchar_palette(std::vector<unsigned char>  &my_pa
     }
     WARNING("asking for uchar buffer of empty image");
 
-    return NULL;
+	return nullptr;
 }

@@ -1,8 +1,10 @@
 #include "holderGUI.h"
 #include <QImageReader>
 #include <QFileDialog>
+#include <QListWidgetItem>
 
 holderGUI::holderGUI() : QMainWindow() {
+	setAttribute(Qt::WA_DeleteOnClose);
     DEBUG("HERE");
     setupUi(this);
     show();
@@ -36,22 +38,20 @@ void holderGUI::openFiles(QStringList fnames) {
 
 void holderGUI::addPhys(nPhysD* my_phys) {
 	graphicsView->showPhys(my_phys);
-	QListWidgetItem *pippo= new QListWidgetItem(listPhys);
-	pippo->setText(QString::fromStdString(my_phys->getName()));
-	pippo->setData(1,QVariant::fromValue(qobject_cast<QObject*>(my_phys)));
+	QListWidgetItem *my_item= new QListWidgetItem(listPhys);
+	my_item->setText(QString::fromStdString(my_phys->getName()));
+	QVariant my_var=QVariant::fromValue(qobject_cast<nPhysD*>(my_phys));
+	qDebug() << my_phys << my_var;
+	my_item->setData(1,my_var);
 	connect(my_phys, SIGNAL(destroyed(QObject*)), this, SLOT(delPhys(QObject*)));
 }
 
 void holderGUI::delPhys(QObject* my_obj) {
 	if (my_obj) {
 		for (int i=0; i< listPhys->count(); i++ ) {
-			qDebug() << listPhys->item(i);
-			qDebug() << my_obj;
-			qDebug() << listPhys->item(i)->data(1).value<QObject*>();
-			if (listPhys->item(i)->data(1).value<QObject*>() == my_obj) {
+			if (listPhys->item(i)->data(1) == QVariant::fromValue(static_cast<nPhysD*>(my_obj))) {
 				delete listPhys->takeItem(i);
 			}
 		}
-		qDebug() << my_obj << " : " << sender();
 	}
 }

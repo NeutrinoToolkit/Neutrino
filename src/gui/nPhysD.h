@@ -40,4 +40,6 @@ signals:
 
 };
 
+Q_DECLARE_METATYPE(physD*);
+
 #endif
