@@ -355,13 +355,14 @@ void nView::keyPressEvent (QKeyEvent *e)
 			break;
 		case Qt::Key_D:
 			if (currentBuffer) {
+				int pos=std::max(physList.indexOf(currentBuffer)-1,0);
 				physList.removeAll(currentBuffer);
 				currentBuffer->deleteLater();
 				currentBuffer=nullptr;
 				if (physList.size()==0) {
 					my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
 				} else {
-					showPhys(physList.first());
+					showPhys(physList.at(pos));
 				}
 				setSize();
 			}
