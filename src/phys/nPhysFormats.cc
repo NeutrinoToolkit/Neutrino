@@ -1824,8 +1824,8 @@ std::string gunzip (std::string filezipped) {
 	return fileunzipped;
 }
 
-std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
-	std::vector <physD *> retPhys;
+std::vector <physD> phys_open(std::string fname, bool separate_rgb) {
+	std::vector <physD> retPhys;
 	size_t last_idx=0;
 
 	std::string ext=fname;
@@ -1859,52 +1859,77 @@ std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
 		datamatrix = new physDouble_txt(fname.c_str());
 	} else if (ext.substr(0,3)=="tif") {
 		std::vector <physD *> imagelist=phys_open_tiff(fname, separate_rgb);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="spe") {
 		std::vector <physD *> imagelist=phys_open_spe(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="pcoraw") {
 		std::vector <physD *> imagelist=phys_open_pcoraw(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="inf") {
 		std::vector <physD *> imagelist=phys_open_inf(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="sif") {
-		datamatrix = new physD;
-		*datamatrix = physInt_sif(fname.c_str());
+		physD datamatrix = physInt_sif(fname.c_str());
+		retPhys.push_back(datamatrix);
 	} else if (ext=="b16") {
-		datamatrix = new physD;
-		*datamatrix = physShort_b16(fname.c_str());
+		physD datamatrix = physShort_b16(fname.c_str());
+		retPhys.push_back(datamatrix);
 	} else if (ext=="img") {
-		datamatrix = new physDouble_img(fname);
+		physD datamatrix = physDouble_img(fname);
+		retPhys.push_back(datamatrix);
 	} else if (ext=="imd") {
-		datamatrix = new physD;
-		*datamatrix = physUint_imd(fname.c_str());
-		phys_divide(*datamatrix,1000.);
+		physD datamatrix = physUint_imd(fname.c_str());
+		phys_divide(datamatrix,1000.);
+		retPhys.push_back(datamatrix);
 	} else if (ext.substr(0,3)=="fit") {
 		std::vector <physD *> imagelist=phys_open_fits(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="hdf") {
 		std::vector <physD *> imagelist=phys_open_HDF4(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="neu") {
 		std::vector <physD *> imagelist=phys_resurrect_binary(fname);
-		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+		for (auto& img: imagelist) {
+			retPhys.push_back(*img);
+		}
+//		retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 	} else if (ext=="gz") {
 		std::string filenameunzipped = gunzip(fname);
 		if ((!filenameunzipped.empty()) && (filenameunzipped!=fname)) {
-			std::vector <physD *> imagelist=phys_open(filenameunzipped);
+			std::vector <physD> imagelist=phys_open(filenameunzipped);
 			unlink(filenameunzipped.c_str());
-			for (std::vector<physD *>::iterator it=imagelist.begin() ; it < imagelist.end(); it++ ) {
-				(*it)->setName("");
-				(*it)->setShortName("");
+			for (std::vector<physD>::iterator it=imagelist.begin() ; it < imagelist.end(); it++ ) {
+				it->setName("");
+				it->setShortName("");
 			}
-			retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+			for (auto& img: imagelist) {
+				retPhys.push_back(img);
+			}
+//			retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
 		}
 		DEBUG(filenameunzipped);
 	}
 
-	if (datamatrix) retPhys.push_back(datamatrix);
+	if (datamatrix) retPhys.push_back(*datamatrix);
 	for (size_t i=0;i<retPhys.size();i++) {
 
 		std::ostringstream ss;
@@ -1912,18 +1937,18 @@ std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
 			ss << i << " ";
 		}
 
-		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+		DEBUG( "<" << retPhys[i].getName() << "> <" <<  retPhys[i].getShortName() << ">");
 
 		// if Name and ShortName are set, don't change them
-		if (retPhys[i]->getName().empty())
-			retPhys[i]->setName(ss.str()+fname);
+		if (retPhys[i].getName().empty())
+			retPhys[i].setName(ss.str()+fname);
 
-		if (retPhys[i]->getShortName().empty())
-			retPhys[i]->setShortName(ss.str()+name);
+		if (retPhys[i].getShortName().empty())
+			retPhys[i].setShortName(ss.str()+name);
 
-		DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+		DEBUG( "<" << retPhys[i].getName() << "> <" <<  retPhys[i].getShortName() << ">");
 
-		retPhys[i]->setFromName(fname);
+		retPhys[i].setFromName(fname);
 		//retPhys[i]->setType(PHYS_FILE);
 	}
 	return retPhys;

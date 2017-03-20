@@ -16,7 +16,7 @@ public slots:
     
     void on_actionOpen_triggered();
 	void openFiles(QStringList fnames);
-	void addPhys(nPhysD* my_phys);
+	void addPhys(nPhysD& my_phys);
 	void delPhys(QObject* my_phys);
 
 //    void addPan(nGenericPan* pan) {

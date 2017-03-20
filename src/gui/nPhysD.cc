@@ -1,10 +1,9 @@
 #include "nPhysD.h"
 
-nPhysD::nPhysD(physD *ref) : physD(*ref) {
-	DEBUG("\n\n\n\n\n\n------------------>>>>>>>>>>>>>" << ref->getName());
+nPhysD::nPhysD(physD &ref) : physD(&ref) {
+	DEBUG("\n\n\n\n\n\n------------------>>>>>>>>>>>>>" << ref.getName());
 	DEBUG("------------------>>>>>>>>>>>>>" << getName());
 }
-
 
 void nPhysD::addParent(nPhysD* my_phys) {
     physParents.push_back(my_phys);

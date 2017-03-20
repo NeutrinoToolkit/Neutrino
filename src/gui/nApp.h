@@ -40,7 +40,7 @@ public:
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
 
-    bool event(QEvent *ev);
+	bool event(QEvent *ev) override;
 
 
 public slots:

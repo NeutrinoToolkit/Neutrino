@@ -177,7 +177,7 @@ std::vector <physD*> phys_open_spe(std::string);
 
 std::vector <physD*> phys_open_pcoraw(std::string);
 
-std::vector <physD*> phys_open(std::string, bool separate_rgb=false);
+std::vector <physD> phys_open(std::string, bool separate_rgb=false);
 
 std::string gunzip(std::string);
 

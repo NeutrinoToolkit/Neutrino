@@ -27,7 +27,7 @@ void holderGUI::on_actionOpen_triggered() {
 void holderGUI::openFiles(QStringList fnames) {
 	setProperty("NeuSave-fileOpen", fnames);
 	foreach (QString fname, fnames) {
-		std::vector<nPhysD*> retlist = nHolder::getInstance().fileOpen(fname.toStdString());
+		std::vector<nPhysD> retlist = nHolder::getInstance().fileOpen(fname.toStdString());
 		for (auto& img: retlist) {
 			addPhys(img);
 		}

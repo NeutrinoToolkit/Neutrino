@@ -21,7 +21,7 @@ public:
     nHolder(nHolder const&) = delete;
     void operator=(nHolder const&)  = delete;
     
-    std::vector<nPhysD*> fileOpen(std::string fname);
+	std::vector<nPhysD> fileOpen(std::string fname);
 };
 
 
