@@ -43,7 +43,6 @@ class nView : public QGraphicsView {
 
 public:
     nView (QWidget *parent=0);
-    ~nView ();
 
     void resizeEvent (QResizeEvent *);
 
@@ -115,6 +114,9 @@ public slots:
     void nextBuffer();
 
 private:
+
+	void closeEvent(QCloseEvent *event);
+
     bool gestureEvent(QGestureEvent *event);
     void swipeTriggered(QSwipeGesture*);
     unsigned int currentStepScaleFactor;

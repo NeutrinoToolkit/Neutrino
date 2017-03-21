@@ -66,6 +66,7 @@ void nTics::changeColor() {
 
 void
 nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
+	qDebug() << my_view->currentBuffer;
     if (my_view->currentBuffer) {
         // enable this for testing
 #ifdef __phys_debug

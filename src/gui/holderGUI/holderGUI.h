@@ -6,15 +6,18 @@
 
 
 class holderGUI: public QMainWindow, private Ui::holderGUI {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	Q_INVOKABLE holderGUI();
-	
+	~holderGUI(){
+		qDebug() << "destructor";
+		graphicsView->close();
+	};
 
 public slots:
-    
-    void on_actionOpen_triggered();
+
+	void on_actionOpen_triggered();
 	void openFiles(QStringList fnames);
 	void addPhys(nPhysD& my_phys);
 	void delPhys(QObject* my_phys);
@@ -22,7 +25,7 @@ public slots:
 //    void addPan(nGenericPan* pan) {
 //        panlist.push_back(pan);
 //    }
-//    
+//
 //    void delPan(nGenericPan* pan) {
 //        panlist.removeAll(pan);
 //    }
