@@ -142,7 +142,7 @@ physData<T>::get_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 template<class T> void
 physData<T>::set_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 
-	T* optr;
+	typename std::vector<T>::iterator optr;
 	offset = offset%getW();
 
 	optr = std::copy(vec.end()-offset, vec.end(), this->begin()+(index%getH()));

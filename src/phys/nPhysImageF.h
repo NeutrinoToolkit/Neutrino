@@ -135,13 +135,6 @@ class nPhysImageF {
 		//! 1D set functions for row/column access
 		void set_Tvector(enum phys_direction, size_t, size_t, T*, size_t, phys_way orient=PHYS_POS);
 
-		//! get row specialized function
-		void get_Trow(size_t, size_t, std::vector<T> &);
-
-		//! set row specialized function
-		void set_Trow(size_t, size_t, std::vector<T> &);
-
-
 		std::string class_name ()
 		{ return std::string(typeid(T).name()); }
 
@@ -205,6 +198,11 @@ class nPhysImageF {
 		{ sh_data->set(x, y, val); }
 		inline void set(size_t xy, T val)
 		{ sh_data->set(xy, val); }
+
+		inline void set_Trow(size_t x, size_t y, std::vector<T> &vec)
+		{ sh_data->set_Trow(x, y, vec); }
+		inline void get_Trow(size_t x, size_t y, std::vector<T> &vec)
+		{ sh_data->get_Trow(x, y, vec); }
 
 		// ------------------------------------------------------------------------
 		// ------------------------------------------------------------------------
@@ -480,7 +478,7 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t w, size_t h, std::string obj_nam
 template<class T>
 nPhysImageF<T>::~nPhysImageF()
 {
-	DEBUG(1,"destructor: ["<<(void *)this<<", buffer "<<(void *)sh_data.get()<<"] "<<  getShortName() << " : " << getName() << " has "<<sh_data.use_count() << " instances. " );
+	DEBUG(1,"destructor: ["<<(void *)this<<", buffer "<<(void *)sh_data.get()<<"] "<<  getShortName() << " : " << getName() << " has "<<sh_data.use_count() << " instance(s). ("<<sh_data.use_count()-1<<" left)" );
 	sh_data.reset();
 }
 

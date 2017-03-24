@@ -1882,14 +1882,7 @@ std::vector <physD *> phys_open(std::string fname, bool separate_rgb) {
 	DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
 	physD *datamatrix=NULL;
-	if (ext=="pgm") {
-#ifdef HAVE_LIBNETPBM
-		datamatrix = new physD;
-		*datamatrix = physGray_pgm(fname.c_str());
-#else
-		WARNING("nPhysImage was compiled without netpbm library");
-#endif
-	} else if (ext=="txt") {
+	if (ext=="txt") {
 		// FIXME: questo e' un baco bastardo: ATTENZIONE! no deep copy when passing reference from
 		// matrices of the same type!
 		//datamatrix = new physD;
