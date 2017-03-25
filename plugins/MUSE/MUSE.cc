@@ -68,6 +68,7 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 	my_timer.setInterval(property("NeuSave-interval").toInt());
 	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
+//	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 
 	show();
