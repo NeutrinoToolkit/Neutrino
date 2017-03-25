@@ -32,178 +32,178 @@
 #define HDF5_MAX_NAME 2048
 
 MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
-    my_offset(0,0),
-    my_offset_val(0,0),
-    my_scale(1,1),
-    cubeSlice(nullptr),
-    meanSlice(nullptr),
-    wavelen(0,1)
+	my_offset(0,0),
+	my_offset_val(0,0),
+	my_scale(1,1),
+	cubeSlice(nullptr),
+	meanSlice(nullptr),
+	wavelen(0,1)
 {
-    setupUi(this);
+	setupUi(this);
 
-    connect(horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
-    connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
+	connect(horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
+	connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
 
-    connect(radius,SIGNAL(valueChanged(int)),this,SLOT(updateLastPoint()));
+	connect(radius,SIGNAL(valueChanged(int)),this,SLOT(updateLastPoint()));
 
-    connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-    connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 
-    connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
+	connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
 
-    new QShortcut(QKeySequence( Qt::Key_S),this, SLOT(on_actionExportTxt_triggered()));
+	new QShortcut(QKeySequence( Qt::Key_S),this, SLOT(on_actionExportTxt_triggered()));
 
-    setProperty("NeuSave-fileMUSE","myfile.fits");
-    plot->addGraph(plot->xAxis, plot->yAxis2);
-    plot->addGraph(plot->xAxis, plot->yAxis);
+	setProperty("NeuSave-fileMUSE","myfile.fits");
+	plot->addGraph(plot->xAxis, plot->yAxis2);
+	plot->addGraph(plot->xAxis, plot->yAxis);
 
-    toolBar->addWidget(percent);
-    toolBar->addWidget(radius);
-    toolBar->addWidget(restLambda);
-    toolBar->addWidget(lambdaz);
+	toolBar->addWidget(percent);
+	toolBar->addWidget(radius);
+	toolBar->addWidget(restLambda);
+	toolBar->addWidget(lambdaz);
 
-    setProperty("NeuSave-MUSEprefix","spec_");
-    setProperty("NeuSave-MUSEdir",QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
-    qDebug() << property("NeuSave-MUSEdir");
-    my_timer.setInterval(property("NeuSave-interval").toInt());
-    connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
+	setProperty("NeuSave-MUSEprefix","spec_");
+	setProperty("NeuSave-MUSEdir",QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+	qDebug() << property("NeuSave-MUSEdir");
+	my_timer.setInterval(property("NeuSave-interval").toInt());
+	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
-    connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
+	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 
-    show();
-    on_actionMode_toggled();
+	show();
+	on_actionMode_toggled();
 
-    loadCube();
+	loadCube();
 }
 
 void MUSE::on_actionMovie_triggered() {
-    DEBUG("here");
-    if (actionMovie->isChecked()) {
-        my_timer.start();
-    } else {
-        my_timer.stop();
-    }
+	DEBUG("here");
+	if (actionMovie->isChecked()) {
+		my_timer.start();
+	} else {
+		my_timer.stop();
+	}
 }
 
 void MUSE::nextPlane(){
-    DEBUG("here" << slices->value());
+	DEBUG("here" << slices->value());
 
-    slices->setValue((slices->value()+1)%slices->maximum());
+	slices->setValue((slices->value()+1)%slices->maximum());
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-    if (meanSlice) meanSlice->property["display_range"] = getColorPrecentPixels(*meanSlice,val);
-    if (cubeSlice) cubeSlice->property["display_range"] = getColorPrecentPixels(*cubeSlice,val);
-    nparent->createQimage();
+	if (meanSlice) meanSlice->property["display_range"] = getColorPrecentPixels(*meanSlice,val);
+	if (cubeSlice) cubeSlice->property["display_range"] = getColorPrecentPixels(*cubeSlice,val);
+	nparent->createQimage();
 }
 
 
 void MUSE::horzScrollBarChanged(int value)
 {
-    if (qAbs(plot->xAxis->range().center()) > 0.01)
-    {
-        plot->xAxis->setRange(value, plot->xAxis->range().size(), Qt::AlignCenter);
-        plot->replot();
-    }
+	if (qAbs(plot->xAxis->range().center()) > 0.01)
+	{
+		plot->xAxis->setRange(value, plot->xAxis->range().size(), Qt::AlignCenter);
+		plot->replot();
+	}
 }
 
 void MUSE::xAxisChanged(QCPRange range)
 {
-    horizontalScrollBar->setValue(qRound(range.center()));
-    horizontalScrollBar->setPageStep(qRound(range.size()));
+	horizontalScrollBar->setValue(qRound(range.center()));
+	horizontalScrollBar->setPageStep(qRound(range.size()));
 }
 
 
 void MUSE::on_actionMean_triggered() {
-    if (actionMean->isChecked()) {
-        nparent->showPhys(meanSlice);
-    } else {
-        nparent->showPhys(cubeSlice);
-    }
+	if (actionMean->isChecked()) {
+		nparent->showPhys(meanSlice);
+	} else {
+		nparent->showPhys(cubeSlice);
+	}
 }
 
 void MUSE::on_actionExportTxt_triggered() {
-    qDebug() << sender();
-    QString prefix=property("NeuSave-MUSEprefix").toString();
-    QDir dirName(property("NeuSave-MUSEdir").toString());
-    qDebug() << dirName;
-    if (sender() && sender()->objectName()=="actionExportTxt") {
-        bool ok;
-        QString dirNamestr = QFileDialog::getExistingDirectory(this,tr("Spectra dir"),dirName.path());
-        if (QFileInfo(dirNamestr).isDir()) {
-            setProperty("NeuSave-MUSEdir",dirNamestr);
-            dirName.setCurrent(dirNamestr);
-        } else {
-            statusbar->showMessage("Cannot change to dir "+ dirNamestr+ ". Using"+ dirName.path());
-        }
+	qDebug() << sender();
+	QString prefix=property("NeuSave-MUSEprefix").toString();
+	QDir dirName(property("NeuSave-MUSEdir").toString());
+	qDebug() << dirName;
+	if (sender() && sender()->objectName()=="actionExportTxt") {
+		bool ok;
+		QString dirNamestr = QFileDialog::getExistingDirectory(this,tr("Spectra dir"),dirName.path());
+		if (QFileInfo(dirNamestr).isDir()) {
+			setProperty("NeuSave-MUSEdir",dirNamestr);
+			dirName.setCurrent(dirNamestr);
+		} else {
+			statusbar->showMessage("Cannot change to dir "+ dirNamestr+ ". Using"+ dirName.path());
+		}
 
-        QString text = QInputDialog::getText(this, tr("Prefix"),tr("Spectrum File prefix:"), QLineEdit::Normal, prefix, &ok);
-        if (ok) {
-            setProperty("NeuSave-MUSEprefix",text);
-        } else {
-            return;
-        }
-    }
+		QString text = QInputDialog::getText(this, tr("Prefix"),tr("Spectrum File prefix:"), QLineEdit::Normal, prefix, &ok);
+		if (ok) {
+			setProperty("NeuSave-MUSEprefix",text);
+		} else {
+			return;
+		}
+	}
 
-    int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
-    QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
-    QFile t(dirName.filePath(fname));
-    qDebug() << fname<<    t.fileName();
-    t.open(QIODevice::WriteOnly| QIODevice::Text);
-    if (t.isOpen()) {
-        QTextStream out(&t);
-        QLocale loc("C");
-        out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << endl;
-        out << "# r = " << radius->value() << " px. Tot pixels: (2r+1)^2 = " << pow(radius->value()*2+1,2) << endl;
-        out << "# " << plot->graph(1)->name() << endl;
-        for (int xx=0; xx< xvals.size(); xx++) {
-            out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << endl;
-        }
-        t.close();
-    }
+	int max_len=cubeSlice?log10(std::max(cubeSlice->getW(),cubeSlice->getH()))+1:5;
+	QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
+	QFile t(dirName.filePath(fname));
+	qDebug() << fname<<    t.fileName();
+	t.open(QIODevice::WriteOnly| QIODevice::Text);
+	if (t.isOpen()) {
+		QTextStream out(&t);
+		QLocale loc("C");
+		out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << endl;
+		out << "# r = " << radius->value() << " px. Tot pixels: (2r+1)^2 = " << pow(radius->value()*2+1,2) << endl;
+		out << "# " << plot->graph(1)->name() << endl;
+		for (int xx=0; xx< xvals.size(); xx++) {
+			out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << endl;
+		}
+		t.close();
+	}
 }
 
 void MUSE::keyPressEvent (QKeyEvent *e) {
-    int delta = (e->modifiers() & Qt::ShiftModifier) ? 10 : 1;
-    switch (e->key()) {
-    case Qt::Key_Left:
-        slices->setValue((slices->maximum()+slices->value()-delta)%slices->maximum());
-        break;
-    case Qt::Key_Right:
-        slices->setValue((slices->maximum()+slices->value()+delta)%slices->maximum());
-        break;
-    case Qt::Key_S:
-        on_actionExportTxt_triggered();
-        break;
-    case Qt::Key_Space:
-    case Qt::Key_P:
-        actionMovie->trigger();
-        break;
-    case Qt::Key_Plus:
-        if (my_timer.interval()>=50)
-            my_timer.setInterval(my_timer.interval()-50);
-        setProperty("NeuSave-interval",my_timer.interval());
-        break;
-    case Qt::Key_Minus:
-        my_timer.setInterval(my_timer.interval()+50);
-        setProperty("NeuSave-interval",my_timer.interval());
-        break;
-    default:
-        break;
-    }
+	int delta = (e->modifiers() & Qt::ShiftModifier) ? 10 : 1;
+	switch (e->key()) {
+		case Qt::Key_Left:
+			slices->setValue((slices->maximum()+slices->value()-delta)%slices->maximum());
+			break;
+		case Qt::Key_Right:
+			slices->setValue((slices->maximum()+slices->value()+delta)%slices->maximum());
+			break;
+		case Qt::Key_S:
+			on_actionExportTxt_triggered();
+			break;
+		case Qt::Key_Space:
+		case Qt::Key_P:
+			actionMovie->trigger();
+			break;
+		case Qt::Key_Plus:
+			if (my_timer.interval()>=50)
+				my_timer.setInterval(my_timer.interval()-50);
+			setProperty("NeuSave-interval",my_timer.interval());
+			break;
+		case Qt::Key_Minus:
+			my_timer.setInterval(my_timer.interval()+50);
+			setProperty("NeuSave-interval",my_timer.interval());
+			break;
+		default:
+			break;
+	}
 }
 
 void MUSE::plotClick(QMouseEvent* e) {
-    QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
-    if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
-        int nslice=xvals.size()*(plot->xAxis->pixelToCoord(e->pos().x())-wavelen.first())/(wavelen.second()-wavelen.first());
-        slices->setValue(nslice);
-    }
+	QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
+	if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
+		int nslice=xvals.size()*(plot->xAxis->pixelToCoord(e->pos().x())-wavelen.first())/wavelen.second();
+		slices->setValue(nslice);
+	}
 }
 
 
 void MUSE::updateLastPoint() {
-    doSpectrum(lastpoint);
+	doSpectrum(lastpoint);
 }
 
 //QString toNum(QPointF p) {
@@ -211,93 +211,93 @@ void MUSE::updateLastPoint() {
 //}
 
 void MUSE::doSpectrum(QPointF point) {
-    QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+	QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
 
-    double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
-    double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
+	double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
+	double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
 
-    QPointF preal=QPointF(prealx,prealy);
+	QPointF preal=QPointF(prealx,prealy);
 
-//    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
+	//    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
 
-    if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
-        lastpoint=pFloor;
-        vec2 p(point.x(),point.y());
-        for (int zz=0; zz< yvals.size(); zz++) {
-            yvals[zz]=0;
-        }
+	if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
+		lastpoint=pFloor;
+		vec2 p(point.x(),point.y());
+		for (int zz=0; zz< yvals.size(); zz++) {
+			yvals[zz]=0;
+		}
 
-        int surf=cubesize[0]*cubesize[1];
+		int surf=cubesize[0]*cubesize[1];
 
 #pragma omp parallel for collapse(3)
-        for (int xx=std::max((int)0,p.x()-radius->value());xx<=std::min((int)(cubesize[0]),p.x()+radius->value()); xx++) {
-            for (int yy=std::max((int)0,p.y()-radius->value());yy<=std::min((int)(cubesize[1]),p.y()+radius->value()); yy++) {
-                for (unsigned int zz=0; zz< cubesize[2]; zz++) {
-                    yvals[zz]+=cubevect[xx+yy*cubesize[0]+zz*surf];
-                }
-            }
-        }
-        plot->graph(1)->setData(xvals,yvals,true);
-        QString spec_name("("+QLocale().toString(pFloor.x())+","+QLocale().toString(pFloor.y())+ ") Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
-        plot->graph(1)->setName(spec_name);
-        plot->setTitle(spec_name);
-        plot->replot();
-    }
+		for (int xx=std::max((int)0,p.x()-radius->value());xx<=std::min((int)(cubesize[0]),p.x()+radius->value()); xx++) {
+			for (int yy=std::max((int)0,p.y()-radius->value());yy<=std::min((int)(cubesize[1]),p.y()+radius->value()); yy++) {
+				for (unsigned int zz=0; zz< cubesize[2]; zz++) {
+					yvals[zz]+=cubevect[xx+yy*cubesize[0]+zz*surf];
+				}
+			}
+		}
+		plot->graph(1)->setData(xvals,yvals,true);
+		QString spec_name("("+QLocale().toString(pFloor.x())+","+QLocale().toString(pFloor.y())+ ") Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
+		plot->graph(1)->setName(spec_name);
+		plot->setTitle(spec_name);
+		plot->replot();
+	}
 }
 
 void MUSE::showImagePlane(int z) {
-    qDebug() << z;
-    disconnect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-    disconnect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-    slices->setValue(z);
-    slicesSlider->setValue(z);
-    if (cubesize.size()==3 && z < (int)cubesize[2]) {
-        nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
-        my_phys->property=cube_prop;
+	qDebug() << z;
+	disconnect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	disconnect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	slices->setValue(z);
+	slicesSlider->setValue(z);
+	if (cubesize.size()==3 && z < (int)cubesize[2]) {
+		nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
+		my_phys->property=cube_prop;
 
-        int offset=z*my_phys->getSurf();
+		int offset=z*my_phys->getSurf();
 #pragma omp parallel for
-        for (unsigned int k=0; k < my_phys->getSurf(); k++) {
-            my_phys->Timg_buffer[k]+=cubevect[offset+k];
-        }
-        my_phys->TscanBrightness();
+		for (unsigned int k=0; k < my_phys->getSurf(); k++) {
+			my_phys->Timg_buffer[k]+=cubevect[offset+k];
+		}
+		my_phys->TscanBrightness();
 
-        my_phys->property["display_range"]=getColorPrecentPixels(*my_phys,percent->value());
+		my_phys->property["display_range"]=getColorPrecentPixels(*my_phys,percent->value());
 
-        if (cubeSlice) {
-            cubeSlice->property["display_range"]=my_phys->property["display_range"];
-        } else {
-            cube_prop["display_range"]=my_phys->property["display_range"];
-        }
-        cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
-        plot->setMousePosition(xvals[z]);
-        setstatusbar();
-    }
-    QApplication::processEvents();
-    connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-    connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+		if (cubeSlice) {
+			cubeSlice->property["display_range"]=my_phys->property["display_range"];
+		} else {
+			cube_prop["display_range"]=my_phys->property["display_range"];
+		}
+		cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
+		plot->setMousePosition(xvals[z]);
+		setstatusbar();
+	}
+	QApplication::processEvents();
+	connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 }
 
 void MUSE::on_restLambda_valueChanged(double) {
-    setstatusbar();
+	setstatusbar();
 }
 
 void MUSE::setstatusbar() {
-    if (xvals.size()>slices->value()) {
-        double lambda=xvals[slices->value()];
-        double redshift=lambda/restLambda->value()-1.0;
-        lambdaz->setText(trUtf8("\xce\xbb") + ":" + QLocale().toString(lambda) + " z=" + QLocale().toString(redshift));
-    }
+	if (xvals.size()>slices->value()) {
+		double lambda=xvals[slices->value()];
+		double redshift=lambda/restLambda->value()-1.0;
+		lambdaz->setText(trUtf8("\xce\xbb") + ":" + QLocale().toString(lambda) + " z=" + QLocale().toString(redshift));
+	}
 }
 
 void MUSE::on_actionMode_toggled() {
-    if (actionMode->isChecked()) {
-        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
-    } else {
-        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
-    }
+	if (actionMode->isChecked()) {
+		disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+		connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
+	} else {
+		disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
+		connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+	}
 }
 
 //void MUSE::on_actionExport_triggered () {
@@ -315,255 +315,254 @@ void MUSE::on_actionMode_toggled() {
 //}
 
 QVariant MUSE::extractData(QString key, QStringList values) {
-    //    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << key;
-    key=key.leftJustified(8,' ',true);
-    QVariant retval;
-    for(auto &my_str: values) {
-        //        qDebug() << "\t " << my_str;
-        QStringList wavelist1(QString(my_str).split("=",QString::SkipEmptyParts));
-        if (wavelist1.size()>1) {
-            //            qDebug() << "here" << wavelist1.first();
-            if(wavelist1.first()==key) {
-                QStringList wavelist2(wavelist1.at(1).split(' ',QString::SkipEmptyParts));
-                //                qDebug() << wavelist2;
-                if (wavelist2.size()>1) {
-                    bool ok;
-                    QVariant val=wavelist2.first().toDouble(&ok);
-                    if (ok) {
-                        retval=QVariant::fromValue(val);
-                    } else {
-                        retval=wavelist2.first();
-                    }
-                } else {
-                    retval=wavelist1.at(1);
-                }
-            }
-        }
-    }
-    return retval;
+	qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << key;
+	key=key.leftJustified(8,' ',true);
+	QVariant retval;
+	for(auto &my_str: values) {
+		qDebug() << "\t " << my_str;
+		QStringList wavelist1(QString(my_str).split("=",QString::SkipEmptyParts));
+		if (wavelist1.size()>1) {
+			qDebug() << "here" << wavelist1.first();
+			if(wavelist1.first()==key) {
+				QStringList wavelist2(wavelist1.at(1).split(' ',QString::SkipEmptyParts));
+				qDebug() << wavelist2;
+				if (wavelist2.size()>1) {
+					bool ok;
+					QVariant val=wavelist2.first().toDouble(&ok);
+					if (ok) {
+						retval=QVariant::fromValue(val);
+					} else {
+						retval=wavelist2.first();
+					}
+				} else {
+					retval=wavelist1.at(1);
+				}
+			}
+		}
+	}
+	return retval;
 }
 
 void MUSE::loadCube() {
-    QFileDialog fd;
-    QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
+	QFileDialog fd;
+	QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
 
-    if (ifilename.isEmpty()) {
-        close();
-    } else {
-        fd.close();
-        QApplication::processEvents();
-        setProperty("NeuSave-fileMUSE", ifilename);
-
-
-        fitsfile *fptr;
-        char card[FLEN_CARD];
-        int status = 0, ii;
-
-        fits_open_file(&fptr, ifilename.toLatin1().data(), READONLY, &status);
-        int bitpix;
-        int anaxis;
-
-        fits_is_compressed_image(fptr, &status);
-        if (fits_check_error(status)) return;
-
-        int hdupos=0;
-        fits_get_hdu_num(fptr, &hdupos);
-        if (fits_check_error(status)) return;
-        DEBUG(hdupos);
-
-        for (; !status; hdupos++)  {
+	if (ifilename.isEmpty()) {
+		close();
+	} else {
+		fd.close();
+		QApplication::processEvents();
+		setProperty("NeuSave-fileMUSE", ifilename);
 
 
-            int hdutype;
-            fits_get_hdu_type(fptr, &hdutype, &status);
-            if (fits_check_error(status)) return;
+		fitsfile *fptr;
+		char card[FLEN_CARD];
+		int status = 0, ii;
 
-            if (hdutype == IMAGE_HDU) {
-                std::array<long,9> naxes={1, 1, 1, 1, 1, 1, 1, 1, 1};
-                int naxis = 0;
-                fits_get_img_param(fptr, 9, &bitpix, &naxis, &naxes[0], &status);
-                DEBUG("IMAGE_HDU " << naxis);
-                for (ii = 0; ii < 9; ii++) {
-                    DEBUG(ii << " " << naxes[ii]);
-                }
-            }
+		fits_open_file(&fptr, ifilename.toLatin1().data(), READONLY, &status);
+		int bitpix;
+		int anaxis;
 
-            fits_get_img_type(fptr,&bitpix,&status);
+		fits_is_compressed_image(fptr, &status);
+		if (fits_check_error(status)) return;
 
-            fits_get_img_dim(fptr,&anaxis,&status);
+		int hdupos=0;
+		fits_get_hdu_num(fptr, &hdupos);
+		if (fits_check_error(status)) return;
+		DEBUG(hdupos);
 
-            int nkeys;
-            fits_get_hdrspace(fptr, &nkeys, NULL, &status);
-
-            QStringList desc;
-            for (ii = 1; ii <= nkeys; ii++)  {
-                fits_read_record(fptr, ii, card, &status);
-                if (fits_check_error(status)) return;
-                desc << QString(card);
-
-            }
-            std::stringstream ss;
-            ss << "fits-header" << std::setfill('0') << std::setw(2) << hdupos;
-            cube_prop[ss.str()]=desc.join('\n').toStdString();
-            DEBUG("Fits header:\n" << cube_prop[ss.str()]);
-
-            bool ok1,ok2;
-            double val_dbl1,val_dbl2;
-            val_dbl1=extractData("WAVELMIN",desc).toDouble(&ok1);
-            val_dbl2=extractData("WAVELMAX",desc).toDouble(&ok2);
-            if(ok1 && ok2) {
-                wavelen.set_first(val_dbl1*10);
-                wavelen.set_second(val_dbl2*10);
-                DEBUG("wavelen " << wavelen);
-            }
-
-            QString val_str1=extractData("CTYPE1",desc).toString();
-            QString val_str2=extractData("CTYPE2",desc).toString();
-            qDebug() << val_str1 << val_str2;
-            if (val_str1=="'RA---TAN'" && val_str2=="'DEC--TAN'") {
-                DEBUG("here ");
-                val_dbl1=extractData("CRPIX1",desc).toDouble(&ok1);
-                val_dbl2=extractData("CRPIX2",desc).toDouble(&ok2);
-                if(ok1 && ok2) {
-                    qDebug() << "CRPIX1" << val_dbl1 << val_dbl2;
-                    my_offset=QPointF(val_dbl1,val_dbl2);
-                }
-                val_dbl1=extractData("CD1_2",desc).toDouble(&ok1);
-                val_dbl2=extractData("CD2_1",desc).toDouble(&ok2);
-                if(ok1 && ok2 && val_dbl1==0 && val_dbl2==0) {
-                    val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
-                    val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
-                    if(ok1 && ok2) {
-                        qDebug() << "CD1_1" << val_dbl1 << val_dbl2;
-                        my_scale=QPointF(val_dbl1,val_dbl2);
-                    }
-                }
-                val_dbl1=extractData("CRVAL1",desc).toDouble(&ok1);
-                val_dbl2=extractData("CRVAL2",desc).toDouble(&ok2);
-                if(ok1 && ok2) {
-                    qDebug() << "CRVAL1" << val_dbl1 << val_dbl2;
-                    my_offset_val=QPointF(val_dbl1,val_dbl2);
-                }
-            }
+		for (; !status; hdupos++)  {
 
 
-            horizontalScrollBar->setRange(wavelen.x(),wavelen.y());
+			int hdutype;
+			fits_get_hdu_type(fptr, &hdutype, &status);
+			if (fits_check_error(status)) return;
 
-            std::vector<long> axissize(anaxis,0),fpixel(anaxis,1);
+			if (hdutype == IMAGE_HDU) {
+				std::array<long,9> naxes={1, 1, 1, 1, 1, 1, 1, 1, 1};
+				int naxis = 0;
+				fits_get_img_param(fptr, 9, &bitpix, &naxis, &naxes[0], &status);
+				DEBUG("IMAGE_HDU " << naxis);
+				for (ii = 0; ii < 9; ii++) {
+					DEBUG(ii << " " << naxes[ii]);
+				}
+			}
 
-            fits_get_img_size(fptr,anaxis,&axissize[0],&status);
-            if (fits_check_error(status)) return;
+			fits_get_img_type(fptr,&bitpix,&status);
 
-            unsigned long totalsize=1;
-            for(int i=0; i<anaxis; i++) {
-                totalsize*=axissize[i];
-            }
-            DEBUG("totalsize " << totalsize);
+			fits_get_img_dim(fptr,&anaxis,&status);
 
-            if (anaxis==3) {
-                int ret = QMessageBox::question(
-                            this, tr("MUSE"),
-                            tr("Found data cube") + QString::number(hdupos) +" : "+QString::number(axissize[0])+"x"+QString::number(axissize[1])+"x"+QString::number(axissize[2])+"\n"+tr("Open it?"),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-                if (ret==QMessageBox::Yes) {
-                    QProgressDialog progress("Reading Cube", "Cancel", 0, 3, this);
-                    progress.setCancelButton(0);
-                    progress.setWindowModality(Qt::WindowModal);
-                    progress.setValue(progress.value()+1);
-                    progress.show();
-                    QApplication::processEvents();
+			int nkeys;
+			fits_get_hdrspace(fptr, &nkeys, NULL, &status);
 
-                    cubevect.resize(totalsize);
-                    cubesize.resize(anaxis);
-                    fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)&cubevect[0], NULL, &status);
-                    DEBUG("got a cube : " << totalsize << " = " << axissize[0] << " x " << axissize[1] << " x " << axissize[2]);
-                    for(int i=0; i<anaxis; i++) {
-                        cubesize[i]=axissize[i];
-                    }
+			QStringList desc;
+			for (ii = 1; ii <= nkeys; ii++)  {
+				fits_read_record(fptr, ii, card, &status);
+				if (fits_check_error(status)) return;
+				desc << QString(card);
 
-                    progress.setLabelText("Mean spectrum");
-                    progress.setValue(progress.value()+1);
-                    QApplication::processEvents();
+			}
+			std::stringstream ss;
+			ss << "fits-header" << std::setfill('0') << std::setw(2) << hdupos;
+			cube_prop[ss.str()]=desc.join('\n').toStdString();
+			DEBUG("Fits header:\n" << cube_prop[ss.str()]);
 
-                    xvals.resize(cubesize[2]);
-                    yvals.resize(cubesize[2]);
-                    ymean.resize(cubesize[2]);
-                    for (int zz=0; zz< xvals.size(); zz++) {
-                        xvals[zz]=wavelen.first()+(zz+1.0)*(wavelen.second()-wavelen.first())/xvals.size();
-                        ymean[zz]=0;
-                    }
-                    int surf=cubesize[0]*cubesize[1];
-                    std::vector<unsigned int> not_nan(ymean.size(),0);
+			bool ok1,ok2;
+			double val_dbl1,val_dbl2;
+			val_dbl1=extractData("CRVAL3",desc).toDouble(&ok1);
+			val_dbl2=extractData("CD3_3",desc).toDouble(&ok2);
+			if(ok1 && ok2) {
+				wavelen.set_first(val_dbl1);
+				wavelen.set_second(val_dbl2);
+				DEBUG("wavelen " << wavelen);
+			}
+
+			QString val_str1=extractData("CTYPE1",desc).toString();
+			QString val_str2=extractData("CTYPE2",desc).toString();
+			qDebug() << val_str1 << val_str2;
+			if (val_str1=="'RA---TAN'" && val_str2=="'DEC--TAN'") {
+				DEBUG("here ");
+				val_dbl1=extractData("CRPIX1",desc).toDouble(&ok1);
+				val_dbl2=extractData("CRPIX2",desc).toDouble(&ok2);
+				if(ok1 && ok2) {
+					qDebug() << "CRPIX1" << val_dbl1 << val_dbl2;
+					my_offset=QPointF(val_dbl1,val_dbl2);
+				}
+				val_dbl1=extractData("CD1_2",desc).toDouble(&ok1);
+				val_dbl2=extractData("CD2_1",desc).toDouble(&ok2);
+				if(ok1 && ok2 && val_dbl1==0 && val_dbl2==0) {
+					val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
+					val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
+					if(ok1 && ok2) {
+						qDebug() << "CD1_1" << val_dbl1 << val_dbl2;
+						my_scale=QPointF(val_dbl1,val_dbl2);
+					}
+				}
+				val_dbl1=extractData("CRVAL1",desc).toDouble(&ok1);
+				val_dbl2=extractData("CRVAL2",desc).toDouble(&ok2);
+				if(ok1 && ok2) {
+					qDebug() << "CRVAL1" << val_dbl1 << val_dbl2;
+					my_offset_val=QPointF(val_dbl1,val_dbl2);
+				}
+			}
+
+
+
+			std::vector<long> axissize(anaxis,0),fpixel(anaxis,1);
+
+			fits_get_img_size(fptr,anaxis,&axissize[0],&status);
+			if (fits_check_error(status)) return;
+
+			unsigned long totalsize=1;
+			for(int i=0; i<anaxis; i++) {
+				totalsize*=axissize[i];
+			}
+			DEBUG("totalsize " << totalsize);
+
+			if (anaxis==3) {
+				int ret = QMessageBox::question(
+							this, tr("MUSE"),
+							tr("Found data cube") + QString::number(hdupos) +" : "+QString::number(axissize[0])+"x"+QString::number(axissize[1])+"x"+QString::number(axissize[2])+"\n"+tr("Open it?"),
+						QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+				if (ret==QMessageBox::Yes) {
+					QProgressDialog progress("Reading Cube", "Cancel", 0, 3, this);
+					progress.setCancelButton(0);
+					progress.setWindowModality(Qt::WindowModal);
+					progress.setValue(progress.value()+1);
+					progress.show();
+					QApplication::processEvents();
+
+					cubevect.resize(totalsize);
+					cubesize.resize(anaxis);
+					fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)&cubevect[0], NULL, &status);
+					DEBUG("got a cube : " << totalsize << " = " << axissize[0] << " x " << axissize[1] << " x " << axissize[2]);
+					for(int i=0; i<anaxis; i++) {
+						cubesize[i]=axissize[i];
+					}
+
+					progress.setLabelText("Mean spectrum");
+					progress.setValue(progress.value()+1);
+					QApplication::processEvents();
+
+					xvals.resize(cubesize[2]);
+					yvals.resize(cubesize[2]);
+					ymean.resize(cubesize[2]);
+					for (int zz=0; zz< xvals.size(); zz++) {
+						xvals[zz]=wavelen.first()+zz*wavelen.second();
+						ymean[zz]=0;
+					}
+					int surf=cubesize[0]*cubesize[1];
+					std::vector<unsigned int> not_nan(ymean.size(),0);
 #pragma omp parallel for
-                    for (unsigned int kk=0;kk<totalsize; kk++) {
-                        if (std::isfinite(cubevect[kk])) {
-                            ymean[kk/surf]+=cubevect[kk];
-                            not_nan[kk/surf]++;
-                        }
-                    }
+					for (unsigned int kk=0;kk<totalsize; kk++) {
+						if (std::isfinite(cubevect[kk])) {
+							ymean[kk/surf]+=cubevect[kk];
+							not_nan[kk/surf]++;
+						}
+					}
 
-                    for (int xx=0; xx< xvals.size(); xx++) {
-                        ymean[xx]/=not_nan[xx];
-                    }
+					for (int xx=0; xx< xvals.size(); xx++) {
+						ymean[xx]/=not_nan[xx];
+					}
 
-                    progress.setLabelText("Mean image");
-                    progress.setValue(progress.value()+1);
-                    QApplication::processEvents();
-                    if (!meanSlice) nparent->removePhys(meanSlice);
-                    meanSlice=new nPhysD(cubesize[0],cubesize[1],0.0,"mean slice");
-                    nPhysImageF<int> my_num(cubesize[0],cubesize[1],0,"number");
+					progress.setLabelText("Mean image");
+					progress.setValue(progress.value()+1);
+					QApplication::processEvents();
+					if (!meanSlice) nparent->removePhys(meanSlice);
+					meanSlice=new nPhysD(cubesize[0],cubesize[1],0.0,"mean slice");
+					nPhysImageF<int> my_num(cubesize[0],cubesize[1],0,"number");
 
-                    meanSlice->property=cube_prop;
+					meanSlice->property=cube_prop;
 
 #pragma omp parallel for collapse(2)
-                    for (unsigned int l=0; l < cubesize[2]; l++) {
-                        for (int k=0; k < surf; k++) {
-                            double val=cubevect[l*surf+k];
-                            if (std::isfinite(val)) {
-                                meanSlice->Timg_buffer[k]+=val;
-                                my_num.Timg_buffer[k]++;
-                            }
-                        }
-                    }
+					for (unsigned int l=0; l < cubesize[2]; l++) {
+						for (int k=0; k < surf; k++) {
+							double val=cubevect[l*surf+k];
+							if (std::isfinite(val)) {
+								meanSlice->Timg_buffer[k]+=val;
+								my_num.Timg_buffer[k]++;
+							}
+						}
+					}
 #pragma omp parallel for
-                    for (int k=0; k < surf; k++) {
-                        meanSlice->Timg_buffer[k]/=my_num.Timg_buffer[k];
-                    }
+					for (int k=0; k < surf; k++) {
+						meanSlice->Timg_buffer[k]/=my_num.Timg_buffer[k];
+					}
 
-                    meanSlice->TscanBrightness();
-                    meanSlice->property["display_range"]=getColorPrecentPixels(*meanSlice,percent->value());
-                    nparent->addShowPhys(meanSlice);
+					meanSlice->TscanBrightness();
+					meanSlice->property["display_range"]=getColorPrecentPixels(*meanSlice,percent->value());
+					nparent->addShowPhys(meanSlice);
 
-                    plot->graph(0)->setName("Mean spectrum");
-                    plot->graph(0)->setData(xvals,ymean,true);
+					plot->graph(0)->setName("Mean spectrum");
+					plot->graph(0)->setData(xvals,ymean,true);
 
-                    plot->rescaleAxes();
-                    plot->replot();
+					plot->rescaleAxes();
+					plot->replot();
 
-                    slices->setMaximum(axissize[2]);
-                    slicesSlider->setMaximum(axissize[2]);
+					slices->setMaximum(axissize[2]);
+					slicesSlider->setMaximum(axissize[2]);
 
-                    showImagePlane(slices->value());
-                    break;
-                }
-            }
+					showImagePlane(slices->value());
+					break;
+				}
+			}
 
-            fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
+			fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
 
-            if (status == END_OF_FILE) {
-                status=0;
-                break;
-            }
+			if (status == END_OF_FILE) {
+				status=0;
+				break;
+			}
 
-            if (fits_check_error(status)) {
-                return;
-            }
-        }
+			if (fits_check_error(status)) {
+				return;
+			}
+		}
 
-        fits_check_error(status);
+		fits_check_error(status);
 
-        DEBUG("out of here");
-    }
+		DEBUG("out of here");
+	}
 }
 
 //void MUSE::on_actionFFT_triggered() {
