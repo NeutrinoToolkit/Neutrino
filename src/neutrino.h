@@ -285,9 +285,10 @@ public slots:
 
     // to python
 
-    nLine* line(QString);
+	nLine* line(QString);
+	nRect* rect(QString);
 
-    void dragEnterEvent(QDragEnterEvent *);
+	void dragEnterEvent(QDragEnterEvent *);
     void dragMoveEvent(QDragMoveEvent *);
     void dropEvent(QDropEvent *);
 

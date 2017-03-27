@@ -102,7 +102,11 @@ public:
         PythonQt::self()->addDecorators(new nPanPyWrapper());
         PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
 
-        PythonQt::self()->registerClass(& nCustomPlot::staticMetaObject, "nPlot");
+		PythonQt::self()->registerClass(& nCustomPlot::staticMetaObject, "nPlot");
+		PythonQt::self()->registerClass(&nLine::staticMetaObject, "nLine");
+		PythonQt::self()->registerClass(&nRect::staticMetaObject, "nRect");
+		PythonQt::self()->registerClass(&nEllipse::staticMetaObject, "nEllipse");
+		PythonQt::self()->registerClass(&nPoint::staticMetaObject, "nPoint");
 
         PythonQt::self()->addDecorators(new nPyWrapper());
         PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);

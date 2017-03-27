@@ -141,4 +141,6 @@ signals:
 	void sceneChanged();
 };
 
+Q_DECLARE_METATYPE(nEllipse*);
+
 #endif

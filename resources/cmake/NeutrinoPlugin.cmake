@@ -58,7 +58,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     # visar needs to borrow some stuff from neutrino tree
     include_directories(${NEUTRINO_ROOT}/src/graphics)
-    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui)
+	QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
 
     file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)

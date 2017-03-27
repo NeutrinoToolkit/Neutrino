@@ -29,6 +29,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include "nPhysImageF.h"
+#include "ui_nObject.h"
 
 #ifndef __nRect
 #define __nRect
@@ -82,7 +83,7 @@ public:
 	double zoom;
 	// roba da padelle
 	QMainWindow my_pad;
-    Ui::nObject *my_w;
+	Ui::nObject my_w;
 	
 	QPainterPath path() const;
 	QPainterPath shape() const;
@@ -145,5 +146,7 @@ signals:
 	void sceneChanged();
 	void key_pressed(int);
 };
+
+Q_DECLARE_METATYPE(nRect*);
 
 #endif

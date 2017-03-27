@@ -1877,13 +1877,23 @@ void neutrino::about() {
 }
 
 nLine* neutrino::line(QString name) {
-    foreach (QObject* widget, children()) {
-        nLine *linea=qobject_cast<nLine *>(widget);
-        if (linea && linea->my_w.name->text() == name) {
-            return linea;
-        }
-    }
-    return NULL;
+	foreach (QObject* widget, children()) {
+		nLine *obj=qobject_cast<nLine *>(widget);
+		if (obj && obj->my_w.name->text() == name) {
+			return obj;
+		}
+	}
+	return NULL;
+}
+
+nRect* neutrino::rect(QString name) {
+	foreach (QObject* widget, children()) {
+		nRect *obj=qobject_cast<nRect *>(widget);
+		if (obj && obj->my_w.name->text() == name) {
+			return obj;
+		}
+	}
+	return NULL;
 }
 
 
