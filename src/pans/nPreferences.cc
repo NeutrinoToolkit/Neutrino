@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -58,30 +58,30 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 #endif
 
 
-    int nthreads, procs, maxt, inpar, dynamic, nested;
+	int nthreads, procs, maxt, inpar, dynamic, nested;
 #pragma omp parallel private(nthreads)
-    {
-        if (omp_get_thread_num() == 0) 
-        {
-            /* Get environment information */
-            procs = omp_get_num_procs();
-            nthreads = omp_get_num_threads();
-            maxt = omp_get_max_threads();
-            inpar = omp_in_parallel();
-            dynamic = omp_get_dynamic();
-            nested = omp_get_nested();
-            
-            /* Print environment information */
-            my_w.infoCores->insertPlainText("Number of processors : "+QString::number(procs));
-            my_w.infoCores->insertPlainText("\nNumber of threads : "+QString::number(nthreads));
-            my_w.infoCores->insertPlainText("\nMax threads : "+QString::number(maxt));
-            my_w.infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
-            my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
-            my_w.infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
-        }
-    }
-    
-    
+	{
+		if (omp_get_thread_num() == 0)
+		{
+			/* Get environment information */
+			procs = omp_get_num_procs();
+			nthreads = omp_get_num_threads();
+			maxt = omp_get_max_threads();
+			inpar = omp_in_parallel();
+			dynamic = omp_get_dynamic();
+			nested = omp_get_nested();
+
+			/* Print environment information */
+			my_w.infoCores->insertPlainText("Number of processors : "+QString::number(procs));
+			my_w.infoCores->insertPlainText("\nNumber of threads : "+QString::number(nthreads));
+			my_w.infoCores->insertPlainText("\nMax threads : "+QString::number(maxt));
+			my_w.infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
+			my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
+			my_w.infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
+		}
+	}
+
+
 	my_w.threads->setMaximum(coreNum);
 #endif
 
@@ -90,114 +90,118 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 		my_w.labelThreads->hide();
 	}
 
-    my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
+	my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
-    my_w.openclUnit->setMaximum(openclEnabled());
+	my_w.openclUnit->setMaximum(openclEnabled());
 
 
-    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
-    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
+	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 
-    show();
+	show();
 
-    my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
+	my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
-    changeFont();
+	changeFont();
 
-    connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-    connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
-    connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
-    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
-    connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+	connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
+	connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
+	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+	connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
-    connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+	connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
-    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
 
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
-    
-    connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
-    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
+	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
-    if(!allLocales.contains(QLocale::system())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("System: ")+nApp::localeToString(QLocale::system()),QLocale::system());
-    }
+	QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
 
-    if(!allLocales.contains(QLocale())) { // custom locale defined
-        my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
-    }
+	if(!allLocales.contains(QLocale::system())) { // custom locale defined
+		my_w.localeCombo->addItem(tr("System: ")+nApp::localeToString(QLocale::system()),QLocale::system());
+	}
 
-    qSort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
+	if(!allLocales.contains(QLocale())) { // custom locale defined
+		my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
+	}
 
-    for(auto &locale : allLocales) {
-        QString my_str=nApp::localeToString(locale);
-//        qDebug() << my_str << locale.name();
-        my_w.localeCombo->addItem(my_str,locale);
-    }
+	qSort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
 
-    my_w.decimal->setText(QLocale().decimalPoint());
-    my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
-    connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
+	for(auto &locale : allLocales) {
+		QString my_str=nApp::localeToString(locale);
+		//        qDebug() << my_str << locale.name();
+		my_w.localeCombo->addItem(my_str,locale);
+	}
 
-    for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
-        my_w.pluginList->addItem(d);
-    }
+	my_w.decimal->setText(QLocale().decimalPoint());
+	my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
+	connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
+
+	for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
+		my_w.pluginList->addItem(d);
+	}
+}
+
+void nPreferences::changeThreads(int num) {
+	nApp::changeThreads(num);
 }
 
 void nPreferences::changeLocale(int num) {
-    QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
-    nApp::changeLocale(locale);
-    my_w.decimal->setText(QLocale().decimalPoint());
-    my_w.statusBar->showMessage(nApp::localeToString(QLocale()), 5000);
+	QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
+	nApp::changeLocale(locale);
+	my_w.decimal->setText(QLocale().decimalPoint());
+	my_w.statusBar->showMessage(nApp::localeToString(QLocale()), 5000);
 }
 
 void nPreferences::openclUnitValueChange(int num) {
-    my_w.openclDescription->clear();
+	my_w.openclDescription->clear();
 #ifdef HAVE_LIBCLFFT
-    if (num>0) {
-        my_w.openclDescription->setPlainText(QString::fromStdString(get_platform_device_info_opencl(num)));
-        setProperty("openclUnit",num);
-    }
+	if (num>0) {
+		my_w.openclDescription->setPlainText(QString::fromStdString(get_platform_device_info_opencl(num)));
+		setProperty("openclUnit",num);
+	}
 #endif
 }
 
 void nPreferences::resetSettings() {
-    int res=QMessageBox::warning(this,tr("Attention"), tr("Are you sure you want to remove Settings?"),
-                                 QMessageBox::Yes | QMessageBox::No);
-    if (res==QMessageBox::Yes) {
-        QSettings my_settings("neutrino","");
-        my_settings.clear();
-    }
+	int res=QMessageBox::warning(this,tr("Attention"), tr("Are you sure you want to remove Settings?"),
+								 QMessageBox::Yes | QMessageBox::No);
+	if (res==QMessageBox::Yes) {
+		QSettings my_settings("neutrino","");
+		my_settings.clear();
+	}
 }
 
 void nPreferences::askCloseUnsaved() {
-    nparent->setProperty("askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
+	nparent->setProperty("askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
 }
 
 void nPreferences::changeShowDimPixel() {
-    nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
-    nparent->my_w->my_view->update();
+	nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
+	nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeFont() {
-    QFont font=nparent->my_w->my_view->font();
-    if (sender()) {
-        font=my_w.fontFace->currentFont();
-        font.setPointSize(my_w.fontSize->value());
-    } else {
-        my_w.fontFace->setCurrentFont(font);
-        my_w.fontSize->setValue(font.pointSize());
-    }
-    nparent->my_w->my_view->setFont(font);
-    QSettings settings("neutrino","");
-    settings.beginGroup("nPreferences");
-    settings.setValue("defaultFont",font.toString());
-    settings.endGroup();
-    nparent->my_w->my_view->setSize();
+	QFont font=nparent->my_w->my_view->font();
+	if (sender()) {
+		font=my_w.fontFace->currentFont();
+		font.setPointSize(my_w.fontSize->value());
+	} else {
+		my_w.fontFace->setCurrentFont(font);
+		my_w.fontSize->setValue(font.pointSize());
+	}
+	nparent->my_w->my_view->setFont(font);
+	QSettings settings("neutrino","");
+	settings.beginGroup("nPreferences");
+	settings.setValue("defaultFont",font.toString());
+	settings.endGroup();
+	nparent->my_w->my_view->setSize();
 }
 
 void nPreferences::changeIconSize(int val) {
@@ -223,33 +227,33 @@ void nPreferences::changeIconSize(int val) {
 
 void nPreferences::hideEvent(QHideEvent*e){
 	disconnect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-    nGenericPan::hideEvent(e);
+	nGenericPan::hideEvent(e);
 }
 
 void nPreferences::showEvent(QShowEvent*e){
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-    nGenericPan::showEvent(e);
+	nGenericPan::showEvent(e);
 }
 
 void nPreferences::changephysNameLength(int k) {
-    nparent->setProperty("physNameLength",k);
+	nparent->setProperty("physNameLength",k);
 }
 
 
 void nPreferences::on_addPlugin_released() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
-    if (QFileInfo(dir).exists()) {
-        nparent->scanPlugins(dir);
-        my_w.pluginList->addItem(dir);
-    }
+	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
+	if (QFileInfo(dir).exists()) {
+		nparent->scanPlugins(dir);
+		my_w.pluginList->addItem(dir);
+	}
 }
 
 void nPreferences::on_removePlugin_released() {
-    qDeleteAll(my_w.pluginList->selectedItems());
-    QStringList pluginList;
-    for(int i = 0; i < my_w.pluginList->count(); ++i) {
-        pluginList.append(my_w.pluginList->item(i)->text());
-    }
-    nparent->setProperty("NeuSave-plugindirs",pluginList);
+	qDeleteAll(my_w.pluginList->selectedItems());
+	QStringList pluginList;
+	for(int i = 0; i < my_w.pluginList->count(); ++i) {
+		pluginList.append(my_w.pluginList->item(i)->text());
+	}
+	nparent->setProperty("NeuSave-plugindirs",pluginList);
 }
 

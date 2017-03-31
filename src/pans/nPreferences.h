@@ -54,7 +54,8 @@ public slots:
     void changephysNameLength(int);
     void openclUnitValueChange(int);
     void resetSettings();
-    void changeLocale(int);
+	void changeLocale(int);
+	void changeThreads(int);
 
     void on_addPlugin_released();
     void on_removePlugin_released();

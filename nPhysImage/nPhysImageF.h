@@ -566,13 +566,9 @@ public:
 				//int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
                     unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
-                    uchar_buf[i*3+0] = palette[3*val+0];
-                    uchar_buf[i*3+1] = palette[3*val+1];
-                    uchar_buf[i*3+2] = palette[3*val+2];
+					std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
 				} else {
-                    uchar_buf[i*3+0] = 255;
-                    uchar_buf[i*3+1] = 255;
-                    uchar_buf[i*3+2] = 255;
+					std::fill(uchar_buf.begin()+3*i,uchar_buf.begin()+3*i+3,255);
 				}
 			}
             display_property["palette_name"]=palette_name;

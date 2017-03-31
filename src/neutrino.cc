@@ -783,7 +783,7 @@ void neutrino::saveSession (QString fname) {
                         ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
                         ofile.flush();
                     } else {
-                        QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
+						QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
                     }
                 } else {
                     QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName(), QMessageBox::Ok);
