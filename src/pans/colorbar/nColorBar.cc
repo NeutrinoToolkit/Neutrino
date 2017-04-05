@@ -34,8 +34,8 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-    connect(nparent, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));
-    connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
+	connect(nparent->my_w->my_view, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));
+	connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
@@ -81,8 +81,8 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
     palettes->setFont(f);
     palettes->addItems(nparent->my_w->my_view->nPalettes.keys());
     palettes->setCurrentIndex(nparent->my_w->my_view->nPalettes.keys().indexOf(parent->my_w->my_view->colorTable));
-    connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
-    //    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
+	connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+	//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
     my_w.toolBar->insertWidget(my_w.actionInvert,palettes);
 
@@ -186,8 +186,8 @@ vec2f nColorBar::sliderValues() {
 
 
 void nColorBar::updatecolorbar() {
-    disconnect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
-    disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+	disconnect(palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
     palettes->clear();
     palettes->addItems(nparent->my_w->my_view->nPalettes.keys());
@@ -202,8 +202,8 @@ void nColorBar::updatecolorbar() {
     }
     
     my_w.histogram->repaint();
-    connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent, SLOT(changeColorTable(QString)));
-    connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+	connect(palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
 
