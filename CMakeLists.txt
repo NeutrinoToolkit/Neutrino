@@ -135,7 +135,7 @@ if (LINUX)
     execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
     string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
-    if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu")
+    if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
         message (STATUS "[${DISTRO}] Using CPackDeb for packaging")
 
