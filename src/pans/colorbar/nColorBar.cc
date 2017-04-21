@@ -72,8 +72,8 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
     connect(my_w.addPaletteFile, SIGNAL(released()), this, SLOT(addPaletteFile()));
     connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
 
-    connect(my_w.percentMin, SIGNAL(valueChanged(int)), this, SLOT(percentChange()));
-    connect(my_w.percentMax, SIGNAL(valueChanged(int)), this, SLOT(percentChange()));
+	connect(my_w.percent, SIGNAL(valueChanged(int)), this, SLOT(percentChange()));
+	my_w.toolBar->addWidget(my_w.percent);
 
     palettes = new QComboBox(this);
     QFont f=palettes->font();
@@ -96,11 +96,12 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
     cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
+
 }
 
 void nColorBar::percentChange() {
     if (currentBuffer) {
-        currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,vec2f(my_w.percentMin->value(),my_w.percentMax->value()));
+		currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,my_w.percent->value());
         nparent->createQimage();
         bufferChanged(currentBuffer);
     }

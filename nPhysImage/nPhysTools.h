@@ -184,7 +184,7 @@ void phys_get_bbox(nPhysImageF<T>& img1, nPhysImageF<T>& img2, vec2f& ul_corner,
 template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, vec2f val) {
 
     std::vector<T> tmp(my_phys.Timg_buffer,my_phys.Timg_buffer+my_phys.getSurf());
-    typename std::vector<T>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](T i){return !isnan(i);});
+    typename std::vector<T>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](T i){return !std::isnan(i);});
 
     std::sort(tmp.begin(),ptr);
 
