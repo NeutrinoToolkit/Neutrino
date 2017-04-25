@@ -767,7 +767,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=(j+offset.y())*dx+i+offset.x();
-                    nAngle->set(i,j,angles[lambdaangle[k]%params.n_angles]);
+					nAngle->set(i,j,angles[lambdaangle[k]/params.n_lambdas]);
                 }
             }
             params.olist["angle"] = nAngle;
@@ -778,7 +778,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=(j+offset.y())*dx+i+offset.x();
-                    nLambda->set(i,j,lambdas[lambdaangle[k]/params.n_angles]);
+					nLambda->set(i,j,lambdas[lambdaangle[k]%params.n_lambdas]);
                 }
             }
             params.olist["lambda"] = nLambda;

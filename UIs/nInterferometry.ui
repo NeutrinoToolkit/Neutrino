@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
+    <width>358</width>
     <height>546</height>
    </rect>
   </property>
@@ -259,7 +259,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
          </property>
         </widget>
@@ -367,7 +367,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -383,7 +383,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -462,7 +462,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
          </property>
          <property name="checkable">
@@ -530,7 +530,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -578,7 +578,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
          <property name="checkable">
@@ -644,7 +644,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -713,7 +713,7 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
          </property>
         </widget>
@@ -732,7 +732,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -836,7 +836,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../resources/icons/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -957,7 +957,6 @@
    <addaction name="separator"/>
    <addaction name="actionDoWavelet"/>
    <addaction name="chained"/>
-   <addaction name="actionIterate"/>
   </widget>
   <action name="actionRect">
    <property name="icon">
@@ -1000,7 +999,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -1013,7 +1012,7 @@
   </action>
   <action name="actionDoWavelet">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
    </property>
    <property name="text">
@@ -1025,7 +1024,7 @@
   </action>
   <action name="actionDuplicate">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -1037,7 +1036,7 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../resources/icons/icons.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -1045,18 +1044,6 @@
    </property>
    <property name="toolTip">
     <string>delete local images</string>
-   </property>
-  </action>
-  <action name="actionIterate">
-   <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
-     <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
-   </property>
-   <property name="text">
-    <string>Iterate</string>
-   </property>
-   <property name="neutrinoSave" stdset="0">
-    <bool>true</bool>
    </property>
   </action>
  </widget>
