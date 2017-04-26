@@ -292,8 +292,7 @@ void nInterferometry::doWavelet (int iimage) {
             my_params.opencl_unit=settings.value("openclUnit").toInt();
             runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet"+QString(suffix.c_str()), niter);
         } else {
-//            phys_wavelet_field_2D_morlet(my_params);
-            runThread(&my_params, phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
+			runThread(&my_params, phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
         }
 
         std::map<std::string,nPhysD *> retList = my_params.olist;

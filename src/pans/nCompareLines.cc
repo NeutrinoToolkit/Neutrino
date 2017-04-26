@@ -115,6 +115,8 @@ void nCompareLines::updatePlot() {
         my_w.plot->clearGraphs();
 
         QPolygonF my_poly=line->poly(line->numPoints);
+		qDebug() << my_poly;
+
         for (int i=0; i<nparent->getBufferList().size(); i++) {
             nPhysD *phys=nparent->getBufferList().at(i);
 
@@ -127,7 +129,7 @@ void nCompareLines::updatePlot() {
                 vec2f scale=phys->get_scale();
                 for(int ii=0;ii<my_poly.size()-1;ii++) {
                     QPointF p=my_poly.at(ii);
-                    my_val=phys->getPoint(p.x()-phys->get_origin().x(),p.y()-phys->get_origin().y());
+					my_val=phys->getPoint(p.x()+phys->get_origin().x(),p.y()+phys->get_origin().y());
                     if (std::isfinite(my_val)) {
                         toPlotx << dist;
                         toPloty << my_val;
