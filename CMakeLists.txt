@@ -75,15 +75,8 @@ include(GetVersionFromGitTag)
 
 if (GIT_FOUND)
     set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-    IF(${PROJECT_NAME}_VERSION_BRANCH STREQUAL master)
-        message(STATUS "Neutrino branch: ${${PROJECT_NAME}_VERSION_BRANCH}")
-        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}")
-    ELSE()
-        message(STATUS "${${PROJECT_NAME}_VERSION_BRANCH} : ${${PROJECT_NAME}_VERSION_STRING} : ${${PROJECT_NAME}_VERSION_AHEAD}")
-        set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_BRANCH}")
-        message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
-    ENDIF()
-
+    set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}")
+    message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
 endif()
 
 # targets
