@@ -28,7 +28,7 @@ public:
 	Ui::nPython my_w;
 
 public slots:
-	void loadScript(void);
+	void loadScript(bool execInline = false);
 	void runScript(void);
     void runScript(QString);
     void changeScriptsFolder();

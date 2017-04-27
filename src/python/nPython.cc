@@ -54,17 +54,25 @@ nPython::nPython(neutrino *nparent, QString winname) : nGenericPan(nparent, winn
     console->setFocus();
 }
 
-void nPython::loadScript(void) {
+void nPython::loadScript(bool execInline) {
 	QString fname;
-    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
+	fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
 	if (!fname.isEmpty()) {
-        setProperty("fileTxt",fname);
-        QFile t(fname);
-        t.open(QIODevice::ReadOnly| QIODevice::Text);
-        QTextStream out(&t);
-        QString toRun=out.readAll();
-        t.close();
-        runScript(toRun);
+		setProperty("fileTxt",fname);
+		if (execInline) {
+			QFile t(fname);
+			t.open(QIODevice::ReadOnly| QIODevice::Text);
+			QTextStream out(&t);
+			QString toRun=out.readAll();
+			t.close();
+			runScript(toRun);
+		} else {
+			QString toRun;
+			toRun.append("g = globals().copy()\n");
+			toRun.append(QString("g['__file__'] = '%1'\n").arg(fname));
+			toRun.append(QString("execfile('%1', g)\n").arg(fname));
+			runScript(toRun);
+		}
 	}
 }
 
