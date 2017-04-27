@@ -256,7 +256,7 @@ public slots:
     nGenericPan* SpectralAnalysis();
 
     // INTEGRAL INVERSION STUFF
-    nGenericPan* Inversions();
+	nGenericPan* IntegralInversion();
 
     // Region path
     nGenericPan* RegionPath();

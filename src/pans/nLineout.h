@@ -58,4 +58,16 @@ private:
 
 };
 
+class nHlineout : public nLineout {
+	Q_OBJECT
+public:
+	Q_INVOKABLE nHlineout(neutrino *n) : nLineout(n, PHYS_X) {};
+};
+
+class nVlineout : public nLineout {
+	Q_OBJECT
+public:
+	Q_INVOKABLE nVlineout(neutrino *n) : nLineout(n, PHYS_Y) {};
+};
+
 #endif

@@ -38,7 +38,6 @@ if (GIT_FOUND)
     # Get partial versions into a list
     string(REGEX MATCHALL "-.*$|[0-9]+" ${PROJECT_NAME}_PARTIAL_VERSION_LIST
         ${${PROJECT_NAME}_VERSION_STRING})
-message(STATUS "<><><><><><><><><><><><><><><>< ${${PROJECT_NAME}_VERSION_STRING} ${${PROJECT_NAME}_PARTIAL_VERSION_LIST}")
     # The tweak part is optional, so check if the list contains it
     list(LENGTH ${PROJECT_NAME}_PARTIAL_VERSION_LIST
         ${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN)
@@ -47,7 +46,6 @@ message(STATUS "<><><><><><><><><><><><><><><>< ${${PROJECT_NAME}_VERSION_STRING
     set(${PROJECT_NAME}_VERSION_MINOR "1")
     set(${PROJECT_NAME}_VERSION_PATCH ${${PROJECT_NAME}_VERSION_AHEAD})
 
-message(STATUS "<><><><><><><><><><><><><><><>< ${${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN}")
     # Set the version numbers
     if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 0)
         list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
@@ -59,7 +57,6 @@ message(STATUS "<><><><><><><><><><><><><><><>< ${${PROJECT_NAME}_PARTIAL_VERSIO
                 list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST
                     2 ${PROJECT_NAME}_VERSION_PATCH)
                 if (${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN GREATER 3)
-message(STATUS "pippo pippo pippo pippos")
 
                     list(GET ${PROJECT_NAME}_PARTIAL_VERSION_LIST 3 ${PROJECT_NAME}_VERSION_TWEAK)
                     string(SUBSTRING ${${PROJECT_NAME}_VERSION_TWEAK} 1 -1 ${PROJECT_NAME}_VERSION_TWEAK)
@@ -83,7 +80,6 @@ endif(GIT_FOUND)
 
 # Set project version (without the preceding 'v')
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
-message(STATUS "<><><><><><><><><><><><><><><>< version ${${PROJECT_NAME}_VERSION}")
 if (${PROJECT_NAME}_VERSION_TWEAK)
     set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION}-${${PROJECT_NAME}_VERSION_TWEAK})
 endif()

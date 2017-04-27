@@ -1663,12 +1663,12 @@ neutrino::createDrawEllipse() {
 
 nGenericPan*
 neutrino::Hlineout() {
-	return new nLineout(this, PHYS_X);
+	return new nHlineout(this);
 }
 
 nGenericPan*
 neutrino::Vlineout() {
-	return new nLineout(this, PHYS_Y);
+	return new nVlineout(this);
 }
 
 nGenericPan*
@@ -1742,7 +1742,7 @@ neutrino::Interferometry() {
 
 /// Integral inversion (Abel etc...)
 nGenericPan*
-neutrino::Inversions() {
+neutrino::IntegralInversion() {
 	return new nIntegralInversion(this);
 }
 
