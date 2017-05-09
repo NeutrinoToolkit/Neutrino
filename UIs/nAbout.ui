@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>326</width>
+    <width>334</width>
     <height>305</height>
    </rect>
   </property>
@@ -68,7 +68,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../qrc/icons.qrc">:/icons/icon.png</pixmap>
+         <pixmap resource="../resources/icons/icons.qrc">:/icons/icon.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -93,9 +93,14 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:20pt; font-weight:600; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Neutrino&lt;/span&gt; &lt;span style=&quot; font-size:10pt; font-weight:400; font-style:italic;&quot;&gt;The only neutrino faster than light&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;alessandro.flacco@polytechnique.edu&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;Alessandro Flacco&lt;/span&gt;&lt;/a&gt; &lt;a href=&quot;mailto:tommaso.vinci@polytechnique.edu&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;Tommaso Vinci&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;
+&lt;a href=&quot;mailto:alessandro.flacco@polytechnique.edu,tommaso.vinci@polytechnique.edu?subject=Neutrino&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;Alessandro Flacco&lt;/span&gt;&lt;/a&gt; 
+&lt;a href=&quot;mailto:tommaso.vinci@polytechnique.edu,alessandro.flacco@polytechnique.edu?subject=Neutrino&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;Tommaso Vinci&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://web.luli.polytechnique.fr/Neutrino&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;http://web.luli.polytechnique.fr/Neutrino&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:400; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -134,8 +139,8 @@ p, li { white-space: pre-wrap; }
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.Helvetica Neue DeskInterface'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.Helvetica Neue DeskInterface';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

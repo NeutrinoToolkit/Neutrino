@@ -131,68 +131,6 @@ physDouble_asc::physDouble_asc(const char *ifilename)
     TscanBrightness();
 }
 
-
-#ifdef HAVE_LIBNETPBM
-physInt_pgm::physInt_pgm(const char *ifilename)
-    : nPhysImageF<int>(std::string(ifilename), PHYS_FILE)
-{
-    int grays;
-    int **readbuf;
-    int w, h;
-
-    FILE *ifd;
-    ifd = fopen(ifilename,"rb");
-    readbuf = (int **)pgm_readpgm(ifd, &w, &h, (gray *)&grays);
-
-    this->resize(w, h);
-
-    //if (grays<256) bpp = 1;
-    //else bpp = 2;
-
-    DEBUG(5,"width: "<<getW());
-    DEBUG(5,"height: "<<getH());
-    DEBUG(5,"grays: "<<grays);
-
-    for (size_t i=0; i<getH(); i++) {
-        for (size_t j=0; j<getW(); j++) {
-            set(i,j,(int)((readbuf[i])[j]));
-        }
-    }
-
-    TscanBrightness();
-}
-#endif
-
-
-#ifdef HAVE_LIBNETPBM
-physGray_pgm::physGray_pgm(const char *ifilename)
-    : nPhysImageF<gray>(std::string(ifilename), PHYS_FILE)
-{
-    gray grays;
-    gray **readbuf;
-    int w, h;
-
-    FILE *ifd;
-    ifd = fopen(ifilename,"rb");
-    readbuf = pgm_readpgm(ifd, &w, &h, &grays);
-
-    this->resize(w, h);
-
-    //	if (grays<256) bpp = 1;
-    //	else bpp = 2;
-
-    DEBUG(5,"width: "<<getW());
-    DEBUG(5,"height: "<<getH());
-    DEBUG(5,"grays: "<<grays);
-
-    for (size_t i=0; i<getH(); i++) {
-        memcpy(Timg_matrix[i], readbuf[i], w*sizeof(gray));
-    }
-
-    TscanBrightness();
-}
-#endif
-
 physInt_sif::physInt_sif(std::string ifilename)
     : nPhysImageF<int>(ifilename, PHYS_FILE)
 {
@@ -1901,21 +1839,7 @@ std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {
     DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
     nPhysD *datamatrix=NULL;
-    if (ext=="pgm") {
-#ifdef HAVE_LIBNETPBM
-        datamatrix = new nPhysD;
-        *datamatrix = physGray_pgm(fname.c_str());
-#else
-        WARNING("nPhysImage was compiled without netpbm library");
-#endif
-    } else if (ext=="txt") {
-        // FIXME: questo e' un baco bastardo: ATTENZIONE! no deep copy when passing reference from
-        // matrices of the same type!
-        //datamatrix = new nPhysD;
-        //*datamatrix = physDouble_txt(fname.toStdString());
-        //
-        //anzi, forse una soluzione semplice esiste: castare Double ad altro nome nei
-        //costruttori specializzati. a revoir.
+	if (ext=="txt") {
         datamatrix = new physDouble_txt(fname.c_str());
     } else if (ext.substr(0,3)=="tif") {
         std::vector <nPhysD *> imagelist=phys_open_tiff(fname, separate_rgb);

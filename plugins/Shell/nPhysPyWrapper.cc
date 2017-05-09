@@ -10,7 +10,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
     QList<nPhysD*> my_list;
     if (fname.isEmpty()) {
         QString formats("");
-        formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.pgm *.ppm *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+		formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
         formats+="Images (";
         foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
             formats+="*."+format+" ";

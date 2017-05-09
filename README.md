@@ -17,7 +17,7 @@ Features
 Neutrino includes:
 
 * multiple windows, multiple buffer support.
-* common lossless input formats (including txt, netpbm, tiff, sif, fits, hdf, raw) plus common formats (as supported by QImage. New formats can be added runtime via C++ plugins or python scripting
+* common lossless input formats (including txt, tiff, sif, fits, hdf, raw) plus common formats (as supported by QImage. New formats can be added runtime via C++ plugins or python scripting
 * txt output format and proprietary binary format for image or session save
 * vectorial export formats (pdf, svg)
 
