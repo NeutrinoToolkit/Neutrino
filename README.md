@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/iltommi/neutrino.svg?branch=master)](https://travis-ci.org/iltommi/neutrino)
+[![Build Status](https://travis-ci.org/NeutrinoToolkit/Neutrino.svg?branch=latest)](https://travis-ci.org/NeutrinoToolkit/Neutrino)
 
-neutrino
+Neutrino
 ========
 
 A light, expandable and full featured image analysis tool for research
