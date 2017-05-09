@@ -483,7 +483,7 @@ void nView::mouseMoveEvent (QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
     if (QGraphicsItem *item = itemAt(e->pos())) {
-        if (item->flags() && QGraphicsItem::ItemIsFocusable) {
+		if (item->flags() & QGraphicsItem::ItemIsFocusable) {
             emit logging (item->toolTip());
         }
     }
