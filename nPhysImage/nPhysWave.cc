@@ -991,7 +991,6 @@ void phys_invert_abel(abel_params &params)
 
     std::vector<phys_point> iaxis = params.iaxis; // TODO: passa a bidimvec
     phys_direction idir = params.idir;
-    inversion_algo ialgo = params.ialgo;
     //	inversion_physics iphysics = params.iphysics;
 
 
@@ -1022,13 +1021,8 @@ void phys_invert_abel(abel_params &params)
 
     DEBUG(5,"after direction allocation");
 
-    // 2. switch on algo
-    size_t axe_point[2];
     // 	size_t longitudinal_size = params.iimage->getSizeByIndex(sym_idx);
     size_t integral_size = params.iimage->getSizeByIndex(inv_idx);
-    double *copy_buffer, *out_buffer;
-    copy_buffer = new double[integral_size];
-    out_buffer = new double[integral_size];
 
     //     params.rimage.resize(params.iimage->getW(), params.iimage->getH());
     // 	vector<double> rbuffer_pos(integral_size);
@@ -1051,133 +1045,136 @@ void phys_invert_abel(abel_params &params)
     }*/
 
     *params.iter_ptr = 0;
+	// 2. switch on algo
 
-    if (ialgo == ABEL) {
+	if (params.ialgo == ABEL) {
         DEBUG(1, "Plain ABEL inversion");
-        for (size_t ii = 0; ii<iaxis.size(); ii++) {
-            if ((*params.iter_ptr)==-1) {
-                DEBUG("aborting");
-                break;
-            }
-            (*params.iter_ptr)++;
+#pragma omp parallel for shared (params)
+		for (size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)!=-1) {
 
-            axe_point[0] = iaxis[ii].x;
-            axe_point[1] = iaxis[ii].y;
-            //cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-            int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
+				(*params.iter_ptr)++;
 
-            // 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_NEG);
-            
-            for (size_t j=copied; j<integral_size; j++)
-                copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+				size_t axe_point[2];
 
-            phys_invert_abel_1D(copy_buffer, out_buffer, integral_size);
+				std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
+				axe_point[0] = iaxis[ii].x;
+				axe_point[1] = iaxis[ii].y;
+				//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
+				int copied=0;
+				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
 
-            params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
+				// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_NEG);
+
+				for (size_t j=copied; j<integral_size; j++)
+					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+
+				phys_invert_abel_1D(&copy_buffer[0], &out_buffer[0], integral_size);
+
+				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
 
 
-            copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
+				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
 
-            // 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_POS);
+				// 			params.rimage.set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &rbuffer_pos[0], integral_size, PHYS_POS);
 
-            for (size_t j=copied; j<integral_size; j++)
-                copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+				for (size_t j=copied; j<integral_size; j++)
+					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-            phys_invert_abel_1D(copy_buffer, out_buffer, integral_size);
-            params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
+				phys_invert_abel_1D(&copy_buffer[0], &out_buffer[0], integral_size);
 
-            //FIXME: pretty sure there is a better way!! ALEX!!!!
-            // .alex. : fixed in some way. To be checked
-            params.oimage->set(iaxis[ii].x, iaxis[ii].y,
-                               0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
 
-        }
+				//FIXME: pretty sure there is a better way!! ALEX!!!!
+				// .alex. : fixed in some way. To be checked
+				params.oimage->set(iaxis[ii].x, iaxis[ii].y,
+								   0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+			}
+		}
 
         params.oimage->setName(std::string("ABEL ")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
 
         //params.oimage->setName(std::string("Inverted (ABEL) ")+std::string(params.iimage->getShortName()));
-    } else if (ialgo == ABEL_HF) {
-        DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
-        // testing purposes only! Many problems in this one:
-        // 1. code copy
-        // 2. lut optimization not working properly
-        // 3. should convert H_0 to FT
-        bessel_alloc_t my_lut;
+	} else if (params.ialgo == ABEL_HF) {
+		size_t axe_point[2];
 
-        //! by fixing integral_size as a single vector size for transformation, results in padding
-        //! hence in a modification of the image resolution
+		DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
+		// testing purposes only! Many problems in this one:
+		// 1. code copy
+		// 2. lut optimization not working properly
+		// 3. should convert H_0 to FT
+		bessel_alloc_t my_lut;
 
-        /*if (sym_idx == PHYS_X) {
-            params.oimage->resize(params.iimage->getW(), 3*integral_size);
-        } else {
-            params.oimage->resize(3*integral_size, params.iimage->getH());
-        }*/
+		//! by fixing integral_size as a single vector size for transformation, results in padding
+		//! hence in a modification of the image resolution
 
-        int axe_inv_mean[2];
-        axe_inv_mean[0] = 0;
-        axe_inv_mean[1] = 0;
-        for (size_t ii=0; ii<iaxis.size(); ii++) {
-            axe_inv_mean[0] += iaxis[ii].x;
-            axe_inv_mean[1] += iaxis[ii].y;
-        }
+		/*if (sym_idx == PHYS_X) {
+			params.oimage->resize(params.iimage->getW(), 3*integral_size);
+		} else {
+			params.oimage->resize(3*integral_size, params.iimage->getH());
+		}*/
 
-        DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
+		int axe_inv_mean[2];
+		axe_inv_mean[0] = 0;
+		axe_inv_mean[1] = 0;
+		for (size_t ii=0; ii<iaxis.size(); ii++) {
+			axe_inv_mean[0] += iaxis[ii].x;
+			axe_inv_mean[1] += iaxis[ii].y;
+		}
 
-        for (size_t ii = 0; ii<iaxis.size(); ii++) {
-            if ((*params.iter_ptr)==-1) {
-                DEBUG("aborting");
-                break;
-            }
-            (*params.iter_ptr)++;
+		DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
 
-            axe_point[0] = iaxis[ii].x;
-            axe_point[1] = iaxis[ii].y;
-            //cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-            int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_NEG);
+		for (size_t ii = 0; ii<iaxis.size(); ii++) {
+			if ((*params.iter_ptr)!=-1) {
 
-            for (size_t j=copied; j<integral_size; j++)
-                copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+				(*params.iter_ptr)++;
+				std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
+				axe_point[0] = iaxis[ii].x;
+				axe_point[1] = iaxis[ii].y;
+				//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
+				int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
 
-
-            phys_invert_abelHF_1D(copy_buffer, out_buffer, integral_size, &my_lut);
-            //phys_invert_abelHF_1D(copy_buffer, out_buffer, copied, &my_lut);
-
-            params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_NEG);
-            //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_NEG);
-
-            double upper_axe_point = out_buffer[0];
+				for (size_t j=copied; j<integral_size; j++)
+					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
 
-            copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], copy_buffer, integral_size, PHYS_POS);
-            for (size_t j=copied; j<integral_size; j++)
-                copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+				phys_invert_abelHF_1D(&copy_buffer[0], &out_buffer[0], integral_size, &my_lut);
+				//phys_invert_abelHF_1D(&copy_buffer[0], out_buffer, copied, &my_lut);
 
-            phys_invert_abelHF_1D(copy_buffer, out_buffer, integral_size, &my_lut);
-            //phys_invert_abelHF_1D(copy_buffer, out_buffer, copied, &my_lut);
+				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
+				//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_NEG);
 
-            params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], out_buffer, integral_size, PHYS_POS);
-            //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, out_buffer, integral_size, PHYS_POS);
+				double upper_axe_point = out_buffer[0];
 
-            //FIXME: pretty sure there is a better way!! ALEX!!!!
-            // .alex. : fixed in some way. To be checked
 
-            // me lo ricordo mica cosa fa questa riga..
-            //params.oimage->set(iaxis[ii].x, iaxis[ii].y,
-            //		0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
+				for (size_t j=copied; j<integral_size; j++)
+					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-            params.oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point);
+				phys_invert_abelHF_1D(&copy_buffer[0], &out_buffer[0], integral_size, &my_lut);
+				//phys_invert_abelHF_1D(copy_buffer, &out_buffer[0], copied, &my_lut);
 
-            DEBUG(10,"step: "<<ii);
+				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
+				//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_POS);
+
+				//FIXME: pretty sure there is a better way!! ALEX!!!!
+				// .alex. : fixed in some way. To be checked
+
+				// me lo ricordo mica cosa fa questa riga..
+				//params.oimage->set(iaxis[ii].x, iaxis[ii].y,
+				//		0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+
+				params.oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point);
+
+				DEBUG(10,"step: "<<ii);
+			}
         }
         params.oimage->setName(std::string("ABEL")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
     } else {
-        DEBUG(1, "Unknown inversion type: "<<(int)ialgo);
+		DEBUG(1, "Unknown inversion type: "<<(int)params.ialgo);
     }
-
-    delete copy_buffer;
-    delete out_buffer;
 
     params.oimage->TscanBrightness();
 

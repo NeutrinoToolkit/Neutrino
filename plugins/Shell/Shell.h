@@ -31,11 +31,11 @@ public:
     Ui::Shell my_w;
 
 public slots:
-    void loadScript(void);
-    void runScript(void);
-    void runScript(QString);
-    void changeScriptsFolder();
-    void changeSiteFolder();
+	void loadScript(bool execInline = false);
+	void runScript(void);
+	void runScript(QString);
+	void changeScriptsFolder();
+	void changeSiteFolder();
 };
 
 class nPyWrapper : public QObject {
@@ -158,7 +158,7 @@ public:
 private:
     neutrino* nparent;
 
-public slots:
+public slots:	
     void
     runPyScript() {
         qDebug() << ">><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<";
