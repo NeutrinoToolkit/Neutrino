@@ -30,7 +30,6 @@
 
 #ifndef __nZoomWin
 #define __nZoomWin
-#include "nPhysWave.h"
 #include "nLine.h"
 #include "nRect.h"
 

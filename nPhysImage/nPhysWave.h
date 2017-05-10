@@ -179,52 +179,45 @@ typedef struct abel_params_str abel_params;
 void phys_invert_abel(abel_params &);
 
 // inline inversion maths
-inline void phys_invert_abel_1D(double *ivec, double *ovec, size_t size)
+inline void phys_invert_abel_1D(std::vector<double> &ivec, std::vector<double> &ovec)
 {
+
+	size_t size=ivec.size();
 	// FIRST element of *ptr MUST BE on symmetry axis
 // 	double integral;
 	int size_dy = size-1;
 
-	if (ivec==NULL || ovec==NULL || size==0)
+	if (size==0)
 		return;
 
 	// 0. init 
 	//memset(ovec, 0, size*sizeof(sizeof(double))); ??????
-	memset(ovec, 0, size*sizeof(double));
-
+	std::fill(ovec.begin(), ovec.end(), 0);
 
 	// 1. dy - mind that this shifts the function to semi-integer indexes
-	double dy[size_dy];
-	double func_x[size_dy];
+	std::vector<double> dy(size_dy), func_x(size_dy);
 	for (int i=0; i<size_dy; i++)
 		dy[i] = (ivec[i+1] - ivec[i]);
 		//dy[i] = 2.*__ifg_pi*(y[i+1] - y[i]); taken care of elsewhere
 
 	// 2. integral
 	int R0_idx = size-1; 			// considering R=0 for the first index
-	double i_dy;
 	for (int R_idx=0; R_idx<R0_idx; R_idx++) {		// looping on function
-		memset(func_x, 0, size_dy*sizeof(double));
+		std::fill(func_x.begin(), func_x.end(), 0);
 		for (int x_idx = (R_idx)+1; x_idx < R0_idx; x_idx++) {
-			//double x = (double)x_idx;
-			double x = (double)x_idx-0.5;
-			double R = (double)R_idx;
-			i_dy = .5*(dy[x_idx]+dy[x_idx-1]);
-
-			func_x[R_idx] = i_dy/sqrt(x*x - R*R);
+			func_x[R_idx] = 0.5*(dy[x_idx]+dy[x_idx-1])/sqrt(pow(x_idx-0.5,2) - pow(R_idx,2));
 			ovec[R_idx] += func_x[R_idx];
 		}
 		// first index is R_idx, last index is (R0_idx-2): trapezioid integral correction
 
 		ovec[R_idx] -= 0.5*(func_x[R_idx]+func_x[R0_idx-1]);
-		ovec[R_idx] /= 3.1415;
-		ovec[R_idx] *= -1.;
+		ovec[R_idx] /= -M_PI;
 
 	}
 
 	// shift of half index on the right
 	double prev_p = ovec[0];
-    for (size_t ii=1; ii<size; ii++) {
+	for (size_t ii=1; ii<size; ii++) {
 		ovec[ii] = .5*(prev_p+ovec[ii]);
 		prev_p = ovec[ii];
 	}

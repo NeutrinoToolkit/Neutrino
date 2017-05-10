@@ -38,8 +38,35 @@ public:
   NaNStream(std::ostream& _out, std::istream& _in):out(_out), in(_in){}
   template<typename T>
   const NaNStream& operator<<(const T& v) const {out << v;return *this;}
+
   template<typename T>
-  const NaNStream& operator>>(T& v) const {std::cerr<<"sara' mica questa che chiami"<<std::endl; in >> v;return *this;}
+  const NaNStream& operator>>(T& v) const {
+	  //	std::cerr<<"ci entri qui?"<<std::endl;
+		if (in >> v) {
+		  //  std::cerr<<"nan got num: "<<v<<std::endl;
+			return *this;
+		}
+
+
+		in.clear();
+		std::string str;
+		if (!(in >> str)) {
+		//  std::cerr<<"nan CAN'T get string!"<<std::endl;
+		  return *this;
+		}
+
+		//std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+
+		if (str == "nan") {
+		  v = std::numeric_limits<double>::quiet_NaN();
+	   //   std::cerr<<"nan got nan: "<<v<<std::endl;
+		}  else {
+	   //   std::cerr<<"nan got error: "<<v<<std::endl;
+		  in.setstate(std::ios::badbit); // Whoops, we've still "stolen" the string
+		}
+
+		return *this;
+  }
 protected:
   std::ostream& out;
   std::istream& in;
