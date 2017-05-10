@@ -210,15 +210,6 @@ public:
 
 };
 
-
-// coolrdinates point
-struct phys_point_str {
-	size_t x;
-	size_t y;
-};
-typedef struct phys_point_str phys_point;
-
-
 template<class T>
 class nPhysImageF {
 public:

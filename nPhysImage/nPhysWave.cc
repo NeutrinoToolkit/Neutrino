@@ -989,7 +989,7 @@ phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double
 void phys_invert_abel(abel_params &params)
 {
 
-    std::vector<phys_point> iaxis = params.iaxis; // TODO: passa a bidimvec
+	std::vector<vec2> iaxis = params.iaxis;
     phys_direction idir = params.idir;
     //	inversion_physics iphysics = params.iphysics;
 
@@ -1058,8 +1058,8 @@ void phys_invert_abel(abel_params &params)
 				size_t axe_point[2];
 
 				std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
-				axe_point[0] = iaxis[ii].x;
-				axe_point[1] = iaxis[ii].y;
+				axe_point[0] = iaxis[ii].x();
+				axe_point[1] = iaxis[ii].y();
 				//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
 				int copied=0;
 				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
@@ -1087,8 +1087,8 @@ void phys_invert_abel(abel_params &params)
 
 				//FIXME: pretty sure there is a better way!! ALEX!!!!
 				// .alex. : fixed in some way. To be checked
-				params.oimage->set(iaxis[ii].x, iaxis[ii].y,
-								   0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
+				params.oimage->set(iaxis[ii].x(), iaxis[ii].y(),
+								   0.5*(params.oimage->point(iaxis[ii].x()-(idir),iaxis[ii].y()+(idir-1))+params.oimage->point(iaxis[ii].x()+idir,iaxis[ii].y()+(1-idir))));
 			}
 		}
 
@@ -1119,8 +1119,8 @@ void phys_invert_abel(abel_params &params)
 		axe_inv_mean[0] = 0;
 		axe_inv_mean[1] = 0;
 		for (size_t ii=0; ii<iaxis.size(); ii++) {
-			axe_inv_mean[0] += iaxis[ii].x;
-			axe_inv_mean[1] += iaxis[ii].y;
+			axe_inv_mean[0] += iaxis[ii].x();
+			axe_inv_mean[1] += iaxis[ii].y();
 		}
 
 		DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/iaxis.size());
@@ -1130,8 +1130,8 @@ void phys_invert_abel(abel_params &params)
 
 				(*params.iter_ptr)++;
 				std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
-				axe_point[0] = iaxis[ii].x;
-				axe_point[1] = iaxis[ii].y;
+				axe_point[0] = iaxis[ii].x();
+				axe_point[1] = iaxis[ii].y();
 				//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
 				int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
 
@@ -1165,7 +1165,7 @@ void phys_invert_abel(abel_params &params)
 				//params.oimage->set(iaxis[ii].x, iaxis[ii].y,
 				//		0.5*(params.oimage->point(iaxis[ii].x-(idir),iaxis[ii].y+(idir-1))+params.oimage->point(iaxis[ii].x+idir,iaxis[ii].y+(1-idir))));
 
-				params.oimage->set(iaxis[ii].x, iaxis[ii].y, 0.5*out_buffer[0]+0.5*upper_axe_point);
+				params.oimage->set(iaxis[ii].x(), iaxis[ii].y(), 0.5*out_buffer[0]+0.5*upper_axe_point);
 
 				DEBUG(10,"step: "<<ii);
 			}

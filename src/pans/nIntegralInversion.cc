@@ -91,7 +91,7 @@ QVariant nIntegralInversion::doInversion() {
 
 		QPolygonF axis_poly;
 		QPolygon axis_clean;
-        std::vector<phys_point> inv_axis;
+		std::vector<vec2> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
 		axis_poly = axis->getLine(npoints);
@@ -112,10 +112,8 @@ QVariant nIntegralInversion::doInversion() {
 		}
 
 		inv_axis.resize(axis_clean.size());
-
 		for (int ii = 0; ii<axis_clean.size(); ii++) {
-			inv_axis[ii].x = axis_clean.at(ii).x();
-			inv_axis[ii].y = axis_clean.at(ii).y();
+			inv_axis[ii] = vec2(axis_clean.at(ii).x(),axis_clean.at(ii).y());
 		}
 
 		// launch inversion
