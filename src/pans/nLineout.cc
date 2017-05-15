@@ -116,7 +116,8 @@ nLineout::updatePlot(QPointF my_point) {
             }
         }
         statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
-        my_w.plot->setMousePosition((b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir));
+		double pos_mouse=(b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
+		my_w.plot->setMousePosition(pos_mouse);
     }
 
 }

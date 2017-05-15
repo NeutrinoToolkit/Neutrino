@@ -641,12 +641,16 @@ nCustomPlot::saveSettings(QSettings *my_set) {
 nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 }
 
+#include "tools.h"
 void nCustomPlotMouseX::setMousePosition(double position) {
     if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
     if (mouseMarker) {
-        mouseMarker->point1->setCoords(position,0);
-        mouseMarker->point2->setCoords(position,1);
-    }
+		DEBUG(mouseMarker->clipToAxisRect() << " " << position);
+		mouseMarker->point1->setTypeY(QCPItemPosition::ptAbsolute);
+		mouseMarker->point2->setTypeY(QCPItemPosition::ptAbsolute);
+		mouseMarker->point1->setCoords(position,0);
+		mouseMarker->point2->setCoords(position,1);
+	}
     replot();
 }
 
@@ -660,9 +664,13 @@ void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
     if (!mouseMarkerY) mouseMarkerY = new QCPItemStraightLine(this);
 
     if (mouseMarkerX && mouseMarkerY) {
-        mouseMarkerX->point1->setCoords(positionX,0);
+		mouseMarkerX->point1->setTypeY(QCPItemPosition::ptAbsolute);
+		mouseMarkerX->point2->setTypeY(QCPItemPosition::ptAbsolute);
+		mouseMarkerX->point1->setCoords(positionX,0);
         mouseMarkerX->point2->setCoords(positionX,1);
-        mouseMarkerY->point1->setCoords(0,positionY);
+		mouseMarkerY->point1->setTypeX(QCPItemPosition::ptAbsolute);
+		mouseMarkerY->point2->setTypeX(QCPItemPosition::ptAbsolute);
+		mouseMarkerY->point1->setCoords(0,positionY);
         mouseMarkerY->point2->setCoords(1,positionY);
     }
     replot();

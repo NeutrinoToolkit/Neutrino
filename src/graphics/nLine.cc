@@ -333,9 +333,11 @@ void nLine::updatePlot () {
 				toPloty << colore;
 			}
 			if (my_points.contains(p) && nSizeHolder>0.0) {
-				QCPItemLine *marker=new QCPItemLine(my_w.plot);
-				marker->start->setCoords(dist, -QCPRange::maxRange);
-				marker->end->setCoords(dist, QCPRange::maxRange);
+				QCPItemStraightLine *marker=new QCPItemStraightLine(my_w.plot);
+				marker->point1->setTypeY(QCPItemPosition::ptAbsolute);
+				marker->point2->setTypeY(QCPItemPosition::ptAbsolute);
+				marker->point1->setCoords(dist,0);
+				marker->point2->setCoords(dist,1);
 				marker->setPen(penna);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));

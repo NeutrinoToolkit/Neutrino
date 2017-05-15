@@ -226,7 +226,9 @@ void FindPeaks::updatePlot() {
         points->setRowCount(0);
         for (unsigned int i=0;i<fitx.size();i++) {
             QCPItemStraightLine *marker=new QCPItemStraightLine(plot);
-            marker->point1->setCoords(fity[i],0);
+			marker->point1->setTypeY(QCPItemPosition::ptAbsolute);
+			marker->point2->setTypeY(QCPItemPosition::ptAbsolute);
+			marker->point1->setCoords(fity[i],0);
             marker->point2->setCoords(fity[i],1);
             marker->setProperty(panName().toLatin1(),true);
             marker->setPen(QPen(Qt::red));

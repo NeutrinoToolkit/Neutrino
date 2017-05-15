@@ -616,6 +616,8 @@ void Visar::updatePlot() {
                     QPen pen(Qt::gray);
                     pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
+					my_jumpLine->point1->setTypeY(QCPItemPosition::ptAbsolute);
+					my_jumpLine->point2->setTypeY(QCPItemPosition::ptAbsolute);
                     my_jumpLine->point1->setCoords(a,0);
                     my_jumpLine->point2->setCoords(a,1);
                 }
