@@ -56,7 +56,7 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent)
 
 	my_w.invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
 	my_w.invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
-	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
+//	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
     
 	refphase_checkbChanged(my_w.refphase_checkb->checkState());
     show();

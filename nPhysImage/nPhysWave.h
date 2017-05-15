@@ -232,47 +232,51 @@ inline void phys_invert_abel_1D(std::vector<double> &ivec, std::vector<double> &
 struct bessel_str {
 public:
 	bessel_str()
-		: N(0), lut(0), cos_lut(0)
+		: N(0), lut(nullptr)/*, cos_lut(nullptr)*/
 	{ }
+	~bessel_str() {
+		if (lut) delete lut;
+//		if (cos_lut) delete cos_lut;
+	}
 
-	int N;
+	size_t N;
 	double *lut;
-	double *cos_lut;
+//	double *cos_lut;
 };
 typedef struct bessel_str bessel_alloc_t;
 
 
-bessel_alloc_t *bessel_allocate();
-void bessel_free(bessel_alloc_t *);
+//bessel_alloc_t *bessel_allocate();
+//void bessel_free(bessel_alloc_t *);
 
 
-inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, bessel_alloc_t *lut)
+inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double> &ovec, bessel_alloc_t &lut)
 {
-	if (ivec==NULL || ovec==NULL || size==0)
+	if (ivec.size()!=ovec.size() || ivec.size()==0)
 		return;
 
-	// 0. init 
-	memset(ovec, 0, size*sizeof(double));
+	// 0. init
+	std::fill(ovec.begin(), ovec.end(), 0);
 
 	// check Bessel LUT
-	int N=size;
-	if (N != lut->N) {
+	size_t N=ivec.size();
+	if (N != lut.N) {
 		// recalculate lut
 		DEBUG(10,"recalculate Bessel LUT for N="<<N<<"...");
-		if (lut->lut != NULL)
-			delete lut->lut;
+		if (lut.lut != NULL)
+			delete lut.lut;
 
-		lut->N = N;
-		lut->lut = new double[N*N];
+		lut.N = N;
+		lut.lut = new double[N*N];
 
-		for (int j=0; j<N; j++) {
-			for (int k=0; k<j+1; k++) {
+		for (size_t j=0; j<N; j++) {
+			for (size_t k=0; k<j+1; k++) {
 				// direct cosine
-				//lut->lut[k*j] = gsl_sf_bessel_J0(j*k/(2.*N+1.));
+				//lut.lut[k*j] = gsl_sf_bessel_J0(j*k/(2.*N+1.));
 
 				// DCT 
 				// (change in integration variable to respect FFTW-DCT definition)
-				lut->lut[k*j] = gsl_sf_bessel_J0(M_PI*j*k/N);
+				lut.lut[k*j] = gsl_sf_bessel_J0(M_PI*j*k/N);
 			}
 		}
 		DEBUG(10,"done");
@@ -280,25 +284,24 @@ inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, besse
 	}
 
 	// sara' da trovare una soluzione rapida per il plan
-	double Fivec[size];
-	std::memset(Fivec, 0, size*sizeof(double));
+	std::vector<double> Fivec(N,0);
 
-	fftw_plan r2rplan = fftw_plan_r2r_1d(size, ivec, (double *)Fivec, FFTW_REDFT00, FFTW_ESTIMATE);
-	
+	fftw_plan r2rplan = fftw_plan_r2r_1d(N, &ivec[0], &Fivec[0], FFTW_REDFT00, FFTW_ESTIMATE);
 	fftw_execute(r2rplan);
+	fftw_destroy_plan(r2rplan);
 
-	for (size_t j=0; j<size; j++) {
+	for (size_t j=0; j<N; j++) {
 	
 	//	for (int i=-N; i<N; i++) { // this was for Cosinus transform
-			for (int k=0; k<N; k++) {
+			for (size_t k=0; k<N; k++) {
 				// direct cosinus
 				//inv_y[j] += 2 * in[i] * cos(i*k/(2.*N+1.)) * k * gsl_sf_bessel_J0(j*k/(2.*N+1.));
-				//ovec[j] += ivec[abs(i)] * cos(i*k/(2.*N+1.)) * k * lut->lut[j*k];
-				//ovec[j] += ivec[abs(i)] * lut->cos_lut[abs(i)*k] * k * lut->lut[j*k];
+				//ovec[j] += ivec[abs(i)] * cos(i*k/(2.*N+1.)) * k * lut.lut[j*k];
+				//ovec[j] += ivec[abs(i)] * lut.cos_lut[abs(i)*k] * k * lut.lut[j*k];
 
 				// fast DCT
-				//ovec[j] += Fivec[k] * k * lut->lut[j*k];
-				ovec[j] += Fivec[k] * (M_PI/N) * k * lut->lut[j*k];
+				//ovec[j] += Fivec[k] * k * lut.lut[j*k];
+				ovec[j] += Fivec[k] * (M_PI/N) * k * lut.lut[j*k];
 			}
 	//	}
 		//ovec[j] *= (1/(2*3.14*pow(2.*N+1.,2)));
@@ -311,8 +314,8 @@ inline void phys_invert_abelHF_1D(double *ivec, double *ovec, size_t size, besse
 		for (int i=-N; i<N; i++) {
 			for (int k=0; k<N; k++) {
 				//inv_y[j] += 2 * in[i] * cos(i*k/(2.*N+1.)) * k * gsl_sf_bessel_J0(j*k/(2.*N+1.));
-				//ovec[j] += ivec[abs(i)] * cos(i*k/(2.*N+1.)) * k * lut->lut[j*k];
-				ovec[j] += ivec[abs(i)] * lut->cos_lut[abs(i)*k] * k * lut->lut[j*k];
+				//ovec[j] += ivec[abs(i)] * cos(i*k/(2.*N+1.)) * k * lut.lut[j*k];
+				ovec[j] += ivec[abs(i)] * lut.cos_lut[abs(i)*k] * k * lut.lut[j*k];
 			}
 		}
 		ovec[j] *= (1/(2*3.14*pow(2.*N+1.,2)));
