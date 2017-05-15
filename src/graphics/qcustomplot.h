@@ -48,8 +48,8 @@ class QCPColorMap;
 class QCPColorScale;
 class QCPBars;
 
-/* including file '/Users/tommaso/qcustomplot/src/global.h'                  */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/global.h'        */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 #include <QtCore/qglobal.h>
@@ -372,11 +372,11 @@ Q_DECLARE_METATYPE(QCP::Interaction)
 Q_DECLARE_METATYPE(QCP::SelectionRectMode)
 Q_DECLARE_METATYPE(QCP::SelectionType)
 
-/* end of '/Users/tommaso/qcustomplot/src/global.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/global.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/vector2d.h'                */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/vector2d.h'      */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -448,11 +448,11 @@ inline QDebug operator<< (QDebug d, const QCPVector2D &vec)
     return d.space();
 }
 
-/* end of '/Users/tommaso/qcustomplot/src/vector2d.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/vector2d.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/painter.h'                 */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/painter.h'       */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -509,11 +509,11 @@ protected:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCPPainter::PainterModes)
 Q_DECLARE_METATYPE(QCPPainter::PainterMode)
 
-/* end of '/Users/tommaso/qcustomplot/src/painter.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/painter.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/paintbuffer.h'             */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/paintbuffer.h'   */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -620,11 +620,11 @@ protected:
 };
 #endif // QCP_OPENGL_FBO
 
-/* end of '/Users/tommaso/qcustomplot/src/paintbuffer.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/paintbuffer.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layer.h'                   */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layer.h'         */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -772,11 +772,11 @@ private:
   friend class QCPAxisRect;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/layer.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layer.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/range.h'              */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/range.h'    */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -892,11 +892,11 @@ inline const QCPRange operator/(const QCPRange& range, double value)
   return result;
 }
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/range.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/range.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/selection.h'               */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/selection.h'     */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1099,11 +1099,11 @@ inline QDebug operator<< (QDebug d, const QCPDataSelection &selection)
 
 
 
-/* end of '/Users/tommaso/qcustomplot/src/selection.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/selection.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/selectionrect.h'           */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/selectionrect.h' */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1156,11 +1156,11 @@ protected:
   friend class QCustomPlot;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/selectionrect.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/selectionrect.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layout.h'                  */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layout.h'        */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1461,11 +1461,11 @@ private:
 };
 Q_DECLARE_METATYPE(QCPLayoutInset::InsetPlacement)
 
-/* end of '/Users/tommaso/qcustomplot/src/layout.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layout.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/lineending.h'              */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/lineending.h'    */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1528,11 +1528,11 @@ protected:
 Q_DECLARE_TYPEINFO(QCPLineEnding, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QCPLineEnding::EndingStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/lineending.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/lineending.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axisticker.h'         */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axisticker.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1591,11 +1591,11 @@ protected:
 Q_DECLARE_METATYPE(QCPAxisTicker::TickStepStrategy)
 Q_DECLARE_METATYPE(QSharedPointer<QCPAxisTicker>)
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axisticker.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axisticker.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerdatetime.h' */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerdatetime.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1634,11 +1634,11 @@ protected:
   virtual QVector<double> createTickVector(double tickStep, const QCPRange &range) Q_DECL_OVERRIDE;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerdatetime.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerdatetime.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickertime.h'     */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertime.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1688,11 +1688,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPAxisTickerTime::TimeUnit)
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickertime.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertime.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerfixed.h'    */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerfixed.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1732,11 +1732,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPAxisTickerFixed::ScaleStrategy)
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerfixed.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerfixed.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickertext.h'     */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertext.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1773,11 +1773,11 @@ protected:
   
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickertext.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertext.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerpi.h'       */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerpi.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1834,11 +1834,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPAxisTickerPi::FractionStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerpi.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerpi.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axistickerlog.h'      */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerlog.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -1869,11 +1869,11 @@ protected:
   virtual QVector<double> createTickVector(double tickStep, const QCPRange &range) Q_DECL_OVERRIDE;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axistickerlog.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerlog.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/axis/axis.h'               */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axis.h'     */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -2296,11 +2296,11 @@ protected:
   virtual void getMaxTickLabelSize(const QFont &font, const QString &text, QSize *tickLabelsSize) const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/axis/axis.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/axis/axis.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/scatterstyle.h'            */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/scatterstyle.h'  */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -2406,11 +2406,11 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QCPScatterStyle::ScatterProperties)
 Q_DECLARE_METATYPE(QCPScatterStyle::ScatterProperty)
 Q_DECLARE_METATYPE(QCPScatterStyle::ScatterShape)
 
-/* end of '/Users/tommaso/qcustomplot/src/scatterstyle.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/scatterstyle.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/datacontainer.h'           */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.h' */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -2481,11 +2481,11 @@ protected:
 
 // include implementation in header since it is a class template:
 
-/* end of '/Users/tommaso/qcustomplot/src/datacontainer.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/datacontainer.cpp'         */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.cpp'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3253,11 +3253,11 @@ void QCPDataContainer<DataType>::performAutoSqueeze()
   if (shrinkPreAllocation || shrinkPostAllocation)
     squeeze(shrinkPreAllocation, shrinkPostAllocation);
 }
-/* end of '/Users/tommaso/qcustomplot/src/datacontainer.cpp' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.cpp' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottable.h'               */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable.h'     */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -3413,11 +3413,11 @@ private:
 };
 
 
-/* end of '/Users/tommaso/qcustomplot/src/plottable.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottable.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/item.h'                    */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/item.h'          */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -3601,11 +3601,11 @@ private:
   friend class QCPItemAnchor;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/item.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/item.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/core.h'                    */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/core.h'          */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -3872,11 +3872,11 @@ protected:
 Q_DECLARE_METATYPE(QCustomPlot::LayerInsertMode)
 Q_DECLARE_METATYPE(QCustomPlot::RefreshPriority)
 
-/* end of '/Users/tommaso/qcustomplot/src/core.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/core.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottable1d.h'             */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.h'   */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -3936,11 +3936,11 @@ private:
 
 // include implementation in header since it is a class template:
 
-/* end of '/Users/tommaso/qcustomplot/src/plottable1d.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottable1d.cpp'           */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.cpp' */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -4455,11 +4455,11 @@ void QCPAbstractPlottable1D<DataType>::drawPolyline(QCPPainter *painter, const Q
     painter->drawPolyline(lineData.constData()+segmentStart, lineDataSize-segmentStart);
   }
 }
-/* end of '/Users/tommaso/qcustomplot/src/plottable1d.cpp' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.cpp' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/colorgradient.h'           */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/colorgradient.h' */
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -4540,11 +4540,11 @@ protected:
 Q_DECLARE_METATYPE(QCPColorGradient::ColorInterpolation)
 Q_DECLARE_METATYPE(QCPColorGradient::GradientPreset)
 
-/* end of '/Users/tommaso/qcustomplot/src/colorgradient.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/colorgradient.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/selectiondecorator-bracket.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/selectiondecorator-bracket.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -4611,11 +4611,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPSelectionDecoratorBracket::BracketStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/selectiondecorator-bracket.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/selectiondecorator-bracket.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-axisrect.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-axisrect.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -4741,11 +4741,11 @@ private:
 };
 
 
-/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-axisrect.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-axisrect.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-legend.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-legend.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -4962,11 +4962,11 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCPLegend::SelectableParts)
 Q_DECLARE_METATYPE(QCPLegend::SelectablePart)
 
-/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-legend.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-legend.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-textelement.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-textelement.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -5052,11 +5052,11 @@ private:
 
 
 
-/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-textelement.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-textelement.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-colorscale.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-colorscale.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -5163,11 +5163,11 @@ private:
 };
 
 
-/* end of '/Users/tommaso/qcustomplot/src/layoutelements/layoutelement-colorscale.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-colorscale.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-graph.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-graph.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -5304,11 +5304,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPGraph::LineStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-graph.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-graph.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-curve.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-curve.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -5422,11 +5422,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPCurve::LineStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-curve.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-curve.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-bars.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-bars.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -5613,11 +5613,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPBars::WidthType)
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-bars.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-bars.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-statisticalbox.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-statisticalbox.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -5733,11 +5733,11 @@ protected:
   friend class QCPLegend;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-statisticalbox.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-statisticalbox.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-colormap.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-colormap.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -5873,11 +5873,11 @@ protected:
 };
 
  
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-colormap.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-colormap.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-financial.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-financial.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -6015,11 +6015,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPFinancial::ChartStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-financial.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-financial.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/plottables/plottable-errorbar.h'*/
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-errorbar.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 /*! \file */
 
 
@@ -6110,7 +6110,7 @@ public:
   virtual bool sortKeyIsMainKey() const;
   virtual QCPDataSelection selectTestRect(const QRectF &rect, bool onlySelectable) const;
   virtual int findBegin(double sortKey, bool expandedRange=true) const;
-  virtual int findEnd(double sortKey, bool expandedRange=true) const override;
+  virtual int findEnd(double sortKey, bool expandedRange=true) const;
   
   // reimplemented virtual methods:
   virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE;
@@ -6143,11 +6143,11 @@ protected:
   friend class QCPLegend;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/plottables/plottable-errorbar.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-errorbar.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-straightline.h' */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-straightline.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6189,11 +6189,11 @@ protected:
   QPen mainPen() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-straightline.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-straightline.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-line.h'         */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-line.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6242,11 +6242,11 @@ protected:
   QPen mainPen() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-line.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-line.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-curve.h'        */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-curve.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6296,11 +6296,11 @@ protected:
   QPen mainPen() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-curve.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-curve.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-rect.h'         */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-rect.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6358,11 +6358,11 @@ protected:
   QBrush mainBrush() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-rect.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-rect.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-text.h'         */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-text.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6458,11 +6458,11 @@ protected:
   QBrush mainBrush() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-text.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-text.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-ellipse.h'      */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-ellipse.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6523,11 +6523,11 @@ protected:
   QBrush mainBrush() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-ellipse.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-ellipse.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-pixmap.h'       */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-pixmap.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6595,11 +6595,11 @@ protected:
   QPen mainPen() const;
 };
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-pixmap.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-pixmap.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-tracer.h'       */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-tracer.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6684,11 +6684,11 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPItemTracer::TracerStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-tracer.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-tracer.h' */
 
 
-/* including file '/Users/tommaso/qcustomplot/src/items/item-bracket.h'      */
-/* commit b129f44e22e1a39655ec6f68810d2624a572b9d7 2016-12-13 10:48:07 +0100 */
+/* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-bracket.h'*/
+/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
 
 
 
@@ -6754,7 +6754,7 @@ protected:
 };
 Q_DECLARE_METATYPE(QCPItemBracket::BracketStyle)
 
-/* end of '/Users/tommaso/qcustomplot/src/items/item-bracket.h' */
+/* end of '/Users/tommaso/local/src/QCustomPlot/src/items/item-bracket.h' */
 
 
 #endif // QCUSTOMPLOT_H
