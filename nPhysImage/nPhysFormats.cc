@@ -543,7 +543,7 @@ void phys_dump_binary(nPhysD *my_phys, std::ofstream &ofile) {
         //int written_data = 0;
 
         //ofile<<my_phys->property<<"\n";
-        my_phys->property.dumper(ofile);
+		my_phys->property.dumper(ofile);
 
         DEBUG("Starting binary dump...");
 
@@ -583,17 +583,17 @@ void phys_dump_binary(nPhysD *my_phys, std::ofstream &ofile) {
         DEBUG(5,"writtendata " << writtendata);
 
         int oo = my_phys->getW();
-        ofile.write((const char *)&oo, sizeof(int));
+		ofile.write((const char *)&oo, sizeof(int));
         oo = my_phys->getH();
-        ofile.write((const char *)&oo, sizeof(int));
+		ofile.write((const char *)&oo, sizeof(int));
 
         //ofile << writtendata << "\n"; // TODO: to be written in binary
-        ofile.write((const char *)&writtendata, sizeof (int));
-        ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
+		ofile.write((const char *)&writtendata, sizeof (int));
+		ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
         DEBUG("Binary dump finished");
 
         //	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
-        ofile<<"\n"<<std::flush;
+		ofile<<"\n"<<std::flush;
 
         //written_data = ofile.tellg()-pos;
     } else {
@@ -1811,8 +1811,7 @@ std::string gunzip (std::string filezipped) {
     }
     fclose(filein);
     fclose(fileout);
-    // 	}
-    return fileunzipped;
+	return fileunzipped;
 }
 
 std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {

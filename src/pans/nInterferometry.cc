@@ -581,25 +581,38 @@ void nInterferometry::doShape(){
 void nInterferometry::addShape(){
     int num=0;
     while (1) {
-        num++;
-        bool found =false;
+		num++;
+		QString tooltipStr="interpolateShape"+QString::number(num);
+		bool found =false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);
             if (line && line->property("parentPan").toString()==panName()) {
-                if (line->toolTip()=="interpolateShape"+QString::number(num)) {
+				qDebug() << line->toolTip();
+				if (line->toolTip()==tooltipStr) {
                     found=true;
                 }
             }
         }
         if (!found) {
-            addShape("interpolateShape"+QString::number(num));
+			addShape(tooltipStr);
             break;
         }
     }
 }
 
 void nInterferometry::addShape(QString name){
-    nLine *my_l=new nLine(this,0);
+
+	foreach (QObject* widget, nparent->children()) {
+		nLine *line=qobject_cast<nLine *>(widget);
+		if (line && line->property("parentPan").toString()==panName()) {
+			if (line->toolTip()==name) {
+				return;
+			}
+		}
+	}
+
+
+	nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
         poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
@@ -674,6 +687,7 @@ void nInterferometry::doPlasma(){
 
 void nInterferometry::loadSettings(QSettings *settings){
     QStringList valu=settings->value("interpolateShape").toStringList();
+	qDebug() << ".........................." << valu;
     foreach (QString name, valu) {
         bool found=false;
         foreach (QObject* widget, nparent->children()) {
@@ -682,7 +696,7 @@ void nInterferometry::loadSettings(QSettings *settings){
                 if (line->toolTip()==name) found=true;
             }
         }            
-        if (!found) addShape(name);
+		if (!found) addShape(name);
     }
 
     settings->beginGroup("localPhys");
