@@ -1786,7 +1786,6 @@ int inflate(FILE *source, FILE *dest)
 }
 
 std::string gunzip (std::string filezipped) {
-    
 
     std::string fileunzipped=filezipped;
     size_t last_idx = filezipped.find_last_of(".");

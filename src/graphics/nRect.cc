@@ -397,8 +397,8 @@ void nRect::intersection() {
 
 void nRect::submatrix() {
     if (nparent->getCurrentBuffer()) {
-        nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-        nparent->showPhys(subPhys);
+		nPhysD *copy=new nPhysD(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+		nparent->showPhys(copy);
     }
 }
 

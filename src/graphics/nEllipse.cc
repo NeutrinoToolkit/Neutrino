@@ -444,9 +444,8 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_S:
             if (nparent->getCurrentBuffer()) {
-                nPhysD subPhys=nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
-                nparent->showPhys(subPhys);
-//				nparent->showPhys(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+				nPhysD *copy=new nPhysD(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+				nparent->showPhys(copy);
 			}
 			break;
 		default:

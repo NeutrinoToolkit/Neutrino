@@ -611,7 +611,6 @@ void nInterferometry::addShape(QString name){
 		}
 	}
 
-
 	nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
@@ -687,7 +686,6 @@ void nInterferometry::doPlasma(){
 
 void nInterferometry::loadSettings(QSettings *settings){
     QStringList valu=settings->value("interpolateShape").toStringList();
-	qDebug() << ".........................." << valu;
     foreach (QString name, valu) {
         bool found=false;
         foreach (QObject* widget, nparent->children()) {

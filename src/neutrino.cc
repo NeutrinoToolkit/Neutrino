@@ -494,10 +494,28 @@ neutrino::loadPlugin(QString pname, bool launch)
 	}
 }
 
-void neutrino::emitBufferChanged(nPhysD *phys) {
-	if (!phys) phys=my_w->my_view->currentBuffer;
+void neutrino::emitBufferChanged(nPhysD *my_phys) {
+	if (!my_phys) my_phys=my_w->my_view->currentBuffer;
+
+	if (my_phys) {
+		double gamma_val=my_phys->gamma();
+		my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
+
+		QString winName=QString::fromUtf8(my_phys->getShortName().c_str());
+		winName.prepend(property("winId").toString()+QString(":")+QString::number(indexOf(my_phys))+QString(" "));
+
+		QString mypath=QString::fromUtf8(my_phys->getFromName().c_str());
+		winName.append(QString(" ")+mypath);
+		setWindowTitle(winName);
+
+		if (my_phys->getType()==PHYS_FILE || my_phys->getType()==PHYS_RFILE) {
+			setWindowFilePath(mypath);
+		} else {
+			setWindowFilePath("");
+		}
+	}
 	my_w->my_view->update();
-	emit bufferChanged(phys);
+	emit bufferChanged(my_phys);
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
@@ -970,78 +988,14 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 	}
 }
 
-void neutrino::showPhys(nPhysD& datamatrixRef) {
-	bool found=false;
-	foreach (nPhysD* datamatrix, my_w->my_view->physList) {
-		if (*datamatrix == datamatrixRef) found=true;
-	}
-	if (!found) {
-		nPhysD *datamatrix =  new nPhysD;
-		*datamatrix=datamatrixRef;
-		showPhys(datamatrix);
-	}
-}
-
-void neutrino::addShowPhys(nPhysD& datamatrixRef) {
-	qDebug() << "there";
-	bool found=false;
-	foreach (nPhysD* datamatrix, my_w->my_view->physList) {
-		if (*datamatrix == datamatrixRef) found=true;
-	}
-	if (!found) {
-		nPhysD *datamatrix =  new nPhysD;
-		*datamatrix=datamatrixRef;
-		addShowPhys(datamatrix);
-	}
-}
-
-void neutrino::addPhys(nPhysD& datamatrixRef) {
-	bool found=false;
-	foreach (nPhysD* datamatrix, my_w->my_view->physList) {
-		if (*datamatrix == datamatrixRef) found=true;
-	}
-	if (!found) {
-		nPhysD *datamatrix =  new nPhysD;
-		*datamatrix=datamatrixRef;
-		addPhys(datamatrix);
-	}
-}
-
-void neutrino::removePhys(nPhysD& datamatrixRef) {
-	foreach (nPhysD* datamatrix, my_w->my_view->physList) {
-		if (*datamatrix == datamatrixRef) removePhys(datamatrix);
-	}
-}
-
 void
 neutrino::showPhys(nPhysD* my_phys) {
-	if (my_phys) {
-		my_w->my_view->showPhys(my_phys);
-		QString winName=QString::fromUtf8(my_phys->getShortName().c_str());
-		winName.prepend(property("winId").toString()+QString(":")+QString::number(indexOf(my_phys))+QString(" "));
-
-		QString mypath=QString::fromUtf8(my_phys->getFromName().c_str());
-		winName.append(QString(" ")+mypath);
-		setWindowTitle(winName);
-
-		if (my_phys->getType()==PHYS_FILE || my_phys->getType()==PHYS_RFILE) {
-			setWindowFilePath(mypath);
-		} else {
-			setWindowFilePath("");
-		}
-
-	}
+	my_w->my_view->showPhys(my_phys);
 }
 
 void
 neutrino::createQimage() {
 	my_w->my_view->createQimage();
-	if (my_w->my_view->currentBuffer) {
-		double gamma_val=my_w->my_view->currentBuffer->gamma();
-		my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
-	} else {
-		statusBar()->showMessage("Image not valid",2000);
-	}
 }
 
 void neutrino::exportGraphics () {

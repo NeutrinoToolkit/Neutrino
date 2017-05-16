@@ -143,14 +143,10 @@ public slots:
 
 
     void addPhys(nPhysD*);
-    void addPhys(nPhysD&);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);
-    void removePhys(nPhysD&);
     void showPhys(nPhysD*);
-    void showPhys(nPhysD&);
     void addShowPhys(nPhysD*);
-    void addShowPhys(nPhysD&);
 
     nPhysD* getBuffer(int);
 
