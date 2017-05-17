@@ -623,7 +623,6 @@ void nGenericPan::loadSettings(QSettings *settings) {
         }
         settings->endGroup();
     }
-
 }
 
 void nGenericPan::saveSettings(QSettings *settings) {

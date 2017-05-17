@@ -686,47 +686,47 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 		for(std::vector<nPhysD*>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
 			imagelist.push_back(*it);
 		}
-	}
-	if (imagelist.size()==0) {
-		QImage image(fname);
-		if (!image.isNull()) {
-			if (image.isGrayscale() || !separate_rgb) {
-				nPhysD *datamatrix = new nPhysD(fname.toStdString());
-				datamatrix->resize(image.width(), image.height());
-				for (int i=0;i<image.height();i++) {
-					for (int j=0;j<image.width();j++) {
-						datamatrix->Timg_matrix[i][j]= qGray(image.pixel(j,i));
+		if (imagelist.size()==0) {
+			QImage image(fname);
+			if (!image.isNull()) {
+				if (image.isGrayscale() || !separate_rgb) {
+					nPhysD *datamatrix = new nPhysD(fname.toStdString());
+					datamatrix->resize(image.width(), image.height());
+					for (int i=0;i<image.height();i++) {
+						for (int j=0;j<image.width();j++) {
+							datamatrix->Timg_matrix[i][j]= qGray(image.pixel(j,i));
+						}
+					}
+					imagelist.push_back(datamatrix);
+				} else {
+					std::array<nPhysD*,3> datamatrix;
+					std::array<std::string,3> name;
+					name[0]="Red";
+					name[1]="Green";
+					name[2]="Blue";
+					for (int k=0;k<3;k++) {
+						datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
+						datamatrix[k]->setShortName(name[k]);
+						datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
+						datamatrix[k]->setFromName(fname.toStdString());
+						datamatrix[k]->resize(image.width(), image.height());
+						imagelist.push_back(datamatrix[k]);
+					}
+					for (int i=0;i<image.height();i++) {
+						for (int j=0;j<image.width();j++) {
+							QRgb px = image.pixel(j,i);
+							datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
+							datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
+							datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
+						}
 					}
 				}
-				imagelist.push_back(datamatrix);
-			} else {
-				std::array<nPhysD*,3> datamatrix;
-				std::array<std::string,3> name;
-				name[0]="Red";
-				name[1]="Green";
-				name[2]="Blue";
-				for (int k=0;k<3;k++) {
-					datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
-					datamatrix[k]->setShortName(name[k]);
-					datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
-					datamatrix[k]->setFromName(fname.toStdString());
-					datamatrix[k]->resize(image.width(), image.height());
-					imagelist.push_back(datamatrix[k]);
+				for (int k=0;k<imagelist.size();k++) {
+					imagelist[k]->TscanBrightness();
+					imagelist[k]->setType(PHYS_FILE);
 				}
-				for (int i=0;i<image.height();i++) {
-					for (int j=0;j<image.width();j++) {
-						QRgb px = image.pixel(j,i);
-						datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-						datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-						datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
-					}
-				}
-			}
-			for (int k=0;k<imagelist.size();k++) {
-				imagelist[k]->TscanBrightness();
-				imagelist[k]->setType(PHYS_FILE);
-			}
 
+			}
 		}
 	}
 
@@ -856,7 +856,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 						nPhysD *my_phys=new nPhysD();
 						int ret=phys_resurrect_binary(my_phys,ifile);
 						if (ret>=0 && my_phys->getSurf()>0) {
-							addShowPhys(my_phys);
+//							addShowPhys(my_phys);
 							imagelist.push_back(my_phys);
 						} else {
 							delete my_phys;

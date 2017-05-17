@@ -47,8 +47,9 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
 
-    foreach (nPhysD *phys, nparent->getBufferList()) physAdd(phys);
-    updatePad(currentBuffer);
+	foreach (nPhysD *phys, nparent->getBufferList()) {
+		physAdd(phys);
+	}
 
     QWidget* empty = new QWidget(this);
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);

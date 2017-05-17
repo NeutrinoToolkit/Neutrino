@@ -685,17 +685,24 @@ void nInterferometry::doPlasma(){
 //////////////////////////////////////////////////////////
 
 void nInterferometry::loadSettings(QSettings *settings){
-    QStringList valu=settings->value("interpolateShape").toStringList();
-    foreach (QString name, valu) {
-        bool found=false;
-        foreach (QObject* widget, nparent->children()) {
-            nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->property("parentPan").toString()==panName()) {
-                if (line->toolTip()==name) found=true;
-            }
-        }            
+
+	for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
+		removeShape((*it).first);
+	}
+
+	QStringList names=settings->value("interpolateShape").toStringList();
+	foreach (QString name, names) {
+		bool found=false;
+		foreach (QObject* widget, nparent->children()) {
+			nLine *line=qobject_cast<nLine *>(widget);
+			if (line) {
+				if (line->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(line->property("parentPan"))==this) {
+					if (line->toolTip()==name) found=true;
+				}
+			}
+		}
 		if (!found) addShape(name);
-    }
+	}
 
     settings->beginGroup("localPhys");
     foreach (const QString &childKey, settings->childKeys()) {
