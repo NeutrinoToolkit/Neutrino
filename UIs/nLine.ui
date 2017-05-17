@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
+    <width>317</width>
     <height>229</height>
    </rect>
   </property>
@@ -431,7 +431,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../qrc/icons.qrc">
+           <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
             <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
           </property>
          </widget>
@@ -461,7 +461,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../qrc/icons.qrc">
+           <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
             <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
           </property>
          </widget>
@@ -475,7 +475,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../qrc/icons.qrc">
+           <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
             <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
           </property>
          </widget>
@@ -486,7 +486,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../qrc/icons.qrc">
+           <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
             <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
           </property>
          </widget>
@@ -538,6 +538,8 @@
    <addaction name="actionClosedLine"/>
    <addaction name="actionBezier"/>
    <addaction name="actionAntialias"/>
+   <addaction name="separator"/>
+   <addaction name="actionRemove"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="font">
@@ -632,7 +634,7 @@
   </action>
   <action name="actionSavePDF">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
      <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
    </property>
    <property name="text">
@@ -640,6 +642,18 @@
    </property>
    <property name="toolTip">
     <string>save PDF</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>remove</string>
+   </property>
+   <property name="toolTip">
+    <string>remove line</string>
    </property>
   </action>
  </widget>
@@ -669,7 +683,7 @@
   <tabstop>colorButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

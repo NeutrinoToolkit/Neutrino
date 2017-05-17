@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>279</height>
+    <width>365</width>
+    <height>249</height>
    </rect>
   </property>
   <property name="font">
@@ -43,87 +43,42 @@
     <property name="verticalSpacing">
      <number>3</number>
     </property>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_6">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Height</string>
-      </property>
+    <item row="6" column="0" colspan="4">
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
+    <item row="2" column="1">
+     <widget class="QDoubleSpinBox" name="spinSizeHolder">
+      <property name="suffix">
+       <string> [px]</string>
       </property>
-      <property name="text">
-       <string>Name</string>
+      <property name="minimum">
+       <double>1.000000000000000</double>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="name"/>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="label">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
+      <property name="singleStep">
+       <double>0.500000000000000</double>
       </property>
-      <property name="text">
-       <string>Depth</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <property name="value">
+       <double>1.000000000000000</double>
       </property>
      </widget>
     </item>
     <item row="0" column="3">
      <widget class="QDoubleSpinBox" name="spinDepth"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Line width</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QDoubleSpinBox" name="spinWidth">
-      <property name="suffix">
-       <string> [px]</string>
-      </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QPushButton" name="colorButton">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Color</string>
-      </property>
-     </widget>
     </item>
     <item row="1" column="3">
      <widget class="QLabel" name="colorLabel">
@@ -143,46 +98,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Node size</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QDoubleSpinBox" name="spinSizeHolder">
-      <property name="suffix">
-       <string> [px]</string>
-      </property>
-      <property name="minimum">
-       <double>1.000000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.500000000000000</double>
-      </property>
-      <property name="value">
-       <double>1.000000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="colorHolderButton">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Color</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="3">
      <widget class="QLabel" name="colorHolderLabel">
       <property name="font">
@@ -198,6 +113,94 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="colorButton">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Color</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="label">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Depth</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Node size</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QPushButton" name="colorHolderButton">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Color</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDoubleSpinBox" name="spinWidth">
+      <property name="suffix">
+       <string> [px]</string>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Line width</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
     </item>
@@ -257,61 +260,12 @@
       </column>
      </widget>
     </item>
-    <item row="4" column="3">
-     <widget class="QPushButton" name="expandX">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Fill horizontal</string>
-      </property>
-     </widget>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="name"/>
     </item>
-    <item row="4" column="1" colspan="2">
-     <widget class="QLineEdit" name="sizeWidth">
-      <property name="readOnly">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_5">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Width</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1" colspan="2">
-     <widget class="QLineEdit" name="sizeHeight">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="3">
-     <widget class="QPushButton" name="expandY">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Fill vertical</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" colspan="4">
-     <widget class="QWidget" name="widget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+    <item row="4" column="0" colspan="4">
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0,1">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -325,26 +279,42 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="intersection">
+        <widget class="QLabel" name="label_5">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Intersect image</string>
+          <string>Width</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="submatrix">
+        <widget class="QLineEdit" name="sizeWidth">
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Submatrix</string>
+          <string>Height</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="sizeHeight">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
          </property>
         </widget>
        </item>
@@ -353,8 +323,104 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRemove"/>
+   <addaction name="actionFillH"/>
+   <addaction name="actionFillV"/>
+   <addaction name="actionIntersect"/>
+   <addaction name="actionSubmatrix"/>
+  </widget>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>remove</string>
+   </property>
+   <property name="toolTip">
+    <string>remove rectangle</string>
+   </property>
+  </action>
+  <action name="actionFillH">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/fillH.png</normaloff>:/icons/fillH.png</iconset>
+   </property>
+   <property name="text">
+    <string>fillH</string>
+   </property>
+   <property name="toolTip">
+    <string>fill horizontally</string>
+   </property>
+  </action>
+  <action name="actionFillV">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/fillV.png</normaloff>:/icons/fillV.png</iconset>
+   </property>
+   <property name="text">
+    <string>fillV</string>
+   </property>
+   <property name="toolTip">
+    <string>fill vertically</string>
+   </property>
+  </action>
+  <action name="actionIntersect">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/intersect.png</normaloff>:/icons/intersect.png</iconset>
+   </property>
+   <property name="text">
+    <string>intersect</string>
+   </property>
+   <property name="toolTip">
+    <string>intersect image</string>
+   </property>
+  </action>
+  <action name="actionSubmatrix">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+     <normaloff>:/icons/submatrix.png</normaloff>:/icons/submatrix.png</iconset>
+   </property>
+   <property name="text">
+    <string>submatrix</string>
+   </property>
+   <property name="toolTip">
+    <string>new image from selection</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

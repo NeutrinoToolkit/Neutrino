@@ -601,16 +601,6 @@ void nInterferometry::addShape(){
 }
 
 void nInterferometry::addShape(QString name){
-
-	foreach (QObject* widget, nparent->children()) {
-		nLine *line=qobject_cast<nLine *>(widget);
-		if (line && line->property("parentPan").toString()==panName()) {
-			if (line->toolTip()==name) {
-				return;
-			}
-		}
-	}
-
 	nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
@@ -625,7 +615,7 @@ void nInterferometry::addShape(QString name){
     my_b->setIcon(QIcon(":icons/region"));
     my_b->setToolTip(name+my_b->toolTip());
     my_shapes[my_b]=my_l;
-    my_w.shapes->layout()->addWidget(my_b);
+	my_w.shapes->layout()->addWidget(my_b);
     
     connect(my_l, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
     connect(my_l, SIGNAL(destroyed(QObject*)), this, SLOT(removeShape(QObject*)));
@@ -695,10 +685,8 @@ void nInterferometry::loadSettings(QSettings *settings){
 		bool found=false;
 		foreach (QObject* widget, nparent->children()) {
 			nLine *line=qobject_cast<nLine *>(widget);
-			if (line) {
-				if (line->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(line->property("parentPan"))==this) {
-					if (line->toolTip()==name) found=true;
-				}
+			if (line && line->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(line->property("parentPan"))==this) {
+				if (line->toolTip()==name) found=true;
 			}
 		}
 		if (!found) addShape(name);

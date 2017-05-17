@@ -37,6 +37,7 @@ nRect::~nRect() {
 }
 
 
+
 nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
 {
 	my_w.name->setText(parentPan->panName()+"Rect");
@@ -45,8 +46,10 @@ nRect::nRect(nGenericPan *parentPan, int level) : nRect(parentPan->nparent)
     if (level>0) {
 		my_w.name->setReadOnly(true);
 		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-    }
 
+		disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+		my_w.actionRemove->setVisible(false);
+	}
 }
 
 
@@ -108,9 +111,11 @@ nRect::nRect(neutrino *my_parent) :
 	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
 	connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 
-	connect(my_w.expandX, SIGNAL(pressed()), this, SLOT(expandX()));
-	connect(my_w.expandY, SIGNAL(pressed()), this, SLOT(expandY()));
-	connect(my_w.intersection, SIGNAL(pressed()), this, SLOT(intersection()));
+	connect(my_w.actionFillH, SIGNAL(triggered()), this, SLOT(expandX()));
+	connect(my_w.actionFillV, SIGNAL(triggered()), this, SLOT(expandY()));
+	connect(my_w.actionIntersect, SIGNAL(triggered()), this, SLOT(intersection()));
+	connect(my_w.actionSubmatrix, SIGNAL(triggered()), this, SLOT(submatrix()));
+	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
@@ -176,11 +181,16 @@ void nRect::addPointAfterClick ( QPointF ) {
 }
 
 void nRect::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
+	qDebug() << e;
+
     for (int i=0;i<ref.size();i++) {
         if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+
             moveRef.append(i);
+			break;
         }
     }
+	qDebug()<< moveRef;
     if (moveRef.size()>0) { // if more that one just pick the last
         int keeplast=moveRef.last();
         moveRef.clear();

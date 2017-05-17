@@ -97,8 +97,11 @@ nEllipse::nEllipse(neutrino *my_parent) :
     connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
     connect(my_w->tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 
-    connect(my_w->expandX, SIGNAL(pressed()), this, SLOT(expandX()));
-    connect(my_w->expandY, SIGNAL(pressed()), this, SLOT(expandY()));
+	connect(my_w->actionFillH, SIGNAL(triggered()), this, SLOT(expandX()));
+	connect(my_w->actionFillV, SIGNAL(triggered()), this, SLOT(expandY()));
+	my_w->actionSubmatrix->setVisible(false);
+	my_w->actionIntersect->setVisible(false);
+	connect(my_w->actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 
     connect(my_w->sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
     connect(my_w->sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));

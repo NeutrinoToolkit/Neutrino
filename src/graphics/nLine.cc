@@ -55,6 +55,11 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
         my_w.cutPoints->setValue(1);
     }
 
+	if (level>0) {
+		disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+		my_w.actionRemove->setVisible(false);
+	}
+
 }
 
 nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
@@ -75,7 +80,6 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
         zoom=my_parent->getZoom();
 
         if (my_parent->getCurrentBuffer()) {
-
                 setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
 		}
 
@@ -123,6 +127,8 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
     connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
 	connect(my_w.actionAntialias, SIGNAL(triggered()), this, SLOT(toggleAntialias()));
+
+	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 
 	my_w.spinWidth->setValue(nWidth);
 	my_w.spinDepth->setValue(zValue());
