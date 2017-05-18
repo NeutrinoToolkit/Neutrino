@@ -35,7 +35,7 @@ public:
     nMouse();
 
     int my_shape;
-    const int num_shape=5;
+	const int num_shape=4;
 
 
 	QSize size;

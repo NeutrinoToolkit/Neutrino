@@ -29,13 +29,14 @@ nMouse::nMouse() : QGraphicsItem(),
     my_shape(0),
     size(100,100)
 {
+	pen.setCosmetic(true);
 }
 
 // reimplementation
 QRectF nMouse::boundingRect() const {
     //	QRectF bbox(-pos().x(),-1,size.width(),3);
     //	return bbox;
-    return shape().boundingRect().adjusted(-pen.widthF(),-pen.widthF(),pen.widthF(),pen.widthF());
+	return shape().boundingRect();
 }
 
 void nMouse::setSize(QSize my_size) {
@@ -58,7 +59,7 @@ QPainterPath nMouse::shape() const {
     const double r=4.0;
     const int len=15*r;
 
-    switch (my_shape) {
+	switch (my_shape%4) {
     case 1:
         my_path.moveTo(0,-pos().y());
         my_path.lineTo(0,size.height()-pos().y());
@@ -90,11 +91,6 @@ QPainterPath nMouse::shape() const {
         my_path.moveTo(r,-r);
         my_path.lineTo(len,-len);
         my_path.addEllipse(-r, -r, 2*r, 2*r);
-        break;
-    case 4:
-        int dx=std::max(1.0,pen.widthF());
-        for (int i=1;i<5;i++)
-            my_path.addEllipse(-i*dx*r, -i*dx*r, 2*i*dx*r, 2*i*dx*r);
         break;
     }
 

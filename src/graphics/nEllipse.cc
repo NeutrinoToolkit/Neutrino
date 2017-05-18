@@ -157,9 +157,13 @@ void nEllipse::addPointAfterClick ( QPointF ) {
 }
 
 void nEllipse::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
-	for (int i=0;i<ref.size();i++) {
-		if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-			moveRef.append(i);
+
+	if (e->button()==Qt::LeftButton) {
+		for (int i=0;i<ref.size();i++) {
+			if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+				moveRef.append(i);
+				break;
+			}
 		}
 	}
 	if (moveRef.size()>0) { // if more that one just pick the las

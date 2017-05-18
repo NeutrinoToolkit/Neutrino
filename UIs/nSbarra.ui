@@ -39,6 +39,9 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="text">
       <string>Xpos</string>
      </property>
@@ -70,6 +73,9 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="text">
       <string>value</string>
      </property>
@@ -87,6 +93,9 @@
      </property>
      <property name="toolTip">
       <string>γ color</string>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
      </property>
      <property name="text">
       <string>γ</string>
@@ -112,6 +121,9 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="text">
       <string>Ypos</string>
      </property>
@@ -130,6 +142,9 @@
      <property name="toolTip">
       <string>Real X position</string>
      </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="text">
       <string>dx</string>
      </property>
@@ -147,6 +162,9 @@
      </property>
      <property name="toolTip">
       <string>Real Y position</string>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
      </property>
      <property name="text">
       <string>dy</string>

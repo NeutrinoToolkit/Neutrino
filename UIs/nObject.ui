@@ -45,7 +45,7 @@
     </property>
     <item row="6" column="0" colspan="4">
      <widget class="QWidget" name="widget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -355,12 +355,13 @@
    <addaction name="actionRemove"/>
    <addaction name="actionFillH"/>
    <addaction name="actionFillV"/>
+   <addaction name="actionFillBoth"/>
    <addaction name="actionIntersect"/>
    <addaction name="actionSubmatrix"/>
   </widget>
   <action name="actionRemove">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -372,7 +373,7 @@
   </action>
   <action name="actionFillH">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
      <normaloff>:/icons/fillH.png</normaloff>:/icons/fillH.png</iconset>
    </property>
    <property name="text">
@@ -384,7 +385,7 @@
   </action>
   <action name="actionFillV">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
      <normaloff>:/icons/fillV.png</normaloff>:/icons/fillV.png</iconset>
    </property>
    <property name="text">
@@ -396,7 +397,7 @@
   </action>
   <action name="actionIntersect">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
      <normaloff>:/icons/intersect.png</normaloff>:/icons/intersect.png</iconset>
    </property>
    <property name="text">
@@ -408,7 +409,7 @@
   </action>
   <action name="actionSubmatrix">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
      <normaloff>:/icons/submatrix.png</normaloff>:/icons/submatrix.png</iconset>
    </property>
    <property name="text">
@@ -418,9 +419,21 @@
     <string>new image from selection</string>
    </property>
   </action>
+  <action name="actionFillBoth">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
+     <normaloff>:/icons/fillBoth.png</normaloff>:/icons/fillBoth.png</iconset>
+   </property>
+   <property name="text">
+    <string>fillBoth</string>
+   </property>
+   <property name="toolTip">
+    <string>fill the whole image</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-Lvo0i4/src/qrc/icons.qrc"/>
+  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

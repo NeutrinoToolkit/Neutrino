@@ -91,7 +91,7 @@ public slots:
     void mousePressEvent (QMouseEvent *);
     void mouseReleaseEvent (QMouseEvent *);
     void mouseMoveEvent (QMouseEvent *);
-    void wheelEvent(QWheelEvent *);
+	void wheelEvent(QWheelEvent *);
 
     void showPhys(nPhysD*);
 
@@ -118,7 +118,9 @@ public slots:
 
 private:
     bool gestureEvent(QGestureEvent *event);
-    void swipeTriggered(QSwipeGesture*);
+	void swipeTriggered(QSwipeGesture *);
+	void pinchTriggered(QPinchGesture *);
+
     unsigned int currentStepScaleFactor;
 
     void build_colormap();

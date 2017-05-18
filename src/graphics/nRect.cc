@@ -113,6 +113,8 @@ nRect::nRect(neutrino *my_parent) :
 
 	connect(my_w.actionFillH, SIGNAL(triggered()), this, SLOT(expandX()));
 	connect(my_w.actionFillV, SIGNAL(triggered()), this, SLOT(expandY()));
+	connect(my_w.actionFillBoth, SIGNAL(triggered()), this, SLOT(expandX()));
+	connect(my_w.actionFillBoth, SIGNAL(triggered()), this, SLOT(expandY()));
 	connect(my_w.actionIntersect, SIGNAL(triggered()), this, SLOT(intersection()));
 	connect(my_w.actionSubmatrix, SIGNAL(triggered()), this, SLOT(submatrix()));
 	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
@@ -180,16 +182,49 @@ void nRect::addPointAfterClick ( QPointF ) {
 	disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
+//void
+//nRect::hoverEnterEvent( QGraphicsSceneHoverEvent *e) {
+//	setFocus(Qt::MouseFocusReason);
+//	if (moveRef.size()==0)
+//		for (int i=0;i<ref.size();i++) {
+//			QRectF my_rect=ref.at(i)->rect();
+//			if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
+//				moveRef.append(i);
+//				showMessage(toolTip()+":"+QString::number(i+1));
+//				break;
+//			}
+//		}
+//}
+
+//void
+//nRect::hoverLeaveEvent( QGraphicsSceneHoverEvent *) {
+//	clearFocus();
+//}
+
+//void
+//nRect::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
+//	if (moveRef.size()==0)
+//		for (int i=0;i<ref.size();i++) {
+//			QRectF my_rect=ref.at(i)->rect();
+//			if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
+//				moveRef.append(i);
+//				showMessage(toolTip()+":"+QString::number(i+1));
+//				break;
+//			}
+//		}
+//}
+
 void nRect::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 	qDebug() << e;
 
-    for (int i=0;i<ref.size();i++) {
-        if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-
-            moveRef.append(i);
-			break;
-        }
-    }
+	if (e->button()==Qt::LeftButton) {
+		for (int i=0;i<ref.size();i++) {
+			if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+				moveRef.append(i);
+				break;
+			}
+		}
+	}
 	qDebug()<< moveRef;
     if (moveRef.size()>0) { // if more that one just pick the last
         int keeplast=moveRef.last();

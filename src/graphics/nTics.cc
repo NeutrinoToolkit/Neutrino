@@ -30,7 +30,7 @@ nTics::nTics(nView *view) : QGraphicsItem(),
     my_view(view),
     color(QColor(Qt::black)),
     rulerVisible(false),
-    gridVisible(false)
+	gridVisible(false)
 {
 }
 
@@ -39,11 +39,13 @@ QRectF nTics::boundingRect() const {
     QSize my_size=my_view->my_pixitem.pixmap().size();
     QRectF bBox;
     if (my_view->currentBuffer) {
-        QFont scaledFont=my_view->font();
-        if (my_view->fillimage) {
-            double ratioFont=std::min(((double)my_view->width())/my_size.width(),((double)my_view->height())/my_size.height());
-            scaledFont.setPointSizeF(std::max(6.0,my_view->font().pointSizeF()/ratioFont));
-        }
+		QFont scaledFont=my_view->font();
+
+		QSize my_size=my_view->my_pixitem.pixmap().size();
+		double ratioFont=std::min(((double)my_view->width())/my_size.width(),((double)my_view->height())/my_size.height());
+
+		scaledFont.setPointSizeF(my_view->font().pointSizeF()/ratioFont);
+
         double fSize=QFontMetrics(scaledFont).size(Qt::TextSingleLine,"M").height();
         bBox=QRectF(-2.1*fSize,-2.2*fSize,my_size.width()+4.2*fSize, my_size.height()+5.1*fSize);
     } else {
@@ -71,13 +73,18 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawRect(boundingRect());
 #endif
         p->setClipRect( option->exposedRect );
-        QFont scaledFont=my_view->font();
-        if (my_view->fillimage) {
-            QSize my_size=my_view->my_pixitem.pixmap().size();
-            double ratioFont=std::min(((double)my_view->width())/my_size.width(),((double)my_view->height())/my_size.height());
-            scaledFont.setPointSizeF(std::max(6.0,my_view->font().pointSizeF()/ratioFont));
-        }
-        p->setFont(scaledFont);
+		qDebug() << option->exposedRect;
+		QFont scaledFont=my_view->font();
+
+		qDebug() << scaledFont;
+		QSize my_size=my_view->my_pixitem.pixmap().size();
+		double ratioFont=std::min(((double)my_view->width())/my_size.width(),((double)my_view->height())/my_size.height());
+
+		qDebug() << my_view->transform().m11() << ratioFont;
+		scaledFont.setPointSizeF(my_view->font().pointSizeF()/ratioFont);
+		qDebug() << scaledFont;
+
+		p->setFont(scaledFont);
         vec2f my_or=my_view->currentBuffer->get_origin();
         vec2f my_sc=my_view->currentBuffer->get_scale();
         QPen pen;

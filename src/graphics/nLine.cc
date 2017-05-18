@@ -239,12 +239,15 @@ void nLine::addPointAfterClick (QPointF) {
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
     if(property("parentPanControlLevel").toInt()<2) {
         click_pos=e->pos();
-        for (int i=0;i<ref.size();i++) {
-            if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
-                moveRef.append(i);
-            }
-        }
-        if (moveRef.size()>0) { // if more that one just pick the las
+
+		if (e->button()==Qt::LeftButton) {
+			for (int i=0;i<ref.size();i++) {
+				if (ref.at(i)->rect().contains(mapToItem(ref.at(i), e->pos()))) {
+					moveRef.append(i);
+				}
+			}
+		}
+		if (moveRef.size()>0) { // if more that one just pick the las
             int keeplast=moveRef.last();
             moveRef.clear();
             moveRef.append(keeplast);
