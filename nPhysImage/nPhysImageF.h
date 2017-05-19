@@ -551,15 +551,13 @@ public:
             }
 
             DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
-            uchar_buf.resize(getSurf()*3);
+			uchar_buf.assign(getSurf()*3,255);
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
 				//int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
                     unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
 					std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
-				} else {
-					std::fill(uchar_buf.begin()+3*i,uchar_buf.begin()+3*i+3,255);
 				}
 			}
             display_property["palette_name"]=palette_name;
