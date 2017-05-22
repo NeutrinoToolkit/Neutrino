@@ -74,7 +74,6 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawRect(boundingRect());
 #endif
         p->setClipRect( option->exposedRect );
-		qDebug() << option->exposedRect << get_font();
 
 		p->setFont(get_font());
 

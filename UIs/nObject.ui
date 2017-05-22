@@ -353,10 +353,13 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRemove"/>
+   <addaction name="separator"/>
    <addaction name="actionFillH"/>
    <addaction name="actionFillV"/>
    <addaction name="actionFillBoth"/>
+   <addaction name="actionCenter"/>
    <addaction name="actionIntersect"/>
+   <addaction name="separator"/>
    <addaction name="actionSubmatrix"/>
   </widget>
   <action name="actionRemove">
@@ -429,6 +432,18 @@
    </property>
    <property name="toolTip">
     <string>fill the whole image</string>
+   </property>
+  </action>
+  <action name="actionCenter">
+   <property name="icon">
+    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-lG16jK/src/qrc/icons.qrc">
+     <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
+   </property>
+   <property name="text">
+    <string>center</string>
+   </property>
+   <property name="toolTip">
+    <string>Center the object</string>
    </property>
   </action>
  </widget>

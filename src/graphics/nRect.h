@@ -29,10 +29,11 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include "nPhysImageF.h"
-#include "ui_nObject.h"
 
 #ifndef __nRect
 #define __nRect
+
+#include "nObject.h"
 
 class neutrino;
 class nGenericPan;
@@ -41,113 +42,40 @@ namespace Ui {
 class nObject;
 }
 
-class nRect : public QGraphicsObject {
+class nRect : public nObject {
 	Q_OBJECT
 public:
 	
-    nRect(neutrino *);
-    nRect(nGenericPan *, int level);
-    ~nRect();
-	
-    neutrino *nparent;
-	
+	nRect(neutrino *neu) : nObject(neu, QString("rect")) {
+		changeColorHolder(QColor(0,0,255,200));
+	};
+
+	nRect(nGenericPan *pan, int level) : nObject(pan,level, QString("rect")) {};
+
+	neutrino *nparent;
+
 	enum { Type = QGraphicsItem::UserType + 2 };
 	int type() const { return Type;}
 	
-	void mousePressEvent ( QGraphicsSceneMouseEvent * );
-	void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
-	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
-	void keyPressEvent ( QKeyEvent *);
-	void keyReleaseEvent ( QKeyEvent *);
-	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
-//	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
-//	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
-//	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
-	void focusInEvent(QFocusEvent * event);
-	void focusOutEvent(QFocusEvent * event);
-    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+	QPainterPath path() const {
+		QPainterPath my_path;
+		if (ref.size()>1) {
+			my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
+		} else {
+			my_path.addRect(QRectF(0,0,0,0));
+		}
+		return my_path;
+	}
 
-	void moveBy(QPointF);
-	
-	qreal nWidth, nSizeHolder;
-	QColor nColor, holderColor;
-	
-	// pure virtuals in QGraphicsObjec
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-	
-	QList<QGraphicsRectItem*> ref;
-	QList<int> moveRef;
+	void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
+		//	p->setCompositionMode((QPainter::CompositionMode)22);
+		QPen pen;
+		pen.setWidthF(nWidth/zoom);
+		pen.setColor(nColor);
+		p->setPen(pen);
+		p->drawPath(path());
+	}
 
-	QPointF click_pos;
-	
-	void changeP(int,QPointF,bool);
-	
-	double zoom;
-	// roba da padelle
-	QMainWindow my_pad;
-	Ui::nObject my_w;
-	
-	QPainterPath path() const;
-	QPainterPath shape() const;
-	
-	void selectThis(bool);
-		
-public slots:
-	
-	void togglePadella();
-	
-	void itemChanged();
-
-	void interactive();
-	
-	void setRect(QRectF);
-	QRect getRect(nPhysD* image =NULL);
-	QRectF getRectF();
-	QString getRectString();
-
-    void bufferChanged(nPhysD*);
-
-	void zoomChanged(double);
-	void showMessage(QString);
-	void changePointPad(int);
-	void sizeHolder(double);
-	void setWidthF(double);
-	void setOrder(double);
-	void changeToolTip(QString);
-	void changeColor();
-	void changeColor(QColor);
-	void changeColorHolder();
-	void changeColorHolder(QColor);
-	void tableUpdated(QTableWidgetItem *);
-	
-	void expandX();
-	void expandY();
-    void intersection();
-	void submatrix();
-	
-	void changeWidth();
-	void changeHeight();
-	
-	void updateSize();
-	
-	void movePoints(QPointF);
-	
-	void appendPoint();
-	void addPoint(int);
-	
-	void addPointAfterClick(QPointF);
-
-	//SETTINGS
-	void loadSettings();
-	void saveSettings();
-	void loadSettings(QSettings *);
-	void saveSettings(QSettings *);
-	
-	
-signals:
-	void sceneChanged();
-	void key_pressed(int);
 };
 
 Q_DECLARE_METATYPE(nRect*);

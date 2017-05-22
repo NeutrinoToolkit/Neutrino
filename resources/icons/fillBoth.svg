@@ -119,7 +119,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.89666667"
-     inkscape:cx="118.77323"
+     inkscape:cx="-75.278814"
      inkscape:cy="300"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -170,38 +170,38 @@
      transform="translate(-461.34375,212.875)">
     <g
        id="g5167"
-       transform="translate(120,0)">
+       transform="matrix(2.1204913,0,0,0.98306019,-598.62009,1.4758806)">
       <path
          style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:Sans;-inkscape-font-specification:Sans;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;stroke:none;stroke-width:43.59999847;marker:none;enable-background:accumulate"
          d="m 641,-169.96875 a 21.802179,21.802179 0 0 0 -21.46875,22.09375 l 0,470 a 21.8125,21.8125 0 0 0 43.625,0 l 0,-470 A 21.802179,21.802179 0 0 0 641,-169.96875 Z"
          id="path2990"
          inkscape:connector-curvature="0" />
       <path
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none;stroke-linejoin:round"
          d="m 641.34375,-198.1894 43.6,75.428 -87.2,0 43.6,-75.428 z"
          id="path5173"
          inkscape:connector-curvature="0" />
       <path
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none;stroke-linejoin:round"
          d="m 641.34375,372.4394 -43.6,-75.428 87.2,0 -43.6,75.428 z"
          id="path5175"
          inkscape:connector-curvature="0" />
     </g>
     <g
        id="g5157"
-       transform="translate(0,-110)">
+       transform="matrix(0.98306019,0,0,2.1204913,12.897016,-330.87685)">
       <path
          style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:Sans;-inkscape-font-specification:Sans;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;stroke:none;stroke-width:43.59999847;marker:none;enable-background:accumulate"
          d="m 526.34375,175.3125 a 21.8125,21.8125 0 1 0 0,43.625 l 470,0 a 21.8125,21.8125 0 0 0 0,-43.625 l -470,0 z"
          id="path5155"
          inkscape:connector-curvature="0" />
       <path
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:10.89967736;marker-start:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round"
          d="m 1046.6581,197.125 -75.42798,43.6 0,-87.2 75.42798,43.6 z"
          id="path5163"
          inkscape:connector-curvature="0" />
       <path
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:8.71999969pt;marker-start:none;stroke-linejoin:round"
          d="m 476.02938,197.125 75.428,-43.6 0,87.2 -75.428,-43.6 z"
          id="path5165"
          inkscape:connector-curvature="0" />

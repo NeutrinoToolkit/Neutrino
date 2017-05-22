@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,12 +17,13 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
 #include <QtGui>
+#include <QWidget>
 #include <QMainWindow>
 #include <QGraphicsObject>
 #include <QTableWidget>
@@ -32,114 +33,63 @@
 #ifndef __nEllipse
 #define __nEllipse
 
+#include "nObject.h"
+
 class neutrino;
+class nGenericPan;
 
 namespace Ui {
 class nObject;
 }
 
-class nEllipse : public QGraphicsObject {
+class nEllipse : public nObject {
 	Q_OBJECT
 public:
-	
-	nEllipse(neutrino *);
-	~nEllipse();
-	
-    neutrino *nparent;
+
+	nEllipse(neutrino *neu) : nObject(neu, QString("ellipse")) {
+		changeColorHolder(QColor(0,255,0,200));
+	};
+
+	nEllipse(nGenericPan *pan, int level) : nObject(pan,level, QString("ellipse")) {};
+
+	neutrino *nparent;
 
 	enum { Type = QGraphicsItem::UserType + 3 };
 	int type() const { return Type;}
-	
-	void mousePressEvent ( QGraphicsSceneMouseEvent * );
-	void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
-	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
-	void keyPressEvent ( QKeyEvent *);
-	void keyReleaseEvent ( QKeyEvent *);
-	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
-	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
-	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
-	void focusInEvent(QFocusEvent * event);
-	void focusOutEvent(QFocusEvent * event);
-	
-	void moveBy(QPointF);
-	
-	qreal nWidth, nSizeHolder;
-	QColor nColor, holderColor;
-	
-	// pure virtuals in QGraphicsObjec
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-	
-	QList<QGraphicsRectItem*> ref;
-	QList<int> moveRef;
-	int nodeSelected;
-	QPointF click_pos;
-	
-	void changeP(int,QPointF,bool);
-	
-	double zoom;
-	// roba da padelle
-	QMainWindow my_pad;
-    Ui::nObject *my_w;
-	
-	QPainterPath path() const;
-	QPainterPath shape() const;
-	
-	void selectThis(bool);
-		
-	public slots:
-	
-	void togglePadella();
-	
-	void itemChanged();
-	
-	void interactive();
-	
-	void setRect(QRectF);
-	QRect getRect();
-	QRectF getRectF();
-	
-    void bufferChanged(nPhysD*);
 
-	void zoomChanged(double);
-	void showMessage(QString);
-	void changePointPad(int);
-	void sizeHolder(double);
-	void setWidthF(double);
-	void setOrder(double);
-	void changeToolTip(QString);
-	void changeColor();
-	void changeColor(QColor);
-	void changeColorHolder();
-	void changeColorHolder(QColor);
-	void tableUpdated(QTableWidgetItem *);
-	
-	void expandX();
-	void expandY();
-	
-	void changeWidth();
-	void changeHeight();
-	
-	void updateSize();
-	
-	void movePoints(QPointF);
-	
-	void appendPoint();
-	void addPoint(int);
-	
-	void addPointAfterClick(QPointF);
-		
-	//SETTINGS
-	void loadSettings();
-	void saveSettings();
-	void loadSettings(QSettings *);
-	void saveSettings(QSettings *);
-	
-	
-signals:
-	void sceneChanged();
+	QPainterPath realPath() const {
+		QPainterPath my_path;
+		if (ref.size()>1) {
+			my_path.addEllipse(QRectF(ref[0]->pos(),ref[1]->pos()));
+		}
+		return my_path;
+	}
+
+	QPainterPath path() const {
+		QPainterPath my_path=realPath();
+		my_path.addRect(my_path.boundingRect());
+		return my_path;
+	}
+
+	void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
+		//	p->setCompositionMode((QPainter::CompositionMode)22);
+		QPainterPath my_path=realPath();
+		QPen pen;
+		pen.setWidthF(nWidth/zoom);
+		pen.setColor(nColor);
+		p->setPen(pen);
+		p->drawPath(my_path);
+		QColor col=pen.color();
+		col.setAlpha(20);
+		pen.setColor(col);
+		p->setPen(pen);
+		QPainterPath bbox;
+		bbox.addRect(my_path.boundingRect());
+		p->drawPath(bbox);
+	}
+
 };
+
 
 Q_DECLARE_METATYPE(nEllipse*);
 

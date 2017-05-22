@@ -65,9 +65,10 @@ list (APPEND SOURCES
     
     nApp.cc main.cc
 
-    graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nRect.cc graphics/nMouse.cc
-    graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc graphics/nEllipse.cc
-    graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
+	graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nMouse.cc
+	graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc
+	graphics/nObject.cc graphics/nRect.h graphics/nEllipse.h
+	graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
 
     pans/nFocalSpot.cc pans/nPhysProperties.cc pans/nContours.cc
     pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc

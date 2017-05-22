@@ -486,6 +486,7 @@ void nView::mouseDoubleClickEvent (QMouseEvent *e) {
 
 void nView::mousePressEvent (QMouseEvent *e)
 {
+	qDebug() << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>";
 	QGraphicsView::mousePressEvent(e);
 	if (e->modifiers()&Qt::ControlModifier && currentBuffer) {
 		minMax=currentBuffer->get_min_max().swap();
