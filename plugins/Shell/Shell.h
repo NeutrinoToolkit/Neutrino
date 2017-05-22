@@ -122,7 +122,6 @@ public:
         PythonQt::self()->getMainModule().addObject("nApp", qApp);
 
 
-
         QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
 
         neu->my_w->menubar->addMenu(menuPython);

@@ -45,7 +45,7 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-
+	QFont get_font() const;
 };
 
 #endif
