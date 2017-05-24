@@ -1,9 +1,5 @@
 # check for neutrino root
-if (OPTION_USE_PYTHON)
-    include(FindPythonLibs)
-else()
-    message(STATUS "Python disabled")
-endif()
+include(FindPythonLibs)
 
 if(PYTHONLIBS_FOUND)
     list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})
