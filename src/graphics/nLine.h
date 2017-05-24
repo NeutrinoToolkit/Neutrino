@@ -170,6 +170,9 @@ public slots:
 	void loadSettings(QSettings *);
 	void saveSettings(QSettings *);
 
+    // math facilities
+    QList<double> getContainedIntegral();
+
 signals:
 	void sceneChanged();
 	void key_pressed(int);

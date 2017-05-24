@@ -1014,7 +1014,11 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool b
 
 std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
 {
+    DEBUG("------------------------- init contour integration ------------------------");
+    DEBUG("got "<<contour.size()<<" points in the contour");
+
 	vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
+
 
 	nPhysD check_image(iimage);
 	check_image.TscanBrightness();
@@ -1027,32 +1031,60 @@ std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bo
 		bbox_sup = vmath::max(bbox_sup, *itr);
 		check_image.set((*itr).x(), (*itr).y(), check_val);
 	}
+    DEBUG("bounding box corners are "<<bbox_inf<<", "<<bbox_sup);
 
 	// coutour bbox subimage (to perform integral on)
 	nPhysD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
 	intg_image.set_origin(iimage.get_origin()-bbox_inf);
 
 	// integrate by scanline fill
-	double intg=0;
+    double intg=0, intg_sq=0;
 	std::list<vec2> up_pl, scan_pl, tmplist;
 
-	vec2 starting_point = intg_image.get_origin();
+    // starting point needs to be INSIDE the contour. If origin is not set (i.e. 0:0)
+    // the center of the bbox is a good starting point.
 
-	for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx++) {
+    vec2 iimage_orig = iimage.get_origin();
+    vec2 intg_orig = intg_image.get_origin();
+
+    bool orig_is_inside = (
+                intg_orig.x()<=bbox_sup.x() &&
+                intg_orig.y()<=bbox_sup.y() &&
+                intg_orig.x()>=bbox_inf.x() &&
+                intg_orig.y()>=bbox_inf.y()) ? true : false;
+    vec2 starting_point;
+
+    if (iimage_orig == vec2(0,0) || !orig_is_inside) {
+        starting_point = vec2(0.5*(bbox_sup-bbox_inf));
+        DEBUG("origin is not set: recalculating");
+    } else {
+        DEBUG("origin is set: using it as starting point");
+        starting_point = intg_orig;
+    }
+    DEBUG("starting point is "<<starting_point);
+
+
+    for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx++) {
 		up_pl.push_back(vec2(xx, starting_point.y()));
 	}
 	
 	for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx--) {
 		up_pl.push_front(vec2(xx, starting_point.y()));
 	}
-	
+
+
 
 	//std::cerr<<"walk starting from "<<up_pl.front()<<" to "<<up_pl.back()<<std::endl;
 
 	int line_check =0;
 
+    // the maximum possible surface w/in a given contour is the circular case;
+    // 20% for additional safety
+    int safety_counter = 0;
+    int safety_counter_max = 1.2*((contour.size()*contour.size())/(4*3.14));
 
-	while (!up_pl.empty()) {
+
+    while (!up_pl.empty() && (safety_counter<safety_counter_max)) {
 		
 		//scan_pl = up_pl;
 		//up_pl.clear();
@@ -1119,6 +1151,7 @@ std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bo
 			scan_pl.pop_front();
 			if (intg_image.point(pp, check_val) != check_val) {
 				intg+=intg_image.point(pp);
+                intg_sq+=pow(intg_image.point(pp), 2);
 				points_count++;
 
 				intg_image.set(pp.x(), pp.y(), check_val);
@@ -1132,24 +1165,34 @@ std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bo
 
 		line_check++;
 
+        safety_counter++;
+
 	}
+
+    if (safety_counter >= safety_counter_max) {
+        DEBUG("Maximum recursion reached, exit forced, integration failed");
+        return std::list<double>();
+    }
 
 	DEBUG(5, "contour integral: "<<intg);
 	if (integrate_boundary) {
 		// add boundary points
-		double bps = 0;
+        double bps = 0, bps_sq = 0;
 		for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
 			bps+= iimage.point((*itr).x(), (*itr).y());
-			points_count++;
+            bps_sq+= pow(iimage.point((*itr).x(), (*itr).y()), 2);
+            points_count++;
 		}
 		DEBUG(5, "boundary points account for "<<bps);
-		intg+=bps;	
+        intg+=bps;
+        intg_sq+=bps_sq;
 	}
 
 	std::list<double> ret;
 	ret.push_front(points_count);
 	ret.push_front(intg);
-	return ret;
+    ret.push_front(intg_sq);
+    return ret;
 
 }
 
