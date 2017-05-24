@@ -4,9 +4,6 @@ cmake_minimum_required (VERSION 3.5)
 
 ### top level compile options
 
-option (OPTION_USE_PYTHON "Use python/pythonqt if available" ON)
-option (OPTION_INSTALL_PYTHONQT "Copy the used libPythonQt, if any, in the installer" ON)
-
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 
 project (Neutrino CXX)
@@ -61,13 +58,6 @@ add_subdirectory (nPhysImage)
 add_subdirectory (src)
 add_subdirectory (plugins)
 
-if (LINUX)
-    if (OPTION_INSTALL_PYTHONQT STREQUAL "ON" AND NOT PYTHONQT STREQUAL "PYTHONQT-NOTFOUND")
-        message (STATUS "PythonQt lib is copied along")
-        install (FILES ${PYTHONQT} DESTINATION lib)
-        list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
-    endif()
-endif()
 
 include(FindGit)
 
@@ -87,7 +77,6 @@ endif()
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 
 # goodies for everybody
-file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
 
 if (WIN32)
     # use nsis
@@ -114,9 +103,6 @@ if (WIN32)
     install (FILES ${RUNTIME_DEPS} DESTINATION bin)
     install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
 
-    if (PYTHONQT_FOUND_COMPLETE)
-        install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
-    endif()
 endif()
 
 
@@ -125,8 +111,9 @@ if (LINUX)
 
     #message("building on linux")
     execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
-    execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
-    string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
+	string(REGEX REPLACE "\n" "" DISTRO ${DISTRO})
+	execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
+	string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
     if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
@@ -156,15 +143,6 @@ if (LINUX)
         # install goodies
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
-
-        if (OPTION_INSTALL_PYTHONQT AND PYTHONQT_FOUND_COMPLETE)
-            list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
-            message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
-        endif()
-
-        if (PYTHONQT_FOUND_COMPLETE)
-            install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
-        endif()
 
     endif()
 endif()

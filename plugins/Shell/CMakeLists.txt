@@ -29,9 +29,24 @@ if(PYTHONLIBS_FOUND)
                 set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
             endif()
 
-            set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
 
-            include(NeutrinoPlugin)
+			file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
+
+
+			if (WIN32)
+				install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+			endif()
+
+			if (LINUX)
+
+				list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
+				message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+
+				install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
+			endif()
+
+			set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
+			include(NeutrinoPlugin)
             ADD_NEUTRINO_PLUGIN()
 
         ELSE()
@@ -43,7 +58,6 @@ if(PYTHONLIBS_FOUND)
     endif()
 else()
     message(STATUS "No python libraries found: python subsystem is DISABLED!")
-
 endif()
 
 

@@ -72,7 +72,6 @@ public:
 	}
 
 	void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
-		//	p->setCompositionMode((QPainter::CompositionMode)22);
 		QPainterPath my_path=realPath();
 		QPen pen;
 		pen.setWidthF(nWidth/zoom);
