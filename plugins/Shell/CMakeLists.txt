@@ -34,6 +34,9 @@ if(PYTHONLIBS_FOUND)
 			endif()
 
 			if (LINUX)
+				message (STATUS "PythonQt lib is copied along")
+				install (FILES ${PYTHONQT} DESTINATION lib)
+				list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
 
 				list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
 				message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
