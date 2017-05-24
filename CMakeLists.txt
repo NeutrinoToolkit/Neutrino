@@ -54,11 +54,6 @@ set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 
-add_subdirectory (nPhysImage)
-add_subdirectory (src)
-add_subdirectory (plugins)
-
-
 include(FindGit)
 
 include(GetVersionFromGitTag)
@@ -165,6 +160,11 @@ if(APPLE)
     set(CPACK_DMG_DS_STORE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/DS_Store")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/background.png")
 endif()
+
+
+add_subdirectory (nPhysImage)
+add_subdirectory (src)
+add_subdirectory (plugins)
 
 include (CPack) # this to be included LAST with resp. to its vars
 
