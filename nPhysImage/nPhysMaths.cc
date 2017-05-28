@@ -1160,14 +1160,32 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
         //std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
 
 
+        /*
+         * Reason for the following lines:
+         *
+         * The two up_pl.push_back() methods in the last while loop do mix points from the upper and the lower lines. As a
+         * consequence, the while loops meant to expand scan_pl on the front and on the back side, will
+         * only expand the upper OR the lower on each side
+         *
+         */
+
+        std::list<vec2>::iterator h_front = scan_pl.begin(); ++h_front;
         while (check_image.point(scan_pl.front(), check_val) != check_val) {
             scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
-            //std::cerr<<"--------------"<<intg_image.getPoint(scan_pl.front())<<std::endl;
         }
 
+        scan_pl.push_front(*h_front);
+        while (check_image.point(scan_pl.front(), check_val) != check_val) {
+            scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+        }
+
+        std::list<vec2>::iterator h_back = scan_pl.end(); --h_back; --h_back;
         while (check_image.point(scan_pl.back(), check_val) != check_val) {
             scan_pl.push_back(scan_pl.back()+vec2(1, 0));
-            //std::cerr<<"--------------"<<intg_image.point(scan_pl.back(), check_val)<<std::endl;
+        }
+        scan_pl.push_back(*h_back);
+        while (check_image.point(scan_pl.back(), check_val) != check_val) {
+            scan_pl.push_back(scan_pl.back()+vec2(1, 0));
         }
 
         //std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
