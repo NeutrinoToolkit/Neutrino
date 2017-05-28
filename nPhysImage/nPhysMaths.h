@@ -306,6 +306,8 @@ nPhysC from_real (nPhysD&, double=0.0);
 
 //! contour trace function
 void contour_trace(nPhysD &, std::list<vec2> &, float, bool blur=false, float blur_radius=10.);
+nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour); // generate in/out/boundary map based on the contour
 std::list<double> contour_integrate(nPhysD &, std::list<vec2> &, bool integrate_boundary=false);
+
 
 #endif

@@ -171,6 +171,7 @@ public slots:
 	void saveSettings(QSettings *);
 
     // math facilities
+    void contourSubImage();
     QList<double> getContainedIntegral();
 
 signals:

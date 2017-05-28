@@ -1012,6 +1012,203 @@ void contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool b
 
 }
 
+nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
+{
+    DEBUG("------------------------- init contour surface mapping ------------------------");
+    DEBUG("got "<<contour.size()<<" points in the contour");
+
+    vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
+
+    nPhysD check_image(iimage);
+
+    // image map relative to contour. Legend:
+    // 'u': undef
+    // 'i': inside
+    // 'o': outside
+    // 'c': contour
+    nPhysImageF<char> ci_map(iimage.getW(), iimage.getH(), 'u');
+
+
+    check_image.TscanBrightness();
+    double check_val = check_image.get_min() - 1;
+    int points_count = 0;
+    //double c_integral = 0;
+
+    // set to check_val contour and image boundaries
+    for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
+        bbox_inf = vmath::min(bbox_inf, *itr);
+        bbox_sup = vmath::max(bbox_sup, *itr);
+        check_image.set((*itr).x(), (*itr).y(), check_val);
+        ci_map.set((*itr).x(), (*itr).y(), 'c');
+    }
+    for (int xx=0; xx<check_image.getW(); xx++) {
+        check_image.set(xx, 0, check_val);
+        check_image.set(xx, check_image.getH()-1, check_val);
+    }
+    for (int yy=0; yy<check_image.getH(); yy++) {
+        check_image.set(0, yy, check_val);
+        check_image.set(check_image.getW()-1, yy, check_val);
+    }
+    DEBUG("bounding box corners are "<<bbox_inf<<", "<<bbox_sup);
+
+    // integration on subimage is DISABLED
+    // coutour bbox subimage (to perform integral on)
+    //nPhysD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
+    //intg_image.set_origin(iimage.get_origin()-bbox_inf);
+
+    // integrate by scanline fill
+    //double intg=0, intg_sq=0;
+    std::list<vec2> up_pl, scan_pl, tmplist;
+
+    // starting point needs to be INSIDE the contour. If origin is not set (i.e. 0:0)
+    // the center of the bbox is a good starting point.
+
+    vec2 iimage_orig = iimage.get_origin();
+
+    vec2 starting_point;
+    if (iimage_orig == vec2(0,0)) {
+        starting_point = bbox_inf+vec2(0.5*(bbox_sup-bbox_inf));
+        DEBUG("origin is not set: recalculating");
+    } else {
+        DEBUG("origin is set: using it as starting point");
+        starting_point = iimage_orig;
+    }
+
+    // check if starting point is inside or outside
+    int sp_is_inside = true; bool state_change = false; // mind: image boundaries ARE boundaries
+    for (int xx=starting_point.x(); xx<check_image.getW(); xx++) {
+        if (check_image.point(xx, starting_point.y()) == check_val && !state_change) {
+            state_change = true;
+            sp_is_inside = !sp_is_inside;
+        } else if (check_image.point(xx, starting_point.y()) != check_val && state_change) {
+            state_change = false;
+        }
+    }
+    if (sp_is_inside) {
+        DEBUG("starting point is INSIDE: "<<starting_point);
+    } else DEBUG("starting point is OUTSIDE: "<<starting_point);
+
+    // ================ HIC SUNT LEONES ===============
+
+    // populate starting vector
+    for (int xx=starting_point.x(); check_image.point(xx, starting_point.y()) != check_val; xx++) {
+        up_pl.push_back(vec2(xx, starting_point.y()));
+    }
+    for (int xx=starting_point.x(); check_image.point(xx, starting_point.y()) != check_val; xx--) {
+        up_pl.push_front(vec2(xx, starting_point.y()));
+    }
+
+    DEBUG("walk starting from "<<up_pl.front()<<" to "<<up_pl.back());
+
+    int line_check =0;
+
+    // the maximum possible surface w/in a given contour is the circular case;
+    // 20% for additional safety
+    int safety_counter = 0;
+    int safety_counter_max;
+    if (sp_is_inside) {
+        safety_counter_max = 1.2*((contour.size()*contour.size())/(4*3.14));
+    } else {
+        safety_counter_max = check_image.getSurf()-1.2*((contour.size()*contour.size())/(4*3.14));
+    }
+    DEBUG("Safety counter max value is "<<safety_counter_max);
+
+
+    while (!up_pl.empty() && (safety_counter<safety_counter_max)) {
+
+        //scan_pl = up_pl;
+        //up_pl.clear();
+
+        tmplist.clear();
+        scan_pl.clear();
+        std::list<vec2>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
+        itrf++;
+
+        while (itrf != up_pl.end()) {
+            if (((*itrf).x()-(*itr).x()) > 1) {
+                //std::cerr<<"separation at "<<*itr<<" -- "<<*itrf<<std::endl;
+                scan_pl.push_back(*itr);
+                tmplist.clear();
+                tmplist.push_back(*itrf);
+
+
+                //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<*itr<<" to "<<*itrf<<std::endl;
+                vec2 ref_sx = *itr, ref_dx = *itrf;
+                while (check_image.point(scan_pl.back(), check_val) != check_val) {
+                    ref_sx+=vec2(1,0);
+                    scan_pl.push_back(ref_sx);
+                }
+                //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
+                while (check_image.point(tmplist.front(), check_val) != check_val) {
+                    ref_dx -= vec2(1,0);
+                    tmplist.push_front(ref_dx);
+                    //std::cerr<<"\t\tsep/walking to "<<tmplist.front()<<" - "<<intg_image.point(tmplist.front())<<std::endl;
+                }
+                //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
+                scan_pl.splice(scan_pl.end(), tmplist);
+
+                itr++;
+                itrf++;
+
+
+            } else scan_pl.push_back(*itr); // ovvero se linea senza separazioni somma tutti i punti
+
+            itr++;
+            itrf++;
+        }
+
+        //std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
+
+
+        while (check_image.point(scan_pl.front(), check_val) != check_val) {
+            scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+            //std::cerr<<"--------------"<<intg_image.getPoint(scan_pl.front())<<std::endl;
+        }
+
+        while (check_image.point(scan_pl.back(), check_val) != check_val) {
+            scan_pl.push_back(scan_pl.back()+vec2(1, 0));
+            //std::cerr<<"--------------"<<intg_image.point(scan_pl.back(), check_val)<<std::endl;
+        }
+
+        //std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
+        //if (line_check == 38)
+        //	break;
+
+        up_pl.clear();
+
+        while (!scan_pl.empty()) {
+            vec2 pp = scan_pl.front();
+            scan_pl.pop_front();
+            if (check_image.point(pp, check_val) != check_val) {
+                //intg+=check_image.point(pp);
+                //intg_sq+=pow(check_image.point(pp), 2);
+                //points_count++;
+
+                check_image.set(pp.x(), pp.y(), check_val);
+                if (sp_is_inside) ci_map.set(pp.x(), pp.y(), 'i');
+                else ci_map.set(pp.x(),pp.y(), 'o');
+                safety_counter++;
+
+                up_pl.push_back(vec2(pp.x(), pp.y()+1));
+                up_pl.push_back(vec2(pp.x(), pp.y()-1));
+                //std::cerr<<"point read: "<<pp<<std::endl;
+            }
+            //else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
+        }
+
+        line_check++;
+
+
+    }
+
+    if (safety_counter >= safety_counter_max) {
+        DEBUG("Maximum recursion reached, exit forced, integration failed");
+    }
+
+    return ci_map;
+}
+
+
 std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
 {
     DEBUG("------------------------- init contour integration ------------------------");

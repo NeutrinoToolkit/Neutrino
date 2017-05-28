@@ -1048,6 +1048,54 @@ void nLine::zoomChanged(double val){
 	update();
 }
 
+// functions on surface/contour survey (integral, cut, etc.)
+
+void
+nLine::contourSubImage()
+{
+    // 1. get point list
+    QPolygonF my_poly;
+    std::list<vec2> cp_list;
+
+    if (ref.size()>0) {
+        foreach (QGraphicsEllipseItem *item, ref){
+            my_poly<< item->pos();
+        }
+        // force closed path
+        my_poly << ref[0]->pos();
+
+        for (int ii=0; ii<my_poly.size()-1; ii++) {
+            QPointF p1 = my_poly.at(ii);
+            QPointF p2 = my_poly.at(ii+1);
+
+            double steps = (p2-p1).manhattanLength();
+            for(int jj = 0; jj<=steps; jj++) {
+                QPointF np = p1+jj*(p2-p1)/steps;
+                cp_list.push_back(vec2(np.x(), np.y()));
+            }
+        }
+    }
+
+    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+    DEBUG("starting contour intergration");
+    nPhysImageF<char> data_map = contour_surface_map(*parent()->currentBuffer, cp_list);
+    DEBUG("contour integration ended");
+
+    // generate map image
+    nPhysD map_img(parent()->currentBuffer->getW(), parent()->currentBuffer->getH(), 0);
+    for (int ii=0; ii<data_map.getSurf(); ii++) {
+        char mval = data_map.point(ii);
+        double oval = 0;
+        if (mval=='i') oval = 1;
+        else if (mval == 'o') oval = 2;
+        else if (mval == 'c') oval = 3;
+        else if (mval == 'u') oval = -1;
+        map_img.set(ii, oval);
+    }
+
+    parent()->addShowPhys(map_img);
+}
+
 QList<double>
 nLine::getContainedIntegral()
 {
@@ -1081,6 +1129,8 @@ nLine::getContainedIntegral()
     return QList<double>::fromStdList(c_data);
 
 }
+
+// --------- end contour ------------
 
 
 
