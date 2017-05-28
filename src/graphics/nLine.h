@@ -171,7 +171,7 @@ public slots:
 	void saveSettings(QSettings *);
 
     // math facilities
-    void contourSubImage();
+    nPhysD getContourSubImage(double fill_value=std::numeric_limits<double>::quiet_NaN());
     QList<double> getContainedIntegral();
 
 signals:

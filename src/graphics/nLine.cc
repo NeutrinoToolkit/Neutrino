@@ -1050,8 +1050,8 @@ void nLine::zoomChanged(double val){
 
 // functions on surface/contour survey (integral, cut, etc.)
 
-void
-nLine::contourSubImage()
+nPhysD
+nLine::getContourSubImage(double fill_value)
 {
     // 1. get point list
     QPolygonF my_poly;
@@ -1082,18 +1082,14 @@ nLine::contourSubImage()
     DEBUG("contour integration ended");
 
     // generate map image
-    nPhysD map_img(parent()->currentBuffer->getW(), parent()->currentBuffer->getH(), 0);
+    nPhysD sub_img(parent()->currentBuffer->getW(), parent()->currentBuffer->getH(), fill_value);
     for (int ii=0; ii<data_map.getSurf(); ii++) {
         char mval = data_map.point(ii);
-        double oval = 0;
-        if (mval=='i') oval = 1;
-        else if (mval == 'o') oval = 2;
-        else if (mval == 'c') oval = 3;
-        else if (mval == 'u') oval = -1;
-        map_img.set(ii, oval);
+        if (mval=='i' || mval == 'c') sub_img.set(ii, parent()->currentBuffer->point(ii));
     }
 
-    parent()->addShowPhys(map_img);
+    //parent()->addShowPhys(sub_img);
+    return sub_img;
 }
 
 QList<double>
