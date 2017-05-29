@@ -37,10 +37,10 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	nparent->my_s.addItem(this);
 	setParent(nparent);
 
-    if (nparent->currentBuffer) {
-        setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
-    }
-    
+	if (nparent->currentBuffer) {
+		setPos(nparent->currentBuffer->get_origin().x(),nparent->currentBuffer->get_origin().y());
+	}
+
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
@@ -97,7 +97,7 @@ nEllipse::nEllipse(neutrino *nparent) : QGraphicsObject()
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 	updateSize();
 }
@@ -137,11 +137,11 @@ QRectF nEllipse::getRectF() {
 }
 
 void nEllipse::bufferChanged(nPhysD* my_phys) {    
-    if (my_phys) {
-        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
-    } else {
-        setPos(0,0);
-    }
+	if (my_phys) {
+		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+	} else {
+		setPos(0,0);
+	}
 }
 
 void nEllipse::interactive ( ) {
@@ -152,7 +152,7 @@ void nEllipse::interactive ( ) {
 
 void nEllipse::addPointAfterClick ( QPointF ) {
 	showMessage(tr("Point added, click for the second point"));
-    moveRef.clear();
+	moveRef.clear();
 	appendPoint();
 	disconnect(parent()->my_w.my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
@@ -244,8 +244,8 @@ nEllipse::setOrder (double w) {
 void
 nEllipse::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
-    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
+	p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
+	p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
 
 	changeP(item->row(),p, false);
 	itemChanged();
@@ -316,7 +316,7 @@ void nEllipse::addPoint (int pos) {
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-        int copyfrom=std::max(pos, 1);
+		int copyfrom=std::max(pos, 1);
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -372,7 +372,7 @@ void nEllipse::changeWidth () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
+		rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -384,7 +384,7 @@ void nEllipse::changeHeight () {
 	if (parent()->currentBuffer) {
 		QRectF rect=getRectF();
 		bool ok;
-        rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
+		rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
 		if (ok) {
 			changeP(1,rect.bottomRight(),true);
 			itemChanged();
@@ -450,7 +450,7 @@ nEllipse::keyPressEvent ( QKeyEvent * e ) {
 			if (parent()->currentBuffer) {
 				nPhysD subPhys=parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height());
 				parent()->showPhys(subPhys);
-//				parent()->showPhys(parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
+				//				parent()->showPhys(parent()->currentBuffer->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
 			}
 			break;
 		default:
@@ -466,7 +466,7 @@ nEllipse::keyReleaseEvent ( QKeyEvent *  ) {
 void
 nEllipse::moveBy(QPointF delta) {
 	for (int i =0; i<ref.size(); i++) {
-        changeP(i,mapToScene(ref[i]->pos()+delta),true);
+		changeP(i,mapToScene(ref[i]->pos()+delta),true);
 	}
 }
 
@@ -588,15 +588,15 @@ nEllipse::saveSettings() {
 void
 nEllipse::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-    setPos(settings->value("position").toPoint());
-    
-    int size = settings->beginReadArray("points");
-    QPolygonF poly_tmp;
-    for (int i = 0; i < size; ++i) {
-        settings->setArrayIndex(i);
-        poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
-    }
-    settings->endArray();
+	setPos(settings->value("position").toPoint());
+
+	int size = settings->beginReadArray("points");
+	QPolygonF poly_tmp;
+	for (int i = 0; i < size; ++i) {
+		settings->setArrayIndex(i);
+		poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+	}
+	settings->endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
@@ -615,7 +615,7 @@ void
 nEllipse::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
-    settings->setValue("position",pos());
+	settings->setValue("position",pos());
 	settings->beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
 		settings->setArrayIndex(i);

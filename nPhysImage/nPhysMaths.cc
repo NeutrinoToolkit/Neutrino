@@ -1109,7 +1109,7 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
     if (sp_is_inside) {
         safety_counter_max = 1.2*((contour.size()*contour.size())/(4*3.14));
     } else {
-        safety_counter_max = check_image.getSurf()-1.2*((contour.size()*contour.size())/(4*3.14));
+        safety_counter_max = check_image.getSurf();
     }
     DEBUG("Safety counter max value is "<<safety_counter_max);
 
@@ -1221,6 +1221,16 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
 
     if (safety_counter >= safety_counter_max) {
         DEBUG("Maximum recursion reached, exit forced, integration failed");
+    } else {
+        // fill the remaining image
+        if (sp_is_inside) {
+            for (int xx=0; xx<ci_map.getSurf(); xx++)
+                if (ci_map.point(xx) == 'u') ci_map.set(xx, 'o');
+        } else {
+            for (int xx=0; xx<ci_map.getSurf(); xx++)
+                if (ci_map.point(xx) == 'u') ci_map.set(xx, 'i');
+
+        }
     }
 
     return ci_map;
