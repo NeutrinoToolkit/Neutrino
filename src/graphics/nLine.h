@@ -168,6 +168,10 @@ public slots:
 	void loadSettings(QSettings *);
 	void saveSettings(QSettings *);
 
+    // math facilities
+    nPhysD getContourSubImage(double fill_value=std::numeric_limits<double>::quiet_NaN());
+    QList<double> getContainedIntegral();
+
 signals:
 	void sceneChanged();
 	void key_pressed(int);

@@ -45,7 +45,7 @@ public:
 	QPointer<nLine> my_c;
 
 public slots:
-	void draw();
+	void on_draw_pb_released();
     void on_percent_released();
     void on_actionCenter_toggled(bool);
 

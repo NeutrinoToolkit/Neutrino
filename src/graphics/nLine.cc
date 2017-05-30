@@ -77,10 +77,10 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
         connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-        zoom=my_parent->getZoom();
+		zoom=my_parent->getZoom();
 
-        if (my_parent->getCurrentBuffer()) {
-                setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
+		if (my_parent->getCurrentBuffer()) {
+				setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
 		}
 
 	} else {
@@ -1068,6 +1068,86 @@ void nLine::zoomChanged(double val){
 	setWidthF(nWidth);
 	update();
 }
+
+// functions on surface/contour survey (integral, cut, etc.)
+
+nPhysD
+nLine::getContourSubImage(double fill_value)
+{
+    // 1. get point list
+    QPolygonF my_poly;
+    std::list<vec2> cp_list;
+
+    if (ref.size()>0) {
+        foreach (QGraphicsEllipseItem *item, ref){
+            my_poly<< item->pos();
+        }
+        // force closed path
+        my_poly << ref[0]->pos();
+
+        for (int ii=0; ii<my_poly.size()-1; ii++) {
+            QPointF p1 = my_poly.at(ii);
+            QPointF p2 = my_poly.at(ii+1);
+
+            double steps = (p2-p1).manhattanLength();
+            for(int jj = 0; jj<=steps; jj++) {
+                QPointF np = p1+jj*(p2-p1)/steps;
+                cp_list.push_back(vec2(np.x(), np.y()));
+            }
+        }
+    }
+
+    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+    DEBUG("starting contour intergration");
+	nPhysImageF<char> data_map = contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
+    DEBUG("contour integration ended");
+
+    // generate map image
+	nPhysD sub_img(nparent->getCurrentBuffer()->getW(), nparent->getCurrentBuffer()->getH(), fill_value);
+    for (int ii=0; ii<data_map.getSurf(); ii++) {
+        char mval = data_map.point(ii);
+		if (mval=='i' || mval == 'c') sub_img.set(ii, nparent->getCurrentBuffer()->point(ii));
+    }
+
+    //parent()->addShowPhys(sub_img);
+    return sub_img;
+}
+
+QList<double>
+nLine::getContainedIntegral()
+{
+    // 1. get point list
+    QPolygonF my_poly;
+    std::list<vec2> cp_list;
+
+    if (ref.size()>0) {
+        foreach (QGraphicsEllipseItem *item, ref){
+            my_poly<< item->pos();
+        }
+        // force closed path
+        my_poly << ref[0]->pos();
+
+        for (int ii=0; ii<my_poly.size()-1; ii++) {
+            QPointF p1 = my_poly.at(ii);
+            QPointF p2 = my_poly.at(ii+1);
+
+            double steps = (p2-p1).manhattanLength();
+            for(int jj = 0; jj<=steps; jj++) {
+                QPointF np = p1+jj*(p2-p1)/steps;
+                cp_list.push_back(vec2(np.x(), np.y()));
+            }
+        }
+    }
+
+    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+    DEBUG("starting contour intergration");
+	std::list<double> c_data = contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
+    DEBUG("contour integration ended");
+    return QList<double>::fromStdList(c_data);
+
+}
+
+// --------- end contour ------------
 
 
 

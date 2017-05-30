@@ -86,7 +86,6 @@ public:
 		bbox.addRect(my_path.boundingRect());
 		p->drawPath(bbox);
 	}
-
 };
 
 
