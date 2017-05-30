@@ -7,9 +7,10 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
     : QPluginLoader(pname), iface(nullptr), nParent(neu)
 {
 
-      qDebug() << "Parsing lib " << pname;
 
-	  setLoadHints(QLibrary::ResolveAllSymbolsHint);
+	  setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::ExportExternalSymbolsHint);
+
+	  qDebug() << "Parsing lib " << pname  << " loadHints:" << loadHints();
 	  QObject *p_obj = instance();
 
       if (p_obj) {

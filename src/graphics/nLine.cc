@@ -1107,7 +1107,7 @@ nLine::getContourSubImage(double fill_value)
 
 		// generate map image
 		nPhysD sub_img(nparent->getCurrentBuffer()->getW(), nparent->getCurrentBuffer()->getH(), fill_value);
-		for (int ii=0; ii<data_map.getSurf(); ii++) {
+		for (unsigned int ii=0; ii<data_map.getSurf(); ii++) {
 			char mval = data_map.point(ii);
 			if (mval=='i' || mval == 'c') sub_img.set(ii, nparent->getCurrentBuffer()->point(ii));
 		}
