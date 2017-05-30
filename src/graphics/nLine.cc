@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -41,19 +41,19 @@ nLine::~nLine() {
 
 nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 {
-    my_w.name->setText(parentPan->panName()+"Line");
-    setProperty("parentPan", QVariant::fromValue(parentPan));
-    setProperty("parentPanControlLevel",level);
-    if (level>0) {
-        my_w.name->setReadOnly(true);
-        disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-    }
-    if (level>1) {
-        sizeHolder(0.0);
-    }
-    if (level>2) {
-        my_w.cutPoints->setValue(1);
-    }
+	my_w.name->setText(parentPan->panName()+"Line");
+	setProperty("parentPan", QVariant::fromValue(parentPan));
+	setProperty("parentPanControlLevel",level);
+	if (level>0) {
+		my_w.name->setReadOnly(true);
+		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+	}
+	if (level>1) {
+		sizeHolder(0.0);
+	}
+	if (level>2) {
+		my_w.cutPoints->setValue(1);
+	}
 
 	if (level>0) {
 		disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
@@ -63,32 +63,32 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 }
 
 nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
-    nparent(my_parent)
+	nparent(my_parent)
 {
 
-    if (my_parent) {
-        my_parent->getScene().addItem(this);
-        setParent(my_parent);
-        int num=my_parent->property("numLine").toInt()+1;
-        my_parent->setProperty("numLine",num);
-        setProperty("numLine",num);
-        setToolTip(tr("line")+QString::number(num));
-        connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+	if (my_parent) {
+		my_parent->getScene().addItem(this);
+		setParent(my_parent);
+		int num=my_parent->property("numLine").toInt()+1;
+		my_parent->setProperty("numLine",num);
+		setProperty("numLine",num);
+		setToolTip(tr("line")+QString::number(num));
+		connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+		connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+		connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
 		zoom=my_parent->getZoom();
 
 		if (my_parent->getCurrentBuffer()) {
-				setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
+			setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
 		}
 
 	} else {
 		setToolTip(tr("line"));
 	}
 
-    setProperty("NeuSave-fileIni",toolTip()+".ini");
-    setProperty("NeuSave-fileTxt",toolTip()+".txt");
+	setProperty("NeuSave-fileIni",toolTip()+".ini");
+	setProperty("NeuSave-fileTxt",toolTip()+".txt");
 
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
@@ -117,16 +117,18 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 	my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
+	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
-    connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
+	connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
+	connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
+	connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
 
-    connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+	connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
 	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
 	connect(my_w.actionAntialias, SIGNAL(triggered()), this, SLOT(toggleAntialias()));
+
+	connect(my_w.actionExtract, SIGNAL(triggered()), this, SLOT(extractPath()));
 
 	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 
@@ -143,8 +145,8 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
-    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
+	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+	connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -160,28 +162,28 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 }
 
 QString nLine::getPointsStr(){
-    QString str_points;
-    foreach(QPointF p, poly(1)) {
-        str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
-    }
-    DEBUG(str_points.toStdString());
-    return str_points;
+	QString str_points;
+	foreach(QPointF p, poly(1)) {
+		str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+	}
+	DEBUG(str_points.toStdString());
+	return str_points;
 }
 
 void nLine::copy_points() {
-    QApplication::clipboard()->setText(getPointsStr());
+	QApplication::clipboard()->setText(getPointsStr());
 }
 
 void nLine::save_points() {
-    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
-    if (!fnametmp.isEmpty()) {
-        setProperty("NeuSave-fileTxt", fnametmp);
-        QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
-        QTextStream out(&t);
-        out << getPointsStr();
-        t.close();
-    }
+	QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+	if (!fnametmp.isEmpty()) {
+		setProperty("NeuSave-fileTxt", fnametmp);
+		QFile t(fnametmp);
+		t.open(QIODevice::WriteOnly| QIODevice::Text);
+		QTextStream out(&t);
+		out << getPointsStr();
+		t.close();
+	}
 
 }
 
@@ -225,7 +227,7 @@ QPolygonF nLine::getLine(int np) {
 
 void nLine::interactive ( ) {
 	showMessage(tr("Click for first point, press Esc to finish"));
-    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+	connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -233,12 +235,12 @@ void nLine::addPointAfterClick (QPointF) {
 	showMessage(tr("Point added, press ESC to finish"));
 	moveRef.clear();
 	appendPoint();
-//    moveRef.erase(moveRef.begin(),moveRef.end()-1);
+	//    moveRef.erase(moveRef.begin(),moveRef.end()-1);
 }
 
 void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
-    if(property("parentPanControlLevel").toInt()<2) {
-        click_pos=e->pos();
+	if(property("parentPanControlLevel").toInt()<2) {
+		click_pos=e->pos();
 
 		if (e->button()==Qt::LeftButton) {
 			for (int i=0;i<ref.size();i++) {
@@ -248,16 +250,16 @@ void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 			}
 		}
 		if (moveRef.size()>0) { // if more that one just pick the las
-            int keeplast=moveRef.last();
-            moveRef.clear();
-            moveRef.append(keeplast);
-            showMessage(tr("Moving node ")+QString::number(keeplast+1));
-        } else { // if none is selected, append ref.size() to move the whole objec
-            moveRef.append(ref.size());
-            showMessage(tr("Moving object"));
-        }
-    }
-    QGraphicsItem::mousePressEvent(e);
+			int keeplast=moveRef.last();
+			moveRef.clear();
+			moveRef.append(keeplast);
+			showMessage(tr("Moving node ")+QString::number(keeplast+1));
+		} else { // if none is selected, append ref.size() to move the whole objec
+			moveRef.append(ref.size());
+			showMessage(tr("Moving object"));
+		}
+	}
+	QGraphicsItem::mousePressEvent(e);
 
 }
 
@@ -271,9 +273,9 @@ void nLine::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
 	nodeSelected=-1;
 	if (moveRef.contains(ref.size())) {
 		QPointF delta=e->pos()-click_pos;
-	    moveBy(delta);
+		moveBy(delta);
 	}
-    click_pos=e->pos();
+	click_pos=e->pos();
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
@@ -294,7 +296,7 @@ void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
 
 void nLine::updatePlot () {
 
-    nPhysD *my_phys=nparent->getCurrentBuffer();
+	nPhysD *my_phys=nparent->getCurrentBuffer();
 	if (my_w.plot->isVisible() && my_phys) {
 
 		if (my_w.plot->graphCount()==0) {
@@ -304,8 +306,8 @@ void nLine::updatePlot () {
 			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 			my_w.plot->xAxis->setLabelPadding(-1);
 			my_w.plot->yAxis->setLabelPadding(-1);
-            my_w.plot->xAxis->setTickLabelFont(nparent->my_w->my_view->font());
-            my_w.plot->yAxis->setTickLabelFont(nparent->my_w->my_view->font());
+			my_w.plot->xAxis->setTickLabelFont(nparent->my_w->my_view->font());
+			my_w.plot->yAxis->setTickLabelFont(nparent->my_w->my_view->font());
 		}
 
 		double colore;
@@ -397,7 +399,7 @@ void nLine::toggleClosedLine ( bool val ) {
 		showMessage(tr("Line is open"));
 	}
 	updatePlot();
-    itemChanged();
+	itemChanged();
 }
 
 void nLine::toggleAntialias () {
@@ -458,8 +460,8 @@ nLine::setOrder (double w) {
 void
 nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-    p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
-    p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
+	p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
+	p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
 	changeP(item->row(),p, true);
 }
 
@@ -543,12 +545,12 @@ void nLine::addPoint () {
 }
 
 void nLine::addPoint (int npos) {
-    moveRef.append(npos);
+	moveRef.append(npos);
 	QPointF position;
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-        int copyfrom=std::max(1,std::min(ref.size()-1,npos));
+		int copyfrom=std::max(1,std::min(ref.size()-1,npos));
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -604,10 +606,10 @@ void nLine::removePoint(int np) {
 			if (ref.size()==1) {
 				deleteLater();
 			}
-            itemChanged();
+			itemChanged();
 		}
 	}
-    nodeSelected=-1;
+	nodeSelected=-1;
 }
 
 void
@@ -624,7 +626,7 @@ nLine::removePoint() {
 
 void
 nLine::showMessage (QString s) {
-    nparent->statusBar()->showMessage(s,2000);
+	nparent->statusBar()->showMessage(s,2000);
 	my_pad.statusBar()->showMessage(s,2000);
 }
 
@@ -634,18 +636,18 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 	if (e->modifiers() & Qt::ShiftModifier) {
 		delta =10.0;
 	}
-    switch (e->key()) {
-        case Qt::Key_W: 
-            togglePadella();
-            break;            
+	switch (e->key()) {
+		case Qt::Key_W:
+			togglePadella();
+			break;
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-            if (disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+			if (disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
-                ungrabKeyboard();
+				ungrabKeyboard();
 			}
-            moveRef.clear();
+			moveRef.clear();
 			break;
 		case Qt::Key_Up:
 			moveBy(QPointF(0.0,-delta));
@@ -665,110 +667,110 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_B:
 			toggleBezier();
-			// .alex. 
+			// .alex.
 			//redundant
 			//updatePlot();
 			break;
 		case Qt::Key_S:
 			toggleAntialias();
-			// .alex. 
+			// .alex.
 			//redundant
 			//updatePlot();
 			break;
 		case Qt::Key_C:
-            if (e->modifiers() & Qt::ShiftModifier) {
-                centerOnImage();
-            } else {
-                toggleClosedLine();
-		// .alex. 
-		//redundant
-                //updatePlot();
-            }
+			if (e->modifiers() & Qt::ShiftModifier) {
+				centerOnImage();
+			} else {
+				toggleClosedLine();
+				// .alex.
+				//redundant
+				//updatePlot();
+			}
 			break;
 		case Qt::Key_A:
-            contextAppendPoint();
+			contextAppendPoint();
 			break;
 		case Qt::Key_P:
-            contextPrependPoint();
+			contextPrependPoint();
 			break;
 		case Qt::Key_D:
-            contextRemovePoint();
+			contextRemovePoint();
 			break;
 		case Qt::Key_X: {
-            makeHorizontal();
-			break;
-		}
+				makeHorizontal();
+				break;
+			}
 		case Qt::Key_Y:{
-            makeVertical();
-			break;
-		}
+				makeVertical();
+				break;
+			}
 		case Qt::Key_R:{
-            makeRectangle();
-			break;
-		}
+				makeRectangle();
+				break;
+			}
 		default:
-            emit key_pressed(e->key());
-            break;
+			emit key_pressed(e->key());
+			break;
 	}
-    e->accept();
+	e->accept();
 }
 
 
 void nLine::makeHorizontal() {
-    if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
-        QPointF p(0,0);
-        foreach (QGraphicsEllipseItem *item, ref){
-            p-=item->pos();
-        }
-        p/=ref.size();
-        vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
-        p+=QPointF(p1.x(),p1.y());
+	if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
+		QPointF p(0,0);
+		foreach (QGraphicsEllipseItem *item, ref){
+			p-=item->pos();
+		}
+		p/=ref.size();
+		vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
+		p+=QPointF(p1.x(),p1.y());
 
-        while (ref.size()>2) removePoint(2);
+		while (ref.size()>2) removePoint(2);
 
-        changeP(0, QPointF(0.0,p.y()));
-        changeP(1, QPointF(nparent->getCurrentBuffer()->getW(),p.y()));
-        
+		changeP(0, QPointF(0.0,p.y()));
+		changeP(1, QPointF(nparent->getCurrentBuffer()->getW(),p.y()));
 
-        itemChanged();
-        moveRef.clear();
-    } 
+
+		itemChanged();
+		moveRef.clear();
+	}
 }
 
 void nLine::makeVertical() {
-    if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
-        QPointF p(0,0);
-        foreach (QGraphicsEllipseItem *item, ref){
-            p-=item->pos();
-        }
-        p/=ref.size();
-        vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
-        p+=QPointF(p1.x(),p1.y());
-        
-        while (ref.size()>2) removePoint(2);
+	if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
+		QPointF p(0,0);
+		foreach (QGraphicsEllipseItem *item, ref){
+			p-=item->pos();
+		}
+		p/=ref.size();
+		vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
+		p+=QPointF(p1.x(),p1.y());
 
-        changeP(0, QPointF(p.x(),0.0));
-        changeP(1, QPointF(p.x(),nparent->getCurrentBuffer()->getH()));
-        
-        itemChanged();
-    }
+		while (ref.size()>2) removePoint(2);
+
+		changeP(0, QPointF(p.x(),0.0));
+		changeP(1, QPointF(p.x(),nparent->getCurrentBuffer()->getH()));
+
+		itemChanged();
+	}
 }
 
 void nLine::makeRectangle() {
-    if(property("parentPanControlLevel").toInt()<2) {
-        QRectF my_rect=path().boundingRect();
+	if(property("parentPanControlLevel").toInt()<2) {
+		QRectF my_rect=path().boundingRect();
 
-        while (ref.size()<4) appendPoint();
-        while (ref.size()>4) removePoint(4);
+		while (ref.size()<4) appendPoint();
+		while (ref.size()>4) removePoint(4);
 
-        QPointF p1=my_rect.topLeft();
-        QPointF p2=my_rect.bottomRight();
+		QPointF p1=my_rect.topLeft();
+		QPointF p2=my_rect.bottomRight();
 
-        changeP(0, p1);
-        changeP(1, QPointF(p1.x(),p2.y()));
-        changeP(2, p2);
-        changeP(3, QPointF(p2.x(),p1.y()));
-    }
+		changeP(0, p1);
+		changeP(1, QPointF(p1.x(),p2.y()));
+		changeP(2, p2);
+		changeP(3, QPointF(p2.x(),p1.y()));
+	}
 }
 
 void
@@ -778,7 +780,7 @@ nLine::keyReleaseEvent ( QKeyEvent *  ) {
 
 void
 nLine::moveBy(QPointF delta) {
-    if (property("parentPanControlLevel").toInt()<2) {
+	if (property("parentPanControlLevel").toInt()<2) {
 		for (int i =0; i<ref.size(); i++) {
 			changeP(i,mapToScene(ref[i]->pos()+delta));
 		}
@@ -789,11 +791,11 @@ void
 nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *e) {
 	setFocus(Qt::MouseFocusReason);
 	for (int i=0;i<ref.size();i++) {
-        QRectF my_rect=ref.at(i)->rect();
+		QRectF my_rect=ref.at(i)->rect();
 		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
-            showMessage(toolTip()+":"+QString::number(i+1));
-            break;
+			showMessage(toolTip()+":"+QString::number(i+1));
+			break;
 		}
 	}
 }
@@ -806,59 +808,59 @@ nLine::hoverLeaveEvent( QGraphicsSceneHoverEvent *) {
 void
 nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
 	for (int i=0;i<ref.size();i++) {
-        QRectF my_rect=ref.at(i)->rect();
+		QRectF my_rect=ref.at(i)->rect();
 		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
-            showMessage(toolTip()+":"+QString::number(i+1));
-            break;
+			showMessage(toolTip()+":"+QString::number(i+1));
+			break;
 		}
 	}
 }
 
 void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
-    QMenu menu;
-    if (nodeSelected>=0) {
-        moveRef.clear();
-        QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1)+" (a)");
-        connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
-        QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1)+" (p)");
-        connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
-        QAction *remove = menu.addAction("Delete point "+QString::number(nodeSelected+1)+" (d)");
-        connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
-        menu.addAction(menu.addSeparator());
-    }
-    QAction *bezier = menu.addAction("Straight/Bezier (b)");
-    connect(bezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
-    QAction *closedline = menu.addAction("Closed/Open (c)");
-    connect(closedline, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
-    QAction *centerimage = menu.addAction("Center on image (C)");
-    connect(centerimage, SIGNAL(triggered()), this, SLOT(centerOnImage()));
-    QAction *twoHoriz = menu.addAction("2 points Horizontal (x)");
-    connect(twoHoriz, SIGNAL(triggered()), this, SLOT(makeHorizontal()));
-    QAction *twoVert = menu.addAction("2 points Vertical (y)");
-    connect(twoVert, SIGNAL(triggered()), this, SLOT(makeVertical()));
-    QAction *makeRect = menu.addAction("4 points Rectangle (r)");
-    connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
-    menu.addAction(menu.addSeparator());
-    QAction *showPan = menu.addAction("Show control (w)");
-    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
-    menu.exec(e->screenPos());
+	QMenu menu;
+	if (nodeSelected>=0) {
+		moveRef.clear();
+		QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1)+" (a)");
+		connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
+		QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1)+" (p)");
+		connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
+		QAction *remove = menu.addAction("Delete point "+QString::number(nodeSelected+1)+" (d)");
+		connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
+		menu.addAction(menu.addSeparator());
+	}
+	QAction *bezier = menu.addAction("Straight/Bezier (b)");
+	connect(bezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+	QAction *closedline = menu.addAction("Closed/Open (c)");
+	connect(closedline, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
+	QAction *centerimage = menu.addAction("Center on image (C)");
+	connect(centerimage, SIGNAL(triggered()), this, SLOT(centerOnImage()));
+	QAction *twoHoriz = menu.addAction("2 points Horizontal (x)");
+	connect(twoHoriz, SIGNAL(triggered()), this, SLOT(makeHorizontal()));
+	QAction *twoVert = menu.addAction("2 points Vertical (y)");
+	connect(twoVert, SIGNAL(triggered()), this, SLOT(makeVertical()));
+	QAction *makeRect = menu.addAction("4 points Rectangle (r)");
+	connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
+	menu.addAction(menu.addSeparator());
+	QAction *showPan = menu.addAction("Show control (w)");
+	connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+	menu.exec(e->screenPos());
 }
 
 
 void nLine::contextAppendPoint(){
-    addPoint(nodeSelected+1);
-    showMessage(tr("Append to point ")+QString::number(nodeSelected));
+	addPoint(nodeSelected+1);
+	showMessage(tr("Append to point ")+QString::number(nodeSelected));
 }
 
 void nLine::contextPrependPoint(){
-    addPoint(nodeSelected);
-    showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
+	addPoint(nodeSelected);
+	showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
 }
 
 void nLine::contextRemovePoint(){
-    removePoint(nodeSelected);
-    showMessage(tr("Delete point ")+QString::number(nodeSelected));
+	removePoint(nodeSelected);
+	showMessage(tr("Delete point ")+QString::number(nodeSelected));
 }
 
 void
@@ -868,7 +870,7 @@ nLine::focusInEvent( QFocusEvent *) {
 
 void
 nLine::focusOutEvent( QFocusEvent *) {
-    selectThis(false);
+	selectThis(false);
 }
 
 void
@@ -878,12 +880,12 @@ nLine::selectThis(bool val) {
 		ref[i]->setVisible(val);
 	}
 	if (val) {
-        grabKeyboard();
-        nparent->my_w->statusbar->showMessage(toolTip());
-    } else {
-        ungrabKeyboard();
-        nparent->my_w->statusbar->clearMessage();
-    }
+		grabKeyboard();
+		nparent->my_w->statusbar->showMessage(toolTip());
+	} else {
+		ungrabKeyboard();
+		nparent->my_w->statusbar->clearMessage();
+	}
 }
 
 void nLine::itemChanged() {
@@ -893,17 +895,17 @@ void nLine::itemChanged() {
 // reimplementation
 QRectF
 nLine::boundingRect() const {
-    QPainterPath my_path=shape();
+	QPainterPath my_path=shape();
 	return my_path.boundingRect();
 }
 
 QPainterPath nLine::shape() const {
 	QPainterPathStroker stroker;
-    double thickness=std::max(nWidth,10.0)/zoom;
-    stroker.setWidth(thickness);
+	double thickness=std::max(nWidth,10.0)/zoom;
+	stroker.setWidth(thickness);
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
-        QRectF my_rect=ref[i]->rect();
+		QRectF my_rect=ref[i]->rect();
 		my_shape.addPolygon(ref[i]->mapToScene(my_rect));
 	}
 	return my_shape;
@@ -933,68 +935,68 @@ QPolygonF nLine::poly(int steps) const {
 			my_poly<< item->pos();
 		}
 
-        if (bezier && my_poly.size()>2) {
+		if (bezier && my_poly.size()>2) {
 
-            std::vector<double> T,X,Y;
-            if (closedLine)  {
-                const int guard=2;
-                T.resize(my_poly.size()+2*guard,0);
-                X.resize(my_poly.size()+2*guard,0);
-                Y.resize(my_poly.size()+2*guard,0);
-                for (int i = 0; i < (int) T.size(); i++ ) {
-                    T[i]=i-guard;
-                    X[i]=my_poly[(i+ref.size()-guard)%ref.size()].x();
-                    Y[i]=my_poly[(i+ref.size()-guard)%ref.size()].y();
-                }
-            } else {
-                T.resize(my_poly.size());
-                X.resize(my_poly.size());
-                Y.resize(my_poly.size());
-                for (int i = 0; i < my_poly.size(); i++ ) {
-                    T[i]=i;
-                    X[i]=my_poly[i].x();
-                    Y[i]=my_poly[i].y();
-                }
-            }
+			std::vector<double> T,X,Y;
+			if (closedLine)  {
+				const int guard=2;
+				T.resize(my_poly.size()+2*guard,0);
+				X.resize(my_poly.size()+2*guard,0);
+				Y.resize(my_poly.size()+2*guard,0);
+				for (int i = 0; i < (int) T.size(); i++ ) {
+					T[i]=i-guard;
+					X[i]=my_poly[(i+ref.size()-guard)%ref.size()].x();
+					Y[i]=my_poly[(i+ref.size()-guard)%ref.size()].y();
+				}
+			} else {
+				T.resize(my_poly.size());
+				X.resize(my_poly.size());
+				Y.resize(my_poly.size());
+				for (int i = 0; i < my_poly.size(); i++ ) {
+					T[i]=i;
+					X[i]=my_poly[i].x();
+					Y[i]=my_poly[i].y();
+				}
+			}
 
-            spline::spline sX(T,X), sY(T,Y);
+			spline::spline sX(T,X), sY(T,Y);
 
-            steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
-            int size=steps*(my_poly.size()-(closedLine?0:1));
-            
-            for (int i = 0; i < size+1; i++ ) {
-                const double dtmp = (double) i / steps;
-                my_poly_interp.append(QPointF(sX(dtmp),sY(dtmp)));
-            }
-            
-        } else {
-            if (closedLine) my_poly << ref[0]->pos();
-            for(int i=0;i<my_poly.size()-1;i++) {
-                QPointF p1=my_poly.at(i);
-                QPointF p2=my_poly.at(i+1);
-                for(int j=0;j<=steps;j++) {
-                    my_poly_interp << p1+j*(p2-p1)/steps;
-                }
-            }
-        }
-    }
+			steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
+			int size=steps*(my_poly.size()-(closedLine?0:1));
 
-    return my_poly_interp;
+			for (int i = 0; i < size+1; i++ ) {
+				const double dtmp = (double) i / steps;
+				my_poly_interp.append(QPointF(sX(dtmp),sY(dtmp)));
+			}
+
+		} else {
+			if (closedLine) my_poly << ref[0]->pos();
+			for(int i=0;i<my_poly.size()-1;i++) {
+				QPointF p1=my_poly.at(i);
+				QPointF p2=my_poly.at(i+1);
+				for(int j=0;j<=steps;j++) {
+					my_poly_interp << p1+j*(p2-p1)/steps;
+				}
+			}
+		}
+	}
+
+	return my_poly_interp;
 }
 
 void nLine::centerOnImage(){
-    
-    if (nparent->getCurrentBuffer()) {
-        QPointF p(0,0);
-        foreach (QGraphicsEllipseItem *item, ref){
-            p-=item->pos();
-        }
-        p/=ref.size();
-        vec2f p1=nparent->getCurrentBuffer()->getSize()/2.0-nparent->getCurrentBuffer()->get_origin();
-        p+=QPointF(p1.x(),p1.y());
-        moveBy(p);
-    }
-    
+
+	if (nparent->getCurrentBuffer()) {
+		QPointF p(0,0);
+		foreach (QGraphicsEllipseItem *item, ref){
+			p-=item->pos();
+		}
+		p/=ref.size();
+		vec2f p1=nparent->getCurrentBuffer()->getSize()/2.0-nparent->getCurrentBuffer()->get_origin();
+		p+=QPointF(p1.x(),p1.y());
+		moveBy(p);
+	}
+
 }
 
 void
@@ -1006,7 +1008,7 @@ nLine::rearrange_monotone() {
 		my_poly<< item->pos();
 	}
 
-    if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
+	if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
 		horizontal = true;
 	else
 		horizontal = false;
@@ -1016,11 +1018,11 @@ nLine::rearrange_monotone() {
 
 	if (horizontal) {
 		qSort(my_poly.begin(),my_poly.end(), orderMonotone_x);
-        nparent->statusBar()->showMessage("Axis is HORIZONTAL");
+		nparent->statusBar()->showMessage("Axis is HORIZONTAL");
 		//std::cerr<<"[nLine] axis is horizontal"<<std::endl;
 	} else {
 		qSort(my_poly.begin(),my_poly.end(), orderMonotone_y);
-        nparent->statusBar()->showMessage("Axis is VERTICAL");
+		nparent->statusBar()->showMessage("Axis is VERTICAL");
 		//std::cerr<<"[nLine] axis is vertical"<<std::endl;
 	}
 
@@ -1043,7 +1045,7 @@ nLine::getHMonotone()
 		my_poly<< item->pos();
 	}
 
-    if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
+	if (std::abs(my_poly.last().rx()-my_poly.first().rx()) > std::abs(my_poly.last().ry()-my_poly.first().ry()))
 		horizontal = true;
 	else
 		horizontal = false;
@@ -1074,77 +1076,87 @@ void nLine::zoomChanged(double val){
 nPhysD
 nLine::getContourSubImage(double fill_value)
 {
-    // 1. get point list
-    QPolygonF my_poly;
-    std::list<vec2> cp_list;
+	if (nparent->getCurrentBuffer()) {
+		// 1. get point list
+		QPolygonF my_poly;
+		std::list<vec2> cp_list;
 
-    if (ref.size()>0) {
-        foreach (QGraphicsEllipseItem *item, ref){
-            my_poly<< item->pos();
-        }
-        // force closed path
-        my_poly << ref[0]->pos();
+		if (ref.size()>0) {
+			foreach (QGraphicsEllipseItem *item, ref){
+				my_poly<< item->pos();
+			}
+			// force closed path
+			my_poly << ref[0]->pos();
 
-        for (int ii=0; ii<my_poly.size()-1; ii++) {
-            QPointF p1 = my_poly.at(ii);
-            QPointF p2 = my_poly.at(ii+1);
+			for (int ii=0; ii<my_poly.size()-1; ii++) {
+				QPointF p1 = my_poly.at(ii);
+				QPointF p2 = my_poly.at(ii+1);
 
-            double steps = (p2-p1).manhattanLength();
-            for(int jj = 0; jj<=steps; jj++) {
-                QPointF np = p1+jj*(p2-p1)/steps;
-                cp_list.push_back(vec2(np.x(), np.y()));
-            }
-        }
-    }
+				double steps = (p2-p1).manhattanLength();
+				for(int jj = 0; jj<=steps; jj++) {
+					QPointF np = p1+jj*(p2-p1)/steps;
+					cp_list.push_back(vec2(np.x(), np.y()));
+				}
+			}
+		}
 
-    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
-    DEBUG("starting contour intergration");
-	nPhysImageF<char> data_map = contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
-    DEBUG("contour integration ended");
+		// 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+		DEBUG("starting contour intergration");
+		nPhysImageF<char> data_map = contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
+		DEBUG("contour integration ended");
 
-    // generate map image
-	nPhysD sub_img(nparent->getCurrentBuffer()->getW(), nparent->getCurrentBuffer()->getH(), fill_value);
-    for (int ii=0; ii<data_map.getSurf(); ii++) {
-        char mval = data_map.point(ii);
-		if (mval=='i' || mval == 'c') sub_img.set(ii, nparent->getCurrentBuffer()->point(ii));
-    }
+		// generate map image
+		nPhysD sub_img(nparent->getCurrentBuffer()->getW(), nparent->getCurrentBuffer()->getH(), fill_value);
+		for (int ii=0; ii<data_map.getSurf(); ii++) {
+			char mval = data_map.point(ii);
+			if (mval=='i' || mval == 'c') sub_img.set(ii, nparent->getCurrentBuffer()->point(ii));
+		}
 
-    //parent()->addShowPhys(sub_img);
-    return sub_img;
+		//parent()->addShowPhys(sub_img);
+		return sub_img;
+	} else {
+		return nPhysD();
+	}
 }
 
 QList<double>
 nLine::getContainedIntegral()
 {
-    // 1. get point list
-    QPolygonF my_poly;
-    std::list<vec2> cp_list;
+	// 1. get point list
+	QPolygonF my_poly;
+	std::list<vec2> cp_list;
 
-    if (ref.size()>0) {
-        foreach (QGraphicsEllipseItem *item, ref){
-            my_poly<< item->pos();
-        }
-        // force closed path
-        my_poly << ref[0]->pos();
+	if (ref.size()>0) {
+		foreach (QGraphicsEllipseItem *item, ref){
+			my_poly<< item->pos();
+		}
+		// force closed path
+		my_poly << ref[0]->pos();
 
-        for (int ii=0; ii<my_poly.size()-1; ii++) {
-            QPointF p1 = my_poly.at(ii);
-            QPointF p2 = my_poly.at(ii+1);
+		for (int ii=0; ii<my_poly.size()-1; ii++) {
+			QPointF p1 = my_poly.at(ii);
+			QPointF p2 = my_poly.at(ii+1);
 
-            double steps = (p2-p1).manhattanLength();
-            for(int jj = 0; jj<=steps; jj++) {
-                QPointF np = p1+jj*(p2-p1)/steps;
-                cp_list.push_back(vec2(np.x(), np.y()));
-            }
-        }
-    }
+			double steps = (p2-p1).manhattanLength();
+			for(int jj = 0; jj<=steps; jj++) {
+				QPointF np = p1+jj*(p2-p1)/steps;
+				cp_list.push_back(vec2(np.x(), np.y()));
+			}
+		}
+	}
 
-    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
-    DEBUG("starting contour intergration");
+	// 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+	DEBUG("starting contour intergration");
 	std::list<double> c_data = contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
-    DEBUG("contour integration ended");
-    return QList<double>::fromStdList(c_data);
+	DEBUG("contour integration ended");
+	return QList<double>::fromStdList(c_data);
 
+}
+
+void nLine::extractPath() {
+	qDebug() << "here";
+	nPhysD *pippo= new nPhysD(getContourSubImage());
+	nparent->addShowPhys(pippo);
 }
 
 // --------- end contour ------------
@@ -1163,9 +1175,9 @@ bool orderMonotone_y(const QPointF &p1, const QPointF &p2)
 
 void
 nLine::loadSettings() {
-    QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+	QString fnametmp = QFileDialog::getOpenFileName(&my_pad, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-        setProperty("NeuSave-fileIni",fnametmp);
+		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		loadSettings(&settings);
 	}
@@ -1173,9 +1185,9 @@ nLine::loadSettings() {
 
 void
 nLine::saveSettings() {
-    QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+	QString fnametmp = QFileDialog::getSaveFileName(&my_pad, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
 	if (!fnametmp.isEmpty()) {
-        setProperty("NeuSave-fileIni",fnametmp);
+		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
 		saveSettings(&settings);
@@ -1185,15 +1197,15 @@ nLine::saveSettings() {
 void
 nLine::loadSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
-    setPos(settings->value("position").toPoint());
+	setPos(settings->value("position").toPoint());
 
 	if (property("parentPanControlLevel").toInt()<2) {
 		int size = settings->beginReadArray("points");
 		QPolygonF poly_tmp;
 		for (int i = 0; i < size; ++i) {
 			settings->setArrayIndex(i);
-            QPointF ppos=QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
-            poly_tmp << ppos;
+			QPointF ppos=QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+			poly_tmp << ppos;
 		}
 		settings->endArray();
 		if (poly_tmp.size()>0) {
@@ -1213,14 +1225,14 @@ nLine::loadSettings(QSettings *settings) {
 	changeColorHolder(settings->value("colorHolder",colorHolder).value<QColor>());
 	setNumPoints(settings->value("samplePoints",numPoints).toInt());
 
-    if (settings->childGroups().contains("Properties")) {
-        settings->beginGroup("Properties");
-        foreach(QString my_key, settings->allKeys()) {
-            qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
-            setProperty(my_key.toStdString().c_str(), settings->value(my_key));
-        }
-        settings->endGroup();
-    }
+	if (settings->childGroups().contains("Properties")) {
+		settings->beginGroup("Properties");
+		foreach(QString my_key, settings->allKeys()) {
+			qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
+			setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+		}
+		settings->endGroup();
+	}
 
 	settings->endGroup();
 }
@@ -1229,14 +1241,14 @@ void
 nLine::saveSettings(QSettings *settings) {
 	settings->beginGroup(toolTip());
 	settings->remove("");
-    settings->setValue("position",pos());	
+	settings->setValue("position",pos());
 	if (property("parentPanControlLevel").toInt()<2) {
 		settings->beginWriteArray("points");
 		for (int i = 0; i < ref.size(); ++i) {
 			settings->setArrayIndex(i);
-            QPointF ppos=mapToScene(ref.at(i)->pos());
-            settings->setValue("x", ppos.x());
-            settings->setValue("y", ppos.y());
+			QPointF ppos=mapToScene(ref.at(i)->pos());
+			settings->setValue("x", ppos.x());
+			settings->setValue("y", ppos.y());
 		}
 		settings->endArray();
 	}
@@ -1251,16 +1263,16 @@ nLine::saveSettings(QSettings *settings) {
 	if (ref.size()>0)	settings->setValue("colorHolder",ref[0]->brush().color());
 	settings->setValue("samplePoints",numPoints);
 
-    settings->beginGroup("Properties");
-    qDebug() << dynamicPropertyNames().size();
-    foreach(QByteArray ba, dynamicPropertyNames()) {
-        qDebug() << "save" << ba << " : " << property(ba);
-        if(ba.startsWith("NeuSave")) {
-            qDebug() << "write" << ba << " : " << property(ba);
-            settings->setValue(ba, property(ba));
-        }
-    }
-    settings->endGroup();
+	settings->beginGroup("Properties");
+	qDebug() << dynamicPropertyNames().size();
+	foreach(QByteArray ba, dynamicPropertyNames()) {
+		qDebug() << "save" << ba << " : " << property(ba);
+		if(ba.startsWith("NeuSave")) {
+			qDebug() << "write" << ba << " : " << property(ba);
+			settings->setValue(ba, property(ba));
+		}
+	}
+	settings->endGroup();
 
 
 	settings->endGroup();

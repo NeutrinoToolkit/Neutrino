@@ -9,6 +9,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
       qDebug() << "Parsing lib " << pname;
 
+	  setLoadHints(QLibrary::ResolveAllSymbolsHint);
 	  QObject *p_obj = instance();
 
       if (p_obj) {

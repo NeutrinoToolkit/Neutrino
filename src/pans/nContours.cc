@@ -104,6 +104,7 @@ nContours::on_draw_pb_released()
 
 		my_c->setPoints(QPolygonF());
 		if (contour.size() > 0) {
+			qDebug() << contour.size();
 
 			// set polygon
 			my_c->setPoints(QPolygonF());
