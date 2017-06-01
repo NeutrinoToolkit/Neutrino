@@ -2,61 +2,101 @@
 include(FindPythonLibs)
 
 if(PYTHONLIBS_FOUND)
-    list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})
-    include_directories(${PYTHON_INCLUDE_DIRS})
+	list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})
+	include_directories(${PYTHON_INCLUDE_DIRS})
 
-    find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
+	include(FindPythonInterp)
 
-    if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
+	if(PYTHONINTERP_FOUND)
 
-        list(APPEND LOCAL_LIBS ${PYTHONQT})
+		if (PYTHON_EXECUTABLE)
+			file(
+				WRITE ${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py "
+try:
+    import numpy; print(numpy.get_include())
+except Exception as exc:
+    print(exc)
+")
 
-        FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h PATH_SUFFIXES PythonQt)
-        IF (NOT ${PYTHONQT_INCLUDE_DIR} STREQUAL "PYTHONQT_INCLUDE_DIR-NOTFOUND")
-            set (PYTHONQT_FOUND_COMPLETE "TRUE")
-            add_definitions(-DHAVE_PYTHONQT)
-            include_directories(${PYTHONQT_INCLUDE_DIR})
+            exec_program(
+				"${PYTHON_EXECUTABLE}"
+				ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\""
+				OUTPUT_VARIABLE NUMPY_PATH)
 
-            if (NOT DEFINED NEUTRINO_ROOT)
-                set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
-            endif()
+		endif (PYTHON_EXECUTABLE)
 
-            if (NOT IS_ABSOLUTE ${NEUTRINO_ROOT})
-                set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
-            endif()
+		find_path(
+			NUMPY_INCLUDE_DIR numpy/arrayobject.h
+			"${NUMPY_PATH}"
+			"${PYTHON_INCLUDE_PATH}"
+			DOC
+			"Directory where the arrayobject.h header file can be found. \
+			This file is part of the numpy package")
+
+		if (NUMPY_INCLUDE_DIR)
+			message(STATUS "Found NumPy includes: ${NUMPY_INCLUDE_DIR}")
+			set(NUMPY_FOUND 1 CACHE INTERNAL "NumPy found")
+			include_directories(${NUMPY_INCLUDE_DIR})
+			add_definitions(-DHAVE_NUMPY)
+			add_definitions(-DSMILEI_USE_NUMPY -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+		endif ()
 
 
-			file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
+	endif(PYTHONINTERP_FOUND)
+
+	find_library(PYTHONQT NAMES PythonQt PATH_SUFFIXES lib)
+
+	if (NOT ${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" )
+
+		list(APPEND LOCAL_LIBS ${PYTHONQT})
+
+		FIND_PATH(PYTHONQT_INCLUDE_DIR PythonQt.h PATH_SUFFIXES PythonQt)
+		IF (NOT ${PYTHONQT_INCLUDE_DIR} STREQUAL "PYTHONQT_INCLUDE_DIR-NOTFOUND")
+		set (PYTHONQT_FOUND_COMPLETE "TRUE")
+		add_definitions(-DHAVE_PYTHONQT)
+		include_directories(${PYTHONQT_INCLUDE_DIR})
+
+		if (NOT DEFINED NEUTRINO_ROOT)
+			set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
+		endif()
+
+		if (NOT IS_ABSOLUTE ${NEUTRINO_ROOT})
+			set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
+		endif()
 
 
-			if (WIN32)
-				install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
-			endif()
+		file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
 
-			if (LINUX)
-				message (STATUS "PythonQt lib is copied along")
-				install (FILES ${PYTHONQT} DESTINATION lib)
-				list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
 
-				list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
-				message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+		if (WIN32)
+			install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+		endif()
 
-				install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
-			endif()
+		if (LINUX)
+			message (STATUS "PythonQt lib is copied along")
+			install (FILES ${PYTHONQT} DESTINATION lib)
+			list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt")
 
-			set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
-			include(NeutrinoPlugin)
-            ADD_NEUTRINO_PLUGIN()
+			list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt2.1, libpythonqt3.0")
+			message (STATUS "[${DISTRO}] Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
 
-        ELSE()
-            set (PYTHONQT_FOUND_COMPLETE "FALSE")
-            message(STATUS "PythonQt.h NOT FOUND (perhaps you forgot -DCMAKE_INCLUDE_PATH)")
-        ENDIF ()
-    else()
-        message(STATUS "PythonQt NOT FOUND (perhaps you forgot -DCMAKE_LIBRARY_PATH)")
-    endif()
+			install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
+		endif()
+
+		set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
+		include(NeutrinoPlugin)
+		ADD_NEUTRINO_PLUGIN()
+
+		ELSE()
+		set (PYTHONQT_FOUND_COMPLETE "FALSE")
+		message(STATUS "PythonQt.h NOT FOUND (perhaps you forgot -DCMAKE_INCLUDE_PATH)")
+		ENDIF ()
+	else()
+		message(STATUS "PythonQt NOT FOUND (perhaps you forgot -DCMAKE_LIBRARY_PATH)")
+	endif()
+
 else()
-    message(STATUS "No python libraries found: python subsystem is DISABLED!")
+	message(STATUS "No python libraries found: python subsystem is DISABLED!")
 endif()
 
 
