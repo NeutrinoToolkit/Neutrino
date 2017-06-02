@@ -1,4 +1,3 @@
-add_exe# src CMakeLists.txt
 
 # ref: http://wiki.qt.io/Using_CMake_build_system 
 
