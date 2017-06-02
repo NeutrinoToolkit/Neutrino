@@ -95,7 +95,7 @@ void nSpectralAnalysis::on_calculate_released() {
             perm->TscanBrightness();
             perm->setShortName(itr->first);
             perm->setName(itr->first);
-            nparent->showPhys( perm );
+            nparent->addShowPhys( perm );
         }
     }
 }

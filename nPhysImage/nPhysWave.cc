@@ -47,7 +47,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         std::vector<int> xx(dx), yy(dy);
 
-        nPhysImageF<mcomplex> zz_morlet("zz_morlet");
+        nPhysC zz_morlet("zz_morlet");
 
         zz_morlet.resize(dx,dy);
 
@@ -81,7 +81,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                 lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
 
-        nPhysImageF<mcomplex> Fmain_window=params.data->ft2(PHYS_FORWARD);
+        nPhysC Fmain_window=params.data->ft2(PHYS_FORWARD);
 
         params.iter=0;
         *params.iter_ptr=0;
@@ -117,7 +117,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                     double gauss = exp(e_x)*exp(e_y);
                     zz_morlet.Timg_buffer[k]=Fmain_window.Timg_buffer[k]*gauss;
                 }
-                nPhysImageF<mcomplex> zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
+                nPhysC zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
 
                 // decision
 #pragma omp parallel for
