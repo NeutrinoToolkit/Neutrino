@@ -1,5 +1,5 @@
 
-# ref: http://wiki.qt.io/Using_CMake_build_system 
+# ref: http://wiki.qt.io/Using_CMake_build_system
 
 cmake_minimum_required (VERSION 3.0)
 
@@ -207,6 +207,7 @@ endif()
 if(WIN32)
 	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
 	list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
+	message(STATUS ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${CMAKE_BUILD_TYPE}")
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
 	else()
@@ -314,5 +315,4 @@ else()
 	set (EXECUTABLE_OUTPUT_PATH "../bin")
 	install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
 endif()
-
 
