@@ -10,7 +10,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
     QList<nPhysD*> my_list;
     if (fname.isEmpty()) {
         QString formats("");
-		formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+        formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
         formats+="Images (";
         foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
             formats+="*."+format+" ";
@@ -36,7 +36,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
     DEBUG("here");
-	nPhysD *phys=new nPhysD();
+    nPhysD *phys=new nPhysD();
     int h=my_shape.first; // row major: first rows(yw or height) than columns(xw or widthv)
     int w=my_shape.second;
     
@@ -46,8 +46,8 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
             phys->set(i,tempData[i]);
         }
         phys->TscanBrightness();
-	}
-	return phys;
+    }
+    return phys;
 }
 
 /**
@@ -55,8 +55,8 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
  */
 nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
     DEBUG("here");
-	nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
-	return phys;
+    nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
+    return phys;
 }
 
 /**
@@ -67,6 +67,61 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     nPhysD *ret_phys = new nPhysD(*phys);
     return ret_phys;
 }
+
+#ifdef HAVE_NUMPY
+
+
+#define __map_numpy(__arr,__my_phys,__numpy_type,__cplusplus_type) case __numpy_type : {__cplusplus_type *data = (__cplusplus_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
+
+nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
+    DEBUG("here " << my_py_obj);
+    init_numpy();
+    if (PyArray_Check(my_py_obj)) {
+        PyArrayObject * arr = (PyArrayObject *)my_py_obj;
+        DEBUG("here " << arr);
+        if (arr && PyArray_NDIM(arr)==2){
+            auto dims=PyArray_DIMS(arr);
+            DEBUG(dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
+            PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
+            DEBUG("here");
+            std::string name(PyString_AsString(objectsRepresentation));
+            DEBUG("here");
+            Py_DECREF(objectsRepresentation);
+            DEBUG("here");
+            nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
+            DEBUG("here");
+            my_phys->setShortName("numpy");
+            DEBUG("here "<< PyArray_TYPE(arr));
+
+            switch (PyArray_TYPE(arr)) {
+                __map_numpy(arr,my_phys,NPY_BOOL        , bool                  );
+                __map_numpy(arr,my_phys,NPY_UBYTE       , char                  );
+                __map_numpy(arr,my_phys,NPY_SHORT       , short                 );
+                __map_numpy(arr,my_phys,NPY_USHORT      , unsigned short        );
+                __map_numpy(arr,my_phys,NPY_INT         , int                   );
+                __map_numpy(arr,my_phys,NPY_UINT        , unsigned int          );
+                __map_numpy(arr,my_phys,NPY_LONG        , long int              );
+                __map_numpy(arr,my_phys,NPY_ULONG       , unsigned long int     );
+                __map_numpy(arr,my_phys,NPY_LONGLONG    , long long int         );
+                __map_numpy(arr,my_phys,NPY_ULONGLONG   , unsigned long long int);
+                __map_numpy(arr,my_phys,NPY_FLOAT       , float                 );
+                __map_numpy(arr,my_phys,NPY_DOUBLE      , double                );
+                __map_numpy(arr,my_phys,NPY_LONGDOUBLE  , long double           );
+                default:
+                    DEBUG("it's a trap!")
+                    break;
+            }
+
+            my_phys->TscanBrightness();
+            Py_INCREF(my_py_obj);
+            return my_phys;
+        }
+    }
+    DEBUG("expected sequence");
+    return nullptr;
+}
+
+#endif
 
 /**
  nPhysD Destructor
@@ -90,19 +145,19 @@ void nPhysPyWrapper::delete_nPhysD(nPhysD* phys) {
 }
 
 QString nPhysPyWrapper::getName(nPhysD* phys) {
-	return QString::fromStdString(phys->getName());
+    return QString::fromStdString(phys->getName());
 }
 
 void nPhysPyWrapper::setName(nPhysD* phys, QString name) {
-	phys->setName(name.toStdString());
+    phys->setName(name.toStdString());
 }
 
 double nPhysPyWrapper::get(nPhysD* phys, double x, double y){
-	return phys->getPoint(x,y);
+    return phys->getPoint(x,y);
 }
 
 double nPhysPyWrapper::get(nPhysD* phys, QPointF p){
-	return get(phys, p.x(), p.y());
+    return get(phys, p.x(), p.y());
 }
 
 QPair<double, double> nPhysPyWrapper::getMinMax(nPhysD* phys){
@@ -111,47 +166,47 @@ QPair<double, double> nPhysPyWrapper::getMinMax(nPhysD* phys){
 }
 
 double nPhysPyWrapper::getMin(nPhysD* phys){
-	return phys->get_min();
+    return phys->get_min();
 }
 
 double nPhysPyWrapper::getMax(nPhysD* phys){
-	return phys->get_max();
+    return phys->get_max();
 }
 
 QPointF nPhysPyWrapper::getOrigin(nPhysD*phys) {
-	return QPointF(phys->get_origin().x(), phys->get_origin().y());
+    return QPointF(phys->get_origin().x(), phys->get_origin().y());
 }
 
 void nPhysPyWrapper::setOrigin(nPhysD*phys, QPointF p) {
-	phys->set_origin(p.x(),p.y());
+    phys->set_origin(p.x(),p.y());
 }
 
 void nPhysPyWrapper::setOrigin(nPhysD*phys, double x, double y){
-	phys->set_origin(x,y);
+    phys->set_origin(x,y);
 }
 
 QPointF nPhysPyWrapper::getScale(nPhysD*phys) {
-	return QPointF(phys->get_scale().x(), phys->get_scale().y());
+    return QPointF(phys->get_scale().x(), phys->get_scale().y());
 }
 
 void nPhysPyWrapper::setScale(nPhysD*phys, QPointF p) {
-	phys->set_scale(p.x(),p.y());
+    phys->set_scale(p.x(),p.y());
 }
 
 void nPhysPyWrapper::setScale(nPhysD*phys, QVariant varX, QVariant varY){
-	if (!varY.isValid()) {
-		varY=varX;
-	}
-	bool ok1,ok2;
-	double x=varX.toDouble(&ok1);
-	double y=varY.toDouble(&ok2);
-	if (ok1 && ok2)	phys->set_scale(x,y);
+    if (!varY.isValid()) {
+        varY=varX;
+    }
+    bool ok1,ok2;
+    double x=varX.toDouble(&ok1);
+    double y=varY.toDouble(&ok2);
+    if (ok1 && ok2)	phys->set_scale(x,y);
 }
 
 QPair<int, int> nPhysPyWrapper::getShape(nPhysD *phys){
     if (phys)
         return qMakePair((int)phys->getH(), (int)phys->getW());
-        
+
     return qMakePair(0, 0);
 }
 
@@ -178,14 +233,16 @@ void nPhysPyWrapper::setProperty(nPhysD* phys, QString prop_name, QVariant prop_
 }
 
 QVector<double> nPhysPyWrapper::getData(nPhysD* phys){
-	QVector<double> tempData;
-	tempData.clear();
+    QVector<double> tempData;
+    tempData.clear();
 
-	if (phys) {
-		tempData.resize(phys->getSurf());
-		for (size_t i=0; i<phys->getSurf(); i++) {
-			tempData[i]=phys->point(i);
-		}
-	}
-	return tempData;
+    if (phys) {
+        tempData.resize(phys->getSurf());
+        for (size_t i=0; i<phys->getSurf(); i++) {
+            tempData[i]=phys->point(i);
+        }
+    }
+    return tempData;
 }
+
+

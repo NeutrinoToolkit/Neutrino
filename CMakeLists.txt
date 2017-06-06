@@ -8,6 +8,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment ver
 
 project (Neutrino CXX)
 
+set(${PROJECT_NAME}_VERSION_MAJOR "2")
+set(${PROJECT_NAME}_VERSION_MINOR "1")
 
 #############################
 
@@ -54,15 +56,7 @@ set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set (PLUGINS_INNER_COMPILE true) # tell plugin compilation not to search for neutrino/nphys sources
 
-include(FindGit)
-
 include(GetVersionFromGitTag)
-
-if (GIT_FOUND)
-    set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-    set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}")
-    message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
-endif()
 
 # targets
 
@@ -100,6 +94,11 @@ if (WIN32)
 
 endif()
 
+if (GIT_FOUND)
+	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
+	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}")
+	message(STATUS "Neutrino package version: ${CPACK_PACKAGE_VERSION}")
+endif()
 
 
 if (LINUX)
@@ -109,6 +108,8 @@ if (LINUX)
 	string(REGEX REPLACE "\n" "" DISTRO ${DISTRO})
 	execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
 	string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
+
+	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}-${DISTRO}")
 
     if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 

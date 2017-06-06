@@ -1029,7 +1029,7 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
 
     check_image.TscanBrightness();
     double check_val = check_image.get_min() - 1;
-    int points_count = 0;
+    //int points_count = 0;
     //double c_integral = 0;
 
     // set to check_val contour and image boundaries
@@ -1039,11 +1039,11 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
         check_image.set((*itr).x(), (*itr).y(), check_val);
         ci_map.set((*itr).x(), (*itr).y(), 'c');
     }
-    for (int xx=0; xx<check_image.getW(); xx++) {
+    for (unsigned int xx=0; xx<check_image.getW(); xx++) {
         check_image.set(xx, 0, check_val);
         check_image.set(xx, check_image.getH()-1, check_val);
     }
-    for (int yy=0; yy<check_image.getH(); yy++) {
+    for (unsigned int yy=0; yy<check_image.getH(); yy++) {
         check_image.set(0, yy, check_val);
         check_image.set(check_image.getW()-1, yy, check_val);
     }
@@ -1074,7 +1074,7 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
 
     // check if starting point is inside or outside
     int sp_is_inside = true; bool state_change = false; // mind: image boundaries ARE boundaries
-    for (int xx=starting_point.x(); xx<check_image.getW(); xx++) {
+    for (unsigned int xx=starting_point.x(); xx<check_image.getW(); xx++) {
         if (check_image.point(xx, starting_point.y()) == check_val && !state_change) {
             state_change = true;
             sp_is_inside = !sp_is_inside;
@@ -1222,10 +1222,10 @@ nPhysImageF<char> contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
     } else {
         // fill the remaining image
         if (sp_is_inside) {
-            for (int xx=0; xx<ci_map.getSurf(); xx++)
+            for (unsigned int xx=0; xx<ci_map.getSurf(); xx++)
                 if (ci_map.point(xx) == 'u') ci_map.set(xx, 'o');
         } else {
-            for (int xx=0; xx<ci_map.getSurf(); xx++)
+            for (unsigned int xx=0; xx<ci_map.getSurf(); xx++)
                 if (ci_map.point(xx) == 'u') ci_map.set(xx, 'i');
 
         }

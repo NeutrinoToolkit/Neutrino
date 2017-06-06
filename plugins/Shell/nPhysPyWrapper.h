@@ -90,30 +90,7 @@ public slots:
         return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
     }
 
-    nPhysD* new_nPhysD(PyObject* my_py_obj){
-        DEBUG("here");
-        if (PyArray_Check(my_py_obj)) {
-            PyArrayObject * arr = (PyArrayObject *)my_py_obj;
-            if (PyArray_NDIM(arr)==2){
-                auto dims=PyArray_DIMS(arr);
-                double *data = reinterpret_cast<double*>(PyArray_DATA(arr));
-                DEBUG(dims[0] << " x " << dims[1]);
-                PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
-                std::string name(PyString_AsString(objectsRepresentation));
-                Py_DECREF(objectsRepresentation);
-                nPhysD *my_phys = new nPhysD(dims[0], dims[1],0,name);
-                my_phys->setShortName("numpy");
-                for (npy_intp i=0; i<(npy_intp) my_phys->getSurf(); i++) {
-                    my_phys->set(i,data[i]);
-                }
-                my_phys->TscanBrightness();
-                Py_INCREF(my_py_obj);
-                return my_phys;
-            }
-        }
-        DEBUG("expected sequence");
-        return nullptr;
-    }
+    nPhysD* new_nPhysD(PyObject* my_py_obj);
 
 private:
 #if PY_MAJOR_VERSION >= 3

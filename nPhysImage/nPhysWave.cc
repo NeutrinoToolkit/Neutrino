@@ -42,8 +42,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         params.olist.clear();
 
-        int dx=params.data->getW();
-        int dy=params.data->getH();
+        unsigned int dx=params.data->getW();
+        unsigned int dy=params.data->getH();
 
         std::vector<int> xx(dx), yy(dy);
 
@@ -51,8 +51,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         zz_morlet.resize(dx,dy);
 
-        for (int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-        for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
+        for (unsigned int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
+        for (unsigned int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
         nPhysD *qmap = new nPhysD(dx, dy, 0.0, "quality");
         nPhysD *wphase = new nPhysD(dx,dy,0.0,"phase_2pi");

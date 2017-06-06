@@ -8,6 +8,9 @@ branches:
   - master
   - latest
   
+git:
+  depth: 9999999
+  
 before_install:
  - export MACOSX_DEPLOYMENT_TARGET=10.11
  - brew update; brew tap homebrew/science

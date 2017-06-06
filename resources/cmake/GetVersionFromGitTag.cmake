@@ -24,7 +24,7 @@ if (GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     #How many commits since last tag
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list master ${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
+	execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count master
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
         OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -42,8 +42,6 @@ if (GIT_FOUND)
     list(LENGTH ${PROJECT_NAME}_PARTIAL_VERSION_LIST
         ${PROJECT_NAME}_PARTIAL_VERSION_LIST_LEN)
 
-    set(${PROJECT_NAME}_VERSION_MAJOR "2")
-    set(${PROJECT_NAME}_VERSION_MINOR "1")
     set(${PROJECT_NAME}_VERSION_PATCH ${${PROJECT_NAME}_VERSION_AHEAD})
 
     # Set the version numbers
