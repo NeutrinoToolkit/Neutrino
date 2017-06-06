@@ -41,7 +41,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
     if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
 
         params.olist.clear();
-        
+
         int dx=params.data->getW();
         int dy=params.data->getH();
 
@@ -54,17 +54,11 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
         for (int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
         for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
-        nPhysD *qmap, *wphase, *lambda, *angle, *intensity;
-        qmap = new nPhysD(dx, dy, 0.0, "quality");
-
-        wphase = new nPhysD("phase/2pi");
-        wphase->resize(dx, dy);
-        lambda = new nPhysD("lambda");
-        lambda->resize(dx, dy);
-        angle = new nPhysD("angle");
-        angle->resize(dx, dy);
-        intensity = new nPhysD("intensity");
-        intensity->resize(dx, dy);
+        nPhysD *qmap = new nPhysD(dx, dy, 0.0, "quality");
+        nPhysD *wphase = new nPhysD(dx,dy,0.0,"phase_2pi");
+        nPhysD *lambda = new nPhysD(dx,dy,0.0,"lambda");
+        nPhysD *angle = new nPhysD(dx,dy,0.0,"angle");
+        nPhysD *intensity = new nPhysD(dx,dy,0.0,"intensity");
 
 
         std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
@@ -102,21 +96,24 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
                 double thick_norm=params.thickness*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
                 double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-                //				double thick_norm=wave_params.thickness*M_PI/dy;
-                //				double lambda_norm=lambdas[i]/dx;
-#pragma omp parallel for
-                for (size_t k=0;k<zz_morlet.getSurf();k++) {
-                    size_t x=k/zz_morlet.getW();
-                    size_t y=k%zz_morlet.getW();
-                    double xr = xx[x]*cr - yy[y]*sr; //rotate
-                    double yr = xx[x]*sr + yy[y]*cr;
+//				double thick_norm=wave_params.thickness*M_PI/dy;
+//				double lambda_norm=lambdas[i]/dx;
+#pragma omp parallel for collapse(2)
+                for (unsigned int x=0;x<dx;x++) {
+                    for (unsigned int y=0;y<dy;y++) {
+                        double xr = xx[x]*cr - yy[y]*sr; //rotate
+                        double yr = xx[x]*sr + yy[y]*cr;
 
-                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-                    double e_y = -pow(yr*thick_norm, 2.);
+                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+                        double e_y = -pow(yr*thick_norm, 2.);
 
-                    double gauss = exp(e_x)*exp(e_y);
-                    zz_morlet.Timg_buffer[k]=Fmain_window.Timg_buffer[k]*gauss;
+                        double gauss = exp(e_x)*exp(e_y);
+
+                        zz_morlet.Timg_matrix[y][x]=Fmain_window.Timg_matrix[y][x]*gauss;
+
+                    }
                 }
+
                 nPhysC zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
 
                 // decision
@@ -177,7 +174,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
     DEBUG("Out of here");
 }
 
-unsigned int opencl_closest_size(unsigned int num) {
+    unsigned int opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
     unsigned int i2,i3,i5,i7,i11,i13;
     i2=i3=i5=i7=i11=i13=0;
