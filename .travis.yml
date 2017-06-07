@@ -36,8 +36,6 @@ before_deploy:
     
 deploy:
   provider: releases
-  edge:
-    branch: releases-fix
   api_key: $github_token
   file_glob: true
   file: "Neutrino.dmg"

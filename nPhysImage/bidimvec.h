@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <gsl/gsl_math.h>
+#include "tools.h"
 
 #ifndef __bidimvec_h
 #define __bidimvec_h
@@ -237,10 +238,10 @@ bidimvec<T>::bidimvec(std::string str)
 {
 	int ref1 = str.find("(",0), ref2 = str.find(":",0), ref3 = str.find(")",0);
 	if (! bd_from_string<T>(myval1, str.substr(ref1+1, ref2-ref1-1) ))
-		std::cerr<<"Vec conversion problems! string was: "<<str.substr(ref1+1, ref2-ref1-1)<<", val is "<<myval1<<std::endl;
+        DEBUG("Vec conversion problems! string was: "<<str.substr(ref1+1, ref2-ref1-1)<<", val is "<<myval1);
 	
 	if (! bd_from_string<T>(myval2, str.substr(ref2+1, ref3-ref2-1) ))
-		std::cerr<<"Vec conversion problems! string was: "<<str.substr(ref2+1, ref3-ref2-1)<<", val is "<<myval2<<std::endl;
+        DEBUG("Vec conversion problems! string was: "<<str.substr(ref2+1, ref3-ref2-1)<<", val is "<<myval2);
 
 
 	//std::cout<<"[bidimvec<T>] std::str constructor: "<<*this<<std::endl;
