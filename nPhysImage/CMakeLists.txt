@@ -6,7 +6,7 @@ if (LINUX)
     set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
-add_library (nPhysImageF SHARED bidimvec.h tools.h nPhysTools.cc anymap.cc NaNStream.h  nPhysFormats.cc  nPhysImageF.h  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
+add_library (nPhysImageF SHARED mcomplex.h bidimvec.h tools.h nPhysTools.cc anymap.cc NaNStream.h  nPhysFormats.cc  nPhysImageF.h  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nPhysImageF "-lm")

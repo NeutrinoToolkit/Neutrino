@@ -83,15 +83,10 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             auto dims=PyArray_DIMS(arr);
             DEBUG(dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
             PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
-            DEBUG("here");
             std::string name(PyString_AsString(objectsRepresentation));
-            DEBUG("here");
             Py_DECREF(objectsRepresentation);
-            DEBUG("here");
             nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
-            DEBUG("here");
             my_phys->setShortName("numpy");
-            DEBUG("here "<< PyArray_TYPE(arr));
 
             switch (PyArray_TYPE(arr)) {
                 __map_numpy(arr,my_phys,NPY_BOOL        , bool                  );

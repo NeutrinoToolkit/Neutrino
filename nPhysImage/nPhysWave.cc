@@ -45,6 +45,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
         unsigned int dx=params.data->getW();
         unsigned int dy=params.data->getH();
 
+        unsigned int surf=dx*dy;
+
         std::vector<int> xx(dx), yy(dy);
 
         nPhysC zz_morlet("zz_morlet");
@@ -75,10 +77,24 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                 lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
 
-        nPhysC Fmain_window=params.data->ft2(PHYS_FORWARD);
-
         params.iter=0;
         *params.iter_ptr=0;
+
+
+        fftw_complex *t = fftw_alloc_complex(surf);
+        fftw_complex *Ft = fftw_alloc_complex(surf);
+        fftw_complex *Ftmorlet = fftw_alloc_complex(surf);
+
+        fftw_plan plan_fwd = fftw_plan_dft_2d(dy, dx, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+#pragma omp parallel for
+        for (size_t i = 0; i < surf; i++) {
+            t[i][0] = params.data->Timg_buffer[i];
+            t[i][1] = 0;
+        }
+
+        fftw_execute(plan_fwd);
 
         double damp_norm=params.damp*M_PI;
         for (size_t i=0; i<lambdas.size(); i++) {
@@ -96,11 +112,11 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
                 double thick_norm=params.thickness*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
                 double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-//				double thick_norm=wave_params.thickness*M_PI/dy;
-//				double lambda_norm=lambdas[i]/dx;
+
 #pragma omp parallel for collapse(2)
                 for (unsigned int x=0;x<dx;x++) {
                     for (unsigned int y=0;y<dy;y++) {
+                        unsigned int k=x+y*dx;
                         double xr = xx[x]*cr - yy[y]*sr; //rotate
                         double yr = xx[x]*sr + yy[y]*cr;
 
@@ -109,20 +125,21 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
                         double gauss = exp(e_x)*exp(e_y);
 
-                        zz_morlet.Timg_matrix[y][x]=Fmain_window.Timg_matrix[y][x]*gauss;
+                        t[k][0]=Ft[k][0]*gauss;
+                        t[k][1]=Ft[k][1]*gauss;
 
                     }
                 }
 
-                nPhysC zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
+                fftw_execute(plan_bwd);
 
                 // decision
 #pragma omp parallel for
                 for (size_t k=0; k<params.data->getSurf(); k++) {
-                    double qmap_local=zz_convolve.Timg_buffer[k].mcabs();
+                    double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
                     if ( qmap_local > qmap->Timg_buffer[k]) {
                         qmap->Timg_buffer[k] = qmap_local;
-                        wphase->Timg_buffer[k] = zz_convolve.Timg_buffer[k].arg();
+                        wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
                         lambda->Timg_buffer[k] = lambdas[i];
                         angle->Timg_buffer[k] = angles[j];
                     }
@@ -136,11 +153,17 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
             }
         }
 
+        fftw_free(t);
+        fftw_free(Ft);
+        fftw_free(Ftmorlet);
+        fftw_destroy_plan(plan_fwd);
+        fftw_destroy_plan(plan_bwd);
+
         if ((*params.iter_ptr)!=-1) {
 
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
+                qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(surf);
                 intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
                 wphase->Timg_buffer[k]/=2*M_PI;
             }
