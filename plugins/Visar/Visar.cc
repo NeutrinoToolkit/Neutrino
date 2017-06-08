@@ -25,6 +25,9 @@
 #include "Visar.h"
 #include "neutrino.h"
 
+#include "ui_Visar2.h"
+#include "ui_Visar3.h"
+
 
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
     nCustomPlotMouseX3Y(parent)
@@ -114,6 +117,8 @@ Visar::~Visar() {
 
 Visar::Visar(neutrino *nparent)
     : nGenericPan(nparent),
+      velocityUi({new Ui::Visar2, new Ui::Visar2}}),
+      phaseUi({new Ui::Visar3, new Ui::Visar3}}),
       sweepCoeff{{std::vector<double>(),std::vector<double>(),std::vector<double>()}}
 {
     setupUi(this);
