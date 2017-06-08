@@ -856,7 +856,6 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 						nPhysD *my_phys=new nPhysD();
 						int ret=phys_resurrect_binary(my_phys,ifile);
 						if (ret>=0 && my_phys->getSurf()>0) {
-//							addShowPhys(my_phys);
 							imagelist.push_back(my_phys);
 						} else {
 							delete my_phys;
@@ -864,6 +863,9 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 						progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
 						QApplication::processEvents();
 					} else if (qLine.startsWith("NeutrinoPan-begin")) {
+                        for (auto& my_phys: imagelist) {
+                            addPhys(my_phys);
+                        }
 						QStringList listLine=qLine.split(" ");
 						QString panName=listLine.at(1);
 						QApplication::processEvents();

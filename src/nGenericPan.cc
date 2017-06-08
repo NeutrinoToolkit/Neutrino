@@ -72,6 +72,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 }
 	
 void nGenericPan::physAdd(nPhysD *buffer) {
+    DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>")
 	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
 			int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
@@ -306,6 +307,7 @@ void nGenericPan::comboChanged(int k) {
 
 nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
     nPhysD* retVal=nullptr;
+    QApplication::processEvents();
     if (combo->count())
          retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
     return retVal;
@@ -381,7 +383,8 @@ nGenericPan::loadUi(QSettings *settings) {
 			}
 			widget->setCurrentIndex(settings->value(widget->objectName()+"Default",0).toInt());
 		}
-		if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
+        DEBUG("here " << widget->objectName().toStdString());
+        if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
             std::string imageName=settings->value(widget->objectName()).toString().toStdString();
 			foreach (nPhysD *physAperto,nparent->getBufferList()) {
 				if (physAperto->getName()==imageName) {

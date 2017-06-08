@@ -154,8 +154,6 @@ Visar::Visar(neutrino *nparent)
     sopRect->setRect(QRectF(0,0,100,100));
     connect(actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
 
-
-
     sopPlot->xAxis->setLabel(tr("Time"));
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
@@ -462,37 +460,37 @@ void Visar::updatePlotSOP() {
         sopCurve[0].resize(sopData.size());
 
         switch (dir) {
-        case 0:
-            for (int j=0;j<dy;j++) {
-                time_sop[j]=getTime(2,geom2.y()+j)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
-                sopCurve[0][j]=sopData[j]/dx-sopOffset->value();
-            }
-            break;
-        case 1:
-            for (int i=0;i<dx;i++) {
-                time_sop[i]=getTime(2,geom2.x()+i)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
-                sopCurve[0][i]=sopData[i]/dy-sopOffset->value();
-            }
-            break;
-        default:
-            break;
+            case 0:
+                for (int j=0;j<dy;j++) {
+                    time_sop[j]=getTime(2,geom2.y()+j)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
+                    sopCurve[0][j]=sopData[j]/dx-sopOffset->value();
+                }
+                break;
+            case 1:
+                for (int i=0;i<dx;i++) {
+                    time_sop[i]=getTime(2,geom2.x()+i)-getTime(2,sopOrigin->value()) + sopTimeOffset->value();
+                    sopCurve[0][i]=sopData[i]/dy-sopOffset->value();
+                }
+                break;
+            default:
+                break;
         }
         sopPlot->graph(0)->setData(time_sop,sopCurve[0]);
 
         // TEMPERATURE FROM REFLECTIVITY
         QVector<int> reflList;
         switch (whichRefl->currentIndex()) {
-        case 0:
-            reflList << 0;
-            break;
-        case 1:
-            reflList << 1;
-            break;
-        case 2:
-            reflList << 0 << 1;
-            break;
-        default:
-            break;
+            case 0:
+                reflList << 0;
+                break;
+            case 1:
+                reflList << 1;
+                break;
+            case 2:
+                reflList << 0 << 1;
+                break;
+            default:
+                break;
         }
 
         sopCurve[1].resize(time_sop.size());
@@ -616,8 +614,8 @@ void Visar::updatePlot() {
                     QPen pen(Qt::gray);
                     pen.setStyle((k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine));
                     my_jumpLine->setPen(pen);
-					my_jumpLine->point1->setTypeY(QCPItemPosition::ptAbsolute);
-					my_jumpLine->point2->setTypeY(QCPItemPosition::ptAbsolute);
+                    my_jumpLine->point1->setTypeY(QCPItemPosition::ptAbsolute);
+                    my_jumpLine->point2->setTypeY(QCPItemPosition::ptAbsolute);
                     my_jumpLine->point1->setCoords(a,0);
                     my_jumpLine->point2->setCoords(a,1);
                 }
@@ -1040,15 +1038,15 @@ void
 Visar::export_txt() {
     QString title=tr("Export ");
     switch (tabs->currentIndex()) {
-    case 0:
-        title=tr("VISAR")+QString(" ")+QString::number(tabPhase->currentIndex()+1);
-        break;
-    case 1:
-        title=tr("VISAR")+QString(" ")+QString::number(tabVelocity->currentIndex()+1);
-        break;
-    case 2:
-        title=tr("SOP");
-        break;
+        case 0:
+            title=tr("VISAR")+QString(" ")+QString::number(tabPhase->currentIndex()+1);
+            break;
+        case 1:
+            title=tr("VISAR")+QString(" ")+QString::number(tabVelocity->currentIndex()+1);
+            break;
+        case 2:
+            title=tr("SOP");
+            break;
     }
     QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save ")+title,property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
     if (!fnametmp.isEmpty()) {
@@ -1057,17 +1055,17 @@ Visar::export_txt() {
         t.open(QIODevice::WriteOnly| QIODevice::Text);
         QTextStream out(&t);
         switch (tabs->currentIndex()) {
-        case 0:
-            out << export_one(tabPhase->currentIndex());
-            break;
-        case 1:
-            out << export_one(tabVelocity->currentIndex());
-            break;
-        case 2:
-            out << export_sop();
-            break;
-        default:
-            break;
+            case 0:
+                out << export_one(tabPhase->currentIndex());
+                break;
+            case 1:
+                out << export_one(tabVelocity->currentIndex());
+                break;
+            case 2:
+                out << export_sop();
+                break;
+            default:
+                break;
         }
         t.close();
         statusBar()->showMessage(tr("Export in file:")+fnametmp,5000);
@@ -1078,20 +1076,20 @@ void
 Visar::export_clipboard() {
     QClipboard *clipboard = QApplication::clipboard();
     switch (tabs->currentIndex()) {
-    case 0:
-        clipboard->setText(export_one(tabPhase->currentIndex()));
-        statusbar->showMessage(tr("Points copied to clipboard ")+tabPhase->tabText(tabPhase->currentIndex()));
-        break;
-    case 1:
-        clipboard->setText(export_one(0)+"\n\n"+export_one(1));
-        statusbar->showMessage(tr("Points copied to clipboard both visars"));
-        break;
-    case 2:
-        clipboard->setText(export_sop());
-        statusbar->showMessage(tr("Points copied to clipboard SOP"));
-        break;
-    default:
-        break;
+        case 0:
+            clipboard->setText(export_one(tabPhase->currentIndex()));
+            statusbar->showMessage(tr("Points copied to clipboard ")+tabPhase->tabText(tabPhase->currentIndex()));
+            break;
+        case 1:
+            clipboard->setText(export_one(0)+"\n\n"+export_one(1));
+            statusbar->showMessage(tr("Points copied to clipboard both visars"));
+            break;
+        case 2:
+            clipboard->setText(export_sop());
+            statusbar->showMessage(tr("Points copied to clipboard SOP"));
+            break;
+        default:
+            break;
     }
 }
 
