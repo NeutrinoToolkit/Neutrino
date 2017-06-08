@@ -80,8 +80,8 @@ public:
     Q_INVOKABLE Visar(neutrino *);
     ~Visar();
 
-    std::array<Ui::Visar2,2> visar;
-    std::array<Ui::Visar3,2> setvisar;
+    std::array<Ui::Visar2,2> velocityUi;
+    std::array<Ui::Visar3,2> phaseUi;
 
     double getTime(int k,double p);
 

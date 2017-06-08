@@ -604,7 +604,6 @@ QString nObject::getRectString() {
 // reimplementation
 QRectF
 nObject::boundingRect() const {
-	qDebug() << shape().boundingRect();
 	return shape().boundingRect();
 }
 
