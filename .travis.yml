@@ -27,12 +27,11 @@ script:
  - mkdir -p build_dir && cd build_dir
  - cmake -DCMAKE_CXX_COMPILER=g++-7  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
  - make
- - cd ..
 
 install:
 
 before_deploy:
- - ./resources/macPackage/prepareapp.sh build_dir
+ - ../resources/macPackage/prepareapp.sh .
     
 deploy:
   provider: releases

@@ -910,7 +910,6 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
 }
 
 void neutrino::addShowPhys(nPhysD* datamatrix) {
-	qDebug() << "here";
 	addPhys(datamatrix);
 	showPhys(datamatrix);
 }
