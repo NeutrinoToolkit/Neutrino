@@ -64,8 +64,14 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
 	if (nparent) {
 		int position = nparent->getBufferList().indexOf(buffer);
 		name=QString::fromUtf8(buffer->getName().c_str());
-		int len=combo->property("physNameLength").toInt();
-		if (name.length()>len) name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
+        if (!combo->property("neuSave-physNameLength").isValid()) {
+            combo->setProperty("neuSave-physNameLength",nparent->property("neuSave-physNameLength"));
+        }
+        int len=combo->property("neuSave-physNameLength").toInt();
+        qDebug() << combo << len << name << name.length();
+        if (name.length()>len) {
+            name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
+        }
 		name.prepend(QString::number(position)+" : ");
 	} 
 	return name;
@@ -139,7 +145,6 @@ void nGenericPan::changeEvent(QEvent *e)
 }
 
 void nGenericPan::grabSave() {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     int ok=0;
     while (ok<10000) {
         ok++;
@@ -151,7 +156,6 @@ void nGenericPan::grabSave() {
             break;
         }
     }
-#endif
 }
 
 void nGenericPan::showEvent(QShowEvent* event) {
@@ -172,6 +176,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
             if (helpFile.exists()) {
                 QWidget* spacer = new QWidget();
                 spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                spacer->setProperty("helpSpacer",true);
                 my_tool->addWidget(spacer);
                 my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
             }
@@ -180,11 +185,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
     }
 
     setWindowTitle(nparent->property("winId").toString()+": "+panName());
-	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
-		if (combo->property("neutrinoImage").isValid()) {	
-			if (!combo->property("physNameLength").isValid()) combo->setProperty("physNameLength",nparent->property("physNameLength"));
-		}
-	}
 	
     foreach (nPhysD *buffer, nparent->getBufferList()) physAdd(buffer);
 	
@@ -277,12 +277,6 @@ void nGenericPan::physDel(nPhysD * buffer) {
 
 void nGenericPan::bufferChanged(nPhysD * buffer)
 {
-	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
-		if (combo->property("neutrinoImage").isValid()) {
-			int position=combo->findData(qVariantFromValue((void*) buffer));
-			if (position >= 0) combo->setItemText(position,getNameForCombo(combo,buffer));
-		}
-	}
 	currentBuffer = buffer;
 }
 

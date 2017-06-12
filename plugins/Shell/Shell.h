@@ -92,9 +92,11 @@ public:
 
     bool instantiate(neutrino *neu) {
         nparent=neu;
+
         PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
 
         PythonQt_init_QtBindings();
+        init_numpy();
 
         PythonQt::self()->addDecorators(new nPhysPyWrapper());
         PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
@@ -123,6 +125,8 @@ public:
 
 
         QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
+
+//        neu->my_w->toolBar->addAction(QIcon(":/icons/python.png"),"Python");
 
         neu->my_w->menubar->addMenu(menuPython);
         settings.beginGroup("Shell");
@@ -156,6 +160,18 @@ public:
 
 private:
     neutrino* nparent;
+
+#ifdef HAVE_NUMPY
+#if PY_MAJOR_VERSION >= 3
+    int
+#else
+    void
+#endif
+    init_numpy()
+    {
+        import_array();
+    }
+#endif
 
 public slots:	
     void

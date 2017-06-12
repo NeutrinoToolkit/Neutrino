@@ -81,8 +81,6 @@ public slots:
 #ifdef HAVE_NUMPY
     PyObject* toArray(nPhysD* my_phys) {
         DEBUG("here");
-        init_numpy();
-        DEBUG("here");
         std::vector<npy_intp> dims={(npy_intp)my_phys->getW(),(npy_intp)my_phys->getH()};
 //        nPhysD *my_copy=new nPhysD();
 //        *my_copy=my_phys->copy();
@@ -91,17 +89,6 @@ public slots:
     }
 
     nPhysD* new_nPhysD(PyObject* my_py_obj);
-
-private:
-#if PY_MAJOR_VERSION >= 3
-    int
-#else
-    void
-#endif
-    init_numpy()
-    {
-        import_array();
-    }
 #endif
 
 };

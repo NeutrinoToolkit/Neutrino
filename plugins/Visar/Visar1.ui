@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -81,55 +81,11 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>-1</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Visar 1</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_5">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QWidget" name="wvisar1" native="true"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_2">
-           <attribute name="title">
-            <string>Visar 2</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QWidget" name="wvisar2" native="true"/>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </item>
        </layout>
@@ -160,67 +116,11 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>-1</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="tab_3">
-           <attribute name="title">
-            <string>Visar 1</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QWidget" name="setVisar1" native="true">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_4">
-           <attribute name="title">
-            <string>Visar 2</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QWidget" name="setVisar2" native="true">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </item>
         <item>
@@ -485,22 +385,12 @@
              </property>
              <item>
               <property name="text">
-               <string>Visar1</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Visar2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Mean</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
                <string>Zero</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Average</string>
               </property>
              </item>
             </widget>
@@ -713,16 +603,17 @@
    <addaction name="actionSaveTxtMultiple"/>
    <addaction name="actionCopy"/>
    <addaction name="separator"/>
-   <addaction name="actionRect1"/>
-   <addaction name="actionRect2"/>
    <addaction name="actionRect3"/>
    <addaction name="separator"/>
    <addaction name="actionGuess"/>
    <addaction name="actionRefresh"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddVisar"/>
+   <addaction name="actionDelVisar"/>
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
    </property>
    <property name="text">
@@ -734,7 +625,7 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
    </property>
    <property name="text">
@@ -746,7 +637,7 @@
   </action>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -758,7 +649,7 @@
   </action>
   <action name="actionGuess">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -770,7 +661,7 @@
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
    </property>
    <property name="text">
@@ -780,49 +671,9 @@
     <string>Calculate both phases</string>
    </property>
   </action>
-  <action name="actionRect1">
-   <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
-     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
-   </property>
-   <property name="text">
-    <string>rect1</string>
-   </property>
-   <property name="toolTip">
-    <string>Rectangle Visar 1</string>
-   </property>
-  </action>
-  <action name="actionRect2">
-   <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
-     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
-   </property>
-   <property name="text">
-    <string>rect2</string>
-   </property>
-   <property name="toolTip">
-    <string>Rectangle Visar 2</string>
-   </property>
-  </action>
-  <action name="actionAutoRefresh">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
-     <normaloff>:/icons/noAutoRefresh.png</normaloff>
-     <normalon>:/autoRefresh</normalon>:/icons/noAutoRefresh.png</iconset>
-   </property>
-   <property name="text">
-    <string>autoRefresh</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto refreh when moving rectangles</string>
-   </property>
-  </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -834,7 +685,7 @@
   </action>
   <action name="actionRect3">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -846,7 +697,7 @@
   </action>
   <action name="actionSaveTxtMultiple">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
    </property>
    <property name="text">
@@ -858,7 +709,7 @@
   </action>
   <action name="showFiltered">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
    </property>
    <property name="text">
@@ -866,6 +717,27 @@
    </property>
    <property name="toolTip">
     <string>Show filtered images</string>
+   </property>
+  </action>
+  <action name="actionAddVisar">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>addVisar</string>
+   </property>
+   <property name="toolTip">
+    <string>add Visar</string>
+   </property>
+  </action>
+  <action name="actionDelVisar">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>delVisar</string>
    </property>
   </action>
  </widget>
@@ -897,7 +769,7 @@
   <tabstop>sopCalibA</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/icons/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

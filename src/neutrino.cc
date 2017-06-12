@@ -123,6 +123,7 @@ neutrino::neutrino():
 	setProperty("winId",numwin);
 
 	setProperty("neuSave-gamma",1);
+    setProperty("neuSave-physNameLength",40);
 
 	setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 

@@ -119,6 +119,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
 
+    my_w.physNameLength->setValue(nparent->property("neuSave-physNameLength").toInt());
 	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
 	QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
@@ -236,7 +237,7 @@ void nPreferences::showEvent(QShowEvent*e){
 }
 
 void nPreferences::changephysNameLength(int k) {
-	nparent->setProperty("physNameLength",k);
+    nparent->setProperty("neuSave-physNameLength",k);
 }
 
 

@@ -60,8 +60,10 @@ public:
 
 class nLine;
 class nRect;
-class Ui::Visar2;
-class Ui::Visar3;
+namespace Ui {
+class Visar2;
+class Visar3;
+}
 
 template<class T>
 inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
@@ -77,17 +79,41 @@ class Visar : public nGenericPan, private Ui::Visar1 {
 public:
     
     Q_INVOKABLE Visar(neutrino *);
-    ~Visar();
+    ~Visar(){};
+
+private:
+
+    std::vector<Ui::Visar2*> velocityUi;
+    std::vector<Ui::Visar3*> phaseUi;
     
-    std::array<Ui::Visar2*,2> velocityUi;
-    std::array<Ui::Visar3*,2> phaseUi;
+    double getTime(std::vector<double> &vecsweep,double p);
     
-    double getTime(int k,double p);
-    
-    std::array<std::vector<double>, 3> sweepCoeff;
+    std::vector<std::vector<double>> sweepCoeff;
+    std::vector<double> sweepCoeffSOP;
+
+    unsigned int numVisars;
+
+    std::vector<std::array<QVector<double>,2>> cPhase, cIntensity, cContrast;
+    std::vector<QVector<double>> time_phase;
+
+    std::vector<QVector<double>> velocity, reflectivity, quality, time_vel;
+
+    std::array<QVector<double>,4> sopCurve;
+    QVector<double> time_sop;
+
+    std::vector<std::array<nPhysD,2>> phase;
+    std::vector<std::array<nPhysD,2>> contrast;
+    std::vector<std::array<nPhysD,2>> intensity;
+
+    std::vector<nLine*> fringeLine;
+    std::vector<nRect*> fringeRect;
+    QPointer<nRect> sopRect;
 
 public slots:
     
+    void addVisar();
+    void delVisar();
+
     void doWave();
     void doWave(int);
     
@@ -104,7 +130,7 @@ public slots:
     void export_txt();
     void export_txt_multiple();
     
-    QString export_one(int);
+    QString export_one(unsigned int);
     QString export_sop();
     
     void export_clipboard();
@@ -114,7 +140,7 @@ public slots:
     
     void updatePlotSOP();
     
-    void tabChanged(int=0);
+    void tabChanged(int);
     
     void mouseAtMatrix(QPointF);
     
@@ -141,24 +167,6 @@ public slots:
         }
     }
     
-    
-private:
-    
-    std::array<std::array<QVector<double>,2>,2> cPhase, cIntensity, cContrast;
-    std::array<QVector<double>,2> time_phase;
-    
-    std::array<QVector<double>,2> velocity, reflectivity, quality, time_vel;
-    
-    std::array<QVector<double>,4> sopCurve;
-    QVector<double> time_sop;
-    
-    std::array<std::array<nPhysD,2>,2> phase;
-    std::array<std::array<nPhysD,2>,2> contrast;
-    std::array<std::array<nPhysD,2>,2> intensity;
-    
-    std::array<QPointer<nLine>,2> fringeLine;
-    std::array<QPointer<nRect>,2> fringeRect;
-    QPointer<nRect> sopRect;
 };
 
 NEUTRINO_PLUGIN(Visar,Analysis);

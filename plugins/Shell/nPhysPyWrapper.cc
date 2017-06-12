@@ -75,7 +75,6 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     DEBUG("here " << my_py_obj);
-    init_numpy();
     if (PyArray_Check(my_py_obj)) {
         PyArrayObject * arr = (PyArrayObject *)my_py_obj;
         DEBUG("here " << arr);
