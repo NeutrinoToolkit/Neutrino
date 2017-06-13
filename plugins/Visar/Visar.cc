@@ -116,7 +116,8 @@ Visar::Visar(neutrino *nparent)
 
     qDebug() << property("NeuSave-numVisars");
     if (property("NeuSave-numVisars").isValid()) {
-        for (int k=0; k<property("NeuSave-numVisars").toInt(); k++) {
+        int kMax=property("NeuSave-numVisars").toInt();
+        for (int k=0; k<kMax; k++) {
             addVisar();
         }
     } else{
@@ -255,6 +256,7 @@ void Visar::addVisar() {
 
     numVisars++;
 
+    setProperty("NeuSave-numVisars",numVisars);
     connections();
 
 }
@@ -305,6 +307,7 @@ void Visar::delVisar() {
 
         QApplication::processEvents();
         numVisars--;
+        setProperty("NeuSave-numVisars",numVisars);
     }
     connections();
 }
@@ -407,13 +410,17 @@ void Visar::mouseAtMatrix(QPointF p) {
     double position=0.0;
     if (tabs->currentIndex()==0) {
         k=tabPhase->currentIndex();
-        position=(direction(k)==0 ? p.y() : p.x());
-        velocityUi[k]->plotPhaseIntensity->setMousePosition(position);
+        if (k > 0 && k<(int)numVisars) {
+            position=(direction(k)==0 ? p.y() : p.x());
+            velocityUi[k]->plotPhaseIntensity->setMousePosition(position);
+        }
     } else if (tabs->currentIndex()==1) {
         k=tabVelocity->currentIndex();
-        double pos=direction(k)==0 ? p.y() : p.x();
-        position=getTime(sweepCoeff[k],pos) - getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value()) + phaseUi[k]->offsetTime->value();
-        plotVelocity->setMousePosition(position);
+        if (k > 0 && k<(int)numVisars) {
+            double pos=direction(k)==0 ? p.y() : p.x();
+            position=getTime(sweepCoeff[k],pos) - getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value()) + phaseUi[k]->offsetTime->value();
+            plotVelocity->setMousePosition(position);
+        }
     } else {
         double pos=sopDirection->currentIndex()==0 ? p.y() : p.x();
         position=getTime(sweepCoeffSOP,pos) - getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
@@ -468,7 +475,7 @@ void Visar::tabChanged(int k) {
             if (k<(int)numVisars) {
                 unsigned int visnum=tabWidget->currentIndex();
                 if (visnum<numVisars)
-                nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
+                    nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
             }
         }
     }

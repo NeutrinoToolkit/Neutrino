@@ -79,9 +79,7 @@ class Visar : public nGenericPan, private Ui::Visar1 {
 public:
     
     Q_INVOKABLE Visar(neutrino *);
-    ~Visar(){
-        setProperty("NeuSave-numVisars",numVisars);
-    }
+    ~Visar(){}
 
 private:
 
