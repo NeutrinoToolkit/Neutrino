@@ -158,6 +158,40 @@ void nGenericPan::grabSave() {
     }
 }
 
+void nGenericPan::decorate(QWidget *main_widget) {
+
+    foreach (nPhysD *buffer, nparent->getBufferList()) physAdd(buffer);
+
+    foreach (QComboBox *combo, main_widget->findChildren<QComboBox *>()) {
+        if (combo->property("neutrinoImage").isValid()) {
+            if (combo->property("neutrinoImage").toBool()) {
+                //connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+                connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+                connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
+            }
+        }
+    }
+    int occurrency=0;
+    foreach (QWidget *wdgt, main_widget->findChildren<QWidget *>()) {
+
+        if (wdgt->property("neutrinoSave").isValid() ||
+            wdgt->property("neutrinoImage").isValid() ||
+                qobject_cast<QPushButton*>(wdgt) ||
+                qobject_cast<QToolButton*>(wdgt)
+            ) {
+            if (wdgt->objectName().isEmpty()) {
+                wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
+            }
+            wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+        }
+    }
+
+    foreach (QAction *wdgt, main_widget->findChildren<QAction *>()) {
+        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+    }
+
+}
+
 void nGenericPan::showEvent(QShowEvent* event) {
     qDebug() << metaObject()->className();
 
@@ -168,8 +202,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("NeuSave-fileIni",panName()+".ini");
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
-    QList<QToolBar*> my_toolbars=findChildren<QToolBar *>();
-    foreach (QToolBar *my_tool, my_toolbars) {
+    foreach (QToolBar *my_tool, findChildren<QToolBar *>()) {
         if (my_tool->objectName() == "toolBar") {
             QFile helpFile(":/"+panName()+"/README.html");
             qDebug() << helpFile.fileName() << helpFile.exists();
@@ -185,36 +218,8 @@ void nGenericPan::showEvent(QShowEvent* event) {
     }
 
     setWindowTitle(nparent->property("winId").toString()+": "+panName());
-	
-    foreach (nPhysD *buffer, nparent->getBufferList()) physAdd(buffer);
-	
-	foreach (QComboBox *combo, findChildren<QComboBox *>()) {
-		if (combo->property("neutrinoImage").isValid()) {	
-			if (combo->property("neutrinoImage").toBool()) {
-				//connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
-				connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
-				connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
-            }
-		}
-	}
-    int occurrency=0;
-    foreach (QWidget *wdgt, findChildren<QWidget *>()) {
-
-		if (wdgt->property("neutrinoSave").isValid() || 
-            wdgt->property("neutrinoImage").isValid() ||
-                qobject_cast<QPushButton*>(wdgt) ||
-                qobject_cast<QToolButton*>(wdgt)
-            ) {
-            if (wdgt->objectName().isEmpty()) {
-                wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
-            }
-            wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
-		}
-	}
-
-    foreach (QAction *wdgt, findChildren<QAction *>()) {
-        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
-    }
+		
+    decorate(this);
 
 	QSize iconSize;
 	foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {

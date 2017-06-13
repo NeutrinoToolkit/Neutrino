@@ -145,6 +145,7 @@ public slots:
     void button(QString, int=1);
 
 protected:
+    void decorate(QWidget *wdg);
     void showEvent( QShowEvent* event );
     void focusOutEvent(QFocusEvent *event);
 

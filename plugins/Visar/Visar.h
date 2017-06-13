@@ -79,7 +79,9 @@ class Visar : public nGenericPan, private Ui::Visar1 {
 public:
     
     Q_INVOKABLE Visar(neutrino *);
-    ~Visar(){};
+    ~Visar(){
+        setProperty("NeuSave-numVisars",numVisars);
+    }
 
 private:
 
@@ -93,7 +95,7 @@ private:
 
     unsigned int numVisars;
 
-    std::vector<std::array<QVector<double>,2>> cPhase, cIntensity, cContrast;
+    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast;
     std::vector<QVector<double>> time_phase;
 
     std::vector<QVector<double>> velocity, reflectivity, quality, time_vel;

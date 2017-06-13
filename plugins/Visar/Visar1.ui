@@ -604,12 +604,12 @@
    <addaction name="actionCopy"/>
    <addaction name="separator"/>
    <addaction name="actionRect3"/>
+   <addaction name="actionAddVisar"/>
+   <addaction name="actionDelVisar"/>
    <addaction name="separator"/>
    <addaction name="actionGuess"/>
    <addaction name="actionRefresh"/>
    <addaction name="separator"/>
-   <addaction name="actionAddVisar"/>
-   <addaction name="actionDelVisar"/>
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
