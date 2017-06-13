@@ -114,6 +114,9 @@ Visar::Visar(neutrino *nparent)
     show();
     QApplication::processEvents();
 
+    for (int l=2+numVisars; l<whichRefl->count();l++) {
+        whichRefl->removeItem(l);
+    }
     qDebug() << property("NeuSave-numVisars");
     if (property("NeuSave-numVisars").isValid()) {
         int kMax=property("NeuSave-numVisars").toInt();
@@ -124,7 +127,6 @@ Visar::Visar(neutrino *nparent)
         addVisar();
         addVisar();
     }
-
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
 
@@ -286,7 +288,7 @@ void Visar::delVisar() {
 
         sweepCoeff.pop_back();
 
-        whichRefl->removeItem(numVisars-1);
+        whichRefl->removeItem(numVisars+1);
 
         velocity.pop_back();
         reflectivity.pop_back();
@@ -321,8 +323,10 @@ void Visar::loadSettings(QString my_settings) {
     while (settings.contains("interfringe-VISAR"+QString::number(numVisars+1))) {
         addVisar();
     }
-
     loadSettings(&settings);
+    if (property("NeuSave-whichRefl").isValid()) {
+        whichRefl->setCurrentIndex(property("NeuSave-whichRefl").toInt());
+    }
     connections();
     sweepChanged();
     doWave();
@@ -625,17 +629,21 @@ void Visar::updatePlotSOP() {
 
         // TEMPERATURE FROM REFLECTIVITY
         QVector<int> reflList;
+        setProperty("NeuSave-whichRefl",whichRefl->currentIndex());
         switch (whichRefl->currentIndex()) {
             case 0:
                 break;
             case 1:
-                for (unsigned int i=0; i<numVisars; i++)
+                for (unsigned int i=0; i<numVisars; i++) {
                     reflList << i;
+                }
                 break;
             default:
                 reflList << whichRefl->currentIndex()-2;
                 break;
         }
+
+        qDebug() << reflList;
 
         sopCurve[1].resize(time_sop.size());
         sopCurve[2].resize(time_sop.size());
@@ -652,7 +660,7 @@ void Visar::updatePlotSOP() {
             for (int numk=0;numk<reflList.size();numk++) {
                 int k=reflList[numk];
 
-                if ( k>0 && k<(int)numVisars && k<(int)reflectivity.size() && reflectivity[k].size()>0 && k<(int)time_vel.size() && time_vel[k].size()>0 ) {
+                if ( k>=0 && k<(int)numVisars ) {
                     for (int j=1;j<time_vel[k].size();j++) {
                         double t_j1=time_vel[k][j-1];
                         double t_j=time_vel[k][j];

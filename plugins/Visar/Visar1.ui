@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -380,9 +380,6 @@
                <pointsize>10</pointsize>
               </font>
              </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
              <item>
               <property name="text">
                <string>Zero</string>
@@ -390,7 +387,7 @@
              </item>
              <item>
               <property name="text">
-               <string>Average</string>
+               <string>Mean</string>
               </property>
              </item>
             </widget>
