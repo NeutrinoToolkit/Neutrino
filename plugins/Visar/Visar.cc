@@ -242,19 +242,21 @@ void Visar::addVisar() {
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis3);
     graph->setName("Quality Visar "+QString::number(numVisars+1));
+    graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis3->labelColor());
     graph->setPen(pen);
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis2);
     graph->setName("Reflectivity Visar "+QString::number(numVisars+1));
+    graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis2->labelColor());
     graph->setPen(pen);
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
     graph->setName("Velocity Visar "+QString::number(numVisars+1));
+    graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis->labelColor());
     graph->setPen(pen);
-    graph->setProperty("id", numVisars);
 
     numVisars++;
 
@@ -643,8 +645,6 @@ void Visar::updatePlotSOP() {
                 break;
         }
 
-        qDebug() << reflList;
-
         sopCurve[1].resize(time_sop.size());
         sopCurve[2].resize(time_sop.size());
         sopCurve[3].resize(time_sop.size());
@@ -816,7 +816,7 @@ void Visar::updatePlot() {
 
                     velocity[k][j] = speed;
                     reflectivity[k][j] = refle;
-                    quality[k][j]= cContrast[1][k][j]/cContrast[0][k][j];
+                    quality[k][j]= refle/(cContrast[1][k][j]/cContrast[0][k][j]);
 
                     for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                         int jloc=i+1;
@@ -843,20 +843,21 @@ void Visar::updatePlot() {
                 }
 
 
-                pen=plotVelocity->graph(3*k+0)->pen();
-                pen.setStyle(pstyle);
-                plotVelocity->graph(3*k+0)->setPen(pen);
-                plotVelocity->graph(3*k+0)->setData(time_vel[k],quality[k]);
-
-                pen=plotVelocity->graph(3*k+1)->pen();
-                pen.setStyle(pstyle);
-                plotVelocity->graph(3*k+1)->setPen(pen);
-                plotVelocity->graph(3*k+1)->setData(time_vel[k],reflectivity[k]);
-
-                pen=plotVelocity->graph(3*k+2)->pen();
-                pen.setStyle(pstyle);
-                plotVelocity->graph(3*k+2)->setPen(pen);
-                plotVelocity->graph(3*k+2)->setData(time_vel[k],velocity[k]);
+                for (int kk=0; kk< plotVelocity->graphCount() ; kk++) {
+                    QCPGraph *my_graph=plotVelocity->graph(kk);
+                    if (my_graph->property("id").toInt() == (int)k ){
+                        pen=my_graph->pen();
+                        pen.setStyle(pstyle);
+                        my_graph->setPen(pen);
+                        if (my_graph->valueAxis()==plotVelocity->yAxis) {
+                            my_graph->setData(time_vel[k],velocity[k]);
+                        } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
+                            my_graph->setData(time_vel[k],reflectivity[k]);
+                        } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
+                            my_graph->setData(time_vel[k],quality[k]);
+                        }
+                    }
+                }
 
             }
         }
