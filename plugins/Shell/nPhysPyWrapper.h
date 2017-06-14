@@ -3,20 +3,11 @@
 
 #include <cmath>
 
-#ifdef HAVE_NUMPY
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "Python.h"
-#include "numpy/arrayobject.h"
-#endif
-
 #include "PythonQt.h"
-
+#include "nPhysImageF.h"
 
 #include <QtGui>
 #include <QWidget>
-
-#include "neutrino.h"
-
 
 //! Wrapper for images nPhysD
 /*!
@@ -28,7 +19,7 @@ class nPhysPyWrapper : public QObject {
     Q_OBJECT
 
 public slots:
-    nPhysD* new_nPhysD() {return new nPhysD();};
+    nPhysD* new_nPhysD();
 
     QList<nPhysD*> static_nPhysD_open(QString=QString());
 
@@ -79,15 +70,7 @@ public slots:
     QVector<double> getData(nPhysD*); // geta data in row major order
 
 #ifdef HAVE_NUMPY
-    PyObject* toArray(nPhysD* my_phys) {
-        DEBUG("here");
-        std::vector<npy_intp> dims={(npy_intp)my_phys->getW(),(npy_intp)my_phys->getH()};
-//        nPhysD *my_copy=new nPhysD();
-//        *my_copy=my_phys->copy();
-//        return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_copy->Timg_buffer);
-        return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
-    }
-
+    PyObject* toArray(nPhysD* my_phys);
     nPhysD* new_nPhysD(PyObject* my_py_obj);
 #endif
 

@@ -2,10 +2,19 @@
 #include "nPhysWave.h"
 #include "nPhysFormats.h"
 #include "nApp.h"
+#include "neutrino.h"
+
+#ifdef HAVE_NUMPY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "Python.h"
+#include "numpy/arrayobject.h"
+#endif
 
 /**
  nPhysD "creator" set a new nPhysD from array and shape data, usually to push data from Python
  */
+
+
 QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
     QList<nPhysD*> my_list;
     if (fname.isEmpty()) {
@@ -32,6 +41,10 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
         }
     }
     return my_list;
+}
+
+nPhysD* nPhysPyWrapper::new_nPhysD() {
+    return new nPhysD();
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
@@ -70,12 +83,35 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 
 #ifdef HAVE_NUMPY
 
+#if PY_MAJOR_VERSION >= 3
+    int
+#else
+    void
+#endif
+    neutrino_init_numpy()
+    {
+        import_array();
+    }
+
+PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
+    DEBUG("here");
+    neutrino_init_numpy();
+    std::vector<npy_intp> dims={(npy_intp)my_phys->getW(),(npy_intp)my_phys->getH()};
+    nPhysD *my_copy=new nPhysD();
+    *my_copy=my_phys->copy();
+    PyObject* my_obj=(PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_copy->Timg_buffer);
+    DEBUG("here");
+    return my_obj;
+//        return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
+}
+
 
 #define __map_numpy(__arr,__my_phys,__numpy_type,__cplusplus_type) case __numpy_type : {__cplusplus_type *data = (__cplusplus_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     DEBUG("here " << my_py_obj);
     if (PyArray_Check(my_py_obj)) {
+        neutrino_init_numpy();
         PyArrayObject * arr = (PyArrayObject *)my_py_obj;
         DEBUG("here " << arr);
         if (arr && PyArray_NDIM(arr)==2){

@@ -16,7 +16,7 @@
 #include "ui_Shell.h"
 #include "nPluginLoader.h"
 
-class neutrino;
+#include "neutrino.h"
 /**
  @short Python Subsystem
 
@@ -96,9 +96,6 @@ public:
         PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
 
         PythonQt_init_QtBindings();
-#ifdef HAVE_NUMPY
-        init_numpy();
-#endif
         PythonQt::self()->addDecorators(new nPhysPyWrapper());
         PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
 
@@ -161,18 +158,6 @@ public:
 
 private:
     neutrino* nparent;
-
-#ifdef HAVE_NUMPY
-#if PY_MAJOR_VERSION >= 3
-    int
-#else
-    void
-#endif
-    init_numpy()
-    {
-        import_array();
-    }
-#endif
 
 public slots:	
     void

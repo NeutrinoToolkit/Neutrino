@@ -1,6 +1,5 @@
 #include "Shell.h"
 #include "gui/PythonQtScriptingConsole.h"
-#include "neutrino.h"
 #include <QThread>
 #include <QFont>
 
