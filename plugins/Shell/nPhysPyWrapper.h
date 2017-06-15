@@ -1,13 +1,17 @@
 #ifndef __nphys_py_wrapper
 #define __nphys_py_wrapper
 
-#include <cmath>
+#ifdef HAVE_NUMPY
+#include <numpy/arrayobject.h>
+#endif
 
+#include <cmath>
 #include "PythonQt.h"
 #include "nPhysImageF.h"
 
 #include <QtGui>
 #include <QWidget>
+
 
 //! Wrapper for images nPhysD
 /*!
@@ -72,6 +76,10 @@ public slots:
 #ifdef HAVE_NUMPY
     PyObject* toArray(nPhysD* my_phys);
     nPhysD* new_nPhysD(PyObject* my_py_obj);
+
+private:
+    void neutrino_init_numpy();
+
 #endif
 
 };
