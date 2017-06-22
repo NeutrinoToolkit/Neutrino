@@ -42,17 +42,16 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         params.olist.clear();
 
-        int dx=params.data->getW();
-        int dy=params.data->getH();
+        unsigned int dx=params.data->getW();
+        unsigned int dy=params.data->getH();
+
+        unsigned int surf=dx*dy;
 
         std::vector<int> xx(dx), yy(dy);
 
         nPhysC zz_morlet("zz_morlet");
 
         zz_morlet.resize(dx,dy);
-
-        for (int i=0;i<dx;i++) xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-        for (int i=0;i<dy;i++) yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
         nPhysD *qmap = new nPhysD(dx, dy, 0.0, "quality");
         nPhysD *wphase = new nPhysD(dx,dy,0.0,"phase_2pi");
@@ -75,10 +74,24 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                 lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
 
-        nPhysC Fmain_window=params.data->ft2(PHYS_FORWARD);
-
         params.iter=0;
         *params.iter_ptr=0;
+
+
+        fftw_complex *t = fftw_alloc_complex(surf);
+        fftw_complex *Ft = fftw_alloc_complex(surf);
+        fftw_complex *Ftmorlet = fftw_alloc_complex(surf);
+
+        fftw_plan plan_fwd = fftw_plan_dft_2d(dy, dx, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+#pragma omp parallel for
+        for (size_t i = 0; i < surf; i++) {
+            t[i][0] = params.data->Timg_buffer[i];
+            t[i][1] = 0;
+        }
+
+        fftw_execute(plan_fwd);
 
         double damp_norm=params.damp*M_PI;
         for (size_t i=0; i<lambdas.size(); i++) {
@@ -96,33 +109,37 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 
                 double thick_norm=params.thickness*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
                 double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-//				double thick_norm=wave_params.thickness*M_PI/dy;
-//				double lambda_norm=lambdas[i]/dx;
-#pragma omp parallel for collapse(2)
-                for (unsigned int x=0;x<dx;x++) {
-                    for (unsigned int y=0;y<dy;y++) {
-                        double xr = xx[x]*cr - yy[y]*sr; //rotate
-                        double yr = xx[x]*sr + yy[y]*cr;
 
-                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-                        double e_y = -pow(yr*thick_norm, 2.);
+#pragma omp parallel for
+                for (unsigned int k=0;k<surf;k++) {
+                    unsigned int x=k%dx;
+                    unsigned int y=k/dx;
 
-                        double gauss = exp(e_x)*exp(e_y);
+                    int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
+                    int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
 
-                        zz_morlet.Timg_matrix[y][x]=Fmain_window.Timg_matrix[y][x]*gauss;
+                    double xr = xx*cr - yy*sr; //rotate
+                    double yr = xx*sr + yy*cr;
 
-                    }
+                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+                    double e_y = -pow(yr*thick_norm, 2.);
+
+                    double gauss = exp(e_x)*exp(e_y);
+
+                    t[k][0]=Ft[k][0]*gauss;
+                    t[k][1]=Ft[k][1]*gauss;
+
                 }
 
-                nPhysC zz_convolve = zz_morlet.ft2(PHYS_BACKWARD);
+                fftw_execute(plan_bwd);
 
                 // decision
 #pragma omp parallel for
-                for (size_t k=0; k<params.data->getSurf(); k++) {
-                    double qmap_local=zz_convolve.Timg_buffer[k].mcabs();
+                for (size_t k=0; k<surf; k++) {
+                    double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
                     if ( qmap_local > qmap->Timg_buffer[k]) {
                         qmap->Timg_buffer[k] = qmap_local;
-                        wphase->Timg_buffer[k] = zz_convolve.Timg_buffer[k].arg();
+                        wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
                         lambda->Timg_buffer[k] = lambdas[i];
                         angle->Timg_buffer[k] = angles[j];
                     }
@@ -136,11 +153,17 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
             }
         }
 
+        fftw_free(t);
+        fftw_free(Ft);
+        fftw_free(Ftmorlet);
+        fftw_destroy_plan(plan_fwd);
+        fftw_destroy_plan(plan_bwd);
+
         if ((*params.iter_ptr)!=-1) {
 
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(dx*dy);
+                qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/(surf);
                 intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0*qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
                 wphase->Timg_buffer[k]/=2*M_PI;
             }
@@ -174,7 +197,8 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
     DEBUG("Out of here");
 }
 
-    unsigned int opencl_closest_size(unsigned int num) {
+
+unsigned int opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
     unsigned int i2,i3,i5,i7,i11,i13;
     i2=i3=i5=i7=i11=i13=0;
@@ -301,8 +325,8 @@ std::string get_platform_device_info_opencl(int num){
     desc+=((value.find("cl_khr_fp64") != std::string::npos) ? "Yes":"No");
 
     cl_device_fp_config cfg;
-      clGetDeviceInfo(device, CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(cfg), &cfg, NULL);
-      desc+="\nCL_DEVICE_DOUBLE_FP_CONFIG : "+std::to_string(cfg);
+    clGetDeviceInfo(device, CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(cfg), &cfg, NULL);
+    desc+="\nCL_DEVICE_DOUBLE_FP_CONFIG : "+std::to_string(cfg);
 
 
     return desc;
@@ -311,65 +335,65 @@ std::string get_platform_device_info_opencl(int num){
 std::string CHECK_OPENCL_ERROR(cl_int err) {
     if (err != CL_SUCCESS) {
         switch (err) {
-        case CL_DEVICE_NOT_FOUND:                           return "CL_DEVICE_NOT_FOUND";
-        case CL_DEVICE_NOT_AVAILABLE:                       return "CL_DEVICE_NOT_AVAILABLE";
-        case CL_COMPILER_NOT_AVAILABLE:                     return "CL_COMPILER_NOT_AVAILABLE";
-        case CL_MEM_OBJECT_ALLOCATION_FAILURE:              return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
-        case CL_OUT_OF_RESOURCES:                           return "CL_OUT_OF_RESOURCES";
-        case CL_OUT_OF_HOST_MEMORY:                         return "CL_OUT_OF_HOST_MEMORY";
-        case CL_PROFILING_INFO_NOT_AVAILABLE:               return "CL_PROFILING_INFO_NOT_AVAILABLE";
-        case CL_MEM_COPY_OVERLAP:                           return "CL_MEM_COPY_OVERLAP";
-        case CL_IMAGE_FORMAT_MISMATCH:                      return "CL_IMAGE_FORMAT_MISMATCH";
-        case CL_IMAGE_FORMAT_NOT_SUPPORTED:                 return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
-        case CL_BUILD_PROGRAM_FAILURE:                      return "CL_BUILD_PROGRAM_FAILURE";
-        case CL_MAP_FAILURE:                                return "CL_MAP_FAILURE";
-        case CL_MISALIGNED_SUB_BUFFER_OFFSET:               return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
-        case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
-        case CL_COMPILE_PROGRAM_FAILURE:                    return "CL_COMPILE_PROGRAM_FAILURE";
-        case CL_LINKER_NOT_AVAILABLE:                       return "CL_LINKER_NOT_AVAILABLE";
-        case CL_LINK_PROGRAM_FAILURE:                       return "CL_LINK_PROGRAM_FAILURE";
-        case CL_DEVICE_PARTITION_FAILED:                    return "CL_DEVICE_PARTITION_FAILED";
-        case CL_KERNEL_ARG_INFO_NOT_AVAILABLE:              return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
-        case CL_INVALID_VALUE:                              return "CL_INVALID_VALUE";
-        case CL_INVALID_DEVICE_TYPE:                        return "CL_INVALID_DEVICE_TYPE";
-        case CL_INVALID_PLATFORM:                           return "CL_INVALID_PLATFORM";
-        case CL_INVALID_DEVICE:                             return "CL_INVALID_DEVICE";
-        case CL_INVALID_CONTEXT:                            return "CL_INVALID_CONTEXT";
-        case CL_INVALID_QUEUE_PROPERTIES:                   return "CL_INVALID_QUEUE_PROPERTIES";
-        case CL_INVALID_COMMAND_QUEUE:                      return "CL_INVALID_COMMAND_QUEUE";
-        case CL_INVALID_HOST_PTR:                           return "CL_INVALID_HOST_PTR";
-        case CL_INVALID_MEM_OBJECT:                         return "CL_INVALID_MEM_OBJECT";
-        case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:            return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
-        case CL_INVALID_IMAGE_SIZE:                         return "CL_INVALID_IMAGE_SIZE";
-        case CL_INVALID_SAMPLER:                            return "CL_INVALID_SAMPLER";
-        case CL_INVALID_BINARY:                             return "CL_INVALID_BINARY";
-        case CL_INVALID_BUILD_OPTIONS:                      return "CL_INVALID_BUILD_OPTIONS";
-        case CL_INVALID_PROGRAM:                            return "CL_INVALID_PROGRAM";
-        case CL_INVALID_PROGRAM_EXECUTABLE:                 return "CL_INVALID_PROGRAM_EXECUTABLE";
-        case CL_INVALID_KERNEL_NAME:                        return "CL_INVALID_KERNEL_NAME";
-        case CL_INVALID_KERNEL_DEFINITION:                  return "CL_INVALID_KERNEL_DEFINITION";
-        case CL_INVALID_KERNEL:                             return "CL_INVALID_KERNEL";
-        case CL_INVALID_ARG_INDEX:                          return "CL_INVALID_ARG_INDEX";
-        case CL_INVALID_ARG_VALUE:                          return "CL_INVALID_ARG_VALUE";
-        case CL_INVALID_ARG_SIZE:                           return "CL_INVALID_ARG_SIZE";
-        case CL_INVALID_KERNEL_ARGS:                        return "CL_INVALID_KERNEL_ARGS";
-        case CL_INVALID_WORK_DIMENSION:                     return "CL_INVALID_WORK_DIMENSION";
-        case CL_INVALID_WORK_GROUP_SIZE:                    return "CL_INVALID_WORK_GROUP_SIZE";
-        case CL_INVALID_WORK_ITEM_SIZE:                     return "CL_INVALID_WORK_ITEM_SIZE";
-        case CL_INVALID_GLOBAL_OFFSET:                      return "CL_INVALID_GLOBAL_OFFSET";
-        case CL_INVALID_EVENT_WAIT_LIST:                    return "CL_INVALID_EVENT_WAIT_LIST";
-        case CL_INVALID_EVENT:                              return "CL_INVALID_EVENT";
-        case CL_INVALID_OPERATION:                          return "CL_INVALID_OPERATION";
-        case CL_INVALID_GL_OBJECT:                          return "CL_INVALID_GL_OBJECT";
-        case CL_INVALID_BUFFER_SIZE:                        return "CL_INVALID_BUFFER_SIZE";
-        case CL_INVALID_MIP_LEVEL:                          return "CL_INVALID_MIP_LEVEL";
-        case CL_INVALID_GLOBAL_WORK_SIZE:                   return "CL_INVALID_GLOBAL_WORK_SIZE";
-        case CL_INVALID_PROPERTY:                           return "CL_INVALID_PROPERTY";
-        case CL_INVALID_IMAGE_DESCRIPTOR:                   return "CL_INVALID_IMAGE_DESCRIPTOR";
-        case CL_INVALID_COMPILER_OPTIONS:                   return "CL_INVALID_COMPILER_OPTIONS";
-        case CL_INVALID_LINKER_OPTIONS:                     return "CL_INVALID_LINKER_OPTIONS";
-        case CL_INVALID_DEVICE_PARTITION_COUNT:             return "CL_INVALID_DEVICE_PARTITION_COUNT";
-        default: return "Unknown error";
+            case CL_DEVICE_NOT_FOUND:                           return "CL_DEVICE_NOT_FOUND";
+            case CL_DEVICE_NOT_AVAILABLE:                       return "CL_DEVICE_NOT_AVAILABLE";
+            case CL_COMPILER_NOT_AVAILABLE:                     return "CL_COMPILER_NOT_AVAILABLE";
+            case CL_MEM_OBJECT_ALLOCATION_FAILURE:              return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+            case CL_OUT_OF_RESOURCES:                           return "CL_OUT_OF_RESOURCES";
+            case CL_OUT_OF_HOST_MEMORY:                         return "CL_OUT_OF_HOST_MEMORY";
+            case CL_PROFILING_INFO_NOT_AVAILABLE:               return "CL_PROFILING_INFO_NOT_AVAILABLE";
+            case CL_MEM_COPY_OVERLAP:                           return "CL_MEM_COPY_OVERLAP";
+            case CL_IMAGE_FORMAT_MISMATCH:                      return "CL_IMAGE_FORMAT_MISMATCH";
+            case CL_IMAGE_FORMAT_NOT_SUPPORTED:                 return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+            case CL_BUILD_PROGRAM_FAILURE:                      return "CL_BUILD_PROGRAM_FAILURE";
+            case CL_MAP_FAILURE:                                return "CL_MAP_FAILURE";
+            case CL_MISALIGNED_SUB_BUFFER_OFFSET:               return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+            case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+            case CL_COMPILE_PROGRAM_FAILURE:                    return "CL_COMPILE_PROGRAM_FAILURE";
+            case CL_LINKER_NOT_AVAILABLE:                       return "CL_LINKER_NOT_AVAILABLE";
+            case CL_LINK_PROGRAM_FAILURE:                       return "CL_LINK_PROGRAM_FAILURE";
+            case CL_DEVICE_PARTITION_FAILED:                    return "CL_DEVICE_PARTITION_FAILED";
+            case CL_KERNEL_ARG_INFO_NOT_AVAILABLE:              return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
+            case CL_INVALID_VALUE:                              return "CL_INVALID_VALUE";
+            case CL_INVALID_DEVICE_TYPE:                        return "CL_INVALID_DEVICE_TYPE";
+            case CL_INVALID_PLATFORM:                           return "CL_INVALID_PLATFORM";
+            case CL_INVALID_DEVICE:                             return "CL_INVALID_DEVICE";
+            case CL_INVALID_CONTEXT:                            return "CL_INVALID_CONTEXT";
+            case CL_INVALID_QUEUE_PROPERTIES:                   return "CL_INVALID_QUEUE_PROPERTIES";
+            case CL_INVALID_COMMAND_QUEUE:                      return "CL_INVALID_COMMAND_QUEUE";
+            case CL_INVALID_HOST_PTR:                           return "CL_INVALID_HOST_PTR";
+            case CL_INVALID_MEM_OBJECT:                         return "CL_INVALID_MEM_OBJECT";
+            case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:            return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+            case CL_INVALID_IMAGE_SIZE:                         return "CL_INVALID_IMAGE_SIZE";
+            case CL_INVALID_SAMPLER:                            return "CL_INVALID_SAMPLER";
+            case CL_INVALID_BINARY:                             return "CL_INVALID_BINARY";
+            case CL_INVALID_BUILD_OPTIONS:                      return "CL_INVALID_BUILD_OPTIONS";
+            case CL_INVALID_PROGRAM:                            return "CL_INVALID_PROGRAM";
+            case CL_INVALID_PROGRAM_EXECUTABLE:                 return "CL_INVALID_PROGRAM_EXECUTABLE";
+            case CL_INVALID_KERNEL_NAME:                        return "CL_INVALID_KERNEL_NAME";
+            case CL_INVALID_KERNEL_DEFINITION:                  return "CL_INVALID_KERNEL_DEFINITION";
+            case CL_INVALID_KERNEL:                             return "CL_INVALID_KERNEL";
+            case CL_INVALID_ARG_INDEX:                          return "CL_INVALID_ARG_INDEX";
+            case CL_INVALID_ARG_VALUE:                          return "CL_INVALID_ARG_VALUE";
+            case CL_INVALID_ARG_SIZE:                           return "CL_INVALID_ARG_SIZE";
+            case CL_INVALID_KERNEL_ARGS:                        return "CL_INVALID_KERNEL_ARGS";
+            case CL_INVALID_WORK_DIMENSION:                     return "CL_INVALID_WORK_DIMENSION";
+            case CL_INVALID_WORK_GROUP_SIZE:                    return "CL_INVALID_WORK_GROUP_SIZE";
+            case CL_INVALID_WORK_ITEM_SIZE:                     return "CL_INVALID_WORK_ITEM_SIZE";
+            case CL_INVALID_GLOBAL_OFFSET:                      return "CL_INVALID_GLOBAL_OFFSET";
+            case CL_INVALID_EVENT_WAIT_LIST:                    return "CL_INVALID_EVENT_WAIT_LIST";
+            case CL_INVALID_EVENT:                              return "CL_INVALID_EVENT";
+            case CL_INVALID_OPERATION:                          return "CL_INVALID_OPERATION";
+            case CL_INVALID_GL_OBJECT:                          return "CL_INVALID_GL_OBJECT";
+            case CL_INVALID_BUFFER_SIZE:                        return "CL_INVALID_BUFFER_SIZE";
+            case CL_INVALID_MIP_LEVEL:                          return "CL_INVALID_MIP_LEVEL";
+            case CL_INVALID_GLOBAL_WORK_SIZE:                   return "CL_INVALID_GLOBAL_WORK_SIZE";
+            case CL_INVALID_PROPERTY:                           return "CL_INVALID_PROPERTY";
+            case CL_INVALID_IMAGE_DESCRIPTOR:                   return "CL_INVALID_IMAGE_DESCRIPTOR";
+            case CL_INVALID_COMPILER_OPTIONS:                   return "CL_INVALID_COMPILER_OPTIONS";
+            case CL_INVALID_LINKER_OPTIONS:                     return "CL_INVALID_LINKER_OPTIONS";
+            case CL_INVALID_DEVICE_PARTITION_COUNT:             return "CL_INVALID_DEVICE_PARTITION_COUNT";
+            default: return "Unknown error";
         }
     }
     return std::string();
@@ -764,7 +788,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=(j+offset.y())*dx+i+offset.x();
-					nAngle->set(i,j,angles[lambdaangle[k]/params.n_lambdas]);
+                    nAngle->set(i,j,angles[lambdaangle[k]/params.n_lambdas]);
                 }
             }
             params.olist["angle"] = nAngle;
@@ -775,7 +799,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=(j+offset.y())*dx+i+offset.x();
-					nLambda->set(i,j,lambdas[lambdaangle[k]%params.n_lambdas]);
+                    nLambda->set(i,j,lambdas[lambdaangle[k]%params.n_lambdas]);
                 }
             }
             params.olist["lambda"] = nLambda;
@@ -834,31 +858,31 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
     uphase->setName("Unwrap "+wphase.getName());
 
     switch (strategy) {
-    case SIMPLE_HV :
-        unwrap_simple_h(&wphase, uphase);
-        unwrap_simple_v(&wphase, uphase);
-        break;
+        case SIMPLE_HV :
+            unwrap_simple_h(&wphase, uphase);
+            unwrap_simple_v(&wphase, uphase);
+            break;
 
-    case SIMPLE_VH :
-        unwrap_simple_v(&wphase, uphase);
-        unwrap_simple_h(&wphase, uphase);
-        break;
+        case SIMPLE_VH :
+            unwrap_simple_v(&wphase, uphase);
+            unwrap_simple_h(&wphase, uphase);
+            break;
 
-    case GOLDSTEIN :
-        unwrap_goldstein(&wphase, uphase);
-        break;
+        case GOLDSTEIN :
+            unwrap_goldstein(&wphase, uphase);
+            break;
 
-    case QUALITY :
-        unwrap_quality(&wphase, uphase, &quality);
-        break;
+        case QUALITY :
+            unwrap_quality(&wphase, uphase, &quality);
+            break;
 
-    case MIGUEL :
-        unwrap_miguel(&wphase, uphase);
-        break;
+        case MIGUEL :
+            unwrap_miguel(&wphase, uphase);
+            break;
 
-    case MIGUEL_QUALITY :
-        unwrap_miguel_quality(&wphase, uphase, &quality);
-        break;
+        case MIGUEL_QUALITY :
+            unwrap_miguel_quality(&wphase, uphase, &quality);
+            break;
 
     }
     DEBUG("here");
@@ -986,11 +1010,11 @@ phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double
 void phys_invert_abel(abel_params &params)
 {
 
-	if (params.iimage->getSurf() == 0) {
+    if (params.iimage->getSurf() == 0) {
         return;
-	}
+    }
 
-	params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),/*std::numeric_limits<double>::quiet_NaN()*/ 0.0,"Inverted");
+    params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),/*std::numeric_limits<double>::quiet_NaN()*/ 0.0,"Inverted");
     params.oimage->set_origin(params.iimage->get_origin());
     params.oimage->set_scale(params.iimage->get_scale());
 
@@ -999,17 +1023,17 @@ void phys_invert_abel(abel_params &params)
 
     // 1. set direction indexes
     enum phys_direction sym_idx, inv_idx;
-	switch (params.idir) {
-    case PHYS_Y:
-        sym_idx = PHYS_Y; // y
-        inv_idx = PHYS_X; // x
-        break;
+    switch (params.idir) {
+        case PHYS_Y:
+            sym_idx = PHYS_Y; // y
+            inv_idx = PHYS_X; // x
+            break;
 
-    case PHYS_X:
-    default:
-        sym_idx = PHYS_X; // x
-        inv_idx = PHYS_Y; // y
-        break;
+        case PHYS_X:
+        default:
+            sym_idx = PHYS_X; // x
+            inv_idx = PHYS_Y; // y
+            break;
     }
 
     DEBUG(5,"after direction allocation");
@@ -1017,126 +1041,126 @@ void phys_invert_abel(abel_params &params)
     size_t integral_size = params.iimage->getSizeByIndex(inv_idx);
 
     *params.iter_ptr = 0;
-	// 2. switch on algo
+    // 2. switch on algo
 
-	if (params.ialgo == ABEL) {
+    if (params.ialgo == ABEL) {
         DEBUG(1, "Plain ABEL inversion");
 #pragma omp parallel for shared (params)
-		for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
-			if ((*params.iter_ptr)!=-1) {
+        for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
+            if ((*params.iter_ptr)!=-1) {
 
-				(*params.iter_ptr)++;
+                (*params.iter_ptr)++;
 
-				size_t axe_point[2];
+                size_t axe_point[2];
 
-				std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
-				axe_point[0] = params.iaxis[ii].x();
-				axe_point[1] = params.iaxis[ii].y();
+                std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
+                axe_point[0] = params.iaxis[ii].x();
+                axe_point[1] = params.iaxis[ii].y();
 
-				int copied=0;
+                int copied=0;
 
-				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
+                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
 
-				for (size_t j=copied; j<integral_size; j++)
-					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+                for (size_t j=copied; j<integral_size; j++)
+                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-				phys_invert_abel_1D(copy_buffer, out_buffer);
+                phys_invert_abel_1D(copy_buffer, out_buffer);
 
-				double axis_val=0.5*out_buffer[1];
+                double axis_val=0.5*out_buffer[1];
 
-				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
+                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
 
-				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
+                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
 
-				for (size_t j=copied; j<integral_size; j++)
-					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+                for (size_t j=copied; j<integral_size; j++)
+                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-				phys_invert_abel_1D(copy_buffer, out_buffer);
+                phys_invert_abel_1D(copy_buffer, out_buffer);
 
-				axis_val+=0.5*out_buffer[1];
+                axis_val+=0.5*out_buffer[1];
 
-				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
+                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
 
-				// set on axis value
-				params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(),axis_val);
-			}
-		}
+                // set on axis value
+                params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(),axis_val);
+            }
+        }
 
         params.oimage->setName(std::string("ABEL ")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
 
         //params.oimage->setName(std::string("Inverted (ABEL) ")+std::string(params.iimage->getShortName()));
-	} else if (params.ialgo == ABEL_HF) {
+    } else if (params.ialgo == ABEL_HF) {
 
-		DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
-		// testing purposes only! Many problems in this one:
-		// 1. code copy
-		// 2. lut optimization not working properly
-		// 3. should convert H_0 to FT
-		bessel_alloc_t my_lut;
+        DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
+        // testing purposes only! Many problems in this one:
+        // 1. code copy
+        // 2. lut optimization not working properly
+        // 3. should convert H_0 to FT
+        bessel_alloc_t my_lut;
 
-		//! by fixing integral_size as a single vector size for transformation, results in padding
-		//! hence in a modification of the image resolution
+        //! by fixing integral_size as a single vector size for transformation, results in padding
+        //! hence in a modification of the image resolution
 
-		/*if (sym_idx == PHYS_X) {
-			params.oimage->resize(params.iimage->getW(), 3*integral_size);
-		} else {
-			params.oimage->resize(3*integral_size, params.iimage->getH());
-		}*/
+        /*if (sym_idx == PHYS_X) {
+            params.oimage->resize(params.iimage->getW(), 3*integral_size);
+        } else {
+            params.oimage->resize(3*integral_size, params.iimage->getH());
+        }*/
 
-//		int axe_inv_mean[2];
-//		axe_inv_mean[0] = 0;
-//		axe_inv_mean[1] = 0;
-//		for (size_t ii=0; ii<params.iaxis.size(); ii++) {
-//			axe_inv_mean[0] += params.iaxis[ii].x();
-//			axe_inv_mean[1] += params.iaxis[ii].y();
-//		}
+        //		int axe_inv_mean[2];
+        //		axe_inv_mean[0] = 0;
+        //		axe_inv_mean[1] = 0;
+        //		for (size_t ii=0; ii<params.iaxis.size(); ii++) {
+        //			axe_inv_mean[0] += params.iaxis[ii].x();
+        //			axe_inv_mean[1] += params.iaxis[ii].y();
+        //		}
 
-//		DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/params.iaxis.size());
+        //		DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/params.iaxis.size());
 
-		std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
+        std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
 
-		for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
-			if ((*params.iter_ptr)!=-1) {
-				(*params.iter_ptr)++;
+        for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
+            if ((*params.iter_ptr)!=-1) {
+                (*params.iter_ptr)++;
 
-				int axe_point[2] = { params.iaxis[ii].x(), params.iaxis[ii].y()};
+                int axe_point[2] = { params.iaxis[ii].x(), params.iaxis[ii].y()};
 
-				//cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-				int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
+                //cerr << axe_point[0]  << " , " << axe_point[1] << endl;
+                int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
 
-				for (size_t j=copied; j<integral_size; j++)
-					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+                for (size_t j=copied; j<integral_size; j++)
+                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
 
-				phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
-				//phys_invert_abelHF_1D(&copy_buffer[0], out_buffer, copied, &my_lut);
-				double upper_axe_point = 0.5*out_buffer[0];
+                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
+                //phys_invert_abelHF_1D(&copy_buffer[0], out_buffer, copied, &my_lut);
+                double upper_axe_point = 0.5*out_buffer[0];
 
-				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
-				//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_NEG);
+                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
+                //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_NEG);
 
-				copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
-				for (size_t j=copied; j<integral_size; j++)
-					copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
+                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
+                for (size_t j=copied; j<integral_size; j++)
+                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-				phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
-				//phys_invert_abelHF_1D(copy_buffer, &out_buffer[0], copied, &my_lut);
+                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
+                //phys_invert_abelHF_1D(copy_buffer, &out_buffer[0], copied, &my_lut);
 
-				upper_axe_point+=0.5*out_buffer[0];
+                upper_axe_point+=0.5*out_buffer[0];
 
-				params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
-				//params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_POS);
+                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
+                //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_POS);
 
-				params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(), upper_axe_point);
+                params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(), upper_axe_point);
 
-				DEBUG(10,"step: "<<ii);
-			}
+                DEBUG(10,"step: "<<ii);
+            }
         }
         params.oimage->setName(std::string("ABEL")+params.oimage->getName());
-		params.oimage->setShortName("ABEL");
+        params.oimage->setShortName("ABEL");
     } else {
-		DEBUG(1, "Unknown inversion type: "<<(int)params.ialgo);
+        DEBUG(1, "Unknown inversion type: "<<(int)params.ialgo);
     }
 
     params.oimage->TscanBrightness();
