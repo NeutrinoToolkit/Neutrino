@@ -9,6 +9,7 @@
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     setAttribute(Qt::AA_UseHighDpiPixmaps);
+    setAttribute(Qt::AA_EnableHighDpiScaling);
 
     setOrganizationName("ParisTech");
     setOrganizationDomain("edu");
@@ -28,7 +29,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     nApp::changeLocale(my_set.value("locale",QLocale()).toLocale());
     nApp::changeThreads(my_set.value("threads",1).toInt());
     my_set.endGroup();
-
 
 }
 

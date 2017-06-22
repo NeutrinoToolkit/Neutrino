@@ -107,6 +107,8 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     title(new QCPTextElement(this))
 {
 
+    setPlottingHint(QCP::phCacheLabels, false);
+
     setProperty("NeuSave-fileIni",objectName()+".ini");
     setProperty("NeuSave-fileTxt",objectName()+".txt");
     setProperty("NeuSave-fileExport",objectName()+".pdf");

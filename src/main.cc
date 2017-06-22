@@ -51,6 +51,8 @@ int main(int argc, char **argv)
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
 
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
     nApp my_app(argc,argv);
