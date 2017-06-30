@@ -448,15 +448,18 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         // KERNEL
         std::string textkernel=
-                "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy,  const float sr,  const float cr, const float lambda_norm, const float damp_norm,  const float thick_norm){\n"
+                "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy, const float damp_norm,  const float thick_norm,  const float angle, const float lambda_norm){\n"
                 "    size_t id = get_global_id(0);\n"
                 "    int i = id%dx;\n"
                 "    int j = id/dx;\n"
                 "    if (i>=(int)dx/2) i-=dx;\n"
                 "    if (j>=(int)dy/2) j-=dy;\n"
+                "    float cr,sr;\n"
+                "    sr=sincos(angle,&cr);\n"
                 "    float xr=i*cr-j*sr;\n"
                 "    float yr=i*sr+j*cr;\n"
-                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
+                "    float thick_rot=thick_norm/sqrt(pown(sr*dx,2)+pown(cr*dy,2));\n"
+                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_rot,2));\n"
                 "    outReal[id] = gauss * inReal[id];\n"
                 "    outImag[id] = gauss * inImag[id];\n"
                 "}\n"
@@ -638,7 +641,10 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         clSetKernelArg(kernelGabor, 4, sizeof(unsigned int), &dx);
         clSetKernelArg(kernelGabor, 5, sizeof(unsigned int), &dy);
         float damp_norm= params.damp * M_PI;
-        clSetKernelArg(kernelGabor, 9, sizeof(float), &damp_norm);
+        clSetKernelArg(kernelGabor, 6, sizeof(float), &damp_norm);
+        float thick_norm=params.thickness * M_PI;
+        err=clSetKernelArg(kernelGabor,7, sizeof(float), &thick_norm);
+        check_opencl_error(err, "clSetKernelArg");
 
         cl_kernel kernelBest = clCreateKernel(program, "best", &err);
         check_opencl_error(err, "clCreateKernel best");
@@ -670,6 +676,10 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         for (size_t nangle=0; nangle <params.n_angles; nangle++) {
 
+            float angle_rad=angles[nangle]*_phys_deg;
+            err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
+            check_opencl_error(err, "clSetKernelArg");
+
             for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
 
                 if ((*params.iter_ptr)==-1) {
@@ -681,20 +691,12 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
                 DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] );
 
-
-                float sr=sin(angles[nangle]*_phys_deg);
-                float cr=cos(angles[nangle]*_phys_deg);
-                err=clSetKernelArg(kernelGabor, 6, sizeof(float), &sr);
-                check_opencl_error(err, "clSetKernelArg");
-                err=clSetKernelArg(kernelGabor, 7, sizeof(float), &cr);
-                check_opencl_error(err, "clSetKernelArg");
+                float sr=sin(angle_rad);
+                float cr=cos(angle_rad);
                 float lambda_norm=lambdas[nlambda]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-                err=clSetKernelArg(kernelGabor, 8, sizeof(float), &lambda_norm);
+                err=clSetKernelArg(kernelGabor, 9, sizeof(float), &lambda_norm);
                 check_opencl_error(err, "clSetKernelArg");
 
-                float thick_norm=params.thickness * M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-                err=clSetKernelArg(kernelGabor,10, sizeof(float), &thick_norm);
-                check_opencl_error(err, "clSetKernelArg");
 
 
                 clEnqueueNDRangeKernel(queue, kernelGabor, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
