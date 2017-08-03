@@ -102,7 +102,7 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
 void nColorBar::percentChange() {
     if (currentBuffer) {
 		currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,my_w.percent->value());
-        nparent->createQimage();
+        nparent->showPhys();
         bufferChanged(currentBuffer);
     }
 }
@@ -110,7 +110,7 @@ void nColorBar::percentChange() {
 void nColorBar::on_gamma_valueChanged(int val) {
     if (currentBuffer) {
         currentBuffer->property["gamma"]=val;
-        nparent->createQimage();
+        nparent->showPhys();
     }
 }
 
@@ -135,7 +135,7 @@ void nColorBar::minChanged (QString value) {
         currentBuffer->property["display_range"]=minmax;
     }
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
-    nparent->createQimage();
+    nparent->showPhys();
     my_w.histogram->repaint();
 }
 
@@ -148,7 +148,7 @@ void nColorBar::maxChanged (QString value) {
         currentBuffer->property["display_range"]=minmax;
     }
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
-    nparent->createQimage();
+    nparent->showPhys();
     my_w.histogram->repaint();
 }
 

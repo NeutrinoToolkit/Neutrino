@@ -41,7 +41,8 @@ nView::~nView ()
 nView::nView (QWidget *parent) : QGraphicsView (parent),
 	my_scene(this),
 	my_tics(this),
-	currentBuffer(nullptr)
+    currentBuffer(nullptr),
+    lockColors(false)
 {
 	DEBUG("HERE I AM");
 
@@ -115,54 +116,46 @@ void nView::setLockColors(bool val) {
 }
 
 void nView::showPhys(nPhysD *my_phys) {
+    if (!my_phys) {
+        my_phys=currentBuffer;
+    }
+
 	if (my_phys) {
 		if (!physList.contains(my_phys)) physList << my_phys;
 
+        DEBUG(lockColors);
 		if (currentBuffer) {
 			if (lockColors) {
 				my_phys->property["display_range"]=currentBuffer->property["display_range"];
 				my_phys->property["gamma"]=currentBuffer->property["gamma"];
 			} else {
 				if (!my_phys->property.have("gamma")) {
-					my_phys->property["gamma"]=property("neuSave-gamma").toInt();
+                    my_phys->property["gamma"]=parent()->property("neuSave-gamma").toInt();
 				}
 			}
 		}
 
-		if (!my_phys->property.have("display_range")) {
-			my_phys->property["display_range"]= my_phys->get_min_max();
-		}
-		currentBuffer=my_phys;
 
-		if (!physList.contains(my_phys)) {
-			// TODO: add memory copy...
-			physList << my_phys;
-		}
+        QApplication::processEvents();
+        if (my_phys->getSurf()>0) {
+            const unsigned char *nPhys_pointer=my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
+            const QImage tempImage(nPhys_pointer,
+                                   my_phys->getW(),
+                                   my_phys->getH(),
+                                   my_phys->getW()*3,
+                                   QImage::Format_RGB888);
 
-		createQimage();
+            my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+        }
+
+        currentBuffer=my_phys;
+
+        QApplication::processEvents();
+
+        setSize();
 
 		emit bufferChanged(my_phys);
 	}
-}
-
-
-void
-nView::createQimage() {
-	QApplication::processEvents();
-	if (currentBuffer && currentBuffer->getSurf()>0) {
-		const unsigned char *nPhys_pointer=currentBuffer->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-		const QImage tempImage(nPhys_pointer,
-							   currentBuffer->getW(),
-							   currentBuffer->getH(),
-							   currentBuffer->getW()*3,
-							   QImage::Format_RGB888);
-
-		my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-	}
-
-	QApplication::processEvents();
-
-	setSize();
 }
 
 void
@@ -380,7 +373,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 		case Qt::Key_A: {
 				if (e->modifiers() & Qt::ShiftModifier) {
 					foreach (nPhysD* phys, physList) {
-						currentBuffer->property["display_range"]=currentBuffer->get_min_max();
+                        phys->property["display_range"]=phys->get_min_max();
 						setGamma(1);
 						emit bufferChanged(phys);
 					}
@@ -391,7 +384,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 						emit updatecolorbar();
 					}
 				}
-				createQimage();
+                showPhys();
 				break;
 			}
 		case Qt::Key_Less:
@@ -418,7 +411,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 void nView::setGamma(int value) {
 	if (currentBuffer) {
 		currentBuffer->property["gamma"]=value;
-		createQimage();
+        showPhys();
 		emit bufferChanged(currentBuffer);
 	}
 }
@@ -436,7 +429,7 @@ nView::changeColorTable (QString ctname) {
 
 void
 nView::changeColorTable () {
-	createQimage();
+    showPhys();
 	emit logging(colorTable);
 	my_tics.update();
 	emit updatecolorbar();
@@ -500,7 +493,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 	emit mouseReleaseEvent_sig(mapToScene(e->pos()));
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
 		currentBuffer->property["display_range"]=minMax;
-		createQimage();
+        showPhys();
 	}
 }
 

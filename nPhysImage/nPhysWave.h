@@ -82,7 +82,7 @@ struct wavelet_params_str {
 
 	int iter;
 	int *iter_ptr;
-	
+
 	std::map<std::string, nPhysD*> olist;
 };
 typedef struct wavelet_params_str wavelet_params;

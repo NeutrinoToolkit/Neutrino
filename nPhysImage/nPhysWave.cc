@@ -524,8 +524,8 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         /* Real and Imaginary arrays. */
         cl_uint N = dx*dy;
-        std::vector<cl_float> inReal(N,0);
-        std::vector<cl_float> inImag(N,0);
+        cl_float *inReal = new cl_float[N];
+        cl_float *inImag = new cl_float[N];
 
         /* Initialization of inReal*/
         for(cl_uint j=0; j<dy; j++) {
@@ -697,12 +697,9 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 err=clSetKernelArg(kernelGabor, 9, sizeof(float), &lambda_norm);
                 check_opencl_error(err, "clSetKernelArg");
 
-
-
                 clEnqueueNDRangeKernel(queue, kernelGabor, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
                 err = clFinish(queue);
                 check_opencl_error(err, "clFinish");
-
 
                 /* Execute Backward FFT. */
                 err = clfftEnqueueTransform(planHandle, CLFFT_BACKWARD, 1, &queue, 0, NULL, NULL, buffersIn, NULL, tmpBuffer);
@@ -752,6 +749,8 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         clReleaseKernel(kernelGabor);
         clReleaseProgram(program);
 
+        delete [] inReal;
+        delete [] inImag;
         /* Release the plan. */
         err = clfftDestroyPlan(&planHandle );
         check_opencl_error(err, "clfftDestroyPlan");
@@ -806,7 +805,6 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             }
             params.olist["lambda"] = nLambda;
         }
-
 
         std::map<std::string, nPhysD *>::const_iterator itr;
         for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {

@@ -523,15 +523,6 @@ public:
     }
 
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
-        bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
-        double mini=minmax.first();
-        double maxi=minmax.second();
-
-        if (!property.have("gamma")) {
-            property["gamma"]=(int)1;
-        }
-        double my_gamma=gamma();
-
         if (getSurf()>0 && palette.size()==768) {
 
             if (uchar_buf.size() == getSurf()*3 &&
@@ -550,7 +541,12 @@ public:
                 }
             }
 
-            DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<"]");
+            bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
+            double mini=minmax.first();
+            double maxi=minmax.second();
+            double my_gamma=gamma();
+
+            DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<" , " << my_gamma << "]");
 			uchar_buf.assign(getSurf()*3,255);
 #pragma omp parallel for
             for (size_t i=0; i<getSurf(); i++) {
@@ -562,7 +558,7 @@ public:
 			}
             display_property["palette_name"]=palette_name;
             display_property["gamma"]=property["gamma"].get_i();
-            display_property["display_range"]=property["display_range"];
+            display_property["display_range"]=property["display_range"]=vec2f(mini,maxi);
 
             return &uchar_buf[0];
 		}
@@ -862,7 +858,7 @@ private:
 	bool _canResize()		// check for parallel instances
 	{ return (*_n_inst == 1) ? true : false; }
 
-	int *_n_inst;
+    int *_n_inst;
 
 };
 

@@ -51,7 +51,6 @@ inline void phys_flip_ud(nPhysImageF<T> &img)
     		std::swap(img.Timg_matrix[j][i],img.Timg_matrix[img.getH()-j-1][i]);
 		}
 	}
-    img.reset_display();
 }
 
 template <class T>
@@ -62,7 +61,6 @@ inline void phys_flip_lr(nPhysImageF<T> &img)
     		std::swap(img.Timg_matrix[j][i],img.Timg_matrix[j][img.getW()-i-1]);
 		}
 	}
-    img.reset_display();
 }
 
 template <class T>
@@ -75,7 +73,6 @@ inline void phys_rotate_left(nPhysImageF<T> &img)
 			img.set(i,j,rotated.point(rotated.getW()-1-j,i));
 		}
 	}
-    img.reset_display();
 }
 
 template <class T>
@@ -88,7 +85,6 @@ inline void phys_rotate_right(nPhysImageF<T> &img)
 			img.set(i,j,rotated.point(j,rotated.getH()-1-i));
 		}
 	}
-    img.reset_display();
 }
 
 

@@ -695,7 +695,7 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
                 TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &units);
                 switch (units) {
                 case 1:
-                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="?";
+                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="";
                     break;
                 case 2:
                     tiff_prop["unitsX"]=tiff_prop["unitsY"]="in";

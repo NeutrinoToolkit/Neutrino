@@ -369,7 +369,7 @@ void neutrino::rotateLeft() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
 	if (my_w->my_view->currentBuffer) {
 		phys_rotate_left(*my_w->my_view->currentBuffer);
-		createQimage();
+        showPhys();
 	}
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -380,7 +380,7 @@ void neutrino::rotateRight() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
 	if (my_w->my_view->currentBuffer) {
 		phys_rotate_right(*my_w->my_view->currentBuffer);
-		createQimage();
+        showPhys();
 	}
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -390,7 +390,7 @@ void neutrino::flipUpDown() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
 	if (my_w->my_view->currentBuffer) {
 		phys_flip_ud(*my_w->my_view->currentBuffer);
-		createQimage();
+        showPhys();
 	}
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -400,7 +400,7 @@ void neutrino::flipLeftRight() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
 	if (my_w->my_view->currentBuffer) {
 		phys_flip_lr(*my_w->my_view->currentBuffer);
-		createQimage();
+        showPhys();
 	}
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -499,7 +499,7 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
 	if (!my_phys) my_phys=my_w->my_view->currentBuffer;
 
 	if (my_phys) {
-		double gamma_val=my_phys->gamma();
+        double gamma_val=my_phys->gamma();
 		my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
 
 		QString winName=QString::fromUtf8(my_phys->getShortName().c_str());
@@ -993,11 +993,6 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 void
 neutrino::showPhys(nPhysD* my_phys) {
 	my_w->my_view->showPhys(my_phys);
-}
-
-void
-neutrino::createQimage() {
-	my_w->my_view->createQimage();
 }
 
 void neutrino::exportGraphics () {

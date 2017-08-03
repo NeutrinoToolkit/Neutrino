@@ -93,7 +93,7 @@ public slots:
     void mouseMoveEvent (QMouseEvent *);
 	void wheelEvent(QWheelEvent *);
 
-    void showPhys(nPhysD*);
+    void showPhys(nPhysD* = nullptr);
 
     void emitMouseposition (QPointF);
 
@@ -109,8 +109,6 @@ public slots:
     void nextColorTable ();
 
     void setLockColors(bool);
-
-    void createQimage();
 
     void setGamma(int value);
     void prevBuffer();

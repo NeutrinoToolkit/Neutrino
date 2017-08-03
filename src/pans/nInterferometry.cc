@@ -283,6 +283,7 @@ void nInterferometry::doWavelet (int iimage) {
         nPhysD datamatrix = image->sub(geom2.left(),geom2.top(),geom2.width(),geom2.height());		
         my_params.data=&datamatrix;
 
+
         int niter=my_params.n_angles*my_params.n_lambdas+1;
 
         QSettings settings("neutrino","");
@@ -296,6 +297,9 @@ void nInterferometry::doWavelet (int iimage) {
         }
 
         std::map<std::string,nPhysD *> retList = my_params.olist;
+        retList["synthetic"]=new nPhysD();
+        phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
+
         for(std::map<std::string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
             itr->second->setShortName(itr->second->getShortName()+suffix);
             localPhys[itr->first+suffix]=nparent->replacePhys(itr->second,localPhys[itr->first+suffix],false);

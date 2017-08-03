@@ -145,7 +145,7 @@ public slots:
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);
-    void showPhys(nPhysD*);
+    void showPhys(nPhysD* = nullptr);
     void addShowPhys(nPhysD*);
 
     nPhysD* getBuffer(int);
@@ -184,9 +184,6 @@ public slots:
     void exportGraphics(QString);
 
     nGenericPan* Monitor();
-
-    // Image
-    void createQimage();
 
     void toggleRuler();
     void toggleGrid();
