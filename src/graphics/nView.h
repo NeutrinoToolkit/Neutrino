@@ -93,7 +93,8 @@ public slots:
     void mouseMoveEvent (QMouseEvent *);
 	void wheelEvent(QWheelEvent *);
 
-    void showPhys(nPhysD* = nullptr);
+    void updatePhys();
+    void showPhys(nPhysD*);
 
     void emitMouseposition (QPointF);
 

@@ -65,7 +65,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
 	if (!parent) ERROREXIT("nView problem");
 
-	DEBUG(qobject_cast<neutrino *>(parent));
+    DEBUG(qobject_cast<neutrino *>(parent->parent()));
 
 	my_scene.addItem(&my_pixitem);
 	my_scene.addItem(&my_mouse);
@@ -115,11 +115,12 @@ void nView::setLockColors(bool val) {
 	lockColors=val;
 }
 
-void nView::showPhys(nPhysD *my_phys) {
-    if (!my_phys) {
-        my_phys=currentBuffer;
-    }
 
+void nView::updatePhys() {
+    showPhys(currentBuffer);
+}
+
+void nView::showPhys(nPhysD *my_phys) {
 	if (my_phys) {
 		if (!physList.contains(my_phys)) physList << my_phys;
 
@@ -128,10 +129,6 @@ void nView::showPhys(nPhysD *my_phys) {
 			if (lockColors) {
 				my_phys->property["display_range"]=currentBuffer->property["display_range"];
 				my_phys->property["gamma"]=currentBuffer->property["gamma"];
-			} else {
-				if (!my_phys->property.have("gamma")) {
-                    my_phys->property["gamma"]=parent()->property("neuSave-gamma").toInt();
-				}
 			}
 		}
 
@@ -384,7 +381,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 						emit updatecolorbar();
 					}
 				}
-                showPhys();
+                updatePhys();
 				break;
 			}
 		case Qt::Key_Less:
@@ -411,7 +408,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 void nView::setGamma(int value) {
 	if (currentBuffer) {
 		currentBuffer->property["gamma"]=value;
-        showPhys();
+        updatePhys();
 		emit bufferChanged(currentBuffer);
 	}
 }
@@ -429,7 +426,7 @@ nView::changeColorTable (QString ctname) {
 
 void
 nView::changeColorTable () {
-    showPhys();
+    updatePhys();
 	emit logging(colorTable);
 	my_tics.update();
 	emit updatecolorbar();
@@ -493,7 +490,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 	emit mouseReleaseEvent_sig(mapToScene(e->pos()));
 	if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
 		currentBuffer->property["display_range"]=minMax;
-        showPhys();
+        updatePhys();
 	}
 }
 

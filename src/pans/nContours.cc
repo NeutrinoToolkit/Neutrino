@@ -65,7 +65,7 @@ void
 nContours::setOrigin(QPointF p) {
 	if (currentBuffer) {
 		currentBuffer->set_origin(p.x(),p.y());
-        nparent->showPhys();
+        nparent->updatePhys();
 	}
 	my_w.actionCenter->setChecked(false);
 }

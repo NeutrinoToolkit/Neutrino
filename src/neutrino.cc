@@ -369,7 +369,7 @@ void neutrino::rotateLeft() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
 	if (my_w->my_view->currentBuffer) {
 		phys_rotate_left(*my_w->my_view->currentBuffer);
-        showPhys();
+        updatePhys();
 	}
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -380,7 +380,7 @@ void neutrino::rotateRight() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
 	if (my_w->my_view->currentBuffer) {
 		phys_rotate_right(*my_w->my_view->currentBuffer);
-        showPhys();
+        updatePhys();
 	}
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -390,7 +390,7 @@ void neutrino::flipUpDown() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
 	if (my_w->my_view->currentBuffer) {
 		phys_flip_ud(*my_w->my_view->currentBuffer);
-        showPhys();
+        updatePhys();
 	}
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -400,7 +400,7 @@ void neutrino::flipLeftRight() {
 	my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
 	if (my_w->my_view->currentBuffer) {
 		phys_flip_lr(*my_w->my_view->currentBuffer);
-        showPhys();
+        updatePhys();
 	}
 	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
 	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -918,9 +918,6 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 void neutrino::addPhys(nPhysD* datamatrix) {
 	if (datamatrix && !my_w->my_view->physList.contains(datamatrix))	{
 		my_w->my_view->physList << datamatrix;
-
-		//        datamatrix->property["display_range"]= datamatrix->get_min_max();
-
 		addMenuBuffers(datamatrix);
 		emit physAdd(datamatrix);
 	}
@@ -992,7 +989,15 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 
 void
 neutrino::showPhys(nPhysD* my_phys) {
-	my_w->my_view->showPhys(my_phys);
+    if (!my_phys->property.have("gamma")) {
+        my_phys->property["gamma"]=property("neuSave-gamma").toInt();
+    }
+    my_w->my_view->showPhys(my_phys);
+}
+
+void
+neutrino::updatePhys() {
+    my_w->my_view->updatePhys();
 }
 
 void neutrino::exportGraphics () {

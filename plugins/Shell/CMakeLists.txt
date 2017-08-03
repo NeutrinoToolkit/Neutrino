@@ -5,6 +5,8 @@ if(PYTHONLIBS_FOUND)
 	list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})
 	include_directories(${PYTHON_INCLUDE_DIRS})
 
+	message(STATUS "Found Python includes: ${PYTHON_INCLUDE_DIRS}")
+
 	include(FindPythonInterp)
 
 	if(PYTHONINTERP_FOUND)
