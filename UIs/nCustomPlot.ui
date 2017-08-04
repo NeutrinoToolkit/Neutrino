@@ -17,7 +17,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QGridLayout" name="gridLayout_2">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -30,7 +30,7 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item>
+    <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
        <string/>
@@ -75,7 +75,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../qrc/icons.qrc">
+          <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/font.png</normaloff>:/icons/font.png</iconset>
          </property>
         </widget>
@@ -83,7 +83,7 @@
       </layout>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="font">
        <font>
@@ -399,6 +399,138 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Errorbars</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QScrollArea" name="scrollArea_3">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>389</width>
+             <height>160</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="errorbars_layout" columnstretch="0,1,0,0,0">
+              <property name="verticalSpacing">
+               <number>0</number>
+              </property>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_14">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Width</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="label_15">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Copy</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="label_16">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Save</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_17">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Show</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_18">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -436,7 +568,7 @@
   </widget>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -448,7 +580,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -460,7 +592,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
    </property>
    <property name="text">
@@ -472,7 +604,7 @@
   </action>
   <action name="actionLoadPref">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
    </property>
    <property name="text">
@@ -484,7 +616,7 @@
   </action>
   <action name="actionSavePref">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
    </property>
    <property name="text">
@@ -496,7 +628,7 @@
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -508,7 +640,7 @@
   </action>
   <action name="actionChangeFonts">
    <property name="icon">
-    <iconset resource="../qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/font.png</normaloff>:/icons/font.png</iconset>
    </property>
    <property name="text">
@@ -524,7 +656,7 @@
   <tabstop>fontTitle</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
