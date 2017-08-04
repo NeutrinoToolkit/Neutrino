@@ -800,13 +800,18 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
                             std::stringstream ss(ifilename);
                             if(docname) {
                                 ss << std::string(docname);
+                            } else {
+                                ss << ifilename;
+                                if (vecReturn.size()>0) {
+                                    ss << " " << vecReturn.size();
+                                }
                             }
                             if (separate_rgb) {
                                 ss << " c" << samples;
                             }
                             my_phys=new nPhysD(w,h,0.0,ss.str());
+                            my_phys->property.insert(tiff_prop.begin(),tiff_prop.end());
                             my_phys->setType(PHYS_FILE);
-                            my_phys->property=tiff_prop;
                             vecReturn.push_back(my_phys);
                         }
 
@@ -852,7 +857,7 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
                             my_phys=nullptr;
                         }
                     }
-                    if (!separate_rgb && my_phys) {
+                    if (!separate_rgb && my_phys && samples>1) {
                         phys_divide(*my_phys,samples);
                     }
                     _TIFFfree(buf);
@@ -871,6 +876,10 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
 #else
     throw phys_fileerror("Neutrino was compiled without TIFF support");
 #endif
+    for (auto& img: vecReturn) {
+        DEBUG(img->getName());
+    }
+
     return vecReturn;
 }
 

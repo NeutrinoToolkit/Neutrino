@@ -217,7 +217,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 QCheckBox *cb_graph = new QCheckBox("", this)   ;
                 QFont f = cb_graph->font();
 
-                cb_graph->setChecked(true);
+                cb_graph->setChecked(graph->visible());
                 cb_graph->setFont(f);
                 cb_graph->setProperty("graph",qVariantFromValue((void *) graph));
                 connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
@@ -250,7 +250,47 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
                 tb_save->setProperty("graph",qVariantFromValue((void *) graph));
                 connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
                 my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
+            }
+            QCPErrorBars *errbar = qobject_cast<QCPErrorBars *>(plottable(g));
+            if(errbar) {
+                int row=my_w.errorbars_layout->rowCount();
+                int col=0;
+                QCheckBox *cb_graph = new QCheckBox("", this)   ;
+                QFont f = cb_graph->font();
 
+                cb_graph->setChecked(errbar->visible());
+                cb_graph->setFont(f);
+                cb_graph->setProperty("errbar",qVariantFromValue((void *) errbar));
+                connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+                my_w.errorbars_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
+
+                QLabel *le = new QLabel(errbar->name(),this);
+                f.setPointSize(10);
+                le->setFont(f);
+                my_w.errorbars_layout->addWidget(le,row,col++);
+
+
+                QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
+                sb_thick->setFont(f);
+                sb_thick->setRange(0,99);
+                sb_thick->setDecimals(1);
+                sb_thick->setSingleStep(0.1);
+                sb_thick->setValue(errbar->pen().widthF());
+                sb_thick->setProperty("errbar",qVariantFromValue((void *) errbar));
+                connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+                my_w.errorbars_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_copy = new QToolButton(this);
+                tb_copy->setIcon(QIcon(":icons/saveClipboard"));
+                tb_copy->setProperty("errbar",qVariantFromValue((void *) errbar));
+                connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+                my_w.errorbars_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
+
+                QToolButton *tb_save = new QToolButton(this);
+                tb_save->setIcon(QIcon(":icons/saveTxt"));
+                tb_save->setProperty("errbar",qVariantFromValue((void *) errbar));
+                connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+                my_w.errorbars_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
             }
         }
 
@@ -263,23 +303,43 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
 
 
 void nCustomPlot::showGraph(bool val) {
-    if (sender() && sender()->property("graph").isValid()) {
-        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
-        if(hasPlottable(graph)) {
-            graph->setVisible(val);
-            replot();
+    if (sender()) {
+        if (sender()->property("graph").isValid()){
+            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            if(hasPlottable(graph)) {
+                graph->setVisible(val);
+                replot();
+            }
+        }
+        if (sender()->property("errbar").isValid()){
+            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<void *>();
+            if(hasPlottable(errbar)) {
+                errbar->setVisible(val);
+                replot();
+            }
         }
     }
 }
 
 void nCustomPlot::changeGraphThickness(double val) {
-    if (sender() && sender()->property("graph").isValid()) {
-        QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
-        if(hasPlottable(graph)) {
-            QPen p=graph->pen();
-            p.setWidthF(val);
-            graph->setPen(p);
-            replot();
+    if (sender()) {
+        if (sender()->property("graph").isValid()){
+            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            if(hasPlottable(graph)) {
+                QPen p=graph->pen();
+                p.setWidthF(val);
+                graph->setPen(p);
+                replot();
+            }
+        }
+        if (sender()->property("errbar").isValid()){
+            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<void *>();
+            if(hasPlottable(errbar)) {
+                QPen p=errbar->pen();
+                p.setWidthF(val);
+                errbar->setPen(p);
+                replot();
+            }
         }
     }
 }
@@ -443,20 +503,20 @@ void nCustomPlot::showGrid(int val) {
         QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<void *>();
         if (grid) {
             switch (val) {
-            case Qt::Unchecked:
-                grid->setVisible(false);
-                grid->setSubGridVisible(false);
-                break;
-            case Qt::PartiallyChecked:
-                grid->setVisible(true);
-                grid->setSubGridVisible(false);
-                break;
-            case Qt::Checked:
-                grid->setVisible(true);
-                grid->setSubGridVisible(true);
-                break;
-            default:
-                break;
+                case Qt::Unchecked:
+                    grid->setVisible(false);
+                    grid->setSubGridVisible(false);
+                    break;
+                case Qt::PartiallyChecked:
+                    grid->setVisible(true);
+                    grid->setSubGridVisible(false);
+                    break;
+                case Qt::Checked:
+                    grid->setVisible(true);
+                    grid->setSubGridVisible(true);
+                    break;
+                default:
+                    break;
             }
             replot();
         }
@@ -647,12 +707,12 @@ nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 void nCustomPlotMouseX::setMousePosition(double position) {
     if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
     if (mouseMarker) {
-		DEBUG(mouseMarker->clipToAxisRect() << " " << position);
-		mouseMarker->point1->setTypeY(QCPItemPosition::ptAbsolute);
-		mouseMarker->point2->setTypeY(QCPItemPosition::ptAbsolute);
-		mouseMarker->point1->setCoords(position,0);
-		mouseMarker->point2->setCoords(position,1);
-	}
+        DEBUG(mouseMarker->clipToAxisRect() << " " << position);
+        mouseMarker->point1->setTypeY(QCPItemPosition::ptAbsolute);
+        mouseMarker->point2->setTypeY(QCPItemPosition::ptAbsolute);
+        mouseMarker->point1->setCoords(position,0);
+        mouseMarker->point2->setCoords(position,1);
+    }
     replot();
 }
 
@@ -666,13 +726,13 @@ void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
     if (!mouseMarkerY) mouseMarkerY = new QCPItemStraightLine(this);
 
     if (mouseMarkerX && mouseMarkerY) {
-		mouseMarkerX->point1->setTypeY(QCPItemPosition::ptAbsolute);
-		mouseMarkerX->point2->setTypeY(QCPItemPosition::ptAbsolute);
-		mouseMarkerX->point1->setCoords(positionX,0);
+        mouseMarkerX->point1->setTypeY(QCPItemPosition::ptAbsolute);
+        mouseMarkerX->point2->setTypeY(QCPItemPosition::ptAbsolute);
+        mouseMarkerX->point1->setCoords(positionX,0);
         mouseMarkerX->point2->setCoords(positionX,1);
-		mouseMarkerY->point1->setTypeX(QCPItemPosition::ptAbsolute);
-		mouseMarkerY->point2->setTypeX(QCPItemPosition::ptAbsolute);
-		mouseMarkerY->point1->setCoords(0,positionY);
+        mouseMarkerY->point1->setTypeX(QCPItemPosition::ptAbsolute);
+        mouseMarkerY->point2->setTypeX(QCPItemPosition::ptAbsolute);
+        mouseMarkerY->point1->setCoords(0,positionY);
         mouseMarkerY->point2->setCoords(1,positionY);
     }
     replot();
