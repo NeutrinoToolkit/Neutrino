@@ -99,9 +99,7 @@ void nPhysPyWrapper::neutrino_init_numpy()
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     DEBUG("here " << my_py_obj);
-#ifdef HAVE_NUMPY
     neutrino_init_numpy();
-#endif
     if (PyArray_Check(my_py_obj)) {
         PyArrayObject * arr = (PyArrayObject *)my_py_obj;
         DEBUG("here " << arr);
@@ -111,7 +109,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
             std::string name(PyString_AsString(objectsRepresentation));
             Py_DECREF(objectsRepresentation);
-            nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
+            nPhysD *my_phys = new nPhysD(dims[0], dims[1],std::numeric_limits<double>::quiet_NaN(),name);
             my_phys->setShortName("numpy");
 
             switch (PyArray_TYPE(arr)) {

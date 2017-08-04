@@ -226,6 +226,7 @@ void Visar::addVisar() {
 
 
     velocity.push_back(QVector<double>());
+    velError.push_back(QVector<double>());
     reflectivity.push_back(QVector<double>());
     quality.push_back(QVector<double>());
     time_vel.push_back(QVector<double>());
@@ -257,6 +258,15 @@ void Visar::addVisar() {
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis->labelColor());
     graph->setPen(pen);
+
+
+    QCPErrorBars *errorBars = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis);
+    errorBars->setDataPlottable(graph);
+    errorBars->setProperty("id",numVisars);
+    QColor my_color=plotVelocity->yAxis->labelColor();
+    my_color.setAlpha(128);
+    pen.setColor(my_color);
+    errorBars->setPen(pen);
 
     numVisars++;
 
@@ -293,6 +303,7 @@ void Visar::delVisar() {
         whichRefl->removeItem(numVisars+1);
 
         velocity.pop_back();
+        velError.pop_back();
         reflectivity.pop_back();
         quality.pop_back();
         time_vel.pop_back();
@@ -456,36 +467,53 @@ void Visar::bufferChanged(nPhysD*phys) {
 }
 
 void Visar::tabChanged(int k) {
+    DEBUG("here")
     QTabWidget *tabWidget=nullptr;
 
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
+    DEBUG("here")
 
     disconnections();
+    DEBUG("here")
     if (tabWidget) {
+        DEBUG("here")
 
         if (tabWidget==tabs) {
+            DEBUG("here")
             if (k==0) {
+                DEBUG("here")
                 tabWidget=tabPhase;
             } else if (k==1) {
+                DEBUG("here")
                 tabWidget=tabVelocity;
             }
         } else if (tabWidget == tabVelocity) {
+            DEBUG("here")
             updatePlot();
         } else if (tabWidget == tabPhase) {
+            DEBUG("here")
             getPhase(k);
         }
 
+        DEBUG("here")
         if (tabWidget==tabs) {
+            DEBUG("here")
             nparent->showPhys(getPhysFromCombo(sopShot));
         } else {
+            DEBUG("here")
             if (k<(int)numVisars) {
+                DEBUG("here")
                 unsigned int visnum=tabWidget->currentIndex();
-                if (visnum<numVisars)
+                if (visnum<numVisars) {
+                    DEBUG("here")
                     nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
+                }
             }
         }
     }
+    DEBUG("here")
     connections();
+    DEBUG("here")
 }
 
 void Visar::connections() {
@@ -783,6 +811,7 @@ void Visar::updatePlot() {
 
                 time_vel[k].resize(time_phase[k].size());
                 velocity[k].resize(time_phase[k].size());
+                velError[k].resize(time_phase[k].size());
                 reflectivity[k].resize(time_phase[k].size());
                 quality[k].resize(time_phase[k].size());
 
@@ -856,6 +885,15 @@ void Visar::updatePlot() {
                         } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
                             my_graph->setData(time_vel[k],quality[k]);
                         }
+                    }
+                }
+                for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
+                    QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
+                    if (my_err && my_err->property("id").toInt() == (int)k ){
+                            pen=my_err->pen();
+                            pen.setStyle(pstyle);
+                            my_err->setPen(pen);
+                            my_err->setData(time_vel[k],velError[k]);
                     }
                 }
 

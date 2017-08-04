@@ -989,7 +989,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 
 void
 neutrino::showPhys(nPhysD* my_phys) {
-    if (!my_phys->property.have("gamma")) {
+    if (my_phys && !my_phys->property.have("gamma")) {
         my_phys->property["gamma"]=property("neuSave-gamma").toInt();
     }
     my_w->my_view->showPhys(my_phys);

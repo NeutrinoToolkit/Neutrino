@@ -93,10 +93,10 @@ private:
 
     unsigned int numVisars;
 
-    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast;
+    std::array<std::vector<QVector<double>>,2> cPhase, cPhaseErr, cIntensity, cContrast;
     std::vector<QVector<double>> time_phase;
 
-    std::vector<QVector<double>> velocity, reflectivity, quality, time_vel;
+    std::vector<QVector<double>> velocity, velError, reflectivity, quality, time_vel;
 
     std::array<QVector<double>,4> sopCurve;
     QVector<double> time_sop;
