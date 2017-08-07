@@ -850,9 +850,9 @@ void Visar::updatePlot() {
                     double refle=iShot/iRef * (Rmat-beta) + beta;
 
                     velocity[k][j] = speed;
-                    velError[k][j] = cPhaseErr[k][j]*sensitivity/refr_index;
                     reflectivity[k][j] = refle;
                     quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
+                    velError[k][j] = cPhaseErr[k][j]/quality[k][j]*sensitivity/refr_index;
 
                     for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                         int jloc=i+1;

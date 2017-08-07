@@ -26,25 +26,25 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nInterferometry.h"
-#include "ui_nInterferometry1.h"
+#include "ui_Interferometry.h"
+#include "ui_Interferometry1.h"
 
-#ifndef __nInterferometry
-#define __nInterferometry
+#ifndef __Interferometry
+#define __Interferometry
 #include "nPhysWave.h"
 #include "nLine.h"
 #include "nRect.h"
 
 class neutrino;
 
-class nInterferometry : public nGenericPan {
+class Interferometry : public nGenericPan {
     Q_OBJECT
 
 public:	
-    Q_INVOKABLE nInterferometry(neutrino *);
+    Q_INVOKABLE Interferometry(neutrino *);
 
-    Ui::nInterferometry my_w;
-    std::vector<Ui::nInterferometry1> my_image;
+    Ui::Interferometry my_w;
+    std::vector<Ui::Interferometry1> my_image;
 
     QPointer<nRect> region;
     QPointer<nLine> unwrapBarrier;
@@ -94,5 +94,7 @@ public slots:
     void checkChangeCombo(QComboBox *);
 
 };
+
+NEUTRINO_PLUGIN(Interferometry,Analysis);
 
 #endif

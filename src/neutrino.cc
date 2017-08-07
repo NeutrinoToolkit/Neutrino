@@ -47,7 +47,6 @@
 #include "nBoxLineout.h"
 #include "nCompareLines.h"
 #include "nWavelet.h"
-#include "nInterferometry.h"
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
 #include "nRotate.h"
@@ -1688,12 +1687,6 @@ neutrino::SpectralAnalysis() {
 nGenericPan*
 neutrino::Wavelet() {
 	return new nWavelet(this);
-}
-
-/// Interferometry analysis window
-nGenericPan*
-neutrino::Interferometry() {
-	return new nInterferometry(this);
 }
 
 /// Integral inversion (Abel etc...)

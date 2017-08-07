@@ -243,9 +243,6 @@ public slots:
     // WAVELET STUFF
     nGenericPan* Wavelet();
     
-    // interferometry STUFF
-    nGenericPan* Interferometry();
-    
     // SPECTRAL ANALYSIS
     nGenericPan* SpectralAnalysis();
 

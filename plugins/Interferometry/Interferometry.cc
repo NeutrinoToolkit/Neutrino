@@ -22,13 +22,12 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nInterferometry.h"
+#include "Interferometry.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 // physWavelets
 
-nInterferometry::nInterferometry(neutrino *nparent) : nGenericPan(nparent),
+Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
     my_image(2)
 {
 	my_w.setupUi(this);
@@ -108,11 +107,11 @@ nInterferometry::nInterferometry(neutrino *nparent) : nGenericPan(nparent),
 
 }
 
-void nInterferometry::on_actionDuplicate_triggered() {
+void Interferometry::on_actionDuplicate_triggered() {
     localPhys.clear();
 }
 
-void nInterferometry::on_actionDelete_triggered() {
+void Interferometry::on_actionDelete_triggered() {
     std::map<std::string, nPhysD *> oldPhys=localPhys;
     for(std::map<std::string, nPhysD *>::const_iterator itr = oldPhys.begin(); itr != oldPhys.end(); ++itr) {
         nparent->removePhys(itr->second);
@@ -121,7 +120,7 @@ void nInterferometry::on_actionDelete_triggered() {
     localPhys.clear();
 }
 
-void nInterferometry::line_key_pressed(int key) {
+void Interferometry::line_key_pressed(int key) {
     if (key==Qt::Key_Period) {
         if (sender()==maskRegion) {
             doMaskCutoff();
@@ -140,7 +139,7 @@ void nInterferometry::line_key_pressed(int key) {
     }
 }
 
-void nInterferometry::physDel(nPhysD* buf) {
+void Interferometry::physDel(nPhysD* buf) {
 
     std::map<std::string, nPhysD *>::iterator itr = localPhys.begin();
     while (itr!=localPhys.end()) {
@@ -152,7 +151,7 @@ void nInterferometry::physDel(nPhysD* buf) {
     }
 }
 
-void nInterferometry::getPosZero(bool check) {
+void Interferometry::getPosZero(bool check) {
     if (check) {
         nparent->showPhys(getPhysFromCombo(my_image[1].image));
         connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
@@ -161,7 +160,7 @@ void nInterferometry::getPosZero(bool check) {
     }
 }
 
-void nInterferometry::setPosZero(QPointF point) {
+void Interferometry::setPosZero(QPointF point) {
     if(currentBuffer) {
         disconnect(my_w.posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         disconnect(my_w.posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
@@ -177,27 +176,27 @@ void nInterferometry::setPosZero(QPointF point) {
     }
 }
 
-void nInterferometry::useBarrierToggled(bool val) {
+void Interferometry::useBarrierToggled(bool val) {
     unwrapBarrier->setVisible(val);
 }
 
-void nInterferometry::maskRegionToggled(bool val) {
+void Interferometry::maskRegionToggled(bool val) {
     maskRegion->setVisible(val);
 }
 
-void nInterferometry::interpolateToggled(bool val) {
+void Interferometry::interpolateToggled(bool val) {
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         it->second->setVisible(val);
     }
 }
 
-void nInterferometry::checkChangeCombo(QComboBox *combo) {
+void Interferometry::checkChangeCombo(QComboBox *combo) {
 	if (combo==my_image[0].image || combo==my_image[1].image) {
 		region->show();
 	}
 }
 
-void nInterferometry::bufferChanged(nPhysD* buf) {
+void Interferometry::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
     if (buf) {
 		if (buf==getPhysFromCombo(my_image[0].image) || buf==getPhysFromCombo(my_image[1].image)) {
@@ -216,7 +215,7 @@ void nInterferometry::bufferChanged(nPhysD* buf) {
 	}
 }
 
-void nInterferometry::guessCarrier() {
+void Interferometry::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_image[0].image);
 	if (image) {
 		QRect geom2=region->getRect(image);
@@ -235,7 +234,7 @@ void nInterferometry::guessCarrier() {
 	}
 }
 
-void nInterferometry::doWavelet () {
+void Interferometry::doWavelet () {
     QTime timer;
     timer.start();
     if (sender()->property("id").isValid()) {
@@ -248,7 +247,7 @@ void nInterferometry::doWavelet () {
     if (!my_w.chained->isChecked()) doSubtract();
 }
 
-void nInterferometry::doWavelet (int iimage) {
+void Interferometry::doWavelet (int iimage) {
     DEBUG("HERE");
     std::string suffix=iimage==0?"_ref":"_shot";
     nPhysD *image=getPhysFromCombo(my_image[iimage].image);
@@ -308,7 +307,7 @@ void nInterferometry::doWavelet (int iimage) {
     }    
 }
 
-void nInterferometry::doUnwrap () {
+void Interferometry::doUnwrap () {
     QProgressDialog progress("Unwrap",QString(), 0, 2, this);
     progress.setWindowModality(Qt::WindowModal);
     for (unsigned int iimage=0;iimage<2;iimage++) {
@@ -320,7 +319,7 @@ void nInterferometry::doUnwrap () {
     if (!my_w.chained->isChecked()) doSubtract();
 }
 
-void nInterferometry::doUnwrap (int iimage) {
+void Interferometry::doUnwrap (int iimage) {
     std::string suffix=iimage==0?"_ref":"_shot";
     
     nPhysD *phase=localPhys["phase_2pi"+suffix];
@@ -389,7 +388,7 @@ void nInterferometry::doUnwrap (int iimage) {
     }
 }
 
-void nInterferometry::doSubtract () {
+void Interferometry::doSubtract () {
 
     if (localPhys["intensity_ref"] && localPhys["intensity_shot"]) {
         nPhysD contrast_loc= *localPhys["intensity_shot"] / *localPhys["intensity_ref"];
@@ -442,7 +441,7 @@ void nInterferometry::doSubtract () {
 }
 
 
-void nInterferometry::doMaskCutoff() {
+void Interferometry::doMaskCutoff() {
     nPhysD* phase=localPhys["phase_2pi"];
     nPhysD *phaseMask=NULL;
     if (nPhysExists(phase)) {
@@ -507,7 +506,7 @@ void nInterferometry::doMaskCutoff() {
     if (!my_w.chained->isChecked()) doShape();
 }
 
-void nInterferometry::doShape(){
+void Interferometry::doShape(){
     nPhysD *image=localPhys["phaseMask"];
     
     if (nPhysExists(image)) {
@@ -582,7 +581,7 @@ void nInterferometry::doShape(){
     if (!my_w.chained->isChecked()) doPlasma();
 }
 
-void nInterferometry::addShape(){
+void Interferometry::addShape(){
     int num=0;
     while (1) {
 		num++;
@@ -604,7 +603,7 @@ void nInterferometry::addShape(){
     }
 }
 
-void nInterferometry::addShape(QString name){
+void Interferometry::addShape(QString name){
 	nLine *my_l=new nLine(this,0);
 	QPolygonF poly;
     if (my_shapes.size()==0){
@@ -626,7 +625,7 @@ void nInterferometry::addShape(QString name){
     connect(my_b, SIGNAL(released()), my_l, SLOT(togglePadella()));
 }
 
-void nInterferometry::removeShape(QObject *obj){
+void Interferometry::removeShape(QObject *obj){
     QToolButton *found=NULL;
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         if ((*it).second==obj) {
@@ -637,7 +636,7 @@ void nInterferometry::removeShape(QObject *obj){
     if (found) my_shapes.erase(my_shapes.find(found));
 }
 
-void nInterferometry::doPlasma(){
+void Interferometry::doPlasma(){
         nPhysD *image=localPhys["interpPhase_2piMask"];
         if (nPhysExists(image)) {
             nPhysD *intNe = new nPhysD(*image);
@@ -678,7 +677,7 @@ void nInterferometry::doPlasma(){
 
 //////////////////////////////////////////////////////////
 
-void nInterferometry::loadSettings(QSettings *settings){
+void Interferometry::loadSettings(QSettings *settings){
 
 	for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
 		removeShape((*it).first);
@@ -709,7 +708,7 @@ void nInterferometry::loadSettings(QSettings *settings){
     nGenericPan::loadSettings(settings);
 }
 
-void nInterferometry::saveSettings(QSettings *settings){
+void Interferometry::saveSettings(QSettings *settings){
     QStringList names;
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         names.append((*it).second->toolTip());

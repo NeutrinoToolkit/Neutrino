@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nInterferometry1</class>
- <widget class="QWidget" name="nInterferometry1">
+ <class>Interferometry1</class>
+ <widget class="QWidget" name="Interferometry1">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -62,7 +62,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../qrc/icons.qrc">
+         <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
           <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
         </property>
        </widget>
@@ -256,7 +256,7 @@
   <tabstop>numAngle</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
