@@ -75,7 +75,6 @@ public slots:
     void doWavelet();
     void doWavelet(int);
     void doUnwrap();
-    void doUnwrap(int);
     void doSubtract();
     void doMaskCutoff();
     void getPosZero(bool);

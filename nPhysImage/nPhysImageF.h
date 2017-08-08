@@ -498,7 +498,7 @@ public:
 		rotated->set_scale(get_scale());
 		rotated->setType(PHYS_DYN);
 		std::ostringstream my_name;
-		my_name << getName() << ".fast_rotated(" << alphaDeg << ")";
+        my_name << "(" << getName() << ").fast_rotated(" << alphaDeg << ")";
 		rotated->setName(my_name.str());
 		rotated->setShortName("rotated");
 		rotated->setFromName(getFromName());

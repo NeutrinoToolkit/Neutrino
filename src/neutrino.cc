@@ -1877,8 +1877,8 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
 				nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
 				qDebug() << my_action->data() << my_qplugin;
 				if (my_qplugin!=nullptr) {
-					qDebug() << "plugin action" << my_qplugin->name();
-					if (panName==my_qplugin->name()) {
+                    qDebug() << panName << "plugin action" << my_qplugin->name();
+                    if (panName==my_qplugin->name() || (panName.left(1)=="n" && panName.right(panName.size()-1) == my_qplugin->name())) {
 						my_qplugin->launch();
 						QApplication::processEvents();
 						QObject *p_obj = my_qplugin->instance();
@@ -1889,7 +1889,6 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
 								my_pan=iface->pan();
 							}
 						}
-
 					}
 				}
 			}

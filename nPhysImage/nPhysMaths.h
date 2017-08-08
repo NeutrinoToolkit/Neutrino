@@ -210,6 +210,8 @@ void phys_multiply(nPhysD &, double);
 void phys_divide(nPhysD &, double);
 void phys_divide(nPhysC &, double);
 
+void phys_fractional(nPhysD &);
+
 void phys_point_add(nPhysD &, nPhysD &);
 void phys_point_subtract(nPhysD &, nPhysD &);
 void phys_point_multiply(nPhysD &, nPhysD &);
