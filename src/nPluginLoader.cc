@@ -10,8 +10,9 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 	  setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::ExportExternalSymbolsHint);
 
-	  qDebug() << "Parsing lib " << pname  << " loadHints:" << loadHints();
-	  QObject *p_obj = instance();
+      qDebug() << "------------------------------------------------------------------------------";
+      qDebug() << "Parsing lib " << pname  << " loadHints:" << loadHints();
+      QObject *p_obj = instance();
 
       if (p_obj) {
           iface = qobject_cast<nPlug *>(p_obj);
@@ -37,36 +38,23 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 if (my_panPlug) {
                     icon_plugin=my_panPlug->icon();
 
-                    foreach (QAction *my_action, neu->my_w->toolBar->actions()) {
-                        if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
-                            qDebug() << "here" << my_action->data();
-                            if (!my_action->data().isNull()) {
-                                QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
-                                qDebug() << my_action->data() << my_qplugin;
-                                if (my_qplugin!=nullptr) {
-                                    if(my_qplugin->instance()){
-                                        delete my_qplugin;
-                                        qDebug() << "instance removed";
-                                    }
-                                    my_qplugin=new QPluginLoader(pname);
-                                    p_obj = my_qplugin->instance();
-                                    if (p_obj) {
-                                        iface = qobject_cast<nPlug *>(p_obj);
-                                        if (iface) {
-                                            qDebug() << "reloaded";
-                                        }
-                                    }
-                                }
-                            }
-                            neu->my_w->toolBar->removeAction(my_action);
-                        }
-                    }
+                    qDebug() << "here" << icon_plugin;
 
                     if (!icon_plugin.isNull()) {
-                        QPointer<QAction>  my_action = new QAction(nParent);
+                        qDebug() << "here";
+
+                        QList<QAction*> my_actions = neu->my_w->toolBar->actions();
+                        foreach (QAction *my_action_tmp, my_actions) {
+                            if (!(my_action_tmp->isSeparator() || my_action_tmp->menu()) && my_action_tmp->text()==name_plugin && my_action_tmp->isEnabled() && !my_action_tmp->data().isNull()) {
+                                neu->my_w->toolBar->removeAction(my_action_tmp);
+                            }
+                        }
+                        QPointer<QAction>  my_action;
+                        my_action = new QAction(nParent);
                         my_action->setIcon(icon_plugin);
                         my_action->setText(name_plugin);
                         my_action->setProperty("neuPlugin",true);
+
                         QVariant v;
                         v.setValue(this);
                         my_action->setData(v);
@@ -76,25 +64,22 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     }
 
                     QPointer<QMenu> my_menu=getMenu(my_panPlug->menuEntryPoint(),nParent);
-
-                    foreach (QAction *my_action,my_menu->actions()) {
-                        if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
-                            qDebug() << "here" << my_action->data();
-                            if (!my_action->data().isNull()) {
-                                QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
-                                qDebug() << my_action->data() << my_qplugin;
-                                if (my_qplugin!=nullptr) {
-                                    if(my_qplugin->instance()){
-                                        delete my_qplugin;
-                                        qDebug() << "instance removed";
-                                    }
-                                    my_qplugin=new QPluginLoader(pname);
-                                    p_obj = my_qplugin->instance();
-                                    if (p_obj) {
-                                        iface = qobject_cast<nPlug *>(p_obj);
-                                        if (iface) {
-                                            qDebug() << "reloaded";
-                                        }
+                    QList<QAction*> my_actions=my_menu->actions();
+                    foreach (QAction *my_action,my_actions) {
+                        if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled() && !my_action->data().isNull()) {
+                            QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
+                            qDebug() << my_action->data() << my_qplugin;
+                            if (my_qplugin!=nullptr) {
+                                if(my_qplugin->instance()){
+                                    delete my_qplugin;
+                                    qDebug() << "instance removed";
+                                }
+                                my_qplugin=new QPluginLoader(pname);
+                                p_obj = my_qplugin->instance();
+                                if (p_obj) {
+                                    iface = qobject_cast<nPlug *>(p_obj);
+                                    if (iface) {
+                                        qDebug() << "reloaded";
                                     }
                                 }
                             }
