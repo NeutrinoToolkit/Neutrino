@@ -30,7 +30,14 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     #endif
                 }
 
-                QIcon icon_plugin(iface->icon());
+                QIcon icon_plugin();
+
+                nPanPlug *my_panPlug = qobject_cast<nPanPlug *>(p_obj);
+
+                if (my_panPlug) {
+                    icon_plugin=my_panPlug->icon();
+                }
+
                 if (!icon_plugin.isNull()) {
                     QPointer<QAction>  my_action = new QAction(nParent);
                     my_action->setIcon(icon_plugin);

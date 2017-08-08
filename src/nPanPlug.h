@@ -68,6 +68,8 @@ public slots:
 
     bool instantiate(neutrino *neu);
 
+    virtual QIcon icon() { return QIcon(); }
+
 protected:
     QPointer<nGenericPan> my_pan;
 
