@@ -236,7 +236,6 @@ neutrino::neutrino():
 
 	connect(my_w->actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
 	connect(my_w->actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
-	connect(my_w->actionInterferometry, SIGNAL(triggered()), this, SLOT(Interferometry()));
 	connect(my_w->actionInversions, SIGNAL(triggered()), this, SLOT(IntegralInversion()));
 	connect(my_w->actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
 	connect(my_w->actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));

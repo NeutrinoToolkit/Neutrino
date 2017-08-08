@@ -206,9 +206,9 @@ void Interferometry::bufferChanged(nPhysD* buf) {
             region->hide();
         }
         if (buf==localPhys["phase_2pi"] ||
-            buf==localPhys["phaseMask"] ||
-            buf==getPhysFromCombo(my_image[0].image) ||
-            buf==getPhysFromCombo(my_image[1].image)) {
+                buf==localPhys["phaseMask"] ||
+                buf==getPhysFromCombo(my_image[0].image) ||
+                buf==getPhysFromCombo(my_image[1].image)) {
             maskRegion->setVisible(my_w.useMask->isChecked());
         } else {
             maskRegion->hide();
@@ -310,6 +310,7 @@ void Interferometry::doWavelet (int iimage) {
 }
 
 void Interferometry::doUnwrap () {
+    my_w.statusbar->showMessage("Unwrapping");
     if (localPhys["phase_2pi_shot"]) {
         nPhysD diff=*localPhys["phase_2pi_shot"];
         if ( !localPhys["phase_2pi_ref"] || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
@@ -396,10 +397,13 @@ void Interferometry::doUnwrap () {
             }
         }
     }
+    my_w.statusbar->showMessage("");
+
     if (!my_w.chained->isChecked()) doSubtract();
 }
 
 void Interferometry::doSubtract () {
+    my_w.statusbar->showMessage("Subtract and rotate");
 
     if (localPhys["intensity_ref"] && localPhys["intensity_shot"]) {
         nPhysD contrast_loc= *localPhys["intensity_shot"] / *localPhys["intensity_ref"];
@@ -441,11 +445,14 @@ void Interferometry::doSubtract () {
         localPhys["phase_2pi"]->setShortName("phase_2pi");
 
     }
+    my_w.statusbar->showMessage("");
+
     if (!my_w.chained->isChecked()) doMaskCutoff();
 }
 
 
 void Interferometry::doMaskCutoff() {
+    my_w.statusbar->showMessage("Mask");
     nPhysD* phase=localPhys["phase_2pi"];
     nPhysD *phaseMask=NULL;
     if (nPhysExists(phase)) {
@@ -508,10 +515,14 @@ void Interferometry::doMaskCutoff() {
         localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
 
     }
+    my_w.statusbar->showMessage("");
+
     if (!my_w.chained->isChecked()) doShape();
 }
 
 void Interferometry::doShape(){
+    my_w.statusbar->showMessage("Interpolating");
+
     nPhysD *image=localPhys["phaseMask"];
 
     if (nPhysExists(image)) {
@@ -643,43 +654,47 @@ void Interferometry::removeShape(QObject *obj){
 }
 
 void Interferometry::doPlasma(){
-        nPhysD *image=localPhys["interpPhase_2piMask"];
-        if (nPhysExists(image)) {
-            nPhysD *intNe = new nPhysD(*image);
+    my_w.statusbar->showMessage("Plasma");
 
-            if (my_w.usePlasma->isChecked()) {
+    nPhysD *image=localPhys["interpPhase_2piMask"];
+    if (nPhysExists(image)) {
+        nPhysD *intNe = new nPhysD(*image);
 
-                double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
-                double scale_cm=my_w.imgRes->value()*1e-4; // convert micron/px to cm/px
+        if (my_w.usePlasma->isChecked()) {
 
-                double toNe = -1.0e-4*8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
+            double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
+            double scale_cm=my_w.imgRes->value()*1e-4; // convert micron/px to cm/px
 
-                phys_multiply(*intNe, toNe);
-                intNe->setShortName("intergratedNe");
-                intNe->set_scale(scale_cm,scale_cm);
-                intNe->property["unitsX"]="cm";
-                intNe->property["unitsY"]="cm";
-                intNe->property["unitsCB"]="cm-2";
-            } else {
-                intNe->setShortName(image->getShortName());
-            }
-            bool ok1,ok2;
-            double mini=QLocale().toDouble(my_w.cutoffMin->text(),&ok1);
-            double maxi=QLocale().toDouble(my_w.cutoffMax->text(),&ok2);
-            if (!ok1) mini=intNe->get_min();
-            if (!ok2) maxi=intNe->get_max();
-            if (ok1||ok2) {
-                phys_cutoff(*intNe,mini,maxi);
-            }
-            intNe->TscanBrightness();
+            double toNe = -1.0e-4*8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
 
-
-            if (localPhys["integratedPlasma"]) {
-                localPhys["integratedPlasma"]->setShortName("integratedPlasma");
-                localPhys["integratedPlasma"]->property["display_range"]=intNe->get_min_max();
-            }
-            localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
+            phys_multiply(*intNe, toNe);
+            intNe->setShortName("intergratedNe");
+            intNe->set_scale(scale_cm,scale_cm);
+            intNe->property["unitsX"]="cm";
+            intNe->property["unitsY"]="cm";
+            intNe->property["unitsCB"]="cm-2";
+        } else {
+            intNe->setShortName(image->getShortName());
         }
+        bool ok1,ok2;
+        double mini=QLocale().toDouble(my_w.cutoffMin->text(),&ok1);
+        double maxi=QLocale().toDouble(my_w.cutoffMax->text(),&ok2);
+        if (!ok1) mini=intNe->get_min();
+        if (!ok2) maxi=intNe->get_max();
+        if (ok1||ok2) {
+            phys_cutoff(*intNe,mini,maxi);
+        }
+        intNe->TscanBrightness();
+
+
+        if (localPhys["integratedPlasma"]) {
+            localPhys["integratedPlasma"]->setShortName("integratedPlasma");
+            localPhys["integratedPlasma"]->property["display_range"]=intNe->get_min_max();
+        }
+        localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
+    }
+    my_w.statusbar->showMessage("");
+
 }
 
 
