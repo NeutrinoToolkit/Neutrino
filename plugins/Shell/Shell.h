@@ -90,6 +90,10 @@ public:
             return new Shell(nparent);
     }
 
+    QIcon icon() {
+        return QIcon(":icons/python.png");
+    }
+
     bool instantiate(neutrino *neu);
 
 private:

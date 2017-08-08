@@ -30,6 +30,20 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     #endif
                 }
 
+                QIcon icon_plugin(iface->icon());
+                if (!icon_plugin.isNull()) {
+                    QPointer<QAction>  my_action = new QAction(nParent);
+                    my_action->setIcon(icon_plugin);
+                    my_action->setText(name_plugin);
+                    my_action->setProperty("neuPlugin",true);
+                    QVariant v;
+                    v.setValue(this);
+                    my_action->setData(v);
+                    connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
+
+                    neu->my_w->toolBar->addAction(my_action);
+                }
+
                 QPointer<QMenu> my_menu=getMenu(iface->menuEntryPoint(),nParent);
 
                 foreach (QAction *my_action, my_menu->actions()) {
@@ -60,6 +74,9 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 QApplication::processEvents();
 
                 QPointer<QAction>  my_action = new QAction(nParent);
+                if (!icon_plugin.isNull()) {
+                    my_action->setIcon(icon_plugin);
+                }
                 my_action->setText(name_plugin);
                 my_action->setProperty("neuPlugin",true);
                 QVariant v;

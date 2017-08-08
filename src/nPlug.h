@@ -67,6 +67,8 @@ public slots:
 
     virtual QByteArray name() { return QByteArray(); }
 
+    virtual QIcon icon() { return QIcon(); }
+
     virtual bool instantiate(neutrino *) = 0;
 
     virtual bool unload() { return true; }

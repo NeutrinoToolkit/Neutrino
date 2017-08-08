@@ -249,6 +249,12 @@ neutrino::neutrino():
 	connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
 	connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
+    // ---------------------------------------------------------------------------------------------
+
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    my_w->toolBar->addWidget(spacer);
+
 
 	// ---------------------------------------------------------------------------------------------
 
