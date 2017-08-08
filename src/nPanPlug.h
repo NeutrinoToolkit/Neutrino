@@ -68,6 +68,8 @@ public slots:
 
     bool instantiate(neutrino *neu);
 
+    virtual QString menuEntryPoint() {return QString();}
+
     virtual QIcon icon() { return QIcon(); }
 
 protected:

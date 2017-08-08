@@ -63,7 +63,6 @@ public:
     virtual ~nPlug() { qDebug() << "here"; }
 
 public slots:
-    virtual QString menuEntryPoint() {return QString();}
 
     virtual QByteArray name() { return QByteArray(); }
 

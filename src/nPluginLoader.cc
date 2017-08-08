@@ -30,68 +30,95 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     #endif
                 }
 
-                QIcon icon_plugin();
+                QIcon icon_plugin;
 
                 nPanPlug *my_panPlug = qobject_cast<nPanPlug *>(p_obj);
 
                 if (my_panPlug) {
                     icon_plugin=my_panPlug->icon();
-                }
 
-                if (!icon_plugin.isNull()) {
+                    foreach (QAction *my_action, neu->my_w->toolBar->actions()) {
+                        if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
+                            qDebug() << "here" << my_action->data();
+                            if (!my_action->data().isNull()) {
+                                QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
+                                qDebug() << my_action->data() << my_qplugin;
+                                if (my_qplugin!=nullptr) {
+                                    if(my_qplugin->instance()){
+                                        delete my_qplugin;
+                                        qDebug() << "instance removed";
+                                    }
+                                    my_qplugin=new QPluginLoader(pname);
+                                    p_obj = my_qplugin->instance();
+                                    if (p_obj) {
+                                        iface = qobject_cast<nPlug *>(p_obj);
+                                        if (iface) {
+                                            qDebug() << "reloaded";
+                                        }
+                                    }
+                                }
+                            }
+                            neu->my_w->toolBar->removeAction(my_action);
+                        }
+                    }
+
+                    if (!icon_plugin.isNull()) {
+                        QPointer<QAction>  my_action = new QAction(nParent);
+                        my_action->setIcon(icon_plugin);
+                        my_action->setText(name_plugin);
+                        my_action->setProperty("neuPlugin",true);
+                        QVariant v;
+                        v.setValue(this);
+                        my_action->setData(v);
+                        connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
+
+                        neu->my_w->toolBar->addAction(my_action);
+                    }
+
+                    QPointer<QMenu> my_menu=getMenu(my_panPlug->menuEntryPoint(),nParent);
+
+                    foreach (QAction *my_action,my_menu->actions()) {
+                        if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
+                            qDebug() << "here" << my_action->data();
+                            if (!my_action->data().isNull()) {
+                                QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
+                                qDebug() << my_action->data() << my_qplugin;
+                                if (my_qplugin!=nullptr) {
+                                    if(my_qplugin->instance()){
+                                        delete my_qplugin;
+                                        qDebug() << "instance removed";
+                                    }
+                                    my_qplugin=new QPluginLoader(pname);
+                                    p_obj = my_qplugin->instance();
+                                    if (p_obj) {
+                                        iface = qobject_cast<nPlug *>(p_obj);
+                                        if (iface) {
+                                            qDebug() << "reloaded";
+                                        }
+                                    }
+                                }
+                            }
+                            my_menu->removeAction(my_action);
+                        }
+                    }
+
+                    QApplication::processEvents();
+
                     QPointer<QAction>  my_action = new QAction(nParent);
-                    my_action->setIcon(icon_plugin);
+                    if (!icon_plugin.isNull()) {
+                        my_action->setIcon(icon_plugin);
+                    }
                     my_action->setText(name_plugin);
                     my_action->setProperty("neuPlugin",true);
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);
                     connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
-
-                    neu->my_w->toolBar->addAction(my_action);
+                    my_menu->addAction(my_action);
+                    qDebug() << "found menu:" << my_menu;
+                } else {
+                    launch();
                 }
-
-                QPointer<QMenu> my_menu=getMenu(iface->menuEntryPoint(),nParent);
-
-                foreach (QAction *my_action, my_menu->actions()) {
-                    if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled()) {
-                        qDebug() << "here" << my_action->data();
-                        if (!my_action->data().isNull()) {
-                            QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
-                            qDebug() << my_action->data() << my_qplugin;
-                            if (my_qplugin!=nullptr) {
-                                if(my_qplugin->instance()){
-                                    delete my_qplugin;
-                                    qDebug() << "instance removed";
-                                }
-                                my_qplugin=new QPluginLoader(pname);
-                                p_obj = my_qplugin->instance();
-                                if (p_obj) {
-                                    iface = qobject_cast<nPlug *>(p_obj);
-                                    if (iface) {
-                                        qDebug() << "reloaded";
-                                    }
-                                }
-                            }
-                        }
-                        my_menu->removeAction(my_action);
-                    }
-                }
-
-                QApplication::processEvents();
-
-                QPointer<QAction>  my_action = new QAction(nParent);
-                if (!icon_plugin.isNull()) {
-                    my_action->setIcon(icon_plugin);
-                }
-                my_action->setText(name_plugin);
-                my_action->setProperty("neuPlugin",true);
-                QVariant v;
-                v.setValue(this);
-                my_action->setData(v);
-                connect (my_action, SIGNAL(triggered()), this, SLOT(launch()));
-                my_menu->addAction(my_action);
-                qDebug() << "found menu:" << my_menu;
 
             } else {
                 QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));
