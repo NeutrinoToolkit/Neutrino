@@ -102,7 +102,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
 
     connect(my_w.cutoffValue, SIGNAL(valueChanged(double)), this, SLOT(doMaskCutoff()));
 
-
     connect(my_w.addShape, SIGNAL(released()), this, SLOT(addShape()));
 
 }
@@ -113,8 +112,10 @@ void Interferometry::on_actionDuplicate_triggered() {
 
 void Interferometry::on_actionDelete_triggered() {
     std::map<std::string, nPhysD *> oldPhys=localPhys;
+    nPhysD *c_buf=currentBuffer;
     for(std::map<std::string, nPhysD *>::const_iterator itr = oldPhys.begin(); itr != oldPhys.end(); ++itr) {
-        nparent->removePhys(itr->second);
+        if (itr->second != c_buf)
+            nparent->removePhys(itr->second);
     }
     DEBUG(localPhys.size());
     localPhys.clear();
@@ -316,7 +317,6 @@ void Interferometry::doUnwrap () {
             double lambda=my_w.widthCarrier->value();
             double kx = cos(alpha*_phys_deg)/lambda;
             double ky = -sin(alpha*_phys_deg)/lambda;
-
             phys_subtract_carrier(diff, kx, ky);
         } else if (localPhys["phase_2pi_ref"]) {
             phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);

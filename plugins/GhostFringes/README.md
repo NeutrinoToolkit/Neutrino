@@ -21,7 +21,7 @@ Open the reference and the shot image and set appropriately the
 combo-boxes.
 
 You need to provide the interfringe and the rest angle orientation of
-the ghost fringes. Alternatively you can hit the button <img src="../../resources/icons/refresh2.png" width="20"/> 
+the ghost fringes. Alternatively you can hit the button <img src="refresh2.png" width="20"/> 
 (if this can't find the good interfringe you can
 either change the "weight" spinbox or select a different region). Pay
 attention that the angle is 0˚ (or 180˚) for vertical fringes and 90˚

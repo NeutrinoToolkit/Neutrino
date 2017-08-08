@@ -909,7 +909,6 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
 void
 phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 {
-
 #pragma omp parallel for collapse(2)
     for (size_t ii=0; ii<iphys.getW(); ii++) {
         for (size_t jj=0; jj<iphys.getH(); jj++) {

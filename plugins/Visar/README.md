@@ -19,7 +19,7 @@ each VISAR:
   * Select the *Reference* and the *Shot* images
   * With your mouse, select the ROI (the phase is taken from the middle
     of the ROI, while the intensity is averaged over the entire ROI)
-  * Get the *Carrier* (orientation and interfringe): hit on the button <img src="../../resources/icons/refresh2.png" width="20" />
+  * Get the *Carrier* (orientation and interfringe): hit on the button <img src="refresh2.png" width="20" />
     (adjusting the *weight* if the values are not correct, to remove
     either the lower frequencies or the higher frequencies 
 
@@ -27,7 +27,7 @@ each VISAR:
   * set the *Time resolution* parameter (in px) is corresponding to the
     width of the Gaussian part of the Morlet function in the direction
     of the fringes, i.e. the time direction.
-  * Fit the interference fringes by hitting <img src="../../resources/icons/refresh.png" width="20" />
+  * Fit the interference fringes by hitting <img src="refresh.png" width="20" />
   * Adjust the *intensity parameters*: 
       o adjust the background *offset* of the ref and of the shot. To
         estimate its value, read on the image directly on an appropriate

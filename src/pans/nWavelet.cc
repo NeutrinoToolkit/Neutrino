@@ -331,11 +331,11 @@ void nWavelet::doUnwrap () {
 			my_w.erasePreviousUnwrap->setEnabled(true);
 
 			if (my_w.removeCarrierAfterUnwrap->isChecked()) {
-				double alpha=my_w.angleCarrier->value();
-				double lambda=my_w.widthCarrier->value();
-				double kx = cos(alpha*_phys_deg)/lambda;
-				double ky = -sin(alpha*_phys_deg)/lambda;
-				phys_subtract_carrier(*uphase, kx, ky);				
+                double alpha=my_w.angleCarrier->value();
+                double lambda=my_w.widthCarrier->value();
+                double kx = cos(alpha*_phys_deg)/lambda;
+                double ky = -sin(alpha*_phys_deg)/lambda;
+                phys_subtract_carrier(*uphase, kx, ky);
 			}
 			
 			if (my_w.erasePreviousUnwrap->isChecked()) {
@@ -389,9 +389,9 @@ void nWavelet::doRemoveCarrier () {
 		unwrappedSubtracted->setShortName("No carrier");
 		unwrappedSubtracted->setFromName(unwrapped->getFromName());
 
-		double kx = cos(alpha*_phys_deg)/lambda;
-		double ky = -sin(alpha*_phys_deg)/lambda;
-		phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
+        double kx = cos(alpha*_phys_deg)/lambda;
+        double ky = -sin(alpha*_phys_deg)/lambda;
+        phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
 		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {

@@ -19,7 +19,7 @@
    width="600"
    x="0"
    y="0"
-   inkscape:export-filename="/Users/tommaso/neutrino/resources/icons/help.png"
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/help.png"
    inkscape:export-xdpi="40.049999"
    inkscape:export-ydpi="40.049999">
   <metadata
@@ -78,12 +78,12 @@
      bordercolor="#666666"
      borderopacity="1.0"
      id="base"
-     inkscape:cx="300"
+     inkscape:cx="59.083193"
      inkscape:cy="300"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:window-height="755"
-     inkscape:window-width="1276"
+     inkscape:window-height="1155"
+     inkscape:window-width="1916"
      inkscape:window-x="4"
      inkscape:window-y="1"
      inkscape:zoom="0.98166667"
@@ -91,7 +91,7 @@
      showgrid="true"
      inkscape:snap-global="true"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1"
+     inkscape:current-layer="text5716"
      showguides="true"
      inkscape:guide-bbox="true">
     <inkscape:grid
@@ -10762,10 +10762,16 @@
      style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      id="text5716"
      transform="matrix(12.324674,0,0,12.324674,-2286.6164,-2614.9539)">
-    <path
-       d="m 206.01562,247.1875 q 0,-1.40625 0.97657,-2.38281 0.99609,-0.9961 2.40234,-0.9961 1.38672,0 2.38281,0.9961 0.9961,0.97656 0.9961,2.38281 0,1.40625 -0.9961,2.40234 -0.99609,0.97657 -2.38281,0.97657 -1.40625,0 -2.40234,-0.97657 -0.97657,-0.99609 -0.97657,-2.40234 z m -3.88671,-19.02344 q 0,-2.10937 1.85546,-3.90625 1.85547,-1.79687 5.625,-1.79687 3.76954,0 5.87891,1.85547 2.12891,1.83593 2.12891,4.70703 0,1.34765 -0.42969,2.40234 -0.78125,1.93359 -2.94922,3.37891 -0.85937,0.54687 -1.17187,0.76172 -0.3125,0.19531 -1.26954,0.78125 -0.9375,0.58593 -1.34765,1.32812 -0.39063,0.74219 -0.50781,3.06641 l -1.19141,0 -0.0391,-1.69922 q 0,-1.71875 1.46484,-4.39453 1.48438,-2.67578 1.48438,-5.66407 0,-2.42187 -0.83985,-3.75 -0.83984,-1.32812 -2.69531,-1.32812 -1.21094,0 -1.73828,0.52734 -0.50781,0.50782 -0.50781,1.09375 0,0.25391 0.0781,0.41016 0.0781,0.15625 0.29297,0.41016 l 0.27344,0.33203 q 0.44922,0.54687 0.625,0.99609 0.19531,0.44922 0.19531,1.13281 0,1.11328 -0.74219,1.77735 -0.74219,0.66406 -1.77734,0.66406 -1.09375,0 -1.89453,-0.78125 -0.80078,-0.80078 -0.80078,-2.30469 z"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Times;-inkscape-font-specification:'Times Bold'"
-       id="path5721"
-       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:39.02703476px;line-height:125%;font-family:'.SF NS Display Condensed';-inkscape-font-specification:'.SF NS Display Condensed, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="200.71652"
+       y="250.17694"
+       id="text5717"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5719"
+         x="200.71652"
+         y="250.17694">?</tspan></text>
   </g>
 </svg>

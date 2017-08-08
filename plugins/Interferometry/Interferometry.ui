@@ -1043,7 +1043,7 @@
     <string>Delete</string>
    </property>
    <property name="toolTip">
-    <string>delete local images</string>
+    <string>delete local images (except current)</string>
    </property>
   </action>
  </widget>

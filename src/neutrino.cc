@@ -954,6 +954,7 @@ nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //T
 		}
 	}
 	emit physMod(std::make_pair(oldPhys, newPhys));
+    QApplication::processEvents();
 	return newPhys;
 }
 

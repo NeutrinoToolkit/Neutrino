@@ -33,7 +33,6 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     // QHeaderView::resizeMode -> ::sectionResizeMode
     my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
     my_w.images->header()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
-    my_w.images->header()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
 
@@ -289,6 +288,9 @@ nWinList::panClicked(QListWidgetItem* item) {
 
 void
 nWinList::updatePad(nPhysD *my_phys) {
+    if (my_phys==nullptr) {
+        my_phys=currentBuffer;
+    }
     QTreeWidgetItemIterator it(my_w.images);
     while (*it) {
         nPhysD *thisPhys=getPhys(*it);
