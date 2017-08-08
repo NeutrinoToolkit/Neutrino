@@ -240,7 +240,9 @@ void Interferometry::doWavelet () {
     if (sender()->property("id").isValid()) {
         doWavelet(sender()->property("id").toInt());
     } else {
-        doWavelet(0);
+        if (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image)) {
+            doWavelet(0);
+        }
         doWavelet(1);
     }
     my_w.statusbar->showMessage(QString::number(timer.elapsed())+" msec", 5000);
@@ -307,15 +309,28 @@ void Interferometry::doWavelet (int iimage) {
 }
 
 void Interferometry::doUnwrap () {
-    if (localPhys["phase_2pi_ref"] && localPhys["phase_2pi_shot"]) {
-        nPhysD diff=*localPhys["phase_2pi_shot"] - *localPhys["phase_2pi_ref"];
+    if (localPhys["phase_2pi_shot"]) {
+        nPhysD diff=*localPhys["phase_2pi_shot"];
+        if ( !localPhys["phase_2pi_ref"] || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
+            double alpha=my_w.angleCarrier->value();
+            double lambda=my_w.widthCarrier->value();
+            double kx = cos(alpha*_phys_deg)/lambda;
+            double ky = -sin(alpha*_phys_deg)/lambda;
+
+            phys_subtract_carrier(diff, kx, ky);
+        } else if (localPhys["phase_2pi_ref"]) {
+            phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);
+        }
         phys_fractional(diff);
         localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD (diff),localPhys["phase_2pi_wrap"]);
         localPhys["phase_2pi_wrap"]->setShortName("phase_2pi_wrap");
     }
 
-    if (localPhys["contrast_ref"] && localPhys["contrast_shot"]) {
-        nPhysD quality_loc= *localPhys["contrast_shot"] * *localPhys["contrast_ref"];
+    if (localPhys["contrast_shot"]) {
+        nPhysD quality_loc= *localPhys["contrast_shot"];
+        if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
+            phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
+        }
         localPhys["quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["quality"]);
         localPhys["quality"]->setShortName("quality");
     }
