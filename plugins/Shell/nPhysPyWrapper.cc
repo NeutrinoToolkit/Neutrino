@@ -81,7 +81,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
     DEBUG("here");
     neutrino_init_numpy();
-    std::vector<npy_intp> dims={(npy_intp)my_phys->getW(),(npy_intp)my_phys->getH()};
+    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
 //    nPhysD *my_copy=new nPhysD();
 //    *my_copy=my_phys->copy();
 //    PyObject* my_obj=(PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_copy->Timg_buffer);
@@ -98,19 +98,25 @@ void nPhysPyWrapper::neutrino_init_numpy()
 #define __map_numpy(__arr,__my_phys,__numpy_type,__cplusplus_type) case __numpy_type : {__cplusplus_type *data = (__cplusplus_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
-    DEBUG("here " << my_py_obj);
     neutrino_init_numpy();
     if (PyArray_Check(my_py_obj)) {
         PyArrayObject * arr = (PyArrayObject *)my_py_obj;
-        DEBUG("here " << arr);
-        if (arr && PyArray_NDIM(arr)==2){
+        if (arr && PyArray_NDIM(arr)==2 && PyArray_ISONESEGMENT(arr)){
             auto dims=PyArray_DIMS(arr);
-            DEBUG(dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
+            std::string shortname="ndarray";
+            if (PyArray_ISFORTRAN(arr)) {
+                std::swap(dims[0],dims[1]);
+                shortname+="_F";
+            } else {
+                shortname+="_C";
+            }
+            DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
             PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
             std::string name(PyString_AsString(objectsRepresentation));
+            DEBUG("name ------------------>" << name);
             Py_DECREF(objectsRepresentation);
-            nPhysD *my_phys = new nPhysD(dims[0], dims[1],std::numeric_limits<double>::quiet_NaN(),name);
-            my_phys->setShortName("numpy");
+            nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
+            my_phys->setShortName(shortname);
 
             switch (PyArray_TYPE(arr)) {
                 __map_numpy(arr,my_phys,NPY_BOOL        , bool                  );
@@ -132,7 +138,6 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             }
 
             my_phys->TscanBrightness();
-            Py_INCREF(my_py_obj);
             return my_phys;
         }
     }

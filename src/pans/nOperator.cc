@@ -247,29 +247,32 @@ void nOperator::doOperation () {
         myresult=new nPhysD(*image1);
         myresult->setName(my_w.operation->currentText().toStdString()+" "+image1->getName());
         if (my_w.operation->currentIndex()==separator[1]+1) {
-            phys_log10(*myresult);
+            phys_transpose(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+2) {
-            phys_log(*myresult);
+            phys_log10(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+3) {
-            phys_abs(*myresult);
+            phys_log(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+4) {
-            phys_square(*myresult);
+            phys_abs(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+5) {
-            phys_sqrt(*myresult);
+            phys_square(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+6) {
-            phys_sin(*myresult);
+            phys_sqrt(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+7) {
-            phys_cos(*myresult);
+            phys_sin(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+8) {
-            phys_tan(*myresult);
+            phys_cos(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+9) {
-            phys_laplace(*myresult);
+            phys_tan(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+10) {
+            phys_laplace(*myresult);
+        } else if (my_w.operation->currentIndex()==separator[1]+11) {
             phys_sobel(*myresult);
         }
     }
 
     if (myresult) {
+        myresult->reset_display();
         myresult->TscanBrightness();
         myresult->setShortName(my_w.operation->currentText().toStdString());
         if (myresult->getSurf()>0) operatorResult=nparent->replacePhys(myresult,operatorResult);

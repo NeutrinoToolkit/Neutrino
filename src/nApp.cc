@@ -57,7 +57,7 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 
 
 bool nApp::event(QEvent *ev) {
-    qDebug() << ev;
+//    qDebug() << ev;
     if (ev->type() == QEvent::FileOpen) {
         QWidget *widget = QApplication::activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);

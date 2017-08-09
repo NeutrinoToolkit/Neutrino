@@ -1,6 +1,7 @@
 #ifndef __nphys_py_wrapper
 #define __nphys_py_wrapper
 
+#include "Python.h"
 #ifdef HAVE_NUMPY
 #include <numpy/arrayobject.h>
 #endif
@@ -74,8 +75,8 @@ public slots:
     QVector<double> getData(nPhysD*); // geta data in row major order
 
 #ifdef HAVE_NUMPY
-    PyObject* toArray(nPhysD* my_phys);
-    nPhysD* new_nPhysD(PyObject* my_py_obj);
+    PyObject* toArray(nPhysD*);
+    nPhysD* new_nPhysD(PyObject*);
 
 private:
     void neutrino_init_numpy();

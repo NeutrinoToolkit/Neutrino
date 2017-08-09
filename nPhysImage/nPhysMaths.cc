@@ -520,6 +520,22 @@ phys_log10(nPhysD &m1)
 }
 
 void
+phys_transpose(nPhysD &m1)
+{
+    nPhysD m2(m1);
+    m1.resize(m2.getH(),m2.getW());
+#pragma omp parallel for collapse(2)
+    for(size_t i = 0 ; i < m1.getW(); i++) {
+        for(size_t j = 0 ; j < m1.getH(); j++) {
+            m1.set(i,j,m2.point(j,i));
+        }
+    }
+
+    m1.TscanBrightness();
+    m1.setName("log("+m1.getName()+")");
+}
+
+void
 phys_fast_gaussian_blur(nPhysD &m1, double radius)
 {
     phys_fast_gaussian_blur(m1,radius,radius);

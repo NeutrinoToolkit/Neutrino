@@ -50,10 +50,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                             }
                         }
                         QPointer<QAction>  my_action;
-                        my_action = new QAction(nParent);
-                        my_action->setIcon(icon_plugin);
-                        my_action->setText(name_plugin);
-                        my_action->setProperty("neuPlugin",true);
+                        my_action = new QAction(icon_plugin,name_plugin,nParent);
 
                         QVariant v;
                         v.setValue(this);
@@ -89,12 +86,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                     QApplication::processEvents();
 
-                    QPointer<QAction>  my_action = new QAction(nParent);
-                    if (!icon_plugin.isNull()) {
-                        my_action->setIcon(icon_plugin);
-                    }
-                    my_action->setText(name_plugin);
-                    my_action->setProperty("neuPlugin",true);
+                    QPointer<QAction>  my_action = new QAction(icon_plugin, name_plugin, nParent);
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);

@@ -177,6 +177,9 @@ void
 phys_log10(nPhysD &);
 
 void
+phys_transpose(nPhysD &);
+
+void
 phys_median_filter(nPhysD&, unsigned int);
 
 void
