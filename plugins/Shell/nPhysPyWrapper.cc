@@ -103,12 +103,8 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
         PyArrayObject * arr = (PyArrayObject *)my_py_obj;
         if (arr && PyArray_NDIM(arr)==2 && PyArray_ISONESEGMENT(arr)){
             auto dims=PyArray_DIMS(arr);
-            std::string shortname="ndarray";
             if (PyArray_ISFORTRAN(arr)) {
                 std::swap(dims[0],dims[1]);
-                shortname+="_F";
-            } else {
-                shortname+="_C";
             }
             DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
             PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
@@ -116,7 +112,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             DEBUG("name ------------------>" << name);
             Py_DECREF(objectsRepresentation);
             nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
-            my_phys->setShortName(shortname);
+            my_phys->setShortName("ndarray");
 
             switch (PyArray_TYPE(arr)) {
                 __map_numpy(arr,my_phys,NPY_BOOL        , bool                  );
@@ -135,6 +131,9 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
                 default:
                     DEBUG("it's a trap!")
                     break;
+            }
+            if (PyArray_ISFORTRAN(arr)) {
+                phys_transpose(*my_phys);
             }
 
             my_phys->TscanBrightness();
