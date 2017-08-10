@@ -755,6 +755,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (QPlainTextEdit *obj, findChildren<QPlainTextEdit *>()) {
         if (obj->objectName()==name) {
             if (my_occurrence==occurrence) {
+                qDebug() << my_val;
                 obj->setPlainText(my_val.toString());
                 return;
             }
@@ -765,6 +766,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (QTextEdit *obj, findChildren<QTextEdit *>()) {
         if (obj->objectName()==name) {
             if (my_occurrence==occurrence) {
+                qDebug() << my_val;
                 obj->setPlainText(my_val.toString());
                 return;
             }

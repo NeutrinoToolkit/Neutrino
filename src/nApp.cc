@@ -8,9 +8,6 @@
 
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
-    setAttribute(Qt::AA_UseHighDpiPixmaps);
-    setAttribute(Qt::AA_EnableHighDpiScaling);
-
     setOrganizationName("ParisTech");
     setOrganizationDomain("edu");
     setApplicationName("Neutrino");
