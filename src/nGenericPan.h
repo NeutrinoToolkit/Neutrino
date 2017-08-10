@@ -143,6 +143,7 @@ public slots:
     QVariant get(QString, int=1);
     QList<QList<qreal> >  getData(QString, int=1);
     void button(QString, int=1);
+    QStringList widgets();
 
 protected:
     void decorate(QWidget *wdg);

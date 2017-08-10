@@ -969,7 +969,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 		int position=indexOf(datamatrix);
 		if (position != -1) {
 			my_w->my_view->physList.removeAll(datamatrix);
-			if (my_w->my_view->physList.size()>0) {
+            if (my_w->my_view->physList.size()>0) {
 				showPhys(my_w->my_view->physList.at(std::min<int>(position,my_w->my_view->physList.size()-1)));
 			} else {
 				my_w->my_view->currentBuffer=nullptr;
@@ -986,9 +986,12 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 					my_w->menuBuffers->removeAction(action);
 				}
 			}
-			delete datamatrix;
-			datamatrix=NULL;
-		}
+            if (datamatrix->property["keep_phys_alive"].get_i()!=42){
+                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python")
+                delete datamatrix;
+            }
+            datamatrix=NULL;
+        }
 	}
 }
 
@@ -1920,63 +1923,43 @@ nGenericPan* neutrino::getPan(QString name) {
 
 nGenericPan* neutrino::newPan(QString my_string) {
 
-	nGenericPan *my_pan=NULL;
+    nGenericPan *my_pan=new nGenericPan(this);
 
-	const QMetaObject* metaObject = this->metaObject();
+    if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
+        QFile file(my_string);
+        file.open(QFile::ReadOnly);
+        QUiLoader loader;
+        QWidget *uiwidget = loader.load(&file);
+        file.close();
+        uiwidget->setParent(my_pan);
 
-	for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i) {
-		QString name;
-		name=metaObject->method(i).name();
-		if (!strcmp(metaObject->method(i).typeName(),"nGenericPan*") &&
-				metaObject->method(i).parameterTypes().empty() &&
-				name==my_string+"()") {
-			QMetaObject::invokeMethod(this,my_string.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
-		}
-	}
-	if (!my_pan) {
-		QString panName;
+        if (uiwidget) {
 
-		QWidget *uiwidget=NULL;
+            my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
+            foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
+                if(my_widget->objectName()=="centralwidget") {
+                    my_pan->setCentralWidget(my_widget);
+                }
+            }
+            foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
+                my_pan->setStatusBar(my_widget);
+            }
+            foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
+                my_pan->addToolBar(my_widget);
+            }
 
-		if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
-			QFile file(my_string);
-			file.open(QFile::ReadOnly);
-			QUiLoader loader;
-			uiwidget = loader.load(&file);
-			file.close();
-			uiwidget->setParent(my_pan);
-			panName=QFileInfo(my_string).baseName();
-		}
+            const QMetaObject *metaobject=uiwidget->metaObject();
+            for (int i=0; i<metaobject->propertyCount(); ++i) {
+                QMetaProperty metaproperty = metaobject->property(i);
+                const char *name = metaproperty.name();
+                QVariant value = uiwidget->property(name);
+            }
 
-		my_pan=new nGenericPan(this);
+            //            my_pan->setCentralWidget(uiwidget);
+            my_pan->show();
+        }
+    }
 
-		if (uiwidget) {
-
-			my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
-			foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
-				if(my_widget->objectName()=="centralwidget") {
-					my_pan->setCentralWidget(my_widget);
-				}
-			}
-			foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
-				my_pan->setStatusBar(my_widget);
-			}
-			foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
-				my_pan->addToolBar(my_widget);
-			}
-
-			const QMetaObject *metaobject=uiwidget->metaObject();
-			for (int i=0; i<metaobject->propertyCount(); ++i) {
-				QMetaProperty metaproperty = metaobject->property(i);
-				const char *name = metaproperty.name();
-				QVariant value = uiwidget->property(name);
-			}
-
-			//            my_pan->setCentralWidget(uiwidget);
-			my_pan->show();
-		}
-
-	}
 
 	return my_pan;
 }

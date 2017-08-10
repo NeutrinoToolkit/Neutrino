@@ -876,9 +876,6 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
 #else
     throw phys_fileerror("Neutrino was compiled without TIFF support");
 #endif
-    for (auto& img: vecReturn) {
-        DEBUG(img->getName());
-    }
 
     return vecReturn;
 }

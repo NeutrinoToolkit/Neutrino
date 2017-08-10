@@ -1,5 +1,5 @@
 <!-- 
-Visar analysis
+Interferometry analysis
 Tommaso Vinci 
 tommaso.vinci@polytechnique.edu
  -->

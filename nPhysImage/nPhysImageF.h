@@ -520,6 +520,8 @@ public:
 
     inline void reset_display() {
         display_property.erase("display_range");
+        uchar_buf.clear();
+        DEBUG(uchar_buf.capacity());
     }
 
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
@@ -928,6 +930,7 @@ nPhysImageF<T>::nPhysImageF(size_t w, size_t h, T val, std::string obj_name)
 	resize(w, h);
     for (size_t i=0; i<getW()*getH(); i++)
 		Timg_buffer[i] = val;
+    TscanBrightness();
 }
 
 
@@ -973,7 +976,6 @@ nPhysImageF<T>::~nPhysImageF()
 		if (Timg_buffer != NULL)
 			delete Timg_buffer;
 		
-		//tom
 		if (Timg_matrix != NULL) delete Timg_matrix;
 	
 		if (vector_buf != NULL) {
@@ -991,10 +993,10 @@ nPhysImageF<T>::~nPhysImageF()
 				delete axis_buf[1];
 			delete axis_buf;
 		}
-		delete _n_inst; // FIXME alex: check this
-		// end tom
+        delete _n_inst;
+
 	} else {
-        DEBUG(1,"["<<(void *)this<<"] "<<  getShortName() << " : " << getName() << " NOT ALLOWING DELETE! " << trashDelete );
+        DEBUG(1,"["<<(void *)this<<"]  NOT ALLOWING DELETE! " << trashDelete );
 	}
 
 }

@@ -29,6 +29,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
         std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
         for(auto it : my_vec) {
             if (it->getSurf()>0) {
+                it->property["keep_phys_alive"]=42;
                 my_list << it;
             } else {
                 delete it;
@@ -39,7 +40,9 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD() {
-    return new nPhysD();
+    nPhysD *my_phys= new nPhysD();
+    my_phys->property["keep_phys_alive"]=42;
+    return my_phys;
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
@@ -55,6 +58,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
         }
         phys->TscanBrightness();
     }
+    phys->property["keep_phys_alive"]=42;
     return phys;
 }
 
@@ -64,6 +68,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
 nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
     DEBUG("here");
     nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
+    phys->property["keep_phys_alive"]=42;
     return phys;
 }
 
@@ -73,20 +78,15 @@ nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString na
 nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     DEBUG("new_nPhysD new_nPhysD new_nPhysD new_nPhysD new_nPhysD ");
     nPhysD *ret_phys = new nPhysD(*phys);
+    ret_phys->property["keep_phys_alive"]=42;
     return ret_phys;
 }
 
 #ifdef HAVE_NUMPY
 
 PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
-    DEBUG("here");
     neutrino_init_numpy();
     std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
-//    nPhysD *my_copy=new nPhysD();
-//    *my_copy=my_phys->copy();
-//    PyObject* my_obj=(PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_copy->Timg_buffer);
-//    DEBUG("here");
-//    return my_obj;
     return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
 }
 
@@ -100,43 +100,48 @@ void nPhysPyWrapper::neutrino_init_numpy()
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     neutrino_init_numpy();
     if (PyArray_Check(my_py_obj)) {
-        PyArrayObject * arr = (PyArrayObject *)my_py_obj;
-        if (arr && PyArray_NDIM(arr)==2 && PyArray_ISONESEGMENT(arr)){
-            auto dims=PyArray_DIMS(arr);
-            if (PyArray_ISFORTRAN(arr)) {
+        PyArrayObject * my_arr = (PyArrayObject *)my_py_obj;
+        if (my_arr && PyArray_NDIM(my_arr)==2 && PyArray_ISONESEGMENT(my_arr)){
+            auto dims=PyArray_DIMS(my_arr);
+            if (PyArray_ISFORTRAN(my_arr)) {
                 std::swap(dims[0],dims[1]);
             }
-            DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(arr));
+            DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(my_arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(my_arr));
+
+            std::string name;
             PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
-            std::string name(PyString_AsString(objectsRepresentation));
+            if (objectsRepresentation) {
+                name = PyString_AsString(objectsRepresentation);
+            }
             DEBUG("name ------------------>" << name);
             Py_DECREF(objectsRepresentation);
             nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
             my_phys->setShortName("ndarray");
 
-            switch (PyArray_TYPE(arr)) {
-                __map_numpy(arr,my_phys,NPY_BOOL        , bool                  );
-                __map_numpy(arr,my_phys,NPY_UBYTE       , char                  );
-                __map_numpy(arr,my_phys,NPY_SHORT       , short                 );
-                __map_numpy(arr,my_phys,NPY_USHORT      , unsigned short        );
-                __map_numpy(arr,my_phys,NPY_INT         , int                   );
-                __map_numpy(arr,my_phys,NPY_UINT        , unsigned int          );
-                __map_numpy(arr,my_phys,NPY_LONG        , long int              );
-                __map_numpy(arr,my_phys,NPY_ULONG       , unsigned long int     );
-                __map_numpy(arr,my_phys,NPY_LONGLONG    , long long int         );
-                __map_numpy(arr,my_phys,NPY_ULONGLONG   , unsigned long long int);
-                __map_numpy(arr,my_phys,NPY_FLOAT       , float                 );
-                __map_numpy(arr,my_phys,NPY_DOUBLE      , double                );
-                __map_numpy(arr,my_phys,NPY_LONGDOUBLE  , long double           );
+            switch (PyArray_TYPE(my_arr)) {
+                __map_numpy(my_arr,my_phys,NPY_BOOL        , bool                  );
+                __map_numpy(my_arr,my_phys,NPY_UBYTE       , char                  );
+                __map_numpy(my_arr,my_phys,NPY_SHORT       , short                 );
+                __map_numpy(my_arr,my_phys,NPY_USHORT      , unsigned short        );
+                __map_numpy(my_arr,my_phys,NPY_INT         , int                   );
+                __map_numpy(my_arr,my_phys,NPY_UINT        , unsigned int          );
+                __map_numpy(my_arr,my_phys,NPY_LONG        , long int              );
+                __map_numpy(my_arr,my_phys,NPY_ULONG       , unsigned long int     );
+                __map_numpy(my_arr,my_phys,NPY_LONGLONG    , long long int         );
+                __map_numpy(my_arr,my_phys,NPY_ULONGLONG   , unsigned long long int);
+                __map_numpy(my_arr,my_phys,NPY_FLOAT       , float                 );
+                __map_numpy(my_arr,my_phys,NPY_DOUBLE      , double                );
+                __map_numpy(my_arr,my_phys,NPY_LONGDOUBLE  , long double           );
                 default:
                     DEBUG("it's a trap!")
-                    break;
+                            break;
             }
-            if (PyArray_ISFORTRAN(arr)) {
+            if (PyArray_ISFORTRAN(my_arr)) {
                 phys_transpose(*my_phys);
             }
 
             my_phys->TscanBrightness();
+            my_phys->property["keep_phys_alive"]=42;
             return my_phys;
         }
     }
@@ -149,21 +154,20 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
 /**
  nPhysD Destructor
  */
-void nPhysPyWrapper::delete_nPhysD(nPhysD* phys) {
+void nPhysPyWrapper::delete_nPhysD(nPhysD* my_phys) {
     DEBUG("delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD");
     nApp* my_app=qobject_cast<nApp*> (qApp);
-    bool found=false;
     if (my_app) {
+        my_app->processEvents();
         DEBUG("and here");
         for(auto& neu: my_app->neus()) {
-            if (neu->getBufferList().contains(phys)) {
-                neu->removePhys(phys);
-                found=true;
+            if (neu->getBufferList().contains(my_phys)) {
+                neu->removePhys(my_phys);
             }
         }
     }
-    if (!found) {
-        delete phys;
+    if (my_phys->property["keep_phys_alive"].get_i()==42) {
+        delete my_phys;
     }
 }
 
@@ -232,7 +236,6 @@ QPair<int, int> nPhysPyWrapper::getShape(nPhysD *phys){
 
     return qMakePair(0, 0);
 }
-
 
 int nPhysPyWrapper::getSurf(nPhysD* phys){	
     return phys?phys->getSurf():0;

@@ -87,6 +87,7 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
 
 	PythonQtScriptingConsole *console;
 	console = new PythonQtScriptingConsole(this, PythonQt::self()->getMainModule());
+    console->setProperty("neutrinoSave",false);
 	my_w.console->addWidget(console);
     console->setFont(my_font);
 	console->show();
