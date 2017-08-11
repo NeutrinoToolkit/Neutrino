@@ -13,7 +13,7 @@ def mousemove(mm):
     x = mm.x()
     y = mm.y()
     pos_lbl.setText("x: "+repr(x)+" y: "+repr(y))
-    val = neu.getBuffer().get(x, y)
+    val = neu.getCurrentBuffer().get(x, y)
     val_lbl.setText("value: "+repr(val))
 
 def buffer_changed():

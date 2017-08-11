@@ -332,12 +332,12 @@ void Interferometry::doUnwrap () {
         if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
             phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
         }
-        localPhys["quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["quality"]);
-        localPhys["quality"]->setShortName("quality");
+        localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["phase_quality"]);
+        localPhys["phase_quality"]->setShortName("phase_quality");
     }
 
     nPhysD *phase=localPhys["phase_2pi_wrap"];
-    nPhysD *qual=localPhys["quality"];
+    nPhysD *qual=localPhys["phase_quality"];
 
     if (phase && qual && nPhysExists(phase) && nPhysExists(qual)) {
 
@@ -426,6 +426,11 @@ void Interferometry::doSubtract () {
         localPhys["lambda"]->setShortName("lambda");
     }
 
+    if (localPhys["phase_quality"]) {
+        localPhys["quality"]=nparent->replacePhys(localPhys["phase_quality"]->fast_rotated(my_w.rotAngle->value()),localPhys["quality"]);
+        localPhys["quality"]->setShortName("quality");
+    }
+
     if (localPhys["phase_2pi_unwrap"]) {
 
         nPhysD phase;
@@ -484,7 +489,6 @@ void Interferometry::doMaskCutoff() {
         } else {
             maskRegion->hide();
         }
-
 
         if (my_w.cutoffValue->value()!=0.0) {
             if (phaseMask==NULL) {
