@@ -192,7 +192,6 @@
     </widget>
     <addaction name="actionSpectral_Analysis"/>
     <addaction name="actionWavelet"/>
-    <addaction name="actionInterferometry"/>
     <addaction name="actionInversions"/>
     <addaction name="actionContours"/>
     <addaction name="actionFocal_Spot"/>
@@ -717,11 +716,6 @@
   <action name="actionAffine_Transform">
    <property name="text">
     <string>Affine Transform</string>
-   </property>
-  </action>
-  <action name="actionInterferometry">
-   <property name="text">
-    <string>Interferometry</string>
    </property>
   </action>
   <action name="actionExport_all">

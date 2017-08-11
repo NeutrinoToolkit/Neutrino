@@ -94,8 +94,8 @@ void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
 
-    QString helpfile(":/"+panName()+"/README.html");
-    if (QFileInfo(helpfile).exists()) {
+    QString helpFile(property("helpFile").toString());
+    if (QFileInfo(helpFile).exists()) {
         QMainWindow *helpwin=nullptr;
         foreach (helpwin, findChildren<QMainWindow *>()) {
             if (helpwin->property("NeutrinoHelp").isValid()) {
@@ -109,7 +109,7 @@ void nGenericPan::help() {
             my_help->setupUi(helpwin);
             helpwin->setWindowTitle(panName()+" help");
             helpwin->setProperty("NeutrinoHelp",true);
-            my_help->help->setSource(QUrl("qrc"+helpfile));
+            my_help->help->setSource(QUrl("qrc"+helpFile));
             connect(my_help->actionHome, SIGNAL(triggered()), my_help->help, SLOT(home()));
             connect(my_help->actionBack, SIGNAL(triggered()), my_help->help, SLOT(backward()));
             connect(my_help->actionForward, SIGNAL(triggered()), my_help->help, SLOT(forward()));
@@ -204,9 +204,9 @@ void nGenericPan::showEvent(QShowEvent* event) {
 
     foreach (QToolBar *my_tool, findChildren<QToolBar *>()) {
         if (my_tool->objectName() == "toolBar") {
-            QFile helpFile(":/"+panName()+"/README.html");
-            qDebug() << helpFile.fileName() << helpFile.exists();
+            QFile helpFile(":/"+panName()+"README.html");
             if (helpFile.exists()) {
+                setProperty("helpFile",helpFile.fileName());
                 QWidget* spacer = new QWidget();
                 spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
                 spacer->setProperty("helpSpacer",true);
