@@ -29,12 +29,23 @@
 JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent)
 {
     setupUi(this);
-    myEngine.globalObject().setProperty("neu", myEngine.newQObject(nparent));
+    engine.globalObject().setProperty("neu", engine.newQObject(nparent));
     show();
+
+    const int typeId = qRegisterMetaType<nGenericPan*>("nGenericPan*");
+    QScriptValue prototype = engine.newQObject(new nGenericPan(nparent));
+    engine.setDefaultPrototype(typeId, prototype);
+    engine.setDefaultPrototype(qMetaTypeId<nGenericPan*>(), prototype);
+
+    QScriptValue namespaceObj = engine.newObject();
+    engine.globalObject().setProperty("nGenericPan", namespaceObj);
+
+
 }
 
-void JavaScript::on_execute_released() {
+void JavaScript::on_command_returnPressed() {
+    saveDefaults();
     qDebug() << command->text();
-    QScriptValue retval = myEngine.evaluate(command->text());
+    QScriptValue retval = engine.evaluate(command->text());
     output->setPlainText(retval.toString());
 }

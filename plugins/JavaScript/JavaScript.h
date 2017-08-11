@@ -43,10 +43,10 @@ public:
     Q_INVOKABLE JavaScript(neutrino *);
 
 public slots:
-    void on_execute_released();
+    void on_command_returnPressed();
 
 private:
-    QScriptEngine myEngine;
+    QScriptEngine engine;
 
 };
 
