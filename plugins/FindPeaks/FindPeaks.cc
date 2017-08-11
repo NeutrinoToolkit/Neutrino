@@ -38,8 +38,8 @@ FindPeaks::FindPeaks(neutrino *nparent) : nGenericPan(nparent)
     connect(actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 
-    connect(setOrigin, SIGNAL(pressed()), this, SLOT(setOrigin()));
-    connect(setScale, SIGNAL(pressed()), this, SLOT(setScale()));
+    connect(setOrigin, SIGNAL(pressed()), this, SLOT(set_origin()));
+    connect(setScale, SIGNAL(pressed()), this, SLOT(set_scale()));
 
     connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 
