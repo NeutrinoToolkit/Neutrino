@@ -72,8 +72,8 @@ class nGenericPan : public QMainWindow {
     Q_OBJECT
 
 public:
-    nGenericPan(){};
-    nGenericPan(neutrino *);
+    Q_INVOKABLE nGenericPan(){};
+    Q_INVOKABLE nGenericPan(neutrino *);
     ~nGenericPan(){};
 
     neutrino *nparent;
@@ -153,6 +153,5 @@ protected:
 };
 
 Q_DECLARE_METATYPE(nGenericPan*);
-
 
 #endif

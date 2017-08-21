@@ -25,22 +25,19 @@
 
 #include "JavaScript.h"
 #include <QScriptEngine>
+#include "nPhysImageF.h"
 
-JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent)
-{
+Q_DECLARE_METATYPE(QList<nGenericPan*>);
+Q_DECLARE_METATYPE(QList<neutrino*>);
+
+JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent) {
     setupUi(this);
     engine.globalObject().setProperty("neu", engine.newQObject(nparent));
+    engine.globalObject().setProperty("nApp", engine.newQObject(qApp));
+
+    qScriptRegisterSequenceMetaType<QList<nGenericPan*> >(&engine);
+    qScriptRegisterSequenceMetaType<QList<neutrino*> >(&engine);
     show();
-
-    const int typeId = qRegisterMetaType<nGenericPan*>("nGenericPan*");
-    QScriptValue prototype = engine.newQObject(new nGenericPan(nparent));
-    engine.setDefaultPrototype(typeId, prototype);
-    engine.setDefaultPrototype(qMetaTypeId<nGenericPan*>(), prototype);
-
-    QScriptValue namespaceObj = engine.newObject();
-    engine.globalObject().setProperty("nGenericPan", namespaceObj);
-
-
 }
 
 void JavaScript::on_command_returnPressed() {

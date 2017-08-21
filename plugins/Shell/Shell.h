@@ -80,7 +80,7 @@ public:
     }
 
     QString menuEntryPoint() {
-        return QString("Python");
+        return QString("Scripts");
     }
 
     nGenericPan* Python()

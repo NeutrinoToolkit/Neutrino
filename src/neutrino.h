@@ -242,12 +242,12 @@ public slots:
 
     // WAVELET STUFF
     nGenericPan* Wavelet();
-    
+
     // SPECTRAL ANALYSIS
     nGenericPan* SpectralAnalysis();
 
     // INTEGRAL INVERSION STUFF
-	nGenericPan* IntegralInversion();
+    nGenericPan* IntegralInversion();
 
     // Region path
     nGenericPan* RegionPath();
@@ -263,7 +263,7 @@ public slots:
 
     // interpolate inside path
     nGenericPan* InterpolatePath();
-    
+
     nGenericPan* MouseInfo();
 
     void about();
@@ -276,10 +276,10 @@ public slots:
 
     // to python
 
-	nLine* line(QString);
-	nRect* rect(QString);
+    nLine* line(QString);
+    nRect* rect(QString);
 
-	void dragEnterEvent(QDragEnterEvent *);
+    void dragEnterEvent(QDragEnterEvent *);
     void dragMoveEvent(QDragMoveEvent *);
     void dropEvent(QDropEvent *);
 

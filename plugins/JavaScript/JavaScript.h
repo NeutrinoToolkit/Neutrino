@@ -50,7 +50,6 @@ private:
 
 };
 
-
-NEUTRINO_PLUGIN(JavaScript,Analysis);
+NEUTRINO_PLUGIN(JavaScript,Scripts,":icons/JavaScript.png");
 
 #endif
