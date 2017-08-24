@@ -192,6 +192,9 @@ void
 phys_fast_gaussian_blur(nPhysD &, double, double);
 
 void
+phys_integratedNe(nPhysD &, double);
+
+void
 phys_laplace(nPhysD&);
 
 void

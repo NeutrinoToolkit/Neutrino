@@ -37,6 +37,9 @@ JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent) {
 
     qScriptRegisterSequenceMetaType<QList<nGenericPan*> >(&engine);
     qScriptRegisterSequenceMetaType<QList<neutrino*> >(&engine);
+
+    const int typeId = qRegisterMetaType<nGenericPan*>("nGenericPan*");
+
     show();
 }
 

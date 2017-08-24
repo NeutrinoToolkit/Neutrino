@@ -124,7 +124,6 @@ Visar::Visar(neutrino *nparent)
         }
     } else{
         addVisar();
-        addVisar();
     }
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
@@ -141,11 +140,31 @@ Visar::Visar(neutrino *nparent)
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
+    connect(etalon_thickness, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
+    connect(etalon_delta, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
+    connect(etalon_n0, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
+    connect(etalon_lambda, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
+
+
     //!END SOP stuff
     QApplication::processEvents();
 
     loadDefaults();
     sweepChanged();
+    calculate_etalon();
+
+}
+
+void Visar::calculate_etalon() {
+    DEBUG("HERE");
+    double e_lambda=etalon_lambda->text().toDouble();
+    double e_n0=etalon_n0->text().toDouble();
+    double e_delta=etalon_delta->text().toDouble();
+    double e_thickness=etalon_thickness->text().toDouble();
+
+    double sens=e_lambda*1e-9*_phys_cspeed/(4*e_thickness*1e-3*(e_n0-1.0/e_n0)*(1+e_delta))*1e-3; // km/s
+
+    etalon_sensitivity->setText(QLocale().toString(sens));
 
 }
 
@@ -351,7 +370,7 @@ void Visar::loadSettings(QString my_settings) {
     QSettings settings(my_settings,QSettings::IniFormat);
     settings.beginGroup("Properties");
     int kMax=settings.value("NeuSave-numVisars",1).toInt();
-    for (int k=0; k<kMax; k++) {
+    for (int k=1; k<kMax; k++) {
         addVisar();
     }
     int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
@@ -364,6 +383,7 @@ void Visar::loadSettings(QString my_settings) {
     connections();
     sweepChanged();
     doWave();
+    calculate_etalon();
 }
 
 void Visar::mouseAtPlot(QMouseEvent* e) {
@@ -507,7 +527,7 @@ void Visar::tabChanged(int k) {
             getPhase(k);
         }
 
-        if (tabWidget==tabs) {
+        if (tabWidget==tabs && tabWidget->currentIndex()==2) {
             nparent->showPhys(getPhysFromCombo(sopShot));
         } else {
             if (k<(int)numVisars) {
@@ -852,7 +872,7 @@ void Visar::updatePlot() {
                     velocity[k][j] = speed;
                     reflectivity[k][j] = refle;
                     quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
-                    velError[k][j] = cPhaseErr[k][j]/quality[k][j]*sensitivity/refr_index;
+                    velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
 
                     for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                         int jloc=i+1;

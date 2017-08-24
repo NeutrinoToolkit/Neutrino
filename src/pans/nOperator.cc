@@ -38,7 +38,7 @@ nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
 
     // separator represents the difference between operations with 2 operands or 1 modify it in .h
     separator[0]=8;
-    separator[1]=15;
+    separator[1]=16;
 
     my_w.operation->insertSeparator(separator[0]);
     my_w.operation->insertSeparator(separator[1]);
@@ -237,6 +237,15 @@ void nOperator::doOperation () {
                 if (ok) {
                     myresult=new nPhysD(*image1);
                     phys_gauss_sobel(*myresult,scalar);
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
+                }
+            } else if (my_w.operation->currentIndex()==separator[0]+7) {
+                bool ok;
+                double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
+                if (ok) {
+                    myresult=new nPhysD(*image1);
+                    phys_integratedNe(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }

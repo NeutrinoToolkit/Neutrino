@@ -167,6 +167,8 @@ public slots:
                 break;
         }
     }
+
+    void calculate_etalon();
     
 };
 

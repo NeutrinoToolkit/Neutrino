@@ -677,6 +677,18 @@ phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
     fftw_free(b2);
 }
 
+void
+phys_integratedNe(nPhysD &image, double lambda_m)
+{
+        double toNe = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
+
+        phys_multiply(image, toNe);
+        image.setShortName("integratedNePlasma");
+        image.property["intergratedNe_lambda_m"]=lambda_m;
+        image.property["unitsCB"]="m-2";
+
+}
+
 std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysD* img1, nPhysD* img2) {
     size_t dx=img1->getW();
     size_t dy=img1->getH();

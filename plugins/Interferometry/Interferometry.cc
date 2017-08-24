@@ -665,18 +665,8 @@ void Interferometry::doPlasma(){
         nPhysD *intNe = new nPhysD(*image);
 
         if (my_w.usePlasma->isChecked()) {
-
             double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
-            double scale_cm=my_w.imgRes->value()*1e-4; // convert micron/px to cm/px
-
-            double toNe = -1.0e-4*8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
-
-            phys_multiply(*intNe, toNe);
-            intNe->setShortName("intergratedNe");
-            intNe->set_scale(scale_cm,scale_cm);
-            intNe->property["unitsX"]="cm";
-            intNe->property["unitsY"]="cm";
-            intNe->property["unitsCB"]="cm-2";
+            phys_integratedNe(*intNe,lambda_m);
         } else {
             intNe->setShortName(image->getShortName());
         }
@@ -692,7 +682,6 @@ void Interferometry::doPlasma(){
 
 
         if (localPhys["integratedPlasma"]) {
-            localPhys["integratedPlasma"]->setShortName("integratedPlasma");
             localPhys["integratedPlasma"]->property["display_range"]=intNe->get_min_max();
         }
         localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
