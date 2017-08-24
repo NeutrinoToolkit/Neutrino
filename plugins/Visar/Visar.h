@@ -110,6 +110,8 @@ private:
     std::vector<nRect*> fringeRect;
     QPointer<nRect> sopRect;
 
+    std::map<std::string, nPhysD *> localPhys;
+
 public slots:
     
     void addVisar();
@@ -169,7 +171,9 @@ public slots:
     }
 
     void calculate_etalon();
+    void on_showFiltered_triggered(bool);
     
+
 };
 
 NEUTRINO_PLUGIN(Visar,Analysis);

@@ -46,7 +46,10 @@ Velocity:
 Select the *Visar 1* or *Visar 2* tab to set the velocity parameters of
 each VISAR:
 
- 1. For each VISAR, specify the sensitivity (Velocity/fringe)
+ 1. For each VISAR, specify the sensitivity (Velocity/fringe). In the **Notes** 
+    tab you can find a simple sensitivity calculator based on the etalon 
+    parameters (thickness, wavelength, refractive index and delta correction 
+    for refractive index)    
  2. Specify the Time 0 window
      1. Pixel position of the synchronization (see synchronization shot)
      2. Delay when compared with the initial synchronization shot (if

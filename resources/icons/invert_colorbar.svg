@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="invert_colorbar.svg"
-   inkscape:export-filename="/Users/tommaso/neutrino/resources/icons/invert_colorbar.png"
-   inkscape:export-xdpi="40.049999"
-   inkscape:export-ydpi="40.049999">
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/invert_colorbar.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs3926">
     <marker
@@ -672,13 +672,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.86370227"
-     inkscape:cx="359.04812"
+     inkscape:cx="85.226911"
      inkscape:cy="475.14781"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1276"
-     inkscape:window-height="755"
+     inkscape:window-width="1916"
+     inkscape:window-height="1155"
      inkscape:window-x="4"
      inkscape:window-y="1"
      inkscape:window-maximized="1" />

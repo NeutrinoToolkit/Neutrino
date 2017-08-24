@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="expand.svg"
-   inkscape:export-filename="/Users/tommaso/neutrino/resources/icons/expand.png"
-   inkscape:export-xdpi="40.049999"
-   inkscape:export-ydpi="40.049999">
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/expand.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs3926">
     <linearGradient
@@ -579,19 +579,6 @@
        y2="-140.00002"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(-1.9787598e-4,7.89771)" />
-    <filter
-       inkscape:collect="always"
-       style="color-interpolation-filters:sRGB"
-       id="filter5629"
-       x="-0.014822504"
-       width="1.029645"
-       y="-0.010080474"
-       height="1.0201609">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.5441797"
-         id="feGaussianBlur5631" />
-    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -600,14 +587,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.46138718"
-     inkscape:cx="-167.91886"
-     inkscape:cy="337.3536"
+     inkscape:zoom="2.175"
+     inkscape:cx="300"
+     inkscape:cy="300.11222"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g5871"
      showgrid="true"
-     inkscape:window-width="1276"
-     inkscape:window-height="755"
+     inkscape:window-width="1916"
+     inkscape:window-height="1155"
      inkscape:window-x="4"
      inkscape:window-y="1"
      inkscape:window-maximized="1"
@@ -652,7 +639,7 @@
          id="rect5606"
          transform="matrix(1.157957,0,0,1.2520962,-494.18204,340.03108)"
          d="m 751.03516,145.49023 0,74.99415 -97.68555,0 c -2.09123,0 -3.77539,1.6822 -3.77539,3.77343 l 0,210.10938 c 0,2.09123 1.68416,3.77539 3.77539,3.77539 l 97.68555,0 0,74.99219 148.5664,-183.82227 -148.5664,-183.82227 z"
-         style="fill:#242424;fill-opacity:1;stroke:none;stroke-width:30;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5629)" />
+         style="fill:#242424;fill-opacity:1;stroke:none;stroke-width:30;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;" />
     </g>
   </g>
 </svg>

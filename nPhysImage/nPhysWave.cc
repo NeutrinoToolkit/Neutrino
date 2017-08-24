@@ -856,6 +856,7 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
     uphase->set_origin(wphase.get_origin());
     uphase->set_scale(wphase.get_scale());
     uphase->setName("Unwrap "+wphase.getName());
+    uphase->setFromName(wphase.getFromName());
 
     switch (strategy) {
         case SIMPLE_HV :

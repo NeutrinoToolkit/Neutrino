@@ -19,9 +19,9 @@
    width="600"
    x="0"
    y="0"
-   inkscape:export-filename="/Users/tommaso/neutrino/resources/icons/lockColor.png"
-   inkscape:export-xdpi="40.049999"
-   inkscape:export-ydpi="40.049999">
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/lockColor.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <metadata
      id="metadata3">
     <rdf:RDF>
@@ -78,12 +78,12 @@
      bordercolor="#666666"
      borderopacity="1.0"
      id="base"
-     inkscape:cx="56.822221"
+     inkscape:cx="-498.30061"
      inkscape:cy="417.3714"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:window-height="755"
-     inkscape:window-width="1276"
+     inkscape:window-height="1155"
+     inkscape:window-width="1916"
      inkscape:window-x="4"
      inkscape:window-y="1"
      inkscape:zoom="0.42603184"

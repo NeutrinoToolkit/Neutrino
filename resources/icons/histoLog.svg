@@ -17,9 +17,9 @@
    sodipodi:docname="histoLog.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="/Users/tommaso/neutrino/resources/icons/histoNorm.png"
-   inkscape:export-xdpi="40.049999"
-   inkscape:export-ydpi="40.049999">
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/histoNorm.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs3975">
     <inkscape:perspective
@@ -40,14 +40,14 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.3615"
-     inkscape:cx="95.358992"
-     inkscape:cy="502.86958"
+     inkscape:zoom="1.5883333"
+     inkscape:cx="300"
+     inkscape:cy="300"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1276"
-     inkscape:window-height="755"
+     inkscape:window-width="1916"
+     inkscape:window-height="1155"
      inkscape:window-x="4"
      inkscape:window-y="1"
      inkscape:window-maximized="1"
@@ -81,7 +81,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -96,5 +96,11 @@
        id="path3071"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccc" />
+    <path
+       sodipodi:nodetypes="ccccccccc"
+       inkscape:connector-curvature="0"
+       id="path4688"
+       d="m 511.29302,296.2914 49.15371,-418.65008 107.7063,110.213005 71.61501,-27.073307 57.78376,44.8492384 74.38127,72.5117616 54.1662,77.399722 59.69871,19.30844 25.40512,117.15352"
+       style="fill:none;stroke:#000000;stroke-width:43.56030273;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>

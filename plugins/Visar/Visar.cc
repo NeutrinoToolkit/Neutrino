@@ -140,10 +140,10 @@ Visar::Visar(neutrino *nparent)
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-    connect(etalon_thickness, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
-    connect(etalon_delta, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
-    connect(etalon_n0, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
-    connect(etalon_lambda, SIGNAL(textChanged(const QString&)), this, SLOT(calculate_etalon()));
+    connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
+    connect(etalon_delta, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
+    connect(etalon_n0, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
+    connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
 
 
     //!END SOP stuff
@@ -156,16 +156,42 @@ Visar::Visar(neutrino *nparent)
 }
 
 void Visar::calculate_etalon() {
-    DEBUG("HERE");
-    double e_lambda=etalon_lambda->text().toDouble();
-    double e_n0=etalon_n0->text().toDouble();
-    double e_delta=etalon_delta->text().toDouble();
-    double e_thickness=etalon_thickness->text().toDouble();
+    double sens=etalon_lambda->value()*1e-9*_phys_cspeed/(4*etalon_thickness->value()*1e-3*(etalon_n0->value()-1.0/etalon_n0->value())*(1+etalon_delta->value()/100.))*1e-3; // km/s
+    etalon_sensitivity->setValue(sens);
 
-    double sens=e_lambda*1e-9*_phys_cspeed/(4*e_thickness*1e-3*(e_n0-1.0/e_n0)*(1+e_delta))*1e-3; // km/s
+}
 
-    etalon_sensitivity->setText(QLocale().toString(sens));
+void Visar::on_showFiltered_triggered(bool) {
+    DEBUG("here");
 
+    for (unsigned int k=0;k<numVisars;k++) {
+        nPhysD *my_phase =  new nPhysD(phase[k][1]);
+        phys_point_subtract(*my_phase, phase[k][0]);
+        phys_fractional(*my_phase);
+
+        nPhysD *my_contrast =  new nPhysD(intensity[k][1]);
+        phys_point_divide(*my_contrast, intensity[k][0]);
+
+        nPhysD *my_quality =  new nPhysD(contrast[k][1]);
+        phys_point_divide(*my_quality, contrast[k][0]);
+
+        nPhysD *my_phase_unwrap;
+        my_phase_unwrap=phys_phase_unwrap(*my_phase, *my_quality, QUALITY);
+        delete my_phase;
+        std::ostringstream ss;
+        ss << k;
+
+        my_phase_unwrap->setShortName("phaseVisar"+ss.str());
+        localPhys[my_phase_unwrap->getShortName()]=nparent->replacePhys(my_phase_unwrap, localPhys[my_phase_unwrap->getShortName()]);
+
+        my_contrast->property["display_range"]=my_contrast->get_min_max();
+        my_contrast->setShortName("contrastVisar"+ss.str());
+        localPhys[my_contrast->getShortName()]=nparent->replacePhys(my_contrast, localPhys[my_contrast->getShortName()]);
+
+        my_quality->setShortName("qualityVisar"+ss.str());
+        localPhys[my_quality->getShortName()]=nparent->replacePhys(my_quality, localPhys[my_quality->getShortName()]);
+
+    }
 }
 
 void Visar::addVisar() {
@@ -903,10 +929,10 @@ void Visar::updatePlot() {
                 for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
                     QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
                     if (my_err && my_err->property("id").toInt() == (int)k ){
-                            pen=my_err->pen();
-                            pen.setStyle(pstyle);
-                            my_err->setPen(pen);
-                            my_err->setData(velError[k]);
+                        pen=my_err->pen();
+                        pen.setStyle(pstyle);
+                        my_err->setPen(pen);
+                        my_err->setData(velError[k]);
                     }
                 }
 

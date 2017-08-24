@@ -520,6 +520,7 @@ public:
 
     inline void reset_display() {
         display_property.erase("display_range");
+        display_property.clear();
         uchar_buf.clear();
         DEBUG(uchar_buf.capacity());
     }

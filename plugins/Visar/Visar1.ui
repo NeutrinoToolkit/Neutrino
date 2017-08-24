@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>530</height>
+    <width>752</width>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -567,7 +567,7 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_5">
           <property name="title">
-           <string>Etalon sensitivity:</string>
+           <string>Etalon</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
            <property name="leftMargin">
@@ -582,142 +582,108 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="10">
-            <widget class="QLineEdit" name="etalon_sensitivity">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+           <property name="horizontalSpacing">
+            <number>1</number>
+           </property>
+           <item row="0" column="5">
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="readOnly">
-              <bool>true</bool>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="etalon_thickness">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>1</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item row="0" column="6">
-            <widget class="QLabel" name="label_5">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+            <widget class="QDoubleSpinBox" name="etalon_sensitivity">
+             <property name="suffix">
+              <string> km/s</string>
              </property>
-             <property name="text">
-              <string>delta:</string>
+             <property name="decimals">
+              <number>5</number>
              </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <widget class="QLineEdit" name="etalon_n0">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>1</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QLabel" name="label_4">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>n0:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Thick [mm]</string>
+             <property name="maximum">
+              <double>999.990000000000009</double>
              </property>
             </widget>
            </item>
            <item row="0" column="3">
-            <widget class="QLineEdit" name="etalon_lambda">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+            <widget class="QDoubleSpinBox" name="etalon_delta">
+             <property name="prefix">
+              <string>δ </string>
              </property>
-             <property name="text">
-              <string>532</string>
+             <property name="suffix">
+              <string>%</string>
              </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
+             <property name="decimals">
+              <number>2</number>
              </property>
-            </widget>
-           </item>
-           <item row="0" column="7">
-            <widget class="QLineEdit" name="etalon_delta">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+             <property name="maximum">
+              <double>9.990000000000000</double>
              </property>
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QLabel" name="label_2">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+            <widget class="QDoubleSpinBox" name="etalon_n0">
+             <property name="prefix">
+              <string>n </string>
              </property>
-             <property name="text">
-              <string>λ [nm]:</string>
+             <property name="decimals">
+              <number>5</number>
              </property>
-            </widget>
-           </item>
-           <item row="0" column="9">
-            <widget class="QLabel" name="label_3">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
              </property>
-             <property name="text">
-              <string>v/fr [km/s]</string>
+             <property name="value">
+              <double>1.500000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="0" column="8">
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="etalon_thickness">
+             <property name="prefix">
+              <string>Thick </string>
+             </property>
+             <property name="suffix">
+              <string> mm</string>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="maximum">
+              <double>999.990000000000009</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>10.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="etalon_lambda">
+             <property name="prefix">
+              <string>λ </string>
+             </property>
+             <property name="suffix">
+              <string> nm</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
+             </property>
+             <property name="value">
+              <double>532.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -767,6 +733,7 @@
    <addaction name="actionGuess"/>
    <addaction name="actionRefresh"/>
    <addaction name="separator"/>
+   <addaction name="showFiltered"/>
   </widget>
   <action name="actionLoadPref">
    <property name="icon">
@@ -867,7 +834,7 @@
   <action name="showFiltered">
    <property name="icon">
     <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
-     <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
+     <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
    </property>
    <property name="text">
     <string>showFiltered</string>
@@ -917,13 +884,22 @@
   <tabstop>tabVelocity</tabstop>
   <tabstop>sopRef</tabstop>
   <tabstop>sopShot</tabstop>
+  <tabstop>sopOffset</tabstop>
   <tabstop>sopOrigin</tabstop>
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>whichRefl</tabstop>
-  <tabstop>sopScale</tabstop>
-  <tabstop>sopDirection</tabstop>
   <tabstop>sopCalibT0</tabstop>
   <tabstop>sopCalibA</tabstop>
+  <tabstop>sopScale</tabstop>
+  <tabstop>sopDirection</tabstop>
+  <tabstop>enableSOP</tabstop>
+  <tabstop>tabs</tabstop>
+  <tabstop>notes</tabstop>
+  <tabstop>etalon_thickness</tabstop>
+  <tabstop>etalon_lambda</tabstop>
+  <tabstop>etalon_n0</tabstop>
+  <tabstop>etalon_delta</tabstop>
+  <tabstop>etalon_sensitivity</tabstop>
  </tabstops>
  <resources>
   <include location="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc"/>
