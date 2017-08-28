@@ -334,7 +334,7 @@ void Visar::delVisar() {
         my_widget->deleteLater();
         foreach (QAction *action, toolBar->actions()) {
             if (action->property("id").isValid() && action->property("id").toInt()==(int)numVisars-1) {
-                action->deleteLater();
+                toolBar->removeAction(action);
             }
         }
         QApplication::processEvents();

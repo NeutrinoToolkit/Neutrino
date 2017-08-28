@@ -643,7 +643,7 @@ void neutrino::fileOpen()
     for (auto &format : phys_image_formats()) {
         formats+="*."+ QString::fromStdString(format)+" ";
     }
-    formats+=");; Images (";
+    formats+=" *.neus);; Images (";
 	foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
 		formats+="*."+format+" ";
 	}
