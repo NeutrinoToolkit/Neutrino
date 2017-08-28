@@ -324,7 +324,6 @@ void Visar::addVisar() {
 }
 
 void Visar::delVisar() {
-    saveDefaults();
     disconnections();
     if (numVisars>0) {
         QWidget* my_widget=tabPhase->widget(numVisars-1);
@@ -338,6 +337,8 @@ void Visar::delVisar() {
                 action->deleteLater();
             }
         }
+        QApplication::processEvents();
+
         fringeLine.back()->deleteLater();
         fringeLine.pop_back();
         fringeRect.back()->deleteLater();
@@ -390,13 +391,14 @@ void Visar::delVisar() {
 
 void Visar::loadSettings(QString my_settings) {
     disconnections();
-    for (unsigned int k=0;k<numVisars;k++) {
-        delVisar();
-    }
     QSettings settings(my_settings,QSettings::IniFormat);
     settings.beginGroup("Properties");
     int kMax=settings.value("NeuSave-numVisars",1).toInt();
-    for (int k=1; k<kMax; k++) {
+    unsigned int numVisars_save=numVisars;
+    for (unsigned int k=0;k<numVisars_save;k++) {
+        delVisar();
+    }
+    for (int k=0; k<kMax; k++) {
         addVisar();
     }
     int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
