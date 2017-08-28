@@ -639,9 +639,11 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-	QString formats("");
-    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.imd *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
-	formats+="Images (";
+    QString formats("Neutrino Images (");
+    for (auto &format : phys_image_formats()) {
+        formats+="*."+ QString::fromStdString(format)+" ";
+    }
+    formats+=");; Images (";
 	foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
 		formats+="*."+format+" ";
 	}

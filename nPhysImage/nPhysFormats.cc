@@ -1916,3 +1916,10 @@ std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {
     }
     return retPhys;
 }
+
+std::vector<std::string> phys_image_formats() {
+
+    std::vector<std::string> retval={"txt", "tif", "tiff", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "fits", "hdf", "neu", "gz"};
+
+    return retval;
+}
