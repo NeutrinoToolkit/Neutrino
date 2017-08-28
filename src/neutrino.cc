@@ -640,7 +640,7 @@ neutrino::fileReopen() {
 void neutrino::fileOpen()
 {
 	QString formats("");
-	formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
+    formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.imd *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
 	formats+="Images (";
 	foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
 		formats+="*."+format+" ";
