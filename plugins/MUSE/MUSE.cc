@@ -41,6 +41,8 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 {
 	setupUi(this);
 
+    my_point =  new nPoint(nparent);
+
 	connect(horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
 	connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
 
@@ -73,6 +75,9 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 
 	show();
 	on_actionMode_toggled();
+
+    QShortcut *openFile = new QShortcut(QKeySequence(Qt::Key_O),this);
+    connect(openFile, SIGNAL(activated()), this, SLOT(loadCube()) );
 
 	loadCube();
 }
@@ -197,8 +202,9 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
 void MUSE::plotClick(QMouseEvent* e) {
 	QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
 	if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
-		int nslice=xvals.size()*(plot->xAxis->pixelToCoord(e->pos().x())-wavelen.first())/wavelen.second();
-		slices->setValue(nslice);
+        int nslice=abs(xvals.size()*(my_pos.x()-wavelen.first())/(wavelen.second()-wavelen.first()));
+        qDebug() << my_pos << nslice;
+        showImagePlane(nslice);
 	}
 }
 
@@ -212,7 +218,10 @@ void MUSE::updateLastPoint() {
 //}
 
 void MUSE::doSpectrum(QPointF point) {
+
 	QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+    qDebug() << pFloor;
+    my_point->setPoint(point);
 
 	double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
 	double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
@@ -295,9 +304,11 @@ void MUSE::on_actionMode_toggled() {
 	if (actionMode->isChecked()) {
 		disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
 		connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
-	} else {
+        my_point->show();
+    } else {
 		disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
 		connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        my_point->hide();
 	}
 }
 
@@ -348,10 +359,8 @@ void MUSE::loadCube() {
 	QFileDialog fd;
 	QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
 
-	if (ifilename.isEmpty()) {
-		close();
-	} else {
-		fd.close();
+    if (!ifilename.isEmpty()) {
+        fd.close();
 		QApplication::processEvents();
 		setProperty("NeuSave-fileMUSE", ifilename);
 
@@ -461,7 +470,7 @@ void MUSE::loadCube() {
 			DEBUG("totalsize " << totalsize);
 
 			if (anaxis==3) {
-				int ret = QMessageBox::question(
+                int ret = QMessageBox::information(
 							this, tr("MUSE"),
 							tr("Found data cube") + QString::number(hdupos) +" : "+QString::number(axissize[0])+"x"+QString::number(axissize[1])+"x"+QString::number(axissize[2])+"\n"+tr("Open it?"),
 						QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);

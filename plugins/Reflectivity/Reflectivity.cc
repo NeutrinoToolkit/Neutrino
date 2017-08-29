@@ -37,6 +37,7 @@ Reflectivity::Reflectivity(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.multiplier, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
     connect(my_w.min_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
     connect(my_w.max_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
+    connect(my_w.blur, SIGNAL(valueChanged(int)), this, SLOT(doIt()));
     show();
 
 }
@@ -48,9 +49,11 @@ void Reflectivity::doIt () {
         saveDefaults();
 
         nPhysD *shot=new nPhysD(*imageShot);
+        phys_fast_gaussian_blur(*shot,my_w.blur->value());
         phys_subtract(*shot,my_w.offset->value());
 
         nPhysD ref(*imageRef);
+        phys_fast_gaussian_blur(ref,my_w.blur->value());
         phys_subtract(ref,my_w.offset->value());
         phys_multiply(ref,my_w.multiplier->value());
 
@@ -58,7 +61,8 @@ void Reflectivity::doIt () {
 
         phys_cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
 
-        shot->reset_display();
+        shot->property["display_range"]=shot->get_min_max();
+
         if (my_w.erasePrevious->isChecked()) {
             Refle=nparent->replacePhys(shot,Refle,true);
         } else {

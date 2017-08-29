@@ -27,6 +27,7 @@
 
 #include "nGenericPan.h"
 #include "ui_MUSE.h"
+#include "nPoint.h"
 
 #ifndef __MUSE
 #define __MUSE
@@ -93,6 +94,8 @@ private:
     QString to_min_sec(double val);
 
     QTimer my_timer;
+
+     QPointer<nPoint> my_point;
 
 };
 

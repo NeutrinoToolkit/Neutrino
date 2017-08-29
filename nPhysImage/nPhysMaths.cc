@@ -639,6 +639,7 @@ void phys_median_filter(nPhysD& image, unsigned int N){
 void
 phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
 {
+    if (radiusX==0  && radiusY==0) return;
     std::vector<double> nan_free_phys(image.getSurf());
 #pragma omp parallel for
     for (size_t i=0; i< image.getSurf(); i++) {
