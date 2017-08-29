@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
+    <width>379</width>
     <height>504</height>
    </rect>
   </property>
@@ -729,37 +729,10 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadPref"/>
-   <addaction name="actionSavePref"/>
-   <addaction name="separator"/>
    <addaction name="actionLine"/>
    <addaction name="actionFlipline"/>
    <addaction name="actionBezier"/>
   </widget>
-  <action name="actionLoadPref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
-   </property>
-   <property name="text">
-    <string>loadPref</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Preferences</string>
-   </property>
-  </action>
-  <action name="actionSavePref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePref</string>
-   </property>
-   <property name="toolTip">
-    <string>Save Preferences</string>
-   </property>
-  </action>
   <action name="actionBezier">
    <property name="icon">
     <iconset>

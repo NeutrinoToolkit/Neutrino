@@ -719,9 +719,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadPref"/>
-   <addaction name="actionSavePref"/>
-   <addaction name="separator"/>
    <addaction name="actionSaveTxt"/>
    <addaction name="actionSaveTxtMultiple"/>
    <addaction name="actionCopy"/>
@@ -735,30 +732,6 @@
    <addaction name="separator"/>
    <addaction name="showFiltered"/>
   </widget>
-  <action name="actionLoadPref">
-   <property name="icon">
-    <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
-     <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
-   </property>
-   <property name="text">
-    <string>loadPref</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Preferences</string>
-   </property>
-  </action>
-  <action name="actionSavePref">
-   <property name="icon">
-    <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
-     <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePref</string>
-   </property>
-   <property name="toolTip">
-    <string>Save Preferences</string>
-   </property>
-  </action>
   <action name="actionSaveTxt">
    <property name="icon">
     <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">

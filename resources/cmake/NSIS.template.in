@@ -46,6 +46,9 @@ BrandingText "@CPACK_PACKAGE_FILE_NAME@"
 
   !include Sections.nsh
 
+; Have the window close automatically at the end.
+ AutoCloseWindow true
+
 ;--- Component support macros: ---
 ; The code for the add/remove functionality is from:
 ;   http://nsis.sourceforge.net/Add/Remove_Functionality

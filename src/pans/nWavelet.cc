@@ -40,8 +40,6 @@ nWavelet::nWavelet(neutrino *nparent) : nGenericPan(nparent)
 	linebarrier->setPoints(poly);
     show();
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
 	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
 

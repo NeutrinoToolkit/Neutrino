@@ -128,9 +128,6 @@ Visar::Visar(neutrino *nparent)
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
 
-    connect(actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-
     connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));

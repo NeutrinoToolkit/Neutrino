@@ -34,10 +34,6 @@ FindPeaks::FindPeaks(neutrino *nparent) : nGenericPan(nparent)
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
 
-
-    connect(actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-
     connect(setOrigin, SIGNAL(pressed()), this, SLOT(set_origin()));
     connect(setScale, SIGNAL(pressed()), this, SLOT(set_scale()));
 

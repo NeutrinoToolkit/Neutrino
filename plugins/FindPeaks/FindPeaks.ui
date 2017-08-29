@@ -74,7 +74,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../resources/icons/icons.qrc">
+          <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
            <normaloff>:/icons/lineoutH.png</normaloff>
            <normalon>:/icons/lineoutV.png</normalon>:/icons/lineoutH.png</iconset>
          </property>
@@ -335,9 +335,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadPref"/>
-   <addaction name="actionSavePref"/>
-   <addaction name="separator"/>
    <addaction name="actionRect"/>
    <addaction name="separator"/>
    <addaction name="actionClipboard"/>
@@ -350,30 +347,6 @@
     </font>
    </property>
   </widget>
-  <action name="actionLoadPref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
-   </property>
-   <property name="text">
-    <string>loadPref</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Preferences</string>
-   </property>
-  </action>
-  <action name="actionSavePref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePref</string>
-   </property>
-   <property name="toolTip">
-    <string>Save Preferences</string>
-   </property>
-  </action>
   <action name="actionClipboard">
    <property name="icon">
     <iconset>
@@ -420,7 +393,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../resources/icons/icons.qrc"/>
+  <include location="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

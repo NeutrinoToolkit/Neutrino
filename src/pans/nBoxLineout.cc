@@ -33,9 +33,6 @@ nBoxLineout::nBoxLineout(neutrino *nparent) : nGenericPan(nparent)
 	box->setRect(QRectF(0,0,100,100));
 	connect(my_w.actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-
     connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
     connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
     connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
@@ -44,7 +41,6 @@ nBoxLineout::nBoxLineout(neutrino *nparent) : nGenericPan(nparent)
     my_w.plot->graph(1)->setName("Vertical");
 
     show();
-	loadDefaults();
 	connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
 	connect(box, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
 	updatePlot();

@@ -34,9 +34,6 @@ nCompareLines::nCompareLines(neutrino *nparent) : nGenericPan(nparent)
     poly << QPointF(0,0) << QPointF(100,100);
     line->setPoints(poly);
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-
     connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
     connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
     connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));

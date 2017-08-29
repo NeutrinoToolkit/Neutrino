@@ -217,33 +217,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadPref"/>
-   <addaction name="actionSavePref"/>
   </widget>
-  <action name="actionLoadPref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
-   </property>
-   <property name="text">
-    <string>loadPref</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Preferences</string>
-   </property>
-  </action>
-  <action name="actionSavePref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePref</string>
-   </property>
-   <property name="toolTip">
-    <string>Save Preferences</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

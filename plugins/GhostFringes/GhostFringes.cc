@@ -42,9 +42,7 @@ GhostFringes::GhostFringes(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
-	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
+    connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
     connect(my_w.actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
 	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));

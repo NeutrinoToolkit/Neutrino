@@ -202,24 +202,31 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("NeuSave-fileIni",panName()+".ini");
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
+    setWindowTitle(nparent->property("winId").toString()+": "+panName());
+
+    decorate(this);
+
     foreach (QToolBar *my_tool, findChildren<QToolBar *>()) {
-        if (my_tool->objectName() == "toolBar") {
+        if (my_tool->objectName() == "toolBar") { // this has been created by the designer
+
+            QWidget* spacer = new QWidget();
+            spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            spacer->setProperty("helpSpacer",true);
+            my_tool->addWidget(spacer);
+
+            my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Help"),this,SLOT(loadSettings()));
+            my_tool->addAction(QIcon(":icons/savePref.png"),tr("Help"),this,SLOT(saveSettings()));
+
             QFile helpFile(":/"+panName()+"README.html");
             if (helpFile.exists()) {
                 setProperty("helpFile",helpFile.fileName());
-                QWidget* spacer = new QWidget();
-                spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-                spacer->setProperty("helpSpacer",true);
-                my_tool->addWidget(spacer);
                 my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
             }
             break;
         }
     }
 
-    setWindowTitle(nparent->property("winId").toString()+": "+panName());
 
-    decorate(this);
 
     QSize iconSize;
     foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {

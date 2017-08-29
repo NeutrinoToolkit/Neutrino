@@ -245,16 +245,13 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadPref"/>
-   <addaction name="actionSavePref"/>
-   <addaction name="separator"/>
    <addaction name="actionRegion"/>
    <addaction name="separator"/>
    <addaction name="actionCarrier"/>
   </widget>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
      <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
@@ -264,33 +261,9 @@
     <string>Show region</string>
    </property>
   </action>
-  <action name="actionSavePref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
-   </property>
-   <property name="text">
-    <string>savePref</string>
-   </property>
-   <property name="toolTip">
-    <string>Save Preferences</string>
-   </property>
-  </action>
-  <action name="actionLoadPref">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
-   </property>
-   <property name="text">
-    <string>loadPref</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Preferences</string>
-   </property>
-  </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset resource="../../resources/icons/icons.qrc">
+    <iconset resource="GhostFringes.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -309,7 +282,8 @@
   <tabstop>erasePrevious</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/icons/icons.qrc"/>
+  <include location="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc"/>
+  <include location="GhostFringes.qrc"/>
  </resources>
  <connections/>
 </ui>

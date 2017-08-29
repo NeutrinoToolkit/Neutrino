@@ -43,8 +43,6 @@ nIntegralInversion::nIntegralInversion(neutrino *nparent)
 	my_w.molarRefr_le->setValidator(dVal);
     my_w.molarRefr_le->setText(QString::number(5.23e-7));
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
 	connect(my_w.actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
 	connect(my_w.actionBezier, SIGNAL(triggered()), axis, SLOT(toggleBezier()));

@@ -66,8 +66,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
     connect(maskRegion, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
     connect(unwrapBarrier, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
 
-    connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-    connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(my_w.actionDoWavelet, SIGNAL(triggered()), this, SLOT(doWavelet()));
 
     connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));

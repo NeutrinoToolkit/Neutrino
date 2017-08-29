@@ -34,8 +34,6 @@ nContours::nContours(neutrino *nparent) : nGenericPan(nparent)
 	my_c = new nLine(this,3);
 	my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
 	connect(my_w.actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
 
 	show();

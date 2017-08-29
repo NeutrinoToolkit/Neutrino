@@ -38,8 +38,6 @@ nInterpolatePath::nInterpolatePath(neutrino *nparent) : nGenericPan(nparent)
 
     show();
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(my_w.actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
 	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
