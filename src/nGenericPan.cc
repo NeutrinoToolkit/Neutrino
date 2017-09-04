@@ -56,8 +56,12 @@ nGenericPan::nGenericPan(neutrino *myparent)
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
     bufferChanged(nparent->getCurrentBuffer());
-    nparent->emitPanAdd(this);
 }
+
+QString nGenericPan::panName() {
+    return property("panName").isValid()? property("panName").toString() : QString(metaObject()->className());
+}
+
 
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
     QString name="";
@@ -263,6 +267,8 @@ void nGenericPan::showEvent(QShowEvent* event) {
     QApplication::processEvents();
     loadDefaults();
     QApplication::processEvents();
+
+    nparent->emitPanAdd(this);
 
     show();
 }

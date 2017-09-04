@@ -1,7 +1,7 @@
 /***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
-**  Copyright (C) 2011-2016 Emanuel Eichhammer                            **
+**  Copyright (C) 2011-2017 Emanuel Eichhammer                            **
 **                                                                        **
 **  This program is free software: you can redistribute it and/or modify  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -19,8 +19,8 @@
 ****************************************************************************
 **           Author: Emanuel Eichhammer                                   **
 **  Website/Contact: http://www.qcustomplot.com/                          **
-**             Date: 13.09.16                                             **
-**          Version: 2.0.0-beta                                           **
+**             Date: 04.09.17                                             **
+**          Version: 2.0.0                                                **
 ****************************************************************************/
 
 #ifndef QCUSTOMPLOT_H
@@ -49,7 +49,7 @@ class QCPColorScale;
 class QCPBars;
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/global.h'        */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 #include <QtCore/qglobal.h>
@@ -67,7 +67,10 @@ class QCPBars;
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-  #define QCP_DEVICEPIXELRATIO_SUPPORTED
+#  define QCP_DEVICEPIXELRATIO_SUPPORTED
+#  if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+#    define QCP_DEVICEPIXELRATIO_FLOAT
+#  endif
 #endif
 
 #include <QtCore/QObject>
@@ -376,7 +379,7 @@ Q_DECLARE_METATYPE(QCP::SelectionType)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/vector2d.h'      */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -452,7 +455,7 @@ inline QDebug operator<< (QDebug d, const QCPVector2D &vec)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/painter.h'       */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -513,7 +516,7 @@ Q_DECLARE_METATYPE(QCPPainter::PainterMode)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/paintbuffer.h'   */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -624,7 +627,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layer.h'         */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -776,7 +779,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/range.h'    */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -896,7 +899,7 @@ inline const QCPRange operator/(const QCPRange& range, double value)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/selection.h'     */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1103,7 +1106,7 @@ inline QDebug operator<< (QDebug d, const QCPDataSelection &selection)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/selectionrect.h' */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1160,7 +1163,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layout.h'        */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1207,6 +1210,7 @@ class QCP_LIB_DECL QCPLayoutElement : public QCPLayerable
   Q_PROPERTY(QMargins minimumMargins READ minimumMargins WRITE setMinimumMargins)
   Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
   Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+  Q_PROPERTY(SizeConstraintRect sizeConstraintRect READ sizeConstraintRect WRITE setSizeConstraintRect)
   /// \endcond
 public:
   /*!
@@ -1218,6 +1222,19 @@ public:
                      ,upLayout     ///< Final phase in which the layout system places the rects of the elements
                    };
   Q_ENUMS(UpdatePhase)
+  
+  /*!
+    Defines to which rect of a layout element the size constraints that can be set via \ref
+    setMinimumSize and \ref setMaximumSize apply. The outer rect (\ref outerRect) includes the
+    margins (e.g. in the case of a QCPAxisRect the axis labels), whereas the inner rect (\ref rect)
+    does not.
+    
+    \see setSizeConstraintRect
+  */
+  enum SizeConstraintRect { scrInnerRect ///< Minimum/Maximum size constraints apply to inner rect
+                            , scrOuterRect ///< Minimum/Maximum size constraints apply to outer rect, thus include layout element margins
+                          };
+  Q_ENUMS(SizeConstraintRect)
 
   explicit QCPLayoutElement(QCustomPlot *parentPlot=0);
   virtual ~QCPLayoutElement();
@@ -1231,6 +1248,7 @@ public:
   QCP::MarginSides autoMargins() const { return mAutoMargins; }
   QSize minimumSize() const { return mMinimumSize; }
   QSize maximumSize() const { return mMaximumSize; }
+  SizeConstraintRect sizeConstraintRect() const { return mSizeConstraintRect; }
   QCPMarginGroup *marginGroup(QCP::MarginSide side) const { return mMarginGroups.value(side, (QCPMarginGroup*)0); }
   QHash<QCP::MarginSide, QCPMarginGroup*> marginGroups() const { return mMarginGroups; }
   
@@ -1243,12 +1261,13 @@ public:
   void setMinimumSize(int width, int height);
   void setMaximumSize(const QSize &size);
   void setMaximumSize(int width, int height);
+  void setSizeConstraintRect(SizeConstraintRect constraintRect);
   void setMarginGroup(QCP::MarginSides sides, QCPMarginGroup *group);
   
   // introduced virtual methods:
   virtual void update(UpdatePhase phase);
-  virtual QSize minimumSizeHint() const;
-  virtual QSize maximumSizeHint() const;
+  virtual QSize minimumOuterSizeHint() const;
+  virtual QSize maximumOuterSizeHint() const;
   virtual QList<QCPLayoutElement*> elements(bool recursive) const;
   
   // reimplemented virtual methods:
@@ -1258,6 +1277,7 @@ protected:
   // property members:
   QCPLayout *mParentLayout;
   QSize mMinimumSize, mMaximumSize;
+  SizeConstraintRect mSizeConstraintRect;
   QRect mRect, mOuterRect;
   QMargins mMargins, mMinimumMargins;
   QCP::MarginSides mAutoMargins;
@@ -1313,6 +1333,8 @@ protected:
   void adoptElement(QCPLayoutElement *el);
   void releaseElement(QCPLayoutElement *el);
   QVector<int> getSectionSizes(QVector<int> maxSizes, QVector<int> minSizes, QVector<double> stretchFactors, int totalSize) const;
+  static QSize getFinalMinimumOuterSize(const QCPLayoutElement *el);
+  static QSize getFinalMaximumOuterSize(const QCPLayoutElement *el);
   
 private:
   Q_DISABLE_COPY(QCPLayout)
@@ -1378,8 +1400,8 @@ public:
   virtual bool take(QCPLayoutElement* element) Q_DECL_OVERRIDE;
   virtual QList<QCPLayoutElement*> elements(bool recursive) const Q_DECL_OVERRIDE;
   virtual void simplify() Q_DECL_OVERRIDE;
-  virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-  virtual QSize maximumSizeHint() const Q_DECL_OVERRIDE;
+  virtual QSize minimumOuterSizeHint() const Q_DECL_OVERRIDE;
+  virtual QSize maximumOuterSizeHint() const Q_DECL_OVERRIDE;
   
   // non-virtual methods:
   QCPLayoutElement *element(int row, int column) const;
@@ -1465,7 +1487,7 @@ Q_DECLARE_METATYPE(QCPLayoutInset::InsetPlacement)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/lineending.h'    */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1532,7 +1554,7 @@ Q_DECLARE_METATYPE(QCPLineEnding::EndingStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axisticker.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1595,7 +1617,7 @@ Q_DECLARE_METATYPE(QSharedPointer<QCPAxisTicker>)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerdatetime.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1638,7 +1660,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertime.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1651,11 +1673,11 @@ public:
     
     \see setFieldWidth, setTimeFormat
   */
-  enum TimeUnit { tuMilliseconds
-                  ,tuSeconds
-                  ,tuMinutes
-                  ,tuHours
-                  ,tuDays
+  enum TimeUnit { tuMilliseconds ///< Milliseconds, one thousandth of a second (%%z in \ref setTimeFormat)
+                  ,tuSeconds     ///< Seconds (%%s in \ref setTimeFormat)
+                  ,tuMinutes     ///< Minutes (%%m in \ref setTimeFormat)
+                  ,tuHours       ///< Hours (%%h in \ref setTimeFormat)
+                  ,tuDays        ///< Days (%%d in \ref setTimeFormat)
                 };
   Q_ENUMS(TimeUnit)
   
@@ -1692,7 +1714,7 @@ Q_DECLARE_METATYPE(QCPAxisTickerTime::TimeUnit)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerfixed.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1736,7 +1758,7 @@ Q_DECLARE_METATYPE(QCPAxisTickerFixed::ScaleStrategy)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickertext.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1777,7 +1799,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerpi.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1838,7 +1860,7 @@ Q_DECLARE_METATYPE(QCPAxisTickerPi::FractionStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axistickerlog.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -1873,7 +1895,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/axis/axis.h'     */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -2193,6 +2215,9 @@ protected:
   QVector<double> mSubTickVector;
   bool mCachedMarginValid;
   int mCachedMargin;
+  bool mDragging;
+  QCPRange mDragStartRange;
+  QCP::AntialiasedElements mAADragBackup, mNotAADragBackup;
   
   // introduced virtual methods:
   virtual int calculateMargin();
@@ -2204,6 +2229,11 @@ protected:
   // events:
   virtual void selectEvent(QMouseEvent *event, bool additive, const QVariant &details, bool *selectionStateChanged) Q_DECL_OVERRIDE;
   virtual void deselectEvent(bool *selectionStateChanged) Q_DECL_OVERRIDE;
+  // mouse events:
+  virtual void mousePressEvent(QMouseEvent *event, const QVariant &details);
+  virtual void mouseMoveEvent(QMouseEvent *event, const QPointF &startPos);
+  virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos);
+  virtual void wheelEvent(QWheelEvent *event);
   
   // non-virtual methods:
   void setupTickVectors();
@@ -2300,7 +2330,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/scatterstyle.h'  */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -2410,7 +2440,7 @@ Q_DECLARE_METATYPE(QCPScatterStyle::ScatterShape)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.h' */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -2423,7 +2453,7 @@ template <class DataType>
 inline bool qcpLessThanSortKey(const DataType &a, const DataType &b) { return a.sortKey() < b.sortKey(); }
 
 template <class DataType>
-class QCP_LIB_DECL QCPDataContainer
+class QCPDataContainer // no QCP_LIB_DECL, template class ends up in header (cpp included below)
 {
 public:
   typedef typename QVector<DataType>::const_iterator const_iterator;
@@ -2485,7 +2515,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/datacontainer.cpp'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3179,8 +3209,9 @@ QCPRange QCPDataContainer<DataType>::valueRange(bool &foundRange, QCP::SignDomai
 
 /*!
   Makes sure \a begin and \a end mark a data range that is both within the bounds of this data
-  container's data, as well as within the specified \a dataRange.
-
+  container's data, as well as within the specified \a dataRange. The initial range described by
+  the passed iterators \a begin and \a end is never expanded, only contracted if necessary.
+  
   This function doesn't require for \a dataRange to be within the bounds of this data container's
   valid range.
 */
@@ -3257,7 +3288,7 @@ void QCPDataContainer<DataType>::performAutoSqueeze()
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable.h'     */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -3417,7 +3448,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/item.h'          */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -3497,7 +3528,7 @@ public:
   QCPAxis *keyAxis() const { return mKeyAxis.data(); }
   QCPAxis *valueAxis() const { return mValueAxis.data(); }
   QCPAxisRect *axisRect() const;
-  virtual QPointF pixelPosition() const;
+  virtual QPointF pixelPosition() const Q_DECL_OVERRIDE;
   
   // setters:
   void setType(PositionType type);
@@ -3605,7 +3636,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/core.h'          */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -3876,13 +3907,14 @@ Q_DECLARE_METATYPE(QCustomPlot::RefreshPriority)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.h'   */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
-class QCP_LIB_DECL QCPPlottableInterface1D
+class QCPPlottableInterface1D
 {
 public:
+  virtual ~QCPPlottableInterface1D() {}
   // introduced pure virtual methods:
   virtual int dataCount() const = 0;
   virtual double dataMainKey(int index) const = 0;
@@ -3897,7 +3929,7 @@ public:
 };
 
 template <class DataType>
-class QCP_LIB_DECL QCPAbstractPlottable1D : public QCPAbstractPlottable, public QCPPlottableInterface1D
+class QCPAbstractPlottable1D : public QCPAbstractPlottable, public QCPPlottableInterface1D // no QCP_LIB_DECL, template class ends up in header (cpp included below)
 {
   // No Q_OBJECT macro due to template class
   
@@ -3906,20 +3938,20 @@ public:
   virtual ~QCPAbstractPlottable1D();
   
   // virtual methods of 1d plottable interface:
-  virtual int dataCount() const;
-  virtual double dataMainKey(int index) const;
-  virtual double dataSortKey(int index) const;
-  virtual double dataMainValue(int index) const;
-  virtual QCPRange dataValueRange(int index) const;
-  virtual QPointF dataPixelPosition(int index) const;
-  virtual bool sortKeyIsMainKey() const;
-  virtual QCPDataSelection selectTestRect(const QRectF &rect, bool onlySelectable) const;
-  virtual int findBegin(double sortKey, bool expandedRange=true) const;
-  virtual int findEnd(double sortKey, bool expandedRange=true) const;
+  virtual int dataCount() const Q_DECL_OVERRIDE;
+  virtual double dataMainKey(int index) const Q_DECL_OVERRIDE;
+  virtual double dataSortKey(int index) const Q_DECL_OVERRIDE;
+  virtual double dataMainValue(int index) const Q_DECL_OVERRIDE;
+  virtual QCPRange dataValueRange(int index) const Q_DECL_OVERRIDE;
+  virtual QPointF dataPixelPosition(int index) const Q_DECL_OVERRIDE;
+  virtual bool sortKeyIsMainKey() const Q_DECL_OVERRIDE;
+  virtual QCPDataSelection selectTestRect(const QRectF &rect, bool onlySelectable) const Q_DECL_OVERRIDE;
+  virtual int findBegin(double sortKey, bool expandedRange=true) const Q_DECL_OVERRIDE;
+  virtual int findEnd(double sortKey, bool expandedRange=true) const Q_DECL_OVERRIDE;
   
-  // virtual methods:
-  virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const;
-  virtual QCPPlottableInterface1D *interface1D() { return this; }
+  // reimplemented virtual methods:
+  virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE;
+  virtual QCPPlottableInterface1D *interface1D() Q_DECL_OVERRIDE { return this; }
   
 protected:
   // property members:
@@ -3940,7 +3972,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottable1d.cpp' */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -4459,7 +4491,7 @@ void QCPAbstractPlottable1D<DataType>::drawPolyline(QCPPainter *painter, const Q
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/colorgradient.h' */
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -4544,7 +4576,7 @@ Q_DECLARE_METATYPE(QCPColorGradient::GradientPreset)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/selectiondecorator-bracket.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -4592,7 +4624,7 @@ public:
   virtual void drawBracket(QCPPainter *painter, int direction) const;
   
   // virtual methods:
-  virtual void drawDecoration(QCPPainter *painter, QCPDataSelection selection);
+  virtual void drawDecoration(QCPPainter *painter, QCPDataSelection selection) Q_DECL_OVERRIDE;
   
 protected:
   // property members:
@@ -4615,7 +4647,7 @@ Q_DECLARE_METATYPE(QCPSelectionDecoratorBracket::BracketStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-axisrect.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -4715,7 +4747,6 @@ protected:
   // non-property members:
   QList<QCPRange> mDragStartHorzRange, mDragStartVertRange;
   QCP::AntialiasedElements mAADragBackup, mNotAADragBackup;
-  QPoint mDragStart;
   bool mDragging;
   QHash<QCPAxis::AxisType, QList<QCPAxis*> > mAxes;
   
@@ -4745,7 +4776,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-legend.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -4829,7 +4860,7 @@ protected:
   
   // reimplemented virtual methods:
   virtual void draw(QCPPainter *painter) Q_DECL_OVERRIDE;
-  virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+  virtual QSize minimumOuterSizeHint() const Q_DECL_OVERRIDE;
   
   // non-virtual methods:
   QPen getIconBorderPen() const;
@@ -4966,7 +4997,7 @@ Q_DECLARE_METATYPE(QCPLegend::SelectablePart)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-textelement.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -5036,8 +5067,8 @@ protected:
   // reimplemented virtual methods:
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const Q_DECL_OVERRIDE;
   virtual void draw(QCPPainter *painter) Q_DECL_OVERRIDE;
-  virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-  virtual QSize maximumSizeHint() const Q_DECL_OVERRIDE;
+  virtual QSize minimumOuterSizeHint() const Q_DECL_OVERRIDE;
+  virtual QSize maximumOuterSizeHint() const Q_DECL_OVERRIDE;
   // events:
   virtual void selectEvent(QMouseEvent *event, bool additive, const QVariant &details, bool *selectionStateChanged) Q_DECL_OVERRIDE;
   virtual void deselectEvent(bool *selectionStateChanged) Q_DECL_OVERRIDE;
@@ -5056,7 +5087,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/layoutelements/layoutelement-colorscale.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -5078,7 +5109,7 @@ protected:
   using QCPAxisRect::mouseReleaseEvent;
   using QCPAxisRect::wheelEvent;
   using QCPAxisRect::update;
-  virtual void draw(QCPPainter *painter);
+  virtual void draw(QCPPainter *painter) Q_DECL_OVERRIDE;
   void updateGradientImage();
   Q_SLOT void axisSelectionChanged(QCPAxis::SelectableParts selectedParts);
   Q_SLOT void axisSelectableChanged(QCPAxis::SelectableParts selectableParts);
@@ -5167,7 +5198,7 @@ private:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-graph.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -5288,11 +5319,12 @@ protected:
   QVector<QPointF> dataToStepRightLines(const QVector<QCPGraphData> &data) const;
   QVector<QPointF> dataToStepCenterLines(const QVector<QCPGraphData> &data) const;
   QVector<QPointF> dataToImpulseLines(const QVector<QCPGraphData> &data) const;
-  void addFillBasePoints(QVector<QPointF> *lines) const;
-  void removeFillBasePoints(QVector<QPointF> *lines) const;
-  QPointF lowerFillBasePoint(double lowerKey) const;
-  QPointF upperFillBasePoint(double upperKey) const;
-  const QPolygonF getChannelFillPolygon(const QVector<QPointF> *lines) const;
+  QVector<QCPDataRange> getNonNanSegments(const QVector<QPointF> *lineData, Qt::Orientation keyOrientation) const;
+  QVector<QPair<QCPDataRange, QCPDataRange> > getOverlappingSegments(QVector<QCPDataRange> thisSegments, const QVector<QPointF> *thisData, QVector<QCPDataRange> otherSegments, const QVector<QPointF> *otherData) const;
+  bool segmentsIntersect(double aLower, double aUpper, double bLower, double bUpper, int &bPrecedence) const;
+  QPointF getFillBasePoint(QPointF matchingDataPoint) const;
+  const QPolygonF getFillPolygon(const QVector<QPointF> *lineData, QCPDataRange segment) const;
+  const QPolygonF getChannelFillPolygon(const QVector<QPointF> *lineData, QCPDataRange thisSegment, const QVector<QPointF> *otherData, QCPDataRange otherSegment) const;
   int findIndexBelowX(const QVector<QPointF> *data, double x) const;
   int findIndexAboveX(const QVector<QPointF> *data, double x) const;
   int findIndexBelowY(const QVector<QPointF> *data, double y) const;
@@ -5308,7 +5340,7 @@ Q_DECLARE_METATYPE(QCPGraph::LineStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-curve.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -5426,7 +5458,7 @@ Q_DECLARE_METATYPE(QCPCurve::LineStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-bars.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -5617,7 +5649,7 @@ Q_DECLARE_METATYPE(QCPBars::WidthType)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-statisticalbox.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -5737,7 +5769,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-colormap.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -5877,7 +5909,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-financial.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -6019,7 +6051,7 @@ Q_DECLARE_METATYPE(QCPFinancial::ChartStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/plottables/plottable-errorbar.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 /*! \file */
 
 
@@ -6101,16 +6133,16 @@ public:
   void addData(double errorMinus, double errorPlus);
   
   // virtual methods of 1d plottable interface:
-  virtual int dataCount() const;
-  virtual double dataMainKey(int index) const;
-  virtual double dataSortKey(int index) const;
-  virtual double dataMainValue(int index) const;
-  virtual QCPRange dataValueRange(int index) const;
-  virtual QPointF dataPixelPosition(int index) const;
-  virtual bool sortKeyIsMainKey() const;
-  virtual QCPDataSelection selectTestRect(const QRectF &rect, bool onlySelectable) const;
-  virtual int findBegin(double sortKey, bool expandedRange=true) const;
-  virtual int findEnd(double sortKey, bool expandedRange=true) const;
+  virtual int dataCount() const Q_DECL_OVERRIDE;
+  virtual double dataMainKey(int index) const Q_DECL_OVERRIDE;
+  virtual double dataSortKey(int index) const Q_DECL_OVERRIDE;
+  virtual double dataMainValue(int index) const Q_DECL_OVERRIDE;
+  virtual QCPRange dataValueRange(int index) const Q_DECL_OVERRIDE;
+  virtual QPointF dataPixelPosition(int index) const Q_DECL_OVERRIDE;
+  virtual bool sortKeyIsMainKey() const Q_DECL_OVERRIDE;
+  virtual QCPDataSelection selectTestRect(const QRectF &rect, bool onlySelectable) const Q_DECL_OVERRIDE;
+  virtual int findBegin(double sortKey, bool expandedRange=true) const Q_DECL_OVERRIDE;
+  virtual int findEnd(double sortKey, bool expandedRange=true) const Q_DECL_OVERRIDE;
   
   // reimplemented virtual methods:
   virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE;
@@ -6147,7 +6179,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-straightline.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6193,7 +6225,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-line.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6246,7 +6278,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-curve.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6300,7 +6332,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-rect.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6362,7 +6394,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-text.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6462,7 +6494,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-ellipse.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6527,7 +6559,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-pixmap.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6599,7 +6631,7 @@ protected:
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-tracer.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 
@@ -6688,7 +6720,7 @@ Q_DECLARE_METATYPE(QCPItemTracer::TracerStyle)
 
 
 /* including file '/Users/tommaso/local/src/QCustomPlot/src/items/item-bracket.h'*/
-/* commit d240c5e07d184dc41b9b407b3f2cffc4a57938ab 2016-11-23 12:30:45 +0100 */
+/* commit f5af15aaddcbc1da048b4b9c1a76ea3da4033ab3 2017-09-04 09:26:17 +0200 */
 
 
 

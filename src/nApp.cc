@@ -8,10 +8,15 @@
 
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
-    setOrganizationName("ParisTech");
-    setOrganizationDomain("edu");
-    setApplicationName("Neutrino");
-    setApplicationVersion(__VER);
+    QCoreApplication::setOrganizationName("ParisTech");
+    QCoreApplication::setOrganizationDomain("edu");
+    QCoreApplication::setApplicationName("Neutrino");
+    QCoreApplication::setApplicationVersion(__VER);
+
+#if defined(Q_OS_MAC)
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
 #ifdef __neutrino_key
     std::string hh = getNHash();
@@ -19,6 +24,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     setProperty("nHash", hh.c_str());
 #endif
 
+    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
     QSettings my_set("neutrino","");

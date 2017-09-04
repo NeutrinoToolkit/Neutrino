@@ -87,12 +87,11 @@ public:
 signals:
     void changeCombo(QComboBox*);
 
-
 public slots:
 
     void changeEvent(QEvent *e);
 
-    QString panName() {return QString(metaObject()->className());}
+    QString panName();
     void grabSave();
     void help();
 

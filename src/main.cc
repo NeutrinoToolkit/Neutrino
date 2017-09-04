@@ -51,11 +51,6 @@ int main(int argc, char **argv)
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
 
-#if defined(Q_OS_MAC)
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
     qSetMessagePattern("%{function}:%{line} : %{message}");
 
     nApp my_app(argc,argv);

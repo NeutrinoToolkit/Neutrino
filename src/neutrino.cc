@@ -1933,9 +1933,12 @@ nGenericPan* neutrino::newPan(QString my_string) {
         QUiLoader loader;
         QWidget *uiwidget = loader.load(&file);
         file.close();
-        uiwidget->setParent(my_pan);
+
+        qDebug() << uiwidget->objectName();
 
         if (uiwidget) {
+            my_pan->setProperty("panName",uiwidget->objectName());
+            uiwidget->setParent(my_pan);
 
             my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
             foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
