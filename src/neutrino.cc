@@ -350,8 +350,8 @@ void neutrino::on_actionOpen_Glob_triggered() {
             setProperty("NeuSave-globdir",dirName);
             setProperty("NeuSave-globstring",globstring);
 
-            QDir my_dir(dirName);
             foreach (QString my_filter, globstring.split(" ")) {
+                QDir my_dir(dirName);
                 my_dir.setNameFilters(QStringList() << my_filter);
                 foreach (QFileInfo my_info, my_dir.entryInfoList(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot)) {
                     fileOpen(my_info.absoluteFilePath());
@@ -661,20 +661,20 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-    QString formats;
+    QString formats("Neutrino Images (");
     for (auto &format : phys_image_formats()) {
-        formats+=QString::fromStdString(format)+" (*."+ QString::fromStdString(format)+");; ";
+        formats+="*."+ QString::fromStdString(format)+" ";
     }
-    formats+="Neutrino session (*.neus);; Images (";
-	foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
-		formats+="*."+format+" ";
-	}
-	formats.chop(1);
-	formats+=");;";
-	formats+=("Any files (*)");
+    formats+=" *.neus);; Images (";
+    foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
+        formats+="*."+format+" ";
+    }
+    formats.chop(1);
+    formats+=");;";
+    formats+=("Any files (*)");
 
-	QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
-	fileOpen(fnames);
+    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
+    fileOpen(fnames);
 }
 
 void neutrino::fileOpen(QStringList fnames) {
