@@ -44,10 +44,11 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     QToolButton *my_lock = new QToolButton(this);
     my_lock->setToolTip("Lock axis range");
     my_lock->setCheckable(true);
-    my_lock->setChecked(my_axis->rangeLocked());
-    my_lock->setIcon(QIcon(my_axis->rangeLocked()?":icons/lockClose":":icons/lockOpen"));
+    qDebug() << "axis " << objectName() << my_axis->property("lock") << my_axis->property("lock").toBool();
+    my_lock->setChecked(my_axis->property("lock").toBool());
+    my_lock->setIcon(QIcon(my_axis->property("lock").toBool()?":icons/lockClose":":icons/lockOpen"));
 
-    setLock(my_axis->rangeLocked());
+    setLock(my_axis->property("lock").toBool());
     rangeChanged(my_axis->range());
 
     connect(my_axis,SIGNAL(rangeChanged(QCPRange)),this,SLOT(rangeChanged(QCPRange)));
@@ -65,7 +66,7 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
 
 void nCustomRangeLineEdit::setLock(bool check) {
     if (my_axis) {
-        my_axis->setRangeLocked(check);
+        my_axis->setProperty("lock",check);
         if (!check) {
             my_axis->rescale(true);
             if (my_axis->parentPlot()) my_axis->parentPlot()->replot();
@@ -124,6 +125,15 @@ nCustomPlot::nCustomPlot(QWidget* parent):
     axisRect()->setMargins(QMargins(0,0,0,0));
     setCursor(QCursor(Qt::CrossCursor));
     repaint();
+}
+
+void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
+    qDebug() << "rescale rescale rescale rescale rescale  " << objectName();
+    foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+        if (!(axis->visible() && axis->property("lock").isValid() && axis->property("lock").toBool())) {
+            axis->rescale();
+        }
+    }
 }
 
 void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
@@ -620,7 +630,7 @@ nCustomPlot::loadSettings(QSettings *my_set) {
                     axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
                     axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
                     axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
-                    axis.at(i)->setRangeLocked(lock.at(i).toBool());
+                    axis.at(i)->setProperty("lock",lock.at(i).toBool());
                     QPointF prange=range.at(i).toPointF();
                     axis.at(i)->setRange(prange.x(),prange.y());
                     for (int g=0; g<plottableCount(); g++) {
@@ -671,7 +681,7 @@ nCustomPlot::saveSettings(QSettings *my_set) {
             logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
             colors << axis->labelColor();
             labelfonts << axis->labelFont();
-            lock << axis->rangeLocked();
+            lock << axis->property("lock").toBool();
             range << QPointF(axis->range().lower,axis->range().upper);
         }
         my_set->setValue("labels",labels);

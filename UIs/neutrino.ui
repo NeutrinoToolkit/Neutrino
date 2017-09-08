@@ -95,6 +95,7 @@
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionOpen_RAW"/>
+    <addaction name="actionOpen_Glob"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="actionCamera"/>
     <addaction name="separator"/>
@@ -706,7 +707,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -736,7 +737,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -749,7 +750,7 @@
   </action>
   <action name="actionOperator">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
    </property>
    <property name="text">
@@ -779,6 +780,11 @@
     <string>Load...</string>
    </property>
   </action>
+  <action name="actionOpen_Glob">
+   <property name="text">
+    <string>Open Glob</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -788,7 +794,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

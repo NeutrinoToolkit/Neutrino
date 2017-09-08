@@ -137,6 +137,8 @@ public slots:
     void saveDefaults();
     void loadDefaults();
 
+    void on_actionOpen_Glob_triggered();
+
     //colortable
     bool addPaletteFromString(QString,QString);
     QString addPaletteFromFile(QString);

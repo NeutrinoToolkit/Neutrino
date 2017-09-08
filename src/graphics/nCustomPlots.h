@@ -83,6 +83,7 @@ public slots:
 
     void showGraph(bool);
     void changeGraphThickness(double);
+    void rescaleAxes ( bool  onlyVisiblePlottables = false);
 
 };
 

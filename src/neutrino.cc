@@ -340,6 +340,28 @@ neutrino::neutrino():
 
 }
 
+void neutrino::on_actionOpen_Glob_triggered() {
+    QString dirName = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),property("NeuSave-globdir").toString());
+    if (!dirName.isEmpty()) {
+        bool ok;
+        QString globstring = QInputDialog::getText(this, dirName,tr("Glob:"), QLineEdit::Normal, property("NeuSave-globstring").toString(), &ok);
+        if (ok) {
+            qDebug() << dirName << globstring;
+            setProperty("NeuSave-globdir",dirName);
+            setProperty("NeuSave-globstring",globstring);
+
+            QDir my_dir(dirName);
+            foreach (QString my_filter, globstring.split(" ")) {
+                my_dir.setNameFilters(QStringList() << my_filter);
+                foreach (QFileInfo my_info, my_dir.entryInfoList(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot)) {
+                    fileOpen(my_info.absoluteFilePath());
+                }
+            }
+        }
+
+    }
+}
+
 void neutrino::processEvents()
 { QApplication::processEvents(); }
 
@@ -639,11 +661,11 @@ neutrino::fileReopen() {
 
 void neutrino::fileOpen()
 {
-    QString formats("Neutrino Images (");
+    QString formats;
     for (auto &format : phys_image_formats()) {
-        formats+="*."+ QString::fromStdString(format)+" ";
+        formats+=QString::fromStdString(format)+" (*."+ QString::fromStdString(format)+");; ";
     }
-    formats+=" *.neus);; Images (";
+    formats+="Neutrino session (*.neus);; Images (";
 	foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
 		formats+="*."+format+" ";
 	}
@@ -1266,16 +1288,27 @@ neutrino::mouseposition(QPointF pos_mouse) {
 }
 
 QString neutrino::getFileSave() {
-	QString formats("");
-	formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.fits);;";
-	formats+="Images (";
+    QString allformats;
+    QStringList formats;
+    formats << "txt" << "neu" << "neus";
+#ifdef HAVE_LIBTIFF
+    formats << "tif" << "tiff";
+#endif
+#ifdef HAVE_LIBCFITSIO
+    formats << "fits";
+#endif
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+    formats << "hdf";
+#endif
+    foreach(QString format, formats ) {
+        allformats += format + " (*."+format+");; ";
+    }
 	foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
-		formats+="*."+format+" ";
-	}
-	formats.chop(1);
-	formats+=");;";
-	formats+=("Any files (*)");
-	return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileOpen").toString(),formats);
+        allformats += format + " (*."+format+");; ";
+    }
+    allformats.chop(1);
+    allformats+=("Any files (*)");
+    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileOpen").toString(),allformats);
 }
 
 void

@@ -37,8 +37,6 @@ nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan
 
     connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
 
-    connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), my_w.actionLockColors, SLOT(setEnabled(bool)));
-    connect(my_w.actionAutoscale, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
     connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
 
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
@@ -104,20 +102,22 @@ nLineout::updatePlot(QPointF my_point) {
                 y[i]=currentBuffer->point(b_p(other_dir),i+lat_skip);
             }
         }
-        my_w.plot->graph(0)->setData(x,y,true);
-        my_w.plot->graph(0)->rescaleKeyAxis();
 
-        if(!my_w.actionAutoscale->isChecked()) {
-            my_w.plot->graph(0)->rescaleValueAxis();
+        my_w.plot->graph(0)->valueAxis()->setProperty("lock",my_w.actionLockColors->isChecked());
+
+        if(my_w.actionLockColors->isChecked()) {
+            vec2f rang=currentBuffer->property["display_range"];
+            my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
         } else {
-            if(my_w.actionLockColors->isChecked()) {
-                vec2f rang=currentBuffer->property["display_range"];
-                my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
-            }
         }
+        my_w.plot->rescaleAxes();
+
         statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
 		double pos_mouse=(b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
-		my_w.plot->setMousePosition(pos_mouse);
+        my_w.plot->setMousePosition(pos_mouse);
+
+        my_w.plot->graph(0)->setData(x,y,true);
+
     }
 
 }

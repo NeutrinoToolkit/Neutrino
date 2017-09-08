@@ -1919,7 +1919,18 @@ std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {
 
 std::vector<std::string> phys_image_formats() {
 
-    std::vector<std::string> retval={"txt", "tif", "tiff", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "fits", "hdf", "neu", "gz"};
+    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "neu", "gz"};
+
+#ifdef HAVE_LIBTIFF
+    retval.push_back("tif");
+    retval.push_back("tiff");
+#endif
+#ifdef HAVE_LIBCFITSIO
+    retval.push_back("fits");
+#endif
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
+    retval.push_back("hdf");
+#endif
 
     return retval;
 }

@@ -390,7 +390,7 @@ void Visar::loadSettings(QString my_settings) {
     disconnections();
     QSettings settings(my_settings,QSettings::IniFormat);
     settings.beginGroup("Properties");
-    int kMax=settings.value("NeuSave-numVisars",1).toInt();
+    int kMax=settings.value("NeuSave-numVisars",2).toInt();
     unsigned int numVisars_save=numVisars;
     for (unsigned int k=0;k<numVisars_save;k++) {
         delVisar();

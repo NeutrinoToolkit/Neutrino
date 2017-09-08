@@ -30,18 +30,14 @@ nLineoutBoth::nLineoutBoth(neutrino *parent) : nGenericPan(parent)
 {
 	my_w.setupUi(this);
 
-    my_w.statusBar->addPermanentWidget(my_w.autoScale, 0);
     my_w.statusBar->addPermanentWidget(my_w.lockColors, 0);
     my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
 
     connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
 
-    connect(my_w.autoScale, SIGNAL(released()), this, SLOT(updateLastPoint(void)));
     connect(parent, SIGNAL(nZoom(double)), this, SLOT(updateLastPoint(void)));
 
     connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
-
-    connect(my_w.autoScale, SIGNAL(toggled(bool)), my_w.lockColors, SLOT(setEnabled(bool)));
 
     for (int k=0;k<2;k++) {
         if (currentBuffer) {
@@ -107,13 +103,11 @@ void nLineoutBoth::updatePlot(QPointF p) {
             my_w.plot->graph(k)->keyAxis()->setRange(x.first(), x.last());
 
 
-            if(!my_w.autoScale->isChecked()) {
-                my_w.plot->graph(k)->rescaleValueAxis();
-            } else {
-                if(my_w.lockColors->isChecked()) {
-                    vec2f rang=currentBuffer->property["display_range"];
-                    my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
-                }
+            my_w.plot->graph(k)->valueAxis()->setProperty("lock",my_w.lockColors->isChecked());
+
+            if(my_w.lockColors->isChecked()) {
+                vec2f rang=currentBuffer->property["display_range"];
+                my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
             }
 
             vec2f phys_origin=currentBuffer->get_origin();
@@ -122,6 +116,7 @@ void nLineoutBoth::updatePlot(QPointF p) {
 
 
         statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
+        my_w.plot->rescaleAxes();
         my_w.plot->replot();
     }
 }

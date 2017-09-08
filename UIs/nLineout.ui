@@ -60,7 +60,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAutoscale"/>
    <addaction name="actionLockColors"/>
    <addaction name="separator"/>
    <addaction name="actionToggleZoom"/>
@@ -89,50 +88,6 @@
     <string>Show visible part</string>
    </property>
   </action>
-  <action name="actionAutoscale">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lockOpen</normaloff>
-     <normalon>:/icons/lockClose.png</normalon>:icons//lockOpen</iconset>
-   </property>
-   <property name="text">
-    <string>autoscale</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto/FixedScale</string>
-   </property>
-  </action>
-  <action name="actionGetMinMax">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//center.png</normaloff>:icons//center.png</iconset>
-   </property>
-   <property name="text">
-    <string>getMinMax</string>
-   </property>
-   <property name="toolTip">
-    <string>Click mouse to set min and max</string>
-   </property>
-  </action>
-  <action name="actionMin">
-   <property name="text">
-    <string>Min</string>
-   </property>
-  </action>
-  <action name="actionMax">
-   <property name="text">
-    <string>Max</string>
-   </property>
-  </action>
   <action name="actionLockClick">
    <property name="checkable">
     <bool>true</bool>
@@ -157,7 +112,7 @@
     <bool>true</bool>
    </property>
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset>

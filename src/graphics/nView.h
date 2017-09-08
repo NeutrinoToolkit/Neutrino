@@ -91,7 +91,7 @@ public slots:
     void mousePressEvent (QMouseEvent *);
     void mouseReleaseEvent (QMouseEvent *);
     void mouseMoveEvent (QMouseEvent *);
-	void wheelEvent(QWheelEvent *);
+    void wheelEvent(QWheelEvent *);
 
     void updatePhys();
     void showPhys(nPhysD*);
