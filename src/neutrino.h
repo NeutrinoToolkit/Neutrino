@@ -137,6 +137,7 @@ public slots:
     void saveDefaults();
     void loadDefaults();
 
+    void scanDir(QString dirpath, QString pattern);
     void on_actionOpen_Glob_triggered();
 
     //colortable

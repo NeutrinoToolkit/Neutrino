@@ -340,27 +340,40 @@ neutrino::neutrino():
 
 }
 
+void neutrino::scanDir(QString dirpath, QString pattern)
+{
+    qDebug() << "Scanning: " << pattern << dirpath;
+    QDir dir(dirpath);
+    dir.setNameFilters(QStringList(pattern));
+    foreach (QFileInfo my_info, dir.entryInfoList(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot)) {
+        qDebug() << my_info.absoluteFilePath();
+        fileOpen(my_info.absoluteFilePath());
+    }
+
+    foreach (QFileInfo my_info, dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks)) {
+        scanDir(my_info.absoluteFilePath(), pattern);
+    }
+}
+
 void neutrino::on_actionOpen_Glob_triggered() {
     QString dirName = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),property("NeuSave-globdir").toString());
     if (!dirName.isEmpty()) {
         bool ok;
-        QString globstring = QInputDialog::getText(this, dirName,tr("Glob:"), QLineEdit::Normal, property("NeuSave-globstring").toString(), &ok);
+        QString globstring = QInputDialog::getText(this, dirName,tr("Pattern"), QLineEdit::Normal, property("NeuSave-globstring").toString(), &ok);
         if (ok) {
-            qDebug() << dirName << globstring;
+
             setProperty("NeuSave-globdir",dirName);
             setProperty("NeuSave-globstring",globstring);
 
-            foreach (QString my_filter, globstring.split(" ")) {
-                QDir my_dir(dirName);
-                my_dir.setNameFilters(QStringList() << my_filter);
-                foreach (QFileInfo my_info, my_dir.entryInfoList(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot)) {
-                    fileOpen(my_info.absoluteFilePath());
-                }
+            foreach (QString my_filter, globstring.split(";")) {
+                scanDir(dirName, my_filter.trimmed());
             }
         }
 
     }
 }
+
+
 
 void neutrino::processEvents()
 { QApplication::processEvents(); }

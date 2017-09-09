@@ -260,9 +260,6 @@
              <property name="value">
               <number>100</number>
              </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
           </layout>
@@ -541,7 +538,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-54xyEn/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/invert_colorbar.png</normaloff>:/icons/invert_colorbar.png</iconset>
    </property>
    <property name="text">
@@ -553,7 +550,7 @@
   </action>
   <action name="actionCutoff">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-54xyEn/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/expand.png</normaloff>:/icons/expand.png</iconset>
    </property>
    <property name="text">
@@ -568,7 +565,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-54xyEn/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/histoNorm.png</normaloff>
      <normalon>:/icons/histolog.png</normalon>:/icons/histoNorm.png</iconset>
    </property>
@@ -611,7 +608,7 @@
   <tabstop>colorbarTabs</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-54xyEn/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

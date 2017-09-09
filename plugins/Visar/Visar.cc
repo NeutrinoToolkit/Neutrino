@@ -459,12 +459,16 @@ void Visar::sweepChanged(QLineEdit *line) {
 
         if (vecsweep) {
             vecsweep->clear();
+            line->setPalette(QApplication::palette());
             foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
                 bool ok;
                 double coeff=QLocale().toDouble(str,&ok);
                 if(ok) {
                     vecsweep->push_back(coeff);
                 } else {
+                    QPalette my_palette=line->palette();
+                    my_palette.setColor(QPalette::Base,Qt::red);
+                    line->setPalette(my_palette);
                     statusbar->showMessage("Cannot understant sweep coefficint "+str);
                     break;
                 }
@@ -812,6 +816,8 @@ void Visar::updatePlot() {
 
                 QVector<double> tjump,njump,rjump;
                 QStringList jumpt=phaseUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
+                phaseUi[k]->jumpst->setPalette(QApplication::palette());
+
                 foreach (QString piece, jumpt) {
                     QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
@@ -837,6 +843,9 @@ void Visar::updatePlot() {
                             }
                         }
                     } else {
+                        QPalette my_palette=phaseUi[k]->jumpst->palette();
+                        my_palette.setColor(QPalette::Base,Qt::red);
+                        phaseUi[k]->jumpst->setPalette(my_palette);
                         statusbar->showMessage(tr("Skipped unreadable jump '")+piece+QString("' VISAR ")+QString::number(k+1),5000);
                     }
                 }
