@@ -25,29 +25,32 @@
 #include <QtGui>
 #include <QWidget>
 #include <QtScript>
+#include <QScriptEngine>
 
-#ifndef __JavaScript
-#define __JavaScript
+#ifndef __Function
+#define __Function
 
 #include "nGenericPan.h"
-#include "ui_JavaScript.h"
+#include "ui_Function.h"
 #include "neutrino.h"
 
-class JavaScript : public nGenericPan, private Ui::JavaScript {
+class Function : public nGenericPan, private Ui::Function {
     Q_OBJECT
 
 public:
 
-    Q_INVOKABLE JavaScript(neutrino *);
+    Q_INVOKABLE Function(neutrino *);
 
 public slots:
-    void on_command_returnPressed();
+    void on_function_returnPressed();
 
 private:
     QScriptEngine engine;
 
+    nPhysD *physFunction;
+
 };
 
-NEUTRINO_PLUGIN(JavaScript,Scripts,":icons/JavaScript.png");
+NEUTRINO_PLUGIN(Function,Analysis);
 
 #endif

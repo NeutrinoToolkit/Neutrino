@@ -28,7 +28,8 @@
 // physWavelets
 
 nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
-      separator(2)
+    // separator represents the difference between operations with 2 operands or 1 modify it in .h
+    separator({8,16})
 {
     my_w.setupUi(this);
     connect(my_w.calculate, SIGNAL(pressed()), this, SLOT(doOperation()));
@@ -36,12 +37,10 @@ nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.operation, SIGNAL(currentIndexChanged(int)), this, SLOT(enableGroups(int)));
     operatorResult=NULL;
 
-    // separator represents the difference between operations with 2 operands or 1 modify it in .h
-    separator[0]=8;
-    separator[1]=16;
-
-    my_w.operation->insertSeparator(separator[0]);
-    my_w.operation->insertSeparator(separator[1]);
+    for (auto &i :separator) {
+        qDebug() <<i;
+        my_w.operation->insertSeparator(i);
+    }
     show();
     enableGroups(my_w.operation->currentIndex());
 }
@@ -55,25 +54,33 @@ void nOperator::copyResult () {
 }
 
 void nOperator::enableGroups (int num) {
-    if (num < separator[0]) {
-        my_w.second->setEnabled(true);
-        my_w.radioImage2->setEnabled(true);
-        my_w.image2->setEnabled(true);
-        my_w.radioNumber1->setEnabled(true);
-        my_w.num1->setEnabled(true);
-    } else if (num < separator[1]) {
-        my_w.second->setEnabled(true);
-        my_w.radioImage1->setChecked(true);
-        my_w.radioNumber1->setEnabled(false);
+    my_w.first->setEnabled(true);
+    my_w.second->setEnabled(true);
+    my_w.radioImage1->setEnabled(true);
+    my_w.radioImage2->setEnabled(true);
+    my_w.image1->setEnabled(true);
+    my_w.image2->setEnabled(true);
+    my_w.radioNumber1->setEnabled(true);
+    my_w.radioNumber2->setEnabled(true);
+    my_w.num1->setEnabled(true);
+    my_w.num2->setEnabled(true);
 
-        my_w.num1->setEnabled(false);
-        my_w.radioNumber2->setChecked(true);
-        my_w.radioImage2->setEnabled(false);
-        my_w.image2->setEnabled(false);
-    } else {
-        my_w.radioNumber1->setEnabled(true);
-        my_w.radioImage1->setChecked(true);
-        my_w.second->setEnabled(false);
+    if(num > separator[0] ) {
+        if (num < separator[1]) {
+            my_w.radioImage1->setChecked(true);
+            my_w.radioNumber1->setEnabled(false);
+            my_w.num1->setEnabled(false);
+            my_w.radioNumber2->setChecked(true);
+            my_w.radioImage2->setEnabled(false);
+            my_w.image2->setEnabled(false);
+        } else if (num < separator[2]) {
+            my_w.radioImage1->setChecked(true);
+            my_w.radioNumber1->setEnabled(false);
+            my_w.num1->setEnabled(false);
+            my_w.second->setEnabled(false);
+        } else {
+            qDebug() << "How did I got here?";
+        }
     }
 }
 
@@ -136,30 +143,30 @@ void nOperator::doOperation () {
                 double val2=operand2->point(i+shift2.x(),j+shift2.y());
                 if (std::isfinite(val1) && std::isfinite(val2)) {
                     switch (my_w.operation->currentIndex()) {
-                    case 0:
-                        myresult->set(i,j,val1+val2);
-                        break;
-                    case 1:
-                        myresult->set(i,j,val1-val2);
-                        break;
-                    case 2:
-                        myresult->set(i,j,val1*val2);
-                        break;
-                    case 3:
-                        myresult->set(i,j,val1/val2);
-                        break;
-                    case 4:
-                        myresult->set(i,j,0.5*(val1+val2));
-                        break;
-                    case 5:
-                        myresult->set(i,j,std::min(val1,val2));
-                        break;
-                    case 6:
-                        myresult->set(i,j,std::max(val1,val2));
-                        break;
-                    case 7:
-                        myresult->set(i,j,fmod(val1,val2));
-                        break;
+                        case 0:
+                            myresult->set(i,j,val1+val2);
+                            break;
+                        case 1:
+                            myresult->set(i,j,val1-val2);
+                            break;
+                        case 2:
+                            myresult->set(i,j,val1*val2);
+                            break;
+                        case 3:
+                            myresult->set(i,j,val1/val2);
+                            break;
+                        case 4:
+                            myresult->set(i,j,0.5*(val1+val2));
+                            break;
+                        case 5:
+                            myresult->set(i,j,std::min(val1,val2));
+                            break;
+                        case 6:
+                            myresult->set(i,j,std::max(val1,val2));
+                            break;
+                        case 7:
+                            myresult->set(i,j,fmod(val1,val2));
+                            break;
                     }
                 } else {
                     myresult->set(i,j,std::isfinite(val1)?val1:val2);
@@ -252,7 +259,7 @@ void nOperator::doOperation () {
             }
 
         }
-    } else { // no value needed
+    } else 	if (my_w.operation->currentIndex() < separator[2]) { // 1 image and 1(or more) scalars
         myresult=new nPhysD(*image1);
         myresult->setName(my_w.operation->currentText().toStdString()+" "+image1->getName());
         if (my_w.operation->currentIndex()==separator[1]+1) {
@@ -278,6 +285,8 @@ void nOperator::doOperation () {
         } else if (my_w.operation->currentIndex()==separator[1]+11) {
             phys_sobel(*myresult);
         }
+    } else { // no value needed
+        qDebug() << "How did I got here?";
     }
 
     if (myresult) {

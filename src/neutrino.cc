@@ -982,7 +982,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
     if (newPhys && newPhys->getSurf()) {
 		bool redisplay = (my_w->my_view->currentBuffer==oldPhys);
 		if (my_w->my_view->physList.contains(oldPhys)) {
-			newPhys->property["display_range"]=oldPhys->property["display_range"];
+//			newPhys->property["display_range"]=oldPhys->property["display_range"];
 			if (oldPhys==NULL) oldPhys=new nPhysD();
 			*oldPhys=*newPhys;
 			delete newPhys;
