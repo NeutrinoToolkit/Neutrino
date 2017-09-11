@@ -110,7 +110,7 @@ private:
     std::vector<nRect*> fringeRect;
     QPointer<nRect> sopRect;
 
-    std::map<std::string, nPhysD *> localPhys;
+    std::vector<std::map<std::string, nPhysD *>> localPhys;
 
 public slots:
     

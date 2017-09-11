@@ -848,46 +848,44 @@ nPhysD *
 phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy)
 {
 
-    if (wphase.getSurf() == 0)
-        return NULL;
+    nPhysD *uphase = new nPhysD (wphase.getW(), wphase.getH(), 0., "unwrap");
+    if (wphase.getSurf()) {
+        uphase->set_origin(wphase.get_origin());
+        uphase->set_scale(wphase.get_scale());
+        uphase->setName("Unwrap "+wphase.getName());
+        uphase->setFromName(wphase.getFromName());
 
-    nPhysD *uphase;
-    uphase = new nPhysD (wphase.getW(), wphase.getH(), 0., "unwrap");
-    uphase->set_origin(wphase.get_origin());
-    uphase->set_scale(wphase.get_scale());
-    uphase->setName("Unwrap "+wphase.getName());
-    uphase->setFromName(wphase.getFromName());
+        switch (strategy) {
+            case SIMPLE_HV :
+                unwrap_simple_h(&wphase, uphase);
+                unwrap_simple_v(&wphase, uphase);
+                break;
 
-    switch (strategy) {
-        case SIMPLE_HV :
-            unwrap_simple_h(&wphase, uphase);
-            unwrap_simple_v(&wphase, uphase);
-            break;
+            case SIMPLE_VH :
+                unwrap_simple_v(&wphase, uphase);
+                unwrap_simple_h(&wphase, uphase);
+                break;
 
-        case SIMPLE_VH :
-            unwrap_simple_v(&wphase, uphase);
-            unwrap_simple_h(&wphase, uphase);
-            break;
+            case GOLDSTEIN :
+                unwrap_goldstein(&wphase, uphase);
+                break;
 
-        case GOLDSTEIN :
-            unwrap_goldstein(&wphase, uphase);
-            break;
+            case QUALITY :
+                unwrap_quality(&wphase, uphase, &quality);
+                break;
 
-        case QUALITY :
-            unwrap_quality(&wphase, uphase, &quality);
-            break;
+            case MIGUEL :
+                unwrap_miguel(&wphase, uphase);
+                break;
 
-        case MIGUEL :
-            unwrap_miguel(&wphase, uphase);
-            break;
+            case MIGUEL_QUALITY :
+                unwrap_miguel_quality(&wphase, uphase, &quality);
+                break;
 
-        case MIGUEL_QUALITY :
-            unwrap_miguel_quality(&wphase, uphase, &quality);
-            break;
-
+        }
+        DEBUG("here");
+        uphase->TscanBrightness();
     }
-    DEBUG("here");
-    uphase->TscanBrightness();
     return uphase;
 }
 

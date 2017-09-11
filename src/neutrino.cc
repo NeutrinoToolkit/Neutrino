@@ -957,7 +957,7 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 }
 
 void neutrino::addPhys(nPhysD* datamatrix) {
-	if (datamatrix && !my_w->my_view->physList.contains(datamatrix))	{
+    if (datamatrix && datamatrix->getSurf()>0 && !my_w->my_view->physList.contains(datamatrix))	{
 		my_w->my_view->physList << datamatrix;
 		addMenuBuffers(datamatrix);
 		emit physAdd(datamatrix);
@@ -978,8 +978,8 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 	my_w->menuBuffers->addAction(action);
 }
 
-nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
-	if (newPhys) {
+nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
+    if (newPhys && newPhys->getSurf()) {
 		bool redisplay = (my_w->my_view->currentBuffer==oldPhys);
 		if (my_w->my_view->physList.contains(oldPhys)) {
 			newPhys->property["display_range"]=oldPhys->property["display_range"];
@@ -994,8 +994,8 @@ nPhysD* neutrino::replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //T
 		if (show || redisplay) {
 			showPhys(newPhys);
 		}
-	}
-	emit physMod(std::make_pair(oldPhys, newPhys));
+        emit physMod(std::make_pair(oldPhys, newPhys));
+    }
     QApplication::processEvents();
 	return newPhys;
 }
