@@ -35,6 +35,7 @@ nView::~nView ()
     my_set.setValue("rulerVisible", my_tics.rulerVisible);
     my_set.setValue("gridVisible", my_tics.gridVisible);
     my_set.setValue("rulerColor", my_tics.rulerColor);
+    my_set.setValue("pixmapFile", property("pixmapFile").toString());
     my_set.endGroup();
 }
 
@@ -103,6 +104,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
     my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
     my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
+    setProperty("pixmapFile",my_set.value("pixmapFile","Pixmap.png"));
     my_set.endGroup();
 }
 
@@ -110,6 +112,15 @@ void nView::setLockColors(bool val) {
     lockColors=val;
 }
 
+
+void nView::exportPixmap() {
+    QString fname = QFileDialog::getSaveFileName(this,tr("Save ")+QImageWriter::supportedImageFormats().join(" "),property("pixmapFile").toString());
+    if (!fname.isEmpty()) {
+        setProperty("pixmapFile",fname);
+        my_pixitem.pixmap().save(fname);
+    }
+
+}
 
 void nView::updatePhys() {
     showPhys(currentBuffer);

@@ -114,6 +114,7 @@ public slots:
     void setGamma(int value);
     void prevBuffer();
     void nextBuffer();
+    void exportPixmap();
 
 private:
     bool gestureEvent(QGestureEvent *event);

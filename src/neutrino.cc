@@ -249,6 +249,11 @@ neutrino::neutrino():
 	connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
 	connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
+
+    connect(my_w->actionExport_pixmap, SIGNAL(triggered()), my_w->my_view, SLOT(exportPixmap()));
+
+
+
     // ---------------------------------------------------------------------------------------------
 
     QWidget* spacer = new QWidget();

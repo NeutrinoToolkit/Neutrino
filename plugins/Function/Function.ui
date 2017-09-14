@@ -220,6 +220,16 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>radioImage</tabstop>
+  <tabstop>radioSize</tabstop>
+  <tabstop>image</tabstop>
+  <tabstop>sb_width</tabstop>
+  <tabstop>sb_height</tabstop>
+  <tabstop>function</tabstop>
+  <tabstop>doIt</tabstop>
+  <tabstop>erasePrevious</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

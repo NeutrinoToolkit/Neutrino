@@ -69,9 +69,7 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 
 if (WIN32)
     # use nsis
-    message (STATUS "[win32] Using NSIS for packaging")
-    list(APPEND CPACK_GENERATOR NSIS)
-    message (STATUS "[win32] NSIS compile LIBS: ${LIBS}")
+    list(APPEND CPACK_GENERATOR NSIS ZIP)
 
     SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
     #SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin/Neutrino.exe")
@@ -88,7 +86,9 @@ if (WIN32)
     # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
     file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
     file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
-    message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+	endif()
     install (FILES ${RUNTIME_DEPS} DESTINATION bin)
     install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
 

@@ -11,19 +11,21 @@ if(PYTHONLIBS_FOUND)
 
 	if(PYTHONINTERP_FOUND)
 
-		if (PYTHON_EXECUTABLE)
+		if (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
 			file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py "try: import numpy; print numpy.get_include()\nexcept: pass\n")
 			exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)
-		endif (PYTHON_EXECUTABLE)
+		endif (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
+
+		message(STATUS "MY_NUMPY_PATH: ${MY_NUMPY_PATH}")
 
 		find_path(
 			NUMPY_INCLUDE_DIR
 			NAMES "numpy/arrayobject.h"
-			PATHS "${NUMPY_PATH}" "${PYTHON_INCLUDE_PATH}"
+			PATHS "${NUMPY_PATH}" "${PYTHON_INCLUDE_PATH}" "${MY_NUMPY_PATH}"
 			DOC "Directory where the arrayobject.h header file can be found."
 		)
 
-		if (NUMPY_INCLUDE_DIR)
+	    if (NUMPY_INCLUDE_DIR)
 			message(STATUS "Found NumPy includes: ${NUMPY_INCLUDE_DIR}")
 			set(NUMPY_FOUND 1 CACHE INTERNAL "NumPy found")
 			include_directories(${NUMPY_INCLUDE_DIR})
