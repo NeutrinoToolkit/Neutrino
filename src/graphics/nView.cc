@@ -112,9 +112,23 @@ void nView::setLockColors(bool val) {
     lockColors=val;
 }
 
-
 void nView::exportPixmap() {
-    QString fname = QFileDialog::getSaveFileName(this,tr("Save ")+QImageWriter::supportedImageFormats().join(" "),property("pixmapFile").toString());
+    QByteArrayList my_list=QImageWriter::supportedImageFormats();
+    QByteArray my_suffix=QFileInfo(property("pixmapFile").toString()).suffix().toUtf8();
+    if (my_list.contains(my_suffix)) {
+        my_list.removeAll(my_suffix);
+        my_list.prepend(my_suffix);
+    }
+    my_suffix.clear();
+
+    QString allformats;
+    foreach (QByteArray format, my_list ) {
+        allformats += QString(format).toUpper()+" image (*."+format+");; ";
+    }
+    allformats.chop(1);
+    DEBUG(">"<< allformats.toStdString() << "<");
+    QString suffix=QFileInfo(property("pixmapFile").toString()).suffix();
+    QString fname = QFileDialog::getSaveFileName(this,tr("Save Pixmap"),property("pixmapFile").toString(),allformats,&suffix );
     if (!fname.isEmpty()) {
         setProperty("pixmapFile",fname);
         my_pixitem.pixmap().save(fname);

@@ -540,6 +540,7 @@ neutrino::loadPlugin(QString pname, bool launch)
 }
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
+    qDebug() << sender();
 	if (!my_phys) my_phys=my_w->my_view->currentBuffer;
 
 	if (my_phys) {

@@ -62,7 +62,6 @@ nWavelet::nWavelet(neutrino *nparent) : nGenericPan(nparent)
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 
-	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
     connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;

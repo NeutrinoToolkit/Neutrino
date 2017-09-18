@@ -89,7 +89,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
     maskRegionToggled(my_w.useMask->isChecked());
     interpolateToggled(my_w.useInterpolate->isChecked());
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
     connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));

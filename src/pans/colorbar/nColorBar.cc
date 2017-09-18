@@ -32,8 +32,6 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
 
     my_w.histogram->parentPan=this;
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-
 	connect(nparent->my_w->my_view, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));
 	connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 

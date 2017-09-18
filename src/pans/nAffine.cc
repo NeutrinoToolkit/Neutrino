@@ -52,8 +52,6 @@ nAffine::nAffine(neutrino *nparent) : nGenericPan(nparent)
 	connect(l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
 	connect(l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
 
-	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
-
 	connect(my_w.first,SIGNAL(pressed()),this,SLOT(affine()));
 	connect(my_w.second,SIGNAL(pressed()),this,SLOT(affine()));
 	

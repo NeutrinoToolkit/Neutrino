@@ -30,7 +30,6 @@ nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
 
 	my_w.splitter->setStretchFactor(0, 1);
 	my_w.splitter->setStretchFactor(1, 2);
-	connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 	
 	connect(my_w.propertyList, SIGNAL(itemSelectionChanged()), this, SLOT(showProperty()));
 

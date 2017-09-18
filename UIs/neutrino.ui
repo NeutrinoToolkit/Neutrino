@@ -790,6 +790,9 @@
    <property name="text">
     <string>Export pixmap</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+E</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
