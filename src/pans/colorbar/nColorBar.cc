@@ -54,8 +54,8 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
     }
-    connect(my_w.lineMin, SIGNAL(textChanged(QString)), this, SLOT(minChanged(QString)));
-    connect(my_w.lineMax, SIGNAL(textChanged(QString)), this, SLOT(maxChanged(QString)));
+    connect(my_w.lineMin, SIGNAL(returnPressed()), this, SLOT(minChanged()));
+    connect(my_w.lineMax, SIGNAL(returnPressed()), this, SLOT(maxChanged()));
 
     connect(my_w.setToMin,SIGNAL(pressed()),this,SLOT(setToMin()));
     connect(my_w.setToMax,SIGNAL(pressed()),this,SLOT(setToMax()));
@@ -124,26 +124,30 @@ void nColorBar::setToMax () {
     }
 }
 
-void nColorBar::minChanged (QString value) {
+void nColorBar::minChanged () {
+    QString value(my_w.lineMin->text());
     disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     if (currentBuffer) {
-        my_w.sliderMin->setValue(sliderValues().first());
         vec2f minmax=currentBuffer->property["display_range"];
+        DEBUG(QLocale().toDouble(value));
         minmax.set_first(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
+        my_w.sliderMin->setValue(sliderValues().first());
     }
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     nparent->updatePhys();
     my_w.histogram->repaint();
 }
 
-void nColorBar::maxChanged (QString value) {
+void nColorBar::maxChanged () {
+    QString value(my_w.lineMax->text());
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
     if (currentBuffer) {
-        my_w.sliderMax->setValue(sliderValues().second());
         vec2f minmax=currentBuffer->property["display_range"];
+        DEBUG(QLocale().toDouble(value));
         minmax.set_second(QLocale().toDouble(value));
         currentBuffer->property["display_range"]=minmax;
+        my_w.sliderMax->setValue(sliderValues().second());
     }
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
     nparent->updatePhys();
@@ -211,6 +215,7 @@ void nColorBar::slider_min_changed(int val)
     double doubleVal=0.0;
     if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
+    minChanged();
 }
 
 void nColorBar::slider_max_changed(int val)
@@ -218,6 +223,7 @@ void nColorBar::slider_max_changed(int val)
     double doubleVal=1.0;
     if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
+    maxChanged();
 }
 
 void nColorBar::cutOff() {

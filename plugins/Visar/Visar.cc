@@ -204,9 +204,7 @@ void Visar::addVisar() {
     
     Ui::Visar2* ui_vel=new Ui::Visar2();
     ui_vel->setupUi(wvisar1);
-    
-    decorate(tab1);
-    
+
     velocityUi.push_back(ui_vel);
     
     QWidget *tab2 = new QWidget();
@@ -220,16 +218,20 @@ void Visar::addVisar() {
     Ui::Visar3* ui_set=new Ui::Visar3();
     ui_set->setupUi(wvisar2);
     
-    decorate(tab2);
     
     phaseUi.push_back(ui_set);
-    
+
     //hack to save diffrent uis!!!
     foreach (QWidget *obj, wvisar1->findChildren<QWidget*>()+wvisar2->findChildren<QWidget*>()) {
         obj->setObjectName(obj->objectName()+"-VISAR"+QString::number(numVisars+1));
         obj->setProperty("id", numVisars);
     }
-    
+
+    decorate(tab1);
+    decorate(tab2);
+
+//    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+
     phase.push_back({nPhysD(),nPhysD()});
     contrast.push_back({nPhysD(),nPhysD()});
     intensity.push_back({nPhysD(),nPhysD()});
@@ -315,9 +317,12 @@ void Visar::addVisar() {
     errorBars->setSymbolGap(1);
 
     localPhys.push_back(std::map<std::string, nPhysD *>());
+
     numVisars++;
     
     setProperty("NeuSave-numVisars",numVisars);
+
+
     connections();
     
 }
@@ -529,23 +534,20 @@ int Visar::direction(int k) {
 }
 
 void Visar::bufferChanged(nPhysD*phys) {
-
-    int physVsarNum=(int)phys->property["VisarNum"];
-
-    sopRect->hide();
-    if (physVsarNum==-1) {
-        if (enableSOP->isChecked()) {
-            sopRect->show();
-        }
-    } else if (physVsarNum>0) {
-        for (unsigned int k=0;k<numVisars;k++){
-            if ((int)k == physVsarNum-1) {
-                fringeRect[k]->show();
-                fringeLine[k]->show();
-            } else {
-                fringeRect[k]->hide();
-                fringeLine[k]->hide();
+    if (phys && phys->property.find("VisarNum") != phys->property.end()) {
+        int physVsarNum=(int)phys->property["VisarNum"];
+        if (physVsarNum>0) {
+            for (unsigned int k=0;k<numVisars;k++){
+                if ((int)k == physVsarNum-1) {
+                    fringeRect[k]->show();
+                    fringeLine[k]->show();
+                } else {
+                    fringeRect[k]->hide();
+                    fringeLine[k]->hide();
+                }
             }
+        } else {
+
         }
     }
 }
@@ -556,6 +558,7 @@ void Visar::tabChanged(int k) {
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
     
     disconnections();
+
     if (tabWidget) {
         
         if (tabWidget==tabs) {
@@ -571,12 +574,20 @@ void Visar::tabChanged(int k) {
         }
         
         if (tabWidget==tabs && tabWidget->currentIndex()==2) {
-            nparent->showPhys(getPhysFromCombo(sopShot));
+            if (enableSOP->isChecked()) {
+                nparent->showPhys(getPhysFromCombo(sopShot));
+            }
         } else {
             if (k<(int)numVisars) {
                 unsigned int visnum=tabWidget->currentIndex();
                 if (visnum<numVisars) {
-                    nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
+                    if (velocityUi[k]->enableVisar->isChecked()) {
+                        nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
+                    }
+                }
+                for (int j=0;j<(int)numVisars;j++) {
+                    fringeLine[j]->setVisible(j==k);
+                    fringeRect[j]->setVisible(j==k);
                 }
             }
         }
@@ -625,7 +636,7 @@ void Visar::connections() {
     connect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
+    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
     
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -674,14 +685,15 @@ void Visar::disconnections() {
     disconnect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     disconnect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(enableSOP, SIGNAL(released()), this, SLOT(updatePlotSOP()));
-    
+    disconnect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
+
     disconnect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     disconnect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     disconnect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 }
 
 void Visar::updatePlotSOP() {
+    sopRect->setVisible(enableSOP->isChecked());
     if (!enableSOP->isChecked()) return;
     disconnections();
     nPhysD *shot=getPhysFromCombo(sopShot);
@@ -690,12 +702,9 @@ void Visar::updatePlotSOP() {
 
     int dir=sopDirection->currentIndex();
     if (shot) {
-        shot->property["VisarNum"]=-1;
-
         QRect geom2=sopRect->getRect(shot);
         if (ref) {
             geom2=geom2.intersected(QRect(0,0,ref->getW(),ref->getH()));
-            ref->property["VisarNum"]=-1;
         }
         if (geom2.isEmpty()) {
             statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
@@ -1011,6 +1020,7 @@ void Visar::getCarrier() {
 
 void Visar::getCarrier(int k) {
     disconnections();
+
     QComboBox *combo=NULL;
     if (velocityUi[k]->carrierPhys->currentIndex()==0) {
         combo=velocityUi[k]->refImage;
@@ -1056,9 +1066,6 @@ void Visar::doWave(int k) {
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
         if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
-            imgs[0]->property["VisarNum"]=k+1;
-            imgs[1]->property["VisarNum"]=k+1;
-
             QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
             progress.setCancelButton(0);
             progress.setWindowModality(Qt::WindowModal);
@@ -1102,7 +1109,7 @@ void Visar::doWave(int k) {
             double cr = cos((velocityUi[k]->angle->value()) * _phys_deg);
             double sr = sin((velocityUi[k]->angle->value()) * _phys_deg);
             double thick_norm=velocityUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
-            double damp_norm=M_PI;
+            const double damp_norm=M_PI;
             
             double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
 #pragma omp parallel for collapse(2)

@@ -44,6 +44,10 @@
  
  */
  
+#ifndef __AVAILABILITY_INTERNAL__MAC_10_13
+#define __AVAILABILITY_INTERNAL__MAC_10_13 __AVAILABILITY_INTERNAL_WEAK_IMPORT
+#endif
+
 #ifndef Tools_h
 #define Tools_h
 

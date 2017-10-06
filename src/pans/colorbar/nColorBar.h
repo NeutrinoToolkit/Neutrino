@@ -57,8 +57,8 @@ public:
 	QColor colorBase;
 	
 public slots:
-	void minChanged(QString);
-	void maxChanged(QString);
+    void minChanged();
+    void maxChanged();
 	
 	void invertColors();
 	void setToMin();
