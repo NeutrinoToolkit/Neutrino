@@ -84,6 +84,8 @@ include(FindNeutrinoDeps)
 
 include(GetVersionFromGitTag)
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
+add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA_LATEST}")
+
 
 if (APPLE AND NOT DEFINED Qt5_DIR)
 	set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
