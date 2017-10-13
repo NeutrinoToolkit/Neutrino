@@ -38,7 +38,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -95,30 +95,6 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <item row="1" column="1">
-         <widget class="QWidget" name="widget" native="true">
-          <layout class="QGridLayout" name="gridLayout_5">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="2">
-            <widget class="QSpinBox" name="fontSize"/>
-           </item>
-           <item row="0" column="1">
-            <widget class="QFontComboBox" name="fontFace"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item row="5" column="0">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
@@ -167,6 +143,30 @@
           </layout>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout_5">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="2">
+            <widget class="QSpinBox" name="fontSize"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QFontComboBox" name="fontFace"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label">
           <property name="font">
@@ -176,6 +176,99 @@
           </property>
           <property name="text">
            <string>Image name length</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="QCheckBox" name="askCloseUnsaved">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ask before closing unsaved buffer</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QComboBox" name="localeCombo"/>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="physNameLength">
+          <property name="value">
+           <number>35</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Zoom increment</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QSpinBox" name="currentStepScaleFactor">
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>999</number>
+          </property>
+          <property name="value">
+           <number>15</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Global font</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -212,41 +305,6 @@
           </item>
          </widget>
         </item>
-        <item row="9" column="0">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="5" column="1">
-         <widget class="QComboBox" name="localeCombo"/>
-        </item>
-        <item row="4" column="1">
-         <widget class="QSpinBox" name="currentStepScaleFactor">
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>999</number>
-          </property>
-          <property name="value">
-           <number>15</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_3">
           <property name="font">
@@ -259,64 +317,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Zoom increment</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="2">
-         <widget class="QCheckBox" name="askCloseUnsaved">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Ask before closing unsaved buffer</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Global font</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="physNameLength">
-          <property name="value">
-           <number>35</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -335,6 +335,24 @@
           </property>
           <property name="tristate">
            <bool>false</bool>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="checkUpdates">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Check for updates on startup</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
@@ -535,7 +553,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/icons/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
             <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
          </widget>
@@ -549,7 +567,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/icons/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
             <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
          </widget>
@@ -613,7 +631,7 @@
   </widget>
   <action name="actionReset_settings">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
    </property>
    <property name="text">
@@ -636,7 +654,7 @@
   <tabstop>openclDescription</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

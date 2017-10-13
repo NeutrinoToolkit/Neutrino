@@ -50,6 +50,8 @@ public slots:
     static void changeLocale(QLocale locale);
     static bool localeLessThan(const QLocale&, const QLocale&);
     static QString localeToString(const QLocale &);
+
+    void checkUpdates();
 };
 #endif
 

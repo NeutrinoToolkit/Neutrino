@@ -81,6 +81,7 @@
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
 
+
 void neutrino::changeEvent(QEvent *e)
 {
 	QWidget::changeEvent(e);

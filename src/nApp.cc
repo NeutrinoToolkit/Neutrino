@@ -1,5 +1,6 @@
 #include "nApp.h"
 #include "neutrino.h"
+#include <QtNetwork>
 
 #ifdef __neutrino_key
 #include "nHash.h"
@@ -29,12 +30,45 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
 
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
-    nApp::changeLocale(my_set.value("locale",QLocale()).toLocale());
-    nApp::changeThreads(my_set.value("threads",1).toInt());
+    changeLocale(my_set.value("locale",QLocale()).toLocale());
+    changeThreads(my_set.value("threads",1).toInt());
+    if (my_set.value("checkUpdates",true).toBool()) {
+        checkUpdates();
+    }
     my_set.endGroup();
 
 }
 
+
+void nApp::checkUpdates() {
+    qDebug() << "-----------------------------------------";
+    QNetworkAccessManager manager;
+    QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/git/refs/tags/latest")));
+    QEventLoop event;
+    connect(response,SIGNAL(finished()),&event,SLOT(quit()));
+    event.exec();
+    QString html = response->readAll(); // Source should be stored here
+
+    QJsonDocument json = QJsonDocument::fromJson(html.toUtf8());
+
+    QJsonObject responseObject = json.object();
+
+    if (responseObject.contains("object") && responseObject.value("object").isObject()) {
+        QJsonObject objreponse = responseObject.value("object").toObject();
+        qDebug() << objreponse;
+
+        if (objreponse.contains("sha") && objreponse.value("sha").isString()) {
+            QString ver = QString(__VER).split(".").last();
+            QString thisVer=objreponse.value("sha").toString().left(ver.size());
+
+            if (ver != thisVer) {
+                QMessageBox::information(nullptr,tr("Attention"),tr("New version available <a href=\"https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest\">here</a> "), QMessageBox::Ok);
+            }
+
+        }
+    }
+
+}
 
 QList<neutrino*> nApp::neus() {
     QList<neutrino*> retList;
