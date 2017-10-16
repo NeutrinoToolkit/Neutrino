@@ -281,7 +281,6 @@ void Visar::addVisar() {
         cPhase[m].push_back(QVector<double>());
         cIntensity[m].push_back(QVector<double>());
         cContrast[m].push_back(QVector<double>());
-        cIntErr[m].push_back(QVector<double>());
     }
     cPhaseErr.push_back(QVector<double>());
 
@@ -386,7 +385,6 @@ void Visar::delVisar() {
             cPhase[m].pop_back();
             cIntensity[m].pop_back();
             cContrast[m].pop_back();
-            cIntErr[m].pop_back();
         }
         cPhaseErr.pop_back();
         
@@ -927,7 +925,6 @@ void Visar::updatePlot() {
                 velocity[k].resize(time_phase[k].size());
                 velError[k].resize(time_phase[k].size());
                 reflectivity[k].resize(time_phase[k].size());
-                reflError[k].resize(time_phase[k].size());
                 quality[k].resize(time_phase[k].size());
 
                 for (int j=0;j<time_phase[k].size();j++) {
@@ -952,7 +949,6 @@ void Visar::updatePlot() {
                     }
                     
                     double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
-                    //double refle=setvisar[k].reflRef->value()*iShot/iRef+setvisar[k].reflOffset->value();
                     double Rg=phaseUi[k]->reflOffset->value();
                     double Rmat=phaseUi[k]->reflRef->value();
                     double beta=-Rg/pow(1.0-Rg,2);
@@ -962,9 +958,6 @@ void Visar::updatePlot() {
                     reflectivity[k][j] = refle;
                     quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
                     velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
-
-                    reflError[k][j] = abs(refle) * sqrt(pow(cIntErr[1][k][j] / iShot , 2) + pow(cIntErr[0][k][j] / iRef , 2));
-
                     
                     for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                         int jloc=i+1;
@@ -1209,7 +1202,7 @@ void Visar::getPhase() {
 
 void Visar::getPhase(int k) {
     disconnections();
-    
+
     if (k< (int) numVisars && velocityUi[k]->enableVisar->isChecked()) {
         velocityUi[k]->plotPhaseIntensity->clearGraphs();
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
@@ -1222,76 +1215,93 @@ void Visar::getPhase(int k) {
                 cIntensity[m][k].clear();
                 cContrast[m][k].clear();
                 cPhaseErr[k].clear();
-                cIntErr[m][k].clear();
+                reflError[k].clear();
+
                 int intensityShift= (m==0 ? velocityUi[k]->intensityShift->value() : 0);
-                double multRef= (m==0 ? velocityUi[k]->multRef->value() : 1.0);
-                double offsetIntensity=(m==0?velocityUi[k]->offRef->value():velocityUi[k]->offShot->value());
                 if (direction(k)==0) { //fringes are vertical
                     for (int j=geom2.top(); j<geom2.bottom();j++) {
                         time_phase[k]  << j;
-                        double meanInt=0.0;
+                        double meanIntRef=0.0;
+                        double meanIntShot=0.0;
                         double contrastTmp=0.0;
                         double meanPhaseTmp=0.0;
                         for (int i=geom2.left(); i<geom2.right();i++) {
-                            meanInt+=intensity[k][m].point(i,j-intensityShift,0);
+                            meanIntRef+=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                            meanIntShot+=(intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value());
+
                             contrastTmp+=contrast[k][m].point(i,j-intensityShift,0);
                             double dp=phase[k][0].point(i,j)-phase[k][1].point(i,j);
-                            meanPhaseTmp += abs(remainder(std::min(dp,-dp),1));
-
+                            meanPhaseTmp += abs(remainder(std::min(dp,dp+1),1));
                         }
-                        meanPhaseTmp /= geom2.width();
-                        meanInt/=geom2.width();
+                        meanIntRef/=geom2.width();
+                        meanIntShot/=geom2.width();
+
                         contrastTmp/=geom2.width();
+                        meanPhaseTmp /= geom2.width();
                         cPhase[m][k]  << phase[k][m].point(geom2.center().x(),j,0);
-                        cIntensity[m][k] << (meanInt-offsetIntensity)*multRef;
-                        cContrast[m][k]  << contrastTmp*multRef;
+//                        cPhase[m][k]  << meanPhaseTmp;
+                        cIntensity[m][k] << (m==0 ? meanIntRef : meanIntShot);
+                        cContrast[m][k]  << contrastTmp*(m==0 ? velocityUi[k]->multRef->value() : 1.0);
                         double sqrtTmpPhase=0.0;
-                        double sqrtTmpInt=0.0;
+                        double stdIntRef=0.0;
+                        double stdIntShot=0.0;
+                        double IntCovarance=0.0;
                         for (int i=geom2.left(); i<geom2.right();i++) {
                             double dp=phase[k][0].point(i,j)-phase[k][1].point(i,j);
                             double rem=abs(remainder(std::min(dp,-dp),1));
-                            double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);                            
+                            double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
                             sqrtTmpPhase += pow(dist,2);
-                            sqrtTmpInt += pow(intensity[k][m].point(i,j-intensityShift,0) - meanInt,2);
 
+                            double diffref=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value() - meanIntRef;
+                            double diffshot=(intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value()) - meanIntShot;
+                            stdIntRef += pow(diffref,2);
+                            stdIntShot += pow(diffshot,2);
+                            IntCovarance += diffref*diffshot;
                         }
-                        cPhaseErr[k] << sqrt(sqrtTmpPhase / (geom2.width()-1));
-                        cIntErr[m][k] << sqrt(sqrtTmpInt / (geom2.width()-1));
-                        qDebug() << j << meanInt << cIntErr[m][k].last();
+                        cPhaseErr[k] << sqrt(sqrtTmpPhase/geom2.width());
+                        stdIntRef = sqrt(stdIntRef / geom2.width());
+                        stdIntShot = sqrt(stdIntShot / geom2.width());
+                        IntCovarance /= geom2.width();
+
+
+                        double valref= meanIntShot/meanIntRef;
+                        reflError[k] << valref*sqrt(pow(stdIntRef/meanIntRef,2) + pow(stdIntShot/meanIntShot,2));
+
+                        qDebug() << j << meanIntRef << reflError[k].last();
                     }
                 } else { //fringes are horizontal
-                    for (int j=geom2.left(); j<geom2.right();j++) {
-                        time_phase[k]  << j;
-                        cPhase[m][k]  << phase[k][m].point(geom2.center().y(),j,0);
-                        double meanInt=0.0;
-                        double contrastTmp=0.0;
-                        double meanPhaseTmp=0.0;
-                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-                            meanInt+=intensity[k][m].point(j-intensityShift,i,0);
-                            contrastTmp+=contrast[k][m].point(j-intensityShift,i,0);
-                            double dp=phase[k][0].point(j,i)-phase[k][1].point(j,i);
-                            meanPhaseTmp += abs(remainder(std::min(dp,-dp),1));;
-                        }
-                        meanPhaseTmp /= geom2.height();
-                        meanInt/=geom2.height();
-                        contrastTmp/=geom2.width();
-                        cIntensity[m][k] << (meanInt-offsetIntensity)*multRef;
-                        cContrast[m][k]  << contrastTmp*multRef;
-                        double sqrtTmpPhase=0.0;
-                        double sqrtTmpInt=0.0;
-                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-                            double p1=phase[k][1].point(j,i);
-                            double p0=phase[k][0].point(j,i);
-                            double dp= p1>p0 ? std::min(p1-p0, p0-p1+1) : std::min(p0-p1, p1-p0+1);
-                            double dist=dp-meanPhaseTmp;
-                            sqrtTmpPhase += pow(dist,2);
-                            sqrtTmpInt += pow(intensity[k][m].point(j-intensityShift,i,0) - meanInt,2);
-                        }
-                        cPhaseErr[k] << sqrt(sqrtTmpPhase / (geom2.height()-1));
-                        cIntErr[m][k] << sqrt(sqrtTmpInt / (geom2.height()-1));
-                    }
+//                    for (int j=geom2.left(); j<geom2.right();j++) {
+//                        time_phase[k]  << j;
+//                        cPhase[m][k]  << phase[k][m].point(geom2.center().y(),j,0);
+//                        double meanInt=0.0;
+//                        double contrastTmp=0.0;
+//                        double meanPhaseTmp=0.0;
+//                        for (int i=geom2.top(); i<geom2.bottom();i++) {
+//                            meanInt+=intensity[k][m].point(j-intensityShift,i,0);
+//                            contrastTmp+=contrast[k][m].point(j-intensityShift,i,0);
+//                            double dp=phase[k][0].point(j,i)-phase[k][1].point(j,i);
+//                            meanPhaseTmp += abs(remainder(std::min(dp,-dp),1));;
+//                        }
+//                        meanPhaseTmp /= geom2.height();
+//                        meanInt/=geom2.height();
+//                        contrastTmp/=geom2.width();
+//                        cIntensity[m][k] << (meanInt-offsetIntensity)*multRef;
+//                        cContrast[m][k]  << contrastTmp*multRef;
+//                        double sqrtTmpPhase=0.0;
+//                        double sqrtTmpInt=0.0;
+//                        for (int i=geom2.top(); i<geom2.bottom();i++) {
+//                            double p1=phase[k][1].point(j,i);
+//                            double p0=phase[k][0].point(j,i);
+//                            double dp= p1>p0 ? std::min(p1-p0, p0-p1+1) : std::min(p0-p1, p1-p0+1);
+//                            double dist=dp-meanPhaseTmp;
+//                            sqrtTmpPhase += pow(dist,2);
+//                            sqrtTmpInt += pow(intensity[k][m].point(j-intensityShift,i,0) - meanInt,2);
+//                        }
+//                        cPhaseErr[k] << sqrt(sqrtTmpPhase / (geom2.height()-1));
+//                        reflError[k] << sqrt(sqrtTmpInt / (geom2.height()-1));
+//                    }
                 }
-                
+
                 double buffer,bufferold,dummy=0.0;
                 double offsetShift=0;
                 if(cPhase[m][k].size()) {
@@ -1473,13 +1483,13 @@ QString Visar::export_one(unsigned int k) {
             out += QString("#Sweep Time         : %L1\n").arg(phaseUi[k]->physScale->text());
             out += QString("#Time zero & delay  : %L1 %L2\n").arg(phaseUi[k]->physOrigin->value()).arg(phaseUi[k]->offsetTime->value());
             out += QString("#Jumps              : %L1\n").arg(phaseUi[k]->jumpst->text());
-            out += QString("# Time       Velocity    ErrVel      Reflect     ErrRefl     Quality     Pixel       RefShift    ShotShift   ErrShift    RefInt      RefErrInt   ShotInt     ShotErrInt  RefContr    ShotContr.\n");
+            out += QString("# Time       Velocity    ErrVel      Reflect     ErrRefl     Quality     Pixel       RefShift    ShotShift   ErrShift    RefInt      ShotInt     RefContr    ShotContr.\n");
             for (int j=0;j<time_phase[k].size();j++) {
                 QVector<double> values {time_vel[k][j],velocity[k][j], velError[k][j],
-                            reflectivity[k][j],reflError[k][j],quality[k][j],
+                            reflectivity[k][j], reflError[k][j], quality[k][j],
                             time_phase[k][j],
                             cPhase[0][k][j],cPhase[1][k][j],cPhaseErr[k][j],
-                            cIntensity[0][k][j], cIntErr[0][k][j],cIntensity[1][k][j], cIntErr[1][k][j],
+                            cIntensity[0][k][j], cIntensity[1][k][j],
                             cContrast[0][k][j],cContrast[1][k][j]};
                 foreach (double val, values) {
                     out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
