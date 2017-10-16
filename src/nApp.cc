@@ -32,6 +32,9 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     my_set.beginGroup("nPreferences");
     changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
+    if (!my_set.contains("checkUpdates")) {
+        my_set.setValue("checkUpdates",QMessageBox::Yes == QMessageBox::question(nullptr,tr("Attention"),tr("Do you want to check for updates?"), QMessageBox::Yes | QMessageBox::No));
+    }
     if (my_set.value("checkUpdates",true).toBool()) {
         checkUpdates();
     }
@@ -41,7 +44,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
 
 
 void nApp::checkUpdates() {
-    qDebug() << "-----------------------------------------";
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/git/refs/tags/latest")));
     QEventLoop event;

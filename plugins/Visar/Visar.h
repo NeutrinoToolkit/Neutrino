@@ -93,11 +93,11 @@ private:
 
     unsigned int numVisars;
 
-    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // 1st: shot/ref. 2nd: numVisar. 3rd: time
+    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast, cIntErr; // indices = 1st: ref/shot. 2nd: numVisar. 3rd: time
     std::vector<QVector<double>> time_phase;
     std::vector<QVector<double>> cPhaseErr;
 
-    std::vector<QVector<double>> velocity, velError, reflectivity, quality, time_vel;
+    std::vector<QVector<double>> velocity, velError, reflectivity, reflError, quality, time_vel;
 
     std::array<QVector<double>,4> sopCurve;
     QVector<double> time_sop;
