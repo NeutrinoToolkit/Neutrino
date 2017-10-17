@@ -1226,6 +1226,23 @@ void Visar::getPhase(int k) {
 
             int refIntShift= velocityUi[k]->intensityShift->value();
 
+//            std::array<nPhysD,2> phaseSub={{nPhysD(phase[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(phase[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
+//            std::array<nPhysD,2> phaseInt={{nPhysD(intensity[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(intensity[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
+//            std::array<nPhysD,2> phaseCon={{nPhysD(contrast[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(contrast[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
+
+//            int time_pixel_offset;
+//            if (direction(k)!=0) { //fringes are vertical
+//                for (unsigned int m=0;m<imgsSub.size();m++) {
+//                    phys_transpose(imgsSub[m]);
+//                }
+//                time_pixel_offset=geom2.top();
+//            } else {
+//                time_pixel_offset=geom2.left();
+//            }
+
+
+
+
             if (direction(k)==0) { //fringes are vertical
                 for (int j=geom2.top(); j<geom2.bottom(); j++) {
                     time_phase[k]  << j;
@@ -1260,7 +1277,8 @@ void Visar::getPhase(int k) {
                     meanIntShot/=geom2.width();
                     meanRefle/=geom2.width();
 
-                    contrastTmp/=geom2.width();
+                    contrastTmpRef/=geom2.width();
+                    contrastTmpShot/=geom2.width();
                     meanPhaseTmp /= geom2.width();
                     cIntensity[0][k] << meanIntRef;
                     cIntensity[1][k] << meanIntShot;
@@ -1318,7 +1336,8 @@ void Visar::getPhase(int k) {
                     meanIntShot/=geom2.height();
                     meanRefle/=geom2.height();
 
-                    contrastTmp/=geom2.height();
+                    contrastTmpRef/=geom2.height();
+                    contrastTmpShot/=geom2.height();
                     meanPhaseTmp /= geom2.height();
                     cIntensity[0][k] << meanIntRef;
                     cIntensity[1][k] << meanIntShot;
