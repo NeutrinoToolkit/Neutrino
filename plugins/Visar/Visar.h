@@ -103,6 +103,7 @@ private:
     QVector<double> time_sop;
 
     std::vector<std::array<nPhysD,2>> phase;
+
     std::vector<std::array<nPhysD,2>> contrast;
     std::vector<std::array<nPhysD,2>> intensity;
 

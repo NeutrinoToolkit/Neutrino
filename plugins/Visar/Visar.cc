@@ -32,12 +32,12 @@
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
     nCustomPlotMouseX3Y(parent)
 {
-    
+
     xAxis->setLabel(tr("Pixel"));
     yAxis->setLabel(tr("Fringeshift"));
     yAxis2->setLabel(tr("Intensity"));
     yAxis3->setLabel(tr("Contrast"));
-    
+
     QPen pen;
     for (unsigned int k=0; k<2; k++) {
         QString my_type(k==0?"reference":"shot");
@@ -46,12 +46,12 @@ VisarPhasePlot::VisarPhasePlot(QWidget* parent):
         graph->setName("Contrast "+my_type);
         pen.setColor(yAxis3->labelColor());
         graph->setPen(pen);
-        
+
         graph = addGraph(xAxis, yAxis2);
         graph->setName("Intensity "+my_type);
         pen.setColor(yAxis2->labelColor());
         graph->setPen(pen);
-        
+
         graph = addGraph(xAxis, yAxis);
         graph->setName("Fringeshift "+my_type);
         pen.setColor(yAxis->labelColor());
@@ -76,19 +76,19 @@ nSOPPlot::nSOPPlot(QWidget* parent):
     graph = addGraph(xAxis, yAxis);
     graph->setName("SOP");
     graph->setPen(QPen(yAxis->labelColor()));
-    
+
     graph = addGraph(xAxis, yAxis2);
     graph->setName("SOP 1");
     graph->setPen(QPen(yAxis2->labelColor()));
-    
+
     graph = addGraph(xAxis, yAxis2);
     graph->setName("SOP 2");
     graph->setPen(QPen(yAxis2->labelColor(),0.3));
-    
+
     graph = addGraph(xAxis, yAxis2);
     graph->setName("SOP 3");
     graph->setPen(QPen(yAxis2->labelColor(),0.7));
-    
+
 };
 
 
@@ -97,23 +97,23 @@ Visar::Visar(neutrino *nparent)
       numVisars(0)
 {
     setupUi(this);
-    
+
     //!START SOP stuff
     sopRect =  new nRect(this,1);
     sopRect->changeToolTip(tr("SOP region"));
     sopRect->setRect(QRectF(0,0,100,100));
     connect(actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
-    
+
     sopPlot->xAxis->setLabel(tr("Time"));
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
-    
-    
+
+
     QApplication::processEvents();
-    
+
     show();
     QApplication::processEvents();
-    
+
     for (int l=2+numVisars; l<whichRefl->count();l++) {
         whichRefl->removeItem(l);
     }
@@ -127,49 +127,49 @@ Visar::Visar(neutrino *nparent)
     }
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
-    
+
     connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
-    
+
     connect(actionGuess, SIGNAL(triggered()), this, SLOT(getCarrier()));
     connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
-        
+
     connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_delta, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_n0, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
-    
-    
+
+
     //!END SOP stuff
     QApplication::processEvents();
-    
+
     loadDefaults();
     sweepChanged();
     calculate_etalon();
-    
+
 }
 
 void Visar::calculate_etalon() {
     double sens=etalon_lambda->value()*1e-9*_phys_cspeed/(4*etalon_thickness->value()*1e-3*(etalon_n0->value()-1.0/etalon_n0->value())*(1+etalon_delta->value()/100.))*1e-3; // km/s
     etalon_sensitivity->setValue(sens);
-    
+
 }
 
 void Visar::on_showFiltered_triggered(bool) {
     DEBUG("here");
-    
+
     for (unsigned int k=0;k<numVisars;k++) {
         nPhysD *my_phase =  new nPhysD(phase[k][1]);
         phys_point_subtract(*my_phase, phase[k][0]);
         phys_fractional(*my_phase);
-        
+
         nPhysD *my_contrast =  new nPhysD(intensity[k][1]);
         phys_point_divide(*my_contrast, intensity[k][0]);
-        
+
         nPhysD *my_quality =  new nPhysD(contrast[k][1]);
         phys_point_divide(*my_quality, contrast[k][0]);
-        
+
         nPhysD *my_phase_unwrap;
         my_phase_unwrap=phys_phase_unwrap(*my_phase, *my_quality, QUALITY);
         delete my_phase;
@@ -201,12 +201,12 @@ void Visar::addVisar() {
     wvisar1->setObjectName(QStringLiteral("wvisar1"));
     gridLayout1->addWidget(wvisar1, 0, 0, 1, 1);
     tabPhase->addTab(tab1, "Visar"+QString::number(numVisars+1));
-    
+
     Ui::Visar2* ui_vel=new Ui::Visar2();
     ui_vel->setupUi(wvisar1);
 
     velocityUi.push_back(ui_vel);
-    
+
     QWidget *tab2 = new QWidget();
     QGridLayout *gridLayout2 = new QGridLayout(tab2);
     gridLayout2->setContentsMargins(0, 0, 0, 0);
@@ -214,11 +214,11 @@ void Visar::addVisar() {
     wvisar2->setObjectName(QStringLiteral("wvisar1"));
     gridLayout2->addWidget(wvisar2, 0, 0, 1, 1);
     tabVelocity->addTab(tab2, "Visar"+QString::number(numVisars+1));
-    
+
     Ui::Visar3* ui_set=new Ui::Visar3();
     ui_set->setupUi(wvisar2);
-    
-    
+
+
     phaseUi.push_back(ui_set);
 
     //hack to save diffrent uis!!!
@@ -233,9 +233,10 @@ void Visar::addVisar() {
 //    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 
     phase.push_back({nPhysD(),nPhysD()});
+
     contrast.push_back({nPhysD(),nPhysD()});
     intensity.push_back({nPhysD(),nPhysD()});
-    
+
     for (int m=0;m<2;m++){
         QString name="Visar "+QString::number(numVisars+1)+" "+QString::number(m);
         phase[numVisars][m].setName(name.toUtf8().constData());
@@ -247,20 +248,20 @@ void Visar::addVisar() {
     }
 
     QApplication::processEvents();
-    
+
     sweepCoeff.push_back(std::vector<double>());
-    
+
     QAction *actionRect = new QAction(QIcon(":icons/rect.png"), "Region Visar"+QString::number(numVisars+1),this);
     actionRect->setProperty("id",numVisars);
-    
+
     toolBar->insertAction(actionDelVisar,actionRect);
-    
+
     whichRefl->addItem("Visar"+QString::number(numVisars+1));
-    
+
     nLine* my_nline=new nLine(this,3);
     my_nline->changeToolTip(tr("Fringeshift Visar ")+QString::number(numVisars+1));
     fringeLine.push_back(my_nline);
-    
+
     nRect *my_rect=new nRect(this,1);
     my_rect->setRect(QRectF(0,0,100,100));
     my_rect->setProperty("id", numVisars);
@@ -268,7 +269,7 @@ void Visar::addVisar() {
     connect(actionRect, SIGNAL(triggered()),my_rect, SLOT(togglePadella()));
     fringeRect.push_back(my_rect);
 
-    
+
     velocity.push_back(QVector<double>());
     velError.push_back(QVector<double>());
     reflectivity.push_back(QVector<double>());
@@ -276,7 +277,7 @@ void Visar::addVisar() {
     quality.push_back(QVector<double>());
     time_vel.push_back(QVector<double>());
     time_phase.push_back(QVector<double>());
-    
+
     for (unsigned int m=0; m<2;m++) {
         cPhase[m].push_back(QVector<double>());
         cIntensity[m].push_back(QVector<double>());
@@ -294,7 +295,7 @@ void Visar::addVisar() {
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis3->labelColor());
     graph->setPen(pen);
-    
+
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis2);
     graph->setName("Reflectivity Visar "+QString::number(numVisars+1));
     graph->setProperty("id",numVisars);
@@ -317,8 +318,8 @@ void Visar::addVisar() {
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis->labelColor());
     graph->setPen(pen);
-    
-    
+
+
     errorBars = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis);
     errorBars->setName("Velocity error Visar "+QString::number(numVisars+1));
     errorBars->setDataPlottable(graph);
@@ -333,7 +334,7 @@ void Visar::addVisar() {
     localPhys.push_back(std::map<std::string, nPhysD *>());
 
     numVisars++;
-    
+
     setProperty("NeuSave-numVisars",numVisars);
 
 
@@ -356,23 +357,23 @@ void Visar::delVisar() {
             }
         }
         QApplication::processEvents();
-        
+
         fringeLine.back()->deleteLater();
         fringeLine.pop_back();
         fringeRect.back()->deleteLater();
         fringeRect.pop_back();
-        
+
         velocityUi.pop_back();
         phaseUi.pop_back();
-        
+
         phase.pop_back();
         contrast.pop_back();
         intensity.pop_back();
-        
+
         sweepCoeff.pop_back();
-        
+
         whichRefl->removeItem(numVisars+1);
-        
+
         velocity.pop_back();
         velError.pop_back();
         reflectivity.pop_back();
@@ -380,14 +381,14 @@ void Visar::delVisar() {
         quality.pop_back();
         time_vel.pop_back();
         time_phase.pop_back();
-        
+
         for (unsigned int m=0; m<2;m++) {
             cPhase[m].pop_back();
             cIntensity[m].pop_back();
             cContrast[m].pop_back();
         }
         cPhaseErr.pop_back();
-        
+
         QList<QCPAbstractPlottable *> listplottable;
         for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
             QVariant id=plotVelocity->plottable(kk)->property("id");
@@ -404,7 +405,7 @@ void Visar::delVisar() {
 
         }
         localPhys.pop_back();
-        
+
         QApplication::processEvents();
         numVisars--;
         setProperty("NeuSave-numVisars",numVisars);
@@ -427,11 +428,11 @@ void Visar::loadSettings(QString my_settings) {
     }
     int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
     settings.endGroup();
-    
+
     loadSettings(&settings);
-    
+
     whichRefl->setCurrentIndex(whichReflSaved);
-    
+
     connections();
     sweepChanged();
     doWave();
@@ -447,7 +448,7 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
                               << plot->yAxis->pixelToCoord(e->pos().y()) << " "
                               << plot->yAxis2->pixelToCoord(e->pos().y()) << ":"
                               << plot->yAxis3->pixelToCoord(e->pos().y());
-            
+
             statusbar->showMessage(msg);
         } else {
             nSOPPlot *plot=qobject_cast<nSOPPlot *>(sender());
@@ -456,7 +457,7 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
                 QTextStream(&msg) << plot->xAxis->pixelToCoord(e->pos().x()) << ","
                                   << plot->yAxis->pixelToCoord(e->pos().y()) << " "
                                   << plot->yAxis2->pixelToCoord(e->pos().y());
-                
+
                 statusbar->showMessage(msg);
             }
         }
@@ -483,7 +484,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             k=line->property("id").toInt();
             vecsweep = &sweepCoeff[k];
         }
-        
+
         if (vecsweep) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
@@ -500,7 +501,7 @@ void Visar::sweepChanged(QLineEdit *line) {
                     break;
                 }
             }
-            
+
             if (line==sopScale) {
                 updatePlotSOP();
             } else {
@@ -569,13 +570,13 @@ void Visar::bufferChanged(nPhysD*phys) {
 
 void Visar::tabChanged(int k) {
     QTabWidget *tabWidget=nullptr;
-    
+
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
-    
+
     disconnections();
 
     if (tabWidget) {
-        
+
         if (tabWidget==tabs) {
             if (k==0) {
                 tabWidget=tabPhase;
@@ -587,7 +588,7 @@ void Visar::tabChanged(int k) {
         } else if (tabWidget == tabPhase) {
             getPhase(k);
         }
-        
+
         if (tabWidget==tabs && tabWidget->currentIndex()==2) {
             if (enableSOP->isChecked()) {
                 nparent->showPhys(getPhysFromCombo(sopShot));
@@ -619,28 +620,28 @@ void Visar::connections() {
         connect(phaseUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         connect(phaseUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         connect(phaseUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        
+
         connect(phaseUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
         connect(phaseUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        
+
         connect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
         connect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
-        
+
         connect(velocityUi[k]->multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         connect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         connect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         connect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        
+
         connect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
-        
+
         connect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-        
+
         connect(velocityUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    
+
     connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
     connect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
@@ -652,11 +653,11 @@ void Visar::connections() {
     connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
-    
+
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-    
+
 }
 
 void Visar::disconnections() {
@@ -668,28 +669,28 @@ void Visar::disconnections() {
         disconnect(phaseUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         disconnect(phaseUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
         disconnect(phaseUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        
+
         disconnect(phaseUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
         disconnect(phaseUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        
+
         disconnect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
         disconnect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
-        
+
         disconnect(velocityUi[k]->multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        
+
         disconnect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
-        
+
         disconnect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-        
+
         disconnect(velocityUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     disconnect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     disconnect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     disconnect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    
+
     disconnect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
     disconnect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     disconnect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
@@ -737,7 +738,7 @@ void Visar::updatePlotSOP() {
         }
         time_sop.resize(sopData.size());
         sopCurve[0].resize(sopData.size());
-        
+
         switch (dir) {
             case 0:
                 for (int j=0;j<dy;j++) {
@@ -755,7 +756,7 @@ void Visar::updatePlotSOP() {
                 break;
         }
         sopPlot->graph(0)->setData(time_sop,sopCurve[0]);
-        
+
         // TEMPERATURE FROM REFLECTIVITY
         QVector<int> reflList;
         setProperty("NeuSave-whichRefl",whichRefl->currentIndex());
@@ -771,37 +772,37 @@ void Visar::updatePlotSOP() {
                 reflList << whichRefl->currentIndex()-2;
                 break;
         }
-        
+
         sopCurve[1].resize(time_sop.size());
         sopCurve[2].resize(time_sop.size());
         sopCurve[3].resize(time_sop.size());
-        
+
         double my_T0=sopCalibT0->value();
         double my_A=sopCalibA->value();
-        
+
         for (int i=0; i<time_sop.size(); i++) {
             double my_reflectivity=0;
             double my_velocity=0;
-            
+
             int numrefl=0;
             for (int numk=0;numk<reflList.size();numk++) {
                 int k=reflList[numk];
-                
+
                 if ( k>=0 && k<(int)numVisars ) {
                     for (int j=1;j<time_vel[k].size();j++) {
                         double t_j1=time_vel[k][j-1];
                         double t_j=time_vel[k][j];
-                        
+
                         if (time_sop[i]>t_j1 && time_sop[i]<=t_j ) {
                             double valRj_1=reflectivity[k][j-1];
                             double valRj=reflectivity[k][j];
-                            
+
                             double valVj_1=velocity[k][j-1];
                             double valVj=velocity[k][j];
-                            
+
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
                             my_velocity+=valVj_1+(time_sop[i]-t_j1)*(valVj-valVj_1)/(t_j-t_j1);
-                            
+
                             numrefl++;
                         }
                     }
@@ -811,10 +812,10 @@ void Visar::updatePlotSOP() {
                 my_reflectivity/=numrefl;
                 my_velocity/=numrefl;
             }
-            
+
             my_reflectivity=std::min(std::max(my_reflectivity,0.0),1.0);
             double my_temp=my_T0/log(1.0+(1.0-my_reflectivity)*my_A/sopCurve[0][i]);
-            
+
             if (numrefl) {
                 sopCurve[1][i]=my_temp;
                 sopCurve[2][i]=0.0;
@@ -826,11 +827,11 @@ void Visar::updatePlotSOP() {
             }
         }
         sopPlot->graph(1)->setData(time_sop,sopCurve[1]);
-        
+
         sopPlot->graph(2)->setData(time_sop,sopCurve[2]);
-        
+
         sopPlot->graph(3)->setData(time_sop,sopCurve[3]);
-        
+
         sopPlot->rescaleAxes();
         sopPlot->replot();
     }
@@ -840,15 +841,15 @@ void Visar::updatePlotSOP() {
 void Visar::updatePlot() {
     disconnections();
 
-    
+
     plotVelocity->clearItems();
-    
+
     for (int g=0; g<plotVelocity->plottableCount(); g++) {
         if (plotVelocity->plottable(g)->property("JumpGraph").toBool()) {
             plotVelocity->removePlottable(plotVelocity->plottable(g));
         }
     }
-    
+
 
     for (unsigned int k=0;k<numVisars;k++){
         if (cPhase[0][k].size()==cPhase[1][k].size() && cPhase[0][k].size()==time_phase[k].size()){
@@ -856,10 +857,10 @@ void Visar::updatePlot() {
             if (velocityUi[k]->enableVisar->isChecked()) {
 
                 Qt::PenStyle pstyle=((int)k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine);
-                
+
                 double sensitivity=phaseUi[k]->sensitivity->value();
                 double deltat=phaseUi[k]->offsetTime->value()-getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value());
-                
+
                 QVector<double> tjump,njump,rjump;
                 QStringList jumpt=phaseUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
                 phaseUi[k]->jumpst->setPalette(QApplication::palette());
@@ -912,15 +913,15 @@ void Visar::updatePlot() {
                     my_jumpLine->point1->setCoords(a,0);
                     my_jumpLine->point2->setCoords(a,1);
                 }
-                
+
                 double offset=phaseUi[k]->offsetShift->value();
-                
+
                 QVector<QVector< double > > velJump_array(abs(phaseUi[k]->jump->value()));
-                
+
                 for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                     velJump_array[i].resize(time_phase[k].size());
                 }
-                
+
                 time_vel[k].resize(time_phase[k].size());
                 velocity[k].resize(time_phase[k].size());
                 velError[k].resize(time_phase[k].size());
@@ -929,7 +930,7 @@ void Visar::updatePlot() {
 
                 for (int j=0;j<time_phase[k].size();j++) {
                     time_vel[k][j] = getTime(sweepCoeff[k],time_phase[k][j])+deltat;
-                    
+
                     double fRef=cPhase[0][k][j];
                     double fShot=cPhase[1][k][j];
                     double iRef=cIntensity[0][k][j];
@@ -938,7 +939,7 @@ void Visar::updatePlot() {
                         fRef=0.0;
                         iRef=1.0;
                     }
-                    
+
                     int njumps=0;
                     double refr_index=1.0;
                     for (int i=0;i<tjump.size();i++) {
@@ -947,18 +948,18 @@ void Visar::updatePlot() {
                             refr_index=rjump.at(i);
                         }
                     }
-                    
+
                     double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
                     double Rg=phaseUi[k]->reflOffset->value();
                     double Rmat=phaseUi[k]->reflRef->value();
                     double beta=-Rg/pow(1.0-Rg,2);
                     double refle=iShot/iRef * (Rmat-beta) + beta;
-                    
+
                     velocity[k][j] = speed;
                     reflectivity[k][j] = refle;
                     quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
                     velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
-                    
+
                     for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                         int jloc=i+1;
                         if (sensitivity<0) jloc*=-1;
@@ -966,10 +967,10 @@ void Visar::updatePlot() {
                         velJump_array[i][j] = (offset+fShot-fRef+jloc)*sensitivity/refr_index;
                     }
                 }
-                
+
                 QPen pen;
                 pen.setStyle(pstyle);
-                
+
                 for (int kk=0; kk< plotVelocity->graphCount() ; kk++) {
                     QCPGraph *my_graph=plotVelocity->graph(kk);
                     if (my_graph->property("id").toInt() == (int)k ){
@@ -1012,7 +1013,7 @@ void Visar::updatePlot() {
                         graph->setPen(pen);
                         graph->setData(time_vel[k],velJump_array[i]);
                     }
-                    
+
                 }
 
             }
@@ -1049,14 +1050,14 @@ void Visar::getCarrier(int k) {
     } else {
         combo=velocityUi[k]->shotImage;
     }
-    
+
     nPhysD *phys=getPhysFromCombo(combo);
     if (phys && fringeRect[k]) {
         QRect geom2=fringeRect[k]->getRect(phys);
         nPhysD datamatrix = phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
-        
+
         vec2f vecCarr=phys_guess_carrier(datamatrix, velocityUi[k]->guessWeight->value());
-        
+
         if (vecCarr.first()==0) {
             statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
         } else {
@@ -1095,17 +1096,17 @@ void Visar::doWave(int k) {
             progress.show();
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             sweepChanged(phaseUi[k]->physScale);
-            
+
             std::array<nPhysC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             vec2 dim(imgs[0]->getSize());
-            
+
             std::array<nPhysC,2> zz_morlet;
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             for (int m=0;m<2;m++) {
                 phase[k][m].resize(dim.x(), dim.y());
                 contrast[k][m].resize(dim.x(), dim.y());
@@ -1119,48 +1120,48 @@ void Visar::doWave(int k) {
                 progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
-            
+
             std::vector<int> xx(dim.x()), yy(dim.y());
 #pragma omp parallel for
             for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
 #pragma omp parallel for
             for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
-            
+
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double cr = cos((velocityUi[k]->angle->value()) * _phys_deg);
             double sr = sin((velocityUi[k]->angle->value()) * _phys_deg);
             double thick_norm=velocityUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
             const double damp_norm=M_PI;
-            
+
             double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
 #pragma omp parallel for collapse(2)
             for (size_t x=0;x<(size_t)dim.x();x++) {
                 for (size_t y=0;y<(size_t)dim.y();y++) {
                     double xr = xx[x]*cr - yy[y]*sr; //rotate
                     double yr = xx[x]*sr + yy[y]*cr;
-                    
+
                     double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
                     double e_y = -pow(yr*thick_norm, 2);
-                    
+
                     double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
-                    
+
                     for (unsigned int m=0;m<2;m++) {
                         zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
                     }
                 }
             }
-            
+
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             for (unsigned int m=0;m<2;m++) {
                 physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
                 progress.setValue(progress.value()+1);
             }
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for
                 for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
@@ -1171,16 +1172,17 @@ void Visar::doWave(int k) {
             }
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             getPhase(k);
-            
+
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            
+
             updatePlot();
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             setProperty("NeuSave-VisarCounter",progress.value()+1);
+
         } else {
             statusBar()->showMessage("size mismatch",5000);
         }
@@ -1206,8 +1208,11 @@ void Visar::getPhase(int k) {
     if (k< (int) numVisars && velocityUi[k]->enableVisar->isChecked()) {
         velocityUi[k]->plotPhaseIntensity->clearGraphs();
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
-        
+
         if (imgs[0] && imgs[1] && imgs[0]->getSize() == imgs[1]->getSize()) {
+
+
+
             for (unsigned int m=0;m<cPhase.size();m++) {
                 QRect geom2=fringeRect[k]->getRect(imgs[m]);
                 time_phase[k].clear();
@@ -1219,87 +1224,117 @@ void Visar::getPhase(int k) {
 
                 int intensityShift= (m==0 ? velocityUi[k]->intensityShift->value() : 0);
                 if (direction(k)==0) { //fringes are vertical
-                    for (int j=geom2.top(); j<geom2.bottom();j++) {
+                    for (int j=geom2.top(); j<geom2.bottom(); j++) {
+
+                        double central=geom2.center().x();
+
                         time_phase[k]  << j;
+                        cPhase[m][k]  << phase[k][m].point(central,j,0);
                         double meanIntRef=0.0;
                         double meanIntShot=0.0;
                         double contrastTmp=0.0;
                         double meanPhaseTmp=0.0;
+                        double meanRefle=0.0;
+                        double weightsum=0.0;
                         for (int i=geom2.left(); i<geom2.right();i++) {
-                            meanIntRef+=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                            meanIntShot+=(intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value());
+                            double intRef=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                            double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+
+                            meanIntRef+=intRef;
+                            meanIntShot+=intShot;
+
+                            double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
+                            meanRefle+= weight*intShot/intRef;
+
+                            weightsum+=weight;
 
                             contrastTmp+=contrast[k][m].point(i,j-intensityShift,0);
-                            double dp=phase[k][0].point(i,j)-phase[k][1].point(i,j);
-                            meanPhaseTmp += abs(remainder(std::min(dp,dp+1),1));
+                            meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
                         }
+
+
                         meanIntRef/=geom2.width();
                         meanIntShot/=geom2.width();
+                        meanRefle/=geom2.width();
 
                         contrastTmp/=geom2.width();
                         meanPhaseTmp /= geom2.width();
-                        cPhase[m][k]  << phase[k][m].point(geom2.center().x(),j,0);
-//                        cPhase[m][k]  << meanPhaseTmp;
                         cIntensity[m][k] << (m==0 ? meanIntRef : meanIntShot);
                         cContrast[m][k]  << contrastTmp*(m==0 ? velocityUi[k]->multRef->value() : 1.0);
                         double sqrtTmpPhase=0.0;
-                        double stdIntRef=0.0;
-                        double stdIntShot=0.0;
-                        double IntCovarance=0.0;
+                        double stdRefle=0.0;
                         for (int i=geom2.left(); i<geom2.right();i++) {
-                            double dp=phase[k][0].point(i,j)-phase[k][1].point(i,j);
-                            double rem=abs(remainder(std::min(dp,-dp),1));
+                            double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
                             double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
                             sqrtTmpPhase += pow(dist,2);
 
-                            double diffref=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value() - meanIntRef;
-                            double diffshot=(intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value()) - meanIntShot;
-                            stdIntRef += pow(diffref,2);
-                            stdIntShot += pow(diffshot,2);
-                            IntCovarance += diffref*diffshot;
+                            double intRef=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                            double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+
+                            double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
+
+                            stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
                         }
-                        cPhaseErr[k] << sqrt(sqrtTmpPhase/geom2.width());
-                        stdIntRef = sqrt(stdIntRef / geom2.width());
-                        stdIntShot = sqrt(stdIntShot / geom2.width());
-                        IntCovarance /= geom2.width();
+                        cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
+                        reflError[k] << sqrt(stdRefle / geom2.width());
 
-
-                        double valref= meanIntShot/meanIntRef;
-                        reflError[k] << valref*sqrt(pow(stdIntRef/meanIntRef,2) + pow(stdIntShot/meanIntShot,2));
-
-                        qDebug() << j << meanIntRef << reflError[k].last();
                     }
                 } else { //fringes are horizontal
-//                    for (int j=geom2.left(); j<geom2.right();j++) {
-//                        time_phase[k]  << j;
-//                        cPhase[m][k]  << phase[k][m].point(geom2.center().y(),j,0);
-//                        double meanInt=0.0;
-//                        double contrastTmp=0.0;
-//                        double meanPhaseTmp=0.0;
-//                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-//                            meanInt+=intensity[k][m].point(j-intensityShift,i,0);
-//                            contrastTmp+=contrast[k][m].point(j-intensityShift,i,0);
-//                            double dp=phase[k][0].point(j,i)-phase[k][1].point(j,i);
-//                            meanPhaseTmp += abs(remainder(std::min(dp,-dp),1));;
-//                        }
-//                        meanPhaseTmp /= geom2.height();
-//                        meanInt/=geom2.height();
-//                        contrastTmp/=geom2.width();
-//                        cIntensity[m][k] << (meanInt-offsetIntensity)*multRef;
-//                        cContrast[m][k]  << contrastTmp*multRef;
-//                        double sqrtTmpPhase=0.0;
-//                        double sqrtTmpInt=0.0;
-//                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-//                            double p1=phase[k][1].point(j,i);
-//                            double p0=phase[k][0].point(j,i);
-//                            double dp= p1>p0 ? std::min(p1-p0, p0-p1+1) : std::min(p0-p1, p1-p0+1);
-//                            double dist=dp-meanPhaseTmp;
-//                            sqrtTmpPhase += pow(dist,2);
-//                            sqrtTmpInt += pow(intensity[k][m].point(j-intensityShift,i,0) - meanInt,2);
-//                        }
-//                        cPhaseErr[k] << sqrt(sqrtTmpPhase / (geom2.height()-1));
-//                        reflError[k] << sqrt(sqrtTmpInt / (geom2.height()-1));
-//                    }
+                    for (int j=geom2.left(); j<geom2.right(); j++) {
+
+                        double central=geom2.center().y();
+
+                        time_phase[k]  << j;
+                        cPhase[m][k]  << phase[k][m].point(j,central,0);
+                        double meanIntRef=0.0;
+                        double meanIntShot=0.0;
+                        double contrastTmp=0.0;
+                        double meanPhaseTmp=0.0;
+                        double meanRefle=0.0;
+                        double weightsum=0.0;
+                        for (int i=geom2.top(); i<geom2.bottom();i++) {
+                            double intRef=(intensity[k][0].point(j-intensityShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                            double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
+
+                            meanIntRef+=intRef;
+                            meanIntShot+=intShot;
+
+                            double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
+                            meanRefle+= weight*intShot/intRef;
+
+                            weightsum+=weight;
+
+                            contrastTmp+=contrast[k][m].point(j-intensityShift,i,0);
+                            meanPhaseTmp += abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i),1));
+                        }
+
+
+                        meanIntRef/=geom2.height();
+                        meanIntShot/=geom2.height();
+                        meanRefle/=geom2.height();
+
+                        contrastTmp/=geom2.height();
+                        meanPhaseTmp /= geom2.height();
+                        cIntensity[m][k] << (m==0 ? meanIntRef : meanIntShot);
+                        cContrast[m][k]  << contrastTmp*(m==0 ? velocityUi[k]->multRef->value() : 1.0);
+                        double sqrtTmpPhase=0.0;
+                        double stdRefle=0.0;
+                        for (int i=geom2.top(); i<geom2.bottom();i++) {
+                            double rem=abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i)+1,1));
+                            double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
+                            sqrtTmpPhase += pow(dist,2);
+
+                            double intRef=(intensity[k][0].point(j-intensityShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                            double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
+
+                            double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
+
+                            stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
+                        }
+                        cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.height());
+                        reflError[k] << sqrt(stdRefle / geom2.height());
+
+                    }
                 }
 
                 double buffer,bufferold,dummy=0.0;
@@ -1329,7 +1364,7 @@ void Visar::getPhase(int k) {
                 for (int j=0;j<cPhase[m][k].size();j++){
                     cPhase[m][k][j] -= offsetShift;
                 }
-                
+
                 QPolygonF myLine;
                 for (int i=0;i<cPhase[m][k].size();i++){
                     if (direction(k)==0) {		//fringes are vertical
@@ -1339,23 +1374,23 @@ void Visar::getPhase(int k) {
                     }
                 }
                 fringeLine[k]->setPoints(myLine);
-                
+
                 QCPGraph* graph;
                 QPen pen;
                 pen.setStyle((m==1?Qt::SolidLine : Qt::DashLine));
-                
+
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
                 graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
                 pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cPhase[m][k]);
-                
+
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis2);
                 graph->setName("Intensity Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
                 pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis2->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cIntensity[m][k]);
-                
+
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis3);
                 graph->setName("Contrast Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
                 pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis3->labelColor());
@@ -1460,7 +1495,7 @@ QString Visar::export_sop() {
     out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
     out += QString("#Calib            : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
     out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
-    
+
     for (int i=0;i<time_sop.size();i++) {
         out += QLocale().toString(time_sop[i])+ " ";
         for (int j=0;j<4;j++) {
