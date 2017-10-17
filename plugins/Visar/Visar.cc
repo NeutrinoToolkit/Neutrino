@@ -1212,131 +1212,139 @@ void Visar::getPhase(int k) {
         if (imgs[0] && imgs[1] && imgs[0]->getSize() == imgs[1]->getSize()) {
 
 
+            QRect geom2=fringeRect[k]->getRect(imgs[0]);
+
+            cPhase[0][k].clear();
+            cPhase[1][k].clear();
+            cIntensity[0][k].clear();
+            cIntensity[1][k].clear();
+            cContrast[0][k].clear();
+            cContrast[1][k].clear();
+            time_phase[k].clear();
+            cPhaseErr[k].clear();
+            reflError[k].clear();
+
+            int refIntShift= velocityUi[k]->intensityShift->value();
+
+            if (direction(k)==0) { //fringes are vertical
+                for (int j=geom2.top(); j<geom2.bottom(); j++) {
+                    time_phase[k]  << j;
+                    cPhase[0][k]  << phase[k][0].point(geom2.center().x(),j,0);
+                    cPhase[1][k]  << phase[k][1].point(geom2.center().x(),j,0);
+                    double meanIntRef=0.0;
+                    double meanIntShot=0.0;
+                    double contrastTmpRef=0.0;
+                    double contrastTmpShot=0.0;
+                    double meanPhaseTmp=0.0;
+                    double meanRefle=0.0;
+                    double weightsum=0.0;
+                    for (int i=geom2.left(); i<geom2.right();i++) {
+                        double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                        double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+
+                        meanIntRef+=intRef;
+                        meanIntShot+=intShot;
+
+                        double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
+                        meanRefle+= weight*intShot/intRef;
+
+                        weightsum+=weight;
+
+                        contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
+                        contrastTmpShot+=contrast[k][1].point(i,j,0);
+                        meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
+                    }
+
+
+                    meanIntRef/=geom2.width();
+                    meanIntShot/=geom2.width();
+                    meanRefle/=geom2.width();
+
+                    contrastTmp/=geom2.width();
+                    meanPhaseTmp /= geom2.width();
+                    cIntensity[0][k] << meanIntRef;
+                    cIntensity[1][k] << meanIntShot;
+                    cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
+                    cContrast[1][k]  << contrastTmpShot;
+                    double sqrtTmpPhase=0.0;
+                    double stdRefle=0.0;
+                    for (int i=geom2.left(); i<geom2.right();i++) {
+                        double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
+                        double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
+                        sqrtTmpPhase += pow(dist,2);
+
+                        double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                        double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+
+                        double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
+
+                        stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
+                    }
+                    cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
+                    reflError[k] << sqrt(stdRefle / geom2.width());
+
+                }
+            } else { //fringes are horizontal
+                for (int j=geom2.left(); j<geom2.right(); j++) {
+                    time_phase[k]  << j;
+                    cPhase[0][k]  << phase[k][0].point(j,geom2.center().y(),0);
+                    cPhase[1][k]  << phase[k][1].point(j,geom2.center().y(),0);
+                    double meanIntRef=0.0;
+                    double meanIntShot=0.0;
+                    double contrastTmpRef=0.0;
+                    double contrastTmpShot=0.0;
+                    double meanPhaseTmp=0.0;
+                    double meanRefle=0.0;
+                    double weightsum=0.0;
+                    for (int i=geom2.top(); i<geom2.bottom();i++) {
+                        double intRef=(intensity[k][0].point(j-refIntShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                        double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
+
+                        meanIntRef+=intRef;
+                        meanIntShot+=intShot;
+
+                        double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
+                        meanRefle+= weight*intShot/intRef;
+
+                        weightsum+=weight;
+
+                        contrastTmpRef+=contrast[k][0].point(j-refIntShift,i,0);
+                        contrastTmpShot+=contrast[k][1].point(j,i,0);
+                        meanPhaseTmp += abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i),1));
+                    }
+
+
+                    meanIntRef/=geom2.height();
+                    meanIntShot/=geom2.height();
+                    meanRefle/=geom2.height();
+
+                    contrastTmp/=geom2.height();
+                    meanPhaseTmp /= geom2.height();
+                    cIntensity[0][k] << meanIntRef;
+                    cIntensity[1][k] << meanIntShot;
+                    cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
+                    cContrast[1][k]  << contrastTmpShot;
+                    double sqrtTmpPhase=0.0;
+                    double stdRefle=0.0;
+                    for (int i=geom2.top(); i<geom2.bottom();i++) {
+                        double rem=abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i)+1,1));
+                        double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
+                        sqrtTmpPhase += pow(dist,2);
+
+                        double intRef=(intensity[k][0].point(j-refIntShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                        double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
+
+                        double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
+
+                        stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
+                    }
+                    cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.height());
+                    reflError[k] << sqrt(stdRefle / geom2.height());
+
+                }
+            }
 
             for (unsigned int m=0;m<cPhase.size();m++) {
-                QRect geom2=fringeRect[k]->getRect(imgs[m]);
-                time_phase[k].clear();
-                cPhase[m][k].clear();
-                cIntensity[m][k].clear();
-                cContrast[m][k].clear();
-                cPhaseErr[k].clear();
-                reflError[k].clear();
-
-                int intensityShift= (m==0 ? velocityUi[k]->intensityShift->value() : 0);
-                if (direction(k)==0) { //fringes are vertical
-                    for (int j=geom2.top(); j<geom2.bottom(); j++) {
-
-                        double central=geom2.center().x();
-
-                        time_phase[k]  << j;
-                        cPhase[m][k]  << phase[k][m].point(central,j,0);
-                        double meanIntRef=0.0;
-                        double meanIntShot=0.0;
-                        double contrastTmp=0.0;
-                        double meanPhaseTmp=0.0;
-                        double meanRefle=0.0;
-                        double weightsum=0.0;
-                        for (int i=geom2.left(); i<geom2.right();i++) {
-                            double intRef=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                            double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
-
-                            meanIntRef+=intRef;
-                            meanIntShot+=intShot;
-
-                            double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-                            meanRefle+= weight*intShot/intRef;
-
-                            weightsum+=weight;
-
-                            contrastTmp+=contrast[k][m].point(i,j-intensityShift,0);
-                            meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
-                        }
-
-
-                        meanIntRef/=geom2.width();
-                        meanIntShot/=geom2.width();
-                        meanRefle/=geom2.width();
-
-                        contrastTmp/=geom2.width();
-                        meanPhaseTmp /= geom2.width();
-                        cIntensity[m][k] << (m==0 ? meanIntRef : meanIntShot);
-                        cContrast[m][k]  << contrastTmp*(m==0 ? velocityUi[k]->multRef->value() : 1.0);
-                        double sqrtTmpPhase=0.0;
-                        double stdRefle=0.0;
-                        for (int i=geom2.left(); i<geom2.right();i++) {
-                            double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
-                            double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
-                            sqrtTmpPhase += pow(dist,2);
-
-                            double intRef=(intensity[k][0].point(i,j-intensityShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                            double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
-
-                            double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-
-                            stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
-                        }
-                        cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
-                        reflError[k] << sqrt(stdRefle / geom2.width());
-
-                    }
-                } else { //fringes are horizontal
-                    for (int j=geom2.left(); j<geom2.right(); j++) {
-
-                        double central=geom2.center().y();
-
-                        time_phase[k]  << j;
-                        cPhase[m][k]  << phase[k][m].point(j,central,0);
-                        double meanIntRef=0.0;
-                        double meanIntShot=0.0;
-                        double contrastTmp=0.0;
-                        double meanPhaseTmp=0.0;
-                        double meanRefle=0.0;
-                        double weightsum=0.0;
-                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-                            double intRef=(intensity[k][0].point(j-intensityShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                            double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
-
-                            meanIntRef+=intRef;
-                            meanIntShot+=intShot;
-
-                            double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
-                            meanRefle+= weight*intShot/intRef;
-
-                            weightsum+=weight;
-
-                            contrastTmp+=contrast[k][m].point(j-intensityShift,i,0);
-                            meanPhaseTmp += abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i),1));
-                        }
-
-
-                        meanIntRef/=geom2.height();
-                        meanIntShot/=geom2.height();
-                        meanRefle/=geom2.height();
-
-                        contrastTmp/=geom2.height();
-                        meanPhaseTmp /= geom2.height();
-                        cIntensity[m][k] << (m==0 ? meanIntRef : meanIntShot);
-                        cContrast[m][k]  << contrastTmp*(m==0 ? velocityUi[k]->multRef->value() : 1.0);
-                        double sqrtTmpPhase=0.0;
-                        double stdRefle=0.0;
-                        for (int i=geom2.top(); i<geom2.bottom();i++) {
-                            double rem=abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i)+1,1));
-                            double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
-                            sqrtTmpPhase += pow(dist,2);
-
-                            double intRef=(intensity[k][0].point(j-intensityShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                            double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
-
-                            double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
-
-                            stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
-                        }
-                        cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.height());
-                        reflError[k] << sqrt(stdRefle / geom2.height());
-
-                    }
-                }
-
                 double buffer,bufferold,dummy=0.0;
                 double offsetShift=0;
                 if(cPhase[m][k].size()) {
