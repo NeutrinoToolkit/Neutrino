@@ -237,14 +237,16 @@ phys_divide(nPhysC &iimage, double val) {
 
 }
 
-void phys_fractional(nPhysD &iimage) {
+void phys_remainder(nPhysD &iimage, double val) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
-        double rem=std::remainder(iimage.point(ii), 1.0);
+        double rem=std::remainder(iimage.point(ii), val);
         iimage.set(ii, (rem < 0) ? rem+1: rem );
     }
     iimage.TscanBrightness();
-    iimage.setName("fractional("+iimage.getName()+")");
+    std::ostringstream ostr;
+    ostr << val;
+    iimage.setName("remainder("+iimage.getName()+","+ostr.str()+")");
 }
 
 void 

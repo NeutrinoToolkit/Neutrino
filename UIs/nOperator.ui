@@ -224,6 +224,11 @@
          </item>
          <item>
           <property name="text">
+           <string>Remanider</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Transpose</string>
           </property>
          </item>

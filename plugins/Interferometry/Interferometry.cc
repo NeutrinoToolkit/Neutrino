@@ -319,7 +319,7 @@ void Interferometry::doUnwrap () {
         } else if (localPhys["phase_2pi_ref"]) {
             phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);
         }
-        phys_fractional(diff);
+        phys_remainder(diff,1.0);
         localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD (diff),localPhys["phase_2pi_wrap"]);
         localPhys["phase_2pi_wrap"]->setShortName("phase_2pi_wrap");
     }
