@@ -156,42 +156,6 @@ void Visar::calculate_etalon() {
 
 }
 
-void Visar::on_showFiltered_triggered(bool) {
-    DEBUG("here");
-
-    for (unsigned int k=0;k<numVisars;k++) {
-        nPhysD *my_phase =  new nPhysD(phase[k][1]);
-        phys_point_subtract(*my_phase, phase[k][0]);
-        phys_fractional(*my_phase);
-
-        nPhysD *my_contrast =  new nPhysD(intensity[k][1]);
-        phys_point_divide(*my_contrast, intensity[k][0]);
-
-        nPhysD *my_quality =  new nPhysD(contrast[k][1]);
-        phys_point_divide(*my_quality, contrast[k][0]);
-
-        nPhysD *my_phase_unwrap;
-        my_phase_unwrap=phys_phase_unwrap(*my_phase, *my_quality, QUALITY);
-        delete my_phase;
-        std::ostringstream ss;
-        ss << k+1;
-        my_phase_unwrap->setShortName("phaseVisar"+ss.str());
-        localPhys[k][my_phase_unwrap->getShortName()]=nparent->replacePhys(my_phase_unwrap, localPhys[k][my_phase_unwrap->getShortName()]);
-
-        my_contrast->property["display_range"]=my_contrast->get_min_max();
-        my_contrast->setShortName("contrastVisar"+ss.str());
-        localPhys[k][my_contrast->getShortName()]=nparent->replacePhys(my_contrast, localPhys[k][my_contrast->getShortName()]);
-
-        my_quality->setShortName("qualityVisar"+ss.str());
-        localPhys[k][my_quality->getShortName()]=nparent->replacePhys(my_quality, localPhys[k][my_quality->getShortName()]);
-
-        for (auto& thisphys : localPhys[k]) {
-            thisphys.second->property["VisarNum"]=(int)k;
-        }
-    }
-
-}
-
 void Visar::addVisar() {
     disconnections();
     QWidget *tab1 = new QWidget();
@@ -331,8 +295,6 @@ void Visar::addVisar() {
     errorBars->setWhiskerWidth(0);
     errorBars->setSymbolGap(1);
 
-    localPhys.push_back(std::map<std::string, nPhysD *>());
-
     numVisars++;
 
     setProperty("NeuSave-numVisars",numVisars);
@@ -399,12 +361,6 @@ void Visar::delVisar() {
         for (auto &plot: listplottable) {
             plotVelocity->removePlottable(plot);
         }
-
-        for (auto &my_phys: localPhys.back()) {
-            nparent->removePhys(my_phys.second);
-
-        }
-        localPhys.pop_back();
 
         QApplication::processEvents();
         numVisars--;
@@ -1170,6 +1126,14 @@ void Visar::doWave(int k) {
                     intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));
                 }
             }
+
+            if (direction(k)!=0) {
+                for (unsigned int m=0;m<2;m++) {
+                    phys_transpose(phase[k][m]);
+                    phys_transpose(contrast[k][m]);
+                    phys_transpose(intensity[k][m]);
+                }
+            }
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
@@ -1213,7 +1177,9 @@ void Visar::getPhase(int k) {
 
 
             QRect geom2=fringeRect[k]->getRect(imgs[0]);
-
+            if (direction(k)!=0) {
+                geom2=QRect(QPoint(geom2.top(),geom2.left()),QSize(geom2.height(),geom2.width()));
+            }
             cPhase[0][k].clear();
             cPhase[1][k].clear();
             cIntensity[0][k].clear();
@@ -1226,143 +1192,64 @@ void Visar::getPhase(int k) {
 
             int refIntShift= velocityUi[k]->intensityShift->value();
 
-//            std::array<nPhysD,2> phaseSub={{nPhysD(phase[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(phase[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
-//            std::array<nPhysD,2> phaseInt={{nPhysD(intensity[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(intensity[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
-//            std::array<nPhysD,2> phaseCon={{nPhysD(contrast[k][0]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height())),nPhysD(contrast[k][1]->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()))}};
+            for (int j=geom2.top(); j<geom2.bottom(); j++) {
+                time_phase[k]  << j;
+                cPhase[0][k]  << phase[k][0].point(geom2.center().x(),j,0);
+                cPhase[1][k]  << phase[k][1].point(geom2.center().x(),j,0);
+                double meanIntRef=0.0;
+                double meanIntShot=0.0;
+                double contrastTmpRef=0.0;
+                double contrastTmpShot=0.0;
+                double meanPhaseTmp=0.0;
+                double meanRefle=0.0;
+                double weightsum=0.0;
+                for (int i=geom2.left(); i<geom2.right();i++) {
+                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                    double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
 
-//            int time_pixel_offset;
-//            if (direction(k)!=0) { //fringes are vertical
-//                for (unsigned int m=0;m<imgsSub.size();m++) {
-//                    phys_transpose(imgsSub[m]);
-//                }
-//                time_pixel_offset=geom2.top();
-//            } else {
-//                time_pixel_offset=geom2.left();
-//            }
+                    meanIntRef+=intRef;
+                    meanIntShot+=intShot;
 
+                    double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
+                    meanRefle+= weight*intShot/intRef;
 
+                    weightsum+=weight;
 
-
-            if (direction(k)==0) { //fringes are vertical
-                for (int j=geom2.top(); j<geom2.bottom(); j++) {
-                    time_phase[k]  << j;
-                    cPhase[0][k]  << phase[k][0].point(geom2.center().x(),j,0);
-                    cPhase[1][k]  << phase[k][1].point(geom2.center().x(),j,0);
-                    double meanIntRef=0.0;
-                    double meanIntShot=0.0;
-                    double contrastTmpRef=0.0;
-                    double contrastTmpShot=0.0;
-                    double meanPhaseTmp=0.0;
-                    double meanRefle=0.0;
-                    double weightsum=0.0;
-                    for (int i=geom2.left(); i<geom2.right();i++) {
-                        double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                        double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
-
-                        meanIntRef+=intRef;
-                        meanIntShot+=intShot;
-
-                        double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-                        meanRefle+= weight*intShot/intRef;
-
-                        weightsum+=weight;
-
-                        contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
-                        contrastTmpShot+=contrast[k][1].point(i,j,0);
-                        meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
-                    }
-
-
-                    meanIntRef/=geom2.width();
-                    meanIntShot/=geom2.width();
-                    meanRefle/=geom2.width();
-
-                    contrastTmpRef/=geom2.width();
-                    contrastTmpShot/=geom2.width();
-                    meanPhaseTmp /= geom2.width();
-                    cIntensity[0][k] << meanIntRef;
-                    cIntensity[1][k] << meanIntShot;
-                    cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
-                    cContrast[1][k]  << contrastTmpShot;
-                    double sqrtTmpPhase=0.0;
-                    double stdRefle=0.0;
-                    for (int i=geom2.left(); i<geom2.right();i++) {
-                        double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
-                        double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
-                        sqrtTmpPhase += pow(dist,2);
-
-                        double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                        double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
-
-                        double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-
-                        stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
-                    }
-                    cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
-                    reflError[k] << sqrt(stdRefle / geom2.width());
-
+                    contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
+                    contrastTmpShot+=contrast[k][1].point(i,j,0);
+                    meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
                 }
-            } else { //fringes are horizontal
-                for (int j=geom2.left(); j<geom2.right(); j++) {
-                    time_phase[k]  << j;
-                    cPhase[0][k]  << phase[k][0].point(j,geom2.center().y(),0);
-                    cPhase[1][k]  << phase[k][1].point(j,geom2.center().y(),0);
-                    double meanIntRef=0.0;
-                    double meanIntShot=0.0;
-                    double contrastTmpRef=0.0;
-                    double contrastTmpShot=0.0;
-                    double meanPhaseTmp=0.0;
-                    double meanRefle=0.0;
-                    double weightsum=0.0;
-                    for (int i=geom2.top(); i<geom2.bottom();i++) {
-                        double intRef=(intensity[k][0].point(j-refIntShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                        double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
-
-                        meanIntRef+=intRef;
-                        meanIntShot+=intShot;
-
-                        double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
-                        meanRefle+= weight*intShot/intRef;
-
-                        weightsum+=weight;
-
-                        contrastTmpRef+=contrast[k][0].point(j-refIntShift,i,0);
-                        contrastTmpShot+=contrast[k][1].point(j,i,0);
-                        meanPhaseTmp += abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i),1));
-                    }
 
 
-                    meanIntRef/=geom2.height();
-                    meanIntShot/=geom2.height();
-                    meanRefle/=geom2.height();
+                meanIntRef/=geom2.width();
+                meanIntShot/=geom2.width();
+                meanRefle/=geom2.width();
 
-                    contrastTmpRef/=geom2.height();
-                    contrastTmpShot/=geom2.height();
-                    meanPhaseTmp /= geom2.height();
-                    cIntensity[0][k] << meanIntRef;
-                    cIntensity[1][k] << meanIntShot;
-                    cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
-                    cContrast[1][k]  << contrastTmpShot;
-                    double sqrtTmpPhase=0.0;
-                    double stdRefle=0.0;
-                    for (int i=geom2.top(); i<geom2.bottom();i++) {
-                        double rem=abs(remainder(phase[k][0].point(j,i)-phase[k][1].point(j,i)+1,1));
-                        double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
-                        sqrtTmpPhase += pow(dist,2);
+                contrastTmpRef/=geom2.width();
+                contrastTmpShot/=geom2.width();
+                meanPhaseTmp /= geom2.width();
+                cIntensity[0][k] << meanIntRef;
+                cIntensity[1][k] << meanIntShot;
+                cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
+                cContrast[1][k]  << contrastTmpShot;
+                double sqrtTmpPhase=0.0;
+                double stdRefle=0.0;
+                for (int i=geom2.left(); i<geom2.right();i++) {
+                    double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
+                    double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
+                    sqrtTmpPhase += pow(dist,2);
 
-                        double intRef=(intensity[k][0].point(j-refIntShift,i,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                        double intShot=intensity[k][1].point(j,i,0)-velocityUi[k]->offShot->value();
+                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
+                    double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
 
-                        double weight= 2.0*pow(sin(M_PI*(i-geom2.top())/geom2.height()),2);
+                    double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
 
-                        stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
-                    }
-                    cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.height());
-                    reflError[k] << sqrt(stdRefle / geom2.height());
-
+                    stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
                 }
+                cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
+                reflError[k] << sqrt(stdRefle / geom2.width());
+
             }
-
             for (unsigned int m=0;m<cPhase.size();m++) {
                 double buffer,bufferold,dummy=0.0;
                 double offsetShift=0;
@@ -1389,15 +1276,21 @@ void Visar::getPhase(int k) {
                 }
                 phaseUi[k]->offset->setTitle("Offset "+QString::number(offsetShift));
                 for (int j=0;j<cPhase[m][k].size();j++){
-                    cPhase[m][k][j] -= offsetShift;
+                    if (direction(k)!=0) {		//fringes are vertical
+                        cPhase[m][k][j] = offsetShift-cPhase[m][k][j];
+                    } else {
+                        cPhase[m][k][j] = cPhase[m][k][j]-offsetShift;
+                    }
                 }
 
                 QPolygonF myLine;
                 for (int i=0;i<cPhase[m][k].size();i++){
+                    double posx=geom2.x()+geom2.width()/2.0+cPhase[m][k][i]*velocityUi[k]->interfringe->value();
+                    double posy=time_phase[k][i];
                     if (direction(k)==0) {		//fringes are vertical
-                        myLine << QPointF(geom2.x()+geom2.width()/2.0+cPhase[m][k][i]*velocityUi[k]->interfringe->value(),time_phase[k][i]);
+                        myLine << QPointF(posx,posy);
                     } else {
-                        myLine << QPointF(time_phase[k][i],geom2.y()+geom2.height()/2.0-cPhase[m][k][i]*velocityUi[k]->interfringe->value());
+                        myLine << QPointF(posy,posx);
                     }
                 }
                 fringeLine[k]->setPoints(myLine);

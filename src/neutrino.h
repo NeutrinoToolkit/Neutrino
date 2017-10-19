@@ -118,6 +118,7 @@ public slots:
     void rotateRight();
     void flipUpDown();
     void flipLeftRight();
+    void transpose();
 
     void menuPaths();
 

@@ -208,7 +208,8 @@ neutrino::neutrino():
 	connect(my_w->actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
 	connect(my_w->actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
 	connect(my_w->actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
-	connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
+    connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
+    connect(my_w->actionTranspose, SIGNAL(triggered()), this, SLOT(transpose()));
 
 	connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
 
@@ -442,13 +443,23 @@ void neutrino::flipUpDown() {
 }
 
 void neutrino::flipLeftRight() {
-	my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
-	if (my_w->my_view->currentBuffer) {
-		phys_flip_lr(*my_w->my_view->currentBuffer);
+    my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
+    if (my_w->my_view->currentBuffer) {
+        phys_flip_lr(*my_w->my_view->currentBuffer);
         updatePhys();
-	}
-	QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
-	my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+    }
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
+}
+
+void neutrino::transpose() {
+    my_w->menuTransformation->setDefaultAction(my_w->actionTranspose);
+    if (my_w->my_view->currentBuffer) {
+        phys_transpose(*my_w->my_view->currentBuffer);
+        updatePhys();
+    }
+    QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
+    my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
 nPhysD* neutrino::getBuffer(int i) {

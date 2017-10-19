@@ -151,6 +151,7 @@
      <addaction name="actionRotate_right"/>
      <addaction name="actionFlip_up_down"/>
      <addaction name="actionFlip_left_right"/>
+     <addaction name="actionTranspose"/>
     </widget>
     <addaction name="menuBuffers"/>
     <addaction name="actionProperties"/>
@@ -792,6 +793,15 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+Shift+E</string>
+   </property>
+  </action>
+  <action name="actionTranspose">
+   <property name="icon">
+    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+     <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
+   </property>
+   <property name="text">
+    <string>Transpose</string>
    </property>
   </action>
  </widget>
