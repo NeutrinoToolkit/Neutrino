@@ -544,21 +544,23 @@ void Visar::tabChanged(int k) {
         } else if (tabWidget == tabPhase) {
             getPhase(k);
         }
-
+        sopRect->setVisible(enableSOP->isChecked() && tabWidget==tabs && tabWidget->currentIndex()==2);
         if (tabWidget==tabs && tabWidget->currentIndex()==2) {
+            for (int j=0;j<(int)numVisars;j++) {
+                fringeLine[j]->setVisible(false);
+                fringeRect[j]->setVisible(false);
+            }
             if (enableSOP->isChecked()) {
                 nparent->showPhys(getPhysFromCombo(sopShot));
             }
-        } else {
+        } else {            
             if (k<(int)numVisars) {
-                unsigned int visnum=tabWidget->currentIndex();
-                if (visnum<numVisars) {
-                    if (velocityUi[k]->enableVisar->isChecked()) {
-                        nparent->showPhys(getPhysFromCombo(velocityUi[visnum]->shotImage));
-                    }
+                k=tabWidget->currentIndex();
+                if (velocityUi[k]->enableVisar->isChecked()) {
+                    nparent->showPhys(getPhysFromCombo(velocityUi[k]->shotImage));
                 }
                 for (int j=0;j<(int)numVisars;j++) {
-                    fringeLine[j]->setVisible(j==k);
+                    fringeLine[j]->setVisible(j==k && (velocityUi[j]->interfringe->value() != 0.0));
                     fringeRect[j]->setVisible(j==k);
                 }
             }

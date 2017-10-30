@@ -96,7 +96,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 		add_custom_command(
 			OUTPUT ${README_HTML}
-			COMMAND ${PANDOC} -f markdown -t html -s -S README.md --self-contained -o ${README_HTML}
+			COMMAND ${PANDOC} -f markdown -t html -S README.md --self-contained -o ${README_HTML}
 			MAIN_DEPENDENCY "README.md"
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
