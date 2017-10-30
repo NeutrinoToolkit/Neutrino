@@ -4,8 +4,7 @@ Tommaso Vinci
 tommaso.vinci@polytechnique.edu
  -->
 
-VISAR analysis
-==============
+% VISAR analysis
 
 In the Window there are 3 tabs on the left : *Settings*, *Velocity* and
 *SOP*

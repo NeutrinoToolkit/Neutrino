@@ -1,6 +1,4 @@
-# GhostFringes
-
-## VISAR ghost fringes remove tool
+% VISAR ghost fringes remove tool
 
 Sometimes, in shock experiments you get an interference between the
 surface you want to measure the velocity (i.e. the shock or a reflective

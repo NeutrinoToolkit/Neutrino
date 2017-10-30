@@ -4,7 +4,7 @@ Tommaso Vinci
 tommaso.vinci@polytechnique.edu
  -->
 
-# Python scripting
+% Python scripting
 
 
 Neutrino includes a scripting console to interact with.

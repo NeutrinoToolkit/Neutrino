@@ -1,4 +1,4 @@
-# MUSE	
+% MUSE	
 
 This is a tool to open cube images in .fits format.
 
