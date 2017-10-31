@@ -936,7 +936,11 @@ void Visar::updatePlot() {
                         pen.setStyle(pstyle);
                         my_graph->setPen(pen);
                         if (my_graph->valueAxis()==plotVelocity->yAxis) {
-                            my_graph->setData(time_vel[k],velocity[k]);
+                            if (velocityUi[k]->interfringe->value() != 0.0) {
+                                my_graph->setData(time_vel[k],velocity[k]);
+                            } else {
+                                my_graph->data()->clear();
+                            }
                         } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
                             my_graph->setData(time_vel[k],reflectivity[k]);
                         } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
@@ -1102,7 +1106,7 @@ void Visar::doWave(int k) {
                     double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
                     double e_y = -pow(yr*thick_norm, 2);
 
-                    double gauss = exp(e_x)*exp(e_y)-exp(-pow(damp_norm, 2));
+                    double gauss = exp(e_x)*exp(e_y);
 
                     for (unsigned int m=0;m<2;m++) {
                         zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
@@ -1204,7 +1208,6 @@ void Visar::getPhase(int k) {
                 double contrastTmpShot=0.0;
                 double meanPhaseTmp=0.0;
                 double meanRefle=0.0;
-                double weightsum=0.0;
                 for (int i=geom2.left(); i<geom2.right();i++) {
                     double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
                     double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
@@ -1212,10 +1215,7 @@ void Visar::getPhase(int k) {
                     meanIntRef+=intRef;
                     meanIntShot+=intShot;
 
-                    double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-                    meanRefle+= weight*intShot/intRef;
-
-                    weightsum+=weight;
+                    meanRefle+= intShot/intRef;
 
                     contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
                     contrastTmpShot+=contrast[k][1].point(i,j,0);
@@ -1244,9 +1244,7 @@ void Visar::getPhase(int k) {
                     double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
                     double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
 
-                    double weight= 2.0*pow(sin(M_PI*(i-geom2.left())/geom2.width()),2);
-
-                    stdRefle+=pow(weight*(intShot/intRef - meanRefle),2);
+                    stdRefle+=pow(intShot/intRef - meanRefle,2);
                 }
                 cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
                 reflError[k] << sqrt(stdRefle / geom2.width());
@@ -1301,11 +1299,13 @@ void Visar::getPhase(int k) {
                 QPen pen;
                 pen.setStyle((m==1?Qt::SolidLine : Qt::DashLine));
 
-                graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
-                graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis->labelColor());
-                graph->setPen(pen);
-                graph->setData(time_phase[k],cPhase[m][k]);
+                if (velocityUi[k]->interfringe->value() != 0.0) {
+                    graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
+                    graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
+                    pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis->labelColor());
+                    graph->setPen(pen);
+                    graph->setData(time_phase[k],cPhase[m][k]);
+                }
 
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis2);
                 graph->setName("Intensity Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
