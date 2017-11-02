@@ -748,7 +748,8 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
                 }
                 char *desc=NULL;
                 if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
-                    std::string str_desc=std::string(desc);
+                    std::string str_desc(desc);
+                    tiff_prop["TIFF_description"]=str_desc;
                     DEBUG(str_desc.size() << "\n" << str_desc);
                     std::stringstream ss(str_desc);
                     vec2f display_range(0,0);
