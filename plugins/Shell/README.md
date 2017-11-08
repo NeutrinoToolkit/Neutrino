@@ -1,11 +1,5 @@
-<!-- 
-Python bindings
-Tommaso Vinci 
-tommaso.vinci@polytechnique.edu
- -->
-
-% Python scripting
-
+Python scripting
+================
 
 Neutrino includes a scripting console to interact with.
 
@@ -23,12 +17,14 @@ other classes (less used) are:
 4. `nPoint` for single points
 5. `nPlot` for plots
 
-## nApp
+nApp
+----
 
 This is a static variable the main use is to collect all the main window present:
 * `nApp.neus()` will return a list of all the main window present
 
-## main window: `neutrino` class and neu variable
+main window: `neutrino` class and neu variable
+----------------------------------------------
 
 You can create a new top-level window with `n=neutrino()` or you can get the one that opened the python shell via the variable `neu` 
 
@@ -39,7 +35,8 @@ available methods (here `n` is a generic `neutrino` and a a generic image `nPhys
 * `n.addShowPhys(a) will display an image
 
 
-## Generic image: `nPhysD`
+Generic image: `nPhysD`
+-----------------------
 
 There are several constructors:
 
@@ -62,7 +59,8 @@ There are several method for each image here (we note with a a generic `nPhysD`)
   * `a.setPropery('name', 'my image name')` will set the image property name to 'my image name'
  
  
-## Generic tool window: `nPan`
+Generic tool window: `nPan`
+---------------------------
 
 retrieve a tool window
 
@@ -80,7 +78,9 @@ operate `p` is a tool window:
 
 The name of the wigdets inside a `nPan` is written in square bracket in tooltip window that appears when hoovering over the widget
 
-### Example
+
+Example
+-------
 
 ```python
 p=neu.newPan()
