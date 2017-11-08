@@ -113,7 +113,7 @@ void nView::setLockColors(bool val) {
 }
 
 void nView::exportPixmap() {
-    QByteArrayList my_list=QImageWriter::supportedImageFormats();
+    QList<QByteArray> my_list=QImageWriter::supportedImageFormats();
     QByteArray my_suffix=QFileInfo(property("pixmapFile").toString()).suffix().toUtf8();
     if (my_list.contains(my_suffix)) {
         my_list.removeAll(my_suffix);

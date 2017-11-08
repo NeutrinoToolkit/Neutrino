@@ -25,7 +25,9 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     setProperty("nHash", hh.c_str());
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#endif
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
     QSettings my_set("neutrino","");
