@@ -14,7 +14,10 @@ git:
 before_install:
  - export MACOSX_DEPLOYMENT_TARGET=10.11
  - brew update; brew tap homebrew/science
- - brew install gcc qt5 cfitsio hdf4 hdf5 gsl clfft pandoc
+ - brew install --only-dependencies gcc
+ - brew install gcc 2>&1
+ - brew link --overwrite gcc 
+ - brew install qt5 cfitsio hdf4 hdf5 gsl clfft pandoc
  - brew install fftw --with-openmp
  - git clone https://github.com/iltommi/PythonQt.git
  - cd PythonQt
