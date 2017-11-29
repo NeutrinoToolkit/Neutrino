@@ -248,7 +248,6 @@ void Interferometry::doWavelet () {
 }
 
 void Interferometry::doWavelet (int iimage) {
-    DEBUG("HERE");
     std::string suffix=iimage==0?"_ref":"_shot";
     nPhysD *image=getPhysFromCombo(my_image[iimage].image);
     if (image) {
@@ -296,12 +295,16 @@ void Interferometry::doWavelet (int iimage) {
         }
 
         std::map<std::string,nPhysD *> retList = my_params.olist;
-        retList["synthetic"]=new nPhysD();
-        phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
+        if (retList["phase_2pi"] && retList["contrast"]) {
+            retList["synthetic"]=new nPhysD();
+            phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
+        }
 
         for(std::map<std::string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
-            itr->second->setShortName(itr->second->getShortName()+suffix);
-            localPhys[itr->first+suffix]=nparent->replacePhys(itr->second,localPhys[itr->first+suffix],false);
+            if (itr->second) {
+                itr->second->setShortName(itr->second->getShortName()+suffix);
+                localPhys[itr->first+suffix]=nparent->replacePhys(itr->second,localPhys[itr->first+suffix],false);
+            }
         }
     }
 }
