@@ -811,7 +811,7 @@ void neutrino::saveSession (QString fname) {
 #ifdef HAVE_LIBTIFF
 		extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
 #endif
-		QString fnameSave = QFileDialog::getSaveFileName(this,tr("Open Session"),property("NeuSave-fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
+        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
 		if (!fnameSave.isEmpty()) {
 			saveSession(fnameSave);
 		}
