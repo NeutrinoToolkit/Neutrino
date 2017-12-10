@@ -661,6 +661,7 @@ static void augment_libtiff_with_custom_tags() {
 std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) {
     std::vector <nPhysD *> vecReturn;
 #ifdef HAVE_LIBTIFF
+    TIFFErrorHandler oldhandler = TIFFSetWarningHandler(nullptr);
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ifilename.c_str(), "r");
     if (tif) {
@@ -874,6 +875,7 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
     } else {
         throw phys_fileerror("TIFF: contact Neutrino developers");
     }
+    TIFFSetWarningHandler(oldhandler);
 #else
     throw phys_fileerror("Neutrino was compiled without TIFF support");
 #endif

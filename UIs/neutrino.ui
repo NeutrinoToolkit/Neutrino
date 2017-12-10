@@ -159,6 +159,7 @@
     <addaction name="actionZoom_eq"/>
     <addaction name="actionZoom_out"/>
     <addaction name="menuColortable"/>
+    <addaction name="action99"/>
     <addaction name="actionMouse_Info"/>
     <addaction name="actionMouse_Zoom"/>
     <addaction name="separator"/>
@@ -802,6 +803,17 @@
    </property>
    <property name="text">
     <string>Transpose</string>
+   </property>
+  </action>
+  <action name="action99">
+   <property name="text">
+    <string>99%</string>
+   </property>
+   <property name="toolTip">
+    <string>rescale colorbar to show 99% of the pixel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
    </property>
   </action>
  </widget>

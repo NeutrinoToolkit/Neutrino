@@ -145,7 +145,11 @@ public slots:
     void tabChanged(int);
     
     void mouseAtMatrix(QPointF);
-    
+    void imageMousePress(QPointF);
+    void imageMouseRelease(QPointF);
+
+    double getTimeFromPixel(QPointF);
+
     void mouseAtPlot(QMouseEvent* e);
     
     void loadSettings(QString);

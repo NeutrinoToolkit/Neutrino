@@ -344,7 +344,18 @@ neutrino::neutrino():
 	//    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
 	//#endif
 
+    connect(&timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
+    timerSaveDefaults.start(60000); // 1 min
 
+
+}
+
+void neutrino::on_action99_triggered() {
+    if (my_w->my_view->currentBuffer) {
+        my_w->my_view->currentBuffer->property["display_range"]=getColorPrecentPixels(*(my_w->my_view->currentBuffer),99);
+        updatePhys();
+        emitBufferChanged();
+    }
 }
 
 void neutrino::scanDir(QString dirpath, QString pattern)
@@ -601,7 +612,6 @@ void neutrino::openRecentFile()
 	if (action) {
 		QString fname=action->data().toString();
 		fileOpen(fname);
-		setProperty("NeuSave-fileOpen", fname);
 	}
 }
 
@@ -709,7 +719,6 @@ void neutrino::fileOpen()
 }
 
 void neutrino::fileOpen(QStringList fnames) {
-	setProperty("NeuSave-fileOpen", fnames);
 	foreach (QString fname, fnames) {
 		QList<nPhysD *> imagelist = fileOpen(fname);
 		if (imagelist.size()==0){
@@ -725,7 +734,8 @@ void neutrino::fileOpen(QStringList fnames) {
 
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
-	QSettings my_set("neutrino","");
+    setProperty("NeuSave-fileOpen", fname);
+    QSettings my_set("neutrino","");
 	my_set.beginGroup("nPreferences");
 	bool separate_rgb= my_set.value("separateRGB",false).toBool();
 	my_set.endGroup();

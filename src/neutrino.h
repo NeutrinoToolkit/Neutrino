@@ -103,6 +103,8 @@ public:
 
 private:
     QList<nGenericPan*> panList;
+    QTimer timerSaveDefaults;
+
 
 public slots:
     inline int indexOf(nPhysD* my_phys){return (my_w->my_view ? my_w->my_view->physList.indexOf(my_phys) : -1);};
@@ -140,6 +142,8 @@ public slots:
 
     void scanDir(QString dirpath, QString pattern);
     void on_actionOpen_Glob_triggered();
+    void on_action99_triggered();
+
 
     //colortable
     bool addPaletteFromString(QString,QString);

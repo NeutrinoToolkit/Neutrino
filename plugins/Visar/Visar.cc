@@ -112,11 +112,15 @@ Visar::Visar(neutrino *nparent)
     QApplication::processEvents();
 
     show();
+
+    setProperty("NeuSave-alphagraph",30);
+
     QApplication::processEvents();
 
     for (int l=2+numVisars; l<whichRefl->count();l++) {
         whichRefl->removeItem(l);
     }
+
     if (property("NeuSave-numVisars").isValid()) {
         int kMax=property("NeuSave-numVisars").toInt();
         for (int k=0; k<kMax; k++) {
@@ -271,7 +275,7 @@ void Visar::addVisar() {
     errorBars->setDataPlottable(graph);
     errorBars->setProperty("id",numVisars);
     my_color=plotVelocity->yAxis2->labelColor();
-    my_color.setAlpha(100);
+    my_color.setAlpha(property("NeuSave-alphagraph").toInt());
     pen.setColor(my_color);
     errorBars->setPen(pen);
     errorBars->setWhiskerWidth(0);
@@ -289,7 +293,7 @@ void Visar::addVisar() {
     errorBars->setDataPlottable(graph);
     errorBars->setProperty("id",numVisars);
     my_color=plotVelocity->yAxis->labelColor();
-    my_color.setAlpha(100);
+    my_color.setAlpha(property("NeuSave-alphagraph").toInt());
     pen.setColor(my_color);
     errorBars->setPen(pen);
     errorBars->setWhiskerWidth(0);
@@ -476,7 +480,7 @@ double Visar::getTime(std::vector<double> &vecsweep, double p) {
     return time;
 }
 
-void Visar::mouseAtMatrix(QPointF p) {
+double Visar::getTimeFromPixel(QPointF p) {
     int k=0;
     double position=0.0;
     if (tabs->currentIndex()==0) {
@@ -497,7 +501,27 @@ void Visar::mouseAtMatrix(QPointF p) {
         position=getTime(sweepCoeffSOP,pos) - getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
         sopPlot->setMousePosition(position);
     }
-    statusbar->showMessage("Postion : "+QString::number(position));
+    return position;
+}
+
+
+void Visar::imageMousePress(QPointF p) {
+    setProperty("timeClick",getTimeFromPixel(p));
+}
+
+void Visar::imageMouseRelease(QPointF p) {
+    double deltatime=getTimeFromPixel(p)-property("timeClick").toDouble();
+    statusbar->showMessage("Delta : "+QString::number(deltatime));
+    setProperty("timeClick",QVariant());
+}
+
+void Visar::mouseAtMatrix(QPointF p) {
+    double deltatime=getTimeFromPixel(p);
+    QString prefix=tr("Time: ")+QString::number(deltatime);
+    if (property("timeClick").isValid()) {
+        prefix += tr(" Delay: ")+QString::number(deltatime-property("timeClick").toDouble());
+    }
+    statusbar->showMessage(prefix);
 }
 
 int Visar::direction(int k) {
@@ -970,7 +994,7 @@ void Visar::updatePlot() {
                         graph->setProperty("JumpGraph",true);
                         graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
                         QColor color(plotVelocity->yAxis->labelColor());
-                        color.setAlpha(100);
+                        color.setAlpha(property("NeuSave-alphagraph").toInt());
                         pen.setColor(color);
                         graph->setPen(pen);
                         graph->setData(time_vel[k],velJump_array[i]);
