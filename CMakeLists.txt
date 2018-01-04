@@ -2,10 +2,10 @@
 
 cmake_minimum_required (VERSION 3.0)
 
+## before project https://stackoverflow.com/a/34208904
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+
 ### top level compile options
-
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-
 project (Neutrino CXX)
 
 set(${PROJECT_NAME}_VERSION_MAJOR "2")
@@ -145,7 +145,6 @@ endif()
 
 
 if(APPLE)
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_STRING_FULL}")
     set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
 

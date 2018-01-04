@@ -1,40 +1,18 @@
 
 # ref: http://wiki.qt.io/Using_CMake_build_system
 
+
 cmake_minimum_required (VERSION 3.0)
+
+if (POLICY CMP0071)
+	cmake_policy (SET CMP0071 OLD)
+endif ()
 
 include(FindGit)
 
 message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
 
 set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
-
-
-if (APPLE)
-
-	message(STATUS "Apple : remember to use brew !")
-
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -headerpad_max_install_names")
-
-	set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../resources/neutrino.plist")
-
-	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
-	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
-	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
-	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_NAME} ${PROJECT_VERSION}")
-	set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
-
-	set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources")
-	set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
-	execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
-
-	set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
-	set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-endif()
 
 if (LINUX)
 	set (CMAKE_PREFIX_PATH "/usr")
@@ -83,6 +61,7 @@ list (APPEND SOURCES
 include(FindNeutrinoDeps)
 
 include(GetVersionFromGitTag)
+
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA_LATEST}")
 
@@ -199,11 +178,46 @@ list(APPEND CMAKE_MODULE_PATH "../lib")
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../nPhysImage)
 
-set(LIBS ${LIBS} "nPhysImageF") 
+set(LIBS ${LIBS} "nPhysImageF")
+
+
+set(PROJECT_DOMAIN_FIRST "neutrino")
+set(PROJECT_DOMAIN_SECOND "com")
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(PROJECT_VENDOR "neutrino inc.")
+string(TIMESTAMP CURRENT_YEAR "%Y")
+set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
+
+
 
 if(APPLE)
+	set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
+	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${${PROJECT_NAME}_VERSION}")
+	set(MACOSX_BUNDLE_ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+
+	set(MACOSX_BUNDLE_BUNDLE_VERSION "${${PROJECT_NAME}_VERSION}")
+	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${${PROJECT_NAME}_VERSION}")
+	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${${PROJECT_NAME}_VERSION_STRING_FULL}")
+	set(MACOSX_BUNDLE_COPYRIGHT "Copyright ${PROJECT_COPYRIGHT_YEAR} Tommaso Vinci, Alessandro Flacco. GNU General Public License v2.0")
+
 	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 	target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
+
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+
+	set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/filetype.icns" "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources"
+	)
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${MACOSX_BUNDLE_ICON_FILE}" "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources"
+	)
+
+	set(CMAKE_INSTALL_PREFIX "..")
+
 endif()
 
 if(WIN32)
@@ -247,12 +261,6 @@ endif()
 
 message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
 
-set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-set(PROJECT_VENDOR "neutrino inc.")
-set(PROJECT_COPYRIGHT_YEAR "2011")
-set(PROJECT_DOMAIN_FIRST "neutrino")
-set(PROJECT_DOMAIN_SECOND "com")
-set(PROJECT_DOMAIN "${PROJECT_DOMAIN_FIRST}.${PROJECT_DOMAIN_SECOND}")
 
 if(LINUX)
 	string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
@@ -317,4 +325,14 @@ else()
 	set (EXECUTABLE_OUTPUT_PATH "../bin")
 	install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
 endif()
+
+
+if (APPLE)
+
+	message(STATUS "Apple : remember to use brew !")
+
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -headerpad_max_install_names")
+
+endif()
+
 

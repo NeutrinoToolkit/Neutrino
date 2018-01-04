@@ -1,6 +1,13 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
 
+    if (POLICY CMP0071)
+		cmake_policy (SET CMP0071 OLD)
+	endif ()
+
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+
 	PROJECT (${MY_PROJECT_NAME} CXX)
 
 	MESSAGE(STATUS "Plugin ${PROJECT_NAME}")
@@ -96,7 +103,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 		add_custom_command(
 			OUTPUT ${README_HTML}
-			COMMAND ${PANDOC} -s README.md --self-contained -o ${README_HTML}
+			COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -s README.md --self-contained -o ${README_HTML}
 			MAIN_DEPENDENCY "README.md"
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)

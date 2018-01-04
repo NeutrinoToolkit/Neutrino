@@ -2,8 +2,8 @@
 cmake_minimum_required (VERSION 3.0)
 
 if (LINUX)
-    message(STATUS "Linux")
-    set (CMAKE_PREFIX_PATH "/usr")
+	message(STATUS "Linux")
+	set (CMAKE_PREFIX_PATH "/usr")
 endif()
 
 add_library (nPhysImageF SHARED mcomplex.h bidimvec.h tools.h nPhysTools.cc anymap.cc NaNStream.h  nPhysFormats.cc  nPhysImageF.h  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
@@ -47,7 +47,7 @@ endif()
 
 #to be removed
 if (NOT APPLE)
-    install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
+	install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
 endif()
 
 
