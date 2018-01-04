@@ -12,8 +12,7 @@ git:
   depth: 9999999
   
 before_install:
- - export MACOSX_DEPLOYMENT_TARGET=10.11
- - brew update; brew tap homebrew/science
+ - brew update; brew tap iltommi/brews
  - brew install --only-dependencies gcc
  - brew install gcc 2>&1
  - brew link --overwrite gcc 
@@ -22,19 +21,19 @@ before_install:
  - git clone https://github.com/iltommi/PythonQt.git
  - cd PythonQt
  - mkdir my_build && cd my_build
- - cmake -DCMAKE_CXX_COMPILER=g++-7  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
+ - cmake -DCMAKE_CXX_COMPILER=g++-7 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -UQT_QMAKE_EXECUTABLE -DPythonQt_Wrap_QtAll=TRUE ..
  - make install
  - cd ../..
 
 script:
  - mkdir -p build_dir && cd build_dir
- - cmake -DCMAKE_CXX_COMPILER=g++-7  -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
+ - cmake -DCMAKE_CXX_COMPILER=g++-7 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
  - make
 
 install:
 
 before_deploy:
- - ../resources/macPackage/prepareapp.sh .
+ - ../resources/macPackage/prepareapp.sh
     
 deploy:
   provider: releases
