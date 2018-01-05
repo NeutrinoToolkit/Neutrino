@@ -24,7 +24,7 @@ if (GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     #How many commits since last tag
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count master
+	execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
         OUTPUT_STRIP_TRAILING_WHITESPACE)

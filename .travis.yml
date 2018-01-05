@@ -30,6 +30,10 @@ script:
  - cmake -DCMAKE_CXX_COMPILER=g++-7 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5  ..
  - make
  - otool -L Neutrino.app/Contents/MacOS/Neutrino
+ - ls -l /usr/local/opt/libtiff/lib/
+ - otool -L /usr/local/opt/libtiff/lib/libtiff.dylib
+ - ls -l /usr/local/opt/libjpeg/lib/
+ - otool -L /usr/local/opt/libjpeg/lib/libjpeg.dylib
 
 install:
 
