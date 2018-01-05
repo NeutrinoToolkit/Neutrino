@@ -26,8 +26,10 @@
 	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
-	<key>	</key>
+	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -49,7 +51,5 @@
 			<string>Viewer</string>
 		</dict>
 	</array>
-	<key>NSHighResolutionCapable</key>
-	<true/>
 </dict>
 </plist>
