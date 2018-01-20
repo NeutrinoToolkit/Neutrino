@@ -1,5 +1,5 @@
 # check for neutrino root
-find_package(PythonLibs 2.7 REQUIRED)
+find_package(PythonLibs 2.7)
 
 if(PYTHONLIBS_FOUND)
 	list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})
