@@ -28,8 +28,8 @@ script:
  - mkdir -p build_dir && cd build_dir
  - cmake -DCMAKE_CXX_COMPILER=g++-7 ..
  - make
- - export dmg_file=Neutrino$(git describe --abbrev=0 --tags)$(git rev-list --count HEAD)-macos
- - cp Neutrino.dmg $dmg_file
+ - export dmg_file=Neutrino-$(git describe --abbrev=0 --tags)$(git rev-list --count HEAD)-macos.dmg
+ - cp Neutrino.dmg "${dmg_file}"
 
 
 install:
@@ -41,7 +41,7 @@ deploy:
   provider: releases
   api_key: $github_token
   file_glob: true
-  file: $dmg_file
+  file: Neutrino-*.dmg
   skip_cleanup: true
   overwrite: true
   on:
