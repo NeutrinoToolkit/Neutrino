@@ -28,14 +28,14 @@ script:
  - mkdir -p build_dir && cd build_dir
  - cmake -DCMAKE_CXX_COMPILER=g++-7 ..
  - make
- - export dmg_file=Neutrino-$(git describe --abbrev=0 --tags)$(git rev-list --count HEAD)-macos.dmg
- - cp Neutrino.dmg "${dmg_file}"
 
 
 install:
 
 before_deploy:
  - ../resources/macPackage/prepareapp.sh
+ - export dmg_file=Neutrino-$(git describe --abbrev=0 --tags)$(git rev-list --count HEAD)-macos.dmg
+ - cp Neutrino.dmg "${dmg_file}"
     
 deploy:
   provider: releases
