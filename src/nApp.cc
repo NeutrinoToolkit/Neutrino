@@ -62,10 +62,18 @@ void nApp::checkUpdates() {
         qDebug() << objreponse;
 
         if (objreponse.contains("sha") && objreponse.value("sha").isString()) {
-            QString ver = QString(__VER_LATEST);
-            QString thisVer=objreponse.value("sha").toString();
+            QString compileSHA = QString(__VER_LATEST);
+            QString onlineSHA=objreponse.value("sha").toString();
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+            qDebug() << compileSHA;
+            qDebug() << onlineSHA;
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
 
-            if (ver != thisVer) {
+            if (compileSHA != onlineSHA) {
                 QMessageBox::information(nullptr,tr("Attention"),tr("New version available <a href=\"https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest\">here</a> "), QMessageBox::Ok);
             }
 
