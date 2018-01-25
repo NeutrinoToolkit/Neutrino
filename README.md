@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/NeutrinoToolkit/Neutrino.svg?branch=latest)](https://travis-ci.org/NeutrinoToolkit/Neutrino)
 
 Neutrino
 ========

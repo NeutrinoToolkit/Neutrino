@@ -15,7 +15,7 @@ before_install:
  - brew update
  - brew install --only-dependencies gcc
  - brew cask uninstall oclint
- - brew install gcc qt5 cfitsio hdf5 gsl clfft pandoc
+ - brew install cmake gcc qt5 cfitsio hdf5 gsl clfft pandoc
  - brew tap iltommi/brews
  - brew install iltommi/brews/hdf4
  - brew install iltommi/brews/fftw
