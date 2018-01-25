@@ -13,6 +13,7 @@ The following packages are needed:
 * file formats: `libtiff5-dev` `libjpeg-dev` `libnetpbm10-dev` `libccfits-dev` `libhdf5-dev`
 * math: libgsl-dev
 * qt5 dev components: `qtbase5-dev` `qtmultimedia5-dev` `qttools5-dev` `libqt5svg5-dev`
+  `qtscript5-dev`
 
 Although building Neutrino against `qt4` is still possible, there are quite a few (and growing)
 differences between the two versions. Future versions may be broken.
@@ -40,8 +41,9 @@ console. The options are the following:
 * `libPythonQt3.0-dev` (debian/testing): includes Qt_Bindings, linked against qt4;
 * build it your own, which is what is currently done for Neutrino deploys; an adapted fork can be
   found at <https://github.com/aflux/PythonQt>
-
-(work in progress)
+* `libpythonqt-qt5-[qtall]-python{2,3}` (debian/testing): two separate libraries for basic support
+  and Qt_Bindings and linked against qt5! With any luck it will find its way to next stable. Still
+unsupported in Neutrino but work is in progress
 
 ## Building
 
@@ -153,6 +155,3 @@ top directory where all of the cross dependencies have been installed:
 cmake .. -DCMAKE_TOOLCHAIN_FILE=<path to neutrino top folder>/resources/cmake/Toolchain-i686-mingw32.cmake -DNEUTRINO_CROSS_ROOT=<cross source root>
 ~~~
 
-# Building for OSX
-
-(work in progress)

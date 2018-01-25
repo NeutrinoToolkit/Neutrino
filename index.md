@@ -41,7 +41,6 @@ Advanced analysis tools:
 
 # Getting Neutrino
 
-The binary releases are available for GNU/Linux, Windows and OSX on [Neutrino Releases](https://github.com/aflux/neutrino/releases/latest).
+The binary releases are available for GNU/Linux, Windows and OSX on [Neutrino Releases](https://github.com/NeutrinoToolkit/Neutrino/releases).
 
-Sources are available from [GitHub Neutrino page](https://github.com/aflux/neutrino). For building
-instructions a tutorial is available [here](build)
+Sources are available from [GitHub Neutrino page](https://github.com/NeutrinoToolkit/Neutrino). For building instructions a tutorial is available [here](build)
