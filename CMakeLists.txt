@@ -139,7 +139,7 @@ if (LINUX)
         # install goodies
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
-	if (DISTRO MATCHES "Fedora")
+	elseif (DISTRO MATCHES "Fedora")
 		set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ RPM)
     endif()
 endif()
