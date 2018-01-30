@@ -47,7 +47,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
 
 void nApp::checkUpdates() {
     QNetworkAccessManager manager;
-    QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/git/refs/tags/latest")));
+    QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
     QEventLoop event;
     connect(response,SIGNAL(finished()),&event,SLOT(quit()));
     event.exec();
@@ -56,28 +56,18 @@ void nApp::checkUpdates() {
     QJsonDocument json = QJsonDocument::fromJson(html.toUtf8());
 
     QJsonObject responseObject = json.object();
+    if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
+        QString compileSHA = QString(__VER_LATEST);
+        QString onlineSHA=responseObject.value("sha").toString();
+        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+        qDebug() << compileSHA;
+        qDebug() << onlineSHA;
+        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
 
-    if (responseObject.contains("object") && responseObject.value("object").isObject()) {
-        QJsonObject objreponse = responseObject.value("object").toObject();
-        qDebug() << objreponse;
-
-        if (objreponse.contains("sha") && objreponse.value("sha").isString()) {
-            QString compileSHA = QString(__VER_LATEST);
-            QString onlineSHA=objreponse.value("sha").toString();
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            qDebug() << compileSHA;
-            qDebug() << onlineSHA;
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-            qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-
-            if (compileSHA != onlineSHA) {
-                QMessageBox::information(nullptr,tr("Attention"),tr("New version available <a href=\"https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest\">here</a> "), QMessageBox::Ok);
-            }
-
+        if (compileSHA != onlineSHA) {
+            QMessageBox::information(nullptr,tr("Attention"),tr("New version available <a href=\"https://github.com/NeutrinoToolkit/Neutrino/releases\">here</a> "), QMessageBox::Ok);
         }
+
     }
 
 }
