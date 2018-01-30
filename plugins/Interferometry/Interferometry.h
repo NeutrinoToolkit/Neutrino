@@ -92,6 +92,7 @@ public slots:
     void bufferChanged(nPhysD*);
     void checkChangeCombo(QComboBox *);
 
+    void imagesTabBarClicked(int);
 };
 
 NEUTRINO_PLUGIN(Interferometry,Analysis);

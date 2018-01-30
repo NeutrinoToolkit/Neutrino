@@ -62,6 +62,7 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
+    connect(my_w.images, SIGNAL(currentChanged(int)), this, SLOT(imagesTabBarClicked(int)));
     connect(region, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
     connect(maskRegion, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
     connect(unwrapBarrier, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
@@ -101,6 +102,10 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
 
     connect(my_w.addShape, SIGNAL(released()), this, SLOT(addShape()));
 
+}
+
+void Interferometry::imagesTabBarClicked(int num) {
+    nparent->showPhys(getPhysFromCombo(my_image[num].image));
 }
 
 void Interferometry::on_actionDuplicate_triggered() {
