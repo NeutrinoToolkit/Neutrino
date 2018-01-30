@@ -30,15 +30,9 @@ if (GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 	# Get current commit SHA from git
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	# Get current commit SHA from git for latest tag
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse latest
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA_LATEST
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 	# Get partial versions into a list

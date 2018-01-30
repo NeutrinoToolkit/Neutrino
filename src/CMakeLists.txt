@@ -63,9 +63,8 @@ include(FindNeutrinoDeps)
 include(GetVersionFromGitTag)
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
-add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA_LATEST}")
+add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
-message("latest SHA: ${${PROJECT_NAME}_VERSION_GIT_SHA_LATEST}")
 message(" HEAD  SHA: ${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
 if (APPLE AND NOT DEFINED Qt5_DIR)
