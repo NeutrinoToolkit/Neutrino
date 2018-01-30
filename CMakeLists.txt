@@ -169,7 +169,7 @@ if(APPLE)
 
 	INSTALL(CODE "
 	   include(BundleUtilities)
-	   fixup_bundle(\"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app\"   \"\"   \"\")
+	   copy_and_fixup_bundle(\"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app\"   \"\"   \"\")
 	   " COMPONENT Runtime)
 
 endif()
