@@ -171,7 +171,7 @@ if(APPLE)
 	   include(BundleUtilities)
 	   copy_and_fixup_bundle(\"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app\"   \"\"   \"\")
 	   " COMPONENT Runtime)
-
+#test
 endif()
 
 
