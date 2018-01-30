@@ -65,7 +65,31 @@ void nApp::checkUpdates() {
         qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
 
         if (compileSHA != onlineSHA) {
-            QMessageBox::information(nullptr,tr("Attention"),tr("New version available <a href=\"https://github.com/NeutrinoToolkit/Neutrino/releases\">here</a> "), QMessageBox::Ok);
+
+            QMessageBox msgBox;
+            msgBox.setText(tr("A newer version is available available"));
+            msgBox.addButton(tr("Go get it now"), QMessageBox::YesRole);
+            msgBox.addButton(tr("Not now"), QMessageBox::RejectRole);
+            msgBox.addButton(tr("Never"), QMessageBox::NoRole);
+//            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
+            int ret = msgBox.exec();
+
+            qDebug() << ret << " : " << msgBox.result();
+            switch ( msgBox.buttonRole(msgBox.clickedButton())) {
+                case QMessageBox::YesRole:
+                    QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino/releases"));
+                    break;
+                case QMessageBox::NoRole: {
+                    QSettings my_set("neutrino","");
+                    my_set.beginGroup("nPreferences");
+                    my_set.setValue("checkUpdates",false);
+                    my_set.endGroup();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
         }
 
     }
