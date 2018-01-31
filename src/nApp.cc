@@ -12,7 +12,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     QCoreApplication::setOrganizationName("ParisTech");
     QCoreApplication::setOrganizationDomain("edu");
     QCoreApplication::setApplicationName("Neutrino");
-    QCoreApplication::setApplicationVersion(__VER);
+    QCoreApplication::setApplicationVersion(__VER_LATEST);
 
 #if defined(Q_OS_MAC)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

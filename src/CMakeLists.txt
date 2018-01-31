@@ -10,8 +10,6 @@ endif ()
 
 include(FindGit)
 
-message (STATUS "${PROJECT_NAME} version : ${${PROJECT_NAME}_VERSION_STRING_FULL}")
-
 set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 if (LINUX)
@@ -62,7 +60,6 @@ include(FindNeutrinoDeps)
 
 include(GetVersionFromGitTag)
 
-add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_STRING_FULL}")
 add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
 message(" HEAD  SHA: ${${PROJECT_NAME}_VERSION_GIT_SHA}")
