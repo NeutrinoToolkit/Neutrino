@@ -26,7 +26,4 @@ Build
 
 To compile for osx, please follow the `.travis.yml` recipe file.
 
-To compile for debian, please follow the docker recipe https://hub.docker.com/r/iltommi/debian-sid-neutrino/~/dockerfile/
-
-To compile for Windows, we cross compile using this other Docker recipe: https://hub.docker.com/r/iltommi/neutrino-docker-cross/~/dockerfile/
-
+Other compile recipes : https://github.com/iltommi/dockerfiles/tree/master/neutrino

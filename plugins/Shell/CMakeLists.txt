@@ -16,8 +16,6 @@ if(PYTHONLIBS_FOUND)
 			exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)
 		endif (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
 
-		message(STATUS "MY_NUMPY_PATH: ${MY_NUMPY_PATH}")
-
 		find_path(
 			NUMPY_INCLUDE_DIR
 			NAMES "numpy/arrayobject.h"

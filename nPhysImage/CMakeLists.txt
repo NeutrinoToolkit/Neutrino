@@ -9,27 +9,13 @@ endif()
 add_library (nPhysImageF SHARED mcomplex.h bidimvec.h tools.h nPhysTools.cc anymap.cc NaNStream.h  nPhysFormats.cc  nPhysImageF.h  nPhysMaths.cc  nPhysWave.cc anymap.cc unwrapping/unwrap_goldstein.cc  unwrapping/unwrap_quality.cc  unwrapping/unwrap_simple.cc  unwrapping/unwrap_util.cc  )
 
 target_include_directories (nPhysImageF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(nPhysImageF "-lm")
-
-
-message(STATUS "cmake_prefix_path: ${CMAKE_PREFIX_PATH}")
-
-
-#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-
-
-# force necessary defines on config.h
-add_definitions(-DHAVE_LIBPTHREAD)
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake)
 include(FindNeutrinoDeps)
 
-
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-target_link_libraries(nPhysImageF ${LIBS})
+target_link_libraries(nPhysImageF m ${LIBS})
 
 # install
 if (WIN32)
@@ -39,16 +25,10 @@ else()
 endif()
 
 if (APPLE)
-set (LIB_INSTALL_DIR "/usr/local/lib")
-set (CMAKE_INSTALL_RPATH "/usr/local/lib")
-set (CMAKE_MACOSX_RPATH off)
-set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR})
+	set (LIB_INSTALL_DIR "/usr/local/lib")
+	set (CMAKE_INSTALL_RPATH "/usr/local/lib")
+	set (CMAKE_MACOSX_RPATH off)
+	set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${LIB_INSTALL_DIR})
 endif()
-
-#to be removed
-if (NOT APPLE)
-	install (DIRECTORY "." COMPONENT dev DESTINATION include/nPhysImage FILES_MATCHING PATTERN "*.h")
-endif()
-
 
 

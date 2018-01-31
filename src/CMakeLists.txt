@@ -58,8 +58,6 @@ list (APPEND SOURCES
 
 include(FindNeutrinoDeps)
 
-include(GetVersionFromGitTag)
-
 add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
 message(" HEAD  SHA: ${${PROJECT_NAME}_VERSION_GIT_SHA}")
@@ -171,7 +169,7 @@ endif(Qt5LinguistTools_FOUND)
 
 
 
-list(APPEND CMAKE_MODULE_PATH "../lib")
+#list(APPEND CMAKE_MODULE_PATH "../lib")
 
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../nPhysImage)
@@ -191,7 +189,6 @@ set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
 if(APPLE)
 	set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
 	set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${${PROJECT_NAME}_VERSION}")
-	set(MACOSX_BUNDLE_ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
 
 	set(MACOSX_BUNDLE_BUNDLE_VERSION "${${PROJECT_NAME}_VERSION}")
@@ -199,20 +196,19 @@ if(APPLE)
 	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${${PROJECT_NAME}_VERSION_STRING_FULL}")
 	set(MACOSX_BUNDLE_COPYRIGHT "Copyright ${PROJECT_COPYRIGHT_YEAR} Tommaso Vinci, Alessandro Flacco. GNU General Public License v2.0")
 
-	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${myApp_ICON} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+	set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+	set(${PROJECT_NAME}_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)
+	set(${PROJECT_NAME}_ICONTYPE ${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/filetype.icns)
+
+	set_source_files_properties(${${PROJECT_NAME}_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+	set_source_files_properties(${${PROJECT_NAME}_ICONTYPE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 	target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/filetype.icns" "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources"
-	)
-
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy "${MACOSX_BUNDLE_ICON_FILE}" "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Resources"
-	)
 
 	set(CMAKE_INSTALL_PREFIX "..")
 
@@ -244,8 +240,6 @@ target_link_libraries(Neutrino ${LIBS})
 qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets Network)
 
 
-
-
 if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
 	set(CMAKE_INSTALL_PREFIX "/Applications")
 endif()
@@ -272,18 +266,8 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 
-if(APPLE)
-	set(CMAKE_INSTALL_PREFIX "/Applications")
-endif()
-
 message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
 #install(TARGETS ${PROJECT_NAME} DESTINATION ${BIN_INSTALL_DIR})
-
-set(LICENSE_FILE "LICENSE.txt")
-
-if(NOT APPLE)
-	install(FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR})
-endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
@@ -293,22 +277,16 @@ set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
 
 set(CPACK_RESOURCE_FILE_README "${README_FILE}")
 
-if(LINUX)
-	set(CPACK_GENERATOR "TBZ2")
-	set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-
-
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")
 include(InstallRequiredSystemLibraries)
 
-if(APPLE)
-	set(EXECUTABLE "${PROJECT_NAME}.app")
-elseif(WIN32)
-	set(EXECUTABLE "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-else()
-	set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-endif()
+#if(APPLE)
+#	set(EXECUTABLE "${PROJECT_NAME}.app")
+#elseif(WIN32)
+#	set(EXECUTABLE "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+#else()
+#	set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+#endif()
 
 if (APPLE)
 	set (CMAKE_INSTALL_RPATH "/usr/local/lib")
