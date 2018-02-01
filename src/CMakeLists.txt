@@ -201,6 +201,7 @@ endif()
 
 if(LINUX)
 	add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${qm_files})
+	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT ${PROJECT_NAME})
 endif()
 
 

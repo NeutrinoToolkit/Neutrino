@@ -76,7 +76,6 @@ add_subdirectory (plugins)
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 
-include(GetVersionFromGitTag)
 find_package(Git REQUIRED)
 if (GIT_FOUND)
 	# Get last tag from git
@@ -97,17 +96,11 @@ if (GIT_FOUND)
 		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-	set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-	set (CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_STRING}${${PROJECT_NAME}_VERSION_AHEAD}")
-
-else(GIT_FOUND)
-	message( FATAL_ERROR "You need to install GIT")
 endif(GIT_FOUND)
 
 
-# Set project version (without the preceding 'v')
-set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
 
+set(CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}+${${PROJECT_NAME}_VERSION_AHEAD}")
 
 if (WIN32)
 	# use nsis
@@ -134,14 +127,10 @@ if (LINUX)
 		execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
 		string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
-		set (CPACK_PACKAGE_VERSION "${DISTRO}")
-
 		if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
-			message (STATUS "[${DISTRO}] Using CPackDeb for packaging")
-
 			set(CPACK_INSTALL_PREFIX "/usr")
-			set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ DEB)
+			set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB ZIP)
 
 			set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
@@ -150,24 +139,19 @@ if (LINUX)
 			set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Neutrino image manipulation program")
 			set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 
-			# debian is picky on version numbers
-			string(REGEX REPLACE "^[a-zA-Z]" "" CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
-			message (STATUS "[${DISTRO}] package version: ${CPACK_DEBIAN_PACKAGE_VERSION}")
-
 			execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-			message(STATUS "[${DISTRO}] Building for architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
 			# triggers
 			set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
 			# install goodies
 			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
-			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
+			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION /usr/share/pixmaps RENAME neutrino.svg)
 		elseif (DISTRO MATCHES "Fedora")
 			execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-			set(CPACK_GENERATOR ${CPACK_GENERATOR} TGZ RPM)
+			set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM ZIP)
 			set(CPACK_RPM_PACKAGE_AUTOREQ YES)
 		endif()
 	else()
