@@ -169,7 +169,7 @@ endif(Qt5LinguistTools_FOUND)
 
 
 
-#list(APPEND CMAKE_MODULE_PATH "../lib")
+list(APPEND CMAKE_MODULE_PATH "../lib")
 
 # cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
 include_directories(../nPhysImage)
@@ -206,7 +206,7 @@ if(APPLE)
 	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 	target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
-	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+#	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
@@ -267,26 +267,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QR
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 
 message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
-#install(TARGETS ${PROJECT_NAME} DESTINATION ${BIN_INSTALL_DIR})
-
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
-
-set(CPACK_RESOURCE_FILE_README "${README_FILE}")
 
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")
 include(InstallRequiredSystemLibraries)
-
-#if(APPLE)
-#	set(EXECUTABLE "${PROJECT_NAME}.app")
-#elseif(WIN32)
-#	set(EXECUTABLE "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-#else()
-#	set(EXECUTABLE "${BIN_INSTALL_DIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-#endif()
 
 if (APPLE)
 	set (CMAKE_INSTALL_RPATH "/usr/local/lib")
