@@ -23,7 +23,6 @@
  *
  */
 #include "neutrino.h"
-#include "ui_neutrino.h"
 #include "nMouseInfo.h"
 
 

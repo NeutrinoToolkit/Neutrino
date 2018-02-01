@@ -24,7 +24,6 @@
  */
 #include "nLineout.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan(parent),
   cut_dir(plot_dir)

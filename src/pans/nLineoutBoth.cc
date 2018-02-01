@@ -24,7 +24,6 @@
  */
 #include "nLineoutBoth.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 nLineoutBoth::nLineoutBoth(neutrino *parent) : nGenericPan(parent)
 {

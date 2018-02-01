@@ -26,7 +26,6 @@
 
 #include "nContours.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 nContours::nContours(neutrino *nparent) : nGenericPan(nparent)
 {

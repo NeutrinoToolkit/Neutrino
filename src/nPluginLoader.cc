@@ -1,6 +1,5 @@
 #include "nPluginLoader.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 #include <QMenu>
 
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu)

@@ -24,9 +24,9 @@
  */
 
 #include "nCustomPlots.h"
-#include "ui_nCustomPlot.h"
 #include <QtSvg>
 
+#include "ui_nCustomPlot.h"
 
 nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     QWidget(qobject_cast<QWidget *>(axis)),

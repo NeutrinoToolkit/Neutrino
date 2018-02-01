@@ -22,11 +22,9 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nLine.h"
 #include "neutrino.h"
+#include "nLine.h"
 #include "nGenericPan.h"
-
-#include "ui_neutrino.h"
 #include <iostream>
 
 //https://github.com/graiola/spline

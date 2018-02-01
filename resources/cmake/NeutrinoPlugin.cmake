@@ -1,8 +1,5 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
 
-    if (POLICY CMP0071)
-		cmake_policy (SET CMP0071 OLD)
-	endif ()
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -29,7 +26,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 		set (PLUGIN_INSTALL_DIR "${LIBRARY_OUTPUT_PATH}")
 	elseif(LINUX)
 		set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../share/neutrino/plugins")
-	set (PLUGIN_INSTALL_DIR "/usr/share/neutrino/plugins")
+		set (PLUGIN_INSTALL_DIR "/usr/share/neutrino/plugins")
     elseif(WIN32)
 		set (LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../bin/plugins")
 		set (PLUGIN_INSTALL_DIR "bin/plugins")
@@ -56,38 +53,32 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 	set(CMAKE_AUTOMOC ON)
 	set(CMAKE_AUTOUIC ON)
+	set(CMAKE_AUTORCC ON)
 	set(CMAKE_INCLUDE_CURRENT_DIR ON)
+	set(CMAKE_AUTOUIC_SEARCH_PATHS ${NEUTRINO_ROOT}/UIs)
 
 	# add neutrino deps
 	include_directories(${NEUTRINO_ROOT}/nPhysImage)
 	include_directories(${NEUTRINO_ROOT}/src) # for base stuff
-	QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui)
 
 	# visar needs to borrow some stuff from neutrino tree
 	include_directories(${NEUTRINO_ROOT}/src/graphics)
-	QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
 
 	file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
 	file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 	file(GLOB QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
 
-	foreach(my_file ${QRCS})
-		qt5_add_resources(RES_SOURCES ${my_file})
-	endforeach()
 
 
 
 	## add help
-	if(NOT DEFINED PANDOC)
-		find_program(PANDOC pandoc)
-	  if(PANDOC)
-		  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-			message(STATUS "Found pandoc")
-		endif()
-	  endif(PANDOC)
-	  mark_as_advanced(PANDOC)
-    endif(NOT DEFINED PANDOC)
-	if(PANDOC AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md"))
+
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+		if(NOT DEFINED PANDOC)
+			find_program(PANDOC pandoc REQUIRED)
+		endif(NOT DEFINED PANDOC)
+
 		set(README_MD "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 		set(README_HTML "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}README.html")
 		set_source_files_properties( ${README_MD} PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -98,8 +89,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 		file(WRITE ${PANDOC_QRC} "<RCC>\n    <qresource>\n")
 		file(APPEND ${PANDOC_QRC} "        <file alias=\"${my_file_basename}\">${README_HTML}</file>\n")
 		file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
-
-		qt5_add_resources(RES_SOURCES ${PANDOC_QRC})
 
 		add_custom_command(
 			OUTPUT ${README_HTML}
@@ -130,7 +119,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 				endif()
 			endif()
 
-		ENDFOREACH()
+			ENDFOREACH()
 
 		IF(LANGUAGE_TS_FILES)
 		    set(TRANSL_QRC ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
@@ -142,25 +131,24 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 			file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
 			list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
 
-			qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
 			ENDIF(LANGUAGE_TS_FILES)
 
-	endif(Qt5LinguistTools_FOUND)
+		endif(Qt5LinguistTools_FOUND)
 
-	QT5_WRAP_UI(nUIs ${UIS})
 
-	# add sources here
+	QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
+	set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
-	add_library (${PROJECT_NAME} SHARED ${SOURCES} ${nUIs} ${RES_SOURCES} ${README_MD})
+	add_library (${PROJECT_NAME} SHARED ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
 
 	IF(APPLE)
 	    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 		ENDIF()
 
-	if(WIN32)
+		if(WIN32)
 		add_dependencies(${PROJECT_NAME} Neutrino)
 		set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-		target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/bin/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+		target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
 		# to check: --enable-runtime-pseudo-reloc
 	endif()
 
@@ -175,7 +163,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
 	qt5_use_modules(${PROJECT_NAME} ${MODULES})
 
-	IF (DEFINED PLUGIN_INSTALL_DIR)
+	IF(DEFINED PLUGIN_INSTALL_DIR)
 	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR})
 		ENDIF()
 

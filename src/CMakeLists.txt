@@ -1,12 +1,4 @@
-
-# ref: http://wiki.qt.io/Using_CMake_build_system
-
-
 cmake_minimum_required (VERSION 3.0)
-
-if (POLICY CMP0071)
-	cmake_policy (SET CMP0071 OLD)
-endif ()
 
 include(FindGit)
 
@@ -25,26 +17,24 @@ endif()
 
 
 set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (LIBPATHS /usr/lib /usr/local/lib ../lib)
 
-
 ## sources
 file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
 list (APPEND SOURCES
 	neutrino.cc
 	nGenericPan.cc panThread.cc nPluginLoader.cc nPlug.cc nPanPlug.cc
-
 	nApp.cc main.cc
-
 	graphics/neutrinoPalettes.cc graphics/nView.cc graphics/nMouse.cc
 	graphics/nLine.cc graphics/nTics.cc graphics/nPoint.cc
 	graphics/nObject.cc graphics/nRect.h graphics/nEllipse.h
 	graphics/spline.cc graphics/qcustomplot.cpp graphics/nCustomPlots.cpp
-
 	pans/nFocalSpot.cc pans/nPhysProperties.cc pans/nContours.cc
 	pans/nInterpolatePath.cc pans/nOpenRAW.cc pans/nSpectralAnalysis.cc
 	pans/colorbar/nHistogram.cc pans/colorbar/nColorBar.cc
@@ -60,17 +50,14 @@ include(FindNeutrinoDeps)
 
 add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
-message(" HEAD  SHA: ${${PROJECT_NAME}_VERSION_GIT_SHA}")
-
 if (APPLE AND NOT DEFINED Qt5_DIR)
 	set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+	MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
 endif()
 
 find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL REQUIRED)
 
 add_definitions(${QT_DEFINITIONS})
-include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-
 
 set(QRCDIR ${CMAKE_CURRENT_BINARY_DIR}/qrc)
 file(MAKE_DIRECTORY ${QRCDIR})
@@ -89,7 +76,6 @@ endforeach()
 file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
 list(LENGTH ICONS LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} icon files: ${ICONS_QRC}")
-qt5_add_resources(RES_SOURCES ${ICONS_QRC})
 
 
 # write automatically the qrc file for html
@@ -105,7 +91,6 @@ endforeach()
 file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLS LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} html files: ${HTML_QRC}")
-qt5_add_resources(RES_SOURCES ${HTML_QRC})
 
 file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
@@ -118,15 +103,9 @@ endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLLICENSES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
-qt5_add_resources(RES_SOURCES ${LICENSES_QRC})
-
-
-
-QT5_WRAP_UI( UI_HEADERS ${UIS} )
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics doc pans pans/colorbar pans/winlist)
-
 
 #translate ui
 
@@ -141,9 +120,9 @@ if (Qt5LinguistTools_FOUND)
 
 	if(EXISTS ${TS_FILE})
 		qt5_add_translation(qm_files ${TS_FILE})
-	else ()
+	else (EXISTS ${TS_FILE})
 		qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
-	endif ()
+	endif(EXISTS ${TS_FILE})
 
 	ENDFOREACH(LANGUAGE ${LANGUAGES})
 
@@ -160,22 +139,16 @@ if (Qt5LinguistTools_FOUND)
 	list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
 	message(STATUS "${LIST_LENGTH} translation files: ${TRANSL_QRC}")
 
-	qt5_add_resources(RES_SOURCES ${TRANSL_QRC})
-	ENDIF(LANGUAGE_TS_FILES)
+ENDIF(LANGUAGE_TS_FILES)
 
 
 endif(Qt5LinguistTools_FOUND)
 
-
-
-
-list(APPEND CMAKE_MODULE_PATH "../lib")
-
-# cmake cannot look for nPhysImageF at this stage, for it will ALWAYS fail..
-include_directories(../nPhysImage)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/nPhysImage")
 
 set(LIBS ${LIBS} "nPhysImageF")
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
 set(PROJECT_DOMAIN_FIRST "neutrino")
 set(PROJECT_DOMAIN_SECOND "com")
@@ -203,11 +176,10 @@ if(APPLE)
 	set_source_files_properties(${${PROJECT_NAME}_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 	set_source_files_properties(${${PROJECT_NAME}_ICONTYPE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+	add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
 	target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
-#	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 	set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
 	set(CMAKE_INSTALL_PREFIX "..")
@@ -218,80 +190,23 @@ if(WIN32)
 	set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
 	list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		SET(WIN32_EXECUTABLE FALSE)
-		add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
+		add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${RC_WIN} )
 	else()
-		add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES}  ${ICONS_QRC} ${HTML_QRC} ${RC_WIN} )
-	endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${RC_WIN} )
+	endif()
 
 	set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
 	set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if(LINUX)
-	add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${UI_HEADERS} ${RES_SOURCES} ${ICONS_QRC} ${HTML_QRC} ${qm_files})
+	add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${qm_files})
 endif()
 
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-target_link_libraries(Neutrino ${LIBS})
-
-qt5_use_modules(Neutrino Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets Network)
-
-
-if(APPLE AND CMAKE_INSTALL_PREFIX MATCHES "/usr/local")
-	set(CMAKE_INSTALL_PREFIX "/Applications")
-endif()
-
-if(NOT CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
-	add_definitions(-DQT_NO_DEBUG_OUTPUT)
-	set(CMAKE_BUILD_RELEASE TRUE)
-else()
-	set(CMAKE_BUILD_RELEASE FALSE)
-endif()
+target_link_libraries(${PROJECT_NAME} ${LIBS} Qt5::Core Qt5::Gui Qt5::Sql Qt5::Widgets Qt5::Svg Qt5::PrintSupport Qt5::UiTools Qt5::Multimedia Qt5::MultimediaWidgets Qt5::Network)
 
 message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
-
-
-if(LINUX)
-	string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
-	set(BIN_INSTALL_DIR "bin")
-	set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME_LOWERCASE}/")
-else()
-	set(BIN_INSTALL_DIR ".")
-	set(DOC_INSTALL_DIR ".")
-endif()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
-target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
-
-message(STATUS "${PROJECT_NAME} will be installed to ${CMAKE_INSTALL_PREFIX}")
-
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_INSTALL_DIR}")
-include(InstallRequiredSystemLibraries)
-
-if (APPLE)
-	set (CMAKE_INSTALL_RPATH "/usr/local/lib")
-	set (CMAKE_MACOSX_RPATH off)
-endif()
-
-# output paths
-if (APPLE)
-	set (EXECUTABLE_OUTPUT_PATH "..")
-	install (TARGETS Neutrino BUNDLE DESTINATION "../.." COMPONENT binary)
-else()
-	set (EXECUTABLE_OUTPUT_PATH "../bin")
-	install (TARGETS Neutrino COMPONENT binary DESTINATION bin)
-endif()
-
-
-if (APPLE)
-
-	message(STATUS "Apple : remember to use brew !")
-
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -headerpad_max_install_names")
-
-endif()
-
 

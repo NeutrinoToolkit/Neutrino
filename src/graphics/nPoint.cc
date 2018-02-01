@@ -24,7 +24,6 @@
  */
 #include "nPoint.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 #include "ui_nPoint.h"
 #include <iostream>
 

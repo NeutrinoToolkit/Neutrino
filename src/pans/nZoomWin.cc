@@ -24,7 +24,6 @@
  */
 #include "nZoomWin.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 // physGhosts
 

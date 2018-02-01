@@ -25,7 +25,6 @@
 #include "nObject.h"
 #include "ui_nObject.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 #include "nGenericPan.h"
 
 #include <iostream>

@@ -26,7 +26,6 @@
 #include "ui_nPanHelp.h"
 
 #include "neutrino.h"
-#include "ui_neutrino.h"
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)

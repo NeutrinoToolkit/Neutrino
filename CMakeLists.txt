@@ -1,6 +1,6 @@
 # this is the frigging toplevel cmakelists
 
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required(VERSION 3.9)
 
 ## before project https://stackoverflow.com/a/34208904
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")

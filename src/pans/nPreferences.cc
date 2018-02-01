@@ -29,7 +29,6 @@
 
 #include "nPreferences.h"
 #include "neutrino.h"
-#include "ui_neutrino.h"
 
 
 #ifdef	__WIN32
