@@ -1,11 +1,5 @@
-
-
-find_package(HDF5 COMPONENTS HL)
-find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS})
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	message(STATUS "${HDF5_FOUND} : ${HDF5_LIBRARIES} : ${HDF5HL} : ${HDF5_HL_LIBRARIES}")
-endif()
+find_package(HDF5 COMPONENTS HL QUIET)
+find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS}  QUIET)
 
 if (HDF5_FOUND AND HDF5_HL_LIBRARIES)
     #hdf5 libs

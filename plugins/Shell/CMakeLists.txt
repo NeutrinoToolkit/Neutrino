@@ -27,8 +27,7 @@ if(PYTHONLIBS_FOUND)
 			message(STATUS "Found NumPy includes: ${NUMPY_INCLUDE_DIR}")
 			set(NUMPY_FOUND 1 CACHE INTERNAL "NumPy found")
 			include_directories(${NUMPY_INCLUDE_DIR})
-			add_definitions(-DHAVE_NUMPY)
-			add_definitions(-DSMILEI_USE_NUMPY -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+            add_definitions(-DHAVE_NUMPY -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
 		endif ()
 
 
@@ -59,14 +58,14 @@ if(PYTHONLIBS_FOUND)
 
 
 		if (WIN32)
-			install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
+            install(FILES ${PYTHONQT_EXAMPLES} DESTINATION python/examples)
 		endif()
 
 		if (LINUX)
 			message (STATUS "PythonQt lib is copied along")
-			install (FILES ${PYTHONQT} DESTINATION lib)
-			list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt3.0")
-			message (STATUS "Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
+            install (FILES ${PYTHONQT} DESTINATION lib)
+            list(APPEND CPACK_DEBIAN_PACKAGE_CONFLICTS "libpythonqt3.0")
+            message (STATUS "Warning: .deb will conflict with ${CPACK_DEBIAN_PACKAGE_CONFLICTS}")
 
 			install(FILES ${PYTHONQT_EXAMPLES} DESTINATION share/neutrino/python/examples)
 		endif()

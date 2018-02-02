@@ -45,7 +45,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	# using Visual Studio C++
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/resources/cmake)
+set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
+
 set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
 set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
