@@ -120,17 +120,19 @@ if (WIN32)
 endif()
 
 if (LINUX)
-	find_program(LSB_RELEASE lsb_release)
+    find_program(LSB_RELEASE lsb_release REQUIRED)
 	if(LSB_RELEASE)
 		execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
 		string(REGEX REPLACE "\n" "" DISTRO ${DISTRO})
 		execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
 		string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
 
-		if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${DISTRO}-${DISTRO_CODE}")
+
+        if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
 			set(CPACK_INSTALL_PREFIX "/usr")
-			set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB ZIP)
+            set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB ZIP)
 
 			set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
@@ -147,11 +149,11 @@ if (LINUX)
 
 			# install goodies
 			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
-			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION /usr/share/pixmaps RENAME neutrino.svg)
+            install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION /usr/share/pixmaps RENAME neutrino.svg)
 		elseif (DISTRO MATCHES "Fedora")
 			execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-			set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM ZIP)
+            set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM ZIP)
 			set(CPACK_RPM_PACKAGE_AUTOREQ YES)
 		endif()
 	else()
@@ -177,11 +179,12 @@ if(APPLE)
 	set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/background.png")
 	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CMAKE_SYSTEM_NAME}")
 
-	INSTALL(CODE "
-		include(BundleUtilities)
-		copy_and_fixup_bundle(\"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app\"   \"\"   \"\")
-		" COMPONENT Runtime)
-	#test
+    install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/prepareapp.sh)")
+
+#	INSTALL(CODE "
+#		include(BundleUtilities)
+#		fixup_bundle(\"${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.app\"   \"\"   \"${CMAKE_LIBRARY_PATH}\")
+#		" COMPONENT Runtime)
 endif()
 
 include (CPack) # this to be included LAST with resp. to its vars

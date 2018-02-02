@@ -55,7 +55,9 @@ if (APPLE AND NOT DEFINED Qt5_DIR)
 	MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
 endif()
 
-find_package(Qt5 COMPONENTS Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL REQUIRED)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL)
+
+find_package(Qt5 COMPONENTS ${MODULES} REQUIRED)
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -182,8 +184,9 @@ if(APPLE)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 	set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
-	set(CMAKE_INSTALL_PREFIX "..")
-
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/..")
+    set (EXECUTABLE_OUTPUT_PATH ".")
+    install (TARGETS Neutrino BUNDLE DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT binary)
 endif()
 
 if(WIN32)
@@ -201,13 +204,17 @@ endif()
 
 if(LINUX)
 	add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${qm_files})
-	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT ${PROJECT_NAME})
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
 endif()
 
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-target_link_libraries(${PROJECT_NAME} ${LIBS} Qt5::Core Qt5::Gui Qt5::Sql Qt5::Widgets Qt5::Svg Qt5::PrintSupport Qt5::UiTools Qt5::Multimedia Qt5::MultimediaWidgets Qt5::Network)
+foreach(MODULE ${MODULES})
+    set(MODULES_TWEAK "${MODULES_TWEAK};Qt5::${MODULE}")
+endforeach()
+
+target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
 
 message(STATUS "Building ${PROJECT_NAME} in ${CMAKE_BUILD_TYPE} mode")
 
