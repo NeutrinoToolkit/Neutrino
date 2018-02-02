@@ -700,7 +700,7 @@
   </action>
   <action name="actionKeyborard_shortcuts">
    <property name="text">
-    <string>Keyborard shortcuts</string>
+    <string>Keyboard shortcuts</string>
    </property>
   </action>
   <action name="actionShow_grid">

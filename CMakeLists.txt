@@ -179,7 +179,7 @@ if(APPLE)
 	set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/background.png")
 	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CMAKE_SYSTEM_NAME}")
 
-    install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/prepareapp.sh)")
+#    install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/prepareapp.sh)")
 
 #	INSTALL(CODE "
 #		include(BundleUtilities)

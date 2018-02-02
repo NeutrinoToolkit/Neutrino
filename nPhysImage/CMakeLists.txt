@@ -23,13 +23,7 @@ if(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 endif()
 
-
 if (APPLE)
-    set (CMAKE_SKIP_RPATH ON)
-    set (CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
-
-#	set (LIB_INSTALL_DIR "/usr/local/lib")
-    set_target_properties(nPhysImageF PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_RPATH})
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Frameworks")
 endif()
 
