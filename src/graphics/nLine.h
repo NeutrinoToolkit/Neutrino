@@ -85,7 +85,7 @@ public:
 
 	// roba da padelle
 	QMainWindow my_pad;
-	Ui::nLine my_w;
+    Ui::nLine my_w;
 
 	QPainterPath path() const;
 	QPolygonF poly(int) const;

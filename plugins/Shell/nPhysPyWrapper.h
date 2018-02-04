@@ -2,9 +2,6 @@
 #define __nphys_py_wrapper
 
 #include "Python.h"
-#ifdef HAVE_NUMPY
-#include <numpy/arrayobject.h>
-#endif
 
 #include <cmath>
 #include "PythonQt.h"

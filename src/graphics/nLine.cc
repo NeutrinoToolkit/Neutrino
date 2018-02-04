@@ -112,7 +112,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 	// PADELLA
 
 	my_pad.setWindowTitle(toolTip());
-	my_pad.setWindowIcon(QIcon(":line"));
+    my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
 	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));

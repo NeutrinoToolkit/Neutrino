@@ -3,6 +3,9 @@
 #include "nPhysFormats.h"
 #include "nApp.h"
 #include "neutrino.h"
+#ifdef HAVE_NUMPY
+#include <numpy/arrayobject.h>
+#endif
 
 
 /**

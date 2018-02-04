@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
 
-include(FindGit)
-
 set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/resources/icons")
 
 if (LINUX)

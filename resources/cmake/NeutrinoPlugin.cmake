@@ -40,12 +40,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
     endif()
 
-    # check for nphys
-    if (NOT ${NPHYS_PATH} STREQUAL "" AND NOT IS_ABSOLUTE ${NPHYS_PATH})
-        message (STATUS "NPHYS_PATH is not absolute, fixing")
-        set (ABS_NPHYS_PATH "${CMAKE_BINARY_DIR}/${NPHYS_PATH}")
-    endif()
-
     # find goodies
 
     add_definitions(-DQT_PLUGIN)

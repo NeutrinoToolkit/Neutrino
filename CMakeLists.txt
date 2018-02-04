@@ -48,10 +48,8 @@ endif()
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
 set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
-set (NPHYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if (WIN32)
-
 	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
 	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
 	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
@@ -60,23 +58,20 @@ if (WIN32)
 	endif()
 	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
 	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
-
 endif()
-
-
 
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
 add_subdirectory (plugins)
 
-
-
-
 # CPack stuff
 
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${${PROJECT_NAME}_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
+set(CPACK_GENERATOR ZIP)
 
+
+#versioning
 find_package(Git REQUIRED)
 if (GIT_FOUND)
 	# Get last tag from git
@@ -96,17 +91,12 @@ if (GIT_FOUND)
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
-
 endif(GIT_FOUND)
-
-
 
 set(CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}+${${PROJECT_NAME}_VERSION_AHEAD}")
 
 if (WIN32)
-	# use nsis
-	list(APPEND CPACK_GENERATOR NSIS ZIP)
-
+    list(APPEND CPACK_GENERATOR NSIS)
 	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
 	set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
 	set(CPACK_CREATE_DESKTOP_LINKS "Neutrino")
@@ -114,26 +104,22 @@ if (WIN32)
 	SET(CPACK_NSIS_HELP_LINK "https://github.com/NeutrinoToolkit/Neutrino")
 	SET(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/NeutrinoToolkit/Neutrino")
 	SET(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-
 	SET(CPACK_NSIS_MODIFY_PATH OFF)
 	SET(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-
 endif()
 
 if (LINUX)
     find_program(LSB_RELEASE lsb_release REQUIRED)
 	if(LSB_RELEASE)
-		execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO)
-		string(REGEX REPLACE "\n" "" DISTRO ${DISTRO})
-		execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE)
-		string(REGEX REPLACE "\n" "" DISTRO_CODE ${DISTRO_CODE})
+        execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
         set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${DISTRO}-${DISTRO_CODE}")
 
         if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
 			set(CPACK_INSTALL_PREFIX "/usr")
-            set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB ZIP)
+            set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB)
 
 			set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
@@ -145,7 +131,6 @@ if (LINUX)
 			execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
-			# triggers
 			set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
 			# install goodies
@@ -154,11 +139,9 @@ if (LINUX)
 		elseif (DISTRO MATCHES "Fedora")
 			execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
-            set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM ZIP)
+            set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM)
 			set(CPACK_RPM_PACKAGE_AUTOREQ YES)
 		endif()
-	else()
-		MESSAGE(WARNING "Missing lsb_release command")
 	endif()
 endif()
 
@@ -172,19 +155,18 @@ if(APPLE)
 	set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/macpackage/neutrino.plist.cmake")
 
 	set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
-	set(CPACK_GENERATOR "Bundle")
+    set(CPACK_GENERATOR ${CPACK_GENERATOR} Bundle)
 	set(CPACK_DMG_FORMAT "UDBZ")
 	set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
 	set(CPACK_SYSTEM_NAME "OSX")
 	set(CPACK_DMG_DS_STORE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/DS_Store")
 	set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/background.png")
-	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CMAKE_SYSTEM_NAME}")
 
 #    install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/prepareapp.sh)")
 
 #	INSTALL(CODE "
 #		include(BundleUtilities)
-#		fixup_bundle(\"${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.app\"   \"\"   \"${CMAKE_LIBRARY_PATH}\")
+#		fixup_bundle(\"${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.app\"   \"\"   \"/usr/local/opt/qt5/lib/cmake/Qt5/lib\")
 #		" COMPONENT Runtime)
 endif()
 
