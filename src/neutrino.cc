@@ -45,7 +45,6 @@
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
 #include "nBoxLineout.h"
-#include "nCompareLines.h"
 #include "nWavelet.h"
 #include "nSpectralAnalysis.h"
 #include "nIntegralInversion.h"
@@ -233,7 +232,6 @@ neutrino::neutrino():
 	connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
 	connect(my_w->actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
 	connect(my_w->actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
-	connect(my_w->actionCompareLines, SIGNAL(triggered()), this, SLOT(CompareLines()));
 	connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
 	connect(my_w->actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
@@ -1738,12 +1736,6 @@ void neutrino::print()
 nGenericPan*
 neutrino::BoxLineout() {
 	return new nBoxLineout(this);
-}
-
-/// compare lines between images
-nGenericPan*
-neutrino::CompareLines() {
-	return new nCompareLines(this);
 }
 
 /// Open raw window

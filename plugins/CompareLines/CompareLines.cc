@@ -22,9 +22,9 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nCompareLines.h"
+#include "CompareLines.h"
 
-nCompareLines::nCompareLines(neutrino *nparent) : nGenericPan(nparent)
+CompareLines::CompareLines(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
 
@@ -64,18 +64,18 @@ nCompareLines::nCompareLines(neutrino *nparent) : nGenericPan(nparent)
 }
 
 
-void nCompareLines::physDel(nPhysD* my_phys) {
+void CompareLines::physDel(nPhysD* my_phys) {
     images.removeAll(my_phys);
     updatePlot();
 }
 
-void nCompareLines::physMod(std::pair<nPhysD*,nPhysD*> my_mod) {
+void CompareLines::physMod(std::pair<nPhysD*,nPhysD*> my_mod) {
     images.removeAll(my_mod.first);
     images.append(my_mod.second);
     updatePlot();
 }
 
-void nCompareLines::addImage() {
+void CompareLines::addImage() {
     nPhysD *my_phys=nGenericPan::getPhysFromCombo(my_w.image);
     if(!images.contains(my_phys)) {
         images.append(my_phys);
@@ -83,12 +83,12 @@ void nCompareLines::addImage() {
     updatePlot();
 }
 
-void nCompareLines::removeImage() {
+void CompareLines::removeImage() {
     images.removeAll(nGenericPan::getPhysFromCombo(my_w.image));
     updatePlot();
 }
 
-void nCompareLines::addImages() {
+void CompareLines::addImages() {
     foreach (nPhysD *my_phys, nparent->getBufferList()) {
         if(!images.contains(my_phys)) {
             images.append(my_phys);
@@ -97,16 +97,16 @@ void nCompareLines::addImages() {
     updatePlot();
 }
 
-void nCompareLines::removeImages() {
+void CompareLines::removeImages() {
     images.clear();
     updatePlot();
 }
 
-void nCompareLines::sceneChanged() {
+void CompareLines::sceneChanged() {
     if (sender()==line) updatePlot();
 }
 
-void nCompareLines::updatePlot() {
+void CompareLines::updatePlot() {
     if (currentBuffer && isVisible()) {
 
         my_w.plot->clearGraphs();

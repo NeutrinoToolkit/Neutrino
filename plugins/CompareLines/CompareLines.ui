@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nCompareLines</class>
- <widget class="QMainWindow" name="nCompareLines">
+ <class>CompareLines</class>
+ <widget class="QMainWindow" name="CompareLines">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -78,7 +78,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
          </property>
         </widget>
@@ -95,7 +95,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
            <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
          </property>
         </widget>
@@ -205,7 +205,7 @@
   </action>
   <action name="actionAddAll">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -217,7 +217,7 @@
   </action>
   <action name="actionRemoveAll">
    <property name="icon">
-    <iconset resource="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -234,7 +234,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/qtc-cmake-cDUc1L/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

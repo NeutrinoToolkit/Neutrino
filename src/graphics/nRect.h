@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -43,38 +43,38 @@ class nObject;
 }
 
 class nRect : public nObject {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	
-	nRect(neutrino *neu) : nObject(neu, QString("rect")) {
-		changeColorHolder(QColor(0,0,255,200));
-	};
 
-	nRect(nGenericPan *pan, int level) : nObject(pan,level, QString("rect")) {};
+    nRect(neutrino *neu) : nObject(neu, QString("rect")) {
+        changeColorHolder(QColor(0,0,255,200));
+    };
 
-	neutrino *nparent;
+    nRect(nGenericPan *pan, int level) : nObject(pan,level, QString("rect")) {};
 
-	enum { Type = QGraphicsItem::UserType + 2 };
-	int type() const { return Type;}
-	
-	QPainterPath path() const {
-		QPainterPath my_path;
-		if (ref.size()>1) {
-			my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
-		} else {
-			my_path.addRect(QRectF(0,0,0,0));
-		}
-		return my_path;
-	}
+    neutrino *nparent;
 
-	void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
-		//	p->setCompositionMode((QPainter::CompositionMode)22);
-		QPen pen;
-		pen.setWidthF(nWidth/zoom);
-		pen.setColor(nColor);
-		p->setPen(pen);
-		p->drawPath(path());
-	}
+    enum { Type = QGraphicsItem::UserType + 2 };
+    int type() const { return Type;}
+
+    QPainterPath path() const {
+        QPainterPath my_path;
+        if (ref.size()>1) {
+            my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
+        } else {
+            my_path.addRect(QRectF(0,0,0,0));
+        }
+        return my_path;
+    }
+
+    void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
+        //	p->setCompositionMode((QPainter::CompositionMode)22);
+        QPen pen;
+        pen.setWidthF(nWidth/zoom);
+        pen.setColor(nColor);
+        p->setPen(pen);
+        p->drawPath(path());
+    }
 
 };
 

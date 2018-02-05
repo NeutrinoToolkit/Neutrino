@@ -52,8 +52,6 @@ public:
 
 	nEllipse(nGenericPan *pan, int level) : nObject(pan,level, QString("ellipse")) {};
 
-	neutrino *nparent;
-
 	enum { Type = QGraphicsItem::UserType + 3 };
 	int type() const { return Type;}
 

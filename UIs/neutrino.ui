@@ -184,7 +184,6 @@
      <addaction name="actionBoth"/>
      <addaction name="separator"/>
      <addaction name="actionBoxLineout"/>
-     <addaction name="actionCompareLines"/>
     </widget>
     <widget class="QMenu" name="menuPlugins">
      <property name="title">

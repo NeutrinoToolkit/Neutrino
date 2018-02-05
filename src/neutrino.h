@@ -217,7 +217,6 @@ public slots:
     nGenericPan* Vlineout();
     nGenericPan* bothLineout();
     nGenericPan* BoxLineout();
-    nGenericPan* CompareLines();
 
     void createDrawLine();
 

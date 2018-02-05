@@ -26,21 +26,21 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nCompareLines.h"
+#include "ui_CompareLines.h"
 
-#ifndef __nCompareLines
-#define __nCompareLines
+#ifndef __CompareLines
+#define __CompareLines
 
 #include "neutrino.h"
 class nLine;
 
-class nCompareLines : public nGenericPan {
+class CompareLines : public nGenericPan {
     Q_OBJECT
 
 public:
 
-    Q_INVOKABLE nCompareLines(neutrino *);
-    Ui::nCompareLines my_w;
+    Q_INVOKABLE CompareLines(neutrino *);
+    Ui::CompareLines my_w;
 
 public slots:
     
@@ -62,5 +62,7 @@ private:
 
     QPointer<nLine> line;
 };
+
+NEUTRINO_PLUGIN(CompareLines,Analysis;Lineout);
 
 #endif
