@@ -57,7 +57,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="Wavelet">
+      <widget class="QWidget" name="widget_1">
        <attribute name="title">
         <string>Wavelet</string>
        </attribute>
@@ -1105,7 +1105,7 @@
   </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset>
+    <iconset resource="../GhostFringes/GhostFringes.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -1166,6 +1166,7 @@
  </tabstops>
  <resources>
   <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../GhostFringes/GhostFringes.qrc"/>
  </resources>
  <connections/>
 </ui>

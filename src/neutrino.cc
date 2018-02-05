@@ -790,7 +790,7 @@ void neutrino::saveSession (QString fname) {
 			progress.show();
 
 			std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
-            ofile << "Neutrino " << __VER_LATEST << " " << my_w->my_view->physList.size() << " " << panList.size() << std::endl;
+            ofile << "Neutrino " << __VER << " " << my_w->my_view->physList.size() << " " << panList.size() << std::endl;
 
 			for (int i=0;i<my_w->my_view->physList.size(); i++) {
 				if (progress.wasCanceled()) break;
@@ -1737,14 +1737,7 @@ void neutrino::about() {
 	connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
 	connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-    my_about.version->setText(QString(__VER_LATEST));
-#ifdef __neutrino_key
-	QString serial(qApp->property("nHash").toString());
-	// copy serial to clipboard
-	myabout.label->setText(myabout.label->text()+"\nSerial number:"+serial);
-	QApplication::clipboard()->setText(serial);
-#endif
-
+    my_about.version->setText(QApplication::applicationVersion());
 	my_about.creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
 	my_about.creditsText->setLineWrapColumnOrWidth(80);
 	QScrollBar *vScrollBar = my_about.creditsText->verticalScrollBar();

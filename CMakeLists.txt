@@ -8,9 +8,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment ve
 ### top level compile options
 project (Neutrino CXX)
 
-set(${PROJECT_NAME}_VERSION_MAJOR "2")
-set(${PROJECT_NAME}_VERSION_MINOR "1")
-
 #############################
 
 option(NEUTRINOPLUGINS "Compile Neutrino plugins" ON)
@@ -20,7 +17,40 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
 	set (CMAKE_BUILD_TYPE "Release")
 endif()
 
-message(STATUS "Neutrino build type: ${CMAKE_BUILD_TYPE}")
+#versioning
+find_package(Git REQUIRED)
+if (GIT_FOUND)
+    #How many commits since last version tag
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --match "v[0-9]*\\.[0-9]*" --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        RESULT_VARIABLE NOT_GOOD_TAG
+        OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_VER
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if (${NOT_GOOD_TAG})
+        set(${PROJECT_NAME}_VERSION "1.0")
+        MESSAGE(WARNING "Cannot find a matching tag imposing ${${PROJECT_NAME}_VERSION}")
+    else()
+        string(REGEX REPLACE "^v([0-9]*)\\.([0-9]*)" "\\1.\\2" ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_GIT_VER}")
+    endif()
+
+
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count ${${PROJECT_NAME}_VERSION_GIT_VER}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    set(${PROJECT_NAME}_VERSION_AHEAD "${${PROJECT_NAME}_VERSION}+${${PROJECT_NAME}_VERSION_AHEAD}")
+
+    # Get current commit SHA from git
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+
+
+endif(GIT_FOUND)
 
 if(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
@@ -71,33 +101,7 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${${PROJECT_NAME}_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 set(CPACK_GENERATOR ZIP)
 
-
-#versioning
-find_package(Git REQUIRED)
-if (GIT_FOUND)
-	# Get last tag from git
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	#How many commits since last tag
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	# Get current commit SHA from git
-	execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
-		OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif(GIT_FOUND)
-
-if(${NEUTRINOPLUGINS})
-    set(CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}+${${PROJECT_NAME}_VERSION_AHEAD}")
-else ()
-endif()
+set(CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_AHEAD}")
 
 if (WIN32)
     list(APPEND CPACK_GENERATOR NSIS)

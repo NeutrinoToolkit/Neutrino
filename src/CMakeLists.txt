@@ -16,6 +16,10 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
 file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    MESSAGE("SOURCES:\n${SOURCES}")
+endif()
+
 list(LENGTH SOURCES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} source files")
 
@@ -24,7 +28,8 @@ include(FindNeutrinoDeps)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/nPhysImage")
 set(LIBS ${LIBS} "nPhysImageF")
 
-add_definitions(-D__VER_LATEST="${${PROJECT_NAME}_VERSION_GIT_SHA}")
+add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
+add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
 if (APPLE AND NOT DEFINED Qt5_DIR)
 	set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")

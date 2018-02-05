@@ -2,27 +2,15 @@
 #include "neutrino.h"
 #include <QtNetwork>
 
-#ifdef __neutrino_key
-#include "nHash.h"
-#endif
-
-
-
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     QCoreApplication::setOrganizationName("ParisTech");
     QCoreApplication::setOrganizationDomain("edu");
     QCoreApplication::setApplicationName("Neutrino");
-    QCoreApplication::setApplicationVersion(__VER_LATEST);
+    QCoreApplication::setApplicationVersion(__VER);
 
 #if defined(Q_OS_MAC)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-#ifdef __neutrino_key
-    std::string hh = getNHash();
-    qDebug() << "got nHash: "<< hh << std::endl;
-    setProperty("nHash", hh.c_str());
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
@@ -57,7 +45,7 @@ void nApp::checkUpdates() {
 
     QJsonObject responseObject = json.object();
     if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
-        QString compileSHA = QString(__VER_LATEST);
+        QString compileSHA = QString(__VER_SHA);
         QString onlineSHA=responseObject.value("sha").toString();
         qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
         qDebug() << compileSHA;
