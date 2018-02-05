@@ -31,7 +31,7 @@ if (APPLE AND NOT DEFINED Qt5_DIR)
 	MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
 endif()
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport UiTools Multimedia MultimediaWidgets OpenGL)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport UiTools OpenGL Network)
 
 find_package(Qt5 COMPONENTS ${MODULES} REQUIRED)
 

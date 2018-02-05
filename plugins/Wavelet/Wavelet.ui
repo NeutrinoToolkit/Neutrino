@@ -1,0 +1,1171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Wavelet</class>
+ <widget class="QMainWindow" name="Wavelet">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>309</width>
+    <height>388</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Wavelet</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>20</width>
+    <height>20</height>
+   </size>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_4">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizeIncrement">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="Wavelet">
+       <attribute name="title">
+        <string>Wavelet</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_13">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_14">
+          <property name="title">
+           <string>Image</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_17">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="image">
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QWidget" name="widget_3" native="true">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="doWavelet">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Calculate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="erasePrevious">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Erase previous</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="title">
+           <string>Stretch &amp;&amp; rotation</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0" columnstretch="1,0,0">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="1" column="0">
+            <widget class="QDoubleSpinBox" name="minStretch">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>9999.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Max</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>number</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QDoubleSpinBox" name="minAngle">
+             <property name="suffix">
+              <string> deg</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-360.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="numStretch">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>999</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Min</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QSpinBox" name="numAngle">
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>999</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="maxStretch">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>9999.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="maxAngle">
+             <property name="suffix">
+              <string> deg</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-360.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="3">
+            <widget class="QWidget" name="widget" native="true">
+             <layout class="QGridLayout" name="gridLayout_11" columnstretch="0,0,0">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="2">
+               <widget class="QLabel" name="angleCarrierLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="relative">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Rel. to carrier</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="widthCarrierLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QWidget" name="widget_7" native="true">
+          <layout class="QGridLayout" name="gridLayout_19">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="showSource">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>crop region</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="synthetic">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>synthetic</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Thickness and Damp</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="thickness">
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999.990000000000009</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="damp">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Unwrap">
+       <attribute name="title">
+        <string>Unwrap</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_12">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_13">
+          <property name="title">
+           <string>Phase/2pi &amp;&amp; quality</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_16">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="imageUnwrap">
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QComboBox" name="qualityUnwrap">
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="methodBox">
+          <property name="title">
+           <string>Method</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,0,0">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="method">
+             <property name="toolTip">
+              <string>Unwrap strategy</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Simple H+V</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Simple V+H</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Goldstein</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Miguel</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Miguel+Quality</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Quality</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="useBarrier">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QToolButton" name="lineBarrier">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+               <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QWidget" name="widget_2" native="true">
+          <layout class="QGridLayout" name="gridLayout_6">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="doUnwrap">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Unwrap</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="erasePreviousUnwrap">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Erase previous</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="removeCarrierAfterUnwrap">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>remove carrier</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Carrier">
+       <attribute name="title">
+        <string>Subtract</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Phase/2pi</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="phaseOffset">
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Offset</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QComboBox" name="unwrapped">
+             <property name="neutrinoImage" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QWidget" name="widget_4" native="true">
+          <layout class="QGridLayout" name="gridLayout_14" rowstretch="0,0" columnstretch="0,1">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <property name="horizontalSpacing">
+            <number>2</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="carrier">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QGroupBox" name="carrierBox">
+             <property name="title">
+              <string>Carrier: interfringe, angle and weight</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,1,0,0">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="angleCarrier">
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="suffix">
+                 <string> ˚</string>
+                </property>
+                <property name="decimals">
+                 <number>2</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QDoubleSpinBox" name="weightCarrier">
+                <property name="toolTip">
+                 <string>Frequency weight (&lt;0 for lower freq; &gt;0 for higher freq)</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="minimum">
+                 <double>-9.900000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>9.900000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.500000000000000</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QDoubleSpinBox" name="widthCarrier">
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="suffix">
+                 <string> px</string>
+                </property>
+                <property name="decimals">
+                 <number>2</number>
+                </property>
+                <property name="minimum">
+                 <double>-9999.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>9999.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QCheckBox" name="liveView">
+                <property name="toolTip">
+                 <string>automatic update</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="reference">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Reference phase/2pi</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QComboBox" name="refUnwrap">
+                <property name="neutrinoImage" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QWidget" name="widget_5" native="true">
+          <layout class="QGridLayout" name="gridLayout_15">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="doRemove">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Subtract</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="erasePreviuos">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Erase previous</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRect"/>
+   <addaction name="separator"/>
+   <addaction name="actionCarrier"/>
+   <addaction name="actionDoAll"/>
+  </widget>
+  <action name="actionRect">
+   <property name="icon">
+    <iconset>
+     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>rect</string>
+   </property>
+   <property name="toolTip">
+    <string>Show wavelet region</string>
+   </property>
+  </action>
+  <action name="actionCarrier">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Carrier</string>
+   </property>
+   <property name="toolTip">
+    <string>Guess carrier interfringe and angle</string>
+   </property>
+  </action>
+  <action name="actionDoAll">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+     <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>doAll</string>
+   </property>
+   <property name="toolTip">
+    <string>Wavelet, unwrap</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>image</tabstop>
+  <tabstop>minStretch</tabstop>
+  <tabstop>maxStretch</tabstop>
+  <tabstop>numStretch</tabstop>
+  <tabstop>minAngle</tabstop>
+  <tabstop>maxAngle</tabstop>
+  <tabstop>numAngle</tabstop>
+  <tabstop>relative</tabstop>
+  <tabstop>thickness</tabstop>
+  <tabstop>damp</tabstop>
+  <tabstop>showSource</tabstop>
+  <tabstop>synthetic</tabstop>
+  <tabstop>doWavelet</tabstop>
+  <tabstop>erasePrevious</tabstop>
+  <tabstop>imageUnwrap</tabstop>
+  <tabstop>qualityUnwrap</tabstop>
+  <tabstop>method</tabstop>
+  <tabstop>useBarrier</tabstop>
+  <tabstop>lineBarrier</tabstop>
+  <tabstop>removeCarrierAfterUnwrap</tabstop>
+  <tabstop>doUnwrap</tabstop>
+  <tabstop>erasePreviousUnwrap</tabstop>
+  <tabstop>unwrapped</tabstop>
+  <tabstop>phaseOffset</tabstop>
+  <tabstop>carrier</tabstop>
+  <tabstop>widthCarrier</tabstop>
+  <tabstop>angleCarrier</tabstop>
+  <tabstop>weightCarrier</tabstop>
+  <tabstop>liveView</tabstop>
+  <tabstop>reference</tabstop>
+  <tabstop>refUnwrap</tabstop>
+  <tabstop>doRemove</tabstop>
+  <tabstop>erasePreviuos</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

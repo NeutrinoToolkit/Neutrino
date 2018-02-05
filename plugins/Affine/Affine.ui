@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Affine</class>
+ <widget class="QMainWindow" name="Affine">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>244</width>
+    <height>270</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Affine</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>20</width>
+    <height>20</height>
+   </size>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_4">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item row="1" column="0" colspan="2">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="forward">
+       <attribute name="title">
+        <string>forward</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="A00">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="A02">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="A01">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="A10">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="A12">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="A11">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="backward">
+       <attribute name="title">
+        <string>backward</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="B00">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="B01">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="B02">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="B10">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="B11">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="B12">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QPushButton" name="second">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>second to first</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QPushButton" name="first">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>first to second</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Images</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="image1">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="image2">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="line1">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+           <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QToolButton" name="line2">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+           <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="defaultValue">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>NaN</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mean</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="erasePrevious">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>erase previous</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QCheckBox" name="crop">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>crop</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>image1</tabstop>
+  <tabstop>image2</tabstop>
+  <tabstop>line1</tabstop>
+  <tabstop>line2</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>A00</tabstop>
+  <tabstop>A01</tabstop>
+  <tabstop>A02</tabstop>
+  <tabstop>A10</tabstop>
+  <tabstop>A11</tabstop>
+  <tabstop>A12</tabstop>
+  <tabstop>first</tabstop>
+  <tabstop>second</tabstop>
+  <tabstop>B00</tabstop>
+  <tabstop>B01</tabstop>
+  <tabstop>B02</tabstop>
+  <tabstop>B10</tabstop>
+  <tabstop>B11</tabstop>
+  <tabstop>B12</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

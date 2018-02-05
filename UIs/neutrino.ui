@@ -97,12 +97,10 @@
     <addaction name="actionOpen_RAW"/>
     <addaction name="actionOpen_Glob"/>
     <addaction name="menuOpen_Recent"/>
-    <addaction name="actionCamera"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_Session"/>
-    <addaction name="actionMonitor_Directory"/>
     <addaction name="separator"/>
     <addaction name="actionExport_pixmap"/>
     <addaction name="actionExport"/>
@@ -161,7 +159,6 @@
     <addaction name="menuColortable"/>
     <addaction name="action99"/>
     <addaction name="actionMouse_Info"/>
-    <addaction name="actionMouse_Zoom"/>
     <addaction name="separator"/>
     <addaction name="menuPaths"/>
     <addaction name="separator"/>
@@ -181,9 +178,7 @@
      </property>
      <addaction name="actionHorizontal"/>
      <addaction name="actionVertical"/>
-     <addaction name="actionBoth"/>
      <addaction name="separator"/>
-     <addaction name="actionBoxLineout"/>
     </widget>
     <widget class="QMenu" name="menuPlugins">
      <property name="title">
@@ -193,19 +188,7 @@
      <addaction name="actionPlugin"/>
      <addaction name="separator"/>
     </widget>
-    <addaction name="actionSpectral_Analysis"/>
-    <addaction name="actionWavelet"/>
-    <addaction name="actionInversions"/>
-    <addaction name="actionContours"/>
-    <addaction name="actionFocal_Spot"/>
-    <addaction name="actionCutoff_Mask"/>
     <addaction name="actionMath_operations"/>
-    <addaction name="actionAffine_Transform"/>
-    <addaction name="actionRotate"/>
-    <addaction name="actionRegionPath"/>
-    <addaction name="actionInterpolate_Path"/>
-    <addaction name="actionPolarigrams"/>
-    <addaction name="actionThomson_P"/>
     <addaction name="separator"/>
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
@@ -332,27 +315,6 @@
     <string>Zoom -</string>
    </property>
   </action>
-  <action name="actionWavelet">
-   <property name="text">
-    <string>Wavelet</string>
-   </property>
-  </action>
-  <action name="actionPolarigrams">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Polarigrams</string>
-   </property>
-  </action>
-  <action name="actionThomson_P">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Thomson P.</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="icon">
     <iconset>
@@ -395,11 +357,6 @@
     <string>Show colortable</string>
    </property>
   </action>
-  <action name="actionFocal_Spot">
-   <property name="text">
-    <string>Focal Spot</string>
-   </property>
-  </action>
   <action name="actionPrint">
    <property name="text">
     <string>Print</string>
@@ -435,29 +392,9 @@
     <string>Vertical</string>
    </property>
   </action>
-  <action name="actionBoth">
-   <property name="text">
-    <string>Both</string>
-   </property>
-  </action>
-  <action name="actionBoxLineout">
-   <property name="text">
-    <string>Box lineout</string>
-   </property>
-  </action>
   <action name="actionMath_operations">
    <property name="text">
     <string>Math operations</string>
-   </property>
-  </action>
-  <action name="actionCutoff_Mask">
-   <property name="text">
-    <string>Cutoff Mask</string>
-   </property>
-  </action>
-  <action name="actionRotate">
-   <property name="text">
-    <string>Rotate</string>
    </property>
   </action>
   <action name="actionReopen_to_saved">
@@ -466,11 +403,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
-   </property>
-  </action>
-  <action name="actionInversions">
-   <property name="text">
-    <string>Inversions</string>
    </property>
   </action>
   <action name="actionShow_ruler">
@@ -570,11 +502,6 @@
     <string>Ellipse</string>
    </property>
   </action>
-  <action name="actionRegionPath">
-   <property name="text">
-    <string>Region from path</string>
-   </property>
-  </action>
   <action name="actionPreferences">
    <property name="icon">
     <iconset>
@@ -582,14 +509,6 @@
    </property>
    <property name="text">
     <string>Preferences...</string>
-   </property>
-  </action>
-  <action name="actionMonitor_Directory">
-   <property name="text">
-    <string>Monitor Directory</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionExport">
@@ -608,11 +527,6 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="actionCompareLines">
-   <property name="text">
-    <string>Compare lines</string>
-   </property>
-  </action>
   <action name="actionOpen_RAW">
    <property name="text">
     <string>Open RAW</string>
@@ -622,11 +536,6 @@
    </property>
    <property name="neutrinoSave" stdset="0">
     <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionSpectral_Analysis">
-   <property name="text">
-    <string>Spectral Analysis</string>
    </property>
   </action>
   <action name="actionFlipRotate">
@@ -716,22 +625,12 @@
     <string>Point</string>
    </property>
   </action>
-  <action name="actionAffine_Transform">
-   <property name="text">
-    <string>Affine Transform</string>
-   </property>
-  </action>
   <action name="actionExport_all">
    <property name="text">
     <string>Export all</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+E</string>
-   </property>
-  </action>
-  <action name="actionInterpolate_Path">
-   <property name="text">
-    <string>Interpolate Path</string>
    </property>
   </action>
   <action name="actionLockColors">
@@ -760,21 +659,6 @@
    </property>
    <property name="toolTip">
     <string>Math operations</string>
-   </property>
-  </action>
-  <action name="actionCamera">
-   <property name="text">
-    <string>Camera</string>
-   </property>
-  </action>
-  <action name="actionMouse_Zoom">
-   <property name="text">
-    <string>Mouse Zoom</string>
-   </property>
-  </action>
-  <action name="actionContours">
-   <property name="text">
-    <string>Contours</string>
    </property>
   </action>
   <action name="actionPlugin">
@@ -806,7 +690,7 @@
   </action>
   <action name="action99">
    <property name="text">
-    <string>99%</string>
+    <string>Rescale 99%</string>
    </property>
    <property name="toolTip">
     <string>rescale colorbar to show 99% of the pixel</string>

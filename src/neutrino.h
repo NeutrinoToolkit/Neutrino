@@ -130,7 +130,6 @@ public slots:
 
     void scanPlugins();
     void scanPlugins(QString);
-    void scanPlugins(QDir);
 
     void openRecentFile();
     void clearRecentFile();
@@ -192,22 +191,13 @@ public slots:
     void exportAllGraphics();
     void exportGraphics(QString);
 
-    nGenericPan* Monitor();
-
     void toggleRuler();
     void toggleGrid();
 
     nGenericPan* Shortcuts();
 
     // Analysis
-    nGenericPan* FocalSpot();
-    nGenericPan* Contours();
     nGenericPan* MathOperations();
-
-    nGenericPan* ZoomWin();
-
-    // cutoff mask
-    nGenericPan* CutoffImage();
 
     nGenericPan* WinList();
 
@@ -215,8 +205,6 @@ public slots:
 
     nGenericPan* Hlineout();
     nGenericPan* Vlineout();
-    nGenericPan* bothLineout();
-    nGenericPan* BoxLineout();
 
     void createDrawLine();
 
@@ -246,30 +234,6 @@ public slots:
     nGenericPan* openRAW();
 
     nGenericPan* ColorBar();
-
-    // WAVELET STUFF
-    nGenericPan* Wavelet();
-
-    // SPECTRAL ANALYSIS
-    nGenericPan* SpectralAnalysis();
-
-    // INTEGRAL INVERSION STUFF
-    nGenericPan* IntegralInversion();
-
-    // Region path
-    nGenericPan* RegionPath();
-
-    // ROTATE STUFF
-    nGenericPan* Rotate();
-
-    // Affine STUFF
-    nGenericPan* Affine();
-
-    // grab picture from camera
-    nGenericPan* Camera();
-
-    // interpolate inside path
-    nGenericPan* InterpolatePath();
 
     nGenericPan* MouseInfo();
 

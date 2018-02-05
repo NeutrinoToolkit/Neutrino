@@ -41,31 +41,13 @@
 #include "nColorBar.h"
 
 #include "nMouseInfo.h"
-#include "nZoomWin.h"
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
-#include "nBoxLineout.h"
-#include "nWavelet.h"
-#include "nSpectralAnalysis.h"
-#include "nIntegralInversion.h"
-#include "nRotate.h"
-#include "nRegionPath.h"
-#include "nInterpolatePath.h"
 #include "nShortcuts.h"
-#include "nAffine.h"
 
-#include "nCamera.h"
-
-#include "nFocalSpot.h"
-#include "nContours.h"
 #include "nLineout.h"
-#include "nLineoutBoth.h"
 
 #include "nOperator.h"
-#include "nCutoffMask.h"
-
-#include "nMonitor.h"
-
 
 #include "nPreferences.h"
 #include "nWinList.h"
@@ -161,8 +143,6 @@ neutrino::neutrino():
 	connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 	connect(my_w->actionOperator, SIGNAL(triggered()), this, SLOT(MathOperations()));
 
-	connect(my_w->actionCamera, SIGNAL(triggered()), this, SLOT(Camera()));
-
 	connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
 	connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
 	connect(my_w->actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
@@ -174,10 +154,6 @@ neutrino::neutrino():
 	connect(my_w->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
 	connect(my_w->actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
 	connect(my_w->actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
-
-	connect(my_w->actionMonitor_Directory, SIGNAL(triggered()), this, SLOT(Monitor()));
-
-
 
 	connect(my_w->actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
 
@@ -202,8 +178,6 @@ neutrino::neutrino():
 	connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
 	connect(my_w->actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
 
-	connect(my_w->actionMouse_Zoom, SIGNAL(triggered()), this, SLOT(ZoomWin()));
-
 	connect(my_w->actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
 	connect(my_w->actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
 	connect(my_w->actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
@@ -218,11 +192,7 @@ neutrino::neutrino():
 
 	connect(my_w->actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
-	connect(my_w->actionFocal_Spot, SIGNAL(triggered()), this, SLOT(FocalSpot()));
-	connect(my_w->actionContours, SIGNAL(triggered()), this, SLOT(Contours()));
-
 	connect(my_w->actionMath_operations, SIGNAL(triggered()), this, SLOT(MathOperations()));
-	connect(my_w->actionCutoff_Mask, SIGNAL(triggered()), this, SLOT(CutoffImage()));
 
 	connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
 	connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(previousColorTable()));
@@ -230,18 +200,8 @@ neutrino::neutrino():
 
 	connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
 	connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
-	connect(my_w->actionBoth, SIGNAL(triggered()), this, SLOT(bothLineout()));
-	connect(my_w->actionBoxLineout, SIGNAL(triggered()), this, SLOT(BoxLineout()));
 	connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
-	connect(my_w->actionSpectral_Analysis, SIGNAL(triggered()), this, SLOT(SpectralAnalysis()));
-	connect(my_w->actionWavelet, SIGNAL(triggered()), this, SLOT(Wavelet()));
-	connect(my_w->actionInversions, SIGNAL(triggered()), this, SLOT(IntegralInversion()));
-	connect(my_w->actionRegionPath, SIGNAL(triggered()), this, SLOT(RegionPath()));
-	connect(my_w->actionInterpolate_Path, SIGNAL(triggered()), this, SLOT(InterpolatePath()));
-
-	connect(my_w->actionRotate, SIGNAL(triggered()), this, SLOT(Rotate()));
-	connect(my_w->actionAffine_Transform, SIGNAL(triggered()), this, SLOT(Affine()));
 	connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
 	connect(my_w->actionLockColors, SIGNAL(toggled(bool)), my_w->my_view, SLOT(setLockColors(bool)));
@@ -371,8 +331,8 @@ void neutrino::scanDir(QString dirpath, QString pattern)
     }
 }
 
-void neutrino::on_actionOpen_Glob_triggered() {
-    QString dirName = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),property("NeuSave-globdir").toString());
+void neutrino::on_actionOpen_Glob_triggered () {
+    QString dirName = QFileDialog::getExistingDirectory(this,tr("Change glob directory"),property("NeuSave-globdir").toString());
     if (!dirName.isEmpty()) {
         bool ok;
         QString globstring = QInputDialog::getText(this, dirName,tr("Pattern"), QLineEdit::Normal, property("NeuSave-globstring").toString(), &ok);
@@ -480,23 +440,19 @@ nPhysD* neutrino::getBuffer(int i) {
 void
 neutrino::scanPlugins(QString pluginsDirStr)
 {
-	scanPlugins(QDir(pluginsDirStr));
-}
-
-void
-neutrino::scanPlugins(QDir pluginsDir) {
-	if (pluginsDir.exists()) {
-		foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-			if (QFileInfo(fileName).suffix() == nPlug::extension()) {
-				loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
-			}
-		}
-		QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
-		qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
-		if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
-			listdirPlugins.append(pluginsDir.absolutePath());
-		setProperty("NeuSave-plugindirs",listdirPlugins);
-	}
+    QDir pluginsDir(pluginsDirStr);
+    if (pluginsDir.exists()) {
+        foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+            if (QFileInfo(fileName).suffix() == nPlug::extension()) {
+                loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
+            }
+        }
+        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
+        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
+        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
+            listdirPlugins.append(pluginsDir.absolutePath());
+        setProperty("NeuSave-plugindirs",listdirPlugins);
+    }
 }
 
 void
@@ -516,7 +472,7 @@ neutrino::scanPlugins() {
 	pluginsDir.cd("plugins");
 	qDebug() << "defaultPluginDir:" << pluginsDir.absolutePath();
 	setProperty("defaultPluginDir",pluginsDir.absolutePath());
-	scanPlugins(pluginsDir);
+    scanPlugins(pluginsDir.absolutePath());
 
 	if (property("NeuSave-plugindirs").isValid()) {
 		for (auto& d : property("NeuSave-plugindirs").toStringList()) {
@@ -1281,14 +1237,6 @@ void neutrino::dropEvent(QDropEvent *e) {
 	}
 }
 
-// zoom
-
-nGenericPan*
-neutrino::ZoomWin() {
-	return new nZoomWin(this);
-}
-
-
 void
 neutrino::zoomChanged(double zoom) {
 	QString tmp;
@@ -1495,23 +1443,8 @@ neutrino::Shortcuts() {
 }
 
 nGenericPan*
-neutrino::FocalSpot() {
-	return new nFocalSpot(this);
-}
-
-nGenericPan*
-neutrino::Contours() {
-	return new nContours(this);
-}
-
-nGenericPan*
 neutrino::MathOperations() {
 	return new nOperator(this);
-}
-
-nGenericPan*
-neutrino::CutoffImage() {
-	return new nCutoffMask(this);
 }
 
 // Window List pan
@@ -1709,11 +1642,6 @@ neutrino::Vlineout() {
 	return new nVlineout(this);
 }
 
-nGenericPan*
-neutrino::bothLineout() {
-	return new nLineoutBoth(this);
-}
-
 void neutrino::print()
 {
 	QPrinter printer(QPrinter::HighResolution);
@@ -1732,12 +1660,6 @@ void neutrino::print()
 	}
 }
 
-/// rectangle lineout
-nGenericPan*
-neutrino::BoxLineout() {
-	return new nBoxLineout(this);
-}
-
 /// Open raw window
 nGenericPan*
 neutrino::openRAW() {
@@ -1751,63 +1673,6 @@ neutrino::openRAW() {
 		if (winRAW) winRAW->add(fnames);
 	}
 	return win;
-}
-
-/// Spectral Analysis (FT, filtering and stuff)
-nGenericPan*
-neutrino::SpectralAnalysis() {
-	return new nSpectralAnalysis(this);
-}
-
-
-/// Wavelet analysis window
-nGenericPan*
-neutrino::Wavelet() {
-	return new nWavelet(this);
-}
-
-/// Integral inversion (Abel etc...)
-nGenericPan*
-neutrino::IntegralInversion() {
-	return new nIntegralInversion(this);
-}
-
-/// Region Path
-nGenericPan*
-neutrino::RegionPath() {
-	return new nRegionPath(this);
-}
-
-/// Region Path
-nGenericPan*
-neutrino::InterpolatePath() {
-	return new nInterpolatePath(this);
-}
-
-
-/// ROTATE STUFF
-nGenericPan*
-neutrino::Rotate() {
-	return new nRotate(this);
-}
-
-/// Affine STUFF
-nGenericPan*
-neutrino::Affine() {
-	return new nAffine(this);
-}
-
-/// camera
-nGenericPan*
-neutrino::Camera() {
-	return new nCamera(this);
-}
-
-
-// MONIOR DIRECTORY
-nGenericPan*
-neutrino::Monitor() {
-	return new nMonitor(this);
 }
 
 //save and load across restart

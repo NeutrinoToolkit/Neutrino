@@ -160,9 +160,8 @@ void nMouseInfo::updateLabels() {
 	my_w.py->setText(QString::number(p.y()));
 	my_w.dx_dy->setText(QString::number(p.x()/p.y()));
 	my_w.dy_dx->setText(QString::number(p.y()/p.x()));
-#define PI    3.141592653589793
-	my_w.atan_dx_dy->setText(QString::number(180.0/PI*atan2(p.x(),p.y())));
-	my_w.atan_dy_dx->setText(QString::number(180.0/PI*atan2(p.y(),p.x())));
+    my_w.atan_dx_dy->setText(QString::number(180.0/M_PI*atan2(p.x(),p.y())));
+    my_w.atan_dy_dx->setText(QString::number(180.0/M_PI*atan2(p.y(),p.x())));
 	my_w.dist_px->setText(QString::number(qSqrt(dist.x()*dist.x()+dist.y()*dist.y())));
 	my_w.dist_real->setText(QString::number(qSqrt(p.x()*p.x()+p.y()*p.y())));
 }
