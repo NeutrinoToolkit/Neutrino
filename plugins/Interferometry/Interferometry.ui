@@ -259,7 +259,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../Visar/Visar.qrc">
+          <iconset resource="../GhostFringes/GhostFringes.qrc">
            <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
          </property>
         </widget>
@@ -367,7 +367,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -462,7 +462,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
          </property>
          <property name="checkable">
@@ -578,7 +578,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
          <property name="checkable">
@@ -713,7 +713,7 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
          </property>
         </widget>
@@ -957,7 +957,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -982,7 +982,7 @@
   </action>
   <action name="actionDuplicate">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -1025,9 +1025,9 @@
   <tabstop>doMaskCutoff</tabstop>
  </tabstops>
  <resources>
-  <include location="../Visar/Visar.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../GhostFringes/GhostFringes.qrc"/>
   <include location="Interferometry.qrc"/>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

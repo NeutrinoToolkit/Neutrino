@@ -1664,7 +1664,7 @@ void neutrino::print()
 nGenericPan*
 neutrino::openRAW() {
 	QStringList fnames;
-	nGenericPan *win = NULL;
+    nGenericPan *win = nullptr;
 	fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),NULL,tr("Any files")+QString(" (*)"));
 	if (fnames.size()) {
 		win=existsPan("nOpenRAW");

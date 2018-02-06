@@ -175,7 +175,7 @@ void nApp::changeThreads(int num) {
 #ifdef HAVE_OPENMP
     omp_set_num_threads(num);
 #endif
-    DEBUG("\n\nTHREADS THREADS THREADS THREADS THREADS THREADS " << num << "\n\n");
+    DEBUG("THREADS " << num);
 }
 
 

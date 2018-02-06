@@ -21,16 +21,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-    IF(NOT DEFINED PLUGIN_INSTALL_DIR)
-        if(APPLE)
-            set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
-        elseif(LINUX)
-            set (PLUGIN_INSTALL_DIR "/usr/share/neutrino/plugins")
-        elseif(WIN32)
-            set (PLUGIN_INSTALL_DIR "bin/plugins")
-        endif()
-    endif()
-
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
     set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
     add_compile_options(-std=c++11)
@@ -53,8 +43,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     # add neutrino deps
     include_directories(${NEUTRINO_ROOT}/nPhysImage)
     include_directories(${NEUTRINO_ROOT}/src) # for base stuff
-
-    # visar needs to borrow some stuff from neutrino tree
     include_directories(${NEUTRINO_ROOT}/src/graphics)
 
     file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
@@ -108,8 +96,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
                     qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
                 endif()
             endif()
-
-            ENDFOREACH()
+        ENDFOREACH()
 
         IF(LANGUAGE_TS_FILES)
             set(TRANSL_QRC ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
@@ -121,9 +108,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
             file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
             list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
 
-            ENDIF(LANGUAGE_TS_FILES)
+        ENDIF(LANGUAGE_TS_FILES)
 
-        endif(Qt5LinguistTools_FOUND)
+    endif(Qt5LinguistTools_FOUND)
 
 
     QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
@@ -148,9 +135,17 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     target_link_libraries(${PROJECT_NAME} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
-    IF(DEFINED PLUGIN_INSTALL_DIR)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR} COMPONENT plugins)
-    ENDIF()
+    IF(NOT DEFINED PLUGIN_INSTALL_DIR)
+        if(APPLE)
+            set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
+        elseif(LINUX)
+            set (PLUGIN_INSTALL_DIR "/usr/share/neutrino/plugins")
+        elseif(WIN32)
+            set (PLUGIN_INSTALL_DIR "bin/plugins")
+        endif()
+    endif()
+
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR} COMPONENT plugins)
 
 ENDMACRO()
 

@@ -148,7 +148,15 @@ void Affine::affine() {
 
 		affinePhys=new nPhysD(dx,dy,0.0,"affine");
 		affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
+
+        QProgressDialog progress("", "Cancel", 0, dx, this);
+        progress.setCancelButton(0);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setValue(0);
+        progress.show();
+
 		for (unsigned int i=0; i<dx; i++) {
+            progress.setValue(i);
 			for (unsigned int j=0; j<dy; j++) {
 				affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
 			}

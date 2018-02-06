@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>387</width>
+    <width>451</width>
     <height>423</height>
    </rect>
   </property>
@@ -38,7 +38,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -553,7 +553,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
          </widget>
@@ -567,7 +567,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
          </widget>
@@ -631,8 +631,8 @@
   </widget>
   <action name="actionReset_settings">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
-     <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
+    <iconset resource="../plugins/Interferometry/Interferometry.qrc">
+     <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
     <string>Reset settings</string>
@@ -654,7 +654,8 @@
   <tabstop>openclDescription</tabstop>
  </tabstops>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../plugins/Interferometry/Interferometry.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

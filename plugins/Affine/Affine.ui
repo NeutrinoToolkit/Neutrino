@@ -10,6 +10,11 @@
     <height>270</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>1</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Affine</string>
   </property>
@@ -245,7 +250,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -256,7 +261,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -351,6 +356,20 @@
     </item>
    </layout>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>image1</tabstop>
@@ -374,7 +393,7 @@
   <tabstop>B12</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
