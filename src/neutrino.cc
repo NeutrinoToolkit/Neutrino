@@ -1176,7 +1176,7 @@ void neutrino::keyPressEvent (QKeyEvent *e)
 		case Qt::Key_X: {
 				if ((e->modifiers() & Qt::ControlModifier)) {
 					bool ok;
-					QString text = QInputDialog::getText(this,"","Open", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
+                    QString text = QInputDialog::getText(this,"","", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
 					if (ok && !text.isEmpty()) {
 						nGenericPan *my_pan= openPan(text,false);
 						if(!my_pan) {

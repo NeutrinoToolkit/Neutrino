@@ -93,6 +93,16 @@ void nGenericPan::physAdd(nPhysD *buffer) {
     QApplication::processEvents();
 }
 
+
+void nGenericPan::raiseNeutrino() {
+    if (nparent) {
+        nparent->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+        nparent->raise();  // for MacOS
+        nparent->activateWindow(); // for Windows
+        QApplication::processEvents();
+    }
+}
+
 void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
@@ -217,8 +227,9 @@ void nGenericPan::showEvent(QShowEvent* event) {
             spacer->setProperty("helpSpacer",true);
             my_tool->addWidget(spacer);
 
-            my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Help"),this,SLOT(loadSettings()));
-            my_tool->addAction(QIcon(":icons/savePref.png"),tr("Help"),this,SLOT(saveSettings()));
+            my_tool->addAction(QIcon(":icons/icon.png"),tr("Raise viewer"),this,SLOT(raiseNeutrino()));
+            my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,SLOT(loadSettings()));
+            my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,SLOT(saveSettings()));
 
             QFile helpFile(":/"+panName()+"README.html");
             if (helpFile.exists()) {

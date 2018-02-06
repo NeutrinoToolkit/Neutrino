@@ -89,6 +89,8 @@ signals:
 
 public slots:
 
+    void raiseNeutrino();
+
     void changeEvent(QEvent *e);
 
     QString panName();
