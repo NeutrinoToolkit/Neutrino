@@ -1,4 +1,4 @@
-Copyright (C) ${PROJECT_COPYRIGHT_YEAR}
+Copyright (c) ${PROJECT_COPYRIGHT_YEAR}
 Alessandro Flacco <alessandro.flacco@polytechnique.edu>
 Tommaso Vinci <tommaso.vinci@polytechnique.edu>
 

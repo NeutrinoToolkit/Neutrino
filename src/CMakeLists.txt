@@ -4,14 +4,6 @@ if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 endif()
 
-set(PROJECT_DOMAIN_FIRST "neutrino")
-set(PROJECT_DOMAIN_SECOND "com")
-set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-set(PROJECT_VENDOR "neutrino inc.")
-string(TIMESTAMP CURRENT_YEAR "%Y")
-set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
-
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -79,9 +71,8 @@ list(LENGTH HTMLS LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} html files: ${HTML_QRC}")
 
 #parse neutrino license file
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake/license.txt.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt)
 file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
-list(APPEND HTMLLICENSES "${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt")
+list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})

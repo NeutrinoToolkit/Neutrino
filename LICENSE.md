@@ -1,4 +1,5 @@
 Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+-----------------------------------------------------------------------
 
 This file is part of Neutrino.
 
@@ -16,9 +17,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
 
 Contact Information: 
+--------------------
 
-  Alessandro Flacco <alessandro.flacco@polytechnique.edu>
-  Tommaso Vinci <tommaso.vinci@polytechnique.edu>
+Alessandro Flacco <alessandro.flacco@polytechnique.edu>
+Tommaso Vinci <tommaso.vinci@polytechnique.edu>
 
 Website:
 http://web.luli.polytechnique.fr/Neutrino/

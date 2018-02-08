@@ -12,6 +12,12 @@ project (Neutrino CXX)
 
 option(NEUTRINOPLUGINS "Compile Neutrino plugins" ON)
 
+#############################
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
 ## default build type is release
 if (CMAKE_BUILD_TYPE STREQUAL "")
 	set (CMAKE_BUILD_TYPE "Release")
@@ -48,13 +54,20 @@ if (GIT_FOUND)
         OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_SHA
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-
-
 endif(GIT_FOUND)
 
-if(UNIX AND NOT APPLE)
-	set(LINUX TRUE)
-endif()
+
+set(PROJECT_DOMAIN_FIRST "neutrino")
+set(PROJECT_DOMAIN_SECOND "com")
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(PROJECT_VENDOR "neutrino inc.")
+string(TIMESTAMP CURRENT_YEAR "%Y")
+set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake/license.txt.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt)
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt")
+
+
 
 ## global compile options
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
@@ -96,8 +109,6 @@ add_subdirectory (src)
 add_subdirectory (plugins)
 
 # CPack stuff
-
-SET(CPACK_RESOURCE_FILE_LICENSE "${${PROJECT_NAME}_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
 set(CPACK_GENERATOR ZIP)
 
