@@ -4,6 +4,13 @@ if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 endif()
 
+set(PROJECT_DOMAIN_FIRST "neutrino")
+set(PROJECT_DOMAIN_SECOND "com")
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(PROJECT_VENDOR "neutrino inc.")
+string(TIMESTAMP CURRENT_YEAR "%Y")
+set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
+
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -71,7 +78,10 @@ file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLS LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} html files: ${HTML_QRC}")
 
+#parse neutrino license file
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake/license.txt.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt)
 file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
+list(APPEND HTMLLICENSES "${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt")
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})
@@ -82,6 +92,7 @@ endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 list(LENGTH HTMLLICENSES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
+
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics pans pans/colorbar pans/winlist)
@@ -126,15 +137,6 @@ endif(Qt5LinguistTools_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
-set(PROJECT_DOMAIN_FIRST "neutrino")
-set(PROJECT_DOMAIN_SECOND "com")
-set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-set(PROJECT_VENDOR "neutrino inc.")
-string(TIMESTAMP CURRENT_YEAR "%Y")
-set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
-
-
-
 if(APPLE)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${${PROJECT_NAME}_VERSION}")
@@ -155,19 +157,17 @@ if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${HTML_QRC} ${TRASL_FILES})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/..")
 
     set (CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
     set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_RPATH} INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-    install (TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT binary)
+    install (TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/.." COMPONENT binary)
 endif()
 
 if(WIN32)
-    set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/neutrino.rc")
+    set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
     list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${RC_WIN} )

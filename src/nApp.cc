@@ -3,7 +3,7 @@
 #include <QtNetwork>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
-    QCoreApplication::setOrganizationName("ParisTech");
+    QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
     QCoreApplication::setApplicationName("Neutrino");
     QCoreApplication::setApplicationVersion(__VER);

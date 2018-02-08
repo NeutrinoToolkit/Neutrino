@@ -160,7 +160,7 @@ if(APPLE)
 
 	set(CPACK_BUNDLE_NAME "Neutrino")
 	set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
-	set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/macpackage/neutrino.plist.cmake")
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
 
 	set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
     set(CPACK_GENERATOR ${CPACK_GENERATOR} Bundle)

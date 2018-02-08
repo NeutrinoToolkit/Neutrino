@@ -71,7 +71,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_command(
             OUTPUT ${README_HTML}
             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -s README.md --self-contained -o ${README_HTML}
-            MAIN_DEPENDENCY "README.md"
+            MAIN_DEPENDENCY ${README_MD}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
 

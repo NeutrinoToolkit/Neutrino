@@ -1009,6 +1009,17 @@ QVariant nGenericPan::get(QString name, int occurrence) {
         }
     }
     my_occurrence=1;
+    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
+        qDebug() << "here" << widget;
+        if (widget->objectName()==name) {
+            qDebug() << widget << my_occurrence;
+            if (my_occurrence==occurrence) {
+                return QVariant::fromValue(widget);
+            }
+            my_occurrence++;
+        }
+    }
+    my_occurrence=1;
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
         if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
             if (my_occurrence==occurrence) {
@@ -1033,17 +1044,6 @@ QVariant nGenericPan::get(QString name, int occurrence) {
         if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getRectF());
-            }
-            my_occurrence++;
-        }
-    }
-    my_occurrence=1;
-    foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
-        qDebug() << "here" << widget;
-        if (widget->objectName()==name) {
-            qDebug() << widget << my_occurrence;
-            if (my_occurrence==occurrence) {
-                return QVariant::fromValue(widget);
             }
             my_occurrence++;
         }

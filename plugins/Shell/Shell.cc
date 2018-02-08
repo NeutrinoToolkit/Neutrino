@@ -20,7 +20,7 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->addDecorators(new nPanPyWrapper());
     PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
 
-    PythonQt::self()->registerClass(& nCustomPlot::staticMetaObject, "nPlot");
+    PythonQt::self()->registerClass(&nCustomPlot::staticMetaObject, "nPlot");
     PythonQt::self()->registerClass(&nLine::staticMetaObject, "nLine");
     PythonQt::self()->registerClass(&nRect::staticMetaObject, "nRect");
     PythonQt::self()->registerClass(&nEllipse::staticMetaObject, "nEllipse");

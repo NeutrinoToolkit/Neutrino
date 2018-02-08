@@ -1738,26 +1738,27 @@ void neutrino::about() {
 	connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
     my_about.version->setText(QApplication::applicationVersion());
-	my_about.creditsText->setLineWrapMode(QTextEdit::FixedColumnWidth);
-	my_about.creditsText->setLineWrapColumnOrWidth(80);
-	QScrollBar *vScrollBar = my_about.creditsText->verticalScrollBar();
-	vScrollBar->triggerAction(QScrollBar::SliderToMinimum);
-	QApplication::processEvents();
+    my_about.creditsText->insertHtml("<h1>Licenses</h1><br>");
 
-	QDirIterator it(":licenses/", QDirIterator::Subdirectories);
-	while (it.hasNext()) {
-		QString fname=it.next();
-		QFile lic(fname);
-		if (lic.open(QFile::ReadOnly | QFile::Text)) {
-			QString licenseText=QTextStream(&lic).readAll();
-			if (!licenseText.isEmpty()) {
-				my_about.creditsText->insertHtml("<h2>"+QFileInfo(fname).completeBaseName()+" license :</h2><PRE>");
-				my_about.creditsText->insertPlainText(licenseText);
-				my_about.creditsText->insertHtml("</PRE><br><hr><br>");
-			}
-		}
-	}
-	myabout.exec();
+    QDirIterator it(":licenses/", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fname=it.next();
+        QString basename=QFileInfo(fname).completeBaseName();
+        QFile lic(fname);
+        if (lic.open(QFile::ReadOnly | QFile::Text)) {
+            QString licenseText=QTextStream(&lic).readAll().replace("\n","<br>");
+            if (!licenseText.isEmpty()) {
+                my_about.creditsText->insertHtml("<h2>"+basename+" license :</h2><PRE>");
+                my_about.creditsText->insertHtml(licenseText);
+                my_about.creditsText->insertHtml("</PRE><br><hr><br>");
+            }
+        }
+    }
+
+    my_about.creditsText->moveCursor(QTextCursor::Start);
+    my_about.creditsText->ensureCursorVisible();
+
+    myabout.exec();
 }
 
 nLine* neutrino::line(QString name) {

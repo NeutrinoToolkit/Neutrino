@@ -1,11 +1,12 @@
-Copyright (C) 2016 
+Copyright (C) ${PROJECT_COPYRIGHT_YEAR}
 Alessandro Flacco <alessandro.flacco@polytechnique.edu>
 Tommaso Vinci <tommaso.vinci@polytechnique.edu>
- All Rights Reserved
 
-Neutrino is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+All Rights Reserved
+
+Neutrino is free software: you can redistribute it and/or modify it 
+under the terms of the GNU Lesser General Public License as published 
+by the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 Neutrino is distributed in the hope that it will be useful,
