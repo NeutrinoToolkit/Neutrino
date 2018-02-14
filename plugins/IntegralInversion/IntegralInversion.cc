@@ -193,7 +193,7 @@ QVariant IntegralInversion::doInversion() {
                 DEBUG("Inversions: no physics applied");
                 break;
             case 1:
-                phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, QLocale().toDouble(my_w.molarRefr_le->text()));
+                phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
                 break;
             case 2:
                 DEBUG("Inversions: applying plasma physics");
@@ -218,8 +218,8 @@ QVariant IntegralInversion::doInversion() {
 			//		}
 
             bool ok1,ok2;
-            double mini=QLocale().toDouble(my_w.minCut->text(),&ok1);
-            double maxi=QLocale().toDouble(my_w.maxCut->text(),&ok2);
+            double mini=locale().toDouble(my_w.minCut->text(),&ok1);
+            double maxi=locale().toDouble(my_w.maxCut->text(),&ok2);
             if (ok1 || ok2) {
                 phys_cutoff(*inv_image, 
                             ok1?mini:inv_image->get_min(), 

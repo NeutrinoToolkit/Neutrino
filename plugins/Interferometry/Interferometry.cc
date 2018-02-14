@@ -676,8 +676,8 @@ void Interferometry::doPlasma(){
             intNe->setShortName(image->getShortName());
         }
         bool ok1,ok2;
-        double mini=QLocale().toDouble(my_w.cutoffMin->text(),&ok1);
-        double maxi=QLocale().toDouble(my_w.cutoffMax->text(),&ok2);
+        double mini=locale().toDouble(my_w.cutoffMin->text(),&ok1);
+        double maxi=locale().toDouble(my_w.cutoffMax->text(),&ok2);
         if (!ok1) mini=intNe->get_min();
         if (!ok2) maxi=intNe->get_max();
         if (ok1||ok2) {

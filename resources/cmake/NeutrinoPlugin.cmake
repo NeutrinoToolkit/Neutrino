@@ -1,6 +1,10 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
 
 
+    if (NOT EXISTS ${NEUTRINO_ROOT}/src/neutrino.h)
+        message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
+    endif()
+
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
     set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
@@ -22,13 +26,10 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
     set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
-    set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
+    set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT -DQT_NO_WARNING_OUTPUT")
     add_compile_options(-std=c++11)
 
 
-    if (NOT EXISTS ${NEUTRINO_ROOT}/src/neutrino.h)
-        message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
-    endif()
 
     # find goodies
 
@@ -90,10 +91,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
                 SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
                 qt5_add_translation(qm_files ${TS_FILE})
             else ()
+                SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_${LANGUAGE}.ts")
+                SET(FILES_TO_TRANSLATE ${SOURCES} ${UIS})
+                qt5_create_translation(qm_files  ${TS_FILE})
                 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-                    SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_${LANGUAGE}.ts")
                     message (STATUS "[Debug] translation file ${TS_FILE} will be created, commit it if you create the translations.")
-                    qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
                 endif()
             endif()
         ENDFOREACH()
@@ -106,8 +108,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
                 file(APPEND ${TRANSL_QRC} "        <file>${my_file_relative_path}</file>\n")
             endforeach()
             file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-            list(LENGTH LANGUAGE_TS_FILES LIST_LENGTH)
-
         ENDIF(LANGUAGE_TS_FILES)
 
     endif(Qt5LinguistTools_FOUND)

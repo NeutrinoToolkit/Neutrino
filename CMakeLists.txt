@@ -29,17 +29,10 @@ if (GIT_FOUND)
     #How many commits since last version tag
     execute_process(COMMAND ${GIT_EXECUTABLE} describe --match "v[0-9]*\\.[0-9]*" --abbrev=0
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        RESULT_VARIABLE NOT_GOOD_TAG
         OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_GIT_VER
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    if (${NOT_GOOD_TAG})
-        set(${PROJECT_NAME}_VERSION "1.0")
-        MESSAGE(WARNING "Cannot find a matching tag imposing ${${PROJECT_NAME}_VERSION}")
-    else()
-        string(REGEX REPLACE "^v([0-9]*)\\.([0-9]*)" "\\1.\\2" ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_GIT_VER}")
-    endif()
-
+    string(REGEX REPLACE "^v([0-9]*)\\.([0-9]*)" "\\1.\\2" ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_GIT_VER}")
 
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count ${${PROJECT_NAME}_VERSION_GIT_VER}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -60,7 +53,6 @@ endif(GIT_FOUND)
 set(PROJECT_DOMAIN_FIRST "neutrino")
 set(PROJECT_DOMAIN_SECOND "com")
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-set(PROJECT_VENDOR "neutrino inc.")
 string(TIMESTAMP CURRENT_YEAR "%Y")
 set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
 
@@ -71,42 +63,22 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/Neutrino.txt")
 
 ## global compile options
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
-set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT -DQT_NO_WARNING_OUTPUT")
 
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_compile_options(-Wall)
-if (!WIN32)
-	add_compile_options(-fPIC)
-endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	add_compile_options(-stdlib=libc++)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	add_compile_options(-static-libgcc -static-libstdc++)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	# using Intel C++
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	# using Visual Studio C++
 endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
 set (NEUTRINO_ROOT ${CMAKE_CURRENT_LIST_DIR})
-
-if (WIN32)
-	# looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
-	file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
-	file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
-	endif()
-	install (FILES ${RUNTIME_DEPS} DESTINATION bin)
-	install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
-endif()
-
-add_subdirectory (nPhysImage)
-add_subdirectory (src)
-add_subdirectory (plugins)
 
 # CPack stuff
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/README.md")
@@ -115,6 +87,16 @@ set(CPACK_GENERATOR ZIP)
 set(CPACK_PACKAGE_VERSION "${${PROJECT_NAME}_VERSION_AHEAD}")
 
 if (WIN32)
+
+    # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
+    file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
+    file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
+    endif()
+    install (FILES ${RUNTIME_DEPS} DESTINATION bin)
+    install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
+
     list(APPEND CPACK_GENERATOR NSIS)
 	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")
 	set(CPACK_PACKAGE_EXECUTABLES "Neutrino" "Neutrino")
@@ -188,5 +170,9 @@ if(APPLE)
 #		fixup_bundle(\"${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.app\"   \"\"   \"/usr/local/opt/qt5/lib/cmake/Qt5/lib\")
 #		" COMPONENT Runtime)
 endif()
+
+add_subdirectory (nPhysImage)
+add_subdirectory (src)
+add_subdirectory (plugins)
 
 include (CPack) # this to be included LAST with resp. to its vars

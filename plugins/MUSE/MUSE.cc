@@ -70,7 +70,6 @@ MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
 	my_timer.setInterval(property("NeuSave-interval").toInt());
 	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
-//	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 
 	show();
@@ -213,10 +212,6 @@ void MUSE::updateLastPoint() {
 	doSpectrum(lastpoint);
 }
 
-//QString toNum(QPointF p) {
-//    return "( " + QLocale().toString(p.x(),'g',9) + " ; " + QLocale().toString(p.y(),'g',9) + ") ";
-//}
-
 void MUSE::doSpectrum(QPointF point) {
 
 	QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
@@ -248,7 +243,7 @@ void MUSE::doSpectrum(QPointF point) {
 			}
 		}
 		plot->graph(1)->setData(xvals,yvals,true);
-		QString spec_name("("+QLocale().toString(pFloor.x())+","+QLocale().toString(pFloor.y())+ ") Ra:" + QLocale().toString(preal.x(),'g',8)+" Dec:" +QLocale().toString(preal.y(),'g',8));
+        QString spec_name("("+locale().toString(pFloor.x())+","+locale().toString(pFloor.y())+ ") Ra:" + locale().toString(preal.x(),'g',8)+" Dec:" +locale().toString(preal.y(),'g',8));
 		plot->graph(1)->setName(spec_name);
 		plot->setTitle(spec_name);
 		plot->replot();
@@ -262,7 +257,7 @@ void MUSE::showImagePlane(int z) {
 	slices->setValue(z);
 	slicesSlider->setValue(z);
 	if (cubesize.size()==3 && z < (int)cubesize[2]) {
-		nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,QLocale().toString(z).toStdString());
+        nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,locale().toString(z).toStdString());
 		my_phys->property=cube_prop;
 
 		int offset=z*my_phys->getSurf();
@@ -296,7 +291,7 @@ void MUSE::setstatusbar() {
 	if (xvals.size()>slices->value()) {
 		double lambda=xvals[slices->value()];
 		double redshift=lambda/restLambda->value()-1.0;
-		lambdaz->setText(trUtf8("\xce\xbb") + ":" + QLocale().toString(lambda) + " z=" + QLocale().toString(redshift));
+        lambdaz->setText(trUtf8("\xce\xbb") + ":" + locale().toString(lambda) + " z=" + locale().toString(redshift));
 	}
 }
 
@@ -664,7 +659,7 @@ void MUSE::loadCube() {
 
 //        showImagePlane(slices->value());
 
-//        statusbar->showMessage(QLocale().toString(progress.value()));
+//        statusbar->showMessage(locale().toString(progress.value()));
 
 //    }
 //}

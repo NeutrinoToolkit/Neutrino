@@ -59,7 +59,7 @@ void nApp::checkUpdates() {
             msgBox.addButton(tr("Go get it now"), QMessageBox::YesRole);
             msgBox.addButton(tr("Not now"), QMessageBox::RejectRole);
             msgBox.addButton(tr("Never"), QMessageBox::NoRole);
-//            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
+            //            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
             int ret = msgBox.exec();
 
             qDebug() << ret << " : " << msgBox.result();
@@ -68,10 +68,10 @@ void nApp::checkUpdates() {
                     QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino/releases"));
                     break;
                 case QMessageBox::NoRole: {
-                    QSettings my_set("neutrino","");
-                    my_set.beginGroup("nPreferences");
-                    my_set.setValue("checkUpdates",false);
-                    my_set.endGroup();
+                        QSettings my_set("neutrino","");
+                        my_set.beginGroup("nPreferences");
+                        my_set.setValue("checkUpdates",false);
+                        my_set.endGroup();
                     }
                     break;
                 default:
@@ -108,7 +108,7 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 
 
 bool nApp::event(QEvent *ev) {
-//    qDebug() << ev;
+    //    qDebug() << ev;
     if (ev->type() == QEvent::FileOpen) {
         QWidget *widget = QApplication::activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);

@@ -65,9 +65,9 @@ void FindPeaks::set_origin() {
     if (currentBuffer) {
         bool ok=true;
         double my_origin=0.0;
-        if (!originOffset->text().isEmpty()) my_origin=QLocale().toDouble(originOffset->text(),&ok);
+        if (!originOffset->text().isEmpty()) my_origin=locale().toDouble(originOffset->text(),&ok);
         if (ok) {
-            double origin=QLocale().toDouble(originOffset->text(),&ok)-my_origin;
+            double origin=locale().toDouble(originOffset->text(),&ok)-my_origin;
             if (ok) {
                 if (direction->isChecked()) {
                     currentBuffer->set_origin(currentBuffer->get_origin().x(),origin);
@@ -84,9 +84,9 @@ void FindPeaks::set_scale() {
     if (currentBuffer) {
         bool ok=true;
         double scaleMult=1.0;
-        if (!scaleOffset->text().isEmpty()) scaleMult=QLocale().toDouble(scaleOffset->text(),&ok);
+        if (!scaleOffset->text().isEmpty()) scaleMult=locale().toDouble(scaleOffset->text(),&ok);
         if (ok) {
-            double my_scale=scaleMult/QLocale().toDouble(scale->text(),&ok);
+            double my_scale=scaleMult/locale().toDouble(scale->text(),&ok);
             if (ok) {
                 if (direction->isChecked()) {
                     currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
@@ -212,8 +212,8 @@ void FindPeaks::updatePlot() {
                     " sq:"+QString::number(sqrt(sum_square)/fitx.size())+
                     "]";
             statusbar->showMessage(msg);
-            origin->setText(QLocale().toString(c0));
-            scale->setText(QLocale().toString(c1));
+            origin->setText(locale().toString(c0));
+            scale->setText(locale().toString(c1));
         }
 
         for (int i=0; i< plot->itemCount(); i++) {
@@ -231,8 +231,8 @@ void FindPeaks::updatePlot() {
 
             int pos=points->rowCount();
             points->insertRow(pos);
-            QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(fity[i]));
-            QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(fitz[i]));
+            QTableWidgetItem *xitem= new QTableWidgetItem(locale().toString(fity[i]));
+            QTableWidgetItem *yitem= new QTableWidgetItem(locale().toString(fitz[i]));
             xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
             yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
             points->setItem(pos, 0, xitem);

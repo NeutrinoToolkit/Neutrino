@@ -450,7 +450,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             line->setPalette(QApplication::palette());
             foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
                 bool ok;
-                double coeff=QLocale().toDouble(str,&ok);
+                double coeff=locale().toDouble(str,&ok);
                 if(ok) {
                     vecsweep->push_back(coeff);
                 } else {
@@ -850,16 +850,16 @@ void Visar::updatePlot() {
                 my_palette.setColor(QPalette::Base,Qt::red);
 
                 foreach (QString piece, jumpt) {
-                    QString err_msg=" "+piece+QString("' VISAR ")+QString::number(k+1)+tr(" Decimal separator is: ")+QLocale().decimalPoint();
+                    QString err_msg=" "+piece+QString("' VISAR ")+QString::number(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
                     QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
                         if (my_jumps.size()>1 && my_jumps.size()<=3) {
                             bool ok1, ok2, ok3=true;
-                            double valdt=QLocale().toDouble(my_jumps.at(0),&ok1);
-                            double valdn=QLocale().toDouble(my_jumps.at(1),&ok2);
+                            double valdt=locale().toDouble(my_jumps.at(0),&ok1);
+                            double valdn=locale().toDouble(my_jumps.at(1),&ok2);
                             double valdrefr_index=1.0;
                             if (my_jumps.size()==3) {
-                                valdrefr_index=QLocale().toDouble(my_jumps.at(2),&ok3);
+                                valdrefr_index=locale().toDouble(my_jumps.at(2),&ok3);
                                 if (!ok3) {
                                     phaseUi[k]->jumpst->setPalette(my_palette);
                                     statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg,5000);
@@ -975,8 +975,6 @@ void Visar::updatePlot() {
                 for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
                     QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
                     if (my_err && my_err->property("id").toInt() == (int)k ){
-                        qDebug() << my_err;
-                        qDebug() << my_err->valueAxis();
                         pen=my_err->pen();
                         pen.setStyle(pstyle);
                         my_err->setPen(pen);

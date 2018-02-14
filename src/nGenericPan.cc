@@ -640,7 +640,6 @@ void nGenericPan::saveDefaults() {
 
 /// THESE are specialized
 void nGenericPan::loadSettings(QSettings *settings) {
-    loadUi(settings);
     if (settings->childGroups().contains("Properties")) {
         settings->beginGroup("Properties");
         foreach(QString my_key, settings->allKeys()) {
@@ -648,11 +647,16 @@ void nGenericPan::loadSettings(QSettings *settings) {
         }
         settings->endGroup();
     }
+    if (property("NeuSave-locale").isValid()) {
+        setLocale(property("NeuSave-locale").toLocale());
+    }
+    loadUi(settings);
 }
 
 void nGenericPan::saveSettings(QSettings *settings) {
     saveUi(settings);
     settings->beginGroup("Properties");
+    setProperty("NeuSave-locale",locale());
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
             settings->setValue(ba, property(ba));

@@ -135,6 +135,9 @@
              <property name="toolTip">
               <string>Decimal number separator</string>
              </property>
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -654,8 +657,8 @@
   <tabstop>openclDescription</tabstop>
  </tabstops>
  <resources>
-  <include location="../plugins/Interferometry/Interferometry.qrc"/>
   <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../plugins/Interferometry/Interferometry.qrc"/>
  </resources>
  <connections/>
 </ui>
