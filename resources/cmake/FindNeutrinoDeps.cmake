@@ -146,7 +146,6 @@ endif()
 
 # opencl
 find_package(OpenCL QUIET)
-
 if (OpenCL_FOUND)
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		message (STATUS "using OpenCL: ${OpenCL_LIBRARIES}")
@@ -157,7 +156,7 @@ if (OpenCL_FOUND)
 	add_definitions(-DHAVE_OPENCL)
 
 	find_library (CLFFT NAMES clFFT)
-	if (NOT ${CLFFT} STREQUAL "CLFFT-NOTFOUND")
+    if (NOT ${CLFFT} STREQUAL "CLFFT-NOTFOUND")
 		if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 			message (STATUS "using clFFT: ${CLFFT}")
 		endif()

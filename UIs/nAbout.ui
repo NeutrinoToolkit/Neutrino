@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>305</height>
+    <width>537</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -152,7 +152,7 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0,1,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -179,6 +179,30 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <widget class="QLineEdit" name="version">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>SHA</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="sha">
         <property name="font">
          <font>
           <pointsize>10</pointsize>

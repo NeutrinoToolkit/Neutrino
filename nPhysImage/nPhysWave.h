@@ -43,6 +43,7 @@
 #include "bidimvec.h"
 
 #ifdef HAVE_LIBCLFFT
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include "clFFT.h"
 #endif
 

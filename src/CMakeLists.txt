@@ -26,6 +26,8 @@ include(FindNeutrinoDeps)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/nPhysImage")
 set(LIBS ${LIBS} "nPhysImageF")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
+
 
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
@@ -52,8 +54,6 @@ foreach(my_file ${ICONS})
     file(APPEND ${ICONS_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
-list(LENGTH ICONS LIST_LENGTH)
-message(STATUS "${LIST_LENGTH} icon files: ${ICONS_QRC}")
 
 
 # write automatically the qrc file for html
@@ -67,8 +67,6 @@ foreach(my_file ${HTMLS})
     file(APPEND ${HTML_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
-list(LENGTH HTMLS LIST_LENGTH)
-message(STATUS "${LIST_LENGTH} html files: ${HTML_QRC}")
 
 #parse neutrino license file
 file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
@@ -81,8 +79,6 @@ foreach(my_file ${HTMLLICENSES})
     file(APPEND ${LICENSES_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
-list(LENGTH HTMLLICENSES LIST_LENGTH)
-message(STATUS "${LIST_LENGTH} license files: ${LICENSES_QRC}")
 
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)

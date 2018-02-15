@@ -57,7 +57,6 @@
 
 namespace Ui {
 class nSbarra;
-class nAbout;
 }
 
 class neu_pluginerror: public std::exception
@@ -93,7 +92,6 @@ public:
 
     Ui::neutrino *my_w;
     Ui::nSbarra *my_sbarra;
-    Ui::nAbout *my_about;
 
     static const int MaxRecentFiles=20;
 

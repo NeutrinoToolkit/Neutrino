@@ -91,8 +91,7 @@ neutrino::~neutrino()
 /// Creator
 neutrino::neutrino():
 	my_w(new Ui::neutrino),
-	my_sbarra(new Ui::nSbarra),
-	my_about(new Ui::nAbout)
+    my_sbarra(new Ui::nSbarra)
 {
 	my_w->setupUi(this);
 	setAcceptDrops(true);
@@ -1730,7 +1729,6 @@ neutrino::Preferences() {
 }
 
 void neutrino::about() {
-
 	QDialog myabout(this);
 	Ui::nAbout my_about;
 	my_about.setupUi(&myabout);
@@ -1738,17 +1736,25 @@ void neutrino::about() {
 	connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
     my_about.version->setText(QApplication::applicationVersion());
-    my_about.creditsText->insertHtml("<h1>Licenses</h1><br>");
-
+    my_about.sha->setText(QString(__VER_SHA));
     QDirIterator it(":licenses/", QDirIterator::Subdirectories);
+    QStringList licenses;
     while (it.hasNext()) {
-        QString fname=it.next();
+        QString lic=it.next();
+        qDebug() << lic;
+        if (lic == ":licenses/Neutrino.txt") {
+            licenses.prepend(lic);
+        } else {
+            licenses.append(lic);
+        }
+    }
+    for(auto& fname: licenses) {
         QString basename=QFileInfo(fname).completeBaseName();
         QFile lic(fname);
         if (lic.open(QFile::ReadOnly | QFile::Text)) {
             QString licenseText=QTextStream(&lic).readAll().replace("\n","<br>");
             if (!licenseText.isEmpty()) {
-                my_about.creditsText->insertHtml("<h2>"+basename+" license :</h2><PRE>");
+                my_about.creditsText->insertHtml("<h1>"+basename+" license :</h1><PRE>");
                 my_about.creditsText->insertHtml(licenseText);
                 my_about.creditsText->insertHtml("</PRE><br><hr><br>");
             }
