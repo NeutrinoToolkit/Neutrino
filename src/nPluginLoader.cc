@@ -19,6 +19,10 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                 QString name_plugin(iface->name());
 
+                qDebug() << "name plugin " << name_plugin;
+
+
+
                 // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
                 if (name_plugin.isEmpty()) {
                     name_plugin=QFileInfo(pname).baseName();
@@ -37,10 +41,9 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 if (my_panPlug) {
                     icon_plugin=my_panPlug->icon();
 
-                    qDebug() << "here" << icon_plugin;
+                    qDebug() << "icon: " << icon_plugin;
 
                     if (!icon_plugin.isNull()) {
-                        qDebug() << "here";
 
                         QList<QAction*> my_actions = neu->my_w->toolBar->actions();
                         foreach (QAction *my_action_tmp, my_actions) {

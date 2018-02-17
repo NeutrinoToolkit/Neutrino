@@ -291,7 +291,6 @@ void nView::incrzoom(double incr)
 
 void
 nView::setSize() {
-    qDebug() << "here";
     QRectF bBox=my_tics.boundingRect();
     setSceneRect(bBox);
     if (fillimage) {

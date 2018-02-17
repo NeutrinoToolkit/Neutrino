@@ -194,9 +194,6 @@ public slots:
 
     nGenericPan* Shortcuts();
 
-    // Analysis
-    nGenericPan* MathOperations();
-
     nGenericPan* WinList();
 
     nGenericPan* Properties();

@@ -22,13 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nOperator.h"
+#include "MathOperations.h"
 #include "neutrino.h"
 
 // physWavelets
 
-nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
-    // separator represents the difference between operations with 2 operands or 1 modify it in .h
+MathOperations::MathOperations(neutrino *nparent) : nGenericPan(nparent),
+    // separator represents the difference between MathOperations with 2 operands or 1 modify it in .h
     separator({8,17})
 {
     my_w.setupUi(this);
@@ -45,7 +45,7 @@ nOperator::nOperator(neutrino *nparent) : nGenericPan(nparent),
     enableGroups(my_w.operation->currentIndex());
 }
 
-void nOperator::copyResult () {
+void MathOperations::copyResult () {
     if (!operatorResult) doOperation();
     if (operatorResult) {
         nPhysD *newoperatorResult=new nPhysD(*operatorResult);
@@ -53,7 +53,7 @@ void nOperator::copyResult () {
     }
 }
 
-void nOperator::enableGroups (int num) {
+void MathOperations::enableGroups (int num) {
     qDebug() << ">>>>>>>>>>>>>" << num;
 
     my_w.first->setEnabled(true);
@@ -84,7 +84,7 @@ void nOperator::enableGroups (int num) {
     }
 }
 
-void nOperator::doOperation () {
+void MathOperations::doOperation () {
     saveDefaults();
     nPhysD *image1=getPhysFromCombo(my_w.image1);
     nPhysD *image2=getPhysFromCombo(my_w.image2);

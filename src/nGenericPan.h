@@ -124,6 +124,8 @@ public slots:
     void loadUi(QSettings*);
     void saveUi(QSettings*);
 
+    void raiseIt();
+
     void closeEvent(QCloseEvent*);
 
     //settings

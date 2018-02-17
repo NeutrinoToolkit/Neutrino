@@ -79,7 +79,7 @@ protected:
 
 Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 
-#define NEUTRINO_PLUGIN1(__class_name,__menu_entry, __menu_icon) class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } QIcon icon() {return QIcon(__menu_icon);} };
+#define NEUTRINO_PLUGIN1(__class_name,__menu_entry, __menu_icon) Q_DECLARE_METATYPE(__class_name *);  class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } QIcon icon() {return QIcon(__menu_icon);} };
 #define NEUTRINO_PLUGIN2(__class_name,__menu_entry) NEUTRINO_PLUGIN1(__class_name,__menu_entry, )
 #define NEUTRINO_PLUGIN3(__class_name) NEUTRINO_PLUGIN1(__class_name, , )
 #define NEUTRINO_PLUGIN4(arg1,arg2,arg3,arg4,...) arg4

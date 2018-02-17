@@ -188,7 +188,12 @@
      <addaction name="actionPlugin"/>
      <addaction name="separator"/>
     </widget>
-    <addaction name="actionMath_operations"/>
+    <widget class="QMenu" name="menuOpen_Pans">
+     <property name="title">
+      <string>Open Pans</string>
+     </property>
+    </widget>
+    <addaction name="menuOpen_Pans"/>
     <addaction name="separator"/>
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
@@ -242,7 +247,6 @@
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
    <addaction name="actionMouseInfo"/>
-   <addaction name="actionOperator"/>
    <addaction name="separator"/>
    <addaction name="actionLineoutH"/>
    <addaction name="actionLineoutV"/>
@@ -390,11 +394,6 @@
    </property>
    <property name="text">
     <string>Vertical</string>
-   </property>
-  </action>
-  <action name="actionMath_operations">
-   <property name="text">
-    <string>Math operations</string>
    </property>
   </action>
   <action name="actionReopen_to_saved">
@@ -618,7 +617,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -638,7 +637,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -647,18 +646,6 @@
    </property>
    <property name="toolTip">
     <string>Lock colorbar</string>
-   </property>
-  </action>
-  <action name="actionOperator">
-   <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
-     <normaloff>:/icons/math.png</normaloff>:/icons/math.png</iconset>
-   </property>
-   <property name="text">
-    <string>Operator</string>
-   </property>
-   <property name="toolTip">
-    <string>Math operations</string>
    </property>
   </action>
   <action name="actionPlugin">
@@ -681,7 +668,7 @@
   </action>
   <action name="actionTranspose">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
    </property>
    <property name="text">
@@ -707,8 +694,6 @@
    <header>../src/graphics/nView.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

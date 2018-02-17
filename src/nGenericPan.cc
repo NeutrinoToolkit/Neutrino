@@ -55,6 +55,13 @@ nGenericPan::nGenericPan(neutrino *myparent)
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
     bufferChanged(nparent->getCurrentBuffer());
+
+}
+
+void nGenericPan::raiseIt() {
+    setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+    raise();  // for MacOS
+    activateWindow(); // for Windows
 }
 
 QString nGenericPan::panName() {
@@ -216,6 +223,10 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
     setWindowTitle(nparent->property("winId").toString()+": "+panName());
+
+    QAction *act = new QAction(windowTitle(),this);
+    connect(act, SIGNAL(triggered()),this, SLOT(raiseIt()));
+    nparent->my_w->menuOpen_Pans->addAction(act);
 
     decorate(this);
 
@@ -580,6 +591,7 @@ void nGenericPan::closeEvent(QCloseEvent*){
             }
         }
     }
+    QApplication::processEvents();
     foreach (QWidget *widget, QApplication::allWidgets()) {
         neutrino *neu=qobject_cast<neutrino *>(widget);
         if (neu==nparent) {
@@ -590,7 +602,11 @@ void nGenericPan::closeEvent(QCloseEvent*){
 
             disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
             disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
+
             disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
+
+            disconnect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
+            disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
         }
     }
 }

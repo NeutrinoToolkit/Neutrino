@@ -280,10 +280,9 @@ nWinList::panDel(nGenericPan *pan) {
 void
 nWinList::panClicked(QListWidgetItem* item) {
     nGenericPan* pan=(nGenericPan*)(item->data(Qt::UserRole).value<void*>());
-    pan->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
-    pan->raise();  // for MacOS
-    pan->activateWindow(); // for Windows
-
+    if (pan) {
+        pan->raiseIt();
+    }
 }
 
 void

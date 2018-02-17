@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nOperator</class>
- <widget class="QMainWindow" name="nOperator">
+ <class>MathOperations</class>
+ <widget class="QMainWindow" name="MathOperations">
   <property name="geometry">
    <rect>
     <x>0</x>

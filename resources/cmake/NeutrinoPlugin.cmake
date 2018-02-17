@@ -46,8 +46,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     include_directories(${NEUTRINO_ROOT}/src) # for base stuff
     include_directories(${NEUTRINO_ROOT}/src/graphics)
 
-    file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
+    file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+    file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
     file(GLOB QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
 
     ## add help
@@ -116,7 +117,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
     set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
-    add_library (${PROJECT_NAME} SHARED ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
+    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
 
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")

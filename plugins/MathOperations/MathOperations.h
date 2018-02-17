@@ -26,22 +26,22 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nOperator.h"
+#include "ui_MathOperations.h"
 
-#ifndef __nOperator
-#define __nOperator
+#ifndef __MathOperations
+#define __MathOperations
 
 class neutrino;
 
-class nOperator : public nGenericPan {
+class MathOperations : public nGenericPan {
     Q_OBJECT
 
     std::vector<int> separator;
 
 public:	
-    Q_INVOKABLE nOperator(neutrino *);
+    Q_INVOKABLE MathOperations(neutrino *);
 
-    Ui::nOperator my_w;
+    Ui::MathOperations my_w;
     nPhysD *operatorResult;
 
 public slots:
@@ -49,5 +49,7 @@ public slots:
     void copyResult();
     void enableGroups(int);
 };
+
+NEUTRINO_PLUGIN(MathOperations,Analysis,":icons/math.png");
 
 #endif

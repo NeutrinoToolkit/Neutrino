@@ -65,4 +65,5 @@ public slots:
 
 NEUTRINO_PLUGIN(Affine, Analysis);
 
+
 #endif
