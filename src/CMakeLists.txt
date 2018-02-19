@@ -94,7 +94,6 @@ if (Qt5LinguistTools_FOUND)
     SET(LANGUAGE_TS_FILES)
     FOREACH(LANGUAGE ${LANGUAGES})
         SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
-        MESSAGE(WARNING "${TS_FILE}")
         message(STATUS "Language : ${TS_FILE}")
         SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
 

@@ -135,7 +135,9 @@ bool nApp::localeLessThan(const QLocale &loc1, const QLocale &loc2)
 
 
 void nApp::changeLocale(QLocale locale) {
-    qDebug() << "here";
+    QKeySequence key_seq=QKeySequence(Qt::CTRL);
+
+    qDebug() << "here" << key_seq.toString();
     if (locale!=QLocale()) {
 
         qDebug() << QLocale::languageToString(locale.language()) <<

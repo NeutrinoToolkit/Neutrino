@@ -192,8 +192,6 @@ public slots:
     void toggleRuler();
     void toggleGrid();
 
-    nGenericPan* Shortcuts();
-
     nGenericPan* WinList();
 
     nGenericPan* Properties();
@@ -232,7 +230,9 @@ public slots:
 
     nGenericPan* MouseInfo();
 
+    void Shortcuts();
     void about();
+
     nGenericPan* Preferences();
 
     nGenericPan* openPan(QString,bool=true);

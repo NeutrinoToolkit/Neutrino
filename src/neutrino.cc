@@ -43,7 +43,6 @@
 #include "nMouseInfo.h"
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
-#include "nShortcuts.h"
 
 #include "nLineout.h"
 
@@ -59,7 +58,7 @@
 
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
-
+#include "ui_nShortcuts.h"
 
 void neutrino::changeEvent(QEvent *e)
 {
@@ -1434,9 +1433,18 @@ neutrino::closeCurrentBuffer() {
     QApplication::processEvents();
 }
 
-nGenericPan*
-neutrino::Shortcuts() {
-    return new nShortcuts(this);
+void neutrino::Shortcuts() {
+    QWidget *myShortcuts = new QWidget(this,Qt::Tool);
+    myShortcuts->setAttribute(Qt::WA_DeleteOnClose);
+    Ui::nShortcuts myShortCutsUI;
+    myShortCutsUI.setupUi(myShortcuts);
+    show();
+    QFile lic(":/html/shortcuts.html");
+    if (lic.open(QFile::ReadOnly | QFile::Text)) {
+        QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
+        myShortCutsUI.textBrowser->insertHtml(htmltext);
+    }
+    myShortcuts->show();
 }
 
 // Window List pan
