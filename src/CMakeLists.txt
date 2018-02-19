@@ -88,20 +88,21 @@ include_directories(graphics pans pans/colorbar pans/winlist)
 
 SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
 find_package(Qt5LinguistTools)
-
 if (Qt5LinguistTools_FOUND)
     SET(LANGUAGES fr_FR it_IT ko_KP)
     SET(LANGUAGE_TS_FILES)
     FOREACH(LANGUAGE ${LANGUAGES})
         SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
-        message(STATUS "Language : ${TS_FILE}")
-        SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
-        if(NOT EXISTS ${TS_FILE})
-            qt5_create_translation(TRASL_FILES ${SOURCES} ${UIS} ${TS_FILE})
+        if(EXISTS ${TS_FILE})
+            SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
+            qt5_add_translation(qm_files ${TS_FILE})
+        else ()
+            qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
+            if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+                message (STATUS "[Debug] translation file ${TS_FILE} will be created, commit it if you create the translations.")
+            endif()
         endif()
-        qt5_add_translation(TRASL_FILES ${TS_FILE})
-
-    ENDFOREACH(LANGUAGE ${LANGUAGES})
+    ENDFOREACH()
 
     IF(LANGUAGE_TS_FILES)
         set(TRANSL_QRC ${QRCDIR}/translations.qrc)
@@ -112,10 +113,10 @@ if (Qt5LinguistTools_FOUND)
             file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
         endforeach()
         file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-
     ENDIF(LANGUAGE_TS_FILES)
 
 endif(Qt5LinguistTools_FOUND)
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
