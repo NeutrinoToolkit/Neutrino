@@ -29,14 +29,14 @@ nMouse::nMouse() : QGraphicsItem(),
     my_shape(0),
     size(100,100)
 {
-	pen.setCosmetic(true);
+    pen.setCosmetic(true);
 }
 
 // reimplementation
 QRectF nMouse::boundingRect() const {
     //	QRectF bbox(-pos().x(),-1,size.width(),3);
     //	return bbox;
-	return shape().boundingRect();
+    return shape().boundingRect();
 }
 
 void nMouse::setSize(QSize my_size) {
@@ -59,42 +59,41 @@ QPainterPath nMouse::shape() const {
     const double r=4.0;
     const int len=15*r;
 
-	switch (my_shape%4) {
-    case 1:
-        my_path.moveTo(0,-pos().y());
-        my_path.lineTo(0,size.height()-pos().y());
-        my_path.moveTo(-pos().x(),0);
-        my_path.lineTo(size.width()-pos().x(),0);
+    switch (my_shape%4) {
+        case 0: break;
+        case 1:
+            my_path.moveTo(0,-pos().y());
+            my_path.lineTo(0,size.height()-pos().y());
+            my_path.moveTo(-pos().x(),0);
+            my_path.lineTo(size.width()-pos().x(),0);
 
-        break;
-    case 2:
-        my_path.moveTo(0,-len);
-        my_path.lineTo(0,-r);
-        my_path.moveTo(0,r);
-        my_path.lineTo(0,len);
+            break;
+        case 2:
+            my_path.moveTo(0,-len);
+            my_path.lineTo(0,-r);
+            my_path.moveTo(0,r);
+            my_path.lineTo(0,len);
 
-        my_path.moveTo(-len,0);
-        my_path.lineTo(-r,0);
-        my_path.moveTo(r,0);
-        my_path.lineTo(len,0);
-        my_path.addEllipse(-r, -r, 2*r, 2*r);
-        break;
+            my_path.moveTo(-len,0);
+            my_path.lineTo(-r,0);
+            my_path.moveTo(r,0);
+            my_path.lineTo(len,0);
+            my_path.addEllipse(-r, -r, 2*r, 2*r);
+            break;
 
-    case 3:
-        my_path.moveTo(-len,-len);
-        my_path.lineTo(-r,-r);
-        my_path.moveTo(r,r);
-        my_path.lineTo(len,len);
+        case 3:
+            my_path.moveTo(-len,-len);
+            my_path.lineTo(-r,-r);
+            my_path.moveTo(r,r);
+            my_path.lineTo(len,len);
 
-        my_path.moveTo(-len,len);
-        my_path.lineTo(-r,r);
-        my_path.moveTo(r,-r);
-        my_path.lineTo(len,-len);
-        my_path.addEllipse(-r, -r, 2*r, 2*r);
-        break;
+            my_path.moveTo(-len,len);
+            my_path.lineTo(-r,r);
+            my_path.moveTo(r,-r);
+            my_path.lineTo(len,-len);
+            my_path.addEllipse(-r, -r, 2*r, 2*r);
+            break;
     }
-
-
     return my_path;
 }
 

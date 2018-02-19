@@ -86,6 +86,9 @@ include_directories(graphics pans pans/colorbar pans/winlist)
 
 #translate ui
 
+SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
+find_package(Qt5LinguistTools)
+
 if (Qt5LinguistTools_FOUND)
     SET(LANGUAGES fr_FR it_IT ko_KP)
     SET(LANGUAGE_TS_FILES)
@@ -118,8 +121,9 @@ if (Qt5LinguistTools_FOUND)
 
 endif(Qt5LinguistTools_FOUND)
 
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
+
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${HTML_QRC} ${TRASL_FILES})
 
 if(APPLE)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
@@ -138,7 +142,7 @@ if(APPLE)
     set_source_files_properties(${${PROJECT_NAME}_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${${PROJECT_NAME}_ICONTYPE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${HTML_QRC} ${TRASL_FILES})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
@@ -148,25 +152,22 @@ if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_RPATH} INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     install (TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/.." COMPONENT binary)
-endif()
 
-if(WIN32)
+elseif(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
     list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${RC_WIN} )
+        add_executable(${PROJECT_NAME} ${RC_WIN} ${filedeps})
     else()
-        add_executable(${PROJECT_NAME} WIN32  ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${RC_WIN} )
+        add_executable(${PROJECT_NAME} WIN32 ${RC_WIN} ${filedeps})
     endif()
 
     set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
 
-endif()
-
-if(LINUX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${TRASL_FILES})
+elseif(LINUX)
+    add_executable(${PROJECT_NAME} ${filedeps})
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
 endif()
 

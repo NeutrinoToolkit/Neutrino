@@ -1,8 +1,8 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
 
 
-    if (NOT EXISTS ${NEUTRINO_ROOT}/src/neutrino.h)
-        message(FATAL_ERROR "Please specify neutrino source tree with -DNEUTRINO_ROOT=<path/to/neutrino>")
+    if (NOT EXISTS "${NEUTRINO_ROOT}/src/neutrino.h")
+        message(FATAL_ERROR "Please specify neutrino source tree with cmake -DNEUTRINO_ROOT=<path/to/neutrino>")
     endif()
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -29,11 +29,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT -DQT_NO_WARNING_OUTPUT")
     add_compile_options(-std=c++11)
 
-
-
-    # find goodies
-
     add_definitions(-DQT_PLUGIN)
+    add_definitions(-DQT_SHARED)
 
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTOUIC ON)

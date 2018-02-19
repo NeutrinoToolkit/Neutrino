@@ -8,21 +8,13 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
 
 	  setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::ExportExternalSymbolsHint);
-
-      qDebug() << "------------------------------------------------------------------------------";
-      qDebug() << "Parsing lib " << pname  << " loadHints:" << loadHints();
+      qDebug() << "Plugin" << pname ;
       QObject *p_obj = instance();
 
       if (p_obj) {
           iface = qobject_cast<nPlug *>(p_obj);
 			if (iface) {
-
                 QString name_plugin(iface->name());
-
-                qDebug() << "name plugin " << name_plugin;
-
-
-
                 // in case the interface returns an empty name (default if method not overridden), pick up the name of the file
                 if (name_plugin.isEmpty()) {
                     name_plugin=QFileInfo(pname).baseName();
@@ -40,8 +32,6 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                 if (my_panPlug) {
                     icon_plugin=my_panPlug->icon();
-
-                    qDebug() << "icon: " << icon_plugin;
 
                     if (!icon_plugin.isNull()) {
 
@@ -67,19 +57,14 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     foreach (QAction *my_action,my_actions) {
                         if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled() && !my_action->data().isNull()) {
                             QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
-                            qDebug() << my_action->data() << my_qplugin;
                             if (my_qplugin!=nullptr) {
                                 if(my_qplugin->instance()){
                                     delete my_qplugin;
-                                    qDebug() << "instance removed";
                                 }
                                 my_qplugin=new QPluginLoader(pname);
                                 p_obj = my_qplugin->instance();
                                 if (p_obj) {
                                     iface = qobject_cast<nPlug *>(p_obj);
-                                    if (iface) {
-                                        qDebug() << "reloaded";
-                                    }
                                 }
                             }
                             my_menu->removeAction(my_action);
@@ -148,8 +133,6 @@ QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
 
 void
 nPluginLoader::launch() {
-    qDebug() << iface->name();
-
     if (iface && nParent) {
         bool retval = iface->instantiate(nParent);
         if (!retval) {
@@ -158,5 +141,4 @@ nPluginLoader::launch() {
             dlg.exec();
         }
     }
-    qDebug() << "end";
 }
