@@ -27,7 +27,7 @@ BrandingText "@CPACK_PACKAGE_FILE_NAME@"
   !include "MUI.nsh"
 
   ;Default installation folder
-  InstallDir "@CPACK_NSIS_INSTALL_ROOT@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+  InstallDir "$LOCALAPPDATA\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
 ;--------------------------------
 ;General
@@ -40,7 +40,7 @@ BrandingText "@CPACK_PACKAGE_FILE_NAME@"
   SetCompressor @CPACK_NSIS_COMPRESSOR@
 
   ;Require administrator access
-  RequestExecutionLevel admin
+  RequestExecutionLevel user
 
 @CPACK_NSIS_DEFINES@
 

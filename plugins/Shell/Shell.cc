@@ -31,14 +31,27 @@ bool ShellPlug::instantiate(neutrino *neu) {
 
     QSettings settings("neutrino","");
     settings.beginGroup("Shell");
-    foreach (QString spath, settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"))) {
+    QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
+#if defined(Q_OS_WIN)
+    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
+    if (base.exists()) {
+        sites << base.absolutePath();
+        sites << base.filePath("plat-win32");
+        sites << base.filePath("lib-tk");
+        sites << base.filePath("site-packages");
+        sites << base.filePath("lib-dynload");
+        sites << base.filePath("lib-dynload");
+        sites << base.filePath("lib-dynload");
+    }
+#endif
+
+    foreach (QString spath, sites) {
         qDebug() << "Python site folder " << spath;
         if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
     }
     settings.endGroup();
 
     PythonQt::self()->getMainModule().addObject("nApp", qApp);
-
 
     QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
 
