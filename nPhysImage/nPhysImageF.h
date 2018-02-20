@@ -53,6 +53,7 @@
 #include <typeinfo>
 #include <limits>
 #include <functional>
+#include <array>
 
 #include <assert.h>
 #include <fftw3.h>

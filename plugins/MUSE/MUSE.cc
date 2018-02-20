@@ -384,7 +384,7 @@ void MUSE::loadCube() {
 			if (fits_check_error(status)) return;
 
 			if (hdutype == IMAGE_HDU) {
-				std::array<long,9> naxes={1, 1, 1, 1, 1, 1, 1, 1, 1};
+                std::array<long,9> naxes={{1, 1, 1, 1, 1, 1, 1, 1, 1}};
 				int naxis = 0;
 				fits_get_img_param(fptr, 9, &bitpix, &naxis, &naxes[0], &status);
 				DEBUG("IMAGE_HDU " << naxis);

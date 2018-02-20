@@ -17,6 +17,10 @@ if(PYTHONLIBS_FOUND)
             exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)
         endif (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
 
+        if (WIN32 AND NOT DEFINED NUMPY_PATH)
+            set(NUMPY_PATH "${PYTHON_INCLUDE_PATH}/../../lib/python2.7/site-packages/numpy/core/include")
+        endif()
+
         find_path(
             NUMPY_INCLUDE_DIR
             NAMES "numpy/arrayobject.h"

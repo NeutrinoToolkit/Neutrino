@@ -67,7 +67,6 @@ elseif (LINUX)
     endif()
 
 elseif(APPLE)
-
     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-MacOS")
 	set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
 

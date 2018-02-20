@@ -200,10 +200,10 @@ void Visar::addVisar() {
 
 //    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 
-    phase.push_back({nPhysD(),nPhysD()});
+    phase.push_back({{nPhysD(),nPhysD()}});
 
-    contrast.push_back({nPhysD(),nPhysD()});
-    intensity.push_back({nPhysD(),nPhysD()});
+    contrast.push_back({{nPhysD(),nPhysD()}});
+    intensity.push_back({{nPhysD(),nPhysD()}});
 
     for (int m=0;m<2;m++){
         QString name="Visar "+QString::number(numVisars+1)+" "+QString::number(m);
