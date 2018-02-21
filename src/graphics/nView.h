@@ -46,6 +46,8 @@ public:
     nView (QWidget *parent=0);
     ~nView ();
 
+    QMap<QString, std::vector<unsigned char>>& nPalettes;
+
     neutrino *nparent;
     void resizeEvent (QResizeEvent *);
 
@@ -76,7 +78,6 @@ public:
     QGraphicsPixmapItem my_pixitem;
 
     QString colorTable;
-    QMap<QString, std::vector<unsigned char>> nPalettes;
 
     nPhysD* currentBuffer;
     QList<nPhysD*> physList;
@@ -122,8 +123,6 @@ private:
 	void pinchTriggered(QPinchGesture *);
 
     unsigned int currentStepScaleFactor;
-
-    void build_colormap();
 
     bool lockColors;
 

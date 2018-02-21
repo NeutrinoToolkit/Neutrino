@@ -88,6 +88,8 @@ public:
         DEBUG("anyway I'm here " << nparent);
         if (nparent)
             return new Shell(nparent);
+        else
+            return nullptr;
     }
 
     QIcon icon() {

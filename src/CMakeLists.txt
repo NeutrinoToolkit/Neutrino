@@ -80,6 +80,18 @@ foreach(my_file ${HTMLLICENSES})
 endforeach()
 file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
 
+#parse neutrino colormap files
+set(CMAPDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/colormaps/cmaps)
+file(GLOB_RECURSE CMAPS ${CMAPDIR}/*)
+set(CMAP_QRC ${QRCDIR}/cmap.qrc)
+file(WRITE ${CMAP_QRC} "<RCC>\n    <qresource prefix=\"/cmaps/\">\n")
+foreach(my_file ${CMAPS})
+    file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
+    GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
+    file(APPEND ${CMAP_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+endforeach()
+file(APPEND ${CMAP_QRC} "    </qresource>\n</RCC>")
+
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics pans pans/colorbar pans/winlist)
@@ -120,7 +132,7 @@ endif(Qt5LinguistTools_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
-set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${HTML_QRC} ${TRASL_FILES})
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${ICONS_QRC} ${CMAP_QRC} ${TRASL_FILES})
 
 if(APPLE)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")

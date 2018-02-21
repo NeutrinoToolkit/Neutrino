@@ -23,10 +23,16 @@
  *
  */
 
+
+#ifdef Q_CC_GNU
+#define QT_INIT_METAOBJECT
+#endif
+
 #include <QVector>
 #include <QList>
 
 #include "neutrino.h"
+
 #include "nApp.h"
 
 #include <QMetaObject>

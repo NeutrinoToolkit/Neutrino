@@ -23,6 +23,7 @@
  *
  */
 #include "neutrino.h"
+#include "nApp.h"
 #include "nView.h"
 
 nView::~nView ()
@@ -39,14 +40,12 @@ nView::~nView ()
 }
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
+    nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
     my_scene(this),
     my_tics(this),
     currentBuffer(nullptr),
     lockColors(false)
 {
-    DEBUG("HERE I AM");
-
-    build_colormap();
 
     setScene(&my_scene);
 
@@ -60,8 +59,6 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
     my_scene.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     setCursor(QCursor(Qt::CrossCursor));
-
-
 
     if (!parent) ERROREXIT("nView problem");
 

@@ -30,6 +30,29 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     }
     my_set.endGroup();
 
+    QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
+
+    while (it.hasNext()) {
+        QString cmapfile=it.next();
+
+        QFile inputFile(cmapfile);
+        if (inputFile.open(QIODevice::ReadOnly)) {
+           QTextStream in(&inputFile);
+           QString title = in.readLine().mid(2);
+
+           nPalettes[title]= std::vector<unsigned char>(256*3);
+           unsigned int iter=0;
+           while (!in.atEnd()) {
+              QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
+              for(auto &strnum : line) {
+                  nPalettes[title].at(iter) = strnum.toInt();
+                  iter++;
+              }
+           }
+           qDebug() << title << iter << nPalettes[title].size();
+           inputFile.close();
+        }
+    }
 }
 
 
@@ -44,6 +67,19 @@ void nApp::checkUpdates() {
     QJsonDocument json = QJsonDocument::fromJson(html.toUtf8());
 
     QJsonObject responseObject = json.object();
+#ifdef __phys_debug
+    for(const auto &key : responseObject.keys() ) {
+        QJsonValue value = responseObject.value(key);
+        qDebug() << "Key = " << key << ", Value = " << value.toString();
+    }
+    QUrl commenturl(responseObject.value("comments_url").toString());
+    response = manager.get(QNetworkRequest(commenturl));
+    connect(response,SIGNAL(finished()),&event,SLOT(quit()));
+    event.exec();
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    qDebug() << response->readAll();
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+#endif
     if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
         QString compileSHA = QString(__VER_SHA);
         QString onlineSHA=responseObject.value("sha").toString();
@@ -55,7 +91,8 @@ void nApp::checkUpdates() {
         if (compileSHA != onlineSHA) {
 
             QMessageBox msgBox;
-            msgBox.setText(tr("A newer version is available available"));
+            QString text=tr("A newer version is available available");
+            msgBox.setText(text);
             msgBox.addButton(tr("Go get it now"), QMessageBox::YesRole);
             msgBox.addButton(tr("Not now"), QMessageBox::RejectRole);
             msgBox.addButton(tr("Never"), QMessageBox::NoRole);

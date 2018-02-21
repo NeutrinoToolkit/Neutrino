@@ -36,6 +36,7 @@ class nApp : public QApplication {
 public:
     nApp( int &argc, char **argv );
 
+    QMap<QString, std::vector<unsigned char>> nPalettes;
 
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
