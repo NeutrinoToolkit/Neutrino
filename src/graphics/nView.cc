@@ -36,6 +36,7 @@ nView::~nView ()
     my_set.setValue("gridVisible", my_tics.gridVisible);
     my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("pixmapFile", property("pixmapFile").toString());
+    my_set.setValue("colorTable", colorTable);
     my_set.endGroup();
 }
 
@@ -101,6 +102,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
     my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
     setProperty("pixmapFile",my_set.value("pixmapFile","Pixmap.png"));
+    changeColorTable(my_set.value("colorTable",colorTable).toString());
     my_set.endGroup();
 }
 

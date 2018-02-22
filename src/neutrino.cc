@@ -99,7 +99,7 @@ neutrino::neutrino():
     my_w->setupUi(this);
     setAcceptDrops(true);
 
-    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
+//    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
     int numwin=qApp->property("numWin").toInt()+1;
     qApp->setProperty("numWin",numwin);
@@ -232,39 +232,6 @@ neutrino::neutrino():
     connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
-
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("Palettes");
-    QStringList paletteNamesClean,paletteNames=my_set.value("paletteNames","").toStringList();
-    QStringList paletteColorsClean,paletteColors=my_set.value("paletteColors","").toStringList();
-    if (paletteNames.size()==paletteColors.size()) {
-        for (int i=0;i<paletteNames.size();i++) {
-            if (addPaletteFromString(paletteNames.at(i), paletteColors.at(i))) {
-                paletteNamesClean << paletteNames.at(i);
-                paletteColorsClean << paletteColors.at(i);
-            }
-        }
-    }
-    my_set.setValue("paletteNames",paletteNamesClean);
-    my_set.setValue("paletteColors",paletteColorsClean);
-
-    QStringList paletteFilesClean,paletteFiles=my_set.value("paletteFiles","").toStringList();
-    QStringList paletteFilesNameClean;
-    foreach (QString paletteFile, paletteFiles) {
-        QString name=addPaletteFromFile(paletteFile);
-        if (!name.isEmpty()) {
-            paletteFilesClean << paletteFile;
-            paletteFilesNameClean<< name;
-        }
-    }
-    my_set.setValue("paletteFiles",paletteFilesClean);
-    my_set.setValue("paletteFilesNames",paletteFilesNameClean);
-    my_set.endGroup();
-
-    if (my_w->my_view->nPalettes.keys().contains("Neutrino"))
-        my_w->my_view->changeColorTable("Neutrino");
-    else
-        my_w->my_view->changeColorTable(my_w->my_view->nPalettes.keys().first());
 
     //recent file stuff
 
@@ -544,12 +511,21 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
+    QAction *act = new QAction(pan->windowTitle(),this);
+    connect(act, SIGNAL(triggered()),pan, SLOT(raiseIt()));
+    my_w->menuOpen_Pans->addAction(act);
+
     panList.removeAll(pan);
     panList.append(pan);
     emit panAdd(pan);
 }
 
 void neutrino::emitPanDel(nGenericPan* pan) {
+    foreach (QAction *action,  my_w->menuOpen_Pans->actions()) {
+        if (action->text() == pan->windowTitle()) {
+            action->deleteLater();
+        }
+     }
     panList.removeAll(pan);
     emit panDel(pan);
 }
@@ -1476,113 +1452,6 @@ neutrino::ColorBar() {
     return new nColorBar(this);
 }
 
-struct QPairFirstComparer {
-    template<typename T1, typename T2>
-    bool operator()(const QPair<T1,T2> & a, const QPair<T1,T2> & b) const {
-        return a.first <= b.first;
-    }
-};
-
-bool neutrino::addPaletteFromString(QString paletteName, QString paletteStr) {
-    if (paletteStr.contains(",")) {
-        QList<QPair<double,QColor> > listDoubleColor;
-        QStringList paletteList=paletteStr.split(",",QString::SkipEmptyParts);
-        for (int i=0;i<paletteList.size();i++) {
-            QStringList colorValueName=paletteList.at(i).split(" ",QString::SkipEmptyParts);
-            if (colorValueName.size()==2) {
-                bool ok;
-                double my_val=QLocale().toDouble(colorValueName.first(),&ok);
-                QColor my_color(colorValueName.last());
-                if (ok && my_color.isValid()) {
-                    listDoubleColor.append(qMakePair(my_val,my_color));
-                }
-            }
-        }
-        qSort(listDoubleColor.begin(), listDoubleColor.end(), QPairFirstComparer());
-        if (listDoubleColor.size()>=2) {
-            double minVal=listDoubleColor.first().first;
-            double maxVal=listDoubleColor.last().first;
-            if (minVal!=maxVal) {
-                for(int i=0;i<listDoubleColor.size();i++) {
-                    listDoubleColor[i]=qMakePair(256.0*(listDoubleColor.at(i).first-minVal)/(maxVal-minVal),listDoubleColor.at(i).second);
-                }
-
-                std::vector<unsigned char> palC(768);
-
-                int counter=1;
-                for (int i=0;i<256;i++) {
-
-                    QColor col1=listDoubleColor.at(counter-1).second;
-                    QColor col2=listDoubleColor.at(counter).second;
-
-                    double delta=(listDoubleColor.at(counter).first-i)/(listDoubleColor.at(counter).first-listDoubleColor.at(counter-1).first);
-
-                    palC[i*3+0]=(unsigned char) (delta*col1.red()+(1.0-delta)*col2.red());
-                    palC[i*3+1]=(unsigned char) (delta*col1.green()+(1.0-delta)*col2.green());
-                    palC[i*3+2]=(unsigned char) (delta*col1.blue()+(1.0-delta)*col2.blue());
-
-                    while (i+1>listDoubleColor.at(counter).first) counter++;
-                }
-                my_w->my_view->nPalettes[paletteName] = palC;
-                my_w->my_view->changeColorTable(paletteName);
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-QString neutrino::addPaletteFromFile(QString paletteFile) {
-    QFile file(paletteFile);
-    QString paletteName=QFileInfo(paletteFile).baseName();
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        std::vector<unsigned char> palette(768);
-        bool allOk=true;
-        int i=0;
-        while (!file.atEnd() && allOk) {
-            QString line = QString(file.readLine()).trimmed();
-            if (line.startsWith("#")) {
-                paletteName=line.remove(0,1).trimmed();
-            } else {
-                QStringList colorsToSplit=line.split(QRegExp("\\s+"),QString::SkipEmptyParts);
-                if (colorsToSplit.size()==3) {
-                    bool ok0,ok1,ok2;
-                    unsigned int redInt=colorsToSplit.at(0).toUInt(&ok0);
-                    unsigned int greenInt=colorsToSplit.at(1).toUInt(&ok1);
-                    unsigned int blueInt=colorsToSplit.at(2).toUInt(&ok2);
-                    if (ok0 && ok1 && ok2 && redInt<256 && greenInt<256 && blueInt<256) {
-                        if (i<256) {
-                            palette[3*i+0]=redInt;
-                            palette[3*i+1]=greenInt;
-                            palette[3*i+2]=blueInt;
-                            i++;
-                        } else {
-                            allOk=false;
-                        }
-                    }
-                }
-            }
-        }
-        if (allOk) {
-            QSettings my_set("neutrino","");
-            my_set.beginGroup("Palettes");
-            QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-            paletteFiles << paletteFile;
-            my_set.setValue("paletteFiles",paletteFiles);
-            QStringList paletteFilesNames=my_set.value("paletteFilesNames","").toStringList();
-            paletteFilesNames << paletteName;
-            my_set.setValue("paletteFilesNames",paletteFilesNames);
-            my_set.endGroup();
-
-            my_w->my_view->nPalettes[paletteName] = palette;
-            my_w->my_view->changeColorTable(paletteName);
-        } else {
-            paletteName.clear();
-        }
-    }
-    return paletteName;
-}
-
 // testing
 void
 neutrino::createDrawLine() {
@@ -1686,7 +1555,6 @@ void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
-    my_set.setValue("colorTable", my_w->my_view->colorTable);
     my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
 
     my_set.beginGroup("Properties");
@@ -1704,7 +1572,6 @@ void neutrino::loadDefaults(){
     my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
 
-    my_w->my_view->changeColorTable(my_set.value("colorTable",my_w->my_view->colorTable).toString());
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 

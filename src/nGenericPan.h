@@ -44,6 +44,7 @@
 #include "nPanPlug.h"
 
 class neutrino;
+class nApp;
 
 namespace Ui {
 class PanHelp;
@@ -77,6 +78,8 @@ public:
     ~nGenericPan(){};
 
     neutrino *nparent;
+    nApp *napp;
+
     nPhysD *currentBuffer;
 
     // thread stuff

@@ -25,16 +25,19 @@
 #include "nGenericPan.h"
 #include "ui_nPanHelp.h"
 
+#include "nApp.h"
 #include "neutrino.h"
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)
     : QMainWindow(myparent),
       nparent(myparent),
+      napp(qobject_cast<nApp*> (qApp)),
       currentBuffer(myparent->getCurrentBuffer()),
       my_help(new Ui::PanHelp)
 {
-    if (nparent==nullptr) return;
+    if (nparent==nullptr || napp==nullptr) return;
+
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
     setAttribute(Qt::WA_DeleteOnClose);
@@ -223,10 +226,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
     setWindowTitle(nparent->property("winId").toString()+": "+panName());
-
-    QAction *act = new QAction(windowTitle(),this);
-    connect(act, SIGNAL(triggered()),this, SLOT(raiseIt()));
-    nparent->my_w->menuOpen_Pans->addAction(act);
 
     decorate(this);
 

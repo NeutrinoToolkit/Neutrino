@@ -52,7 +52,7 @@ public:
 	nPhysD *cutOffPhys;
 	Ui::Colorbar my_w;
 
-    QPointer<QComboBox> palettes;
+    QComboBox palettes;
 
 	QColor colorBase;
 	
@@ -74,7 +74,6 @@ public slots:
 	void addColor();
 	void addPalette();
 	void removePalette();
-	void savePalettes();
 	void loadPalettes();
 	void itemDoubleClicked(QTreeWidgetItem*,int);
 	

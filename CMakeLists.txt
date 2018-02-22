@@ -65,10 +65,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	add_compile_options(-stdlib=libc++)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-static-libgcc -static-libstdc++)
-    if(APPLE)
-        add_compile_options(-DQT_INIT_METAOBJECT)
-    endif()
-endif()
+ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 

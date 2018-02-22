@@ -141,12 +141,6 @@ public slots:
     void on_actionOpen_Glob_triggered();
     void on_action99_triggered();
 
-
-    //colortable
-    bool addPaletteFromString(QString,QString);
-    QString addPaletteFromFile(QString);
-
-
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);

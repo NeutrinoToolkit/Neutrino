@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>334</height>
+    <height>338</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -284,18 +284,6 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="addPaletteFile">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Add File</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="removePaletteFile">
           <property name="font">
@@ -308,8 +296,20 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="addPaletteFile">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Add File</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QTreeWidget" name="fileList">
+         <widget class="QListWidget" name="fileList">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
@@ -318,19 +318,9 @@
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
-          <attribute name="headerDefaultSectionSize">
-           <number>100</number>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>File</string>
-           </property>
-          </column>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
          </widget>
         </item>
        </layout>
@@ -538,7 +528,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/invert_colorbar.png</normaloff>:/icons/invert_colorbar.png</iconset>
    </property>
    <property name="text">
@@ -550,7 +540,7 @@
   </action>
   <action name="actionCutoff">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/expand.png</normaloff>:/icons/expand.png</iconset>
    </property>
    <property name="text">
@@ -565,7 +555,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/histoNorm.png</normaloff>
      <normalon>:/icons/histolog.png</normalon>:/icons/histoNorm.png</iconset>
    </property>
@@ -607,8 +597,6 @@
   <tabstop>paletteColorlist</tabstop>
   <tabstop>colorbarTabs</tabstop>
  </tabstops>
- <resources>
-  <include location="../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

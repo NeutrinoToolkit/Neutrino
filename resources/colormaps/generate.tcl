@@ -7,17 +7,16 @@ set fin [open [file join [file dirname [info script]] "definitions.txt"] r]
 seek $fin 0
 set i 0
 while {! [eof $fin]} {
-	set linea [gets $fin]
+	set linea [string trim [gets $fin]]
 	if { [string index $linea 0] != "\#" && [string is alnum $linea] == 0} {
 		set splitlinea [split $linea ";"]
 		set name [string trim [lindex $splitlinea 0]]
 		set cmap [string trim [lindex $splitlinea 1]]
 
-	    set foutname [file join [file dirname [info script]] "cmaps" "gnuplot_[format %03d $i]"]
+	    set foutname [file join [file dirname [info script]] "cmaps" "$name"]
+	    puts "$foutname $cmap"
 	    set fout [open $foutname w ]
 		incr i;
-	    puts "$foutname $name $cmap"
-		puts $fout "# $name"
 		regsub -all {"} $cmap {\"} cmap
  		set command [concat "gnuplot -e \"set palette" $cmap "; show palette palette 256\""]
   		set gnuplot [open "| $command 2>@stdout" w+]
