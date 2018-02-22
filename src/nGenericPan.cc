@@ -37,10 +37,12 @@ nGenericPan::nGenericPan(neutrino *myparent)
       my_help(new Ui::PanHelp)
 {
     if (nparent==nullptr || napp==nullptr) return;
-
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
     setAttribute(Qt::WA_DeleteOnClose);
+
+    setProperty("numpan",nparent->property("numpan").toInt()+1);
+    nparent->setProperty("numpan",property("numpan"));
 
     connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
 
@@ -77,10 +79,10 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
     if (nparent) {
         int position = nparent->getBufferList().indexOf(buffer);
         name=QString::fromUtf8(buffer->getName().c_str());
-        if (!combo->property("neuSave-physNameLength").isValid()) {
-            combo->setProperty("neuSave-physNameLength",nparent->property("neuSave-physNameLength"));
+        if (!combo->property("NeuSave-physNameLength").isValid()) {
+            combo->setProperty("NeuSave-physNameLength",nparent->property("NeuSave-physNameLength"));
         }
-        int len=combo->property("neuSave-physNameLength").toInt();
+        int len=combo->property("NeuSave-physNameLength").toInt();
         qDebug() << combo << len << name << name.length();
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
@@ -88,6 +90,11 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
         name.prepend(QString::number(position)+" : ");
     }
     return name;
+}
+
+void nGenericPan::keyPressEvent(QKeyEvent *event) {
+    qDebug() << event;
+    event->accept();
 }
 
 void nGenericPan::physAdd(nPhysD *buffer) {
@@ -215,7 +222,8 @@ void nGenericPan::decorate(QWidget *main_widget) {
 
 }
 
-void nGenericPan::showEvent(QShowEvent* event) {
+void nGenericPan::show() {
+
     qDebug() << metaObject()->className();
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
@@ -224,7 +232,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
     setProperty("NeuSave-fileIni",panName()+".ini");
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
-    setWindowTitle(nparent->property("winId").toString()+": "+panName());
+    setWindowTitle(nparent->property("winId").toString()+": "+panName()+" "+property("numpan").toString());
 
     decorate(this);
 
@@ -237,9 +245,18 @@ void nGenericPan::showEvent(QShowEvent* event) {
             my_tool->addWidget(spacer);
 
             my_tool->addAction(QIcon(":icons/icon.png"),tr("Raise viewer"),this,SLOT(raiseNeutrino()));
-            my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,SLOT(loadSettings()));
-            my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,SLOT(saveSettings()));
 
+            bool needPrefToolButtons=false;
+            foreach (QWidget *wdgt, findChildren<QWidget *>()) {
+                if (wdgt->property("neutrinoSave").isValid()) {
+                    needPrefToolButtons=true;
+                    break;
+                }
+            }
+            if(needPrefToolButtons) {
+                my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,SLOT(loadSettings()));
+                my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,SLOT(saveSettings()));
+            }
             QFile helpFile(":/"+panName()+"README.html");
             if (helpFile.exists()) {
                 setProperty("helpFile",helpFile.fileName());
@@ -248,8 +265,6 @@ void nGenericPan::showEvent(QShowEvent* event) {
             break;
         }
     }
-
-
 
     QSize iconSize;
     foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {
@@ -289,7 +304,7 @@ void nGenericPan::showEvent(QShowEvent* event) {
 
     nparent->emitPanAdd(this);
 
-    show();
+    QMainWindow::show();
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {

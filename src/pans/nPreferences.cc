@@ -115,10 +115,10 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
-    my_w.askCloseUnsaved->setChecked(nparent->property("neuSave-askCloseUnsaved").toBool());
+    my_w.askCloseUnsaved->setChecked(nparent->property("NeuSave-askCloseUnsaved").toBool());
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
 
-    my_w.physNameLength->setValue(nparent->property("neuSave-physNameLength").toInt());
+    my_w.physNameLength->setValue(nparent->property("NeuSave-physNameLength").toInt());
 	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
 	QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
@@ -236,7 +236,7 @@ void nPreferences::showEvent(QShowEvent*e){
 }
 
 void nPreferences::changephysNameLength(int k) {
-    nparent->setProperty("neuSave-physNameLength",k);
+    nparent->setProperty("NeuSave-physNameLength",k);
 }
 
 

@@ -62,9 +62,6 @@ public slots:
 
     nPhysD*	getPhys(QTreeWidgetItem*);
     void changeProperties();
-    void panAdd(nGenericPan*);
-    void panDel(nGenericPan*);
-    void panClicked(QListWidgetItem*);
 
     void setFreezed(bool);
     void originChanged();

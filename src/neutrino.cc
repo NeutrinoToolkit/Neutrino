@@ -101,16 +101,14 @@ neutrino::neutrino():
 
 //    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
-    int numwin=qApp->property("numWin").toInt()+1;
-    qApp->setProperty("numWin",numwin);
-    setProperty("winId",numwin);
+    setProperty("winId",qApp->property("numWin").toInt()+1);
+    qApp->setProperty("numWin",property("winId"));
 
-    setProperty("neuSave-gamma",1);
-    setProperty("neuSave-physNameLength",40);
-
+    setProperty("NeuSave-gamma",1);
+    setProperty("NeuSave-physNameLength",40);
     setProperty("NeuSave-askCloseUnsaved",true);
 
-    setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
+    setWindowTitle(property("winId").toString()+QString(": Neutrino"));
 
     QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
     foreach (QAction * act, my_w->menuTransformation->actions()) {
@@ -124,7 +122,6 @@ neutrino::neutrino():
         }
     }
     connect(my_w->actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
-
 
     QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
@@ -169,7 +166,7 @@ neutrino::neutrino():
 
     connect(my_w->actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
 
-    connect(my_w->actionClose, SIGNAL(triggered()), this, SLOT(fileClose()));
+    connect(my_w->actionClose, SIGNAL(triggered()), this, SLOT(close()));
     connect(my_w->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
     connect(my_w->actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
 
@@ -263,10 +260,6 @@ neutrino::neutrino():
     show();
 
     QApplication::processEvents();
-
-    //#ifdef  __phys_debug
-    //    if (numwin==1 && recentFileActs.size()>0)	recentFileActs.first()->trigger();
-    //#endif
 
     connect(&timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
     timerSaveDefaults.start(60000); // 1 min
@@ -599,7 +592,7 @@ void neutrino::updateRecentFileActions(QString fname)
 
 void neutrino::setGamma(int value) {
     my_w->my_view->setGamma(value);
-    setProperty("neuSave-gamma",value);
+    setProperty("NeuSave-gamma",value);
 }
 
 nGenericPan* neutrino::existsPan(QString name) {
@@ -782,7 +775,7 @@ void neutrino::saveSession (QString fname) {
                 my_w->my_view->physList.at(i)->setType(PHYS_FILE);
             }
             for (int i=0;i<panList.size(); i++) {
-                QString namePan=panList.at(i)->metaObject()->className();
+                QString pName=panList.at(i)->metaObject()->className();
                 QTemporaryFile tmpFile(this);
                 if (tmpFile.open()) {
                     QString tmp_filename=tmpFile.fileName();
@@ -794,7 +787,7 @@ void neutrino::saveSession (QString fname) {
                     tmpFile.close();
                     QFile file(tmp_filename);
                     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                        ofile << "NeutrinoPan-begin " << namePan.toStdString() << std::endl;
+                        ofile << "NeutrinoPan-begin " << pName.toStdString() << std::endl;
                         ofile.flush();
                         while (!file.atEnd()) {
                             QByteArray line = file.readLine();
@@ -802,7 +795,7 @@ void neutrino::saveSession (QString fname) {
                         }
                         file.close();
                         file.remove();
-                        ofile << "NeutrinoPan-end " << namePan.toStdString() << std::endl;
+                        ofile << "NeutrinoPan-end " << pName.toStdString() << std::endl;
                         ofile.flush();
                     } else {
                         QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
@@ -871,14 +864,14 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             addPhys(my_phys);
                         }
                         QStringList listLine=qLine.split(" ");
-                        QString panName=listLine.at(1);
+                        QString pName=listLine.at(1);
                         QApplication::processEvents();
 
                         for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i) {
                             qDebug() << "method:" << metaObject()->method(i).methodSignature();
                         }
 
-                        nGenericPan *my_pan=openPan(panName, false);
+                        nGenericPan *my_pan=openPan(pName, false);
 
                         if (my_pan) {
                             QApplication::processEvents();
@@ -899,7 +892,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             QApplication::processEvents();
                             tmpFile.close(); // this should also remove it...
                         } else {
-                            QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+panName,  QMessageBox::Ok);
+                            QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+pName,  QMessageBox::Ok);
                         }
 
                     }
@@ -997,7 +990,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 void
 neutrino::showPhys(nPhysD* my_phys) {
     if (my_phys && !my_phys->property.have("gamma")) {
-        my_phys->property["gamma"]=property("neuSave-gamma").toInt();
+        my_phys->property["gamma"]=property("NeuSave-gamma").toInt();
     }
     my_w->my_view->showPhys(my_phys);
 }
@@ -1085,13 +1078,21 @@ void neutrino::toggleGrid() {
 
 void neutrino::closeEvent (QCloseEvent *e) {
     qDebug() << "here" << sender();
-    disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-    if (fileClose()) {
-        saveDefaults();
-        e->accept();
+    qDebug() << QApplication::activeWindow();
+    if (QApplication::activeWindow() == this) {
+        disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        if (fileClose()) {
+            saveDefaults();
+            e->accept();
+        } else {
+            e->ignore();
+            connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        }
     } else {
+        if (QApplication::activeWindow()) {
+            QApplication::activeWindow()->close();
+        }
         e->ignore();
-        connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     }
 }
 
@@ -1665,21 +1666,21 @@ nRect* neutrino::rect(QString name) {
 }
 
 
-nGenericPan* neutrino::openPan(QString panName, bool force) {
+nGenericPan* neutrino::openPan(QString pName, bool force) {
 
     nGenericPan *my_pan=nullptr;
 
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << panName;
-    int methodIdx=metaObject()->indexOfMethod((panName+"()").toLatin1().constData());
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << pName;
+    int methodIdx=metaObject()->indexOfMethod((pName+"()").toLatin1().constData());
     qDebug() << "methodIdx" << methodIdx;
-    if (methodIdx<0 && panName.size()>1) {
-        QString other_panName=panName;
-        other_panName.remove(0,1);
-        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
-        methodIdx=metaObject()->indexOfMethod((other_panName+"()").toLatin1().constData());
-        qDebug() << "methodIdx" << methodIdx << panName << other_panName;
+    if (methodIdx<0 && pName.size()>1) {
+        QString othe_pName=pName;
+        othe_pName.remove(0,1);
+        qDebug() << "methodIdx" << methodIdx << pName << othe_pName;
+        methodIdx=metaObject()->indexOfMethod((othe_pName+"()").toLatin1().constData());
+        qDebug() << "methodIdx" << methodIdx << pName << othe_pName;
         if (methodIdx>=0) {
-            panName=other_panName;
+            pName=othe_pName;
         }
     }
     qDebug() << "methodIdx" << methodIdx;
@@ -1687,7 +1688,7 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
     if (methodIdx>=0) {
         if (!strcmp(metaObject()->method(methodIdx).typeName(),"nGenericPan*") &&
                 metaObject()->method(methodIdx).parameterTypes().empty()) {
-            QMetaObject::invokeMethod(this,panName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
+            QMetaObject::invokeMethod(this,pName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
         }
     }
     if (my_pan==nullptr) {
@@ -1696,9 +1697,8 @@ nGenericPan* neutrino::openPan(QString panName, bool force) {
                 nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
                 qDebug() << my_action->data() << my_qplugin;
                 if (my_qplugin!=nullptr) {
-                    qDebug() << panName << "plugin action" << my_qplugin->name();
-//                    if (panName==my_qplugin->name() || (panName.left(1)=="n" && panName.right(panName.size()-1) == my_qplugin->name())) {
-                    if (panName==my_qplugin->name()) {
+                    qDebug() << pName << "plugin action" << my_qplugin->name();
+                    if (pName==my_qplugin->name()) {
                         my_qplugin->launch();
                         QApplication::processEvents();
                         QObject *p_obj = my_qplugin->instance();

@@ -151,9 +151,12 @@ public slots:
     void button(QString, int=1);
     QStringList widgets();
 
+    void show();
+
+    void keyPressEvent(QKeyEvent *event) override;
+
 protected:
     void decorate(QWidget *wdg);
-    void showEvent( QShowEvent* event );
     void focusOutEvent(QFocusEvent *event);
 
 };

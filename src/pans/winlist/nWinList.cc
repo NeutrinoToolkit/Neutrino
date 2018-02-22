@@ -50,16 +50,6 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
 		physAdd(phys);
 	}
 
-    QWidget* empty = new QWidget(this);
-    empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    my_w.toolBar->insertWidget(my_w.actionPans,empty);
-
-    my_w.pans->setVisible(my_w.actionPans->isChecked());
-    my_w.images->setHidden(my_w.actionPans->isChecked());
-
-    //	my_w.statusBar->addPermanentWidget(my_w.line,1);
-
-    connect(my_w.pans, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(panClicked(QListWidgetItem*)));
     connect(my_w.actionShort, SIGNAL(triggered()), this, SLOT(changeProperties()));
     connect(my_w.actionName, SIGNAL(triggered()), this, SLOT(changeProperties()));
     connect(my_w.actionOrigin, SIGNAL(triggered()), this, SLOT(changeProperties()));
@@ -68,11 +58,6 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(buttonCopyPhys()));
     connect(my_w.actionFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreezed(bool)));
 
-    connect(nparent, SIGNAL(panAdd(nGenericPan*)), this, SLOT(panAdd(nGenericPan*)));
-    connect(nparent, SIGNAL(panDel(nGenericPan*)), this, SLOT(panDel(nGenericPan*)));
-    foreach (nGenericPan* pan, nparent->getPanList()) {
-        panAdd(pan);
-    }
     show();
 }
 
@@ -260,30 +245,6 @@ void nWinList::keyPressEvent(QKeyEvent *e){
     e->accept();
 }
 
-
-void
-nWinList::panAdd(nGenericPan *pan) {
-    if (pan->panName()!=panName()) {
-        QListWidgetItem *item=new QListWidgetItem(pan->panName(),my_w.pans);
-        item->setData(Qt::UserRole,qVariantFromValue((void*)pan));
-        my_w.pans->addItem(item);
-    }
-}
-
-void
-nWinList::panDel(nGenericPan *pan) {
-    foreach (QListWidgetItem * item,my_w.pans->findItems(pan->panName(),Qt::MatchExactly)) {
-        delete item;
-    }
-}
-
-void
-nWinList::panClicked(QListWidgetItem* item) {
-    nGenericPan* pan=(nGenericPan*)(item->data(Qt::UserRole).value<void*>());
-    if (pan) {
-        pan->raiseIt();
-    }
-}
 
 void
 nWinList::updatePad(nPhysD *my_phys) {
