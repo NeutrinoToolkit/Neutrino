@@ -526,7 +526,7 @@ void nView::mouseDoubleClickEvent (QMouseEvent *e) {
 
 void nView::mousePressEvent (QMouseEvent *e)
 {
-    qDebug() << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>";
+//    qDebug() << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>";
     QGraphicsView::mousePressEvent(e);
     if (e->modifiers()&Qt::ControlModifier && currentBuffer) {
         minMax=currentBuffer->get_min_max().swap();
@@ -536,7 +536,7 @@ void nView::mousePressEvent (QMouseEvent *e)
 
 void nView::mouseReleaseEvent (QMouseEvent *e)
 {
-    qDebug() << "end " << e;
+//    qDebug() << "end " << e;
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {

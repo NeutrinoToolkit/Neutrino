@@ -44,13 +44,15 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 
 nPhysD* nPhysPyWrapper::new_nPhysD() {
     nPhysD *my_phys= new nPhysD();
+    my_phys->setType(PHYS_DYN);
     my_phys->property["keep_phys_alive"]=42;
     return my_phys;
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
     DEBUG("here");
-    nPhysD *phys=new nPhysD();
+    nPhysD *phys=new nPhysD(PHYS_DYN);
+    phys->setType(PHYS_DYN);
     int h=my_shape.first; // row major: first rows(yw or height) than columns(xw or widthv)
     int w=my_shape.second;
     
@@ -71,6 +73,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
 nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
     DEBUG("here");
     nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
+    phys->setType(PHYS_DYN);
     phys->property["keep_phys_alive"]=42;
     return phys;
 }
@@ -98,7 +101,6 @@ void nPhysPyWrapper::neutrino_init_numpy()
     import_array();
 }
 
-#define __map_numpy(__arr,__my_phys,__numpy_type,__cplusplus_type) case __numpy_type : {__cplusplus_type *data = (__cplusplus_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     neutrino_init_numpy();
@@ -119,26 +121,30 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             DEBUG("name ------------------>" << name);
             Py_DECREF(objectsRepresentation);
             nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
+            my_phys->setType(PHYS_DYN);
             my_phys->setShortName("ndarray");
 
+#define __map_numpy(__arr,__my_phys,__cpp_type)  {__cpp_type *data = (__cpp_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
+
             switch (PyArray_TYPE(my_arr)) {
-                __map_numpy(my_arr,my_phys,NPY_BOOL        , bool                  );
-                __map_numpy(my_arr,my_phys,NPY_UBYTE       , char                  );
-                __map_numpy(my_arr,my_phys,NPY_SHORT       , short                 );
-                __map_numpy(my_arr,my_phys,NPY_USHORT      , unsigned short        );
-                __map_numpy(my_arr,my_phys,NPY_INT         , int                   );
-                __map_numpy(my_arr,my_phys,NPY_UINT        , unsigned int          );
-                __map_numpy(my_arr,my_phys,NPY_LONG        , long int              );
-                __map_numpy(my_arr,my_phys,NPY_ULONG       , unsigned long int     );
-                __map_numpy(my_arr,my_phys,NPY_LONGLONG    , long long int         );
-                __map_numpy(my_arr,my_phys,NPY_ULONGLONG   , unsigned long long int);
-                __map_numpy(my_arr,my_phys,NPY_FLOAT       , float                 );
-                __map_numpy(my_arr,my_phys,NPY_DOUBLE      , double                );
-                __map_numpy(my_arr,my_phys,NPY_LONGDOUBLE  , long double           );
+                case NPY_BOOL        : __map_numpy(my_arr,my_phys, bool                  );
+                case NPY_UBYTE       : __map_numpy(my_arr,my_phys, char                  );
+                case NPY_SHORT       : __map_numpy(my_arr,my_phys, short                 );
+                case NPY_USHORT      : __map_numpy(my_arr,my_phys, unsigned short        );
+                case NPY_INT         : __map_numpy(my_arr,my_phys, int                   );
+                case NPY_UINT        : __map_numpy(my_arr,my_phys, unsigned int          );
+                case NPY_LONG        : __map_numpy(my_arr,my_phys, long int              );
+                case NPY_ULONG       : __map_numpy(my_arr,my_phys, unsigned long int     );
+                case NPY_LONGLONG    : __map_numpy(my_arr,my_phys, long long int         );
+                case NPY_ULONGLONG   : __map_numpy(my_arr,my_phys, unsigned long long int);
+                case NPY_FLOAT       : __map_numpy(my_arr,my_phys, float                 );
+                case NPY_DOUBLE      : __map_numpy(my_arr,my_phys, double                );
+                case NPY_LONGDOUBLE  : __map_numpy(my_arr,my_phys, long double           );
                 default:
                     DEBUG("it's a trap!")
                             break;
             }
+
             if (PyArray_ISFORTRAN(my_arr)) {
                 phys_transpose(*my_phys);
             }

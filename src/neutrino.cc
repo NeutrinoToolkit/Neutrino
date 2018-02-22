@@ -108,6 +108,8 @@ neutrino::neutrino():
     setProperty("neuSave-gamma",1);
     setProperty("neuSave-physNameLength",40);
 
+    setProperty("NeuSave-askCloseUnsaved",true);
+
     setWindowTitle(QString::number(numwin)+QString(": Neutrino"));
 
     QString menuTransformationDefault=QSettings("neutrino","").value("menuTransformationDefault", "").toString();
@@ -1082,6 +1084,7 @@ void neutrino::toggleGrid() {
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
+    qDebug() << "here" << sender();
     disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     if (fileClose()) {
         saveDefaults();
@@ -1345,58 +1348,52 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
 bool
 neutrino::fileClose() {
     saveDefaults();
-    if (QApplication::activeWindow() == this) {
-        bool askAll=true;
-        QApplication::processEvents();
-        foreach (nGenericPan* pan, panList) {
-            pan->hide();
-            pan->close();
-            QApplication::processEvents();
-        }
-        foreach (nPhysD *phys, my_w->my_view->physList) {
-            if (askAll && phys->getType()==	PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
-                int res=QMessageBox::warning(this,tr("Attention"),
-                                             tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
-                                             QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
-                switch (res) {
-                    case QMessageBox::Yes:
-                        fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
-                        break;
-                    case QMessageBox::NoToAll:
-                        askAll=false;
-                        break;
-                    case QMessageBox::Cancel:
-                        return false;
-                        break;
-                }
+    qDebug() << "here" << sender();
+    bool askAll=true;
+    foreach (nPhysD *phys, my_w->my_view->physList) {
+        DEBUG( phys->getName() << " " << phys->getType());
+        if (askAll && phys->getType()==	PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
+            int res=QMessageBox::warning(this,tr("Attention"),
+                                         tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
+                                         QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
+            switch (res) {
+                case QMessageBox::Yes:
+                    fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
+                    break;
+                case QMessageBox::NoToAll:
+                    askAll=false;
+                    break;
+                case QMessageBox::Cancel:
+                    return false;
+                    break;
             }
         }
-
-        foreach (nGenericPan *pan, panList) {
-            pan->close();
-        }
-        QApplication::processEvents();
-        my_w->my_view->currentBuffer=NULL;
-        foreach (nPhysD *phys, my_w->my_view->physList) {
-            delete phys;
-        }
-        //#ifdef HAVE_PYTHONQT
-        //        PythonQt::self()->getMainModule().removeVariable(objectName());
-        //#endif
-
-        deleteLater();
-        return true;
-    } else {
-        nGenericPan *pan=qobject_cast<nGenericPan *>(QApplication::activeWindow());
-        if (pan) pan->close();
-        return false;
     }
+
+    foreach (nGenericPan *pan, panList) {
+        pan->close();
+    }
+    QApplication::processEvents();
+    my_w->my_view->currentBuffer=NULL;
+    foreach (nPhysD *phys, my_w->my_view->physList) {
+        delete phys;
+    }
+
+    QApplication::processEvents();
+    foreach (nGenericPan* pan, panList) {
+        pan->hide();
+        pan->close();
+        QApplication::processEvents();
+    }
+
+    deleteLater();
+    return true;
 }
 
 void
 neutrino::closeCurrentBuffer() {
     if (my_w->my_view->currentBuffer)  {
-        if (my_w->my_view->currentBuffer->getType()==PHYS_DYN && property("askCloseUnsaved").toBool()==true) {
+        if (my_w->my_view->currentBuffer->getType()==PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString("\n")+QString::fromUtf8(my_w->my_view->currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);

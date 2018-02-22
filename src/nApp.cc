@@ -57,12 +57,9 @@ void nApp::addPalettes() {
             addPaletteFile(it.next());
         }
     }
-
 }
 
 void nApp::addPaletteFile(QString cmapfile) {
-    qDebug() << cmapfile;
-
     QFile inputFile(cmapfile);
     if (inputFile.open(QIODevice::ReadOnly)) {
        QTextStream in(&inputFile);
@@ -155,7 +152,10 @@ void nApp::addPaletteFromString(QString paletteStr) {
 
 void nApp::closeAllWindows() {
     qDebug() << "here" << sender();
-    QApplication::closeAllWindows();
+    for(auto &neu : neus()) {
+        neu->close();
+    }
+//    QApplication::closeAllWindows();
 };
 
 

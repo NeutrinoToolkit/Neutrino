@@ -218,8 +218,7 @@ void nGenericPan::decorate(QWidget *main_widget) {
 void nGenericPan::showEvent(QShowEvent* event) {
     qDebug() << metaObject()->className();
 
-    QShortcut *snapshot = new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this);
-    connect(snapshot, SIGNAL(activated()), this, SLOT(grabSave()) );
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
 
     // these properties will be automatically saved
     setProperty("NeuSave-fileIni",panName()+".ini");

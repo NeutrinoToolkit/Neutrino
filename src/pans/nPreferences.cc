@@ -115,7 +115,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
-
+    my_w.askCloseUnsaved->setChecked(nparent->property("neuSave-askCloseUnsaved").toBool());
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
 
     my_w.physNameLength->setValue(nparent->property("neuSave-physNameLength").toInt());
@@ -179,7 +179,7 @@ void nPreferences::resetSettings() {
 }
 
 void nPreferences::askCloseUnsaved() {
-	nparent->setProperty("askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
+    nparent->setProperty("NeuSave-askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
 }
 
 void nPreferences::changeShowDimPixel() {

@@ -37,11 +37,11 @@ nObject::~nObject() {
 
 nObject::nObject(nGenericPan *parentPan, int level, QString cname) : nObject(parentPan->nparent, cname)
 {
-	my_w.name->setText(parentPan->panName()+cname);
-	setProperty("parentPan", QVariant::fromValue(parentPan));
-	setProperty("parentPanControlLevel",level);
-	if (level>0) {
-		my_w.name->setReadOnly(true);
+    my_w.name->setText(parentPan->panName()+cname);
+    setProperty("parentPan", QVariant::fromValue(parentPan));
+    setProperty("parentPanControlLevel",level);
+    if (level>0) {
+        my_w.name->setReadOnly(true);
 		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
 
 		disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
@@ -179,24 +179,24 @@ void nObject::bufferChanged(nPhysD* my_phys) {
 
 void nObject::interactive ( ) {
 	showMessage(tr("Click and drag"),5000);
-	if (ref.size()==0) {
-		connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-		connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
-		appendPoint();
-		appendPoint();
-		moveRef.clear();
-		moveRef << 0 << 1;
-	} else {
-		if (moveRef.size()==2) {
-			disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-			moveRef.removeAt(0);
-			showMessage(tr("Drag"),5000);
-		} else if(moveRef.size()==1) {
-			moveRef.clear();
-			disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
-			showMessage("");
-		}
-	}
+    qDebug() << "here" << moveRef << sender();
+    switch (ref.size()) {
+        case 0:
+            connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
+            connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+            appendPoint();
+            moveRef << 0 ;
+            break;
+        case 1:
+            appendPoint();
+            moveRef.clear();
+            moveRef << 1 ;
+        case 2:
+            disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
+            disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+        default:
+            break;
+    }
 }
 
 void nObject::hoverEnterEvent( QGraphicsSceneHoverEvent *){
