@@ -106,6 +106,10 @@ neutrino::neutrino():
 
     setProperty("NeuSave-gamma",1);
     setProperty("NeuSave-physNameLength",40);
+
+    setProperty("NeuSave-lockOrigin",QVariant());
+    setProperty("NeuSave-lockScale",QVariant());
+
     setProperty("NeuSave-askCloseUnsaved",true);
 
     setWindowTitle(property("winId").toString()+QString(": Neutrino"));
@@ -506,9 +510,12 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
-    QAction *act = new QAction(pan->windowTitle(),this);
+    QAction *act = new QAction(pan->panName(),this);
+    QVariant v;
+    v.setValue(pan);
+    act->setData(v);
     connect(act, SIGNAL(triggered()),pan, SLOT(raiseIt()));
-    my_w->menuOpen_Pans->addAction(act);
+    my_w->menuWindow->addAction(act);
 
     panList.removeAll(pan);
     panList.append(pan);
@@ -516,8 +523,8 @@ void neutrino::emitPanAdd(nGenericPan* pan) {
 }
 
 void neutrino::emitPanDel(nGenericPan* pan) {
-    foreach (QAction *action,  my_w->menuOpen_Pans->actions()) {
-        if (action->text() == pan->windowTitle()) {
+    foreach (QAction *action,  my_w->menuWindow->actions()) {
+        if (action->data().value<nGenericPan*>() == pan) {
             action->deleteLater();
         }
      }
@@ -914,6 +921,14 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 void neutrino::addPhys(nPhysD* datamatrix) {
     if (datamatrix && datamatrix->getSurf()>0 && !my_w->my_view->physList.contains(datamatrix))	{
         my_w->my_view->physList << datamatrix;
+        if (property("NeuSave-lockOrigin").isValid()) {
+            QPointF p=property("NeuSave-lockOrigin").toPointF();
+            datamatrix->set_origin(p.x(),p.y());
+        }
+        if (property("NeuSave-lockScale").isValid()) {
+            QPointF p=property("NeuSave-lockScale").toPointF();
+            datamatrix->set_scale(p.x(),p.y());
+        }
         addMenuBuffers(datamatrix);
         emit physAdd(datamatrix);
     }

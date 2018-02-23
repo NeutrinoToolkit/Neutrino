@@ -60,6 +60,11 @@ public slots:
     void on_addPlugin_released();
     void on_removePlugin_released();
 
+    void on_getOrigin_released();
+    void on_getScale_released();
+    void on_lockOrigin_released();
+    void on_lockScale_released();
+
 };
 
 #endif

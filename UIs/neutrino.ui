@@ -188,13 +188,6 @@
      <addaction name="actionPlugin"/>
      <addaction name="separator"/>
     </widget>
-    <widget class="QMenu" name="menuOpen_Pans">
-     <property name="title">
-      <string>Open Pans</string>
-     </property>
-    </widget>
-    <addaction name="menuOpen_Pans"/>
-    <addaction name="separator"/>
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
     <addaction name="menuPlugins"/>
@@ -206,9 +199,21 @@
     <addaction name="actionAbout"/>
     <addaction name="actionKeyborard_shortcuts"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+    <widget class="QMenu" name="menuOthers">
+     <property name="title">
+      <string>Others</string>
+     </property>
+    </widget>
+    <addaction name="menuOthers"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage"/>
    <addaction name="menuAnalysis"/>
+   <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -617,7 +622,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -637,7 +642,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -668,7 +673,7 @@
   </action>
   <action name="actionTranspose">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
    </property>
    <property name="text">
@@ -686,6 +691,11 @@
     <string>Ctrl+9</string>
    </property>
   </action>
+  <action name="actionceppa">
+   <property name="text">
+    <string>ceppa</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -694,6 +704,8 @@
    <header>../src/graphics/nView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

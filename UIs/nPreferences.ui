@@ -38,7 +38,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -72,9 +72,6 @@
         </item>
         <item>
          <widget class="QGroupBox" name="groupBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="title">
            <string>Defaults</string>
           </property>
@@ -83,6 +80,9 @@
             <widget class="QLineEdit" name="scaleX">
              <property name="text">
               <string>1</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -102,6 +102,9 @@
              <property name="text">
               <string>1</string>
              </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="4">
@@ -109,12 +112,18 @@
              <property name="text">
               <string>0</string>
              </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="3">
             <widget class="QLineEdit" name="originX">
              <property name="text">
               <string>0</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -166,6 +175,9 @@
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="1" column="2">
@@ -179,6 +191,9 @@
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
              <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
@@ -252,7 +267,7 @@
             <widget class="QLabel" name="decimal">
              <property name="font">
               <font>
-               <pointsize>15</pointsize>
+               <pointsize>30</pointsize>
               </font>
              </property>
              <property name="toolTip">
@@ -316,7 +331,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Ask before closing unsaved buffer</string>
+           <string>Ask before closing unsaved images</string>
           </property>
           <property name="checked">
            <bool>true</bool>
