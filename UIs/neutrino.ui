@@ -97,6 +97,7 @@
     <addaction name="actionOpen_RAW"/>
     <addaction name="actionOpen_Glob"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="actionPlugin"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
@@ -180,17 +181,8 @@
      <addaction name="actionVertical"/>
      <addaction name="separator"/>
     </widget>
-    <widget class="QMenu" name="menuPlugins">
-     <property name="title">
-      <string>Plugins</string>
-     </property>
-     <addaction name="separator"/>
-     <addaction name="actionPlugin"/>
-     <addaction name="separator"/>
-    </widget>
     <addaction name="menuLineout"/>
     <addaction name="separator"/>
-    <addaction name="menuPlugins"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -654,8 +646,12 @@
    </property>
   </action>
   <action name="actionPlugin">
+   <property name="icon">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/plugin.png</normaloff>:/icons/plugin.png</iconset>
+   </property>
    <property name="text">
-    <string>Load...</string>
+    <string>Load plugin ...</string>
    </property>
   </action>
   <action name="actionOpen_Glob">

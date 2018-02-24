@@ -70,7 +70,7 @@ void nGenericPan::raiseIt() {
 }
 
 QString nGenericPan::panName() {
-    return property("panName").isValid()? property("panName").toString() : QString(metaObject()->className());
+    return property("panName").isValid()? property("panName").toString() : QString(metaObject()->className()).replace("_"," ");
 }
 
 

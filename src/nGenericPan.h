@@ -94,7 +94,7 @@ public slots:
 
     void raiseNeutrino();
 
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e) override;
 
     QString panName();
     void grabSave();
@@ -129,7 +129,7 @@ public slots:
 
     void raiseIt();
 
-    void closeEvent(QCloseEvent*);
+    void closeEvent(QCloseEvent*) override;
 
     //settings
 
@@ -157,7 +157,7 @@ public slots:
 
 protected:
     void decorate(QWidget *wdg);
-    void focusOutEvent(QFocusEvent *event);
+    void focusOutEvent(QFocusEvent *event) override;
 
 };
 

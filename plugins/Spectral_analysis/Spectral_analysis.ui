@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Spectral_analysis</class>
+ <widget class="QMainWindow" name="Spectral_analysis">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>322</width>
+    <height>316</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MathOperation</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>20</width>
+    <height>20</height>
+   </size>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="calculate">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Calculate</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="title">
+       <string>Filter</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1,1">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0" rowspan="2">
+        <widget class="QCheckBox" name="useFilter">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_9">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>H:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QDoubleSpinBox" name="filterMinX">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="prefix">
+          <string>min: </string>
+         </property>
+         <property name="suffix">
+          <string> [px]</string>
+         </property>
+         <property name="maximum">
+          <double>99999.990000000005239</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QDoubleSpinBox" name="filterMaxX">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="prefix">
+          <string>max: </string>
+         </property>
+         <property name="suffix">
+          <string> [px]</string>
+         </property>
+         <property name="maximum">
+          <double>99999.990000000005239</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_10">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>V:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QDoubleSpinBox" name="filterMinY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="prefix">
+          <string>min: </string>
+         </property>
+         <property name="suffix">
+          <string> [px]</string>
+         </property>
+         <property name="maximum">
+          <double>99999.990000000005239</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QDoubleSpinBox" name="filterMaxY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="prefix">
+          <string>max: </string>
+         </property>
+         <property name="suffix">
+          <string> [px]</string>
+         </property>
+         <property name="maximum">
+          <double>99999.990000000005239</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="title">
+       <string>Input image real and imaginary</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Real image</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="useImaginary">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Imaginary</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="imaginary">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="title">
+       <string>Output</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="spectral_transform">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>1D horizontal Fourier</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1D vertical Fourier</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2D Fourier</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="direction">
+         <property name="toolTip">
+          <string>Forward (&gt;) / Backward(&lt;)</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QComboBox" name="output_format">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+            <item>
+             <property name="text">
+              <string>Polar</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Rectagular</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Power spectrum</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Log10 power spectrum</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="doshift_cb">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Swap FFT quadrants (after for forward and before for backward)</string>
+            </property>
+            <property name="text">
+             <string>Shift</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="normalize">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Divide results by the square root of the image surface</string>
+            </property>
+            <property name="text">
+             <string>Normalize</string>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>useFilter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filterMaxX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useFilter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filterMaxY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useFilter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filterMinX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useFilter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filterMinY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useImaginary</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>imaginary</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>61</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -410,8 +410,17 @@ neutrino::scanPlugins(QString pluginsDirStr)
 {
     QDir pluginsDir(pluginsDirStr);
     if (pluginsDir.exists()) {
+
+#if defined(Q_OS_WIN)
+        QString extension("dll");
+#elif defined(Q_OS_MAC)
+        QString extension("dylib");
+#elif defined(Q_OS_LINUX)
+        QString extension("so");
+#endif
+
         foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-            if (QFileInfo(fileName).suffix() == nPlug::extension()) {
+            if (QFileInfo(fileName).suffix() == extension) {
                 loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
             }
         }
@@ -510,7 +519,8 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
-    QAction *act = new QAction(pan->panName(),this);
+    QAction *act = new QAction(pan->windowTitle(),this);
+//    QAction *act = new QAction(pan->panName().replace("_"," "),this);
     QVariant v;
     v.setValue(pan);
     act->setData(v);

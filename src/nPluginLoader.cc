@@ -37,7 +37,10 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                         QList<QAction*> my_actions = neu->my_w->toolBar->actions();
                         foreach (QAction *my_action_tmp, my_actions) {
-                            if (!(my_action_tmp->isSeparator() || my_action_tmp->menu()) && my_action_tmp->text()==name_plugin && my_action_tmp->isEnabled() && !my_action_tmp->data().isNull()) {
+                            if (!(my_action_tmp->isSeparator() || my_action_tmp->menu()) &&
+                                    my_action_tmp->text()==name_plugin &&
+                                    my_action_tmp->isEnabled() &&
+                                    !my_action_tmp->data().isNull()) {
                                 neu->my_w->toolBar->removeAction(my_action_tmp);
                             }
                         }
@@ -73,7 +76,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
 
                     QApplication::processEvents();
 
-                    QPointer<QAction>  my_action = new QAction(icon_plugin, name_plugin, nParent);
+                    QPointer<QAction>  my_action = new QAction(icon_plugin, name_plugin.replace("_"," "), nParent);
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);
@@ -101,7 +104,7 @@ QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
     QPointer<QMenu> my_menu;
 
     if (menuEntry.isEmpty()) {
-        my_menu=neu->my_w->menuPlugins;
+        my_menu=neu->my_w->menuAnalysis;
     } else {
         QStringList my_list=menuEntry.split(";");
         // need a QWidget because it might be a QToolBar or QMenu

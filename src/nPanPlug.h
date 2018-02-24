@@ -64,9 +64,9 @@ public slots:
 
     nGenericPan* pan() { return my_pan;}
 
-    bool unload();
+    bool unload() override;
 
-    bool instantiate(neutrino *neu);
+    bool instantiate(neutrino *neu) override;
 
     virtual QString menuEntryPoint() {return QString();}
 
