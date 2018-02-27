@@ -29,6 +29,7 @@ nMouse::~   nMouse() {
     my_set.beginGroup("nPreferences");
     my_set.setValue("mouseShape", my_shape);
     my_set.setValue("mouseColor", pen.color());
+    my_set.setValue("mouseThickness", pen.widthF());
     my_set.endGroup();
 }
 
@@ -43,6 +44,7 @@ nMouse::nMouse() : QGraphicsItem(),
     my_set.beginGroup("nPreferences");
     my_shape=my_set.value("mouseShape",my_shape).toInt();
     pen.setColor(my_set.value("mouseColor",pen.color()).value<QColor>());
+    pen.setWidthF(my_set.value("mouseThickness",my_shape).toDouble());
     my_set.endGroup();
 
 
@@ -58,17 +60,6 @@ QRectF nMouse::boundingRect() const {
 void nMouse::setSize(QSize my_size) {
     size=my_size;
 }
-
-void nMouse::changeColor() {
-    QColorDialog colordial(pen.color());
-    colordial.setOption(QColorDialog::ShowAlphaChannel);
-    colordial.exec();
-    if (colordial.result() && colordial.currentColor().isValid()) {
-        pen.setColor(colordial.currentColor());
-        update();
-    }
-}
-
 
 QPainterPath nMouse::shape() const {
     QPainterPath my_path;

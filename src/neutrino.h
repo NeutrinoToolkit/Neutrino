@@ -188,7 +188,7 @@ public slots:
 
     nGenericPan* WinList();
 
-    nGenericPan* Properties();
+    nGenericPan* PhysProperties();
 
     nGenericPan* Hlineout();
     nGenericPan* Vlineout();
@@ -221,8 +221,6 @@ public slots:
     nGenericPan* openRAW();
 
     nGenericPan* ColorBar();
-
-    nGenericPan* MouseInfo();
 
     void Shortcuts();
     void about();

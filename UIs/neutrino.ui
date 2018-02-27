@@ -159,7 +159,6 @@
     <addaction name="actionZoom_out"/>
     <addaction name="menuColortable"/>
     <addaction name="action99"/>
-    <addaction name="actionMouse_Info"/>
     <addaction name="separator"/>
     <addaction name="menuPaths"/>
     <addaction name="separator"/>
@@ -243,10 +242,10 @@
    <addaction name="separator"/>
    <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
-   <addaction name="actionMouseInfo"/>
    <addaction name="separator"/>
    <addaction name="actionLineoutH"/>
    <addaction name="actionLineoutV"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="text">
@@ -366,15 +365,6 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="actionMouse_Info">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//ruler.png</normaloff>:icons//ruler.png</iconset>
-   </property>
-   <property name="text">
-    <string>Mouse Info</string>
-   </property>
-  </action>
   <action name="actionHorizontal">
    <property name="icon">
     <iconset>
@@ -433,18 +423,6 @@
    </property>
    <property name="toolTip">
     <string>Color table</string>
-   </property>
-  </action>
-  <action name="actionMouseInfo">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//ruler.png</normaloff>:icons//ruler.png</iconset>
-   </property>
-   <property name="text">
-    <string>ruler</string>
-   </property>
-   <property name="toolTip">
-    <string>Point Info</string>
    </property>
   </action>
   <action name="actionLineoutH">

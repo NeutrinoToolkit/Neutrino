@@ -46,7 +46,6 @@
 
 #include "nColorBar.h"
 
-#include "nMouseInfo.h"
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
 
@@ -145,7 +144,6 @@ neutrino::neutrino():
     connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
     connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
-    connect(my_w->actionMouseInfo, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
     connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
     connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
@@ -194,7 +192,6 @@ neutrino::neutrino():
     connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
     connect(my_w->actionZoom_eq, SIGNAL(triggered()), my_w->my_view, SLOT(zoomEq()));
 
-    connect(my_w->actionMouse_Info, SIGNAL(triggered()), this, SLOT(MouseInfo()));
 
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
     connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(previousColorTable()));
@@ -213,14 +210,6 @@ neutrino::neutrino():
 
 
     connect(my_w->actionExport_pixmap, SIGNAL(triggered()), my_w->my_view, SLOT(exportPixmap()));
-
-
-
-    // ---------------------------------------------------------------------------------------------
-
-    QWidget* spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    my_w->toolBar->addWidget(spacer);
 
 
     // ---------------------------------------------------------------------------------------------
@@ -1150,16 +1139,9 @@ void neutrino::keyPressEvent (QKeyEvent *e)
                 ColorBar();
             }
             break;
-        case Qt::Key_I:
-            if (e->modifiers() & Qt::ShiftModifier) {
-                MouseInfo();
-            } else {
-                WinList();
-            }
-            break;
         case Qt::Key_P:
             if (e->modifiers() & Qt::ShiftModifier) {
-                Properties();
+                PhysProperties();
             }
             break;
         case Qt::Key_R:
@@ -1459,14 +1441,10 @@ neutrino::WinList() {
 }
 
 nGenericPan*
-neutrino::Properties() {
+neutrino::PhysProperties() {
     return new nPhysProperties(this);
 }
 
-nGenericPan*
-neutrino::MouseInfo() {
-    return new nMouseInfo(this);
-}
 
 // colortables
 

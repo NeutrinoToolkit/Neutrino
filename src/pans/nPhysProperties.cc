@@ -72,9 +72,8 @@ nPhysProperties::showProperty() {
         DEBUG(currentKey);
         DEBUG(currentBuffer);
         if (currentBuffer) {
-            QVariant my_variant=toVariant(currentBuffer->property[currentKey]);
-            DEBUG(my_variant.toString().toStdString());
-            my_w.propertyValue->setPlainText(my_variant.toString());
+            std::string myval=currentBuffer->property[currentKey];
+            my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
 		}
 	}
 }

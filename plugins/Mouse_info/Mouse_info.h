@@ -29,24 +29,24 @@
 
 #include "nGenericPan.h"
 
-#include "ui_nMouseInfo.h"
+#include "ui_Mouse_info.h"
 
-#ifndef __nMouseInfo_h
-#define __nMouseInfo_h
+#ifndef __Mouse_info_h
+#define __Mouse_info_h
 
 class neutrino;
 
-class nMouseInfo : public nGenericPan {
+class Mouse_info : public nGenericPan {
     Q_OBJECT
 
 public:
 
-    Q_INVOKABLE nMouseInfo (neutrino *parent);
+    Q_INVOKABLE Mouse_info (neutrino *parent);
     neutrino *parent(){
         return (neutrino *) QWidget::parent();
     };
 
-    Ui::MouseInfo my_w;
+    Ui::Mouse_info my_w;
     QPointF mouse;
 
 public slots:
@@ -62,6 +62,8 @@ public slots:
     QString getPointText();
     //	void bufferChanged(nPhysD*);
 };
+
+NEUTRINO_PLUGIN(Mouse_info,Analysis,":icons/ruler.png");
 
 #endif
 

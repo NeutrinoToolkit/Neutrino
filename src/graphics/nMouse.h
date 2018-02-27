@@ -43,7 +43,6 @@ public:
     QPen pen;
 
     void setSize(QSize);
-    void changeColor();
 	
 	QRectF boundingRect() const;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);

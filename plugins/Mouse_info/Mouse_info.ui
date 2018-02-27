@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MouseInfo</class>
- <widget class="QMainWindow" name="MouseInfo">
+ <class>Mouse_info</class>
+ <widget class="QMainWindow" name="Mouse_info">
   <property name="geometry">
    <rect>
     <x>0</x>

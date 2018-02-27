@@ -23,10 +23,10 @@
  *
  */
 #include "neutrino.h"
-#include "nMouseInfo.h"
+#include "Mouse_info.h"
 
 
-nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
+Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 {
 
 	my_w.setupUi(this);
@@ -50,7 +50,7 @@ nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
     show();
 }
 
-void nMouseInfo::addPoint(QPointF position) {
+void Mouse_info::addPoint(QPointF position) {
 	if (my_w.getpoints->isChecked()) {
 		int pos=my_w.points->rowCount();
 		my_w.points->insertRow(pos);
@@ -85,7 +85,7 @@ void nMouseInfo::addPoint(QPointF position) {
 	}
 }
 
-void nMouseInfo::updateOrigin() {
+void Mouse_info::updateOrigin() {
 	if (currentBuffer) {
 		bool ok1, ok2;
         double valx=QLocale().toDouble(my_w.rx->text(),&ok1);
@@ -97,7 +97,7 @@ void nMouseInfo::updateOrigin() {
     nparent->my_w->my_view->update();
 }
 
-void nMouseInfo::updateScale() {
+void Mouse_info::updateScale() {
 	if (currentBuffer) {
 		bool ok1, ok2;
         double valx=QLocale().toDouble(my_w.sc_x->text(),&ok1);
@@ -109,12 +109,12 @@ void nMouseInfo::updateScale() {
     nparent->my_w->my_view->update();
 }
 
-void nMouseInfo::setMouse(QPointF pos) {
+void Mouse_info::setMouse(QPointF pos) {
 	mouse=pos;
 	updateLabels();
 }
 
-void nMouseInfo::updateLabels() {
+void Mouse_info::updateLabels() {
 	my_w.ix->setText(QString::number(mouse.x()));
 	my_w.iy->setText(QString::number(mouse.y()));
 		
@@ -150,7 +150,7 @@ void nMouseInfo::updateLabels() {
 }
 
 QString 
-nMouseInfo::getPointText() {
+Mouse_info::getPointText() {
 	QString retText;
 	for (int i=0; i<my_w.points->rowCount(); i++) {
 		for (int j=0; j<my_w.points->columnCount();j++) {
@@ -161,14 +161,14 @@ nMouseInfo::getPointText() {
 	return retText;
 }
 
-void nMouseInfo::copyPoints() {
+void Mouse_info::copyPoints() {
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setText(getPointText());
 	statusBar()->showMessage(tr("Point values copied"),2000);
 }
 
 void
-nMouseInfo::export_txt() {
+Mouse_info::export_txt() {
     QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
 	if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
@@ -184,7 +184,7 @@ nMouseInfo::export_txt() {
 }
 
 void
-nMouseInfo::remove_point() {
+Mouse_info::remove_point() {
 	QString removedrows;
 	foreach (QTableWidgetSelectionRange r, my_w.points->selectedRanges()) {
 		for (int i=r.topRow(); i <=r.bottomRow(); i++) {

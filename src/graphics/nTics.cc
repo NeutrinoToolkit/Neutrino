@@ -32,6 +32,7 @@ nTics::~nTics() {
     my_set.setValue("rulerVisible", rulerVisible);
     my_set.setValue("gridVisible", gridVisible);
     my_set.setValue("rulerColor", rulerColor);
+    my_set.setValue("gridThickness",gridThickness);
     my_set.endGroup();
 }
 
@@ -47,6 +48,7 @@ nTics::nTics(nView *view) : QGraphicsItem(),
     rulerVisible=my_set.value("rulerVisible",rulerVisible).toBool();
     gridVisible=my_set.value("gridVisible",gridVisible).toBool();
     rulerColor=my_set.value("rulerColor",rulerColor).value<QColor>();
+    gridThickness = my_set.value("gridThickness",gridThickness).toDouble();
     my_set.endGroup();
 }
 
@@ -376,7 +378,9 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 
         //now draw the ruler
         if (rulerVisible && !gridVisible) {
-            p->setPen(QColor(rulerColor));
+            pen.setWidthF(gridThickness);
+            pen.setColor(rulerColor);
+            p->setPen(pen);
             QPainterPath ruler;
             ruler.moveTo(0,my_view->currentBuffer->get_origin().y());
             ruler.lineTo(my_view->currentBuffer->getW(),my_view->currentBuffer->get_origin().y());

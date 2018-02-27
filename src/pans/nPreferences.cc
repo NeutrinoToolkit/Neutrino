@@ -321,6 +321,13 @@ void nPreferences::setColorRuler() {
 }
 
 void nPreferences::setColorMouse() {
-    nparent->my_w->my_view->my_mouse.changeColor();
+
+    QColorDialog colordial(nparent->my_w->my_view->my_mouse.pen.color());
+    colordial.setOption(QColorDialog::ShowAlphaChannel);
+    colordial.exec();
+    if (colordial.result() && colordial.currentColor().isValid()) {
+        nparent->my_w->my_view->my_mouse.pen.setColor(colordial.currentColor());
+        update();
+    }
 }
 
