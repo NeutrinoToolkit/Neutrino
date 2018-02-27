@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0" columnstretch="1,0">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -36,7 +36,31 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="changePhysProperty">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Change property</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QCheckBox" name="applyToAll">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>apply to all images</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -61,18 +85,6 @@
         </font>
        </property>
       </widget>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="changePhysProperty">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Change property</string>
-      </property>
      </widget>
     </item>
    </layout>

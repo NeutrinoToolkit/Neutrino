@@ -41,17 +41,17 @@ nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
 void
 nPhysProperties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
+    std::string currentProperty("");
+    if (my_w.propertyList->selectedItems().size() >0) {
+        qDebug() << "here";
+        qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
+        currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
+        qDebug() << "here";
+    }
+    my_w.propertyList->clear();
+    my_w.propertyValue->clear();
+    DEBUG(currentProperty);
     if (my_phys) {
-        std::string currentProperty("");
-        if (my_w.propertyList->selectedItems().size() >0) {
-            qDebug() << "here";
-            qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
-            currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
-            qDebug() << "here";
-        }
-        my_w.propertyList->clear();
-        my_w.propertyValue->clear();
-        DEBUG(currentProperty);
         setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
         for(anymap::iterator iter=my_phys->property.begin();iter!=my_phys->property.end(); iter++ ) {
             QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
@@ -94,7 +94,13 @@ void nPhysProperties::on_changePhysProperty_pressed() {
     }
     if (currentBuffer) {
         anydata my_val=toAnydata(pippo);
-        currentBuffer->property[item]=my_val;
+        if (my_w.applyToAll->isChecked()) {
+            for (auto & phys: nparent->getBufferList()) {
+                phys->property[item]=my_val;
+            }
+        } else {
+            currentBuffer->property[item]=my_val;
+        }
         nparent->showPhys(currentBuffer);
     }
     qDebug() << "here";
