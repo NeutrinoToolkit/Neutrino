@@ -26,12 +26,28 @@
 #include "nView.h"
 #include "neutrino.h"
 
+nTics::~nTics() {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    my_set.setValue("rulerVisible", rulerVisible);
+    my_set.setValue("gridVisible", gridVisible);
+    my_set.setValue("rulerColor", rulerColor);
+    my_set.endGroup();
+}
+
 nTics::nTics(nView *view) : QGraphicsItem(),
     my_view(view),
     color(QColor(Qt::black)),
     rulerVisible(false),
-	gridVisible(false)
+    gridVisible(false),
+    gridThickness(1.0)
 {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    rulerVisible=my_set.value("rulerVisible",rulerVisible).toBool();
+    gridVisible=my_set.value("gridVisible",gridVisible).toBool();
+    rulerColor=my_set.value("rulerColor",rulerColor).value<QColor>();
+    my_set.endGroup();
 }
 
 QFont nTics::get_font() const {
@@ -83,6 +99,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QPen pen;
         pen.setColor(color);
 		pen.setCosmetic(true);
+        pen.setWidthF(1);
 
         p->setPen(pen);
 
@@ -103,7 +120,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             if (my_sc.x()>0){
                 for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp-1;i<=5.0*(my_view->currentBuffer->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i+=1) {
                     double position=(i*ticsTmp/5.0/my_sc.x()+my_or.x());
-                    if (position>=0&&position<=my_view->currentBuffer->getW()) {
+                    if (position>=0 && position<=my_view->currentBuffer->getW()) {
                         allTics.moveTo(position,0);
                         if (i%5) {
                             allTics.lineTo(position,-0.15*p->fontMetrics().height());
@@ -124,7 +141,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             } else {
                 for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp;i>5.0*(my_view->currentBuffer->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i-=1) {
                     double position=(i*ticsTmp/5.0/my_sc.x()+my_or.x());
-                    if (position>=0&&position<=my_view->currentBuffer->getW()) {
+                    if (position>=0 && position<=my_view->currentBuffer->getW()) {
                         allTics.moveTo(position,0);
                         if (i%5) {
                             allTics.lineTo(position,-0.15*p->fontMetrics().height());
@@ -164,18 +181,16 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QSizeF labelSize=QSizeF(p->fontMetrics().width(label), p->fontMetrics().height());
         if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
 
-        //		allTics.moveTo(0,0);
-        //        allTics.lineTo(my_view->currentBuffer->getW(),0);
-        //        allTics.moveTo(0,0);
-        //		allTics.lineTo(0,my_view->currentBuffer->getH());
         allTics.addRect(0,0,my_view->currentBuffer->getW(),my_view->currentBuffer->getH());
         p->drawPath(allTics);
 
-        p->setPen(QColor(rulerColor));
+        pen.setWidthF(gridThickness);
+        pen.setColor(rulerColor);
+        p->setPen(pen);
         p->drawPath(allGrid);
-        p->setPen(QColor(color));
-
-
+        pen.setWidthF(1);
+        pen.setColor(color);
+        p->setPen(pen);
 
         int exponentY=log10(std::abs(my_sc.y()*size.height()));
         for (int k=0;k<5;k++) {
@@ -263,9 +278,13 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 
         p->drawPath(allTics);
 
-        p->setPen(QColor(rulerColor));
+        pen.setWidthF(gridThickness);
+        pen.setColor(rulerColor);
+        p->setPen(pen);
         p->drawPath(allGrid);
-        p->setPen(QColor(color));
+        pen.setWidthF(1);
+        pen.setColor(color);
+        p->setPen(pen);
 
         if (my_view->nPalettes[my_view->colorTable].size()) {
             QPen emptyPen=pen;

@@ -24,12 +24,28 @@
  */
 #include "nMouse.h"
 #include "neutrino.h"
+nMouse::~   nMouse() {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    my_set.setValue("mouseShape", my_shape);
+    my_set.setValue("mouseColor", pen.color());
+    my_set.endGroup();
+}
 
 nMouse::nMouse() : QGraphicsItem(),
     my_shape(0),
+    mouseThickness(1.0),
     size(100,100)
 {
     pen.setCosmetic(true);
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    my_shape=my_set.value("mouseShape",my_shape).toInt();
+    pen.setColor(my_set.value("mouseColor",pen.color()).value<QColor>());
+    my_set.endGroup();
+
+
 }
 
 // reimplementation

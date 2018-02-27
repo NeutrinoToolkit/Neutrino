@@ -43,9 +43,11 @@ Lineout_XY::Lineout_XY(neutrino *parent) : nGenericPan(parent)
             my_w.plot->graph(k)->keyAxis()->setRange(currentBuffer->getW(),currentBuffer->getH());
             my_w.plot->graph(k)->valueAxis()->setRange(currentBuffer->get_min(),currentBuffer->get_max());
         }
+        my_w.plot->graph(0)->setAntialiased(false);
     }
     my_w.plot->graph(0)->setName("Horizontal");
     my_w.plot->graph(1)->setName("Vertical");
+
 
     show();
     setBehaviour();
@@ -76,25 +78,30 @@ void Lineout_XY::updatePlot(QPointF p) {
         vec2 b_o((int)orig.x(),(int)orig.y());
         vec2 b_c((int)corner.x(),(int)corner.y());
 
-        for (int k=0;k<2;k++) {
-            phys_direction cut_dir=k==0?PHYS_HORIZONTAL:PHYS_VERTICAL;
-            phys_direction oth_dir=k==0?PHYS_VERTICAL:PHYS_HORIZONTAL;
+        std::array<phys_direction,2> cut_dir={{PHYS_HORIZONTAL,PHYS_VERTICAL}};
+        std::array<phys_direction,2> oth_dir={{PHYS_VERTICAL,PHYS_HORIZONTAL}};
 
-            size_t lat_skip = std::max(b_o(cut_dir), 0);
-            size_t z_size = std::min(b_c(cut_dir)-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);
+        vec2f origin=currentBuffer->get_origin();
+        vec2f scale=currentBuffer->get_scale();
+        vec2 size=currentBuffer->get_size();
+
+        for (int k=0;k<2;k++) {
+
+            size_t lat_skip = std::max(b_o(cut_dir[k]), 0);
+            size_t z_size = std::min(b_c(cut_dir[k])-lat_skip, size(cut_dir[k])-lat_skip);
 
             QVector<double> x(z_size);
             for (unsigned int i=0;i<z_size;i++){
-                x[i]=(i+lat_skip-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
+                x[i]=(i+lat_skip-origin(cut_dir[k]))*scale(cut_dir[k]);
             }
             QVector<double> y(z_size);
             if (k==0) {
                 for (unsigned int i=0;i<z_size;i++){
-                    y[i]=currentBuffer->point(i+lat_skip,b_p(oth_dir));
+                    y[i]=currentBuffer->point(i+lat_skip,b_p(oth_dir[k]));
                 }
             } else {
                 for (unsigned int i=0;i<z_size;i++){
-                    y[i]=currentBuffer->point(b_p(oth_dir),i+lat_skip);
+                    y[i]=currentBuffer->point(b_p(oth_dir[k]),i+lat_skip);
                 }
             }
             my_w.plot->graph(k)->setData(x,y);
@@ -109,8 +116,7 @@ void Lineout_XY::updatePlot(QPointF p) {
                 my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
             }
 
-            vec2f phys_origin=currentBuffer->get_origin();
-            my_w.plot->setMousePosition((p.x()-phys_origin.x())*currentBuffer->get_scale(cut_dir),(p.y()-phys_origin.y())*currentBuffer->get_scale(cut_dir));
+            my_w.plot->setMousePosition((p.x()-origin.x())*scale(cut_dir[k]),(p.y()-origin.y())*scale(cut_dir[k]));
         }
 
 

@@ -33,12 +33,14 @@ class nView;
 class nTics : public QGraphicsItem {
 public:
 
+    nTics(nView*);
+    ~nTics();
+	
     nView* my_view;
 
-    nTics(nView*);
-	
-	QColor color, rulerColor;
-	bool rulerVisible,gridVisible;
+    QColor color, rulerColor;
+    bool rulerVisible, gridVisible;
+    double gridThickness;
 
 	void changeColor();
 	

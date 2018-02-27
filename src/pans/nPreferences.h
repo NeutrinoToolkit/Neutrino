@@ -65,6 +65,13 @@ public slots:
     void on_lockOrigin_released();
     void on_lockScale_released();
 
+
+    void setColorRuler();
+    void setColorMouse();
+    void on_mouseThickness_valueChanged(double);
+    void on_gridThickness_valueChanged(double);
+
 };
+
 
 #endif

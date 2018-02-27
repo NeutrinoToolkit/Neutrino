@@ -33,10 +33,11 @@ class nMouse : public QGraphicsItem {
 public:
 	
     nMouse();
-
+    ~nMouse();
     int my_shape;
-	const int num_shape=4;
+    const int num_shape=4;
 
+    double mouseThickness;
 
 	QSize size;
     QPen pen;

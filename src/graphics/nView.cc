@@ -30,11 +30,6 @@ nView::~nView ()
 {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
-    my_set.setValue("mouseShape", my_mouse.my_shape);
-    my_set.setValue("mouseColor", my_mouse.pen.color());
-    my_set.setValue("rulerVisible", my_tics.rulerVisible);
-    my_set.setValue("gridVisible", my_tics.gridVisible);
-    my_set.setValue("rulerColor", my_tics.rulerColor);
     my_set.setValue("pixmapFile", property("pixmapFile").toString());
     my_set.setValue("colorTable", colorTable);
     my_set.endGroup();
@@ -96,14 +91,11 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
-    setMouseShape(my_set.value("mouseShape",my_mouse.my_shape).toInt());
-    my_mouse.pen.setColor(my_set.value("mouseColor",my_mouse.pen.color()).value<QColor>());
-    my_tics.rulerVisible=my_set.value("rulerVisible",my_tics.rulerVisible).toBool();
-    my_tics.gridVisible=my_set.value("gridVisible",my_tics.gridVisible).toBool();
-    my_tics.rulerColor=my_set.value("rulerColor",my_tics.rulerColor).value<QColor>();
     setProperty("pixmapFile",my_set.value("pixmapFile","Pixmap.png"));
     changeColorTable(my_set.value("colorTable",colorTable).toString());
     my_set.endGroup();
+
+    setMouseShape(my_mouse.my_shape);
 }
 
 void nView::setLockColors(bool val) {

@@ -146,6 +146,10 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
 		my_w.pluginList->addItem(d);
 	}
+
+    connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
+    connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
+
 }
 
 void nPreferences::changeThreads(int num) {
@@ -277,7 +281,6 @@ void nPreferences::changephysNameLength(int k) {
     nparent->setProperty("NeuSave-physNameLength",k);
 }
 
-
 void nPreferences::on_addPlugin_released() {
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
 	if (QFileInfo(dir).exists()) {
@@ -293,5 +296,31 @@ void nPreferences::on_removePlugin_released() {
 		pluginList.append(my_w.pluginList->item(i)->text());
 	}
 	nparent->setProperty("NeuSave-plugindirs",pluginList);
+}
+
+void nPreferences::on_mouseThickness_valueChanged(double val){
+    nparent->my_w->my_view->my_mouse.pen.setWidthF(val);
+    nparent->my_w->my_view->repaint();
+    qDebug() << "here";
+}
+
+void nPreferences::on_gridThickness_valueChanged(double val) {
+    nparent->my_w->my_view->my_tics.gridThickness=val;
+    nparent->my_w->my_view->my_tics.update();
+    qDebug() << "here";
+}
+
+void nPreferences::setColorRuler() {
+    QColorDialog colordial(nparent->my_w->my_view->my_tics.rulerColor,this);
+    colordial.setOption(QColorDialog::ShowAlphaChannel);
+    colordial.exec();
+    if (colordial.result() && colordial.currentColor().isValid()) {
+        nparent->my_w->my_view->my_tics.rulerColor=colordial.currentColor();
+        nparent->my_w->my_view->my_tics.update();
+    }
+}
+
+void nPreferences::setColorMouse() {
+    nparent->my_w->my_view->my_mouse.changeColor();
 }
 

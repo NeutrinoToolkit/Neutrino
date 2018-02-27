@@ -54,8 +54,6 @@ public slots:
     void updateLabels();
     void updateOrigin();
     void updateScale();
-    void setColorRuler();
-    void setColorMouse();
     void addPoint(QPointF);
 
     void remove_point();

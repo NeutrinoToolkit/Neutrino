@@ -35,23 +35,20 @@ nMouseInfo::nMouseInfo (neutrino *parent) : nGenericPan(parent)
 	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
 	connect(my_w.exportTxt, SIGNAL(released()),this, SLOT(export_txt()));
 
-	connect(parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(setMouse(QPointF)));
+    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(setMouse(QPointF)));
 	connect(my_w.rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
 	connect(my_w.ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
 	connect(my_w.sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
 	connect(my_w.sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
 
-	connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
-	connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
-    connect(parent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
-	connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
 
-    mouse=parent->my_w->my_view->my_mouse.pos();
+    mouse=nparent->my_w->my_view->my_mouse.pos();
 	updateLabels();
     show();
 }
-
 
 void nMouseInfo::addPoint(QPointF position) {
 	if (my_w.getpoints->isChecked()) {
@@ -86,20 +83,6 @@ void nMouseInfo::addPoint(QPointF position) {
 		my_w.points->resizeRowToContents(pos);
 		statusBar()->showMessage(tr("Added point ")+QString::number(pos+1),2000);
 	}
-}
-
-void nMouseInfo::setColorRuler() {
-    QColorDialog colordial(nparent->my_w->my_view->my_tics.rulerColor,this);
-	colordial.setOption(QColorDialog::ShowAlphaChannel);
-	colordial.exec();
-	if (colordial.result() && colordial.currentColor().isValid()) {
-        nparent->my_w->my_view->my_tics.rulerColor=colordial.currentColor();
-        nparent->my_w->my_view->my_tics.update();
-	}
-}
-
-void nMouseInfo::setColorMouse() {
-    nparent->my_w->my_view->my_mouse.changeColor();
 }
 
 void nMouseInfo::updateOrigin() {
