@@ -57,19 +57,9 @@ file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
 
 
 # write automatically the qrc file for html
-set(HTMLDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/html)
-file(GLOB HTMLS ${HTMLDIR}/*.html)
-set(HTML_QRC ${QRCDIR}/html.qrc)
-file(WRITE ${HTML_QRC} "<RCC>\n    <qresource prefix=\"/html/\">\n")
-foreach(my_file ${HTMLS})
-    file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
-    GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-    file(APPEND ${HTML_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
-endforeach()
-file(APPEND ${HTML_QRC} "    </qresource>\n</RCC>")
-
+set(LICENSESDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/licenses)
 #parse neutrino license file
-file(GLOB_RECURSE HTMLLICENSES ${HTMLDIR}/licenses/*)
+file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*)
 list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
@@ -132,7 +122,7 @@ endif(Qt5LinguistTools_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
-set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${HTML_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${CMAP_QRC} ${TRASL_FILES})
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${CMAP_QRC} ${TRASL_FILES})
 
 if(APPLE)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
