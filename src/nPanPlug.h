@@ -72,6 +72,8 @@ public slots:
 
     virtual QIcon icon() { return QIcon(); }
 
+    virtual QKeySequence shortcut() {return QKeySequence();}
+
 protected:
     QPointer<nGenericPan> my_pan;
 
@@ -79,12 +81,13 @@ protected:
 
 Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 
-#define NEUTRINO_PLUGIN1(__class_name,__menu_entry, __menu_icon) Q_DECLARE_METATYPE(__class_name *);  class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } QIcon icon() {return QIcon(__menu_icon);} };
-#define NEUTRINO_PLUGIN2(__class_name,__menu_entry) NEUTRINO_PLUGIN1(__class_name,__menu_entry, )
-#define NEUTRINO_PLUGIN3(__class_name) NEUTRINO_PLUGIN1(__class_name, , )
-#define NEUTRINO_PLUGIN4(arg1,arg2,arg3,arg4,...) arg4
-#define NEUTRINO_PLUGIN5(...) NEUTRINO_PLUGIN4(__VA_ARGS__,NEUTRINO_PLUGIN1,NEUTRINO_PLUGIN2,NEUTRINO_PLUGIN3,)
-#define NEUTRINO_PLUGIN(...) NEUTRINO_PLUGIN5(__VA_ARGS__)(__VA_ARGS__)
+#define NEUTRINO_PLUGIN1(__class_name,__menu_entry, __menu_icon, __key_shortcut) Q_DECLARE_METATYPE(__class_name *);  class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(#__menu_entry); } QIcon icon() {return QIcon(__menu_icon);} QKeySequence shortcut() {return QKeySequence(__key_shortcut);} };
+#define NEUTRINO_PLUGIN2(__class_name,__menu_entry, __menu_icon) NEUTRINO_PLUGIN1(__class_name,__menu_entry, __menu_icon, )
+#define NEUTRINO_PLUGIN3(__class_name,__menu_entry) NEUTRINO_PLUGIN1(__class_name,__menu_entry, , )
+#define NEUTRINO_PLUGIN4(__class_name) NEUTRINO_PLUGIN1(__class_name, , , )
+#define NEUTRINO_PLUGIN5(arg1,arg2,arg3,arg4,arg5,...) arg5
+#define NEUTRINO_PLUGIN6(...) NEUTRINO_PLUGIN5(__VA_ARGS__,NEUTRINO_PLUGIN1,NEUTRINO_PLUGIN2,NEUTRINO_PLUGIN3,)
+#define NEUTRINO_PLUGIN(...) NEUTRINO_PLUGIN6(__VA_ARGS__)(__VA_ARGS__)
 
 
 

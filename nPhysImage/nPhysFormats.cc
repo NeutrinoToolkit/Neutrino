@@ -355,6 +355,8 @@ physShort_b16::physShort_b16(const char *ifilename)
 }
 
 
+#include <regex>
+
 physDouble_img::physDouble_img(std::string ifilename)
     : nPhysD(ifilename, PHYS_FILE) {
     
@@ -390,6 +392,7 @@ physDouble_img::physDouble_img(std::string ifilename)
         
         for (int i=0;i<25;i++) {
             ifile.read((char *)&buffer,sizeof(unsigned short));
+            DEBUG(i << " " << buffer);
             if (buffer != 0)
                 throw phys_fileerror("This file is detected as Hamamatsu ut it cannot be opened, please contact developpers");
         }
@@ -398,7 +401,39 @@ physDouble_img::physDouble_img(std::string ifilename)
         buffer2.resize(skipbyte);
         ifile.read((char *)&buffer2[0],skipbyte);
         
-        property["info"]=buffer2;
+        buffer2.erase(std::remove(buffer2.begin(), buffer2.end(), '\t'), buffer2.end());
+        buffer2.erase(std::remove(buffer2.begin(), buffer2.end(), '\r'), buffer2.end());
+        property["Hamamatsu"]=std::string(buffer2);
+
+        std::vector<std::string> strings;
+
+        std::string::size_type pos = 0;
+        std::string::size_type prev = 0;
+        while ((pos = buffer2.find("\n", prev)) != std::string::npos) {
+            strings.push_back(buffer2.substr(prev, pos - prev));
+            prev = pos + 1;
+        }
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        DEBUG(buffer2);
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        strings.push_back(buffer2.substr(prev));
+        for(unsigned int i=0; i<strings.size(); i++) {
+
+            std::stringstream ss;
+            ss << std::setw(log10(strings.size())+1) << std::setfill('0') << i;
+
+            DEBUG( ss.str() << " <> " << strings[i]);
+
+            std::regex my_regex(".*\\[(.*?)\\],(.*?)");
+
+            std::smatch m;
+            if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
+                property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
+            } else {
+                property["Hamamatsu_"+ss.str()]=strings[i];
+            }
+        }
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         
         switch (kind) {
         case 2: // unsigned short int

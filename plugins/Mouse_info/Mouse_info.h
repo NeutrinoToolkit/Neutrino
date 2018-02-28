@@ -63,7 +63,7 @@ public slots:
     //	void bufferChanged(nPhysD*);
 };
 
-NEUTRINO_PLUGIN(Mouse_info,Analysis,":icons/ruler.png");
+NEUTRINO_PLUGIN(Mouse_info,Analysis,":icons/ruler.png",Qt::CTRL+Qt::ALT+Qt::Key_M);
 
 #endif
 

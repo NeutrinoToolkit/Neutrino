@@ -27,11 +27,13 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                 }
 
                 QIcon icon_plugin;
+                QKeySequence shortcut_key;
 
                 nPanPlug *my_panPlug = qobject_cast<nPanPlug *>(p_obj);
 
                 if (my_panPlug) {
                     icon_plugin=my_panPlug->icon();
+                    shortcut_key = my_panPlug->shortcut();
 
                     if (!icon_plugin.isNull()) {
 
@@ -77,6 +79,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu)
                     QApplication::processEvents();
 
                     QPointer<QAction>  my_action = new QAction(icon_plugin, name_plugin.replace("_"," "), nParent);
+                    my_action->setShortcut(shortcut_key);
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);

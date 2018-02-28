@@ -96,6 +96,10 @@ public:
         return QIcon(":icons/python.png");
     }
 
+    QKeySequence shortcut() {
+        return QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S);
+    }
+
     bool instantiate(neutrino *neu);
 
 private:

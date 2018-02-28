@@ -44,8 +44,8 @@ public:
     Ui::nPhysProperties my_w;
 
 public slots:
-    void showProperty();
     void bufferChanged(nPhysD*);
+    void on_propertyList_itemSelectionChanged();
     void on_changePhysProperty_pressed();
 
 };

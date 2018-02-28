@@ -203,7 +203,7 @@ public slots:
 
     void createDrawPoint();
 
-    void mouseposition(QPointF);
+    void mouseposition(QPointF=QPointF());
 
     void zoomChanged(double);
 
@@ -246,6 +246,8 @@ public slots:
 
     void changeEvent(QEvent *e);
 
+    void on_actionKeyboard_shortcut_triggered();
+
 signals:
     void colorValue(double);
 
@@ -256,7 +258,6 @@ signals:
     void nZoom(double);
 
     void bufferChanged(nPhysD*);						// visible image update
-    void bufferOriginChanged();
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
     void physMod(std::pair<nPhysD*,nPhysD*>);

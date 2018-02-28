@@ -175,6 +175,8 @@ neutrino::neutrino():
 
     connect(my_w->actionPrev_Buffer, SIGNAL(triggered()), my_w->my_view, SLOT(prevBuffer()));
     connect(my_w->actionNext_Buffer, SIGNAL(triggered()), my_w->my_view, SLOT(nextBuffer()));
+    connect(my_w->actionShow_mouse, SIGNAL(triggered()), my_w->my_view, SLOT(nextMouseShape()));
+
     connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 
     connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
@@ -185,6 +187,9 @@ neutrino::neutrino():
     connect(my_w->actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
     connect(my_w->actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
     connect(my_w->actionTranspose, SIGNAL(triggered()), this, SLOT(transpose()));
+
+    connect(my_w->actionSet_origin, SIGNAL(triggered()), my_w->my_view, SLOT(setMouseOrigin()));
+
 
     connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
 
@@ -205,10 +210,6 @@ neutrino::neutrino():
 
     connect(my_w->actionLockColors, SIGNAL(toggled(bool)), my_w->my_view, SLOT(setLockColors(bool)));
 
-    connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
-    connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
-
-
     connect(my_w->actionExport_pixmap, SIGNAL(triggered()), my_w->my_view, SLOT(exportPixmap()));
 
 
@@ -223,6 +224,8 @@ neutrino::neutrino():
 
     connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
+    connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
 
     //recent file stuff
@@ -1110,74 +1113,19 @@ void neutrino::closeEvent (QCloseEvent *e) {
     }
 }
 
-// keyevents: pass to my_view!
+void neutrino::on_actionKeyboard_shortcut_triggered() {
+    bool ok;
+    QString text = QInputDialog::getText(this,"Open","", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
+    if (ok && !text.isEmpty()) {
+        nGenericPan *my_pan= openPan(text,false);
+        if(!my_pan) {
+            statusBar()->showMessage(tr("Can't find ")+text, 2000);
+        }
+    }
+}
+
 void neutrino::keyPressEvent (QKeyEvent *e)
 {
-    switch (e->key()) {
-        case Qt::Key_Question:
-            Shortcuts();
-            break;
-        case Qt::Key_O:
-            if (e->modifiers() & Qt::ShiftModifier) {
-                foreach (nPhysD* phys, my_w->my_view->physList) {
-                    phys->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
-                    emit bufferChanged(phys);
-                }
-            } else {
-                if (my_w->my_view->currentBuffer) my_w->my_view->currentBuffer->set_origin(my_w->my_view->my_mouse.pos().x(),my_w->my_view->my_mouse.pos().y());
-            }
-            mouseposition(my_w->my_view->my_mouse.pos());
-            my_w->my_view->my_tics.update();
-            emitBufferChanged();
-
-            // I need a signal to communicate explicit origin change not to
-            // be taken for a buffer change. Used in nWinList.
-            emit bufferOriginChanged();
-            break;
-        case Qt::Key_C:
-            if (e->modifiers() & Qt::ShiftModifier) {
-                ColorBar();
-            }
-            break;
-        case Qt::Key_P:
-            if (e->modifiers() & Qt::ShiftModifier) {
-                PhysProperties();
-            }
-            break;
-        case Qt::Key_R:
-            if (!(e->modifiers() & Qt::ShiftModifier))
-                toggleRuler();
-            break;
-        case Qt::Key_G:
-            if (!(e->modifiers() & Qt::ShiftModifier))
-                toggleGrid();
-            break;
-        case Qt::Key_V: {
-                if (!(e->modifiers() & Qt::ShiftModifier))
-                    Vlineout();
-                break;
-            }
-        case Qt::Key_H: {
-                if (!(e->modifiers() & Qt::ShiftModifier))
-                    Hlineout();
-                break;
-            }
-        case Qt::Key_X: {
-                if ((e->modifiers() & Qt::ControlModifier)) {
-                    bool ok;
-                    QString text = QInputDialog::getText(this,"","", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
-                    if (ok && !text.isEmpty()) {
-                        nGenericPan *my_pan= openPan(text,false);
-                        if(!my_pan) {
-                            statusBar()->showMessage(tr("Can't find ")+text, 2000);
-                        }
-                    }
-                }
-                break;
-            }
-        default:
-            break;
-    }
 }
 
 void neutrino::keyReleaseEvent (QKeyEvent *e)

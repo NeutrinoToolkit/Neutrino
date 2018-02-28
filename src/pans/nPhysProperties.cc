@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -26,27 +26,23 @@
 #include "nPhysProperties.h"
 nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
 {
-	my_w.setupUi(this);
+    my_w.setupUi(this);
 
-	my_w.splitter->setStretchFactor(0, 1);
-	my_w.splitter->setStretchFactor(1, 2);
-	
-	connect(my_w.propertyList, SIGNAL(itemSelectionChanged()), this, SLOT(showProperty()));
+    my_w.splitter->setStretchFactor(0, 1);
+    my_w.splitter->setStretchFactor(1, 2);
+
 
     bufferChanged(currentBuffer);
 
-	show();
+    show();
 }
 
 void
 nPhysProperties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
     std::string currentProperty("");
-    if (my_w.propertyList->selectedItems().size() >0) {
-        qDebug() << "here";
-        qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
+    if (my_w.propertyList->selectedItems().size() > 0) {
         currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
-        qDebug() << "here";
     }
     my_w.propertyList->clear();
     my_w.propertyValue->clear();
@@ -66,51 +62,27 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 }
 
 void
-nPhysProperties::showProperty() {
-	if (my_w.propertyList->currentItem()) {
+nPhysProperties::on_propertyList_itemSelectionChanged() {
+    if (currentBuffer && my_w.propertyList->currentItem()) {
         std::string currentKey=my_w.propertyList->currentItem()->text().toStdString();
-        DEBUG(currentKey);
-        DEBUG(currentBuffer);
-        if (currentBuffer) {
-            std::string myval=currentBuffer->property[currentKey];
-            my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
-		}
-	}
+        std::string myval=currentBuffer->property[currentKey];
+        my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+    }
 }
 
 void nPhysProperties::on_changePhysProperty_pressed() {
-    DEBUG("Do something");
-    QVariant pippo(my_w.propertyValue->toPlainText());
-    DEBUG(pippo.toString().toStdString());
-    std::string item("");
-    if(my_w.propertyList->currentItem()) {
-        qDebug() << "here";
-        item =  my_w.propertyList->currentItem()->text().toStdString();
-    } else if (my_w.propertyList->selectedItems().size() >0) {
-        qDebug() << "here";
-        qDebug() << "here" << my_w.propertyList->selectedItems().first()->text();
-        item =  my_w.propertyList->selectedItems().first()->text().toStdString();
-        qDebug() << "here";
-    }
     if (currentBuffer) {
-        anydata my_val=toAnydata(pippo);
+        std::string currentProperty =  my_w.propertyList->selectedItems().first()->text().toStdString();
+        QVariant new_value(my_w.propertyValue->toPlainText());
+        anydata my_val=toAnydata(new_value);
         if (my_w.applyToAll->isChecked()) {
             for (auto & phys: nparent->getBufferList()) {
-                phys->property[item]=my_val;
+                phys->property[currentProperty]=my_val;
             }
         } else {
-            currentBuffer->property[item]=my_val;
+            currentBuffer->property[currentProperty]=my_val;
         }
         nparent->showPhys(currentBuffer);
     }
     qDebug() << "here";
 }
-
-
-
-
-
-
-
-
-

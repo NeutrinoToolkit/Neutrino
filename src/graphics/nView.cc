@@ -367,21 +367,6 @@ void nView::keyPressEvent (QKeyEvent *e)
                 }
                 break;
             }
-        case Qt::Key_Plus:
-            zoomIn();
-            break;
-        case Qt::Key_Minus:
-            zoomOut();
-            break;
-        case Qt::Key_Equal:
-            zoomEq();
-            break;
-        case Qt::Key_M: {
-                if (!(e->modifiers() & Qt::ShiftModifier)) {
-                    setMouseShape(my_mouse.my_shape+1);
-                }
-                break;
-            }
         case Qt::Key_C:
             if ((e->modifiers() & Qt::ControlModifier))
                 QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard)   ;
@@ -449,6 +434,33 @@ nView::changeColorTable () {
     emit logging(colorTable);
     my_tics.update();
     emit updatecolorbar();
+}
+
+void nView::setMouseOrigin() {
+    if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier) {
+        foreach (nPhysD* phys, physList) {
+            phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+            emit bufferChanged(phys);
+        }
+    } else {
+        if (currentBuffer) {
+            currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+            emit bufferChanged(currentBuffer);
+        }
+    }
+    my_tics.update();
+
+    // I need a signal to communicate explicit origin change not to
+    // be taken for a buffer change. Used in nWinList.
+    emit bufferOriginChanged();
+    emit mouseposition(my_mouse.pos());
+
+}
+
+
+void nView::nextMouseShape() {
+    qDebug() << "here" << my_mouse.num_shape;
+    setMouseShape(my_mouse.my_shape+1);
 }
 
 void nView::setMouseShape(int num) {

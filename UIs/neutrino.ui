@@ -98,6 +98,7 @@
     <addaction name="actionOpen_Glob"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="actionPlugin"/>
+    <addaction name="actionKeyboard_shortcut"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
@@ -167,6 +168,7 @@
     <addaction name="actionShow_grid"/>
     <addaction name="separator"/>
     <addaction name="menuTransformation"/>
+    <addaction name="actionSet_origin"/>
    </widget>
    <widget class="QMenu" name="menuAnalysis">
     <property name="title">
@@ -302,17 +304,26 @@
   </action>
   <action name="actionZoom_in">
    <property name="text">
-    <string>Zoom +</string>
+    <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
    </property>
   </action>
   <action name="actionZoom_eq">
    <property name="text">
-    <string>Zoom =</string>
+    <string>Zoom eq</string>
+   </property>
+   <property name="shortcut">
+    <string>=</string>
    </property>
   </action>
   <action name="actionZoom_out">
    <property name="text">
-    <string>Zoom -</string>
+    <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>-</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -356,6 +367,9 @@
    <property name="text">
     <string>Show colortable</string>
    </property>
+   <property name="shortcut">
+    <string>C</string>
+   </property>
   </action>
   <action name="actionPrint">
    <property name="text">
@@ -373,6 +387,9 @@
    <property name="text">
     <string>Horizontal</string>
    </property>
+   <property name="shortcut">
+    <string>H</string>
+   </property>
   </action>
   <action name="actionVertical">
    <property name="icon">
@@ -381,6 +398,9 @@
    </property>
    <property name="text">
     <string>Vertical</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
    </property>
   </action>
   <action name="actionReopen_to_saved">
@@ -395,10 +415,16 @@
    <property name="text">
     <string>Show ruler</string>
    </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
   </action>
   <action name="actionShow_mouse">
    <property name="text">
     <string>Show mouse</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
    </property>
   </action>
   <action name="actionWinlist">
@@ -584,10 +610,16 @@
    <property name="text">
     <string>Keyboard shortcuts</string>
    </property>
+   <property name="shortcut">
+    <string>?</string>
+   </property>
   </action>
   <action name="actionShow_grid">
    <property name="text">
     <string>Show grid</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
    </property>
   </action>
   <action name="actionPoint">
@@ -665,9 +697,20 @@
     <string>Ctrl+9</string>
    </property>
   </action>
-  <action name="actionceppa">
+  <action name="actionSet_origin">
    <property name="text">
-    <string>ceppa</string>
+    <string>Set origin</string>
+   </property>
+   <property name="shortcut">
+    <string>O</string>
+   </property>
+  </action>
+  <action name="actionKeyboard_shortcut">
+   <property name="text">
+    <string>Keyboard shortcut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
    </property>
   </action>
  </widget>

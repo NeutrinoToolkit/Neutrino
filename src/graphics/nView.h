@@ -102,7 +102,7 @@ public slots:
     void setZoomFactor(int val);
 
     void setMouseShape(int);
-
+    void nextMouseShape();
 
     void changeColorTable (QString);
     void changeColorTable ();
@@ -116,6 +116,9 @@ public slots:
     void prevBuffer();
     void nextBuffer();
     void exportPixmap();
+
+    void setMouseOrigin();
+
 
 private:
     bool gestureEvent(QGestureEvent *event);
@@ -142,6 +145,7 @@ signals:
     void zoomChanged(double);
     void bufferChanged(nPhysD*);
     void logging(QString);
+    void bufferOriginChanged();
 };
 
 #endif

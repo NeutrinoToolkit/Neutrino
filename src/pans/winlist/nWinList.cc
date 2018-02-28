@@ -39,9 +39,9 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     my_w.images->setColumnHidden((my_w.images->columnCount()-1),true);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
-    connect(nparent, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent->my_w->my_view, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
