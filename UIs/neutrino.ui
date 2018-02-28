@@ -154,7 +154,6 @@
      <addaction name="actionTranspose"/>
     </widget>
     <addaction name="menuBuffers"/>
-    <addaction name="actionProperties"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_eq"/>
     <addaction name="actionZoom_out"/>
@@ -190,7 +189,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="actionKeyborard_shortcuts"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -295,11 +293,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Up</string>
-   </property>
-  </action>
-  <action name="actionProperties">
-   <property name="text">
-    <string>Properties</string>
    </property>
   </action>
   <action name="actionZoom_in">
@@ -606,14 +599,6 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="actionKeyborard_shortcuts">
-   <property name="text">
-    <string>Keyboard shortcuts</string>
-   </property>
-   <property name="shortcut">
-    <string>?</string>
-   </property>
-  </action>
   <action name="actionShow_grid">
    <property name="text">
     <string>Show grid</string>
@@ -644,7 +629,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -657,7 +642,7 @@
   </action>
   <action name="actionPlugin">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/plugin.png</normaloff>:/icons/plugin.png</iconset>
    </property>
    <property name="text">
@@ -679,7 +664,7 @@
   </action>
   <action name="actionTranspose">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
    </property>
    <property name="text">

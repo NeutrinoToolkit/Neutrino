@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/html">
+        <file>Shortcuts.html</file>
+    </qresource>
+</RCC>

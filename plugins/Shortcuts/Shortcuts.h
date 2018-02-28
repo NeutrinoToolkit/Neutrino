@@ -22,32 +22,28 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nPhysProperties_h
-#define __nPhysProperties_h
+#ifndef __Shortcuts_h
+#define __Shortcuts_h
 
 #include <QtGui>
 #include <QWidget>
 
-#include "ui_nPhysProperties.h"
+#include "ui_Shortcuts.h"
 
-#include "nTreeWidget.h"
 #include "nPhysImageF.h"
 #include "nGenericPan.h"
 
 class neutrino;
 
-class nPhysProperties : public nGenericPan {
+class Shortcuts : public nGenericPan {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE nPhysProperties(neutrino*);
-    Ui::nPhysProperties my_w;
-
-public slots:
-    void bufferChanged(nPhysD*);
-    void on_propertyList_itemSelectionChanged();
-    void on_changePhysProperty_pressed();
+    Q_INVOKABLE Shortcuts(neutrino*);
+    Ui::Shortcuts my_w;
 
 };
+
+NEUTRINO_PLUGIN(Shortcuts,Help,"",Qt::Key_Question);
 
 #endif

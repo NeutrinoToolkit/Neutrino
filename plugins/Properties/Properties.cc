@@ -23,14 +23,13 @@
  *
  */
 #include "neutrino.h"
-#include "nPhysProperties.h"
-nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
+#include "Properties.h"
+Properties::Properties(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
 
     my_w.splitter->setStretchFactor(0, 1);
     my_w.splitter->setStretchFactor(1, 2);
-
 
     bufferChanged(currentBuffer);
 
@@ -38,7 +37,7 @@ nPhysProperties::nPhysProperties(neutrino *nparent) : nGenericPan(nparent)
 }
 
 void
-nPhysProperties::bufferChanged(nPhysD *my_phys) {
+Properties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
     std::string currentProperty("");
     if (my_w.propertyList->selectedItems().size() > 0) {
@@ -62,7 +61,7 @@ nPhysProperties::bufferChanged(nPhysD *my_phys) {
 }
 
 void
-nPhysProperties::on_propertyList_itemSelectionChanged() {
+Properties::on_propertyList_itemSelectionChanged() {
     if (currentBuffer && my_w.propertyList->currentItem()) {
         std::string currentKey=my_w.propertyList->currentItem()->text().toStdString();
         std::string myval=currentBuffer->property[currentKey];
@@ -70,7 +69,7 @@ nPhysProperties::on_propertyList_itemSelectionChanged() {
     }
 }
 
-void nPhysProperties::on_changePhysProperty_pressed() {
+void Properties::on_changePhysProperty_pressed() {
     if (currentBuffer) {
         std::string currentProperty =  my_w.propertyList->selectedItems().first()->text().toStdString();
         QVariant new_value(my_w.propertyValue->toPlainText());

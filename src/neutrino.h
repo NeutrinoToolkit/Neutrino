@@ -188,8 +188,6 @@ public slots:
 
     nGenericPan* WinList();
 
-    nGenericPan* PhysProperties();
-
     nGenericPan* Hlineout();
     nGenericPan* Vlineout();
 
@@ -222,7 +220,6 @@ public slots:
 
     nGenericPan* ColorBar();
 
-    void Shortcuts();
     void about();
 
     nGenericPan* Preferences();

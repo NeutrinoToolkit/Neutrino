@@ -53,7 +53,6 @@
 
 #include "nPreferences.h"
 #include "nWinList.h"
-#include "nPhysProperties.h"
 
 #include "nPhysFormats.h"
 
@@ -63,7 +62,6 @@
 
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
-#include "ui_nShortcuts.h"
 
 void neutrino::changeEvent(QEvent *e)
 {
@@ -190,9 +188,6 @@ neutrino::neutrino():
 
     connect(my_w->actionSet_origin, SIGNAL(triggered()), my_w->my_view, SLOT(setMouseOrigin()));
 
-
-    connect(my_w->actionProperties, SIGNAL(triggered()), this, SLOT(Properties()));
-
     connect(my_w->actionZoom_in, SIGNAL(triggered()), my_w->my_view, SLOT(zoomIn()));
     connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
     connect(my_w->actionZoom_eq, SIGNAL(triggered()), my_w->my_view, SLOT(zoomEq()));
@@ -206,7 +201,6 @@ neutrino::neutrino():
     connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
     connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
-    connect(my_w->actionKeyborard_shortcuts, SIGNAL(triggered()), this, SLOT(Shortcuts()));
 
     connect(my_w->actionLockColors, SIGNAL(toggled(bool)), my_w->my_view, SLOT(setLockColors(bool)));
 
@@ -1368,34 +1362,13 @@ neutrino::closeCurrentBuffer() {
     QApplication::processEvents();
 }
 
-void neutrino::Shortcuts() {
-    QWidget *myShortcuts = new QWidget(this,Qt::Tool);
-    myShortcuts->setAttribute(Qt::WA_DeleteOnClose);
-    Ui::nShortcuts myShortCutsUI;
-    myShortCutsUI.setupUi(myShortcuts);
-    show();
-    QFile lic(":/html/shortcuts.html");
-    if (lic.open(QFile::ReadOnly | QFile::Text)) {
-        QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
-        myShortCutsUI.textBrowser->insertHtml(htmltext);
-    }
-    myShortcuts->show();
-}
-
 // Window List pan
 nGenericPan*
 neutrino::WinList() {
     return new nWinList(this);
 }
 
-nGenericPan*
-neutrino::PhysProperties() {
-    return new nPhysProperties(this);
-}
-
-
 // colortables
-
 nGenericPan*
 neutrino::ColorBar() {
     return new nColorBar(this);
