@@ -43,10 +43,9 @@ nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan
     QString namedirection(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");
     my_w.plot->graph(0)->setName(namedirection);
 
+    setProperty("panName",namedirection);
     show();
-    setWindowTitle(windowTitle()+" "+namedirection);
     setBehaviour();
-    updateLastPoint();
 }
 
 void nLineout::setBehaviour() {

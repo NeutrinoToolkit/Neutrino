@@ -404,11 +404,8 @@ neutrino::scanPlugins(QString pluginsDirStr)
 #elif defined(Q_OS_LINUX)
         QString extension("so");
 #endif
-
-        foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-            if (QFileInfo(fileName).suffix() == extension) {
-                loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
-            }
+        foreach (QString fileName, pluginsDir.entryList(QStringList("*."+extension), QDir::Files)) {
+            loadPlugin(pluginsDir.absoluteFilePath(fileName), false);
         }
         QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
         qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
@@ -449,13 +446,6 @@ void
 neutrino::loadPlugin()
 {
     QStringList pnames=QFileDialog::getOpenFileNames(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
-    loadPlugins(pnames);
-
-}
-
-void
-neutrino::loadPlugins(QStringList pnames)
-{
     bool launch(pnames.size()==1);
     for(auto& pname: pnames) {
         loadPlugin(pname, launch);
