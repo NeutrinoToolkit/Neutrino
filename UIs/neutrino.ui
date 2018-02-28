@@ -103,6 +103,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_Session"/>
     <addaction name="separator"/>
+    <addaction name="actionCopy"/>
     <addaction name="actionExport_pixmap"/>
     <addaction name="actionExport"/>
     <addaction name="actionExport_all"/>
@@ -401,7 +402,7 @@
   </action>
   <action name="actionShow_ruler">
    <property name="text">
-    <string>Show ruler</string>
+    <string>Show /Hide ruler</string>
    </property>
    <property name="shortcut">
     <string>R</string>
@@ -409,7 +410,7 @@
   </action>
   <action name="actionShow_mouse">
    <property name="text">
-    <string>Show mouse</string>
+    <string>Change mouse</string>
    </property>
    <property name="shortcut">
     <string>M</string>
@@ -596,7 +597,7 @@
   </action>
   <action name="actionShow_grid">
    <property name="text">
-    <string>Show grid</string>
+    <string>Show/Hide grid</string>
    </property>
    <property name="shortcut">
     <string>G</string>
@@ -691,6 +692,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy pixmap</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>

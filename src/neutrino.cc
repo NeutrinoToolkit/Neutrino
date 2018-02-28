@@ -177,8 +177,8 @@ neutrino::neutrino():
 
     connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 
-    connect(my_w->actionShow_ruler, SIGNAL(triggered()), this, SLOT(toggleRuler()));
-    connect(my_w->actionShow_grid, SIGNAL(triggered()), this, SLOT(toggleGrid()));
+    connect(my_w->actionShow_ruler, SIGNAL(triggered()), my_w->my_view, SLOT(toggleRuler()));
+    connect(my_w->actionShow_grid, SIGNAL(triggered()), my_w->my_view, SLOT(toggleGrid()));
 
     connect(my_w->actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
     connect(my_w->actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
@@ -204,6 +204,7 @@ neutrino::neutrino():
 
     connect(my_w->actionLockColors, SIGNAL(toggled(bool)), my_w->my_view, SLOT(setLockColors(bool)));
 
+    connect(my_w->actionCopy, SIGNAL(triggered()), my_w->my_view, SLOT(copyImage()));
     connect(my_w->actionExport_pixmap, SIGNAL(triggered()), my_w->my_view, SLOT(exportPixmap()));
 
 
@@ -588,23 +589,9 @@ void neutrino::setGamma(int value) {
     setProperty("NeuSave-gamma",value);
 }
 
-nGenericPan* neutrino::existsPan(QString name) {
-    foreach (nGenericPan *pan, panList) {
-        if (pan->panName()==name) {
-            pan->show();
-            pan->raise();
-            return pan;
-        }
-    }
-    return NULL;
-}
-
-
 // public slots
 
 // file menu actions
-
-
 neutrino* neutrino::fileNew() {
     //	QThread *m_thread = new QThread();
     return new neutrino();
@@ -643,7 +630,7 @@ void neutrino::fileOpen(QStringList fnames) {
         QList<nPhysD *> imagelist = fileOpen(fname);
         if (imagelist.size()==0){
             QString vwinname="OpenRaw";
-            nOpenRAW *openRAW=(nOpenRAW *)existsPan(vwinname);
+            nOpenRAW *openRAW=(nOpenRAW *)getPan(vwinname);
             if (!openRAW) {
                 openRAW = new nOpenRAW(this);
             }
@@ -950,7 +937,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
         if (show || redisplay) {
             showPhys(newPhys);
         }
-        emit physMod(std::make_pair(oldPhys, newPhys));
+        emit physReplace(std::make_pair(oldPhys, newPhys));
     }
     QApplication::processEvents();
     return newPhys;
@@ -1055,26 +1042,6 @@ void neutrino::exportGraphics (QString fout) {
         QPixmap::grabWidget(my_w->my_view).save(fout);
     }
     my_w->my_view->my_mouse.setVisible(resetmouse);
-}
-
-void neutrino::toggleRuler() {
-    my_w->my_view->my_tics.rulerVisible=!my_w->my_view->my_tics.rulerVisible;
-    if (my_w->my_view->my_tics.rulerVisible) {
-        my_w->actionShow_ruler->setText("Hide ruler");
-    } else {
-        my_w->actionShow_ruler->setText("Show ruler");
-    }
-    my_w->my_view->my_tics.update();
-}
-
-void neutrino::toggleGrid() {
-    my_w->my_view->my_tics.gridVisible=!my_w->my_view->my_tics.gridVisible;
-    if (my_w->my_view->my_tics.gridVisible) {
-        my_w->actionShow_grid->setText("Hide grid");
-    } else {
-        my_w->actionShow_grid->setText("Show grid");
-    }
-    my_w->my_view->my_tics.update();
 }
 
 void neutrino::closeEvent (QCloseEvent *e) {
@@ -1454,7 +1421,7 @@ neutrino::openRAW() {
     nGenericPan *win = nullptr;
     fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),NULL,tr("Any files")+QString(" (*)"));
     if (fnames.size()) {
-        win=existsPan("nOpenRAW");
+        win=getPan("nOpenRAW");
         if (!win) win= new nOpenRAW(this);
         nOpenRAW *winRAW=qobject_cast<nOpenRAW*>(win);
         if (winRAW) winRAW->add(fnames);
@@ -1641,7 +1608,10 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
 
 nGenericPan* neutrino::getPan(QString name) {
     foreach(nGenericPan* pan, getPanList()) {
-        if(pan->panName()==name) return pan;
+        if(pan->panName()==name) {
+            pan->raiseIt();
+            return pan;
+        }
     }
     return nullptr;
 }

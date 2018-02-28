@@ -172,7 +172,7 @@ nWinList::changeProperties() {
                             phys->set_origin(xOrigin,yOrigin);
                             nparent->emitBufferChanged(phys);
                         }
-                        nparent->my_w->my_view->my_tics.update();
+                        nparent->my_w->my_view->update();
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(3,0,lista.at(0)+" "+lista.at(1));
                         }
@@ -202,7 +202,7 @@ nWinList::changeProperties() {
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(4,0,lista.at(0));
                         }
-                        nparent->my_w->my_view->my_tics.update();
+                        nparent->my_w->my_view->update();
                     }
                     break;
                 }
@@ -220,7 +220,7 @@ nWinList::changeProperties() {
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(4,0,lista.at(0)+" "+lista.at(1));
                         }
-                        nparent->my_w->my_view->my_tics.update();
+                        nparent->my_w->my_view->update();
                     }
                     break;
                 }

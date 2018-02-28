@@ -115,10 +115,16 @@ public slots:
     void setGamma(int value);
     void prevBuffer();
     void nextBuffer();
-    void exportPixmap();
 
     void setMouseOrigin();
 
+    void toggleRuler();
+    void toggleGrid();
+
+    void copyImage();
+    void exportPixmap();
+
+    void update();
 
 private:
     bool gestureEvent(QGestureEvent *event);

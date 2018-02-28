@@ -533,7 +533,7 @@
             </widget>
            </item>
            <item row="0" column="6">
-            <widget class="QPushButton" name="colorRuler">
+            <widget class="QPushButton" name="gridColor">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -557,7 +557,7 @@
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QPushButton" name="colorMouse">
+            <widget class="QPushButton" name="mouseColor">
              <property name="font">
               <font>
                <pointsize>10</pointsize>

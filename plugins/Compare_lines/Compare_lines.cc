@@ -49,7 +49,7 @@ Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.current, SIGNAL(released()), this, SLOT(updatePlot()));
 
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    connect(nparent, SIGNAL(physMod(std::pair<nPhysD*,nPhysD*>)), this, SLOT(physMod(std::pair<nPhysD*,nPhysD*>)));
+    connect(nparent, SIGNAL(physReplace(std::pair<nPhysD*,nPhysD*>)), this, SLOT(physReplace(std::pair<nPhysD*,nPhysD*>)));
 
     my_w.plot->xAxis->setLabel(tr("Distance"));
     my_w.plot->yAxis->setLabel(tr("Value"));
@@ -69,7 +69,7 @@ void Compare_lines::physDel(nPhysD* my_phys) {
     updatePlot();
 }
 
-void Compare_lines::physMod(std::pair<nPhysD*,nPhysD*> my_mod) {
+void Compare_lines::physReplace(std::pair<nPhysD*,nPhysD*> my_mod) {
     images.removeAll(my_mod.first);
     images.append(my_mod.second);
     updatePlot();

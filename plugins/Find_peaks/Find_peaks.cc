@@ -74,7 +74,7 @@ void Find_peaks::set_origin() {
                 } else {
                     currentBuffer->set_origin(origin,currentBuffer->get_origin().y());
                 }
-                nparent->my_w->my_view->my_tics.update();
+                nparent->my_w->my_view->update();
             }
         }
     }
@@ -93,7 +93,7 @@ void Find_peaks::set_scale() {
                 } else {
                     currentBuffer->set_scale(my_scale,currentBuffer->get_scale().y());
                 }
-                nparent->my_w->my_view->my_tics.update();
+                nparent->my_w->my_view->update();
             }
         }
     }

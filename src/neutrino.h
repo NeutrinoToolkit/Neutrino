@@ -107,8 +107,6 @@ private:
 public slots:
     inline int indexOf(nPhysD* my_phys){return (my_w->my_view ? my_w->my_view->physList.indexOf(my_phys) : -1);};
 
-    nGenericPan* existsPan(QString);
-
     void setGamma(int value);
 
     void processEvents();
@@ -182,9 +180,6 @@ public slots:
     void exportAllGraphics();
     void exportGraphics(QString);
 
-    void toggleRuler();
-    void toggleGrid();
-
     nGenericPan* WinList();
 
     nGenericPan* Hlineout();
@@ -256,7 +251,7 @@ signals:
     void bufferChanged(nPhysD*);						// visible image update
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
-    void physMod(std::pair<nPhysD*,nPhysD*>);
+    void physReplace(std::pair<nPhysD*,nPhysD*>);
 
     void keyPressEvent();
     void closeAll();

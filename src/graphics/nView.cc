@@ -256,6 +256,12 @@ void nView::swipeTriggered(QSwipeGesture *gesture)
     }
 }
 
+void nView::update () {
+    my_mouse.update();
+    my_tics.update();
+    QGraphicsView::update();
+}
+
 void nView::focusInEvent (QFocusEvent *) {
 }
 
@@ -347,9 +353,8 @@ void nView::keyPressEvent (QKeyEvent *e)
         }
     }
 
-    // cycle over items
     switch (e->key()) {
-        case Qt::Key_Tab: {
+        case Qt::Key_Tab: { // cycle over items
                 QList<QGraphicsItem *> lista;
                 foreach (QGraphicsItem *oggetto, scene()->items() ) {
                     if (oggetto->type() > QGraphicsItem::UserType) {
@@ -367,10 +372,6 @@ void nView::keyPressEvent (QKeyEvent *e)
                 }
                 break;
             }
-        case Qt::Key_C:
-            if ((e->modifiers() & Qt::ControlModifier))
-                QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard)   ;
-            break;
         case Qt::Key_A: {
                 if (e->modifiers() & Qt::ShiftModifier) {
                     foreach (nPhysD* phys, physList) {
@@ -403,11 +404,43 @@ void nView::keyPressEvent (QKeyEvent *e)
                 setGamma(1);
             }
             break;
+        case Qt::Key_G:
+            toggleGrid();
+            break;
     }
 
     update();
     emit keypressed(e);
 }
+
+void nView::copyImage() {
+    QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard);
+    emit logging("Image copied in clipboard");
+}
+
+void nView::toggleRuler() {
+    my_tics.rulerVisible=!my_tics.rulerVisible;
+    my_tics.update();
+    QString log="Ruler";
+    if (!my_tics.rulerVisible) {
+        log.append(" not");
+    }
+    log.append(" visible");
+    emit logging(log);
+}
+
+void nView::toggleGrid() {
+    my_tics.gridVisible=!my_tics.gridVisible;
+    my_tics.update();
+    QString log="Grid";
+    if (!my_tics.gridVisible) {
+        log.append(" not");
+    }
+    log.append(" visible");
+    emit logging(log);
+}
+
+
 
 void nView::setGamma(int value) {
     if (currentBuffer) {
@@ -454,6 +487,7 @@ void nView::setMouseOrigin() {
     // be taken for a buffer change. Used in nWinList.
     emit bufferOriginChanged();
     emit mouseposition(my_mouse.pos());
+    emit logging("Origin set");
 
 }
 
@@ -477,6 +511,7 @@ void nView::setMouseShape(int num) {
     }
     my_mouse.my_shape=num;
     my_mouse.update();
+    emit logging("Mouse "+QString::number(num));
 }
 
 void nView::keyReleaseEvent (QKeyEvent *e) {

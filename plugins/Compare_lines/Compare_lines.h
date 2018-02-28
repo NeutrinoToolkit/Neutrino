@@ -55,7 +55,7 @@ public slots:
     void sceneChanged();
 
     void physDel(nPhysD*);
-    void physMod(std::pair<nPhysD*,nPhysD*>);
+    void physReplace(std::pair<nPhysD*,nPhysD*>);
     
 private:
     QList <nPhysD*> images;

@@ -234,8 +234,6 @@ void nGenericPan::show() {
 
     setWindowTitle(nparent->property("winId").toString()+": "+panName()+" "+property("numpan").toString());
 
-    decorate(this);
-
     foreach (QToolBar *my_tool, findChildren<QToolBar *>()) {
         if (my_tool->objectName() == "toolBar") { // this has been created by the designer
 
@@ -265,6 +263,8 @@ void nGenericPan::show() {
             break;
         }
     }
+
+    decorate(this);
 
     QSize iconSize;
     foreach (QToolBar *widget, nparent->findChildren<QToolBar *>()) {

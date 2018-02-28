@@ -31,14 +31,14 @@ nTics::~nTics() {
     my_set.beginGroup("nPreferences");
     my_set.setValue("rulerVisible", rulerVisible);
     my_set.setValue("gridVisible", gridVisible);
-    my_set.setValue("rulerColor", rulerColor);
+    my_set.setValue("gridColor", gridColor);
     my_set.setValue("gridThickness",gridThickness);
     my_set.endGroup();
 }
 
 nTics::nTics(nView *view) : QGraphicsItem(),
     my_view(view),
-    color(QColor(Qt::black)),
+    ticsColor(QColor(Qt::black)),
     rulerVisible(false),
     gridVisible(false),
     gridThickness(1.0)
@@ -47,9 +47,14 @@ nTics::nTics(nView *view) : QGraphicsItem(),
     my_set.beginGroup("nPreferences");
     rulerVisible=my_set.value("rulerVisible",rulerVisible).toBool();
     gridVisible=my_set.value("gridVisible",gridVisible).toBool();
-    rulerColor=my_set.value("rulerColor",rulerColor).value<QColor>();
-    gridThickness = my_set.value("gridThickness",gridThickness).toDouble();
+    gridColor=my_set.value("gridColor",gridColor).value<QColor>();
+    setGridThickness(my_set.value("gridThickness",gridThickness).toDouble());
     my_set.endGroup();
+}
+
+void nTics::setGridThickness(double val) {
+    gridThickness=val;
+    update();
 }
 
 QFont nTics::get_font() const {
@@ -74,12 +79,12 @@ QRectF nTics::boundingRect() const {
     return bBox;
 }
 
-void nTics::changeColor() {
-    QColorDialog colordial(color);
+void nTics::changeTicsColor() {
+    QColorDialog colordial(ticsColor);
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        color=colordial.currentColor();
+        ticsColor=colordial.currentColor();
         update();
     }
 }
@@ -99,7 +104,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         vec2f my_or=my_view->currentBuffer->get_origin();
         vec2f my_sc=my_view->currentBuffer->get_scale();
         QPen pen;
-        pen.setColor(color);
+        pen.setColor(ticsColor);
 		pen.setCosmetic(true);
         pen.setWidthF(1);
 
@@ -187,11 +192,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawPath(allTics);
 
         pen.setWidthF(gridThickness);
-        pen.setColor(rulerColor);
+        pen.setColor(gridColor);
         p->setPen(pen);
         p->drawPath(allGrid);
         pen.setWidthF(1);
-        pen.setColor(color);
+        pen.setColor(ticsColor);
         p->setPen(pen);
 
         int exponentY=log10(std::abs(my_sc.y()*size.height()));
@@ -281,11 +286,11 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->drawPath(allTics);
 
         pen.setWidthF(gridThickness);
-        pen.setColor(rulerColor);
+        pen.setColor(gridColor);
         p->setPen(pen);
         p->drawPath(allGrid);
         pen.setWidthF(1);
-        pen.setColor(color);
+        pen.setColor(ticsColor);
         p->setPen(pen);
 
         if (my_view->nPalettes[my_view->colorTable].size()) {
@@ -379,7 +384,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         //now draw the ruler
         if (rulerVisible && !gridVisible) {
             pen.setWidthF(gridThickness);
-            pen.setColor(rulerColor);
+            pen.setColor(gridColor);
             p->setPen(pen);
             QPainterPath ruler;
             ruler.moveTo(0,my_view->currentBuffer->get_origin().y());

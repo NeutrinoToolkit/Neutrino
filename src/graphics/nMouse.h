@@ -37,7 +37,7 @@ public:
     int my_shape;
     const int num_shape=4;
 
-    double mouseThickness;
+    void setThickness(double);
 
 	QSize size;
     QPen pen;

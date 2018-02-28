@@ -66,10 +66,10 @@ public slots:
     void on_lockScale_released();
 
 
-    void setColorRuler();
-    void setColorMouse();
     void on_mouseThickness_valueChanged(double);
+    void on_mouseColor_released();
     void on_gridThickness_valueChanged(double);
+    void on_gridColor_released();
 
 };
 

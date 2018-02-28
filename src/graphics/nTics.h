@@ -38,16 +38,20 @@ public:
 	
     nView* my_view;
 
-    QColor color, rulerColor;
+    QColor ticsColor, gridColor;
     bool rulerVisible, gridVisible;
-    double gridThickness;
 
-	void changeColor();
-	
+    void setGridThickness(double);
+    void changeTicsColor();
+
     QRectF boundingRect() const;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
 	QFont get_font() const;
+
+private:
+    double gridThickness;
+
 };
 
 #endif

@@ -35,7 +35,6 @@ nMouse::~   nMouse() {
 
 nMouse::nMouse() : QGraphicsItem(),
     my_shape(0),
-    mouseThickness(1.0),
     size(100,100)
 {
     pen.setCosmetic(true);
@@ -44,7 +43,7 @@ nMouse::nMouse() : QGraphicsItem(),
     my_set.beginGroup("nPreferences");
     my_shape=my_set.value("mouseShape",my_shape).toInt();
     pen.setColor(my_set.value("mouseColor",pen.color()).value<QColor>());
-    pen.setWidthF(my_set.value("mouseThickness",my_shape).toDouble());
+    pen.setWidthF(my_set.value("mouseThickness",pen.widthF()).toDouble());
     my_set.endGroup();
 
 

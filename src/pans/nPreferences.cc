@@ -135,7 +135,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	for(auto &locale : allLocales) {
 		QString my_str=nApp::localeToString(locale);
-		//        qDebug() << my_str << locale.name();
 		my_w.localeCombo->addItem(my_str,locale);
 	}
 
@@ -146,9 +145,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
 		my_w.pluginList->addItem(d);
 	}
-
-    connect(my_w.colorRuler, SIGNAL(released()), this, SLOT(setColorRuler()));
-    connect(my_w.colorMouse, SIGNAL(released()), this, SLOT(setColorMouse()));
 
 }
 
@@ -300,34 +296,31 @@ void nPreferences::on_removePlugin_released() {
 
 void nPreferences::on_mouseThickness_valueChanged(double val){
     nparent->my_w->my_view->my_mouse.pen.setWidthF(val);
-    nparent->my_w->my_view->repaint();
+    nparent->my_w->my_view->update();
     qDebug() << "here";
 }
 
 void nPreferences::on_gridThickness_valueChanged(double val) {
-    nparent->my_w->my_view->my_tics.gridThickness=val;
-    nparent->my_w->my_view->my_tics.update();
-    qDebug() << "here";
+    nparent->my_w->my_view->my_tics.setGridThickness(val);
 }
 
-void nPreferences::setColorRuler() {
-    QColorDialog colordial(nparent->my_w->my_view->my_tics.rulerColor,this);
+void nPreferences::on_gridColor_released() {
+    QColorDialog colordial(nparent->my_w->my_view->my_tics.gridColor,this);
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        nparent->my_w->my_view->my_tics.rulerColor=colordial.currentColor();
-        nparent->my_w->my_view->my_tics.update();
+        nparent->my_w->my_view->my_tics.gridColor=colordial.currentColor();
+        nparent->my_w->my_view->update();
     }
 }
 
-void nPreferences::setColorMouse() {
-
+void nPreferences::on_mouseColor_released() {
     QColorDialog colordial(nparent->my_w->my_view->my_mouse.pen.color());
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
         nparent->my_w->my_view->my_mouse.pen.setColor(colordial.currentColor());
-        update();
+        nparent->my_w->my_view->update();
     }
 }
 
