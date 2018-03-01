@@ -112,9 +112,18 @@ public slots:
 
     void setLockColors(bool);
 
+    void decrGamma();
+    void incrGamma();
+    void resetGamma();
     void setGamma(int value);
     void prevBuffer();
     void nextBuffer();
+
+    void cycleOverItems();
+    void rescale99();
+    void rescaleColor(int=100);
+    void rescaleLess();
+    void rescaleMore();
 
     void setMouseOrigin();
 

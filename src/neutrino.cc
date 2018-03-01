@@ -175,6 +175,12 @@ neutrino::neutrino():
     connect(my_w->actionNext_Buffer, SIGNAL(triggered()), my_w->my_view, SLOT(nextBuffer()));
     connect(my_w->actionShow_mouse, SIGNAL(triggered()), my_w->my_view, SLOT(nextMouseShape()));
 
+    connect(my_w->actionRescale99, SIGNAL(triggered()), my_w->my_view, SLOT(rescale99()));
+    connect(my_w->actionRescale_max, SIGNAL(triggered()), my_w->my_view, SLOT(rescaleColor()));
+
+    connect(my_w->actionShow_less_pixels, SIGNAL(triggered()), my_w->my_view, SLOT(rescaleLess()));
+    connect(my_w->actionShow_more_pixels, SIGNAL(triggered()), my_w->my_view, SLOT(rescaleMore()));
+
     connect(my_w->actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()));
 
     connect(my_w->actionShow_ruler, SIGNAL(triggered()), my_w->my_view, SLOT(toggleRuler()));
@@ -191,6 +197,13 @@ neutrino::neutrino():
     connect(my_w->actionZoom_in, SIGNAL(triggered()), my_w->my_view, SLOT(zoomIn()));
     connect(my_w->actionZoom_out, SIGNAL(triggered()), my_w->my_view, SLOT(zoomOut()));
     connect(my_w->actionZoom_eq, SIGNAL(triggered()), my_w->my_view, SLOT(zoomEq()));
+
+    connect(my_w->actionIncrement, SIGNAL(triggered()), my_w->my_view, SLOT(incrGamma()));
+    connect(my_w->actionDecrement, SIGNAL(triggered()), my_w->my_view, SLOT(decrGamma()));
+    connect(my_w->actionReset, SIGNAL(triggered()), my_w->my_view, SLOT(resetGamma()));
+    connect(my_w->actionCycle_over_items, SIGNAL(triggered()), my_w->my_view, SLOT(cycleOverItems()));
+
+
 
 
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
@@ -261,14 +274,6 @@ neutrino::neutrino():
     }
 
 
-}
-
-void neutrino::on_action99_triggered() {
-    if (my_w->my_view->currentBuffer) {
-        my_w->my_view->currentBuffer->property["display_range"]=getColorPrecentPixels(*(my_w->my_view->currentBuffer),99);
-        updatePhys();
-        emitBufferChanged();
-    }
 }
 
 void neutrino::scanDir(QString dirpath, QString pattern)

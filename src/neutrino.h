@@ -136,7 +136,6 @@ public slots:
 
     void scanDir(QString dirpath, QString pattern);
     void on_actionOpen_Glob_triggered();
-    void on_action99_triggered();
 
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);

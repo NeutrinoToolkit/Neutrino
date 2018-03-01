@@ -60,6 +60,24 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
     DEBUG(qobject_cast<neutrino *>(parent->parent()));
 
+
+    if (!qobject_cast<neutrino *>(parent->parent())) {
+        qDebug() << "ACTIVATING LOCAL SHORTCUTS since not part of Neutrino" ;
+        connect(new QShortcut(QKeySequence(Qt::Key_Tab),this), SIGNAL(activated()), this, SLOT(cycleOverItems()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(nextColorTable()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(previousColorTable()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Less),this), SIGNAL(activated()), this, SLOT(decrGamma()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Greater),this), SIGNAL(activated()), this, SLOT(incrGamma()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Period),this), SIGNAL(activated()), this, SLOT(resetGamma()));
+        connect(new QShortcut(QKeySequence(Qt::Key_G),this), SIGNAL(activated()), this, SLOT(toggleGrid()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_0),this), SIGNAL(activated()), this, SLOT(rescaleColor()));
+        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
+        connect(new QShortcut(QKeySequence(Qt::Key_R),this), SIGNAL(activated()), this, SLOT(toggleRuler()));
+        connect(new QShortcut(QKeySequence(Qt::Key_M),this), SIGNAL(activated()), this, SLOT(nextMouseShape()));
+        connect(new QShortcut(QKeySequence(Qt::Key_O),this), SIGNAL (activated()), this, SLOT(nextMouseShape()));
+    }
+
     my_scene.addItem(&my_pixitem);
     my_scene.addItem(&my_mouse);
     my_scene.addItem(&my_tics);
@@ -96,6 +114,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_set.endGroup();
 
     setMouseShape(my_mouse.my_shape);
+
 }
 
 void nView::setLockColors(bool val) {
@@ -295,7 +314,6 @@ nView::setSize() {
     }
     my_mouse.setSize(my_pixitem.pixmap().size());
     repaint();
-    emit zoomChanged(transform().m11());
 }
 
 void
@@ -306,6 +324,7 @@ nView::resizeEvent(QResizeEvent *e) {
 
 void nView::keyPressEvent (QKeyEvent *e)
 {
+    qDebug() << e;
     QGraphicsView::keyPressEvent(e);
     bool insideItem = false;
     foreach (QGraphicsItem *item, scene()->selectedItems()){
@@ -353,64 +372,60 @@ void nView::keyPressEvent (QKeyEvent *e)
         }
     }
 
-    switch (e->key()) {
-        case Qt::Key_Tab: { // cycle over items
-                QList<QGraphicsItem *> lista;
-                foreach (QGraphicsItem *oggetto, scene()->items() ) {
-                    if (oggetto->type() > QGraphicsItem::UserType) {
-                        if (oggetto->isVisible()) lista << oggetto;
-                    }
-                }
-                scene()->clearSelection();
-                if (lista.size()>0) {
-                    int found=0;
-                    for (int i=lista.size()-1; i >=0; i-- ) {
-                        if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
-                    }
-
-                    lista.at(found)->setFocus(Qt::TabFocusReason);
-                }
-                break;
-            }
-        case Qt::Key_A: {
-                if (e->modifiers() & Qt::ShiftModifier) {
-                    foreach (nPhysD* phys, physList) {
-                        phys->property["display_range"]=phys->get_min_max();
-                        setGamma(1);
-                        emit bufferChanged(phys);
-                    }
-                } else {
-                    if (currentBuffer) {
-                        currentBuffer->property["display_range"]=currentBuffer->get_min_max();
-                        setGamma(1);
-                        emit updatecolorbar();
-                    }
-                }
-                updatePhys();
-                break;
-            }
-        case Qt::Key_Less:
-            if (currentBuffer) {
-                setGamma(int(currentBuffer->property["gamma"])-1);
-            }
-            break;
-        case Qt::Key_Greater:
-            if (currentBuffer) {
-                setGamma(int(currentBuffer->property["gamma"])+1);
-            }
-            break;
-        case Qt::Key_Period:
-            if (currentBuffer) {
-                setGamma(1);
-            }
-            break;
-        case Qt::Key_G:
-            toggleGrid();
-            break;
-    }
-
     update();
     emit keypressed(e);
+}
+
+void nView::rescaleColor(int val) {
+    val=std::max<int>(std::min<int>(val,100),0);
+    setProperty("percentPixels",val);
+    qDebug() << "really here";
+    if (currentBuffer) {
+        if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
+            foreach (nPhysD* phys, physList) {
+                phys->property["display_range"]=getColorPrecentPixels(*phys,val);
+                emit bufferChanged(phys);
+            }
+            emit logging("All images rescaled to "+QString::number(val)+"%");
+        } else {
+            currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,val);
+            emit bufferChanged(currentBuffer);
+            emit logging("Image rescaled to "+QString::number(val)+"%");
+        }
+        updatePhys();
+    }
+}
+
+void nView::rescale99() {
+    rescaleColor(99);
+}
+
+void nView::rescaleLess() {
+    qDebug() << "hree";
+    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()-1 : 99);
+}
+
+void nView::rescaleMore() {
+    qDebug() << "hree";
+    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()+1 : 100);
+}
+
+void nView::cycleOverItems() {
+    QList<QGraphicsItem *> lista;
+    foreach (QGraphicsItem *oggetto, scene()->items() ) {
+        if (oggetto->type() > QGraphicsItem::UserType) {
+            if (oggetto->isVisible()) lista << oggetto;
+        }
+    }
+    scene()->clearSelection();
+    if (lista.size()>0) {
+        int found=0;
+        for (int i=lista.size()-1; i >=0; i-- ) {
+            if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
+        }
+
+        lista.at(found)->setFocus(Qt::TabFocusReason);
+    }
 }
 
 void nView::copyImage() {
@@ -441,6 +456,18 @@ void nView::toggleGrid() {
 }
 
 
+void nView::incrGamma() {
+    setGamma(int(currentBuffer->property["gamma"])+1);
+}
+
+void nView::decrGamma() {
+    setGamma(int(currentBuffer->property["gamma"])-1);
+}
+
+void nView::resetGamma() {
+    setGamma(1);
+}
+
 
 void nView::setGamma(int value) {
     if (currentBuffer) {
@@ -470,15 +497,17 @@ nView::changeColorTable () {
 }
 
 void nView::setMouseOrigin() {
-    if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier) {
+    if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
         foreach (nPhysD* phys, physList) {
             phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(phys);
+            emit logging("Origin set for all images");
         }
     } else {
         if (currentBuffer) {
             currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(currentBuffer);
+            emit logging("Origin set");
         }
     }
     my_tics.update();
@@ -487,13 +516,10 @@ void nView::setMouseOrigin() {
     // be taken for a buffer change. Used in nWinList.
     emit bufferOriginChanged();
     emit mouseposition(my_mouse.pos());
-    emit logging("Origin set");
 
 }
 
-
 void nView::nextMouseShape() {
-    qDebug() << "here" << my_mouse.num_shape;
     setMouseShape(my_mouse.my_shape+1);
 }
 
@@ -580,6 +606,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
         currentBuffer->property["display_range"]=minMax;
+        setProperty("percentPixels",QVariant());
         updatePhys();
     }
 }

@@ -83,9 +83,6 @@ public slots:
 
     vec2f sliderValues();
 
-    void percentChange();
-
-
 signals:
 	void change_contrast(double,double);
 

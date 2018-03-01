@@ -130,14 +130,29 @@
      <property name="title">
       <string>Colortable</string>
      </property>
+     <widget class="QMenu" name="menuGamma">
+      <property name="title">
+       <string>Gamma</string>
+      </property>
+      <addaction name="actionIncrement"/>
+      <addaction name="actionDecrement"/>
+      <addaction name="actionReset"/>
+     </widget>
      <addaction name="actionNext_LUT"/>
      <addaction name="actionPrevious_LUT"/>
      <addaction name="actionShow_colortable"/>
+     <addaction name="actionRescale99"/>
+     <addaction name="actionRescale_max"/>
+     <addaction name="menuGamma"/>
+     <addaction name="actionShow_more_pixels"/>
+     <addaction name="actionShow_less_pixels"/>
     </widget>
     <widget class="QMenu" name="menuPaths">
      <property name="title">
       <string>Paths</string>
      </property>
+     <addaction name="actionCycle_over_items"/>
+     <addaction name="separator"/>
      <addaction name="actionLine"/>
      <addaction name="actionRect"/>
      <addaction name="actionPoint"/>
@@ -153,12 +168,17 @@
      <addaction name="actionFlip_left_right"/>
      <addaction name="actionTranspose"/>
     </widget>
+    <widget class="QMenu" name="menuZoom">
+     <property name="title">
+      <string>Zoom</string>
+     </property>
+     <addaction name="actionZoom_in"/>
+     <addaction name="actionZoom_eq"/>
+     <addaction name="actionZoom_out"/>
+    </widget>
     <addaction name="menuBuffers"/>
-    <addaction name="actionZoom_in"/>
-    <addaction name="actionZoom_eq"/>
-    <addaction name="actionZoom_out"/>
     <addaction name="menuColortable"/>
-    <addaction name="action99"/>
+    <addaction name="menuZoom"/>
     <addaction name="separator"/>
     <addaction name="menuPaths"/>
     <addaction name="separator"/>
@@ -667,7 +687,7 @@
     <string>Transpose</string>
    </property>
   </action>
-  <action name="action99">
+  <action name="actionRescale99">
    <property name="text">
     <string>Rescale 99%</string>
    </property>
@@ -700,6 +720,62 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionIncrement">
+   <property name="text">
+    <string>Increment</string>
+   </property>
+   <property name="shortcut">
+    <string>&gt;</string>
+   </property>
+  </action>
+  <action name="actionDecrement">
+   <property name="text">
+    <string>Decrement</string>
+   </property>
+   <property name="shortcut">
+    <string>&lt;</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="shortcut">
+    <string>.</string>
+   </property>
+  </action>
+  <action name="actionCycle_over_items">
+   <property name="text">
+    <string>Cycle over items</string>
+   </property>
+   <property name="shortcut">
+    <string>Tab</string>
+   </property>
+  </action>
+  <action name="actionRescale_max">
+   <property name="text">
+    <string>Rescale reset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="actionShow_more_pixels">
+   <property name="text">
+    <string>Show more pixels</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="actionShow_less_pixels">
+   <property name="text">
+    <string>Show less pixels</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+[</string>
    </property>
   </action>
  </widget>
