@@ -43,11 +43,9 @@ public:
     Q_INVOKABLE nLineout(neutrino *, enum phys_direction);
 
 public slots:
-    void updatePlot(QPointF);
+    void updatePlot(QPointF=QPointF());
 
     void nZoom(double);
-
-    void updateLastPoint();
 
     void setBehaviour();
 

@@ -25,9 +25,13 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-    set (CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -Wall -D__phys_debug=10")
-    set (CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT -DQT_NO_WARNING_OUTPUT")
-    add_compile_options(-std=c++11)
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT -DQT_NO_WARNING_OUTPUT")
+
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    add_compile_options(-Wall)
 
     add_definitions(-DQT_PLUGIN)
     add_definitions(-DQT_SHARED)

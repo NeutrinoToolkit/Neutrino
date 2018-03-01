@@ -112,6 +112,7 @@
     <addaction name="actionQuit"/>
     <addaction name="actionClose"/>
     <addaction name="actionPreferences"/>
+    <addaction name="actionLog_info"/>
    </widget>
    <widget class="QMenu" name="menuImage">
     <property name="title">
@@ -776,6 +777,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+[</string>
+   </property>
+  </action>
+  <action name="actionLog_info">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Log info</string>
    </property>
   </action>
  </widget>

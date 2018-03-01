@@ -93,6 +93,7 @@ neutrino::neutrino():
     my_w(new Ui::neutrino),
     my_sbarra(new Ui::nSbarra)
 {
+
     my_w->setupUi(this);
     setAcceptDrops(true);
 
@@ -235,7 +236,6 @@ neutrino::neutrino():
     connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
     connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
-
     //recent file stuff
 
     for (int i = 0; i < MaxRecentFiles; ++i) {
@@ -272,6 +272,15 @@ neutrino::neutrino():
         if (strcmp(metaObject()->method(i).typeName(),"nGenericPan*")==0 && metaObject()->method(i).parameterCount() == 0 )
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
     }
+
+    // logging win
+    log_win.setCentralWidget(&logger);
+    log_win.setWindowTitle("Log");
+    log_win.setWindowIcon(QIcon(":icons/icon.png"));
+    logger.setReadOnly(true);
+    logger.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    connect(my_w->my_view, SIGNAL(logging(QString)), &logger, SLOT(appendPlainText(QString)));
+    connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &log_win, SLOT(setVisible(bool)));
 
 
 }
@@ -398,8 +407,7 @@ nPhysD* neutrino::getBuffer(int i) {
 // ------------------ PLUGINS -----------------------
 
 void
-neutrino::scanPlugins(QString pluginsDirStr)
-{
+neutrino::scanPlugins(QString pluginsDirStr) {
     QDir pluginsDir(pluginsDirStr);
     if (pluginsDir.exists()) {
 
@@ -461,6 +469,7 @@ neutrino::loadPlugin()
 void
 neutrino::loadPlugin(QString pname, bool launch)
 {
+    logger.appendPlainText(pname);
     if (!property("NeuSave-loadPlugin").isValid()) {
         setProperty("NeuSave-loadPlugin",QString("plugin.so"));
     }
@@ -1044,7 +1053,7 @@ void neutrino::exportGraphics (QString fout) {
         QPainter painter( &svgGen );
         getScene().render(&painter);
     } else {
-        QPixmap::grabWidget(my_w->my_view).save(fout);
+        QPixmap(my_w->my_view->grab()).save(fout);
     }
     my_w->my_view->my_mouse.setVisible(resetmouse);
 }
@@ -1069,8 +1078,9 @@ void neutrino::closeEvent (QCloseEvent *e) {
 
 void neutrino::on_actionKeyboard_shortcut_triggered() {
     bool ok;
-    QString text = QInputDialog::getText(this,"Open","", QLineEdit::Normal,QString(""), &ok, Qt::Sheet);
+    QString text = QInputDialog::getText(this,"Open","", QLineEdit::Normal,property("NeuSave-shortcut").toString(), &ok, Qt::Sheet);
     if (ok && !text.isEmpty()) {
+        setProperty("NeuSave-shortcut",text.replace(" ","_"));
         nGenericPan *my_pan= openPan(text,false);
         if(!my_pan) {
             statusBar()->showMessage(tr("Can't find ")+text, 2000);

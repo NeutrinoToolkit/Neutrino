@@ -51,10 +51,6 @@ public:
 	};
 	nPhysD *cutOffPhys;
 	Ui::Colorbar my_w;
-
-    QComboBox palettes;
-
-	QColor colorBase;
 	
 public slots:
     void minChanged();
@@ -71,12 +67,9 @@ public slots:
 
 	void cutOff();
 
-	void addColor();
-	void addPalette();
-	void removePalette();
-	void loadPalettes();
-	void itemDoubleClicked(QTreeWidgetItem*,int);
-	
+    void loadPalettes();
+
+    void resetPalettes();
 	void addPaletteFile();
 	void removePaletteFile();
     void on_gamma_valueChanged(int);

@@ -30,28 +30,23 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     }
     my_set.endGroup();
 
-    addPalettes();
+    addDefaultPalettes();
 }
 
-void nApp::addPalettes() {
+void nApp::addDefaultPalettes() {
+    qDebug() << "reset Palettes";
+    nPalettes.clear();
+
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
-
     QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
     paletteFiles.removeDuplicates();
-
     for(auto &my_str : paletteFiles) {
         if (QFileInfo(my_str).exists())
             addPaletteFile(my_str);
     }
     my_set.setValue("paletteFiles",paletteFiles);
-
-
-    QStringList paletteNames=my_set.value("palettesFromString","").toStringList();
-    for(auto &my_str : paletteNames) {
-        addPaletteFromString(my_str);
-    }
-    if(nPalettes.size() == 0) {
+    if (nPalettes.size()==0) {
         QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
         while (it.hasNext()) {
             addPaletteFile(it.next());
@@ -85,68 +80,6 @@ void nApp::addPaletteFile(QString cmapfile) {
        my_set.endGroup();
 
        inputFile.close();
-    }
-}
-
-struct QPairFirstComparer {
-    template<typename T1, typename T2>
-    bool operator()(const QPair<T1,T2> & a, const QPair<T1,T2> & b) const {
-        return a.first <= b.first;
-    }
-};
-
-void nApp::addPaletteFromString(QString paletteStr) {
-    QStringList nameColors=paletteStr.split(":",QString::SkipEmptyParts);
-    if (nameColors.size() == 2) {
-        QString palettename=nameColors.at(0);
-        QStringList paletteList=nameColors.at(1).split(",",QString::SkipEmptyParts);
-        QList<QPair<double,QColor> > listDoubleColor;
-
-        for (int i=0;i<paletteList.size();i++) {
-            QStringList colorValueName=paletteList.at(i).split(" ",QString::SkipEmptyParts);
-            if (colorValueName.size()==2) {
-                bool ok;
-                double my_val=QLocale().toDouble(colorValueName.first(),&ok);
-                QColor my_color(colorValueName.last());
-                if (ok && my_color.isValid()) {
-                    listDoubleColor.append(qMakePair(my_val,my_color));
-                }
-            }
-        }
-        qSort(listDoubleColor.begin(), listDoubleColor.end(), QPairFirstComparer());
-        if (listDoubleColor.size()>=2) {
-            double minVal=listDoubleColor.first().first;
-            double maxVal=listDoubleColor.last().first;
-            if (minVal!=maxVal) {
-                for(int i=0;i<listDoubleColor.size();i++) {
-                    listDoubleColor[i]=qMakePair(256.0*(listDoubleColor.at(i).first-minVal)/(maxVal-minVal),listDoubleColor.at(i).second);
-                }
-
-                std::vector<unsigned char> palC(768);
-
-                int counter=1;
-                for (int i=0;i<256;i++) {
-
-                    QColor col1=listDoubleColor.at(counter-1).second;
-                    QColor col2=listDoubleColor.at(counter).second;
-
-                    double delta=(listDoubleColor.at(counter).first-i)/(listDoubleColor.at(counter).first-listDoubleColor.at(counter-1).first);
-
-                    palC[i*3+0]=(unsigned char) (delta*col1.red()+(1.0-delta)*col2.red());
-                    palC[i*3+1]=(unsigned char) (delta*col1.green()+(1.0-delta)*col2.green());
-                    palC[i*3+2]=(unsigned char) (delta*col1.blue()+(1.0-delta)*col2.blue());
-
-                    while (i+1>listDoubleColor.at(counter).first) counter++;
-                }
-                nPalettes[palettename] = palC;
-                QSettings my_set("neutrino","");
-                my_set.beginGroup("Palettes");
-                QStringList paletteNames=my_set.value("palettesFromString","").toStringList();
-                paletteNames.append(palettename);
-                paletteNames.removeDuplicates();
-                my_set.setValue("palettesFromString",paletteNames);
-            }
-        }
     }
 }
 

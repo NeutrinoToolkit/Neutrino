@@ -56,15 +56,19 @@ void nLineout::setBehaviour() {
         disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
-    updateLastPoint();
+    updatePlot();
 }
 
 
 // mouse movement
 void
 nLineout::updatePlot(QPointF my_point) {
+    if (my_point.isNull())
+        my_point=nparent->my_w->my_view->my_mouse.pos();
 
-    if (currentBuffer != NULL) {
+    qDebug() << my_point;
+    if (currentBuffer) {
+        qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
 
         vec2 b_p(my_point.x(),my_point.y());
 
@@ -121,12 +125,9 @@ nLineout::updatePlot(QPointF my_point) {
 }
 
 void nLineout::nZoom(double d) {
-    updateLastPoint();
+    updatePlot();
 }
 
-void nLineout::updateLastPoint() {
-    updatePlot(nparent->my_w->my_view->my_mouse.pos());
-}
 
 
 

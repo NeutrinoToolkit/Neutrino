@@ -43,9 +43,9 @@ protected:
 
     bool event(QEvent *ev) override;
 
-    void addPalettes();
 
 public slots:
+
     void closeAllWindows();
 
     QList<neutrino*> neus();
@@ -58,7 +58,7 @@ public slots:
     void checkUpdates();
 
     void addPaletteFile(QString);
-    void addPaletteFromString(QString paletteStr);
+    void addDefaultPalettes();
 
 };
 #endif

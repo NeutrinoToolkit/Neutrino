@@ -27,8 +27,7 @@
 #include "neutrino.h"
 #include "nApp.h"
 
-nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent),
-  palettes(this)
+nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
 {
     my_w.setupUi(this);
 
@@ -62,28 +61,18 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent),
     connect(my_w.setToMin,SIGNAL(pressed()),this,SLOT(setToMin()));
     connect(my_w.setToMax,SIGNAL(pressed()),this,SLOT(setToMax()));
 
-    colorBase=QColor("blue");
-    connect(my_w.addPalette, SIGNAL(released()), this, SLOT(addPalette()));
-    connect(my_w.removePalette, SIGNAL(released()), this, SLOT(removePalette()));
-    connect(my_w.addColor, SIGNAL(released()), this, SLOT(addColor()));
-    connect(my_w.paletteColorlist, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem *,int)));
-
-
     connect(my_w.addPaletteFile, SIGNAL(released()), this, SLOT(addPaletteFile()));
     connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
+    connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
 
     connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
 	my_w.toolBar->addWidget(my_w.percent);
 
-    QFont f=palettes.font();
-    f.setPointSize(10);
-    palettes.setFont(f);
-    palettes.addItems(napp->nPalettes.keys());
-    palettes.setCurrentIndex(napp->nPalettes.keys().indexOf(parent->my_w->my_view->colorTable));
-    connect(&palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+    my_w.palettes->setCurrentIndex(my_w.palettes->findText(parent->my_w->my_view->colorTable));
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
-    my_w.toolBar->insertWidget(my_w.actionInvert,&palettes);
+    my_w.toolBar->insertWidget(my_w.actionInvert,my_w.palettes);
 
     show(true);
 
@@ -100,6 +89,16 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent),
         my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
     }
 
+}
+
+void nColorBar::resetPalettes() {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("Palettes");
+    my_set.setValue("paletteFiles",QStringList());
+    my_set.endGroup();
+
+    napp->addDefaultPalettes();
+    loadPalettes();
 }
 
 void nColorBar::on_gamma_valueChanged(int val) {
@@ -199,12 +198,12 @@ vec2f nColorBar::sliderValues() {
 
 void nColorBar::updatecolorbar() {
     qDebug() << "-------------------------------";
-    disconnect(&palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
-    palettes.clear();
-    palettes.addItems(napp->nPalettes.keys());
-    palettes.setCurrentIndex(palettes.findText(nparent->my_w->my_view->colorTable));
+    my_w.palettes->clear();
+    my_w.palettes->addItems(napp->nPalettes.keys());
+    my_w.palettes->setCurrentIndex(my_w.palettes->findText(nparent->my_w->my_view->colorTable));
 
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
@@ -215,7 +214,7 @@ void nColorBar::updatecolorbar() {
     }
     
     my_w.histogram->repaint();
-    connect(&palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
@@ -242,74 +241,18 @@ void nColorBar::cutOff() {
     }
 }
 
-void nColorBar::addColor() {
-    QColorDialog colordial(colorBase,this);
-    colordial.exec();
-    if (colordial.result() && colordial.currentColor().isValid()) {
-        colorBase=colordial.currentColor();
-        my_w.colorlist->insert(colorBase.name());
-    }
-}
-
-void nColorBar::removePalette() {
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("Palettes");
-    QStringList paletteNames=my_set.value("palettesFromString","").toStringList();
-
-    QTreeWidgetItemIterator it(my_w.paletteColorlist);
-    while (*it) {
-        QString paletteName=(*it)->text(0);
-        if (paletteName==my_w.paletteName->text()){
-            if (napp->nPalettes.contains(paletteName)) {
-                if (nparent->my_w->my_view->colorTable==paletteName) nparent->my_w->my_view->nextColorTable();
-                napp->nPalettes.remove(paletteName);
-                paletteNames.removeAll(paletteName);
-            }
-            delete (*it);
-        }
-        ++it;
-    }
-    updatecolorbar();
-    my_set.setValue("palettesFromString",paletteNames);
-}
-
-void nColorBar::addPalette() {
-    removePalette();
-    QStringList liststring;
-    liststring << my_w.paletteName->text() << my_w.colorlist->text();
-
-    napp->addPaletteFromString(liststring.join(":"));
-
-    if (napp->nPalettes.keys().contains(my_w.paletteName->text())) {
-        new QTreeWidgetItem(my_w.paletteColorlist,liststring);
-    }
-}
-
 void nColorBar::loadPalettes() {
+    my_w.palettes->clear();
+    my_w.palettes->addItems(napp->nPalettes.keys());
+    my_w.fileList->clear();
+
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
-    QStringList paletteNames=my_set.value("paletteNames","").toStringList();
-    QStringList paletteColors=my_set.value("paletteColors","").toStringList();
-    if (paletteNames.size()==paletteColors.size()) {
-        for (int i=0;i<paletteNames.size();i++) {
-            QStringList liststring;
-            liststring << paletteNames.at(i) << paletteColors.at(i);
-            new QTreeWidgetItem(my_w.paletteColorlist,liststring);
-        }
-    }
-
     QStringList paletteFilesName=my_set.value("paletteFiles","").toStringList();
     for(auto &my_file : paletteFilesName) {
         new QListWidgetItem(my_file,my_w.fileList);
     }
     my_set.endGroup();
-}
-
-void nColorBar::itemDoubleClicked(QTreeWidgetItem *item,int){
-    if (item) {
-        my_w.paletteName->setText(item->text(0));
-        my_w.colorlist->setText(item->text(1));
-    }
 }
 
 void nColorBar::addPaletteFile() {
@@ -329,11 +272,13 @@ void nColorBar::removePaletteFile() {
         QString paletteName=QFileInfo(my_item->text()).baseName().replace("_"," ");
         qDebug() << my_item->text() << paletteName;
         if (napp->nPalettes.contains(paletteName)) {
-            if (nparent->my_w->my_view->colorTable==paletteName) nparent->my_w->my_view->nextColorTable();
-            napp->nPalettes.remove(paletteName);
+            if (nparent->my_w->my_view->colorTable!=paletteName) {
+                napp->nPalettes.remove(paletteName);
+                paletteFiles.removeAll(my_item->text());
+                my_w.palettes->removeItem(my_w.palettes->findText(paletteName));
+                delete my_item;
+            }
         }
-        paletteFiles.removeAll(my_item->text());
-        delete my_item;
     }
     updatecolorbar();
     my_set.setValue("paletteFiles",paletteFiles);

@@ -326,24 +326,20 @@ void nView::keyPressEvent (QKeyEvent *e)
 {
     qDebug() << e;
     QGraphicsView::keyPressEvent(e);
-    bool insideItem = false;
-    foreach (QGraphicsItem *item, scene()->selectedItems()){
-        insideItem = true;
-        //		item->keyPressEvent(e);
-        QGraphicsObject *itemObj=item->toGraphicsObject();
-        switch (e->key()) {
-            case Qt::Key_Backspace: {
-                    if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
-                        emit logging(tr("Removed ")+item->toolTip());
-                        itemObj->deleteLater();
-                    } else {
-                        emit logging(tr("Can't remove ")+item->toolTip());
-                    }
+    if (scene()->selectedItems().size()) {
+        if (e->key() == Qt::Key_Backspace) {
+            foreach (QGraphicsItem *item, scene()->selectedItems()){
+                QGraphicsObject *itemObj=item->toGraphicsObject();
+                if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
+                    emit logging(tr("Removed ")+item->toolTip());
+                    itemObj->deleteLater();
                     break;
+                } else {
+                    emit logging(tr("Can't remove ")+item->toolTip());
                 }
+            }
         }
-    }
-    if (!insideItem) {
+    } else {
         QPointF delta(0,0);
         switch (e->key()) {
             case Qt::Key_Up:
@@ -379,7 +375,6 @@ void nView::keyPressEvent (QKeyEvent *e)
 void nView::rescaleColor(int val) {
     val=std::max<int>(std::min<int>(val,100),0);
     setProperty("percentPixels",val);
-    qDebug() << "really here----------------------------------------->" << sender();
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
             foreach (nPhysD* phys, physList) {
@@ -401,12 +396,10 @@ void nView::rescale99() {
 }
 
 void nView::rescaleLess() {
-    qDebug() << "hree";
     rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()-1 : 99);
 }
 
 void nView::rescaleMore() {
-    qDebug() << "hree";
     rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()+1 : 100);
 }
 
@@ -429,7 +422,7 @@ void nView::cycleOverItems() {
 }
 
 void nView::copyImage() {
-    QApplication::clipboard()->setPixmap(QPixmap::grabWidget(this), QClipboard::Clipboard);
+    QApplication::clipboard()->setPixmap(grab(), QClipboard::Clipboard);
     emit logging("Image copied in clipboard");
 }
 
