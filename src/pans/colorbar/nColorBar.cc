@@ -85,7 +85,7 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent),
 
     my_w.toolBar->insertWidget(my_w.actionInvert,&palettes);
 
-    show();
+    show(true);
 
     if (currentBuffer) my_w.gamma->setValue(currentBuffer->property["gamma"]);
 
@@ -95,6 +95,10 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent),
     cutOffPhys=NULL;
     QApplication::processEvents();
     my_w.histogram->repaint();
+
+    if (nparent->my_w->my_view->property("percentPixels").isValid()) {
+        my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
+    }
 
 }
 
@@ -172,6 +176,13 @@ void nColorBar::bufferChanged(nPhysD *phys) {
     my_w.sliderMax->setValue(sliderValues().second());
     my_w.gamma->setValue(phys->property["gamma"]);
     my_w.histogram->repaint();
+
+    disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
+    if (nparent->my_w->my_view->property("percentPixels").isValid()) {
+        my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
+    }
+    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
+
 }
 
 vec2f nColorBar::sliderValues() {
@@ -179,7 +190,6 @@ vec2f nColorBar::sliderValues() {
         vec2f minmax=currentBuffer->property["display_range"];
         double valmin=my_w.sliderMin->maximum()*(minmax.first()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
         double valmax=my_w.sliderMax->maximum()*(minmax.second()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
-        qDebug() << "=====================================" << valmin << valmax;
         return vec2f(valmin,valmax);
     }
     return vec2f(0,my_w.sliderMax->maximum());

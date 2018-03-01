@@ -115,7 +115,7 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
 
     PythonQt::self()->getMainModule().addObject("neu", nparent);
 
-    show();
+    show(true);
     
     connect(my_w.changeScriptsFolder, SIGNAL(released()), this, SLOT(changeScriptsFolder()));
     connect(my_w.changeSiteFolder, SIGNAL(released()), this, SLOT(changeSiteFolder()));

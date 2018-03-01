@@ -44,7 +44,7 @@ nLineout::nLineout(neutrino *parent, enum phys_direction plot_dir) : nGenericPan
     my_w.plot->graph(0)->setName(namedirection);
 
     setProperty("panName",namedirection);
-    show();
+    show(true);
     setBehaviour();
 }
 

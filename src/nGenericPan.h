@@ -151,7 +151,7 @@ public slots:
     void button(QString, int=1);
     QStringList widgets();
 
-    void show();
+    void show(bool onlyOneAllowed=false);
 
     void keyPressEvent(QKeyEvent *event) override;
 

@@ -379,7 +379,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 void nView::rescaleColor(int val) {
     val=std::max<int>(std::min<int>(val,100),0);
     setProperty("percentPixels",val);
-    qDebug() << "really here";
+    qDebug() << "really here----------------------------------------->" << sender();
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
             foreach (nPhysD* phys, physList) {

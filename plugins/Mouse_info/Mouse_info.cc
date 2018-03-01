@@ -47,7 +47,7 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 
     mouse=nparent->my_w->my_view->my_mouse.pos();
 	updateLabels();
-    show();
+    show(true);
 }
 
 void Mouse_info::addPoint(QPointF position) {

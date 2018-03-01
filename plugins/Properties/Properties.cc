@@ -33,7 +33,7 @@ Properties::Properties(neutrino *nparent) : nGenericPan(nparent)
 
     bufferChanged(currentBuffer);
 
-    show();
+    show(true);
 }
 
 void

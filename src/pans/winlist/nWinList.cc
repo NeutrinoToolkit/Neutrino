@@ -58,7 +58,7 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(buttonCopyPhys()));
     connect(my_w.actionFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreezed(bool)));
 
-    show();
+    show(true);
 }
 
 void nWinList::selectionChanged() {

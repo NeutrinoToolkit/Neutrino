@@ -34,8 +34,7 @@ Shortcuts::Shortcuts(neutrino *nparent) : nGenericPan(nparent)
         QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
         my_w.textBrowser->insertHtml(htmltext);
     }
-
-    show();
+    show(true);
 }
 
 

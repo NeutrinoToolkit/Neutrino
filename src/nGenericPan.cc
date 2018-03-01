@@ -223,8 +223,16 @@ void nGenericPan::decorate(QWidget *main_widget) {
 
 }
 
-void nGenericPan::show() {
-
+    void nGenericPan::show(bool onlyOneAllowed) {
+    if (onlyOneAllowed) {
+        for (auto & pan: nparent->getPanList()) {
+            qDebug() << this << pan;
+            if (pan!=this && pan->metaObject()->className() == metaObject()->className()) {
+                pan->close();
+                QApplication::processEvents();
+            }
+        }
+    }
     qDebug() << metaObject()->className();
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
@@ -572,7 +580,7 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
-    nparent->emitPanDel(this);
+    qDebug() << "Going to close" << this;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
@@ -623,6 +631,7 @@ void nGenericPan::closeEvent(QCloseEvent*){
             disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
         }
     }
+    nparent->emitPanDel(this);
 }
 
 void nGenericPan::focusOutEvent(QFocusEvent *event) {

@@ -1052,7 +1052,7 @@ void neutrino::exportGraphics (QString fout) {
 void neutrino::closeEvent (QCloseEvent *e) {
     qDebug() << "here" << sender();
     qDebug() << QApplication::activeWindow();
-    if (QApplication::activeWindow() == this) {
+    if (!QApplication::activeWindow() || QApplication::activeWindow() == this) {
         disconnect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
         if (fileClose()) {
             saveDefaults();
@@ -1062,9 +1062,7 @@ void neutrino::closeEvent (QCloseEvent *e) {
             connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
         }
     } else {
-        if (QApplication::activeWindow()) {
-            QApplication::activeWindow()->close();
-        }
+        QApplication::activeWindow()->close();
         e->ignore();
     }
 }

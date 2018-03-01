@@ -98,7 +98,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
 	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 
-	show();
+    show(true);
 
 	my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
