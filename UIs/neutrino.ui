@@ -252,7 +252,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionWinlist"/>
    <addaction name="actionLockColors"/>
    <addaction name="separator"/>
    <addaction name="actionFlipRotate"/>

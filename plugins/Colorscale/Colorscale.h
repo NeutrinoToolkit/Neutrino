@@ -74,9 +74,11 @@ public slots:
 	void removePaletteFile();
     void on_gamma_valueChanged(int);
 
-    void on_fileList_itemSelectionChanged();
+    void on_fileList_itemClicked(QListWidgetItem*);
 
     vec2f sliderValues();
+    const QIcon getPaletteIconFile(QString my_file);
+    const QIcon getPaletteIcon(QString paletteName);
 
 signals:
 	void change_contrast(double,double);

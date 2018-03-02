@@ -22,13 +22,13 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nwinlist_h
-#define __nwinlist_h
+#ifndef __Image_list_h
+#define __Image_list_h
 
 #include <QtGui>
 #include <QWidget>
 
-#include "ui_nWinList.h"
+#include "ui_Image_list.h"
 
 #include "nTreeWidget.h"
 #include "nPhysImageF.h"
@@ -36,16 +36,16 @@
 
 class neutrino;
 
-class nWinList : public nGenericPan {
+class Image_list : public nGenericPan {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE nWinList(neutrino*);
+    Q_INVOKABLE Image_list(neutrino*);
 
-    Ui::nWinList my_w;
+    Ui::Image_list my_w;
 
     // stuff for static scale/origin
-    // (should pass to nPhysProperties once this has been merged to nWinList)
+    // (should pass to nPhysProperties once this has been merged to Image_list)
     bool freezedFrame;
     vec2f frScale, frOrigin;
 
@@ -68,5 +68,7 @@ public slots:
     void keyPressEvent(QKeyEvent *);
 
 };
+
+NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I);
 
 #endif

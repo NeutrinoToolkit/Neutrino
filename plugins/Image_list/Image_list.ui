@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nWinList</class>
- <widget class="QMainWindow" name="nWinList">
+ <class>Image_list</class>
+ <widget class="QMainWindow" name="Image_list">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -267,7 +267,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -283,11 +283,11 @@
   <customwidget>
    <class>nTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header location="global">../src/pans/winlist/nTreeWidget.h</header>
+   <header location="global">nTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

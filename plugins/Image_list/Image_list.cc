@@ -23,8 +23,8 @@
  *
  */
 #include "neutrino.h"
-#include "nWinList.h"
-nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
+#include "Image_list.h"
+Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     freezedFrame(false), frScale(1,1), frOrigin(0,0)
 {
     my_w.setupUi(this);
@@ -61,7 +61,7 @@ nWinList::nWinList(neutrino *nparent) : nGenericPan(nparent),
     show(true);
 }
 
-void nWinList::selectionChanged() {
+void Image_list::selectionChanged() {
     QList<QTreeWidgetItem *> sel=my_w.images->selectedItems();
     if (sel.size()) {
         QTreeWidgetItem *item=sel.last();
@@ -77,14 +77,14 @@ void nWinList::selectionChanged() {
 }
 
 nPhysD*
-nWinList::getPhys(QTreeWidgetItem* item) {
+Image_list::getPhys(QTreeWidgetItem* item) {
     nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<void*>());
     //	retphys->property.dumper(std::cerr);
     return retphys;
 }
 
 void
-nWinList::buttonCopyPhys() {
+Image_list::buttonCopyPhys() {
     foreach (QTreeWidgetItem* item, my_w.images->selectedItems()) {
         nPhysD *copyPhys=new nPhysD(*getPhys(item));
         nparent->addShowPhys(copyPhys);
@@ -92,7 +92,7 @@ nWinList::buttonCopyPhys() {
 }
 
 void
-nWinList::buttonRemovePhys() {
+Image_list::buttonRemovePhys() {
     disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
@@ -110,7 +110,7 @@ nWinList::buttonRemovePhys() {
 }
 
 void
-nWinList::changeProperties() {
+Image_list::changeProperties() {
     QList<nPhysD*> physSelected;
     QList<QTreeWidgetItem*> itemsSelected;
     foreach (QTreeWidgetItem* item, my_w.images->selectedItems()) {
@@ -232,7 +232,7 @@ nWinList::changeProperties() {
     }
 }
 
-void nWinList::keyPressEvent(QKeyEvent *e){
+void Image_list::keyPressEvent(QKeyEvent *e){
     switch (e->key()) {
     case Qt::Key_Return:
         nparent->showPhys(getPhys(my_w.images->selectedItems().first()));
@@ -247,7 +247,7 @@ void nWinList::keyPressEvent(QKeyEvent *e){
 
 
 void
-nWinList::updatePad(nPhysD *my_phys) {
+Image_list::updatePad(nPhysD *my_phys) {
     if (my_phys==nullptr) {
         my_phys=currentBuffer;
     }
@@ -284,7 +284,7 @@ nWinList::updatePad(nPhysD *my_phys) {
 
 
 void
-nWinList::physDel(nPhysD *my_phys) {
+Image_list::physDel(nPhysD *my_phys) {
     QTreeWidgetItemIterator it(my_w.images);
     while (*it) {
         if (getPhys(*it)==my_phys) delete (*it);
@@ -294,7 +294,7 @@ nWinList::physDel(nPhysD *my_phys) {
 }
 
 /// new image entry point
-void nWinList::physAdd(nPhysD *my_phys) {
+void Image_list::physAdd(nPhysD *my_phys) {
     QTreeWidgetItem *my_item = new QTreeWidgetItem(my_w.images);
 
     if (freezedFrame) {
@@ -322,7 +322,7 @@ void nWinList::physAdd(nPhysD *my_phys) {
 
 /// set static scale/origin
 void
-nWinList::setFreezed(bool st) {
+Image_list::setFreezed(bool st) {
     if (st) {
         DEBUG("setFreezed");
         if (!freezedFrame) {
@@ -348,7 +348,7 @@ nWinList::setFreezed(bool st) {
 
 /// called for external origin change
 void
-nWinList::originChanged() {
+Image_list::originChanged() {
     if (currentBuffer) {
         frScale = currentBuffer->get_scale();
         frOrigin = currentBuffer->get_origin();

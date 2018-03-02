@@ -163,8 +163,6 @@ public slots:
     void exportAllGraphics();
     void exportGraphics(QString);
 
-    nGenericPan* WinList();
-
     nGenericPan* Hlineout();
     nGenericPan* Vlineout();
 

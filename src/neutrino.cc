@@ -50,7 +50,6 @@
 #include "nLineout.h"
 
 #include "nPreferences.h"
-#include "nWinList.h"
 
 #include "nPhysFormats.h"
 
@@ -136,9 +135,6 @@ neutrino::neutrino():
         }
     }
     connect(my_w->actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
-
-
-    connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
 
 
     connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -1323,12 +1319,6 @@ neutrino::closeCurrentBuffer() {
         }
     }
     QApplication::processEvents();
-}
-
-// Window List pan
-nGenericPan*
-neutrino::WinList() {
-    return new nWinList(this);
 }
 
 // testing

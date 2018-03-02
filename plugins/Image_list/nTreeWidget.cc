@@ -23,7 +23,7 @@
  *
  */
 #include "nTreeWidget.h"
-#include "nWinList.h"
+#include "Image_list.h"
 #include "neutrino.h"
 
 void nTreeWidget::mousePressEvent(QMouseEvent *e) {
