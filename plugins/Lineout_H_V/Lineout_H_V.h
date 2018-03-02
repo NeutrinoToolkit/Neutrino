@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,11 +17,34 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nPlug.h"
+#ifndef __Lineout_H_V
+#define __Lineout_H_V
 
+#include <QtGui>
+#include <QWidget>
 
+#include "nGenericPan.h"
+#include "ui_Lineout_H_V.h"
+
+class Lineout_H_V : public nGenericPan {
+    Q_OBJECT
+public:
+    Q_INVOKABLE Lineout_H_V(neutrino *);
+
+public slots:
+    void updatePlot(QPointF);
+    void setBehaviour();
+    void updateLastPoint();
+
+private:
+    Ui::Lineout_H_V my_w;
+};
+
+NEUTRINO_PLUGIN(Lineout_H_V,Analysis;Lineout);
+
+#endif

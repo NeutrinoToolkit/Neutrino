@@ -22,10 +22,10 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "Lineout_XY.h"
+#include "Lineout_H_V.h"
 #include "neutrino.h"
 
-Lineout_XY::Lineout_XY(neutrino *parent) : nGenericPan(parent)
+Lineout_H_V::Lineout_H_V(neutrino *parent) : nGenericPan(parent)
 {
 	my_w.setupUi(this);
 
@@ -55,7 +55,7 @@ Lineout_XY::Lineout_XY(neutrino *parent) : nGenericPan(parent)
     
 }
 
-void Lineout_XY::setBehaviour() {
+void Lineout_H_V::setBehaviour() {
     if (my_w.lockClick->isChecked()) {
         disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
@@ -65,7 +65,7 @@ void Lineout_XY::setBehaviour() {
     }
 }
 
-void Lineout_XY::updatePlot(QPointF p) {
+void Lineout_H_V::updatePlot(QPointF p) {
 
     if (currentBuffer != NULL) {
 
@@ -126,7 +126,7 @@ void Lineout_XY::updatePlot(QPointF p) {
     }
 }
 
-void Lineout_XY::updateLastPoint() {
+void Lineout_H_V::updateLastPoint() {
     if (!my_w.lockClick->isChecked()) {
         updatePlot(nparent->my_w->my_view->my_mouse.pos());
     }

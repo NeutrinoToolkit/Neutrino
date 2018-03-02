@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Lineout_XY</class>
- <widget class="QMainWindow" name="Lineout_XY">
+ <class>Lineout_H_V</class>
+ <widget class="QMainWindow" name="Lineout_H_V">
   <property name="geometry">
    <rect>
     <x>0</x>

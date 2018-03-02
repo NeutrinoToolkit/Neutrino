@@ -567,7 +567,7 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_5">
           <property name="title">
-           <string>Etalon</string>
+           <string>Etalon calculator</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
            <property name="leftMargin">
@@ -585,6 +585,72 @@
            <property name="horizontalSpacing">
             <number>1</number>
            </property>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="etalon_lambda">
+             <property name="prefix">
+              <string>λ </string>
+             </property>
+             <property name="suffix">
+              <string> nm</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
+             </property>
+             <property name="value">
+              <double>532.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="etalon_thickness">
+             <property name="prefix">
+              <string>Thick </string>
+             </property>
+             <property name="suffix">
+              <string> mm</string>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="maximum">
+              <double>999.990000000000009</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>10.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QDoubleSpinBox" name="etalon_n0">
+             <property name="prefix">
+              <string>n </string>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.500000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="5">
             <spacer name="horizontalSpacer_4">
              <property name="orientation">
@@ -598,7 +664,7 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="6">
+           <item row="0" column="7">
             <widget class="QDoubleSpinBox" name="etalon_sensitivity">
              <property name="suffix">
               <string> km/s</string>
@@ -636,69 +702,15 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QDoubleSpinBox" name="etalon_n0">
-             <property name="prefix">
-              <string>n </string>
+           <item row="0" column="6">
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
              </property>
-             <property name="decimals">
-              <number>5</number>
-             </property>
-             <property name="singleStep">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.500000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QDoubleSpinBox" name="etalon_thickness">
-             <property name="prefix">
-              <string>Thick </string>
-             </property>
-             <property name="suffix">
-              <string> mm</string>
-             </property>
-             <property name="decimals">
-              <number>5</number>
-             </property>
-             <property name="maximum">
-              <double>999.990000000000009</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="value">
-              <double>10.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="etalon_lambda">
-             <property name="prefix">
-              <string>λ </string>
-             </property>
-             <property name="suffix">
-              <string> nm</string>
-             </property>
-             <property name="decimals">
-              <number>3</number>
-             </property>
-             <property name="maximum">
-              <double>9999.989999999999782</double>
-             </property>
-             <property name="value">
-              <double>532.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
+             <property name="text">
+              <string>sensitivity</string>
              </property>
             </widget>
            </item>
@@ -747,7 +759,7 @@
   </widget>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -759,7 +771,7 @@
   </action>
   <action name="actionGuess">
    <property name="icon">
-    <iconset resource="../GhostFringes/GhostFringes.qrc">
+    <iconset resource="../Ghost_fringes/GhostFringes.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -783,7 +795,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -795,7 +807,7 @@
   </action>
   <action name="actionRect3">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -807,7 +819,7 @@
   </action>
   <action name="actionSaveTxtMultiple">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
    </property>
    <property name="text">
@@ -819,7 +831,7 @@
   </action>
   <action name="actionAddVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -831,7 +843,7 @@
   </action>
   <action name="actionDelVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -876,8 +888,8 @@
   <tabstop>etalon_sensitivity</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
-  <include location="../GhostFringes/GhostFringes.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
  </resources>
  <connections/>

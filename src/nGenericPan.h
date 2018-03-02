@@ -46,10 +46,6 @@
 class neutrino;
 class nApp;
 
-namespace Ui {
-class PanHelp;
-}
-
 typedef void (*ifunc)(void *, int &);
 
 class nHelpTextBrowser : public QTextBrowser {
@@ -77,15 +73,15 @@ public:
     Q_INVOKABLE nGenericPan(neutrino *);
     ~nGenericPan(){};
 
-    neutrino *nparent;
-    nApp *napp;
+    QPointer<neutrino> nparent;
+    QPointer<nApp> napp;
 
     nPhysD *currentBuffer;
 
     // thread stuff
     panThread nThread;
 
-    Ui::PanHelp *my_help;
+    QPointer<QMainWindow> helpwin;
 
 signals:
     void changeCombo(QComboBox*);

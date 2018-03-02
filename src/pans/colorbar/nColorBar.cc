@@ -68,7 +68,8 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
     connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
 	my_w.toolBar->addWidget(my_w.percent);
 
-    my_w.palettes->setCurrentIndex(my_w.palettes->findText(parent->my_w->my_view->colorTable));
+    loadPalettes();
+
     connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
@@ -77,8 +78,6 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
     show(true);
 
     if (currentBuffer) my_w.gamma->setValue(currentBuffer->property["gamma"]);
-
-    loadPalettes();
 
     updatecolorbar();
     cutOffPhys=NULL;
@@ -89,6 +88,12 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
         my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
     }
 
+}
+
+void nColorBar::on_fileList_itemSelectionChanged(){
+    QString ctable = QFileInfo(my_w.fileList->selectedItems().at(0)->text()).baseName().replace("_"," ");
+    qDebug() << ctable;
+    nparent->my_w->my_view->changeColorTable(ctable);
 }
 
 void nColorBar::resetPalettes() {

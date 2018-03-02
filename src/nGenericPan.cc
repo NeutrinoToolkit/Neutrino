@@ -33,8 +33,7 @@ nGenericPan::nGenericPan(neutrino *myparent)
     : QMainWindow(myparent),
       nparent(myparent),
       napp(qobject_cast<nApp*> (qApp)),
-      currentBuffer(myparent->getCurrentBuffer()),
-      my_help(new Ui::PanHelp)
+      currentBuffer(myparent->getCurrentBuffer())
 {
     if (nparent==nullptr || napp==nullptr) return;
     connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
@@ -98,8 +97,8 @@ void nGenericPan::keyPressEvent(QKeyEvent *event) {
 }
 
 void nGenericPan::physAdd(nPhysD *buffer) {
-    DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>")
-            foreach (QComboBox *combo, findChildren<QComboBox *>()) {
+    DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>");
+    foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
             if (alreadyThere == -1) {
@@ -124,28 +123,24 @@ void nGenericPan::help() {
     qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
     qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
 
-    QString helpFile(property("helpFile").toString());
-    if (QFileInfo(helpFile).exists()) {
-        QMainWindow *helpwin=nullptr;
-        foreach (helpwin, findChildren<QMainWindow *>()) {
-            if (helpwin->property("NeutrinoHelp").isValid()) {
-                helpwin->raise();
-                helpwin->show();
-                break;
-            }
-        }
-        if (!helpwin) {
-            helpwin=new QMainWindow();
-            my_help->setupUi(helpwin);
+    if (helpwin.isNull()) {
+        helpwin= new QMainWindow();
+        QString helpFile(property("helpFile").toString());
+        if (QFileInfo(helpFile).exists()) {
+            Ui::PanHelp my_help;
+            my_help.setupUi(helpwin);
             helpwin->setWindowTitle(panName()+" help");
-            helpwin->setProperty("NeutrinoHelp",true);
-            my_help->help->setSource(QUrl("qrc"+helpFile));
-            connect(my_help->actionHome, SIGNAL(triggered()), my_help->help, SLOT(home()));
-            connect(my_help->actionBack, SIGNAL(triggered()), my_help->help, SLOT(backward()));
-            connect(my_help->actionForward, SIGNAL(triggered()), my_help->help, SLOT(forward()));
-            connect(my_help->actionPrint, SIGNAL(triggered()), my_help->help, SLOT(print()));
+            my_help.help->setSource(QUrl("qrc"+helpFile));
+            connect(my_help.actionHome, SIGNAL(triggered()), my_help.help, SLOT(home()));
+            connect(my_help.actionBack, SIGNAL(triggered()), my_help.help, SLOT(backward()));
+            connect(my_help.actionForward, SIGNAL(triggered()), my_help.help, SLOT(forward()));
+            connect(my_help.actionPrint, SIGNAL(triggered()), my_help.help, SLOT(print()));
             helpwin->show();
         }
+    } else {
+        helpwin->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+        helpwin->raise();  // for MacOS
+        helpwin->activateWindow(); // for Windows
     }
 }
 
@@ -223,7 +218,7 @@ void nGenericPan::decorate(QWidget *main_widget) {
 
 }
 
-    void nGenericPan::show(bool onlyOneAllowed) {
+void nGenericPan::show(bool onlyOneAllowed) {
     if (onlyOneAllowed) {
         for (auto & pan: nparent->getPanList()) {
             qDebug() << this << pan;
@@ -580,6 +575,9 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
+    if (!helpwin.isNull()) {
+        helpwin->close();
+    }
     qDebug() << "Going to close" << this;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
@@ -614,24 +612,25 @@ void nGenericPan::closeEvent(QCloseEvent*){
         }
     }
     QApplication::processEvents();
-    foreach (QWidget *widget, QApplication::allWidgets()) {
-        neutrino *neu=qobject_cast<neutrino *>(widget);
-        if (neu==nparent) {
-            disconnect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
-            disconnect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
+//    foreach (QWidget *widget, QApplication::allWidgets()) {
+//        neutrino *neu=qobject_cast<neutrino *>(widget);
+//        if (neu==nparent) {
+//            disconnect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
+//            disconnect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
 
-            disconnect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
+//            disconnect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
 
-            disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
-            disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
+//            disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
+//            disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
 
-            disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
+//            disconnect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
 
-            disconnect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-            disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-        }
-    }
+//            disconnect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
+//            disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+//        }
+//    }
     nparent->emitPanDel(this);
+    QApplication::processEvents();
 }
 
 void nGenericPan::focusOutEvent(QFocusEvent *event) {

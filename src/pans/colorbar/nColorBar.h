@@ -74,6 +74,8 @@ public slots:
 	void removePaletteFile();
     void on_gamma_valueChanged(int);
 
+    void on_fileList_itemSelectionChanged();
+
     vec2f sliderValues();
 
 signals:
