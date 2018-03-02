@@ -23,11 +23,11 @@
  *
  */
 
-#include "nColorBar.h"
+#include "Colorscale.h"
 #include "neutrino.h"
 #include "nApp.h"
 
-nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
+Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent)
 {
     my_w.setupUi(this);
 
@@ -90,13 +90,13 @@ nColorBar::nColorBar (neutrino *parent) : nGenericPan(parent)
 
 }
 
-void nColorBar::on_fileList_itemSelectionChanged(){
+void Colorscale::on_fileList_itemSelectionChanged(){
     QString ctable = QFileInfo(my_w.fileList->selectedItems().at(0)->text()).baseName().replace("_"," ");
     qDebug() << ctable;
     nparent->my_w->my_view->changeColorTable(ctable);
 }
 
-void nColorBar::resetPalettes() {
+void Colorscale::resetPalettes() {
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     my_set.setValue("paletteFiles",QStringList());
@@ -106,26 +106,26 @@ void nColorBar::resetPalettes() {
     loadPalettes();
 }
 
-void nColorBar::on_gamma_valueChanged(int val) {
+void Colorscale::on_gamma_valueChanged(int val) {
     if (currentBuffer) {
         currentBuffer->property["gamma"]=val;
         nparent->updatePhys();
     }
 }
 
-void nColorBar::setToMin () {
+void Colorscale::setToMin () {
     if (currentBuffer) {
         my_w.lineMin->setText(QLocale().toString(currentBuffer->get_min()));
     }
 }
 
-void nColorBar::setToMax () {
+void Colorscale::setToMax () {
     if (currentBuffer) {
         my_w.lineMax->setText(QLocale().toString(currentBuffer->get_max()));
     }
 }
 
-void nColorBar::minChanged () {
+void Colorscale::minChanged () {
     QString value(my_w.lineMin->text());
     disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     if (currentBuffer) {
@@ -140,7 +140,7 @@ void nColorBar::minChanged () {
     my_w.histogram->repaint();
 }
 
-void nColorBar::maxChanged () {
+void Colorscale::maxChanged () {
     QString value(my_w.lineMax->text());
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
     if (currentBuffer) {
@@ -155,7 +155,7 @@ void nColorBar::maxChanged () {
     my_w.histogram->repaint();
 }
 
-void nColorBar::invertColors () {
+void Colorscale::invertColors () {
     if (currentBuffer) {
         vec2f oldrange = currentBuffer->property["display_range"];
         currentBuffer->property["display_range"]=oldrange.swap();
@@ -165,7 +165,7 @@ void nColorBar::invertColors () {
     }
 }
 
-void nColorBar::bufferChanged(nPhysD *phys) {
+void Colorscale::bufferChanged(nPhysD *phys) {
     nGenericPan::bufferChanged(phys);
     if (phys) {
         vec2f minmax=phys->property["display_range"];
@@ -189,7 +189,7 @@ void nColorBar::bufferChanged(nPhysD *phys) {
 
 }
 
-vec2f nColorBar::sliderValues() {
+vec2f Colorscale::sliderValues() {
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
         double valmin=my_w.sliderMin->maximum()*(minmax.first()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
@@ -201,7 +201,7 @@ vec2f nColorBar::sliderValues() {
 
 
 
-void nColorBar::updatecolorbar() {
+void Colorscale::updatecolorbar() {
     qDebug() << "-------------------------------";
     disconnect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
@@ -224,21 +224,21 @@ void nColorBar::updatecolorbar() {
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
 
-void nColorBar::slider_min_changed(int val) {
+void Colorscale::slider_min_changed(int val) {
     double doubleVal=0.0;
     if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
     minChanged();
 }
 
-void nColorBar::slider_max_changed(int val) {
+void Colorscale::slider_max_changed(int val) {
     double doubleVal=1.0;
     if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
     maxChanged();
 }
 
-void nColorBar::cutOff() {
+void Colorscale::cutOff() {
     if (currentBuffer) {
         nPhysD *cut=new nPhysD(*currentBuffer);
         phys_cutoff(*cut,QLocale().toDouble(my_w.lineMin->text()),QLocale().toDouble(my_w.lineMax->text()));
@@ -246,7 +246,7 @@ void nColorBar::cutOff() {
     }
 }
 
-void nColorBar::loadPalettes() {
+void Colorscale::loadPalettes() {
     my_w.palettes->clear();
     my_w.palettes->addItems(napp->nPalettes.keys());
     my_w.fileList->clear();
@@ -260,7 +260,7 @@ void nColorBar::loadPalettes() {
     my_set.endGroup();
 }
 
-void nColorBar::addPaletteFile() {
+void Colorscale::addPaletteFile() {
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),NULL,tr("Any files")+QString(" (*)"));
     foreach (QString paletteFile, fnames) {
         napp->addPaletteFile(paletteFile);
@@ -268,7 +268,7 @@ void nColorBar::addPaletteFile() {
     }
 }
 
-void nColorBar::removePaletteFile() {
+void Colorscale::removePaletteFile() {
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();

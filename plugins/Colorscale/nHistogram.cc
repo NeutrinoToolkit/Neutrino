@@ -22,19 +22,22 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include "nColorBar.h"
+#include "Colorscale.h"
 #include "nHistogram.h"
 #include "neutrino.h"
 
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
-    qDebug() << parent;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
     setMouseTracking(true);
     offsety=8;
     dyColorBar=offsety*3/2;
     offsetx=6;
     setMinimumHeight(200);
-    parentPan=NULL;
     colorvalue=0;
     setProperty("mousepress",QVariant());
 }

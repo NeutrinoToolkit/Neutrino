@@ -141,7 +141,6 @@
      </widget>
      <addaction name="actionNext_LUT"/>
      <addaction name="actionPrevious_LUT"/>
-     <addaction name="actionShow_colortable"/>
      <addaction name="actionRescale99"/>
      <addaction name="actionRescale_max"/>
      <addaction name="menuGamma"/>
@@ -254,7 +253,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionWinlist"/>
-   <addaction name="actionColors"/>
    <addaction name="actionLockColors"/>
    <addaction name="separator"/>
    <addaction name="actionFlipRotate"/>
@@ -447,18 +445,6 @@
    </property>
    <property name="toolTip">
     <string>Window list</string>
-   </property>
-  </action>
-  <action name="actionColors">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//colors.png</normaloff>:icons//colors.png</iconset>
-   </property>
-   <property name="text">
-    <string>colors</string>
-   </property>
-   <property name="toolTip">
-    <string>Color table</string>
    </property>
   </action>
   <action name="actionLineoutH">
@@ -785,6 +771,18 @@
    </property>
    <property name="text">
     <string>Log info</string>
+   </property>
+  </action>
+  <action name="actionColors">
+   <property name="icon">
+    <iconset>
+     <normaloff>:icons//colors.png</normaloff>:icons//colors.png</iconset>
+   </property>
+   <property name="text">
+    <string>colors</string>
+   </property>
+   <property name="toolTip">
+    <string>Color table</string>
    </property>
   </action>
  </widget>

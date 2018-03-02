@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>colors.png</file>
+        <file>expand.png</file>
+        <file>histoLog.png</file>
+        <file>histoNorm.png</file>
+        <file>invert_colorbar.png</file>
+    </qresource>
+</RCC>

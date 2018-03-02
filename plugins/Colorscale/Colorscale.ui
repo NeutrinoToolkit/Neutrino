@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Colorbar</class>
- <widget class="QMainWindow" name="Colorbar">
+ <class>Colorscale</class>
+ <widget class="QMainWindow" name="Colorscale">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>338</height>
+    <height>374</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -382,7 +382,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="Colorscale.qrc">
      <normaloff>:/icons/invert_colorbar.png</normaloff>:/icons/invert_colorbar.png</iconset>
    </property>
    <property name="text">
@@ -394,7 +394,7 @@
   </action>
   <action name="actionCutoff">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="Colorscale.qrc">
      <normaloff>:/icons/expand.png</normaloff>:/icons/expand.png</iconset>
    </property>
    <property name="text">
@@ -409,7 +409,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="Colorscale.qrc">
      <normaloff>:/icons/histoNorm.png</normaloff>
      <normalon>:/icons/histoLog.png</normalon>:/icons/histoNorm.png</iconset>
    </property>
@@ -428,7 +428,7 @@
   <customwidget>
    <class>nHistogram</class>
    <extends>QWidget</extends>
-   <header>../src/pans/colorbar/nHistogram.h</header>
+   <header>nHistogram.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -446,7 +446,7 @@
   <tabstop>colorbarTabs</tabstop>
  </tabstops>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="Colorscale.qrc"/>
  </resources>
  <connections/>
 </ui>

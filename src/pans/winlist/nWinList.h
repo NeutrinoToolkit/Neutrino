@@ -44,7 +44,6 @@ public:
 
     Ui::nWinList my_w;
 
-
     // stuff for static scale/origin
     // (should pass to nPhysProperties once this has been merged to nWinList)
     bool freezedFrame;

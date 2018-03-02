@@ -22,64 +22,39 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nColorBar_h
-#define __nColorBar_h
-
 #include <iostream>
 
 #include <QtGui>
 #include <QWidget>
+#include <QtSvg>
 
-#include "nGenericPan.h"
-#include "ui_nColorBar.h"
-#include "nHistogram.h"
+#ifndef __nhistogram_h
+#define __nhistogram_h
 
-class neutrino;
+#include "nPhysImageF.h"
 
-class nColorBar : public nGenericPan {
+class Colorscale;
+
+class nHistogram : public QWidget
+{
 	Q_OBJECT
-	
-	
-private:
-	QDoubleValidator *dVal;
 	
 public:
 	
-    nColorBar (neutrino *);
-	neutrino *parent(){
-		return (neutrino *) QWidget::parent();
-	};
-	nPhysD *cutOffPhys;
-	Ui::Colorbar my_w;
+	nHistogram (QWidget *parent=0);
+	
+	int offsety, offsetx, dyColorBar;
+	double colorvalue;
+    QPointer<Colorscale> parentPan;
 	
 public slots:
-    void minChanged();
-    void maxChanged();
-	
-	void invertColors();
-	void setToMin();
-	void setToMax();
-	void slider_min_changed(int);
-	void slider_max_changed(int);
+	void paintEvent(QPaintEvent *);
+    void mousePressEvent (QMouseEvent *);
+    void mouseReleaseEvent (QMouseEvent *);
+    void mouseMoveEvent (QMouseEvent *);
 
-	void bufferChanged(nPhysD*);
-	void updatecolorbar();
-
-	void cutOff();
-
-    void loadPalettes();
-
-    void resetPalettes();
-	void addPaletteFile();
-	void removePaletteFile();
-    void on_gamma_valueChanged(int);
-
-    void on_fileList_itemSelectionChanged();
-
-    vec2f sliderValues();
-
-signals:
-	void change_contrast(double,double);
+    void drawPicture (QPainter&);
+	void colorValue(double);
 
 };
 

@@ -39,6 +39,8 @@ bool nPanPlug::instantiate(neutrino *neu) {
 
     const QByteArray className(name()+"*");
     const int type = QMetaType::type( className );
+    qDebug() << className << type;
+
     if(type != QMetaType::UnknownType) {
         const QMetaObject *mo = QMetaType::metaObjectForType(type);
         if(mo) {

@@ -44,8 +44,6 @@
 
 #include "nView.h"
 
-#include "nColorBar.h"
-
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
 
@@ -141,7 +139,6 @@ neutrino::neutrino():
 
 
     connect(my_w->actionWinlist, SIGNAL(triggered()), this, SLOT(WinList()));
-    connect(my_w->actionColors, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
 
     connect(my_w->actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
@@ -204,12 +201,8 @@ neutrino::neutrino():
     connect(my_w->actionReset, SIGNAL(triggered()), my_w->my_view, SLOT(resetGamma()));
     connect(my_w->actionCycle_over_items, SIGNAL(triggered()), my_w->my_view, SLOT(cycleOverItems()));
 
-
-
-
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
     connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(previousColorTable()));
-    connect(my_w->actionShow_colortable, SIGNAL(triggered()), this, SLOT(ColorBar()));
 
     connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
     connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
@@ -1336,12 +1329,6 @@ neutrino::closeCurrentBuffer() {
 nGenericPan*
 neutrino::WinList() {
     return new nWinList(this);
-}
-
-// colortables
-nGenericPan*
-neutrino::ColorBar() {
-    return new nColorBar(this);
 }
 
 // testing

@@ -195,8 +195,6 @@ public slots:
 
     nGenericPan* openRAW();
 
-    nGenericPan* ColorBar();
-
     void about();
 
     nGenericPan* Preferences();
