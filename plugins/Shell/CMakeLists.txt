@@ -12,13 +12,17 @@ if(PYTHONLIBS_FOUND)
 
     if(PYTHONINTERP_FOUND)
 
+
         if (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
             file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py "try: import numpy; print numpy.get_include()\nexcept: pass\n")
             exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)
         endif (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
 
-        if (WIN32 AND NOT DEFINED NUMPY_PATH)
-            set(NUMPY_PATH "${PYTHON_INCLUDE_PATH}/../../lib/python2.7/site-packages/numpy/core/include")
+        if (WIN32)
+            install (DIRECTORY ${PYTHON_INCLUDE_DIRS}/../../lib/python2.7 DESTINATION bin PATTERN "python2.7/test" EXCLUDE)
+            if (NOT DEFINED NUMPY_PATH)
+                set(NUMPY_PATH "${PYTHON_INCLUDE_PATH}/../../lib/python2.7/site-packages/numpy/core/include")
+            endif()
         endif()
 
         find_path(

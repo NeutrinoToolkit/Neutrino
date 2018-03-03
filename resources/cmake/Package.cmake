@@ -16,7 +16,6 @@ if (WIN32)
     endif()
     install (FILES ${RUNTIME_DEPS} DESTINATION bin)
     install (FILES ${RUNTIME_PLATFORM_DEPS} DESTINATION bin/platforms)
-    install (DIRECTORY ${CMAKE_FIND_ROOT_PATH}/lib/python2.7 DESTINATION bin PATTERN "python2.7/test" EXCLUDE)
 
     list(APPEND CPACK_GENERATOR NSIS)
 	SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.ico")

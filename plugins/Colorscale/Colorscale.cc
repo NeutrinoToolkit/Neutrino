@@ -27,7 +27,8 @@
 #include "neutrino.h"
 #include "nApp.h"
 
-Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent)
+Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
+  dVal(this)
 {
     my_w.setupUi(this);
 
@@ -45,10 +46,9 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent)
 
     connect(my_w.actionInvert,SIGNAL(triggered()),this,SLOT(invertColors()));
 
-    QDoubleValidator *dVal = new QDoubleValidator(this);
-    dVal->setNotation(QDoubleValidator::ScientificNotation);
-    my_w.lineMin->setValidator(dVal);
-    my_w.lineMax->setValidator(dVal);
+    dVal.setNotation(QDoubleValidator::ScientificNotation);
+    my_w.lineMin->setValidator(&dVal);
+    my_w.lineMax->setValidator(&dVal);
 
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
@@ -70,7 +70,8 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent)
 
     loadPalettes();
 
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+
 	//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
     my_w.toolBar->insertWidget(my_w.actionInvert,my_w.palettes);
@@ -88,6 +89,12 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent)
         my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
     }
 
+}
+
+void Colorscale::paletteComboChange(int val) {
+    QString pname=my_w.palettes->itemData(val).toString();
+    qDebug() << pname;
+    nparent->my_w->my_view->changeColorTable(pname);
 }
 
 void Colorscale::on_gamma_valueChanged(int val) {
@@ -187,14 +194,11 @@ vec2f Colorscale::sliderValues() {
 
 void Colorscale::updatecolorbar() {
     qDebug() << "-------------------------------";
-    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
-	disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
-    my_w.palettes->clear();
-    for (auto& name : napp->nPalettes.keys()) {
-        my_w.palettes->addItem(getPaletteIcon(name), name);
-    }
-    my_w.palettes->setCurrentIndex(my_w.palettes->findText(nparent->my_w->my_view->colorTable));
+    my_w.palettes->setCurrentIndex(my_w.palettes->findData(nparent->my_w->my_view->colorTable));
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
     if (currentBuffer) {
         vec2f minmax=currentBuffer->property["display_range"];
@@ -205,7 +209,6 @@ void Colorscale::updatecolorbar() {
     }
     
     my_w.histogram->repaint();
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
 	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
@@ -232,7 +235,7 @@ void Colorscale::cutOff() {
     }
 }
 
-const QIcon Colorscale::getPaletteIcon(QString paletteName) {
+const QIcon Colorscale::getPaletteIconFile(QString paletteName) {
     QPixmap pix(256,256);
     QPainter paint(&pix);
     for (unsigned int i=0;i<napp->nPalettes[paletteName].size()/3;i++) {
@@ -243,21 +246,19 @@ const QIcon Colorscale::getPaletteIcon(QString paletteName) {
     return QIcon(pix);
 }
 
-const QIcon Colorscale::getPaletteIconFile(QString my_file) {
-    QString paletteName=QFileInfo(my_file).baseName().replace("_"," ");
-    return getPaletteIcon(paletteName);
-}
-
 void Colorscale::loadPalettes() {
+    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
     my_w.palettes->clear();
-    my_w.palettes->addItems(napp->nPalettes.keys());
+    for (auto& name : napp->nPalettes.keys()) {
+        my_w.palettes->addItem(getPaletteIconFile(name), QFileInfo(name).baseName().replace("_"," "), name);
+    }
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
     my_w.fileList->clear();
-
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList paletteFilesName=my_set.value("paletteFiles","").toStringList();
     for(auto &my_file : paletteFilesName) {
-        new QListWidgetItem(getPaletteIconFile(my_file), my_file,my_w.fileList);
+        QListWidgetItem *my_item = new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
     }
     my_set.endGroup();
 }
@@ -266,29 +267,27 @@ void Colorscale::addPaletteFile() {
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),NULL,tr("Any files")+QString(" (*)"));
     foreach (QString my_file, fnames) {
         napp->addPaletteFile(my_file);
-        new QListWidgetItem(getPaletteIconFile(my_file),my_file, my_w.fileList);
+        QListWidgetItem *my_item = new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
     }
 }
 
 void Colorscale::removePaletteFile() {
-    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
-
+    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
     for (auto & my_item : my_w.fileList->selectedItems()) {
-        QString paletteName=QFileInfo(my_item->text()).baseName().replace("_"," ");
-        qDebug() << my_item->text() << paletteName;
-        napp->nPalettes.remove(paletteName);
+        napp->nPalettes.remove(my_item->text());
         paletteFiles.removeAll(my_item->text());
-        my_w.palettes->removeItem(my_w.palettes->findText(paletteName));
+        my_w.palettes->removeItem(my_w.palettes->findData(my_item->text()));
         delete my_item;
 
     }
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(QString)), nparent->my_w->my_view, SLOT(changeColorTable(QString)));
     if (napp->nPalettes.size()==0) {
         resetPalettes();
     }
+    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+
 //    updatecolorbar();
     my_set.setValue("paletteFiles",paletteFiles);
     qDebug() << paletteFiles;
@@ -296,12 +295,11 @@ void Colorscale::removePaletteFile() {
 }
 
 void Colorscale::on_fileList_itemClicked(QListWidgetItem *item){
-    QString ctable = QFileInfo(item->text()).baseName().replace("_"," ");
-    qDebug() << ctable;
-    nparent->my_w->my_view->changeColorTable(ctable);
+    nparent->my_w->my_view->changeColorTable(item->text());
 }
 
 void Colorscale::resetPalettes() {
+    showMessage("Restoring colortables");
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     my_set.setValue("paletteFiles",QStringList());

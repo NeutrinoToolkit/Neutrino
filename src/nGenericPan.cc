@@ -170,12 +170,11 @@ void nGenericPan::changeEvent(QEvent *e)
 }
 
 void nGenericPan::grabSave() {
-    int ok=0;
-    while (ok<10000) {
-        ok++;
-        QString fname=QDir::homePath()+"/Grab_"+panName()+"_"+QString("%1").arg(ok, 5, 10, QChar('0'))+".png";
-        showMessage(fname);
+    int progNum=0;
+    while (progNum<10000) {
+        QString fname=QDir::homePath()+"/Grab_"+panName()+"_"+QString("%1").arg(progNum++, 5, 10, QChar('0'))+".png";
         if (!QFileInfo(fname).exists()) {
+            showMessage(fname);
             setUnifiedTitleAndToolBarOnMac(false);
             grab().save(fname);
             setUnifiedTitleAndToolBarOnMac(true);

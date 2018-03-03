@@ -41,7 +41,7 @@ class Colorscale : public nGenericPan {
 	
 	
 private:
-	QDoubleValidator *dVal;
+    QDoubleValidator dVal;
 	
 public:
 	
@@ -78,7 +78,7 @@ public slots:
 
     vec2f sliderValues();
     const QIcon getPaletteIconFile(QString my_file);
-    const QIcon getPaletteIcon(QString paletteName);
+    void paletteComboChange(int);
 
 signals:
 	void change_contrast(double,double);

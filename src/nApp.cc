@@ -42,8 +42,7 @@ void nApp::addDefaultPalettes() {
     QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
     paletteFiles.removeDuplicates();
     for(auto &my_str : paletteFiles) {
-        if (QFileInfo(my_str).exists())
-            addPaletteFile(my_str);
+        addPaletteFile(my_str);
     }
     my_set.setValue("paletteFiles",paletteFiles);
     if (nPalettes.size()==0) {
@@ -55,31 +54,29 @@ void nApp::addDefaultPalettes() {
 }
 
 void nApp::addPaletteFile(QString cmapfile) {
-    QFile inputFile(cmapfile);
-    if (inputFile.open(QIODevice::ReadOnly)) {
-       QTextStream in(&inputFile);
+    if (QFileInfo(cmapfile).exists()) {
+        QFile inputFile(cmapfile);
+        if (inputFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&inputFile);
+            nPalettes[cmapfile]= std::vector<unsigned char>(256*3);
+            unsigned int iter=0;
+            while (!in.atEnd()) {
+                QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
+                for(auto &strnum : line) {
+                    nPalettes[cmapfile].at(iter) = strnum.toInt();
+                    iter++;
+                }
+            }
+            QSettings my_set("neutrino","");
+            my_set.beginGroup("Palettes");
+            QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
+            paletteFiles << cmapfile;
+            paletteFiles.removeDuplicates();
+            my_set.setValue("paletteFiles",paletteFiles);
+            my_set.endGroup();
 
-       QString name = QFileInfo(inputFile).baseName().replace("_"," ");
-
-       nPalettes[name]= std::vector<unsigned char>(256*3);
-       unsigned int iter=0;
-       while (!in.atEnd()) {
-          QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
-          for(auto &strnum : line) {
-              nPalettes[name].at(iter) = strnum.toInt();
-              iter++;
-          }
-       }
-
-       QSettings my_set("neutrino","");
-       my_set.beginGroup("Palettes");
-       QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-       paletteFiles << cmapfile;
-       paletteFiles.removeDuplicates();
-       my_set.setValue("paletteFiles",paletteFiles);
-       my_set.endGroup();
-
-       inputFile.close();
+            inputFile.close();
+        }
     }
 }
 
