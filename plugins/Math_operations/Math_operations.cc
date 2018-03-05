@@ -29,7 +29,7 @@
 
 Math_operations::Math_operations(neutrino *nparent) : nGenericPan(nparent),
     // separator represents the difference between Math_operations with 2 operands or 1 modify it in .h
-    separator({8,17})
+    separator({8,18})
 {
     my_w.setupUi(this);
     connect(my_w.calculate, SIGNAL(pressed()), this, SLOT(doOperation()));
@@ -265,6 +265,20 @@ void Math_operations::doOperation () {
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
+            } else if (my_w.operation->currentIndex()==separator[0]+9) { //Resize
+                QStringList scalars=my_w.num2->text().split(" ");
+                if (scalars.size()==2) {
+                    bool ok1, ok2;
+                    int scalar1=QLocale().toInt(scalars.at(0),&ok1);
+                    int scalar2=QLocale().toInt(scalars.at(1),&ok2);
+                    if (scalars.size()==2 && ok1 && ok2) {
+                        myresult=new nPhysD(phys_resample(*image1, vec2(scalar1, scalar2)));
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 int"));
+                    }
+                } else {
+                    my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));
+                }
             }
 
         }
@@ -295,12 +309,13 @@ void Math_operations::doOperation () {
             phys_sobel(*myresult);
         }
     }
-
+    qDebug() << "here";
     if (myresult) {
         myresult->reset_display();
         myresult->TscanBrightness();
         myresult->setShortName(my_w.operation->currentText().toStdString());
         if (myresult->getSurf()>0) operatorResult=nparent->replacePhys(myresult,operatorResult);
     }
+    qDebug() << "here";
 }
 

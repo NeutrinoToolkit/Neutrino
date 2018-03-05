@@ -51,6 +51,9 @@ void nApp::addDefaultPalettes() {
             addPaletteFile(it.next());
         }
     }
+    if (nPalettes.size()==0) {
+        QMessageBox::warning(nullptr,tr("Attention"),tr("No colorscales present!"), QMessageBox::Ok);
+    }
 }
 
 void nApp::addPaletteFile(QString cmapfile) {
@@ -72,6 +75,7 @@ void nApp::addPaletteFile(QString cmapfile) {
             QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
             paletteFiles << cmapfile;
             paletteFiles.removeDuplicates();
+            paletteFiles.sort(Qt::CaseInsensitive);
             my_set.setValue("paletteFiles",paletteFiles);
             my_set.endGroup();
 

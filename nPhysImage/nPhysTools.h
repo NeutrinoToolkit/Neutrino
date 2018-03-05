@@ -202,6 +202,18 @@ template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, do
     return getColorPrecentPixels(my_phys,vec2f((100.0-val)/2.0, (100.0+val)/2.0));
 }
 
+template <class T> void phys_cutoff(nPhysImageF<T>& iimage, T minval, T maxval) {
+    iimage.setShortName("IntensityCutoff");
+#pragma omp parallel for
+    for (size_t ii=0; ii<iimage.getSurf(); ii++) {
+        T val=iimage.point(ii);
+        if (std::isfinite(val)) iimage.set(ii,std::min(std::max(val,minval),maxval));
+    }
+    iimage.TscanBrightness();
+    std::ostringstream ostr;
+    ostr << "min_max(" << iimage.getName() << "," << minval << "," << maxval << ")";
+    iimage.setName(ostr.str());
+}
 
 #endif
 

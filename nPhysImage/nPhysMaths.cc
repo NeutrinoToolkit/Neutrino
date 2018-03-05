@@ -353,19 +353,6 @@ void phys_replace_NaN(nPhysD &iimage, double newval) {
     iimage.setName(ostr.str());
 }
 
-void phys_cutoff(nPhysD &iimage, double minval, double maxval) {
-    iimage.setShortName("IntensityCutoff");
-#pragma omp parallel for
-    for (size_t ii=0; ii<iimage.getSurf(); ii++) {
-        double val=iimage.point(ii);
-        if (std::isfinite(val)) iimage.set(ii,std::min(std::max(val,minval),maxval));
-    }
-    iimage.TscanBrightness();
-    std::ostringstream ostr;
-    ostr << "min_max(" << iimage.getName() << "," << minval << "," << maxval << ")";
-    iimage.setName(ostr.str());
-}
-
 void 
 phys_add_noise(nPhysD &iimage, double vMax=1.0)
 {

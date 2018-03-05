@@ -301,10 +301,11 @@ void nGenericPan::show(bool onlyOneAllowed) {
         }
     }
 
-    QApplication::processEvents();
-    loadDefaults();
-    QApplication::processEvents();
-
+    if (!QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
+        QApplication::processEvents();
+        loadDefaults();
+        QApplication::processEvents();
+    }
     nparent->emitPanAdd(this);
 
     QMainWindow::show();

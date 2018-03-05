@@ -232,7 +232,6 @@ void phys_inverse(nPhysD &);
 
 void phys_replace(nPhysD &, double, double);
 void phys_replace_NaN(nPhysD &, double);
-void phys_cutoff(nPhysD &, double, double);
 
 std::pair<double, bidimvec<int> > phys_cross_correlate(nPhysD*, nPhysD*);
 
@@ -285,7 +284,7 @@ nPhysImageF<T> ftshift1(nPhysImageF<T> &iimg, enum phys_direction ftdir=PHYS_X) 
 }
 
 template <class T>
-nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
+nPhysImageF<T> phys_resample(nPhysImageF<T> &iimg, vec2 new_size)
 {
 	nPhysImageF<T> oimg;
 
@@ -296,6 +295,7 @@ nPhysImageF<T> resample(nPhysImageF<T> &iimg, vec2 new_size)
 
 	DEBUG("Hscale: "<<hscale<<", Vscale: "<<vscale);
 
+#pragma omp parallel for
     for (size_t ii=0; ii<oimg.getH(); ii++) {
 		double frow = vscale*ii; 
         for (size_t jj=0; jj<oimg.getW(); jj++) {

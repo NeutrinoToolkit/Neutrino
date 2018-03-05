@@ -237,11 +237,12 @@ void Colorscale::cutOff() {
 
 const QIcon Colorscale::getPaletteIconFile(QString paletteName) {
     QPixmap pix(256,256);
+    pix.fill(QColor(Qt::transparent));
     QPainter paint(&pix);
     for (unsigned int i=0;i<napp->nPalettes[paletteName].size()/3;i++) {
         QColor col(napp->nPalettes[paletteName][3*i],napp->nPalettes[paletteName][3*i+1],napp->nPalettes[paletteName][3*i+2]);
         paint.setPen(QPen(col));
-        paint.drawLine(i,0,i,256);
+        paint.drawLine(i,50,i,240);
     }
     return QIcon(pix);
 }
@@ -258,7 +259,7 @@ void Colorscale::loadPalettes() {
     my_set.beginGroup("Palettes");
     QStringList paletteFilesName=my_set.value("paletteFiles","").toStringList();
     for(auto &my_file : paletteFilesName) {
-        QListWidgetItem *my_item = new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
+        new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
     }
     my_set.endGroup();
 }
@@ -267,7 +268,7 @@ void Colorscale::addPaletteFile() {
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),NULL,tr("Any files")+QString(" (*)"));
     foreach (QString my_file, fnames) {
         napp->addPaletteFile(my_file);
-        QListWidgetItem *my_item = new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
+        new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
     }
 }
 

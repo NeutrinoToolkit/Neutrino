@@ -745,7 +745,7 @@
     <string>Rescale reset</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+0</string>
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="actionShow_more_pixels">
