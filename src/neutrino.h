@@ -163,9 +163,6 @@ public slots:
     void exportAllGraphics();
     void exportGraphics(QString);
 
-    nGenericPan* Hlineout();
-    nGenericPan* Vlineout();
-
     void createDrawLine();
 
     QString newRect(QRectF);

@@ -47,10 +47,14 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     include_directories(${NEUTRINO_ROOT}/src) # for base stuff
     include_directories(${NEUTRINO_ROOT}/src/graphics)
 
-    file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
-    file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
-    file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
-    file(GLOB QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+    file(GLOB MY_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+    LIST(APPEND HEADERS ${MY_HEADERS})
+    file(GLOB MY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+    LIST(APPEND SOURCES ${MY_SOURCES})
+    file(GLOB MY_UIS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
+    LIST(APPEND UIS ${MY_UIS})
+    file(GLOB MY_QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+    LIST(APPEND QRCS ${MY_QRCS})
 
     ## add help
 
@@ -139,7 +143,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     IF(NOT DEFINED PLUGIN_INSTALL_DIR)
         if(APPLE)
-            set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
+            if(DEFINED Neutrino_BINARY_DIR)
+                set (PLUGIN_INSTALL_DIR "${Neutrino_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
+            else()
+                set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
+            endif()
         elseif(LINUX)
             set (PLUGIN_INSTALL_DIR "/usr/share/neutrino/plugins")
         elseif(WIN32)

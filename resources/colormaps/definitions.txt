@@ -67,7 +67,8 @@ Set3; defined ( 0 '#8DD3C7', 1 '#FFFFB3', 2 '#BEBADA', 3 '#FB8072', 4 '#80B1D3',
 Sinus_black; rgbformulae 3, 2, 19 model HSV
 Spectral; defined ( 0 '#D53E4F', 1 '#F46D43', 2 '#FDAE61', 3 '#FEE08B', 4 '#E6F598', 5 '#ABDDA4', 6 '#66C2A5', 7 '#3288BD' )
 Stacked_black; defined (0 "green", 1 "black", 1 "red", 2 "black", 2 "#ffa500", 3 "black", 3 "yellow", 4 "black", 4 "cyan", 5 "black", 5 "blue", 6 "black", 6 "magenta", 7 "black") model RGB
-Stacked_white; defined (0 "green", 1 "white", 1 "red", 2 "white", 2 "#ffa500", 3 "white", 3 "yellow", 4 "white", 4 "cyan", 5 "white", 5 "blue", 6 "white", 6 "magenta", 7 "white") model RGB
+Stacked_black; defined (-1 "black", -0.5 "#008800", 0 "black",  0.5 "green", 1 "black", 1.5 "red", 2 "black", 2.5 "#ffa500", 3 "black", 3.5 "yellow", 4 "black", 4.5 "cyan", 5 "black", 5.5 "blue", 6 "black", 6.5 "magenta", 7 "black", 7.5 "#880088", 8 "black", 8.5 "white", 9 "black") model RGB
+Stacked_white; defined (-1 "white", -0.5 "#008800", 0 "white",  0.5 "green", 1 "white", 1.5 "red", 2 "white", 2.5 "#ffa500", 3 "white", 3.5 "yellow", 4 "white", 4.5 "cyan", 5 "white", 5.5 "blue", 6 "white", 6.5 "magenta", 7 "white", 7.5 "#880088", 8 "white", 8.5 "black", 9 "white") model RGB
 Sunset; rgbformulae 13, 30, 3 model RGB
 XRay_reverse; rgbformulae -36, -3, -3 model RGB
 XRay; rgbformulae 36, 3, 3 model RGB

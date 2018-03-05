@@ -47,7 +47,6 @@
 #include "nPluginLoader.h"
 #include "nPanPlug.h"
 
-#include "nLineout.h"
 
 #include "nPreferences.h"
 
@@ -141,8 +140,6 @@ neutrino::neutrino():
     connect(my_w->actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
     connect(my_w->actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
     connect(my_w->actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
-    connect(my_w->actionLineoutH, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w->actionLineoutV, SIGNAL(triggered()), this, SLOT(Vlineout()));
 
     connect(my_w->actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
     connect(my_w->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
@@ -200,8 +197,6 @@ neutrino::neutrino():
     connect(my_w->actionNext_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(nextColorTable()));
     connect(my_w->actionPrevious_LUT, SIGNAL(triggered()), my_w->my_view, SLOT(previousColorTable()));
 
-    connect(my_w->actionHorizontal, SIGNAL(triggered()), this, SLOT(Hlineout()));
-    connect(my_w->actionVertical, SIGNAL(triggered()), this, SLOT(Vlineout()));
     connect(my_w->actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
 
@@ -1374,16 +1369,6 @@ neutrino::createDrawEllipse() {
     item->interactive();
     my_w->actionPaths->setIcon(my_w->menuPaths->defaultAction()->icon());
     QSettings("neutrino","").setValue("defualtActionPath",my_w->menuPaths->defaultAction()->text());
-}
-
-nGenericPan*
-neutrino::Hlineout() {
-    return new nHlineout(this);
-}
-
-nGenericPan*
-neutrino::Vlineout() {
-    return new nVlineout(this);
 }
 
 void neutrino::print()

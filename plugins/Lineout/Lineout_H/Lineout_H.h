@@ -22,50 +22,18 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nlineout
-#define __nlineout
+#ifndef __nlineout_H
+#define __nlineout_H
 
-#include <QtGui>
-#include <QWidget>
+#include "../nLineout.h"
 
-#include "nGenericPan.h"
-#include "ui_nLineout.h"
 
-#include <iostream>
-#include "nPhysImageF.h"
-#include "nPhysMaths.h"
-
-class neutrino;
-
-class nLineout : public nGenericPan {
-    Q_OBJECT
-public:
-    Q_INVOKABLE nLineout(neutrino *, enum phys_direction);
-
-public slots:
-    void updatePlot(QPointF=QPointF());
-
-    void nZoom(double);
-
-    void setBehaviour();
-
-private:
-    Ui::nLineout my_w;
-
-    enum phys_direction cut_dir;
-
-};
-
-class nHlineout : public nLineout {
+class Lineout_H : public nLineout {
 	Q_OBJECT
 public:
-	Q_INVOKABLE nHlineout(neutrino *n) : nLineout(n, PHYS_X) {};
+    Q_INVOKABLE Lineout_H(neutrino *n) : nLineout(n, PHYS_X) {};
 };
 
-class nVlineout : public nLineout {
-	Q_OBJECT
-public:
-	Q_INVOKABLE nVlineout(neutrino *n) : nLineout(n, PHYS_Y) {};
-};
+NEUTRINO_PLUGIN(Lineout_H,Analysis;Lineout,":icons/lineoutH.png", Qt::Key_H);
 
 #endif

@@ -193,16 +193,6 @@
     <property name="title">
      <string>Analysis</string>
     </property>
-    <widget class="QMenu" name="menuLineout">
-     <property name="title">
-      <string>Lineout</string>
-     </property>
-     <addaction name="actionHorizontal"/>
-     <addaction name="actionVertical"/>
-     <addaction name="separator"/>
-    </widget>
-    <addaction name="menuLineout"/>
-    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -252,14 +242,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLockColors"/>
-   <addaction name="separator"/>
-   <addaction name="actionFlipRotate"/>
    <addaction name="actionPaths"/>
+   <addaction name="actionFlipRotate"/>
    <addaction name="separator"/>
-   <addaction name="actionLineoutH"/>
-   <addaction name="actionLineoutV"/>
-   <addaction name="separator"/>
+   <addaction name="actionLockColors"/>
   </widget>
   <action name="actionNew">
    <property name="text">
@@ -432,42 +418,6 @@
    </property>
    <property name="shortcut">
     <string>M</string>
-   </property>
-  </action>
-  <action name="actionWinlist">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//info.png</normaloff>:icons//info.png</iconset>
-   </property>
-   <property name="text">
-    <string>winlist</string>
-   </property>
-   <property name="toolTip">
-    <string>Window list</string>
-   </property>
-  </action>
-  <action name="actionLineoutH">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lineoutH.png</normaloff>:icons//lineoutH.png</iconset>
-   </property>
-   <property name="text">
-    <string>lineoutH</string>
-   </property>
-   <property name="toolTip">
-    <string>Horizontal lineout</string>
-   </property>
-  </action>
-  <action name="actionLineoutV">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//lineoutV.png</normaloff>:icons//lineoutV.png</iconset>
-   </property>
-   <property name="text">
-    <string>lineoutV</string>
-   </property>
-   <property name="toolTip">
-    <string>Vertical lineout</string>
    </property>
   </action>
   <action name="actionLine">
@@ -770,18 +720,6 @@
    </property>
    <property name="text">
     <string>Log info</string>
-   </property>
-  </action>
-  <action name="actionColors">
-   <property name="icon">
-    <iconset>
-     <normaloff>:icons//colors.png</normaloff>:icons//colors.png</iconset>
-   </property>
-   <property name="text">
-    <string>colors</string>
-   </property>
-   <property name="toolTip">
-    <string>Color table</string>
    </property>
   </action>
  </widget>
