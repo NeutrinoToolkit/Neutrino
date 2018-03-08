@@ -259,10 +259,8 @@ neutrino::neutrino():
 
     nApp *napp(qobject_cast<nApp*> (qApp));
 
-    connect(my_w->my_view, SIGNAL(logging(QString)), &(napp->logger), SLOT(appendPlainText(QString)));
     my_w->actionLog_info->setChecked(napp->log_win.isVisible());
     connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
-
 }
 
 void neutrino::scanDir(QString dirpath, QString pattern)

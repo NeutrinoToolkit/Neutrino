@@ -159,7 +159,6 @@ signals:
     void mouseReleaseEvent_sig(QPointF);
     void zoomChanged(double);
     void bufferChanged(nPhysD*);
-    void logging(QString);
     void bufferOriginChanged();
 };
 

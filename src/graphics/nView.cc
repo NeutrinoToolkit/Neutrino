@@ -331,11 +331,11 @@ void nView::keyPressEvent (QKeyEvent *e)
             foreach (QGraphicsItem *item, scene()->selectedItems()){
                 QGraphicsObject *itemObj=item->toGraphicsObject();
                 if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
-                    emit logging(tr("Removed ")+item->toolTip());
+                    qInfo() << tr("Removed ") << item->toolTip();
                     itemObj->deleteLater();
                     break;
                 } else {
-                    emit logging(tr("Can't remove ")+item->toolTip());
+                    qInfo() << tr("Can't remove ") << item->toolTip();
                 }
             }
         }
@@ -382,11 +382,11 @@ void nView::rescaleColor(int val) {
                 phys->property["display_range"]=getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
-            emit logging("All images rescaled to "+QString::number(val)+"%");
+            qInfo() << "All images rescaled to " << QString::number(val) << "%";
         } else {
             currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,val);
             emit bufferChanged(currentBuffer);
-            emit logging("Image rescaled to "+QString::number(val)+"%");
+            qInfo() << "Image rescaled to " << QString::number(val) << "%";
         }
         updatePhys();
     }
@@ -424,7 +424,7 @@ void nView::cycleOverItems() {
 
 void nView::copyImage() {
     QApplication::clipboard()->setPixmap(grab(), QClipboard::Clipboard);
-    emit logging("Image copied in clipboard");
+    qInfo() << "Image copied in clipboard";
 }
 
 void nView::toggleRuler() {
@@ -435,7 +435,7 @@ void nView::toggleRuler() {
         log.append(" not");
     }
     log.append(" visible");
-    emit logging(log);
+    qInfo() << log;
 }
 
 void nView::toggleGrid() {
@@ -446,7 +446,7 @@ void nView::toggleGrid() {
         log.append(" not");
     }
     log.append(" visible");
-    emit logging(log);
+    qInfo() << log;
 }
 
 
@@ -485,7 +485,7 @@ nView::changeColorTable (QString ctname) {
 void
 nView::changeColorTable () {
     updatePhys();
-    emit logging(colorTable);
+    qInfo() << colorTable;
     my_tics.update();
     emit updatecolorbar();
 }
@@ -495,13 +495,13 @@ void nView::setMouseOrigin() {
         foreach (nPhysD* phys, physList) {
             phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(phys);
-            emit logging("Origin set for all images");
+            qInfo() << "Origin set for all images";
         }
     } else {
         if (currentBuffer) {
             currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(currentBuffer);
-            emit logging("Origin set");
+            qInfo() << "Origin set";
         }
     }
     my_tics.update();
@@ -531,7 +531,7 @@ void nView::setMouseShape(int num) {
     }
     my_mouse.my_shape=num;
     my_mouse.update();
-    emit logging("Mouse "+QString::number(num));
+    qInfo() << "Mouse " << QString::number(num);
 }
 
 void nView::keyReleaseEvent (QKeyEvent *e) {
@@ -547,35 +547,36 @@ void nView::wheelEvent(QWheelEvent *event) {
                 } else {
                     incrzoom(1.0/1.05);
                 }
+                return;
             }
             break;
         default:
-//            {
-//                int mindelta=2;
-//                QPoint numPixels = event->pixelDelta();
+            //            {
+            //                int mindelta=2;
+            //                QPoint numPixels = event->pixelDelta();
 
-//                if (!numPixels.isNull()) {
-//                    if (abs(numPixels.x()) > abs(numPixels.y())) {
-//                        if (numPixels.x()>mindelta) {
-//                            nextColorTable();
-//                        } else if(numPixels.x()<-mindelta) {
-//                            previousColorTable();
-//                        }
-//                    } else if (abs(numPixels.x()) < abs(numPixels.y())) {
-//                        if (numPixels.y()>mindelta) {
-//                            nextBuffer();
-//                        } else if(numPixels.y()<-mindelta) {
-//                            prevBuffer();
-//                        }
-//                    }
-//                    qDebug() << event;
-//                }
+            //                if (!numPixels.isNull()) {
+            //                    if (abs(numPixels.x()) > abs(numPixels.y())) {
+            //                        if (numPixels.x()>mindelta) {
+            //                            nextColorTable();
+            //                        } else if(numPixels.x()<-mindelta) {
+            //                            previousColorTable();
+            //                        }
+            //                    } else if (abs(numPixels.x()) < abs(numPixels.y())) {
+            //                        if (numPixels.y()>mindelta) {
+            //                            nextBuffer();
+            //                        } else if(numPixels.y()<-mindelta) {
+            //                            prevBuffer();
+            //                        }
+            //                    }
+            //                    qDebug() << event;
+            //                }
 
-//                event->accept();
-//            }
+            //                event->accept();
+            //            }
             break;
     }
-    //    QGraphicsView::wheelEvent(event);
+    QGraphicsView::wheelEvent(event);
 }
 
 void nView::mouseDoubleClickEvent (QMouseEvent *e) {
@@ -610,7 +611,7 @@ void nView::mouseMoveEvent (QMouseEvent *e)
     QGraphicsView::mouseMoveEvent(e);
     if (QGraphicsItem *item = itemAt(e->pos())) {
         if (item->flags() & QGraphicsItem::ItemIsFocusable) {
-            emit logging (item->toolTip());
+            qInfo() << item->toolTip();
         }
     }
 

@@ -59,6 +59,9 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.actionFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreezed(bool)));
 
     show(true);
+
+    qInfo() << "pippa";
+
 }
 
 void Image_list::selectionChanged() {
