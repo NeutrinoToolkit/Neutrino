@@ -27,6 +27,7 @@
 #include "nGenericPan.h"
 
 bool nPanPlug::instantiate(neutrino *neu) {
+    qDebug() << "here";
     qDebug() << "Instantiate plugin" << name();
     qDebug() << "Translation" << QLocale() << QLatin1String(name());
     QPointer<QTranslator> translator(new QTranslator(qApp));

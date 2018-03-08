@@ -1,6 +1,9 @@
 # check for neutrino root
+IF(APPLE)
+    set(PYVER 2.7)
+ENDIF()
 
-find_package(PythonLibs 2.7)
+find_package(PythonLibs ${PYVER})
 
 if(PYTHONLIBS_FOUND)
     list(APPEND LOCAL_LIBS ${PYTHON_LIBRARIES})

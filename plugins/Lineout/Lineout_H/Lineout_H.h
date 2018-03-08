@@ -25,7 +25,7 @@
 #ifndef __nlineout_H
 #define __nlineout_H
 
-#include "../nLineout.h"
+#include "../Lineout.h"
 
 
 class Lineout_H : public nLineout {

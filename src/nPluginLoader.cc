@@ -139,8 +139,11 @@ QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
 
 void
 nPluginLoader::launch() {
+    qDebug() << "here";
     if (iface && nParent) {
+        qDebug() << iface->name();
         bool retval = iface->instantiate(nParent);
+        qDebug() << retval;
         if (!retval) {
             QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),iface->name()+tr(" cannot be instantiated"));
             dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);

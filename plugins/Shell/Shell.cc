@@ -9,11 +9,14 @@
 
 
 bool ShellPlug::instantiate(neutrino *neu) {
+    qDebug() << "here";
     nparent=neu;
 
+    qDebug() << "here";
     PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
-
+    qDebug() << "here";
     PythonQt_init_QtBindings();
+    qDebug() << "here";
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
     PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
 
@@ -29,6 +32,7 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->addDecorators(new nPyWrapper());
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
 
+    qDebug() << "here";
     QSettings settings("neutrino","");
     settings.beginGroup("Shell");
     QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
@@ -40,20 +44,22 @@ bool ShellPlug::instantiate(neutrino *neu) {
         sites << base.filePath("lib-tk");
         sites << base.filePath("site-packages");
         sites << base.filePath("lib-dynload");
-        sites << base.filePath("lib-dynload");
-        sites << base.filePath("lib-dynload");
     }
 #endif
 
+    qDebug() << "here";
     foreach (QString spath, sites) {
         qDebug() << "Python site folder " << spath;
         if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
     }
     settings.endGroup();
 
+    qDebug() << "here";
     PythonQt::self()->getMainModule().addObject("nApp", qApp);
+    qDebug() << "here";
 
     QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
+    qDebug() << "here";
 
 //        neu->my_w->toolBar->addAction(QIcon(":/icons/python.png"),"Python");
 
@@ -84,6 +90,7 @@ bool ShellPlug::instantiate(neutrino *neu) {
     }
     settings.endGroup();
 
+    qDebug() << "here";
     return nPanPlug::instantiate(neu);
 }
 

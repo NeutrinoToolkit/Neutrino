@@ -29,7 +29,7 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
-#include "ui_nLineout.h"
+#include "ui_Lineout.h"
 
 #include <iostream>
 #include "nPhysImageF.h"

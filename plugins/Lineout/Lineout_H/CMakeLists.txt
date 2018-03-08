@@ -9,9 +9,9 @@ endif()
 
 set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
 
-set(HEADERS "../nLineout.h")
+set(HEADERS "../Lineout.h")
 
-set(UIS "../nLineout.ui")
+set(UIS "../Lineout.ui")
 include(NeutrinoPlugin)
 ADD_NEUTRINO_PLUGIN()
 
