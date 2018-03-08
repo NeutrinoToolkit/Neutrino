@@ -37,6 +37,7 @@
 
 #include <QMetaObject>
 #include <QtSvg>
+#include <QDirIterator>
 
 #include <QtUiTools>
 
@@ -397,8 +398,6 @@ neutrino::scanPlugins(QString pluginsDirStr) {
 #elif defined(Q_OS_LINUX)
         QString extension("so");
 #endif
-
-
         QDirIterator it(pluginsDir.absolutePath(), QStringList() << "*."+extension, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
             loadPlugin(it.next(), false);
@@ -415,16 +414,16 @@ neutrino::scanPlugins(QString pluginsDirStr) {
 void
 neutrino::scanPlugins() {
     QDir pluginsDir;
-#if defined(Q_OS_WIN)
     pluginsDir.setPath(qApp->applicationDirPath());
+#if defined(Q_OS_WIN)
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
         pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
-    pluginsDir.setPath(qApp->applicationDirPath());
     pluginsDir.cdUp();
     pluginsDir.cd("Resources");
 #elif defined(Q_OS_LINUX)
-    pluginsDir.setPath("/usr/share/neutrino");
+    pluginsDir.cdUp();
+    pluginsDir.cd("share/neutrino");
 #endif
     pluginsDir.cd("plugins");
     qDebug() << "defaultPluginDir:" << pluginsDir.absolutePath();
