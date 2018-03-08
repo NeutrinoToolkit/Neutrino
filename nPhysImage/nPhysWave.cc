@@ -238,10 +238,12 @@ int openclEnabled() {
     cl_uint platformCount;
     clGetPlatformIDs(0, NULL, &platformCount);
     std::vector<cl_platform_id> platforms(platformCount);
+    DEBUG("OpenCL heads found: "<<platformCount );
     clGetPlatformIDs(platformCount, &platforms[0], NULL);
     for (unsigned int i = 0; i < platformCount; i++) {
         cl_uint deviceCount=0;
         clGetDeviceIDs(platforms[i], NEUTRINO_OPENCL, 0, NULL, &deviceCount);
+        DEBUG("OpenCL device count: "<<deviceCount);
         found_GPU+=deviceCount;
     }
 #endif

@@ -1,4 +1,19 @@
 [Desktop Entry]
 Name=Neutrino
-Exec=Neutrino
-Icon=icon.png
+GenericName=Neutrino Scientific Image Manipulation
+Comment=The only neutrino faster than light
+
+Type=Application
+Categories=Science;Physics;
+
+Keywords=graphics;science;raw;
+
+Exec=/usr/bin/Neutrino
+Terminal=false
+StartupNotify=true
+
+MimeType=application/x-neutrino;image/png;image/tiff;image/x-portable-pixmap;image/x-portable-floatmap;
+
+Icon=neutrino
+
+

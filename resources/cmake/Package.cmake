@@ -40,7 +40,7 @@ elseif (LINUX)
         if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
 
 			set(CPACK_INSTALL_PREFIX "/usr")
-            set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB)
+                        set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB)
 
 			set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
@@ -55,9 +55,11 @@ elseif (LINUX)
 			set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/postrm")
 
 			# install goodies
-			install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/debian/neutrino.menu DESTINATION share/menu RENAME neutrino)
-            install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION /usr/share/pixmaps RENAME neutrino.svg)
-		elseif (DISTRO MATCHES "Fedora")
+                        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/neutrino.menu DESTINATION share/menu RENAME neutrino)
+                        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/linuxPackage/Neutrino.desktop DESTINATION share/applications)
+                        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
+                        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/icons RENAME neutrino.svg)
+                elseif (DISTRO MATCHES "Fedora")
 			execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
 			set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
             set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM)
