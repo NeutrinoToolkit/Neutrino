@@ -73,10 +73,6 @@ public:
     Ui::neutrino *my_w;
     Ui::nSbarra *my_sbarra;
 
-    // logging win
-    QMainWindow log_win;
-    QPlainTextEdit logger;
-
     static const int MaxRecentFiles=20;
 
     QList <QAction *> recentFileActs;

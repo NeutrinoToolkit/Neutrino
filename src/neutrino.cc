@@ -218,7 +218,6 @@ neutrino::neutrino():
     connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
     connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
-    connect(my_w->my_view, SIGNAL(logging(QString)), statusBar(), SLOT(showMessage(QString)));
 
     //recent file stuff
 
@@ -257,15 +256,11 @@ neutrino::neutrino():
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
     }
 
-    // logging win
-    log_win.setCentralWidget(&logger);
-    log_win.setWindowTitle("Log");
-    log_win.setWindowIcon(QIcon(":icons/icon.png"));
-    logger.setReadOnly(true);
-    logger.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    connect(my_w->my_view, SIGNAL(logging(QString)), &logger, SLOT(appendPlainText(QString)));
-    connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &log_win, SLOT(setVisible(bool)));
+    nApp *napp(qobject_cast<nApp*> (qApp));
 
+    connect(my_w->my_view, SIGNAL(logging(QString)), &(napp->logger), SLOT(appendPlainText(QString)));
+    my_w->actionLog_info->setChecked(napp->log_win.isVisible());
+    connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
 
 }
 
@@ -457,7 +452,6 @@ neutrino::loadPlugin()
 void
 neutrino::loadPlugin(QString pname, bool launch)
 {
-    logger.appendPlainText(pname);
     if (!property("NeuSave-loadPlugin").isValid()) {
         setProperty("NeuSave-loadPlugin",QString("plugin.so"));
     }
