@@ -373,6 +373,7 @@ void nView::keyPressEvent (QKeyEvent *e)
 }
 
 void nView::rescaleColor(int val) {
+    if (val==100) resetGamma();
     val=std::max<int>(std::min<int>(val,100),0);
     setProperty("percentPixels",val);
     if (currentBuffer) {
