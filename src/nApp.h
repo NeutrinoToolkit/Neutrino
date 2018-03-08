@@ -26,6 +26,8 @@
 #define nApp_H
 
 #include <QApplication>
+#include <QMainWindow>
+#include <QPlainTextEdit>
 #include <QSettings>
 #include <QDebug>
 
@@ -38,13 +40,18 @@ public:
 
     QMap<QString, std::vector<unsigned char>> nPalettes;
 
+    QMainWindow log_win;
+    QPlainTextEdit logger;
+
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
 
     bool event(QEvent *ev) override;
 
+    static void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 public slots:
+
 
     void closeAllWindows();
 

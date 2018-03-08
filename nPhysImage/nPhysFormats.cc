@@ -359,7 +359,7 @@ physShort_b16::physShort_b16(const char *ifilename)
 
 physDouble_img::physDouble_img(std::string ifilename)
     : nPhysD(ifilename, PHYS_FILE) {
-    
+
     unsigned short buffer;
     std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
     

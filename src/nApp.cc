@@ -3,6 +3,9 @@
 #include <QtNetwork>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
+
+    qInstallMessageHandler(nApp::myMessageOutput);
+
     QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
     QCoreApplication::setApplicationName("Neutrino");
@@ -28,9 +31,52 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     if (my_set.value("checkUpdates",true).toBool()) {
         checkUpdates();
     }
-    my_set.endGroup();
+
+    log_win.setCentralWidget(&logger);
+    log_win.setWindowTitle("Log");
+    log_win.setWindowIcon(QIcon(":icons/icon.png"));
+    logger.setReadOnly(true);
+    logger.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    logger.setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    log_win.setVisible(my_set.value("log_winVisible",false).toBool());
 
     addDefaultPalettes();
+
+    my_set.endGroup();
+}
+
+void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    nApp *napp(qobject_cast<nApp*> (qApp));
+    if (napp && napp->log_win.isVisible()) {
+        QByteArray localMsg = msg.toLocal8Bit();
+        QString outstr(QDateTime::currentDateTime().toString());
+        switch (type) {
+            case QtDebugMsg:
+                outstr += " Debug";
+                break;
+            case QtInfoMsg:
+                outstr += " Info";
+                break;
+            case QtWarningMsg:
+                outstr += " Warn";
+                break;
+            case QtCriticalMsg:
+                outstr += " Critical";
+                break;
+            case QtFatalMsg:
+                outstr += " Fatal";
+                abort();
+        }
+        outstr+= QString(" (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " + msg;
+
+#ifdef __phys_debug
+        std::cerr << "* " << outstr.toStdString();
+#endif
+        napp->logger.appendPlainText(outstr);
+    }
+
+
 }
 
 void nApp::addDefaultPalettes() {
@@ -89,11 +135,19 @@ void nApp::closeAllWindows() {
     for(auto &neu : neus()) {
         neu->close();
     }
-//    QApplication::closeAllWindows();
+    processEvents();
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    my_set.setValue("log_winVisible",log_win.isVisible());
+    my_set.endGroup();
+
+    log_win.close();
+    //    QApplication::closeAllWindows();
 };
 
 
 void nApp::checkUpdates() {
+    QNetworkProxyFactory::setUseSystemConfiguration(true) ;
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
     QEventLoop event;

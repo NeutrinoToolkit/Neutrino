@@ -721,6 +721,9 @@
    <property name="text">
     <string>Log info</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
