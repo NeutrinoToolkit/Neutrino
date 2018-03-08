@@ -94,6 +94,7 @@ void nApp::closeAllWindows() {
 
 
 void nApp::checkUpdates() {
+    QNetworkProxyFactory::setUseSystemConfiguration(true) ;
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
     QEventLoop event;
