@@ -301,7 +301,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
         }
     }
 
-    if (!QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
+    if (!(QGuiApplication::keyboardModifiers() & Qt::AltModifier)) {
         QApplication::processEvents();
         loadDefaults();
         QApplication::processEvents();

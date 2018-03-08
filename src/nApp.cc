@@ -68,11 +68,16 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
                 outstr += " Fatal";
                 abort();
         }
-        outstr+= QString(" (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " + msg;
 
 #ifdef __phys_debug
-        std::cerr << "* " << outstr.toStdString();
+        outstr+= QString(" (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " + msg;
 #endif
+        outstr += " " +msg;
+
+#ifdef __phys_debug
+        std::cerr << "* " << outstr.toStdString() << std::endl;
+#endif
+
         napp->logger.appendPlainText(outstr);
     }
 
@@ -124,7 +129,7 @@ void nApp::addPaletteFile(QString cmapfile) {
             paletteFiles.sort(Qt::CaseInsensitive);
             my_set.setValue("paletteFiles",paletteFiles);
             my_set.endGroup();
-
+            qInfo() << cmapfile;
             inputFile.close();
         }
     }
