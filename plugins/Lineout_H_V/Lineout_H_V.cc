@@ -32,9 +32,9 @@ Lineout_H_V::Lineout_H_V(neutrino *parent) : nGenericPan(parent)
     my_w.statusBar->addPermanentWidget(my_w.lockColors, 0);
     my_w.statusBar->addPermanentWidget(my_w.lockClick, 0);
 
-    connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint(void)));
+    connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
 
-    connect(parent, SIGNAL(nZoom(double)), this, SLOT(updateLastPoint(void)));
+    connect(parent, SIGNAL(nZoom(double)), this, SLOT(updatePlot()));
 
     connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
 
@@ -51,7 +51,7 @@ Lineout_H_V::Lineout_H_V(neutrino *parent) : nGenericPan(parent)
 
     show();
     setBehaviour();
-	updateLastPoint();
+    updatePlot();
     
 }
 
@@ -68,6 +68,8 @@ void Lineout_H_V::setBehaviour() {
 void Lineout_H_V::updatePlot(QPointF p) {
 
     if (currentBuffer != NULL) {
+        if (p.isNull())
+            p=nparent->my_w->my_view->my_mouse.pos();
 
         vec2 b_p(p.x(),p.y());
 
@@ -104,17 +106,15 @@ void Lineout_H_V::updatePlot(QPointF p) {
                     y[i]=currentBuffer->point(b_p(oth_dir[k]),i+lat_skip);
                 }
             }
-            my_w.plot->graph(k)->setData(x,y);
+            my_w.plot->graph(k)->setData(x,y,true);
 
             my_w.plot->graph(k)->keyAxis()->setRange(x.first(), x.last());
-
-
-            my_w.plot->graph(k)->valueAxis()->setProperty("lock",my_w.lockColors->isChecked());
 
             if(my_w.lockColors->isChecked()) {
                 vec2f rang=currentBuffer->property["display_range"];
                 my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
             }
+            my_w.plot->graph(k)->valueAxis()->setProperty("lock",my_w.lockColors->isChecked());
 
             my_w.plot->setMousePosition((p.x()-origin.x())*scale(cut_dir[k]),(p.y()-origin.y())*scale(cut_dir[k]));
         }
@@ -125,13 +125,6 @@ void Lineout_H_V::updatePlot(QPointF p) {
         my_w.plot->replot();
     }
 }
-
-void Lineout_H_V::updateLastPoint() {
-    if (!my_w.lockClick->isChecked()) {
-        updatePlot(nparent->my_w->my_view->my_mouse.pos());
-    }
-}
-
 
 
 

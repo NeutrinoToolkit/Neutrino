@@ -306,10 +306,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                 p->drawRect(colorRect);
             }
         } else {
-            //			qDebug() << my_view->colorTable << (void*)&my_view->nPalettes;
-            //			qDebug() << my_view->nPalettes;
-            //			qDebug() << (void*) my_view->nPalettes[my_view->colorTable];
-            WARNING("problem!!!! exetern nPalettes not found");
+            qWarning() << "problem!!!! exetern nPalettes not found : "<< my_view->colorTable;
         }
 
         p->setPen(pen);

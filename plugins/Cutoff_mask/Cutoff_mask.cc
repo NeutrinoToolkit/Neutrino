@@ -83,7 +83,6 @@ void Cutoff_mask::doOperation () {
 			} else if (my_w.replaceVal->currentText().toLower() == "zero") {
 				replaceVal=0.0;
 			}
-			if (image2->getSurf() == image1->getSurf()) {
 				nPhysD *masked = new nPhysD(image1->getW(),image1->getH(), replaceVal);
 				masked->set_origin(image1->get_origin());
 				masked->set_scale(image1->get_scale());
@@ -100,10 +99,10 @@ void Cutoff_mask::doOperation () {
 				masked->TscanBrightness();
 				
 				cutoffPhys=nparent->replacePhys(masked,cutoffPhys);
-			}
-
-		}
-	} else {
+        } else {
+            statusBar()->showMessage("Error image size do not match", 5000);
+        }
+    } else {
 		statusBar()->showMessage("Error "+my_w.cutValue->text(), 5000);
 	}
 }

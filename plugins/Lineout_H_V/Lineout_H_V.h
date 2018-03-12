@@ -37,9 +37,8 @@ public:
     Q_INVOKABLE Lineout_H_V(neutrino *);
 
 public slots:
-    void updatePlot(QPointF);
+    void updatePlot(QPointF = QPointF());
     void setBehaviour();
-    void updateLastPoint();
 
 private:
     Ui::Lineout_H_V my_w;

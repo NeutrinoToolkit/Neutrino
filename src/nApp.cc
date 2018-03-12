@@ -31,7 +31,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     if (my_set.value("checkUpdates",true).toBool()) {
         checkUpdates();
     }
-
+    log_win.setWindowFlag(Qt::Tool);
     log_win.setCentralWidget(&logger);
     log_win.setWindowTitle("Log");
     log_win.setWindowIcon(QIcon(":icons/icon.png"));
@@ -53,26 +53,26 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
         QString outstr;
         switch (type) {
             case QtDebugMsg:
-                outstr += " D";
+                outstr += "D ";
                 break;
             case QtInfoMsg:
-                outstr += " I";
+                outstr += "I ";
                 break;
             case QtWarningMsg:
-                outstr += " W";
+                outstr += "W ";
                 break;
             case QtCriticalMsg:
-                outstr += " C";
+                outstr += "C ";
                 break;
             case QtFatalMsg:
-                outstr += " F";
+                outstr += "F ";
                 abort();
         }
 
 #ifdef __phys_debug
-        outstr+= QString(" (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " + msg;
+        outstr+= QString("(") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " ;
 #endif
-        outstr += " " +msg;
+        outstr += msg;
 
 #ifdef __phys_debug
         std::cerr << "* " << outstr.toStdString() << std::endl;

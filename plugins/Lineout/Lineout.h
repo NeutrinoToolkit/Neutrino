@@ -45,13 +45,13 @@ public:
     {
         my_w.setupUi(this);
 
-        connect(my_w.actionToggleZoom,SIGNAL(triggered()), this, SLOT(updateLastPoint()));
+        connect(my_w.actionToggleZoom,SIGNAL(triggered()), this, SLOT(updatePlot()));
 
-        connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLastPoint()));
+        connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
 
         connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
 
-        connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updateLastPoint()));
+        connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
 
         my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
         my_w.plot->graph(0)->setPen(QPen(Qt::black));
@@ -61,6 +61,7 @@ public:
         setProperty("panName",namedirection);
         show(true);
         setBehaviour();
+        updatePlot();
     }
 
 
@@ -108,13 +109,12 @@ public slots:
                 }
             }
 
-            my_w.plot->graph(0)->valueAxis()->setProperty("lock",my_w.actionLockColors->isChecked());
-
             if(my_w.actionLockColors->isChecked()) {
                 vec2f rang=currentBuffer->property["display_range"];
                 my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
-            } else {
             }
+
+            my_w.plot->graph(0)->valueAxis()->setProperty("lock",my_w.actionLockColors->isChecked());
             my_w.plot->rescaleAxes();
 
             statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
@@ -126,8 +126,9 @@ public slots:
         }
     }
 
-    void nZoom(double){    updatePlot();
-                      }
+    void nZoom(double){
+        updatePlot();
+    }
 
     void setBehaviour() {
         if (my_w.actionLockClick->isChecked()) {

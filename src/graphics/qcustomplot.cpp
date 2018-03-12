@@ -7682,6 +7682,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
 */
 void QCPAxis::setRange(const QCPRange &range)
 {
+  if (property("lock").isValid() && property("lock").toBool()) return;
   if (range.lower == mRange.lower && range.upper == mRange.upper)
     return;
   
@@ -7752,6 +7753,7 @@ void QCPAxis::setSelectedParts(const SelectableParts &selected)
 */
 void QCPAxis::setRange(double lower, double upper)
 {
+  if (property("lock").isValid() && property("lock").toBool()) return;
   if (lower == mRange.lower && upper == mRange.upper)
     return;
   

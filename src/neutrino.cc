@@ -459,7 +459,7 @@ neutrino::loadPlugin(QString pname, bool launch)
 
         nPluginLoader *my_npl = new nPluginLoader(pname, this);
         qDebug() << "here" << my_npl->ok();
-        if (launch) my_npl->launch();
+        if (launch) my_npl->run();
     }
 }
 
@@ -1550,7 +1550,7 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
                 if (my_qplugin!=nullptr) {
                     qDebug() << pName << "plugin action" << my_qplugin->name();
                     if (pName==my_qplugin->name()) {
-                        my_qplugin->launch();
+                        my_qplugin->run();
                         QApplication::processEvents();
                         QObject *p_obj = my_qplugin->instance();
                         if (p_obj) {

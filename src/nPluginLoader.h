@@ -33,7 +33,7 @@ public:
 
 public slots:
 	
-	void launch(void);
+    void run(void);
 
 private:
     nPlug *iface;

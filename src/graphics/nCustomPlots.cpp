@@ -79,6 +79,7 @@ void nCustomRangeLineEdit::setLock(bool check) {
                 my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
             }
         }
+        qDebug() << "check" << my_axis << my_axis->property("lock");
     }
 }
 
@@ -130,7 +131,8 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
     qDebug() << "rescale rescale rescale rescale rescale  " << objectName();
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
-        if (!(axis->visible() && axis->property("lock").isValid() && axis->property("lock").toBool())) {
+        if (axis->visible() && !(axis->property("lock").isValid() && axis->property("lock").toBool())) {
+            qDebug() << "rescale" << objectName() << axis << axis->property("lock");
             axis->rescale();
         }
     }
@@ -717,7 +719,6 @@ nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
 void nCustomPlotMouseX::setMousePosition(double position) {
     if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
     if (mouseMarker) {
-        DEBUG(mouseMarker->clipToAxisRect() << " " << position);
         mouseMarker->point1->setTypeY(QCPItemPosition::ptAbsolute);
         mouseMarker->point2->setTypeY(QCPItemPosition::ptAbsolute);
         mouseMarker->point1->setCoords(position,0);

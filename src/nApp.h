@@ -32,6 +32,7 @@
 #include <QDebug>
 
 class neutrino;
+class nGenericPan;
 
 class nApp : public QApplication {
     Q_OBJECT

@@ -53,7 +53,7 @@ set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
 
 
 ## global compile options
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10 -DQT_DEBUG_PLUGINS=1")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
 
 set(CMAKE_CXX_STANDARD 11)

@@ -509,7 +509,7 @@ void nView::setMouseOrigin() {
     // I need a signal to communicate explicit origin change not to
     // be taken for a buffer change. Used in nWinList.
     emit bufferOriginChanged();
-    emit mouseposition(my_mouse.pos());
+    emitMouseposition(my_mouse.pos());
 
 }
 
