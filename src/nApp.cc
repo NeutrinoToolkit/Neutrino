@@ -31,7 +31,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     if (my_set.value("checkUpdates",true).toBool()) {
         checkUpdates();
     }
-    log_win.setWindowFlag(Qt::Tool);
+    log_win.setWindowFlags(Qt::Tool);
     log_win.setCentralWidget(&logger);
     log_win.setWindowTitle("Log");
     log_win.setWindowIcon(QIcon(":icons/icon.png"));
