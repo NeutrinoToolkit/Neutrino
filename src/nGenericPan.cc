@@ -454,7 +454,7 @@ nGenericPan::loadUi(QSettings *settings) {
     }
 
     foreach (QObject* widget, nparent->children()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             nLine *linea=qobject_cast<nLine *>(widget);
             if (linea) {
                 linea->loadSettings(settings);
@@ -553,7 +553,7 @@ nGenericPan::saveUi(QSettings *settings) {
     }
 
     foreach (QObject* widget, nparent->children()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             nLine *line=qobject_cast<nLine *>(widget);
             if (line) {
                 line->saveSettings(settings);
@@ -588,7 +588,9 @@ void nGenericPan::closeEvent(QCloseEvent*){
     }
     saveDefaults();
     foreach (QObject* widget, nparent->children()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        qDebug() << widget->parent();
+        if (widget->parent()==this) {
+            QApplication::processEvents();
             nLine *line=qobject_cast<nLine *>(widget);
             if (line) {
                 line->my_pad.hide();
@@ -609,9 +611,9 @@ void nGenericPan::closeEvent(QCloseEvent*){
                 elli->my_pad.hide();
                 elli->deleteLater();
             }
+            QApplication::processEvents();
         }
     }
-    QApplication::processEvents();
 //    foreach (QWidget *widget, QApplication::allWidgets()) {
 //        neutrino *neu=qobject_cast<neutrino *>(widget);
 //        if (neu==nparent) {
@@ -895,7 +897,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 QPolygonF poly;
                 foreach (QVariant p, my_val.toList()) {
@@ -910,7 +912,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
@@ -922,7 +924,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::PointF)) {
                     widget->setPoint(my_val.toPointF());
@@ -934,7 +936,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
@@ -1039,7 +1041,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     }
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 QVariantList variantList;
                 foreach (QPointF p, widget->getPoints()) {
@@ -1063,7 +1065,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     }
     my_occurrence=1;
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getRectF());
             }
@@ -1073,7 +1075,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     }
     my_occurrence=1;
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getPointF());
             }
@@ -1083,7 +1085,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     }
     my_occurrence=1;
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
-        if (widget->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(widget->property("parentPan"))==this) {
+        if (widget->parent()==this) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getRectF());
             }

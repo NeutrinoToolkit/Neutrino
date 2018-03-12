@@ -37,7 +37,7 @@ class nLine : public QGraphicsObject {
 Q_OBJECT
 
 public:
-    nLine(neutrino * = NULL);
+    nLine(neutrino * = nullptr);
     nLine(nGenericPan *, int level);
     ~nLine();
 

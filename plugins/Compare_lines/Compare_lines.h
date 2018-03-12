@@ -60,7 +60,7 @@ public slots:
 private:
     QList <nPhysD*> images;
 
-    QPointer<nLine> line;
+    nLine line;
 };
 
 NEUTRINO_PLUGIN(Compare_lines,Analysis;Lineout);

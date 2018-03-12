@@ -29,12 +29,13 @@
 
 #include "nGenericPan.h"
 #include "ui_RegionPath.h"
+#include "nLine.h"
 
 #ifndef __RegionPath
 #define __RegionPath
 
+
 class neutrino;
-class nLine;
 
 class RegionPath : public nGenericPan {
     Q_OBJECT
@@ -44,7 +45,7 @@ public:
 
     Ui::RegionPath my_w;
 
-    QPointer<nLine> region;
+    nLine region;
 
     nPhysD *regionPhys;
 public slots:

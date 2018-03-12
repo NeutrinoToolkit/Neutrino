@@ -49,7 +49,7 @@ public:
 
     nPhysD *affined;
 
-    QPointer<nLine> l1, l2;
+    nLine l1, l2;
 
     vec2f affine(vec2f, std::vector<double>);
 

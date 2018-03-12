@@ -27,30 +27,29 @@
 
 // physWavelets
 
-Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(nparent)
+Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(nparent),
+    l1(this,1),
+    l2(this,1)
 {
 	my_w.setupUi(this);
-    l1 =  new nLine(this,1);
-    l1->changeToolTip(panName()+"Line 1");
-	l1->changeColorHolder("red");
+    l1.changeToolTip(panName()+"Line 1");
+    l1.changeColorHolder("red");
 	QPolygonF poly;
 	poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
-	l1->setPoints(poly);
+    l1.setPoints(poly);
 	
-
-    l2 =  new nLine(this,1);
-    l2->changeToolTip(panName()+"Line 2");
-	l2->changeColorHolder("blue");
+    l2.changeToolTip(panName()+"Line 2");
+    l2.changeColorHolder("blue");
 	poly.clear();
 	poly << QPointF(150,50) << QPointF(50,50) << QPointF(50,150);
-	l2->setPoints(poly);
+    l2.setPoints(poly);
 	
 
-	connect(my_w.line1, SIGNAL(released()), l1, SLOT(togglePadella()));
-	connect(my_w.line2, SIGNAL(released()), l2, SLOT(togglePadella()));
+    connect(my_w.line1, SIGNAL(released()), &l1, SLOT(togglePadella()));
+    connect(my_w.line2, SIGNAL(released()), &l2, SLOT(togglePadella()));
 
-	connect(l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
-	connect(l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
+    connect(&l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
+    connect(&l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
 
     connect(my_w.first,SIGNAL(pressed()),this,SLOT(affine()));
     connect(my_w.second,SIGNAL(pressed()),this,SLOT(affine()));
@@ -66,14 +65,14 @@ void Affine_transformation::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
 	if (buf) {
 		if (buf==getPhysFromCombo(my_w.image1)) {
-			l1->show();
+            l1.show();
 		} else {
-			l1->hide();
+            l1.hide();
 		}
 		if (buf==getPhysFromCombo(my_w.image2)) {
-			l2->show();
+            l2.show();
 		} else {
-			l2->hide();
+            l2.hide();
 		}
 	}
 }
@@ -221,7 +220,7 @@ std::vector<double> Affine_transformation::getAffine(QPolygonF poly1, QPolygonF 
 void Affine_transformation::apply() {
 	
 	
-    forward=getAffine(l1->getPoints(),l2->getPoints());
+    forward=getAffine(l1.getPoints(),l2.getPoints());
 	
 	
 	my_w.A00->setText(QString::number(forward[0]));
@@ -231,7 +230,7 @@ void Affine_transformation::apply() {
 	my_w.A11->setText(QString::number(forward[4]));
 	my_w.A12->setText(QString::number(forward[5]));
 	
-    backward=getAffine(l2->getPoints(),l1->getPoints());
+    backward=getAffine(l2.getPoints(),l1.getPoints());
 
 	my_w.B00->setText(QString::number(backward[0]));
 	my_w.B01->setText(QString::number(backward[1]));

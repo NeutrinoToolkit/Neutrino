@@ -27,8 +27,16 @@
 #include "ui_nPoint.h"
 #include <iostream>
 
-nPoint::nPoint(neutrino *nparent) :
+nPoint::nPoint(nGenericPan *parentPan, int level) : nPoint(parentPan->nparent)
+{
+    setParent(parentPan);
+    my_w->name->setText(parentPan->panName()+"Point");
+    setProperty("parentPanControlLevel",level);
+}
+
+nPoint::nPoint(neutrino *my_parent) :
     QGraphicsObject(),
+    nparent(my_parent),
     my_w(new Ui::nPoint)
 {
     nparent->getScene().addItem(this);
@@ -56,15 +64,15 @@ nPoint::nPoint(neutrino *nparent) :
 	setOrder(0.0);
 	setToolTip(tr("point")+QString(" ")+QString::number(num));
 
-	connect(parent(), SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoint(QPointF)));
+    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoint(QPointF)));
 
-    connect(parent()->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
-	zoom=parent()->getZoom();
+    zoom=nparent->getZoom();
 
 
 	// PADELLA
-	my_pad.setWindowTitle(toolTip());
+    my_pad.setWindowTitle(toolTip());
 	my_pad.setWindowIcon(QIcon(":center"));
     my_w->setupUi(&my_pad);
 
@@ -117,13 +125,13 @@ void nPoint::bufferChanged(nPhysD* my_phys) {
 
 void nPoint::interactive ( ) {
     showMessage(tr("Click for the first point"));
-    connect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nPoint::addPointAfterClick ( QPointF p) {
 	setPoint(p);
 	showMessage(tr("Point added"));
-    disconnect(parent()->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 }
 
 void nPoint::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -240,7 +248,7 @@ void nPoint::changePos(QString valStr) {
 
 void
 nPoint::showMessage ( QString s ) {
-	parent()->statusBar()->showMessage(s);
+    nparent->statusBar()->showMessage(s);
 }
 
 void
@@ -312,9 +320,9 @@ nPoint::selectThis(bool val) {
 	ref.setVisible(val);
 	update();
 	if (val) {
-        parent()->my_w->statusbar->showMessage(toolTip());
+        nparent->my_w->statusbar->showMessage(toolTip());
 	} else {
-        parent()->my_w->statusbar->showMessage("");
+        nparent->my_w->statusbar->showMessage("");
 	}
 }
 

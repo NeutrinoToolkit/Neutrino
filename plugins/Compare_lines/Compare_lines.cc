@@ -24,15 +24,15 @@
  */
 #include "Compare_lines.h"
 
-Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent)
+Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent),
+     line(this,1)
 {
     my_w.setupUi(this);
 
     // signals
-    line =  new nLine(this,1);
     QPolygonF poly;
     poly << QPointF(0,0) << QPointF(100,100);
-    line->setPoints(poly);
+    line.setPoints(poly);
 
     connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
     connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
@@ -42,7 +42,6 @@ Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeImages()));
 
 
-    connect(my_w.actionLine, SIGNAL(triggered()), line, SLOT(togglePadella()));
     connect(my_w.addImage, SIGNAL(released()), this, SLOT(addImage()));
     connect(my_w.removeImage, SIGNAL(released()), this, SLOT(removeImage()));
 
@@ -58,7 +57,8 @@ Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent)
     my_w.plot->graph(0)->setName("Compare Lines");
 
     show();
-    connect(line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
+    connect(my_w.actionLine, SIGNAL(triggered()), &line, SLOT(togglePadella()));
+    connect(&line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
     updatePlot();
 }
@@ -103,7 +103,7 @@ void Compare_lines::removeImages() {
 }
 
 void Compare_lines::sceneChanged() {
-    if (sender()==line) updatePlot();
+    if (sender()== &line) updatePlot();
 }
 
 void Compare_lines::updatePlot() {
@@ -111,7 +111,7 @@ void Compare_lines::updatePlot() {
 
         my_w.plot->clearGraphs();
 
-        QPolygonF my_poly=line->poly(line->numPoints);
+        QPolygonF my_poly=line.poly(line.numPoints);
 		qDebug() << my_poly;
 
         for (int i=0; i<nparent->getBufferList().size(); i++) {

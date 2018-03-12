@@ -615,7 +615,7 @@ void Interferometry::addShape(){
         bool found =false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->property("parentPan").toString()==panName()) {
+            if (line && line->parent()==this) {
                 qDebug() << line->toolTip();
                 if (line->toolTip()==tooltipStr) {
                     found=true;
@@ -709,7 +709,7 @@ void Interferometry::loadSettings(QSettings *settings){
         bool found=false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->property("parentPan").isValid() && qvariant_cast<nGenericPan*>(line->property("parentPan"))==this) {
+            if (line && line->parent()==this) {
                 if (line->toolTip()==name) found=true;
             }
         }

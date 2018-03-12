@@ -25,31 +25,31 @@
 #include "RegionPath.h"
 #include "neutrino.h"
 
-RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent)
+RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent),
+    region(this,1),
+    regionPhys(nullptr)
 {
 
 	my_w.setupUi(this);
 
-    region =  new nLine(this,1);
 	// TODO: create something better to avoid line removal
-	region->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
-	region->toggleClosedLine(true);
+    region.setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
+    region.toggleClosedLine(true);
 
     show();
 
-    connect(my_w.actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
-	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
+    connect(my_w.actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
+    connect(my_w.actionBezier, SIGNAL(triggered()), &region, SLOT(toggleBezier()));
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
 	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
-	regionPhys=NULL;
 }
 
 void RegionPath::duplicate () {
-    if (regionPhys==NULL) {
+    if (regionPhys==nullptr) {
         doIt();
     }
-	regionPhys=NULL;
+    regionPhys=nullptr;
 }
 
 void RegionPath::doIt() {
@@ -57,45 +57,45 @@ void RegionPath::doIt() {
     nPhysD *image=getPhysFromCombo(my_w.image);
     if (image) {
         double replaceVal=getReplaceVal();
-        QPolygonF regionPoly=region->poly(1);
-        regionPoly=regionPoly.translated(image->get_origin().x(),image->get_origin().y());
+        QPolygonF regPoly=region.poly(1);
+        regPoly=regPoly.translated(image->get_origin().x(),image->get_origin().y());
         
-        std::vector<vec2f> vecPoints(regionPoly.size());
-        for(int k=0;k<regionPoly.size();k++) {
-            vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
+        std::vector<vec2f> vecPoints(regPoly.size());
+        for(int k=0;k<regPoly.size();k++) {
+            vecPoints[k]=vec2f(regPoly[k].x(),regPoly[k].y());
         }
         
-        QRect rectRegion=regionPoly.boundingRect().toRect();
+        QRect regRect=regPoly.boundingRect().toRect();
         
-        nPhysD *regionPath = new nPhysD(*image);
+        nPhysD *regPath = new nPhysD(*image);
         
         if (!my_w.inverse->isChecked()) {
-            regionPath->set(replaceVal);
+            regPath->set(replaceVal);
         } 
         
-        regionPath->setShortName("Region path");
-        regionPath->setName("path");
-        QProgressDialog progress("Extracting", "Stop", 0, rectRegion.width(), this);
+        regPath->setShortName("Region path");
+        regPath->setName("path");
+        QProgressDialog progress("Extracting", "Stop", 0, regRect.width(), this);
         progress.setWindowModality(Qt::WindowModal);
         progress.show();
-        for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
+        for (int i=regRect.left(); i<=regRect.right(); i++) {
             if (progress.wasCanceled()) break;
             QApplication::processEvents();
-            for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+            for (int j=regRect.top(); j<=regRect.bottom(); j++) {
                 vec2f pp(i,j);
                 if (point_inside_poly(pp,vecPoints)==my_w.inverse->isChecked()) {
-                    regionPath->set(pp,replaceVal);
+                    regPath->set(pp,replaceVal);
                 } else {
-                    regionPath->set(pp,image->point(i,j));
+                    regPath->set(pp,image->point(i,j));
                 }
             }
-            progress.setValue(i-rectRegion.left());
+            progress.setValue(i-regRect.left());
         }
         if (my_w.crop->isChecked()) {
-            *regionPath=regionPath->sub(rectRegion.x(), rectRegion.y(), rectRegion.width(), rectRegion.height());
+            *regPath=regPath->sub(regRect.x(), regRect.y(), regRect.width(), regRect.height());
         }
-        regionPath->TscanBrightness();
-        regionPhys=nparent->replacePhys(regionPath,regionPhys);
+        regPath->TscanBrightness();
+        regionPhys=nparent->replacePhys(regPath,regionPhys);
     }
 }
 

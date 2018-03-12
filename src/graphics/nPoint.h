@@ -33,6 +33,7 @@
 #define __nPoint
 
 class neutrino;
+class nGenericPan;
 
 namespace Ui {
 class nPoint;
@@ -42,12 +43,12 @@ class nPoint : public QGraphicsObject {
 	Q_OBJECT
 public:
 	
-	nPoint(neutrino *);
-	~nPoint(){};
+    nPoint(neutrino * = nullptr);
+    nPoint(nGenericPan*, int level);
+
+    ~nPoint(){};
 	
-	neutrino *parent(){
-		return (neutrino *) QGraphicsObject::parent();
-	};
+    neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 4 };
 	int type() const { return Type;}

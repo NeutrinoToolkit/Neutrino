@@ -39,8 +39,8 @@ nLine::~nLine() {
 
 nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 {
+    setParent(parentPan);
 	my_w.name->setText(parentPan->panName()+"Line");
-	setProperty("parentPan", QVariant::fromValue(parentPan));
 	setProperty("parentPanControlLevel",level);
 	if (level>0) {
 		my_w.name->setReadOnly(true);
@@ -61,24 +61,24 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 }
 
 nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
-	nparent(my_parent)
+    nparent(my_parent)
 {
 
-	if (my_parent) {
-		my_parent->getScene().addItem(this);
-		setParent(my_parent);
-		int num=my_parent->property("numLine").toInt()+1;
-		my_parent->setProperty("numLine",num);
+    if (nparent) {
+        nparent->getScene().addItem(this);
+        setParent(nparent);
+        int num=nparent->property("numLine").toInt()+1;
+        nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
 		setToolTip(tr("line")+QString::number(num));
-		connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-		connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-		connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
+        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
-		zoom=my_parent->getZoom();
+        zoom=nparent->getZoom();
 
-		if (my_parent->getCurrentBuffer()) {
-			setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
+        if (nparent->getCurrentBuffer()) {
+            setPos(nparent->getCurrentBuffer()->get_origin().x(),nparent->getCurrentBuffer()->get_origin().y());
 		}
 
 	} else {
@@ -91,8 +91,6 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
-	setProperty("parentPan",QString(""));
-	setProperty("parentPanControlLevel",0);
 
 	nodeSelected=-1;
 

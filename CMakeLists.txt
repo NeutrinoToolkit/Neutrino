@@ -17,8 +17,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
 	set (CMAKE_BUILD_TYPE "Release")
 endif()
 
-set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf")
-
 #versioning
 find_package(Git REQUIRED)
 if (GIT_FOUND)

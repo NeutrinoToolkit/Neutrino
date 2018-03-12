@@ -37,8 +37,8 @@ nObject::~nObject() {
 
 nObject::nObject(nGenericPan *parentPan, int level, QString cname) : nObject(parentPan->nparent, cname)
 {
+    setParent(parentPan);
     my_w.name->setText(parentPan->panName()+cname);
-    setProperty("parentPan", QVariant::fromValue(parentPan));
     setProperty("parentPanControlLevel",level);
     if (level>0) {
         my_w.name->setReadOnly(true);
@@ -75,8 +75,6 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 	setAcceptHoverEvents(true);
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
-	setProperty("parentPan",QString(""));
-	setProperty("parentPanControlLevel",0);
 
 	setProperty("NeuSave-fileIni",toolTip()+".ini");
 

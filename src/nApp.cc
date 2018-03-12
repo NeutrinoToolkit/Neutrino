@@ -50,22 +50,22 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
     nApp *napp(qobject_cast<nApp*> (qApp));
     if (napp && napp->log_win.isVisible()) {
         QByteArray localMsg = msg.toLocal8Bit();
-        QString outstr(QDateTime::currentDateTime().toString());
+        QString outstr;
         switch (type) {
             case QtDebugMsg:
-                outstr += " Debug";
+                outstr += " D";
                 break;
             case QtInfoMsg:
-                outstr += " Info";
+                outstr += " I";
                 break;
             case QtWarningMsg:
-                outstr += " Warn";
+                outstr += " W";
                 break;
             case QtCriticalMsg:
-                outstr += " Critical";
+                outstr += " C";
                 break;
             case QtFatalMsg:
-                outstr += " Fatal";
+                outstr += " F";
                 abort();
         }
 
@@ -79,6 +79,8 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
 #endif
 
         napp->logger.appendPlainText(outstr);
+        napp->logger.verticalScrollBar()->setValue(napp->logger.verticalScrollBar()->maximum());
+
     }
 
 
