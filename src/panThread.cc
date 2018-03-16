@@ -7,12 +7,12 @@
 #include <QApplication>
 
 panThread::panThread() : 
-params(NULL), 
-calculation_function(NULL), 
-n_iter(-1),
-err_message("Error in thread")
+    n_iter(-1),
+    params(nullptr),
+    calculation_function(nullptr),
+    err_message("Error in thread")
 {
-    DEBUG("creator");   
+    DEBUG("creator");
 }
 
 void panThread::setThread(void *iparams, void (*ifunc)(void *, int &)) {
@@ -20,8 +20,9 @@ void panThread::setThread(void *iparams, void (*ifunc)(void *, int &)) {
     params = iparams;
     calculation_function = ifunc;
 }
+
 void panThread::run() {
-    if (calculation_function==NULL) {
+    if (calculation_function==nullptr) {
         WARNING("Problems getting calculation_function");
         return;
     }
@@ -38,4 +39,6 @@ void panThread::run() {
 void panThread::stop() {
     DEBUG("[nGenericPan] pan thread killed");
     n_iter = -1;
+    params=nullptr;
+    calculation_function=nullptr;
 }

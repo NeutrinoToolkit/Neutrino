@@ -244,7 +244,6 @@
    </attribute>
    <addaction name="actionPaths"/>
    <addaction name="actionFlipRotate"/>
-   <addaction name="separator"/>
    <addaction name="actionLockColors"/>
   </widget>
   <action name="actionNew">
@@ -492,7 +491,7 @@
     <string>FlipRotate</string>
    </property>
    <property name="toolTip">
-    <string>Flip and Rotate</string>
+    <string>Flip and Rotate (right click to change)</string>
    </property>
   </action>
   <action name="actionRotate_left">

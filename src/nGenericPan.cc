@@ -715,8 +715,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
         progress.setWindowModality(Qt::WindowModal);
         progress.show();
     }
-    nThread.params = iparams;
-    nThread.calculation_function = my_func;
+    nThread.setThread(iparams,my_func);
 
     nThread.start();
     while (nThread.isRunning()) {
@@ -728,7 +727,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
             }
         }
         QApplication::processEvents();
-        sleeper_thread::msleep(100);
+        QThread::msleep(100);
     }
     progress.setValue(0);
     progress.hide();

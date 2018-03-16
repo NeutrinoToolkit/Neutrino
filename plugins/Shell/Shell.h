@@ -100,6 +100,10 @@ public:
         return QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S);
     }
 
+    int order() {
+        return 100;
+    }
+
     bool instantiate(neutrino *neu);
 
 private:

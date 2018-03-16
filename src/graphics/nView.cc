@@ -373,8 +373,8 @@ void nView::keyPressEvent (QKeyEvent *e)
 }
 
 void nView::rescaleColor(int val) {
-    if (val==100) resetGamma();
     val=std::max<int>(std::min<int>(val,100),0);
+    if (val==100) resetGamma();
     setProperty("percentPixels",val);
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
@@ -382,11 +382,11 @@ void nView::rescaleColor(int val) {
                 phys->property["display_range"]=getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
-            qInfo() << "All images rescaled to " << QString::number(val) << "%";
+            qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
             currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,val);
             emit bufferChanged(currentBuffer);
-            qInfo() << "Image rescaled to " << QString::number(val) << "%";
+            qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }
         updatePhys();
     }
@@ -485,7 +485,7 @@ nView::changeColorTable (QString ctname) {
 void
 nView::changeColorTable () {
     updatePhys();
-    qInfo() << colorTable;
+    qInfo() << "Colortable:" << colorTable;
     my_tics.update();
     emit updatecolorbar();
 }

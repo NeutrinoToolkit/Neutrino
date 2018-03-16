@@ -34,6 +34,6 @@ public:
     Q_INVOKABLE Lineout_V(neutrino *n) : nLineout(n, PHYS_Y) {};
 };
 
-NEUTRINO_PLUGIN(Lineout_V,Analysis;Lineout,":icons/lineoutV.png", Qt::Key_V);
+NEUTRINO_PLUGIN(Lineout_V,Analysis;Lineout,":icons/lineoutV.png", Qt::Key_V, 51);
 
 #endif

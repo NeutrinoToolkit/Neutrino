@@ -35,7 +35,7 @@
 #include <QTranslator>
 
 void my_handler(int s){
-    printf("Caught signal %d\n",s);
+    qCritical() << "Caught signal" << s;
     QCoreApplication::quit();
 }
 
@@ -67,6 +67,8 @@ int main(int argc, char **argv)
 
     neutrino *ny_neu = new neutrino();
     ny_neu->fileOpen(args);
+
+    my_app.connect(&my_app, SIGNAL(lastWindowClosed()), &my_app, SLOT(quit()));
 
     return my_app.exec();
 }

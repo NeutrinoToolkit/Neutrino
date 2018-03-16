@@ -1,9 +1,18 @@
 #include "nApp.h"
 #include "neutrino.h"
 #include <QtNetwork>
+#include "ui_nLogWin.h"
+#include <QFileDialog>
 
-nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
-
+nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
+    log_win(nullptr,Qt::Tool),
+    log_win_ui(new Ui::nLogWin),
+#ifdef __phys_debug
+    qerr(std::cerr),
+#endif
+    qout(std::cout)
+{
+    log_win_ui->setupUi(&log_win);
     qInstallMessageHandler(nApp::myMessageOutput);
 
     QCoreApplication::setOrganizationName("polytechnique");
@@ -31,61 +40,71 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv) {
     if (my_set.value("checkUpdates",true).toBool()) {
         checkUpdates();
     }
-    log_win.setWindowFlags(Qt::Tool);
-    log_win.setCentralWidget(&logger);
-    log_win.setWindowTitle("Log");
-    log_win.setWindowIcon(QIcon(":icons/icon.png"));
-    logger.setReadOnly(true);
-    logger.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    logger.setLineWrapMode(QPlainTextEdit::NoWrap);
 
+
+    QObject::connect(log_win_ui->clearLog,&QPushButton::released,log_win_ui->logger,&QTextEdit::clear);
+    QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
+    QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
+
+    log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
+    log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
     log_win.setVisible(my_set.value("log_winVisible",false).toBool());
+    setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
 
     addDefaultPalettes();
 
     my_set.endGroup();
+
 }
 
 void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     nApp *napp(qobject_cast<nApp*> (qApp));
-    if (napp && napp->log_win.isVisible()) {
+    if (napp) {
+        if (napp->log_win_ui->levelLog->currentIndex() > type) return;
         QByteArray localMsg = msg.toLocal8Bit();
         QString outstr;
         switch (type) {
             case QtDebugMsg:
-                outstr += "D ";
+                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + " :</font><font color=\"black\">";
                 break;
             case QtInfoMsg:
-                outstr += "I ";
+                outstr+="I: <font color=\"black\">";
                 break;
             case QtWarningMsg:
-                outstr += "W ";
+                outstr+="W: <font color=\"#C71585\">";
                 break;
             case QtCriticalMsg:
-                outstr += "C ";
+                outstr+="C: <font color=\"#9932CC\">";
                 break;
             case QtFatalMsg:
-                outstr += "F ";
+                outstr+="F: <font color=\"#FF0000\">";
                 abort();
         }
+        outstr +=  msg + "</font>";
 
-#ifdef __phys_debug
-        outstr+= QString("(") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + context.function + " : " ;
-#endif
-        outstr += msg;
-
-#ifdef __phys_debug
-        std::cerr << "* " << outstr.toStdString() << std::endl;
-#endif
-
-        napp->logger.appendPlainText(outstr);
-        napp->logger.verticalScrollBar()->setValue(napp->logger.verticalScrollBar()->maximum());
+        napp->log_win_ui->logger->append(outstr);
+        if (napp->log_win_ui->followLog->isChecked())
+            napp->log_win_ui->logger->verticalScrollBar()->setValue(napp->log_win_ui->logger->verticalScrollBar()->maximum());
 
     }
-
-
 }
 
+void nApp::copyLog() {
+    QApplication::clipboard()->setText(log_win_ui->logger->toPlainText());
+}
+
+void nApp::saveLog(){
+    QString fnametmp=QFileDialog::getSaveFileName(&log_win,tr("Save Log"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("NeuSave-fileTxt",fnametmp);
+        QFile t(fnametmp);
+        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        QTextStream out(&t);
+        out << log_win_ui->logger->toPlainText();
+        t.close();
+    }
+
+}
 void nApp::addDefaultPalettes() {
     qDebug() << "reset Palettes";
     nPalettes.clear();
@@ -131,7 +150,7 @@ void nApp::addPaletteFile(QString cmapfile) {
             paletteFiles.sort(Qt::CaseInsensitive);
             my_set.setValue("paletteFiles",paletteFiles);
             my_set.endGroup();
-            qInfo() << cmapfile;
+            qInfo() << "Adding colormap" << cmapfile;
             inputFile.close();
         }
     }
@@ -146,9 +165,11 @@ void nApp::closeAllWindows() {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     my_set.setValue("log_winVisible",log_win.isVisible());
-    my_set.endGroup();
+    my_set.setValue("log_level",log_win_ui->levelLog->currentIndex());
+    my_set.setValue("log_follow",log_win_ui->followLog->isChecked());
+    my_set.setValue("NeuSave-fileTxt",property("NeuSave-fileTxt"));
 
-    log_win.close();
+    my_set.endGroup();
     //    QApplication::closeAllWindows();
 };
 
@@ -158,7 +179,7 @@ void nApp::checkUpdates() {
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
     QEventLoop event;
-    connect(response,SIGNAL(finished()),&event,SLOT(quit()));
+    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
     event.exec();
     QString html = response->readAll(); // Source should be stored here
 
@@ -172,7 +193,7 @@ void nApp::checkUpdates() {
     }
     QUrl commenturl(responseObject.value("comments_url").toString());
     response = manager.get(QNetworkRequest(commenturl));
-    connect(response,SIGNAL(finished()),&event,SLOT(quit()));
+    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
     event.exec();
     qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
     qDebug() << response->readAll();
@@ -233,9 +254,8 @@ bool nApp::notify(QObject *rec, QEvent *ev)
     try {
         return QApplication::notify(rec, ev);
     } catch (std::exception &e) {
-        QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
-        dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-        dlg.exec();
+        log_win.show();
+        qCritical() << e.what();
     }
 
     return false;

@@ -1453,6 +1453,10 @@ phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
 
     my_phys->property.loader(ifile);
 
+#ifdef __phys_debug
+    my_phys->property.dumper(std::cout);
+#endif
+
     // w/h/size binary read
     int my_w, my_h, buffer_size;
     ifile.read((char *)&my_w, sizeof(int));
@@ -1468,6 +1472,7 @@ phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
     my_phys->resize(my_w,my_h);
     std::vector<unsigned char> in(buffer_size);
     ifile.read((char*)&in[0], buffer_size);
+
 
     z_stream strm;
 

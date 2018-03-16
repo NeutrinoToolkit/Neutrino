@@ -39,6 +39,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
 
                     QList<QAction*> my_actions = neu->my_w->toolBar->actions();
                     foreach (QAction *my_action_tmp, my_actions) {
+                        qDebug() << my_action_tmp->text();
                         if (!(my_action_tmp->isSeparator() || my_action_tmp->menu()) &&
                                 my_action_tmp->text()==name_plugin &&
                                 my_action_tmp->isEnabled() &&
@@ -46,15 +47,37 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                             neu->my_w->toolBar->removeAction(my_action_tmp);
                         }
                     }
-                    QPointer<QAction>  my_action;
-                    my_action = new QAction(icon_plugin,name_plugin,nParent);
+
+
+                    QToolButton *my_button = new QToolButton(neu->my_w->toolBar);
+
+                    QAction*  my_action = new QAction(icon_plugin,name_plugin,my_button);
+                    if (!shortcut_key.isEmpty()) {
+                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
+                    }
+                    my_action->setProperty("plugin-order",my_panPlug->order());
 
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);
                     connect (my_action, SIGNAL(triggered()), this, SLOT(run()));
 
-                    neu->my_w->toolBar->addAction(my_action);
+                    my_button->setIcon(icon_plugin);
+                    my_button->setDefaultAction(my_action);
+
+                    // placing the icon in the toolbar by nPanPlug::order() values
+                    bool place_found=false;
+
+                    foreach (QAction *my_action_tmp, my_actions) {
+                        if (my_action_tmp->property("plugin-order").toInt() > my_panPlug->order()) {
+                            neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
+                            place_found=true;
+                            break;
+                        }
+                    }
+                    if(!place_found) {
+                        neu->my_w->toolBar->addWidget(my_button);
+                    }
                 }
 
                 QPointer<QMenu> my_menu=getMenu(my_panPlug->menuEntryPoint(),nParent);

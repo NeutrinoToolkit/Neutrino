@@ -69,6 +69,6 @@ public slots:
 
 };
 
-NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I);
+NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I, -100);
 
 #endif

@@ -26,13 +26,16 @@
 #define nApp_H
 
 #include <QApplication>
-#include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QSettings>
 #include <QDebug>
+#include "grabStream.h"
 
 class neutrino;
 class nGenericPan;
+namespace Ui {
+class nLogWin;
+}
 
 class nApp : public QApplication {
     Q_OBJECT
@@ -41,8 +44,8 @@ public:
 
     QMap<QString, std::vector<unsigned char>> nPalettes;
 
-    QMainWindow log_win;
-    QPlainTextEdit logger;
+    QWidget log_win;
+    Ui::nLogWin *log_win_ui;
 
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
@@ -50,6 +53,13 @@ protected:
     bool event(QEvent *ev) override;
 
     static void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+
+private:
+
+#ifdef __phys_debug
+    grabStream qerr;
+#endif
+    grabStream qout;
 
 public slots:
 
@@ -68,6 +78,12 @@ public slots:
     void addPaletteFile(QString);
     void addDefaultPalettes();
 
+    void copyLog();
+    void saveLog();
+
+signals:
+    void logWinVisibility(bool);
 };
+
 #endif
 

@@ -104,8 +104,7 @@ Contours::on_draw_pb_released()
 			qDebug() << contour.size();
 
 			// set polygon
-			my_c->setPoints(QPolygonF());
-			QPolygonF myp;
+            QPolygonF myp;
 			for (auto &p : contour) {
 				myp<<QPointF(p.x(), p.y());
 			}
@@ -114,7 +113,7 @@ Contours::on_draw_pb_released()
 			//my_w.statusBar->showMessage("Contour ok");
 			my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
 		} else {
-			my_w.statusBar->showMessage(QString::number(cutoff) + " : "+tr(" cannot trace contour"),5000);
+            my_w.statusBar->showMessage(QString::number(cutoff) + " : "+tr("cannot trace contour"),5000);
 		}
 	}
 }

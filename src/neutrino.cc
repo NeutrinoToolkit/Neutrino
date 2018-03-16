@@ -249,8 +249,10 @@ neutrino::neutrino():
 
     QApplication::processEvents();
 
-    connect(&timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
-    timerSaveDefaults.start(60000); // 1 min
+    // autosave config
+    QTimer *timerSaveDefaults =  new QTimer(this);
+    connect(timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
+    timerSaveDefaults->start(60000); // 1 min
 
     for (int i=0; i<metaObject()->methodCount(); i++){
         if (strcmp(metaObject()->method(i).typeName(),"nGenericPan*")==0 && metaObject()->method(i).parameterCount() == 0 )
@@ -386,6 +388,7 @@ nPhysD* neutrino::getBuffer(int i) {
 
 void
 neutrino::scanPlugins(QString pluginsDirStr) {
+    qInfo() << "Looking for plugins in" << pluginsDirStr;
     QDir pluginsDir(pluginsDirStr);
     if (pluginsDir.exists()) {
 
@@ -455,16 +458,13 @@ neutrino::loadPlugin(QString pname, bool launch)
 
     if (QFileInfo(pname).exists()) {
         setProperty("NeuSave-loadPlugin",pname);
-        DEBUG(10, "loading plugin "<<pname.toStdString());
-
         nPluginLoader *my_npl = new nPluginLoader(pname, this);
-        qDebug() << "here" << my_npl->ok();
+        qInfo() << "Loading plugin" <<  QFileInfo(pname).baseName() << " : " << my_npl->ok();
         if (launch) my_npl->run();
     }
 }
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
-    qDebug() << sender();
     if (!my_phys) my_phys=my_w->my_view->currentBuffer;
 
     if (my_phys) {
@@ -586,10 +586,7 @@ void neutrino::setGamma(int value) {
 
 // file menu actions
 neutrino* neutrino::fileNew() {
-    //	QThread *m_thread = new QThread();
     return new neutrino();
-    //	my_neu->moveToThread(m_thread);
-    //	m_thread->start();
 }
 
 void
@@ -798,10 +795,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
         updateRecentFileActions(fname);
         setProperty("NeuSave-fileOpen", fname);
         if (my_w->my_view->physList.size()!=0) {
-            QThread *m_thread = new QThread();
             neutrino*my_neu= new neutrino();
-            my_neu->moveToThread(m_thread);
-            m_thread->start();
             my_neu->fileOpen(fname);
         } else {
             QProgressDialog progress("Load session", "Cancel", 0, 0, this);

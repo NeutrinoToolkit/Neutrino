@@ -182,7 +182,6 @@ void phys_get_bbox(nPhysImageF<T>& img1, nPhysImageF<T>& img2, vec2f& ul_corner,
 }
 
 template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, vec2f val) {
-
     std::vector<T> tmp(my_phys.Timg_buffer,my_phys.Timg_buffer+my_phys.getSurf());
     typename std::vector<T>::iterator ptr  = std::partition(tmp.begin(), tmp.end(), [](T i){return !std::isnan(i);});
 
@@ -199,6 +198,9 @@ template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, ve
 }
 
 template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, double val) {
+    if (val==100) {
+        return my_phys.get_min_max();
+    }
     return getColorPrecentPixels(my_phys,vec2f((100.0-val)/2.0, (100.0+val)/2.0));
 }
 
