@@ -30,6 +30,8 @@
 #include <QGraphicsObject>
 #include "ui_nLine.h"
 
+#include "nPhysImageF.h"
+
 class neutrino;
 class nGenericPan;
 

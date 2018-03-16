@@ -139,7 +139,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         set(MODULES_TWEAK "${MODULES_TWEAK};Qt5::${MODULE}")
     endforeach()
 
-    target_link_libraries(${PROJECT_NAME} ${LOCAL_LIBS} ${MODULES_TWEAK})
+    target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
     IF(NOT DEFINED PLUGIN_INSTALL_DIR)
         if(APPLE)
