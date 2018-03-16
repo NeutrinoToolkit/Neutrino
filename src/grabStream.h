@@ -20,6 +20,7 @@ public:
     }
 
 protected:
+    using std::basic_streambuf<char>::overflow;
     virtual std::streambuf::int_type overflow(std::streambuf::int_type v) {
         if (v == '\n') {
             warn(my_string);
