@@ -1,15 +1,12 @@
 
-
-# GLU
-find_library(GLU NAMES GLU)
-if (NOT ${GLU} STREQUAL "GLU-NOTFOUND")
-        list(APPEND LOCAL_LIBS ${GLU})
-        message (STATUS "using GLU ${GLU}")
+include(FindOpenGL)
+if (OPENGL_GLU_FOUND)
+    list(APPEND LOCAL_LIBS ${OPENGL_GLU_LIBRARY})
+    include_directories(BEFORE "${OPENGL_INCLUDE_DIR}")
 else()
-        message (WARNING "Cannot find GLU: Skipping plugin")
-        return()
+    message(WARNING "Cannot find GLU: Skipping plugin")
+    return()
 endif()
-
 
 # check for neutrino root
 if (NOT DEFINED NEUTRINO_ROOT)
