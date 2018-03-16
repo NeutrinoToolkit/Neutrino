@@ -8,9 +8,9 @@
 
 panThread::panThread() : 
     n_iter(-1),
+    err_message("Error in thread"),
     params(nullptr),
-    calculation_function(nullptr),
-    err_message("Error in thread")
+    calculation_function(nullptr)
 {
     DEBUG("creator");
 }

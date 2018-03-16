@@ -64,7 +64,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_compile_options(-Wall)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-	add_compile_options(-stdlib=libc++)
+    add_compile_options(-stdlib=libc++)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-static-libgcc -static-libstdc++)
  endif()

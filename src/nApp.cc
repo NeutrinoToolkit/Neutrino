@@ -7,7 +7,7 @@
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
     log_win_ui(new Ui::nLogWin)
-  #ifndef __clang__
+#ifndef __clang__
   ,
 #ifdef __phys_debug
     qerr(std::cerr),

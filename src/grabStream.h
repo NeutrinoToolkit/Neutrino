@@ -8,7 +8,8 @@ class grabStream : public QObject, public std::basic_streambuf<char> {
     Q_OBJECT
 
 public:
-    grabStream(std::ostream &stream) : my_stream(stream), my_old_stream(stream.rdbuf()) {
+    grabStream(std::ostream &stream) : my_stream(stream) {
+        my_old_stream=stream.rdbuf() ;
         stream.rdbuf(this);
     }
     ~grabStream() {
@@ -19,8 +20,7 @@ public:
     }
 
 protected:
-    using std::basic_streambuf<char>::overflow
-    virtual unsigned long overflow(unsigned long v) {
+    virtual std::streambuf::int_type overflow(std::streambuf::int_type v) {
         if (v == '\n') {
             warn(my_string);
             my_string.clear();

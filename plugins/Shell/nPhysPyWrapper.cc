@@ -197,7 +197,6 @@ double nPhysPyWrapper::get(nPhysD* phys, QPointF p){
 }
 
 QPair<double, double> nPhysPyWrapper::getMinMax(nPhysD* phys){
-    QPair<double, double> vec;
     return qMakePair(phys->get_min(), phys->get_max());
 }
 
