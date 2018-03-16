@@ -15,6 +15,14 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
 file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(file_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/grabStream.h")
+    list(FIND SOURCES "${file_to_remove}" file_to_remove_found)
+    if (${file_to_remove_found})
+        list(REMOVE_ITEM SOURCES "${file_to_remove}")
+    endif()
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     MESSAGE("SOURCES:\n${SOURCES}")
 endif()

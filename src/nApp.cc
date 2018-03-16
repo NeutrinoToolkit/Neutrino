@@ -6,14 +6,16 @@
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
-    log_win_ui(new Ui::nLogWin),
+    log_win_ui(new Ui::nLogWin)
+  #ifndef __clang__
+  ,
 #ifdef __phys_debug
     qerr(std::cerr),
 #endif
     qout(std::cout)
+#endif
 {
     log_win_ui->setupUi(&log_win);
-    qInstallMessageHandler(nApp::myMessageOutput);
 
     QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
@@ -55,11 +57,12 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
 
     my_set.endGroup();
 
+    qInstallMessageHandler(nApp::myMessageOutput);
 }
 
 void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     nApp *napp(qobject_cast<nApp*> (qApp));
-    if (napp) {
+    if (napp /*&& napp->log_win.isVisible()*/) {
         if (napp->log_win_ui->levelLog->currentIndex() > type) return;
         QByteArray localMsg = msg.toLocal8Bit();
         QString outstr;

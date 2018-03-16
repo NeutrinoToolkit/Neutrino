@@ -29,7 +29,9 @@
 #include <QPlainTextEdit>
 #include <QSettings>
 #include <QDebug>
+#ifndef __clang__
 #include "grabStream.h"
+#endif
 
 class neutrino;
 class nGenericPan;
@@ -55,11 +57,12 @@ protected:
     static void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 private:
-
+#ifndef __clang__
 #ifdef __phys_debug
     grabStream qerr;
 #endif
     grabStream qout;
+#endif
 
 public slots:
 

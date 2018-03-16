@@ -1,6 +1,7 @@
 #ifndef grabStream_H
 #define grabStream_H
 
+#include <streambuf>
 #include <QDebug>
 
 class grabStream : public QObject, public std::basic_streambuf<char> {
@@ -18,7 +19,8 @@ public:
     }
 
 protected:
-    virtual int_type overflow(int_type v) {
+    using std::basic_streambuf<char>::overflow
+    virtual unsigned long overflow(unsigned long v) {
         if (v == '\n') {
             warn(my_string);
             my_string.clear();
