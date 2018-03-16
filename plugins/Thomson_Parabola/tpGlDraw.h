@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 
+#include <QtOpenGL>
+
 #include <QDebug>
 
 #if defined(Q_OS_MAC)
