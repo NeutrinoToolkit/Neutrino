@@ -1,12 +1,4 @@
 
-# libconfig
-find_library(LIBCONF NAMES config++)
-if (NOT ${LIBCONF} STREQUAL "LIBCONF-NOTFOUND")
-        list(APPEND LOCAL_LIBS ${LIBCONF})
-        message (STATUS "using libconfig++ ${LIBCONF}")
-else()
-        message (WARNING "Cannot find libconfig++")
-endif()
 
 # GLU
 find_library(GLU NAMES GLU)
@@ -14,7 +6,8 @@ if (NOT ${GLU} STREQUAL "GLU-NOTFOUND")
         list(APPEND LOCAL_LIBS ${GLU})
         message (STATUS "using GLU ${GLU}")
 else()
-        message (WARNING "Cannot find GLU")
+        message (WARNING "Cannot find GLU: Skipping plugin")
+        return()
 endif()
 
 

@@ -22,7 +22,7 @@
 #include <gsl/gsl_const_mksa.h>
 
 // libconfig
-#include <libconfig.h++>
+//#include <libconfig.h++>
 
 // memcpy
 #include <string.h>
@@ -56,7 +56,6 @@ typedef std::vector<bidimvec<double> > f2vec;
 
 
 using namespace std;
-using namespace libconfig;
 
 #ifndef __tpSystem_h
 #define __tpSystem_h
@@ -91,8 +90,8 @@ public:
 	~tpSystem()
 	{ }
 
-	void parseConfig (const char *);
-	void writeConfig(const char *);
+    //void parseConfig (const char *);
+    //void writeConfig(const char *);
 
 	void getImpact(struct ionImpact *);
 

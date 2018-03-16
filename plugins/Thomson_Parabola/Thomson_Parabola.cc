@@ -40,9 +40,12 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 	show();
 
 
-	connect(my_w.loadConfig_pb, SIGNAL(clicked()), this, SLOT(load_config()));
-	connect(my_w.saveConfig_pb, SIGNAL(clicked()), this, SLOT(save_config()));
-	//connect(my_w.track_pb, SIGNAL(clicked()), this, SLOT(run_simulation()));
+    // moved to neutrino load/save system
+    //connect(my_w.loadConfig_pb, SIGNAL(clicked()), this, SLOT(load_config()));
+    //connect(my_w.saveConfig_pb, SIGNAL(clicked()), this, SLOT(save_config()));
+
+
+    //connect(my_w.track_pb, SIGNAL(clicked()), this, SLOT(run_simulation()));
 	//connect(my_w.run_pb, SIGNAL(clicked()), this, SLOT(run_simulation()));
 
 	// table
@@ -106,40 +109,40 @@ Thomson_Parabola::vecInput(f3point p)
 	//}
 }
 
-void
-Thomson_Parabola::load_config(void)
-{
-	QString confname = QFileDialog::getOpenFileName (this, QString("Select tp conf file"), "", QString("*.conf"));
-	if (! confname.isEmpty()) {
-		my_tp->parseConfig(confname.toStdString().c_str());
+//void
+//Thomson_Parabola::load_config(void)
+//{
+//	QString confname = QFileDialog::getOpenFileName (this, QString("Select tp conf file"), "", QString("*.conf"));
+//	if (! confname.isEmpty()) {
+//		my_tp->parseConfig(confname.toStdString().c_str());
 
-		// sync to widget
-		if (my_tp->isValid()) {
-			findChild<QVecInput *>("boxV1")->setText(my_tp->sim_box->myvertex1.str().c_str());
-			findChild<QVecInput *>("boxV2")->setText(my_tp->sim_box->myvertex2.str().c_str());
+//		// sync to widget
+//		if (my_tp->isValid()) {
+//			findChild<QVecInput *>("boxV1")->setText(my_tp->sim_box->myvertex1.str().c_str());
+//			findChild<QVecInput *>("boxV2")->setText(my_tp->sim_box->myvertex2.str().c_str());
 
-			findChild<QVecInput *>("Ecenter")->setText(my_tp->Efield->getCenter().str().c_str());
-			findChild<QVecInput *>("Ebox")->setText(my_tp->Efield->getSize().str().c_str());
-			findChild<QVecInput *>("Evec")->setText((my_tp->Efield->fieldValue*my_tp->Efield->myfield_versor).str().c_str());
+//			findChild<QVecInput *>("Ecenter")->setText(my_tp->Efield->getCenter().str().c_str());
+//			findChild<QVecInput *>("Ebox")->setText(my_tp->Efield->getSize().str().c_str());
+//			findChild<QVecInput *>("Evec")->setText((my_tp->Efield->fieldValue*my_tp->Efield->myfield_versor).str().c_str());
 
-			findChild<QVecInput *>("Bcenter")->setText(my_tp->Bfield->getCenter().str().c_str());
-			findChild<QVecInput *>("Bbox")->setText(my_tp->Bfield->getSize().str().c_str());
-			findChild<QVecInput *>("Bvec")->setText((my_tp->Bfield->fieldValue*my_tp->Bfield->myfield_versor).str().c_str());
-		}
-	}
+//			findChild<QVecInput *>("Bcenter")->setText(my_tp->Bfield->getCenter().str().c_str());
+//			findChild<QVecInput *>("Bbox")->setText(my_tp->Bfield->getSize().str().c_str());
+//			findChild<QVecInput *>("Bvec")->setText((my_tp->Bfield->fieldValue*my_tp->Bfield->myfield_versor).str().c_str());
+//		}
+//	}
 
 
-}
+//}
 
-void
-Thomson_Parabola::save_config(void)
-{
-	QString confname = QFileDialog::getSaveFileName (this, QString("Select tp conf file"), "", QString("*.conf"));
-	if (! confname.isEmpty()) {
-		my_tp->writeConfig(confname.toStdString().c_str());
-	}
+//void
+//Thomson_Parabola::save_config(void)
+//{
+//	QString confname = QFileDialog::getSaveFileName (this, QString("Select tp conf file"), "", QString("*.conf"));
+//	if (! confname.isEmpty()) {
+//		my_tp->writeConfig(confname.toStdString().c_str());
+//	}
        	
-}
+//}
 
 
 void

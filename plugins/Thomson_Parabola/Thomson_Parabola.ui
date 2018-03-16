@@ -565,45 +565,6 @@
           </layout>
          </widget>
         </item>
-        <item>
-         <widget class="QFrame" name="frame">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>353</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="loadConfig_pb">
-             <property name="text">
-              <string>Load</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="saveConfig_pb">
-             <property name="text">
-              <string>Save</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="drawTab">
@@ -658,8 +619,6 @@
   <tabstop>Ecenter</tabstop>
   <tabstop>Ebox</tabstop>
   <tabstop>Evec</tabstop>
-  <tabstop>loadConfig_pb</tabstop>
-  <tabstop>saveConfig_pb</tabstop>
  </tabstops>
  <resources/>
  <connections/>

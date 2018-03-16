@@ -1,193 +1,172 @@
 #include "tpSystem.h"
 
 
-void
-tpSystem::parseConfig(const char *conf_filename)
-{
-	// read/parse conf file
-	Config *tpConfig;
-	tpConfig = new Config();
-	tpConfig->setAutoConvert(true);
-	tpConfig->readFile(conf_filename);
+//void
+//tpSystem::parseConfig(const char *conf_filename)
+//{
+//	// read/parse conf file
+//	Config *tpConfig;
+//	tpConfig = new Config();
+//	tpConfig->setAutoConvert(true);
+//	tpConfig->readFile(conf_filename);
 
-	string read_string, efield_type, bfield_type;
-	double Evalue, Bvalue;
-	double xs[2], ys[2], zs[2], fsize[3];
+//	string read_string, efield_type, bfield_type;
+//	double Evalue, Bvalue;
+//	double xs[2], ys[2], zs[2], fsize[3];
 
-	f3point Efield_vec, Bfield_vec;
-
-//	tpConfig->lookupValue("dump-trajectory", traj_dump);
-
-	// simulation box
-	tpConfig->lookupValue("simulation-box.x-spawn-mm.init", xs[0]);
-	tpConfig->lookupValue("simulation-box.x-spawn-mm.end", xs[1]);
-	tpConfig->lookupValue("simulation-box.y-spawn-mm.init", ys[0]);
-	tpConfig->lookupValue("simulation-box.y-spawn-mm.end", ys[1]);
-	tpConfig->lookupValue("simulation-box.z-spawn-mm.init", zs[0]);
-	tpConfig->lookupValue("simulation-box.z-spawn-mm.end", zs[1]);
-	f3point sB_1(xs[0]*mm, ys[0]*mm, zs[0]*mm), sB_2(xs[1]*mm, ys[1]*mm, zs[1]*mm);	// sim boundaries
-	sim_box->setBoundaries(sB_1, sB_2);
+//	f3point Efield_vec, Bfield_vec;
 
 
-	// efield boundary field (got to change map version to include vertical dependence)
-	tpConfig->lookupValue("thomson-parabola.efield.box-center-vec", read_string );
-	tpConfig->lookupValue("thomson-parabola.efield.x-size-mm",fsize[0]);
-	tpConfig->lookupValue("thomson-parabola.efield.y-size-mm",fsize[1]);
-	tpConfig->lookupValue("thomson-parabola.efield.z-size-mm",fsize[2]);
-	f3point Ef_1( mm*(f3point(read_string) - f3point(fsize[0], fsize[1], fsize[2])/2) );
-	f3point Ef_2( mm*(f3point(read_string) + f3point(fsize[0], fsize[1], fsize[2])/2) );
-	Efield->setBoundaries(Ef_1, Ef_2);
+//	// simulation box
+//	tpConfig->lookupValue("simulation-box.x-spawn-mm.init", xs[0]);
+//	tpConfig->lookupValue("simulation-box.x-spawn-mm.end", xs[1]);
+//	tpConfig->lookupValue("simulation-box.y-spawn-mm.init", ys[0]);
+//	tpConfig->lookupValue("simulation-box.y-spawn-mm.end", ys[1]);
+//	tpConfig->lookupValue("simulation-box.z-spawn-mm.init", zs[0]);
+//	tpConfig->lookupValue("simulation-box.z-spawn-mm.end", zs[1]);
+//	f3point sB_1(xs[0]*mm, ys[0]*mm, zs[0]*mm), sB_2(xs[1]*mm, ys[1]*mm, zs[1]*mm);	// sim boundaries
+//	sim_box->setBoundaries(sB_1, sB_2);
 
-	// efield field
-	tpConfig->lookupValue("thomson-parabola.efield.type",efield_type);
-	if (efield_type == string("const")) {
-		cerr<<"E field type: CONST"<<endl;
-		tpConfig->lookupValue("thomson-parabola.efield.field-value", Evalue);
-		tpConfig->lookupValue("thomson-parabola.efield.field-direction", read_string);
-		Efield_vec = f3point(read_string);
-		Efield_vec.norm();
-		Efield->assignScalarQuantity(Evalue, Efield_vec);
-	} else if (efield_type == string("scalarMap")) {
-		cerr<<"E field type: SCALAR MAP"<<endl;
-		f3point field_direction, field_center, map_direction;
-		string ifilename;
-		tpConfig->lookupValue("thomson-parabola.efield.mapfile", ifilename);
-		tpConfig->lookupValue("thomson-parabola.efield.field-direction", read_string);
-		field_direction = f3point(read_string);
-		field_direction.norm();
-		tpConfig->lookupValue("thomson-parabola.efield.field-center", read_string);
-		field_center = f3point(read_string)*mm;
-		tpConfig->lookupValue("thomson-parabola.efield.map-direction", read_string);
-		map_direction = f3point(read_string);
-		map_direction.norm();
 
-		// TODO: cambiare numero dimensioni (2->1)
-		Efield->setScalarMap(ifilename.c_str(), 2, map_direction, field_center, field_direction);
+//	// efield boundary field (got to change map version to include vertical dependence)
+//	tpConfig->lookupValue("thomson-parabola.efield.box-center-vec", read_string );
+//	tpConfig->lookupValue("thomson-parabola.efield.x-size-mm",fsize[0]);
+//	tpConfig->lookupValue("thomson-parabola.efield.y-size-mm",fsize[1]);
+//	tpConfig->lookupValue("thomson-parabola.efield.z-size-mm",fsize[2]);
+//	f3point Ef_1( mm*(f3point(read_string) - f3point(fsize[0], fsize[1], fsize[2])/2) );
+//	f3point Ef_2( mm*(f3point(read_string) + f3point(fsize[0], fsize[1], fsize[2])/2) );
+//	Efield->setBoundaries(Ef_1, Ef_2);
 
-	}
+//	// efield field
+//	tpConfig->lookupValue("thomson-parabola.efield.type",efield_type);
+//	if (efield_type == string("const")) {
+//		cerr<<"E field type: CONST"<<endl;
+//		tpConfig->lookupValue("thomson-parabola.efield.field-value", Evalue);
+//		tpConfig->lookupValue("thomson-parabola.efield.field-direction", read_string);
+//		Efield_vec = f3point(read_string);
+//		Efield_vec.norm();
+//		Efield->assignScalarQuantity(Evalue, Efield_vec);
+//	} else if (efield_type == string("scalarMap")) {
+//		cerr<<"E field type: SCALAR MAP"<<endl;
+//		f3point field_direction, field_center, map_direction;
+//		string ifilename;
+//		tpConfig->lookupValue("thomson-parabola.efield.mapfile", ifilename);
+//		tpConfig->lookupValue("thomson-parabola.efield.field-direction", read_string);
+//		field_direction = f3point(read_string);
+//		field_direction.norm();
+//		tpConfig->lookupValue("thomson-parabola.efield.field-center", read_string);
+//		field_center = f3point(read_string)*mm;
+//		tpConfig->lookupValue("thomson-parabola.efield.map-direction", read_string);
+//		map_direction = f3point(read_string);
+//		map_direction.norm();
+
+//		// TODO: cambiare numero dimensioni (2->1)
+//		Efield->setScalarMap(ifilename.c_str(), 2, map_direction, field_center, field_direction);
+
+//	}
 	
 	
-	// bfield boundary and field
-	tpConfig->lookupValue("thomson-parabola.bfield.box-center-vec", read_string );
-	tpConfig->lookupValue("thomson-parabola.bfield.x-size-mm",fsize[0]);
-	tpConfig->lookupValue("thomson-parabola.bfield.y-size-mm",fsize[1]);
-	tpConfig->lookupValue("thomson-parabola.bfield.z-size-mm",fsize[2]);
-	f3point Bf_1( mm*(f3point(read_string) - f3point(fsize[0], fsize[1], fsize[2])/2) );
-	f3point Bf_2( mm*(f3point(read_string) + f3point(fsize[0], fsize[1], fsize[2])/2) );
-	Bfield->setBoundaries(Bf_1, Bf_2);
+//	// bfield boundary and field
+//	tpConfig->lookupValue("thomson-parabola.bfield.box-center-vec", read_string );
+//	tpConfig->lookupValue("thomson-parabola.bfield.x-size-mm",fsize[0]);
+//	tpConfig->lookupValue("thomson-parabola.bfield.y-size-mm",fsize[1]);
+//	tpConfig->lookupValue("thomson-parabola.bfield.z-size-mm",fsize[2]);
+//	f3point Bf_1( mm*(f3point(read_string) - f3point(fsize[0], fsize[1], fsize[2])/2) );
+//	f3point Bf_2( mm*(f3point(read_string) + f3point(fsize[0], fsize[1], fsize[2])/2) );
+//	Bfield->setBoundaries(Bf_1, Bf_2);
 	
-	// bfield field
-	tpConfig->lookupValue("thomson-parabola.bfield.type",bfield_type);
-	if (bfield_type == string("const")) {
-		cerr<<"B field type: CONST"<<endl;
-		tpConfig->lookupValue("thomson-parabola.bfield.field-value", Bvalue);
-		tpConfig->lookupValue("thomson-parabola.bfield.field-direction", read_string);
-		Bfield_vec = f3point(read_string);
-		Bfield_vec.norm();
-		Bfield->assignScalarQuantity(Bvalue, Bfield_vec);
-	} else if (bfield_type == string("scalarMap")) {
-		cerr<<"B field type: SCALAR MAP"<<endl;
-		f3point field_direction, field_center, map_direction;
-		string ifilename;
-		tpConfig->lookupValue("thomson-parabola.bfield.mapfile", ifilename);
-		tpConfig->lookupValue("thomson-parabola.bfield.field-direction", read_string);
-		field_direction = f3point(read_string);
-		field_direction.norm();
-		tpConfig->lookupValue("thomson-parabola.bfield.field-center", read_string);
-		field_center = f3point(read_string)*mm;
-		tpConfig->lookupValue("thomson-parabola.bfield.map-direction", read_string);
-		map_direction = f3point(read_string);
-		map_direction.norm();
+//	// bfield field
+//	tpConfig->lookupValue("thomson-parabola.bfield.type",bfield_type);
+//	if (bfield_type == string("const")) {
+//		cerr<<"B field type: CONST"<<endl;
+//		tpConfig->lookupValue("thomson-parabola.bfield.field-value", Bvalue);
+//		tpConfig->lookupValue("thomson-parabola.bfield.field-direction", read_string);
+//		Bfield_vec = f3point(read_string);
+//		Bfield_vec.norm();
+//		Bfield->assignScalarQuantity(Bvalue, Bfield_vec);
+//	} else if (bfield_type == string("scalarMap")) {
+//		cerr<<"B field type: SCALAR MAP"<<endl;
+//		f3point field_direction, field_center, map_direction;
+//		string ifilename;
+//		tpConfig->lookupValue("thomson-parabola.bfield.mapfile", ifilename);
+//		tpConfig->lookupValue("thomson-parabola.bfield.field-direction", read_string);
+//		field_direction = f3point(read_string);
+//		field_direction.norm();
+//		tpConfig->lookupValue("thomson-parabola.bfield.field-center", read_string);
+//		field_center = f3point(read_string)*mm;
+//		tpConfig->lookupValue("thomson-parabola.bfield.map-direction", read_string);
+//		map_direction = f3point(read_string);
+//		map_direction.norm();
 
-		Bfield->setScalarMap(ifilename.c_str(), 2, map_direction, field_center, field_direction);
+//		Bfield->setScalarMap(ifilename.c_str(), 2, map_direction, field_center, field_direction);
 
-	}
+//	}
 
-	valid_system = true;
-	valid_config = true;
+//	valid_system = true;
+//	valid_config = true;
 
-	// mah...
-	delete tpConfig;
-}
+//	// mah...
+//	delete tpConfig;
+//}
 
-void
-tpSystem::writeConfig(const char *fname)
-{
-	Config cf;
-	cf.setAutoConvert(true);
+//void
+//tpSystem::writeConfig(const char *fname)
+//{
+//	Config cf;
+//	cf.setAutoConvert(true);
 
-	Setting &root = cf.getRoot();
-	//Setting &relative = root;
+//	Setting &root = cf.getRoot();
+//	//Setting &relative = root;
 
-	// simulation box
-	Setting &cf_sim = root.add("simulation-box", Setting::TypeGroup);
+//	// simulation box
+//	Setting &cf_sim = root.add("simulation-box", Setting::TypeGroup);
 
-       	Setting& cf_sim_x = cf_sim.add("x-spawn-mm", Setting::TypeGroup);
-	cf_sim_x.add("init", Setting::TypeFloat) = sim_box->myvertex1.x()/mm;
-	cf_sim_x.add("end", Setting::TypeFloat) = sim_box->myvertex2.x()/mm;
+//       	Setting& cf_sim_x = cf_sim.add("x-spawn-mm", Setting::TypeGroup);
+//	cf_sim_x.add("init", Setting::TypeFloat) = sim_box->myvertex1.x()/mm;
+//	cf_sim_x.add("end", Setting::TypeFloat) = sim_box->myvertex2.x()/mm;
 
-       	Setting& cf_sim_y = cf_sim.add("y-spawn-mm", Setting::TypeGroup);
-	cf_sim_y.add("init", Setting::TypeFloat) = sim_box->myvertex1.y()/mm;
-	cf_sim_y.add("end", Setting::TypeFloat) = sim_box->myvertex2.y()/mm;
+//       	Setting& cf_sim_y = cf_sim.add("y-spawn-mm", Setting::TypeGroup);
+//	cf_sim_y.add("init", Setting::TypeFloat) = sim_box->myvertex1.y()/mm;
+//	cf_sim_y.add("end", Setting::TypeFloat) = sim_box->myvertex2.y()/mm;
 
-       	Setting& cf_sim_z = cf_sim.add("z-spawn-mm", Setting::TypeGroup);
-	cf_sim_z.add("init", Setting::TypeFloat) = sim_box->myvertex1.z()/mm;
-	cf_sim_z.add("end", Setting::TypeFloat) = sim_box->myvertex2.z()/mm;
+//       	Setting& cf_sim_z = cf_sim.add("z-spawn-mm", Setting::TypeGroup);
+//	cf_sim_z.add("init", Setting::TypeFloat) = sim_box->myvertex1.z()/mm;
+//	cf_sim_z.add("end", Setting::TypeFloat) = sim_box->myvertex2.z()/mm;
 	
 	
-	Setting &cf_tp = root.add("thomson-parabola", Setting::TypeGroup);
-	Setting &cf_tp_B = cf_tp.add("bfield", Setting::TypeGroup);
-	Setting &cf_tp_E = cf_tp.add("efield", Setting::TypeGroup);
+//	Setting &cf_tp = root.add("thomson-parabola", Setting::TypeGroup);
+//	Setting &cf_tp_B = cf_tp.add("bfield", Setting::TypeGroup);
+//	Setting &cf_tp_E = cf_tp.add("efield", Setting::TypeGroup);
 
-	// efield
-	cf_tp_E.add("type", Setting::TypeString) = std::string("const");
-	cf_tp_E.add("box-center-vec", Setting::TypeString) = ((1/mm)*Efield->getCenter()).str();
+//	// efield
+//	cf_tp_E.add("type", Setting::TypeString) = std::string("const");
+//	cf_tp_E.add("box-center-vec", Setting::TypeString) = ((1/mm)*Efield->getCenter()).str();
 
-	f3point si = Efield->getSize();
-	cf_tp_E.add("x-size-mm", Setting::TypeFloat) = si.x()/mm;
-	cf_tp_E.add("y-size-mm", Setting::TypeFloat) = si.y()/mm;
-	cf_tp_E.add("z-size-mm", Setting::TypeFloat) = si.z()/mm;
+//	f3point si = Efield->getSize();
+//	cf_tp_E.add("x-size-mm", Setting::TypeFloat) = si.x()/mm;
+//	cf_tp_E.add("y-size-mm", Setting::TypeFloat) = si.y()/mm;
+//	cf_tp_E.add("z-size-mm", Setting::TypeFloat) = si.z()/mm;
 
-	cf_tp_E.add("field-value", Setting::TypeFloat) = Efield->fieldValue;
-	cf_tp_E.add("field-direction", Setting::TypeString) = Efield->myfield_versor.str();
+//	cf_tp_E.add("field-value", Setting::TypeFloat) = Efield->fieldValue;
+//	cf_tp_E.add("field-direction", Setting::TypeString) = Efield->myfield_versor.str();
 
-	// bfield
-	cf_tp_B.add("type", Setting::TypeString) = std::string("const");
-	cf_tp_B.add("box-center-vec", Setting::TypeString) = ((1/mm)*Bfield->getCenter()).str();
+//	// bfield
+//	cf_tp_B.add("type", Setting::TypeString) = std::string("const");
+//	cf_tp_B.add("box-center-vec", Setting::TypeString) = ((1/mm)*Bfield->getCenter()).str();
 
-	si = Bfield->getSize();
-	cf_tp_B.add("x-size-mm", Setting::TypeFloat) = si.x()/mm;
-	cf_tp_B.add("y-size-mm", Setting::TypeFloat) = si.y()/mm;
-	cf_tp_B.add("z-size-mm", Setting::TypeFloat) = si.z()/mm;
+//	si = Bfield->getSize();
+//	cf_tp_B.add("x-size-mm", Setting::TypeFloat) = si.x()/mm;
+//	cf_tp_B.add("y-size-mm", Setting::TypeFloat) = si.y()/mm;
+//	cf_tp_B.add("z-size-mm", Setting::TypeFloat) = si.z()/mm;
 
-	cf_tp_B.add("field-value", Setting::TypeFloat) = Bfield->fieldValue;
-	cf_tp_B.add("field-direction", Setting::TypeString) = Bfield->myfield_versor.str();
+//	cf_tp_B.add("field-value", Setting::TypeFloat) = Bfield->fieldValue;
+//	cf_tp_B.add("field-direction", Setting::TypeString) = Bfield->myfield_versor.str();
 
 
-	cf.writeFile(fname);
+//	cf.writeFile(fname);
 
-//
-//	//# electric
-//	lcread.setKey("thomson-parabola.efield.type=const","string")
-//	lcread.setKey("thomson-parabola.efield.box-center-vec="+self.efield.box_center.str(),"vector")
-//	lcread.setKey("thomson-parabola.efield.x-size-mm="+str(self.efield.box_widths.x),"number")
-//	lcread.setKey("thomson-parabola.efield.y-size-mm="+str(self.efield.box_widths.y),"number")
-//	lcread.setKey("thomson-parabola.efield.z-size-mm="+str(self.efield.box_widths.z),"number")
-//	f_mod = self.efield.fieldVec.mod()
-//	lcread.setKey("thomson-parabola.efield.field-value="+str(f_mod),"number")
-//	lcread.setKey("thomson-parabola.efield.field-direction="+self.efield.fieldVec.scale(1./f_mod).str(),"vector")
-//
-//	//# magnetic
-//	lcread.setKey("thomson-parabola.bfield.type=const","string")
-//	lcread.setKey("thomson-parabola.bfield.box-center-vec="+self.bfield.box_center.str(),"vector")
-//	lcread.setKey("thomson-parabola.bfield.x-size-mm="+str(self.bfield.box_widths.x),"number")
-//	lcread.setKey("thomson-parabola.bfield.y-size-mm="+str(self.bfield.box_widths.y),"number")
-//	lcread.setKey("thomson-parabola.bfield.z-size-mm="+str(self.bfield.box_widths.z),"number")
-//	f_mod = self.bfield.fieldVec.mod()
-//	lcread.setKey("thomson-parabola.bfield.field-value="+str(f_mod),"number")
-//	lcread.setKey("thomson-parabola.bfield.field-direction="+self.bfield.fieldVec.scale(1./f_mod).str(),"vector")
 
-}
+//}
 
 void
 tpSystem::getImpact(struct ionImpact *ion)

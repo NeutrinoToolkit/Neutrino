@@ -65,8 +65,8 @@ public slots:
 	// here the GUI slots
 	void vecInput(f3point);
 	
-	void load_config(void);
-	void save_config(void);
+//	void load_config(void);
+//	void save_config(void);
 	void run_simulation(void);
 
 	void addTrack(void);
