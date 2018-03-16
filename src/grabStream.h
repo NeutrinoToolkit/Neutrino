@@ -19,7 +19,7 @@ public:
     }
 
 protected:
-    using std::basic_streambuf<char>::overflow
+    using std::basic_streambuf<char>::overflow;
     virtual unsigned long overflow(unsigned long v) {
         if (v == '\n') {
             warn(my_string);
