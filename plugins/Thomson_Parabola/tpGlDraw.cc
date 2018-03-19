@@ -2,19 +2,27 @@
 #include "tpGlDraw.h"
 
 tpGlDraw::tpGlDraw(QWidget *parent)
-    : QGLWidget(parent),
-    rotationX(-21.0),
-    rotationY(-57.0),
-    rotationZ(0.0),
-
-    translationX(0.),
-    translationY(0.),
-    translationZ(-10.),
-
-    magnification(1.),
-    faceColors({Qt::red,Qt::green,Qt::blue,Qt::yellow})
+    : QGLWidget(parent)
 {
     setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+
+    // report resize
+    resize(parent->size());
+
+    rotationX = -21.0;
+    rotationY = -57.0;
+    rotationZ = 0.0;
+
+    translationX = 0.;
+    translationY = 0.;
+    translationZ = -10.;
+
+    magnification = 1.;
+
+    faceColors[0] = Qt::red;
+    faceColors[1] = Qt::green;
+    faceColors[2] = Qt::blue;
+    faceColors[3] = Qt::yellow;
 }
 
 void tpGlDraw::initializeGL()
@@ -24,12 +32,6 @@ void tpGlDraw::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 }
-
-void tpGlDraw::updateGL() {
-    qDebug() << size();
-    QGLWidget::updateGL();
-}
-
 
 void tpGlDraw::resizeGL(int width, int height)
 {
@@ -59,16 +61,16 @@ void tpGlDraw::draw()
     //
     // from: https://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
 
-//    static GLfloat P1[3] = { 1.0, -1.0, 2. };
-//    static GLfloat P2[3] = { 0, -1.0, 2. };
+    static GLfloat P1[3] = { 1.0, -1.0, 2. };
+    static GLfloat P2[3] = { 0, -1.0, 2. };
 
-//        static GLfloat P3[3] = { 0, -1.0, 3. };
-//        static GLfloat P4[3] = { 1.0, -1., 3. };
+        static GLfloat P3[3] = { 0, -1.0, 3. };
+        static GLfloat P4[3] = { 1.0, -1., 3. };
 
-//    GLfloat M[16] = {    magnification,0,0,0,
-//                    0,magnification,0,0,
-//                    0,0,magnification,0,
-//                    0,0,0,magnification};
+    GLfloat M[16] = {    magnification,0,0,0,
+                    0,magnification,0,0,
+                    0,0,magnification,0,
+                    0,0,0,magnification};
 //
 //    static const GLfloat * const coords[4][3] = {
 //        { P1, P2, P3 }, { P1, P3, P4 }, { P1, P4, P2 }, { P2, P4, P3 }
@@ -111,7 +113,7 @@ void tpGlDraw::draw()
 
     // get min/max
     fp minv, maxv;
-    for (unsigned int ii=0; ii<boxes.size(); ii++) {
+    for (int ii=0; ii<boxes.size(); ii++) {
         minv = min(minv, boxes[ii]->myvertex1);
         minv = min(minv, boxes[ii]->myvertex2);
 
@@ -154,7 +156,7 @@ void tpGlDraw::draw()
     //GLfloat cp2[3] = {2,2,2};
     //generateCube(cp1, cp2, 2);
 
-    for (unsigned int ii=0; ii<boxes.size(); ii++) {
+    for (int ii=0; ii<boxes.size(); ii++) {
         //std::cerr<<"---- Adding tribox "<<boxes[ii]->myvertex1<<" <--> "<<boxes[ii]->myvertex2<<std::endl;
         generateTribox(*boxes[ii], Qt::blue);
     }

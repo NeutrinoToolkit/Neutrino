@@ -84,7 +84,7 @@ class tpSystem {
 
 public:
 	tpSystem()
-        : relativistic(false), valid_system(false), valid_config(false)
+		: valid_system(false), valid_config(false), relativistic(false)
 	{ sim_box = new tribox; Efield = new scalarMap; Bfield = new scalarMap; }
 
 	~tpSystem()

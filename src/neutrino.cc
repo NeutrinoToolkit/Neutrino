@@ -701,7 +701,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         updateRecentFileActions(fname);
         QMutableListIterator<nPhysD*> i(imagelist);
         while (i.hasNext()) {
-            if (i.next() && i.next()->getSurf()>0) {
+            if (i.next()->getSurf()>0) {
                 addShowPhys(i.value());
             } else {
                 i.remove();

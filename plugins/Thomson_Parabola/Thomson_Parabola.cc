@@ -163,7 +163,7 @@ Thomson_Parabola::run_simulation(void)
 	float iE = sp.iE_mev*MeV;
 	float eE = sp.eE_mev*MeV;
 	int nSim = sp.n_points;
-//	float stepE = (eE-iE)/(nSim-1);
+	float stepE = (eE-iE)/(nSim-1);
 
 	nSpectrum *my_line = sp.nsp;
 	if (my_line == NULL) {
@@ -223,7 +223,7 @@ Thomson_Parabola::run_simulation(void)
 	// WARNING: this is the ONLY mechanism actually passing energy
 	// associated to curvilinear coordinate from tp-plugin to nSpectrum
 	my_line->setPoints(lp);
-    for (unsigned int ii=0; ii<ens.size(); ii++) {
+	for (int ii=0; ii<ens.size(); ii++) {
 		QTableWidgetItem *en_it = new QTableWidgetItem(QString::number(ens[ii]));
 		my_line->my_w.points->setItem(ii, 2, en_it);
 	
