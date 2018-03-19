@@ -61,7 +61,7 @@ public:
             myvertex1 = op1+dcc;
         myvertex2 = op2+dcc;
 
-        fp sz = getSize();
+//        fp sz = getSize();
     }
 
     void setSize(fp si)

@@ -178,7 +178,7 @@ tpSystem::getImpact(struct ionImpact *ion)
 
 	double ion_energy = my_ion->energy;
 	double ion_mass = my_ion->mass;
-	double ion_charge = my_ion->charge;
+//	double ion_charge = my_ion->charge;
 
 	double ion_gamma = 1+ion_energy/(ion_mass*_cspeed*_cspeed);
 	double ion_beta = sqrt(1-1/(ion_gamma*ion_gamma));
@@ -220,7 +220,8 @@ tpSystem::getImpact(struct ionImpact *ion)
 		memcpy((void*)&sys, (void*)&temp_sys, sizeof(gsl_odeiv_system));
 	}
 
-	double t = 0.0*ns, t1 = 100*ns;
+    double t = 0.0*ns;
+//    double t1 = 100*ns;
 	double h = 10*ps;
 	double y[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, init_v };
 
