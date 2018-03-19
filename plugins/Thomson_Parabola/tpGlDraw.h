@@ -8,7 +8,11 @@
 
 #include <QDebug>
 
-#include <GL/glu.h>
+#if defined(Q_OS_MAC)
+#include <glu.h>
+#else
+#include <Headers/glu.h>
+#endif
 
 #include "tribox.h"
 

@@ -28,17 +28,12 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 	my_tp = new tpSystem();
 
 	// initialize GL draw area
-	QBoxLayout *bl = new QBoxLayout(QBoxLayout::LeftToRight, my_w.tpDrawWidget);
-	tpDraw = new tpGlDraw(my_w.tpDrawWidget);
-	bl->addWidget(tpDraw);
-	my_w.tpDrawWidget->setLayout(bl);
+    tpDraw = new tpGlDraw(this);
+    my_w.gridGl->addWidget(tpDraw);
 
 	// pass tpSystem boxes to GL for plotting
 	tpDraw->addTribox(my_tp->Efield);
 	tpDraw->addTribox(my_tp->Bfield);
-
-	show();
-
 
     // moved to neutrino load/save system
     //connect(my_w.loadConfig_pb, SIGNAL(clicked()), this, SLOT(load_config()));
@@ -75,6 +70,8 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 	//QStringList lbls; lbls<<"X"<<"Y"<<"K [MeV/nucl.]"<<"Q [e+]"<<"m [amu]";
 	//my_line->my_w.points->setHorizontalHeaderLabels(lbls);
 	// --> moved to nSpectrum constructor
+
+    show();
 }
 
 void
