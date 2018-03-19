@@ -4,7 +4,7 @@
 tpGlDraw::tpGlDraw(QWidget *parent)
     : QGLWidget(parent)
 {
-//    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
 
     // report resize
     resize(parent->size());
@@ -23,12 +23,10 @@ tpGlDraw::tpGlDraw(QWidget *parent)
     faceColors[1] = Qt::green;
     faceColors[2] = Qt::blue;
     faceColors[3] = Qt::yellow;
-    qDebug() << "created";
 }
 
 void tpGlDraw::initializeGL()
 {
-    qDebug() << "HERE";
     qglClearColor(Qt::white);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
@@ -37,7 +35,6 @@ void tpGlDraw::initializeGL()
 
 void tpGlDraw::resizeGL(int width, int height)
 {
-    qDebug() << "HERE";
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -49,14 +46,12 @@ void tpGlDraw::resizeGL(int width, int height)
 
 void tpGlDraw::paintGL()
 {
-    qDebug() << "HERE";
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw();
 }
 
 void tpGlDraw::draw()
 {
-    qDebug() << "HERE";
 
 	// e tutta la spiegazione sta qui:
 	// gluLookAt is equivalent to
@@ -171,7 +166,6 @@ void tpGlDraw::draw()
 }
 
 void tpGlDraw::wheelEvent(QWheelEvent *ev) {
-    qDebug() << ev;
 	int nDeg = ev->delta()/8;
 	int nSteps = nDeg/15;
 
@@ -184,14 +178,12 @@ void tpGlDraw::wheelEvent(QWheelEvent *ev) {
 
 void tpGlDraw::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "HERE";
     lastPos = event->pos();
     //qDebug()<<"mouse event: "<<event->buttons();
 }
 
 void tpGlDraw::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << "HERE";
     GLfloat dx = GLfloat(event->x() - lastPos.x()) / width();
     GLfloat dy = GLfloat(event->y() - lastPos.y()) / height();
     if (event->buttons() & Qt::LeftButton) {
@@ -213,7 +205,6 @@ void tpGlDraw::mouseMoveEvent(QMouseEvent *event)
 
 void tpGlDraw::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    qDebug() << "HERE";
     int face = faceAtPosition(event->pos());
     if (face != -1) {
         QColor color = QColorDialog::getColor(faceColors[face], this);
@@ -226,7 +217,6 @@ void tpGlDraw::mouseDoubleClickEvent(QMouseEvent *event)
 
 int tpGlDraw::faceAtPosition(const QPoint &pos)
 {
-    qDebug() << "HERE";
     const int MaxSize = 512;
     GLuint buffer[MaxSize];
     GLint viewport[4];
@@ -261,8 +251,7 @@ int tpGlDraw::faceAtPosition(const QPoint &pos)
 
 void tpGlDraw::generateCube(GLfloat *P1, GLfloat *P2, int num)
 {
-    qDebug() << "HERE";
-    glLoadName(num);
+	glLoadName(num);
 	glBegin(GL_QUAD_STRIP);
 	//qglColor(Qt::red);
 
@@ -304,8 +293,7 @@ void tpGlDraw::generateCube(GLfloat *P1, GLfloat *P2, int num)
 // draw tribox
 void tpGlDraw::generateTribox(tribox my_box, QColor color)
 {
-    qDebug() << "HERE";
-    qglColor(color);
+	qglColor(color);
 	GLfloat cp1[3] = {(GLfloat) my_box.myvertex1.x(),
 		(GLfloat) my_box.myvertex1.y(),
 		(GLfloat) my_box.myvertex1.z()};

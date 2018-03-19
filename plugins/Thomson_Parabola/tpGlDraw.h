@@ -8,11 +8,8 @@
 
 #include <QDebug>
 
-#if defined(Q_OS_MAC)
-#include <glu.h>
-#else
-#include <Headers/glu.h>
-#endif
+#include <GL/glu.h>
+
 #include "tribox.h"
 
 #ifndef __tpGlDraw
@@ -23,7 +20,7 @@ class tpGlDraw : public QGLWidget
     Q_OBJECT
 
 public:
-    Q_INVOKABLE tpGlDraw(QWidget *parent = 0);
+    tpGlDraw(QWidget *parent = 0);
     
     void addTribox(tribox *tb)
     { 

@@ -28,8 +28,10 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 	my_tp = new tpSystem();
 
 	// initialize GL draw area
-    tpDraw = new tpGlDraw(this);
-    my_w.tpDrawWidget->addWidget(tpDraw);
+	QBoxLayout *bl = new QBoxLayout(QBoxLayout::LeftToRight, my_w.tpDrawWidget);
+	tpDraw = new tpGlDraw(my_w.tpDrawWidget);
+	bl->addWidget(tpDraw);
+	my_w.tpDrawWidget->setLayout(bl);
 
 	// pass tpSystem boxes to GL for plotting
 	tpDraw->addTribox(my_tp->Efield);
