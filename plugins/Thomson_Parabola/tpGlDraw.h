@@ -11,7 +11,7 @@
 #if defined(Q_OS_MAC)
 #include <glu.h>
 #else
-#include <Headers/glu.h>
+#include <GL/glu.h>
 #endif
 
 #include "tribox.h"
