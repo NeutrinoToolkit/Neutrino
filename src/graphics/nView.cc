@@ -192,7 +192,7 @@ nView::previousColorTable () {
     } else {
         colorTable=nPalettes.keys().last();
     }
-    changeColorTable ();
+    changeColorTable();
 };
 
 void
@@ -203,7 +203,7 @@ nView::nextColorTable () {
     } else {
         colorTable=nPalettes.keys().first();
     }
-    changeColorTable ();
+    changeColorTable();
 };
 
 
@@ -487,7 +487,7 @@ nView::changeColorTable () {
     updatePhys();
     qInfo() << "Colortable:" << colorTable;
     my_tics.update();
-    emit updatecolorbar();
+    emit updatecolorbar(colorTable);
 }
 
 void nView::setMouseOrigin() {

@@ -2,13 +2,11 @@
 #include "tpGlDraw.h"
 
 tpGlDraw::tpGlDraw(QWidget *parent)
-    : QGLWidget(parent)
+    : QGLWidget(parent),
+      faceColors({Qt::red,Qt::green,Qt::blue,Qt::yellow})
 {
+    grabKeyboard();
     setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
-
-    // report resize
-    resize(parent->size());
-
     rotationX = -21.0;
     rotationY = -57.0;
     rotationZ = 0.0;
@@ -19,14 +17,14 @@ tpGlDraw::tpGlDraw(QWidget *parent)
 
     magnification = 1.;
 
-    faceColors[0] = Qt::red;
-    faceColors[1] = Qt::green;
-    faceColors[2] = Qt::blue;
-    faceColors[3] = Qt::yellow;
+    initializeOverlayGL();
+    makeOverlayCurrent();
+
 }
 
 void tpGlDraw::initializeGL()
 {
+
     qglClearColor(Qt::white);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);

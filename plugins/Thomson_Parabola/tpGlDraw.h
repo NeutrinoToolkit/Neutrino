@@ -13,6 +13,7 @@
 #else
 #include <GL/glu.h>
 #endif
+#include <array>
 
 #include "tribox.h"
 
@@ -25,12 +26,12 @@ class tpGlDraw : public QGLWidget
 
 public:
     tpGlDraw(QWidget *parent = 0);
-    
+
     void addTribox(tribox *tb)
-    { 
-	    if (tb) {
-		    boxes.push_back(tb);
-	    }
+    {
+        if (tb) {
+            boxes.push_back(tb);
+        }
     }
 
 
@@ -45,8 +46,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void resizeEvent (QResizeEvent *ev) {
-	    std::cerr<<"viewport resize: "<<ev->size().width()<<":"<<ev->size().height()<<std::endl;
-	    resizeGL(ev->size().width(), ev->size().height());
+        std::cerr<<"viewport resize: "<<ev->size().width()<<":"<<ev->size().height()<<std::endl;
+        resizeGL(ev->size().width(), ev->size().height());
     }
 
 private:
@@ -67,7 +68,7 @@ private:
 
     GLfloat magnification;
 
-    QColor faceColors[4];
+    std::array<QColor,4> faceColors;
     QPoint lastPos;
 };
 

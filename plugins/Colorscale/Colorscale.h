@@ -63,7 +63,7 @@ public slots:
 	void slider_max_changed(int);
 
 	void bufferChanged(nPhysD*);
-	void updatecolorbar();
+    void updatecolorbar(QString=QString());
 
 	void cutOff();
 

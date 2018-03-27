@@ -16,6 +16,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
 #endif
 {
     log_win_ui->setupUi(&log_win);
+    qInstallMessageHandler(nApp::myMessageOutput);
 
     QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
@@ -57,7 +58,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
 
     my_set.endGroup();
 
-    qInstallMessageHandler(nApp::myMessageOutput);
 }
 
 void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {

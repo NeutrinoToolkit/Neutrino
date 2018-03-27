@@ -48,7 +48,6 @@ public:
 
     QMap<QString, std::vector<unsigned char>>& nPalettes;
 
-    neutrino *nparent;
     void resizeEvent (QResizeEvent *);
 
     // events
@@ -151,7 +150,7 @@ protected:
 
 
 signals:
-    void updatecolorbar();
+    void updatecolorbar(QString);
     void keypressed(QKeyEvent*);
     void mouseposition(QPointF);
     void mousePressEvent_sig(QPointF);

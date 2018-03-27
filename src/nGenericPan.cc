@@ -181,6 +181,7 @@ void nGenericPan::grabSave() {
             setUnifiedTitleAndToolBarOnMac(true);
             break;
         }
+        qInfo() << "Image saved to file" << fname;
     }
 }
 
@@ -589,7 +590,6 @@ void nGenericPan::closeEvent(QCloseEvent*){
     }
     saveDefaults();
     foreach (QObject* widget, nparent->children()) {
-        qDebug() << widget->parent();
         if (widget->parent()==this) {
             QApplication::processEvents();
             nLine *line=qobject_cast<nLine *>(widget);
@@ -700,6 +700,7 @@ void nGenericPan::saveSettings(QSettings *settings) {
     setProperty("NeuSave-locale",locale());
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
+            qDebug() << ba, property(ba);
             settings->setValue(ba, property(ba));
         }
     }

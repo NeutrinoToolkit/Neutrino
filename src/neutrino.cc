@@ -219,6 +219,7 @@ neutrino::neutrino():
     connect(my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     connect(my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
     connect(my_w->my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
+    connect(my_w->my_view, SIGNAL(updatecolorbar(QString)), my_w->statusbar, SLOT(showMessage(QString)));
 
     //recent file stuff
 

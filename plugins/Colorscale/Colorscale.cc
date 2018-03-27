@@ -34,7 +34,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
 
     my_w.histogram->parentPan=this;
 
-	connect(nparent->my_w->my_view, SIGNAL(updatecolorbar()), this, SLOT(updatecolorbar()));
+    connect(nparent->my_w->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
 	connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
@@ -192,7 +192,7 @@ vec2f Colorscale::sliderValues() {
 
 
 
-void Colorscale::updatecolorbar() {
+void Colorscale::updatecolorbar(QString) {
     qDebug() << "-------------------------------";
     disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
     disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
