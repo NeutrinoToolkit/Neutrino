@@ -1020,9 +1020,6 @@ void Visar::getCarrier() {
             getCarrier(k);
         }
     }
-    if (tabs->currentIndex()==1) {
-        statusbar->showMessage(tr("Carrier (")+QString::number(velocityUi[0]->interfringe->value())+tr("px, ")+velocityUi[0]->angle->value()+tr("deg) - (")+QString::number(velocityUi[1]->interfringe->value())+tr("px, ")+velocityUi[1]->angle->value()+tr("deg)"));
-    }
 }
 
 void Visar::getCarrier(int k) {
