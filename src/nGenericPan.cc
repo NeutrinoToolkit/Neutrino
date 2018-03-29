@@ -455,25 +455,20 @@ nGenericPan::loadUi(QSettings *settings) {
         widget->loadSettings(settings);
     }
 
-    foreach (QObject* widget, nparent->children()) {
-        if (widget->parent()==this) {
-            nLine *linea=qobject_cast<nLine *>(widget);
-            if (linea) {
-                linea->loadSettings(settings);
-            }
-            nRect *rect=qobject_cast<nRect *>(widget);
-            if (rect) {
-                rect->loadSettings(settings);
-            }
-            nPoint *point=qobject_cast<nPoint *>(widget);
-            if (point) {
-                point->loadSettings(settings);
-            }
-            nEllipse *elli=qobject_cast<nEllipse *>(widget);
-            if (elli) {
-                elli->loadSettings(settings);
-            }
-        }
+    foreach (nLine *widget, findChildren<nLine *>()) {
+        widget->loadSettings(settings);
+    }
+
+    foreach (nRect *widget, findChildren<nRect *>()) {
+        widget->loadSettings(settings);
+    }
+
+    foreach (nEllipse *widget, findChildren<nEllipse *>()) {
+        widget->loadSettings(settings);
+    }
+
+    foreach (nPoint *widget, findChildren<nPoint *>()) {
+        widget->loadSettings(settings);
     }
 
 }
@@ -554,26 +549,22 @@ nGenericPan::saveUi(QSettings *settings) {
         widget->saveSettings(settings);
     }
 
-    foreach (QObject* widget, nparent->children()) {
-        if (widget->parent()==this) {
-            nLine *line=qobject_cast<nLine *>(widget);
-            if (line) {
-                line->saveSettings(settings);
-            }
-            nRect *rect=qobject_cast<nRect *>(widget);
-            if (rect) {
-                rect->saveSettings(settings);
-            }
-            nPoint *point=qobject_cast<nPoint *>(widget);
-            if (point) {
-                point->saveSettings(settings);
-            }
-            nEllipse *elli=qobject_cast<nEllipse *>(widget);
-            if (elli) {
-                elli->saveSettings(settings);
-            }
-        }
+    foreach (nLine *widget, findChildren<nLine *>()) {
+        widget->saveSettings(settings);
     }
+
+    foreach (nRect *widget, findChildren<nRect *>()) {
+        widget->saveSettings(settings);
+    }
+
+    foreach (nEllipse *widget, findChildren<nEllipse *>()) {
+        widget->saveSettings(settings);
+    }
+
+    foreach (nPoint *widget, findChildren<nPoint *>()) {
+        widget->saveSettings(settings);
+    }
+
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){

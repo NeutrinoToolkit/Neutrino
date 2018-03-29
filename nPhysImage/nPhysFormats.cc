@@ -1872,7 +1872,7 @@ std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {
         ext.erase(0,last_idx + 1);
     }
 
-    transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << fname << " " << ext);
 

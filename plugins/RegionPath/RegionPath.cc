@@ -81,6 +81,7 @@ void RegionPath::doIt() {
         for (int i=regRect.left(); i<=regRect.right(); i++) {
             if (progress.wasCanceled()) break;
             QApplication::processEvents();
+#pragma omp parallel for
             for (int j=regRect.top(); j<=regRect.bottom(); j++) {
                 vec2f pp(i,j);
                 if (point_inside_poly(pp,vecPoints)==my_w.inverse->isChecked()) {
