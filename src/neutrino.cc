@@ -466,10 +466,16 @@ neutrino::loadPlugin(QString pname, bool launch)
 }
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
+    QApplication::processEvents();
     if (!my_phys) my_phys=my_w->my_view->currentBuffer;
 
     if (my_phys) {
-        double gamma_val=my_phys->gamma();
+        double gamma_val=1.0;
+        if (my_w->my_view->physList.contains(my_phys)) {
+            qDebug() << "gonna die!!";
+            gamma_val=my_phys->gamma();
+        }
+
         my_sbarra->gamma->setText(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QString::number(int(1.0/gamma_val)) : QString::number(int(gamma_val))));
 
         QString winName=QString::fromUtf8(my_phys->getShortName().c_str());
@@ -633,6 +639,9 @@ void neutrino::fileOpen(QStringList fnames) {
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
     setProperty("NeuSave-fileOpen", fname);
+    if (!property("NeuSave-fileSave").isValid()) {
+        setProperty("NeuSave-fileSave",property("NeuSave-fileOpen"));
+    }
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     bool separate_rgb= my_set.value("separateRGB",false).toBool();
@@ -719,14 +728,14 @@ void neutrino::saveSession (QString fname) {
 #ifdef HAVE_LIBTIFF
         extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
 #endif
-        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileOpen").toString(),extensions+tr("Any files")+QString(" (*)"));
+        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileSave").toString(),extensions+tr("Any files")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
         }
     } else {
         QFileInfo file_info(fname);
         if (file_info.suffix()=="neus") {
-            setProperty("NeuSave-fileOpen", fname);
+            setProperty("NeuSave-fileSave", fname);
             //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
             QProgressDialog progress("Save session", "Cancel", 0, my_w->my_view->physList.size()+1, this);
@@ -871,6 +880,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
             ifile.close();
         }
     }
+    qInfo() << imagelist.size() << " images";
     return imagelist;
 }
 
@@ -932,16 +942,22 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
 }
 
 void neutrino::removePhys(nPhysD* datamatrix) {
-    if (datamatrix) {
+    if (datamatrix && my_w->my_view->physList.contains(datamatrix)) {
         emit physDel(datamatrix);
+        QApplication::processEvents();
         int position=indexOf(datamatrix);
         if (position != -1) {
-            my_w->my_view->physList.removeAll(datamatrix);
+            qDebug() << my_w->my_view->physList.size();
+             my_w->my_view->physList.removeAll(datamatrix);
             if (my_w->my_view->physList.size()>0) {
-                showPhys(my_w->my_view->physList.at(std::min<int>(position,my_w->my_view->physList.size()-1)));
+                int pos = std::min<int>(position,my_w->my_view->physList.size()-1);
+                qDebug() << my_w->my_view->physList.size() << pos;
+                qDebug() << my_w->my_view->physList;
+                showPhys(my_w->my_view->physList.at(pos));
             } else {
                 my_w->my_view->currentBuffer=nullptr;
                 emitBufferChanged();
+                QApplication::processEvents();
                 setWindowTitle(property("winId").toString()+QString(": Neutrino"));
                 setWindowFilePath("");
                 zoomChanged(1);
@@ -955,8 +971,8 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 }
             }
             if (datamatrix->property["keep_phys_alive"].get_i()!=42){
-                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python")
-                        delete datamatrix;
+                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
+                delete datamatrix;
             }
             datamatrix=NULL;
         }
@@ -1162,15 +1178,18 @@ QString neutrino::getFileSave() {
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
     formats << "hdf";
 #endif
+    foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
+        if (!formats.contains(format))
+            formats << format ;
+    }
+
     foreach(QString format, formats ) {
         allformats += format + " (*."+format+");; ";
     }
-    foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
-        allformats += format + " (*."+format+");; ";
-    }
-    allformats.chop(1);
+
     allformats+=("Any files (*)");
-    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileOpen").toString(),allformats);
+    qInfo() << allformats;
+    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
 }
 
 void
@@ -1184,7 +1203,7 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
     if (!fname.isEmpty()) {
-        setProperty("NeuSave-fileOpen", fname);
+        setProperty("NeuSave-fileSave", fname);
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.isEmpty()) {
             fname+=".neus";
@@ -1286,6 +1305,7 @@ neutrino::fileClose() {
 
 void
 neutrino::closeCurrentBuffer() {
+    QApplication::processEvents();
     if (my_w->my_view->currentBuffer)  {
         if (my_w->my_view->currentBuffer->getType()==PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
             int res=QMessageBox::warning(this,tr("Attention"),

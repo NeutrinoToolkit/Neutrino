@@ -121,11 +121,8 @@ void nGenericPan::raiseNeutrino() {
 }
 
 void nGenericPan::help() {
-    qDebug() << "\n\n\n" << staticMetaObject.className() << "\n\n\n\n";
-    qDebug() << "\n\n\n" << metaObject()->className() << "\n\n\n\n";
-
     if (helpwin.isNull()) {
-        helpwin= new QMainWindow();
+        helpwin= new QMainWindow(this);
         QString helpFile(property("helpFile").toString());
         if (QFileInfo(helpFile).exists()) {
             Ui::PanHelp my_help;
@@ -568,9 +565,6 @@ nGenericPan::saveUi(QSettings *settings) {
 }
 
 void nGenericPan::closeEvent(QCloseEvent*){
-    if (!helpwin.isNull()) {
-        helpwin->close();
-    }
     qDebug() << "Going to close" << this;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {

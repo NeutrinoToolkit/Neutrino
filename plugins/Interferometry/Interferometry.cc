@@ -27,9 +27,7 @@
 
 // physWavelets
 
-Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent),
-    my_image(2)
-{
+Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     my_w.setupUi(this);
 
     region =  new nRect(this,1);
@@ -143,13 +141,12 @@ void Interferometry::line_key_pressed(int key) {
 }
 
 void Interferometry::physDel(nPhysD* buf) {
-
     std::map<std::string, nPhysD *>::iterator itr = localPhys.begin();
     while (itr!=localPhys.end()) {
         if (buf==itr->second) {
             itr = localPhys.erase(itr);
         } else {
-            itr++;
+            ++itr;
         }
     }
 }

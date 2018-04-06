@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>492</width>
-    <height>114</height>
+    <width>555</width>
+    <height>133</height>
    </rect>
   </property>
   <property name="font">
@@ -19,18 +19,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>4</number>
-   </property>
-   <property name="topMargin">
-    <number>4</number>
-   </property>
-   <property name="rightMargin">
-    <number>4</number>
-   </property>
-   <property name="bottomMargin">
-    <number>4</number>
-   </property>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
      <property name="font">
@@ -38,7 +26,7 @@
        <pointsize>10</pointsize>
       </font>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -74,7 +62,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
+         <item row="0" column="2">
           <widget class="QDoubleSpinBox" name="sensitivity">
            <property name="font">
             <font>
@@ -130,24 +118,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QSpinBox" name="physOrigin">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="minimum">
-            <number>-99999</number>
-           </property>
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="neutrinoSave" stdset="0">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="2">
           <widget class="QDoubleSpinBox" name="offsetTime">
            <property name="font">
@@ -172,6 +142,24 @@
            </property>
            <property name="value">
             <double>0.000000000000000</double>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="physOrigin">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="minimum">
+            <number>-99999</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
            </property>
            <property name="neutrinoSave" stdset="0">
             <bool>true</bool>
@@ -220,6 +208,22 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="enableVisar">
+        <property name="toolTip">
+         <string>Enable visar</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>

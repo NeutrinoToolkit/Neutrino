@@ -15,6 +15,9 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     qout(std::cout)
 #endif
 {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+
     log_win_ui->setupUi(&log_win);
     qInstallMessageHandler(nApp::myMessageOutput);
 
@@ -33,8 +36,6 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
 #endif
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
     changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
     if (!my_set.contains("checkUpdates")) {

@@ -198,7 +198,7 @@ void Visar::addVisar() {
     decorate(tab1);
     decorate(tab2);
 
-//    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
+    //    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 
     phase.push_back({{nPhysD(),nPhysD()}});
 
@@ -577,10 +577,10 @@ void Visar::tabChanged(int k) {
             if (enableSOP->isChecked()) {
                 nparent->showPhys(getPhysFromCombo(sopShot));
             }
-        } else {            
+        } else {
             if (k<(int)numVisars) {
                 k=tabWidget->currentIndex();
-                if (velocityUi[k]->enableVisar->isChecked()) {
+                if (phaseUi[k]->enableVisar->isChecked()) {
                     nparent->showPhys(getPhysFromCombo(velocityUi[k]->shotImage));
                 }
                 for (int j=0;j<(int)numVisars;j++) {
@@ -614,7 +614,7 @@ void Visar::connections() {
         connect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         connect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 
-        connect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        connect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
 
         connect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
@@ -663,7 +663,7 @@ void Visar::disconnections() {
         disconnect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
 
-        disconnect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        disconnect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
 
         disconnect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
@@ -827,7 +827,7 @@ void Visar::updatePlot() {
     plotVelocity->clearItems();
 
     for (int g=0; g<plotVelocity->plottableCount(); g++) {
-        if (plotVelocity->plottable(g)->property("JumpGraph").toBool()) {
+        if (plotVelocity->plottable(g)->property("JumpGraph").isValid()) {
             plotVelocity->removePlottable(plotVelocity->plottable(g));
         }
     }
@@ -836,171 +836,172 @@ void Visar::updatePlot() {
     for (unsigned int k=0;k<numVisars;k++){
         if (cPhase[0][k].size()==cPhase[1][k].size() && cPhase[0][k].size()==time_phase[k].size()){
 
-            if (velocityUi[k]->enableVisar->isChecked()) {
 
-                Qt::PenStyle pstyle=((int)k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine);
+            Qt::PenStyle pstyle=((int)k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine);
 
-                double sensitivity=phaseUi[k]->sensitivity->value();
-                double deltat=phaseUi[k]->offsetTime->value()-getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value());
+            double sensitivity=phaseUi[k]->sensitivity->value();
+            double deltat=phaseUi[k]->offsetTime->value()-getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value());
 
-                QVector<double> tjump,njump,rjump;
-                QStringList jumpt=phaseUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
-                phaseUi[k]->jumpst->setPalette(QApplication::palette());
-                QPalette my_palette=phaseUi[k]->jumpst->palette();
-                my_palette.setColor(QPalette::Base,Qt::red);
+            QVector<double> tjump,njump,rjump;
+            QStringList jumpt=phaseUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
+            phaseUi[k]->jumpst->setPalette(QApplication::palette());
+            QPalette my_palette=phaseUi[k]->jumpst->palette();
+            my_palette.setColor(QPalette::Base,Qt::red);
 
-                foreach (QString piece, jumpt) {
-                    QString err_msg=" "+piece+QString("' VISAR ")+QString::number(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
-                    QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+            foreach (QString piece, jumpt) {
+                QString err_msg=" "+piece+QString("' VISAR ")+QString::number(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
+                QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+                if (my_jumps.size()>1 && my_jumps.size()<=3) {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
-                        if (my_jumps.size()>1 && my_jumps.size()<=3) {
-                            bool ok1, ok2, ok3=true;
-                            double valdt=locale().toDouble(my_jumps.at(0),&ok1);
-                            double valdn=locale().toDouble(my_jumps.at(1),&ok2);
-                            double valdrefr_index=1.0;
-                            if (my_jumps.size()==3) {
-                                valdrefr_index=locale().toDouble(my_jumps.at(2),&ok3);
-                                if (!ok3) {
-                                    phaseUi[k]->jumpst->setPalette(my_palette);
-                                    statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg,5000);
-                                }
-                            }
-                            if (sensitivity<0) valdn*=-1.0;
-                            if (ok1 && ok2) {
-                                tjump << valdt;
-                                njump << valdn;
-                            } else {
+                        bool ok1, ok2, ok3=true;
+                        double valdt=locale().toDouble(my_jumps.at(0),&ok1);
+                        double valdn=locale().toDouble(my_jumps.at(1),&ok2);
+                        double valdrefr_index=1.0;
+                        if (my_jumps.size()==3) {
+                            valdrefr_index=locale().toDouble(my_jumps.at(2),&ok3);
+                            if (!ok3) {
                                 phaseUi[k]->jumpst->setPalette(my_palette);
-                                statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
-                            }
-                            if (ok3) {
-                                rjump << valdrefr_index;
-                            } else {
-                                rjump << 1.0;
+                                statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg,5000);
                             }
                         }
-                    } else {
-                        phaseUi[k]->jumpst->setPalette(my_palette);
-                        statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
+                        if (sensitivity<0) valdn*=-1.0;
+                        if (ok1 && ok2) {
+                            tjump << valdt;
+                            njump << valdn;
+                        } else {
+                            phaseUi[k]->jumpst->setPalette(my_palette);
+                            statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
+                        }
+                        if (ok3) {
+                            rjump << valdrefr_index;
+                        } else {
+                            rjump << 1.0;
+                        }
+                    }
+                } else {
+                    phaseUi[k]->jumpst->setPalette(my_palette);
+                    statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
+                }
+            }
+
+            foreach (double a, tjump) {
+                QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(plotVelocity);
+                QPen pen(Qt::gray);
+                pen.setStyle(pstyle);
+                my_jumpLine->setPen(pen);
+                my_jumpLine->point1->setTypeY(QCPItemPosition::ptAbsolute);
+                my_jumpLine->point2->setTypeY(QCPItemPosition::ptAbsolute);
+                my_jumpLine->point1->setCoords(a,0);
+                my_jumpLine->point2->setCoords(a,1);
+            }
+
+            double offset=phaseUi[k]->offsetShift->value();
+
+            QVector<QVector< double > > velJump_array(abs(phaseUi[k]->jump->value()));
+
+            for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
+                velJump_array[i].resize(time_phase[k].size());
+            }
+
+            time_vel[k].resize(time_phase[k].size());
+            velocity[k].resize(time_phase[k].size());
+            velError[k].resize(time_phase[k].size());
+            reflectivity[k].resize(time_phase[k].size());
+            quality[k].resize(time_phase[k].size());
+
+            for (int j=0;j<time_phase[k].size();j++) {
+                time_vel[k][j] = getTime(sweepCoeff[k],time_phase[k][j])+deltat;
+
+                double fRef=cPhase[0][k][j];
+                double fShot=cPhase[1][k][j];
+                double iRef=cIntensity[0][k][j];
+                double iShot=cIntensity[1][k][j];
+                if (getPhysFromCombo(velocityUi[k]->shotImage)==getPhysFromCombo(velocityUi[k]->refImage)) {
+                    fRef=0.0;
+                    iRef=1.0;
+                }
+
+                int njumps=0;
+                double refr_index=1.0;
+                for (int i=0;i<tjump.size();i++) {
+                    if (time_vel[k][j]>tjump.at(i)) {
+                        njumps+=njump.at(i);
+                        refr_index=rjump.at(i);
                     }
                 }
 
-                foreach (double a, tjump) {
-                    QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(plotVelocity);
-                    QPen pen(Qt::gray);
-                    pen.setStyle(pstyle);
-                    my_jumpLine->setPen(pen);
-                    my_jumpLine->point1->setTypeY(QCPItemPosition::ptAbsolute);
-                    my_jumpLine->point2->setTypeY(QCPItemPosition::ptAbsolute);
-                    my_jumpLine->point1->setCoords(a,0);
-                    my_jumpLine->point2->setCoords(a,1);
-                }
+                double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
+                double Rg=phaseUi[k]->reflOffset->value();
+                double Rmat=phaseUi[k]->reflRef->value();
+                double beta=-Rg/pow(1.0-Rg,2);
+                double refle=iShot/iRef * (Rmat-beta) + beta;
 
-                double offset=phaseUi[k]->offsetShift->value();
-
-                QVector<QVector< double > > velJump_array(abs(phaseUi[k]->jump->value()));
+                velocity[k][j] = speed;
+                reflectivity[k][j] = refle;
+                quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
+                velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
 
                 for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
-                    velJump_array[i].resize(time_phase[k].size());
+                    int jloc=i+1;
+                    if (sensitivity<0) jloc*=-1;
+                    if (phaseUi[k]->jump->value()<0) jloc*=-1;
+                    velJump_array[i][j] = (offset+fShot-fRef+jloc)*sensitivity/refr_index;
                 }
+            }
 
-                time_vel[k].resize(time_phase[k].size());
-                velocity[k].resize(time_phase[k].size());
-                velError[k].resize(time_phase[k].size());
-                reflectivity[k].resize(time_phase[k].size());
-                quality[k].resize(time_phase[k].size());
+            QPen pen;
+            pen.setStyle(pstyle);
 
-                for (int j=0;j<time_phase[k].size();j++) {
-                    time_vel[k][j] = getTime(sweepCoeff[k],time_phase[k][j])+deltat;
-
-                    double fRef=cPhase[0][k][j];
-                    double fShot=cPhase[1][k][j];
-                    double iRef=cIntensity[0][k][j];
-                    double iShot=cIntensity[1][k][j];
-                    if (getPhysFromCombo(velocityUi[k]->shotImage)==getPhysFromCombo(velocityUi[k]->refImage)) {
-                        fRef=0.0;
-                        iRef=1.0;
-                    }
-
-                    int njumps=0;
-                    double refr_index=1.0;
-                    for (int i=0;i<tjump.size();i++) {
-                        if (time_vel[k][j]>tjump.at(i)) {
-                            njumps+=njump.at(i);
-                            refr_index=rjump.at(i);
+            for (int kk=0; kk< plotVelocity->graphCount() ; kk++) {
+                QCPGraph *my_graph=plotVelocity->graph(kk);
+                if (my_graph->property("id").toInt() == (int)k ){
+                    pen=my_graph->pen();
+                    pen.setStyle(pstyle);
+                    my_graph->setPen(pen);
+                    if (my_graph->valueAxis()==plotVelocity->yAxis) {
+                        if (velocityUi[k]->interfringe->value() != 0.0) {
+                            my_graph->setData(time_vel[k],velocity[k]);
+                        } else {
+                            my_graph->data()->clear();
                         }
+                    } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
+                        my_graph->setData(time_vel[k],reflectivity[k]);
+                    } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
+                        my_graph->setData(time_vel[k],quality[k]);
                     }
-
-                    double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
-                    double Rg=phaseUi[k]->reflOffset->value();
-                    double Rmat=phaseUi[k]->reflRef->value();
-                    double beta=-Rg/pow(1.0-Rg,2);
-                    double refle=iShot/iRef * (Rmat-beta) + beta;
-
-                    velocity[k][j] = speed;
-                    reflectivity[k][j] = refle;
-                    quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
-                    velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
-
-                    for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
-                        int jloc=i+1;
-                        if (sensitivity<0) jloc*=-1;
-                        if (phaseUi[k]->jump->value()<0) jloc*=-1;
-                        velJump_array[i][j] = (offset+fShot-fRef+jloc)*sensitivity/refr_index;
-                    }
+                    my_graph->setVisible(phaseUi[k]->enableVisar->isChecked());
                 }
-
-                QPen pen;
-                pen.setStyle(pstyle);
-
-                for (int kk=0; kk< plotVelocity->graphCount() ; kk++) {
-                    QCPGraph *my_graph=plotVelocity->graph(kk);
-                    if (my_graph->property("id").toInt() == (int)k ){
-                        pen=my_graph->pen();
-                        pen.setStyle(pstyle);
-                        my_graph->setPen(pen);
-                        if (my_graph->valueAxis()==plotVelocity->yAxis) {
-                            if (velocityUi[k]->interfringe->value() != 0.0) {
-                                my_graph->setData(time_vel[k],velocity[k]);
-                            } else {
-                                my_graph->data()->clear();
-                            }
-                        } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
-                            my_graph->setData(time_vel[k],reflectivity[k]);
-                        } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
-                            my_graph->setData(time_vel[k],quality[k]);
-                        }
+            }
+            for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
+                QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
+                if (my_err && my_err->property("id").toInt() == (int)k ){
+                    pen=my_err->pen();
+                    pen.setStyle(pstyle);
+                    my_err->setPen(pen);
+                    if (my_err->valueAxis() == plotVelocity->yAxis) {
+                        my_err->setData(velError[k]);
+                    } else if (my_err->valueAxis() == plotVelocity->yAxis2) {
+                        my_err->setData(reflError[k]);
                     }
+                    my_err->setVisible(phaseUi[k]->enableVisar->isChecked());
                 }
-                for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
-                    QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
-                    if (my_err && my_err->property("id").toInt() == (int)k ){
-                        pen=my_err->pen();
-                        pen.setStyle(pstyle);
-                        my_err->setPen(pen);
-                        if (my_err->valueAxis() == plotVelocity->yAxis) {
-                            my_err->setData(velError[k]);
-                        } else if (my_err->valueAxis() == plotVelocity->yAxis2) {
-                            my_err->setData(reflError[k]);
-                        }
-                    }
-                }
+            }
 
-                if (phaseUi[k]->jump->value()!=0) {
-                    for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
-                        QCPGraph* graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
-                        graph->setProperty("JumpGraph",true);
-                        graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
-                        QColor color(plotVelocity->yAxis->labelColor());
-                        color.setAlpha(property("NeuSave-alphagraph").toInt());
-                        pen.setColor(color);
-                        graph->setPen(pen);
-                        graph->setData(time_vel[k],velJump_array[i]);
-                    }
-
+            if (phaseUi[k]->jump->value()!=0) {
+                for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
+                    QCPGraph* graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
+                    graph->setProperty("JumpGraph",k);
+                    graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
+                    QColor color(plotVelocity->yAxis->labelColor());
+                    color.setAlpha(property("NeuSave-alphagraph").toInt());
+                    pen.setColor(color);
+                    graph->setPen(pen);
+                    graph->setData(time_vel[k],velJump_array[i]);
+                    graph->setVisible(phaseUi[k]->enableVisar->isChecked());
                 }
 
             }
+
         }
     }
     plotVelocity->rescaleAxes();
@@ -1066,116 +1067,115 @@ void Visar::doWave() {
 
 void Visar::doWave(int k) {
     disconnections();
-    if (velocityUi[k]->enableVisar->isChecked()){
-        std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
-        if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
+    std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
+    if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
-            QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
-            progress.setCancelButton(0);
-            progress.setWindowModality(Qt::WindowModal);
-            progress.setValue(0);
-            progress.show();
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            sweepChanged(phaseUi[k]->physScale);
+        QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
+        progress.setCancelButton(0);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setValue(0);
+        progress.show();
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        sweepChanged(phaseUi[k]->physScale);
 
-            std::array<nPhysC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
+        std::array<nPhysC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        vec2 dim(imgs[0]->getSize());
+
+        std::array<nPhysC,2> zz_morlet;
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        for (int m=0;m<2;m++) {
+            phase[k][m].resize(dim.x(), dim.y());
+            contrast[k][m].resize(dim.x(), dim.y());
+            intensity[k][m]= imgs[m]->copy();
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            vec2 dim(imgs[0]->getSize());
-
-            std::array<nPhysC,2> zz_morlet;
+            phys_fast_gaussian_blur(intensity[k][m], velocityUi[k]->resolution->value());
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            for (int m=0;m<2;m++) {
-                phase[k][m].resize(dim.x(), dim.y());
-                contrast[k][m].resize(dim.x(), dim.y());
-                intensity[k][m]= imgs[m]->copy();
-                progress.setValue(progress.value()+1);
-                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-                phys_fast_gaussian_blur(intensity[k][m], velocityUi[k]->resolution->value());
-                progress.setValue(progress.value()+1);
-                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-                zz_morlet[m].resize(dim.x(),dim.y());
-                progress.setValue(progress.value()+1);
-                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            }
-
-            std::vector<int> xx(dim.x()), yy(dim.y());
-#pragma omp parallel for
-            for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
-#pragma omp parallel for
-            for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
-
+            zz_morlet[m].resize(dim.x(),dim.y());
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            double cr = cos((velocityUi[k]->angle->value()) * _phys_deg);
-            double sr = sin((velocityUi[k]->angle->value()) * _phys_deg);
-            double thick_norm=velocityUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
-            const double damp_norm=M_PI;
-
-            double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
-#pragma omp parallel for collapse(2)
-            for (size_t x=0;x<(size_t)dim.x();x++) {
-                for (size_t y=0;y<(size_t)dim.y();y++) {
-                    double xr = xx[x]*cr - yy[y]*sr; //rotate
-                    double yr = xx[x]*sr + yy[y]*cr;
-
-                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
-                    double e_y = -pow(yr*thick_norm, 2);
-
-                    double gauss = exp(e_x)*exp(e_y);
-
-                    for (unsigned int m=0;m<2;m++) {
-                        zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
-                    }
-                }
-            }
-
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            for (unsigned int m=0;m<2;m++) {
-                physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
-                progress.setValue(progress.value()+1);
-            }
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            for (unsigned int m=0;m<2;m++) {
-#pragma omp parallel for
-                for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
-                    phase[k][m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
-                    contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
-                    intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));
-                }
-            }
-
-            if (direction(k)!=0) {
-                for (unsigned int m=0;m<2;m++) {
-                    phys_transpose(phase[k][m]);
-                    phys_transpose(contrast[k][m]);
-                    phys_transpose(intensity[k][m]);
-                }
-            }
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            getPhase(k);
-
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-            updatePlot();
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            setProperty("NeuSave-VisarCounter",progress.value()+1);
-
-        } else {
-            statusBar()->showMessage("size mismatch",5000);
         }
+
+        std::vector<int> xx(dim.x()), yy(dim.y());
+#pragma omp parallel for
+        for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
+#pragma omp parallel for
+        for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
+
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        double cr = cos((velocityUi[k]->angle->value()) * _phys_deg);
+        double sr = sin((velocityUi[k]->angle->value()) * _phys_deg);
+        double thick_norm=velocityUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
+        const double damp_norm=M_PI;
+
+        double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
+#pragma omp parallel for collapse(2)
+        for (size_t x=0;x<(size_t)dim.x();x++) {
+            for (size_t y=0;y<(size_t)dim.y();y++) {
+                double xr = xx[x]*cr - yy[y]*sr; //rotate
+                double yr = xx[x]*sr + yy[y]*cr;
+
+                double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
+                double e_y = -pow(yr*thick_norm, 2);
+
+                double gauss = exp(e_x)*exp(e_y);
+
+                for (unsigned int m=0;m<2;m++) {
+                    zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
+                }
+            }
+        }
+
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        for (unsigned int m=0;m<2;m++) {
+            physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
+            progress.setValue(progress.value()+1);
+        }
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        for (unsigned int m=0;m<2;m++) {
+#pragma omp parallel for
+            for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
+                phase[k][m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
+                contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
+                intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[k][m].point(kk));
+            }
+        }
+
+        if (direction(k)!=0) {
+            for (unsigned int m=0;m<2;m++) {
+                phys_transpose(phase[k][m]);
+                phys_transpose(contrast[k][m]);
+                phys_transpose(intensity[k][m]);
+            }
+        }
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        getPhase(k);
+
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        updatePlot();
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        setProperty("NeuSave-VisarCounter",progress.value()+1);
+
+    } else {
+        statusBar()->showMessage("size mismatch",5000);
     }
+
     connections();
 }
 
@@ -1194,7 +1194,7 @@ void Visar::getPhase() {
 void Visar::getPhase(int k) {
     disconnections();
 
-    if (k< (int) numVisars && velocityUi[k]->enableVisar->isChecked()) {
+    if (k< (int) numVisars) {
         velocityUi[k]->plotPhaseIntensity->clearGraphs();
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
 
@@ -1451,7 +1451,7 @@ QString Visar::export_sop() {
 QString Visar::export_one(unsigned int k) {
     QString out;
     if (k<numVisars) {
-        if (velocityUi[k]->enableVisar->isChecked()) {
+        if (phaseUi[k]->enableVisar->isChecked()) {
             out += "#VISAR " + QString::number(k+1) + "\n";
             out += QString("#Offset shift       : %L1\n").arg(phaseUi[k]->offsetShift->value());
             out += QString("#Sensitivity        : %L1\n").arg(phaseUi[k]->sensitivity->value());
