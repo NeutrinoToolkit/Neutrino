@@ -49,6 +49,8 @@
 #ifndef __nPhysWave_h
 #define __nPhysWave_h
 
+namespace physWave {
+
 
 #ifdef HAVE_LIBCLFFT
 std::string CHECK_OPENCL_ERROR(cl_int err);
@@ -329,5 +331,7 @@ inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double>
 void phys_apply_inversion_plasma(nPhysImageF<double> &, double, double);
 void phys_apply_inversion_gas(nPhysImageF<double> &, double, double, double);
 void phys_apply_inversion_protons(nPhysImageF<double> &, double, double, double, double);
+
+}
 
 #endif

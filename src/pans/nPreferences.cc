@@ -92,7 +92,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
-	my_w.openclUnit->setMaximum(openclEnabled());
+    my_w.openclUnit->setMaximum(physWave::openclEnabled());
 
 
 	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
@@ -163,7 +163,7 @@ void nPreferences::openclUnitValueChange(int num) {
 	my_w.openclDescription->clear();
 #ifdef HAVE_LIBCLFFT
 	if (num>0) {
-		my_w.openclDescription->setPlainText(QString::fromStdString(get_platform_device_info_opencl(num)));
+        my_w.openclDescription->setPlainText(QString::fromStdString(physWave::get_platform_device_info_opencl(num)));
 		setProperty("openclUnit",num);
 	}
 #endif

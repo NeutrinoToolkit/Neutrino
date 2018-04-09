@@ -52,7 +52,7 @@ public:
     nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;
 
 private:
-    wavelet_params my_params;
+    physWave::wavelet_params my_params;
 
 public slots:
 

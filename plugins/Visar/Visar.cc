@@ -1038,7 +1038,7 @@ void Visar::getCarrier(int k) {
         QRect geom2=fringeRect[k]->getRect(phys);
         nPhysD datamatrix = phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-        vec2f vecCarr=phys_guess_carrier(datamatrix, velocityUi[k]->guessWeight->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, velocityUi[k]->guessWeight->value());
 
         if (vecCarr.first()==0) {
             statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);

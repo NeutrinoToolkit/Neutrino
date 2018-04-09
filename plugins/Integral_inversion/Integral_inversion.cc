@@ -169,9 +169,9 @@ QVariant Integral_inversion::doInversion() {
 		//	my_abel_params.ialgo = ABEL_HF;
 		//else
 		//	my_abel_params.ialgo = ABEL;
-		my_abel_params.ialgo = (enum inversion_algo) my_w.invAlgo_cb->itemData(cb_idx).value<int>();
+        my_abel_params.ialgo = (enum physWave::inversion_algo) my_w.invAlgo_cb->itemData(cb_idx).value<int>();
 
-		my_abel_params.iphysics = ABEL_NONE;
+        my_abel_params.iphysics = physWave::ABEL_NONE;
 
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 
@@ -193,15 +193,15 @@ QVariant Integral_inversion::doInversion() {
                 DEBUG("Inversions: no physics applied");
                 break;
             case 1:
-                phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
+                physWave::phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
                 break;
             case 2:
                 DEBUG("Inversions: applying plasma physics");
-                phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
+                physWave::phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
                 break;
             case 3: {
                 DEBUG("Inversions: applying proton  physics");
-                phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+                physWave::phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
                 //                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
                 //                    phys_point_multiply(*pippo, *inv_image);
                 //                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
@@ -244,8 +244,8 @@ QVariant Integral_inversion::doInversion() {
 }
 
 void phys_invert_abel_transl(void *params, int& iter) {
-	((abel_params *)params)->iter_ptr = &iter;
-	phys_invert_abel(*((abel_params *)params));
+    ((physWave::abel_params *)params)->iter_ptr = &iter;
+    phys_invert_abel(*((physWave::abel_params *)params));
 }
 
 

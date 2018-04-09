@@ -33,7 +33,7 @@
  * @{
  */
 
-void phys_wavelet_field_2D_morlet(wavelet_params &params)
+void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 {
     DEBUG(5,"start");
 
@@ -198,7 +198,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
 }
 
 
-unsigned int opencl_closest_size(unsigned int num) {
+unsigned int physWave::opencl_closest_size(unsigned int num) {
     unsigned int closest=2*num;
     unsigned int i2,i3,i5,i7,i11,i13;
     i2=i3=i5=i7=i11=i13=0;
@@ -226,12 +226,12 @@ unsigned int opencl_closest_size(unsigned int num) {
     return closest;
 }
 
-vec2 opencl_closest_size(vec2 num){
+vec2 physWave::opencl_closest_size(vec2 num){
     return vec2(opencl_closest_size(num.x()),opencl_closest_size(num.y()));
 }
 
 #define NEUTRINO_OPENCL CL_DEVICE_TYPE_DEFAULT
-int openclEnabled() {
+int physWave::openclEnabled() {
     int found_GPU=0;
 #ifdef HAVE_LIBCLFFT
     // get all platforms
@@ -251,7 +251,7 @@ int openclEnabled() {
 }
 
 #ifdef HAVE_LIBCLFFT
-std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
+std::pair<cl_platform_id,cl_device_id> physWave::get_platform_device_opencl(int num) {
     int found_GPU=0;
 
     cl_uint platformCount=0;
@@ -275,7 +275,7 @@ std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int num) {
     return std::make_pair(nullptr,nullptr);
 }
 
-std::string get_platform_device_info_opencl(int num){
+std::string physWave::get_platform_device_info_opencl(int num){
     std::string desc;
     cl_device_id device=get_platform_device_opencl(num).second;
 
@@ -334,7 +334,7 @@ std::string get_platform_device_info_opencl(int num){
     return desc;
 }
 
-std::string CHECK_OPENCL_ERROR(cl_int err) {
+std::string physWave::CHECK_OPENCL_ERROR(cl_int err) {
     if (err != CL_SUCCESS) {
         switch (err) {
             case CL_DEVICE_NOT_FOUND:                           return "CL_DEVICE_NOT_FOUND";
@@ -404,7 +404,7 @@ std::string CHECK_OPENCL_ERROR(cl_int err) {
 #endif
 
 
-void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
+void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
     DEBUG(">>>>>>>>>>>>>>>>>>>>>here " << params.opencl_unit);
 #ifdef HAVE_LIBCLFFT
 
@@ -832,22 +832,22 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 // ---------------------- thread transport functions ------------------------
 
-void phys_wavelet_trasl_opencl(void *params, int &iter) {
+void physWave::phys_wavelet_trasl_opencl(void *params, int &iter) {
     DEBUG("Enter here");
     ((wavelet_params *)params)->iter_ptr = &iter;
-    phys_wavelet_field_2D_morlet_opencl(*((wavelet_params *)params));
+    physWave::phys_wavelet_field_2D_morlet_opencl(*((wavelet_params *)params));
 }
 
-void phys_wavelet_trasl_cpu(void *params, int &iter) {
+void physWave::phys_wavelet_trasl_cpu(void *params, int &iter) {
     DEBUG("Enter here");
     ((wavelet_params *)params)->iter_ptr = &iter;
-    phys_wavelet_field_2D_morlet(*((wavelet_params *)params));
+    physWave::phys_wavelet_field_2D_morlet(*((wavelet_params *)params));
 }
 
 
 // unwrap methods
 nPhysD *
-phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy)
+physWave::phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy)
 {
 
     nPhysD *uphase = new nPhysD (wphase.getW(), wphase.getH(), 0., "unwrap");
@@ -891,7 +891,7 @@ phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy
     return uphase;
 }
 
-void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
+void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
@@ -908,7 +908,7 @@ void phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<d
 }
 
 void
-phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
+physWave::phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 {
 #pragma omp parallel for collapse(2)
     for (size_t ii=0; ii<iphys.getW(); ii++) {
@@ -921,7 +921,7 @@ phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 
 //! this function returns the carrier bidimvec<double(angle[deg],interfringe[px])>
 bidimvec<double>
-phys_guess_carrier(nPhysD &phys, double weight)
+physWave::phys_guess_carrier(nPhysD &phys, double weight)
 {
     size_t dx=phys.getW();
     size_t dy=phys.getH();
@@ -964,7 +964,7 @@ phys_guess_carrier(nPhysD &phys, double weight)
 // --------------------------------------------------------------------- integral inversions --
 
 void
-phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double molar_refr)
+physWave::phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double molar_refr)
 {
     // TODO: accendere candelina al dio dei define che rendono il codice leggibile come 'sta ceppa di cazzo
     //double kappa = M_2_PI/probe_wl;
@@ -981,7 +981,7 @@ phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double m
 }
 
 void
-phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
+physWave::phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 {
     double kappa = 2*M_PI/probe_wl;
     double mult = _phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
@@ -995,7 +995,7 @@ phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
 }
 
 void
-phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
+physWave::phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
 {
     double mult = (2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
     physMath::phys_multiply(invimage,mult);
@@ -1007,7 +1007,7 @@ phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double
 
 
 //! General function for Abel inversion
-void phys_invert_abel(abel_params &params)
+void physWave::phys_invert_abel(abel_params &params)
 {
 
     if (params.iimage->getSurf() == 0) {

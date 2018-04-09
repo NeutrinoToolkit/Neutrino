@@ -52,7 +52,7 @@ public:
     QPointer<nLine> axis;
     nPhysD *invertedPhys;
 private:
-    abel_params my_abel_params;
+    physWave::abel_params my_abel_params;
 
 public slots:
     void physDel(nPhysD*);

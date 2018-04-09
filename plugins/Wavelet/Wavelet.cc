@@ -119,7 +119,7 @@ void Wavelet::guessCarrier() {
 		nPhysD datamatrix;
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
 		
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
@@ -187,15 +187,15 @@ void Wavelet::doWavelet () {
 
         QString out;
 
-        qDebug() << openclEnabled() << settings.value("openclUnit").toInt();
+        qDebug() << physWave::openclEnabled() << settings.value("openclUnit").toInt();
 
-        if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
+        if (physWave::openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             out="OpenCL: ";
             my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas);
         } else {
             out="CPU: ";
-            runThread(&my_params, phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas);
         }
 
 
@@ -237,7 +237,7 @@ void Wavelet::doWavelet () {
 		}
         if (my_w.synthetic->isChecked()) {
             nPhysD *tmpSynthetic = new nPhysD();
-            phys_synthetic_interferogram(*tmpSynthetic,waveletPhys["phase_2pi"],waveletPhys["contrast"]);
+            physWave::phys_synthetic_interferogram(*tmpSynthetic,waveletPhys["phase_2pi"],waveletPhys["contrast"]);
             if (my_w.erasePrevious->isChecked()) {
                 syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
             } else {
@@ -289,33 +289,33 @@ void Wavelet::doUnwrap () {
 				barrierPhys.set(p.x()+1,p.y()+1,0.0);
 			}
 			if (methodName=="Simple H+V") {
-				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV);
 			} else if (methodName=="Simple V+H") {
-				uphase = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH);
 			} else if (methodName=="Goldstein") {
-				uphase = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN);
 			} else if (methodName=="Miguel") {
-				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                uphase = phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
 			} else if (methodName=="Miguel+Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
 			} else if (methodName=="Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-				uphase = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY);
 			}
 		} else {
 			if (methodName=="Simple H+V") {
-				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_HV);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_HV);
 			} else if (methodName=="Simple V+H") {
-				uphase = phys_phase_unwrap(*phase, *qual, SIMPLE_VH);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_VH);
 			} else if (methodName=="Goldstein") {
-				uphase = phys_phase_unwrap(*phase, *qual, GOLDSTEIN);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::GOLDSTEIN);
 			} else if (methodName=="Miguel") {
-				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL);
 			} else if (methodName=="Miguel+Quality") {
-				uphase = phys_phase_unwrap(*phase, *qual, MIGUEL_QUALITY);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL_QUALITY);
 			} else if (methodName=="Quality") {
-				uphase = phys_phase_unwrap(*phase, *qual, QUALITY);
+                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::QUALITY);
 			}
 		}
 		
@@ -332,7 +332,7 @@ void Wavelet::doUnwrap () {
                 double lambda=my_w.widthCarrier->value();
                 double kx = cos(alpha*_phys_deg)/lambda;
                 double ky = -sin(alpha*_phys_deg)/lambda;
-                phys_subtract_carrier(*uphase, kx, ky);
+                physWave::phys_subtract_carrier(*uphase, kx, ky);
 			}
 			
 			if (my_w.erasePreviousUnwrap->isChecked()) {
@@ -388,7 +388,7 @@ void Wavelet::doRemoveCarrier () {
 
         double kx = cos(alpha*_phys_deg)/lambda;
         double ky = -sin(alpha*_phys_deg)/lambda;
-        phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
+        physWave::phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
         physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {

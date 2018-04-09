@@ -222,7 +222,7 @@ void Interferometry::guessCarrier() {
         nPhysD datamatrix;
         datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-        vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
 
         if (vecCarr.first()==0) {
             my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
@@ -288,18 +288,18 @@ void Interferometry::doWavelet (int iimage) {
 
         QSettings settings("neutrino","");
         settings.beginGroup("nPreferences");
-        if (openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
+        if (physWave::openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             DEBUG("Ready to run on OpenCL");
             my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, phys_wavelet_trasl_opencl, "Wavelet"+QString(suffix.c_str()), niter);
+            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "Wavelet"+QString(suffix.c_str()), niter);
         } else {
-            runThread(&my_params, phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
+            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
         }
 
         std::map<std::string,nPhysD *> retList = my_params.olist;
         if (retList["phase_2pi"] && retList["contrast"]) {
             retList["synthetic"]=new nPhysD();
-            phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
+            physWave::phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
         }
 
         for(std::map<std::string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
@@ -320,7 +320,7 @@ void Interferometry::doUnwrap () {
             double lambda=my_w.widthCarrier->value();
             double kx = cos(alpha*_phys_deg)/lambda;
             double ky = -sin(alpha*_phys_deg)/lambda;
-            phys_subtract_carrier(diff, kx, ky);
+            physWave::phys_subtract_carrier(diff, kx, ky);
         } else if (localPhys["phase_2pi_ref"]) {
             physMath::phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);
         }
@@ -369,19 +369,19 @@ void Interferometry::doUnwrap () {
                 }
             }
             if (methodName=="Simple H+V") {
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_HV);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV);
             } else if (methodName=="Simple V+H") {
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, SIMPLE_VH);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH);
             } else if (methodName=="Goldstein") {
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, GOLDSTEIN);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN);
             } else if (methodName=="Miguel") {
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
             } else if (methodName=="Miguel+Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
             } else if (methodName=="Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-                unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
+                unwrap = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY);
             }
 #ifdef __phys_debug
             if (my_w.useBarrier->isChecked()) {

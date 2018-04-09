@@ -56,7 +56,7 @@ public:
     void saveSettings(QSettings *);
 
 private:
-    wavelet_params my_params;
+    physWave::wavelet_params my_params;
 
     std::map<QToolButton*, nLine *> my_shapes;
 

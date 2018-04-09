@@ -56,7 +56,7 @@ void Ghost_fringes::guessCarrier() {
 		nPhysD datamatrix;
         datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-		vec2f vecCarr=phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
