@@ -54,7 +54,7 @@ FocalSpot::calculate_stats()
 
     // 0. build decimated
     decimated = nPhysD(*currentBuffer);
-    phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
+    physMath::phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
     decimated.TscanBrightness();
 
     // 1. find centroid
@@ -140,7 +140,7 @@ FocalSpot::find_contour(double th)
     QList<double> ql;
     if (currentBuffer) {
         std::list<vec2> contour;
-        contour_trace(decimated, contour, th);
+        physMath::contour_trace(decimated, contour, th);
         std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.end();
 
         DEBUG(5, "got contour of "<<contour.size()<<" points");
@@ -173,7 +173,7 @@ FocalSpot::find_contour(double th)
             nContour->setPoints(myp);
             my_w.statusBar->showMessage("Contour ok");
 
-            std::list<double> ci = contour_integrate(*currentBuffer, contour, true);
+            std::list<double> ci = physMath::contour_integrate(*currentBuffer, contour, true);
             while (ci.size() > 0) {
                 ql.append(ci.front()); ci.pop_front();
             }

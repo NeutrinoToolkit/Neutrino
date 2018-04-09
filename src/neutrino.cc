@@ -333,7 +333,7 @@ void neutrino::menuFlipRotate() {
 void neutrino::rotateLeft() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
     if (my_w->my_view->currentBuffer) {
-        phys_rotate_left(*my_w->my_view->currentBuffer);
+        physMath::phys_rotate_left(*my_w->my_view->currentBuffer);
         updatePhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -344,7 +344,7 @@ void neutrino::rotateLeft() {
 void neutrino::rotateRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
     if (my_w->my_view->currentBuffer) {
-        phys_rotate_right(*my_w->my_view->currentBuffer);
+        physMath::phys_rotate_right(*my_w->my_view->currentBuffer);
         updatePhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -354,7 +354,7 @@ void neutrino::rotateRight() {
 void neutrino::flipUpDown() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
     if (my_w->my_view->currentBuffer) {
-        phys_flip_ud(*my_w->my_view->currentBuffer);
+        physMath::phys_flip_ud(*my_w->my_view->currentBuffer);
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -364,7 +364,7 @@ void neutrino::flipUpDown() {
 void neutrino::flipLeftRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
     if (my_w->my_view->currentBuffer) {
-        phys_flip_lr(*my_w->my_view->currentBuffer);
+        physMath::phys_flip_lr(*my_w->my_view->currentBuffer);
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -374,7 +374,7 @@ void neutrino::flipLeftRight() {
 void neutrino::transpose() {
     my_w->menuTransformation->setDefaultAction(my_w->actionTranspose);
     if (my_w->my_view->currentBuffer) {
-        phys_transpose(*my_w->my_view->currentBuffer);
+        physMath::phys_transpose(*my_w->my_view->currentBuffer);
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());

@@ -895,7 +895,7 @@ std::vector <nPhysD *> phys_open_tiff(std::string ifilename, bool separate_rgb) 
                         }
                     }
                     if (!separate_rgb && my_phys && samples>1) {
-                        phys_divide(*my_phys,samples);
+                        physMath::phys_divide(*my_phys,samples);
                     }
                     _TIFFfree(buf);
                 } else {
@@ -1911,7 +1911,7 @@ std::vector <nPhysD *> phys_open(std::string fname, bool separate_rgb) {
     } else if (ext=="imd") {
         datamatrix = new nPhysD;
         *datamatrix = physUint_imd(fname.c_str());
-        phys_divide(*datamatrix,1000.);
+        physMath::phys_divide(*datamatrix,1000.);
     } else if (ext.substr(0,3)=="fit") {
         std::vector <nPhysD *> imagelist=phys_open_fits(fname);
         retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());

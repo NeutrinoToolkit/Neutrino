@@ -47,18 +47,18 @@ void Spectral_analysis::on_calculate_released() {
         if (my_w.useImaginary->isChecked()) {
             nPhysD *imaginary=getPhysFromCombo(my_w.imaginary);
             if (imaginary) {
-                temp_complex= from_real_imaginary(*image, *imaginary);
+                temp_complex= physMath::from_real_imaginary(*image, *imaginary);
             }
         } else {
-            temp_complex= from_real(*image);
+            temp_complex= physMath::from_real(*image);
         }
 
         // ftshift before if backward
         if (my_w.doshift_cb->isChecked() && dir==PHYS_BACKWARD) {
             switch (kind) {
-            case 0: temp_complex = ftshift1(temp_complex, PHYS_X); break;   // 1D horizontal
-            case 1: temp_complex = ftshift1(temp_complex, PHYS_Y); break;   // 1D vertical
-            case 2: temp_complex = ftshift2(temp_complex); break;           // 2D
+            case 0: temp_complex = physMath::ftshift1(temp_complex, PHYS_X); break;   // 1D horizontal
+            case 1: temp_complex = physMath::ftshift1(temp_complex, PHYS_Y); break;   // 1D vertical
+            case 2: temp_complex = physMath::ftshift2(temp_complex); break;           // 2D
             }
         }
 
@@ -71,22 +71,22 @@ void Spectral_analysis::on_calculate_released() {
         // ftshift after if forward
         if (my_w.doshift_cb->isChecked()&& dir==PHYS_FORWARD) {
             switch (kind) {
-            case 0: ft = ftshift1(ft, PHYS_X); break;   // 1D horizontal
-            case 1: ft = ftshift1(ft, PHYS_Y); break;   // 1D vertical
-            case 2: ft = ftshift2(ft); break;           // 2D
+            case 0: ft = physMath::ftshift1(ft, PHYS_X); break;   // 1D horizontal
+            case 1: ft = physMath::ftshift1(ft, PHYS_Y); break;   // 1D vertical
+            case 2: ft = physMath::ftshift2(ft); break;           // 2D
             }
         }
 
         if (my_w.normalize->isChecked()) {
-            phys_divide(ft, sqrt(image->getSurf()));
+            physMath::phys_divide(ft, sqrt(image->getSurf()));
         }
 
         std::map<std::string, nPhysD> omap;
         switch (my_w.output_format->currentIndex()) {
-        case 0: omap = to_polar(ft); break; // polar
-        case 1: omap = to_rect(ft); break; // rectangular
-        case 2: omap = to_powersp(ft, false); break; // power spectrum linear
-        case 3: omap = to_powersp(ft, true); break;// power spectrum log10
+        case 0: omap = physMath::to_polar(ft); break; // polar
+        case 1: omap = physMath::to_rect(ft); break; // rectangular
+        case 2: omap = physMath::to_powersp(ft, false); break; // power spectrum linear
+        case 3: omap = physMath::to_powersp(ft, true); break;// power spectrum log10
         }
 
         for (std::map<std::string, nPhysD>::iterator itr = omap.begin(); itr != omap.end(); itr++) {

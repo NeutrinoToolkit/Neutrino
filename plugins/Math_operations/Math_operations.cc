@@ -183,7 +183,7 @@ void Math_operations::doOperation () {
                 double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
-                    phys_pow(*myresult, scalar);
+                    physMath::phys_pow(*myresult, scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Expected 2 values"));
                 }
@@ -194,7 +194,7 @@ void Math_operations::doOperation () {
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
                         myresult=new nPhysD(*image1);
-                        phys_fast_gaussian_blur(*myresult, scalar);
+                        physMath::phys_fast_gaussian_blur(*myresult, scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Exepcted a float radius"));
                     }
@@ -204,7 +204,7 @@ void Math_operations::doOperation () {
                     double scalar2=QLocale().toDouble(scalars.at(1),&ok2);
                     if(ok1 && ok2) {
                         myresult=new nPhysD(*image1);
-                        phys_fast_gaussian_blur(*myresult, scalar1, scalar2);
+                        physMath::phys_fast_gaussian_blur(*myresult, scalar1, scalar2);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));
                     }
@@ -216,7 +216,7 @@ void Math_operations::doOperation () {
                     int scalar=my_w.num2->text().toInt(&ok);
                     if (ok) {
                         myresult=new nPhysD(*image1);
-                        phys_median_filter(*myresult, scalar);
+                        physMath::phys_median_filter(*myresult, scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Scalar should be an integer"));
                     }
@@ -234,7 +234,7 @@ void Math_operations::doOperation () {
                 double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
-                    phys_gauss_laplace(*myresult,scalar);
+                    physMath::phys_gauss_laplace(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
@@ -243,7 +243,7 @@ void Math_operations::doOperation () {
                 double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
-                    phys_gauss_sobel(*myresult,scalar);
+                    physMath::phys_gauss_sobel(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
@@ -252,7 +252,7 @@ void Math_operations::doOperation () {
                 double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
-                    phys_integratedNe(*myresult,scalar);
+                    physMath::phys_integratedNe(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
@@ -261,7 +261,7 @@ void Math_operations::doOperation () {
                 double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                 if (ok) {
                     myresult=new nPhysD(*image1);
-                    phys_remainder(*myresult,scalar);
+                    physMath::phys_remainder(*myresult,scalar);
                 } else {
                     my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                 }
@@ -272,7 +272,7 @@ void Math_operations::doOperation () {
                     int scalar1=QLocale().toInt(scalars.at(0),&ok1);
                     int scalar2=QLocale().toInt(scalars.at(1),&ok2);
                     if (scalars.size()==2 && ok1 && ok2) {
-                        myresult=new nPhysD(phys_resample(*image1, vec2(scalar1, scalar2)));
+                        myresult=new nPhysD(physMath::phys_resample(*image1, vec2(scalar1, scalar2)));
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 int"));
                     }
@@ -286,27 +286,27 @@ void Math_operations::doOperation () {
         myresult=new nPhysD(*image1);
         myresult->setName(my_w.operation->currentText().toStdString()+" "+image1->getName());
         if (my_w.operation->currentIndex()==separator[1]+1) {
-            phys_transpose(*myresult);
+            physMath::phys_transpose(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+2) {
-            phys_log10(*myresult);
+            physMath::phys_log10(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+3) {
-            phys_log(*myresult);
+            physMath::phys_log(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+4) {
-            phys_abs(*myresult);
+            physMath::phys_abs(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+5) {
-            phys_square(*myresult);
+            physMath::phys_square(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+6) {
-            phys_sqrt(*myresult);
+            physMath::phys_sqrt(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+7) {
-            phys_sin(*myresult);
+            physMath::phys_sin(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+8) {
-            phys_cos(*myresult);
+            physMath::phys_cos(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+9) {
-            phys_tan(*myresult);
+            physMath::phys_tan(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+10) {
-            phys_laplace(*myresult);
+            physMath::phys_laplace(*myresult);
         } else if (my_w.operation->currentIndex()==separator[1]+11) {
-            phys_sobel(*myresult);
+            physMath::phys_sobel(*myresult);
         }
     }
     qDebug() << "here";

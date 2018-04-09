@@ -97,8 +97,8 @@ void MUSE::nextPlane(){
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-	if (meanSlice) meanSlice->property["display_range"] = getColorPrecentPixels(*meanSlice,val);
-	if (cubeSlice) cubeSlice->property["display_range"] = getColorPrecentPixels(*cubeSlice,val);
+    if (meanSlice) meanSlice->property["display_range"] = physMath::getColorPrecentPixels(*meanSlice,val);
+    if (cubeSlice) cubeSlice->property["display_range"] = physMath::getColorPrecentPixels(*cubeSlice,val);
     nparent->updatePhys();
 }
 
@@ -267,7 +267,7 @@ void MUSE::showImagePlane(int z) {
 		}
 		my_phys->TscanBrightness();
 
-		my_phys->property["display_range"]=getColorPrecentPixels(*my_phys,percent->value());
+        my_phys->property["display_range"]=physMath::getColorPrecentPixels(*my_phys,percent->value());
 
 		if (cubeSlice) {
 			cubeSlice->property["display_range"]=my_phys->property["display_range"];
@@ -535,7 +535,7 @@ void MUSE::loadCube() {
 					}
 
 					meanSlice->TscanBrightness();
-					meanSlice->property["display_range"]=getColorPrecentPixels(*meanSlice,percent->value());
+                    meanSlice->property["display_range"]=physMath::getColorPrecentPixels(*meanSlice,percent->value());
 					nparent->addShowPhys(meanSlice);
 
 					plot->graph(0)->setName("Mean spectrum");

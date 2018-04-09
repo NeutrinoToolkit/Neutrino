@@ -49,17 +49,17 @@ void Reflectivity::doIt () {
         saveDefaults();
 
         nPhysD *shot=new nPhysD(*imageShot);
-        phys_fast_gaussian_blur(*shot,my_w.blur->value());
-        phys_subtract(*shot,my_w.offset->value());
+        physMath::phys_fast_gaussian_blur(*shot,my_w.blur->value());
+        physMath::phys_subtract(*shot,my_w.offset->value());
 
         nPhysD ref(*imageRef);
-        phys_fast_gaussian_blur(ref,my_w.blur->value());
-        phys_subtract(ref,my_w.offset->value());
-        phys_multiply(ref,my_w.multiplier->value());
+        physMath::phys_fast_gaussian_blur(ref,my_w.blur->value());
+        physMath::phys_subtract(ref,my_w.offset->value());
+        physMath::phys_multiply(ref,my_w.multiplier->value());
 
-        phys_point_divide(*shot,ref);
+        physMath::phys_point_divide(*shot,ref);
 
-        phys_cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
+        physMath::phys_cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
 
         shot->property["display_range"]=shot->get_min_max();
 

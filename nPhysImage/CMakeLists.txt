@@ -12,7 +12,6 @@ add_library (nPhysImageF SHARED
     nPhysImageF.h
     nPhysMaths.cc
     nPhysMaths.h
-    nPhysTools.h
     nPhysWave.cc
     nPhysWave.h
     tools.h

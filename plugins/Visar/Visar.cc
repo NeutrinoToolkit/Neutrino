@@ -1094,7 +1094,7 @@ void Visar::doWave(int k) {
             intensity[k][m]= imgs[m]->copy();
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            phys_fast_gaussian_blur(intensity[k][m], velocityUi[k]->resolution->value());
+            physMath::phys_fast_gaussian_blur(intensity[k][m], velocityUi[k]->resolution->value());
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             zz_morlet[m].resize(dim.x(),dim.y());
@@ -1154,9 +1154,9 @@ void Visar::doWave(int k) {
 
         if (direction(k)!=0) {
             for (unsigned int m=0;m<2;m++) {
-                phys_transpose(phase[k][m]);
-                phys_transpose(contrast[k][m]);
-                phys_transpose(intensity[k][m]);
+                physMath::phys_transpose(phase[k][m]);
+                physMath::phys_transpose(contrast[k][m]);
+                physMath::phys_transpose(intensity[k][m]);
             }
         }
         progress.setValue(progress.value()+1);

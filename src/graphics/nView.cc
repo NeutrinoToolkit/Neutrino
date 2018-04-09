@@ -381,12 +381,12 @@ void nView::rescaleColor(int val) {
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
             foreach (nPhysD* phys, physList) {
-                phys->property["display_range"]=getColorPrecentPixels(*phys,val);
+                phys->property["display_range"]=physMath::getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
             qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
-            currentBuffer->property["display_range"]=getColorPrecentPixels(*currentBuffer,val);
+            currentBuffer->property["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
             emit bufferChanged(currentBuffer);
             qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }

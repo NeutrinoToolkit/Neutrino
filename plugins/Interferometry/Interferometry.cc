@@ -322,9 +322,9 @@ void Interferometry::doUnwrap () {
             double ky = -sin(alpha*_phys_deg)/lambda;
             phys_subtract_carrier(diff, kx, ky);
         } else if (localPhys["phase_2pi_ref"]) {
-            phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);
+            physMath::phys_point_subtract(diff,*localPhys["phase_2pi_ref"]);
         }
-        phys_remainder(diff,1.0);
+        physMath::phys_remainder(diff,1.0);
         localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD (diff),localPhys["phase_2pi_wrap"]);
         localPhys["phase_2pi_wrap"]->setShortName("phase_2pi_wrap");
     }
@@ -332,7 +332,7 @@ void Interferometry::doUnwrap () {
     if (localPhys["contrast_shot"]) {
         nPhysD quality_loc= *localPhys["contrast_shot"];
         if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
-            phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
+            physMath::phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
         }
         localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["phase_quality"]);
         localPhys["phase_quality"]->setShortName("phase_quality");
@@ -377,10 +377,10 @@ void Interferometry::doUnwrap () {
             } else if (methodName=="Miguel") {
                 unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
             } else if (methodName=="Miguel+Quality") {
-                phys_point_multiply(barrierPhys,*qual);
+                physMath::phys_point_multiply(barrierPhys,*qual);
                 unwrap = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
             } else if (methodName=="Quality") {
-                phys_point_multiply(barrierPhys,*qual);
+                physMath::phys_point_multiply(barrierPhys,*qual);
                 unwrap = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
             }
 #ifdef __phys_debug
@@ -439,12 +439,12 @@ void Interferometry::doSubtract () {
         phase = *localPhys["phase_2pi_unwrap"];
 
         if (my_w.opposite->isChecked()) {
-            phys_multiply(phase,-1.0);
+            physMath::phys_multiply(phase,-1.0);
         }
 
         double offset=phase.point(localPhys["phase_2pi_unwrap"]->to_pixel(vec2f(my_w.posZeroX->value(),my_w.posZeroY->value())));
         if (std::isfinite(offset)) {
-            phys_subtract(phase,offset);
+            physMath::phys_subtract(phase,offset);
         } else {
             my_w.statusbar->showMessage("Can't subtract point " + QString::number(my_w.posZeroX->value()) + " , " + QString::number(my_w.posZeroY->value()) + " is not finite", 5000);
         }
@@ -501,7 +501,7 @@ void Interferometry::doMaskCutoff() {
             if (nPhysExists(quality)) {
                 nPhysD loc_qual(*quality);
                 if (my_w.cutoffLog->isChecked()) {
-                    phys_log10(loc_qual);
+                    physMath::phys_log10(loc_qual);
                 }
                 double mini=loc_qual.get_min();
                 double maxi=loc_qual.get_max();
@@ -668,7 +668,7 @@ void Interferometry::doPlasma(){
 
         if (my_w.usePlasma->isChecked()) {
             double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
-            phys_integratedNe(*intNe,lambda_m);
+            physMath::phys_integratedNe(*intNe,lambda_m);
         } else {
             intNe->setShortName(image->getShortName());
         }
@@ -678,7 +678,7 @@ void Interferometry::doPlasma(){
         if (!ok1) mini=intNe->get_min();
         if (!ok2) maxi=intNe->get_max();
         if (ok1||ok2) {
-            phys_cutoff(*intNe,mini,maxi);
+            physMath::phys_cutoff(*intNe,mini,maxi);
         }
         intNe->TscanBrightness();
 

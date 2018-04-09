@@ -168,7 +168,7 @@ void phys_wavelet_field_2D_morlet(wavelet_params &params)
                 wphase->Timg_buffer[k]/=2*M_PI;
             }
 
-            phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
+            physMath::phys_fast_gaussian_blur(*intensity,params.thickness/2.0);
 
             params.olist["phase_2pi"] = wphase;
             params.olist["contrast"] = qmap;
@@ -779,7 +779,7 @@ void phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             }
         }
 
-        phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
+        physMath::phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
 
         params.olist["phase_2pi"] = nPhase;
         params.olist["contrast"] = nQuality;
@@ -998,7 +998,7 @@ void
 phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
 {
     double mult = (2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
-    phys_multiply(invimage,mult);
+    physMath::phys_multiply(invimage,mult);
     invimage.set_scale(res*1e2,res*1e2);
     invimage.property["unitsX"]="cm";
     invimage.property["unitsY"]="cm";

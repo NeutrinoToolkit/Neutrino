@@ -146,7 +146,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
             }
 
             if (PyArray_ISFORTRAN(my_arr)) {
-                phys_transpose(*my_phys);
+                physMath::phys_transpose(*my_phys);
             }
 
             my_phys->TscanBrightness();

@@ -38,7 +38,6 @@
 
 #include "nPhysImageF.h"
 #include "nPhysMaths.h"
-#include "nPhysTools.h"
 #include "mcomplex.h"
 #include "bidimvec.h"
 

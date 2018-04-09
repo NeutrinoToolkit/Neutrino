@@ -76,7 +76,7 @@ Contours::on_draw_pb_released()
 		// 0. build decimated
 		decimated = nPhysD(*currentBuffer);
 		if(my_w.blur_radius_sb->value()>0) {
-			phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
+            physMath::phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
 		}
 
 		// 1. find centroid
@@ -96,7 +96,7 @@ Contours::on_draw_pb_released()
 
 		DEBUG("cutoff" << cutoff);
 
-		contour_trace(decimated, contour, cutoff);
+        physMath::contour_trace(decimated, contour, cutoff);
 
 
 		my_c->setPoints(QPolygonF());

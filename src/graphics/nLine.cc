@@ -1098,7 +1098,7 @@ nLine::getContourSubImage(double fill_value)
 
 		// 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
 		DEBUG("starting contour intergration");
-		nPhysImageF<char> data_map = contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
+        nPhysImageF<char> data_map = physMath::contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
 		DEBUG("contour integration ended");
 
 		// generate map image
@@ -1143,7 +1143,7 @@ nLine::getContainedIntegral()
 
 	// 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
 	DEBUG("starting contour intergration");
-	std::list<double> c_data = contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
+    std::list<double> c_data = physMath::contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
 	DEBUG("contour integration ended");
 	return QList<double>::fromStdList(c_data);
 

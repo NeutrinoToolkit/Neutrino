@@ -133,13 +133,13 @@ QVariant Integral_inversion::doInversion() {
 			iimage->setName("inverted");
 
 			if (my_w.blurRadius_checkb->isChecked()) {	// blur
-				phys_fast_gaussian_blur(*iimage, my_w.blurRadius_sb->value());
+                physMath::phys_fast_gaussian_blur(*iimage, my_w.blurRadius_sb->value());
                 std::ostringstream oss; oss<<iimage->getName()<<" (blur"<<my_w.blurRadius_sb->value()<<")";
 				iimage->setName(oss.str());
 			}
 
 			if (my_w.multiply_checkb->isChecked()) {	// multiply
-				phys_multiply(*iimage, my_w.multiply_sb->value());
+                physMath::phys_multiply(*iimage, my_w.multiply_sb->value());
                 std::ostringstream oss; oss<<iimage->getName()<<" *( "<<my_w.multiply_sb->value()<<")";
 				iimage->setName(oss.str());
 			}
@@ -221,7 +221,7 @@ QVariant Integral_inversion::doInversion() {
             double mini=locale().toDouble(my_w.minCut->text(),&ok1);
             double maxi=locale().toDouble(my_w.maxCut->text(),&ok2);
             if (ok1 || ok2) {
-                phys_cutoff(*inv_image, 
+                physMath::phys_cutoff(*inv_image,
                             ok1?mini:inv_image->get_min(), 
                             ok2?maxi:inv_image->get_max());
             }

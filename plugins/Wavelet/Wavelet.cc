@@ -297,10 +297,10 @@ void Wavelet::doUnwrap () {
 			} else if (methodName=="Miguel") {
 				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
 			} else if (methodName=="Miguel+Quality") {
-				phys_point_multiply(barrierPhys,*qual);
+                physMath::phys_point_multiply(barrierPhys,*qual);
 				uphase = phys_phase_unwrap(*phase, barrierPhys, MIGUEL_QUALITY);
 			} else if (methodName=="Quality") {
-				phys_point_multiply(barrierPhys,*qual);
+                physMath::phys_point_multiply(barrierPhys,*qual);
 				uphase = phys_phase_unwrap(*phase, barrierPhys, QUALITY);
 			}
 		} else {
@@ -389,7 +389,7 @@ void Wavelet::doRemoveCarrier () {
         double kx = cos(alpha*_phys_deg)/lambda;
         double ky = -sin(alpha*_phys_deg)/lambda;
         phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
-		phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
+        physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
@@ -408,7 +408,7 @@ void Wavelet::doRemoveReference () {
 			nPhysD *unwrappedSubtracted;
 			unwrappedSubtracted = new nPhysD();
 			*unwrappedSubtracted=(*unwrapped)-(*ref);
-			phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
+            physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 			unwrappedSubtracted->setName(unwrapped->getName()+" - "+ref->getName());
 			unwrappedSubtracted->setName("Reference removed : "+ref->getName());
 			unwrappedSubtracted->setShortName("Ref removed");
