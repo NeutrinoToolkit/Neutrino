@@ -369,11 +369,11 @@ void MUSE::loadCube() {
 		int anaxis;
 
 		fits_is_compressed_image(fptr, &status);
-		if (fits_check_error(status)) return;
+        if (physFormat::fits_check_error(status)) return;
 
 		int hdupos=0;
 		fits_get_hdu_num(fptr, &hdupos);
-		if (fits_check_error(status)) return;
+        if (physFormat::fits_check_error(status)) return;
 		DEBUG(hdupos);
 
 		for (; !status; hdupos++)  {
@@ -381,7 +381,7 @@ void MUSE::loadCube() {
 
 			int hdutype;
 			fits_get_hdu_type(fptr, &hdutype, &status);
-			if (fits_check_error(status)) return;
+            if (physFormat::fits_check_error(status)) return;
 
 			if (hdutype == IMAGE_HDU) {
                 std::array<long,9> naxes={{1, 1, 1, 1, 1, 1, 1, 1, 1}};
@@ -403,7 +403,7 @@ void MUSE::loadCube() {
 			QStringList desc;
 			for (ii = 1; ii <= nkeys; ii++)  {
 				fits_read_record(fptr, ii, card, &status);
-				if (fits_check_error(status)) return;
+                if (physFormat::fits_check_error(status)) return;
 				desc << QString(card);
 
 			}
@@ -456,7 +456,7 @@ void MUSE::loadCube() {
 			std::vector<long> axissize(anaxis,0),fpixel(anaxis,1);
 
 			fits_get_img_size(fptr,anaxis,&axissize[0],&status);
-			if (fits_check_error(status)) return;
+            if (physFormat::fits_check_error(status)) return;
 
 			unsigned long totalsize=1;
 			for(int i=0; i<anaxis; i++) {
@@ -559,12 +559,12 @@ void MUSE::loadCube() {
 				break;
 			}
 
-			if (fits_check_error(status)) {
+            if (physFormat::fits_check_error(status)) {
 				return;
 			}
 		}
 
-		fits_check_error(status);
+        physFormat::fits_check_error(status);
 
 		DEBUG("out of here");
 	}

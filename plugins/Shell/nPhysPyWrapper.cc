@@ -29,7 +29,7 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
         fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }
     if (!fname.isEmpty( )) {
-        std::vector<nPhysD*> my_vec=phys_open(fname.toUtf8().constData());
+        std::vector<nPhysD*> my_vec=physFormat::phys_open(fname.toUtf8().constData());
         for(auto it : my_vec) {
             if (it->getSurf()>0) {
                 it->property["keep_phys_alive"]=42;

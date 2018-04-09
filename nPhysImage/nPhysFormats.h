@@ -48,11 +48,14 @@ extern "C" {
 #undef uint32
 #endif
 
+namespace physFormat {
+
 // standard formats
 class physDouble_txt : public nPhysImageF<double> {
 public:
 	physDouble_txt(const char *);
 };
+
 
 // LULI scanner it opens .inf and the .img associated with 16 bit raw data
 std::vector <nPhysD*> phys_open_inf(std::string);
@@ -183,5 +186,6 @@ std::string gunzip(std::string);
 
 std::vector<std::string> phys_image_formats();
 
+}
 #endif
 
