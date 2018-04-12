@@ -90,21 +90,24 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 
 #ifdef HAVE_NUMPY
 
+
+#if PY_MAJOR_VERSION >= 3
+int neutrino_init_numpy()
+{
+import_array();
+}
+#else
+void neutrino_init_numpy()
+{
+import_array();
+}
+#endif
+
 PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
     neutrino_init_numpy();
     std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
     return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
 }
-
-void nPhysPyWrapper::neutrino_init_numpy()
-{
-#if PY_MAJOR_VERSION >= 3
-    int dummy = import_array();
-#else
-    import_array();
-#endif
-}
-
 
 nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
     neutrino_init_numpy();

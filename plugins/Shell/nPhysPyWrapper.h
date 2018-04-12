@@ -75,9 +75,6 @@ public slots:
     PyObject* toArray(nPhysD*);
     nPhysD* new_nPhysD(PyObject*);
 
-private:
-    void neutrino_init_numpy();
-
 #endif
 
 };
