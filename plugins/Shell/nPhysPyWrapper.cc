@@ -98,7 +98,7 @@ PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
 
 void nPhysPyWrapper::neutrino_init_numpy()
 {
-    import_array();
+    int dummy = import_array();
 }
 
 
