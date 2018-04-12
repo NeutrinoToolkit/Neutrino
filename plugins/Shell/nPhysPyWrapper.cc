@@ -98,7 +98,11 @@ PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
 
 void nPhysPyWrapper::neutrino_init_numpy()
 {
+#if PY_MAJOR_VERSION >= 3
     int dummy = import_array();
+#else
+    import_array();
+#endif
 }
 
 
