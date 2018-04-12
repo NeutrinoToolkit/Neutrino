@@ -99,7 +99,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.cutoffValue, SIGNAL(valueChanged(double)), this, SLOT(doMaskCutoff()));
 
     connect(my_w.addShape, SIGNAL(released()), this, SLOT(addShape()));
-
 }
 
 void Interferometry::imagesTabBarClicked(int num) {
@@ -145,6 +144,7 @@ void Interferometry::physDel(nPhysD* buf) {
     while (itr!=localPhys.end()) {
         if (buf==itr->second) {
             itr = localPhys.erase(itr);
+            qDebug() << "Remove localPhys " << QString::fromStdString(itr->first);
         } else {
             ++itr;
         }
@@ -302,10 +302,10 @@ void Interferometry::doWavelet (int iimage) {
             physWave::phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
         }
 
-        for(std::map<std::string, nPhysD *>::const_iterator itr = retList.begin(); itr != retList.end(); ++itr) {
-            if (itr->second) {
-                itr->second->setShortName(itr->second->getShortName()+suffix);
-                localPhys[itr->first+suffix]=nparent->replacePhys(itr->second,localPhys[itr->first+suffix],false);
+        for(auto & itr : retList) {
+            if (itr.second) {
+                itr.second->setShortName(itr.second->getShortName()+suffix);
+                localPhys[itr.first+suffix]=nparent->replacePhys(itr.second,localPhys[itr.first+suffix],true);
             }
         }
     }
@@ -715,10 +715,17 @@ void Interferometry::loadSettings(QSettings *settings){
 
     settings->beginGroup("localPhys");
     foreach (const QString &childKey, settings->childKeys()) {
-        nPhysD *my_phys=nparent->getBuffer(settings->value(childKey).toInt());
-        if (my_phys) {
-            localPhys[childKey.toStdString()]=my_phys;
-            DEBUG("found " << childKey.toStdString());
+        QStringList qstr = settings->value(childKey).toStringList();
+        if (qstr.size()==2) {
+            std::string str0=qstr.at(0).toStdString();
+            std::string str1=qstr.at(1).toStdString();
+            for(auto & img : nparent->getBufferList()) {
+                qDebug() << "Image" << img;
+                if (img->getShortName() == str0 && img->getName() == str1) {
+                    qDebug() << "Found localPhys" << childKey;
+                    localPhys[childKey.toStdString()]=img;
+                }
+            }
         }
     }
     settings->endGroup();
@@ -735,9 +742,11 @@ void Interferometry::saveSettings(QSettings *settings){
 
     settings->beginGroup("localPhys");
     for(std::map<std::string, nPhysD *>::iterator itr = localPhys.begin(); itr != localPhys.end(); ++itr) {
-        int pos=nparent->indexOf(itr->second);
-        if (pos!=-1) {
-            settings->setValue(QString::fromStdString(itr->first), pos);
+        //        qDebug() << itr->first;
+        if (itr->second && nparent->getBufferList().contains(itr->second)) {
+            QStringList value;
+            value << QString::fromStdString(itr->second->getShortName()) << QString::fromStdString(itr->second->getName());
+            settings->setValue(QString::fromStdString(itr->first), value);
             DEBUG(itr->first << " " <<  nparent->indexOf(itr->second));
         }
     }
