@@ -85,6 +85,7 @@ public slots:
 
     void copyLog();
     void saveLog();
+    void findLogText();
 
 signals:
     void logWinVisibility(bool);

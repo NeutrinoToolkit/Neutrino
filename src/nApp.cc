@@ -60,6 +60,8 @@ int nApp::exec() {
     QObject::connect(log_win_ui->clearLog,&QPushButton::released,log_win_ui->logger,&QTextEdit::clear);
     QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
     QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
+    QObject::connect(log_win_ui->buttonFind,&QPushButton::released,this,&nApp::findLogText);
+    QObject::connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nApp::findLogText);
 
 //    QSettings my_set("neutrino","");
 //    my_set.beginGroup("nPreferences");
@@ -68,7 +70,7 @@ int nApp::exec() {
     log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
     log_win.setVisible(my_set.value("log_winVisible",false).toBool());
     setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
-
+    log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
 
     my_set.endGroup();
 
@@ -80,6 +82,22 @@ int nApp::exec() {
 
 
     return QApplication::exec();
+}
+
+void nApp::findLogText() {
+    QString searchString = log_win_ui->lineFind->text();
+    if (!searchString.isEmpty()) {
+       bool found = log_win_ui->logger->find(searchString, QTextDocument::FindWholeWords);
+       if (!found) {
+           QTextCursor cursor(log_win_ui->logger->textCursor());
+           cursor.movePosition(QTextCursor::Start);
+           log_win_ui->logger->setTextCursor(cursor);
+           found = log_win_ui->logger->find(searchString, QTextDocument::FindWholeWords);
+       }
+       if (found) {
+           log_win_ui->logger->ensureCursorVisible();
+       }
+    }
 }
 
 void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
