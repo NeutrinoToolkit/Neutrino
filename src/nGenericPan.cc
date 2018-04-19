@@ -534,7 +534,7 @@ nGenericPan::saveUi(QSettings *settings) {
         if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
             for (int i=0; i< widget->count(); i++) {
                 nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<void*>());
-                if (phys) {
+                if (nparent && nparent->my_w->my_view->physList.contains(phys)) {
                     settings->setValue(widget->objectName(),QString::fromUtf8(phys->getName().c_str()));
                     settings->setValue(widget->objectName()+"-From",QString::fromUtf8(phys->getFromName().c_str()));
                 }

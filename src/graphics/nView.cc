@@ -33,6 +33,11 @@ nView::~nView ()
     my_set.setValue("pixmapFile", property("pixmapFile").toString());
     my_set.setValue("colorTable", colorTable);
     my_set.endGroup();
+    currentBuffer=NULL;
+    foreach (nPhysD *phys, physList) {
+        delete phys;
+    }
+    physList.clear();
 }
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
@@ -181,6 +186,7 @@ void nView::showPhys(nPhysD *my_phys) {
         setSize();
 
         emit bufferChanged(my_phys);
+        QApplication::processEvents();
     }
 }
 

@@ -49,6 +49,8 @@ public:
     QWidget log_win;
     Ui::nLogWin *log_win_ui;
 
+    int exec();
+
 protected:
     virtual bool notify(QObject *rec, QEvent *ev) override;
 

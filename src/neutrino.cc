@@ -467,7 +467,7 @@ neutrino::loadPlugin(QString pname, bool launch)
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
     QApplication::processEvents();
-    if (!my_phys) my_phys=my_w->my_view->currentBuffer;
+    if (!my_w->my_view->physList.contains(my_phys)) my_phys=getCurrentBuffer();
 
     if (my_phys) {
         double gamma_val=1.0;
@@ -493,6 +493,7 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
     }
     my_w->my_view->update();
     emit bufferChanged(my_phys);
+    QApplication::processEvents();
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
@@ -711,7 +712,9 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         updateRecentFileActions(fname);
         QMutableListIterator<nPhysD*> i(imagelist);
         while (i.hasNext()) {
-            if (i.next()->getSurf()>0) {
+            nPhysD *my_phys=i.next();
+            qDebug() << my_phys << i.value();
+            if (my_phys  && my_phys->getSurf()>0) {
                 addShowPhys(i.value());
             } else {
                 i.remove();
@@ -1283,21 +1286,14 @@ neutrino::fileClose() {
         }
     }
 
-    foreach (nGenericPan *pan, panList) {
-        pan->close();
-    }
-    QApplication::processEvents();
-    my_w->my_view->currentBuffer=NULL;
-    foreach (nPhysD *phys, my_w->my_view->physList) {
-        delete phys;
-    }
-
     QApplication::processEvents();
     foreach (nGenericPan* pan, panList) {
         pan->hide();
         pan->close();
         QApplication::processEvents();
     }
+
+    QApplication::processEvents();
 
     deleteLater();
     return true;
@@ -1306,21 +1302,22 @@ neutrino::fileClose() {
 void
 neutrino::closeCurrentBuffer() {
     QApplication::processEvents();
-    if (my_w->my_view->currentBuffer)  {
-        if (my_w->my_view->currentBuffer->getType()==PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
+    nPhysD *my_phys=getCurrentBuffer();
+    if (my_phys)  {
+        if (my_phys->getType()==PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
             int res=QMessageBox::warning(this,tr("Attention"),
-                                         tr("The image")+QString("\n")+QString::fromUtf8(my_w->my_view->currentBuffer->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+                                         tr("The image")+QString("\n")+QString::fromUtf8(my_phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             switch (res) {
                 case QMessageBox::Yes:
-                    fileSave(my_w->my_view->currentBuffer); // TODO: add here a check for a cancel to avoid exiting
+                    fileSave(my_phys); // TODO: add here a check for a cancel to avoid exiting
                     break;
                 case QMessageBox::No:
-                    removePhys(my_w->my_view->currentBuffer);
+                    removePhys(my_phys);
                     break;
             }
         } else {
-            removePhys(my_w->my_view->currentBuffer);
+            removePhys(my_phys);
         }
     }
     QApplication::processEvents();

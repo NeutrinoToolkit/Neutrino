@@ -62,13 +62,5 @@ int main(int argc, char **argv)
 
     nApp my_app(argc,argv);
 
-    QStringList args=my_app.arguments();
-    args.removeFirst();
-
-    neutrino *ny_neu = new neutrino();
-    ny_neu->fileOpen(args);
-
-    my_app.connect(&my_app, SIGNAL(lastWindowClosed()), &my_app, SLOT(quit()));
-
     return my_app.exec();
 }

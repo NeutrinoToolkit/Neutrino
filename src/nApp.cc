@@ -15,11 +15,19 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     qout(std::cout)
 #endif
 {
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
+
+}
+
+int nApp::exec() {
 
     log_win_ui->setupUi(&log_win);
+
     qInstallMessageHandler(nApp::myMessageOutput);
+
+    addDefaultPalettes();
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
 
     QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
@@ -45,20 +53,33 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
         checkUpdates();
     }
 
+    my_set.endGroup();
+
+    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
     QObject::connect(log_win_ui->clearLog,&QPushButton::released,log_win_ui->logger,&QTextEdit::clear);
     QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
     QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
+
+//    QSettings my_set("neutrino","");
+//    my_set.beginGroup("nPreferences");
 
     log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
     log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
     log_win.setVisible(my_set.value("log_winVisible",false).toBool());
     setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
 
-    addDefaultPalettes();
 
     my_set.endGroup();
 
+    QStringList args=arguments();
+    args.removeFirst();
+
+    neutrino *ny_neu = new neutrino();
+    ny_neu->fileOpen(args);
+
+
+    return QApplication::exec();
 }
 
 void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
