@@ -691,7 +691,6 @@ void Visar::disconnections() {
 }
 
 void Visar::updatePlotSOP() {
-    sopRect->setVisible(enableSOP->isChecked());
     if (!enableSOP->isChecked()) return;
     disconnections();
     nPhysD *shot=getPhysFromCombo(sopShot);

@@ -253,7 +253,7 @@ void nApp::checkUpdates() {
         if (compileSHA != onlineSHA) {
 
             QMessageBox msgBox;
-            QString text=tr("A newer version is available available");
+            QString text=tr("A newer version is available");
             msgBox.setText(text);
             msgBox.addButton(tr("Go get it now"), QMessageBox::YesRole);
             msgBox.addButton(tr("Not now"), QMessageBox::RejectRole);

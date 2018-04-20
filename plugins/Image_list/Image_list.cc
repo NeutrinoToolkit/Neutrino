@@ -248,6 +248,7 @@ void Image_list::keyPressEvent(QKeyEvent *e){
 
 void
 Image_list::updatePad(nPhysD *my_phys) {
+    QApplication::processEvents();
     if (my_phys==nullptr) {
         my_phys=currentBuffer;
     }
@@ -291,6 +292,7 @@ Image_list::physDel(nPhysD *my_phys) {
         ++it;
     }
     updatePad();
+    QApplication::processEvents();
 }
 
 /// new image entry point
