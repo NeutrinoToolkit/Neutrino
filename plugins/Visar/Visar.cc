@@ -153,7 +153,6 @@ Visar::Visar(neutrino *nparent)
     loadDefaults();
     sweepChanged();
     calculate_etalon();
-    setObjectVisibility(currentBuffer);
 }
 
 void Visar::calculate_etalon() {
@@ -396,9 +395,13 @@ void Visar::loadSettings(QString my_settings) {
     whichRefl->setCurrentIndex(whichReflSaved);
 
     connections();
+    QApplication::processEvents();
     sweepChanged();
     doWave();
     calculate_etalon();
+    QApplication::processEvents();
+    setObjectVisibility(currentBuffer);
+    QApplication::processEvents();
 }
 
 void Visar::mouseAtPlot(QMouseEvent* e) {
@@ -622,10 +625,12 @@ void Visar::connections() {
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+    QApplication::processEvents();
 
 }
 
 void Visar::disconnections() {
+    QApplication::processEvents();
     for (unsigned int k=0;k<numVisars;k++){
         disconnect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
         disconnect(phaseUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
