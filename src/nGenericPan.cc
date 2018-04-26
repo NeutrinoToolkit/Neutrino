@@ -332,6 +332,7 @@ void nGenericPan::physDel(nPhysD * buffer) {
 
 void nGenericPan::bufferChanged(nPhysD * buffer)
 {
+    qDebug() << "here";
     currentBuffer = buffer;
 }
 

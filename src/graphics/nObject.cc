@@ -201,7 +201,9 @@ void nObject::hoverEnterEvent( QGraphicsSceneHoverEvent *){
 	selectThis(true);
 }
 
-void nObject::hoverLeaveEvent( QGraphicsSceneHoverEvent *){}
+void nObject::hoverLeaveEvent( QGraphicsSceneHoverEvent *){
+    selectThis(false);
+}
 
 void nObject::hoverMoveEvent( QGraphicsSceneHoverEvent *){}
 
@@ -217,7 +219,7 @@ void nObject::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 			}
 		}
 	}
-	qDebug()<< moveRef;
+    qDebug()<< toolTip() << moveRef;
 	if (moveRef.size()>0) { // if more that one just pick the last
 		int keeplast=moveRef.last();
 		moveRef.clear();
@@ -632,6 +634,7 @@ void nObject::zoomChanged(double val){
 }
 
 void nObject::itemChanged() {
+    qDebug() << toolTip() << "sceneChanged";
 	emit sceneChanged();
 }
 

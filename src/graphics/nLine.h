@@ -169,7 +169,7 @@ public slots:
 	void loadSettings(QSettings *);
 	void saveSettings(QSettings *);
 
-	void extractPath();
+    void extractPath();
 
     // math facilities
     nPhysD getContourSubImage(double fill_value=std::numeric_limits<double>::quiet_NaN());

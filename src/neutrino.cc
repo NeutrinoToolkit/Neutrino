@@ -466,13 +466,13 @@ neutrino::loadPlugin(QString pname, bool launch)
 }
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
+    qDebug() << "here";
     QApplication::processEvents();
     if (!my_w->my_view->physList.contains(my_phys)) my_phys=getCurrentBuffer();
 
     if (my_phys) {
         double gamma_val=1.0;
         if (my_w->my_view->physList.contains(my_phys)) {
-            qDebug() << "gonna die!!";
             gamma_val=my_phys->gamma();
         }
 
@@ -1287,7 +1287,7 @@ neutrino::fileClose() {
     }
 
     QApplication::processEvents();
-    foreach (nGenericPan* pan, panList) {
+    for (auto &pan : panList) {
         pan->hide();
         pan->close();
         QApplication::processEvents();

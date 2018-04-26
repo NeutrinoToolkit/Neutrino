@@ -154,7 +154,7 @@ public slots:
     
     void loadSettings(QString);
     
-    void bufferChanged(nPhysD*);
+    void setObjectVisibility(nPhysD*);
     
     void sweepChanged(QLineEdit*line=nullptr);
     

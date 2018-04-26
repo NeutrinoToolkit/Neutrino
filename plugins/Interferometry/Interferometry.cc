@@ -144,7 +144,6 @@ void Interferometry::physDel(nPhysD* buf) {
     while (itr!=localPhys.end()) {
         if (buf==itr->second) {
             itr = localPhys.erase(itr);
-            qDebug() << "Remove localPhys " << QString::fromStdString(itr->first);
         } else {
             ++itr;
         }

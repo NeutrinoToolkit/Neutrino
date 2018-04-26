@@ -144,6 +144,8 @@ Visar::Visar(neutrino *nparent)
     connect(etalon_n0, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
 
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
+
 
     //!END SOP stuff
     QApplication::processEvents();
@@ -151,7 +153,7 @@ Visar::Visar(neutrino *nparent)
     loadDefaults();
     sweepChanged();
     calculate_etalon();
-
+    setObjectVisibility(currentBuffer);
 }
 
 void Visar::calculate_etalon() {
@@ -529,22 +531,14 @@ int Visar::direction(int k) {
     return dir;
 }
 
-void Visar::bufferChanged(nPhysD*phys) {
-    if (phys && phys->property.find("VisarNum") != phys->property.end()) {
-        int physVsarNum=(int)phys->property["VisarNum"];
-        if (physVsarNum>0) {
-            for (unsigned int k=0;k<numVisars;k++){
-                if ((int)k == physVsarNum-1) {
-                    fringeRect[k]->show();
-                    fringeLine[k]->show();
-                } else {
-                    fringeRect[k]->hide();
-                    fringeLine[k]->hide();
-                }
-            }
-        } else {
-
+void Visar::setObjectVisibility(nPhysD*phys) {
+    qDebug() << "here";
+    if (phys) {
+        for (unsigned int k=0;k<numVisars;k++){
+            fringeLine[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
+            fringeRect[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
         }
+        sopRect->setVisible(phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot));
     }
 }
 
@@ -568,24 +562,13 @@ void Visar::tabChanged(int k) {
         } else if (tabWidget == tabPhase) {
             getPhase(k);
         }
-        sopRect->setVisible(enableSOP->isChecked() && tabWidget==tabs && tabWidget->currentIndex()==2);
-        if (tabWidget==tabs && tabWidget->currentIndex()==2) {
-            for (int j=0;j<(int)numVisars;j++) {
-                fringeLine[j]->setVisible(false);
-                fringeRect[j]->setVisible(false);
-            }
-            if (enableSOP->isChecked()) {
-                nparent->showPhys(getPhysFromCombo(sopShot));
-            }
+        if (tabWidget==tabs && tabs->currentIndex()==2 && enableSOP->isChecked()) {
+            nparent->showPhys(getPhysFromCombo(sopShot));
         } else {
             if (k<(int)numVisars) {
                 k=tabWidget->currentIndex();
                 if (phaseUi[k]->enableVisar->isChecked()) {
                     nparent->showPhys(getPhysFromCombo(velocityUi[k]->shotImage));
-                }
-                for (int j=0;j<(int)numVisars;j++) {
-                    fringeLine[j]->setVisible(j==k && (velocityUi[j]->interfringe->value() != 0.0));
-                    fringeRect[j]->setVisible(j==k);
                 }
             }
         }
