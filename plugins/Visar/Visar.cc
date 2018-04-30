@@ -410,8 +410,8 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
         if(plot) {
             QString msg;
             QTextStream(&msg) << plot->xAxis->pixelToCoord(e->pos().x()) << ","
-                              << plot->yAxis->pixelToCoord(e->pos().y()) << " "
-                              << plot->yAxis2->pixelToCoord(e->pos().y()) << ":"
+                              << plot->yAxis->pixelToCoord(e->pos().y()) << " R="
+                              << plot->yAxis2->pixelToCoord(e->pos().y()) << " Q="
                               << plot->yAxis3->pixelToCoord(e->pos().y());
 
             statusbar->showMessage(msg);
@@ -541,7 +541,7 @@ void Visar::setObjectVisibility(nPhysD*phys) {
             fringeLine[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
             fringeRect[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
         }
-        sopRect->setVisible(phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot));
+        sopRect->setVisible(enableSOP->isChecked() && (phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot)));
     }
 }
 

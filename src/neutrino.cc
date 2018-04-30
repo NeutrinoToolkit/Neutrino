@@ -620,23 +620,10 @@ void neutrino::fileOpen()
     formats+=("Any files (*)");
 
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
-    fileOpen(fnames);
-}
-
-void neutrino::fileOpen(QStringList fnames) {
     foreach (QString fname, fnames) {
-        QList<nPhysD *> imagelist = fileOpen(fname);
-        if (imagelist.size()==0){
-            QString vwinname="OpenRaw";
-            nOpenRAW *openRAW=(nOpenRAW *)getPan(vwinname);
-            if (!openRAW) {
-                openRAW = new nOpenRAW(this);
-            }
-            openRAW->add(fname);
-        }
+        fileOpen(fname);
     }
 }
-
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
     setProperty("NeuSave-fileOpen", fname);
@@ -706,21 +693,28 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
             }
         }
-    }
-
-    if (imagelist.size()>0) {
-        updateRecentFileActions(fname);
-        QMutableListIterator<nPhysD*> i(imagelist);
-        while (i.hasNext()) {
-            nPhysD *my_phys=i.next();
-            qDebug() << my_phys << i.value();
-            if (my_phys  && my_phys->getSurf()>0) {
-                addShowPhys(i.value());
-            } else {
-                i.remove();
+        if (imagelist.size()>0) {
+            QMutableListIterator<nPhysD*> i(imagelist);
+            while (i.hasNext()) {
+                nPhysD *my_phys=i.next();
+                qDebug() << my_phys << i.value();
+                if (my_phys  && my_phys->getSurf()>0) {
+                    addShowPhys(i.value());
+                } else {
+                    i.remove();
+                }
             }
+        } else {
+            nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
+            if (!openRAW) {
+                openRAW = new nOpenRAW(this);
+            }
+            openRAW->add(fname);
         }
     }
+
+    updateRecentFileActions(fname);
+
     QApplication::processEvents();
     return imagelist;
 }
@@ -820,7 +814,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
             if (qLine.startsWith("Neutrino")) {
                 progress.setWindowModality(Qt::WindowModal);
                 progress.setLabelText(tr("Load Session ")+qLine.split(" ").at(1));
-                progress.setMaximum(1+qLine.split(" ").at(2).toInt()+1);
+                progress.setMaximum(2+qLine.split(" ").at(2).toInt());
                 progress.show();
                 QApplication::processEvents();
                 while(ifile.peek()!=-1) {
@@ -834,15 +828,13 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         int ret=physFormat::phys_resurrect_binary(my_phys,ifile);
                         if (ret>=0 && my_phys->getSurf()>0) {
                             imagelist.push_back(my_phys);
+                            addShowPhys(my_phys);
                         } else {
                             delete my_phys;
                         }
                         progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
-                        for (auto& my_phys: imagelist) {
-                            addPhys(my_phys);
-                        }
                         QStringList listLine=qLine.split(" ");
                         QString pName=listLine.at(1);
                         QApplication::processEvents();
@@ -1123,10 +1115,7 @@ void neutrino::dropEvent(QDropEvent *e) {
         e->acceptProposedAction();
         QStringList fileList;
         foreach (QUrl qurl, e->mimeData()->urls()) {
-            fileList << qurl.toLocalFile();
-        }
-        if (fileList.size()>0) {
-            fileOpen(fileList);
+            fileOpen(qurl.toLocalFile());
         }
     }
 }

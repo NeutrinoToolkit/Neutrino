@@ -83,9 +83,6 @@ public:
 
     QPointer<QMainWindow> helpwin;
 
-signals:
-    void changeCombo(QComboBox*);
-
 public slots:
 
     void raiseNeutrino();

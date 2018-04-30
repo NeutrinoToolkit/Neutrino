@@ -78,7 +78,8 @@ int nApp::exec() {
     args.removeFirst();
 
     neutrino *ny_neu = new neutrino();
-    ny_neu->fileOpen(args);
+    for (auto &arg : args)
+        ny_neu->fileOpen(arg);
 
 
     return QApplication::exec();

@@ -67,7 +67,6 @@ public slots:
 
     void bufferChanged(nPhysD*);
     void physDel(nPhysD*);
-    void checkChangeCombo(QComboBox *);
 
     void on_relative_toggled(bool);
 

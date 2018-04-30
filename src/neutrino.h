@@ -138,7 +138,6 @@ public slots:
 
     void fileOpen();
     QList<nPhysD*> fileOpen(QString);
-    void fileOpen(QStringList);
     void fileReopen();
 
     QString getFileSave();

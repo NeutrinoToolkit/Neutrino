@@ -90,7 +90,6 @@ public slots:
     void doPlasma();
     
     void bufferChanged(nPhysD*);
-    void checkChangeCombo(QComboBox *);
 
     void imagesTabBarClicked(int);
 };

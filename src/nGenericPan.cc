@@ -314,15 +314,12 @@ void nGenericPan::physDel(nPhysD * buffer) {
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
-                //				disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
                 disconnect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
             int position=combo->findData(qVariantFromValue((void*) buffer));
-
             combo->removeItem(position);
             if (combo->property("neutrinoImage").toBool()) {
-                //				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
@@ -351,7 +348,6 @@ void nGenericPan::comboChanged(int k) {
         if (image) {
             nparent->showPhys(image);
         }
-        emit changeCombo(combo);
     }
 }
 

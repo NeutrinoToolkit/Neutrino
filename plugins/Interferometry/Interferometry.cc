@@ -90,8 +90,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
-    connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
-
     connect(my_w.rotAngle,SIGNAL(valueChanged(double)), this, SLOT(doSubtract()));
 
     connect(my_w.posZeroButton,SIGNAL(toggled(bool)), this, SLOT(getPosZero(bool)));
@@ -140,13 +138,22 @@ void Interferometry::line_key_pressed(int key) {
 }
 
 void Interferometry::physDel(nPhysD* buf) {
-    std::map<std::string, nPhysD *>::iterator itr = localPhys.begin();
-    while (itr!=localPhys.end()) {
-        if (buf==itr->second) {
-            itr = localPhys.erase(itr);
-        } else {
-            ++itr;
-        }
+//    std::map<std::string, nPhysD *>::iterator itr = localPhys.begin();
+//    while (itr!=localPhys.end()) {
+//        if (buf==itr->second) {
+//            itr = localPhys.erase(itr);
+//        } else {
+//            ++itr;
+//        }
+//    }
+
+    for (auto it = localPhys.cbegin(); it != localPhys.cend(); ) // no "++"!
+    {
+      if (it->second == buf) {
+        localPhys.erase(it++);
+      } else {
+        ++it;
+      }
     }
 }
 
@@ -186,12 +193,6 @@ void Interferometry::maskRegionToggled(bool val) {
 void Interferometry::interpolateToggled(bool val) {
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         it->second->setVisible(val);
-    }
-}
-
-void Interferometry::checkChangeCombo(QComboBox *combo) {
-    if (combo==my_image[0].image || combo==my_image[1].image) {
-        region->show();
     }
 }
 

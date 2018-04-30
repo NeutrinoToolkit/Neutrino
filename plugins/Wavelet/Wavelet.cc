@@ -61,8 +61,6 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent)
 	connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-
-    connect(this, SIGNAL(changeCombo(QComboBox *)), this, SLOT(checkChangeCombo(QComboBox *)));
 	
 	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
 }
@@ -77,12 +75,6 @@ void Wavelet::useBarrierToggled(bool val) {
 		linebarrier->show();
 	} else {
 		linebarrier->hide();
-	}
-}
-
-void Wavelet::checkChangeCombo(QComboBox *combo) {
-	if (combo==my_w.image) {
-		region->show();
 	}
 }
 
