@@ -390,7 +390,7 @@ void Visar::loadSettings(QString my_settings) {
     int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
     settings.endGroup();
 
-    loadSettings(&settings);
+    nGenericPan::loadSettings(settings);
 
     whichRefl->setCurrentIndex(whichReflSaved);
 

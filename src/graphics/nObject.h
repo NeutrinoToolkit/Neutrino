@@ -141,8 +141,8 @@ public slots:
 	//SETTINGS
 	void loadSettings();
 	void saveSettings();
-	void loadSettings(QSettings *);
-	void saveSettings(QSettings *);
+    void loadSettings(QSettings&);
+    void saveSettings(QSettings&);
 	
 	
 signals:

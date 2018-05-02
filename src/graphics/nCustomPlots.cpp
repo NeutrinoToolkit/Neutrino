@@ -593,119 +593,125 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 
 // SETTINGS
 void
-nCustomPlot::loadSettings(QSettings *my_set) {
-    if (my_set==nullptr) {
-        QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
-        if (!fnametmp.isEmpty()) {
-            setProperty("NeuSave-fileIni",fnametmp);
-            loadSettings(new QSettings(fnametmp,QSettings::IniFormat));
-        }
-    } else {
-        my_set->beginGroup(objectName());
-        my_set->beginGroup("axes");
-        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
-        labels = my_set->value("labels").toList();
-        grids = my_set->value("grids").toList();
-        logs = my_set->value("logs").toList();
-        colors = my_set->value("colors").toList();
-        labelfonts = my_set->value("labelfonts").toList();
-        lock = my_set->value("lock").toList();
-        range = my_set->value("range").toList();
-        QList<QCPAxis *> axis=findChildren<QCPAxis *>();
-        if (    axis.size() == labels.size() &&
-                axis.size() == grids.size() &&
-                axis.size() == logs.size() &&
-                axis.size() == colors.size()  &&
-                axis.size() == labelfonts.size() &&
-                axis.size() == lock.size() &&
-                axis.size() == range.size())
-        {
-            for (int i=0; i< axis.size(); i++) {
-                if(axis.at(i)->visible()) {
-                    axis.at(i)->setLabel(labels.at(i).toString());
-                    axis.at(i)->setLabelColor(colors.at(i).value<QColor>());
-                    axis.at(i)->setLabelFont(labelfonts.at(i).value<QFont>());
-                    axis.at(i)->setTickLabelFont(labelfonts.at(i).value<QFont>());
-                    axis.at(i)->setTickLabelColor(colors.at(i).value<QColor>());
-                    axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
-                    axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
-                    axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
-                    axis.at(i)->setProperty("lock",lock.at(i).toBool());
-                    QPointF prange=range.at(i).toPointF();
-                    axis.at(i)->setRange(prange.x(),prange.y());
-                    for (int g=0; g<plottableCount(); g++) {
-                        QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-                        if(hasPlottable(graph) && graph->valueAxis()==axis.at(i)) {
-                            QPen p=graph->pen();
-                            p.setColor(colors.at(i).value<QColor>());
-                            graph->setPen(p);
-                        }
-                    }
-
-                }
-            }
-        }
-        my_set->endGroup();
-        title->setFont(qvariant_cast<QFont>(my_set->value("titleFont",title->font())));
-        setTitle(my_set->value("title",title->text()).toString());
-
-        if (my_set->childGroups().contains("Properties")) {
-            my_set->beginGroup("Properties");
-            foreach(QString my_key, my_set->allKeys()) {
-                setProperty(my_key.toStdString().c_str(), my_set->value(my_key));
-            }
-            my_set->endGroup();
-        }
-
-
-        my_set->endGroup();
+nCustomPlot::loadSettings() {
+    QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("NeuSave-fileIni",fnametmp);
+        QSettings my_set(fnametmp,QSettings::IniFormat);
+        loadSettings(my_set);
     }
 }
 
 void
-nCustomPlot::saveSettings(QSettings *my_set) {
-    qDebug() << "save settings" << objectName();
-    if (my_set==nullptr) {
-        QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
-        if (!fnametmp.isEmpty()) {
-            setProperty("NeuSave-fileIni",fnametmp);
-            saveSettings(new QSettings(fnametmp,QSettings::IniFormat));
-        }
-    } else {
-        my_set->beginGroup(objectName());
-        my_set->beginGroup("axes");
-        QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
-        foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
-            labels << axis->label();
-            grids << (axis->grid()->visible() && axis->grid()->subGridVisible()?2:(axis->grid()->visible()?1:0));
-            logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
-            colors << axis->labelColor();
-            labelfonts << axis->labelFont();
-            lock << axis->property("lock").toBool();
-            range << QPointF(axis->range().lower,axis->range().upper);
-        }
-        my_set->setValue("labels",labels);
-        my_set->setValue("grids",grids);
-        my_set->setValue("logs",logs);
-        my_set->setValue("colors",colors);
-        my_set->setValue("labelfonts",labelfonts);
-        my_set->setValue("lock",lock);
-        my_set->setValue("range",range);
-        my_set->endGroup();
-        my_set->setValue("titleFont",title->font());
-        my_set->setValue("title",title->text());
+nCustomPlot::loadSettings(QSettings &my_set) {
+    my_set.beginGroup(objectName());
+    my_set.beginGroup("axes");
+    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
+    labels = my_set.value("labels").toList();
+    grids = my_set.value("grids").toList();
+    logs = my_set.value("logs").toList();
+    colors = my_set.value("colors").toList();
+    labelfonts = my_set.value("labelfonts").toList();
+    lock = my_set.value("lock").toList();
+    range = my_set.value("range").toList();
+    QList<QCPAxis *> axis=findChildren<QCPAxis *>();
+    if (    axis.size() == labels.size() &&
+            axis.size() == grids.size() &&
+            axis.size() == logs.size() &&
+            axis.size() == colors.size()  &&
+            axis.size() == labelfonts.size() &&
+            axis.size() == lock.size() &&
+            axis.size() == range.size())
+    {
+        for (int i=0; i< axis.size(); i++) {
+            if(axis.at(i)->visible()) {
+                axis.at(i)->setLabel(labels.at(i).toString());
+                axis.at(i)->setLabelColor(colors.at(i).value<QColor>());
+                axis.at(i)->setLabelFont(labelfonts.at(i).value<QFont>());
+                axis.at(i)->setTickLabelFont(labelfonts.at(i).value<QFont>());
+                axis.at(i)->setTickLabelColor(colors.at(i).value<QColor>());
+                axis.at(i)->grid()->setVisible(grids.at(i).toInt()>0);
+                axis.at(i)->grid()->setSubGridVisible(grids.at(i).toInt()>1);
+                axis.at(i)->setScaleType(logs.at(i).toBool()?QCPAxis::stLogarithmic:QCPAxis::stLinear);
+                axis.at(i)->setProperty("lock",lock.at(i).toBool());
+                QPointF prange=range.at(i).toPointF();
+                axis.at(i)->setRange(prange.x(),prange.y());
+                for (int g=0; g<plottableCount(); g++) {
+                    QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
+                    if(hasPlottable(graph) && graph->valueAxis()==axis.at(i)) {
+                        QPen p=graph->pen();
+                        p.setColor(colors.at(i).value<QColor>());
+                        graph->setPen(p);
+                    }
+                }
 
-        my_set->beginGroup("Properties");
-        foreach(QByteArray ba, dynamicPropertyNames()) {
-            if(ba.startsWith("NeuSave")) {
-                qDebug() << "write" << ba << " : " << property(ba);
-                my_set->setValue(ba, property(ba));
             }
         }
-        my_set->endGroup();
-
-        my_set->endGroup();
     }
+    my_set.endGroup();
+    title->setFont(qvariant_cast<QFont>(my_set.value("titleFont",title->font())));
+    setTitle(my_set.value("title",title->text()).toString());
+
+    if (my_set.childGroups().contains("Properties")) {
+        my_set.beginGroup("Properties");
+        foreach(QString my_key, my_set.allKeys()) {
+            setProperty(my_key.toStdString().c_str(), my_set.value(my_key));
+        }
+        my_set.endGroup();
+    }
+
+
+    my_set.endGroup();
+
+}
+
+void
+nCustomPlot::saveSettings() {
+    QString fnametmp = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
+    if (!fnametmp.isEmpty()) {
+        setProperty("NeuSave-fileIni",fnametmp);
+        QSettings my_set(fnametmp,QSettings::IniFormat);
+        saveSettings(my_set);
+    }
+}
+
+void
+nCustomPlot::saveSettings(QSettings &my_set) {
+    qDebug() << "save settings" << objectName();
+    my_set.beginGroup(objectName());
+    my_set.beginGroup("axes");
+    QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
+    foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+        labels << axis->label();
+        grids << (axis->grid()->visible() && axis->grid()->subGridVisible()?2:(axis->grid()->visible()?1:0));
+        logs << QVariant::fromValue(axis->scaleType()==QCPAxis::stLogarithmic);
+        colors << axis->labelColor();
+        labelfonts << axis->labelFont();
+        lock << axis->property("lock").toBool();
+        range << QPointF(axis->range().lower,axis->range().upper);
+    }
+    my_set.setValue("labels",labels);
+    my_set.setValue("grids",grids);
+    my_set.setValue("logs",logs);
+    my_set.setValue("colors",colors);
+    my_set.setValue("labelfonts",labelfonts);
+    my_set.setValue("lock",lock);
+    my_set.setValue("range",range);
+    my_set.endGroup();
+    my_set.setValue("titleFont",title->font());
+    my_set.setValue("title",title->text());
+
+    my_set.beginGroup("Properties");
+    foreach(QByteArray ba, dynamicPropertyNames()) {
+        if(ba.startsWith("NeuSave")) {
+            qDebug() << "write" << ba << " : " << property(ba);
+            my_set.setValue(ba, property(ba));
+        }
+    }
+    my_set.endGroup();
+
+    my_set.endGroup();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

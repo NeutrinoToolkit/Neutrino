@@ -152,7 +152,7 @@ public slots:
 
     void mouseAtPlot(QMouseEvent* e);
     
-    void loadSettings(QString);
+    void loadSettings(QString=QString());
     
     void setObjectVisibility(nPhysD*);
     

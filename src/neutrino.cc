@@ -761,19 +761,19 @@ void neutrino::saveSession (QString fname) {
                 QTemporaryFile tmpFile(this);
                 if (tmpFile.open()) {
                     QString tmp_filename=tmpFile.fileName();
-                    QApplication::processEvents();
-                    QSettings my_set(tmp_filename,QSettings::IniFormat);
-                    my_set.clear();
-                    panList.at(i)->saveSettings(&my_set);
-                    my_set.sync();
                     tmpFile.close();
+                    tmpFile.remove();
+                    panList.at(i)->saveSettings(tmp_filename);
+
                     QFile file(tmp_filename);
                     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                         ofile << "NeutrinoPan-begin " << pName.toStdString() << std::endl;
                         ofile.flush();
+                        file.seek(0);
                         while (!file.atEnd()) {
                             QByteArray line = file.readLine();
-                            ofile << line.constData();
+                            qWarning() << line;
+                            ofile << line.toStdString();
                         }
                         file.close();
                         file.remove();
@@ -854,11 +854,9 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             QApplication::processEvents();
                             QTemporaryFile tmpFile(this);
                             tmpFile.open();
-                            qDebug() << "pan temporary filename" << tmpFile.fileName();
 
                             while(!ifile.eof()) {
                                 getline(ifile,line);
-                                qDebug() << QString::fromStdString(line);
                                 qLine=QString::fromStdString(line);
                                 if (qLine.startsWith("NeutrinoPan-end"))
                                     break;

@@ -646,7 +646,7 @@ nObject::loadSettings() {
 	if (!fnametmp.isEmpty()) {
 		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
-		loadSettings(&settings);
+        loadSettings(settings);
 	}
 }
 
@@ -657,77 +657,77 @@ nObject::saveSettings() {
 		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
-		saveSettings(&settings);
+        saveSettings(settings);
 	}
 }
 
 void
-nObject::loadSettings(QSettings *settings) {
-	settings->beginGroup(toolTip());
-	setPos(settings->value("position").toPoint());
+nObject::loadSettings(QSettings &settings) {
+    settings.beginGroup(toolTip());
+    setPos(settings.value("position").toPoint());
 
-	int size = settings->beginReadArray("points");
+    int size = settings.beginReadArray("points");
 	QPolygonF poly_tmp;
 	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
-		poly_tmp << QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+        settings.setArrayIndex(i);
+        poly_tmp << QPointF(settings.value("x").toDouble(),settings.value("y").toDouble());
 	}
-	settings->endArray();
+    settings.endArray();
 	if (poly_tmp.size()==2) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
 		showMessage(tr("Error reading from file"));
 	}
-	setToolTip(settings->value("name",toolTip()).toString());
-	setZValue(settings->value("depth",zValue()).toDouble());
-	setWidthF(settings->value("width",nWidth).toDouble());
-	changeColor(settings->value("colorLine",nColor).value<QColor>());
-	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
-	changeColorHolder(settings->value("colorHolder",ref[0]->brush().color()).value<QColor>());
+    setToolTip(settings.value("name",toolTip()).toString());
+    setZValue(settings.value("depth",zValue()).toDouble());
+    setWidthF(settings.value("width",nWidth).toDouble());
+    changeColor(settings.value("colorLine",nColor).value<QColor>());
+    sizeHolder(settings.value("sizeHolder",nSizeHolder).toDouble());
+    changeColorHolder(settings.value("colorHolder",ref[0]->brush().color()).value<QColor>());
 
-	if (settings->childGroups().contains("Properties")) {
-		settings->beginGroup("Properties");
-		foreach(QString my_key, settings->allKeys()) {
-			qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
-			setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+    if (settings.childGroups().contains("Properties")) {
+        settings.beginGroup("Properties");
+        foreach(QString my_key, settings.allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings.value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings.value(my_key));
 		}
-		settings->endGroup();
+        settings.endGroup();
 	}
 
-	settings->endGroup();
+    settings.endGroup();
 }
 
 void
-nObject::saveSettings(QSettings *settings) {
-	settings->beginGroup(toolTip());
-	settings->remove("");
-	settings->setValue("position",pos());
-	settings->beginWriteArray("points");
+nObject::saveSettings(QSettings &settings) {
+    settings.beginGroup(toolTip());
+    settings.remove("");
+    settings.setValue("position",pos());
+    settings.beginWriteArray("points");
 	for (int i = 0; i < ref.size(); ++i) {
-		settings->setArrayIndex(i);
+        settings.setArrayIndex(i);
 		QPointF ppos=mapToScene(ref.at(i)->pos());
-		settings->setValue("x", ppos.x());
-		settings->setValue("y", ppos.y());
+        settings.setValue("x", ppos.x());
+        settings.setValue("y", ppos.y());
 	}
-	settings->endArray();
-	settings->setValue("name",toolTip());
-	settings->setValue("depth",zValue());
-	settings->setValue("width",nWidth);
-	settings->setValue("colorLine",nColor);
-	settings->setValue("sizeHolder",nSizeHolder);
-	settings->setValue("colorHolder",ref[0]->brush().color());
+    settings.endArray();
+    settings.setValue("name",toolTip());
+    settings.setValue("depth",zValue());
+    settings.setValue("width",nWidth);
+    settings.setValue("colorLine",nColor);
+    settings.setValue("sizeHolder",nSizeHolder);
+    settings.setValue("colorHolder",ref[0]->brush().color());
 
-	settings->beginGroup("Properties");
+    settings.beginGroup("Properties");
 	qDebug() << dynamicPropertyNames().size();
 	foreach(QByteArray ba, dynamicPropertyNames()) {
 		qDebug() << "save" << ba << " : " << property(ba);
 		if(ba.startsWith("NeuSave")) {
 			qDebug() << "write" << ba << " : " << property(ba);
-			settings->setValue(ba, property(ba));
+            settings.setValue(ba, property(ba));
 		}
 	}
-	settings->endGroup();
+    settings.endGroup();
 
-	settings->endGroup();
+    settings.endGroup();
 }
 

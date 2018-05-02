@@ -1175,7 +1175,7 @@ nLine::loadSettings() {
 	if (!fnametmp.isEmpty()) {
 		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
-		loadSettings(&settings);
+        loadSettings(settings);
 	}
 }
 
@@ -1186,91 +1186,91 @@ nLine::saveSettings() {
 		setProperty("NeuSave-fileIni",fnametmp);
 		QSettings settings(fnametmp,QSettings::IniFormat);
 		settings.clear();
-		saveSettings(&settings);
+        saveSettings(settings);
 	}
 }
 
 void
-nLine::loadSettings(QSettings *settings) {
-	settings->beginGroup(toolTip());
-	setPos(settings->value("position").toPoint());
+nLine::loadSettings(QSettings &settings) {
+    settings.beginGroup(toolTip());
+    setPos(settings.value("position").toPoint());
 
 	if (property("parentPanControlLevel").toInt()<2) {
-		int size = settings->beginReadArray("points");
+        int size = settings.beginReadArray("points");
 		QPolygonF poly_tmp;
 		for (int i = 0; i < size; ++i) {
-			settings->setArrayIndex(i);
-			QPointF ppos=QPointF(settings->value("x").toDouble(),settings->value("y").toDouble());
+            settings.setArrayIndex(i);
+            QPointF ppos=QPointF(settings.value("x").toDouble(),settings.value("y").toDouble());
 			poly_tmp << ppos;
 		}
-		settings->endArray();
+        settings.endArray();
 		if (poly_tmp.size()>0) {
 			setPoints(poly_tmp);
 		} else {
 			showMessage(tr("Error reading from file"));
 		}
 	}
-	setToolTip(settings->value("name",toolTip()).toString());
-	setZValue(settings->value("depth",zValue()).toDouble());
-	setWidthF(settings->value("width",nWidth).toDouble());
-	changeColor(settings->value("colorLine",colorLine).value<QColor>());
-	toggleBezier(settings->value("bezier",bezier).toBool());
-	toggleClosedLine(settings->value("closedLine",closedLine).toBool());
-	toggleAntialias(settings->value("antialias",antialias).toBool());
-	sizeHolder(settings->value("sizeHolder",nSizeHolder).toDouble());
-	changeColorHolder(settings->value("colorHolder",colorHolder).value<QColor>());
-	setNumPoints(settings->value("samplePoints",numPoints).toInt());
+    setToolTip(settings.value("name",toolTip()).toString());
+    setZValue(settings.value("depth",zValue()).toDouble());
+    setWidthF(settings.value("width",nWidth).toDouble());
+    changeColor(settings.value("colorLine",colorLine).value<QColor>());
+    toggleBezier(settings.value("bezier",bezier).toBool());
+    toggleClosedLine(settings.value("closedLine",closedLine).toBool());
+    toggleAntialias(settings.value("antialias",antialias).toBool());
+    sizeHolder(settings.value("sizeHolder",nSizeHolder).toDouble());
+    changeColorHolder(settings.value("colorHolder",colorHolder).value<QColor>());
+    setNumPoints(settings.value("samplePoints",numPoints).toInt());
 
-	if (settings->childGroups().contains("Properties")) {
-		settings->beginGroup("Properties");
-		foreach(QString my_key, settings->allKeys()) {
-			qDebug() << "load" <<  my_key << " : " << settings->value(my_key);
-			setProperty(my_key.toStdString().c_str(), settings->value(my_key));
+    if (settings.childGroups().contains("Properties")) {
+        settings.beginGroup("Properties");
+        foreach(QString my_key, settings.allKeys()) {
+            qDebug() << "load" <<  my_key << " : " << settings.value(my_key);
+            setProperty(my_key.toStdString().c_str(), settings.value(my_key));
 		}
-		settings->endGroup();
+        settings.endGroup();
 	}
 
-	settings->endGroup();
+    settings.endGroup();
 }
 
 void
-nLine::saveSettings(QSettings *settings) {
-	settings->beginGroup(toolTip());
-	settings->remove("");
-	settings->setValue("position",pos());
+nLine::saveSettings(QSettings &settings) {
+    settings.beginGroup(toolTip());
+    settings.remove("");
+    settings.setValue("position",pos());
 	if (property("parentPanControlLevel").toInt()<2) {
-		settings->beginWriteArray("points");
+        settings.beginWriteArray("points");
 		for (int i = 0; i < ref.size(); ++i) {
-			settings->setArrayIndex(i);
+            settings.setArrayIndex(i);
 			QPointF ppos=mapToScene(ref.at(i)->pos());
-			settings->setValue("x", ppos.x());
-			settings->setValue("y", ppos.y());
+            settings.setValue("x", ppos.x());
+            settings.setValue("y", ppos.y());
 		}
-		settings->endArray();
+        settings.endArray();
 	}
-	settings->setValue("name",toolTip());
-	settings->setValue("depth",zValue());
-	settings->setValue("width",nWidth);
-	settings->setValue("colorLine",colorLine);
-	settings->setValue("bezier",bezier);
-	settings->setValue("closedLine",closedLine);
-	settings->setValue("antialias",antialias);
-	settings->setValue("sizeHolder",nSizeHolder);
-	if (ref.size()>0)	settings->setValue("colorHolder",ref[0]->brush().color());
-	settings->setValue("samplePoints",numPoints);
+    settings.setValue("name",toolTip());
+    settings.setValue("depth",zValue());
+    settings.setValue("width",nWidth);
+    settings.setValue("colorLine",colorLine);
+    settings.setValue("bezier",bezier);
+    settings.setValue("closedLine",closedLine);
+    settings.setValue("antialias",antialias);
+    settings.setValue("sizeHolder",nSizeHolder);
+    if (ref.size()>0)	settings.setValue("colorHolder",ref[0]->brush().color());
+    settings.setValue("samplePoints",numPoints);
 
-	settings->beginGroup("Properties");
+    settings.beginGroup("Properties");
 	qDebug() << dynamicPropertyNames().size();
 	foreach(QByteArray ba, dynamicPropertyNames()) {
 		qDebug() << "save" << ba << " : " << property(ba);
 		if(ba.startsWith("NeuSave")) {
 			qDebug() << "write" << ba << " : " << property(ba);
-			settings->setValue(ba, property(ba));
+            settings.setValue(ba, property(ba));
 		}
 	}
-	settings->endGroup();
+    settings.endGroup();
 
 
-	settings->endGroup();
+    settings.endGroup();
 }
 

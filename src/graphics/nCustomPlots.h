@@ -27,6 +27,7 @@
 
 #include "qcustomplot.h"
 #include <QMenu>
+#include <QSettings>
 
 class nCustomRangeLineEdit : public QWidget {
     Q_OBJECT
@@ -65,8 +66,10 @@ public slots:
     void contextMenuEvent (QContextMenuEvent*) override;
 
     //SETTINGS
-    void loadSettings(QSettings* = nullptr);
-    void saveSettings(QSettings* = nullptr);
+    void loadSettings();
+    void saveSettings();
+    void loadSettings(QSettings&);
+    void saveSettings(QSettings&);
 
     void setLabel(QString);
     void showGrid(int val);

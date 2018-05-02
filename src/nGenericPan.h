@@ -117,23 +117,19 @@ public slots:
 
     QString getNameForCombo(QComboBox*,nPhysD *);
 
-    void loadUi(QSettings*);
-    void saveUi(QSettings*);
-
     void raiseIt();
 
     void closeEvent(QCloseEvent*) override;
 
     //settings
-
     void loadDefaults();
     void saveDefaults();
-
-    void loadSettings();
-    void loadSettings(QString);
-    virtual void loadSettings(QSettings *);
-    void saveSettings();
-    virtual void saveSettings(QSettings *);
+    void loadSettings(QString=QString());
+    void saveSettings(QString=QString());
+    virtual void loadSettings(QSettings&);
+    virtual void saveSettings(QSettings&);
+    void loadUi(QSettings&);
+    void saveUi(QSettings&);
 
     bool nPhysExists(nPhysD*);
 

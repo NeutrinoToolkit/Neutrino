@@ -52,8 +52,8 @@ public:
 
     std::map<std::string, nPhysD *> localPhys;
 
-    void loadSettings(QSettings *);
-    void saveSettings(QSettings *);
+    void loadSettings(QSettings&);
+    void saveSettings(QSettings&);
 
 private:
     physWave::wavelet_params my_params;

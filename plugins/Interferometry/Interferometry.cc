@@ -695,13 +695,13 @@ void Interferometry::doPlasma(){
 
 //////////////////////////////////////////////////////////
 
-void Interferometry::loadSettings(QSettings *settings){
+void Interferometry::loadSettings(QSettings &settings){
 
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         removeShape((*it).first);
     }
 
-    QStringList names=settings->value("interpolateShape").toStringList();
+    QStringList names=settings.value("interpolateShape").toStringList();
     foreach (QString name, names) {
         bool found=false;
         foreach (QObject* widget, nparent->children()) {
@@ -713,9 +713,9 @@ void Interferometry::loadSettings(QSettings *settings){
         if (!found) addShape(name);
     }
 
-    settings->beginGroup("localPhys");
-    foreach (const QString &childKey, settings->childKeys()) {
-        QStringList qstr = settings->value(childKey).toStringList();
+    settings.beginGroup("localPhys");
+    foreach (const QString &childKey, settings.childKeys()) {
+        QStringList qstr = settings.value(childKey).toStringList();
         if (qstr.size()==2) {
             std::string str0=qstr.at(0).toStdString();
             std::string str1=qstr.at(1).toStdString();
@@ -728,29 +728,29 @@ void Interferometry::loadSettings(QSettings *settings){
             }
         }
     }
-    settings->endGroup();
+    settings.endGroup();
 
     nGenericPan::loadSettings(settings);
 }
 
-void Interferometry::saveSettings(QSettings *settings){
+void Interferometry::saveSettings(QSettings &settings){
     QStringList names;
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         names.append((*it).second->toolTip());
     }
-    settings->setValue("interpolateShape", names);
+    settings.setValue("interpolateShape", names);
 
-    settings->beginGroup("localPhys");
+    settings.beginGroup("localPhys");
     for(std::map<std::string, nPhysD *>::iterator itr = localPhys.begin(); itr != localPhys.end(); ++itr) {
         //        qDebug() << itr->first;
         if (itr->second && nparent->getBufferList().contains(itr->second)) {
             QStringList value;
             value << QString::fromStdString(itr->second->getShortName()) << QString::fromStdString(itr->second->getName());
-            settings->setValue(QString::fromStdString(itr->first), value);
+            settings.setValue(QString::fromStdString(itr->first), value);
             DEBUG(itr->first << " " <<  nparent->indexOf(itr->second));
         }
     }
-    settings->endGroup();
+    settings.endGroup();
 
     nGenericPan::saveSettings(settings);
 }
