@@ -44,6 +44,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
     my_scene(this),
     my_tics(this),
+    colorTable(":cmaps/Neutrino"),
     currentBuffer(nullptr),
     lockColors(false)
 {

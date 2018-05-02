@@ -655,13 +655,16 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             QImage image(fname);
             if (!image.isNull()) {
                 if (image.isGrayscale() || !separate_rgb) {
+                    qDebug() << image.size();
                     nPhysD *datamatrix = new nPhysD(fname.toStdString());
                     datamatrix->resize(image.width(), image.height());
+                    datamatrix->setType(PHYS_FILE);
                     for (int i=0;i<image.height();i++) {
                         for (int j=0;j<image.width();j++) {
-                            datamatrix->Timg_matrix[i][j]= qGray(image.pixel(j,i));
+                            datamatrix->Timg_matrix[i][j]= (double) (qGray(image.pixel(j,i)));
                         }
                     }
+                    datamatrix->TscanBrightness();
                     imagelist.push_back(datamatrix);
                 } else {
                     std::array<nPhysD*,3> datamatrix;
@@ -675,7 +678,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                         datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
                         datamatrix[k]->setFromName(fname.toStdString());
                         datamatrix[k]->resize(image.width(), image.height());
-                        imagelist.push_back(datamatrix[k]);
+                        datamatrix[k]->setType(PHYS_FILE);
                     }
                     for (int i=0;i<image.height();i++) {
                         for (int j=0;j<image.width();j++) {
@@ -685,25 +688,27 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                             datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
                         }
                     }
-                }
-                for (int k=0;k<imagelist.size();k++) {
-                    imagelist[k]->TscanBrightness();
-                    imagelist[k]->setType(PHYS_FILE);
+                    for (int k=0;k<3;k++) {
+                        datamatrix[k]->TscanBrightness();
+                        imagelist.push_back(datamatrix[k]);
+                    }
                 }
 
             }
         }
         if (imagelist.size()>0) {
-            QMutableListIterator<nPhysD*> i(imagelist);
-            while (i.hasNext()) {
-                nPhysD *my_phys=i.next();
-                qDebug() << my_phys << i.value();
-                if (my_phys  && my_phys->getSurf()>0) {
-                    addShowPhys(i.value());
-                } else {
-                    i.remove();
+            QList <nPhysD *> imagelistold;
+            for (auto &my_phys : imagelist) {
+                if (my_phys) {
+                    if (my_phys->getSurf()>0) {
+                        addShowPhys(my_phys);
+                        imagelistold << my_phys;
+                    } else {
+                        delete my_phys;
+                    }
                 }
             }
+            imagelist=imagelistold;
         } else {
             nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
             if (!openRAW) {
@@ -827,12 +832,12 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         nPhysD *my_phys=new nPhysD();
                         int ret=physFormat::phys_resurrect_binary(my_phys,ifile);
                         if (ret>=0 && my_phys->getSurf()>0) {
+                            progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                             imagelist.push_back(my_phys);
                             addShowPhys(my_phys);
                         } else {
                             delete my_phys;
                         }
-                        progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
                         QStringList listLine=qLine.split(" ");
@@ -849,9 +854,11 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             QApplication::processEvents();
                             QTemporaryFile tmpFile(this);
                             tmpFile.open();
+                            qDebug() << "pan temporary filename" << tmpFile.fileName();
+
                             while(!ifile.eof()) {
                                 getline(ifile,line);
-                                // WARNING(line);
+                                qDebug() << QString::fromStdString(line);
                                 qLine=QString::fromStdString(line);
                                 if (qLine.startsWith("NeutrinoPan-end"))
                                     break;

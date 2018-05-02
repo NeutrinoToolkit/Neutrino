@@ -139,178 +139,176 @@ void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
 }
 
 void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
-    QMainWindow *my_pad=nullptr;
-    foreach (my_pad, findChildren<QMainWindow *>()) {
-        if(my_pad->objectName() == "Preferences") break;
-    }
-    if (!my_pad) {
-        my_pad=new QMainWindow(this,Qt::Tool);
-        my_pad->setObjectName("Preferences");
-        my_pad->setAttribute(Qt::WA_DeleteOnClose);
-        Ui::nCustomPlot my_w;
-        my_w.setupUi(my_pad);
-        my_pad->setProperty("Preferences",true);
-        my_pad->setWindowTitle("Plot "+objectName());
-        connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
-        connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
-        connect(my_w.actionChangeFonts, SIGNAL(triggered()), this, SLOT(changeAllFonts()));
-        connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
-        connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
-        connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
-        connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
-        if (!title.isNull()) {
-            my_w.plotTitle->setText(title->text());
+    QString winTitle="Plot "+objectName();
+    foreach (QMainWindow *prefTmp, findChildren<QMainWindow *>()) {
+        if(prefTmp->windowTitle() == winTitle) {
+            prefTmp->close();
+            QApplication::processEvents();
         }
-        connect(my_w.plotTitle, SIGNAL(textEdited(QString)), this, SLOT(setTitle(QString)));
-        connect(my_w.fontTitle,SIGNAL(released()),this,SLOT(changeTitleFont()));
-
-        foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
-            if (axis->visible()) {
-                int row=my_w.labels_layout->rowCount();
-                int col=0;
-
-                QCheckBox *cb_axis = new QCheckBox("", this);
-                QFont f = cb_axis->font();
-                cb_axis->setChecked(true);
-                cb_axis->setFont(f);
-                cb_axis->setProperty("axis",qVariantFromValue((void *) axis));
-                connect(cb_axis,SIGNAL(toggled(bool)),this,SLOT(showAxis(bool)));
-                my_w.labels_layout->addWidget(cb_axis,row,col++,Qt::AlignCenter);
-
-
-                QLineEdit *le = new QLineEdit(this);
-                f.setPointSize(10);
-                le->setFont(f);
-                le->setText(axis->label());
-                le->setProperty("axis",qVariantFromValue((void *) axis));
-                connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
-                my_w.labels_layout->addWidget(le,row,col++);
-
-
-                QCheckBox *cb_grid = new QCheckBox("", this);
-                cb_grid->setTristate(true);
-                cb_grid->setCheckState(axis->grid()->visible() && axis->grid()->subGridVisible()?Qt::Checked:(axis->grid()->visible()?Qt::PartiallyChecked:Qt::Unchecked));
-                cb_grid->setFont(f);
-                cb_grid->setProperty("grid",qVariantFromValue((void *) axis->grid()));
-                connect(cb_grid,SIGNAL(stateChanged(int)),this,SLOT(showGrid(int)));
-                my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
-
-                QCheckBox *cb_log = new QCheckBox("", this);
-                cb_log->setChecked(axis->scaleType()==QCPAxis::stLogarithmic);
-                cb_log->setFont(f);
-                cb_log->setProperty("axis",qVariantFromValue((void *) axis));
-                connect(cb_log,SIGNAL(toggled(bool)),this,SLOT(setLog(bool)));
-                my_w.labels_layout->addWidget(cb_log,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_color = new QToolButton(this);
-                QPixmap px(20, 20);
-                px.fill(axis->labelColor());
-                tb_color->setIcon(px);
-                tb_color->setProperty("axis",qVariantFromValue((void *) axis));
-                connect(tb_color,SIGNAL(released()),this,SLOT(setColor()));
-                my_w.labels_layout->addWidget(tb_color,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_font = new QToolButton(this);
-                tb_font->setIcon(QIcon(":icons/font"));
-                tb_font->setProperty("axis",qVariantFromValue((void *) axis));
-                connect(tb_font,SIGNAL(released()),this,SLOT(changeAxisFont()));
-                my_w.labels_layout->addWidget(tb_font,row,col++,Qt::AlignCenter);
-
-                nCustomRangeLineEdit *minmax = new nCustomRangeLineEdit(axis);
-                minmax->setFont(f);
-                my_w.labels_layout->addWidget(minmax,row,col++);
-            }
-        }
-        for (int g=0; g<plottableCount(); g++) {
-            QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
-            if(graph) {
-                int row=my_w.graphs_layout->rowCount();
-                int col=0;
-                QCheckBox *cb_graph = new QCheckBox("", this)   ;
-                QFont f = cb_graph->font();
-
-                cb_graph->setChecked(graph->visible());
-                cb_graph->setFont(f);
-                cb_graph->setProperty("graph",qVariantFromValue((void *) graph));
-                connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
-                my_w.graphs_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
-
-                QLabel *le = new QLabel(graph->name(),this);
-                f.setPointSize(10);
-                le->setFont(f);
-                my_w.graphs_layout->addWidget(le,row,col++);
-
-
-                QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
-                sb_thick->setFont(f);
-                sb_thick->setRange(0,99);
-                sb_thick->setDecimals(1);
-                sb_thick->setSingleStep(0.1);
-                sb_thick->setValue(graph->pen().widthF());
-                sb_thick->setProperty("graph",qVariantFromValue((void *) graph));
-                connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
-                my_w.graphs_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_copy = new QToolButton(this);
-                tb_copy->setIcon(QIcon(":icons/saveClipboard"));
-                tb_copy->setProperty("graph",qVariantFromValue((void *) graph));
-                connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
-                my_w.graphs_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_save = new QToolButton(this);
-                tb_save->setIcon(QIcon(":icons/saveTxt"));
-                tb_save->setProperty("graph",qVariantFromValue((void *) graph));
-                connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
-                my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
-            }
-            QCPErrorBars *errbar = qobject_cast<QCPErrorBars *>(plottable(g));
-            if(errbar) {
-                int row=my_w.errorbars_layout->rowCount();
-                int col=0;
-                QCheckBox *cb_graph = new QCheckBox("", this)   ;
-                QFont f = cb_graph->font();
-
-                cb_graph->setChecked(errbar->visible());
-                cb_graph->setFont(f);
-                cb_graph->setProperty("errbar",qVariantFromValue((void *) errbar));
-                connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
-                my_w.errorbars_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
-
-                QLabel *le = new QLabel(errbar->name(),this);
-                f.setPointSize(10);
-                le->setFont(f);
-                my_w.errorbars_layout->addWidget(le,row,col++);
-
-
-                QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
-                sb_thick->setFont(f);
-                sb_thick->setRange(0,99);
-                sb_thick->setDecimals(1);
-                sb_thick->setSingleStep(0.1);
-                sb_thick->setValue(errbar->pen().widthF());
-                sb_thick->setProperty("errbar",qVariantFromValue((void *) errbar));
-                connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
-                my_w.errorbars_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_copy = new QToolButton(this);
-                tb_copy->setIcon(QIcon(":icons/saveClipboard"));
-                tb_copy->setProperty("errbar",qVariantFromValue((void *) errbar));
-                connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
-                my_w.errorbars_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
-
-                QToolButton *tb_save = new QToolButton(this);
-                tb_save->setIcon(QIcon(":icons/saveTxt"));
-                tb_save->setProperty("errbar",qVariantFromValue((void *) errbar));
-                connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
-                my_w.errorbars_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
-            }
-        }
-
     }
-    if (my_pad) {
-        my_pad->show();
-        my_pad->raise();
+
+    QMainWindow *preferences = new QMainWindow(this,Qt::Tool);
+    preferences->setAttribute(Qt::WA_DeleteOnClose);
+    Ui::nCustomPlot my_w;
+    my_w.setupUi(preferences);
+    preferences->setWindowTitle(winTitle);
+    connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
+    connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
+    connect(my_w.actionChangeFonts, SIGNAL(triggered()), this, SLOT(changeAllFonts()));
+    connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
+    connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
+    connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
+    connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
+    if (!title.isNull()) {
+        my_w.plotTitle->setText(title->text());
     }
+    connect(my_w.plotTitle, SIGNAL(textEdited(QString)), this, SLOT(setTitle(QString)));
+    connect(my_w.fontTitle,SIGNAL(released()),this,SLOT(changeTitleFont()));
+
+    foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
+        if (axis->visible()) {
+            int row=my_w.labels_layout->rowCount();
+            int col=0;
+
+            QCheckBox *cb_axis = new QCheckBox("", this);
+            QFont f = cb_axis->font();
+            cb_axis->setChecked(true);
+            cb_axis->setFont(f);
+            cb_axis->setProperty("axis",qVariantFromValue((void *) axis));
+            connect(cb_axis,SIGNAL(toggled(bool)),this,SLOT(showAxis(bool)));
+            my_w.labels_layout->addWidget(cb_axis,row,col++,Qt::AlignCenter);
+
+
+            QLineEdit *le = new QLineEdit(this);
+            f.setPointSize(10);
+            le->setFont(f);
+            le->setText(axis->label());
+            le->setProperty("axis",qVariantFromValue((void *) axis));
+            connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
+            my_w.labels_layout->addWidget(le,row,col++);
+
+
+            QCheckBox *cb_grid = new QCheckBox("", this);
+            cb_grid->setTristate(true);
+            cb_grid->setCheckState(axis->grid()->visible() && axis->grid()->subGridVisible()?Qt::Checked:(axis->grid()->visible()?Qt::PartiallyChecked:Qt::Unchecked));
+            cb_grid->setFont(f);
+            cb_grid->setProperty("grid",qVariantFromValue((void *) axis->grid()));
+            connect(cb_grid,SIGNAL(stateChanged(int)),this,SLOT(showGrid(int)));
+            my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
+
+            QCheckBox *cb_log = new QCheckBox("", this);
+            cb_log->setChecked(axis->scaleType()==QCPAxis::stLogarithmic);
+            cb_log->setFont(f);
+            cb_log->setProperty("axis",qVariantFromValue((void *) axis));
+            connect(cb_log,SIGNAL(toggled(bool)),this,SLOT(setLog(bool)));
+            my_w.labels_layout->addWidget(cb_log,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_color = new QToolButton(this);
+            QPixmap px(20, 20);
+            px.fill(axis->labelColor());
+            tb_color->setIcon(px);
+            tb_color->setProperty("axis",qVariantFromValue((void *) axis));
+            connect(tb_color,SIGNAL(released()),this,SLOT(setColor()));
+            my_w.labels_layout->addWidget(tb_color,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_font = new QToolButton(this);
+            tb_font->setIcon(QIcon(":icons/font"));
+            tb_font->setProperty("axis",qVariantFromValue((void *) axis));
+            connect(tb_font,SIGNAL(released()),this,SLOT(changeAxisFont()));
+            my_w.labels_layout->addWidget(tb_font,row,col++,Qt::AlignCenter);
+
+            nCustomRangeLineEdit *minmax = new nCustomRangeLineEdit(axis);
+            minmax->setFont(f);
+            my_w.labels_layout->addWidget(minmax,row,col++);
+        }
+    }
+    for (int g=0; g<plottableCount(); g++) {
+        QCPGraph *graph = qobject_cast<QCPGraph *>(plottable(g));
+        if(graph) {
+            int row=my_w.graphs_layout->rowCount();
+            int col=0;
+            QCheckBox *cb_graph = new QCheckBox("", this)   ;
+            QFont f = cb_graph->font();
+
+            cb_graph->setChecked(graph->visible());
+            cb_graph->setFont(f);
+            cb_graph->setProperty("graph",qVariantFromValue((void *) graph));
+            connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+            my_w.graphs_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
+
+            QLabel *le = new QLabel(graph->name(),this);
+            f.setPointSize(10);
+            le->setFont(f);
+            my_w.graphs_layout->addWidget(le,row,col++);
+
+
+            QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
+            sb_thick->setFont(f);
+            sb_thick->setRange(0,99);
+            sb_thick->setDecimals(1);
+            sb_thick->setSingleStep(0.1);
+            sb_thick->setValue(graph->pen().widthF());
+            sb_thick->setProperty("graph",qVariantFromValue((void *) graph));
+            connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+            my_w.graphs_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_copy = new QToolButton(this);
+            tb_copy->setIcon(QIcon(":icons/saveClipboard"));
+            tb_copy->setProperty("graph",qVariantFromValue((void *) graph));
+            connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+            my_w.graphs_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_save = new QToolButton(this);
+            tb_save->setIcon(QIcon(":icons/saveTxt"));
+            tb_save->setProperty("graph",qVariantFromValue((void *) graph));
+            connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+            my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
+        }
+        QCPErrorBars *errbar = qobject_cast<QCPErrorBars *>(plottable(g));
+        if(errbar) {
+            int row=my_w.errorbars_layout->rowCount();
+            int col=0;
+            QCheckBox *cb_graph = new QCheckBox("", this)   ;
+            QFont f = cb_graph->font();
+
+            cb_graph->setChecked(errbar->visible());
+            cb_graph->setFont(f);
+            cb_graph->setProperty("errbar",qVariantFromValue((void *) errbar));
+            connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+            my_w.errorbars_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
+
+            QLabel *le = new QLabel(errbar->name(),this);
+            f.setPointSize(10);
+            le->setFont(f);
+            my_w.errorbars_layout->addWidget(le,row,col++);
+
+
+            QDoubleSpinBox *sb_thick= new QDoubleSpinBox(this);
+            sb_thick->setFont(f);
+            sb_thick->setRange(0,99);
+            sb_thick->setDecimals(1);
+            sb_thick->setSingleStep(0.1);
+            sb_thick->setValue(errbar->pen().widthF());
+            sb_thick->setProperty("errbar",qVariantFromValue((void *) errbar));
+            connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+            my_w.errorbars_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_copy = new QToolButton(this);
+            tb_copy->setIcon(QIcon(":icons/saveClipboard"));
+            tb_copy->setProperty("errbar",qVariantFromValue((void *) errbar));
+            connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+            my_w.errorbars_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
+
+            QToolButton *tb_save = new QToolButton(this);
+            tb_save->setIcon(QIcon(":icons/saveTxt"));
+            tb_save->setProperty("errbar",qVariantFromValue((void *) errbar));
+            connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+            my_w.errorbars_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
+        }
+    }
+
+    preferences->show();
+    preferences->raise();
 }
 
 

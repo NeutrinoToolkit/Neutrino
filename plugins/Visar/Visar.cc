@@ -595,10 +595,10 @@ void Visar::connections() {
         connect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
         connect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
-        connect(velocityUi[k]->multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        connect(velocityUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
         connect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         connect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        connect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        connect(velocityUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
 
         connect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
 
@@ -646,10 +646,10 @@ void Visar::disconnections() {
         disconnect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
         disconnect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
-        disconnect(velocityUi[k]->multRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        disconnect(velocityUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        disconnect(velocityUi[k]->intensityShift, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        disconnect(velocityUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
 
         disconnect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
 
