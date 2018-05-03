@@ -71,11 +71,10 @@ public slots:
     
     QVector<double> getData(nPhysD*); // geta data in row major order
 
-#ifdef HAVE_NUMPY
-    PyObject* toArray(nPhysD*);
-    nPhysD* new_nPhysD(PyObject*);
-
-#endif
+//#ifdef HAVE_NUMPY
+//    PyObject* toArray(nPhysD*);
+//    nPhysD* new_nPhysD(PyObject*);
+//#endif
 
 };
 

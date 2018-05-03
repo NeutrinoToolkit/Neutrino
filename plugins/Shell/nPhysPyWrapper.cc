@@ -88,84 +88,84 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     return ret_phys;
 }
 
-#ifdef HAVE_NUMPY
+//#ifdef HAVE_NUMPY
 
 
-#if PY_MAJOR_VERSION >= 3
-int neutrino_init_numpy()
-{
-import_array();
-}
-#else
-void neutrino_init_numpy()
-{
-import_array();
-}
-#endif
+//#if PY_MAJOR_VERSION >= 3
+//int neutrino_init_numpy()
+//{
+//import_array();
+//}
+//#else
+//void neutrino_init_numpy()
+//{
+//import_array();
+//}
+//#endif
 
-PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
-    neutrino_init_numpy();
-    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
-    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
-}
+//PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
+//    neutrino_init_numpy();
+//    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
+//    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
+//}
 
-nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
-    neutrino_init_numpy();
-    if (PyArray_Check(my_py_obj)) {
-        PyArrayObject * my_arr = (PyArrayObject *)my_py_obj;
-        if (my_arr && PyArray_NDIM(my_arr)==2 && PyArray_ISONESEGMENT(my_arr)){
-            auto dims=PyArray_DIMS(my_arr);
-            if (PyArray_ISFORTRAN(my_arr)) {
-                std::swap(dims[0],dims[1]);
-            }
-            DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(my_arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(my_arr));
+//nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
+//    neutrino_init_numpy();
+//    if (PyArray_Check(my_py_obj)) {
+//        PyArrayObject * my_arr = (PyArrayObject *)my_py_obj;
+//        if (my_arr && PyArray_NDIM(my_arr)==2 && PyArray_ISONESEGMENT(my_arr)){
+//            auto dims=PyArray_DIMS(my_arr);
+//            if (PyArray_ISFORTRAN(my_arr)) {
+//                std::swap(dims[0],dims[1]);
+//            }
+//            DEBUG("Contiguous: " << PyArray_ISCONTIGUOUS(my_arr) << " " << dims[0] << " x " << dims[1] << " " << PyArray_TYPE(my_arr));
 
-            std::string name;
-            PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
-            if (objectsRepresentation) {
-                name = PyString_AsString(objectsRepresentation);
-            }
-            DEBUG("name ------------------>" << name);
-            Py_DECREF(objectsRepresentation);
-            nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
-            my_phys->setType(PHYS_DYN);
-            my_phys->setShortName("ndarray");
+//            std::string name;
+//            PyObject* objectsRepresentation = PyObject_Repr(my_py_obj);
+//            if (objectsRepresentation) {
+//                name = PyString_AsString(objectsRepresentation);
+//            }
+//            DEBUG("name ------------------>" << name);
+//            Py_DECREF(objectsRepresentation);
+//            nPhysD *my_phys = new nPhysD(dims[1], dims[0],std::numeric_limits<double>::quiet_NaN(),name);
+//            my_phys->setType(PHYS_DYN);
+//            my_phys->setShortName("ndarray");
 
-#define __map_numpy(__arr,__my_phys,__cpp_type)  {__cpp_type *data = (__cpp_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
+//#define __map_numpy(__arr,__my_phys,__cpp_type)  {__cpp_type *data = (__cpp_type*) PyArray_DATA(__arr); for (npy_intp i=0; i<(npy_intp) __my_phys->getSurf(); i++) {__my_phys->set(i,(double)data[i]);} break;}
 
-            switch (PyArray_TYPE(my_arr)) {
-                case NPY_BOOL        : __map_numpy(my_arr,my_phys, bool                  );
-                case NPY_UBYTE       : __map_numpy(my_arr,my_phys, char                  );
-                case NPY_SHORT       : __map_numpy(my_arr,my_phys, short                 );
-                case NPY_USHORT      : __map_numpy(my_arr,my_phys, unsigned short        );
-                case NPY_INT         : __map_numpy(my_arr,my_phys, int                   );
-                case NPY_UINT        : __map_numpy(my_arr,my_phys, unsigned int          );
-                case NPY_LONG        : __map_numpy(my_arr,my_phys, long int              );
-                case NPY_ULONG       : __map_numpy(my_arr,my_phys, unsigned long int     );
-                case NPY_LONGLONG    : __map_numpy(my_arr,my_phys, long long int         );
-                case NPY_ULONGLONG   : __map_numpy(my_arr,my_phys, unsigned long long int);
-                case NPY_FLOAT       : __map_numpy(my_arr,my_phys, float                 );
-                case NPY_DOUBLE      : __map_numpy(my_arr,my_phys, double                );
-                case NPY_LONGDOUBLE  : __map_numpy(my_arr,my_phys, long double           );
-                default:
-                    DEBUG("it's a trap!")
-                            break;
-            }
+//            switch (PyArray_TYPE(my_arr)) {
+//                case NPY_BOOL        : __map_numpy(my_arr,my_phys, bool                  );
+//                case NPY_UBYTE       : __map_numpy(my_arr,my_phys, char                  );
+//                case NPY_SHORT       : __map_numpy(my_arr,my_phys, short                 );
+//                case NPY_USHORT      : __map_numpy(my_arr,my_phys, unsigned short        );
+//                case NPY_INT         : __map_numpy(my_arr,my_phys, int                   );
+//                case NPY_UINT        : __map_numpy(my_arr,my_phys, unsigned int          );
+//                case NPY_LONG        : __map_numpy(my_arr,my_phys, long int              );
+//                case NPY_ULONG       : __map_numpy(my_arr,my_phys, unsigned long int     );
+//                case NPY_LONGLONG    : __map_numpy(my_arr,my_phys, long long int         );
+//                case NPY_ULONGLONG   : __map_numpy(my_arr,my_phys, unsigned long long int);
+//                case NPY_FLOAT       : __map_numpy(my_arr,my_phys, float                 );
+//                case NPY_DOUBLE      : __map_numpy(my_arr,my_phys, double                );
+//                case NPY_LONGDOUBLE  : __map_numpy(my_arr,my_phys, long double           );
+//                default:
+//                    DEBUG("it's a trap!")
+//                            break;
+//            }
 
-            if (PyArray_ISFORTRAN(my_arr)) {
-                physMath::phys_transpose(*my_phys);
-            }
+//            if (PyArray_ISFORTRAN(my_arr)) {
+//                physMath::phys_transpose(*my_phys);
+//            }
 
-            my_phys->TscanBrightness();
-            my_phys->property["keep_phys_alive"]=42;
-            return my_phys;
-        }
-    }
-    DEBUG("expected sequence");
-    return nullptr;
-}
+//            my_phys->TscanBrightness();
+//            my_phys->property["keep_phys_alive"]=42;
+//            return my_phys;
+//        }
+//    }
+//    DEBUG("expected sequence");
+//    return nullptr;
+//}
 
-#endif
+//#endif
 
 /**
  nPhysD Destructor

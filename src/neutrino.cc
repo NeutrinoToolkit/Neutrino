@@ -970,10 +970,11 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                     my_w->menuBuffers->removeAction(action);
                 }
             }
-            if (datamatrix->property["keep_phys_alive"].get_i()!=42){
-                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
-                delete datamatrix;
-            }
+//            if (datamatrix->property["keep_phys_alive"].get_i()!=42){
+//                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
+//                delete datamatrix;
+//            }
+            delete datamatrix;
             datamatrix=NULL;
         }
     }
