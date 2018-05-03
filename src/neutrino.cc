@@ -756,8 +756,11 @@ void neutrino::saveSession (QString fname) {
                 physFormat::phys_dump_binary(my_w->my_view->physList.at(i),ofile);
                 my_w->my_view->physList.at(i)->setType(PHYS_FILE);
             }
+            progress.setValue(my_w->my_view->physList.size());
             for (int i=0;i<panList.size(); i++) {
                 QString pName=panList.at(i)->metaObject()->className();
+                progress.setLabelText(pName);
+                QApplication::processEvents();
                 QTemporaryFile tmpFile(this);
                 if (tmpFile.open()) {
                     QString tmp_filename=tmpFile.fileName();
@@ -815,11 +818,12 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
             std::string line;
             getline(ifile,line);
             QString qLine=QString::fromStdString(line);
+            qInfo() << "Session version" << qLine;
             int counter=0;
             if (qLine.startsWith("Neutrino")) {
                 progress.setWindowModality(Qt::WindowModal);
                 progress.setLabelText(tr("Load Session ")+qLine.split(" ").at(1));
-                progress.setMaximum(2+qLine.split(" ").at(2).toInt());
+                progress.setMaximum(1+qLine.split(" ").at(2).toInt());
                 progress.show();
                 QApplication::processEvents();
                 while(ifile.peek()!=-1) {
@@ -827,12 +831,12 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     QString qLine=QString::fromStdString(line);
                     if (progress.wasCanceled()) break;
                     if (qLine.startsWith("NeutrinoImage")) {
-                        counter++;
-                        progress.setValue(counter);
+                        progress.setValue(++counter);
                         nPhysD *my_phys=new nPhysD();
                         int ret=physFormat::phys_resurrect_binary(my_phys,ifile);
                         if (ret>=0 && my_phys->getSurf()>0) {
                             progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
+                            QApplication::processEvents();
                             imagelist.push_back(my_phys);
                             addShowPhys(my_phys);
                         } else {
@@ -842,11 +846,8 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
                         QStringList listLine=qLine.split(" ");
                         QString pName=listLine.at(1);
+                        progress.setLabelText(pName);
                         QApplication::processEvents();
-
-                        for(int i =  metaObject()->methodOffset(); i < metaObject()->methodCount(); ++i) {
-                            qDebug() << "method:" << metaObject()->method(i).methodSignature();
-                        }
 
                         nGenericPan *my_pan=openPan(pName, false);
 
@@ -873,7 +874,6 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         }
 
                     }
-                    progress.setValue(counter++);
                     QApplication::processEvents();
                 }
             }
