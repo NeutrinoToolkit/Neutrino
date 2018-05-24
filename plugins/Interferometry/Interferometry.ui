@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
-    <height>572</height>
+    <width>362</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="font">
@@ -48,16 +48,16 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,1,0,0">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="verticalSpacing">
         <number>3</number>
@@ -259,7 +259,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../GhostFringes/GhostFringes.qrc">
+          <iconset resource="../Ghost_fringes/GhostFringes.qrc">
            <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
          </property>
         </widget>
@@ -294,16 +294,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <item>
         <widget class="QComboBox" name="method">
@@ -367,7 +367,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -407,16 +407,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,0,0,0,0,1,0">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <item>
         <widget class="QSpinBox" name="posZeroX">
@@ -462,7 +462,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
          </property>
          <property name="checkable">
@@ -551,16 +551,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0,0">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <item>
         <widget class="QCheckBox" name="useMask">
@@ -578,7 +578,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
          <property name="checkable">
@@ -659,16 +659,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0,0">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <item>
         <widget class="QCheckBox" name="useInterpolate">
@@ -713,7 +713,7 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
          </property>
         </widget>
@@ -741,137 +741,61 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="groupBox_3">
       <property name="title">
-       <string>Plasma: Integrated Ne</string>
+       <string>Cutoff</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
-       <property name="verticalSpacing">
-        <number>3</number>
-       </property>
-       <item row="0" column="2">
-        <widget class="QDoubleSpinBox" name="probeLambda">
+       <item>
+        <widget class="QLineEdit" name="cutoffMin">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="suffix">
-          <string> [nm]</string>
-         </property>
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="maximum">
-          <double>999999999.000000000000000</double>
-         </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="5">
-        <widget class="QWidget" name="widget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,1,0,1">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Cutoff: </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Min</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="cutoffMin">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="neutrinoSave" stdset="0">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Max</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="cutoffMax">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="neutrinoSave" stdset="0">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="usePlasma">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="text">
-          <string/>
+          <string>:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="cutoffMax">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="4">
-        <widget class="QToolButton" name="doPlasma">
+       <item>
+        <widget class="QToolButton" name="doCutoff">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -886,21 +810,6 @@
          <property name="icon">
           <iconset resource="Interferometry.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_6">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>probe λ:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -957,7 +866,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -982,7 +891,7 @@
   </action>
   <action name="actionDuplicate">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -1025,8 +934,8 @@
   <tabstop>doMaskCutoff</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
-  <include location="../GhostFringes/GhostFringes.qrc"/>
+  <include location="../../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc"/>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Interferometry.qrc"/>
  </resources>
  <connections/>

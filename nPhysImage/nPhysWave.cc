@@ -574,7 +574,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         buffersOut[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float), NULL, &err);
         check_opencl_error(err, "buffersOut[1] clCreateBuffer");
 
-        cl_mem best[3] = {0, 0, 0};
+        std::array<cl_mem,3> best({0,0,0});
 
         /* Prepare OpenCL memory objects : create buffer for quality. */
         best[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_float), &inImag[0], &err);
@@ -808,8 +808,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             params.olist["lambda"] = nLambda;
         }
 
-        std::map<std::string, nPhysD *>::const_iterator itr;
-        for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+        for(std::map<std::string, nPhysD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
             itr->second->TscanBrightness();
             itr->second->set_origin(params.data->get_origin());
             itr->second->set_scale(params.data->get_scale());

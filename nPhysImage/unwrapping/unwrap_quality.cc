@@ -6,9 +6,9 @@
 #include "unwrap_util.h"
 
 inline int jump(double lVal, double rVal) {
-	double difference = lVal - rVal;
-	if (difference > 0.5)	return -1;
-	else if (difference<-0.5)	return 1;
+    double difference = rVal - lVal;
+    if (difference > 0.5)	return 1;
+    else if (difference<-0.5)	return -1;
 	return 0;
 } 
 
@@ -22,6 +22,7 @@ inline double reliability(nPhysD* phase, int i, int j) {
 
 // Pixel information
 struct Pixel {
+    Pixel() : jumps(0), nPixels(1), quality(0.0), first(this),  last(this),  next(nullptr) {}
 	int jumps;						// # of 2*pi to add to the Pixel to unwrap it
 	int nPixels;					// # of Pixel in the Pixel group
 	double quality;					// quality based on reliability
@@ -30,6 +31,7 @@ struct Pixel {
 
 //the Edge is the line that connects two Pixels.
 struct Edge {
+    Edge() : p1(nullptr), p2(nullptr), quality(0.0), jumps(0) {}
 	Pixel *p1,*p2;					// pointer to the first and second Pixel
 	double quality;					// quality of the Edge and it depends on the two Pixels
 	int jumps;						// # of 2*pi to add to one of the Pixels tounwrap it with respect to the second
@@ -73,12 +75,7 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
 	// initialize
 	std::vector<Pixel> px(dx*dy);
 	for (unsigned int i = 0; i<dx*dy; ++i) {
-		px[i].jumps = 0;
-		px[i].nPixels = 1;
 		px[i].quality = quality->point(i);
-		px[i].first = &px[i];
-		px[i].last = &px[i];
-		px[i].next = NULL;	    
 	}
 	
 	// calculate Edges
@@ -107,27 +104,27 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
 	std::sort(edge.begin(), edge.end(), EdgeComp);
     
 	//gather Pixels into groups
-	for (std::vector<Edge>::iterator ed = edge.begin() ; ed != edge.end(); ++ed) {
-		if (ed->p2->first != ed->p1->first) {
+    for (std::vector<Edge>::iterator ied = edge.begin() ; ied != edge.end(); ++ied) {
+        if (ied->p2->first != ied->p1->first) {
 			// Pixel 2 is alone in its group merge this Pixel with Pixel 1 group 
 			// and find the number of 2 pi to add to or subtract to unwrap it
-			if ((ed->p2->next == NULL) && (ed->p2->first == ed->p2)) {
-				ed->p1->first->last->next = ed->p2;
-				ed->p1->first->last = ed->p2;
-				(ed->p1->first->nPixels)++;
-				ed->p2->first=ed->p1->first;
-				ed->p2->jumps = ed->p1->jumps-ed->jumps;
-			} else if ((ed->p1->next == NULL) && (ed->p1->first == ed->p1)) {
+            if ((ied->p2->next == NULL) && (ied->p2->first == ied->p2)) {
+                ied->p1->first->last->next = ied->p2;
+                ied->p1->first->last = ied->p2;
+                (ied->p1->first->nPixels)++;
+                ied->p2->first=ied->p1->first;
+                ied->p2->jumps = ied->p1->jumps-ied->jumps;
+            } else if ((ied->p1->next == NULL) && (ied->p1->first == ied->p1)) {
 				// Pixel 1 is alone in its group merge this Pixel with Pixel 2 group 
 				// and find the number of 2 pi to add to or subtract to unwrap it
-				ed->p2->first->last->next = ed->p1;
-				ed->p2->first->last = ed->p1;
-				(ed->p2->first->nPixels)++;
-				ed->p1->first = ed->p2->first;
-				ed->p1->jumps = ed->p2->jumps+ed->jumps;
+                ied->p2->first->last->next = ied->p1;
+                ied->p2->first->last = ied->p1;
+                (ied->p2->first->nPixels)++;
+                ied->p1->first = ied->p2->first;
+                ied->p1->jumps = ied->p2->jumps+ied->jumps;
 			} else { //Pixel 1 and Pixel 2 both have groups
-				Pixel *group1 = ed->p1->first;
-				Pixel *group2 = ed->p2->first;
+                Pixel *group1 = ied->p1->first;
+                Pixel *group2 = ied->p2->first;
 				// if the no. of Pixels in Pixel 1 group is larger than the no. of Pixels in Pixel 2 group.  
 				// Merge Pixel 2 group to Pixel 1 group and find the number of wraps between Pixel 2
 				// group and Pixel 1 group to unwrap Pixel 2 group with respect to Pixel 1 group.  
@@ -137,7 +134,7 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
 					group1->last->next = group2;
 					group1->last = group2->last;
 					group1->nPixels = group1->nPixels + group2->nPixels;
-					int incr = ed->p1->jumps-ed->jumps - ed->p2->jumps;
+                    int incr = ied->p1->jumps-ied->jumps - ied->p2->jumps;
 					//merge the other Pixels in Pixel 2 group to Pixel 1 group
 					while (group2 != NULL) {
 						group2->first = group1;
@@ -153,7 +150,7 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
 					group2->last->next = group1;
 					group2->last = group1->last;
 					group2->nPixels = group2->nPixels + group1->nPixels;
-					int incr = ed->p2->jumps + ed->jumps - ed->p1->jumps;
+                    int incr = ied->p2->jumps + ied->jumps - ied->p1->jumps;
 					//merge the other Pixels in Pixel 2 group to Pixel 1 group
 					while (group1 != NULL) {
 						group1->first = group2;

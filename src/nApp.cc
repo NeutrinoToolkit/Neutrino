@@ -295,14 +295,14 @@ QList<neutrino*> nApp::neus() {
 
 bool nApp::notify(QObject *rec, QEvent *ev)
 {
+    bool retval=false;
     try {
-        return QApplication::notify(rec, ev);
+        retval = QApplication::notify(rec, ev);
     } catch (std::exception &e) {
         log_win.show();
         qCritical() << e.what();
     }
-
-    return false;
+    return retval;
 }
 
 

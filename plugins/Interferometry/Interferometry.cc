@@ -76,7 +76,7 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.doSubtract, SIGNAL(released()), this, SLOT(doSubtract()));
     connect(my_w.doMaskCutoff, SIGNAL(released()), this, SLOT(doMaskCutoff()));
     connect(my_w.doInterpolate, SIGNAL(released()), this, SLOT(doShape()));
-    connect(my_w.doPlasma, SIGNAL(released()), this, SLOT(doPlasma()));
+    connect(my_w.doCutoff, SIGNAL(released()), this, SLOT(doCutoff()));
 
     connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
@@ -97,6 +97,9 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.cutoffValue, SIGNAL(valueChanged(double)), this, SLOT(doMaskCutoff()));
 
     connect(my_w.addShape, SIGNAL(released()), this, SLOT(addShape()));
+    connect(my_w.cutoffMin, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
+    connect(my_w.cutoffMax, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
+
 }
 
 void Interferometry::imagesTabBarClicked(int num) {
@@ -109,13 +112,13 @@ void Interferometry::on_actionDuplicate_triggered() {
 
 void Interferometry::on_actionDelete_triggered() {
     std::map<std::string, nPhysD *> oldPhys=localPhys;
+    localPhys.clear();
     nPhysD *c_buf=currentBuffer;
     for(std::map<std::string, nPhysD *>::const_iterator itr = oldPhys.begin(); itr != oldPhys.end(); ++itr) {
         if (itr->second != c_buf)
             nparent->removePhys(itr->second);
     }
     DEBUG(localPhys.size());
-    localPhys.clear();
 }
 
 void Interferometry::line_key_pressed(int key) {
@@ -138,22 +141,13 @@ void Interferometry::line_key_pressed(int key) {
 }
 
 void Interferometry::physDel(nPhysD* buf) {
-//    std::map<std::string, nPhysD *>::iterator itr = localPhys.begin();
-//    while (itr!=localPhys.end()) {
-//        if (buf==itr->second) {
-//            itr = localPhys.erase(itr);
-//        } else {
-//            ++itr;
-//        }
-//    }
-
     for (auto it = localPhys.cbegin(); it != localPhys.cend(); ) // no "++"!
     {
-      if (it->second == buf) {
-        localPhys.erase(it++);
-      } else {
-        ++it;
-      }
+        if (it->second == buf) {
+            localPhys.erase(it++);
+        } else {
+            ++it;
+        }
     }
 }
 
@@ -252,9 +246,10 @@ void Interferometry::doWavelet () {
 void Interferometry::doWavelet (int iimage) {
     std::string suffix=iimage==0?"_ref":"_shot";
     nPhysD *image=getPhysFromCombo(my_image[iimage].image);
+    physWave::wavelet_params my_params;
     if (image) {
+        qInfo() << "Wavelet filetr" << QString::fromStdString(suffix) << QString::fromStdString(image->getName());
         saveDefaults();
-
         if (my_image[iimage].numAngle->value()==0) {
             my_params.init_angle=my_w.angleCarrier->value();
             my_params.end_angle=my_w.angleCarrier->value();
@@ -301,13 +296,14 @@ void Interferometry::doWavelet (int iimage) {
             retList["synthetic"]=new nPhysD();
             physWave::phys_synthetic_interferogram(*(retList["synthetic"]), retList["phase_2pi"], retList["contrast"]);
         }
-
+        qDebug() << retList.size();
         for(auto & itr : retList) {
             if (itr.second) {
                 itr.second->setShortName(itr.second->getShortName()+suffix);
-                localPhys[itr.first+suffix]=nparent->replacePhys(itr.second,localPhys[itr.first+suffix],true);
+                localPhys[itr.first+suffix]=nparent->replacePhys(itr.second,localPhys[itr.first+suffix],false);
             }
         }
+        my_params.data=nullptr;
     }
 }
 
@@ -601,7 +597,7 @@ void Interferometry::doShape(){
         }
         localPhys["interpPhase_2piMask"]=nparent->replacePhys(regionPath,localPhys["interpPhase_2piMask"]);
     }
-    if (!my_w.chained->isChecked()) doPlasma();
+    if (!my_w.chained->isChecked()) doCutoff();
 }
 
 void Interferometry::addShape(){
@@ -659,19 +655,10 @@ void Interferometry::removeShape(QObject *obj){
     if (found) my_shapes.erase(my_shapes.find(found));
 }
 
-void Interferometry::doPlasma(){
-    my_w.statusbar->showMessage("Plasma");
-
+void Interferometry::doCutoff(){
     nPhysD *image=localPhys["interpPhase_2piMask"];
     if (nPhysExists(image)) {
         nPhysD *intNe = new nPhysD(*image);
-
-        if (my_w.usePlasma->isChecked()) {
-            double lambda_m=my_w.probeLambda->value()*1e-9; // nm to m
-            physMath::phys_integratedNe(*intNe,lambda_m);
-        } else {
-            intNe->setShortName(image->getShortName());
-        }
         bool ok1,ok2;
         double mini=locale().toDouble(my_w.cutoffMin->text(),&ok1);
         double maxi=locale().toDouble(my_w.cutoffMax->text(),&ok2);
@@ -679,19 +666,15 @@ void Interferometry::doPlasma(){
         if (!ok2) maxi=intNe->get_max();
         if (ok1||ok2) {
             physMath::phys_cutoff(*intNe,mini,maxi);
+            intNe->property["display_range"]=intNe->get_min_max();
         }
-        intNe->TscanBrightness();
 
-
-        if (localPhys["integratedPlasma"]) {
-            localPhys["integratedPlasma"]->property["display_range"]=intNe->get_min_max();
+        if (localPhys["interpPhase_2piMaskCutoff"]) {
+            localPhys["interpPhase_2piMaskCutoff"]->property["display_range"]=intNe->get_min_max();
         }
-        localPhys["integratedPlasma"]=nparent->replacePhys(intNe,localPhys["integratedPlasma"]);
+        localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
     }
-    my_w.statusbar->showMessage("");
-
 }
-
 
 //////////////////////////////////////////////////////////
 

@@ -61,9 +61,9 @@ enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_Q
 
 struct wavelet_params_str {
 	wavelet_params_str() :
-    data(NULL),	dosynthetic(false),	docropregion(false), opencl_unit(0)	{
-	    iter_ptr = &iter; 
-	}
+    data(NULL),	dosynthetic(false),	docropregion(false), opencl_unit(0), iter(0), iter_ptr(&iter) {
+        DEBUG("wavelet_params created");
+    }
     
     nPhysD *data;
 

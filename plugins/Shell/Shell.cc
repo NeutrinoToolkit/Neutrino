@@ -12,8 +12,18 @@ bool ShellPlug::instantiate(neutrino *neu) {
     qDebug() << "here";
     nparent=neu;
 
-    qDebug() << "here";
-    PythonQt::init(PythonQt::IgnoreSiteModule|PythonQt::RedirectStdOut);
+    QSettings settings("neutrino","");
+    settings.beginGroup("Shell");
+
+    PythonQt::InitFlags ignoreSite;
+
+    if (settings.value("useSite").toBool()) {
+        ignoreSite =  PythonQt::IgnoreSiteModule;
+        qDebug() << "here ignoresite";
+    }
+
+    PythonQt::init(PythonQt::RedirectStdOut | ignoreSite);
+
     qDebug() << "here";
     PythonQt_init_QtBindings();
     qDebug() << "here";
@@ -33,26 +43,24 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
 
     qDebug() << "here";
-    QSettings settings("neutrino","");
-    settings.beginGroup("Shell");
     QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
-#if defined(Q_OS_WIN)
-    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
-    if (base.exists()) {
-        sites << base.absolutePath();
-        sites << base.filePath("plat-win32");
-        sites << base.filePath("lib-tk");
-        sites << base.filePath("site-packages");
-        sites << base.filePath("lib-dynload");
-    }
-#endif
+//Re-enable below if numpy start to work again:
+//#if defined(Q_OS_WIN)
+//    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
+//    if (base.exists()) {
+//        sites << base.absolutePath();
+//        sites << base.filePath("plat-win32");
+//        sites << base.filePath("lib-tk");
+//        sites << base.filePath("site-packages");
+//        sites << base.filePath("lib-dynload");
+//    }
+//#endif
 
     qDebug() << "here";
     foreach (QString spath, sites) {
         qDebug() << "Python site folder " << spath;
         if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
     }
-    settings.endGroup();
 
     qDebug() << "here";
     PythonQt::self()->getMainModule().addObject("nApp", qApp);
@@ -64,7 +72,6 @@ bool ShellPlug::instantiate(neutrino *neu) {
 //        neu->my_w->toolBar->addAction(QIcon(":/icons/python.png"),"Python");
 
     neu->my_w->menubar->addMenu(menuPython);
-    settings.beginGroup("Shell");
     QDir scriptdir(settings.value("scriptsFolder").toString());
     qDebug() << scriptdir.exists() << scriptdir;
     if (scriptdir.exists()) {

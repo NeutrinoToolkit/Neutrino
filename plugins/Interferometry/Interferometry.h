@@ -56,7 +56,6 @@ public:
     void saveSettings(QSettings&);
 
 private:
-    physWave::wavelet_params my_params;
 
     std::map<QToolButton*, nLine *> my_shapes;
 
@@ -87,7 +86,7 @@ public slots:
     void removeShape(QObject*);
     void doShape();
 
-    void doPlasma();
+    void doCutoff();
     
     void bufferChanged(nPhysD*);
 
