@@ -424,14 +424,15 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
 
             DEBUG( ss.str() << " <> " << strings[i]);
             property["Hamamatsu_"+ss.str()]=strings[i];
+		
+//             std::regex my_regex(".*\\[(.*?)\\],(.*?)");
 
-//            std::regex my_regex(".*\\[(.*?)\\],(.*?)");
-//            std::smatch m;
-//            if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
-//                property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
-//            } else {
-//                property["Hamamatsu_"+ss.str()]=strings[i];
-//            }
+//             std::smatch m;
+//             if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
+//                 property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
+//             } else {
+//                 property["Hamamatsu_"+ss.str()]=strings[i];
+//             }
         }
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         
