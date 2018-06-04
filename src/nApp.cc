@@ -22,7 +22,9 @@ int nApp::exec() {
 
     log_win_ui->setupUi(&log_win);
 
+#ifndef __phys_debug
     qInstallMessageHandler(nApp::myMessageOutput);
+#endif
 
     addDefaultPalettes();
 

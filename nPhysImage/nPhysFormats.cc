@@ -355,7 +355,7 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
 }
 
 
-#include <regex>
+//#include <regex>
 
 physFormat::physDouble_img::physDouble_img(std::string ifilename)
     : nPhysD(ifilename, PHYS_FILE) {
@@ -423,15 +423,15 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
             ss << std::setw(log10(strings.size())+1) << std::setfill('0') << i;
 
             DEBUG( ss.str() << " <> " << strings[i]);
+            property["Hamamatsu_"+ss.str()]=strings[i];
 
-            std::regex my_regex(".*\\[(.*?)\\],(.*?)");
-
-            std::smatch m;
-            if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
-                property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
-            } else {
-                property["Hamamatsu_"+ss.str()]=strings[i];
-            }
+//            std::regex my_regex(".*\\[(.*?)\\],(.*?)");
+//            std::smatch m;
+//            if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
+//                property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
+//            } else {
+//                property["Hamamatsu_"+ss.str()]=strings[i];
+//            }
         }
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         

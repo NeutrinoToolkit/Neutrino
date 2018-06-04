@@ -496,9 +496,6 @@ void Interferometry::doMaskCutoff() {
             nPhysD *quality=localPhys["quality"];
             if (nPhysExists(quality)) {
                 nPhysD loc_qual(*quality);
-                if (my_w.cutoffLog->isChecked()) {
-                    physMath::phys_log10(loc_qual);
-                }
                 double mini=loc_qual.get_min();
                 double maxi=loc_qual.get_max();
                 double valDouble=mini+my_w.cutoffValue->value()*(maxi-mini)/100.0;

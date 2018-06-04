@@ -549,7 +549,7 @@
       <property name="checkable">
        <bool>false</bool>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -612,21 +612,6 @@
          </property>
          <property name="maximum">
           <double>100.000000000000000</double>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="cutoffLog">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Log</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -930,7 +915,6 @@
   <tabstop>doSubtract</tabstop>
   <tabstop>maskRegion</tabstop>
   <tabstop>cutoffValue</tabstop>
-  <tabstop>cutoffLog</tabstop>
   <tabstop>doMaskCutoff</tabstop>
  </tabstops>
  <resources>

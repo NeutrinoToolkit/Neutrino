@@ -6,23 +6,29 @@
 
 #include "Shell.h"
 
+//#include "PythonQt_QtAll.h"
 
 
 bool ShellPlug::instantiate(neutrino *neu) {
-    qDebug() << "here";
+    qDebug() << "here" << neu;
     nparent=neu;
+
+    qDebug() << "here";
 
     QSettings settings("neutrino","");
     settings.beginGroup("Shell");
 
-    PythonQt::InitFlags ignoreSite;
-
-    if (settings.value("useSite").toBool()) {
-        ignoreSite =  PythonQt::IgnoreSiteModule;
-        qDebug() << "here ignoresite";
+    qDebug() << "here";
+    if (settings.value("useSite").isValid() &&  settings.value("useSite").toBool()) {
+        qDebug() << "here";
+        PythonQt::init(PythonQt::RedirectStdOut);
+    } else {
+        qDebug() << "here";
+        PythonQt::init();
+        qDebug() << "here";
     }
 
-    PythonQt::init(PythonQt::RedirectStdOut | ignoreSite);
+//    PythonQt_QtAll::init();
 
     qDebug() << "here";
     PythonQt_init_QtBindings();
