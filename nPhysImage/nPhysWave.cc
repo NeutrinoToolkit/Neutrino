@@ -24,10 +24,7 @@
  */
 #include "nPhysWave.h"
 
-#include "unwrapping/unwrap_simple.h"
-#include "unwrapping/unwrap_goldstein.h"
-#include "unwrapping/unwrap_quality.h"
-
+#include "unwrap/unwrap.h"
 
 /*! \addtogroup nPhysWave
  * @{
@@ -49,15 +46,15 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         std::vector<int> xx(dx), yy(dy);
 
-        nPhysC zz_morlet("zz_morlet");
+        physC zz_morlet("zz_morlet");
 
         zz_morlet.resize(dx,dy);
 
-        nPhysD *qmap = new nPhysD(dx, dy, 0.0, "quality");
-        nPhysD *wphase = new nPhysD(dx,dy,0.0,"phase_2pi");
-        nPhysD *lambda = new nPhysD(dx,dy,0.0,"lambda");
-        nPhysD *angle = new nPhysD(dx,dy,0.0,"angle");
-        nPhysD *intensity = new nPhysD(dx,dy,0.0,"intensity");
+        physD *qmap = new physD(dx, dy, 0.0, "quality");
+        physD *wphase = new physD(dx,dy,0.0,"phase_2pi");
+        physD *lambda = new physD(dx,dy,0.0,"lambda");
+        physD *angle = new physD(dx,dy,0.0,"angle");
+        physD *intensity = new physD(dx,dy,0.0,"intensity");
 
 
         std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
@@ -176,7 +173,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             params.olist["angle"] = angle;
             params.olist["intensity"] = intensity;
 
-            std::map<std::string, nPhysD *>::const_iterator itr;
+            std::map<std::string, physD *>::const_iterator itr;
             for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
                 itr->second->TscanBrightness();
                 itr->second->set_origin(params.data->get_origin());
@@ -418,7 +415,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         double mean=params.data->sum()/params.data->getSurf();
 
-        nPhysD padded(newSize.x(), newSize.y(), mean);
+        physD padded(newSize.x(), newSize.y(), mean);
         bidimvec<int> offset=(newSize-params.data->get_size())/2;
         DEBUG("padding offset : " << offset);
         padded.set_origin(params.data->get_origin()+offset);
@@ -468,7 +465,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "__kernel void best(__global float *inReal, __global float *inImag, __global float *outQual, __global float *outPhase, __global unsigned int *outLambdaAngle, const unsigned int nlambdaangle){\n"
                 "    size_t id = get_global_id(0);\n"
                 "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
-                "    if (quality>outQual[id]) {\n"
+                "    if (quality>=outQual[id]) {\n"
                 "        outQual[id]=quality;\n"
                 "        outPhase[id]=atan2pi(inImag[id],inReal[id]);\n"
                 "        outLambdaAngle[id]=nlambdaangle;\n"
@@ -481,7 +478,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         cl_program program = clCreateProgramWithSource(ctx,1,&source, NULL, &err);
         check_opencl_error(err, "clCreateProgramWithSource");
-        err=clBuildProgram(program, 1, &device, "-Werror -cl-fast-relaxed-math", NULL, NULL);
+        err=clBuildProgram(program, 1, &device, "-Werror -cl-finite-math-only", NULL, NULL);
         check_opencl_error(err, "clBuildProgram");
 
         if (err == CL_BUILD_PROGRAM_FAILURE) {
@@ -574,7 +571,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         buffersOut[1] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float), NULL, &err);
         check_opencl_error(err, "buffersOut[1] clCreateBuffer");
 
-        std::array<cl_mem,3> best({0,0,0});
+        std::array<cl_mem,3> best = {{0,0,0}};
 
         /* Prepare OpenCL memory objects : create buffer for quality. */
         best[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, N * sizeof(cl_float), &inImag[0], &err);
@@ -586,6 +583,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         check_opencl_error(err, "best[1] clCreateBuffer");
         best[2] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_uint),  NULL, &err);
         check_opencl_error(err, "best[2] clCreateBuffer");
+
+        std::vector<unsigned int> lambdaangle(N,0);
+        err = clEnqueueWriteBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
+        check_opencl_error(err, "best[2] clEnqueueWriteBuffer");
+
 
         /* Execute Forward FFT. */
         err = clfftEnqueueTransform(planHandle, CLFFT_FORWARD, 1, &queue, 0, NULL, NULL, buffersIn, buffersOut, tmpBuffer);
@@ -681,7 +683,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             float angle_rad=angles[nangle]*_phys_deg;
             err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
             check_opencl_error(err, "clSetKernelArg");
-
+            unsigned int iter=0;
             for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
 
                 if ((*params.iter_ptr)==-1) {
@@ -711,9 +713,9 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 err = clFinish(queue);
                 check_opencl_error(err, "clFinish");
 
-                unsigned int iter=params.iter;
                 err=clSetKernelArg(kernelBest, 5, sizeof(unsigned int), &iter);
                 check_opencl_error(err, "clSetKernelArg");
+                iter++;
 
                 clEnqueueNDRangeKernel(queue, kernelBest, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
                 err = clFinish(queue);
@@ -731,7 +733,6 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         err = clEnqueueReadBuffer(queue, best[1], CL_TRUE, 0, N * sizeof(float), &phase[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
-        std::vector<unsigned int> lambdaangle(N,0);
         err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
@@ -766,9 +767,9 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         params.olist.clear();
 
-        nPhysD *nQuality = new nPhysD(params.data->getW(),params.data->getH(),0,"Quality");
-        nPhysD *nPhase = new nPhysD(params.data->getW(),params.data->getH(),0,"Phase");
-        nPhysD *nIntensity = new nPhysD(params.data->getW(),params.data->getH(),0,"Intensity");
+        physD *nQuality = new physD(params.data->getW(),params.data->getH(),0,"Quality");
+        physD *nPhase = new physD(params.data->getW(),params.data->getH(),0,"Phase");
+        physD *nIntensity = new physD(params.data->getW(),params.data->getH(),0,"Intensity");
 
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
@@ -787,18 +788,23 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 
         if (params.n_angles>1) {
-            nPhysD *nAngle = new nPhysD(params.data->getW(),params.data->getH(),0,"Angle");
+            physD *nAngle = new physD(params.data->getW(),params.data->getH(),0,"Angle");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=j*dx+i;
-                    nAngle->set(i,j,angles[lambdaangle[k]/params.n_lambdas]);
+                    unsigned int val=lambdaangle[k]/params.n_lambdas;
+                    if (val >= angles.size()) {
+                        DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx )
+                    } else {
+                        nAngle->set(i,j,angles[val]);
+                    }
                 }
             }
             params.olist["angle"] = nAngle;
         }
 
         if (params.n_lambdas>1) {
-            nPhysD *nLambda = new nPhysD(params.data->getW(),params.data->getH(),0,"Lambda");
+            physD *nLambda = new physD(params.data->getW(),params.data->getH(),0,"Lambda");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=j*dx+i;
@@ -808,7 +814,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             params.olist["lambda"] = nLambda;
         }
 
-        for(std::map<std::string, nPhysD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+        for(std::map<std::string, physD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
             itr->second->TscanBrightness();
             itr->second->set_origin(params.data->get_origin());
             itr->second->set_scale(params.data->get_scale());
@@ -845,49 +851,46 @@ void physWave::phys_wavelet_trasl_cpu(void *params, int &iter) {
 
 
 // unwrap methods
-nPhysD *
-physWave::phys_phase_unwrap(nPhysD &wphase, nPhysD &quality, enum unwrap_strategy strategy)
+void physWave::phys_phase_unwrap(physD &wphase, physD &quality, enum unwrap_strategy strategy, physD &uphase)
 {
-
-    nPhysD *uphase = new nPhysD (wphase.getW(), wphase.getH(), 0., "unwrap");
+    uphase.resize(wphase.getW(), wphase.getH());
     if (wphase.getSurf()) {
-        uphase->set_origin(wphase.get_origin());
-        uphase->set_scale(wphase.get_scale());
-        uphase->setName("Unwrap "+wphase.getName());
-        uphase->setFromName(wphase.getFromName());
+        uphase.set_origin(wphase.get_origin());
+        uphase.set_scale(wphase.get_scale());
+        uphase.setName("Unwrap "+wphase.getName());
+        uphase.setFromName(wphase.getFromName());
 
         switch (strategy) {
             case SIMPLE_HV :
-                unwrap_simple_h(&wphase, uphase);
-                unwrap_simple_v(&wphase, uphase);
+                unwrap::simple_h(wphase, uphase);
+                unwrap::simple_v(wphase, uphase);
                 break;
 
             case SIMPLE_VH :
-                unwrap_simple_v(&wphase, uphase);
-                unwrap_simple_h(&wphase, uphase);
+                unwrap::simple_v(wphase, uphase);
+                unwrap::simple_h(wphase, uphase);
                 break;
 
             case GOLDSTEIN :
-                unwrap_goldstein(&wphase, uphase);
+                unwrap::goldstein(wphase, uphase);
                 break;
 
             case QUALITY :
-                unwrap_quality(&wphase, uphase, &quality);
+                unwrap::quality(wphase, uphase, quality);
                 break;
 
             case MIGUEL :
-                unwrap_miguel(&wphase, uphase);
+                unwrap::miguel(wphase, uphase);
                 break;
 
             case MIGUEL_QUALITY :
-                unwrap_miguel_quality(&wphase, uphase, &quality);
+                unwrap::miguel_quality(wphase, uphase, quality);
                 break;
 
         }
         DEBUG("here");
-        uphase->TscanBrightness();
+        uphase.TscanBrightness();
     }
-    return uphase;
 }
 
 void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
@@ -898,7 +901,7 @@ void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPh
             for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
                 synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
             }
-            synthetic.property=phase_over_2pi->property;
+            synthetic.prop=phase_over_2pi->prop;
             synthetic.setShortName("synthetic");
             synthetic.setName("synthetic("+phase_over_2pi->getName()+","+quality->getName()+")");
             synthetic.TscanBrightness();
@@ -907,8 +910,11 @@ void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPh
 }
 
 void
-physWave::phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
+physWave::phys_subtract_carrier(physD &iphys, double alpha, double lambda)
 {
+    double kx = cos(alpha*_phys_deg)/lambda;
+    double ky = -sin(alpha*_phys_deg)/lambda;
+
 #pragma omp parallel for collapse(2)
     for (size_t ii=0; ii<iphys.getW(); ii++) {
         for (size_t jj=0; jj<iphys.getH(); jj++) {
@@ -920,7 +926,7 @@ physWave::phys_subtract_carrier(nPhysD &iphys, double kx, double ky)
 
 //! this function returns the carrier bidimvec<double(angle[deg],interfringe[px])>
 bidimvec<double>
-physWave::phys_guess_carrier(nPhysD &phys, double weight)
+physWave::phys_guess_carrier(physD &phys, double weight)
 {
     size_t dx=phys.getW();
     size_t dy=phys.getH();
@@ -963,7 +969,7 @@ physWave::phys_guess_carrier(nPhysD &phys, double weight)
 // --------------------------------------------------------------------- integral inversions --
 
 void
-physWave::phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res, double molar_refr)
+physWave::phys_apply_inversion_gas(physD &invimage, double probe_wl, double res, double molar_refr)
 {
     // TODO: accendere candelina al dio dei define che rendono il codice leggibile come 'sta ceppa di cazzo
     //double kappa = M_2_PI/probe_wl;
@@ -975,12 +981,12 @@ physWave::phys_apply_inversion_gas(nPhysD &invimage, double probe_wl, double res
         //invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
         invimage.set(ii, mult*(pow(the_point/kappa + 1,2.)-1) );
     }
-    invimage.property["unitsCB"]="m-3";
+    invimage.prop["unitsCB"]="m-3";
     invimage.TscanBrightness();
 }
 
 void
-physWave::phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double res)
+physWave::phys_apply_inversion_plasma(physD &invimage, double probe_wl, double res)
 {
     double kappa = 2*M_PI/probe_wl;
     double mult = _phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
@@ -989,19 +995,19 @@ physWave::phys_apply_inversion_plasma(nPhysD &invimage, double probe_wl, double 
         double the_point = invimage.point(ii)/res;
         invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
     }
-    invimage.property["unitsCB"]="m-3";
+    invimage.prop["unitsCB"]="m-3";
     invimage.TscanBrightness();
 }
 
 void
-physWave::phys_apply_inversion_protons(nPhysD &invimage, double energy, double res, double distance, double magnification)
+physWave::phys_apply_inversion_protons(physD &invimage, double energy, double res, double distance, double magnification)
 {
     double mult = (2.0*_phys_vacuum_eps*magnification*energy)/(distance*res);
     physMath::phys_multiply(invimage,mult);
     invimage.set_scale(res*1e2,res*1e2);
-    invimage.property["unitsX"]="cm";
-    invimage.property["unitsY"]="cm";
-    invimage.property["unitsCB"]="C/m-3";
+    invimage.prop["unitsX"]="cm";
+    invimage.prop["unitsY"]="cm";
+    invimage.prop["unitsCB"]="C/m-3";
 }
 
 
@@ -1013,7 +1019,7 @@ void physWave::phys_invert_abel(abel_params &params)
         return;
     }
 
-    params.oimage = new nPhysD (params.iimage->getW(), params.iimage->getH(),/*std::numeric_limits<double>::quiet_NaN()*/ 0.0,"Inverted");
+    params.oimage = new physD (params.iimage->getW(), params.iimage->getH(),/*std::numeric_limits<double>::quiet_NaN()*/ 0.0,"Inverted");
     params.oimage->set_origin(params.iimage->get_origin());
     params.oimage->set_scale(params.iimage->get_scale());
 
@@ -1096,7 +1102,7 @@ void physWave::phys_invert_abel(abel_params &params)
         // 1. code copy
         // 2. lut optimization not working properly
         // 3. should convert H_0 to FT
-        bessel_alloc_t my_lut;
+        std::vector<double> my_lut;
 
         //! by fixing integral_size as a single vector size for transformation, results in padding
         //! hence in a modification of the image resolution
@@ -1119,6 +1125,9 @@ void physWave::phys_invert_abel(abel_params &params)
 
         std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
 
+        std::vector<double> Fivec;
+        fftw_plan r2rplan;
+
         for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
             if ((*params.iter_ptr)!=-1) {
                 (*params.iter_ptr)++;
@@ -1132,7 +1141,7 @@ void physWave::phys_invert_abel(abel_params &params)
                     copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
 
-                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
+                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut, Fivec, r2rplan);
                 //phys_invert_abelHF_1D(&copy_buffer[0], out_buffer, copied, &my_lut);
                 double upper_axe_point = 0.5*out_buffer[0];
 
@@ -1143,7 +1152,7 @@ void physWave::phys_invert_abel(abel_params &params)
                 for (size_t j=copied; j<integral_size; j++)
                     copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
 
-                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut);
+                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut, Fivec, r2rplan);
                 //phys_invert_abelHF_1D(copy_buffer, &out_buffer[0], copied, &my_lut);
 
                 upper_axe_point+=0.5*out_buffer[0];
@@ -1156,6 +1165,9 @@ void physWave::phys_invert_abel(abel_params &params)
                 DEBUG(10,"step: "<<ii);
             }
         }
+
+        fftw_destroy_plan(r2rplan);
+
         params.oimage->setName(std::string("ABEL")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
     } else {

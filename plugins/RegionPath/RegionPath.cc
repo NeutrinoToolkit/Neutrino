@@ -67,7 +67,7 @@ void RegionPath::doIt() {
         
         QRect regRect=regPoly.boundingRect().toRect();
         
-        nPhysD *regPath = new nPhysD(*image);
+        nPhysD *regPath = new nPhysD(image->copy());
         
         if (!my_w.inverse->isChecked()) {
             regPath->set(replaceVal);

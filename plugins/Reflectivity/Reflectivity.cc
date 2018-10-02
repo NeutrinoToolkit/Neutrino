@@ -48,11 +48,11 @@ void Reflectivity::doIt () {
     if (imageShot && imageRef) {
         saveDefaults();
 
-        nPhysD *shot=new nPhysD(*imageShot);
+        nPhysD *shot=new nPhysD(imageShot->copy());
         physMath::phys_fast_gaussian_blur(*shot,my_w.blur->value());
         physMath::phys_subtract(*shot,my_w.offset->value());
 
-        nPhysD ref(*imageRef);
+        nPhysD ref(imageRef->copy());
         physMath::phys_fast_gaussian_blur(ref,my_w.blur->value());
         physMath::phys_subtract(ref,my_w.offset->value());
         physMath::phys_multiply(ref,my_w.multiplier->value());
@@ -61,7 +61,7 @@ void Reflectivity::doIt () {
 
         physMath::phys_cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
 
-        shot->property["display_range"]=shot->get_min_max();
+        shot->prop["display_range"]=shot->get_min_max();
 
         if (my_w.erasePrevious->isChecked()) {
             Refle=nparent->replacePhys(shot,Refle,true);

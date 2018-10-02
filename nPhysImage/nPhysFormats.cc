@@ -39,7 +39,7 @@
 #define GZIP_ENCODING 16
 
 physFormat::physDouble_txt::physDouble_txt(const char *ifilename)
-    : nPhysD(std::string(ifilename), PHYS_FILE)
+    : physD(std::string(ifilename), PHYS_FILE)
 {
     std::ifstream ifile(ifilename);
     // 1. get image statistics
@@ -89,7 +89,7 @@ physFormat::physDouble_txt::physDouble_txt(const char *ifilename)
 
 
 physFormat::physDouble_asc::physDouble_asc(const char *ifilename)
-    : nPhysD(std::string(ifilename), PHYS_FILE)
+    : physD(std::string(ifilename), PHYS_FILE)
 {
     std::ifstream ifile(ifilename);
     // 1. get image statistics
@@ -151,11 +151,11 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
     for (size_t i=0; i<3; i++) {
         getline(ifile, temp_string);
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-        property["sif-a-"+ss.str()]=temp_string;
+        prop["sif-a-"+ss.str()]=temp_string;
     }
     getline(ifile, temp_string);
     ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-    property["sif-b-"+ss.str()]=temp_string;
+    prop["sif-b-"+ss.str()]=temp_string;
 
     int w, h;
     ss.str(temp_string);
@@ -165,7 +165,7 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
 
     getline(ifile, temp_string);
     ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-    property["sif-c-"+ss.str()]=temp_string;
+    prop["sif-c-"+ss.str()]=temp_string;
 
     getline(ifile, temp_string);
     ss.str(temp_string);
@@ -192,7 +192,7 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
     while (!ifile.eof()) {
         getline(ifile, temp_string);
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-        property["sif-d-"+ss.str()]=temp_string;
+        prop["sif-d-"+ss.str()]=temp_string;
         if (temp_string.substr(0,12) == control_string) {
             break;
         }
@@ -213,13 +213,13 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         std::istringstream iss(temp_string);
 
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-        property["sif-e-"+ss.str()]=temp_string;
+        prop["sif-e-"+ss.str()]=temp_string;
 
         DEBUG(ss.str() << " " << temp_string.size())
 
                 // most readable ever
                 if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
-            property["sif-magic_number"]=(int)magic_number;
+            prop["sif-magic_number"]=(int)magic_number;
             break;
         }
     }
@@ -232,7 +232,7 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         getline(ifile, temp_string);
         std::istringstream iss(temp_string);
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
-        property["sif-f-"+ss.str()]=temp_string;
+        prop["sif-f-"+ss.str()]=temp_string;
     }
 
     // consistency check
@@ -262,7 +262,7 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         ifile.seekg(init_matrix);
         DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
         ss.str(""); ss.clear(); ss << init_matrix << " bytes";
-        property["sif-header"]=ss.str();
+        prop["sif-header"]=ss.str();
         std::vector<float> readb(getSurf());
 
         ifile.read((char*)(&readb[0]),getSurf()*sizeof(float));
@@ -358,7 +358,7 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
 //#include <regex>
 
 physFormat::physDouble_img::physDouble_img(std::string ifilename)
-    : nPhysD(ifilename, PHYS_FILE) {
+    : physD(ifilename, PHYS_FILE) {
 
     unsigned short buffer;
     std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
@@ -403,7 +403,7 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
         
         buffer2.erase(std::remove(buffer2.begin(), buffer2.end(), '\t'), buffer2.end());
         buffer2.erase(std::remove(buffer2.begin(), buffer2.end(), '\r'), buffer2.end());
-        property["Hamamatsu"]=std::string(buffer2);
+        prop["Hamamatsu"]=std::string(buffer2);
 
         std::vector<std::string> strings;
 
@@ -423,7 +423,7 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
             ss << std::setw(log10(strings.size())+1) << std::setfill('0') << i;
 
             DEBUG( ss.str() << " <> " << strings[i]);
-            property["Hamamatsu_"+ss.str()]=strings[i];
+            prop["Hamamatsu_"+ss.str()]=strings[i];
 		
 //             std::regex my_regex(".*\\[(.*?)\\],(.*?)");
 
@@ -477,18 +477,17 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
         resize(w, h);
         skipbyte=ifile.tellg();
         ifile.close();
-        property["kind"]=kind;
-        property["skip bytes"]=skipbyte;
+        prop["kind"]=kind;
+        prop["skip bytes"]=skipbyte;
 
         phys_open_RAW(this,kind,skipbyte,endian);
     }
 }
 
 physFormat::physUint_imd::physUint_imd(std::string ifilename)
-    : nPhysImageF<unsigned int>(ifilename, PHYS_FILE)
+    : physD(ifilename, PHYS_FILE)
 {
     // Optronics luli
-    // we should also check if a .imi text file exists and read it?
 
     unsigned short buffer_header;
     std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
@@ -496,14 +495,19 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
     unsigned short h=0;
 
     ifile.read((char *)&buffer_header,sizeof(unsigned short));
-    property["imd-version"]=buffer_header;
+    prop["imd-version"]=buffer_header;
     ifile.read((char *)&buffer_header,sizeof(unsigned short));
     w=buffer_header;
     ifile.read((char *)&buffer_header,sizeof(unsigned short));
     h=buffer_header;
 
     this->resize(w, h);
-    ifile.read((char *)Timg_buffer,sizeof(unsigned int)*w*h);
+    std::vector<unsigned int> buf(w*h);
+    ifile.read((char *)(&buf[0]),sizeof(unsigned int)*w*h);
+#pragma omp parallel for
+    for (size_t ii=0; ii<w*h; ii++) {
+        set(ii, buf[ii]/1000.);
+    }
 
     ifile.close();
 
@@ -518,7 +522,7 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
             comment.append(temp_line);
         }
         ifileimg.close();
-        property["imi-info"]=comment;
+        prop["imi-info"]=comment;
     }
 
     TscanBrightness();
@@ -566,12 +570,12 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
 //}
 
 // dump out for state save
-void physFormat::phys_dump_binary(nPhysD *my_phys, const char *fname) {
+void physFormat::phys_dump_binary(physD *my_phys, const char *fname) {
     std::ofstream ofile(fname, std::ios::out | std::ios::binary);
     physFormat::phys_dump_binary(my_phys,ofile);
 }
 
-void physFormat::phys_dump_binary(nPhysD *my_phys, std::ofstream &ofile) {
+void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
 
     if (!ofile.fail() && my_phys != NULL) {
 
@@ -579,7 +583,7 @@ void physFormat::phys_dump_binary(nPhysD *my_phys, std::ofstream &ofile) {
         //int written_data = 0;
 
         //ofile<<my_phys->property<<"\n";
-		my_phys->property.dumper(ofile);
+        my_phys->prop.dumper(ofile);
 
         DEBUG("Starting binary dump...");
 
@@ -637,13 +641,13 @@ void physFormat::phys_dump_binary(nPhysD *my_phys, std::ofstream &ofile) {
     }
 }
 
-void physFormat::phys_dump_ascii(nPhysD *my_phys, std::ofstream &ofile)
+void physFormat::phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 {	
 
     if (ofile.good() && my_phys != NULL) {
 
         std::stringstream ss;
-        my_phys->property.dumper(ss);
+        my_phys->prop.dumper(ss);
         std::string str = ss.str(), str2;
 
         size_t pos=0;
@@ -694,8 +698,8 @@ static void augment_libtiff_with_custom_tags() {
 }
 #endif
 
-std::vector <nPhysD *> physFormat::phys_open_tiff(std::string ifilename, bool separate_rgb) {
-    std::vector <nPhysD *> vecReturn;
+std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separate_rgb) {
+    std::vector <physD> vecReturn;
 #ifdef HAVE_LIBTIFF
     TIFFErrorHandler oldhandler = TIFFSetWarningHandler(nullptr);
     augment_libtiff_with_custom_tags();
@@ -830,7 +834,7 @@ std::vector <nPhysD *> physFormat::phys_open_tiff(std::string ifilename, bool se
                     tsize_t scanlineSize=TIFFScanlineSize(tif);
                     tdata_t buf = _TIFFmalloc(scanlineSize);
                     DEBUG("Buf allocated " << scanlineSize);
-                    nPhysD* my_phys=nullptr;
+                    physD* my_phys=nullptr;
                     DEBUG("here");
 
                     for (int k=0;k<samples;k++) {
@@ -847,10 +851,10 @@ std::vector <nPhysD *> physFormat::phys_open_tiff(std::string ifilename, bool se
                             if (separate_rgb) {
                                 ss << " c" << samples;
                             }
-                            my_phys=new nPhysD(w,h,0.0,ss.str());
-                            my_phys->property.insert(tiff_prop.begin(),tiff_prop.end());
+                            my_phys=new physD(w,h,0.0,ss.str());
+                            my_phys->prop.insert(tiff_prop.begin(),tiff_prop.end());
                             my_phys->setType(PHYS_FILE);
-                            vecReturn.push_back(my_phys);
+                            vecReturn.push_back(*my_phys);
                         }
 
                         DEBUG("here");
@@ -920,7 +924,7 @@ std::vector <nPhysD *> physFormat::phys_open_tiff(std::string ifilename, bool se
 }
 
 #ifdef HAVE_LIBTIFF
-void physFormat::phys_write_one_tiff(nPhysD *my_phys, TIFF* tif) {
+void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
     TIFFSetWarningHandler(NULL);
     TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
     TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
@@ -930,7 +934,7 @@ void physFormat::phys_write_one_tiff(nPhysD *my_phys, TIFF* tif) {
     TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
     TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
     std::stringstream prop_ss;
-    my_phys->property.dumper(prop_ss);
+    my_phys->prop.dumper(prop_ss);
     std::string description=prop_ss.str();
 
     std::replace( description.begin(), description.end(), '\0', ' ');
@@ -965,7 +969,7 @@ void physFormat::phys_write_one_tiff(nPhysD *my_phys, TIFF* tif) {
 }
 #endif
 
-void physFormat::phys_write_tiff(nPhysD *my_phys, std::string ofilename) {
+void physFormat::phys_write_tiff(physD *my_phys, std::string ofilename) {
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
@@ -980,7 +984,7 @@ void physFormat::phys_write_tiff(nPhysD *my_phys, std::string ofilename) {
 #endif
 }
 
-void physFormat::phys_write_tiff(std::vector <nPhysD *> vecPhys, std::string ofilename) {
+void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofilename) {
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
@@ -1001,8 +1005,8 @@ void physFormat::phys_write_tiff(std::vector <nPhysD *> vecPhys, std::string ofi
 }
 
 
-std::vector <nPhysD *> physFormat::phys_open_spe(std::string ifilename) {
-    std::vector <nPhysD *> vecReturn;
+std::vector <physD> physFormat::phys_open_spe(std::string ifilename) {
+    std::vector <physD> vecReturn;
 
     std::ifstream ifile(ifilename.c_str(), std::ios::in);
     std::string header;
@@ -1025,43 +1029,43 @@ std::vector <nPhysD *> physFormat::phys_open_spe(std::string ifilename) {
     DEBUG(type << " " << height  << " " << width << " " << noscan << " " << NumFrames);
 
     for (unsigned int nf=0;nf<NumFrames;nf++) {
-        nPhysD *phys=new nPhysD(width,height,0.0);
-        phys->property["spe-frame"]=vec2f(nf,NumFrames);
+        physD phys(width,height,0.0);
+        phys.prop["spe-frame"]=vec2f(nf,NumFrames);
         switch (type) {
         case 0: {
-            phys->property["spe-type"]="float";
+            phys.prop["spe-type"]="float";
             std::vector<float> buffer(width*height);
             ifile.read((char*) &buffer[0],width*height*sizeof(float));
-            for (unsigned int i=0; i<phys->getSurf(); i++) {
-                phys->set(i,buffer[i]);
+            for (unsigned int i=0; i<phys.getSurf(); i++) {
+                phys.set(i,buffer[i]);
             }
             break;
         }
         case 1: {
-            phys->property["spe-type"]="int";
+            phys.prop["spe-type"]="int";
             std::vector<int> buffer(width*height);
             DEBUG(sizeof(long));
             ifile.read((char*) &buffer[0],width*height*sizeof(int));
-            for (unsigned int i=0; i<phys->getSurf(); i++) {
-                phys->set(i,buffer[i]);
+            for (unsigned int i=0; i<phys.getSurf(); i++) {
+                phys.set(i,buffer[i]);
             }
             break;
         }
         case 2: {
-            phys->property["spe-type"]="short";
+            phys.prop["spe-type"]="short";
             std::vector<short> buffer(width*height);
             ifile.read((char*) &buffer[0],width*height*sizeof(short));
-            for (unsigned int i=0; i<phys->getSurf(); i++) {
-                phys->set(i,buffer[i]);
+            for (unsigned int i=0; i<phys.getSurf(); i++) {
+                phys.set(i,buffer[i]);
             }
             break;
         }
         case 3: {
-            phys->property["spe-type"]="unsigned short";
+            phys.prop["spe-type"]="unsigned short";
             std::vector<unsigned short> buffer(width*height);
             ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
-            for (unsigned int i=0; i<phys->getSurf(); i++) {
-                phys->set(i,buffer[i]);
+            for (unsigned int i=0; i<phys.getSurf(); i++) {
+                phys.set(i,buffer[i]);
             }
             break;
         }
@@ -1069,7 +1073,7 @@ std::vector <nPhysD *> physFormat::phys_open_spe(std::string ifilename) {
             break;
         }
 
-        phys->TscanBrightness();
+        phys.TscanBrightness();
         vecReturn.push_back(phys);
     }
 
@@ -1077,11 +1081,11 @@ std::vector <nPhysD *> physFormat::phys_open_spe(std::string ifilename) {
     return vecReturn;
 }
 
-std::vector <nPhysD *> physFormat::phys_open_pcoraw(std::string ifilename) {
-    std::vector <nPhysD *> vecReturn;
+std::vector <physD> physFormat::phys_open_pcoraw(std::string ifilename) {
+    std::vector <physD> vecReturn;
     throw phys_fileerror("Neutrino has not yet implemented PCO read");
 
-    //     std::ifstream ifile(ifilename.c_str(), std::ios::in);
+    //    std::ifstream ifile(ifilename.c_str(), std::ios::in);
     //    string header(2,' ');
     //    ifile.read((char *)&header[0],header.size());
     //    DEBUG("HERE >" << header << "<");
@@ -1095,8 +1099,8 @@ std::vector <nPhysD *> physFormat::phys_open_pcoraw(std::string ifilename) {
     return vecReturn;
 }
 
-std::vector <nPhysD *> physFormat::phys_open_inf(std::string ifilename) {
-    std::vector <nPhysD *> imagelist;
+std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
+    std::vector <physD> imagelist;
     std::ifstream ifile(ifilename.c_str(), std::ios::in);
     if (ifile) {
         std::string ifilenameimg=ifilename;
@@ -1124,31 +1128,31 @@ std::vector <nPhysD *> physFormat::phys_open_inf(std::string ifilename) {
         int w=atoi(line.c_str());
         getline(ifile,line);
         int h=atoi(line.c_str());
-        nPhysD *linearized = new nPhysD(w,h,0.0,ifilename);
-        linearized->setType(PHYS_FILE);
-        linearized->setShortName("linearized");
-        nPhysD *original = new nPhysD(w,h,0.0,ifilenameimg.c_str());
-        original->setType(PHYS_FILE);
-        original->setShortName("original");
+        physD linearized(w,h,0.0,ifilename);
+        linearized.setType(PHYS_FILE);
+        linearized.setShortName("linearized");
+        physD original(w,h,0.0,ifilenameimg.c_str());
+        original.setType(PHYS_FILE);
+        original.setShortName("original");
 
-        phys_open_RAW(original,bit==8?0:2,0,true);
+        phys_open_RAW(&original,bit==8?0:2,0,true);
 
-        linearized->property["inf-resx"] = original->property["inf-resx"] = resx;
-        linearized->property["inf-resy"] = original->property["inf-resy"] = resy;
-        linearized->set_scale(resx/1000.,resy/1000.);
-        linearized->property["unitsX"] = original->property["unitsX"] = "mm";
-        linearized->property["unitsY"] = original->property["unitsY"] = "mm";
+        linearized.prop["inf-resx"] = original.prop["inf-resx"] = resx;
+        linearized.prop["inf-resy"] = original.prop["inf-resy"] = resy;
+        linearized.set_scale(resx/1000.,resy/1000.);
+        linearized.prop["unitsX"] = original.prop["unitsX"] = "mm";
+        linearized.prop["unitsY"] = original.prop["unitsY"] = "mm";
 
         getline(ifile,line);
         double sensitivity=atoi(line.c_str());
-        linearized->property["inf-sens"] = original->property["inf-sens"] = sensitivity;
+        linearized.prop["inf-sens"] = original.prop["inf-sens"] = sensitivity;
         getline(ifile,line);
         double latitude=atoi(line.c_str());
-        linearized->property["inf-lati"] = original->property["inf-lati"] = latitude;
+        linearized.prop["inf-lati"] = original.prop["inf-lati"] = latitude;
         getline(ifile,line);
-        linearized->property["inf-date"] = original->property["inf-date"] = line;
+        linearized.prop["inf-date"] = original.prop["inf-date"] = line;
         getline(ifile,line);
-        linearized->property["inf-number"] = original->property["inf-number"] = line;
+        linearized.prop["inf-number"] = original.prop["inf-number"] = line;
         getline(ifile,line); //empty line
         getline(ifile,line);
         if (line.compare(std::string("FLA-7000"))!=0) {
@@ -1167,20 +1171,18 @@ std::vector <nPhysD *> physFormat::phys_open_inf(std::string ifilename) {
             getline(ifile,line); //empty line
             std::stringstream ss;
             ss << "inf-" << std::setw(3) << std::setfill('0') << i;
-            linearized->property[ss.str()] = original->property[ss.str()] = line;
+            linearized.prop[ss.str()] = original.prop[ss.str()] = line;
         }
 
 #pragma omp parallel for
-        for (size_t i=0;i<original->getSurf();i++) {
-            linearized->set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original->point(i)/pow(2.0,bit)-0.5)));
+        for (size_t i=0;i<original.getSurf();i++) {
+            linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original.point(i)/pow(2.0,bit)-0.5)));
         }
-        linearized->TscanBrightness();
+        linearized.TscanBrightness();
         imagelist.push_back(linearized);
 #ifdef __phys_debug
-        original->TscanBrightness();
+        original.TscanBrightness();
         imagelist.push_back(original);
-#else
-        delete original;
 #endif
     }
     ifile.close();
@@ -1206,7 +1208,7 @@ bool physFormat::fits_check_error (int status) {
     return false;
 }
 
-void physFormat::phys_write_fits(nPhysD *phys, const char * fname, float compression) {
+void physFormat::phys_write_fits(physD *phys, const char * fname, float compression) {
 #ifdef HAVE_LIBCFITSIO
     fitsfile *fptr;       /* pointer to the FITS file, defined in fitsio.h */
     int status=0;
@@ -1262,8 +1264,8 @@ void physFormat::phys_write_fits(nPhysD *phys, const char * fname, float compres
 #endif
 }
 
-std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
-    std::vector<nPhysD *> retVec;
+std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
+    std::vector<physD> retVec;
 #ifdef HAVE_LIBCFITSIO
     fitsfile *fptr;
     char card[FLEN_CARD];
@@ -1286,9 +1288,9 @@ std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
     for (; !status; hdupos++)  {
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-        nPhysD *myphys=new nPhysD(ifilename,PHYS_FILE);
+        physD phys(ifilename,PHYS_FILE);
 
-        DEBUG(myphys->getShortName());
+        DEBUG(phys.getShortName());
         int hdutype;
         fits_get_hdu_type(fptr, &hdutype, &status);
         if (physFormat::fits_check_error(status)) return retVec;
@@ -1312,8 +1314,8 @@ std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
         
         fits_get_img_dim(fptr,&anaxis,&status);
         DEBUG(5,"fits_get_img_dim " << anaxis);
-        vec2f orig=myphys->get_origin();
-        vec2f scale=myphys->get_scale();
+        vec2f orig=phys.get_origin();
+        vec2f scale=phys.get_scale();
         
         int nkeys;
         fits_get_hdrspace(fptr, &nkeys, NULL, &status);
@@ -1369,11 +1371,11 @@ std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
                 }
             } else {
                 std::stringstream ss; ss << std::setw(log10(nkeys)+1) << std::setfill('0') << ii;
-                myphys->property["fits-"+ss.str()]=card;
+                phys.prop["fits-"+ss.str()]=card;
             }
         }
-        myphys->set_origin(orig);
-        myphys->set_scale(scale);
+        phys.set_origin(orig);
+        phys.set_scale(scale);
         // 		property.dumper(std::cerr);
         
         DEBUG("here");
@@ -1390,18 +1392,16 @@ std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
         DEBUG("totalsize " << totalsize);
 
         if (anaxis==2) {
-            myphys->resize(axissize[0],axissize[1]);
+            phys.resize(axissize[0],axissize[1]);
             
-            fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)myphys->Timg_buffer, NULL, &status);
+            fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)phys.Timg_buffer, NULL, &status);
             if (physFormat::fits_check_error(status)) return retVec;
 
-            myphys->TscanBrightness();
+            phys.TscanBrightness();
         }
 
-        if (myphys->getSurf()) {
-            retVec.push_back(myphys);
-        } else {
-            delete myphys;
+        if (phys.getSurf()) {
+            retVec.push_back(phys);
         }
 
         fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
@@ -1422,21 +1422,19 @@ std::vector <nPhysD *> physFormat::phys_open_fits(std::string ifilename) {
     return retVec;
 }
 
-std::vector <nPhysD *> physFormat::phys_resurrect_binary(std::string fname) {
+std::vector <physD> physFormat::phys_resurrect_binary(std::string fname) {
 
-    std::vector <nPhysD *> imagelist;
+    std::vector <physD> imagelist;
     std::ifstream ifile(fname.c_str(), std::ios::in | std::ios::binary);
     int ret;
     while(ifile.peek()!=-1) {
 
-        nPhysD *datamatrix = new nPhysD();
+        physD datamatrix;
         DEBUG("here");
 
         ret=physFormat::phys_resurrect_binary(datamatrix,ifile);
-        if (ret>=0 && datamatrix->getSurf()>0) {
+        if (ret>=0 && datamatrix.getSurf()>0) {
             imagelist.push_back(datamatrix);
-        } else {
-            delete datamatrix;
         }
 
     }
@@ -1445,17 +1443,17 @@ std::vector <nPhysD *> physFormat::phys_resurrect_binary(std::string fname) {
 }
 
 int
-physFormat::phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
+physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
 
     if (ifile.fail() || ifile.eof()) {
         throw phys_fileerror("istream error");
         return -1;
     }
 
-    my_phys->property.loader(ifile);
+    my_phys.prop.loader(ifile);
 
 #ifdef __phys_debug
-    my_phys->property.dumper(std::cout);
+    my_phys.prop.dumper(std::cout);
 #endif
 
     // w/h/size binary read
@@ -1470,7 +1468,7 @@ physFormat::phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
 
     if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
 
-    my_phys->resize(my_w,my_h);
+    my_phys.resize(my_w,my_h);
     std::vector<unsigned char> in(buffer_size);
     ifile.read((char*)&in[0], buffer_size);
 
@@ -1491,8 +1489,8 @@ physFormat::phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
 
     strm.next_in = &in[0];
     strm.avail_in = buffer_size;
-    strm.next_out = (unsigned char *)my_phys->Timg_buffer;
-    strm.avail_out = my_phys->getSurf()*sizeof(double);
+    strm.next_out = (unsigned char *)my_phys.Timg_buffer;
+    strm.avail_out = my_phys.getSurf()*sizeof(double);
     status = inflate (&strm, Z_SYNC_FLUSH);
     if (status < 0) {
         std::ostringstream oss;
@@ -1502,10 +1500,10 @@ physFormat::phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
     }
     inflateEnd (& strm);
 
-    my_phys->setType(PHYS_FILE);
+    my_phys.setType(PHYS_FILE);
 
-    //	ifile.read((char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
-    my_phys->TscanBrightness();
+    //	ifile.read((char *)my_phys.Timg_buffer, my_phys.getSurf()*sizeof(double));
+    my_phys.TscanBrightness();
 
     std::string line;
     getline(ifile,line);
@@ -1514,7 +1512,7 @@ physFormat::phys_resurrect_binary(nPhysD * my_phys, std::ifstream &ifile) {
     return 0;
 }
 
-void physFormat::phys_open_RAW(nPhysD * my_phys, int kind, int skipbyte, bool endian){
+void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool endian){
     std::ifstream ifile(my_phys->getName().c_str(), std::ios::in | std::ios::binary);
     if (!ifile.fail()) {
         if (my_phys!=NULL && my_phys->getSurf()>0) {
@@ -1599,8 +1597,8 @@ void physFormat::phys_open_RAW(nPhysD * my_phys, int kind, int skipbyte, bool en
     }
 }
 //! open HDF4 file (works for: Omega LLR  visar images)
-std::vector <nPhysD *> physFormat::phys_open_HDF4(std::string fname) {
-    std::vector <nPhysD *> imagelist;
+std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
+    std::vector <physD> imagelist;
     DEBUG("HERE");
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
     DEBUG("HERE2");
@@ -1611,7 +1609,7 @@ std::vector <nPhysD *> physFormat::phys_open_HDF4(std::string fname) {
 
     char name[64];
 
-    nPhysD *background=NULL;
+    physD background;
     /* Open the file and initiate the SD interface. */
     sd_id = SDstart(fname.c_str(), DFACC_READ);
     if (sd_id != FAIL) {
@@ -1666,55 +1664,55 @@ std::vector <nPhysD *> physFormat::phys_open_HDF4(std::string fname) {
                         DEBUG(5,"	  num mat " << numMat << " " << dim_sizes[rank-1]<< " x " << dim_sizes[rank-2]);
                         for (i=0;i<numMat;i++) {
                             DEBUG(5,"	  mat " << i);
-                            nPhysD *my_data = new nPhysD(dim_sizes[rank-1],dim_sizes[rank-2],0.0,"hdf4");
-                            for (size_t k=0;k<my_data->getSurf();k++) {
+                            physD phys(dim_sizes[rank-1],dim_sizes[rank-2],0.0,"hdf4");
+                            for (size_t k=0;k<phys.getSurf();k++) {
                                 switch (num_type) {
                                 case DFNT_CHAR :
-                                    my_data->set(k,((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_UCHAR:
-                                    my_data->set(k,((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_INT8:
-                                    my_data->set(k,(int)((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,(int)((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_UINT8:
-                                    my_data->set(k,(int)((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,(int)((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_FLOAT32:
-                                    my_data->set(k,(float) ((float *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,(float) ((float *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_FLOAT64:
-                                    my_data->set(k,((double *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((double *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_INT16:
-                                    my_data->set(k,((short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_UINT16:
-                                    my_data->set(k,((unsigned short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((unsigned short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_INT32:
-                                    my_data->set(k,((int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 case DFNT_UINT32:
-                                    my_data->set(k,((unsigned int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                    phys.set(k,((unsigned int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
                                     break;
                                 }
                             }
                             double origin[2];
                             int attr_origin=SDfindattr(sds_id, "physOrigin");
                             if (attr_origin!=-1) {
-                                if (SDreadattr(sds_id,attr_origin,origin)==0) my_data->set_origin(origin[0],origin[1]);
+                                if (SDreadattr(sds_id,attr_origin,origin)==0) phys.set_origin(origin[0],origin[1]);
                             }
                             double scale[2];
                             int attr_scale=SDfindattr(sds_id, "physScale");
                             if (attr_scale!=-1) {
-                                if (SDreadattr(sds_id,attr_scale,scale)==0) my_data->set_scale(scale[0],scale[1]);
+                                if (SDreadattr(sds_id,attr_scale,scale)==0) phys.set_scale(scale[0],scale[1]);
                             }
-                            if (i==1 && !background) {
-                                background=my_data;
+                            if (i==1 && background.getSurf()==0) {
+                                background=phys;
                             } else {
-                                imagelist.push_back(my_data);
+                                imagelist.push_back(phys);
                             }
                         }
 
@@ -1725,11 +1723,10 @@ std::vector <nPhysD *> physFormat::phys_open_HDF4(std::string fname) {
             SDendaccess(sds_id);
         }
 
-        if (background) {
-            for (std::vector<nPhysD *>::iterator it=imagelist.begin() ; it < imagelist.end(); it++ ) {
-                *(*it)=(*(*it))-(*background);
+        if (background.getSurf() > 0 ) {
+            for (auto& it : imagelist) {
+                it = it -background;
             }
-            delete background;
         }
 
         /* Terminate access to the SD interface and close the file. */
@@ -1740,7 +1737,7 @@ std::vector <nPhysD *> physFormat::phys_open_HDF4(std::string fname) {
 }
 
 
-void physFormat::phys_write_HDF4(nPhysD *phys, const char* fname) {
+void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
     if (phys) {
         intn istat=0;
@@ -1863,8 +1860,8 @@ std::string physFormat::gunzip (std::string filezipped) {
 	return fileunzipped;
 }
 
-std::vector <nPhysD *> physFormat::phys_open(std::string fname, bool separate_rgb) {
-    std::vector <nPhysD *> retPhys;
+std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) {
+    std::vector <physD> retPhys;
     size_t last_idx=0;
 
     std::string ext=fname;
@@ -1886,57 +1883,44 @@ std::vector <nPhysD *> physFormat::phys_open(std::string fname, bool separate_rg
 
     DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
-    nPhysD *datamatrix=NULL;
 	if (ext=="txt") {
-        datamatrix = new physDouble_txt(fname.c_str());
+        retPhys.push_back(physDouble_txt(fname.c_str()));
     } else if (ext.substr(0,3)=="tif") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_tiff(fname, separate_rgb);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_tiff(fname, separate_rgb);
     } else if (ext=="spe") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_spe(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_spe(fname);
     } else if (ext=="pcoraw") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_pcoraw(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_pcoraw(fname);
     } else if (ext=="inf") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_inf(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_inf(fname);
     } else if (ext=="sif") {
-        datamatrix = new nPhysD;
-        *datamatrix = physFormat::physInt_sif(fname.c_str());
+        retPhys.push_back(physFormat::physInt_sif(fname.c_str()));
     } else if (ext=="b16") {
-        datamatrix = new nPhysD;
-        *datamatrix = physFormat::physShort_b16(fname.c_str());
+        retPhys.push_back(physFormat::physShort_b16(fname.c_str()));
     } else if (ext=="img") {
-        datamatrix = new physFormat::physDouble_img(fname);
+        retPhys.push_back(physFormat::physDouble_img(fname));
     } else if (ext=="imd") {
-        datamatrix = new nPhysD;
-        *datamatrix = physFormat::physUint_imd(fname.c_str());
-        physMath::phys_divide(*datamatrix,1000.);
+        retPhys.push_back(physFormat::physUint_imd(fname.c_str()));
     } else if (ext.substr(0,3)=="fit") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_fits(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_fits(fname);
     } else if (ext=="hdf") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_open_HDF4(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_open_HDF4(fname);
     } else if (ext=="neu") {
-        std::vector <nPhysD *> imagelist=physFormat::phys_resurrect_binary(fname);
-        retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
+        retPhys=physFormat::phys_resurrect_binary(fname);
     } else if (ext=="gz") {
         std::string filenameunzipped = physFormat::gunzip(fname);
         if ((!filenameunzipped.empty()) && (filenameunzipped!=fname)) {
-            std::vector <nPhysD *> imagelist=physFormat::phys_open(filenameunzipped);
+            std::vector <physD> imagelist=physFormat::phys_open(filenameunzipped);
             unlink(filenameunzipped.c_str());
-            for (std::vector<nPhysD *>::iterator it=imagelist.begin() ; it < imagelist.end(); it++ ) {
-                (*it)->setName("");
-                (*it)->setShortName("");
+            for (auto& it : imagelist) {
+                it.setName("");
+                it.setShortName("");
             }
             retPhys.insert(retPhys.end(), imagelist.begin(), imagelist.end());
         }
         DEBUG(filenameunzipped);
     }
     
-    if (datamatrix) retPhys.push_back(datamatrix);
     for (size_t i=0;i<retPhys.size();i++) {
 
         std::ostringstream ss;
@@ -1944,19 +1928,19 @@ std::vector <nPhysD *> physFormat::phys_open(std::string fname, bool separate_rg
             ss << i << " ";
         }
 
-        DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+        DEBUG( "<" << retPhys[i].getName() << "> <" <<  retPhys[i].getShortName() << ">");
 
         // if Name and ShortName are set, don't change them
-        if (retPhys[i]->getName().empty())
-            retPhys[i]->setName(ss.str()+fname);
+        if (retPhys[i].getName().empty())
+            retPhys[i].setName(ss.str()+fname);
 
-        if (retPhys[i]->getShortName().empty())
-            retPhys[i]->setShortName(ss.str()+name);
+        if (retPhys[i].getShortName().empty())
+            retPhys[i].setShortName(ss.str()+name);
 
-        DEBUG( "<" << retPhys[i]->getName() << "> <" <<  retPhys[i]->getShortName() << ">");
+        DEBUG( "<" << retPhys[i].getName() << "> <" <<  retPhys[i].getShortName() << ">");
 
-        retPhys[i]->setFromName(fname);
-        retPhys[i]->setType(PHYS_FILE);
+        retPhys[i].setFromName(fname);
+        retPhys[i].setType(PHYS_FILE);
     }
     return retPhys;
 }

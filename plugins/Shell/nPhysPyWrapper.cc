@@ -13,8 +13,8 @@
  */
 
 
-QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
-    QList<nPhysD*> my_list;
+QList<nPhysD> nPhysPyWrapper::static_nPhysD_open(QString fname){
+    QList<nPhysD> my_list;
     if (fname.isEmpty()) {
         QString formats("");
         formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
@@ -29,13 +29,11 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
         fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }
     if (!fname.isEmpty( )) {
-        std::vector<nPhysD*> my_vec=physFormat::phys_open(fname.toUtf8().constData());
+        std::vector<physD> my_vec=physFormat::phys_open(fname.toUtf8().constData());
         for(auto it : my_vec) {
-            if (it->getSurf()>0) {
-                it->property["keep_phys_alive"]=42;
+            if (it.getSurf()>0) {
+                it.prop["keep_phys_alive"]=1;
                 my_list << it;
-            } else {
-                delete it;
             }
         }
     }
@@ -45,14 +43,13 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 nPhysD* nPhysPyWrapper::new_nPhysD() {
     nPhysD *my_phys= new nPhysD();
     my_phys->setType(PHYS_DYN);
-    my_phys->property["keep_phys_alive"]=42;
+    my_phys->prop["keep_phys_alive"]=1;
     return my_phys;
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
     DEBUG("here");
-    nPhysD *phys=new nPhysD(PHYS_DYN);
-    phys->setType(PHYS_DYN);
+    nPhysD *phys=new_nPhysD();
     int h=my_shape.first; // row major: first rows(yw or height) than columns(xw or widthv)
     int w=my_shape.second;
     
@@ -63,20 +60,19 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
         }
         phys->TscanBrightness();
     }
-    phys->property["keep_phys_alive"]=42;
     return phys;
 }
 
-/**
- nPhysD creates an nPhysD of size x filled with val and name name
- */
-nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
-    DEBUG("here");
-    nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
-    phys->setType(PHYS_DYN);
-    phys->property["keep_phys_alive"]=42;
-    return phys;
-}
+///**
+// nPhysD creates an nPhysD of size x filled with val and name name
+// */
+//nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
+//    DEBUG("here");
+//    nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
+//    phys->setType(PHYS_DYN);
+//    phys->property["keep_phys_alive"]=1;
+//    return phys;
+//}
 
 /**
  nPhysD copy constructor
@@ -84,7 +80,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString na
 nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     DEBUG("new_nPhysD new_nPhysD new_nPhysD new_nPhysD new_nPhysD ");
     nPhysD *ret_phys = new nPhysD(*phys);
-    ret_phys->property["keep_phys_alive"]=42;
+    ret_phys->prop["keep_phys_alive"]=1;
     return ret_phys;
 }
 
@@ -182,7 +178,7 @@ void nPhysPyWrapper::delete_nPhysD(nPhysD* my_phys) {
             }
         }
     }
-    if (my_phys->property["keep_phys_alive"].get_i()==42) {
+    if (my_phys->prop.have("keep_phys_alive")) {
         delete my_phys;
     }
 }
@@ -258,19 +254,19 @@ int nPhysPyWrapper::getSurf(nPhysD* phys){
 
 QStringList nPhysPyWrapper::properties(nPhysD* phys){
     QStringList retval;
-    for(anymap::iterator it = phys->property.begin(); it != phys->property.end(); ++it) {
+    for(anymap::iterator it = phys->prop.begin(); it != phys->prop.end(); ++it) {
         retval << QString::fromStdString(it->first);
     }
     return retval;
 }
 
 QVariant nPhysPyWrapper::getProperty(nPhysD* phys, QString my_name){
-    return toVariant(phys->property[my_name.toStdString()]);
+    return toVariant(phys->prop[my_name.toStdString()]);
 }
 
 void nPhysPyWrapper::setProperty(nPhysD* phys, QString prop_name, QVariant prop_val) {
     anydata pippo=toAnydata(prop_val);
-    phys->property[prop_name.toStdString()]=pippo;
+    phys->prop[prop_name.toStdString()]=pippo;
 }
 
 QVector<double> nPhysPyWrapper::getData(nPhysD* phys){

@@ -1,9 +1,7 @@
-#include "unwrap_quality.h"
-
 #include <iostream>
 #include <limits>
 #include <algorithm>
-#include "unwrap_util.h"
+#include "unwrap.h"
 
 inline int jump(double lVal, double rVal) {
     double difference = rVal - lVal;
@@ -12,11 +10,11 @@ inline int jump(double lVal, double rVal) {
 	return 0;
 } 
 
-inline double reliability(nPhysD* phase, int i, int j) {
-    double H = grad(phase->point(i-1,j), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j));
-    double V = grad(phase->point(i,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i,j+1));
-    double D1 = grad(phase->point(i-1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i+1,j+1));
-    double D2 = grad(phase->point(i+1,j-1), phase->point(i,j)) - grad(phase->point(i,j), phase->point(i-1,j+1));
+inline double reliability(physD &phase, int i, int j) {
+    double H = grad(phase.point(i-1,j), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i+1,j));
+    double V = grad(phase.point(i,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i,j+1));
+    double D1 = grad(phase.point(i-1,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i+1,j+1));
+    double D2 = grad(phase.point(i+1,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i-1,j+1));
     return 1.0/sqrt(H*H + V*V + D1*D1 + D2*D2);
 }
 
@@ -41,43 +39,43 @@ inline bool EdgeComp(Edge const & a, Edge const & b) {
     return a.quality>b.quality;
 }
 
-void unwrap_miguel(nPhysD* phase, nPhysD* unwrap) {
-    unsigned int dx=phase->getW();
-    unsigned int dy=phase->getH();
-    nPhysD quality(dx,dy,1.0);
+void unwrap::miguel(physD &phase, physD &unwrap) {
+    unsigned int dx=phase.getW();
+    unsigned int dy=phase.getH();
+    physD quality(dx,dy,1.0);
 	for (unsigned int j = 1; j<dy -1; ++j) {
 		for (unsigned int i = 1; i<dx - 1; ++i) {
-			quality.set(i,j,reliability(phase, i,j));
+            quality.set(i,j,reliability(phase, i,j));
 		}
     }
-    unwrap_quality(phase, unwrap, &quality);
+    unwrap::quality(phase, unwrap, quality);
 }
 
-void unwrap_miguel_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
-    unsigned int dx=phase->getW();
-    unsigned int dy=phase->getH();
-    nPhysD quality_miguel(dx,dy,1.0);
+void unwrap::miguel_quality(physD& phase, physD& unwrap, physD& quality) {
+    unsigned int dx=phase.getW();
+    unsigned int dy=phase.getH();
+    physD quality_miguel(dx,dy,1.0);
 	for (unsigned int j = 0; j<dy; ++j) {
         for (unsigned int i = 0; i<dx; ++i) {
 		    if (j>0 && j<dy-1 && i>0 && i < dx-1) {
-                quality_miguel.set(i,j,quality->point(i,j)*reliability(phase, i,j));
+                quality_miguel.set(i,j,quality.point(i,j)*reliability(phase, i,j));
             } else{
-                quality_miguel.set(i,j,quality->point(i+j*dx));
+                quality_miguel.set(i,j,quality.point(i+j*dx));
             }
 		}
     }
-    unwrap_quality(phase, unwrap, &quality_miguel);
+    unwrap::quality(phase, unwrap, quality_miguel);
 }
 
-void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
-    unsigned int dx=phase->getW();
-    unsigned int dy=phase->getH();
+void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
+    unsigned int dx=phase.getW();
+    unsigned int dy=phase.getH();
     // initialize
     std::vector<Pixel> px(dx*dy);
     for (unsigned int i = 0; i<dx*dy; ++i) {
         px[i].jumps = 0;
         px[i].nPixels = 1;
-        px[i].quality = quality->point(i);
+        px[i].quality = quality.point(i);
         px[i].first = &px[i];
         px[i].last = &px[i];
         px[i].next = NULL;
@@ -91,7 +89,7 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
             edge[k].p1 = &px[i+j*dx];
             edge[k].p2 = &px[i+1+j*dx];
             edge[k].quality = px[i+j*dx].quality + px[i+1+j*dx].quality;
-            edge[k].jumps = jump(phase->point(i,j),phase->point(i+1,j));
+            edge[k].jumps = jump(phase.point(i,j),phase.point(i+1,j));
             k++;
         }
     }
@@ -100,7 +98,7 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
             edge[k].p1 = &px[i+j*dx];
             edge[k].p2 = &px[i+(1+j)*dx];
             edge[k].quality = px[i+j*dx].quality + px[i+(1+j)*dx].quality;
-            edge[k].jumps = jump(phase->point(i,j),phase->point(i,j+1));
+            edge[k].jumps = jump(phase.point(i,j),phase.point(i,j+1));
             k++;
         }
     }
@@ -168,5 +166,5 @@ void unwrap_quality(nPhysD* phase, nPhysD* unwrap, nPhysD* quality) {
         } //if
     }
     // fill the unwrapped map
-    for (unsigned int i=0; i<dx*dy; i++) unwrap->set(i,phase->point(i)+px[i].jumps);
+    for (unsigned int i=0; i<dx*dy; i++) unwrap.set(i,phase.point(i)+px[i].jumps);
 }

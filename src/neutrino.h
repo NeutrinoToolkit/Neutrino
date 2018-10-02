@@ -22,8 +22,6 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __neutrino_h
-#define __neutrino_h
 
 #include <string>
 #include <iostream>
@@ -40,12 +38,14 @@
 #include <QPrinter>
 #include <QMap>
 
-#include "nGenericPan.h"
+#ifndef __neutrino_h
+#define __neutrino_h
 
 // physImage
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 #include "nPhysMaths.h"
 
+#include "nGenericPan.h"
 
 // Items
 #include "nLine.h"
@@ -54,6 +54,7 @@
 #include "nPoint.h"
 
 #include "ui_neutrino.h"
+
 
 namespace Ui {
 class nSbarra;

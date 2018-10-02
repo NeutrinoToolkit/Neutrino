@@ -70,7 +70,7 @@ void Function::on_function_returnPressed() {
                 }
             }
             QString name=function->toPlainText();
-            my_phys->property["function"]=name.toStdString();
+            my_phys->prop["function"]=name.toStdString();
 
             int len=image->property("NeuSave-physNameLength").toInt();
             if (name.length()>len) {

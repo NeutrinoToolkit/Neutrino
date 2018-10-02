@@ -22,9 +22,9 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include "neutrino.h"
 #include "nObject.h"
 #include "ui_nObject.h"
-#include "neutrino.h"
 #include "nGenericPan.h"
 
 #include <iostream>

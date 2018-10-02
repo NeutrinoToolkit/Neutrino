@@ -77,7 +77,7 @@ void Ghost_fringes::doGhost () {
         size_t dx=imageShot->getW();
         size_t dy=imageShot->getH();
         
-        nPhysC imageFFT = imageShot->ft2(PHYS_FORWARD);
+        physC imageFFT = imageShot->ft2(PHYS_FORWARD);
         std::vector<int> xx(dx), yy(dy);
 
         for (size_t i=0;i<dx;i++)

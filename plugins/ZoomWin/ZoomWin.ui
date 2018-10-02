@@ -37,7 +37,7 @@
      <number>4</number>
     </property>
     <item row="0" column="0">
-     <widget class="QGraphicsView" name="my_view">
+     <widget class="ZoomView" name="my_view">
       <property name="mouseTracking">
        <bool>true</bool>
       </property>
@@ -104,7 +104,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -115,8 +115,15 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ZoomView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">ZoomView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

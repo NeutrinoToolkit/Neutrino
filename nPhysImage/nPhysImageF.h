@@ -221,7 +221,7 @@ public:
 	nPhysImageF(std::string, phys_type=PHYS_DYN);
 	
 	//! creates named nPhys, performing a DEEP copy from the passed reference
-	nPhysImageF(const nPhysImageF<T> &, std::string=std::string("copy")); // copy constructor --->> REALLOCATION!
+    nPhysImageF(const nPhysImageF<T> &, std::string=std::string("")); // copy constructor --->> REALLOCATION!
 
 	//! creates flat, named nPhys
 	nPhysImageF(size_t, size_t, T, std::string = std::string());
@@ -283,8 +283,7 @@ public:
 
 	//phys_properties property; now on anymap
 	//anymap property; specialized class: phys_properties
-	phys_properties property;
-    phys_properties display_property;
+    phys_properties prop;
 
 	// image derivation
 	//nPhysImageF<T> *get_Tlast()
@@ -326,7 +325,7 @@ public:
 		}
 
 		// copy everything
-		property = rhs.property; // probably missing DEEP operator
+        prop = rhs.prop; // probably missing DEEP operator
 		
 		Tmaximum_value = rhs.Tmaximum_value;
 		Tminimum_value = rhs.Tminimum_value;
@@ -369,7 +368,7 @@ public:
 		
 		//lhs->object_name = object_name;
 		//lhs->filename=filename;
-		lhs.property = property;
+        lhs.prop = prop;
 		return lhs;
 	}
 
@@ -385,62 +384,62 @@ public:
 	nPhysImageF<T> sub(size_t, size_t, size_t, size_t);
 
 	// ! get interpolated stretched image
-	nPhysImageF<T> * stretch(bidimvec<size_t> newSize) {
-		nPhysImageF<T> *stretched = new nPhysImageF<T> (newSize.x(), newSize.y(), 0.);
+    nPhysImageF<T> stretch(bidimvec<size_t> newSize) {
+        nPhysImageF<T> stretched(newSize.x(), newSize.y(), 0.);
 		bidimvec<double> ratio=div_P<double>(newSize,get_size());
 		DEBUG(5,"ratio" << newSize << " " << ratio);
 
- 		stretched->set_origin(mul_P(get_origin(),ratio));
- 		stretched->set_origin(mul_P(get_scale(),ratio));
-		stretched->setType(PHYS_DYN);
+        stretched.set_origin(mul_P(get_origin(),ratio));
+        stretched.set_origin(mul_P(get_scale(),ratio));
+        stretched.setType(PHYS_DYN);
 
-        for (size_t j=0; j<stretched->getH(); j++) {
-            for (size_t i=0; i<stretched->getW(); i++) {
+        for (size_t j=0; j<stretched.getH(); j++) {
+            for (size_t i=0; i<stretched.getW(); i++) {
 				bidimvec<double> p=div_P<double>(bidimvec<double>(i,j),ratio);
-				stretched->set(i,j,getPoint(p.x(),p.y()));
+                stretched.set(i,j,getPoint(p.x(),p.y()));
 			}
 		}
 		return stretched;
 	}
-	nPhysImageF<T> * stretch(size_t newW, size_t newH) { return stretch(bidimvec<size_t>(newW,newH));}
+    nPhysImageF<T> stretch(size_t newW, size_t newH) { return stretch(bidimvec<size_t>(newW,newH));}
 
 	// get rotated matrix
-	nPhysImageF<T> * rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+    nPhysImageF<T> rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated=NULL;
+        nPhysImageF<T> rotated;
 
 		if (alphaDeg==0.0) {
-			rotated = new nPhysImageF<T> (getW(), getH(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(i,j));
+            rotated.resize(getW(), getH());
+            for (size_t j=0; j<rotated.getH(); j++) {
+                for (size_t i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(i,j));
 				}
 			}
-			rotated->set_origin(get_origin());
+            rotated.set_origin(get_origin());
 		} else if (alphaDeg==90.0) {
-			rotated = new nPhysImageF<T> (getH(), getW(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(getW()-1-j,i));
+            rotated.resize(getH(), getW());
+            for (size_t j=0; j<rotated.getH(); j++) {
+                for (size_t i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(getW()-1-j,i));
 				}
 			}
-			rotated->set_origin(get_origin().y(),getW()-1-get_origin().x());
+            rotated.set_origin(get_origin().y(),getW()-1-get_origin().x());
 		} else if (alphaDeg==180.0) {
-			rotated = new nPhysImageF<T> (getW(), getH(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(getW()-1-i,getH()-1-j));
+            rotated.resize(getW(), getH());
+            for (size_t j=0; j<rotated.getH(); j++) {
+                for (size_t i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(getW()-1-i,getH()-1-j));
 				}
 			}
-			rotated->set_origin(getW()-1-get_origin().x(),getH()-1-get_origin().y());
+            rotated.set_origin(getW()-1-get_origin().x(),getH()-1-get_origin().y());
 		} else if (alphaDeg==270.0) {
-			rotated = new nPhysImageF<T> (getH(), getW(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(j,getH()-1-i));
+            rotated.resize(getH(), getW());
+            for (size_t j=0; j<rotated.getH(); j++) {
+                for (size_t i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(j,getH()-1-i));
 				}
 			}
-			rotated->set_origin(get_origin().y(),getH()-1-get_origin().x());
+            rotated.set_origin(get_origin().y(),getH()-1-get_origin().x());
 		} else {		
 			double sina=sin(alpha);
 			double cosa=cos(alpha);
@@ -449,41 +448,42 @@ public:
 			double dy1=-((double)(getW()-1))*sina;
 			double dy2=((double)(getH()-1))*cosa;
 
-            rotated = new nPhysImageF<T> (fabs(dx1)+fabs(dx2)+1,fabs(dy1)+fabs(dy2)+1, def_value);
+            rotated.resize(fabs(dx1)+fabs(dx2)+1,fabs(dy1)+fabs(dy2)+1);
+            rotated.set(def_value);
 			double shiftx=std::min(dx1,0.0)+std::min(dx2,0.0);
 			double shifty=std::min(dy1,0.0)+std::min(dy2,0.0);
 			size_t i,j;
 #pragma omp parallel for collapse(2)
-			for (j=0; j<rotated->getH(); j++) {
-				for (i=0; i<rotated->getW(); i++) {
+            for (j=0; j<rotated.getH(); j++) {
+                for (i=0; i<rotated.getW(); i++) {
 					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
 					double jr=(i+shiftx)*sin(alpha)+(j+shifty)*cos(alpha);
-					rotated->set(i,j,getPoint(ir,jr,def_value));
+                    rotated.set(i,j,getPoint(ir,jr,def_value));
 				}
 			}
 			vec2f orig=get_origin();
 			double ir=(orig.x())*cos(-alpha)-(orig.y())*sin(-alpha);
 			double jr=(orig.x())*sin(-alpha)+(orig.y())*cos(-alpha);
-			rotated->set_origin(ir-shiftx,jr-shifty);
+            rotated.set_origin(ir-shiftx,jr-shifty);
 		}
 		//FIXME: this must be roto-translated
-//		rotated->set_origin(get_origin());
-		rotated->set_scale(get_scale());
+//		rotated.set_origin(get_origin());
+        rotated.set_scale(get_scale());
 
-		rotated->setType(PHYS_DYN);
+        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
 		my_name << getName() << ".rotate(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
+        rotated.setName(my_name.str());
+        rotated.setShortName("rotated");
+        rotated.setFromName(getFromName());
 
-		rotated->TscanBrightness();
+        rotated.TscanBrightness();
 		return rotated;
 	}
 	
-	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+    nPhysImageF<T> fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated= new nPhysImageF<T> (getW(),getH(), def_value);
+        nPhysImageF<T> rotated(getW(),getH(), def_value);
 		double dx_2=0.5*((double) getW());
 		double dy_2=0.5*((double) getH());
 		double cosa=cos(alpha);
@@ -492,19 +492,19 @@ public:
 			for (size_t i=0; i<getW(); i++) {
 				double ir=dx_2+(i-dx_2)*cosa-(j-dy_2)*sina;
 				double jr=dy_2+(i-dx_2)*sina+(j-dy_2)*cosa;
-				rotated->set(i,j,getPoint(ir,jr,def_value));
+                rotated.set(i,j,getPoint(ir,jr,def_value));
 			}
 		}
-		rotated->set_origin(get_origin());
-		rotated->set_scale(get_scale());
-		rotated->setType(PHYS_DYN);
+        rotated.set_origin(get_origin());
+        rotated.set_scale(get_scale());
+        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
         my_name << "(" << getName() << ").fast_rotated(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
+        rotated.setName(my_name.str());
+        rotated.setShortName("rotated");
+        rotated.setFromName(getFromName());
 
-		rotated->TscanBrightness();
+        rotated.TscanBrightness();
 		return rotated;	
 	}
 
@@ -512,64 +512,12 @@ public:
     // correspondence between int/power:
     // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
     double gamma() {
-        if (!property.have("gamma")) {
-            property["gamma"]=(int)1;
+        if (!prop.have("gamma")) {
+            prop["gamma"]=(int)1;
         }
-        int gamma_int= property["gamma"].get_i();
+        int gamma_int= prop["gamma"].get_i();
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
-
-    inline void reset_display() {
-        display_property.erase("display_range");
-        display_property.clear();
-        uchar_buf.clear();
-        DEBUG(uchar_buf.capacity());
-    }
-
-    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
-        if (getSurf()>0 && palette.size()==768) {
-
-            if (uchar_buf.size() == getSurf()*3 &&
-                    display_property.have("display_range") &&
-                    display_property.have("palette_name") &&
-                    display_property["palette_name"].get_str()==palette_name &&
-                    display_property.have("gamma") &&
-                    display_property["gamma"].get_i()==property["gamma"].get_i()) {
-
-                vec2f old_display_range=display_property["display_range"];
-                vec2f new_display_range=property["display_range"];
-
-                if (old_display_range==new_display_range) {
-                    DEBUG("reusing old uchar_buf");
-                    return &uchar_buf[0];
-                }
-            }
-
-            bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
-            double mini=minmax.first();
-            double maxi=minmax.second();
-            double my_gamma=gamma();
-
-            DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<" , " << my_gamma << "]");
-			uchar_buf.assign(getSurf()*3,255);
-#pragma omp parallel for
-            for (size_t i=0; i<getSurf(); i++) {
-				//int val = mult*(Timg_buffer[i]-lower_cut);
-                if (std::isfinite(Timg_buffer[i])) {
-                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
-					std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
-				}
-			}
-            display_property["palette_name"]=palette_name;
-            display_property["gamma"]=property["gamma"].get_i();
-            display_property["display_range"]=property["display_range"]=vec2f(mini,maxi);
-
-            return &uchar_buf[0];
-		}
-		WARNING("asking for uchar buffer of empty image");
-
-		return NULL;
-	}
 
 	const double *to_dvector(enum phys_direction direction, size_t index) {
         throw phys_deprecated();
@@ -766,65 +714,69 @@ public:
 
 	// getting and setting properties
 	inline std::string getName()
-    { return property["phys_name"]; }
+    { return prop["phys_name"]; }
 	void setName(std::string name)
-    { property["phys_name"] = name; }
+    { prop["phys_name"] = name; }
 
 //tom
 	inline std::string getShortName()
-    { return property["phys_short_name"]; }
+    { return prop["phys_short_name"]; }
 	
 	inline void setShortName(std::string name)
-    { property["phys_short_name"] = name; }
+    { prop["phys_short_name"] = name; }
 
 	inline std::string getFromName()
-    { return property["phys_from_name"]; }
+    { return prop["phys_from_name"]; }
 	
 	inline void setFromName(std::string name)
-    { property["phys_from_name"] = name; }
+    { prop["phys_from_name"] = name; }
 
 	inline vec2f get_origin()
-    { return property["origin"]; }
+    { return prop["origin"]; }
 
 	inline double get_origin(enum phys_direction direction)
-    { return (direction==PHYS_X ? vec2f(property["origin"].get_str()).x() : vec2f(property["origin"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(prop["origin"].get_str()).x() : vec2f(prop["origin"].get_str()).y()); }
 
 	inline void set_origin(T val_x, T val_y)
-    { property["origin"] = vec2f(val_x,val_y); }
+    { prop["origin"] = vec2f(val_x,val_y); }
 	
 	inline void set_origin(vec2f val) 
-    { property["origin"] = val; }
+    { prop["origin"] = val; }
 
     inline vec2f get_scale()
-    { return property["scale"]; }
+    { return prop["scale"]; }
 
 	inline double get_scale(enum phys_direction direction)
-    { return (direction==PHYS_X ? vec2f(property["scale"].get_str()).x() : vec2f(property["scale"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(prop["scale"].get_str()).x() : vec2f(prop["scale"].get_str()).y()); }
 
 	inline void set_scale(T val_x, T val_y)
-    { property["scale"] = vec2f(val_x,val_y); }
+    { prop["scale"] = vec2f(val_x,val_y); }
 	
 	inline void set_scale(vec2f val)
-    { property["scale"] = val; }
+    { prop["scale"] = val; }
 	
 	inline vec2f to_real(vec2f val) { 
 		vec2f oo, ss; 
-        oo = property["origin"]; ss = property["scale"];
+        oo = prop["origin"]; ss = prop["scale"];
 		return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
 	}
 
 	inline vec2f to_pixel(vec2f val) { 
 		vec2f oo, ss; 
-        oo = property["origin"]; ss = property["scale"];
+        oo = prop["origin"]; ss = prop["scale"];
 		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
 	}
+
+    inline int copies() {
+        return *_n_inst;
+    }
 
 //end
 
 	inline phys_type getType()
-    { return property["phys_orig"]; }
+    { return prop["phys_orig"]; }
 	void setType(std::string orig)
-	{ property["phys_orig"] = orig; }
+    { prop["phys_orig"] = orig; }
 
 
 	// (dovra' passare protected, prima o poi...)
@@ -832,7 +784,6 @@ public:
 	T **Timg_matrix;
 
 protected:
-    std::vector<unsigned char> uchar_buf;
 	double **vector_buf;
 	double **axis_buf;
 	std::vector<double> histogram;
@@ -866,10 +817,6 @@ private:
 
 };
 
-typedef nPhysImageF<double> nPhysD;
-typedef nPhysImageF<mcomplex> nPhysC;
-
-typedef std::map<std::string, nPhysImageF<double> > nMapD;
 
 
 
@@ -915,9 +862,11 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	
 //	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
     std::copy(oth.Timg_buffer, oth.Timg_buffer+getSurf(), Timg_buffer);
-	property = oth.property;
+    prop = oth.prop;
 	
-	setShortName(sName);
+    if (!sName.empty()) {
+        setShortName(sName);
+    }
 	TscanBrightness();
 //	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
 }
@@ -1066,8 +1015,6 @@ nPhysImageF<T>::matrix_points_aligned()
 		delete Timg_matrix;
 		Timg_matrix = NULL;
 	}
-
-    uchar_buf.clear();
 
 	if (vector_buf != NULL) {
 		if (vector_buf[0] != NULL)
@@ -1706,9 +1653,9 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 	nPhysImageF<T> new_img;
 	new_img.resize(width, height);
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+other.property.at("phys_name").get_str()+")");
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
     for (size_t i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = (T)(Timg_buffer[i]) + (T)(other.Timg_buffer[i]);
@@ -1723,7 +1670,7 @@ nPhysImageF<T>::operator+ (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 	
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
     for (size_t i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] += val;
@@ -1741,9 +1688,9 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 	new_img.resize(width, height);
 
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")-("+other.property.at("phys_name").get_str()+")");
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
+    new_img.setName("("+prop.at("phys_name").get_str()+")-("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Subtract");
 	
     for (size_t i=0; i<height*width; i++)
@@ -1759,7 +1706,7 @@ nPhysImageF<T>::operator- (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 	
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
     for (size_t i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] -= val;
@@ -1775,10 +1722,10 @@ nPhysImageF<T>::operator* (const nPhysImageF<T> &other) const {
 	
 	nPhysImageF<T> new_img;
 	
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName("("+property.at("phys_name").get_str()+")*("+other.property.at("phys_name").get_str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")*("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Multiply");
 
     for (size_t i=0; i<height*width; i++)
@@ -1798,10 +1745,10 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 	
 	nPhysImageF<T> new_img;
 	
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName("("+property.at("phys_name").get_str()+")/("+other.property.at("phys_name").get_str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")/("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");
 	
     for (size_t i=0; i<height*width; i++)
@@ -1823,6 +1770,15 @@ template<class T> inline T nPhysImageF<T>::get_max() {
 template<class T> inline bidimvec<T> nPhysImageF<T>::get_min_max() {
 	return bidimvec<T>(get_min(),get_max());
 }
+
+
+
+using physC = nPhysImageF<mcomplex>;
+
+using nMapD = std::map<std::string, nPhysImageF<double> >;
+
+
+using physD = nPhysImageF<double>;
 
 
 

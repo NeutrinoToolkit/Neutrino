@@ -29,7 +29,9 @@
 
 #include "nPreferences.h"
 #include "neutrino.h"
-
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QColorDialog>
 
 #ifdef	__WIN32
 #include <windows.h>

@@ -35,7 +35,7 @@
 #include <QPrintDialog>
 
 #include <iostream>
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 #include "panThread.h"
 
 #ifndef __generic_pan

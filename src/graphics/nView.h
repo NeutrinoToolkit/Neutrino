@@ -64,7 +64,6 @@ public:
 
     vec2f minMax;
 
-    // painter
     bool show_mouse;
 
     bool showDimPixel;

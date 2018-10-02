@@ -27,23 +27,21 @@
 
 // physWavelets
 
-Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent)
+Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), linebarrier(this,1)
 {
 	my_w.setupUi(this);
 
-    region =  new nRect(this,1);
-	region->setRect(QRectF(100,100,100,100));
+    region.setRect(QRectF(100,100,100,100));
 	
-    linebarrier =  new nLine(this,1);
 	QPolygonF poly;
 	poly << QPointF(0,0) << QPointF(100,100);
-	linebarrier->setPoints(poly);
+    linebarrier.setPoints(poly);
     show();
 
 	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
 	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
 
-	connect(my_w.actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
+    connect(my_w.actionRect, SIGNAL(triggered()), &region, SLOT(togglePadella()));
 	
 	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
 	connect(my_w.doUnwrap, SIGNAL(pressed()), this, SLOT(doUnwrap()));
@@ -53,7 +51,7 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent)
 	connect(my_w.doRemove, SIGNAL(pressed()), this, SLOT(doRemove()));
 	
 	connect(my_w.useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
-	connect(my_w.lineBarrier, SIGNAL(released()), linebarrier, SLOT(togglePadella()));
+    connect(my_w.lineBarrier, SIGNAL(released()), &linebarrier, SLOT(togglePadella()));
 	useBarrierToggled(my_w.useBarrier->isChecked());
 
 	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
@@ -72,9 +70,9 @@ void Wavelet::on_relative_toggled(bool tog) {
 
 void Wavelet::useBarrierToggled(bool val) {
 	if (val) {
-		linebarrier->show();
+        linebarrier.show();
 	} else {
-		linebarrier->hide();
+        linebarrier.hide();
 	}
 }
 
@@ -82,9 +80,9 @@ void Wavelet::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
     if (buf) {
 		if (buf==getPhysFromCombo(my_w.image)) {
-			region->show();
+            region.show();
 		} else {
-			region->hide();
+            region.hide();
 		}
 	}
 }
@@ -107,7 +105,7 @@ void Wavelet::physDel(nPhysD* buf) {
 void Wavelet::guessCarrier() {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-        QRect geom2=region->getRect(image);
+        QRect geom2=region.getRect(image);
 		nPhysD datamatrix;
 		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
@@ -139,7 +137,7 @@ void Wavelet::doWavelet () {
 		timer.start();
 
 		saveDefaults();
-        QRect geom2=region->getRect(image);
+        QRect geom2=region.getRect(image);
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
 		
@@ -192,27 +190,28 @@ void Wavelet::doWavelet () {
 
 
 		my_w.erasePrevious->setEnabled(true);
-        std::map<std::string, nPhysD *>::const_iterator itr;
-		for(itr = my_params.olist.begin(); itr != my_params.olist.end(); ++itr) {
-            if ((itr->first=="angle"  && my_params.n_angles==1) ||
-                (itr->first=="lambda" && my_params.n_lambdas==1)) {
-                delete itr->second;
+        for(auto &itr : my_params.olist) {
+            if ((itr.first=="angle"  && my_params.n_angles==1) ||
+                (itr.first=="lambda" && my_params.n_lambdas==1)) {
+                delete itr.second;
             } else {
                 if (my_w.erasePrevious->isChecked()) {
-                    waveletPhys[itr->first]=nparent->replacePhys(itr->second,waveletPhys[itr->first],false);
+                    waveletPhys[itr.first]=nparent->replacePhys(new nPhysD(itr.second->copy()),waveletPhys[itr.first],false);
                 } else {
-                    nparent->addPhys(itr->second);
-                    waveletPhys[itr->first]=itr->second;
+                    nPhysD*ceppa = new nPhysD(itr.second->copy());
+                    delete itr.second;
+                    nparent->addPhys(ceppa);
+                    waveletPhys[itr.first]=ceppa;
                 }
             }
 		}
         QApplication::processEvents();
         
-		for(itr = waveletPhys.begin(); itr != waveletPhys.end(); ++itr) {
-            if (itr->first=="phase_2pi") {
-                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr->second))));
-            } else if (itr->first=="contrast") {
-                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(qVariantFromValue((void*)(itr->second))));
+        for(auto &itr: waveletPhys) {
+            if (itr.first=="phase_2pi") {
+                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr.second))));
+            } else if (itr.first=="contrast") {
+                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(qVariantFromValue((void*)(itr.second))));
             }
         }
         
@@ -253,21 +252,21 @@ void Wavelet::doWavelet () {
 // --------------------------------------------------------------------------
 
 void Wavelet::doUnwrap () {
-	nPhysD *phase=getPhysFromCombo(my_w.imageUnwrap);
-	nPhysD *qual=getPhysFromCombo(my_w.qualityUnwrap);
+    physD *phase=static_cast<physD*>(getPhysFromCombo(my_w.imageUnwrap));
+    physD *qual=static_cast<physD*>(getPhysFromCombo(my_w.qualityUnwrap));
 	nPhysD barrierPhys;
 	
 	QTime timer;
 	timer.start();
 
 	if (qual && phase) {
-		nPhysD *uphase=NULL;
+        physD uphase;
 
 		QString methodName=my_w.method->currentText();
 
 		if (my_w.useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
-            QPolygonF my_poly=linebarrier->poly(phase->getW()+phase->getH());
+            QPolygonF my_poly=linebarrier.poly(phase->getW()+phase->getH());
             my_poly.translate(qual->get_origin().x(),qual->get_origin().y());
 			foreach(QPointF p, my_poly) {
 				barrierPhys.set(p.x()-1,p.y()-1,0.0);
@@ -281,61 +280,53 @@ void Wavelet::doUnwrap () {
 				barrierPhys.set(p.x()+1,p.y()+1,0.0);
 			}
 			if (methodName=="Simple H+V") {
-                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV);
+                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV, uphase);
 			} else if (methodName=="Simple V+H") {
-                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH);
+                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH, uphase);
 			} else if (methodName=="Goldstein") {
-                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN);
+                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN, uphase);
 			} else if (methodName=="Miguel") {
-                uphase = phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
+                phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
 			} else if (methodName=="Miguel+Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY);
+                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
 			} else if (methodName=="Quality") {
                 physMath::phys_point_multiply(barrierPhys,*qual);
-                uphase = physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY);
+                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY, uphase);
 			}
 		} else {
 			if (methodName=="Simple H+V") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_HV);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_HV, uphase);
 			} else if (methodName=="Simple V+H") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_VH);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_VH, uphase);
 			} else if (methodName=="Goldstein") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::GOLDSTEIN);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::GOLDSTEIN, uphase);
 			} else if (methodName=="Miguel") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL, uphase);
 			} else if (methodName=="Miguel+Quality") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL_QUALITY);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL_QUALITY, uphase);
 			} else if (methodName=="Quality") {
-                uphase = physWave::phys_phase_unwrap(*phase, *qual, physWave::QUALITY);
+                physWave::phys_phase_unwrap(*phase, *qual, physWave::QUALITY, uphase);
 			}
 		}
-		
-		// esistono sicuramente dei metodi piu' intelligenti
-		
-		if (uphase) {
-			uphase->setShortName("unwrap");
-			uphase->setName(uphase->getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
-			uphase->setFromName(phase->getFromName());
-			my_w.erasePreviousUnwrap->setEnabled(true);
 
-			if (my_w.removeCarrierAfterUnwrap->isChecked()) {
-                double alpha=my_w.angleCarrier->value();
-                double lambda=my_w.widthCarrier->value();
-                double kx = cos(alpha*_phys_deg)/lambda;
-                double ky = -sin(alpha*_phys_deg)/lambda;
-                physWave::phys_subtract_carrier(*uphase, kx, ky);
-			}
-			
-			if (my_w.erasePreviousUnwrap->isChecked()) {
-				unwrapPhys=nparent->replacePhys(uphase,unwrapPhys);
-			} else {
-				unwrapPhys=uphase;
-				nparent->addShowPhys(unwrapPhys);
-			}
-			my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
-			
-		}
+        uphase.setShortName("unwrap");
+        uphase.setName(uphase.getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
+        uphase.setFromName(phase->getFromName());
+        my_w.erasePreviousUnwrap->setEnabled(true);
+
+        if (my_w.removeCarrierAfterUnwrap->isChecked()) {
+            physWave::phys_subtract_carrier(uphase, my_w.angleCarrier->value(), my_w.widthCarrier->value());
+        }
+
+        if (my_w.erasePreviousUnwrap->isChecked()) {
+            unwrapPhys=nparent->replacePhys(new nPhysD(uphase.copy()),unwrapPhys);
+        } else {
+            unwrapPhys=new nPhysD(uphase.copy());
+            nparent->addShowPhys(unwrapPhys);
+        }
+        my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
+
 	}
 	QString out;
 	out.sprintf("%d msec",timer.elapsed());
@@ -378,9 +369,7 @@ void Wavelet::doRemoveCarrier () {
 		unwrappedSubtracted->setShortName("No carrier");
 		unwrappedSubtracted->setFromName(unwrapped->getFromName());
 
-        double kx = cos(alpha*_phys_deg)/lambda;
-        double ky = -sin(alpha*_phys_deg)/lambda;
-        physWave::phys_subtract_carrier(*unwrappedSubtracted, kx, ky);
+        physWave::phys_subtract_carrier(*unwrappedSubtracted, alpha, lambda);
         physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
 		my_w.erasePreviuos->setEnabled(true);
 		if (my_w.erasePreviuos->isChecked()) {

@@ -42,8 +42,8 @@ void Spectral_analysis::on_calculate_released() {
     nPhysD *image=getPhysFromCombo(my_w.image);
     phys_fft dir = my_w.direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
     if (image) {
-        nPhysC ft;
-        nPhysC temp_complex;
+        physC ft;
+        physC temp_complex;
         if (my_w.useImaginary->isChecked()) {
             nPhysD *imaginary=getPhysFromCombo(my_w.imaginary);
             if (imaginary) {
@@ -81,7 +81,7 @@ void Spectral_analysis::on_calculate_released() {
             physMath::phys_divide(ft, sqrt(image->getSurf()));
         }
 
-        std::map<std::string, nPhysD> omap;
+        std::map<std::string, physD> omap;
         switch (my_w.output_format->currentIndex()) {
         case 0: omap = physMath::to_polar(ft); break; // polar
         case 1: omap = physMath::to_rect(ft); break; // rectangular
@@ -89,12 +89,11 @@ void Spectral_analysis::on_calculate_released() {
         case 3: omap = physMath::to_powersp(ft, true); break;// power spectrum log10
         }
 
-        for (std::map<std::string, nPhysD>::iterator itr = omap.begin(); itr != omap.end(); itr++) {
-            nPhysD *perm = new nPhysD;
-            *perm = itr->second;
+        for ( auto& itr : omap) {
+            nPhysD *perm = new nPhysD(itr.second);
             perm->TscanBrightness();
-            perm->setShortName(itr->first);
-            perm->setName(itr->first);
+            perm->setShortName(itr.first);
+            perm->setName(itr.first);
             nparent->addShowPhys( perm );
         }
     }

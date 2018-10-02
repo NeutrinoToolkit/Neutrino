@@ -5,7 +5,7 @@
 
 #include <cmath>
 #include "PythonQt.h"
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -23,11 +23,11 @@ class nPhysPyWrapper : public QObject {
 public slots:
     nPhysD* new_nPhysD();
 
-    QList<nPhysD*> static_nPhysD_open(QString=QString());
+    QList<nPhysD> static_nPhysD_open(QString=QString());
 
     nPhysD* new_nPhysD(QVector<double>, QPair<int,int>);
 
-    nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python"));
+//    nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python"));
 
     nPhysD* new_nPhysD(nPhysD*);
 

@@ -1,6 +1,9 @@
 #include "nPluginLoader.h"
 #include "neutrino.h"
 #include <QMenu>
+#include <QToolButton>
+#include <QMessageBox>
+
 
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
     QPluginLoader(pname),

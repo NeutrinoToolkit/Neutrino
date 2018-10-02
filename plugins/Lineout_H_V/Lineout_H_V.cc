@@ -111,7 +111,7 @@ void Lineout_H_V::updatePlot(QPointF p) {
             my_w.plot->graph(k)->keyAxis()->setRange(x.first(), x.last());
 
             if(my_w.lockColors->isChecked()) {
-                vec2f rang=currentBuffer->property["display_range"];
+                vec2f rang=currentBuffer->prop["display_range"];
                 my_w.plot->graph(k)->valueAxis()->setRange(rang.x(),rang.y());
             }
             my_w.plot->graph(k)->valueAxis()->setProperty("lock",my_w.lockColors->isChecked());

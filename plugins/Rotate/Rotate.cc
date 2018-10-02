@@ -43,7 +43,8 @@ void Rotate::doRotateLive () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		if (image!=rotated) {
-			rotated=nparent->replacePhys(image->rotated(alpha,getReplaceVal()),rotated, true);
+            nPhysD pippo = image->rotated(alpha,getReplaceVal());
+            rotated=nparent->replacePhys(new nPhysD(pippo),rotated, true);
 		} else {
 			my_w.statusbar->showMessage("Can't work on this image",5000);
 		}
@@ -53,7 +54,7 @@ void Rotate::doRotateLive () {
 void Rotate::doRotate () {
 	doRotateLive();
 	if (rotated) {
-		nPhysD *newRotated=new nPhysD(*rotated);
+        nPhysD *newRotated=new nPhysD(rotated->copy());
 		nparent->addPhys(newRotated);
 	}
 }

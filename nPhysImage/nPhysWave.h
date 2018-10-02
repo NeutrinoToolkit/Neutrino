@@ -65,7 +65,7 @@ struct wavelet_params_str {
         DEBUG("wavelet_params created");
     }
     
-    nPhysD *data;
+    physD *data;
 
 	double init_angle;
 	double end_angle;
@@ -85,43 +85,11 @@ struct wavelet_params_str {
 	int iter;
 	int *iter_ptr;
 
-	std::map<std::string, nPhysD*> olist;
+    std::map<std::string, physD*> olist;
 };
 typedef struct wavelet_params_str wavelet_params;
 
 
-
-//struct convolution_result_str {
-//public:
-//	convolution_result_str()
-//		: I(0)
-//	{ } 
-//	
-//	convolution_result_str(int)
-//		: I(0)
-//	{ } 
-//
-//	// (cosa cazzo gli servono questi?? creeepy...
-//	convolution_result_str operator+ (const convolution_result_str &oth)
-//	{ return *this; }
-//	convolution_result_str operator- (convolution_result_str &oth)
-//	{ return *this; }
-//	convolution_result_str operator* (convolution_result_str &oth)
-//	{ return *this; }
-//	
-//	operator convolution_result_str & ()
-//	{ return *this; }
-//
-//	double I;
-//	double phi;
-//	double lambda;
-//	double angle;
-//};
-//typedef struct convolution_result_str convolution_result;
-
-// calculate wavelet field
-
-// std::list<nPhysImageF<double> *> phys_wavelet_field_2D(nPhysImageF<double> &, wavelet_params &);
 void phys_wavelet_field_2D_morlet(wavelet_params &);
 
 void phys_wavelet_field_2D_morlet_opencl(wavelet_params &);
@@ -143,7 +111,7 @@ std::string get_platform_device_info_opencl(int);
 void phys_wavelet_trasl_opencl(void *, int &);
 
 // unwrap methods
-nPhysImageF<double> *phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy);
+void phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy, nPhysImageF<double>&);
 
 // carrier subtraction
 void phys_subtract_carrier (nPhysImageF<double> &, double, double);
@@ -163,9 +131,9 @@ struct abel_params_str {
 		: iimage(NULL), oimage(NULL), iter_ptr(0)
 	{ }
 
-    nPhysD *iimage;
-    nPhysD *oimage;
-//     nPhysD rimage;
+    physD *iimage;
+    physD *oimage;
+//     physD rimage;
     
 	std::vector<vec2> iaxis;
 	phys_direction idir;
@@ -230,29 +198,13 @@ inline void phys_invert_abel_1D(std::vector<double> &ivec, std::vector<double> &
 	return;
 }
 
-// bessel LUT
-struct bessel_str {
-public:
-	bessel_str()
-		: N(0), lut(nullptr)/*, cos_lut(nullptr)*/
-	{ }
-	~bessel_str() {
-		if (lut) delete lut;
-//		if (cos_lut) delete cos_lut;
-	}
-
-	size_t N;
-	double *lut;
-//	double *cos_lut;
-};
-typedef struct bessel_str bessel_alloc_t;
 
 
 //bessel_alloc_t *bessel_allocate();
 //void bessel_free(bessel_alloc_t *);
 
 
-inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double> &ovec, bessel_alloc_t &lut)
+inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double> &ovec, std::vector<double> &lut, std::vector<double> &Fivec, fftw_plan &r2rplan)
 {
 	if (ivec.size()!=ovec.size() || ivec.size()==0)
 		return;
@@ -262,15 +214,10 @@ inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double>
 
 	// check Bessel LUT
 	size_t N=ivec.size();
-	if (N != lut.N) {
+    if (N*N != lut.size()) {
 		// recalculate lut
 		DEBUG(10,"recalculate Bessel LUT for N="<<N<<"...");
-		if (lut.lut != NULL)
-			delete lut.lut;
-
-		lut.N = N;
-		lut.lut = new double[N*N];
-
+        lut.resize(N*N);
 		for (size_t j=0; j<N; j++) {
 			for (size_t k=0; k<j+1; k++) {
 				// direct cosine
@@ -278,19 +225,18 @@ inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double>
 
 				// DCT 
 				// (change in integration variable to respect FFTW-DCT definition)
-				lut.lut[k*j] = gsl_sf_bessel_J0(M_PI*j*k/N);
+                lut[k*j] = gsl_sf_bessel_J0(M_PI*j*k/N);
 			}
 		}
 		DEBUG(10,"done");
-
 	}
 
+    if (Fivec.size()==0) {
+        Fivec.resize(N);
+        r2rplan = fftw_plan_r2r_1d(N, &ivec[0], &Fivec[0], FFTW_REDFT00, FFTW_ESTIMATE);
+    }
 	// sara' da trovare una soluzione rapida per il plan
-	std::vector<double> Fivec(N,0);
-
-	fftw_plan r2rplan = fftw_plan_r2r_1d(N, &ivec[0], &Fivec[0], FFTW_REDFT00, FFTW_ESTIMATE);
 	fftw_execute(r2rplan);
-	fftw_destroy_plan(r2rplan);
 
 	for (size_t j=0; j<N; j++) {
 	
@@ -303,8 +249,8 @@ inline void phys_invert_abelHF_1D(std::vector<double> &ivec, std::vector<double>
 
 				// fast DCT
 				//ovec[j] += Fivec[k] * k * lut.lut[j*k];
-				ovec[j] += Fivec[k] * (M_PI/N) * k * lut.lut[j*k];
-			}
+                ovec[j] += Fivec[k] * (M_PI/N) * k * lut[j*k];
+            }
 	//	}
 		//ovec[j] *= (1/(2*3.14*pow(2.*N+1.,2)));
 		ovec[j] *= 1./(2.*N);

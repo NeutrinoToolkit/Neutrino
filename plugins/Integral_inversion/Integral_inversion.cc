@@ -79,9 +79,8 @@ Integral_inversion::sceneChanged()
 	}
 }
 
-QVariant Integral_inversion::doInversion() {
+void Integral_inversion::doInversion() {
 	saveDefaults();
-	QVariant retVar;
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		//axis->rearrange_monotone();
@@ -115,42 +114,28 @@ QVariant Integral_inversion::doInversion() {
 		}
 
 		// launch inversion
-		nPhysD *iimage=NULL;
-		// do we need a copy?
-		if ((my_w.refphase_checkb->isChecked() && getPhysFromCombo(my_w.refphase_cb)) || my_w.blurRadius_checkb->isChecked() || my_w.multiply_checkb->isChecked()) {
-			// deep copy and perform operations
-			if (my_w.refphase_checkb->isChecked()) {
-				nPhysD *ref=getPhysFromCombo(my_w.refphase_cb);
-				if (ref && image->getW() == ref->getW() && image->getH() == ref->getH()) {
-					iimage = new nPhysD();
-					*iimage=(*image)-(*ref);
-				} else {
-					statusBar()->showMessage("Problem in removing reference", 5000);
-				}
-			}
-			if (iimage==NULL) iimage = new nPhysD(*image);
-			iimage->setFromName(iimage->getName());
-			iimage->setName("inverted");
+        physD iimage(static_cast<physD*>(image)->copy());
+        // deep copy and perform operations
+        if (my_w.refphase_checkb->isChecked()) {
+            physD *ref=static_cast<physD*>(getPhysFromCombo(my_w.refphase_cb));
+            if (ref && iimage.getW() == ref->getW() && iimage.getH() == ref->getH()) {
+                iimage = iimage - (*ref);
+            } else {
+                statusBar()->showMessage("Problem in removing reference", 5000);
+            }
+        }
+        iimage.setFromName(iimage.getName());
+        iimage.setName("inverted");
 
-			if (my_w.blurRadius_checkb->isChecked()) {	// blur
-                physMath::phys_fast_gaussian_blur(*iimage, my_w.blurRadius_sb->value());
-                std::ostringstream oss; oss<<iimage->getName()<<" (blur"<<my_w.blurRadius_sb->value()<<")";
-				iimage->setName(oss.str());
-			}
+        if (my_w.blurRadius_checkb->isChecked()) {	// blur
+            physMath::phys_fast_gaussian_blur(iimage, my_w.blurRadius_sb->value());
+        }
 
-			if (my_w.multiply_checkb->isChecked()) {	// multiply
-                physMath::phys_multiply(*iimage, my_w.multiply_sb->value());
-                std::ostringstream oss; oss<<iimage->getName()<<" *( "<<my_w.multiply_sb->value()<<")";
-				iimage->setName(oss.str());
-			}
+        if (my_w.multiply_checkb->isChecked()) {	// multiply
+            physMath::phys_multiply(iimage, my_w.multiply_sb->value());
+        }
 
 
-		} else {
-			// move pointer
-			iimage = image;
-		}
-
-		nPhysD *inv_image=NULL;
 		enum phys_direction inv_axis_dir = (isHorizontal) ? PHYS_X : PHYS_Y;
 		
 		//inv_image = phys_invert_abel(*iimage, inv_axis, inv_axis_dir, ABEL, ABEL_NONE);
@@ -165,21 +150,16 @@ QVariant Integral_inversion::doInversion() {
 		// (workaround)
 
 		int cb_idx = my_w.invAlgo_cb->currentIndex();
-		//if (cb_idx == 1)
-		//	my_abel_params.ialgo = ABEL_HF;
-		//else
-		//	my_abel_params.ialgo = ABEL;
         my_abel_params.ialgo = (enum physWave::inversion_algo) my_w.invAlgo_cb->itemData(cb_idx).value<int>();
 
         my_abel_params.iphysics = physWave::ABEL_NONE;
 
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 
-        my_abel_params.iimage=iimage;
+        my_abel_params.iimage= &iimage;
 
         runThread(&my_abel_params, phys_invert_abel_transl, "Abel inversion..." , inv_axis.size());
 
-        inv_image = my_abel_params.oimage;
 		
 
 		DEBUG(5,"about to launch thread");
@@ -187,60 +167,51 @@ QVariant Integral_inversion::doInversion() {
 			// apply physics
 		QApplication::processEvents();		
 
-        if (inv_image) {
+        if (my_abel_params.oimage) {
+            nPhysD inv_image(my_abel_params.oimage->copy());
+
             switch (my_w.physTabs->currentIndex()) {
             case 0:
                 DEBUG("Inversions: no physics applied");
                 break;
             case 1:
-                physWave::phys_apply_inversion_gas(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
+                physWave::phys_apply_inversion_gas(inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
                 break;
             case 2:
                 DEBUG("Inversions: applying plasma physics");
-                physWave::phys_apply_inversion_plasma(*inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
+                physWave::phys_apply_inversion_plasma(inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
                 break;
             case 3: {
                 DEBUG("Inversions: applying proton  physics");
-                physWave::phys_apply_inversion_protons(*inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
-                //                    nPhysD *pippo= new nPhysD(my_abel_params.rimage);
-                //                    phys_point_multiply(*pippo, *inv_image);
-                //                    phys_multiply(*pippo, my_w.imgRes_sb->value()*1e-6/(2.0*_phys_vacuum_eps));
-                //                    nparent->addPhys(pippo);
+                physWave::phys_apply_inversion_protons(inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
                 break;
             }
             default:
                 break;
             }
-            inv_image->setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
-
-			//		if (my_w.blurRadius_checkb->isChecked()) {	// blur
-			//			phys_fast_gaussian_blur(*inv_image, my_w.blurRadius_sb->value());
-			//		}
+            inv_image.setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
 
             bool ok1,ok2;
             double mini=locale().toDouble(my_w.minCut->text(),&ok1);
             double maxi=locale().toDouble(my_w.maxCut->text(),&ok2);
             if (ok1 || ok2) {
-                physMath::phys_cutoff(*inv_image,
-                            ok1?mini:inv_image->get_min(), 
-                            ok2?maxi:inv_image->get_max());
+                physMath::phys_cutoff(inv_image,
+                            ok1?mini:inv_image.get_min(),
+                            ok2?maxi:inv_image.get_max());
             }
             
-            
+            nPhysD *pippo = new nPhysD(inv_image.copy());
 			if (my_w.erasePrevious->isChecked()) {
-				invertedPhys=nparent->replacePhys(inv_image,invertedPhys);
+                invertedPhys=nparent->replacePhys(pippo,invertedPhys);
 			} else {
-				invertedPhys=inv_image;
-				nparent->addPhys(inv_image);
+                invertedPhys=pippo;
+                nparent->addPhys(pippo);
 			}
-			retVar=qVariantFromValue(*invertedPhys);
-		} else {
-            DEBUG("[Integral_inversion] Error: inversion returned NULL");
-		}
+        } else {
+            statusBar()->showMessage("Problem in inversion", 5000);
+        }
 		
 	}
-
-	return retVar;
 }
 
 void phys_invert_abel_transl(void *params, int& iter) {

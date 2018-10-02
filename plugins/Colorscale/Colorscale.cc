@@ -51,7 +51,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     my_w.lineMax->setValidator(&dVal);
 
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->property["display_range"];
+        vec2f minmax=currentBuffer->prop["display_range"];
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
     }
@@ -78,7 +78,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
 
     show(true);
 
-    if (currentBuffer) my_w.gamma->setValue(currentBuffer->property["gamma"]);
+    if (currentBuffer) my_w.gamma->setValue(currentBuffer->prop["gamma"]);
 
     updatecolorbar();
     cutOffPhys=NULL;
@@ -99,7 +99,7 @@ void Colorscale::paletteComboChange(int val) {
 
 void Colorscale::on_gamma_valueChanged(int val) {
     if (currentBuffer) {
-        currentBuffer->property["gamma"]=val;
+        currentBuffer->prop["gamma"]=val;
         nparent->updatePhys();
     }
 }
@@ -120,10 +120,10 @@ void Colorscale::minChanged () {
     QString value(my_w.lineMin->text());
     disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->property["display_range"];
+        vec2f minmax=currentBuffer->prop["display_range"];
         DEBUG(QLocale().toDouble(value) << " " << minmax);
         minmax.set_first(QLocale().toDouble(value));
-        currentBuffer->property["display_range"]=minmax;
+        currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMin->setValue(sliderValues().first());
     }
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
@@ -135,10 +135,10 @@ void Colorscale::maxChanged () {
     QString value(my_w.lineMax->text());
     disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->property["display_range"];
+        vec2f minmax=currentBuffer->prop["display_range"];
         DEBUG(QLocale().toDouble(value) << " " << minmax);
         minmax.set_second(QLocale().toDouble(value));
-        currentBuffer->property["display_range"]=minmax;
+        currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMax->setValue(sliderValues().second());
     }
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
@@ -148,8 +148,8 @@ void Colorscale::maxChanged () {
 
 void Colorscale::invertColors () {
     if (currentBuffer) {
-        vec2f oldrange = currentBuffer->property["display_range"];
-        currentBuffer->property["display_range"]=oldrange.swap();
+        vec2f oldrange = currentBuffer->prop["display_range"];
+        currentBuffer->prop["display_range"]=oldrange.swap();
         nparent->updatePhys();
     } else {
         my_w.actionInvert->setChecked(false);
@@ -159,7 +159,7 @@ void Colorscale::invertColors () {
 void Colorscale::bufferChanged(nPhysD *phys) {
     nGenericPan::bufferChanged(phys);
     if (phys) {
-        vec2f minmax=phys->property["display_range"];
+        vec2f minmax=phys->prop["display_range"];
         DEBUG(minmax);
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
@@ -169,7 +169,7 @@ void Colorscale::bufferChanged(nPhysD *phys) {
         my_w.lineMax->setText("");
     }
     my_w.sliderMax->setValue(sliderValues().second());
-    my_w.gamma->setValue(phys->property["gamma"]);
+    my_w.gamma->setValue(phys->prop["gamma"]);
     my_w.histogram->repaint();
 
     disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
@@ -182,7 +182,7 @@ void Colorscale::bufferChanged(nPhysD *phys) {
 
 vec2f Colorscale::sliderValues() {
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->property["display_range"];
+        vec2f minmax=currentBuffer->prop["display_range"];
         double valmin=my_w.sliderMin->maximum()*(minmax.first()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
         double valmax=my_w.sliderMax->maximum()*(minmax.second()-currentBuffer->get_min())/(currentBuffer->get_max()-currentBuffer->get_min());
         return vec2f(valmin,valmax);
@@ -201,7 +201,7 @@ void Colorscale::updatecolorbar(QString) {
     connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->property["display_range"];
+        vec2f minmax=currentBuffer->prop["display_range"];
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
         my_w.sliderMin->setValue(sliderValues().first());

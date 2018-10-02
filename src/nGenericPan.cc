@@ -27,6 +27,11 @@
 
 #include "nApp.h"
 #include "neutrino.h"
+#include "nLine.h"
+#include "nRect.h"
+#include "nEllipse.h"
+#include "nPoint.h"
+#include "nCustomPlots.h"
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)

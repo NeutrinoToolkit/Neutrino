@@ -512,7 +512,7 @@ nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
 }
 
 
-int OpenHdf5::phys_write_Hdf5(nPhysImageF<double> *phys, std::string fname) {
+int OpenHdf5::phys_write_Hdf5(nPhysD *phys, std::string fname) {
     if (phys) {
         if (H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
             unsigned int	filter_info;
@@ -554,7 +554,7 @@ int OpenHdf5::phys_write_Hdf5(nPhysImageF<double> *phys, std::string fname) {
     return -1;
 }
 
-void OpenHdf5::scan_attributes(hid_t aid, nPhysImageF<double> *my_data){
+void OpenHdf5::scan_attributes(hid_t aid, nPhysD *my_data){
     ssize_t len = 1+H5Aget_name(aid, 0, NULL );
     char *attrName=new char[len];
     H5Aget_name(aid, len, attrName );
@@ -583,7 +583,7 @@ void OpenHdf5::scan_attributes(hid_t aid, nPhysImageF<double> *my_data){
         int nelem=aInfo.data_size/sizeof(int);
         std::vector<int> val(nelem);
         if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
-            my_data->property[std::string(attrName)]=val[0];
+            my_data->prop[std::string(attrName)]=val[0];
         }
     } else if (classAType == H5T_STRING) {
         char *val =NULL;

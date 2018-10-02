@@ -25,6 +25,8 @@
 #include "neutrino.h"
 #include "nApp.h"
 #include "nView.h"
+#include <QShortcut>
+#include <QFileDialog>
 
 nView::~nView ()
 {
@@ -159,11 +161,12 @@ void nView::showPhys(nPhysD *my_phys) {
     if (my_phys) {
         if (!physList.contains(my_phys)) physList << my_phys;
 
-        DEBUG(lockColors);
+        DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
+
         if (currentBuffer) {
             if (lockColors) {
-                my_phys->property["display_range"]=currentBuffer->property["display_range"];
-                my_phys->property["gamma"]=currentBuffer->property["gamma"];
+                my_phys->prop["display_range"]=currentBuffer->prop["display_range"];
+                my_phys->prop["gamma"]=currentBuffer->prop["gamma"];
             }
         }
 
@@ -388,12 +391,12 @@ void nView::rescaleColor(int val) {
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
             foreach (nPhysD* phys, physList) {
-                phys->property["display_range"]=physMath::getColorPrecentPixels(*phys,val);
+                phys->prop["display_range"]=physMath::getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
             qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
-            currentBuffer->property["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
+            currentBuffer->prop["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
             emit bufferChanged(currentBuffer);
             qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }
@@ -460,11 +463,11 @@ void nView::toggleGrid() {
 
 
 void nView::incrGamma() {
-    setGamma(int(currentBuffer->property["gamma"])+1);
+    setGamma(int(currentBuffer->prop["gamma"])+1);
 }
 
 void nView::decrGamma() {
-    setGamma(int(currentBuffer->property["gamma"])-1);
+    setGamma(int(currentBuffer->prop["gamma"])-1);
 }
 
 void nView::resetGamma() {
@@ -474,7 +477,7 @@ void nView::resetGamma() {
 
 void nView::setGamma(int value) {
     if (currentBuffer) {
-        currentBuffer->property["gamma"]=value;
+        currentBuffer->prop["gamma"]=value;
         updatePhys();
         emit bufferChanged(currentBuffer);
     }
@@ -609,7 +612,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        currentBuffer->property["display_range"]=minMax;
+        currentBuffer->prop["display_range"]=minMax;
         setProperty("percentPixels",QVariant());
         updatePhys();
     }

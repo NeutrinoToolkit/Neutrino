@@ -28,7 +28,7 @@
 #include <QGraphicsObject>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 #ifndef __nRect
 #define __nRect

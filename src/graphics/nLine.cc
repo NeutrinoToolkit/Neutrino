@@ -43,20 +43,18 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 	my_w.name->setText(parentPan->panName()+"Line");
 	setProperty("parentPanControlLevel",level);
 	if (level>0) {
-		my_w.name->setReadOnly(true);
-		disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-	}
-	if (level>1) {
-		sizeHolder(0.0);
-	}
-	if (level>2) {
-		my_w.cutPoints->setValue(1);
-	}
-
-	if (level>0) {
-		disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+        my_w.name->setReadOnly(true);
+        disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+        disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 		my_w.actionRemove->setVisible(false);
-	}
+        if (level>1) {
+            sizeHolder(0.0);
+            if (level>2) {
+                my_w.cutPoints->setValue(1);
+                my_w.cutPoints->setReadOnly(true);
+            }
+        }
+    }
 
 }
 
@@ -283,12 +281,6 @@ void nLine::togglePadella() {
 		my_pad.hide();
 	}
 }
-
-void nLine::mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * e ) {
-	togglePadella();
-	QGraphicsItem::mouseDoubleClickEvent(e);
-}
-
 
 void nLine::updatePlot () {
 

@@ -78,9 +78,9 @@ void nHistogram::mouseReleaseEvent (QMouseEvent *){
     if (parentPan->currentBuffer && property("mousepress").isValid()){
         double oldcolor=property("mousepress").toDouble();
         if (oldcolor!=colorvalue) {
-            parentPan->currentBuffer->property["display_range"]=vec2f(oldcolor,colorvalue);
+            parentPan->currentBuffer->prop["display_range"]=vec2f(oldcolor,colorvalue);
         } else {
-           parentPan->currentBuffer->property["display_range"]=parentPan->currentBuffer->get_min_max();
+           parentPan->currentBuffer->prop["display_range"]=parentPan->currentBuffer->get_min_max();
         }
         parentPan->nparent->updatePhys();
         parentPan->updatecolorbar();
@@ -194,7 +194,7 @@ void nHistogram::drawPicture (QPainter &p) {
 
         int num_labels=0;
         bool too_big=false;
-        vec2f minmax=parentPan->currentBuffer->property.have("display_range") ? parentPan->currentBuffer->property["display_range"] : parentPan->currentBuffer->get_min_max();
+        vec2f minmax=parentPan->currentBuffer->prop.have("display_range") ? parentPan->currentBuffer->prop["display_range"] : parentPan->currentBuffer->get_min_max();
         while (!too_big) {
             num_labels++;
             too_big=false;

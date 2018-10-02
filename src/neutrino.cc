@@ -333,7 +333,8 @@ void neutrino::menuFlipRotate() {
 void neutrino::rotateLeft() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
     if (my_w->my_view->currentBuffer) {
-        physMath::phys_rotate_left(*my_w->my_view->currentBuffer);
+        physMath::phys_rotate_left(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
+        my_w->my_view->currentBuffer->reset_display();
         updatePhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -344,7 +345,8 @@ void neutrino::rotateLeft() {
 void neutrino::rotateRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
     if (my_w->my_view->currentBuffer) {
-        physMath::phys_rotate_right(*my_w->my_view->currentBuffer);
+        physMath::phys_rotate_right(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
+        my_w->my_view->currentBuffer->reset_display();
         updatePhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -354,7 +356,8 @@ void neutrino::rotateRight() {
 void neutrino::flipUpDown() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
     if (my_w->my_view->currentBuffer) {
-        physMath::phys_flip_ud(*my_w->my_view->currentBuffer);
+        physMath::phys_flip_ud(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
+        my_w->my_view->currentBuffer->reset_display();
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -364,7 +367,8 @@ void neutrino::flipUpDown() {
 void neutrino::flipLeftRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
     if (my_w->my_view->currentBuffer) {
-        physMath::phys_flip_lr(*my_w->my_view->currentBuffer);
+        physMath::phys_flip_lr(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
+        my_w->my_view->currentBuffer->reset_display();
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -374,7 +378,8 @@ void neutrino::flipLeftRight() {
 void neutrino::transpose() {
     my_w->menuTransformation->setDefaultAction(my_w->actionTranspose);
     if (my_w->my_view->currentBuffer) {
-        physMath::phys_transpose(*my_w->my_view->currentBuffer);
+        physMath::phys_transpose(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
+        my_w->my_view->currentBuffer->reset_display();
         updatePhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -640,7 +645,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     if (suffix=="neus") {
         imagelist=openSession(fname);
     } else {
-        std::vector<nPhysD*> my_vec;
+        std::vector<physD> my_vec;
         try {
             my_vec=physFormat::phys_open(fname.toUtf8().constData(),separate_rgb);
         } catch (std::exception &e) {
@@ -648,8 +653,9 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
             dlg.exec();
         }
-        for(std::vector<nPhysD*>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
-            imagelist.push_back(*it);
+        for(std::vector<physD>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
+            nPhysD *ceppa = new nPhysD(*it);
+            imagelist.push_back(ceppa);
         }
         if (imagelist.size()==0) {
             QImage image(fname);
@@ -775,7 +781,7 @@ void neutrino::saveSession (QString fname) {
                         file.seek(0);
                         while (!file.atEnd()) {
                             QByteArray line = file.readLine();
-                            qWarning() << line;
+                            qDebug() << line;
                             ofile << line.toStdString();
                         }
                         file.close();
@@ -792,9 +798,9 @@ void neutrino::saveSession (QString fname) {
             progress.setValue(my_w->my_view->physList.size()+1);
             ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
-            std::vector <nPhysD *> vecPhys;
+            std::vector <physD *> vecPhys;
             foreach (nPhysD * my_phys, my_w->my_view->physList) {
-                vecPhys.push_back(my_phys);
+                vecPhys.push_back(dynamic_cast<physD*>(my_phys));
             }
             physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData());
         } else {
@@ -833,7 +839,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     if (qLine.startsWith("NeutrinoImage")) {
                         progress.setValue(++counter);
                         nPhysD *my_phys=new nPhysD();
-                        int ret=physFormat::phys_resurrect_binary(my_phys,ifile);
+                        int ret=physFormat::phys_resurrect_binary(*my_phys,ifile);
                         if (ret>=0 && my_phys->getSurf()>0) {
                             progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
                             QApplication::processEvents();
@@ -929,7 +935,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
             delete newPhys;
             newPhys=oldPhys;
         } else {
-            newPhys->property.erase("display_range");
+            newPhys->prop.erase("display_range");
             addPhys(newPhys);
         }
         if (show || redisplay) {
@@ -970,11 +976,11 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                     my_w->menuBuffers->removeAction(action);
                 }
             }
-//            if (datamatrix->property["keep_phys_alive"].get_i()!=42){
-//                DEBUG("PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
-//                delete datamatrix;
-//            }
-            delete datamatrix;
+            if (!datamatrix->prop.have("keep_phys_alive")){
+                delete datamatrix;
+            } else {
+                DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
+            }
             datamatrix=NULL;
         }
     }
@@ -982,8 +988,8 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 
 void
 neutrino::showPhys(nPhysD* my_phys) {
-    if (my_phys && !my_phys->property.have("gamma")) {
-        my_phys->property["gamma"]=property("NeuSave-gamma").toInt();
+    if (my_phys && !my_phys->prop.have("gamma")) {
+        my_phys->prop["gamma"]=property("NeuSave-gamma").toInt();
     }
     my_w->my_view->showPhys(my_phys);
 }

@@ -3,6 +3,8 @@
 #include <QtNetwork>
 #include "ui_nLogWin.h"
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QScrollBar>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),

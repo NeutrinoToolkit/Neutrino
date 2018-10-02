@@ -24,8 +24,7 @@ bool ShellPlug::instantiate(neutrino *neu) {
         PythonQt::init(PythonQt::RedirectStdOut);
     } else {
         qDebug() << "here";
-        PythonQt::init();
-        qDebug() << "here";
+        PythonQt::init(PythonQt::IgnoreSiteModule);
     }
 
 //    PythonQt_QtAll::init();

@@ -48,7 +48,7 @@ Properties::bufferChanged(nPhysD *my_phys) {
     DEBUG(currentProperty);
     if (my_phys) {
         setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
-        for(anymap::iterator iter=my_phys->property.begin();iter!=my_phys->property.end(); iter++ ) {
+        for(anymap::iterator iter=my_phys->prop.begin();iter!=my_phys->prop.end(); iter++ ) {
             QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
             my_w.propertyList->addItem(item);
             if (iter->first==currentProperty) {
@@ -64,7 +64,7 @@ void
 Properties::on_propertyList_itemSelectionChanged() {
     if (currentBuffer && my_w.propertyList->currentItem()) {
         std::string currentKey=my_w.propertyList->currentItem()->text().toStdString();
-        std::string myval=currentBuffer->property[currentKey];
+        std::string myval=currentBuffer->prop[currentKey];
         my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
     }
 }
@@ -76,10 +76,10 @@ void Properties::on_changePhysProperty_pressed() {
         anydata my_val=toAnydata(new_value);
         if (my_w.applyToAll->isChecked()) {
             for (auto & phys: nparent->getBufferList()) {
-                phys->property[currentProperty]=my_val;
+                phys->prop[currentProperty]=my_val;
             }
         } else {
-            currentBuffer->property[currentProperty]=my_val;
+            currentBuffer->prop[currentProperty]=my_val;
         }
         nparent->showPhys(currentBuffer);
     }

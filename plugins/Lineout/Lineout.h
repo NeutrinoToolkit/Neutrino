@@ -110,7 +110,7 @@ public slots:
             }
 
             if(my_w.actionLockColors->isChecked()) {
-                vec2f rang=currentBuffer->property["display_range"];
+                vec2f rang=currentBuffer->prop["display_range"];
                 my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
             }
 

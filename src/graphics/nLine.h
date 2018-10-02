@@ -30,7 +30,7 @@
 #include <QGraphicsObject>
 #include "ui_nLine.h"
 
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 class neutrino;
 class nGenericPan;
@@ -53,7 +53,6 @@ public:
 	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
 	void keyPressEvent ( QKeyEvent *);
 	void keyReleaseEvent ( QKeyEvent *);
-	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
 	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
 	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
 	void hoverMoveEvent( QGraphicsSceneHoverEvent *);

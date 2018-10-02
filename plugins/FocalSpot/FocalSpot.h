@@ -51,6 +51,10 @@ public slots:
 
     void bufferChanged(nPhysD*);
 
+    void on_centroid_toggled(bool tog);
+    void setPosZero(QPointF pos);
+
+
 private:
     // blurred image for easier calculations
     nPhysD decimated;
