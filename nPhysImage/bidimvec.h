@@ -110,6 +110,12 @@ public:
 	inline void set_second(T val)
 	{ myval2= val;}
 
+    inline void set(bidimvec<T> val)
+    {
+        myval1= val.x();
+        myval2= val.y();
+    }
+
     inline T operator () (phys_direction dir) {
         return dir==0?myval1:myval2;
     }
@@ -347,5 +353,10 @@ namespace vmath {
 }
 
 // -----------------------------------------------------------
+
+typedef bidimvec<double> vec2f;
+typedef bidimvec<int> vec2i;
+typedef bidimvec<int> vec2u;
+
 
 #endif

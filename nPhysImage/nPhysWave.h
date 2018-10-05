@@ -61,7 +61,7 @@ enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_Q
 
 struct wavelet_params_str {
 	wavelet_params_str() :
-    data(NULL),	dosynthetic(false),	docropregion(false), opencl_unit(0), iter(0), iter_ptr(&iter) {
+    data(NULL),	opencl_unit(0), iter(0), iter_ptr(&iter) {
         DEBUG("wavelet_params created");
     }
     
@@ -78,8 +78,6 @@ struct wavelet_params_str {
 	int thickness;
 	double damp;
 	
-	bool dosynthetic;
-	bool docropregion;
     int opencl_unit;
 
 	int iter;
@@ -101,7 +99,7 @@ int openclEnabled();
 
 unsigned int opencl_closest_size(unsigned int);
 
-vec2 opencl_closest_size(vec2);
+vec2i opencl_closest_size(vec2i);
 
 #ifdef HAVE_LIBCLFFT
 std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int);
@@ -135,7 +133,7 @@ struct abel_params_str {
     physD *oimage;
 //     physD rimage;
     
-	std::vector<vec2> iaxis;
+    std::vector<vec2i> iaxis;
 	phys_direction idir;
 	inversion_algo ialgo;
 	inversion_physics iphysics;

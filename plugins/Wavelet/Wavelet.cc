@@ -198,8 +198,7 @@ void Wavelet::doWavelet () {
                 if (my_w.erasePrevious->isChecked()) {
                     waveletPhys[itr.first]=nparent->replacePhys(new nPhysD(itr.second->copy()),waveletPhys[itr.first],false);
                 } else {
-                    nPhysD*ceppa = new nPhysD(itr.second->copy());
-                    delete itr.second;
+                    nPhysD *ceppa = new nPhysD(*itr.second);
                     nparent->addPhys(ceppa);
                     waveletPhys[itr.first]=ceppa;
                 }
@@ -217,8 +216,7 @@ void Wavelet::doWavelet () {
         
 		if (my_w.showSource->isChecked()) {
 			datamatrix.setShortName("wavelet source");
-			nPhysD *deepcopy=new nPhysD();
-			*deepcopy=datamatrix;
+            nPhysD *deepcopy=new nPhysD(datamatrix);
 			if (my_w.erasePrevious->isChecked()) {
 				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
 			} else {

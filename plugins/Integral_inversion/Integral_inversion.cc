@@ -44,7 +44,7 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
     my_w.molarRefr_le->setText(QString::number(5.23e-7));
 
 	connect(my_w.actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
-	connect(my_w.actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
+    connect(my_w.actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
 	connect(my_w.actionBezier, SIGNAL(triggered()), axis, SLOT(toggleBezier()));
 	connect(my_w.refphase_checkb, SIGNAL(stateChanged(int)), this, SLOT(refphase_checkbChanged(int)));
 
@@ -88,19 +88,19 @@ void Integral_inversion::doInversion() {
 
 		QPolygonF axis_poly;
 		QPolygon axis_clean;
-		std::vector<vec2> inv_axis;
+        std::vector<vec2i> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
 		axis_poly = axis->getLine(npoints);
 		
 		//!fixme we should cut the line when it goes outside and not move the point
-        int xpos= std::max<int>(0lu,std::min((size_t)axis_poly.first().x(),image->getW()-1));
-        int ypos=std::max<int>(0lu,std::min((size_t)axis_poly.first().y(),image->getH()-1));
+        int xpos= std::max<int>(0lu,std::min((unsigned int)axis_poly.first().x(),image->getW()-1));
+        int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.first().y(),image->getH()-1));
 		axis_clean << QPoint(xpos,ypos);
 
 		for (int i=1; i<axis_poly.size(); i++) {
-            int xpos=std::max<int>(0lu,std::min((size_t)axis_poly.at(i).x(),image->getW()-1));
-            int ypos=std::max<int>(0lu,std::min((size_t)axis_poly.at(i).y(),image->getH()-1));
+            int xpos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).x(),image->getW()-1));
+            int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).y(),image->getH()-1));
 			if (isHorizontal) {
 				if (xpos != axis_clean.last().x()) axis_clean << QPoint(xpos,ypos);
 			} else {
@@ -110,7 +110,7 @@ void Integral_inversion::doInversion() {
 
 		inv_axis.resize(axis_clean.size());
 		for (int ii = 0; ii<axis_clean.size(); ii++) {
-			inv_axis[ii] = vec2(axis_clean.at(ii).x(),axis_clean.at(ii).y());
+            inv_axis[ii] = vec2i(axis_clean.at(ii).x(),axis_clean.at(ii).y());
 		}
 
 		// launch inversion
@@ -195,7 +195,7 @@ void Integral_inversion::doInversion() {
             double mini=locale().toDouble(my_w.minCut->text(),&ok1);
             double maxi=locale().toDouble(my_w.maxCut->text(),&ok2);
             if (ok1 || ok2) {
-                physMath::phys_cutoff(inv_image,
+                physMath::cutoff(inv_image,
                             ok1?mini:inv_image.get_min(),
                             ok2?maxi:inv_image.get_max());
             }

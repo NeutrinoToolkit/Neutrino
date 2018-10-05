@@ -74,7 +74,7 @@ public slots:
         if (currentBuffer) {
             qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
 
-            vec2 b_p(my_point.x(),my_point.y());
+            vec2i b_p(my_point.x(),my_point.y());
 
             //get bounds from view
             QPointF orig,corner;
@@ -86,8 +86,8 @@ public slots:
                 corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
             }
 
-            vec2 b_o((int)orig.x(),(int)orig.y());
-            vec2 b_c((int)corner.x(),(int)corner.y());
+            vec2i b_o((int)orig.x(),(int)orig.y());
+            vec2i b_c((int)corner.x(),(int)corner.y());
 
             phys_direction other_dir=(cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL);
 

@@ -59,7 +59,7 @@ void Reflectivity::doIt () {
 
         physMath::phys_point_divide(*shot,ref);
 
-        physMath::phys_cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
+        physMath::cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
 
         shot->prop["display_range"]=shot->get_min_max();
 

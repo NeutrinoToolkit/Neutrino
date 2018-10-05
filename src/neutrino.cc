@@ -715,7 +715,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                 }
             }
             imagelist=imagelistold;
-        } else {
+        } else if (suffix!="neus") {
             nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
             if (!openRAW) {
                 openRAW = new nOpenRAW(this);

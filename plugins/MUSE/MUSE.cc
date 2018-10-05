@@ -227,7 +227,7 @@ void MUSE::doSpectrum(QPointF point) {
 
 	if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
 		lastpoint=pFloor;
-		vec2 p(point.x(),point.y());
+		vec2i p(point.x(),point.y());
 		for (int zz=0; zz< yvals.size(); zz++) {
 			yvals[zz]=0;
 		}

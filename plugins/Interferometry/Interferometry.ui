@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>362</width>
-    <height>526</height>
+    <height>535</height>
    </rect>
   </property>
   <property name="font">
@@ -92,7 +92,7 @@
        </item>
        <item row="1" column="1" colspan="4">
         <widget class="QWidget" name="widget_2" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1">
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1,0">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -113,7 +113,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Thickness:</string>
+             <string>Thick</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -156,7 +156,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Correlation:</string>
+             <string>Correlation</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -185,6 +185,21 @@
             </property>
             <property name="value">
              <double>1.000000000000000</double>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="padding">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Pad</string>
             </property>
             <property name="neutrinoSave" stdset="0">
              <bool>true</bool>
@@ -744,11 +759,45 @@
         <number>2</number>
        </property>
        <item>
+        <widget class="QCheckBox" name="display99">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Cutoff image to show 99% of pixels</string>
+         </property>
+         <property name="text">
+          <string>99%</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QLineEdit" name="cutoffMin">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="toolTip">
+          <string>Minimum cutoff</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -773,6 +822,9 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="toolTip">
+          <string>Maximum cutoff</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>

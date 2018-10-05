@@ -1067,7 +1067,7 @@ nLine::getContourSubImage(double fill_value)
     if (nparent->getCurrentBuffer()) {
         // 1. get point list
         QPolygonF my_poly;
-        std::list<vec2> cp_list;
+        std::list<vec2i> cp_list;
 
         if (ref.size()>0) {
             foreach (QGraphicsEllipseItem *item, ref){
@@ -1083,7 +1083,7 @@ nLine::getContourSubImage(double fill_value)
                 double steps = (p2-p1).manhattanLength();
                 for(int jj = 0; jj<=steps; jj++) {
                     QPointF np = p1+jj*(p2-p1)/steps;
-                    cp_list.push_back(vec2(np.x(), np.y()));
+                    cp_list.push_back(vec2i(np.x(), np.y()));
                 }
             }
         }
@@ -1112,7 +1112,7 @@ nLine::getContainedIntegral()
 {
     // 1. get point list
     QPolygonF my_poly;
-    std::list<vec2> cp_list;
+    std::list<vec2i> cp_list;
 
     if (ref.size()>0) {
         foreach (QGraphicsEllipseItem *item, ref){
@@ -1128,7 +1128,7 @@ nLine::getContainedIntegral()
             double steps = (p2-p1).manhattanLength();
             for(int jj = 0; jj<=steps; jj++) {
                 QPointF np = p1+jj*(p2-p1)/steps;
-                cp_list.push_back(vec2(np.x(), np.y()));
+                cp_list.push_back(vec2i(np.x(), np.y()));
             }
         }
     }

@@ -223,8 +223,8 @@ unsigned int physWave::opencl_closest_size(unsigned int num) {
     return closest;
 }
 
-vec2 physWave::opencl_closest_size(vec2 num){
-    return vec2(opencl_closest_size(num.x()),opencl_closest_size(num.y()));
+vec2i physWave::opencl_closest_size(vec2i num){
+    return vec2i(opencl_closest_size(num.x()),opencl_closest_size(num.y()));
 }
 
 #define NEUTRINO_OPENCL CL_DEVICE_TYPE_DEFAULT
@@ -411,7 +411,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         params.iter=0;
         *params.iter_ptr=0;
 
-        vec2 newSize(opencl_closest_size(params.data->getSize()));
+        vec2i newSize(opencl_closest_size(params.data->getSize()));
 
         double mean=params.data->sum()/params.data->getSurf();
 

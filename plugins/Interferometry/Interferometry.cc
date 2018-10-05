@@ -248,7 +248,6 @@ void Interferometry::doWavelet (int iimage) {
     nPhysD *image=getPhysFromCombo(my_image[iimage].image);
     physWave::wavelet_params my_params;
     if (image) {
-        qInfo() << "Wavelet filetr" << QString::fromStdString(suffix) << QString::fromStdString(image->getName());
         saveDefaults();
         if (my_image[iimage].numAngle->value()==0) {
             my_params.init_angle=my_w.angleCarrier->value();
@@ -268,16 +267,17 @@ void Interferometry::doWavelet (int iimage) {
             my_params.end_lambda=my_image[iimage].maxStretch->value()*my_w.widthCarrier->value();
             my_params.n_lambdas=my_image[iimage].numStretch->value();
         }
-        my_params.thickness=my_w.widthCarrier->value()*my_w.thickness->value();
+        double thick=my_w.widthCarrier->value()*my_w.thickness->value();
+        my_params.thickness=thick;
         my_params.damp=my_w.correlation->value();
-        my_params.dosynthetic=true;
-        my_params.docropregion=true;
 
         QRect geom2=region->getRect(image);
 
-        nPhysD datamatrix = image->sub(geom2.left(),geom2.top(),geom2.width(),geom2.height());
-        my_params.data=&datamatrix;
+        nPhysD datamatrix = image->sub(geom2.left(),geom2.top(),geom2.width(),geom2.height(),my_w.padding->isChecked()?thick:0);
 
+        std::ostringstream my_name;
+
+        my_params.data=&datamatrix;
 
         int niter=my_params.n_angles*my_params.n_lambdas+1;
 
@@ -293,7 +293,14 @@ void Interferometry::doWavelet (int iimage) {
 
         std::map<std::string,nPhysD *> retList;
         for (auto& it : my_params.olist) {
-            retList[it.first] = new nPhysD(*(it.second));
+            nPhysD pippo;
+            if (my_w.padding->isChecked()) {
+                pippo = it.second->sub(thick,thick,geom2.width(),geom2.height());
+            } else {
+                pippo = *it.second;
+            }
+            DEBUG(pippo);
+            retList[it.first] = new nPhysD(pippo);
             delete it.second;
         }
 
@@ -493,28 +500,21 @@ void Interferometry::doMaskCutoff() {
             maskRegion->hide();
         }
 
-        if (my_w.cutoffValue->value()!=0.0) {
-            if (phaseMask==NULL) {
-                phaseMask=new nPhysD(phase->copy());
-                phaseMask->setShortName("Mask");
-            }
-            nPhysD *quality=localPhys["quality"];
-            if (nPhysExists(quality)) {
-                nPhysD loc_qual(quality->copy());
-                double mini=loc_qual.get_min();
-                double maxi=loc_qual.get_max();
-                double valDouble=mini+my_w.cutoffValue->value()*(maxi-mini)/100.0;
-                for (size_t k=0; k<loc_qual.getSurf(); k++)
-                    if (loc_qual.Timg_buffer[k] < valDouble)
-                        phaseMask->Timg_buffer[k]=0.0;
-            }
-        }
-
         if (phaseMask==NULL) {
-            localPhys["phaseMask"]=new nPhysD(phase->copy());
-        } else {
-            localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
+            phaseMask=new nPhysD(phase->copy());
+            phaseMask->setShortName("Mask");
         }
+        nPhysD *quality=localPhys["quality"];
+        if (nPhysExists(quality)) {
+            nPhysD loc_qual(quality->copy());
+            double mini=loc_qual.get_min();
+            double maxi=loc_qual.get_max();
+            double valDouble=mini+my_w.cutoffValue->value()*(maxi-mini)/100.0;
+            for (size_t k=0; k<loc_qual.getSurf(); k++)
+                if (loc_qual.Timg_buffer[k] < valDouble)
+                    phaseMask->Timg_buffer[k]=0.0;
+        }
+        localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
     }
     my_w.statusbar->clearMessage();
 
@@ -660,13 +660,16 @@ void Interferometry::doCutoff(){
     nPhysD *image=localPhys["interpPhase_2piMask"];
     if (nPhysExists(image)) {
         nPhysD *intNe = new nPhysD(*image);
+        if (my_w.display99->isChecked()) {
+            physMath::cutoff(*intNe,physMath::getColorPrecentPixels(*intNe,99));
+        }
         bool ok1,ok2;
         double mini=locale().toDouble(my_w.cutoffMin->text(),&ok1);
         double maxi=locale().toDouble(my_w.cutoffMax->text(),&ok2);
         if (!ok1) mini=intNe->get_min();
         if (!ok2) maxi=intNe->get_max();
         if (ok1||ok2) {
-            physMath::phys_cutoff(*intNe,mini,maxi);
+            physMath::cutoff(*intNe,mini,maxi);
             intNe->prop["display_range"]=intNe->get_min_max();
 
             if (localPhys["interpPhase_2piMaskCutoff"]) {

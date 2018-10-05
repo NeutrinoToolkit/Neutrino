@@ -230,7 +230,7 @@ void Colorscale::slider_max_changed(int val) {
 void Colorscale::cutOff() {
     if (currentBuffer) {
         nPhysD *cut=new nPhysD(*currentBuffer);
-        physMath::phys_cutoff(*cut,QLocale().toDouble(my_w.lineMin->text()),QLocale().toDouble(my_w.lineMax->text()));
+        physMath::cutoff(*cut,QLocale().toDouble(my_w.lineMin->text()),QLocale().toDouble(my_w.lineMax->text()));
         cutOffPhys=nparent->replacePhys(cut,cutOffPhys);
     }
 }

@@ -1075,7 +1075,7 @@ void Visar::doWave(int k) {
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        vec2 dim(imgs[0]->getSize());
+        vec2i dim(imgs[0]->getSize());
 
         std::array<physC,2> zz_morlet;
         progress.setValue(progress.value()+1);

@@ -79,8 +79,8 @@ FocalSpot::calculate_stats()
     decimated.TscanBrightness();
 
     // 1. find centroid
-    vec2 centr;
-    if (currentBuffer->get_origin() == vec2(0,0)) {
+    vec2i centr;
+    if (currentBuffer->get_origin() == vec2i(0,0)) {
         centr = decimated.max_Tv;
         currentBuffer->set_origin(centr);
     } else {
@@ -153,7 +153,7 @@ FocalSpot::find_contour(double th)
 {
     QList<double> ql;
     if (currentBuffer) {
-        std::list<vec2> contour;
+        std::list<vec2i> contour;
         physMath::contour_trace(decimated, contour, th);
 
         DEBUG(5, "got contour of "<<contour.size()<<" points");

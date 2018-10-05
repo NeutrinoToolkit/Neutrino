@@ -14,10 +14,17 @@ class nPhysD : public physD {
 
     nPhysD & operator= (const nPhysD &rhs)
     {
-        physD *ceppa=static_cast<physD*>(this);
-        *ceppa=static_cast<const physD &>(rhs);
+        physD *tmpimg=static_cast<physD*>(this);
+        *tmpimg=static_cast<const physD &>(rhs);
         display_prop = rhs.display_prop; // probably missing DEEP operator
         uchar_buf = rhs.uchar_buf;
+        return *this;
+    }
+
+    nPhysD & operator= (const physD &rhs)
+    {
+        physD *tmpimg=static_cast<physD*>(this);
+        *tmpimg=rhs;
         return *this;
     }
 

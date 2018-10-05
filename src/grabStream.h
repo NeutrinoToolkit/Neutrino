@@ -1,6 +1,7 @@
 #ifndef grabStream_H
 #define grabStream_H
 
+#include <iostream>
 #include <streambuf>
 #include <QDebug>
 
@@ -47,7 +48,11 @@ protected:
 
 private:
     void warn(std::string& msg) {
+#ifdef __phys_debug
+        qDebug().noquote() << QString::fromStdString(msg);
+#else
         qWarning().noquote() << QString::fromStdString(msg);
+#endif
     }
     std::ostream &my_stream;
     std::streambuf *my_old_stream;

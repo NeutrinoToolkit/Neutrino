@@ -71,21 +71,21 @@ void Lineout_H_V::updatePlot(QPointF p) {
         if (p.isNull())
             p=nparent->my_w->my_view->my_mouse.pos();
 
-        vec2 b_p(p.x(),p.y());
+        vec2i b_p(p.x(),p.y());
 
         //get bounds from view
         QPointF orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
         QPointF corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
 
-        vec2 b_o((int)orig.x(),(int)orig.y());
-        vec2 b_c((int)corner.x(),(int)corner.y());
+        vec2i b_o((int)orig.x(),(int)orig.y());
+        vec2i b_c((int)corner.x(),(int)corner.y());
 
         std::array<phys_direction,2> cut_dir={{PHYS_HORIZONTAL,PHYS_VERTICAL}};
         std::array<phys_direction,2> oth_dir={{PHYS_VERTICAL,PHYS_HORIZONTAL}};
 
         vec2f origin=currentBuffer->get_origin();
         vec2f scale=currentBuffer->get_scale();
-        vec2 size=currentBuffer->get_size();
+        vec2i size=currentBuffer->get_size();
 
         for (int k=0;k<2;k++) {
 

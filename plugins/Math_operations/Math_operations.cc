@@ -270,16 +270,25 @@ void Math_operations::doOperation () {
                         int scalar1=QLocale().toInt(scalars.at(0),&ok1);
                         int scalar2=QLocale().toInt(scalars.at(1),&ok2);
                         if (scalars.size()==2 && ok1 && ok2) {
-                            myresult=new nPhysD(physMath::phys_resample(*image1, vec2(scalar1, scalar2)));
+                            myresult=new nPhysD(physMath::phys_resample(*image1, vec2i(scalar1, scalar2)));
                         } else {
                             my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 int"));
                         }
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));
                     }
+                } else if (my_w.operation->currentIndex()==separator[0]+10) { //add noise
+                    bool ok;
+                    double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
+                    if (ok) {
+                        myresult=new nPhysD(image1->copy());
+                        physMath::add_noise(*myresult,scalar);
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
+                    }
                 }
-
             }
+
         } else { // 1 image and 1(or more) scalars
             myresult=new nPhysD(image1->copy());
             myresult->setName(image1->getName());

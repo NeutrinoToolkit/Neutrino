@@ -719,6 +719,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
     }
     progress.setValue(0);
     progress.hide();
+    progress.close();
     if (nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }
