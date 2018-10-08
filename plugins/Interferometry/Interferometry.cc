@@ -331,7 +331,7 @@ void Interferometry::doUnwrap () {
             physMath::phys_point_subtract(diff,ref_phase);
         }
         physMath::phys_remainder(diff,1.0);
-        localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD (diff),localPhys["phase_2pi_wrap"]);
+        localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD(diff),localPhys["phase_2pi_wrap"]);
         localPhys["phase_2pi_wrap"]->setShortName("phase_2pi_wrap");
     }
     qDebug() << "here";
@@ -402,7 +402,7 @@ void Interferometry::doUnwrap () {
             unwrap.setName(unwrap.getShortName()+"(\""+methodName.toStdString()+"\") "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
             unwrap.setFromName(phase->getFromName());
 
-            nPhysD *unwrapcopy= new nPhysD(unwrap.copy());
+            nPhysD *unwrapcopy= new nPhysD(unwrap);
             localPhys["phase_2pi_unwrap"]=nparent->replacePhys(unwrapcopy,localPhys["phase_2pi_unwrap"]);
 
         }
@@ -501,7 +501,7 @@ void Interferometry::doMaskCutoff() {
         }
 
         if (phaseMask==NULL) {
-            phaseMask=new nPhysD(phase->copy());
+            phaseMask=new nPhysD(*phase);
             phaseMask->setShortName("Mask");
         }
         nPhysD *quality=localPhys["quality"];

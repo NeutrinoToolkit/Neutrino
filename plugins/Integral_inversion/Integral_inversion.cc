@@ -200,7 +200,7 @@ void Integral_inversion::doInversion() {
                             ok2?maxi:inv_image.get_max());
             }
             
-            nPhysD *pippo = new nPhysD(inv_image.copy());
+            nPhysD *pippo = new nPhysD(inv_image);
 			if (my_w.erasePrevious->isChecked()) {
                 invertedPhys=nparent->replacePhys(pippo,invertedPhys);
 			} else {

@@ -185,7 +185,7 @@ void nLine::save_points() {
 void nLine::setPoints(QPolygonF my_poly) {
 	while (ref.size()>my_poly.size()) {
 		prepareGeometryChange();
-		delete ref.at(0);
+        delete ref.at(0);
 		ref.removeAt(0);
 		my_w.points->removeRow(0);
 		update();

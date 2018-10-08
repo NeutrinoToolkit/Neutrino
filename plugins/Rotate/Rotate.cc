@@ -54,7 +54,7 @@ void Rotate::doRotateLive () {
 void Rotate::doRotate () {
 	doRotateLive();
 	if (rotated) {
-        nPhysD *newRotated=new nPhysD(rotated->copy());
+        nPhysD *newRotated=new nPhysD(*rotated);
 		nparent->addPhys(newRotated);
 	}
 }

@@ -48,11 +48,11 @@ void Reflectivity::doIt () {
     if (imageShot && imageRef) {
         saveDefaults();
 
-        nPhysD *shot=new nPhysD(imageShot->copy());
+        nPhysD *shot=new nPhysD(*imageShot);
         physMath::phys_fast_gaussian_blur(*shot,my_w.blur->value());
         physMath::phys_subtract(*shot,my_w.offset->value());
 
-        nPhysD ref(imageRef->copy());
+        nPhysD ref(*imageRef);
         physMath::phys_fast_gaussian_blur(ref,my_w.blur->value());
         physMath::phys_subtract(ref,my_w.offset->value());
         physMath::phys_multiply(ref,my_w.multiplier->value());

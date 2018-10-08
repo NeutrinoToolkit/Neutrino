@@ -59,8 +59,9 @@ std::string CHECK_OPENCL_ERROR(cl_int err);
 
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
 
-struct wavelet_params_str {
-	wavelet_params_str() :
+class wavelet_params {
+public:
+    wavelet_params() :
     data(NULL),	opencl_unit(0), iter(0), iter_ptr(&iter) {
         DEBUG("wavelet_params created");
     }
@@ -85,8 +86,6 @@ struct wavelet_params_str {
 
     std::map<std::string, physD*> olist;
 };
-typedef struct wavelet_params_str wavelet_params;
-
 
 void phys_wavelet_field_2D_morlet(wavelet_params &);
 

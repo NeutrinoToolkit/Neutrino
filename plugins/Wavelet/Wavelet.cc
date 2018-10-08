@@ -196,7 +196,7 @@ void Wavelet::doWavelet () {
                 delete itr.second;
             } else {
                 if (my_w.erasePrevious->isChecked()) {
-                    waveletPhys[itr.first]=nparent->replacePhys(new nPhysD(itr.second->copy()),waveletPhys[itr.first],false);
+                    waveletPhys[itr.first]=nparent->replacePhys(new nPhysD(*itr.second),waveletPhys[itr.first],false);
                 } else {
                     nPhysD *ceppa = new nPhysD(*itr.second);
                     nparent->addPhys(ceppa);
@@ -318,9 +318,9 @@ void Wavelet::doUnwrap () {
         }
 
         if (my_w.erasePreviousUnwrap->isChecked()) {
-            unwrapPhys=nparent->replacePhys(new nPhysD(uphase.copy()),unwrapPhys);
+            unwrapPhys=nparent->replacePhys(new nPhysD(uphase),unwrapPhys);
         } else {
-            unwrapPhys=new nPhysD(uphase.copy());
+            unwrapPhys=new nPhysD(uphase);
             nparent->addShowPhys(unwrapPhys);
         }
         my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));

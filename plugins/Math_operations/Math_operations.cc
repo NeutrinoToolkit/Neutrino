@@ -96,7 +96,7 @@ void Math_operations::doOperation () {
         }
         DEBUG("Operator " << my_w.operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << my_w.operation->currentText().toStdString());
         nPhysD *myresult=NULL;
-        if (my_w.operation->currentIndex() < separator[0]) { // two values neeeded
+        if (my_w.operation->currentIndex() < separator[0]) { // two images neeeded
             nPhysD *operand1=NULL;
             nPhysD *operand2=NULL;
 
@@ -105,29 +105,39 @@ void Math_operations::doOperation () {
                 return;
             }
 
-            if (my_w.radioNumber1->isChecked()) {
-                operand1=new nPhysD(image2->getW(),image2->getH(),QLocale().toDouble(my_w.num1->text()),my_w.num1->text().toStdString());
+            if (my_w.radioNumber1->isChecked() && image2) {
+                double val=QLocale().toDouble(my_w.num1->text());
+                qDebug() <<"radio 1" << val;
+                operand1=new nPhysD(image2->getW(),image2->getH(),val,my_w.num1->text().toStdString());
                 operand1->set_origin(image2->get_origin());
                 operand1->set_scale(image2->get_scale());
-                operand2=new nPhysD(image2->copy());
-            } else if (my_w.radioNumber2->isChecked()) {
-                operand2=new nPhysD(image1->getW(),image1->getH(),QLocale().toDouble(my_w.num2->text()),my_w.num2->text().toStdString());
+            }
+
+            if (my_w.radioNumber2->isChecked() && image1) {
+                double val=QLocale().toDouble(my_w.num2->text());
+                qDebug() <<"radio 2" << val;
+                operand2=new nPhysD(image1->getW(),image1->getH(),val,my_w.num2->text().toStdString());
                 operand2->set_origin(image1->get_origin());
                 operand2->set_scale(image1->get_scale());
-                operand1=new nPhysD(image1->copy());
-            } else {
-                operand1=new nPhysD(image1->copy());
-                operand2=new nPhysD(image2->copy());
+            }
+
+            if (my_w.radioImage1->isChecked()) {
+                operand1=new nPhysD(*image1);
+            }
+            if (my_w.radioImage2->isChecked()) {
+                operand2=new nPhysD(*image2);
             }
 
             if (operand1->get_scale() != operand2->get_scale())  {
                 QMessageBox::warning(this,tr("Scale problem"),tr("The images do not have the same scale"),QMessageBox::Ok);
             }
+
             QRectF r1=QRectF(-operand1->get_origin().x(),-operand1->get_origin().y(),operand1->getW(),operand1->getH());
             QRectF r2=QRectF(-operand2->get_origin().x(),-operand2->get_origin().y(),operand2->getW(),operand2->getH());
 
             // obs
             QRectF rTot=r1.intersected(r2);;
+            qDebug() << my_w.operation->currentText();
 
             myresult=new nPhysD(rTot.width(),rTot.height(), 1.0);
             myresult->setName(my_w.operation->currentText().toStdString()+" "+operand1->getName()+" "+operand2->getName());
@@ -180,7 +190,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::phys_pow(*myresult, scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Expected 2 values"));
@@ -191,7 +201,7 @@ void Math_operations::doOperation () {
                         bool ok;
                         double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                         if (ok) {
-                            myresult=new nPhysD(image1->copy());
+                            myresult=new nPhysD(*image1);
                             physMath::phys_fast_gaussian_blur(*myresult, scalar);
                         } else {
                             my_w.statusbar->showMessage(tr("ERROR: Exepcted a float radius"));
@@ -201,7 +211,7 @@ void Math_operations::doOperation () {
                         double scalar1=QLocale().toDouble(scalars.at(0),&ok1);
                         double scalar2=QLocale().toDouble(scalars.at(1),&ok2);
                         if(ok1 && ok2) {
-                            myresult=new nPhysD(image1->copy());
+                            myresult=new nPhysD(*image1);
                             physMath::phys_fast_gaussian_blur(*myresult, scalar1, scalar2);
                         } else {
                             my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));
@@ -213,7 +223,7 @@ void Math_operations::doOperation () {
                         bool ok;
                         int scalar=my_w.num2->text().toInt(&ok);
                         if (ok) {
-                            myresult=new nPhysD(image1->copy());
+                            myresult=new nPhysD(*image1);
                             physMath::phys_median_filter(*myresult, scalar);
                         } else {
                             my_w.statusbar->showMessage(tr("ERROR: Scalar should be an integer"));
@@ -231,7 +241,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::phys_gauss_laplace(*myresult,scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -240,7 +250,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::phys_gauss_sobel(*myresult,scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -249,7 +259,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::phys_integratedNe(*myresult,scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -258,7 +268,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::phys_remainder(*myresult,scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -281,7 +291,7 @@ void Math_operations::doOperation () {
                     bool ok;
                     double scalar=QLocale().toDouble(my_w.num2->text(),&ok);
                     if (ok) {
-                        myresult=new nPhysD(image1->copy());
+                        myresult=new nPhysD(*image1);
                         physMath::add_noise(*myresult,scalar);
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
@@ -290,7 +300,7 @@ void Math_operations::doOperation () {
             }
 
         } else { // 1 image and 1(or more) scalars
-            myresult=new nPhysD(image1->copy());
+            myresult=new nPhysD(*image1);
             myresult->setName(image1->getName());
             if (my_w.operation->currentIndex()==separator[1]+1) {
                 physMath::phys_transpose(*myresult);
