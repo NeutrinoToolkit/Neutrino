@@ -153,6 +153,7 @@ if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
     target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
 
+    message(STATUS "-------------------------- ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 

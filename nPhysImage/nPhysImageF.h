@@ -241,7 +241,7 @@ public:
 
 	
 	//! re-reads buffer for minimum/maximum value
-	void TscanBrightness(void);
+    void TscanBrightness();
 	
 	//! 1D get functions for row/column access
     unsigned int get_Tvector(enum phys_direction, unsigned int, unsigned int, T*, unsigned int, phys_way orient=PHYS_POS);

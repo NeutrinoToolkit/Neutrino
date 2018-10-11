@@ -15,9 +15,8 @@ inline double reliability(physD &phase, int i, int j) {
     double V = grad(phase.point(i,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i,j+1));
     double D1 = grad(phase.point(i-1,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i+1,j+1));
     double D2 = grad(phase.point(i+1,j-1), phase.point(i,j)) - grad(phase.point(i,j), phase.point(i-1,j+1));
-    return 1.0/sqrt(H*H + V*V + D1*D1 + D2*D2);
+    return 1.0/sqrt(H*H + V*V + 0.5*D1*D1 + 0.5*D2*D2);
 }
-
 // Pixel information
 struct Pixel {
     Pixel() : jumps(0), nPixels(1), quality(0.0), first(this),  last(this),  next(nullptr) {}
@@ -42,27 +41,27 @@ inline bool EdgeComp(Edge const & a, Edge const & b) {
 void unwrap::miguel(physD &phase, physD &unwrap) {
     unsigned int dx=phase.getW();
     unsigned int dy=phase.getH();
-    physD quality(dx,dy,1.0);
-	for (unsigned int j = 1; j<dy -1; ++j) {
-		for (unsigned int i = 1; i<dx - 1; ++i) {
-            quality.set(i,j,reliability(phase, i,j));
-		}
+    physD quality_miguel(dx,dy,1.0);
+    for (unsigned int j = 1; j<dy -1; ++j) {
+        for (unsigned int i = 1; i<dx - 1; ++i) {
+            quality_miguel.set(i,j,reliability(phase, i,j));
+        }
     }
-    unwrap::quality(phase, unwrap, quality);
+    unwrap::quality(phase, unwrap, quality_miguel);
 }
 
 void unwrap::miguel_quality(physD& phase, physD& unwrap, physD& quality) {
     unsigned int dx=phase.getW();
     unsigned int dy=phase.getH();
     physD quality_miguel(dx,dy,1.0);
-	for (unsigned int j = 0; j<dy; ++j) {
+    for (unsigned int j = 0; j<dy; ++j) {
         for (unsigned int i = 0; i<dx; ++i) {
-		    if (j>0 && j<dy-1 && i>0 && i < dx-1) {
+            if (j>0 && j<dy-1 && i>0 && i < dx-1) {
                 quality_miguel.set(i,j,quality.point(i,j)*reliability(phase, i,j));
             } else{
                 quality_miguel.set(i,j,quality.point(i+j*dx));
             }
-		}
+        }
     }
     unwrap::quality(phase, unwrap, quality_miguel);
 }

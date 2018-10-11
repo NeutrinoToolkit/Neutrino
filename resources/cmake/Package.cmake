@@ -68,6 +68,10 @@ elseif (LINUX)
     endif()
 
 elseif(APPLE)
+	
+    set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
+    message(STATUS "MACOSX_BUNDLE_INFO_PLIST: ${MACOSX_BUNDLE_INFO_PLIST}")
+
     set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-MacOS")
 	set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
 

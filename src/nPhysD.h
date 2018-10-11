@@ -88,12 +88,15 @@ class nPhysD : public physD {
     phys_properties display_prop;
 
     inline void reset_display() {
-        display_prop.erase("display_range");
         display_prop.clear();
         uchar_buf.clear();
         DEBUG(uchar_buf.capacity());
     }
 
+    void TscanBrightness() {
+        reset_display();
+        physD::TscanBrightness();
+    }
     std::vector<unsigned char> uchar_buf;
 
 };

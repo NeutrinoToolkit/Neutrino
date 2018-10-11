@@ -49,7 +49,7 @@ Math_operations::Math_operations(neutrino *nparent) : nGenericPan(nparent)
 void Math_operations::copyResult () {
     if (!operatorResult) doOperation();
     if (operatorResult) {
-        nPhysD *newoperatorResult=new nPhysD(operatorResult->copy());
+        nPhysD *newoperatorResult=new nPhysD(*operatorResult);
         nparent->addPhys(newoperatorResult);
     }
 }

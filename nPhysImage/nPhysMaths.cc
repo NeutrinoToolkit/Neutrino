@@ -571,7 +571,7 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(physD* img1, ph
     bidimvec<int> maxP(0,0);
 
     if (dx == img2->getW() && dy== img2->getH()) {
-        physD *rPhys=new physD(dx,dy,0.0,"Result");
+        physD rPhys(dx,dy,0.0,"Result");
 
         fftw_complex *myData1C=fftw_alloc_complex(dy*(dx/2+1));
         fftw_complex *myData2C=fftw_alloc_complex(dy*(dx/2+1));
@@ -579,7 +579,7 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(physD* img1, ph
         fftw_plan plan1R2C=fftw_plan_dft_r2c_2d(dy,dx, img1->Timg_buffer, myData1C, FFTW_ESTIMATE);
         fftw_plan plan2R2C=fftw_plan_dft_r2c_2d(dy,dx, img2->Timg_buffer, myData2C, FFTW_ESTIMATE);
 
-        fftw_plan planC2R=fftw_plan_dft_c2r_2d(dy,dx, myData1C, rPhys->Timg_buffer, FFTW_ESTIMATE);
+        fftw_plan planC2R=fftw_plan_dft_c2r_2d(dy,dx, myData1C, rPhys.Timg_buffer, FFTW_ESTIMATE);
 
         fftw_execute(plan1R2C);
         fftw_execute(plan2R2C);
@@ -594,19 +594,17 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(physD* img1, ph
 
         for (size_t i=0;i<dx;i++) {
             for (size_t j=0;j<dy;j++) {
-                if (rPhys->point(i,j) > rPhys->point(maxP.x(),maxP.y())) {
+                if (rPhys.point(i,j) > rPhys.point(maxP.x(),maxP.y())) {
                     maxP=vec2f(i,j);
                 }
             }
         }
-        maxValue=rPhys->point(maxP.x(),maxP.y());
+        maxValue=rPhys.point(maxP.x(),maxP.y());
         bidimvec<int> shift(dx/2+1,dy/2+1);
         maxP+=shift;
         maxP=vec2f(maxP.x()%dx,maxP.y()%dy)-shift;
 
         DEBUG(5,"max corr " << maxP.x() << " " << maxP.y() << " " << maxValue);
-
-        delete rPhys;
 
         fftw_free(myData1C);
         fftw_free(myData2C);

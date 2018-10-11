@@ -514,6 +514,7 @@ void Interferometry::doMaskCutoff() {
                 if (loc_qual.Timg_buffer[k] < valDouble)
                     phaseMask->Timg_buffer[k]=0.0;
         }
+        phaseMask->TscanBrightness();
         localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
     }
     my_w.statusbar->clearMessage();

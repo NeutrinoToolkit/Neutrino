@@ -84,29 +84,20 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     return ret_phys;
 }
 
-//#ifdef HAVE_NUMPY
+#ifdef HAVE_NUMPY
 
-
-//#if PY_MAJOR_VERSION >= 3
-//int neutrino_init_numpy()
-//{
-//import_array();
-//}
-//#else
-//void neutrino_init_numpy()
-//{
-//import_array();
-//}
-//#endif
-
-//PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
-//    neutrino_init_numpy();
-//    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
-//    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
-//}
+PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
+    if(PyArray_API == NULL) {
+        import_array();
+    }
+    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
+    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
+}
 
 //nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
-//    neutrino_init_numpy();
+//if(PyArray_API == NULL) {
+//    import_array();
+//}
 //    if (PyArray_Check(my_py_obj)) {
 //        PyArrayObject * my_arr = (PyArrayObject *)my_py_obj;
 //        if (my_arr && PyArray_NDIM(my_arr)==2 && PyArray_ISONESEGMENT(my_arr)){
@@ -161,7 +152,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 //    return nullptr;
 //}
 
-//#endif
+#endif
 
 /**
  nPhysD Destructor

@@ -136,7 +136,8 @@ public slots:
 private:
     bool gestureEvent(QGestureEvent *event);
 	void swipeTriggered(QSwipeGesture *);
-	void pinchTriggered(QPinchGesture *);
+    void pinchTriggered(QPinchGesture *);
+    void tapandholdTriggered(QTapAndHoldGesture *);
 
     unsigned int currentStepScaleFactor;
 

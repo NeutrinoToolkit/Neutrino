@@ -94,7 +94,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     fillimage=true;
     setMouseTracking(true);
     setInteractive(true);
-
+    QTapAndHoldGesture::setTimeout(3000);
     grabGesture(Qt::TapAndHoldGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
@@ -235,27 +235,28 @@ bool nView::gestureEvent(QGestureEvent *event)
     foreach (QGesture *gesture, event->gestures()) {
         qDebug() << "type: " << gesture->gestureType();
     }
-
-    if (QGesture *taphold = event->gesture(Qt::TapAndHoldGesture)) {
-        qDebug() << taphold;
-        fillimage=true;
-        setSize();
-        update();
-    } else {
-
-        if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
-            swipeTriggered(static_cast<QSwipeGesture *>(swipe));
-        }
-
-        if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
-            pinchTriggered(static_cast<QPinchGesture *>(pinch));
-        }
-
-        if (QGesture *pan = event->gesture(Qt::PanGesture)) {
-            qDebug() << static_cast<QPanGesture *>(pan);
-        }
+    QGesture *gesture=nullptr;
+    if ((gesture = event->gesture(Qt::TapAndHoldGesture))) {
+        tapandholdTriggered(static_cast<QTapAndHoldGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::SwipeGesture))) {
+        swipeTriggered(static_cast<QSwipeGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::PinchGesture))) {
+        pinchTriggered(static_cast<QPinchGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::PanGesture))) {
+        qDebug() << static_cast<QPanGesture *>(gesture);
     }
     return true;
+}
+
+void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
+    DEBUG("-------------");
+    qDebug() << gesture;
+    fillimage=true;
+    setSize();
+    update();
 }
 
 void nView::pinchTriggered(QPinchGesture *gesture)
