@@ -32,7 +32,7 @@ Rotate::Rotate(neutrino *nparent) : nGenericPan(nparent)
     show();
 
 	connect(my_w.valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
-	connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doRotate()));
+    connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(keepCopy()));
 	connect(my_w.image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
 	rotated=NULL;
 	doRotateLive();
@@ -43,15 +43,14 @@ void Rotate::doRotateLive () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		if (image!=rotated) {
-            nPhysD pippo = image->rotated(alpha,getReplaceVal());
-            rotated=nparent->replacePhys(new nPhysD(pippo),rotated, true);
+            rotated=nparent->replacePhys(new nPhysD(image->rotated(alpha,getReplaceVal(image))),rotated, true);
 		} else {
 			my_w.statusbar->showMessage("Can't work on this image",5000);
 		}
 	}
 }
 
-void Rotate::doRotate () {
+void Rotate::keepCopy () {
 	doRotateLive();
 	if (rotated) {
         nPhysD *newRotated=new nPhysD(*rotated);
@@ -59,30 +58,27 @@ void Rotate::doRotate () {
 	}
 }
 
-double Rotate::getReplaceVal() {
+double Rotate::getReplaceVal(nPhysD* image) {
 	double val=0.0;
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
-		switch (my_w.defaultValue->currentIndex()) {
-			case 0:
-				val=std::numeric_limits<double>::quiet_NaN();
-				break;
-			case 1:
-				val=image->get_min();
-				break;
-			case 2:
-				val=image->get_max();
-				break;
-			case 3:
-				val=0.5*(image->get_min()+image->get_max());
-				break;
-			case 4:
-				val=0.0;
-				break;
-			default:
-				WARNING("something is broken here");
-				break;
-		}
-	}
-	return val;
+    switch (my_w.defaultValue->currentIndex()) {
+        case 0:
+            val=std::numeric_limits<double>::quiet_NaN();
+            break;
+        case 1:
+            val=image->get_min();
+            break;
+        case 2:
+            val=image->get_max();
+            break;
+        case 3:
+            val=0.5*(image->get_min()+image->get_max());
+            break;
+        case 4:
+            val=0.0;
+            break;
+        default:
+            WARNING("something is broken here");
+            break;
+    }
+    return val;
 }

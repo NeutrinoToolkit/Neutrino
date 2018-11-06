@@ -200,12 +200,12 @@ void Integral_inversion::doInversion() {
                             ok2?maxi:inv_image.get_max());
             }
             
-            nPhysD *pippo = new nPhysD(inv_image);
+            nPhysD *invert = new nPhysD(inv_image);
 			if (my_w.erasePrevious->isChecked()) {
-                invertedPhys=nparent->replacePhys(pippo,invertedPhys);
+                invertedPhys=nparent->replacePhys(invert,invertedPhys);
 			} else {
-                invertedPhys=pippo;
-                nparent->addPhys(pippo);
+                invertedPhys=invert;
+                nparent->addPhys(invert);
 			}
         } else {
             statusBar()->showMessage("Problem in inversion", 5000);

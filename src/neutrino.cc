@@ -1108,8 +1108,8 @@ void neutrino::dragMoveEvent(QDragMoveEvent *e)
 void neutrino::dropEvent(QDropEvent *e) {
     if (e->mimeData()->hasFormat("data/neutrino")) {
         e->acceptProposedAction();
-        QList<QByteArray> pippo=e->mimeData()->data("data/neutrino").split(' ');
-        foreach(QByteArray bytephys, pippo) {
+        QList<QByteArray> my_data=e->mimeData()->data("data/neutrino").split(' ');
+        foreach(QByteArray bytephys, my_data) {
             bool ok=false;
             nPhysD *my_phys=(nPhysD *) bytephys.toLongLong(&ok);
             if (ok && my_phys) {
@@ -1497,16 +1497,29 @@ void neutrino::about() {
 
     my_about.creditsText->moveCursor(QTextCursor::Start);
     my_about.creditsText->ensureCursorVisible();
-
-    myabout.exec();
-
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-    nGenericPan pippo(this);
-    for (int i=0; i< pippo.metaObject()->classInfoCount(); i++){
-        QMetaClassInfo inf = pippo.metaObject()->classInfo(i);
-        qDebug() << inf.name();
+    for (int id=0; id< 2000; id++){
+        if (QMetaType(id).isRegistered()) {
+            void *myClassPtr = QMetaType::create(id);
+            qDebug() << id << myClassPtr;
+            if(myClassPtr) {
+                QObject *my_qobject = static_cast<QObject*>(myClassPtr);
+                if (my_qobject) {
+                    qDebug() << my_qobject->metaObject()->className();
+                }
+                QMetaType::destroy(id, myClassPtr);
+            }
+        }
     }
 
+
+//    nGenericPan pippo(this);
+//    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << pippo.metaObject()->classInfoCount();
+//    for (int i=0; i< pippo.metaObject()->classInfoCount(); i++){
+//        QMetaClassInfo inf = pippo.metaObject()->classInfo(i);
+//        qDebug() << inf.name();
+//    }
+
+    myabout.exec();
 }
 
 nLine* neutrino::line(QString name) {

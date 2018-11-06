@@ -1,7 +1,7 @@
 #ifndef __nPhysD
 #define __nPhysD
 
-
+#include <QDebug>
 #include "nPhysImageF.h"
 
 class nPhysD : public physD {
@@ -10,7 +10,11 @@ class nPhysD : public physD {
 
     using physD::nPhysImageF;
 
-    nPhysD(physD in): physD(in) {};
+    nPhysD(physD in): physD(in) {}
+    ~nPhysD(){
+        qDebug() << "------------------------------------------------------------ DELETE "<< copies();
+    }
+
 
     nPhysD & operator= (const nPhysD &rhs)
     {
@@ -57,7 +61,7 @@ class nPhysD : public physD {
             for (size_t i=0; i<getSurf(); i++) {
                 //int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
-                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
+                    unsigned char val = static_cast<unsigned char>(std::max(0,std::min(255,static_cast<int>(255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma)))));
                     std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
                 }
             }
@@ -69,7 +73,7 @@ class nPhysD : public physD {
         }
 
         return nullptr;
-    };
+    }
 
 //    nPhysD & operator= (const nPhysD &rhs)
 //    {

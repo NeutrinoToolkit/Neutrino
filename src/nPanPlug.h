@@ -82,7 +82,18 @@ protected:
 
 Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 
-#define NEUTRINO_PLUGIN5(__class_name,__menu_entry, __menu_icon, __key_shortcut, __order) Q_DECLARE_METATYPE(__class_name *);  class __class_name ## Plug : public QObject, nPanPlug {  Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  public: __class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} QByteArray name() {return #__class_name;} QString menuEntryPoint() { return QString(tr(#__menu_entry)); } QIcon icon() {return QIcon(__menu_icon);} QKeySequence shortcut() {return QKeySequence(__key_shortcut);} int order() {return int(__order);}};
+#define NEUTRINO_PLUGIN5(__class_name,__menu_entry, __menu_icon, __key_shortcut, __order) Q_DECLARE_METATYPE(__class_name *); /*
+*/ class __class_name ## Plug : public QObject, nPanPlug {  /*
+*/Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  /*
+*/public: /*
+*/__class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} /*
+*/QByteArray name() {return #__class_name;} /*
+*/QString menuEntryPoint() { return QString(tr(#__menu_entry)); } /*
+*/QIcon icon() {return QIcon(__menu_icon);} /*
+*/QKeySequence shortcut() {return QKeySequence(__key_shortcut);} /*
+*/int order() {return int(__order);}/*
+*/};
+
 #define NEUTRINO_PLUGIN4(__class_name,__menu_entry, __menu_icon, __key_shortcut) NEUTRINO_PLUGIN5(__class_name,__menu_entry, __menu_icon, __key_shortcut, 1 )
 #define NEUTRINO_PLUGIN3(__class_name,__menu_entry, __menu_icon) NEUTRINO_PLUGIN4(__class_name,__menu_entry, __menu_icon, )
 #define NEUTRINO_PLUGIN2(__class_name,__menu_entry) NEUTRINO_PLUGIN3(__class_name,__menu_entry, )

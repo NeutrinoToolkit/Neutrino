@@ -424,27 +424,27 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
 
             DEBUG( ss.str() << " <> " << strings[i]);
             prop["Hamamatsu_"+ss.str()]=strings[i];
-		
-//             std::regex my_regex(".*\\[(.*?)\\],(.*?)");
 
-//             std::smatch m;
-//             if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
-//                 property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
-//             } else {
-//                 property["Hamamatsu_"+ss.str()]=strings[i];
-//             }
+            //             std::regex my_regex(".*\\[(.*?)\\],(.*?)");
+
+            //             std::smatch m;
+            //             if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
+            //                 property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
+            //             } else {
+            //                 property["Hamamatsu_"+ss.str()]=strings[i];
+            //             }
         }
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         
         switch (kind) {
-        case 2: // unsigned short int
-            kind=3;
-            break;
-        case 3: // unsigned int
-            kind=4;
-            break;
-        default:
-            break;
+            case 2: // unsigned short int
+                kind=3;
+                break;
+            case 3: // unsigned int
+                kind=4;
+                break;
+            default:
+                break;
         }
         
     } else if (buffer == 512) { // ARP blue ccd camera w optic fibers...
@@ -529,46 +529,6 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
 }
 
 
-// --------- write out ------------
-//
-
-//std::ostream &
-//operator<< (std::ostream &lhs, phys_properties &pp)
-//{
-//	lhs<<pp.phys_name<<"\n";
-//	lhs<<pp.phys_orig<<"\n";
-//	lhs<<pp.phys_short_name<<"\n";
-//	lhs<<pp.phys_from_name<<"\n";
-//	lhs<<pp.origin<<"\n";
-//	lhs<<pp.scale<<"\n";
-//	lhs<<bool(true);
-//	return lhs;
-//}
-//
-//// --------- read properties ------------
-////
-//std::istream &
-//operator>> (std::istream &lhs, phys_properties &pp)
-//{
-//	string line;
-//	getline(lhs,pp.phys_name);
-//	// TODO enum!!!!!!
-//	// 	int pippo;
-//	// 	lhs>>pippo;
-//	// 	pp.phys_orig=pippo;
-//	getline(lhs,line);
-//	
-//	getline(lhs,pp.phys_short_name);
-//	getline(lhs,pp.phys_from_name);
-//	getline(lhs,line);
-//	pp.origin=bidimvec<double>(line);
-//	getline(lhs,line);
-//	pp.scale=bidimvec<double>(line);
-//	getline(lhs,line);
-//	//pp.derived=(line=="0");
-//	return lhs;
-//}
-
 // dump out for state save
 void physFormat::phys_dump_binary(physD *my_phys, const char *fname) {
     std::ofstream ofile(fname, std::ios::out | std::ios::binary);
@@ -623,17 +583,17 @@ void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
         DEBUG(5,"writtendata " << writtendata);
 
         int oo = my_phys->getW();
-		ofile.write((const char *)&oo, sizeof(int));
+        ofile.write((const char *)&oo, sizeof(int));
         oo = my_phys->getH();
-		ofile.write((const char *)&oo, sizeof(int));
+        ofile.write((const char *)&oo, sizeof(int));
 
         //ofile << writtendata << "\n"; // TODO: to be written in binary
-		ofile.write((const char *)&writtendata, sizeof (int));
-		ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
+        ofile.write((const char *)&writtendata, sizeof (int));
+        ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
         DEBUG("Binary dump finished");
 
         //	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
-		ofile<<"\n"<<std::flush;
+        ofile<<"\n"<<std::flush;
 
         //written_data = ofile.tellg()-pos;
     } else {
@@ -735,15 +695,15 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 }
                 TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &units);
                 switch (units) {
-                case 1:
-                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="";
-                    break;
-                case 2:
-                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="in";
-                    break;
-                case 3:
-                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="cm";
-                    break;
+                    case 1:
+                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="";
+                        break;
+                    case 2:
+                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="in";
+                        break;
+                    case 3:
+                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="cm";
+                        break;
                 }
 
                 float posx=0.0, posy=0.0;
@@ -834,28 +794,25 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                     tsize_t scanlineSize=TIFFScanlineSize(tif);
                     tdata_t buf = _TIFFmalloc(scanlineSize);
                     DEBUG("Buf allocated " << scanlineSize);
-                    physD* my_phys=nullptr;
+                    physD my_phys(w,h,0.0,"");
                     DEBUG("here");
 
                     for (int k=0;k<samples;k++) {
-                        if (my_phys==nullptr) {
-                            std::stringstream ss(ifilename);
-                            if(docname) {
-                                ss << std::string(docname);
-                            } else {
-                                ss << ifilename;
-                                if (vecReturn.size()>0) {
-                                    ss << " " << vecReturn.size();
-                                }
+                        std::stringstream ss(ifilename);
+                        if(docname) {
+                            ss << std::string(docname);
+                        } else {
+                            ss << ifilename;
+                            if (vecReturn.size()>0) {
+                                ss << " " << vecReturn.size();
                             }
-                            if (separate_rgb) {
-                                ss << " c" << samples;
-                            }
-                            my_phys=new physD(w,h,0.0,ss.str());
-                            my_phys->prop.insert(tiff_prop.begin(),tiff_prop.end());
-                            my_phys->setType(PHYS_FILE);
-                            vecReturn.push_back(*my_phys);
                         }
+                        if (separate_rgb) {
+                            ss << " c" << samples;
+                        }
+                        my_phys.setName(ss.str());
+                        my_phys.prop.insert(tiff_prop.begin(),tiff_prop.end());
+                        my_phys.setType(PHYS_FILE);
 
                         DEBUG("here");
                         for (tiff_uint32 j = 0; j < h; j++) {
@@ -891,16 +848,17 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                                         val+=((double*)buf)[i*samples];
                                     }
                                 }
-                                my_phys->set(i,j,my_phys->point(i,j)+val);
+                                my_phys.set(i,j,my_phys.point(i,j)+val);
                             }
                         }
-                        my_phys->TscanBrightness();
+                        my_phys.TscanBrightness();
                         if (separate_rgb) {
-                            my_phys=nullptr;
+                            vecReturn.push_back(my_phys);
                         }
                     }
-                    if (!separate_rgb && my_phys && samples>1) {
-                        physMath::phys_divide(*my_phys,samples);
+                    if (!separate_rgb && samples>0) {
+                        physMath::phys_divide(my_phys,samples);
+                        vecReturn.push_back(my_phys);
                     }
                     _TIFFfree(buf);
                 } else {
@@ -1032,45 +990,45 @@ std::vector <physD> physFormat::phys_open_spe(std::string ifilename) {
         physD phys(width,height,0.0);
         phys.prop["spe-frame"]=vec2f(nf,NumFrames);
         switch (type) {
-        case 0: {
-            phys.prop["spe-type"]="float";
-            std::vector<float> buffer(width*height);
-            ifile.read((char*) &buffer[0],width*height*sizeof(float));
-            for (unsigned int i=0; i<phys.getSurf(); i++) {
-                phys.set(i,buffer[i]);
-            }
-            break;
-        }
-        case 1: {
-            phys.prop["spe-type"]="int";
-            std::vector<int> buffer(width*height);
-            DEBUG(sizeof(long));
-            ifile.read((char*) &buffer[0],width*height*sizeof(int));
-            for (unsigned int i=0; i<phys.getSurf(); i++) {
-                phys.set(i,buffer[i]);
-            }
-            break;
-        }
-        case 2: {
-            phys.prop["spe-type"]="short";
-            std::vector<short> buffer(width*height);
-            ifile.read((char*) &buffer[0],width*height*sizeof(short));
-            for (unsigned int i=0; i<phys.getSurf(); i++) {
-                phys.set(i,buffer[i]);
-            }
-            break;
-        }
-        case 3: {
-            phys.prop["spe-type"]="unsigned short";
-            std::vector<unsigned short> buffer(width*height);
-            ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
-            for (unsigned int i=0; i<phys.getSurf(); i++) {
-                phys.set(i,buffer[i]);
-            }
-            break;
-        }
-        default:
-            break;
+            case 0: {
+                    phys.prop["spe-type"]="float";
+                    std::vector<float> buffer(width*height);
+                    ifile.read((char*) &buffer[0],width*height*sizeof(float));
+                    for (unsigned int i=0; i<phys.getSurf(); i++) {
+                        phys.set(i,buffer[i]);
+                    }
+                    break;
+                }
+            case 1: {
+                    phys.prop["spe-type"]="int";
+                    std::vector<int> buffer(width*height);
+                    DEBUG(sizeof(long));
+                    ifile.read((char*) &buffer[0],width*height*sizeof(int));
+                    for (unsigned int i=0; i<phys.getSurf(); i++) {
+                        phys.set(i,buffer[i]);
+                    }
+                    break;
+                }
+            case 2: {
+                    phys.prop["spe-type"]="short";
+                    std::vector<short> buffer(width*height);
+                    ifile.read((char*) &buffer[0],width*height*sizeof(short));
+                    for (unsigned int i=0; i<phys.getSurf(); i++) {
+                        phys.set(i,buffer[i]);
+                    }
+                    break;
+                }
+            case 3: {
+                    phys.prop["spe-type"]="unsigned short";
+                    std::vector<unsigned short> buffer(width*height);
+                    ifile.read((char*) &buffer[0],width*height*sizeof(unsigned short));
+                    for (unsigned int i=0; i<phys.getSurf(); i++) {
+                        phys.set(i,buffer[i]);
+                    }
+                    break;
+                }
+            default:
+                break;
         }
 
         phys.TscanBrightness();
@@ -1523,15 +1481,15 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
 
             DEBUG (my_phys->getSurf());
             switch (kind) {
-            case 0: bpp=sizeof(unsigned char); break;
-            case 1: bpp=sizeof(signed char); break;
-            case 2: bpp=sizeof(unsigned short); break;
-            case 3: bpp=sizeof(signed short); break;
-            case 4: bpp=sizeof(unsigned int); break;
-            case 5: bpp=sizeof(signed int); break;
-            case 6: bpp=sizeof(float); break;
-            case 7: bpp=sizeof(double); break;
-            default: kind=-1;
+                case 0: bpp=sizeof(unsigned char); break;
+                case 1: bpp=sizeof(signed char); break;
+                case 2: bpp=sizeof(unsigned short); break;
+                case 3: bpp=sizeof(signed short); break;
+                case 4: bpp=sizeof(unsigned int); break;
+                case 5: bpp=sizeof(signed int); break;
+                case 6: bpp=sizeof(float); break;
+                case 7: bpp=sizeof(double); break;
+                default: kind=-1;
             }
 
             if (kind!=-1) {
@@ -1541,46 +1499,46 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
                 ifile.close();
                 for (size_t i=0;i<my_phys->getSurf();i++) {
                     switch (kind) {
-                    case 0: {
-                        unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
-                        break;
-                    }
-                    case 1: {
-                        signed char buf = *((signed char*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
-                        break;
-                    }
-                    case 2: {
-                        unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
-                        break;
-                    }
-                    case 3: {
-                        signed short buf = *((signed short*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
-                        break;
-                    }
-                    case 4: {
-                        unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
-                        break;
-                    }
-                    case 5: {
-                        signed int buf = *((signed int*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
-                        break;
-                    }
-                    case 6: {
-                        float buf = *((float*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
-                        break;
-                    }
-                    case 7: {
-                        double buf = *((double*)(&buffer[i*bpp]));
-                        my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
-                        break;
-                    }
+                        case 0: {
+                                unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<unsigned char>(buf) : buf);
+                                break;
+                            }
+                        case 1: {
+                                signed char buf = *((signed char*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<signed char>(buf) : buf);
+                                break;
+                            }
+                        case 2: {
+                                unsigned short buf = *((unsigned short*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<unsigned short>(buf) : buf);
+                                break;
+                            }
+                        case 3: {
+                                signed short buf = *((signed short*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<signed short>(buf) : buf);
+                                break;
+                            }
+                        case 4: {
+                                unsigned int buf = *((unsigned int*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<unsigned int>(buf) : buf);
+                                break;
+                            }
+                        case 5: {
+                                signed int buf = *((signed int*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<signed int>(buf) : buf);
+                                break;
+                            }
+                        case 6: {
+                                float buf = *((float*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<float>(buf) : buf);
+                                break;
+                            }
+                        case 7: {
+                                double buf = *((double*)(&buffer[i*bpp]));
+                                my_phys->set(i,endian ? swap_endian<double>(buf) : buf);
+                                break;
+                            }
                     }
                 }
 
@@ -1634,26 +1592,26 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
             }
             std::vector<char> data;
             switch (num_type) {
-            case DFNT_CHAR:
-            case DFNT_UCHAR:
-            case DFNT_INT8:
-            case DFNT_UINT8:
-                data.resize(surf*sizeof(char));
-                break;
-            case DFNT_FLOAT32:
-                data.resize(surf*sizeof(float));
-                break;
-            case DFNT_FLOAT64:
-                data.resize(surf*sizeof(double));
-                break;
-            case DFNT_INT16:
-            case DFNT_UINT16:
-                data.resize(surf*sizeof(short));
-                break;
-            case DFNT_INT32:
-            case DFNT_UINT32:
-                data.resize(surf*sizeof(int));
-                break;
+                case DFNT_CHAR:
+                case DFNT_UCHAR:
+                case DFNT_INT8:
+                case DFNT_UINT8:
+                    data.resize(surf*sizeof(char));
+                    break;
+                case DFNT_FLOAT32:
+                    data.resize(surf*sizeof(float));
+                    break;
+                case DFNT_FLOAT64:
+                    data.resize(surf*sizeof(double));
+                    break;
+                case DFNT_INT16:
+                case DFNT_UINT16:
+                    data.resize(surf*sizeof(short));
+                    break;
+                case DFNT_INT32:
+                case DFNT_UINT32:
+                    data.resize(surf*sizeof(int));
+                    break;
             }
 
             if (data.size()>0) {
@@ -1667,36 +1625,36 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
                             physD phys(dim_sizes[rank-1],dim_sizes[rank-2],0.0,"hdf4");
                             for (size_t k=0;k<phys.getSurf();k++) {
                                 switch (num_type) {
-                                case DFNT_CHAR :
-                                    phys.set(k,((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_UCHAR:
-                                    phys.set(k,((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_INT8:
-                                    phys.set(k,(int)((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_UINT8:
-                                    phys.set(k,(int)((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_FLOAT32:
-                                    phys.set(k,(float) ((float *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_FLOAT64:
-                                    phys.set(k,((double *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_INT16:
-                                    phys.set(k,((short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_UINT16:
-                                    phys.set(k,((unsigned short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_INT32:
-                                    phys.set(k,((int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
-                                case DFNT_UINT32:
-                                    phys.set(k,((unsigned int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
-                                    break;
+                                    case DFNT_CHAR :
+                                        phys.set(k,((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_UCHAR:
+                                        phys.set(k,((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_INT8:
+                                        phys.set(k,(int)((char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_UINT8:
+                                        phys.set(k,(int)((unsigned char *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_FLOAT32:
+                                        phys.set(k,(float) ((float *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_FLOAT64:
+                                        phys.set(k,((double *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_INT16:
+                                        phys.set(k,((short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_UINT16:
+                                        phys.set(k,((unsigned short *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_INT32:
+                                        phys.set(k,((int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
+                                    case DFNT_UINT32:
+                                        phys.set(k,((unsigned int *)&data[0])[k+i*dim_sizes[1]*dim_sizes[2]]);
+                                        break;
                                 }
                             }
                             double origin[2];
@@ -1809,13 +1767,13 @@ int inflate(FILE *source, FILE *dest)
             ret = inflate(&strm, Z_NO_FLUSH);
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
             switch (ret) {
-            case Z_NEED_DICT:
-                ret = Z_DATA_ERROR;     /* and fall through */
-                break;
-            case Z_DATA_ERROR:
-            case Z_MEM_ERROR:
-                (void)inflateEnd(&strm);
-                return ret;
+                case Z_NEED_DICT:
+                    ret = Z_DATA_ERROR;     /* and fall through */
+                    break;
+                case Z_DATA_ERROR:
+                case Z_MEM_ERROR:
+                    (void)inflateEnd(&strm);
+                    return ret;
             }
             have = CHUNK - strm.avail_out;
             if (fwrite(&out[0], 1, have, dest) != have || ferror(dest)) {
@@ -1857,7 +1815,7 @@ std::string physFormat::gunzip (std::string filezipped) {
     }
     fclose(filein);
     fclose(fileout);
-	return fileunzipped;
+    return fileunzipped;
 }
 
 std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) {
@@ -1883,7 +1841,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
     DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
-	if (ext=="txt") {
+    if (ext=="txt") {
         retPhys.push_back(physDouble_txt(fname.c_str()));
     } else if (ext.substr(0,3)=="tif") {
         retPhys=physFormat::phys_open_tiff(fname, separate_rgb);

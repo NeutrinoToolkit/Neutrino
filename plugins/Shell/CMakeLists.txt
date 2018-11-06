@@ -1,6 +1,6 @@
 # check for neutrino root
 IF(APPLE)
-    set(PYVER 3.7)
+    set(PYVER 2.7)
 ENDIF()
 
 find_package(PythonLibs ${PYVER})
@@ -13,6 +13,7 @@ if(PYTHONLIBS_FOUND)
 
     include(FindPythonInterp)
     if(PYTHONINTERP_FOUND)
+        message(STATUS "Found Python interpreter: ${PYTHON_EXECUTABLE}")
         if (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
             file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py "try: import numpy; print(numpy.get_include())\nexcept: pass\n")
             exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)

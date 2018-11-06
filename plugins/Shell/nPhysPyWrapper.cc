@@ -4,6 +4,7 @@
 #include "nApp.h"
 #include "neutrino.h"
 #ifdef HAVE_NUMPY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #endif
 
@@ -85,10 +86,14 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 }
 
 #ifdef HAVE_NUMPY
+void my_import_array () {
+    import_array();
+}
+
 
 PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
     if(PyArray_API == NULL) {
-        import_array();
+        my_import_array();
     }
     std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
     return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
@@ -256,8 +261,8 @@ QVariant nPhysPyWrapper::getProperty(nPhysD* phys, QString my_name){
 }
 
 void nPhysPyWrapper::setProperty(nPhysD* phys, QString prop_name, QVariant prop_val) {
-    anydata pippo=toAnydata(prop_val);
-    phys->prop[prop_name.toStdString()]=pippo;
+    anydata my_data=toAnydata(prop_val);
+    phys->prop[prop_name.toStdString()]=my_data;
 }
 
 QVector<double> nPhysPyWrapper::getData(nPhysD* phys){

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>309</width>
-    <height>388</height>
+    <height>395</height>
    </rect>
   </property>
   <property name="font">
@@ -55,7 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="widget_1">
        <attribute name="title">
@@ -538,7 +538,7 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_13">
           <property name="title">
-           <string>Phase/2pi &amp;&amp; quality</string>
+           <string>FringeShift &amp;&amp; Quality</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_16">
            <property name="leftMargin">
@@ -657,7 +657,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
              </property>
             </widget>
@@ -1105,7 +1105,7 @@
   </action>
   <action name="actionCarrier">
    <property name="icon">
-    <iconset resource="../GhostFringes/GhostFringes.qrc">
+    <iconset resource="../Ghost_fringes/GhostFringes.qrc">
      <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
    </property>
    <property name="text">
@@ -1117,7 +1117,7 @@
   </action>
   <action name="actionDoAll">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -1165,8 +1165,8 @@
   <tabstop>erasePreviuos</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
-  <include location="../GhostFringes/GhostFringes.qrc"/>
+  <include location="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc"/>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
  </resources>
  <connections/>
 </ui>

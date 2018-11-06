@@ -1143,8 +1143,8 @@ nLine::getContainedIntegral()
 
 void nLine::extractPath() {
     qDebug() << "here";
-    nPhysD *pippo= new nPhysD(getContourSubImage());
-    nparent->addShowPhys(pippo);
+    nPhysD *my_path_image= new nPhysD(getContourSubImage());
+    nparent->addShowPhys(my_path_image);
 }
 
 // --------- end contour ------------
