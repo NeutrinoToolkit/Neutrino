@@ -46,9 +46,6 @@ private:
 public:
 	
     Q_INVOKABLE Colorscale (neutrino *);
-	neutrino *parent(){
-		return (neutrino *) QWidget::parent();
-	};
 	nPhysD *cutOffPhys;
     Ui::Colorscale my_w;
 	
