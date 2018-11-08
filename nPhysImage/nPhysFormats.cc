@@ -821,31 +821,31 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                                 double val=0;
                                 if (bytesperpixel == sizeof(char)) {
                                     if (format==SAMPLEFORMAT_UINT) {
-                                        val+=((unsigned char*)buf)[i*samples];
+                                        val+=((unsigned char*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_INT) {
-                                        val+=((char*)buf)[i*samples];
+                                        val+=((char*)buf)[i*samples+k];
                                     }
                                 } else if (bytesperpixel == sizeof(short)) {
                                     if (format==SAMPLEFORMAT_UINT) {
-                                        val+=((unsigned short*)buf)[i*samples];
+                                        val+=((unsigned short*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_INT) {
-                                        val+=((short*)buf)[i*samples];
+                                        val+=((short*)buf)[i*samples+k];
                                     }
                                 } else if (bytesperpixel == sizeof(int)) {
                                     if (format==SAMPLEFORMAT_UINT) {
-                                        val+=((unsigned int*)buf)[i*samples];
+                                        val+=((unsigned int*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_INT) {
-                                        val+=((int*)buf)[i*samples];
+                                        val+=((int*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_IEEEFP) {
-                                        val+=((float*)buf)[i*samples];
+                                        val+=((float*)buf)[i*samples+k];
                                     }
                                 } else if (bytesperpixel == sizeof(double)) {
                                     if (format==SAMPLEFORMAT_UINT) {
-                                        val+=((long unsigned int*)buf)[i*samples];
+                                        val+=((long unsigned int*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_INT) {
-                                        val+=((long int*)buf)[i*samples];
+                                        val+=((long int*)buf)[i*samples+k];
                                     } else if (format==SAMPLEFORMAT_IEEEFP) {
-                                        val+=((double*)buf)[i*samples];
+                                        val+=((double*)buf)[i*samples+k];
                                     }
                                 }
                                 my_phys.set(i,j,my_phys.point(i,j)+val);
