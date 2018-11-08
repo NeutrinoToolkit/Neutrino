@@ -18,14 +18,14 @@ bool ShellPlug::instantiate(neutrino *neu) {
     QSettings settings("neutrino","");
     settings.beginGroup("Shell");
 
-    PythonQt::InitFlags ignoreSite;
-
     if (settings.value("useSite").isValid() &&  settings.value("useSite").toBool()) {
-        ignoreSite =  PythonQt::IgnoreSiteModule;
+        PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+
         qDebug() << "here ignoresite";
+    } else {
+        PythonQt::init(PythonQt::RedirectStdOut);
     }
 
-    PythonQt::init(PythonQt::RedirectStdOut | ignoreSite);
 
 
 //    PythonQt_QtAll::init();

@@ -621,6 +621,7 @@ void nGenericPan::closeEvent(QCloseEvent*){
 //    }
     nparent->emitPanDel(this);
     QApplication::processEvents();
+    deleteLater();
 }
 
 void nGenericPan::focusOutEvent(QFocusEvent *event) {

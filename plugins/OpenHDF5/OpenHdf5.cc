@@ -258,7 +258,6 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         item2->setExpanded(true);
         item2->setData(2,0,strKind);
         qDebug() << QString::fromStdString(std::string(ds_name.begin(),ds_name.end()));
-        for(auto &c:ds_name) {DEBUG(c)}
 
         item2->setData(3,0,QString::fromStdString(std::string(ds_name.begin(),ds_name.end())));
         item2->setForeground(0,QBrush(QColor(0,0,200)));

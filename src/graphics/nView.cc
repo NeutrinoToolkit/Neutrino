@@ -174,23 +174,24 @@ void nView::showPhys(nPhysD *my_phys) {
         QApplication::processEvents();
         if (my_phys->getSurf()>0) {
             const unsigned char *nPhys_pointer=my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-            const QImage tempImage(nPhys_pointer,
-                                   my_phys->getW(),
-                                   my_phys->getH(),
-                                   my_phys->getW()*3,
-                                   QImage::Format_RGB888);
+            if(nPhys_pointer) {
+                const QImage tempImage(nPhys_pointer,
+                                       my_phys->getW(),
+                                       my_phys->getH(),
+                                       my_phys->getW()*3,
+                                       QImage::Format_RGB888);
 
-            my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+                my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+                currentBuffer=my_phys;
+
+                QApplication::processEvents();
+
+                setSize();
+
+                emit bufferChanged(my_phys);
+                QApplication::processEvents();
+            }
         }
-
-        currentBuffer=my_phys;
-
-        QApplication::processEvents();
-
-        setSize();
-
-        emit bufferChanged(my_phys);
-        QApplication::processEvents();
     }
 }
 

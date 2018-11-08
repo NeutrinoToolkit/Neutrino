@@ -7,6 +7,12 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #endif
+#if PY_VERSION_HEX >= 0x03000000
+#define NUMPY_IMPORT_ARRAY_RETVAL NULL
+#else
+#define NUMPY_IMPORT_ARRAY_RETVAL
+#endif
+
 
 
 /**
@@ -87,7 +93,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 
 #ifdef HAVE_NUMPY
 void my_import_array () {
-    import_array();
+    _import_array();
 }
 
 

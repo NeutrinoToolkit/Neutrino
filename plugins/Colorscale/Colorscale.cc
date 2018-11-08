@@ -28,17 +28,22 @@
 #include "nApp.h"
 
 Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
-  dVal(this)
+    dVal(this)
 {
     my_w.setupUi(this);
 
     my_w.histogram->parentPan=this;
 
     connect(nparent->my_w->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
-	connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
+    connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 
     connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
+
+    connect(my_w.sliderMin,SIGNAL(sliderPressed()),this,SLOT(sliderPressed()));
+    connect(my_w.sliderMax,SIGNAL(sliderPressed()),this,SLOT(sliderPressed()));
+    connect(my_w.sliderMin,SIGNAL(sliderReleased()),this,SLOT(sliderReleased()));
+    connect(my_w.sliderMax,SIGNAL(sliderReleased()),this,SLOT(sliderReleased()));
 
     connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(repaint()));
 
@@ -66,13 +71,13 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
 
     connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
-	my_w.toolBar->addWidget(my_w.percent);
+    my_w.toolBar->addWidget(my_w.percent);
 
     loadPalettes();
 
     connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
-	//    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
+    //    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
     my_w.toolBar->insertWidget(my_w.actionInvert,my_w.palettes);
 
@@ -89,6 +94,16 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
         my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
     }
 
+}
+
+void Colorscale::sliderPressed() {
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<< PRESSED PRESSED";
+    this->blockSignals(true);
+}
+
+void Colorscale::sliderReleased() {
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>> RELEASED RELEASED";
+    this->blockSignals(false);
 }
 
 void Colorscale::paletteComboChange(int val) {
@@ -126,9 +141,9 @@ void Colorscale::minChanged () {
         currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMin->setValue(sliderValues().first());
     }
-    connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
-    nparent->updatePhys();
     my_w.histogram->repaint();
+    QApplication::processEvents();
+    connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
 }
 
 void Colorscale::maxChanged () {
@@ -141,9 +156,9 @@ void Colorscale::maxChanged () {
         currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMax->setValue(sliderValues().second());
     }
-    connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
-    nparent->updatePhys();
     my_w.histogram->repaint();
+    QApplication::processEvents();
+    connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
 
 void Colorscale::invertColors () {
@@ -157,6 +172,9 @@ void Colorscale::invertColors () {
 }
 
 void Colorscale::bufferChanged(nPhysD *phys) {
+    disconnect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+    disconnect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
+
     nGenericPan::bufferChanged(phys);
     if (phys) {
         vec2f minmax=phys->prop["display_range"];
@@ -177,6 +195,8 @@ void Colorscale::bufferChanged(nPhysD *phys) {
         my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
     }
     connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
+    connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+    connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 
 }
 
@@ -209,22 +229,24 @@ void Colorscale::updatecolorbar(QString) {
     }
     
     my_w.histogram->repaint();
-	connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
+    connect(my_w.sliderMin,SIGNAL(valueChanged(int)),this,SLOT(slider_min_changed(int)));
     connect(my_w.sliderMax,SIGNAL(valueChanged(int)),this,SLOT(slider_max_changed(int)));
 }
 
 void Colorscale::slider_min_changed(int val) {
     double doubleVal=0.0;
-    if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
+    if (currentBuffer) doubleVal = (double)val/my_w.sliderMin->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
     minChanged();
+    nparent->updatePhys();
 }
 
 void Colorscale::slider_max_changed(int val) {
     double doubleVal=1.0;
-    if (currentBuffer) doubleVal = (double)val/10000.*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
+    if (currentBuffer) doubleVal = (double)val/my_w.sliderMax->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
     maxChanged();
+    nparent->updatePhys();
 }
 
 void Colorscale::cutOff() {
@@ -289,7 +311,7 @@ void Colorscale::removePaletteFile() {
     }
     connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
-//    updatecolorbar();
+    //    updatecolorbar();
     my_set.setValue("paletteFiles",paletteFiles);
     qDebug() << paletteFiles;
     my_set.endGroup();

@@ -132,6 +132,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
     ENDIF()
 
     if(WIN32)

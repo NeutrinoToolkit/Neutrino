@@ -11,6 +11,7 @@ class nPhysD : public physD {
     using physD::nPhysImageF;
 
     nPhysD(physD in): physD(in) {}
+
     ~nPhysD(){
         qDebug() << "------------------------------------------------------------ DELETE "<< copies();
     }
@@ -20,7 +21,7 @@ class nPhysD : public physD {
     {
         physD *tmpimg=static_cast<physD*>(this);
         *tmpimg=static_cast<const physD &>(rhs);
-        display_prop = rhs.display_prop; // probably missing DEEP operator
+        display_prop = rhs.display_prop;
         uchar_buf = rhs.uchar_buf;
         return *this;
     }
@@ -34,12 +35,11 @@ class nPhysD : public physD {
 
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
         if (getSurf()>0 && palette.size()==768) {
-
             if (uchar_buf.size() == getSurf()*3 &&
                     display_prop.have("display_range") &&
                     display_prop.have("palette_name") &&
-                    display_prop["palette_name"].get_str()==palette_name &&
                     display_prop.have("gamma") &&
+                    display_prop["palette_name"].get_str()==palette_name &&
                     display_prop["gamma"].get_i()==prop["gamma"].get_i()) {
 
                 vec2f old_display_range=display_prop["display_range"];
@@ -47,7 +47,7 @@ class nPhysD : public physD {
 
                 if (old_display_range==new_display_range) {
                     DEBUG("reusing old uchar_buf");
-                    return &uchar_buf[0];
+                    return nullptr;
                 }
             }
 

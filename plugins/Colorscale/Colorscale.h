@@ -77,6 +77,9 @@ public slots:
     const QIcon getPaletteIconFile(QString my_file);
     void paletteComboChange(int);
 
+    void sliderPressed();
+    void sliderReleased();
+
 signals:
 	void change_contrast(double,double);
 
