@@ -223,21 +223,21 @@ void Affine_transformation::apply() {
     forward=getAffine(l1.getPoints(),l2.getPoints());
 	
 	
-	my_w.A00->setText(QString::number(forward[0]));
-	my_w.A01->setText(QString::number(forward[1]));
-	my_w.A02->setText(QString::number(forward[2]));
-	my_w.A10->setText(QString::number(forward[3]));
-	my_w.A11->setText(QString::number(forward[4]));
-	my_w.A12->setText(QString::number(forward[5]));
+	my_w.A00->setText(QLocale().toString(forward[0]));
+	my_w.A01->setText(QLocale().toString(forward[1]));
+	my_w.A02->setText(QLocale().toString(forward[2]));
+	my_w.A10->setText(QLocale().toString(forward[3]));
+	my_w.A11->setText(QLocale().toString(forward[4]));
+	my_w.A12->setText(QLocale().toString(forward[5]));
 	
     backward=getAffine(l2.getPoints(),l1.getPoints());
 
-	my_w.B00->setText(QString::number(backward[0]));
-	my_w.B01->setText(QString::number(backward[1]));
-	my_w.B02->setText(QString::number(backward[2]));
-	my_w.B10->setText(QString::number(backward[3]));
-	my_w.B11->setText(QString::number(backward[4]));
-	my_w.B12->setText(QString::number(backward[5]));	
+	my_w.B00->setText(QLocale().toString(backward[0]));
+	my_w.B01->setText(QLocale().toString(backward[1]));
+	my_w.B02->setText(QLocale().toString(backward[2]));
+	my_w.B10->setText(QLocale().toString(backward[3]));
+	my_w.B11->setText(QLocale().toString(backward[4]));
+	my_w.B12->setText(QLocale().toString(backward[5]));	
 	
 }
 

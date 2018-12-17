@@ -117,7 +117,7 @@ public slots:
             my_w.plot->graph(0)->valueAxis()->setProperty("lock",my_w.actionLockColors->isChecked());
             my_w.plot->rescaleAxes();
 
-            statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
+            statusBar()->showMessage(tr("Point (")+QLocale().toString(my_point.x())+","+QLocale().toString(my_point.y())+")="+QLocale().toString(currentBuffer->point(my_point.x(),my_point.y())));
             double pos_mouse=(b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
             my_w.plot->setMousePosition(pos_mouse);
 

@@ -54,8 +54,8 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
     connect(my_w.lineBarrier, SIGNAL(released()), &linebarrier, SLOT(togglePadella()));
 	useBarrierToggled(my_w.useBarrier->isChecked());
 
-	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
+	my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
+	my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 	connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
@@ -114,14 +114,14 @@ void Wavelet::guessCarrier() {
 		if (vecCarr.first()==0) {
 			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-			my_w.statusbar->showMessage(tr("Carrier: ")+QString::number(vecCarr.first())+"px "+QString::number(vecCarr.second())+"deg", 5000);
+			my_w.statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
 			disconnect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			disconnect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			disconnect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			my_w.widthCarrier->setValue(vecCarr.first());
 			my_w.angleCarrier->setValue(vecCarr.second());
-			my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-			my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
+			my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
+			my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 			connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 			connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
@@ -346,8 +346,8 @@ void Wavelet::doRemove () {
 }
 
 void Wavelet::doRemoveCarrier () {
-	my_w.widthCarrierLabel->setText(QString::number(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-	my_w.angleCarrierLabel->setText(QString::number(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
+	my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
+	my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
 	if (sender() && (sender()==my_w.widthCarrier || sender()==my_w.angleCarrier || sender()==my_w.weightCarrier) && (!my_w.liveView->isChecked())) {
 		return;
 	}
@@ -361,8 +361,8 @@ void Wavelet::doRemoveCarrier () {
 		double alpha=my_w.angleCarrier->value();
 		double lambda=my_w.widthCarrier->value();
 
-		unwrappedSubtracted->setName("No carrier ("+QString::number(lambda).toStdString()+","+
-																 QString::number(alpha).toStdString()+") "+
+		unwrappedSubtracted->setName("No carrier ("+QLocale().toString(lambda).toStdString()+","+
+																 QLocale().toString(alpha).toStdString()+") "+
 																 QFileInfo(QString::fromUtf8(unwrapped->getFromName().c_str())).fileName().toStdString());
 		unwrappedSubtracted->setShortName("No carrier");
 		unwrappedSubtracted->setFromName(unwrapped->getFromName());

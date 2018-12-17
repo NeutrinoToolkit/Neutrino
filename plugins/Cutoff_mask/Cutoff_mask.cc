@@ -42,7 +42,7 @@ Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
 
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
-		my_w.cutValue->setText(QString::number(image2->get_min()));
+		my_w.cutValue->setText(QLocale().toString(image2->get_min()));
 	}
 	updateMiniMaxi();
 	cutoffPhys=NULL;
@@ -52,8 +52,8 @@ Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
 void Cutoff_mask::updateMiniMaxi () {
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
-		my_w.mini->setText(QString::number(image2->get_min()));
-		my_w.maxi->setText(QString::number(image2->get_max()));
+		my_w.mini->setText(QLocale().toString(image2->get_min()));
+		my_w.maxi->setText(QLocale().toString(image2->get_max()));
 	}
 }
 
@@ -61,7 +61,7 @@ void Cutoff_mask::sliderChanged(int val) {
 	nPhysD *image2=getPhysFromCombo(my_w.image2);
 	if (image2) {
 		double valDouble=(val-my_w.slider->minimum())*(image2->get_max()-image2->get_min())/(my_w.slider->maximum()-my_w.slider->minimum());
-		my_w.cutValue->setText(QString::number(valDouble));
+		my_w.cutValue->setText(QLocale().toString(valDouble));
 		doOperation();
 	}
 }

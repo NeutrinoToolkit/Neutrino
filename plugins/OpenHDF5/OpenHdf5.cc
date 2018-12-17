@@ -138,18 +138,18 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         H5Sget_simple_extent_dims(sid,&dims[0],NULL);
         DEBUG("here");
     } if (t_class == H5T_INTEGER) {
-        QString title="DS Integer "+QString::number(ndims)+"D ";
+        QString title="DS Integer "+QLocale().toString(ndims)+"D ";
         dims.resize(ndims);
         H5Sget_simple_extent_dims(sid,&dims[0],NULL);
-        for (int d=ndims-1;d>=0;d--) title += QString::number(dims[d])+"x";
+        for (int d=ndims-1;d>=0;d--) title += QLocale().toString(dims[d])+"x";
         title.chop(1);
         item2->setData(1,0,title);
     } else if(t_class == H5T_ARRAY) {
         //! TODO: check this
-        QString title="DS Array "+QString::number(ndims)+"D ";
+        QString title="DS Array "+QLocale().toString(ndims)+"D ";
         dims.resize(ndims);
         H5Sget_simple_extent_dims(sid,&dims[0],NULL);
-        for (int d=ndims-1;d>=0;d--) title += QString::number(dims[d])+"x";
+        for (int d=ndims-1;d>=0;d--) title += QLocale().toString(dims[d])+"x";
         title.chop(1);
         item2->setData(1,0,title);
 
@@ -171,7 +171,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 
         item2->setData(1,0,"DS Compound");
         int nCompund=H5Tget_nmembers(tid);
-        item2->setData(2,0,QString::number(nCompund)+" objs");
+        item2->setData(2,0,QLocale().toString(nCompund)+" objs");
         std::vector<char> buffer(size*nCompund);
         hid_t dataread=H5Dread(did, tid, sid, H5S_ALL, H5P_DEFAULT, &buffer[0]);
         if (dataread>=0) {
@@ -188,67 +188,67 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
                 if (H5Tequal(nativeType,H5T_NATIVE_DOUBLE)) {
                     double *val=(double*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"double");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_FLOAT)) {
                     float *val=(float*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"float");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_INT)) {
                     int *val=(int*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"int");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_USHORT)) {
                     unsigned short *val=(unsigned short*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"ushort");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_SHORT)) {
                     short *val=(short*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"short");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_UINT)) {
                     unsigned int *val=(unsigned int*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"uint");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString(*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_LONG)) {
                     long int *val=(long int*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"long int");
-                    item3->setData(2,0,QString::number(*val));
+                    item3->setData(2,0,QLocale().toString((long long int)(*val)));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_UCHAR)) {
                     unsigned char *val=(unsigned char*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"uchar");
-                    item3->setData(2,0,QString::number((int)*val));
+                    item3->setData(2,0,QLocale().toString((int)*val));
                 } else if (H5Tequal(nativeType,H5T_NATIVE_CHAR)) {
                     char *val=(char*)(&(buffer[compundOffset]));
                     item3->setData(1,0,"char");
-                    item3->setData(2,0,QString::number((int)*val));
+                    item3->setData(2,0,QLocale().toString((int)*val));
                 } else if (classCompoundType==H5T_STRING) {
                     item3->setData(1,0,"String");
-                    item3->setData(2,0,QString::number(H5Tget_size(nativeType)));
+                    item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 } else if (classCompoundType==H5T_COMPOUND) {
                     item3->setData(1,0,"Compound");
-                    item3->setData(2,0,QString::number(H5Tget_size(nativeType)));
+                    item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 } else if (classCompoundType==H5T_ENUM) {
                     item3->setData(1,0,"Enum");
-                    item3->setData(2,0,QString::number(H5Tget_size(nativeType)));
+                    item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 } else if (classCompoundType==H5T_VLEN) {
                     item3->setData(1,0,"Vlen");
-                    item3->setData(2,0,QString::number(H5Tget_size(nativeType)));
+                    item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 } else {
-                    item3->setData(1,0,"unknown "+QString::number(classCompoundType));
-                    item3->setData(2,0,QString::number(H5Tget_size(nativeType)));
+                    item3->setData(1,0,"unknown "+QLocale().toString(classCompoundType));
+                    item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 }
 
                 position+=H5Tget_size(nativeType);
             }
         }
     }
-    QString strKind=QString::number(ndims)+"D ";
+    QString strKind=QLocale().toString(ndims)+"D ";
     if (dims.size()==1) {
         item2->setData(1,0,"DS 1D");
         item2->setData(2,0,"Data 1D");
         item2->setData(3,0,QString::fromStdString(std::string(ds_name.begin(),ds_name.end())));
     } else if (dims.size()==2) {
-        strKind+=QString::number(dims[1])+"x"+QString::number(dims[0]);
+        strKind+=QLocale().toString(dims[1])+"x"+QLocale().toString(dims[0]);
         QTreeWidgetItem *dataParent=item2->parent();
         while (dataParent) {
             dataParent->setExpanded(true);
@@ -264,7 +264,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         item2->setForeground(1,QBrush(QColor(0,0,200)));
         item2->setForeground(2,QBrush(QColor(0,0,200)));
     } else {
-        item2->setData(1,0,"DS "+QString::number(t_class));
+        item2->setData(1,0,"DS "+QLocale().toString(t_class));
         item2->setData(2,0,"Data not supported");
         item2->setBackground(2,QBrush(QColor(200,200,255)));
     }
@@ -299,8 +299,8 @@ void OpenHdf5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_
                         my_data->set_scale(val[0],val[1]);
                     }
                 }
-                QString strData=QString::number(val[0]);
-                for (int i=1;i<nelem;i++) strData+=" "+QString::number(val[i]);
+                QString strData=QLocale().toString(val[0]);
+                for (int i=1;i<nelem;i++) strData+=" "+QLocale().toString(val[i]);
                 item3->setData(2,0,strData);
             }
         }
@@ -309,8 +309,8 @@ void OpenHdf5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_
         item3->setData(1,0,"Attr int");
         std::vector<int> val(nelem);
         if (H5Aread(aid, nativeType, (void*)(&val[0])) >= 0) {
-            QString strData=QString::number(val[0]);
-            for (int i=1;i<nelem;i++) strData+=" "+QString::number(val[i]);
+            QString strData=QLocale().toString(val[0]);
+            for (int i=1;i<nelem;i++) strData+=" "+QLocale().toString(val[i]);
             item3->setData(2,0,strData);
         }
     } else if (classAType == H5T_STRING) {

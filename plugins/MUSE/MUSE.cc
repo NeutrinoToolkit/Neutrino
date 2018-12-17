@@ -467,7 +467,7 @@ void MUSE::loadCube() {
 			if (anaxis==3) {
                 int ret = QMessageBox::information(
 							this, tr("MUSE"),
-							tr("Found data cube") + QString::number(hdupos) +" : "+QString::number(axissize[0])+"x"+QString::number(axissize[1])+"x"+QString::number(axissize[2])+"\n"+tr("Open it?"),
+                            tr("Found data cube") + QLocale().toString(hdupos) +" : "+QLocale().toString((long long int)(axissize[0]))+"x"+QLocale().toString((long long int)(axissize[1]))+"x"+QLocale().toString((long long int)(axissize[2]))+"\n"+tr("Open it?"),
 						QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 				if (ret==QMessageBox::Yes) {
 					QProgressDialog progress("Reading Cube", "Cancel", 0, 3, this);

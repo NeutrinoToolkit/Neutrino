@@ -47,7 +47,7 @@ class nPhysD : public physD {
 
                 if (old_display_range==new_display_range) {
                     DEBUG("reusing old uchar_buf");
-                    return nullptr;
+                    return &uchar_buf[0];
                 }
             }
 

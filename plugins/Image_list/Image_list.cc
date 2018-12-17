@@ -259,11 +259,11 @@ Image_list::updatePad(nPhysD *my_phys) {
             (*it)->setData(0,0,nparent->getBufferList().indexOf(thisPhys));
             (*it)->setData(1,0,QString::fromUtf8(thisPhys->getShortName().c_str()));
             (*it)->setData(2,0,QString::fromUtf8(thisPhys->getName().c_str()));
-            (*it)->setData(3,0,QString::number(thisPhys->get_origin().x())+" "+QString::number(thisPhys->get_origin().y()));
+            (*it)->setData(3,0,QLocale().toString(thisPhys->get_origin().x())+" "+QLocale().toString(thisPhys->get_origin().y()));
             if (thisPhys->get_scale().x()==thisPhys->get_scale().y()) {
-                (*it)->setData(4,0,QString::number(thisPhys->get_scale().x()));
+                (*it)->setData(4,0,QLocale().toString(thisPhys->get_scale().x()));
             } else {
-                (*it)->setData(4,0,QString::number(thisPhys->get_scale().x())+" "+QString::number(thisPhys->get_scale().y()));
+                (*it)->setData(4,0,QLocale().toString(thisPhys->get_scale().x())+" "+QLocale().toString(thisPhys->get_scale().y()));
             }
             if (thisPhys==my_phys) {
                 (*it)->setSelected(true);
@@ -308,12 +308,12 @@ void Image_list::physAdd(nPhysD *my_phys) {
     my_item->setData(0,0,nparent->getBufferList().indexOf(my_phys));
     my_item->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
     my_item->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
-    my_item->setData(3,0,QString::number(my_phys->get_origin().x())+" "+QString::number(my_phys->get_origin().y()));
+    my_item->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
 
     if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
-        my_item->setData(4,0,QString::number(my_phys->get_scale().x()));
+        my_item->setData(4,0,QLocale().toString(my_phys->get_scale().x()));
     } else {
-        my_item->setData(4,0,QString::number(my_phys->get_scale().x())+" "+QString::number(my_phys->get_scale().y()));
+        my_item->setData(4,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
     }
 
     my_item->setData((my_w.images->columnCount()-1),0,qVariantFromValue((void*) my_phys));

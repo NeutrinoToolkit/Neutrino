@@ -205,11 +205,11 @@ void Find_peaks::updatePlot() {
         if (fitx.size()>2) {
             double c0, c1, cov00, cov01, cov11, sum_square;
             gsl_fit_linear (&fitx[0], 1, &fity[0], 1, fitx.size(), &c0, &c1, &cov00, &cov01, &cov11, &sum_square);
-            QString msg=QString::number(fitx.size())+
-                    " pts [c00:"+QString::number(cov00)+
-                    " c01:"+QString::number(cov01)+
-                    " c11:"+QString::number(cov11)+
-                    " sq:"+QString::number(sqrt(sum_square)/fitx.size())+
+            QString msg=QLocale().toString((unsigned int)(fitx.size()))+
+                    " pts [c00:"+QLocale().toString(cov00)+
+                    " c01:"+QLocale().toString(cov01)+
+                    " c11:"+QLocale().toString(cov11)+
+                    " sq:"+QLocale().toString(sqrt(sum_square)/fitx.size())+
                     "]";
             statusbar->showMessage(msg);
             origin->setText(locale().toString(c0));

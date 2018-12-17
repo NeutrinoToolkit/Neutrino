@@ -113,7 +113,7 @@ Visar::Visar(neutrino *nparent)
 
     show();
 
-    setProperty("NeuSave-alphagraph",30);
+    setProperty("NeuSave-alphagraph",20);
 
     QApplication::processEvents();
 
@@ -136,11 +136,10 @@ Visar::Visar(neutrino *nparent)
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
 
-    connect(actionGuess, SIGNAL(triggered()), this, SLOT(getCarrier()));
     connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
     connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
-    connect(etalon_delta, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
+    connect(etalon_dn_over_dlambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_n0, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
 
@@ -156,7 +155,18 @@ Visar::Visar(neutrino *nparent)
 }
 
 void Visar::calculate_etalon() {
-    double sens=etalon_lambda->value()*1e-9*_phys_cspeed/(4*etalon_thickness->value()*1e-3*(etalon_n0->value()-1.0/etalon_n0->value())*(1+etalon_delta->value()/100.))*1e-3; // km/s
+    double lam=etalon_lambda->value();
+    double e=etalon_thickness->value();
+    double n0=etalon_n0->value();
+    double dn_dl = etalon_dn_over_dlambda->value();
+    double c=_phys_cspeed;
+
+    double delta= -1e-3*lam*n0/(n0*n0-1)*dn_dl;
+    double tau=2*e/c*(n0-1.0/n0);
+
+    double sens=lam*1e-9/(2*tau*(1+delta)); // km/s
+
+    qDebug() << "delta tau sens"  << delta << tau << sens;
     etalon_sensitivity->setValue(sens);
 
 }
@@ -169,7 +179,7 @@ void Visar::addVisar() {
     QWidget*wvisar1 = new QWidget(tab1);
     wvisar1->setObjectName(QStringLiteral("wvisar1"));
     gridLayout1->addWidget(wvisar1, 0, 0, 1, 1);
-    tabPhase->addTab(tab1, "Visar"+QString::number(numVisars+1));
+    tabPhase->addTab(tab1, "Visar"+QLocale().toString(numVisars+1));
 
     Ui::Visar2* ui_vel=new Ui::Visar2();
     ui_vel->setupUi(wvisar1);
@@ -182,7 +192,7 @@ void Visar::addVisar() {
     QWidget*wvisar2 = new QWidget(tab2);
     wvisar2->setObjectName(QStringLiteral("wvisar1"));
     gridLayout2->addWidget(wvisar2, 0, 0, 1, 1);
-    tabVelocity->addTab(tab2, "Visar"+QString::number(numVisars+1));
+    tabVelocity->addTab(tab2, "Visar"+QLocale().toString(numVisars+1));
 
     Ui::Visar3* ui_set=new Ui::Visar3();
     ui_set->setupUi(wvisar2);
@@ -192,7 +202,7 @@ void Visar::addVisar() {
 
     //hack to save diffrent uis!!!
     foreach (QWidget *obj, wvisar1->findChildren<QWidget*>()+wvisar2->findChildren<QWidget*>()) {
-        obj->setObjectName(obj->objectName()+"-VISAR"+QString::number(numVisars+1));
+        obj->setObjectName(obj->objectName()+"-VISAR"+QLocale().toString(numVisars+1));
         obj->setProperty("id", numVisars);
     }
 
@@ -207,7 +217,7 @@ void Visar::addVisar() {
     intensity.push_back({{nPhysD(),nPhysD()}});
 
     for (int m=0;m<2;m++){
-        QString name="Visar "+QString::number(numVisars+1)+" "+QString::number(m);
+        QString name="Visar "+QLocale().toString(numVisars+1)+" "+QLocale().toString(m);
         phase[numVisars][m].setName(name.toUtf8().constData());
         phase[numVisars][m].setShortName("phase");
         contrast[numVisars][m].setName(name.toUtf8().constData());
@@ -220,21 +230,21 @@ void Visar::addVisar() {
 
     sweepCoeff.push_back(std::vector<double>());
 
-    QAction *actionRect = new QAction(QIcon(":icons/rect.png"), "Region Visar"+QString::number(numVisars+1),this);
+    QAction *actionRect = new QAction(QIcon(":icons/rect.png"), "Region Visar"+QLocale().toString(numVisars+1),this);
     actionRect->setProperty("id",numVisars);
 
     toolBar->insertAction(actionDelVisar,actionRect);
 
-    whichRefl->addItem("Visar"+QString::number(numVisars+1));
+    whichRefl->addItem("Visar"+QLocale().toString(numVisars+1));
 
     nLine* my_nline=new nLine(this,3);
-    my_nline->changeToolTip(tr("Fringeshift Visar ")+QString::number(numVisars+1));
+    my_nline->changeToolTip(tr("Fringeshift Visar ")+QLocale().toString(numVisars+1));
     fringeLine.push_back(my_nline);
 
     nRect *my_rect=new nRect(this,1);
     my_rect->setRect(QRectF(0,0,100,100));
     my_rect->setProperty("id", numVisars);
-    my_rect->changeToolTip(tr("Visar region ")+QString::number(numVisars+1));
+    my_rect->changeToolTip(tr("Visar region ")+QLocale().toString(numVisars+1));
     connect(actionRect, SIGNAL(triggered()),my_rect, SLOT(togglePadella()));
     fringeRect.push_back(my_rect);
 
@@ -263,19 +273,19 @@ void Visar::addVisar() {
     QColor my_color;
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis3);
-    graph->setName("Quality Visar "+QString::number(numVisars+1));
+    graph->setName("Quality Visar "+QLocale().toString(numVisars+1));
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis3->labelColor());
     graph->setPen(pen);
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis2);
-    graph->setName("Reflectivity Visar "+QString::number(numVisars+1));
+    graph->setName("Reflectivity Visar "+QLocale().toString(numVisars+1));
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis2->labelColor());
     graph->setPen(pen);
 
     errorBars = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis2);
-    errorBars->setName("Reflectivity error Visar "+QString::number(numVisars+1));
+    errorBars->setName("Reflectivity error Visar "+QLocale().toString(numVisars+1));
     errorBars->setDataPlottable(graph);
     errorBars->setProperty("id",numVisars);
     my_color=plotVelocity->yAxis2->labelColor();
@@ -286,14 +296,14 @@ void Visar::addVisar() {
     errorBars->setSymbolGap(1);
 
     graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
-    graph->setName("Velocity Visar "+QString::number(numVisars+1));
+    graph->setName("Velocity Visar "+QLocale().toString(numVisars+1));
     graph->setProperty("id",numVisars);
     pen.setColor(plotVelocity->yAxis->labelColor());
     graph->setPen(pen);
 
 
     errorBars = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis);
-    errorBars->setName("Velocity error Visar "+QString::number(numVisars+1));
+    errorBars->setName("Velocity error Visar "+QLocale().toString(numVisars+1));
     errorBars->setDataPlottable(graph);
     errorBars->setProperty("id",numVisars);
     my_color=plotVelocity->yAxis->labelColor();
@@ -842,7 +852,7 @@ void Visar::updatePlot() {
             my_palette.setColor(QPalette::Base,Qt::red);
 
             foreach (QString piece, jumpt) {
-                QString err_msg=" "+piece+QString("' VISAR ")+QString::number(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
+                QString err_msg=" "+piece+QString("' VISAR ")+QLocale().toString(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
                 QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
                 if (my_jumps.size()>1 && my_jumps.size()<=3) {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
@@ -960,7 +970,11 @@ void Visar::updatePlot() {
                     } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
                         my_graph->setData(time_vel[k],reflectivity[k]);
                     } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
-                        my_graph->setData(time_vel[k],quality[k]);
+                        if (velocityUi[k]->interfringe->value() != 0.0) {
+                            my_graph->setData(time_vel[k],quality[k]);
+                        } else {
+                            my_graph->data()->clear();
+                        }
                     }
                     my_graph->setVisible(phaseUi[k]->enableVisar->isChecked());
                 }
@@ -984,7 +998,7 @@ void Visar::updatePlot() {
                 for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
                     QCPGraph* graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
                     graph->setProperty("JumpGraph",k);
-                    graph->setName("VelJump Visar"+QString::number(k+1) + " #" +QString::number(i));
+                    graph->setName("VelJump Visar"+QLocale().toString(k+1) + " #" +QLocale().toString(i));
                     QColor color(plotVelocity->yAxis->labelColor());
                     color.setAlpha(property("NeuSave-alphagraph").toInt());
                     pen.setColor(color);
@@ -1009,10 +1023,6 @@ void Visar::getCarrier() {
     if (sender() && sender()->property("id").isValid()) {
         int k=sender()->property("id").toInt();
         getCarrier(k);
-    } else {
-        for (unsigned int k=0;k<numVisars;k++){
-            getCarrier(k);
-        }
     }
 }
 
@@ -1039,7 +1049,7 @@ void Visar::getCarrier(int k) {
             velocityUi[k]->interfringe->setValue(vecCarr.first());
             velocityUi[k]->angle->setValue(vecCarr.second());
             if (tabPhase->currentIndex()==k) {
-                statusbar->showMessage(tr("Carrier :")+QString::number(vecCarr.first())+tr("px, ")+QString::number(vecCarr.second())+tr("deg"));
+                statusbar->showMessage(tr("Carrier :")+QLocale().toString(vecCarr.first())+tr("px, ")+QLocale().toString(vecCarr.second())+tr("deg"));
             }
         }
     }
@@ -1063,7 +1073,7 @@ void Visar::doWave(int k) {
     std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
     if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
-        QProgressDialog progress("Filter visar "+QString::number(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
+        QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
         progress.setCancelButton(0);
         progress.setWindowModality(Qt::WindowModal);
         progress.setValue(0);
@@ -1109,24 +1119,24 @@ void Visar::doWave(int k) {
         const double damp_norm=M_PI;
 
         double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
+        for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for collapse(2)
-        for (size_t x=0;x<(size_t)dim.x();x++) {
-            for (size_t y=0;y<(size_t)dim.y();y++) {
-                double xr = xx[x]*cr - yy[y]*sr; //rotate
-                double yr = xx[x]*sr + yy[y]*cr;
+            for (size_t x=0;x<(size_t)dim.x();x++) {
+                for (size_t y=0;y<(size_t)dim.y();y++) {
+                    double xr = xx[x]*cr - yy[y]*sr; //rotate
+                    double yr = xx[x]*sr + yy[y]*cr;
 
-                double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
-                double e_y = -pow(yr*thick_norm, 2);
+                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
+                    double e_y = -pow(yr*thick_norm, 2);
 
-                double gauss = exp(e_x)*exp(e_y);
+                    double gauss = exp(e_x)*exp(e_y);
 
-                for (unsigned int m=0;m<2;m++) {
                     zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
                 }
             }
+            progress.setValue(progress.value()+1);
         }
 
-        progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
         for (unsigned int m=0;m<2;m++) {
@@ -1288,7 +1298,7 @@ void Visar::getPhase(int k) {
                         offsetShift=cPhase[m][k].last();
                     }
                 }
-                phaseUi[k]->offset->setTitle("Offset "+QString::number(offsetShift));
+                phaseUi[k]->offset->setTitle("Offset "+QLocale().toString(offsetShift));
                 for (int j=0;j<cPhase[m][k].size();j++){
                     if (direction(k)!=0) {		//fringes are vertical
                         cPhase[m][k][j] = offsetShift-cPhase[m][k][j];
@@ -1315,7 +1325,7 @@ void Visar::getPhase(int k) {
 
                 if (velocityUi[k]->interfringe->value() != 0.0) {
                     graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
-                    graph->setName("Phase Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
+                    graph->setName("Phase Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
                     pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis->labelColor());
                     graph->setPen(pen);
                     graph->setData(time_phase[k],cPhase[m][k]);
@@ -1325,13 +1335,13 @@ void Visar::getPhase(int k) {
 
 
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis2);
-                graph->setName("Intensity Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
+                graph->setName("Intensity Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
                 pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis2->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cIntensity[m][k]);
 
                 graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis3);
-                graph->setName("Contrast Visar "+QString::number(k+1) + " " + (m==0?"ref":"shot"));
+                graph->setName("Contrast Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
                 pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis3->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cContrast[m][k]);
@@ -1379,10 +1389,10 @@ Visar::export_txt() {
     QString title=tr("Export ");
     switch (tabs->currentIndex()) {
         case 0:
-            title=tr("VISAR")+QString(" ")+QString::number(tabPhase->currentIndex()+1);
+            title=tr("VISAR")+QString(" ")+QLocale().toString(tabPhase->currentIndex()+1);
             break;
         case 1:
-            title=tr("VISAR")+QString(" ")+QString::number(tabVelocity->currentIndex()+1);
+            title=tr("VISAR")+QString(" ")+QLocale().toString(tabVelocity->currentIndex()+1);
             break;
         case 2:
             title=tr("SOP");
@@ -1426,7 +1436,7 @@ Visar::export_clipboard() {
                     txt += export_one(k)+"\n\n";
                 }
                 clipboard->setText(txt);
-                statusbar->showMessage(tr("Points copied to clipboard ")+QString::number(numVisars)+" visars");
+                statusbar->showMessage(tr("Points copied to clipboard ")+QLocale().toString(numVisars)+" visars");
                 break;
             }
         case 2:
@@ -1463,7 +1473,7 @@ QString Visar::export_one(unsigned int k) {
     QString out;
     if (k<numVisars) {
         if (phaseUi[k]->enableVisar->isChecked()) {
-            out += "#VISAR " + QString::number(k+1) + "\n";
+            out += "#VISAR " + QLocale().toString(k+1) + "\n";
             out += QString("#Offset shift       : %L1\n").arg(phaseUi[k]->offsetShift->value());
             out += QString("#Sensitivity        : %L1\n").arg(phaseUi[k]->sensitivity->value());
             out += QString("#Reflectivity       : %L1 %L2\n").arg(phaseUi[k]->reflOffset->value()).arg(phaseUi[k]->reflRef->value());

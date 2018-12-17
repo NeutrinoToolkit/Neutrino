@@ -51,7 +51,7 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
         my_image[k].setupUi(my_w.images->widget(k));
         foreach (QWidget *my_obj,  my_w.images->widget(k)->findChildren<QWidget *>()) {
             if (!my_obj->objectName().isEmpty()) {
-                my_obj->setObjectName(my_obj->objectName()+panName()+QString::number(k));
+                my_obj->setObjectName(my_obj->objectName()+panName()+QLocale().toString(k));
                 my_obj->setProperty("id",k);
             }
         }
@@ -221,7 +221,7 @@ void Interferometry::guessCarrier() {
         if (vecCarr.first()==0) {
             my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
         } else {
-            my_w.statusbar->showMessage(tr("Carrier: ")+QString::number(vecCarr.first())+"px "+QString::number(vecCarr.second())+"deg", 5000);
+            my_w.statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
             my_w.widthCarrier->setValue(vecCarr.first());
             my_w.angleCarrier->setValue(vecCarr.second());
         }
@@ -239,7 +239,7 @@ void Interferometry::doWavelet () {
         }
         doWavelet(1);
     }
-    my_w.statusbar->showMessage(QString::number(timer.elapsed())+" msec", 5000);
+    my_w.statusbar->showMessage(QLocale().toString(timer.elapsed())+" msec", 5000);
     if (!my_w.chained->isChecked()) doUnwrap();
 }
 
@@ -463,7 +463,7 @@ void Interferometry::doSubtract () {
         if (std::isfinite(offset)) {
             physMath::phys_subtract(phase,offset);
         } else {
-            my_w.statusbar->showMessage("Can't subtract point " + QString::number(my_w.posZeroX->value()) + " , " + QString::number(my_w.posZeroY->value()) + " is not finite", 5000);
+            my_w.statusbar->showMessage("Can't subtract point " + QLocale().toString(my_w.posZeroX->value()) + " , " + QLocale().toString(my_w.posZeroY->value()) + " is not finite", 5000);
         }
 
         localPhys["phase_2pi"]=nparent->replacePhys(new nPhysD(phase.fast_rotated(my_w.rotAngle->value())),localPhys["phase_2pi"]);
@@ -610,7 +610,7 @@ void Interferometry::addShape(){
     int num=0;
     while (1) {
         num++;
-        QString tooltipStr="interpolateShape"+QString::number(num);
+        QString tooltipStr="interpolateShape"+QLocale().toString(num);
         bool found =false;
         foreach (QObject* widget, nparent->children()) {
             nLine *line=qobject_cast<nLine *>(widget);

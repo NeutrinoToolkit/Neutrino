@@ -94,7 +94,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     fillimage=true;
     setMouseTracking(true);
     setInteractive(true);
-    QTapAndHoldGesture::setTimeout(3000);
+    QTapAndHoldGesture::setTimeout(5000);
     grabGesture(Qt::TapAndHoldGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
@@ -173,24 +173,21 @@ void nView::showPhys(nPhysD *my_phys) {
 
         QApplication::processEvents();
         if (my_phys->getSurf()>0) {
-            const unsigned char *nPhys_pointer=my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-            if(nPhys_pointer) {
-                const QImage tempImage(nPhys_pointer,
-                                       my_phys->getW(),
-                                       my_phys->getH(),
-                                       my_phys->getW()*3,
-                                       QImage::Format_RGB888);
+            const QImage tempImage(my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString()),
+                                   my_phys->getW(),
+                                   my_phys->getH(),
+                                   my_phys->getW()*3,
+                                   QImage::Format_RGB888);
 
-                my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-                currentBuffer=my_phys;
+            my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+            currentBuffer=my_phys;
 
-                QApplication::processEvents();
+            QApplication::processEvents();
 
-                setSize();
+            setSize();
 
-                emit bufferChanged(my_phys);
-                QApplication::processEvents();
-            }
+            emit bufferChanged(my_phys);
+            QApplication::processEvents();
         }
     }
 }
@@ -254,10 +251,10 @@ bool nView::gestureEvent(QGestureEvent *event)
 
 void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
     DEBUG("-------------");
-    qDebug() << gesture;
-    fillimage=true;
-    setSize();
-    update();
+//    qDebug() << gesture;
+//    fillimage=true;
+//    setSize();
+//    update();
 }
 
 void nView::pinchTriggered(QPinchGesture *gesture)
@@ -545,7 +542,7 @@ void nView::setMouseShape(int num) {
     }
     my_mouse.my_shape=num;
     my_mouse.update();
-    qInfo() << "Mouse " << QString::number(num);
+    qInfo() << "Mouse " << QLocale().toString(num);
 }
 
 void nView::keyReleaseEvent (QKeyEvent *e) {

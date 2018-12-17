@@ -56,8 +56,12 @@ public slots:
 	void invertColors();
 	void setToMin();
 	void setToMax();
-	void slider_min_changed(int);
-	void slider_max_changed(int);
+    void on_sliderMin_valueChanged(int);
+    void on_sliderMax_valueChanged(int);
+
+    void on_sliderMin_sliderReleased();
+    void on_sliderMax_sliderReleased();
+
 
 	void bufferChanged(nPhysD*);
     void updatecolorbar(QString=QString());
@@ -76,9 +80,6 @@ public slots:
     vec2f sliderValues();
     const QIcon getPaletteIconFile(QString my_file);
     void paletteComboChange(int);
-
-    void sliderPressed();
-    void sliderReleased();
 
 signals:
 	void change_contrast(double,double);

@@ -41,7 +41,7 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
 	my_w.molarRefr_le->setValidator(dVal);
-    my_w.molarRefr_le->setText(QString::number(5.23e-7));
+    my_w.molarRefr_le->setText(QLocale().toString(5.23e-7));
 
 	connect(my_w.actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
     connect(my_w.actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));

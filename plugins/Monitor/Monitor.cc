@@ -80,7 +80,7 @@ Monitor::listViewActivated(QModelIndex index) {
 			unit = i.next();
 			num /= 1024.0;
 		}
-		QString sizeF=" ("+QString::number(num,'f',1)+unit+")";
+		QString sizeF=" ("+QLocale().toString(num,'f',1)+unit+")";
 		my_w.statusBar->showMessage(fInfo.lastModified().toString(Qt::DefaultLocaleShortDate) +sizeF,5000);
 	}
 }

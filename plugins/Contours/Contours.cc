@@ -111,9 +111,9 @@ Contours::on_draw_pb_released()
 			my_c->setPoints(myp);
 			currentBuffer->set_origin(centr);
 			//my_w.statusBar->showMessage("Contour ok");
-			my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
+            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
 		} else {
-            my_w.statusBar->showMessage(QString::number(cutoff) + " : "+tr("cannot trace contour"),5000);
+            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
 		}
 	}
 }

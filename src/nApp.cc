@@ -113,7 +113,7 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
         QString outstr;
         switch (type) {
             case QtDebugMsg:
-                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + " :</font><font color=\"black\">";
+                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
                 break;
             case QtInfoMsg:
                 outstr+="I: <font color=\"black\">";
@@ -311,7 +311,7 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 
 
 bool nApp::event(QEvent *ev) {
-    //    qDebug() << ev;
+    qDebug() << ev;
     if (ev->type() == QEvent::FileOpen) {
         QWidget *widget = QApplication::activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);
@@ -321,6 +321,7 @@ bool nApp::event(QEvent *ev) {
         }
         if (neu == NULL) neu = new neutrino();
         neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
+        ev->accept();
     } else {
         return QApplication::event(ev);
     }

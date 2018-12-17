@@ -47,6 +47,9 @@ int main(int argc, char **argv)
     freopen("conin$", "r", stdin);
     freopen("conout$", "w", stdout);
     freopen("conout$", "w", stderr);
+    qSetMessagePattern("%{message}");
+#else
+    qSetMessagePattern("%{file}(%{line}): %{message}");
 #endif
 #else
     struct sigaction sigIntHandler;
@@ -57,8 +60,6 @@ int main(int argc, char **argv)
 
     sigaction(SIGINT, &sigIntHandler, NULL);
 #endif
-
-    qSetMessagePattern("%{function}:%{line} : %{message}");
 
     nApp my_app(argc,argv);
 

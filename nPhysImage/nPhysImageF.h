@@ -80,7 +80,7 @@
 
 #include <gsl/gsl_math.h>
 
-#define _phys_cspeed (2.99e8)
+#define _phys_cspeed (299792458.0)
 #define _phys_echarge (1.602e-19)
 #define _phys_emass (9.1e-31)
 #define _phys_vacuum_eps (8.8e-12)

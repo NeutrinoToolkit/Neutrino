@@ -120,7 +120,7 @@ void Lineout_H_V::updatePlot(QPointF p) {
         }
 
 
-        statusBar()->showMessage(tr("Point (")+QString::number(p.x())+","+QString::number(p.y())+")="+QString::number(currentBuffer->point(p.x(),p.y())));
+        statusBar()->showMessage(tr("Point (")+QLocale().toString(p.x())+","+QLocale().toString(p.y())+")="+QLocale().toString(currentBuffer->point(p.x(),p.y())));
         my_w.plot->rescaleAxes();
         my_w.plot->replot();
     }

@@ -68,7 +68,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
         int num=nparent->property("numLine").toInt()+1;
         nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
-		setToolTip(tr("line")+QString::number(num));
+        setToolTip(tr("line")+QLocale().toString(num));
         connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
@@ -158,7 +158,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 QString nLine::getPointsStr(){
 	QString str_points;
 	foreach(QPointF p, poly(1)) {
-		str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
+        str_points += QLocale().toString(p.x()) + " " + QLocale().toString(p.y()) + "\n";
 	}
 	DEBUG(str_points.toStdString());
 	return str_points;
@@ -247,7 +247,7 @@ void nLine::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
 			int keeplast=moveRef.last();
 			moveRef.clear();
 			moveRef.append(keeplast);
-			showMessage(tr("Moving node ")+QString::number(keeplast+1));
+            showMessage(tr("Moving node ")+QLocale().toString(keeplast+1));
 		} else { // if none is selected, append ref.size() to move the whole objec
 			moveRef.append(ref.size());
 			showMessage(tr("Moving object"));
@@ -285,7 +285,7 @@ void nLine::togglePadella() {
 void nLine::updatePlot () {
 
 	nPhysD *my_phys=nparent->getCurrentBuffer();
-	if (my_w.plot->isVisible() && my_phys) {
+    if (my_w.plot->isVisible() && my_phys && ref.size() ) {
 
 		if (my_w.plot->graphCount()==0) {
 			my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
@@ -511,8 +511,8 @@ nLine::changeP (int np, QPointF p, bool isLocal) {
 void nLine::changePointPad(int nrow) {
 	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 	QPointF p=ref[nrow]->pos();
-	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(p.x()));
-	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(p.y()));
+    QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
+    QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	my_w.points->setItem(nrow, 0, xitem);
@@ -529,7 +529,7 @@ void nLine::addPoint () {
 	moveRef.clear();
 	addPoint(i);
 	moveRef.removeLast();
-	showMessage(tr("Added point:")+QString::number(i+1));
+    showMessage(tr("Added point:")+QLocale().toString(i+1));
 }
 
 void nLine::addPoint (int npos) {
@@ -560,8 +560,8 @@ void nLine::addPoint (int npos) {
 
 	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 	my_w.points->insertRow(npos);
-	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
-	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
+    QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
+    QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	my_w.points->setItem(npos, 0, xitem);
@@ -606,7 +606,7 @@ nLine::removePoint() {
 	foreach (QTableWidgetSelectionRange r, my_w.points->selectedRanges()) {
 		for (int i=r.topRow(); i <=r.bottomRow(); i++) {
 			removePoint(i);
-			removedrows+=QString(" ")+QString::number(i+1);
+            removedrows+=QString(" ")+QLocale().toString(i+1);
 		}
 	}
 	showMessage(tr("Removed Rows:")+removedrows);
@@ -782,7 +782,7 @@ nLine::hoverEnterEvent( QGraphicsSceneHoverEvent *e) {
 		QRectF my_rect=ref.at(i)->rect();
 		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
-			showMessage(toolTip()+":"+QString::number(i+1));
+            showMessage(toolTip()+":"+QLocale().toString(i+1));
 			break;
 		}
 	}
@@ -799,7 +799,7 @@ nLine::hoverMoveEvent( QGraphicsSceneHoverEvent *e) {
 		QRectF my_rect=ref.at(i)->rect();
 		if (my_rect.contains(mapToItem(ref.at(i), e->pos()))) {
 			nodeSelected=i;
-			showMessage(toolTip()+":"+QString::number(i+1));
+            showMessage(toolTip()+":"+QLocale().toString(i+1));
 			break;
 		}
 	}
@@ -809,11 +809,11 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QMenu menu;
 	if (nodeSelected>=0) {
 		moveRef.clear();
-		QAction *append = menu.addAction("Append point "+QString::number(nodeSelected+1)+" (a)");
+        QAction *append = menu.addAction("Append point "+QLocale().toString(nodeSelected+1)+" (a)");
 		connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
-		QAction *prepend = menu.addAction("Prepend point "+QString::number(nodeSelected+1)+" (p)");
+        QAction *prepend = menu.addAction("Prepend point "+QLocale().toString(nodeSelected+1)+" (p)");
 		connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
-		QAction *remove = menu.addAction("Delete point "+QString::number(nodeSelected+1)+" (d)");
+        QAction *remove = menu.addAction("Delete point "+QLocale().toString(nodeSelected+1)+" (d)");
 		connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
 		menu.addAction(menu.addSeparator());
 	}
@@ -838,17 +838,17 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 
 void nLine::contextAppendPoint(){
 	addPoint(nodeSelected+1);
-	showMessage(tr("Append to point ")+QString::number(nodeSelected));
+    showMessage(tr("Append to point ")+QLocale().toString(nodeSelected));
 }
 
 void nLine::contextPrependPoint(){
 	addPoint(nodeSelected);
-	showMessage(tr("Prepend to point ")+QString::number(nodeSelected));
+    showMessage(tr("Prepend to point ")+QLocale().toString(nodeSelected));
 }
 
 void nLine::contextRemovePoint(){
 	removePoint(nodeSelected);
-	showMessage(tr("Delete point ")+QString::number(nodeSelected));
+    showMessage(tr("Delete point ")+QLocale().toString(nodeSelected));
 }
 
 void

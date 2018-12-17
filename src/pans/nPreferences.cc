@@ -73,9 +73,9 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 			nested = omp_get_nested();
 
 			/* Print environment information */
-            my_w.infoCores->insertPlainText("Number of processors : "+QString::number(procs));
-			my_w.infoCores->insertPlainText("\nNumber of threads : "+QString::number(nthreads));
-			my_w.infoCores->insertPlainText("\nMax threads : "+QString::number(maxt));
+            my_w.infoCores->insertPlainText("Number of processors : "+QLocale().toString(procs));
+			my_w.infoCores->insertPlainText("\nNumber of threads : "+QLocale().toString(nthreads));
+			my_w.infoCores->insertPlainText("\nMax threads : "+QLocale().toString(maxt));
 			my_w.infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
 			my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
 			my_w.infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));

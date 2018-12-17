@@ -62,7 +62,7 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 		my_parent->setProperty(my_prop_name,num);
 		setProperty(my_prop_name,num);
 
-		setToolTip(cname+QString(" ")+QString::number(num));
+		setToolTip(cname+QString(" ")+QLocale().toString(num));
 		connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
 		connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 		connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
@@ -275,7 +275,7 @@ nObject::movePoints (QPointF p) {
 	for (int i=0;i<ref.size(); i++) {
 		if (moveRef.contains(i)) {
 			changeP(i,p,true);
-			showMessage("P"+QString::number(i)+" "+getRectString());
+			showMessage("P"+QLocale().toString(i)+" "+getRectString());
 		}
 	}
 }
@@ -360,8 +360,8 @@ nObject::changeP (int np, QPointF p, bool updatepad) {
 void nObject::changePointPad(int nrow) {
 	disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 	QPointF p=ref[nrow]->pos();
-	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(p.x()));
-	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(p.y()));
+	QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
+	QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	my_w.tableWidget->setItem(nrow, 0, xitem);
@@ -397,8 +397,8 @@ void nObject::addPoint (int pos) {
 	sizeHolder(nSizeHolder);
 	disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 	my_w.tableWidget->insertRow(pos);
-	QTableWidgetItem *xitem= new QTableWidgetItem(QString::number(position.x()));
-	QTableWidgetItem *yitem= new QTableWidgetItem(QString::number(position.y()));
+	QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
+	QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
 	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
 	my_w.tableWidget->setItem(pos, 0, xitem);
@@ -489,8 +489,8 @@ void nObject::changeHeight () {
 void nObject::updateSize() {
 	disconnect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	disconnect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
-	my_w.sizeWidth->setText(QString::number(getRectF().width()));
-	my_w.sizeHeight->setText(QString::number(getRectF().height()));
+	my_w.sizeWidth->setText(QLocale().toString(getRectF().width()));
+	my_w.sizeHeight->setText(QLocale().toString(getRectF().height()));
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 }
@@ -594,10 +594,10 @@ nObject::selectThis(bool val) {
 
 QString nObject::getRectString() {
 	QRectF myR=getRectF();
-	return QString::number(myR.left())+","+
-			QString::number(myR.top())+" "+
-			QString::number(myR.width())+"x"+
-			QString::number(myR.height());
+	return QLocale().toString(myR.left())+","+
+			QLocale().toString(myR.top())+" "+
+			QLocale().toString(myR.width())+"x"+
+			QLocale().toString(myR.height());
 }
 
 // reimplementation

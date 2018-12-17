@@ -92,7 +92,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
-        name.prepend(QString::number(position)+" : ");
+        name.prepend(QLocale().toString(position)+" : ");
     }
     return name;
 }
@@ -209,7 +209,7 @@ void nGenericPan::decorate(QWidget *main_widget) {
                 qobject_cast<QToolButton*>(wdgt)
                 ) {
             if (wdgt->objectName().isEmpty()) {
-                wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
+                wdgt->setObjectName(wdgt->metaObject()->className()+QLocale().toString(occurrency++));
             }
             wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
         }
@@ -316,6 +316,8 @@ void nGenericPan::show(bool onlyOneAllowed) {
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {
+    DEBUG(">>>>>enter");
+    currentBuffer=nullptr;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
@@ -323,19 +325,27 @@ void nGenericPan::physDel(nPhysD * buffer) {
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
             int position=combo->findData(qVariantFromValue((void*) buffer));
+            QApplication::processEvents();
             combo->removeItem(position);
+            QApplication::processEvents();
             if (combo->property("neutrinoImage").toBool()) {
                 connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
         }
     }
+    QApplication::processEvents();
+    DEBUG(">>>>>exit");
 }
 
 void nGenericPan::bufferChanged(nPhysD * buffer)
 {
-    qDebug() << "here";
+    qDebug() << "here" << buffer;
+    if (buffer) {
+        DEBUG(buffer->getFromName());
+    }
     currentBuffer = buffer;
+    qDebug() << "here" ;
 }
 
 void nGenericPan::showMessage(QString message) {
