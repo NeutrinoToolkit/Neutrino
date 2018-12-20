@@ -44,6 +44,8 @@ public:
 
 public slots:
     void changeShowDimPixel();
+    void changeShowXYaxes();
+    void changeShowColorbar();
     void changeIconSize(int);
 
 

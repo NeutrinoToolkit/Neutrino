@@ -110,6 +110,8 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
         }
     }
     showDimPixel=settings.value("showDimPixel",true).toBool();
+    showXYaxes=settings.value("showXYaxes",true).toBool();
+    showColorbar=settings.value("showColorbar",true).toBool();
 
     currentStepScaleFactor=settings.value("currentStepScaleFactor",15).toInt();
 

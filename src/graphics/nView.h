@@ -67,6 +67,8 @@ public:
     bool show_mouse;
 
     bool showDimPixel;
+    bool showXYaxes;
+    bool showColorbar;
 
     QGraphicsScene my_scene;
 
