@@ -70,6 +70,8 @@ public slots:
 
     void loadPalettes();
 
+    void addItem(QString);
+
     void resetPalettes();
 	void addPaletteFile();
 	void removePaletteFile();

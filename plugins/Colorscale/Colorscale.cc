@@ -258,44 +258,47 @@ void Colorscale::loadPalettes() {
     }
     connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
     my_w.fileList->clear();
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("Palettes");
-    QStringList paletteFilesName=my_set.value("paletteFiles","").toStringList();
-    for(auto &my_file : paletteFilesName) {
-        new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
+    foreach(QString my_file,napp->nPalettes.keys()) {
+        addItem(my_file);
     }
-    my_set.endGroup();
+}
+
+void Colorscale::addItem(QString my_file) {
+    QListWidgetItem * item = new QListWidgetItem(getPaletteIconFile(my_file),my_file,my_w.fileList);
+    qDebug() << item;
 }
 
 void Colorscale::addPaletteFile() {
     QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),NULL,tr("Any files")+QString(" (*)"));
     foreach (QString my_file, fnames) {
-        napp->addPaletteFile(my_file);
-        new QListWidgetItem(getPaletteIconFile(my_file), my_file, my_w.fileList);
+        addItem(my_file);
     }
 }
 
 void Colorscale::removePaletteFile() {
-    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
-    QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-    for (auto & my_item : my_w.fileList->selectedItems()) {
-        napp->nPalettes.remove(my_item->text());
-        paletteFiles.removeAll(my_item->text());
-        my_w.palettes->removeItem(my_w.palettes->findData(my_item->text()));
-        delete my_item;
+    QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
 
+    for (auto & my_item : my_w.fileList->selectedItems()) {
+        qInfo() << "Remove palette" << my_item->text();
+        napp->nPalettes.remove(my_item->text());
+        my_w.palettes->removeItem(my_w.palettes->findData(my_item->text()));
+        hiddenPalettes.append(my_item->text());
+        delete my_item;
     }
+
+    hiddenPalettes.removeDuplicates();
+    hiddenPalettes.sort(Qt::CaseInsensitive);
+    my_set.setValue("hiddenPalettes",hiddenPalettes);
+    my_set.endGroup();
+
     if (napp->nPalettes.size()==0) {
         resetPalettes();
     }
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
-    //    updatecolorbar();
-    my_set.setValue("paletteFiles",paletteFiles);
-    qDebug() << paletteFiles;
-    my_set.endGroup();
+    updatecolorbar();
 }
 
 void Colorscale::on_fileList_itemClicked(QListWidgetItem *item){
@@ -306,7 +309,7 @@ void Colorscale::resetPalettes() {
     showMessage("Restoring colortables");
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
-    my_set.setValue("paletteFiles",QStringList());
+    my_set.setValue("hiddenPalettes",QStringList());
     my_set.endGroup();
 
     napp->addDefaultPalettes();

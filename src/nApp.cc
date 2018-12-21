@@ -156,20 +156,10 @@ void nApp::saveLog(){
 void nApp::addDefaultPalettes() {
     qDebug() << "reset Palettes";
     nPalettes.clear();
-
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("Palettes");
-    QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-    paletteFiles.removeDuplicates();
-    for(auto &my_str : paletteFiles) {
-        addPaletteFile(my_str);
-    }
-    my_set.setValue("paletteFiles",paletteFiles);
-    if (nPalettes.size()==0) {
-        QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            addPaletteFile(it.next());
-        }
+    QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString pal=it.next();
+            addPaletteFile(pal);
     }
     if (nPalettes.size()==0) {
         QMessageBox::warning(nullptr,tr("Attention"),tr("No colorscales present!"), QMessageBox::Ok);
@@ -177,7 +167,14 @@ void nApp::addDefaultPalettes() {
 }
 
 void nApp::addPaletteFile(QString cmapfile) {
-    if (QFileInfo(cmapfile).exists()) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("Palettes");
+    QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
+    my_set.setValue("hiddenPalettes",hiddenPalettes);
+    my_set.endGroup();
+    qInfo() << hiddenPalettes;
+
+    if (QFileInfo(cmapfile).exists() && (! hiddenPalettes.contains(cmapfile))) {
         QFile inputFile(cmapfile);
         if (inputFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&inputFile);
@@ -186,18 +183,12 @@ void nApp::addPaletteFile(QString cmapfile) {
             while (!in.atEnd()) {
                 QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
                 for(auto &strnum : line) {
-                    nPalettes[cmapfile].at(iter) = strnum.toInt();
+                    if (iter < nPalettes[cmapfile].size()) {
+                        nPalettes[cmapfile][iter] = strnum.toInt();
+                    }
                     iter++;
                 }
-            }
-            QSettings my_set("neutrino","");
-            my_set.beginGroup("Palettes");
-            QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-            paletteFiles << cmapfile;
-            paletteFiles.removeDuplicates();
-            paletteFiles.sort(Qt::CaseInsensitive);
-            my_set.setValue("paletteFiles",paletteFiles);
-            my_set.endGroup();
+            }            
             qInfo() << "Adding colormap" << cmapfile;
             inputFile.close();
         }
