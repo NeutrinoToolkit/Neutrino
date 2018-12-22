@@ -51,12 +51,12 @@ public:
 
     nLine l1, l2;
 
-    vec2f affine(vec2f, std::vector<double>);
+    vec2f affine(vec2f, std::array<double,6>&);
 
-    std::vector<double> forward, backward;
+    std::array<double,6> forward, backward;
 
 public slots:
-    std::vector<double> getAffine(QPolygonF, QPolygonF);
+    std::array<double,6> getAffine(QPolygonF, QPolygonF);
     void apply();
     void affine();
     void bufferChanged(nPhysD*);

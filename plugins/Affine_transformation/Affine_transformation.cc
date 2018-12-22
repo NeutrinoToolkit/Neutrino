@@ -74,14 +74,17 @@ void Affine_transformation::bufferChanged(nPhysD* buf) {
 		} else {
             l2.hide();
 		}
-	}
+    } else {
+        l1.hide();
+        l2.hide();
+    }
 }
 
 void Affine_transformation::affine() {
 	nPhysD *my_phys=NULL;
 	nPhysD *my_phys_other=NULL;
 
-    std::vector<double> vecForward,vecBackward;
+    std::array<double,6> vecForward,vecBackward;
 	if (sender()==my_w.first) {
 		my_phys=getPhysFromCombo(my_w.image1);
 		my_phys_other=getPhysFromCombo(my_w.image2);
@@ -172,16 +175,16 @@ void Affine_transformation::affine() {
 	}
 }
 
-vec2f Affine_transformation::affine(vec2f in, std::vector<double> vec){
+vec2f Affine_transformation::affine(vec2f in, std::array<double,6>& vec){
 	return vec2f(in.x()*vec[0]+in.y()*vec[1]+vec[2],in.x()*vec[3]+in.y()*vec[4]+vec[5]);
 }
 
-std::vector<double> Affine_transformation::getAffine(QPolygonF poly1, QPolygonF poly2) {
-    std::vector<double>ret(6);
+std::array<double,6> Affine_transformation::getAffine(QPolygonF poly1, QPolygonF poly2) {
+    std::array<double,6>ret;
 	poly1.resize(3);
 	poly2.resize(3);
 
-    std::vector<double> p1(9), p2(9), mat(9), inva(9);
+    std::array<double,9> p1, p2, mat, inva;
 	
 	p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
 	p1[3] = poly1[0].y(); p1[4] = poly1[1].y(); p1[5] = poly1[2].y();

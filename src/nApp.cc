@@ -172,8 +172,9 @@ void nApp::addPaletteFile(QString cmapfile) {
     QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
     my_set.setValue("hiddenPalettes",hiddenPalettes);
     my_set.endGroup();
-    qInfo() << hiddenPalettes;
-
+    if (hiddenPalettes.size()) {
+        qInfo() << hiddenPalettes;
+    }
     if (QFileInfo(cmapfile).exists() && (! hiddenPalettes.contains(cmapfile))) {
         QFile inputFile(cmapfile);
         if (inputFile.open(QIODevice::ReadOnly)) {
