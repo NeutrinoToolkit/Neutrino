@@ -87,8 +87,6 @@ public slots:
     void saveLog();
     void findLogText();
 
-signals:
-    void logWinVisibility(bool);
 };
 
 #endif

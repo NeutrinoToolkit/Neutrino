@@ -129,9 +129,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
+    add_dependencies(${PROJECT_NAME} Neutrino)
 
     IF(APPLE)
-#        add_dependencies(${PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
         target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
     ENDIF()

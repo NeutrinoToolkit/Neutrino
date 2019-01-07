@@ -280,7 +280,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Remove File</string>
+           <string>Hide File</string>
           </property>
          </widget>
         </item>
@@ -292,7 +292,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Add File</string>
+           <string>Add plaette from file</string>
           </property>
          </widget>
         </item>

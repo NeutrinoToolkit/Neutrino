@@ -159,8 +159,18 @@ void nApp::addDefaultPalettes() {
     QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString pal=it.next();
-            addPaletteFile(pal);
+        addPaletteFile(pal);
     }
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("Palettes");
+    QStringList userPalettes=my_set.value("userPalettes","").toStringList();
+    my_set.endGroup();
+    for (auto &pal : userPalettes) {
+        addPaletteFile(pal);
+    }
+
+
     if (nPalettes.size()==0) {
         QMessageBox::warning(nullptr,tr("Attention"),tr("No colorscales present!"), QMessageBox::Ok);
     }
@@ -170,7 +180,6 @@ void nApp::addPaletteFile(QString cmapfile) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
-    my_set.setValue("hiddenPalettes",hiddenPalettes);
     my_set.endGroup();
     if (hiddenPalettes.size()) {
         qInfo() << hiddenPalettes;
