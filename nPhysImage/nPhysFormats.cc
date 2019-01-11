@@ -189,13 +189,11 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
 
     temp_string.clear();
     std::string control_string="Pixel number";
-    while (!ifile.eof()) {
+    DEBUG(control_string.size());
+    while ((!ifile.eof()) && (temp_string.substr(0,control_string.size()) != control_string)) {
         getline(ifile, temp_string);
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
         prop["sif-d-"+ss.str()]=temp_string;
-        if (temp_string.substr(0,12) == control_string) {
-            break;
-        }
     }
 
     temp_string.clear();
@@ -204,10 +202,11 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         long int test_position = ifile.tellg();
         getline(ifile, temp_string);
 
-        // to praise the hindi god of love Kamadeva, add this line
         if (temp_string.size() > 10000) {
             temp_string.clear();
             ifile.seekg(test_position);
+            WARNING("breaking sif loop");
+            DEBUG("to praise the hindi god of love Kamadeva");
             break;
         }
         std::istringstream iss(temp_string);
@@ -215,10 +214,10 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
         prop["sif-e-"+ss.str()]=temp_string;
 
-        DEBUG(ss.str() << " " << temp_string.size())
+        DEBUG(ss.str() << " " << temp_string.size());
 
-                // most readable ever
-                if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
+        // most readable ever
+        if ( !(iss >> std::noskipws >> magic_number).fail() && iss.eof() ) {
             prop["sif-magic_number"]=(int)magic_number;
             break;
         }
