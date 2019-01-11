@@ -234,7 +234,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
                     item3->setData(1,0,"Vlen");
                     item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 } else {
-                    item3->setData(1,0,"unknown "+QLocale().toString(classCompoundType));
+                    item3->setData(1,0,"unknown "+QLocale().toString((unsigned int)classCompoundType));
                     item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 }
 
