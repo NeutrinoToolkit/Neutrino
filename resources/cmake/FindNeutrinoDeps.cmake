@@ -4,9 +4,9 @@ if (OPENMP_FOUND AND NOT "${CMAKE_CXX_FLAGS}" MATCHES "^(${OpenMP_CXX_FLAGS})")
     set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
     add_definitions(-DHAVE_OPENMP)
 
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        add_definitions(-D_GLIBCXX_PARALLEL)
-    endif()
+#    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+#        add_definitions(-D_GLIBCXX_PARALLEL)
+#    endif()
 
 endif()
 

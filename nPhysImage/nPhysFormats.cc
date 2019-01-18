@@ -336,17 +336,10 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
     assert (readb = new char [w*bpp]);
 
     for (int i=0; i<h; i++) {
-
         memset(readb,0,w*bpp);
         ifile.read(readb,w*bpp);
-
-        //		for (j=0; j<w; j++) {
-        //			Timg_matrix[i][j] = (short)( *((unsigned short *)&readb[bpp*j]) );
-        //		}
-
         memcpy(Timg_matrix[i], readb, w*sizeof(short));
     }
-
 
     ifile.close();
     delete readb;
@@ -354,7 +347,23 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
 }
 
 
-//#include <regex>
+#include <regex>
+
+std::string splitHamamatsuComments(std::string line) {
+    std::string res;
+    const char *mystart=line.c_str();
+    bool instring{false};
+    for (const char* p=mystart; *p; p++) {
+        if (*p=='"')
+            instring = !instring;
+        else if (*p==',' && !instring) {
+            res+=std::string(mystart,p-mystart)+"\n";
+            mystart=p+1;
+        }
+    }
+    res+=std::string(mystart);
+    return res;
+}
 
 physFormat::physDouble_img::physDouble_img(std::string ifilename)
     : physD(ifilename, PHYS_FILE) {
@@ -422,16 +431,20 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
             ss << std::setw(log10(strings.size())+1) << std::setfill('0') << i;
 
             DEBUG( ss.str() << " <> " << strings[i]);
-            prop["Hamamatsu_"+ss.str()]=strings[i];
+//            prop["Hamamatsu_"+ss.str()]=strings[i];
 
-            //             std::regex my_regex(".*\\[(.*?)\\],(.*?)");
+            std::regex my_regex(".*\\[(.*?)\\],(.*?)");
 
-            //             std::smatch m;
-            //             if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
-            //                 property["Hamamatsu_"+ss.str()+"("+std::string(m[1])+")"]=m[2];
-            //             } else {
-            //                 property["Hamamatsu_"+ss.str()]=strings[i];
-            //             }
+            std::smatch m;
+            if(regex_match(strings[i],m,my_regex) &&m.size()==3) {
+                DEBUG(m[0]);
+                DEBUG(m[1]);
+                DEBUG(m[2]);
+                std::string res = splitHamamatsuComments(m[2]);
+                prop["Hamamatsu_"+ss.str()+"_"+std::string(m[1])]=res;
+            } else {
+                prop["Hamamatsu_"+ss.str()]=strings[i];
+            }
         }
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         
