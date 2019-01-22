@@ -35,13 +35,12 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
     l1.changeToolTip(panName()+"Line 1");
     l1.changeColorHolder("red");
 	QPolygonF poly;
-	poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
+    poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
     l1.setPoints(poly);
 	
     l2.changeToolTip(panName()+"Line 2");
     l2.changeColorHolder("blue");
-	poly.clear();
-	poly << QPointF(150,50) << QPointF(50,50) << QPointF(50,150);
+    poly.translate(50,50);
     l2.setPoints(poly);
 	
 
@@ -54,11 +53,22 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
     connect(my_w.first,SIGNAL(pressed()),this,SLOT(affine()));
     connect(my_w.second,SIGNAL(pressed()),this,SLOT(affine()));
 	
-	
+    connect(my_w.actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
+
     affined=NULL;
     show();
 	apply();
-	
+
+
+}
+
+void Affine_transformation::resetPoints() {
+    QPolygonF poly;
+    poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
+    l1.setPoints(poly);
+    poly.translate(50,50);
+    l2.setPoints(poly);
+    apply();
 }
 
 void Affine_transformation::bufferChanged(nPhysD* buf) {

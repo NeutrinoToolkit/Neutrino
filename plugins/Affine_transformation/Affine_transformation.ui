@@ -250,7 +250,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -261,7 +261,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -369,7 +369,20 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionReset"/>
   </widget>
+  <action name="actionReset">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset points</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>image1</tabstop>
@@ -393,7 +406,7 @@
   <tabstop>B12</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

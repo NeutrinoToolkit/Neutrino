@@ -60,7 +60,7 @@ public slots:
     void apply();
     void affine();
     void bufferChanged(nPhysD*);
-
+    void resetPoints();
 };
 
 NEUTRINO_PLUGIN(Affine_transformation, Analysis);
