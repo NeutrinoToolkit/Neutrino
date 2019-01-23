@@ -502,42 +502,54 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
     // Optronics luli
 
     unsigned short buffer_header;
-    std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
-    unsigned short w=0;
-    unsigned short h=0;
+    std::vector<std::string> exts = {"imd", "IMD", ifilename.substr(ifilename.size()-3,3)};
+    std::string ifilenamebase=ifilename;
+    ifilenamebase.resize(ifilenamebase.size()-3);
 
-    ifile.read((char *)&buffer_header,sizeof(unsigned short));
-    prop["imd-version"]=buffer_header;
-    ifile.read((char *)&buffer_header,sizeof(unsigned short));
-    w=buffer_header;
-    ifile.read((char *)&buffer_header,sizeof(unsigned short));
-    h=buffer_header;
+    for (auto &ext : exts) {
+        ifilename=ifilenamebase+ext;
+        DEBUG(ifilename.substr(ifilename.size()-3,3));
+        std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
+        if (ifile) {
+            unsigned short w=0;
+            unsigned short h=0;
 
-    this->resize(w, h);
-    std::vector<unsigned int> buf(w*h);
-    ifile.read((char *)(&buf[0]),sizeof(unsigned int)*w*h);
+            ifile.read((char *)&buffer_header,sizeof(unsigned short));
+            prop["imd-version"]=buffer_header;
+            ifile.read((char *)&buffer_header,sizeof(unsigned short));
+            w=buffer_header;
+            ifile.read((char *)&buffer_header,sizeof(unsigned short));
+            h=buffer_header;
+
+            this->resize(w, h);
+            std::vector<unsigned int> buf(w*h);
+            ifile.read((char *)(&buf[0]),sizeof(unsigned int)*w*h);
 #pragma omp parallel for
-    for (size_t ii=0; ii<w*h; ii++) {
-        set(ii, buf[ii]/1000.);
-    }
+            for (size_t ii=0; ii<w*h; ii++) {
+                set(ii, buf[ii]/1000.);
+            }
 
-    ifile.close();
+            ifile.close();
 
-    std::string ifilenameimg=ifilename;
-    ifilenameimg.resize(ifilenameimg.size()-3);
-    ifilenameimg = ifilenameimg+"imi";
-    std::ifstream ifileimg(ifilenameimg.c_str(), std::ios::in);
-    if (ifileimg) {
-        std::string comment(""),temp_line;
-        while (!ifileimg.eof()) {
-            getline(ifileimg, temp_line);
-            comment.append(temp_line);
+            std::vector<std::string> extensions = {"imi", "IMI"};
+            for (auto &ext : extensions) {
+                ifilenamebase = ifilenamebase+ext;
+                std::ifstream ifileimg(ifilenamebase.c_str(), std::ios::in);
+                if (ifileimg) {
+                    std::string comment(""),temp_line;
+                    while (!ifileimg.eof()) {
+                        getline(ifileimg, temp_line);
+                        comment.append(temp_line);
+                    }
+                    ifileimg.close();
+                    prop["imi-info"]=comment;
+                    break;
+                }
+            }
+            TscanBrightness();
+            break;
         }
-        ifileimg.close();
-        prop["imi-info"]=comment;
     }
-
-    TscanBrightness();
 }
 
 
@@ -1869,7 +1881,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
         retPhys.push_back(physFormat::physShort_b16(fname.c_str()));
     } else if (ext=="img") {
         retPhys.push_back(physFormat::physDouble_img(fname));
-    } else if (ext=="imd") {
+    } else if (ext=="imd" || ext=="imi") {
         retPhys.push_back(physFormat::physUint_imd(fname.c_str()));
     } else if (ext.substr(0,3)=="fit") {
         retPhys=physFormat::phys_open_fits(fname);
@@ -1917,7 +1929,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
 std::vector<std::string> physFormat::phys_image_formats() {
 
-    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "neu", "gz"};
+    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "neu", "gz"};
 
 #ifdef HAVE_LIBTIFF
     retval.push_back("tif");
