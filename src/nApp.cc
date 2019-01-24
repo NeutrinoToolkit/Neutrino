@@ -76,7 +76,7 @@ int nApp::exec() {
     setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
     log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
 
-    my_set.endGroup();
+//    my_set.endGroup();
 
     QStringList args=arguments();
     args.removeFirst();
