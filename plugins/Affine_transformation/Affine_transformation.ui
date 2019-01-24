@@ -370,6 +370,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionReset"/>
+   <addaction name="actionRegion"/>
   </widget>
   <action name="actionReset">
    <property name="icon">
@@ -381,6 +382,18 @@
    </property>
    <property name="toolTip">
     <string>Reset points</string>
+   </property>
+  </action>
+  <action name="actionRegion">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="toolTip">
+    <string>Crop rectangle</string>
    </property>
   </action>
  </widget>

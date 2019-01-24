@@ -32,6 +32,7 @@
 #include "nGenericPan.h"
 #include "ui_Affine_transformation.h"
 #include "nLine.h"
+#include "nRect.h"
 
 
 #ifndef __Affine_transformation
@@ -50,6 +51,7 @@ public:
     nPhysD *affined;
 
     nLine l1, l2;
+    nRect region;
 
     vec2f affine(vec2f, std::array<double,6>&);
 

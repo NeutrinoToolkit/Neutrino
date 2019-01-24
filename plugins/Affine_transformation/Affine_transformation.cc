@@ -29,8 +29,12 @@
 
 Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(nparent),
     l1(this,1),
-    l2(this,1)
+    l2(this,1),
+    region(this,1)
 {
+
+    region.setRect(QRectF(100,100,100,100));
+
 	my_w.setupUi(this);
     l1.changeToolTip(panName()+"Line 1");
     l1.changeColorHolder("red");
@@ -44,8 +48,11 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
     l2.setPoints(poly);
 	
 
+
     connect(my_w.line1, SIGNAL(released()), &l1, SLOT(togglePadella()));
     connect(my_w.line2, SIGNAL(released()), &l2, SLOT(togglePadella()));
+
+    connect(my_w.actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
 
     connect(&l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
     connect(&l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
@@ -68,6 +75,8 @@ void Affine_transformation::resetPoints() {
     l1.setPoints(poly);
     poly.translate(50,50);
     l2.setPoints(poly);
+    region.setRect(QRectF(100,100,100,100));
+
     apply();
 }
 
@@ -135,25 +144,25 @@ void Affine_transformation::affine() {
 		
 		double minx=0.0;
 		double miny=0.0;
-		if (!my_w.crop->isChecked()) {			
+        if (!my_w.crop->isChecked()){
             std::vector<vec2f> corners(4); //clockwise...
             corners[0]=affine(vec2f(0,0),vecForward);
             corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
             corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
             corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);
-			minx=corners[0].x();
-			double maxx=corners[0].x();
-			miny=corners[0].y();
-			double maxy=corners[0].y();
-			for (unsigned int i=1;i<4;i++) {
-				if (minx>corners[i].x()) minx=corners[i].x();
-				if (maxx<corners[i].x()) maxx=corners[i].x();
-				if (miny>corners[i].y()) miny=corners[i].y();
-				if (maxy<corners[i].y()) maxy=corners[i].y();
-			}
-			dx=maxx-minx;
-			dy=maxy-miny;
-		}
+            minx=corners[0].x();
+            double maxx=corners[0].x();
+            miny=corners[0].y();
+            double maxy=corners[0].y();
+            for (unsigned int i=1;i<4;i++) {
+                if (minx>corners[i].x()) minx=corners[i].x();
+                if (maxx<corners[i].x()) maxx=corners[i].x();
+                if (miny>corners[i].y()) miny=corners[i].y();
+                if (maxy<corners[i].y()) maxy=corners[i].y();
+            }
+            dx=maxx-minx;
+            dy=maxy-miny;
+        }
 		
         DEBUG(affine(vec2f(0,0),vecForward).x() << " " << affine(vec2f(0,0),vecForward).y());
         DEBUG(affine(vec2f(0,0),vecBackward).x() << " " << affine(vec2f(0,0),vecBackward).y());
@@ -174,13 +183,32 @@ void Affine_transformation::affine() {
 			}
 		}
         affinePhys->TscanBrightness();
-		
-		if (my_w.erasePrevious->isChecked()) {
-            affined=nparent->replacePhys(affinePhys,affined,true);
-		} else {
-            nparent->addShowPhys(affinePhys);
-            affined=affinePhys;
-		}
+
+//        if (my_w.crop->isChecked()){
+//            QRectF reg=region.getRect();
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << reg;
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+//            qDebug() << "----------------------------------------------------";
+////            nPhysD *copy=new nPhysD(affined->sub(reg.x(),reg.y(),reg.width(),reg.height()).copy());
+//            nPhysD copy=affined->sub(reg.x(),reg.y(),reg.width(),reg.height());
+////            delete affined;
+////            affined=copy;
+////            nparent->addShowPhys(copy);
+//        }
+
+//		if (my_w.erasePrevious->isChecked()) {
+//            affined=nparent->replacePhys(affinePhys,affined,true);
+//		} else {
+//            nparent->addShowPhys(affinePhys);
+//            affined=affinePhys;
+//		}
 
 	}
 }

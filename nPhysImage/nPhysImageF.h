@@ -384,6 +384,7 @@ public:
 	}
 
     nPhysImageF<T> sub(int x, int y, unsigned int Dx, unsigned int Dy) {
+        DEBUG("-----------------------------------------------");
         nPhysImageF<T> subphys(Dx, Dy, 0.);
         subphys.set_origin(get_origin()-vec2f(x,y));
         subphys.set_scale(get_scale());
@@ -394,6 +395,11 @@ public:
         unsigned int end_h = std::min(y+Dy, getH());
         unsigned int begin_w = std::max(0,x);
         unsigned int begin_h = std::max(0,y);
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG(begin_h << " " << end_h << " " << begin_w << " " << end_w);
         int pad_w = std::min(0,x);
         int pad_h = std::min(0,y);
         for (unsigned int i=begin_h; i<end_h; i++) {

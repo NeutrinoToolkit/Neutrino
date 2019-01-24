@@ -19,7 +19,7 @@ if(PYTHONLIBS_FOUND)
             exec_program("${PYTHON_EXECUTABLE}" ARGS "\"${CMAKE_CURRENT_BINARY_DIR}/determineNumpyPath.py\"" OUTPUT_VARIABLE NUMPY_PATH)
         endif (NOT NUMPY_PATH AND PYTHON_EXECUTABLE)
         if (WIN32)
-            install (DIRECTORY ${PYTHON_INCLUDE_DIRS}/../../lib/python2.7 DESTINATION bin PATTERN "python2.7/test" EXCLUDE)
+#            install (DIRECTORY ${PYTHON_INCLUDE_DIRS}/../../lib/python2.7 DESTINATION bin PATTERN "python2.7/test" EXCLUDE)
             if (NOT DEFINED NUMPY_PATH)
                 set(NUMPY_PATH "${PYTHON_INCLUDE_PATH}/../../lib/python2.7/site-packages/numpy/core/include")
             endif()
@@ -59,7 +59,7 @@ if(PYTHONLIBS_FOUND)
             endif()
 
 
-            file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/resources/python/examples/*py)
+            file (GLOB PYTHONQT_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/examples/*py)
 
 
             if (WIN32)
