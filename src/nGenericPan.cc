@@ -726,7 +726,6 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
             }
         }
         QApplication::processEvents();
-        QThread::msleep(100);
     }
     progress.setValue(0);
     progress.hide();

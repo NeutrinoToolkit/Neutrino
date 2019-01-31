@@ -1101,9 +1101,9 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
         getline(ifile,line); //this we don't know what it is
         DEBUG("unknown : " << line);
         getline(ifile,line);
-        double resx=atoi(line.c_str());
+        double resx=atof(line.c_str());
         getline(ifile,line);
-        double resy=atoi(line.c_str());
+        double resy=atof(line.c_str());
         getline(ifile,line);
         int bit=atoi(line.c_str());
         getline(ifile,line);
@@ -1112,54 +1112,64 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
         int h=atoi(line.c_str());
         physD linearized(w,h,0.0,ifilename);
         linearized.setType(PHYS_FILE);
-        linearized.setShortName("linearized");
         physD original(w,h,0.0,ifilenameimg.c_str());
         original.setType(PHYS_FILE);
         original.setShortName("original");
 
-        phys_open_RAW(&original,bit==8?0:2,0,true);
+        switch (bit) {
+            case 8:
+                phys_open_RAW(&original,0,0,true);
+                break;
+            case 16:
+            default:
+                phys_open_RAW(&original,2,0,true);
+                break;
+        }
 
-        linearized.prop["inf-resx"] = original.prop["inf-resx"] = resx;
-        linearized.prop["inf-resy"] = original.prop["inf-resy"] = resy;
+        linearized.prop["inf-resx"] = resx;
+        linearized.prop["inf-resy"] = resy;
         linearized.set_scale(resx/1000.,resy/1000.);
-        linearized.prop["unitsX"] = original.prop["unitsX"] = "mm";
-        linearized.prop["unitsY"] = original.prop["unitsY"] = "mm";
+        linearized.prop["unitsX"] = "mm";
+        linearized.prop["unitsY"] = "mm";
+        linearized.prop["unitsCB"] = "PSL";
 
         getline(ifile,line);
-        double sensitivity=atoi(line.c_str());
-        linearized.prop["inf-sens"] = original.prop["inf-sens"] = sensitivity;
+        double sensitivity=atof(line.c_str());
+        linearized.prop["inf-sens"] = sensitivity;
         getline(ifile,line);
-        double latitude=atoi(line.c_str());
-        linearized.prop["inf-lati"] = original.prop["inf-lati"] = latitude;
+        double latitude=atof(line.c_str());
+        linearized.prop["inf-lati"] = latitude;
         getline(ifile,line);
-        linearized.prop["inf-date"] = original.prop["inf-date"] = line;
+        linearized.prop["inf-date"] = line;
         getline(ifile,line);
-        linearized.prop["inf-number"] = original.prop["inf-number"] = line;
+        linearized.prop["inf-number"] = line;
         getline(ifile,line); //empty line
         getline(ifile,line);
-        if (line.compare(std::string("FLA-7000"))!=0) {
-            throw phys_fileerror("File does not have FLA-7000");
-            return imagelist;
-        }
-        getline(ifile,line); //empty line
-        getline(ifile,line);
-        if (line.compare(std::string("*** more info ***"))!=0) {
-            throw phys_fileerror("File does not have *** more info ***");
-            return imagelist;
-        }
-        getline(ifile,line);
-        int properties=atoi(line.c_str());
-        for (int i=0;i<properties;i++) {
-            getline(ifile,line); //empty line
-            std::stringstream ss;
-            ss << "inf-" << std::setw(3) << std::setfill('0') << i;
-            linearized.prop[ss.str()] = original.prop[ss.str()] = line;
-        }
+        linearized.prop["scanner"] = line;
 
+        getline(ifile,line); //empty line
+        getline(ifile,line);
+        if (line.compare(std::string("*** more info ***"))==0) {
+            getline(ifile,line);
+            int nprop=atoi(line.c_str());
+            std::string ss;
+            for (int i=0;i<nprop;i++) {
+                getline(ifile,line); //empty line
+                ss += line + "\n" ;
+            }
+            DEBUG(ss);
+            linearized.prop["inf-more-info"] = ss;
+        }
+        double bitVal=pow(2.0,bit)-1;
 #pragma omp parallel for
         for (size_t i=0;i<original.getSurf();i++) {
-            linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * pow(10,latitude*(original.point(i)/pow(2.0,bit)-0.5)));
+            if (original.point(i) != 0) {
+                linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * exp(M_LN10*latitude*(original.point(i)/bitVal-0.5)));
+            } else {
+                linearized.set(i,0.0);
+            }
         }
+        physMath::phys_flip_lr(linearized);
         linearized.TscanBrightness();
         imagelist.push_back(linearized);
 #ifdef __phys_debug

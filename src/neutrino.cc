@@ -465,7 +465,7 @@ neutrino::loadPlugin(QString pname, bool launch)
     if (QFileInfo(pname).exists()) {
         setProperty("NeuSave-loadPlugin",pname);
         nPluginLoader *my_npl = new nPluginLoader(pname, this);
-        qInfo() << "Loading plugin" <<  QFileInfo(pname).baseName() << " : " << my_npl->ok();
+        qDebug() << "Loading plugin" <<  QFileInfo(pname).baseName() << " : " << my_npl->ok();
         if (launch) my_npl->run();
     }
 }

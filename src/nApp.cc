@@ -46,7 +46,6 @@ int nApp::exec() {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
-    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
 
     changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
@@ -57,18 +56,13 @@ int nApp::exec() {
         checkUpdates();
     }
 
-    my_set.endGroup();
-
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
-    QObject::connect(log_win_ui->clearLog,&QPushButton::released,log_win_ui->logger,&QTextEdit::clear);
+    QObject::connect(log_win_ui->clearLog,&QPushButton::released,this,&nApp::clearLog);
     QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
     QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
     QObject::connect(log_win_ui->buttonFind,&QPushButton::released,this,&nApp::findLogText);
     QObject::connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nApp::findLogText);
-
-//    QSettings my_set("neutrino","");
-//    my_set.beginGroup("nPreferences");
 
     log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
     log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
@@ -76,7 +70,7 @@ int nApp::exec() {
     setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
     log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
 
-//    my_set.endGroup();
+    my_set.endGroup();
 
     QStringList args=arguments();
     args.removeFirst();
@@ -87,6 +81,12 @@ int nApp::exec() {
 
 
     return QApplication::exec();
+}
+
+void nApp::clearLog() {
+    log_win_ui->logger->clear();
+    log_win_ui->logger->hide();
+    log_win_ui->logger->show();
 }
 
 void nApp::findLogText() {
@@ -181,9 +181,6 @@ void nApp::addPaletteFile(QString cmapfile) {
     my_set.beginGroup("Palettes");
     QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
     my_set.endGroup();
-    if (hiddenPalettes.size()) {
-        qInfo() << hiddenPalettes;
-    }
     if (QFileInfo(cmapfile).exists() && (! hiddenPalettes.contains(cmapfile))) {
         QFile inputFile(cmapfile);
         if (inputFile.open(QIODevice::ReadOnly)) {
@@ -199,7 +196,7 @@ void nApp::addPaletteFile(QString cmapfile) {
                     iter++;
                 }
             }            
-            qInfo() << "Adding colormap" << cmapfile;
+            qDebug() << "Adding colormap" << cmapfile;
             inputFile.close();
         }
     }

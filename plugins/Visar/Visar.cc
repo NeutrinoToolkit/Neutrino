@@ -100,7 +100,7 @@ Visar::Visar(neutrino *nparent)
 
     //!START SOP stuff
     sopRect =  new nRect(this,1);
-    sopRect->changeToolTip(tr("SOP region"));
+    sopRect->changeToolTip("SOP region");
     sopRect->setRect(QRectF(0,0,100,100));
     connect(actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
 
@@ -238,13 +238,13 @@ void Visar::addVisar() {
     whichRefl->addItem("Visar"+QLocale().toString(numVisars+1));
 
     nLine* my_nline=new nLine(this,3);
-    my_nline->changeToolTip(tr("Fringeshift Visar ")+QLocale().toString(numVisars+1));
+    my_nline->changeToolTip("Fringeshift Visar "+QLocale().toString(numVisars+1));
     fringeLine.push_back(my_nline);
 
     nRect *my_rect=new nRect(this,1);
     my_rect->setRect(QRectF(0,0,100,100));
     my_rect->setProperty("id", numVisars);
-    my_rect->changeToolTip(tr("Visar region ")+QLocale().toString(numVisars+1));
+    my_rect->changeToolTip("Visar region "+QLocale().toString(numVisars+1));
     connect(actionRect, SIGNAL(triggered()),my_rect, SLOT(togglePadella()));
     fringeRect.push_back(my_rect);
 
@@ -835,7 +835,7 @@ void Visar::updatePlot() {
         }
     }
 
-
+    std::vector<double> minmax;
     for (unsigned int k=0;k<numVisars;k++){
         if (cPhase[0][k].size()==cPhase[1][k].size() && cPhase[0][k].size()==time_phase[k].size()){
 
@@ -1008,10 +1008,26 @@ void Visar::updatePlot() {
                 }
 
             }
+            if (time_vel.size()) {
+                double mmin = *std::min_element(time_vel[k].constBegin(), time_vel[k].constEnd());
+                double mmax = *std::max_element(time_vel[k].constBegin(), time_vel[k].constEnd());
 
+                minmax.push_back(mmin);
+                minmax.push_back(mmax);
+                qDebug() << k << mmin << mmax;
+            }
         }
     }
-    plotVelocity->rescaleAxes();
+
+    plotVelocity->rescaleAxes(true);
+    if (minmax.size()) {
+        double mmin = *std::min_element(minmax.begin(),minmax.end());
+        double mmax = *std::max_element(minmax.begin(),minmax.end());
+        qDebug() << mmin << mmax;
+
+        plotVelocity->xAxis->setRange(mmin,mmax);
+    }
+
     plotVelocity->replot();
 
     updatePlotSOP();

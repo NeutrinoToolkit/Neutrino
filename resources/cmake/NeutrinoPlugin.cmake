@@ -130,6 +130,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
     add_dependencies(${PROJECT_NAME} Neutrino)
+    add_dependencies(${PROJECT_NAME} nPhysImageF)
 
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")

@@ -83,6 +83,7 @@ public slots:
     void addPaletteFile(QString);
     void addDefaultPalettes();
 
+    void clearLog();
     void copyLog();
     void saveLog();
     void findLogText();

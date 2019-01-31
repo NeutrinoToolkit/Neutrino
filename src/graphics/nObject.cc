@@ -670,10 +670,12 @@ nObject::loadSettings(QSettings &settings) {
 	QPolygonF poly_tmp;
 	for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        poly_tmp << QPointF(settings.value("x").toDouble(),settings.value("y").toDouble());
+        QPointF pp(settings.value("x").toDouble(),settings.value("y").toDouble());
+        poly_tmp << pp;
+        qInfo() << toolTip() << i << pp;
 	}
     settings.endArray();
-	if (poly_tmp.size()==2) {
+    if (poly_tmp.size()>1) {
 		setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
 	} else {
 		showMessage(tr("Error reading from file"));

@@ -117,15 +117,11 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
             }
 
         } else {
-            QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));
-            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-            dlg.exec();
+            qCritical().noquote() << tr("Plugin error: ")+pname+tr(" does not look like a Neutrino plugin");
         }
     } else {
-        QMessageBox dlg(QMessageBox::Warning, tr("Plugin error"),tr("Error loading plugin ")+QFileInfo(fileName()).fileName());
-        dlg.setDetailedText(errorString());
-        dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-        dlg.exec();
+        qCritical().noquote() << tr("Plugin error: ")+pname;
+        qCritical().noquote() << errorString();
     }
 }
 
