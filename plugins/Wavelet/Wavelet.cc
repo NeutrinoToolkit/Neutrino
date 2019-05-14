@@ -225,8 +225,7 @@ void Wavelet::doWavelet () {
 			}
 		}
         if (my_w.synthetic->isChecked()) {
-            nPhysD *tmpSynthetic = new nPhysD();
-            physWave::phys_synthetic_interferogram(*tmpSynthetic,waveletPhys["phase_2pi"],waveletPhys["contrast"]);
+            nPhysD *tmpSynthetic = new nPhysD(physWave::phys_synthetic_interferogram(waveletPhys["phase_2pi"],waveletPhys["contrast"]));
             if (my_w.erasePrevious->isChecked()) {
                 syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
             } else {

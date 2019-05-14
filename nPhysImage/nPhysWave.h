@@ -114,7 +114,7 @@ void phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap
 void phys_subtract_carrier (nPhysImageF<double> &, double, double);
 
 // create a synthetic interferogram from phase and quality
-void phys_synthetic_interferogram (nPhysImageF<double> &, nPhysImageF<double> *, nPhysImageF<double> *);
+nPhysImageF<double> phys_synthetic_interferogram (nPhysImageF<double> *, nPhysImageF<double> *);
 
 bidimvec<double> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
 

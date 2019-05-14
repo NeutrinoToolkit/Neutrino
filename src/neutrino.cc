@@ -631,102 +631,107 @@ void neutrino::fileOpen()
 }
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
-    setProperty("NeuSave-fileOpen", fname);
-    if (!property("NeuSave-fileSave").isValid()) {
-        setProperty("NeuSave-fileSave",property("NeuSave-fileOpen"));
-    }
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
-    bool separate_rgb= my_set.value("separateRGB",false).toBool();
-    my_set.endGroup();
-
     QList <nPhysD *> imagelist;
-    QString suffix=QFileInfo(fname).suffix().toLower();
-    if (suffix=="neus") {
-        imagelist=openSession(fname);
-    } else {
-        std::vector<physD> my_vec;
-        try {
-            my_vec=physFormat::phys_open(fname.toUtf8().constData(),separate_rgb);
-        } catch (std::exception &e) {
-            QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
-            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-            dlg.exec();
-        }
-        for(std::vector<physD>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
-            nPhysD *ceppa = new nPhysD(*it);
-            imagelist.push_back(ceppa);
-        }
-        if (imagelist.size()==0) {
-            QImage image(fname);
-            if (!image.isNull()) {
-                if (image.isGrayscale() || !separate_rgb) {
-                    qDebug() << image.size();
-                    nPhysD *datamatrix = new nPhysD(fname.toStdString());
-                    datamatrix->resize(image.width(), image.height());
-                    datamatrix->setType(PHYS_FILE);
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            datamatrix->Timg_matrix[i][j]= (double) (qGray(image.pixel(j,i)));
-                        }
-                    }
-                    datamatrix->TscanBrightness();
-                    imagelist.push_back(datamatrix);
-                } else {
-                    std::array<nPhysD*,3> datamatrix;
-                    std::array<std::string,3> name;
-                    name[0]="Red";
-                    name[1]="Green";
-                    name[2]="Blue";
-                    for (int k=0;k<3;k++) {
-                        datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setShortName(name[k]);
-                        datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
-                        datamatrix[k]->setFromName(fname.toStdString());
-                        datamatrix[k]->resize(image.width(), image.height());
-                        datamatrix[k]->setType(PHYS_FILE);
-                    }
-                    for (int i=0;i<image.height();i++) {
-                        for (int j=0;j<image.width();j++) {
-                            QRgb px = image.pixel(j,i);
-                            datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-                            datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-                            datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
-                        }
-                    }
-                    for (int k=0;k<3;k++) {
-                        datamatrix[k]->TscanBrightness();
-                        imagelist.push_back(datamatrix[k]);
-                    }
-                }
+    if (QFile(fname).exists()) {
 
-            }
+        setProperty("NeuSave-fileOpen", fname);
+        if (!property("NeuSave-fileSave").isValid()) {
+            setProperty("NeuSave-fileSave",property("NeuSave-fileOpen"));
         }
-        if (imagelist.size()>0) {
-            QList <nPhysD *> imagelistold;
-            for (auto &my_phys : imagelist) {
-                if (my_phys) {
-                    if (my_phys->getSurf()>0) {
-                        addShowPhys(my_phys);
-                        imagelistold << my_phys;
+        QSettings my_set("neutrino","");
+        my_set.beginGroup("nPreferences");
+        bool separate_rgb= my_set.value("separateRGB",false).toBool();
+        my_set.endGroup();
+
+        QString suffix=QFileInfo(fname).suffix().toLower();
+        if (suffix=="neus") {
+            imagelist=openSession(fname);
+        } else {
+            std::vector<physD> my_vec;
+            try {
+                my_vec=physFormat::phys_open(fname.toUtf8().constData(),separate_rgb);
+            } catch (std::exception &e) {
+                QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+                dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+                dlg.exec();
+            }
+            for(std::vector<physD>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
+                nPhysD *ceppa = new nPhysD(*it);
+                imagelist.push_back(ceppa);
+            }
+            if (imagelist.size()==0) {
+                QImage image(fname);
+                if (!image.isNull()) {
+                    if (image.isGrayscale() || !separate_rgb) {
+                        qDebug() << image.size();
+                        nPhysD *datamatrix = new nPhysD(fname.toStdString());
+                        datamatrix->resize(image.width(), image.height());
+                        datamatrix->setType(PHYS_FILE);
+                        for (int i=0;i<image.height();i++) {
+                            for (int j=0;j<image.width();j++) {
+                                datamatrix->Timg_matrix[i][j]= (double) (qGray(image.pixel(j,i)));
+                            }
+                        }
+                        datamatrix->TscanBrightness();
+                        imagelist.push_back(datamatrix);
                     } else {
-                        delete my_phys;
+                        std::array<nPhysD*,3> datamatrix;
+                        std::array<std::string,3> name;
+                        name[0]="Red";
+                        name[1]="Green";
+                        name[2]="Blue";
+                        for (int k=0;k<3;k++) {
+                            datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
+                            datamatrix[k]->setShortName(name[k]);
+                            datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
+                            datamatrix[k]->setFromName(fname.toStdString());
+                            datamatrix[k]->resize(image.width(), image.height());
+                            datamatrix[k]->setType(PHYS_FILE);
+                        }
+                        for (int i=0;i<image.height();i++) {
+                            for (int j=0;j<image.width();j++) {
+                                QRgb px = image.pixel(j,i);
+                                datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
+                                datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
+                                datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
+                            }
+                        }
+                        for (int k=0;k<3;k++) {
+                            datamatrix[k]->TscanBrightness();
+                            imagelist.push_back(datamatrix[k]);
+                        }
                     }
+
                 }
             }
-            imagelist=imagelistold;
-        } else if (suffix!="neus") {
-            nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
-            if (!openRAW) {
-                openRAW = new nOpenRAW(this);
+            if (imagelist.size()>0) {
+                QList <nPhysD *> imagelistold;
+                for (auto &my_phys : imagelist) {
+                    if (my_phys) {
+                        if (my_phys->getSurf()>0) {
+                            addShowPhys(my_phys);
+                            imagelistold << my_phys;
+                        } else {
+                            delete my_phys;
+                        }
+                    }
+                }
+                imagelist=imagelistold;
+            } else if (suffix!="neus") {
+                nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
+                if (!openRAW) {
+                    openRAW = new nOpenRAW(this);
+                }
+                openRAW->add(fname);
             }
-            openRAW->add(fname);
         }
+
+        updateRecentFileActions(fname);
+
+        QApplication::processEvents();
+    } else {
+        qWarning() << fname << "does not exists";
     }
-
-    updateRecentFileActions(fname);
-
-    QApplication::processEvents();
     return imagelist;
 }
 

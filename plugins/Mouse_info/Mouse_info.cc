@@ -39,7 +39,9 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 	connect(my_w.rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
 	connect(my_w.ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
 	connect(my_w.sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
-	connect(my_w.sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
+    connect(my_w.sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
+    connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+    connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
 
     connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
@@ -109,6 +111,15 @@ void Mouse_info::updateScale() {
     nparent->my_w->my_view->update();
 }
 
+void Mouse_info::updateUnits() {
+    if (currentBuffer) {
+        currentBuffer->prop["unitsX"] = my_w.unit_x->text().toStdString();
+        currentBuffer->prop["unitsY"] = my_w.unit_y->text().toStdString();
+    }
+    nparent->my_w->my_view->update();
+}
+
+
 void Mouse_info::setMouse(QPointF pos) {
 	mouse=pos;
 	updateLabels();
@@ -127,15 +138,21 @@ void Mouse_info::updateLabels() {
 		disconnect(my_w.ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
 		disconnect(my_w.sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
 		disconnect(my_w.sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));	
-		my_w.rx->setText(QLocale().toString(currentBuffer->get_origin().x()));
+        connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        my_w.rx->setText(QLocale().toString(currentBuffer->get_origin().x()));
 		my_w.ry->setText(QLocale().toString(currentBuffer->get_origin().y()));
-		my_w.sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
-		my_w.sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
-		connect(my_w.rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
+        my_w.sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
+        my_w.sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
+        my_w.unit_x->setText(QString::fromStdString(currentBuffer->prop["unitsX"].get_str()));
+        my_w.unit_y->setText(QString::fromStdString(currentBuffer->prop["unitsY"].get_str()));
+        connect(my_w.rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
 		connect(my_w.ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
 		connect(my_w.sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
 		connect(my_w.sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
-	}
+        connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+    }
 
 	QPointF p=QPointF(resolution.x()*dist.x(),resolution.y()*dist.y());
 

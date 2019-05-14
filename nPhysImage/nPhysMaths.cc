@@ -555,12 +555,15 @@ physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
 void
 physMath::phys_integratedNe(physD &image, double lambda_m)
 {
-        double toNe = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
+    // image is fringeshifts (i.e. phase/2pi)
+    double toNe = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
 
-        phys_multiply(image, toNe);
-        image.setShortName("integratedNePlasma");
-        image.prop["intergratedNe_lambda_m"]=lambda_m;
-        image.prop["unitsCB"]="m-2";
+    WARNING("toNe" << toNe);
+
+    phys_multiply(image, toNe/lambda_m);
+    image.setShortName("integratedNePlasma");
+    image.prop["intergratedNe_lambda_m"]=lambda_m;
+    image.prop["unitsCB"]="m-2";
 
 }
 

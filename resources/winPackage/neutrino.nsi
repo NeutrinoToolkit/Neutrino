@@ -50,3 +50,5 @@ rmDir /r "$INSTDIR"
 Delete "$DESKTOP\neutrino.lnk"
 rmdir /r "$SMPROGRAMS\Neutrino"
 sectionEnd
+
+SilentUnInstall silent

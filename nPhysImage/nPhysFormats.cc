@@ -1135,17 +1135,17 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
 
         getline(ifile,line);
         double sensitivity=atof(line.c_str());
-        linearized.prop["inf-sens"] = sensitivity;
+        linearized.prop["inf-sensitivity"] = sensitivity;
         getline(ifile,line);
         double latitude=atof(line.c_str());
-        linearized.prop["inf-lati"] = latitude;
+        linearized.prop["inf-latitude"] = latitude;
         getline(ifile,line);
         linearized.prop["inf-date"] = line;
         getline(ifile,line);
         linearized.prop["inf-number"] = line;
         getline(ifile,line); //empty line
         getline(ifile,line);
-        linearized.prop["scanner"] = line;
+        linearized.prop["inf-scanner"] = line;
 
         getline(ifile,line); //empty line
         getline(ifile,line);
@@ -1160,7 +1160,7 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
             DEBUG(ss);
             linearized.prop["inf-more-info"] = ss;
         }
-        double bitVal=pow(2.0,bit)-1;
+        double bitVal=pow(2,bit)-1;
 #pragma omp parallel for
         for (size_t i=0;i<original.getSurf();i++) {
             if (original.point(i) != 0) {

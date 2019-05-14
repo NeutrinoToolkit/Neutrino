@@ -68,7 +68,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
         int num=nparent->property("numLine").toInt()+1;
         nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
-        setToolTip(tr("line")+QLocale().toString(num));
+        setToolTip("line"+QLocale().toString(num));
         connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
@@ -80,7 +80,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 		}
 
 	} else {
-		setToolTip(tr("line"));
+        setToolTip("line");
 	}
 
 	setProperty("NeuSave-fileIni",toolTip()+".ini");
@@ -169,7 +169,7 @@ void nLine::copy_points() {
 }
 
 void nLine::save_points() {
-	QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
 	if (!fnametmp.isEmpty()) {
 		setProperty("NeuSave-fileTxt", fnametmp);
 		QFile t(fnametmp);
@@ -290,7 +290,7 @@ void nLine::updatePlot () {
 		if (my_w.plot->graphCount()==0) {
 			my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
 			my_w.plot->graph(0)->setPen(QPen(Qt::blue));
-			my_w.plot->xAxis->setLabel(tr("distance"));
+            my_w.plot->xAxis->setLabel(tr("distance"));
 			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 			my_w.plot->xAxis->setLabelPadding(-1);
 			my_w.plot->yAxis->setLabelPadding(-1);

@@ -893,7 +893,8 @@ void physWave::phys_phase_unwrap(physD &wphase, physD &quality, enum unwrap_stra
     }
 }
 
-void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
+nPhysImageF<double> physWave::phys_synthetic_interferogram (nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
+    nPhysImageF<double> synthetic;
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
@@ -907,6 +908,7 @@ void physWave::phys_synthetic_interferogram (nPhysImageF<double> &synthetic, nPh
             synthetic.TscanBrightness();
         }
     }
+    return synthetic;
 }
 
 void

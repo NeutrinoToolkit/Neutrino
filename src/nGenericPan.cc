@@ -178,9 +178,9 @@ void nGenericPan::grabSave() {
         QString fname=QDir::homePath()+"/Grab_"+panName()+"_"+QString("%1").arg(progNum++, 5, 10, QChar('0'))+".png";
         if (!QFileInfo(fname).exists()) {
             showMessage(fname);
-            setUnifiedTitleAndToolBarOnMac(false);
+//             setUnifiedTitleAndToolBarOnMac(false);
             grab().save(fname);
-            setUnifiedTitleAndToolBarOnMac(true);
+//             setUnifiedTitleAndToolBarOnMac(true);
             break;
         }
         qInfo() << "Image saved to file" << fname;

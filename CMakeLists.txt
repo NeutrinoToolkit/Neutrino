@@ -50,9 +50,8 @@ set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT
 string(TIMESTAMP CURRENT_YEAR "%Y")
 set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
 
-set(DEBUG_LEVEL "10" CACHE string "DEBUG verbosity")
-
 option(DEBUG_LEVEL "DEBUG verbosity" "10")
+set(DEBUG_LEVEL "10" CACHE STRING "DEBUG verbosity")
 
 ## global compile options
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")

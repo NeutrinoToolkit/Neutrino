@@ -8,9 +8,11 @@ class nPhysD : public physD {
 
   public:
 
-    using physD::nPhysImageF;
+    using physD::physD;
 
-    nPhysD(physD in): physD(in) {}
+    nPhysD(physD in=physD()): physD(in) {
+        qDebug() << "------------------------------------------------------------ CREATE "<< copies();
+    }
 
     ~nPhysD(){
         qDebug() << "------------------------------------------------------------ DELETE "<< copies();
@@ -74,20 +76,6 @@ class nPhysD : public physD {
 
         return nullptr;
     }
-
-//    nPhysD & operator= (const nPhysD &rhs)
-//    {
-//        physD::operator=(rhs);
-//        display_property=rhs.display_property;
-//        return *this;
-//    }
-
-//    nPhysD & operator= (const physD &rhs)
-//    {
-//        physD::operator=(rhs);
-//        return *this;
-
-//    }
 
     phys_properties display_prop;
 
