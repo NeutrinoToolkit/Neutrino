@@ -276,7 +276,7 @@ void Math_operations::doOperation () {
                 } else if (my_w.operation->currentIndex()==separator[0]+9) { //Resize
                     QStringList scalars=my_w.num2->text().split(" ");
                     if (scalars.size()==1) {
-                        bool ok1, ok2;
+                        bool ok1;
                         double scalar1=QLocale().toDouble(scalars.at(0),&ok1);
                         if (ok1) {
                             vec2i newsize= image1->getSize()*scalar1;

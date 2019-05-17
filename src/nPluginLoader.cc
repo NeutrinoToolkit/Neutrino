@@ -51,35 +51,31 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                         }
                     }
 
-
                     QToolButton *my_button = new QToolButton(neu->my_w->toolBar);
 
-                    QAction*  my_action = new QAction(icon_plugin,name_plugin,my_button);
-                    if (!shortcut_key.isEmpty()) {
-                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
+                    QAction* my_action;
+                    bool found=false;
+                    foreach (QAction  *my_action_tmp, my_actions) {
+                        QVariant  var=my_action_tmp->property("plugin-order");
+                        if (var.toInt() > my_panPlug->order()) {
+                            my_action = neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
+                            found=true;
+                            break;
+                        }
+                    }
+                    if(!found) {
+                        my_action = neu->my_w->toolBar->addWidget(my_button);
                     }
                     my_action->setProperty("plugin-order",my_panPlug->order());
-
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);
                     connect (my_action, SIGNAL(triggered()), this, SLOT(run()));
-
-                    my_button->setIcon(icon_plugin);
                     my_button->setDefaultAction(my_action);
-
-                    // placing the icon in the toolbar by nPanPlug::order() values
-                    bool place_found=false;
-
-                    foreach (QAction *my_action_tmp, my_actions) {
-                        if (my_action_tmp->property("plugin-order").toInt() > my_panPlug->order()) {
-                            neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
-                            place_found=true;
-                            break;
-                        }
-                    }
-                    if(!place_found) {
-                        neu->my_w->toolBar->addWidget(my_button);
+                    my_action->setText(name_plugin);
+                    my_action->setIcon(icon_plugin);
+                    if (!shortcut_key.isEmpty()) {
+                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]" +QString::number(my_panPlug->order()) );
                     }
                 }
 

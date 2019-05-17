@@ -236,6 +236,9 @@
    <property name="floatable">
     <bool>false</bool>
    </property>
+   <property name="plugin_order" stdset="0">
+    <number>0</number>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -560,7 +563,7 @@
   </action>
   <action name="actionPoint">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -580,7 +583,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -593,7 +596,7 @@
   </action>
   <action name="actionPlugin">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/plugin.png</normaloff>:/icons/plugin.png</iconset>
    </property>
    <property name="text">
@@ -615,7 +618,7 @@
   </action>
   <action name="actionTranspose">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
    </property>
    <property name="text">
@@ -733,7 +736,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../build-neutrinoMaster-Qt_5_10_1_5_10_1-Debug/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
