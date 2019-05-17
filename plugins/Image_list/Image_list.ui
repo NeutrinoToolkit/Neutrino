@@ -189,6 +189,7 @@
    <addaction name="actionOrigin"/>
    <addaction name="actionScale"/>
    <addaction name="actionFreeze"/>
+   <addaction name="actionRescale"/>
   </widget>
   <action name="actionCopy">
    <property name="icon">
@@ -267,7 +268,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -276,6 +277,18 @@
    </property>
    <property name="toolTip">
     <string>Set current origin/scale to new images</string>
+   </property>
+  </action>
+  <action name="actionRescale">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+     <normaloff>:/icons/rescale.png</normaloff>:/icons/rescale.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rescale</string>
+   </property>
+   <property name="toolTip">
+    <string>Change scale</string>
    </property>
   </action>
  </widget>
@@ -287,7 +300,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

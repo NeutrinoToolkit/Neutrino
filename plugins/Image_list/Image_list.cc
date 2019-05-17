@@ -57,6 +57,7 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(buttonRemovePhys()));
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(buttonCopyPhys()));
     connect(my_w.actionFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreezed(bool)));
+    connect(my_w.actionRescale, SIGNAL(triggered()), this, SLOT(changeProperties()));
 
     show(true);
 }
@@ -90,6 +91,7 @@ Image_list::buttonCopyPhys() {
         nparent->addShowPhys(copyPhys);
     }
 }
+
 
 void
 Image_list::buttonRemovePhys() {
@@ -226,6 +228,32 @@ Image_list::changeProperties() {
                 }
                 default:
                     break;
+                }
+            }
+        } else if (sender()==my_w.actionRescale) {
+            text = QInputDialog::getText(this, tr("Change Size"),tr("Size:"), QLineEdit::Normal, "1024 1024", &ok);
+            if (ok && !text.isEmpty()) {
+                QStringList lista=text.split(' ', QString::SkipEmptyParts);
+                if (lista.size()==1) {
+                    bool ok1;
+                    double scale=QLocale().toDouble(lista.at(0),&ok1);
+                    if (ok1) {
+                        foreach (nPhysD* phys, physSelected) {
+                            vec2i newsize= phys->getSize()*scale;
+                            nPhysD *resized=new nPhysD(physMath::phys_resample(*phys, newsize));
+                            nparent->addShowPhys(resized);
+                        }
+                    }
+                } else if (lista.size()==2) {
+                    bool ok1,ok2;
+                    int sizex=QLocale().toInt(lista.at(0),&ok1);
+                    int sizey=QLocale().toInt(lista.at(1),&ok2);
+                    if (ok1  && ok2) {
+                        foreach (nPhysD* phys, physSelected) {
+                            nPhysD *resized=new nPhysD(physMath::phys_resample(*phys, vec2i(sizex, sizey)));
+                            nparent->addShowPhys(resized);
+                        }
+                    }
                 }
             }
         }

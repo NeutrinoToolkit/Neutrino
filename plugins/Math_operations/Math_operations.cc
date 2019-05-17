@@ -275,14 +275,23 @@ void Math_operations::doOperation () {
                     }
                 } else if (my_w.operation->currentIndex()==separator[0]+9) { //Resize
                     QStringList scalars=my_w.num2->text().split(" ");
-                    if (scalars.size()==2) {
+                    if (scalars.size()==1) {
+                        bool ok1, ok2;
+                        double scalar1=QLocale().toDouble(scalars.at(0),&ok1);
+                        if (ok1) {
+                            vec2i newsize= image1->getSize()*scalar1;
+                            myresult=new nPhysD(physMath::phys_resample(*image1, newsize));
+                        } else {
+                            my_w.statusbar->showMessage(tr("ERROR: Exepcted 1 double"));
+                        }
+                    } else if (scalars.size()==2) {
                         bool ok1, ok2;
                         int scalar1=QLocale().toInt(scalars.at(0),&ok1);
                         int scalar2=QLocale().toInt(scalars.at(1),&ok2);
-                        if (scalars.size()==2 && ok1 && ok2) {
+                        if (ok1 && ok2) {
                             myresult=new nPhysD(physMath::phys_resample(*image1, vec2i(scalar1, scalar2)));
                         } else {
-                            my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 int"));
+                            my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 int sperated by space"));
                         }
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Exepcted 2 values"));

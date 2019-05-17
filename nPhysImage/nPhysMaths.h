@@ -205,6 +205,10 @@ nPhysImageF<T> phys_resample(nPhysImageF<T> &iimg, vec2i new_size)
             oimg.set(jj, ii, iimg.getPoint(fcol, frow));
         }
     }
+    std::ostringstream ostr;
+    ostr << "resize(" << iimg.getName() << "," << new_size.x() << "," << new_size.y() << ")";
+    oimg.setName(ostr.str());
+    oimg.setShortName("scaled("+iimg.getShortName()+")");
 
     return oimg;
 }
@@ -282,7 +286,7 @@ template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, ve
 }
 
 template <class T> bidimvec<T> getColorPrecentPixels(nPhysImageF<T>& my_phys, double val) {
-    if (val==100) {
+    if (val==100.) {
         return my_phys.get_min_max();
     }
     return getColorPrecentPixels(my_phys,vec2f((100.0-val)/2.0, (100.0+val)/2.0));
