@@ -1455,7 +1455,7 @@ void neutrino::loadDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
-
+    qInfo() << "Reading defaults from" <<   my_set.fileName();
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 

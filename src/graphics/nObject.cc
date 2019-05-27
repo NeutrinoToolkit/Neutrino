@@ -136,8 +136,10 @@ void nObject::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QAction *expandBoth = menu.addAction("Expand Both (e)");
 	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandX()));
 	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandY()));
-	QAction *centerIt = menu.addAction("Center (c)");
-	connect(centerIt, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
+    QAction *centerIt = menu.addAction("Center (c)");
+    connect(centerIt, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
+    QAction *submat = menu.addAction("Submatrix (s)");
+    connect(submat, SIGNAL(triggered()), this, SLOT(submatrix()));
 
 	menu.exec(e->screenPos());
 }

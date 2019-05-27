@@ -75,7 +75,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                     my_action->setText(name_plugin);
                     my_action->setIcon(icon_plugin);
                     if (!shortcut_key.isEmpty()) {
-                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]" +QString::number(my_panPlug->order()) );
+                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
                     }
                 }
 

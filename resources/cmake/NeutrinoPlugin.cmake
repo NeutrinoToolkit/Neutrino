@@ -25,7 +25,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
 
     set(CMAKE_CXX_STANDARD 11)
@@ -160,7 +160,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         elseif(LINUX)
             set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
         elseif(WIN32)
-            set (PLUGIN_INSTALL_DIR "bin/plugins")
+            set (PLUGIN_INSTALL_DIR "plugins")
         endif()
     endif()
 

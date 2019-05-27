@@ -675,15 +675,13 @@ void Interferometry::doCutoff(){
         if (!ok2) maxi=intNe->get_max();
         if (ok1||ok2) {
             physMath::cutoff(*intNe,mini,maxi);
-            intNe->prop["display_range"]=intNe->get_min_max();
+            intNe->reset_display();
 
             if (localPhys["interpPhase_2piMaskCutoff"]) {
                 localPhys["interpPhase_2piMaskCutoff"]->prop["display_range"]=intNe->get_min_max();
             }
-            localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
-        } else {
-            localPhys["interpPhase_2piMaskCutoff"]=image;
         }
+        localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
     }
     my_w.statusbar->clearMessage();
 }

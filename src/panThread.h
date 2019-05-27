@@ -7,7 +7,7 @@ class panThread : public QThread {
     Q_OBJECT
 public:
 	panThread();
-	~panThread(){};
+    ~panThread(){}
 	
     void setThread(void *iparams, void (*ifunc)(void *, int &));
     void run();
