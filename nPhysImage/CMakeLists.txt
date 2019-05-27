@@ -27,7 +27,7 @@ target_link_libraries(nPhysImageF m ${LIBS})
 
 # install
 if (WIN32)
-    install (TARGETS nPhysImageF COMPONENT binary DESTINATION ".")
+    install (TARGETS nPhysImageF COMPONENT binary DESTINATION "bin")
 elseif(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 elseif (APPLE)

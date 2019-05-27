@@ -160,7 +160,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         elseif(LINUX)
             set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
         elseif(WIN32)
-            set (PLUGIN_INSTALL_DIR "plugins")
+            set (PLUGIN_INSTALL_DIR "bin/plugins")
         endif()
     endif()
 
