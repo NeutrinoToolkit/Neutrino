@@ -31,8 +31,8 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     nContour = new nLine(this,3);
-
     show();
+    nContour->toggleClosedLine(true);
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
     connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
@@ -142,7 +142,7 @@ FocalSpot::calculate_stats()
 
     my_w.stats->append(QString("below zero average: %1").arg(below_zero_energy/zero_point_count));
 
-    my_w.stats->append(QString("points stats (bz/az) %1/%2").arg(zero_point_count).arg(point_count));
+    my_w.stats->append(QString("points stats (bz / az) %1 / %2").arg(zero_point_count).arg(point_count));
 
     my_w.stats->append(QString("contour integral (contour points) %1 (%2)").arg(ath_integral).arg(ath_points));
 
@@ -158,34 +158,41 @@ FocalSpot::find_contour(double th)
 
         DEBUG(5, "got contour of "<<contour.size()<<" points");
 
+        QPolygonF myp;
 
-        nContour->setPoints(QPolygonF());
         if (contour.size() > 0) {
 
             // set polygon
-            nContour->setPoints(QPolygonF());
-            QPolygonF myp;
             vec2f centroid(0,0);
+
             for (auto& itr : contour) {
                 myp<<QPointF(itr.x(), itr.y());
-                centroid+= itr;
-                //std::cerr<<*itr<<std::endl;
+                centroid+=itr;
             }
-            centroid /= contour.size();
+            centroid/=contour.size();
+            my_w.stats->append(QString("Barycenter: ( %1  , %2 )").arg(centroid.x()).arg(centroid.y()));
+
+//            vec2f centroid = currentBuffer->get_origin();
 
             // get stats
             vec2f c_scale = currentBuffer->get_scale();
             double min_r = std::numeric_limits<double>::max();
             double max_r = std::numeric_limits<double>::min();
+            double meanr=0;
             for (auto &itr : contour) {
                 double dd = vmath::td<double>(itr-centroid, c_scale).mod();
+                meanr+=abs(dd);
                 if (dd > max_r) max_r = dd;
                 if (dd < min_r) min_r = dd;
+//                DEBUG(itr <<  " - "  << centroid)
             }
+            meanr/=myp.size();
+            contour.resize(myp.size());
+            DEBUG(myp.size() << " "  << contour.size())
 
-            my_w.stats->append(QString("min:max radius: %1 : %2").arg(min_r).arg(max_r));
+            my_w.stats->append(QString("Mean radius: %1").arg(meanr));
+            my_w.stats->append(QString("Min Max radius:  %1  %2").arg(min_r).arg(max_r));
 
-            nContour->setPoints(myp);
             my_w.statusBar->showMessage("Contour ok", 2000);
 
             std::list<double> ci = physMath::contour_integrate(*currentBuffer, contour, true);
@@ -195,6 +202,9 @@ FocalSpot::find_contour(double th)
         } else {
             my_w.statusBar->showMessage("Contour not ok", 5000);
         }
+        nContour->setPoints(myp);
+        DEBUG("==================================" << nContour->closedLine);
+
     }
     return ql;
 }

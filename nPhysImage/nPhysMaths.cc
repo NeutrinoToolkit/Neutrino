@@ -800,7 +800,7 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, float lev
     for (size_t ii=0; ii<cmap.getSurf(); ii++)
         stats[cmap.point(ii)] ++;
 
-    int b_points = 0;
+    int b_points = 1;
     for (int ii=1; ii<15; ii++) b_points+=stats[ii]; // total number of boundary points
 
     DEBUG(5,"There are "<<stats[0]<<" points under threshold, "<<stats[15]<<" points over threshold and "<<b_points<<" boundary points"<<std::endl);
@@ -917,7 +917,7 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, float lev
         contour.clear();
         DEBUG(5, "Contour walk failed!");
     } else {
-        DEBUG(5, "Contour walk finished");
+        DEBUG(5, "Contour walk finished " << contour.size());
         contour.resize(std::distance(contour.begin(), itr_last));
     }
 
