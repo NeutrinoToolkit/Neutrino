@@ -267,8 +267,18 @@ void Interferometry::doWavelet (int iimage) {
             my_params.end_lambda=my_image[iimage].maxStretch->value()*my_w.widthCarrier->value();
             my_params.n_lambdas=my_image[iimage].numStretch->value();
         }
-        double thick=my_w.widthCarrier->value()*my_w.thickness->value();
-        my_params.thickness=thick;
+
+        if (my_image[iimage].numThick->value()==0) {
+            my_params.init_thick=my_w.widthCarrier->value();
+            my_params.end_thick=my_w.widthCarrier->value();
+            my_params.n_thick=1;
+        } else {
+            my_params.init_thick=my_image[iimage].minThick->value()*my_w.widthCarrier->value();
+            my_params.end_thick=my_image[iimage].maxThick->value()*my_w.widthCarrier->value();
+            my_params.n_thick=my_image[iimage].numThick->value();
+        }
+
+        double thick = my_w.widthCarrier->value()*my_image[iimage].maxThick->value();
         my_params.damp=my_w.correlation->value();
 
         QRect geom2=region->getRect(image);
@@ -279,7 +289,7 @@ void Interferometry::doWavelet (int iimage) {
 
         my_params.data=&datamatrix;
 
-        int niter=my_params.n_angles*my_params.n_lambdas+1;
+        int niter=my_params.n_angles*my_params.n_lambdas*my_params.n_thick+1;
 
         QSettings settings("neutrino","");
         settings.beginGroup("nPreferences");

@@ -66,6 +66,8 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
 void Wavelet::on_relative_toggled(bool tog) {
     my_w.minStretch->setSuffix(tog?" X":" [px]");
     my_w.maxStretch->setSuffix(tog?" X":" [px]");
+    my_w.minThick->setSuffix(tog?" X":" [px]");
+    my_w.maxThick->setSuffix(tog?" X":" [px]");
 }
 
 void Wavelet::useBarrierToggled(bool val) {
@@ -162,17 +164,25 @@ void Wavelet::doWavelet () {
 			my_params.end_angle=my_w.maxAngle->value()+conversionAngle;
 			my_params.n_angles=my_w.numAngle->value();
 		}
-		if (my_w.numStretch->value()==0) {
-			my_params.init_lambda=my_w.widthCarrier->value();
-			my_params.end_lambda=my_w.widthCarrier->value();
-			my_params.n_lambdas=1;
-		} else {
-			my_params.init_lambda=my_w.minStretch->value()*conversionStretch;
-			my_params.end_lambda=my_w.maxStretch->value()*conversionStretch;
-			my_params.n_lambdas=my_w.numStretch->value();
-		}
-		my_params.thickness=my_w.thickness->value();
-		my_params.damp=my_w.damp->value();
+        if (my_w.numStretch->value()==0) {
+            my_params.init_lambda=my_w.widthCarrier->value();
+            my_params.end_lambda=my_w.widthCarrier->value();
+            my_params.n_lambdas=1;
+        } else {
+            my_params.init_lambda=my_w.minStretch->value()*conversionStretch;
+            my_params.end_lambda=my_w.maxStretch->value()*conversionStretch;
+            my_params.n_lambdas=my_w.numStretch->value();
+        }
+        if (my_w.numThick->value()==0) {
+            my_params.init_thick=my_w.widthCarrier->value();
+            my_params.end_thick=my_w.widthCarrier->value();
+            my_params.n_thick=1;
+        } else {
+            my_params.init_thick=my_w.minThick->value()*conversionStretch;
+            my_params.end_thick=my_w.maxThick->value()*conversionStretch;
+            my_params.n_thick=my_w.numThick->value();
+        }
+        my_params.damp=my_w.damp->value();
         my_params.data=&datamatrix;
 
         QString out;
@@ -182,10 +192,10 @@ void Wavelet::doWavelet () {
         if (physWave::openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
             out="OpenCL: ";
             my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thick);
         } else {
             out="CPU: ";
-            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas);
+            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thick);
         }
 
 

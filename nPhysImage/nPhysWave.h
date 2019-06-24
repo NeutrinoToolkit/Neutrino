@@ -72,12 +72,15 @@ public:
 	double end_angle;
 	size_t n_angles;
 
-	double init_lambda;
-	double end_lambda;
-	size_t n_lambdas;
+    double init_lambda;
+    double end_lambda;
+    size_t n_lambdas;
 
-	int thickness;
-	double damp;
+    double init_thick;
+    double end_thick;
+    size_t n_thick;
+
+    double damp;
 	
     int opencl_unit;
 
