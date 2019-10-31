@@ -31,7 +31,6 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
 {
     my_w.setupUi(this);
     nContour = new nLine(this,3);
-    show();
     nContour->toggleClosedLine(true);
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
     connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
@@ -40,7 +39,18 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
     if (my_w.centroid->isChecked()) {
         connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     }
+    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+    my_w.plot->graph(0)->setPen(QPen(Qt::black));
+    my_w.plot->show();
 
+    connect(my_w.plot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    show();
+    calculate_stats();
+
+}
+
+void FocalSpot::loadSettings(QString my_settings) {
+    nGenericPan::loadSettings(my_settings);
     calculate_stats();
 }
 
@@ -199,6 +209,38 @@ FocalSpot::find_contour(double th)
             while (ci.size() > 0) {
                 ql.append(ci.front()); ci.pop_front();
             }
+
+// PLOT radius
+            int len=max_r*5 ; //std::min(currentBuffer->get_size().x(),currentBuffer->get_size().y());
+            QVector <double> rplot(len,0.0);
+            QVector <double> rnum(len,0.0);
+            vec2f cntr= currentBuffer->get_origin();
+    #pragma omp parallel for collapse(2)
+            for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
+                for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
+                    double r=(vec2f(i,j)-cntr).mod()+0.5;
+                    if (r<len)  {
+                        rplot[(int)r]+=currentBuffer->point(i,j);
+                        rnum[(int)r] ++;
+                    }
+                }
+            }
+
+            QVector <double> rdata(len);
+            for (int i=0;i<len;i++) {
+                rdata[i]=i;
+                rplot[i]=rplot[i]/rnum[i];
+                DEBUG(rdata[i]  << " " << rplot[i])
+            }
+            my_w.plot->graph(0)->setData(rdata,rplot,true);
+            my_w.plot->graph(0)->rescaleAxes();
+            qDebug() << my_w.plot->graph(0)->valueAxis()->range();
+
+            my_w.plot->replot();
+//  END PLOT radius
+
+
+
         } else {
             my_w.statusBar->showMessage("Contour not ok", 5000);
         }
@@ -209,6 +251,14 @@ FocalSpot::find_contour(double th)
     return ql;
 }
 
+void FocalSpot::mouseAtWorld(QPointF p){
+    double trueLength = std::sqrt(std::pow(p.x(), 2) + std::pow(p.y(), 2));
+    my_w.plot->setMousePosition(trueLength);
+    QString msg;
+    QTextStream(&msg) << trueLength;
+
+    my_w.statusBar->showMessage(msg);
+}
 
 void
 FocalSpot::bufferChanged(nPhysD *buf)
@@ -216,3 +266,13 @@ FocalSpot::bufferChanged(nPhysD *buf)
     nGenericPan::bufferChanged(buf);
     calculate_stats();
 }
+
+
+void FocalSpot::mouseAtPlot(QMouseEvent* e) {
+    QString msg;
+    QTextStream(&msg) << my_w.plot->xAxis->pixelToCoord(e->pos().x()) << ","
+                      << my_w.plot->yAxis->pixelToCoord(e->pos().y());
+
+    my_w.statusBar->showMessage(msg);
+}
+

@@ -44,7 +44,6 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     QToolButton *my_lock = new QToolButton(this);
     my_lock->setToolTip("Lock axis range");
     my_lock->setCheckable(true);
-    qDebug() << "axis " << objectName() << my_axis->property("lock") << my_axis->property("lock").toBool();
     my_lock->setChecked(my_axis->property("lock").toBool());
     my_lock->setIcon(QIcon(my_axis->property("lock").toBool()?":icons/lockClose":":icons/lockOpen"));
 
@@ -79,7 +78,6 @@ void nCustomRangeLineEdit::setLock(bool check) {
                 my_lock->setIcon(QIcon(check?":icons/lockClose":":icons/lockOpen"));
             }
         }
-        qDebug() << "check" << my_axis << my_axis->property("lock");
     }
 }
 
@@ -129,10 +127,8 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 }
 
 void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
-    qDebug() << "rescale rescale rescale rescale rescale  " << objectName();
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         if (axis->visible() && !(axis->property("lock").isValid() && axis->property("lock").toBool())) {
-            qDebug() << "rescale" << objectName() << axis << axis->property("lock");
             axis->rescale();
         }
     }
@@ -387,7 +383,6 @@ QString nCustomPlot::get_data(int g) {
 }
 
 void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
-    qDebug() << "here" << obj;
     if (obj) {
         QCPGraph *graph = qobject_cast<QCPGraph *>(obj);
         if (graph) {
@@ -677,7 +672,6 @@ nCustomPlot::saveSettings() {
 
 void
 nCustomPlot::saveSettings(QSettings &my_set) {
-    qDebug() << "save settings" << objectName();
     my_set.beginGroup(objectName());
     my_set.beginGroup("axes");
     QList<QVariant> labels ,grids, logs, ticks, colors, labelfonts, lock, range;
@@ -704,7 +698,6 @@ nCustomPlot::saveSettings(QSettings &my_set) {
     my_set.beginGroup("Properties");
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
-            qDebug() << "write" << ba << " : " << property(ba);
             my_set.setValue(ba, property(ba));
         }
     }

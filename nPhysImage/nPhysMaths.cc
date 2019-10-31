@@ -741,7 +741,7 @@ physC physMath::from_real (physD&real, double val){
 
 // contour functions
 //
-void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, float level, bool blur, float blur_radius)
+void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double level, bool blur, double blur_radius)
 {
     // marching squares algorithm
 
@@ -769,26 +769,26 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, float lev
     //	double c_value = wimage.point(orig.x(),orig.y());
 
     nPhysImageF<short> bmap(wimage.getW(), wimage.getH(), 0);
-    for (size_t ii=0; ii<wimage.getSurf(); ii++)
+    for (unsigned int ii=0; ii<wimage.getSurf(); ii++)
         if (wimage.point(ii) > level)
             bmap.set(ii, 1);
 
     // 2. cell map
     nPhysImageF<short> cmap(wimage.getW()-1, wimage.getH()-1, 0);
-    for (size_t ii=0; ii<cmap.getSurf(); ii++) {
-        int xx = ii%cmap.getW();
-        int yy = ii/cmap.getW();
+    for (unsigned int ii=0; ii<cmap.getSurf(); ii++) {
+        unsigned int xx = ii%cmap.getW();
+        unsigned int yy = ii/cmap.getW();
 
         short cval = (bmap.point(xx,yy)<<3) + (bmap.point(xx+1,yy)<<2) + (bmap.point(xx+1, yy+1)<<1) + bmap.point(xx,yy+1);
         cmap.set(ii, cval);
     }
 
     // close boundary
-    for (size_t ii=0; ii<cmap.getW(); ii++) {
+    for (unsigned int ii=0; ii<cmap.getW(); ii++) {
         cmap.set(ii, 0, cmap.point(ii, 0) &~ 12);
         cmap.set(ii, 0, cmap.point(ii, cmap.getH()-1) &~ 3);
     }
-    for (size_t ii=0; ii<cmap.getH(); ii++) {
+    for (unsigned int ii=0; ii<cmap.getH(); ii++) {
         cmap.set(0, ii, cmap.point(0, ii) &~ 9);
         cmap.set(cmap.getW()-1, ii, cmap.point(cmap.getW()-1, ii) &~ 6);
     }
@@ -797,7 +797,7 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, float lev
     int stats[16];
     for (int i=0; i<16; i++)
         stats[i] = 0;
-    for (size_t ii=0; ii<cmap.getSurf(); ii++)
+    for (unsigned int ii=0; ii<cmap.getSurf(); ii++)
         stats[cmap.point(ii)] ++;
 
     int b_points = 1;

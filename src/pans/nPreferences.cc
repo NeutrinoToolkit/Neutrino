@@ -135,7 +135,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 		my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
 	}
 
-	qSort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
+    std::sort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
 
 	for(auto &locale : allLocales) {
 		QString my_str=nApp::localeToString(locale);

@@ -1005,11 +1005,11 @@ nLine::rearrange_monotone() {
 		horizontal = !horizontal;
 
 	if (horizontal) {
-		qSort(my_poly.begin(),my_poly.end(), orderMonotone_x);
+        std::sort(my_poly.begin(),my_poly.end(), orderMonotone_x);
 		nparent->statusBar()->showMessage("Axis is HORIZONTAL");
 		//std::cerr<<"[nLine] axis is horizontal"<<std::endl;
 	} else {
-		qSort(my_poly.begin(),my_poly.end(), orderMonotone_y);
+        std::sort(my_poly.begin(),my_poly.end(), orderMonotone_y);
 		nparent->statusBar()->showMessage("Axis is VERTICAL");
 		//std::cerr<<"[nLine] axis is vertical"<<std::endl;
 	}

@@ -405,9 +405,15 @@ neutrino::scanPlugins(QString pluginsDirStr) {
 #elif defined(Q_OS_LINUX)
         QString extension("so");
 #endif
+
+        QStringList pluginlist;
         QDirIterator it(pluginsDir.absolutePath(), QStringList() << "*."+extension, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
-            loadPlugin(it.next(), false);
+            pluginlist.append(it.next());
+        }
+        pluginlist.sort();
+        for (auto &pluginfile : pluginlist) {
+            loadPlugin(pluginfile, false);
         }
 
         QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();

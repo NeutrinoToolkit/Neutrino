@@ -60,9 +60,6 @@ protected:
 
 private:
 #ifndef __clang__
-#ifdef __phys_debug
-    grabStream qerr;
-#endif
     grabStream qout;
 #endif
 

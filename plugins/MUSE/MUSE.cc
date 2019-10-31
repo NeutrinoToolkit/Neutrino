@@ -291,7 +291,7 @@ void MUSE::setstatusbar() {
 	if (xvals.size()>slices->value()) {
 		double lambda=xvals[slices->value()];
 		double redshift=lambda/restLambda->value()-1.0;
-        lambdaz->setText(trUtf8("\xce\xbb") + ":" + locale().toString(lambda) + " z=" + locale().toString(redshift));
+        lambdaz->setText(tr("\xce\xbb") + ":" + locale().toString(lambda) + " z=" + locale().toString(redshift));
 	}
 }
 

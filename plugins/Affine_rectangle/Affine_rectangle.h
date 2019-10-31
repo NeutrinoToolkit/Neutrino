@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (C) 2014 Alessandro Flacco, Tommaso Vinci All Rights Reserved
+ *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
  *
  *    This file is part of neutrino.
  *
@@ -22,53 +22,46 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-
 #include <QtGui>
 #include <QWidget>
 
-#include "nGenericPan.h"
-#include "ui_FocalSpot.h"
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>   
 
-#ifndef __FocalSpot
-#define __FocalSpot
+
+#include "nGenericPan.h"
+#include "ui_Affine_rectangle.h"
+#include "nLine.h"
+#include "nRect.h"
+
+
+#ifndef __Affine_rectangle
+#define __Affine_rectangle
 
 class neutrino;
-class nLine;
 
-class FocalSpot : public nGenericPan {
+class Affine_rectangle : public nGenericPan {
     Q_OBJECT
 
-    using nGenericPan::loadSettings;
+public:	
+    Q_INVOKABLE Affine_rectangle(neutrino *);
 
-public:
-    Q_INVOKABLE FocalSpot(neutrino *);
+    Ui::Affine_rectangle my_w;
 
-    Ui::FocalSpot my_w;
+    nPhysD *affined;
 
-    QPointer<nLine> nContour;
+    nLine l1;
+
+    vec2f affine(vec2f, std::array<double,6>&);
 
 public slots:
-    void calculate_stats();
-    QList<double> find_contour(double);
-
+    std::array<double,6> getAffine(QPolygonF, QPolygonF);
+    void affine();
     void bufferChanged(nPhysD*);
-
-    void on_centroid_toggled(bool tog);
-    void setPosZero(QPointF pos);
-
-    void mouseAtPlot(QMouseEvent*);
-    void mouseAtWorld(QPointF);
-
-    void loadSettings(QString=QString());
-
-
-private:
-    // blurred image for easier calculations
-    nPhysD decimated;
-
+    void resetPoints();
 };
 
-NEUTRINO_PLUGIN(FocalSpot,Analysis);
+NEUTRINO_PLUGIN(Affine_rectangle, Analysis);
 
 
 #endif

@@ -192,8 +192,8 @@ nPhysImageF<T> phys_resample(nPhysImageF<T> &iimg, vec2i new_size)
 
     oimg.resize(new_size.x(), new_size.y());
 
-    double vscale = ((double)iimg.getH())/oimg.getH();
-    double hscale = ((double)iimg.getW())/oimg.getW();
+    double vscale = static_cast<double>(iimg.getH())/oimg.getH();
+    double hscale = static_cast<double>(iimg.getW())/oimg.getW();
 
     DEBUG("Hscale: "<<hscale<<", Vscale: "<<vscale);
 
@@ -218,7 +218,7 @@ physC from_real_imaginary (physD&, physD&);
 physC from_real (physD&, double=0.0);
 
 //! contour trace function
-void contour_trace(physD &, std::list<vec2i> &, float, bool blur=false, float blur_radius=10.);
+void contour_trace(physD &, std::list<vec2i> &, double, bool blur=false, double blur_radius=10.);
 nPhysImageF<char> contour_surface_map(physD &iimage, std::list<vec2i> &contour); // generate in/out/boundary map based on the contour
 std::list<double> contour_integrate(physD &, std::list<vec2i> &, bool integrate_boundary=false);
 

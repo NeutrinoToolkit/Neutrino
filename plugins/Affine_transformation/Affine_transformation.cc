@@ -138,7 +138,7 @@ void Affine_transformation::affine() {
 				WARNING("something is broken here");
 				break;
 		}
-        nPhysD *affinePhys=NULL;
+
 		unsigned int dx=my_phys_other->getW();
 		unsigned int dy=my_phys_other->getH();
 		
@@ -160,15 +160,15 @@ void Affine_transformation::affine() {
                 if (miny>corners[i].y()) miny=corners[i].y();
                 if (maxy<corners[i].y()) maxy=corners[i].y();
             }
-            dx=maxx-minx;
-            dy=maxy-miny;
+            dx=(unsigned int) (maxx-minx);
+            dy=(unsigned int) (maxy-miny);
         }
 		
         DEBUG(affine(vec2f(0,0),vecForward).x() << " " << affine(vec2f(0,0),vecForward).y());
         DEBUG(affine(vec2f(0,0),vecBackward).x() << " " << affine(vec2f(0,0),vecBackward).y());
 
-        affinePhys=new nPhysD(dx,dy,0.0,"affine");
-        affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
+        nPhysD affinePhys(dx,dy,0.0,"affine");
+//        affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
 
         QProgressDialog progress("", "Cancel", 0, dx, this);
         progress.setCancelButton(0);
@@ -179,37 +179,34 @@ void Affine_transformation::affine() {
 		for (unsigned int i=0; i<dx; i++) {
             progress.setValue(i);
 			for (unsigned int j=0; j<dy; j++) {
-                affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
+                affinePhys.set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
 			}
 		}
-        affinePhys->TscanBrightness();
+        affinePhys.TscanBrightness();
 
-//        if (my_w.crop->isChecked()){
-//            QRectF reg=region.getRect();
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << reg;
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-//            qDebug() << "----------------------------------------------------";
-////            nPhysD *copy=new nPhysD(affined->sub(reg.x(),reg.y(),reg.width(),reg.height()).copy());
-//            nPhysD copy=affined->sub(reg.x(),reg.y(),reg.width(),reg.height());
-////            delete affined;
-////            affined=copy;
-////            nparent->addShowPhys(copy);
-//        }
+        if (my_w.crop->isChecked()){
+            QRectF reg=region.getRect();
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << reg;
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
 
-//		if (my_w.erasePrevious->isChecked()) {
-//            affined=nparent->replacePhys(affinePhys,affined,true);
-//		} else {
-//            nparent->addShowPhys(affinePhys);
-//            affined=affinePhys;
-//		}
+            nPhysD mycopy(affinePhys.sub(reg.x(),reg.y(),reg.width(),reg.height()));
+            affinePhys=mycopy;
+        }
 
+        if (my_w.erasePrevious->isChecked()) {
+            affined=nparent->replacePhys(new nPhysD(affinePhys),affined,true);
+        } else {
+            affined=new nPhysD(affinePhys);
+            nparent->addShowPhys(affined);
+        }
 	}
 }
 
