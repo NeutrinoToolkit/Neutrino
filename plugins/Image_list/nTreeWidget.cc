@@ -43,7 +43,7 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
             QByteArray dragPhysPointers;
             QList<QUrl> lista;
             foreach (QTreeWidgetItem * item, dragitems) {
-                nPhysD *my_phys=(nPhysD*) (item->data((columnCount()-1),0).value<void*>());
+                nPhysD *my_phys=(nPhysD*) (item->data((columnCount()-1),0).value<nPhysD*>());
                 if (my_phys) {
                     dragPhysPointers+=QByteArray::number((qlonglong) my_phys)+ " ";
                     lista << QUrl(QString::fromUtf8(my_phys->getName().c_str()));
@@ -68,7 +68,7 @@ void nTreeWidget::mouseReleaseEvent(QMouseEvent *e) {
         if (e->modifiers() == Qt::NoModifier) {
             QTreeWidgetItem *item=itemAt(e->pos());
             if (item) {
-                nPhysD *phys=(nPhysD*) (item->data(columnCount()-1,Qt::DisplayRole).value<void*>());
+                nPhysD *phys=(nPhysD*) (item->data(columnCount()-1,Qt::DisplayRole).value<nPhysD*>());
                 nparent->showPhys(phys);
             }
         }

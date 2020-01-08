@@ -91,15 +91,6 @@
 #ifndef __nPhysImageF_h
 #define __nPhysImageF_h
 
-//enum phys_direction { PHYS_HORIZONTAL, PHYS_VERTICAL, PHYS_X, PHYS_Y, PHYS_ROW, PHYS_COLUMN };
-
-// direction defs moved to bidimvec.h
-//#if (__GNUC_MINOR__ > 5)
-//enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-//#else
-//enum phys_direction { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-//#endif
-
 enum phys_way { PHYS_POS, PHYS_NEG };
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
 
@@ -117,15 +108,6 @@ public:
 	{ return description; }
 
 	const char *description;
-};
-
-//! exception to be used on deprecated functions still in the sources
-class phys_deprecated: public std::exception
-{
-  virtual const char* what() const throw()
-  {
-	return "FATAL: function declared UNSAFE!";
-  }
 };
 
 //! exception to be used on wanna-be deprecated functions
@@ -261,9 +243,8 @@ public:
 	nPhysImageF<mcomplex> *getSingletonFFT(enum phys_direction, enum phys_fft);
 	//! old ft functions (DEPRECATED!)
 	void fftshift();
-	//! old ft functions (DEPRECATED!)
-	void ifftshift();
-	//! old ft functions (DEPRECATED!)
+
+    //! old ft functions (DEPRECATED!)
 	T get_shifted(int, int);	
 
 	//! 2D Complex FT
@@ -491,8 +472,8 @@ public:
             rotated.set(def_value);
 			double shiftx=std::min(dx1,0.0)+std::min(dx2,0.0);
 			double shifty=std::min(dy1,0.0)+std::min(dy2,0.0);
-            unsigned int i,j;
-#pragma omp parallel for collapse(2)
+            unsigned int i=0,j=0;
+#pragma omp parallel for private(i) collapse(2)
             for (j=0; j<rotated.getH(); j++) {
                 for (i=0; i<rotated.getW(); i++) {
 					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
@@ -558,56 +539,6 @@ public:
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
 
-    const double *to_dvector(enum phys_direction direction, unsigned int index) {
-        throw phys_deprecated();
-
-//		std::cerr<<"[to_dvector] dir: "<<direction<<", index: "<<index<<std::endl;
-        unsigned int size[2]={width,height};
-			
-		if (vector_buf[direction] == NULL)
-			vector_buf[direction] = new double [size[direction]];
-
-        unsigned int ndir = (direction+1)%2;	// normal direction
-		index = std::min(index,size[ndir]-1);
-
-		if (direction == PHYS_X) {
-            for (unsigned int i=0; i<size[direction]; i++)
-				vector_buf[direction][i] = Timg_matrix[index][i];
-				//vector_buf[direction][i] = point(index, i);
-		} else {
-            for (unsigned int i=0; i<size[direction]; i++)
-				vector_buf[direction][i] = Timg_matrix[i][index];
-				//vector_buf[direction][i] = point(i, index);
-		}
-
-		return vector_buf[direction];
-
-	}
-
-	const double *to_axis(enum phys_direction direction) {
-        throw phys_deprecated();
-        unsigned int size= direction==PHYS_X ? width : height;
-		
-		if (axis_buf[direction]==NULL) axis_buf[direction] = new double [size];
-		
-        for (unsigned int i=0; i<size; i++)
-			axis_buf[direction][i] = (i-get_origin(direction))*get_scale(direction);
-
-		return axis_buf[direction];
-
-	}
-
-//	const double *to_evector(int x1, int y1, int x2, int y2) {
-//		// here allocation is dynamic. calling object MUST cleanup
-
-//		double *ovec;
-
-//		if ((x1==x2) && (y1==y2)) {
-
-//		}
-//		return NULL;
-//	}
-
 	// interfacing methods
 
 	// get point (to be used for accessing data - no overload)
@@ -642,7 +573,7 @@ public:
 			return nan_value;
 	}
 
-	inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
+    inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
 		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()) && (p.x()>=0) && (p.y()>=0))
 			return Timg_matrix[p.y()][p.x()];
 		else
@@ -705,13 +636,13 @@ public:
 			TscanBrightness();
 
         unsigned int nbins = std::max<int>(getW()*getH()/10000, 100lu);
-		double binw = (double)(Tmaximum_value-Tminimum_value)/(nbins-1.);
+        double binw = static_cast<double>(Tmaximum_value-Tminimum_value)/(nbins-1.);
 		histogram.resize(nbins);
 
 		DEBUG(5,"histogram has "<<nbins<<" bins, bin width: "<<binw);
 
         for (unsigned int i=0; i<getSurf(); i++) {
-            unsigned int bin_n = (unsigned int)floor((Timg_buffer[i]-Tminimum_value)/(binw));
+            unsigned int bin_n = static_cast<unsigned int>(floor((Timg_buffer[i]-Tminimum_value)/(binw)));
 			histogram[bin_n]++;
 		}
 
@@ -1433,169 +1364,6 @@ nPhysImageF<T>::fftshift() {
 }
 
 template<class T> void
-nPhysImageF<T>::ifftshift() {
-
-
-}
-
-
-template<class T> inline nPhysImageF<mcomplex> * 
-nPhysImageF<T>::getFFT(int direction) {
-	throw phys_deprecated();
-	// tu te la calcoli
-	//if (direction == 0)
-	//	throw pIF_FFT_error;
-	//if (width == 0 || height == 0)
-	//	throw pIF_FFT_error;
-
-	// 1. allocation
-    fftw_complex *t = fftw_alloc_complex(getSurf());
-    fftw_complex *Ft = fftw_alloc_complex(getSurf());
-	nPhysImageF<mcomplex> *ftbuf;
-
-	ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.), "ftbuf");
-	
-	fftw_plan plan_t;
-	if (direction > 0)
-		plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-	else
-		plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-	
-	// 2. data copy	
-    for (unsigned int  j = 0; j < height; j++){
-        for (unsigned int i = 0; i < width; i++) {
-			//assign_val_to_fftw_complex(Timg_matrix[j][i], t[i+j*width]);
-			assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
-			//t[i+j*width][0] = Timg_matrix[j][i];
-			//t[i+j*width][1]=0.0;
-		}
-	}
-
-	// 3. transform
-	fftw_execute(plan_t);
-
-	// 4. transplant
-    for (unsigned int  j = 0; j < height; j++){
-        for (unsigned int i = 0; i < width; i++) {
-			//ftbuf->Timg_matrix[j][i] = mcomplex(Ft[i+j*width][0], Ft[i+j*width][1]);
-			ftbuf->Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
-		}
-	}
-
-	// 5. return
-	fftw_free(t);
-	fftw_free(Ft);
-	fftw_destroy_plan(plan_t);
-	
-	DEBUG(10,"out of fft");
-
-	return ftbuf;
-}
-
-template<class T> nPhysImageF<mcomplex> * 
-nPhysImageF<T>::getSingletonFFT(enum phys_direction dir, enum phys_fft fftdir) {
-	throw phys_deprecated();
-	
-	int mydir;
-	switch (dir) {
-        case 0:
-			mydir = 0;
-			break;
-
-        case 1:
-			mydir = 1;
-			break;
-
-		default:
-			//throw pIF_FFT_error;
-			return NULL;
-			break;
-	}
-	
-	// che mi sta un po' sul culo lo switch...
-	if (mydir == 0) {
-		// horizontal
-
-		// 1. allocation
-		fftw_complex *t = fftw_alloc_complex(width);
-		fftw_complex *Ft = fftw_alloc_complex(width);
-		nPhysImageF<mcomplex> *ftbuf;
-		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
-
-		fftw_plan plan_t;
-		
-		if (fftdir == PHYS_FORWARD)
-			plan_t = fftw_plan_dft_1d(width, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-		else
-			plan_t = fftw_plan_dft_1d(width, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-		// 2. data copy, transform and tralsplant
-        for (unsigned int row_n = 0; row_n<height; row_n++) {
-            for (unsigned int col_n = 0; col_n<width; col_n++)
-				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[col_n]);
-			fftw_execute(plan_t);
-            for (unsigned int col_n = 0; col_n<width; col_n++)
-				ftbuf->Timg_matrix[row_n][col_n] = mcomplex(Ft[col_n][0], Ft[col_n][1]);
-			
-		}
-
-		// and don't bother to realign..
-
-		fftw_destroy_plan(plan_t);
-		fftw_free(t);
-		fftw_free(Ft);
-
-		// 5. return
-		return ftbuf;
-
-	} else if (mydir == 1) {
-		// vertical
-	
-		// 1. allocation
-		fftw_complex *t = fftw_alloc_complex(height);
-		fftw_complex *Ft = fftw_alloc_complex(height);
-		nPhysImageF<mcomplex> *ftbuf;
-		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
-
-		fftw_plan plan_t;
-		
-		if (fftdir == PHYS_FORWARD)
-			plan_t = fftw_plan_dft_1d(height, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-		else
-			plan_t = fftw_plan_dft_1d(height, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-		// 2. data copy, transform and tralsplant
-        for (unsigned int col_n = 0; col_n<width; col_n++) {
-            for (unsigned int row_n = 0; row_n<height; row_n++)
-				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[row_n]);
-			fftw_execute(plan_t);
-            for (unsigned int row_n = 0; row_n<height; row_n++)
-				ftbuf->Timg_matrix[row_n][col_n] = mcomplex(Ft[row_n][0], Ft[row_n][1]);
-			
-		}
-
-		// and don't bother to realign..
-
-		fftw_destroy_plan(plan_t);
-		fftw_free(t);
-		fftw_free(Ft);
-
-		// 5. return
-		return ftbuf;
-	}
-
-}
-
-//template<> nPhysImageF<complex<double> > *
-//nPhysImageF<complex<double> >::getFFT(int direction) {
-	// tu pure te la calcoli
-//}
-
-// output
-//
-// --------------------------------------------------------------------------------------------------
-
-template<class T> void
 nPhysImageF<T>::writeASC(const char *ofilename) {
 	// alla bruttissimo dio
 	DEBUG(5,getName() << " Short: " << getShortName() << " from: " << getFromName());
@@ -1635,16 +1403,16 @@ nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
 }
 
 
-template<class T> void
-nPhysImageF<T>::writeRAW(const char *ofilename) {
-    throw phys_deprecated();
-    std::ofstream ofile(ofilename);
+//template<class T> void
+//nPhysImageF<T>::writeRAW(const char *ofilename) {
+//    throw phys_deprecated();
+//    std::ofstream ofile(ofilename);
 
-	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
-	// alla bruttissimo dio
-    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
-	ofile.close();
-}
+//	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
+//	// alla bruttissimo dio
+//    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
+//	ofile.close();
+//}
 
 // ------------------------------ operators ------------------------------------
 

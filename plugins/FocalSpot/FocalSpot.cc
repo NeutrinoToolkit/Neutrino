@@ -256,8 +256,8 @@ void FocalSpot::mouseAtWorld(QPointF p){
     my_w.plot->setMousePosition(trueLength);
     QString msg;
     QTextStream(&msg) << trueLength;
-
     my_w.statusBar->showMessage(msg);
+    my_w.plot->setMousePosition(trueLength);
 }
 
 void

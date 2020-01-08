@@ -131,8 +131,8 @@ void Find_peaks::updatePlot() {
                 yd[j]+=val;
             }
         }
-        transform(xd.begin(), xd.end(), xd.begin(),bind2nd(std::divides<double>(), dy));
-        transform(yd.begin(), yd.end(), yd.begin(),bind2nd(std::divides<double>(), dx));
+        std::transform(xd.begin(), xd.end(), xd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dy));
+        std::transform(yd.begin(), yd.end(), yd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dx));
 
         QVector<double> xdata(dx);
         QVector<double> ydata(dy);

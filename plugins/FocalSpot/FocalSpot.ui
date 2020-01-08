@@ -57,7 +57,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/QtCreator-NjElaN/qtc-cmake-gRZxzoAN/src/qrc/icons.qrc">
+       <iconset>
         <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
       </property>
       <property name="checkable">
@@ -707,8 +707,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../../../../private/var/folders/0v/r34b88ss03z9spv7tk_cs0nr0000gp/T/QtCreator-NjElaN/qtc-cmake-gRZxzoAN/src/qrc/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

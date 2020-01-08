@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>503</height>
+    <width>760</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="font">
@@ -19,20 +19,17 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
-   <property name="spacing">
-    <number>1</number>
-   </property>
    <property name="leftMargin">
-    <number>2</number>
+    <number>4</number>
    </property>
    <property name="topMargin">
-    <number>2</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>2</number>
+    <number>4</number>
    </property>
    <property name="bottomMargin">
-    <number>2</number>
+    <number>4</number>
    </property>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
@@ -87,6 +84,42 @@
             <property name="bottomMargin">
              <number>2</number>
             </property>
+            <item row="0" column="0">
+             <widget class="QToolButton" name="guess">
+              <property name="toolTip">
+               <string>Calculate interfringe</string>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="Visar.qrc">
+                <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
+              </property>
+              <property name="neutrinoSave" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QDoubleSpinBox" name="interfringe">
+              <property name="toolTip">
+               <string>Interfringe (px)</string>
+              </property>
+              <property name="suffix">
+               <string> [px]</string>
+              </property>
+              <property name="maximum">
+               <double>9999.989999999999782</double>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="neutrinoSave" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="2">
              <widget class="QDoubleSpinBox" name="guessWeight">
               <property name="toolTip">
@@ -106,23 +139,6 @@
               </property>
               <property name="value">
                <double>0.500000000000000</double>
-              </property>
-              <property name="neutrinoSave" stdset="0">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QToolButton" name="guess">
-              <property name="toolTip">
-               <string>Calculate interfringe</string>
-              </property>
-              <property name="text">
-               <string>...</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../Ghost_fringes/GhostFringes.qrc">
-                <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
               </property>
               <property name="neutrinoSave" stdset="0">
                <bool>true</bool>
@@ -165,71 +181,10 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="3">
-             <widget class="QDoubleSpinBox" name="interfringe">
-              <property name="toolTip">
-               <string>Interfringe (px)</string>
-              </property>
-              <property name="suffix">
-               <string> [px]</string>
-              </property>
-              <property name="maximum">
-               <double>9999.989999999999782</double>
-              </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="neutrinoSave" stdset="0">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QGroupBox" name="groupBox_4">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Time resolution in pixel</string>
-           </property>
-           <property name="title">
-            <string>Time resolution</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <property name="leftMargin">
-             <number>2</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
-            </property>
-            <property name="rightMargin">
-             <number>2</number>
-            </property>
-            <property name="bottomMargin">
-             <number>2</number>
-            </property>
-            <item row="0" column="1">
-             <widget class="QDoubleSpinBox" name="resolution">
-              <property name="suffix">
-               <string> [px]</string>
-              </property>
-              <property name="value">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="neutrinoSave" stdset="0">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="0" colspan="2">
+         <item row="0" column="0" colspan="4">
           <widget class="QWidget" name="widget_3" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
             <property name="leftMargin">
@@ -309,6 +264,145 @@
            </layout>
           </widget>
          </item>
+         <item row="1" column="3">
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Time resolution in pixel</string>
+           </property>
+           <property name="title">
+            <string>Slit</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QDoubleSpinBox" name="resolution">
+              <property name="suffix">
+               <string> [px]</string>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="neutrinoSave" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="title">
+            <string>Center</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QSpinBox" name="physOriginSpace">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="suffix">
+               <string> [px]</string>
+              </property>
+              <property name="minimum">
+               <number>-99999</number>
+              </property>
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+              <property name="neutrinoSave" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QGroupBox" name="groupBox_8">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="title">
+            <string>Magnification</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QDoubleSpinBox" name="magnification">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="suffix">
+               <string> [space/px]</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>9999.989999999999782</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="neutrinoSave" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -316,111 +410,198 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string>Intensity parameters: </string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
+    <widget class="QWidget" name="widget_4" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1">
       <property name="leftMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="offRef">
-        <property name="toolTip">
-         <string>offset reference (dark value)</string>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
         </property>
-        <property name="prefix">
-         <string>ref: </string>
+        <property name="title">
+         <string>Intensity parameters (offset, shift, ref*): </string>
         </property>
-        <property name="suffix">
-         <string> [counts]</string>
-        </property>
-        <property name="maximum">
-         <double>99999.000000000000000</double>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item row="2" column="3">
+          <widget class="QDoubleSpinBox" name="multRef">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference multiplication factor:&lt;/p&gt;&lt;p&gt;Fix jitter between ref. and shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="suffix">
+            <string/>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.050000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="offRef">
+           <property name="toolTip">
+            <string>offset reference (dark value)</string>
+           </property>
+           <property name="maximum">
+            <double>99999.000000000000000</double>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QSpinBox" name="intensityShift">
+           <property name="toolTip">
+            <string>Pixel time delay of intensity between probe and shot</string>
+           </property>
+           <property name="suffix">
+            <string> [px]</string>
+           </property>
+           <property name="minimum">
+            <number>-1000</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QDoubleSpinBox" name="multRef">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference multiplication factor:&lt;/p&gt;&lt;p&gt;Fix jitter between ref. and shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <item>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
         </property>
-        <property name="prefix">
-         <string>ref * </string>
+        <property name="title">
+         <string>Visar sensitivity</string>
         </property>
-        <property name="suffix">
-         <string/>
-        </property>
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="minimum">
-         <double>-99.989999999999995</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
+        <layout class="QGridLayout" name="gridLayout_18">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item row="0" column="2">
+          <widget class="QDoubleSpinBox" name="sensitivity">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="suffix">
+            <string> [v/fr]</string>
+           </property>
+           <property name="decimals">
+            <number>5</number>
+           </property>
+           <property name="minimum">
+            <double>-10000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QDoubleSpinBox" name="offShot">
-        <property name="toolTip">
-         <string>offset shot (dark value)</string>
+      <item>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
         </property>
-        <property name="prefix">
-         <string>shot: </string>
+        <property name="title">
+         <string>Sweep time</string>
         </property>
-        <property name="suffix">
-         <string> [counts]</string>
-        </property>
-        <property name="maximum">
-         <double>99999.000000000000000</double>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QSpinBox" name="intensityShift">
-        <property name="toolTip">
-         <string>Pixel time delay of intensity between probe and shot</string>
-        </property>
-        <property name="suffix">
-         <string> [px]</string>
-        </property>
-        <property name="minimum">
-         <number>-1000</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="neutrinoSave" stdset="0">
-         <bool>true</bool>
-        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLineEdit" name="physScale">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -453,12 +634,10 @@
   <tabstop>angle</tabstop>
   <tabstop>resolution</tabstop>
   <tabstop>offRef</tabstop>
-  <tabstop>offShot</tabstop>
   <tabstop>intensityShift</tabstop>
   <tabstop>multRef</tabstop>
  </tabstops>
  <resources>
-  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
  </resources>
  <connections/>

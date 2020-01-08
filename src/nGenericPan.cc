@@ -106,9 +106,9 @@ void nGenericPan::physAdd(nPhysD *buffer) {
     DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>");
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
-            int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
-            if (alreadyThere == -1) {
-                combo->addItem(getNameForCombo(combo,buffer),qVariantFromValue((void*) buffer));
+            QVariant varBuffer=QVariant::fromValue(buffer);
+            if (combo->findData(varBuffer) == -1) {
+                combo->addItem(getNameForCombo(combo,buffer),varBuffer);
             }
         }
     }
@@ -216,7 +216,11 @@ void nGenericPan::decorate(QWidget *main_widget) {
     }
 
     foreach (QAction *wdgt, main_widget->findChildren<QAction *>()) {
-        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+        if (!wdgt->objectName().isEmpty()) {
+            wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+        } else {
+            wdgt->setToolTip(wdgt->toolTip());
+        }
     }
 
 }
@@ -324,7 +328,7 @@ void nGenericPan::physDel(nPhysD * buffer) {
                 disconnect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
-            int position=combo->findData(qVariantFromValue((void*) buffer));
+            int position=combo->findData(QVariant::fromValue(buffer));
             QApplication::processEvents();
             combo->removeItem(position);
             QApplication::processEvents();
@@ -359,7 +363,7 @@ void nGenericPan::showMessage(QString message,int msec) {
 void nGenericPan::comboChanged(int k) {
     QComboBox *combo = qobject_cast<QComboBox *>(sender());
     if (combo) {
-        nPhysD *image=(nPhysD*) (combo->itemData(k).value<void*>());
+        nPhysD *image=(nPhysD*) (combo->itemData(k).value<nPhysD*>());
         if (image) {
             nparent->showPhys(image);
         }
@@ -370,7 +374,7 @@ nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
     nPhysD* retVal=nullptr;
     QApplication::processEvents();
     if (combo->count())
-        retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+        retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<nPhysD*>());
     return retVal;
 }
 
@@ -450,7 +454,7 @@ nGenericPan::loadUi(QSettings &settings) {
             foreach (nPhysD *physAperto,nparent->getBufferList()) {
                 if (physAperto->getName()==imageName) {
                     for (int i=0; i<widget->count();i++) {
-                        if (physAperto==(nPhysD*) (widget->itemData(i).value<void*>())) {
+                        if (physAperto==(nPhysD*) (widget->itemData(i).value<nPhysD*>())) {
                             widget->setCurrentIndex(i);
                             break;
                         }
@@ -545,7 +549,7 @@ nGenericPan::saveUi(QSettings &settings) {
 
         if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
             for (int i=0; i< widget->count(); i++) {
-                nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<void*>());
+                nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<nPhysD*>());
                 if (nparent && nparent->my_w->my_view->physList.contains(phys)) {
                     settings.setValue(widget->objectName(),QString::fromUtf8(phys->getName().c_str()));
                     settings.setValue(widget->objectName()+"-From",QString::fromUtf8(phys->getFromName().c_str()));
@@ -749,14 +753,14 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     //			if (my_occurrence==occurrence) {
     //				bool found=false;
     //				for (int i=0;i<obj->count();i++) {
-    //					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<void *>());
-    //					if (*objPhys == *(nPhysD*) (my_val.value<void *>())){
+    //					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<nPhysD *>());
+    //					if (*objPhys == *(nPhysD*) (my_val.value<nPhysD *>())){
     //						obj->setCurrentIndex(i);
     //						found=true;
     //					}
     //				}
     //				if (!found) {
-    //					nparent->addPhys((nPhysD*) (my_val.value<void *>()));
+    //					nparent->addPhys((nPhysD*) (my_val.value<nPhysD *>()));
     //					QApplication::processEvents();
     //					if (obj->findData(my_val)>-1) {
     //						obj->setCurrentIndex(obj->findData(my_val));

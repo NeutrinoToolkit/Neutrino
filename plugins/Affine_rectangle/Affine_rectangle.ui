@@ -187,6 +187,9 @@
          <property name="text">
           <string>erase previous</string>
          </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>

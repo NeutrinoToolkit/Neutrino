@@ -9,6 +9,8 @@ class nPhysD : public physD {
   public:
 
     using physD::physD;
+    using physD::setName;
+
 
     nPhysD(physD in=physD()): physD(in) {
         qDebug() << "------------------------------------------------------------ CREATE "<< copies();
@@ -93,5 +95,6 @@ class nPhysD : public physD {
 
 };
 
+Q_DECLARE_METATYPE(nPhysD*);
 
 #endif

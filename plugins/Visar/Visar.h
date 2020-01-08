@@ -74,6 +74,7 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 class Visar : public nGenericPan, private Ui::Visar1 {
     Q_OBJECT
     
+    using nGenericPan::nGenericPan;
     using nGenericPan::loadSettings;
     using Ui::Visar1::retranslateUi;
 public:
@@ -83,8 +84,8 @@ public:
 
 private:
 
-    std::vector<Ui::Visar2*> velocityUi;
-    std::vector<Ui::Visar3*> phaseUi;
+    std::vector<Ui::Visar2*> settingsUi;
+    std::vector<Ui::Visar3*> velocityUi;
     
     double getTime(std::vector<double> &vecsweep,double p);
     
@@ -151,7 +152,7 @@ public slots:
     void imageMousePress(QPointF);
     void imageMouseRelease(QPointF);
 
-    double getTimeFromPixel(QPointF);
+    QPointF getTimeSpaceFromPixel(QPointF);
 
     void mouseAtPlot(QMouseEvent* e);
     

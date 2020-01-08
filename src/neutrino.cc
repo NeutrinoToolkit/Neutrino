@@ -564,7 +564,7 @@ void neutrino::openRecentBuffer()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     if (action) {
-        nPhysD *phys=(nPhysD*) (action->data().value<void*>());
+        nPhysD *phys=(nPhysD*) (action->data().value<nPhysD*>());
         showPhys(phys);
     }
 }
@@ -931,7 +931,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
     } else {
         action->setText(name);
     }
-    action->setData(qVariantFromValue((void*) datamatrix));
+    action->setData(QVariant::fromValue( datamatrix));
     connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
     my_w->menuBuffers->addAction(action);
 }
@@ -969,7 +969,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             qDebug() << "after" << my_w->my_view->physList.size();
             QList<QAction *> lista=my_w->menuBuffers->actions();
             foreach (QAction* action, my_w->menuBuffers->actions()) {
-                if (action->data() == qVariantFromValue((void*) datamatrix)) {
+                if (action->data() == QVariant::fromValue( datamatrix)) {
                     my_w->menuBuffers->removeAction(action);
                 }
             }
@@ -1159,9 +1159,7 @@ void neutrino::dropEvent(QDropEvent *e) {
 
 void
 neutrino::zoomChanged(double zoom) {
-    QString tmp;
-    tmp.sprintf(" %.1f%%",100.0*zoom);
-    statusBar()->showMessage(tr("Zoom :")+tmp,2000);
+    statusBar()->showMessage(QString(tr("Zoom")+" : %1").arg(100.0*zoom,0,' ',1),2000);
     emit nZoom(zoom);
     update();
 }

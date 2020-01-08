@@ -229,7 +229,7 @@ void Interferometry::guessCarrier() {
 }
 
 void Interferometry::doWavelet () {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     if (sender()->property("id").isValid()) {
         doWavelet(sender()->property("id").toInt());
@@ -271,7 +271,7 @@ void Interferometry::doWavelet (int iimage) {
         if (my_image[iimage].numThick->value()==0) {
             my_params.init_thick=my_w.widthCarrier->value();
             my_params.end_thick=my_w.widthCarrier->value();
-            my_params.n_thick=1;
+        my_params.n_thick=1;
         } else {
             my_params.init_thick=my_image[iimage].minThick->value()*my_w.widthCarrier->value();
             my_params.end_thick=my_image[iimage].maxThick->value()*my_w.widthCarrier->value();

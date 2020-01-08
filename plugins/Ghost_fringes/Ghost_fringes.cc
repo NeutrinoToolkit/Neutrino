@@ -71,7 +71,7 @@ void Ghost_fringes::doGhost () {
     if (imageShot) {
         saveDefaults();
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 
         size_t dx=imageShot->getW();
@@ -137,9 +137,7 @@ void Ghost_fringes::doGhost () {
         }
 
         my_w.erasePrevious->setEnabled(true);
-        QString out;
-        out.sprintf("Time: %d msec",timer.elapsed());
-        my_w.statusbar->showMessage(out);
+        my_w.statusbar->showMessage(QString(tr("Time: %1 msec")).arg(timer.elapsed()));
 
 	}
 }

@@ -79,7 +79,7 @@ void Image_list::selectionChanged() {
 
 nPhysD*
 Image_list::getPhys(QTreeWidgetItem* item) {
-    nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<void*>());
+    nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<nPhysD*>());
     //	retphys->property.dumper(std::cerr);
     return retphys;
 }
@@ -344,7 +344,7 @@ void Image_list::physAdd(nPhysD *my_phys) {
         my_item->setData(4,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
     }
 
-    my_item->setData((my_w.images->columnCount()-1),0,qVariantFromValue((void*) my_phys));
+    my_item->setData((my_w.images->columnCount()-1),0,QVariant::fromValue(my_phys));
     my_w.images->sortItems(0,Qt::AscendingOrder);
     updatePad();
 }

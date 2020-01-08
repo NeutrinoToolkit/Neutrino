@@ -110,25 +110,25 @@ Visar::Visar(neutrino *nparent)
 
 
     QApplication::processEvents();
-
     show();
+
 
     setProperty("NeuSave-alphagraph",20);
 
     QApplication::processEvents();
 
-    for (int l=2+numVisars; l<whichRefl->count();l++) {
+    for (int l=2+(int)numVisars; l<whichRefl->count();l++) {
         whichRefl->removeItem(l);
     }
 
+    int kMax=1;
     if (property("NeuSave-numVisars").isValid()) {
-        int kMax=property("NeuSave-numVisars").toInt();
-        for (int k=0; k<kMax; k++) {
-            addVisar();
-        }
-    } else{
+        kMax=property("NeuSave-numVisars").toInt();
+    }
+    for (int k=0; k<kMax; k++) {
         addVisar();
     }
+
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
 
@@ -148,6 +148,7 @@ Visar::Visar(neutrino *nparent)
 
     //!END SOP stuff
     QApplication::processEvents();
+
 
     loadDefaults();
     sweepChanged();
@@ -184,7 +185,7 @@ void Visar::addVisar() {
     Ui::Visar2* ui_vel=new Ui::Visar2();
     ui_vel->setupUi(wvisar1);
 
-    velocityUi.push_back(ui_vel);
+    settingsUi.push_back(ui_vel);
 
     QWidget *tab2 = new QWidget();
     QGridLayout *gridLayout2 = new QGridLayout(tab2);
@@ -198,7 +199,7 @@ void Visar::addVisar() {
     ui_set->setupUi(wvisar2);
 
 
-    phaseUi.push_back(ui_set);
+    velocityUi.push_back(ui_set);
 
     //hack to save diffrent uis!!!
     foreach (QWidget *obj, wvisar1->findChildren<QWidget*>()+wvisar2->findChildren<QWidget*>()) {
@@ -343,8 +344,8 @@ void Visar::delVisar() {
         fringeRect.back()->deleteLater();
         fringeRect.pop_back();
 
+        settingsUi.pop_back();
         velocityUi.pop_back();
-        phaseUi.pop_back();
 
         phase.pop_back();
         contrast.pop_back();
@@ -453,7 +454,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             sweepChanged(line);
         } else {
             for (unsigned int n=0; n< numVisars; n++) {
-                sweepChanged(phaseUi[n]->physScale);
+                sweepChanged(settingsUi[n]->physScale);
             }
             sweepChanged(sopScale);
         }
@@ -501,52 +502,66 @@ double Visar::getTime(std::vector<double> &vecsweep, double p) {
     return time;
 }
 
-double Visar::getTimeFromPixel(QPointF p) {
+QPointF Visar::getTimeSpaceFromPixel(QPointF p) {
     int k=0;
-    double position=0.0;
+    double posTime=0.0;
+    double posSpace=0.0;
     if (tabs->currentIndex()==0) {
         k=tabPhase->currentIndex();
         if (k >= 0 && k<(int)numVisars) {
-            position=(direction(k)==0 ? p.y() : p.x());
-            velocityUi[k]->plotPhaseIntensity->setMousePosition(position);
+            posTime=(direction(k)==0 ? p.y() : p.x());
+            posSpace=(direction(k)==0 ? p.x() : p.y())-settingsUi[k]->physOriginSpace->value();
+            settingsUi[k]->plotPhaseIntensity->setMousePosition(posTime);
         }
     } else if (tabs->currentIndex()==1) {
         k=tabVelocity->currentIndex();
         if (k >= 0 && k<(int)numVisars) {
             double pos=direction(k)==0 ? p.y() : p.x();
-            position=getTime(sweepCoeff[k],pos) - getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value()) + phaseUi[k]->offsetTime->value();
-            plotVelocity->setMousePosition(position);
+            posTime=getTime(sweepCoeff[k],pos) - getTime(sweepCoeff[k],velocityUi[k]->physOrigin->value()) + velocityUi[k]->offsetTime->value();
+            posSpace=((direction(k)==0 ? p.x() : p.y())-settingsUi[k]->physOriginSpace->value())*settingsUi[k]->magnification->value();
+            plotVelocity->setMousePosition(posTime);
         }
     } else {
         double pos=sopDirection->currentIndex()==0 ? p.y() : p.x();
-        position=getTime(sweepCoeffSOP,pos) - getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
-        sopPlot->setMousePosition(position);
+        posTime=getTime(sweepCoeffSOP,pos) - getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
+        posSpace=((direction(k)==0 ? p.x() : p.y())-physOriginSpace->value())*magnification->value();
+        sopPlot->setMousePosition(posTime);
     }
-    return position;
+    return QPointF(posTime,posSpace);
 }
 
-
 void Visar::imageMousePress(QPointF p) {
-    setProperty("timeClick",getTimeFromPixel(p));
+    setProperty("timeClick",getTimeSpaceFromPixel(p));
 }
 
 void Visar::imageMouseRelease(QPointF p) {
-    double deltatime=getTimeFromPixel(p)-property("timeClick").toDouble();
-    statusbar->showMessage("Delta : "+QString::number(deltatime));
+    QPointF timeSpace=getTimeSpaceFromPixel(p);
+    QPointF refTimeSpace=property("timeClick").toPointF();
+    double deltatime=timeSpace.x()-refTimeSpace.x();
+    double deltaspace=timeSpace.y()-refTimeSpace.y();
+    statusbar->showMessage("Delta : "+QString::number(deltatime)+" "+QString::number(deltaspace));
     setProperty("timeClick",QVariant());
 }
 
 void Visar::mouseAtMatrix(QPointF p) {
-    double deltatime=getTimeFromPixel(p);
+    QPointF timeSpace=getTimeSpaceFromPixel(p);
+    QPointF refTimeSpace=property("timeClick").toPointF();
+
+    double deltatime=timeSpace.x();
+    double deltaspace=timeSpace.y();
     QString prefix=tr("Time: ")+QString::number(deltatime);
     if (property("timeClick").isValid()) {
-        prefix += tr(" Delay: ")+QString::number(deltatime-property("timeClick").toDouble());
+        prefix += tr(" Delay: ")+QString::number(deltatime-refTimeSpace.x());
+    }
+    prefix += " Position: "+QString::number(deltaspace);
+    if (property("timeClick").isValid()) {
+        prefix += tr(" Distance: ")+QString::number(deltaspace-refTimeSpace.y());
     }
     statusbar->showMessage(prefix);
 }
 
 int Visar::direction(int k) {
-    int dir=((int) ((velocityUi[k]->angle->value()+360+45)/90.0) )%2;
+    int dir=((int) ((settingsUi[k]->angle->value()+360+45)/90.0) )%2;
     return dir;
 }
 
@@ -554,8 +569,8 @@ void Visar::setObjectVisibility(nPhysD*phys) {
     qDebug() << "here";
     if (phys) {
         for (unsigned int k=0;k<numVisars;k++){
-            fringeLine[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
-            fringeRect[k]->setVisible(phys == getPhysFromCombo(velocityUi[k]->shotImage) || phys == getPhysFromCombo(velocityUi[k]->refImage));
+            fringeLine[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
+            fringeRect[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
         }
         sopRect->setVisible(enableSOP->isChecked() && (phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot)));
     }
@@ -586,8 +601,8 @@ void Visar::tabChanged(int k) {
         } else {
             if (k<(int)numVisars) {
                 k=tabWidget->currentIndex();
-                if (phaseUi[k]->enableVisar->isChecked()) {
-                    nparent->showPhys(getPhysFromCombo(velocityUi[k]->shotImage));
+                if (velocityUi[k]->enableVisar->isChecked()) {
+                    nparent->showPhys(getPhysFromCombo(settingsUi[k]->shotImage));
                 }
             }
         }
@@ -598,29 +613,30 @@ void Visar::tabChanged(int k) {
 void Visar::connections() {
     for (unsigned int k=0;k<numVisars;k++){
         connect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
-        connect(phaseUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        connect(settingsUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
 
-        connect(phaseUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        connect(phaseUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 
-        connect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
-        connect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
+        connect(settingsUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
+        connect(settingsUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
-        connect(velocityUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
-        connect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        connect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        connect(velocityUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
+        connect(settingsUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
+        connect(settingsUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        connect(settingsUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
 
-        connect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
+        connect(velocityUi[k]->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
 
-        connect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+        connect(settingsUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
-        connect(velocityUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+        connect(settingsUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
@@ -649,29 +665,30 @@ void Visar::disconnections() {
     QApplication::processEvents();
     for (unsigned int k=0;k<numVisars;k++){
         disconnect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
-        disconnect(phaseUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        disconnect(settingsUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
 
-        disconnect(phaseUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        disconnect(phaseUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
 
-        disconnect(velocityUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
-        disconnect(velocityUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
+        disconnect(settingsUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
+        disconnect(settingsUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
 
-        disconnect(velocityUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
-        disconnect(velocityUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        disconnect(velocityUi[k]->offShot, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        disconnect(velocityUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
+        disconnect(settingsUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
+        disconnect(settingsUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+        disconnect(settingsUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
 
-        disconnect(phaseUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
+        disconnect(velocityUi[k]->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
 
-        disconnect(phaseUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+        disconnect(settingsUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
-        disconnect(velocityUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+        disconnect(settingsUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     }
     disconnect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     disconnect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
@@ -842,13 +859,13 @@ void Visar::updatePlot() {
 
             Qt::PenStyle pstyle=((int)k==tabVelocity->currentIndex()?Qt::SolidLine : Qt::DashLine);
 
-            double sensitivity=phaseUi[k]->sensitivity->value();
-            double deltat=phaseUi[k]->offsetTime->value()-getTime(sweepCoeff[k],phaseUi[k]->physOrigin->value());
+            double sensitivity=settingsUi[k]->sensitivity->value();
+            double deltat=velocityUi[k]->offsetTime->value()-getTime(sweepCoeff[k],velocityUi[k]->physOrigin->value());
 
             QVector<double> tjump,njump,rjump;
-            QStringList jumpt=phaseUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
-            phaseUi[k]->jumpst->setPalette(QApplication::palette());
-            QPalette my_palette=phaseUi[k]->jumpst->palette();
+            QStringList jumpt=velocityUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
+            velocityUi[k]->jumpst->setPalette(QApplication::palette());
+            QPalette my_palette=velocityUi[k]->jumpst->palette();
             my_palette.setColor(QPalette::Base,Qt::red);
 
             foreach (QString piece, jumpt) {
@@ -863,7 +880,7 @@ void Visar::updatePlot() {
                         if (my_jumps.size()==3) {
                             valdrefr_index=locale().toDouble(my_jumps.at(2),&ok3);
                             if (!ok3) {
-                                phaseUi[k]->jumpst->setPalette(my_palette);
+                                velocityUi[k]->jumpst->setPalette(my_palette);
                                 statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg,5000);
                             }
                         }
@@ -872,7 +889,7 @@ void Visar::updatePlot() {
                             tjump << valdt;
                             njump << valdn;
                         } else {
-                            phaseUi[k]->jumpst->setPalette(my_palette);
+                            velocityUi[k]->jumpst->setPalette(my_palette);
                             statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
                         }
                         if (ok3) {
@@ -882,7 +899,7 @@ void Visar::updatePlot() {
                         }
                     }
                 } else {
-                    phaseUi[k]->jumpst->setPalette(my_palette);
+                    velocityUi[k]->jumpst->setPalette(my_palette);
                     statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
                 }
             }
@@ -898,11 +915,11 @@ void Visar::updatePlot() {
                 my_jumpLine->point2->setCoords(a,1);
             }
 
-            double offset=phaseUi[k]->offsetShift->value();
+            double offset=velocityUi[k]->offsetShift->value();
 
-            QVector<QVector< double > > velJump_array(abs(phaseUi[k]->jump->value()));
+            QVector<QVector< double > > velJump_array(abs(velocityUi[k]->jump->value()));
 
-            for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
+            for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
                 velJump_array[i].resize(time_phase[k].size());
             }
 
@@ -919,7 +936,7 @@ void Visar::updatePlot() {
                 double fShot=cPhase[1][k][j];
                 double iRef=cIntensity[0][k][j];
                 double iShot=cIntensity[1][k][j];
-                if (getPhysFromCombo(velocityUi[k]->shotImage)==getPhysFromCombo(velocityUi[k]->refImage)) {
+                if (getPhysFromCombo(settingsUi[k]->shotImage)==getPhysFromCombo(settingsUi[k]->refImage)) {
                     fRef=0.0;
                     iRef=1.0;
                 }
@@ -934,8 +951,8 @@ void Visar::updatePlot() {
                 }
 
                 double speed=(offset+fShot-fRef+njumps)*sensitivity/refr_index;
-                double Rg=phaseUi[k]->reflOffset->value();
-                double Rmat=phaseUi[k]->reflRef->value();
+                double Rg=velocityUi[k]->reflOffset->value();
+                double Rmat=velocityUi[k]->reflRef->value();
                 double beta=-Rg/pow(1.0-Rg,2);
                 double refle=iShot/iRef * (Rmat-beta) + beta;
 
@@ -944,10 +961,10 @@ void Visar::updatePlot() {
                 quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
                 velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
 
-                for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
+                for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
                     int jloc=i+1;
                     if (sensitivity<0) jloc*=-1;
-                    if (phaseUi[k]->jump->value()<0) jloc*=-1;
+                    if (velocityUi[k]->jump->value()<0) jloc*=-1;
                     velJump_array[i][j] = (offset+fShot-fRef+jloc)*sensitivity/refr_index;
                 }
             }
@@ -962,21 +979,25 @@ void Visar::updatePlot() {
                     pen.setStyle(pstyle);
                     my_graph->setPen(pen);
                     if (my_graph->valueAxis()==plotVelocity->yAxis) {
-                        if (velocityUi[k]->interfringe->value() != 0.0) {
+                        if (settingsUi[k]->interfringe->value() != 0.0) {
                             my_graph->setData(time_vel[k],velocity[k]);
                         } else {
                             my_graph->data()->clear();
                         }
                     } else if (my_graph->valueAxis()==plotVelocity->yAxis2) {
-                        my_graph->setData(time_vel[k],reflectivity[k]);
+                        if (velocityUi[k]->plotR->isChecked()) {
+                            my_graph->setData(time_vel[k],reflectivity[k]);
+                        } else {
+                            my_graph->data()->clear();
+                        }
                     } else if (my_graph->valueAxis()==plotVelocity->yAxis3) {
-                        if (velocityUi[k]->interfringe->value() != 0.0) {
+                        if (settingsUi[k]->interfringe->value() != 0.0 && velocityUi[k]->plotQ->isChecked() ) {
                             my_graph->setData(time_vel[k],quality[k]);
                         } else {
                             my_graph->data()->clear();
                         }
                     }
-                    my_graph->setVisible(phaseUi[k]->enableVisar->isChecked());
+                    my_graph->setVisible(velocityUi[k]->enableVisar->isChecked());
                 }
             }
             for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
@@ -990,12 +1011,12 @@ void Visar::updatePlot() {
                     } else if (my_err->valueAxis() == plotVelocity->yAxis2) {
                         my_err->setData(reflError[k]);
                     }
-                    my_err->setVisible(phaseUi[k]->enableVisar->isChecked());
+                    my_err->setVisible(velocityUi[k]->enableVisar->isChecked());
                 }
             }
 
-            if (phaseUi[k]->jump->value()!=0) {
-                for (int i=0;i<abs(phaseUi[k]->jump->value());i++) {
+            if (velocityUi[k]->jump->value()!=0) {
+                for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
                     QCPGraph* graph = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
                     graph->setProperty("JumpGraph",k);
                     graph->setName("VelJump Visar"+QLocale().toString(k+1) + " #" +QLocale().toString(i));
@@ -1004,7 +1025,7 @@ void Visar::updatePlot() {
                     pen.setColor(color);
                     graph->setPen(pen);
                     graph->setData(time_vel[k],velJump_array[i]);
-                    graph->setVisible(phaseUi[k]->enableVisar->isChecked());
+                    graph->setVisible(velocityUi[k]->enableVisar->isChecked());
                 }
 
             }
@@ -1046,10 +1067,10 @@ void Visar::getCarrier(int k) {
     disconnections();
 
     QComboBox *combo=NULL;
-    if (velocityUi[k]->carrierPhys->currentIndex()==0) {
-        combo=velocityUi[k]->refImage;
+    if (settingsUi[k]->carrierPhys->currentIndex()==0) {
+        combo=settingsUi[k]->refImage;
     } else {
-        combo=velocityUi[k]->shotImage;
+        combo=settingsUi[k]->shotImage;
     }
 
     nPhysD *phys=getPhysFromCombo(combo);
@@ -1057,13 +1078,13 @@ void Visar::getCarrier(int k) {
         QRect geom2=fringeRect[k]->getRect(phys);
         nPhysD datamatrix = phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, velocityUi[k]->guessWeight->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, settingsUi[k]->guessWeight->value());
 
         if (vecCarr.first()==0) {
             statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
         } else {
-            velocityUi[k]->interfringe->setValue(vecCarr.first());
-            velocityUi[k]->angle->setValue(vecCarr.second());
+            settingsUi[k]->interfringe->setValue(vecCarr.first());
+            settingsUi[k]->angle->setValue(vecCarr.second());
             if (tabPhase->currentIndex()==k) {
                 statusbar->showMessage(tr("Carrier :")+QLocale().toString(vecCarr.first())+tr("px, ")+QLocale().toString(vecCarr.second())+tr("deg"));
             }
@@ -1086,7 +1107,7 @@ void Visar::doWave() {
 
 void Visar::doWave(int k) {
     disconnections();
-    std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
+    std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
     if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
         QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
@@ -1095,7 +1116,7 @@ void Visar::doWave(int k) {
         progress.setValue(0);
         progress.show();
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        sweepChanged(phaseUi[k]->physScale);
+        sweepChanged(settingsUi[k]->physScale);
 
         std::array<physC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
         progress.setValue(progress.value()+1);
@@ -1113,7 +1134,7 @@ void Visar::doWave(int k) {
             intensity[k][m]= imgs[m]->copy();
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            physMath::phys_fast_gaussian_blur(intensity[k][m], velocityUi[k]->resolution->value());
+            physMath::phys_fast_gaussian_blur(intensity[k][m], settingsUi[k]->resolution->value());
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             zz_morlet[m].resize(dim.x(),dim.y());
@@ -1129,12 +1150,12 @@ void Visar::doWave(int k) {
 
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        double cr = cos((velocityUi[k]->angle->value()) * _phys_deg);
-        double sr = sin((velocityUi[k]->angle->value()) * _phys_deg);
-        double thick_norm=velocityUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
+        double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
+        double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
+        double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
         const double damp_norm=M_PI;
 
-        double lambda_norm=velocityUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
+        double lambda_norm=settingsUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
         for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for collapse(2)
             for (size_t x=0;x<(size_t)dim.x();x++) {
@@ -1192,7 +1213,12 @@ void Visar::doWave(int k) {
         setProperty("NeuSave-VisarCounter",progress.value()+1);
 
     } else {
-        statusBar()->showMessage("size mismatch",5000);
+        if (imgs[0] && imgs[1]) {
+            DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW())
+        } else {
+            DEBUG("BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! ");
+        }
+        statusBar()->showMessage("Size mismatch",5000);
     }
 
     connections();
@@ -1214,8 +1240,8 @@ void Visar::getPhase(int k) {
     disconnections();
 
     if (k< (int) numVisars) {
-        velocityUi[k]->plotPhaseIntensity->clearGraphs();
-        std::array<nPhysD*,2> imgs={{getPhysFromCombo(velocityUi[k]->refImage),getPhysFromCombo(velocityUi[k]->shotImage)}};
+        settingsUi[k]->plotPhaseIntensity->clearGraphs();
+        std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
 
         if (imgs[0] && imgs[1] && imgs[0]->getSize() == imgs[1]->getSize()) {
 
@@ -1234,7 +1260,7 @@ void Visar::getPhase(int k) {
             cPhaseErr[k].clear();
             reflError[k].clear();
 
-            int refIntShift= velocityUi[k]->intensityShift->value();
+            int refIntShift= settingsUi[k]->intensityShift->value();
 
             for (int j=geom2.top(); j<geom2.bottom(); j++) {
                 time_phase[k]  << j;
@@ -1248,8 +1274,8 @@ void Visar::getPhase(int k) {
                 double meanPhaseTmp=0.0;
                 double meanRefle=0.0;
                 for (int i=geom2.left(); i<geom2.right();i++) {
-                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                    double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-settingsUi[k]->offRef->value())*settingsUi[k]->multRef->value();
+                    double intShot=intensity[k][1].point(i,j,0)-settingsUi[k]->offRef->value();
 
                     meanIntRef+=intRef;
                     meanIntShot+=intShot;
@@ -1271,7 +1297,7 @@ void Visar::getPhase(int k) {
                 meanPhaseTmp /= geom2.width();
                 cIntensity[0][k] << meanIntRef;
                 cIntensity[1][k] << meanIntShot;
-                cContrast[0][k]  << contrastTmpRef*velocityUi[k]->multRef->value();
+                cContrast[0][k]  << contrastTmpRef*settingsUi[k]->multRef->value();
                 cContrast[1][k]  << contrastTmpShot;
                 double sqrtTmpPhase=0.0;
                 double stdRefle=0.0;
@@ -1280,8 +1306,8 @@ void Visar::getPhase(int k) {
                     double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
                     sqrtTmpPhase += pow(dist,2);
 
-                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-velocityUi[k]->offRef->value())*velocityUi[k]->multRef->value();
-                    double intShot=intensity[k][1].point(i,j,0)-velocityUi[k]->offShot->value();
+                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-settingsUi[k]->offRef->value())*settingsUi[k]->multRef->value();
+                    double intShot=intensity[k][1].point(i,j,0)-settingsUi[k]->offRef->value();
 
                     stdRefle+=pow(intShot/intRef - meanRefle,2);
                 }
@@ -1314,7 +1340,7 @@ void Visar::getPhase(int k) {
                         offsetShift=cPhase[m][k].last();
                     }
                 }
-                phaseUi[k]->offset->setTitle("Offset "+QLocale().toString(offsetShift));
+                velocityUi[k]->offset->setTitle("Offset "+QLocale().toString(offsetShift));
                 for (int j=0;j<cPhase[m][k].size();j++){
                     if (direction(k)!=0) {		//fringes are vertical
                         cPhase[m][k][j] = offsetShift-cPhase[m][k][j];
@@ -1325,7 +1351,7 @@ void Visar::getPhase(int k) {
 
                 QPolygonF myLine;
                 for (int i=0;i<cPhase[m][k].size();i++){
-                    double posx=geom2.x()+geom2.width()/2.0+cPhase[m][k][i]*velocityUi[k]->interfringe->value();
+                    double posx=geom2.x()+geom2.width()/2.0+cPhase[m][k][i]*settingsUi[k]->interfringe->value();
                     double posy=time_phase[k][i];
                     if (direction(k)==0) {		//fringes are vertical
                         myLine << QPointF(posx,posy);
@@ -1339,10 +1365,10 @@ void Visar::getPhase(int k) {
                 QPen pen;
                 pen.setStyle((m==1?Qt::SolidLine : Qt::DashLine));
 
-                if (velocityUi[k]->interfringe->value() != 0.0) {
-                    graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
+                if (settingsUi[k]->interfringe->value() != 0.0) {
+                    graph = settingsUi[k]->plotPhaseIntensity->addGraph(settingsUi[k]->plotPhaseIntensity->xAxis, settingsUi[k]->plotPhaseIntensity->yAxis);
                     graph->setName("Phase Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
-                    pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis->labelColor());
+                    pen.setColor(settingsUi[k]->plotPhaseIntensity->yAxis->labelColor());
                     graph->setPen(pen);
                     graph->setData(time_phase[k],cPhase[m][k]);
                 }
@@ -1350,15 +1376,15 @@ void Visar::getPhase(int k) {
                 pen.setStyle((m==1?Qt::SolidLine : Qt::DashLine));
 
 
-                graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis2);
+                graph = settingsUi[k]->plotPhaseIntensity->addGraph(settingsUi[k]->plotPhaseIntensity->xAxis, settingsUi[k]->plotPhaseIntensity->yAxis2);
                 graph->setName("Intensity Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis2->labelColor());
+                pen.setColor(settingsUi[k]->plotPhaseIntensity->yAxis2->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cIntensity[m][k]);
 
-                graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis3);
+                graph = settingsUi[k]->plotPhaseIntensity->addGraph(settingsUi[k]->plotPhaseIntensity->xAxis, settingsUi[k]->plotPhaseIntensity->yAxis3);
                 graph->setName("Contrast Visar "+QLocale().toString(k+1) + " " + (m==0?"ref":"shot"));
-                pen.setColor(velocityUi[k]->plotPhaseIntensity->yAxis3->labelColor());
+                pen.setColor(settingsUi[k]->plotPhaseIntensity->yAxis3->labelColor());
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cContrast[m][k]);
             }
@@ -1368,15 +1394,15 @@ void Visar::getPhase(int k) {
                 cPhaseMod[k] << fmod(cPhase[1][k][j]-cPhase[0][k][j]+0.5,1.0)-0.5;
             }
             QCPGraph* graph;
-            graph = velocityUi[k]->plotPhaseIntensity->addGraph(velocityUi[k]->plotPhaseIntensity->xAxis, velocityUi[k]->plotPhaseIntensity->yAxis);
+            graph = settingsUi[k]->plotPhaseIntensity->addGraph(settingsUi[k]->plotPhaseIntensity->xAxis, settingsUi[k]->plotPhaseIntensity->yAxis);
             graph->setName("Phase Visar Modulo");
             graph->setPen(QPen(Qt::lightGray));
             graph->setData(time_phase[k],cPhaseMod[k]);
 #endif
 
 
-            velocityUi[k]->plotPhaseIntensity->rescaleAxes();
-            velocityUi[k]->plotPhaseIntensity->replot();
+            settingsUi[k]->plotPhaseIntensity->rescaleAxes();
+            settingsUi[k]->plotPhaseIntensity->replot();
         }
     }
     connections();
@@ -1468,6 +1494,7 @@ QString Visar::export_sop() {
     QString out;
     out += QString("#SOP Origin       : %L1\n").arg(sopOrigin->value());
     out += QString("#SOP Offset       : %L1\n").arg(sopTimeOffset->value());
+    out += QString("#Center & magnif. : %L1 %L2\n").arg(physOriginSpace->value()).arg(magnification->value());
     out += QString("#SOP Time scale   : %L1\n").arg(sopScale->text());
     out += QString("#SOP Direction    : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
     out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
@@ -1488,14 +1515,15 @@ QString Visar::export_sop() {
 QString Visar::export_one(unsigned int k) {
     QString out;
     if (k<numVisars) {
-        if (phaseUi[k]->enableVisar->isChecked()) {
+        if (velocityUi[k]->enableVisar->isChecked()) {
             out += "#VISAR " + QLocale().toString(k+1) + "\n";
-            out += QString("#Offset shift       : %L1\n").arg(phaseUi[k]->offsetShift->value());
-            out += QString("#Sensitivity        : %L1\n").arg(phaseUi[k]->sensitivity->value());
-            out += QString("#Reflectivity       : %L1 %L2\n").arg(phaseUi[k]->reflOffset->value()).arg(phaseUi[k]->reflRef->value());
-            out += QString("#Sweep Time         : %L1\n").arg(phaseUi[k]->physScale->text());
-            out += QString("#Time zero & delay  : %L1 %L2\n").arg(phaseUi[k]->physOrigin->value()).arg(phaseUi[k]->offsetTime->value());
-            out += QString("#Jumps              : %L1\n").arg(phaseUi[k]->jumpst->text());
+            out += QString("#Offset shift       : %L1\n").arg(velocityUi[k]->offsetShift->value());
+            out += QString("#Sensitivity        : %L1\n").arg(settingsUi[k]->sensitivity->value());
+            out += QString("#Reflectivity       : %L1 %L2\n").arg(velocityUi[k]->reflOffset->value()).arg(velocityUi[k]->reflRef->value());
+            out += QString("#Sweep Time         : %L1\n").arg(settingsUi[k]->physScale->text());
+            out += QString("#Time zero & delay  : %L1 %L2\n").arg(velocityUi[k]->physOrigin->value()).arg(velocityUi[k]->offsetTime->value());
+            out += QString("#Center & magnif.   : %L1 %L2\n").arg(settingsUi[k]->physOriginSpace->value()).arg(settingsUi[k]->magnification->value());
+            out += QString("#Jumps              : %L1\n").arg(velocityUi[k]->jumpst->text());
             out += QString("# Time       Velocity    ErrVel      Reflect     ErrRefl     Quality     Pixel       RefShift    ShotShift   ErrShift    RefInt      ShotInt     RefContr    ShotContr.\n");
             for (int j=0;j<time_phase[k].size();j++) {
                 QVector<double> values {time_vel[k][j],velocity[k][j], velError[k][j],

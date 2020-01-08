@@ -135,7 +135,7 @@ void Wavelet::doWavelet () {
     setEnabled(false);
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
-		QTime timer;
+        QElapsedTimer timer;
 		timer.start();
 
 		saveDefaults();
@@ -218,9 +218,9 @@ void Wavelet::doWavelet () {
         
         for(auto &itr: waveletPhys) {
             if (itr.first=="phase_2pi") {
-                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(qVariantFromValue((void*)(itr.second))));
+                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(QVariant::fromValue(itr.second)));
             } else if (itr.first=="contrast") {
-                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(qVariantFromValue((void*)(itr.second))));
+                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(QVariant::fromValue(itr.second)));
             }
         }
         
@@ -244,8 +244,7 @@ void Wavelet::doWavelet () {
             }
         }
         
-        QString status_bar_measure;
-        status_bar_measure.sprintf("%.2f sec, %.2f Mpx/s",1.0e-3*timer.elapsed(), 1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed());
+        QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
         my_w.statusbar->showMessage(out+status_bar_measure, 50000);
         DEBUG(status_bar_measure.toStdString());
     } else {
@@ -263,7 +262,7 @@ void Wavelet::doUnwrap () {
     physD *qual=static_cast<physD*>(getPhysFromCombo(my_w.qualityUnwrap));
 	nPhysD barrierPhys;
 	
-	QTime timer;
+    QElapsedTimer timer;
 	timer.start();
 
 	if (qual && phase) {
@@ -332,12 +331,10 @@ void Wavelet::doUnwrap () {
             unwrapPhys=new nPhysD(uphase);
             nparent->addShowPhys(unwrapPhys);
         }
-        my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(qVariantFromValue((void*)unwrapPhys)));
+        my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(QVariant::fromValue(unwrapPhys)));
 
 	}
-	QString out;
-	out.sprintf("%d msec",timer.elapsed());
-	my_w.statusbar->showMessage(out);
+    my_w.statusbar->showMessage(QString("%1 msec").arg(timer.elapsed()));
 }
 
 void Wavelet::doAll () {
