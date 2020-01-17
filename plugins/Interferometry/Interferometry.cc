@@ -359,7 +359,7 @@ void Interferometry::doUnwrap () {
         physD *phase = static_cast<physD*>(localPhys["phase_2pi_wrap"]);
         physD *qual = static_cast<physD*>(localPhys["phase_quality"]);
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 
         qDebug() << "here";
@@ -746,7 +746,7 @@ void Interferometry::saveSettings(QSettings &settings){
     settings.beginGroup("localPhys");
     for(std::map<std::string, nPhysD *>::iterator itr = localPhys.begin(); itr != localPhys.end(); ++itr) {
         //        qDebug() << itr->first;
-        if (itr->second && nparent->getBufferList().contains(itr->second)) {
+        if (itr->second && nPhysExists(itr->second)) {
             QStringList value;
             value << QString::fromStdString(itr->second->getShortName()) << QString::fromStdString(itr->second->getName());
             settings.setValue(QString::fromStdString(itr->first), value);

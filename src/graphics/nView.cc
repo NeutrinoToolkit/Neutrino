@@ -160,6 +160,7 @@ void nView::updatePhys() {
 }
 
 void nView::showPhys(nPhysD *my_phys) {
+    DEBUG("ENTER")
     if (my_phys) {
         if (!physList.contains(my_phys)) physList << my_phys;
 
@@ -192,6 +193,7 @@ void nView::showPhys(nPhysD *my_phys) {
             QApplication::processEvents();
         }
     }
+    DEBUG("EXIT")
 }
 
 void

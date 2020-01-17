@@ -84,7 +84,8 @@ private:
     QList<nGenericPan*> panList;
 
 public slots:
-    inline int indexOf(nPhysD* my_phys){return (my_w->my_view ? my_w->my_view->physList.indexOf(my_phys) : -1);};
+    inline bool nPhysExists(nPhysD* my_phys) {return my_w->my_view->physList.contains(my_phys);}
+    inline int indexOf(nPhysD* my_phys){return my_w->my_view->physList.indexOf(my_phys);}
 
     void setGamma(int value);
 
@@ -115,6 +116,9 @@ public slots:
 
     void scanDir(QString dirpath, QString pattern);
     void on_actionOpen_Glob_triggered();
+    void on_actionClose_All_Buffers_triggered();
+    void closeCurrentBuffer();
+    void closeBuffer(nPhysD*);
 
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
@@ -146,7 +150,6 @@ public slots:
     void fileSave(nPhysD*);
     void fileSave(QString);
     void fileSave(nPhysD*,QString);
-    void closeCurrentBuffer();
     bool fileClose();
     //	void file_quit_slot();
 

@@ -311,14 +311,14 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
 void nCustomPlot::showGraph(bool val) {
     if (sender()) {
         if (sender()->property("graph").isValid()){
-            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<QCPGraph *>();
             if(hasPlottable(graph)) {
                 graph->setVisible(val);
                 replot();
             }
         }
         if (sender()->property("errbar").isValid()){
-            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<void *>();
+            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<QCPErrorBars *>();
             if(hasPlottable(errbar)) {
                 errbar->setVisible(val);
                 replot();
@@ -330,7 +330,7 @@ void nCustomPlot::showGraph(bool val) {
 void nCustomPlot::changeGraphThickness(double val) {
     if (sender()) {
         if (sender()->property("graph").isValid()){
-            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<void *>();
+            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<QCPGraph *>();
             if(hasPlottable(graph)) {
                 QPen p=graph->pen();
                 p.setWidthF(val);
@@ -339,7 +339,7 @@ void nCustomPlot::changeGraphThickness(double val) {
             }
         }
         if (sender()->property("errbar").isValid()){
-            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<void *>();
+            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<QCPErrorBars *>();
             if(hasPlottable(errbar)) {
                 QPen p=errbar->pen();
                 p.setWidthF(val);
@@ -353,7 +353,7 @@ void nCustomPlot::changeGraphThickness(double val) {
 
 void nCustomPlot::showAxis(bool val) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
         if (axis) {
             axis->setVisible(val);
             replot();
@@ -490,7 +490,7 @@ void nCustomPlot::changeTitleFont() {
 
 void nCustomPlot::changeAxisFont() {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
         if (axis) {
             bool ok;
             QFont myfont = QFontDialog::getFont(&ok, axis->labelFont(), this, axis->label()+" Font");
@@ -505,7 +505,7 @@ void nCustomPlot::changeAxisFont() {
 
 void nCustomPlot::showGrid(int val) {
     if (sender() && sender()->property("grid").isValid()) {
-        QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<void *>();
+        QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<QCPAxis *>();
         if (grid) {
             switch (val) {
                 case Qt::Unchecked:
@@ -530,7 +530,7 @@ void nCustomPlot::showGrid(int val) {
 
 void nCustomPlot::setLog(bool val) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
         if (axis) {
             axis->setScaleType(val?QCPAxis::stLogarithmic:QCPAxis::stLinear);
             replot();
@@ -540,7 +540,7 @@ void nCustomPlot::setLog(bool val) {
 
 void nCustomPlot::setLabel(QString name) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<void *>();
+        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
         if (axis) {
             axis->setLabel(name);
             replot();
@@ -552,7 +552,7 @@ void nCustomPlot::setColor() {
     if (sender() && sender()->property("axis").isValid()) {
         QAbstractButton *tb = qobject_cast<QAbstractButton *>(sender());
         if(tb) {
-            QCPAxis *axis = (QCPAxis *) tb->property("axis").value<void *>();
+            QCPAxis *axis = (QCPAxis *) tb->property("axis").value<QCPAxis *>();
             if (axis) {
                 QColorDialog colordial(axis->labelColor(),this);
                 colordial.setOption(QColorDialog::ShowAlphaChannel);

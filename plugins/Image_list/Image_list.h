@@ -49,11 +49,12 @@ public:
     bool freezedFrame;
     vec2f frScale, frOrigin;
 
+    std::map<nPhysD*,QTreeWidgetItem*> itemsMap;
 
 public slots:
     void selectionChanged();
 
-    void updatePad(nPhysD* = NULL);
+    void updatePad(nPhysD* = nullptr);
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
     void buttonRemovePhys();
@@ -66,7 +67,6 @@ public slots:
     void originChanged();
 
     void keyPressEvent(QKeyEvent *);
-
 };
 
 NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I, -100);

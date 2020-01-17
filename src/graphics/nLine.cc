@@ -206,7 +206,7 @@ QPolygonF nLine::getPoints() {
 }
 
 void nLine::bufferChanged(nPhysD* my_phys) {    
-	if (my_phys) {
+    if (nparent->nPhysExists(my_phys)) {
 		// qui si definisce la posizione dell'origine (quindi non deve dipendere dalla scala)
 		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
 	} else {

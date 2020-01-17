@@ -29,14 +29,10 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
 {
     my_w.setupUi(this);
 
-    // qt4.8->qt5.5
-    // QHeaderView::resizeMode -> ::sectionResizeMode
     my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
     my_w.images->header()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
-
-    my_w.images->setColumnHidden((my_w.images->columnCount()-1),true);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
@@ -68,10 +64,12 @@ void Image_list::selectionChanged() {
         QTreeWidgetItem *item=sel.last();
         if (item) {
             nPhysD *phys=getPhys(item);
-            if (phys) {
+            if (nPhysExists(phys)) {
                 disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
                 nparent->showPhys(phys);
                 connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+            } else {
+                delete item;
             }
         }
     }
@@ -79,9 +77,10 @@ void Image_list::selectionChanged() {
 
 nPhysD*
 Image_list::getPhys(QTreeWidgetItem* item) {
-    nPhysD *retphys=(nPhysD*) (item->data((my_w.images->columnCount()-1),0).value<nPhysD*>());
-    //	retphys->property.dumper(std::cerr);
-    return retphys;
+    for (auto & my_key : itemsMap) {
+        if(my_key.second == item) return my_key.first;
+    }
+    return nullptr;
 }
 
 void
@@ -98,8 +97,7 @@ Image_list::buttonRemovePhys() {
     disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-    QList<QTreeWidgetItem*> my_sel= my_w.images->selectedItems();
-    foreach (QTreeWidgetItem * item, my_sel) {
+    foreach (QTreeWidgetItem * item, my_w.images->selectedItems()) {
         nPhysD *phys=getPhys(item);
         if (phys) {
             delete item;
@@ -139,21 +137,10 @@ Image_list::changeProperties() {
             text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(1,0).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
-                    item->setData(1,0,text);
+                    item->setData(0,0,text);
                 }
                 foreach (nPhysD* phys, physSelected) {
                     phys->setShortName(text.toStdString());
-                    nparent->emitBufferChanged(phys);
-                }
-            }
-        } else if (sender()==my_w.actionName) {
-            text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(2,0).toString(), &ok);
-            if (ok && !text.isEmpty()) {
-                foreach (QTreeWidgetItem* item, itemsSelected) {
-                    item->setData(2,0,text);
-                }
-                foreach (nPhysD* phys, physSelected) {
-                    phys->setName(text.toStdString());
                     nparent->emitBufferChanged(phys);
                 }
             }
@@ -176,7 +163,7 @@ Image_list::changeProperties() {
                         }
                         nparent->my_w->my_view->update();
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(3,0,lista.at(0)+" "+lista.at(1));
+                            item->setData(1,0,lista.at(0)+" "+lista.at(1));
                         }
                     }
                 }
@@ -202,7 +189,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(4,0,lista.at(0));
+                            item->setData(2,0,lista.at(0));
                         }
                         nparent->my_w->my_view->update();
                     }
@@ -220,7 +207,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(4,0,lista.at(0)+" "+lista.at(1));
+                            item->setData(2,0,lista.at(0)+" "+lista.at(1));
                         }
                         nparent->my_w->my_view->update();
                     }
@@ -228,6 +215,17 @@ Image_list::changeProperties() {
                 }
                 default:
                     break;
+                }
+            }
+        } else if (sender()==my_w.actionName) {
+            text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(2,0).toString(), &ok);
+            if (ok && !text.isEmpty()) {
+                foreach (QTreeWidgetItem* item, itemsSelected) {
+                    item->setData(3,0,text);
+                }
+                foreach (nPhysD* phys, physSelected) {
+                    phys->setName(text.toStdString());
+                    nparent->emitBufferChanged(phys);
                 }
             }
         } else if (sender()==my_w.actionRescale) {
@@ -276,77 +274,52 @@ void Image_list::keyPressEvent(QKeyEvent *e){
 
 void
 Image_list::updatePad(nPhysD *my_phys) {
-    QApplication::processEvents();
-    if (my_phys==nullptr) {
-        my_phys=currentBuffer;
+    disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    QTreeWidgetItem* it=itemsMap[my_phys];
+    if (!it) {
+        it=new QTreeWidgetItem(my_w.images);
+        itemsMap[my_phys]=it;
     }
-    QTreeWidgetItemIterator it(my_w.images);
-    while (*it) {
-        nPhysD *thisPhys=getPhys(*it);
-        if (thisPhys) {
-            (*it)->setData(0,0,nparent->getBufferList().indexOf(thisPhys));
-            (*it)->setData(1,0,QString::fromUtf8(thisPhys->getShortName().c_str()));
-            (*it)->setData(2,0,QString::fromUtf8(thisPhys->getName().c_str()));
-            (*it)->setData(3,0,QLocale().toString(thisPhys->get_origin().x())+" "+QLocale().toString(thisPhys->get_origin().y()));
-            if (thisPhys->get_scale().x()==thisPhys->get_scale().y()) {
-                (*it)->setData(4,0,QLocale().toString(thisPhys->get_scale().x()));
-            } else {
-                (*it)->setData(4,0,QLocale().toString(thisPhys->get_scale().x())+" "+QLocale().toString(thisPhys->get_scale().y()));
-            }
-            if (thisPhys==my_phys) {
-                (*it)->setSelected(true);
-            } else {
-                (*it)->setSelected(false);
-            }
+    if (nPhysExists(my_phys) && it) {
+        it->setData(0,0,QString::fromUtf8(my_phys->getShortName().c_str()));
+        if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
+            it->setData(1,0,QLocale().toString(my_phys->get_scale().x()));
         } else {
-            WARNING("This should not happend");
+            it->setData(1,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
         }
-        ++it;
+        it->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
+        it->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
+        if (nPhysExists(my_phys)) {
+            my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
+            my_w.lineEdit->setCursorPosition(0);
+        }
     }
-    if (my_phys) {
-        my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
-        my_w.lineEdit->setCursorPosition(0);
-    } else {
-        my_w.lineEdit->setText(tr("No image"));
+    for (auto & my_key : itemsMap) {
+        my_key.second->setSelected(my_key.first == my_phys);
     }
+    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
 
 void
 Image_list::physDel(nPhysD *my_phys) {
-    QTreeWidgetItemIterator it(my_w.images);
-    while (*it) {
-        if (getPhys(*it)==my_phys) delete (*it);
-        ++it;
+    DEBUG(">> enter");
+    qDebug() << itemsMap[my_phys];
+    delete itemsMap[my_phys];
+    itemsMap.erase(my_phys);
+    if (itemsMap.size() == 0) {
+        my_w.lineEdit->setText(tr("No image"));
     }
-    updatePad();
-    QApplication::processEvents();
+    DEBUG(">> exit");
 }
 
 /// new image entry point
 void Image_list::physAdd(nPhysD *my_phys) {
-    QTreeWidgetItem *my_item = new QTreeWidgetItem(my_w.images);
-
     if (freezedFrame) {
         my_phys->set_scale(frScale);
         my_phys->set_origin(frOrigin);
     }
-
-    QString name=QString::fromUtf8(my_phys->getName().c_str());
-    my_item->setData(0,0,nparent->getBufferList().indexOf(my_phys));
-    my_item->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
-    my_item->setData(2,0,QString::fromUtf8(my_phys->getName().c_str()));
-    my_item->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
-
-    if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
-        my_item->setData(4,0,QLocale().toString(my_phys->get_scale().x()));
-    } else {
-        my_item->setData(4,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
-    }
-
-    my_item->setData((my_w.images->columnCount()-1),0,QVariant::fromValue(my_phys));
-    my_w.images->sortItems(0,Qt::AscendingOrder);
-    updatePad();
+    updatePad(my_phys);
 }
 
 

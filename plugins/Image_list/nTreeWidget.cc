@@ -68,8 +68,12 @@ void nTreeWidget::mouseReleaseEvent(QMouseEvent *e) {
         if (e->modifiers() == Qt::NoModifier) {
             QTreeWidgetItem *item=itemAt(e->pos());
             if (item) {
-                nPhysD *phys=(nPhysD*) (item->data(columnCount()-1,Qt::DisplayRole).value<nPhysD*>());
-                nparent->showPhys(phys);
+                nPhysD *phys=item->data(columnCount()-1,Qt::DisplayRole).value<nPhysD*>();
+                if (nparent->nPhysExists(phys)) {
+                    nparent->showPhys(phys);
+                } else {
+                    delete item;
+                }
             }
         }
     }

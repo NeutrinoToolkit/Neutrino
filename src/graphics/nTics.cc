@@ -93,7 +93,7 @@ void nTics::changeTicsColor() {
 
 void
 nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
-    if (my_view->currentBuffer) {
+    if (my_view->currentBuffer  && my_view->physList.contains(my_view->currentBuffer)) {
         // enable this for testing
 #ifdef __phys_debug
         p->drawRect(boundingRect());

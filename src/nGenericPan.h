@@ -69,9 +69,9 @@ class nGenericPan : public QMainWindow {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE nGenericPan(){};
+    Q_INVOKABLE nGenericPan(){}
     Q_INVOKABLE nGenericPan(neutrino *);
-    ~nGenericPan(){};
+    ~nGenericPan() override {}
 
     QPointer<neutrino> nparent;
     QPointer<nApp> napp;

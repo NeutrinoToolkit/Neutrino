@@ -9,14 +9,12 @@ class nPhysD : public physD {
   public:
 
     using physD::physD;
-    using physD::setName;
-
 
     nPhysD(physD in=physD()): physD(in) {
         qDebug() << "------------------------------------------------------------ CREATE "<< copies();
     }
 
-    ~nPhysD(){
+    virtual ~nPhysD(){
         qDebug() << "------------------------------------------------------------ DELETE "<< copies();
     }
 
@@ -50,7 +48,7 @@ class nPhysD : public physD {
                 vec2f new_display_range=prop["display_range"];
 
                 if (old_display_range==new_display_range) {
-                    DEBUG("reusing old uchar_buf");
+                    DEBUG("reusing old uchar_buf")
                     return &uchar_buf[0];
                 }
             }
@@ -84,7 +82,7 @@ class nPhysD : public physD {
     inline void reset_display() {
         display_prop.clear();
         uchar_buf.clear();
-        DEBUG(uchar_buf.capacity());
+        DEBUG(uchar_buf.capacity())
     }
 
     void TscanBrightness() {

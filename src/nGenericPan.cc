@@ -320,8 +320,8 @@ void nGenericPan::show(bool onlyOneAllowed) {
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {
-    DEBUG(">>>>>enter");
-    currentBuffer=nullptr;
+    DEBUG(panName().toStdString() <<  " >>>>> enter");
+//    currentBuffer=nullptr;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
@@ -329,27 +329,27 @@ void nGenericPan::physDel(nPhysD * buffer) {
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
             int position=combo->findData(QVariant::fromValue(buffer));
-            QApplication::processEvents();
+//            QApplication::processEvents();
             combo->removeItem(position);
-            QApplication::processEvents();
+//            QApplication::processEvents();
             if (combo->property("neutrinoImage").toBool()) {
                 connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
         }
     }
-    QApplication::processEvents();
-    DEBUG(">>>>>exit");
+//    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    DEBUG(panName().toStdString() << " >>>>> exit");
 }
 
-void nGenericPan::bufferChanged(nPhysD * buffer)
+void nGenericPan::bufferChanged(nPhysD * my_phys)
 {
-    qDebug() << "here" << buffer;
-    if (buffer) {
-        DEBUG(buffer->getFromName());
+    qDebug() << panName() << "here" << my_phys;
+    if (nPhysExists(my_phys)) {
+        DEBUG(my_phys->getFromName());
     }
-    currentBuffer = buffer;
-    qDebug() << "here" ;
+    currentBuffer = my_phys;
+    qDebug() << panName() << "here" ;
 }
 
 void nGenericPan::showMessage(QString message) {
@@ -550,7 +550,7 @@ nGenericPan::saveUi(QSettings &settings) {
         if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
             for (int i=0; i< widget->count(); i++) {
                 nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<nPhysD*>());
-                if (nparent && nparent->my_w->my_view->physList.contains(phys)) {
+                if (nparent && nparent->nPhysExists(phys)) {
                     settings.setValue(widget->objectName(),QString::fromUtf8(phys->getName().c_str()));
                     settings.setValue(widget->objectName()+"-From",QString::fromUtf8(phys->getFromName().c_str()));
                 }

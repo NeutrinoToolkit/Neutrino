@@ -170,7 +170,7 @@ QRectF nObject::getRectF() {
 }
 
 void nObject::bufferChanged(nPhysD* my_phys) {
-	if (my_phys) {
+    if (nparent->getBufferList().contains(my_phys)) {
 		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
 	} else {
 		setPos(0,0);
