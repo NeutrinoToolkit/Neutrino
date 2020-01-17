@@ -15,7 +15,6 @@
 /*!
  You can create or get nPhysD as well applyin some filter
 */
-Q_DECLARE_METATYPE(nPhysD*);
 
 class nPhysPyWrapper : public QObject {
     Q_OBJECT
