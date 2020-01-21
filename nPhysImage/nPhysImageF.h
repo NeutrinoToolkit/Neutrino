@@ -1557,10 +1557,11 @@ template<class T> inline bidimvec<T> nPhysImageF<T>::get_min_max() {
 
 using physC = nPhysImageF<mcomplex>;
 
-using nMapD = std::map<std::string, nPhysImageF<double> >;
-
-
 using physD = nPhysImageF<double>;
+
+using nMapD = std::map<std::string, physD >;
+
+
 
 
 

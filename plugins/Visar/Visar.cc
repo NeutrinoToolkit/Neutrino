@@ -213,6 +213,7 @@ void Visar::addVisar() {
     //    connect(,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
 
     phase.push_back({{nPhysD(),nPhysD()}});
+    phaseUnwrap.push_back(nPhysD());
 
     contrast.push_back({{nPhysD(),nPhysD()}});
     intensity.push_back({{nPhysD(),nPhysD()}});
@@ -264,9 +265,6 @@ void Visar::addVisar() {
         cContrast[m].push_back(QVector<double>());
     }
     cPhaseErr.push_back(QVector<double>());
-#ifdef __phys_debug
-    cPhaseMod.push_back(QVector<double>());
-#endif
 
     QCPGraph* graph;
     QPen pen;
@@ -348,6 +346,8 @@ void Visar::delVisar() {
         velocityUi.pop_back();
 
         phase.pop_back();
+        phaseUnwrap.pop_back();
+
         contrast.pop_back();
         intensity.pop_back();
 
@@ -369,9 +369,6 @@ void Visar::delVisar() {
             cContrast[m].pop_back();
         }
         cPhaseErr.pop_back();
-#ifdef __phys_debug
-        cPhaseMod.pop_back();
-#endif
 
         QList<QCPAbstractPlottable *> listplottable;
         for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
@@ -843,6 +840,14 @@ void Visar::updatePlotSOP() {
 void Visar::updatePlot() {
     disconnections();
 
+    bool needReflectivityAxe=false;
+    bool needQualityAxe=false;
+    for (unsigned int k=0;k<numVisars;k++){
+        if (velocityUi[k]->plotR->isChecked()) needReflectivityAxe=true;
+        if (velocityUi[k]->plotQ->isChecked()) needQualityAxe=true;
+    }
+    plotVelocity->yAxis2->setVisible(needReflectivityAxe);
+    plotVelocity->yAxis3->setVisible(needQualityAxe);
 
     plotVelocity->clearItems();
 
@@ -959,7 +964,7 @@ void Visar::updatePlot() {
                 velocity[k][j] = speed;
                 reflectivity[k][j] = refle;
                 quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
-                velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
+                velError[k][j] = 2.0*abs(cPhaseErr[k][j]*sensitivity/refr_index);
 
                 for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
                     int jloc=i+1;
@@ -1201,6 +1206,14 @@ void Visar::doWave(int k) {
         }
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+//unwrap
+        physD diff= phase[k][1]-phase[k][0];
+        physD qual= contrast[k][0]*contrast[k][1];
+        physWave::phys_phase_unwrap(diff, qual, physWave::QUALITY, phaseUnwrap[k]);
+//        nparent->addShowPhys(new nPhysD(phaseUnwrap[k]));
+
+        progress.setValue(progress.value()+1);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
         getPhase(k);
 
@@ -1284,7 +1297,7 @@ void Visar::getPhase(int k) {
 
                     contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
                     contrastTmpShot+=contrast[k][1].point(i,j,0);
-                    meanPhaseTmp += abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j),1));
+                    meanPhaseTmp += phaseUnwrap[k].point(i,j);
                 }
 
 
@@ -1299,19 +1312,17 @@ void Visar::getPhase(int k) {
                 cIntensity[1][k] << meanIntShot;
                 cContrast[0][k]  << contrastTmpRef*settingsUi[k]->multRef->value();
                 cContrast[1][k]  << contrastTmpShot;
-                double sqrtTmpPhase=0.0;
+                double sqrTmpPhase=0.0;
                 double stdRefle=0.0;
                 for (int i=geom2.left(); i<geom2.right();i++) {
-                    double rem=abs(remainder(phase[k][0].point(i,j)-phase[k][1].point(i,j)+1,1));
-                    double dist=std::min(rem-meanPhaseTmp,meanPhaseTmp-rem);
-                    sqrtTmpPhase += pow(dist,2);
+                    sqrTmpPhase += pow(phaseUnwrap[k].point(i,j)-meanPhaseTmp,2);
 
                     double intRef=(intensity[k][0].point(i,j-refIntShift,0)-settingsUi[k]->offRef->value())*settingsUi[k]->multRef->value();
                     double intShot=intensity[k][1].point(i,j,0)-settingsUi[k]->offRef->value();
 
                     stdRefle+=pow(intShot/intRef - meanRefle,2);
                 }
-                cPhaseErr[k] << 2.0*sqrt(sqrtTmpPhase/geom2.width());
+                cPhaseErr[k] << sqrt(sqrTmpPhase/geom2.width());
 
                 reflError[k] << sqrt(stdRefle / geom2.width());
 
@@ -1388,18 +1399,6 @@ void Visar::getPhase(int k) {
                 graph->setPen(pen);
                 graph->setData(time_phase[k],cContrast[m][k]);
             }
-#ifdef __phys_debug
-            cPhaseMod[k].clear();
-            for (int j=0;j<cPhase[1][k].size();j++){
-                cPhaseMod[k] << fmod(cPhase[1][k][j]-cPhase[0][k][j]+0.5,1.0)-0.5;
-            }
-            QCPGraph* graph;
-            graph = settingsUi[k]->plotPhaseIntensity->addGraph(settingsUi[k]->plotPhaseIntensity->xAxis, settingsUi[k]->plotPhaseIntensity->yAxis);
-            graph->setName("Phase Visar Modulo");
-            graph->setPen(QPen(Qt::lightGray));
-            graph->setData(time_phase[k],cPhaseMod[k]);
-#endif
-
 
             settingsUi[k]->plotPhaseIntensity->rescaleAxes();
             settingsUi[k]->plotPhaseIntensity->replot();

@@ -916,8 +916,8 @@ void physWave::phys_phase_unwrap(physD &wphase, physD &quality, enum unwrap_stra
     }
 }
 
-nPhysImageF<double> physWave::phys_synthetic_interferogram (nPhysImageF<double> *phase_over_2pi, nPhysImageF<double> *quality){
-    nPhysImageF<double> synthetic;
+physD physWave::phys_synthetic_interferogram (physD *phase_over_2pi, physD *quality){
+    physD synthetic;
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());

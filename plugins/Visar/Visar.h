@@ -94,10 +94,7 @@ private:
 
     unsigned int numVisars;
 
-    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // indices = 1st: ref/shot. 2nd: numVisar. 3rd: time
-#ifdef __phys_debug
-    std::vector<QVector<double>> cPhaseMod;
-#endif
+    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // indices = 1st:numVisar. 2nd:ref/shot. 3rd:time
     std::vector<QVector<double>> time_phase;
     std::vector<QVector<double>> cPhaseErr;
 
@@ -107,6 +104,7 @@ private:
     QVector<double> time_sop;
 
     std::vector<std::array<nPhysD,2>> phase;
+    std::vector<nPhysD> phaseUnwrap;
 
     std::vector<std::array<nPhysD,2>> contrast;
     std::vector<std::array<nPhysD,2>> intensity;
