@@ -1018,7 +1018,7 @@ physWave::phys_apply_inversion_plasma(physD &invimage, double probe_wl, double r
     DEBUG(5,"resolution: "<< res << ", probe: " << probe_wl << ", mult: " << mult);
     for (size_t ii=0; ii<invimage.getSurf(); ii++) {
         double the_point = invimage.point(ii)/res;
-        invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
+        invimage.set(ii, - mult * (2*kappa*the_point));
     }
     invimage.prop["unitsCB"]="m-3";
     invimage.TscanBrightness();
