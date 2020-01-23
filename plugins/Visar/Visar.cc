@@ -85,10 +85,6 @@ nSOPPlot::nSOPPlot(QWidget* parent):
     graph->setName("SOP 2");
     graph->setPen(QPen(yAxis2->labelColor(),0.3));
 
-    graph = addGraph(xAxis, yAxis2);
-    graph->setName("SOP 3");
-    graph->setPen(QPen(yAxis2->labelColor(),0.7));
-
 };
 
 
@@ -760,21 +756,20 @@ void Visar::updatePlotSOP() {
         QVector<int> reflList;
         setProperty("NeuSave-whichRefl",whichRefl->currentIndex());
         switch (whichRefl->currentIndex()) {
-            case 0:
+            case 0: // Zero
                 break;
-            case 1:
+            case 1: // mean
                 for (unsigned int i=0; i<numVisars; i++) {
                     reflList << i;
                 }
                 break;
-            default:
+            default: // single refl
                 reflList << whichRefl->currentIndex()-2;
                 break;
         }
 
         sopCurve[1].resize(time_sop.size());
         sopCurve[2].resize(time_sop.size());
-        sopCurve[3].resize(time_sop.size());
 
         double my_T0=sopCalibT0->value();
         double my_A=sopCalibA->value();
@@ -818,18 +813,15 @@ void Visar::updatePlotSOP() {
             if (numrefl) {
                 sopCurve[1][i]=my_temp;
                 sopCurve[2][i]=0.0;
-                sopCurve[3][i]=my_velocity;
             } else {
                 sopCurve[1][i]=0.0;
                 sopCurve[2][i]=my_temp;
-                sopCurve[3][i]=0.0;
             }
         }
+
         sopPlot->graph(1)->setData(time_sop,sopCurve[1]);
 
         sopPlot->graph(2)->setData(time_sop,sopCurve[2]);
-
-        sopPlot->graph(3)->setData(time_sop,sopCurve[3]);
 
         sopPlot->rescaleAxes();
         sopPlot->replot();
@@ -1210,7 +1202,6 @@ void Visar::doWave(int k) {
         physD diff= phase[k][1]-phase[k][0];
         physD qual= contrast[k][0]*contrast[k][1];
         physWave::phys_phase_unwrap(diff, qual, physWave::QUALITY, phaseUnwrap[k]);
-//        nparent->addShowPhys(new nPhysD(phaseUnwrap[k]));
 
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1323,7 +1314,6 @@ void Visar::getPhase(int k) {
                     stdRefle+=pow(intShot/intRef - meanRefle,2);
                 }
                 cPhaseErr[k] << sqrt(sqrTmpPhase/geom2.width());
-
                 reflError[k] << sqrt(stdRefle / geom2.width());
 
             }

@@ -100,7 +100,7 @@ private:
 
     std::vector<QVector<double>> velocity, velError, reflectivity, reflError, quality, time_vel;
 
-    std::array<QVector<double>,4> sopCurve;
+    std::array<QVector<double>,3> sopCurve;
     QVector<double> time_sop;
 
     std::vector<std::array<nPhysD,2>> phase;
