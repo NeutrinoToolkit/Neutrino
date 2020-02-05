@@ -35,15 +35,6 @@ int nApp::exec() {
     QCoreApplication::setApplicationName("Neutrino");
     QCoreApplication::setApplicationVersion(__VER);
 
-#if defined(Q_OS_MAC)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-#endif
-
     changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
     if (!my_set.contains("checkUpdates")) {
@@ -192,7 +183,7 @@ void nApp::addPaletteFile(QString cmapfile) {
                     }
                     iter++;
                 }
-            }            
+            }
             qDebug() << "Adding colormap" << cmapfile;
             inputFile.close();
         }

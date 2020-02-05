@@ -1013,12 +1013,13 @@ physWave::phys_apply_inversion_gas(physD &invimage, double probe_wl, double res,
 void
 physWave::phys_apply_inversion_plasma(physD &invimage, double probe_wl, double res)
 {
-    double kappa = 2*M_PI/probe_wl;
-    double mult = _phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
+    double kappa = 2*M_PI/probe_wl; // unit: 1/m
+    double mult = _phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge); // unit: 1/m
     DEBUG(5,"resolution: "<< res << ", probe: " << probe_wl << ", mult: " << mult);
     for (size_t ii=0; ii<invimage.getSurf(); ii++) {
         double the_point = invimage.point(ii)/res;
-        invimage.set(ii, - mult * (2*kappa*the_point));
+//        invimage.set(ii, - mult * (the_point*the_point+2*kappa*the_point));
+        invimage.set(ii, - mult * 2*kappa*the_point);
     }
     invimage.prop["unitsCB"]="m-3";
     invimage.TscanBrightness();

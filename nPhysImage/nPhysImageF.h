@@ -184,7 +184,10 @@ public:
 	phys_properties()
 		: anymap()
 	{
-		(*this)["origin"] = vec2f(0,0);
+        (*this)["phys_name"] = "";
+        (*this)["phys_short_name"] = "";
+        (*this)["phys_from_name"] = "";
+        (*this)["origin"] = vec2f(0,0);
 		(*this)["scale"] = vec2f(1,1);
 	}
 
