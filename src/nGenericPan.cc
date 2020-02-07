@@ -103,7 +103,6 @@ void nGenericPan::keyPressEvent(QKeyEvent *event) {
 }
 
 void nGenericPan::physAdd(nPhysD *buffer) {
-    DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>");
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             QVariant varBuffer=QVariant::fromValue(buffer);

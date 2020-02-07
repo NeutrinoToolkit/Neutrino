@@ -38,12 +38,12 @@ void nTreeWidget::mousePressEvent(QMouseEvent *e) {
 
 void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
     if (dragitems.size() && (dragposition - e->pos()).manhattanLength()>=QApplication::startDragDistance() && dragtime.elapsed() > qApp->startDragTime() ) {
-        neutrino* nparent=qobject_cast<neutrino *> (parent()->parent()->parent());
-        if (nparent) {
+        Image_list* imParent=qobject_cast<Image_list *> (parent()->parent());
+        if(imParent) {
             QByteArray dragPhysPointers;
             QList<QUrl> lista;
             foreach (QTreeWidgetItem * item, dragitems) {
-                nPhysD *my_phys=(nPhysD*) (item->data((columnCount()-1),0).value<nPhysD*>());
+                nPhysD *my_phys=imParent->getPhys(item);
                 if (my_phys) {
                     dragPhysPointers+=QByteArray::number((qlonglong) my_phys)+ " ";
                     lista << QUrl(QString::fromUtf8(my_phys->getName().c_str()));
@@ -57,26 +57,13 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
                 drag->setMimeData(mymimeData);
                 drag->exec();
             }
+            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>> FOUND PARENT")
         }
     }
 }
 
 void nTreeWidget::mouseReleaseEvent(QMouseEvent *e) {
     dragitems.clear();
-    neutrino* nparent=qobject_cast<neutrino *> (parent()->parent()->parent());
-    if (nparent) {
-        if (e->modifiers() == Qt::NoModifier) {
-            QTreeWidgetItem *item=itemAt(e->pos());
-            if (item) {
-                nPhysD *phys=item->data(columnCount()-1,Qt::DisplayRole).value<nPhysD*>();
-                if (nparent->nPhysExists(phys)) {
-                    nparent->showPhys(phys);
-                } else {
-                    delete item;
-                }
-            }
-        }
-    }
     QTreeWidget::mouseReleaseEvent(e);
 }
 

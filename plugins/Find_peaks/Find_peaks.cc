@@ -41,6 +41,8 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
 
     toolBar->addWidget(direction);
     toolBar->addWidget(param);
+    toolBar->addWidget(order);
+
 
     show();
 
@@ -57,6 +59,8 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
     connect(direction, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
     connect(param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(order, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+    connect(transpose, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
     updatePlot();
 }
 
@@ -107,6 +111,52 @@ void Find_peaks::mouseAtMatrix(QPointF p) {
             plot->setMousePosition(p.x());
         }
     }
+}
+
+bool polynomialfit(std::vector<double> dx, std::vector<double> dy, std::vector<double> &store) /* n, p */
+{
+    gsl_multifit_linear_workspace *ws;
+    gsl_matrix *cov, *X;
+    gsl_vector *y, *c;
+    double chisq;
+
+    int i, j;
+
+    if (dx.size() != dy.size()) return false;
+
+    int degree=store.size();
+    int obs = dx.size();
+    if (degree>=obs+1) return false;
+
+
+    X = gsl_matrix_alloc(obs, degree);
+    y = gsl_vector_alloc(obs);
+    c = gsl_vector_alloc(degree);
+    cov = gsl_matrix_alloc(degree, degree);
+
+    for(i=0; i < obs; i++) {
+        for(j=0; j < degree; j++) {
+            gsl_matrix_set(X, i, j, pow(dx[i], j));
+        }
+        gsl_vector_set(y, i, dy[i]);
+    }
+
+    ws = gsl_multifit_linear_alloc(obs, degree);
+    gsl_multifit_linear(X, y, c, cov, &chisq, ws);
+
+    /* store result ... */
+    for(i=0; i < degree; i++)
+    {
+        store[i] = gsl_vector_get(c, i);
+    }
+
+    gsl_multifit_linear_free(ws);
+    gsl_matrix_free(X);
+    gsl_matrix_free(cov);
+    gsl_vector_free(y);
+    gsl_vector_free(c);
+
+    return true;
 }
 
 void Find_peaks::updatePlot() {
@@ -200,7 +250,18 @@ void Find_peaks::updatePlot() {
             }
         }
 
+        std::vector<double> my_coeff(order->value()+1);
 
+        bool res= transpose->isChecked()? polynomialfit(fity,fitx,my_coeff) : polynomialfit(fitx,fity,my_coeff);
+        QString outcoeff;
+        if (res) {
+            for (auto &i:my_coeff) {
+                outcoeff+=QString::number(i,'e',3)+"\t";
+            }
+        } else {
+            outcoeff=tr("Not enough points for order ")+QString::number(order->value());
+        }
+        coeff->setText(outcoeff);
 
         if (fitx.size()>2) {
             double c0, c1, cov00, cov01, cov11, sum_square;

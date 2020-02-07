@@ -461,7 +461,10 @@ void Visar::sweepChanged(QLineEdit *line) {
         if (vecsweep) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
-            foreach(QString str, line->text().split(" ", QString::SkipEmptyParts)) {
+            QRegExp separator("[(;| |\t)]");
+            QStringList strSweep=line->text().split(separator, QString::SkipEmptyParts);
+            qDebug() << strSweep;
+            foreach(QString str, strSweep) {
                 bool ok;
                 double coeff=locale().toDouble(str,&ok);
                 if(ok) {
@@ -470,7 +473,7 @@ void Visar::sweepChanged(QLineEdit *line) {
                     QPalette my_palette=line->palette();
                     my_palette.setColor(QPalette::Base,Qt::red);
                     line->setPalette(my_palette);
-                    statusbar->showMessage("Cannot understant sweep coefficint "+str);
+                    statusbar->showMessage("Cannot understant sweep coefficent "+str);
                     break;
                 }
             }
