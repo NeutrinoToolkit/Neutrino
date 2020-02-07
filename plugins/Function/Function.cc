@@ -40,7 +40,7 @@ void Function::on_function_returnPressed() {
     if (radioImage->isChecked()) {
         nPhysD *orig=getPhysFromCombo(image);
         if (orig) {
-            my_phys = new nPhysD(orig->getW(), orig->getH(), 0.0, orig->getName());
+            my_phys = new nPhysD(*orig);
         }
     } else {
         my_phys = new nPhysD(sb_width->value(), sb_height->value(), 0.0, "");
@@ -50,7 +50,7 @@ void Function::on_function_returnPressed() {
         engine.globalObject().setProperty("width", (int)my_phys->getW());
         engine.globalObject().setProperty("height", (int)my_phys->getH());
 
-        engine.evaluate("function neutrinoFunction(x,y) { return "+function->toPlainText()+"; }");
+        engine.evaluate("function neutrinoFunction(x,y,z) { return "+function->toPlainText()+"; }");
         if (engine.uncaughtException().isValid()) {
             qDebug() << engine.uncaughtExceptionBacktrace().join(" ");
             qDebug() << engine.uncaughtException().toString();
@@ -65,19 +65,18 @@ void Function::on_function_returnPressed() {
 
             for (int x=0; x<(int)my_phys->getW(); x++) {
                 for (int y=0; y<(int)my_phys->getH(); y++) {
-                    my_phys->set(x,y, neutrinoFunction.call(QScriptValue(), QScriptValueList() << x << y).toNumber());
-                    progress.setValue(y+x*my_phys->getW());
+                    double z=my_phys->point(x,y);
+                    my_phys->set(x,y, neutrinoFunction.call(QScriptValue(), QScriptValueList() << x << y << z).toNumber());
+                    progress.setValue(y+x*my_phys->getH());
                 }
             }
-            QString name=function->toPlainText();
-            my_phys->prop["function"]=name.toStdString();
-
-            int len=image->property("NeuSave-physNameLength").toInt();
-            if (name.length()>len) {
-                name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
+            QString name="function("+function->toPlainText()+", ";
+            if (radioImage->isChecked()) {
+                name.append(QString::fromStdString(my_phys->getName()));
+            } else {
+                name.append(QString::number(my_phys->getW())+", "+QString::number(my_phys->getH()));
             }
-
-
+            name.append(")");
             my_phys->TscanBrightness();
             my_phys->setName(name.toStdString());
             my_phys->setShortName("function");

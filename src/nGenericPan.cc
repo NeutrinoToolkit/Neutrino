@@ -82,16 +82,13 @@ QString nGenericPan::panName() {
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
     QString name="";
     if (nparent) {
-        int position = nparent->getBufferList().indexOf(buffer);
         name=QString::fromUtf8(buffer->getName().c_str());
-        if (!combo->property("NeuSave-physNameLength").isValid()) {
-            combo->setProperty("NeuSave-physNameLength",nparent->property("NeuSave-physNameLength"));
-        }
-        int len=combo->property("NeuSave-physNameLength").toInt();
+        int len=nparent->property("NeuSave-physNameLength").toInt();
         qDebug() << combo << len << name << name.length();
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
+        int position = nparent->getBufferList().indexOf(buffer);
         name.prepend(QLocale().toString(position)+" : ");
     }
     return name;
