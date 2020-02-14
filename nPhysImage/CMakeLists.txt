@@ -15,7 +15,8 @@ add_library (nPhysImageF SHARED
     nPhysWave.cc
     nPhysWave.h
     tools.h
-    unwrapping/unwrap_goldstein.cc unwrapping/unwrap_quality.cc unwrapping/unwrap_simple.cc unwrapping/unwrap_util.cc )
+    unwrap/unwrap.h unwrap/goldstein.cc unwrap/quality.cc unwrap/simple.cc
+    )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -26,7 +27,7 @@ target_link_libraries(nPhysImageF m ${LIBS})
 
 # install
 if (WIN32)
-    install (TARGETS nPhysImageF COMPONENT binary DESTINATION bin)
+    install (TARGETS nPhysImageF COMPONENT binary DESTINATION "bin")
 elseif(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 elseif (APPLE)

@@ -60,9 +60,6 @@ protected:
 
 private:
 #ifndef __clang__
-#ifdef __phys_debug
-    grabStream qerr;
-#endif
     grabStream qout;
 #endif
 
@@ -83,12 +80,11 @@ public slots:
     void addPaletteFile(QString);
     void addDefaultPalettes();
 
+    void clearLog();
     void copyLog();
     void saveLog();
     void findLogText();
 
-signals:
-    void logWinVisibility(bool);
 };
 
 #endif

@@ -1,6 +1,9 @@
 #include "nPluginLoader.h"
 #include "neutrino.h"
 #include <QMenu>
+#include <QToolButton>
+#include <QMessageBox>
+
 
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
     QPluginLoader(pname),
@@ -48,35 +51,31 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                         }
                     }
 
-
                     QToolButton *my_button = new QToolButton(neu->my_w->toolBar);
 
-                    QAction*  my_action = new QAction(icon_plugin,name_plugin,my_button);
-                    if (!shortcut_key.isEmpty()) {
-                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
+                    QAction* my_action;
+                    bool found=false;
+                    foreach (QAction  *my_action_tmp, my_actions) {
+                        QVariant  var=my_action_tmp->property("plugin-order");
+                        if (var.toInt() > my_panPlug->order()) {
+                            my_action = neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
+                            found=true;
+                            break;
+                        }
+                    }
+                    if(!found) {
+                        my_action = neu->my_w->toolBar->addWidget(my_button);
                     }
                     my_action->setProperty("plugin-order",my_panPlug->order());
-
                     QVariant v;
                     v.setValue(this);
                     my_action->setData(v);
                     connect (my_action, SIGNAL(triggered()), this, SLOT(run()));
-
-                    my_button->setIcon(icon_plugin);
                     my_button->setDefaultAction(my_action);
-
-                    // placing the icon in the toolbar by nPanPlug::order() values
-                    bool place_found=false;
-
-                    foreach (QAction *my_action_tmp, my_actions) {
-                        if (my_action_tmp->property("plugin-order").toInt() > my_panPlug->order()) {
-                            neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
-                            place_found=true;
-                            break;
-                        }
-                    }
-                    if(!place_found) {
-                        neu->my_w->toolBar->addWidget(my_button);
+                    my_action->setText(name_plugin);
+                    my_action->setIcon(icon_plugin);
+                    if (!shortcut_key.isEmpty()) {
+                        my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
                     }
                 }
 
@@ -114,15 +113,11 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
             }
 
         } else {
-            QMessageBox dlg(QMessageBox::Critical, tr("Plugin error"),pname+tr(" does not look like a Neutrino plugin"));
-            dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-            dlg.exec();
+            qCritical().noquote() << tr("Plugin error: ")+pname+tr(" does not look like a Neutrino plugin");
         }
     } else {
-        QMessageBox dlg(QMessageBox::Warning, tr("Plugin error"),tr("Error loading plugin ")+QFileInfo(fileName()).fileName());
-        dlg.setDetailedText(errorString());
-        dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-        dlg.exec();
+        qCritical().noquote() << tr("Plugin error: ")+pname;
+        qCritical().noquote() << errorString();
     }
 }
 

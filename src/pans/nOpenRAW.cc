@@ -38,7 +38,7 @@ nOpenRAW::nOpenRAW(neutrino *nparent) : nGenericPan(nparent)
 void nOpenRAW::checkStringList() {
 	fileList.removeDuplicates();
 	if (fileList.size()>0) {
-		my_w.okButton->setText(tr("Open ")+QString::number(fileList.size())+tr(" image")+(fileList.size()>1?tr("s"):""));
+		my_w.okButton->setText(tr("Open ")+QLocale().toString(fileList.size())+tr(" image")+(fileList.size()>1?tr("s"):""));
 	} else {
 		my_w.okButton->setText(tr("No image"));
 	}

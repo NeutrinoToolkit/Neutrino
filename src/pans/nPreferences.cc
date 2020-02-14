@@ -29,7 +29,9 @@
 
 #include "nPreferences.h"
 #include "neutrino.h"
-
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QColorDialog>
 
 #ifdef	__WIN32
 #include <windows.h>
@@ -71,9 +73,9 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 			nested = omp_get_nested();
 
 			/* Print environment information */
-            my_w.infoCores->insertPlainText("Number of processors : "+QString::number(procs));
-			my_w.infoCores->insertPlainText("\nNumber of threads : "+QString::number(nthreads));
-			my_w.infoCores->insertPlainText("\nMax threads : "+QString::number(maxt));
+            my_w.infoCores->insertPlainText("Number of processors : "+QLocale().toString(procs));
+			my_w.infoCores->insertPlainText("\nNumber of threads : "+QLocale().toString(nthreads));
+			my_w.infoCores->insertPlainText("\nMax threads : "+QLocale().toString(maxt));
 			my_w.infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
 			my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
 			my_w.infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
@@ -107,8 +109,10 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
 	connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
-	connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
-	connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
+    connect(my_w.showXYaxes, SIGNAL(released()), this, SLOT(changeShowXYaxes()));
+    connect(my_w.showColorbar, SIGNAL(released()), this, SLOT(changeShowColorbar()));
+    connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
 	connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
 	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
@@ -131,7 +135,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 		my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
 	}
 
-	qSort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
+    std::sort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
 
 	for(auto &locale : allLocales) {
 		QString my_str=nApp::localeToString(locale);
@@ -221,8 +225,18 @@ void nPreferences::askCloseUnsaved() {
 }
 
 void nPreferences::changeShowDimPixel() {
-	nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
-	nparent->my_w->my_view->update();
+    nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
+    nparent->my_w->my_view->update();
+}
+
+void nPreferences::changeShowXYaxes() {
+    nparent->my_w->my_view->showXYaxes=my_w.showXYaxes->isChecked();
+    nparent->my_w->my_view->update();
+}
+
+void nPreferences::changeShowColorbar() {
+    nparent->my_w->my_view->showColorbar=my_w.showColorbar->isChecked();
+    nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeFont() {

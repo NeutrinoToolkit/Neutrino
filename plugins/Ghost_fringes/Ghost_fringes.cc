@@ -71,13 +71,13 @@ void Ghost_fringes::doGhost () {
     if (imageShot) {
         saveDefaults();
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 
         size_t dx=imageShot->getW();
         size_t dy=imageShot->getH();
         
-        nPhysC imageFFT = imageShot->ft2(PHYS_FORWARD);
+        physC imageFFT = imageShot->ft2(PHYS_FORWARD);
         std::vector<int> xx(dx), yy(dy);
 
         for (size_t i=0;i<dx;i++)
@@ -137,9 +137,7 @@ void Ghost_fringes::doGhost () {
         }
 
         my_w.erasePrevious->setEnabled(true);
-        QString out;
-        out.sprintf("Time: %d msec",timer.elapsed());
-        my_w.statusbar->showMessage(out);
+        my_w.statusbar->showMessage(QString(tr("Time: %1 msec")).arg(timer.elapsed()));
 
 	}
 }

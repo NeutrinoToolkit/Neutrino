@@ -64,10 +64,11 @@ public:
 
     vec2f minMax;
 
-    // painter
     bool show_mouse;
 
     bool showDimPixel;
+    bool showXYaxes;
+    bool showColorbar;
 
     QGraphicsScene my_scene;
 
@@ -137,7 +138,8 @@ public slots:
 private:
     bool gestureEvent(QGestureEvent *event);
 	void swipeTriggered(QSwipeGesture *);
-	void pinchTriggered(QPinchGesture *);
+    void pinchTriggered(QPinchGesture *);
+    void tapandholdTriggered(QTapAndHoldGesture *);
 
     unsigned int currentStepScaleFactor;
 

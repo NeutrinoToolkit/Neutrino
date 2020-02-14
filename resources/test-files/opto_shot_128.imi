@@ -1,0 +1,23 @@
+[Calibration Setup]
+CalibX_Type=None
+CalibY_Type=None
+[ROI]
+Top=0
+Left=0
+Bottom=1391
+Right=1023
+Type=0
+[Parameters]
+Image Comment=
+Image Contrast=4095
+[Sweep Unit Setup]
+UnitID_1=6078
+UnitID_2=-1
+SpeedUnit_1=1ns/mm
+SpeedUnit_2=-1
+[Geometrical Correction]
+StaticDistortionCorrected=0
+NonLinearityCorrected=0
+TransitTimeVaritationCorrected=0
+HorizontalDisplayPixelSize=0.000000000
+VerticalDisplayPixelSize=0.000000000

@@ -29,24 +29,30 @@
 
 Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(nparent),
     l1(this,1),
-    l2(this,1)
+    l2(this,1),
+    region(this,1)
 {
+
+    region.setRect(QRectF(100,100,100,100));
+
 	my_w.setupUi(this);
     l1.changeToolTip(panName()+"Line 1");
     l1.changeColorHolder("red");
 	QPolygonF poly;
-	poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
+    poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
     l1.setPoints(poly);
 	
     l2.changeToolTip(panName()+"Line 2");
     l2.changeColorHolder("blue");
-	poly.clear();
-	poly << QPointF(150,50) << QPointF(50,50) << QPointF(50,150);
+    poly.translate(50,50);
     l2.setPoints(poly);
 	
 
+
     connect(my_w.line1, SIGNAL(released()), &l1, SLOT(togglePadella()));
     connect(my_w.line2, SIGNAL(released()), &l2, SLOT(togglePadella()));
+
+    connect(my_w.actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
 
     connect(&l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
     connect(&l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
@@ -54,11 +60,24 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
     connect(my_w.first,SIGNAL(pressed()),this,SLOT(affine()));
     connect(my_w.second,SIGNAL(pressed()),this,SLOT(affine()));
 	
-	
+    connect(my_w.actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
+
     affined=NULL;
     show();
 	apply();
-	
+
+
+}
+
+void Affine_transformation::resetPoints() {
+    QPolygonF poly;
+    poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
+    l1.setPoints(poly);
+    poly.translate(50,50);
+    l2.setPoints(poly);
+    region.setRect(QRectF(100,100,100,100));
+
+    apply();
 }
 
 void Affine_transformation::bufferChanged(nPhysD* buf) {
@@ -74,14 +93,17 @@ void Affine_transformation::bufferChanged(nPhysD* buf) {
 		} else {
             l2.hide();
 		}
-	}
+    } else {
+        l1.hide();
+        l2.hide();
+    }
 }
 
 void Affine_transformation::affine() {
 	nPhysD *my_phys=NULL;
 	nPhysD *my_phys_other=NULL;
 
-    std::vector<double> vecForward,vecBackward;
+    std::array<double,6> vecForward,vecBackward;
 	if (sender()==my_w.first) {
 		my_phys=getPhysFromCombo(my_w.image1);
 		my_phys_other=getPhysFromCombo(my_w.image2);
@@ -116,37 +138,37 @@ void Affine_transformation::affine() {
 				WARNING("something is broken here");
 				break;
 		}
-        nPhysD *affinePhys=NULL;
+
 		unsigned int dx=my_phys_other->getW();
 		unsigned int dy=my_phys_other->getH();
 		
 		double minx=0.0;
 		double miny=0.0;
-		if (!my_w.crop->isChecked()) {			
+        if (!my_w.crop->isChecked()){
             std::vector<vec2f> corners(4); //clockwise...
             corners[0]=affine(vec2f(0,0),vecForward);
             corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
             corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
             corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);
-			minx=corners[0].x();
-			double maxx=corners[0].x();
-			miny=corners[0].y();
-			double maxy=corners[0].y();
-			for (unsigned int i=1;i<4;i++) {
-				if (minx>corners[i].x()) minx=corners[i].x();
-				if (maxx<corners[i].x()) maxx=corners[i].x();
-				if (miny>corners[i].y()) miny=corners[i].y();
-				if (maxy<corners[i].y()) maxy=corners[i].y();
-			}
-			dx=maxx-minx;
-			dy=maxy-miny;
-		}
+            minx=corners[0].x();
+            double maxx=corners[0].x();
+            miny=corners[0].y();
+            double maxy=corners[0].y();
+            for (unsigned int i=1;i<4;i++) {
+                if (minx>corners[i].x()) minx=corners[i].x();
+                if (maxx<corners[i].x()) maxx=corners[i].x();
+                if (miny>corners[i].y()) miny=corners[i].y();
+                if (maxy<corners[i].y()) maxy=corners[i].y();
+            }
+            dx=(unsigned int) (maxx-minx);
+            dy=(unsigned int) (maxy-miny);
+        }
 		
         DEBUG(affine(vec2f(0,0),vecForward).x() << " " << affine(vec2f(0,0),vecForward).y());
         DEBUG(affine(vec2f(0,0),vecBackward).x() << " " << affine(vec2f(0,0),vecBackward).y());
 
-        affinePhys=new nPhysD(dx,dy,0.0,"affine");
-        affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
+        nPhysD affinePhys(dx,dy,0.0,"affine");
+//        affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
 
         QProgressDialog progress("", "Cancel", 0, dx, this);
         progress.setCancelButton(0);
@@ -157,31 +179,47 @@ void Affine_transformation::affine() {
 		for (unsigned int i=0; i<dx; i++) {
             progress.setValue(i);
 			for (unsigned int j=0; j<dy; j++) {
-                affinePhys->set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
+                affinePhys.set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
 			}
 		}
-        affinePhys->TscanBrightness();
-		
-		if (my_w.erasePrevious->isChecked()) {
-            affined=nparent->replacePhys(affinePhys,affined,true);
-		} else {
-            nparent->addShowPhys(affinePhys);
-            affined=affinePhys;
-		}
+        affinePhys.TscanBrightness();
 
+        if (my_w.crop->isChecked()){
+            QRectF reg=region.getRect();
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << reg;
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+            qDebug() << "----------------------------------------------------";
+
+            nPhysD mycopy(affinePhys.sub(reg.x(),reg.y(),reg.width(),reg.height()));
+            affinePhys=mycopy;
+        }
+
+        if (my_w.erasePrevious->isChecked()) {
+            affined=nparent->replacePhys(new nPhysD(affinePhys),affined,true);
+        } else {
+            affined=new nPhysD(affinePhys);
+            nparent->addShowPhys(affined);
+        }
 	}
 }
 
-vec2f Affine_transformation::affine(vec2f in, std::vector<double> vec){
+vec2f Affine_transformation::affine(vec2f in, std::array<double,6>& vec){
 	return vec2f(in.x()*vec[0]+in.y()*vec[1]+vec[2],in.x()*vec[3]+in.y()*vec[4]+vec[5]);
 }
 
-std::vector<double> Affine_transformation::getAffine(QPolygonF poly1, QPolygonF poly2) {
-    std::vector<double>ret(6);
+std::array<double,6> Affine_transformation::getAffine(QPolygonF poly1, QPolygonF poly2) {
+    std::array<double,6>ret;
 	poly1.resize(3);
 	poly2.resize(3);
 
-    std::vector<double> p1(9), p2(9), mat(9), inva(9);
+    std::array<double,9> p1, p2, mat, inva;
 	
 	p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
 	p1[3] = poly1[0].y(); p1[4] = poly1[1].y(); p1[5] = poly1[2].y();
@@ -223,21 +261,21 @@ void Affine_transformation::apply() {
     forward=getAffine(l1.getPoints(),l2.getPoints());
 	
 	
-	my_w.A00->setText(QString::number(forward[0]));
-	my_w.A01->setText(QString::number(forward[1]));
-	my_w.A02->setText(QString::number(forward[2]));
-	my_w.A10->setText(QString::number(forward[3]));
-	my_w.A11->setText(QString::number(forward[4]));
-	my_w.A12->setText(QString::number(forward[5]));
+	my_w.A00->setText(QLocale().toString(forward[0]));
+	my_w.A01->setText(QLocale().toString(forward[1]));
+	my_w.A02->setText(QLocale().toString(forward[2]));
+	my_w.A10->setText(QLocale().toString(forward[3]));
+	my_w.A11->setText(QLocale().toString(forward[4]));
+	my_w.A12->setText(QLocale().toString(forward[5]));
 	
     backward=getAffine(l2.getPoints(),l1.getPoints());
 
-	my_w.B00->setText(QString::number(backward[0]));
-	my_w.B01->setText(QString::number(backward[1]));
-	my_w.B02->setText(QString::number(backward[2]));
-	my_w.B10->setText(QString::number(backward[3]));
-	my_w.B11->setText(QString::number(backward[4]));
-	my_w.B12->setText(QString::number(backward[5]));	
+	my_w.B00->setText(QLocale().toString(backward[0]));
+	my_w.B01->setText(QLocale().toString(backward[1]));
+	my_w.B02->setText(QLocale().toString(backward[2]));
+	my_w.B10->setText(QLocale().toString(backward[3]));
+	my_w.B11->setText(QLocale().toString(backward[4]));
+	my_w.B12->setText(QLocale().toString(backward[5]));	
 	
 }
 

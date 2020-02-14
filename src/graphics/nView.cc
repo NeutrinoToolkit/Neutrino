@@ -25,6 +25,8 @@
 #include "neutrino.h"
 #include "nApp.h"
 #include "nView.h"
+#include <QShortcut>
+#include <QFileDialog>
 
 nView::~nView ()
 {
@@ -92,7 +94,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     fillimage=true;
     setMouseTracking(true);
     setInteractive(true);
-
+    QTapAndHoldGesture::setTimeout(5000);
     grabGesture(Qt::TapAndHoldGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
@@ -108,6 +110,8 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
         }
     }
     showDimPixel=settings.value("showDimPixel",true).toBool();
+    showXYaxes=settings.value("showXYaxes",true).toBool();
+    showColorbar=settings.value("showColorbar",true).toBool();
 
     currentStepScaleFactor=settings.value("currentStepScaleFactor",15).toInt();
 
@@ -156,39 +160,40 @@ void nView::updatePhys() {
 }
 
 void nView::showPhys(nPhysD *my_phys) {
+    DEBUG("ENTER")
     if (my_phys) {
         if (!physList.contains(my_phys)) physList << my_phys;
 
-        DEBUG(lockColors);
+        DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
+
         if (currentBuffer) {
             if (lockColors) {
-                my_phys->property["display_range"]=currentBuffer->property["display_range"];
-                my_phys->property["gamma"]=currentBuffer->property["gamma"];
+                my_phys->prop["display_range"]=currentBuffer->prop["display_range"];
+                my_phys->prop["gamma"]=currentBuffer->prop["gamma"];
             }
         }
 
 
         QApplication::processEvents();
         if (my_phys->getSurf()>0) {
-            const unsigned char *nPhys_pointer=my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString());
-            const QImage tempImage(nPhys_pointer,
+            const QImage tempImage(my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString()),
                                    my_phys->getW(),
                                    my_phys->getH(),
                                    my_phys->getW()*3,
                                    QImage::Format_RGB888);
 
             my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+            currentBuffer=my_phys;
+
+            QApplication::processEvents();
+
+            setSize();
+
+            emit bufferChanged(my_phys);
+            QApplication::processEvents();
         }
-
-        currentBuffer=my_phys;
-
-        QApplication::processEvents();
-
-        setSize();
-
-        emit bufferChanged(my_phys);
-        QApplication::processEvents();
     }
+    DEBUG("EXIT")
 }
 
 void
@@ -232,27 +237,28 @@ bool nView::gestureEvent(QGestureEvent *event)
     foreach (QGesture *gesture, event->gestures()) {
         qDebug() << "type: " << gesture->gestureType();
     }
-
-    if (QGesture *taphold = event->gesture(Qt::TapAndHoldGesture)) {
-        qDebug() << taphold;
-        fillimage=true;
-        setSize();
-        update();
-    } else {
-
-        if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
-            swipeTriggered(static_cast<QSwipeGesture *>(swipe));
-        }
-
-        if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
-            pinchTriggered(static_cast<QPinchGesture *>(pinch));
-        }
-
-        if (QGesture *pan = event->gesture(Qt::PanGesture)) {
-            qDebug() << static_cast<QPanGesture *>(pan);
-        }
+    QGesture *gesture=nullptr;
+    if ((gesture = event->gesture(Qt::TapAndHoldGesture))) {
+        tapandholdTriggered(static_cast<QTapAndHoldGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::SwipeGesture))) {
+        swipeTriggered(static_cast<QSwipeGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::PinchGesture))) {
+        pinchTriggered(static_cast<QPinchGesture *>(gesture));
+    }
+    if ((gesture = event->gesture(Qt::PanGesture))) {
+        qDebug() << static_cast<QPanGesture *>(gesture);
     }
     return true;
+}
+
+void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
+    DEBUG("-------------");
+//    qDebug() << gesture;
+//    fillimage=true;
+//    setSize();
+//    update();
 }
 
 void nView::pinchTriggered(QPinchGesture *gesture)
@@ -388,12 +394,12 @@ void nView::rescaleColor(int val) {
     if (currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
             foreach (nPhysD* phys, physList) {
-                phys->property["display_range"]=physMath::getColorPrecentPixels(*phys,val);
+                phys->prop["display_range"]=physMath::getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
             qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
-            currentBuffer->property["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
+            currentBuffer->prop["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
             emit bufferChanged(currentBuffer);
             qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }
@@ -460,11 +466,11 @@ void nView::toggleGrid() {
 
 
 void nView::incrGamma() {
-    setGamma(int(currentBuffer->property["gamma"])+1);
+    setGamma(int(currentBuffer->prop["gamma"])+1);
 }
 
 void nView::decrGamma() {
-    setGamma(int(currentBuffer->property["gamma"])-1);
+    setGamma(int(currentBuffer->prop["gamma"])-1);
 }
 
 void nView::resetGamma() {
@@ -474,7 +480,7 @@ void nView::resetGamma() {
 
 void nView::setGamma(int value) {
     if (currentBuffer) {
-        currentBuffer->property["gamma"]=value;
+        currentBuffer->prop["gamma"]=value;
         updatePhys();
         emit bufferChanged(currentBuffer);
     }
@@ -540,7 +546,7 @@ void nView::setMouseShape(int num) {
     }
     my_mouse.my_shape=num;
     my_mouse.update();
-    qInfo() << "Mouse " << QString::number(num);
+    qInfo() << "Mouse " << QLocale().toString(num);
 }
 
 void nView::keyReleaseEvent (QKeyEvent *e) {
@@ -609,7 +615,7 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        currentBuffer->property["display_range"]=minMax;
+        currentBuffer->prop["display_range"]=minMax;
         setProperty("percentPixels",QVariant());
         updatePhys();
     }
@@ -620,7 +626,7 @@ void nView::mouseMoveEvent (QMouseEvent *e)
     QGraphicsView::mouseMoveEvent(e);
     if (QGraphicsItem *item = itemAt(e->pos())) {
         if (item->flags() & QGraphicsItem::ItemIsFocusable) {
-            qInfo() << item->toolTip();
+            qDebug() << item->toolTip();
         }
     }
 

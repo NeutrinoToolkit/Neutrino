@@ -97,14 +97,17 @@ void Interpolate_path::doIt() {
                     for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
                         vec2f p=it->first;
                         double wi=1.0/(pow(std::abs((pp-p).x()),ex)+pow(std::abs((pp-p).y()),ex));
-                        mean+=wi*it->second;
-                        weight+=wi;                        
+                        if (std::isfinite(wi) &&std::isfinite(it->second)) {
+                            mean+=wi*it->second;
+                            weight+=wi;
+                        }
                     }
                     regionPath->set(pp,mean/weight);
                 }
             }
             progress.setValue(i-rectRegion.left());
-        }                
+        }
+        regionPath->reset_display();
         interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys);
     }
 }

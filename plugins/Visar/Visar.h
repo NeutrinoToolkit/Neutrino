@@ -74,6 +74,7 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 class Visar : public nGenericPan, private Ui::Visar1 {
     Q_OBJECT
     
+    using nGenericPan::nGenericPan;
     using nGenericPan::loadSettings;
     using Ui::Visar1::retranslateUi;
 public:
@@ -83,8 +84,8 @@ public:
 
 private:
 
-    std::vector<Ui::Visar2*> velocityUi;
-    std::vector<Ui::Visar3*> phaseUi;
+    std::vector<Ui::Visar2*> settingsUi;
+    std::vector<Ui::Visar3*> velocityUi;
     
     double getTime(std::vector<double> &vecsweep,double p);
     
@@ -93,16 +94,18 @@ private:
 
     unsigned int numVisars;
 
-    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // indices = 1st: ref/shot. 2nd: numVisar. 3rd: time
+    std::array<std::vector<QVector<double>>,2> cIntensity, cContrast; // indices = 1st:numVisar. 2nd:ref/shot. 3rd:time
+    std::vector<QVector<double>> cPhase;
+
     std::vector<QVector<double>> time_phase;
     std::vector<QVector<double>> cPhaseErr;
 
     std::vector<QVector<double>> velocity, velError, reflectivity, reflError, quality, time_vel;
 
-    std::array<QVector<double>,4> sopCurve;
+    std::array<QVector<double>,3> sopCurve;
     QVector<double> time_sop;
 
-    std::vector<std::array<nPhysD,2>> phase;
+    std::vector<nPhysD> phaseUnwrap;
 
     std::vector<std::array<nPhysD,2>> contrast;
     std::vector<std::array<nPhysD,2>> intensity;
@@ -148,7 +151,7 @@ public slots:
     void imageMousePress(QPointF);
     void imageMouseRelease(QPointF);
 
-    double getTimeFromPixel(QPointF);
+    QPointF getTimeSpaceFromPixel(QPointF);
 
     void mouseAtPlot(QMouseEvent* e);
     

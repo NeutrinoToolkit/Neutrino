@@ -9,6 +9,7 @@ else()
         message (WARNING "Cannot find GLU: Skipping plugin")
         return()
 endif()
+set(QT_USE_QTOPENGL TRUE)
 
 
 # check for neutrino root

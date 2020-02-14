@@ -46,9 +46,6 @@ private:
 public:
 	
     Q_INVOKABLE Colorscale (neutrino *);
-	neutrino *parent(){
-		return (neutrino *) QWidget::parent();
-	};
 	nPhysD *cutOffPhys;
     Ui::Colorscale my_w;
 	
@@ -59,8 +56,12 @@ public slots:
 	void invertColors();
 	void setToMin();
 	void setToMax();
-	void slider_min_changed(int);
-	void slider_max_changed(int);
+    void on_sliderMin_valueChanged(int);
+    void on_sliderMax_valueChanged(int);
+
+    void on_sliderMin_sliderReleased();
+    void on_sliderMax_sliderReleased();
+
 
 	void bufferChanged(nPhysD*);
     void updatecolorbar(QString=QString());
@@ -68,6 +69,8 @@ public slots:
 	void cutOff();
 
     void loadPalettes();
+
+    void addItem(QString);
 
     void resetPalettes();
 	void addPaletteFile();

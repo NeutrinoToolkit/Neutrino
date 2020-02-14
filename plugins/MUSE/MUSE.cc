@@ -97,8 +97,8 @@ void MUSE::nextPlane(){
 }
 
 void MUSE::on_percent_valueChanged(double val) {
-    if (meanSlice) meanSlice->property["display_range"] = physMath::getColorPrecentPixels(*meanSlice,val);
-    if (cubeSlice) cubeSlice->property["display_range"] = physMath::getColorPrecentPixels(*cubeSlice,val);
+    if (meanSlice) meanSlice->prop["display_range"] = physMath::getColorPrecentPixels(*meanSlice,val);
+    if (cubeSlice) cubeSlice->prop["display_range"] = physMath::getColorPrecentPixels(*cubeSlice,val);
     nparent->updatePhys();
 }
 
@@ -227,7 +227,7 @@ void MUSE::doSpectrum(QPointF point) {
 
 	if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
 		lastpoint=pFloor;
-		vec2 p(point.x(),point.y());
+		vec2i p(point.x(),point.y());
 		for (int zz=0; zz< yvals.size(); zz++) {
 			yvals[zz]=0;
 		}
@@ -258,7 +258,7 @@ void MUSE::showImagePlane(int z) {
 	slicesSlider->setValue(z);
 	if (cubesize.size()==3 && z < (int)cubesize[2]) {
         nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,locale().toString(z).toStdString());
-		my_phys->property=cube_prop;
+		my_phys->prop=cube_prop;
 
 		int offset=z*my_phys->getSurf();
 #pragma omp parallel for
@@ -267,12 +267,12 @@ void MUSE::showImagePlane(int z) {
 		}
 		my_phys->TscanBrightness();
 
-        my_phys->property["display_range"]=physMath::getColorPrecentPixels(*my_phys,percent->value());
+        my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,percent->value());
 
 		if (cubeSlice) {
-			cubeSlice->property["display_range"]=my_phys->property["display_range"];
+			cubeSlice->prop["display_range"]=my_phys->prop["display_range"];
 		} else {
-			cube_prop["display_range"]=my_phys->property["display_range"];
+			cube_prop["display_range"]=my_phys->prop["display_range"];
 		}
 		cubeSlice=nparent->replacePhys(my_phys,cubeSlice);
 		plot->setMousePosition(xvals[z]);
@@ -291,7 +291,7 @@ void MUSE::setstatusbar() {
 	if (xvals.size()>slices->value()) {
 		double lambda=xvals[slices->value()];
 		double redshift=lambda/restLambda->value()-1.0;
-        lambdaz->setText(trUtf8("\xce\xbb") + ":" + locale().toString(lambda) + " z=" + locale().toString(redshift));
+        lambdaz->setText(tr("\xce\xbb") + ":" + locale().toString(lambda) + " z=" + locale().toString(redshift));
 	}
 }
 
@@ -467,7 +467,7 @@ void MUSE::loadCube() {
 			if (anaxis==3) {
                 int ret = QMessageBox::information(
 							this, tr("MUSE"),
-							tr("Found data cube") + QString::number(hdupos) +" : "+QString::number(axissize[0])+"x"+QString::number(axissize[1])+"x"+QString::number(axissize[2])+"\n"+tr("Open it?"),
+                            tr("Found data cube") + QLocale().toString(hdupos) +" : "+QLocale().toString((long long int)(axissize[0]))+"x"+QLocale().toString((long long int)(axissize[1]))+"x"+QLocale().toString((long long int)(axissize[2]))+"\n"+tr("Open it?"),
 						QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 				if (ret==QMessageBox::Yes) {
 					QProgressDialog progress("Reading Cube", "Cancel", 0, 3, this);
@@ -517,7 +517,7 @@ void MUSE::loadCube() {
 					meanSlice=new nPhysD(cubesize[0],cubesize[1],0.0,"mean slice");
 					nPhysImageF<int> my_num(cubesize[0],cubesize[1],0,"number");
 
-					meanSlice->property=cube_prop;
+					meanSlice->prop=cube_prop;
 
 #pragma omp parallel for collapse(2)
 					for (unsigned int l=0; l < cubesize[2]; l++) {
@@ -535,7 +535,7 @@ void MUSE::loadCube() {
 					}
 
 					meanSlice->TscanBrightness();
-                    meanSlice->property["display_range"]=physMath::getColorPrecentPixels(*meanSlice,percent->value());
+                    meanSlice->prop["display_range"]=physMath::getColorPrecentPixels(*meanSlice,percent->value());
 					nparent->addShowPhys(meanSlice);
 
 					plot->graph(0)->setName("Mean spectrum");

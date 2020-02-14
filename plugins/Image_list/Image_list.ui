@@ -113,7 +113,7 @@
        <bool>false</bool>
       </property>
       <property name="columnCount">
-       <number>6</number>
+       <number>4</number>
       </property>
       <attribute name="headerDefaultSectionSize">
        <number>45</number>
@@ -123,22 +123,7 @@
       </attribute>
       <column>
        <property name="text">
-        <string>#</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
         <string>Short</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Origin</string>
        </property>
       </column>
       <column>
@@ -148,7 +133,12 @@
       </column>
       <column>
        <property name="text">
-        <string>Hidden</string>
+        <string>Origin</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Name</string>
        </property>
       </column>
      </widget>
@@ -189,6 +179,7 @@
    <addaction name="actionOrigin"/>
    <addaction name="actionScale"/>
    <addaction name="actionFreeze"/>
+   <addaction name="actionRescale"/>
   </widget>
   <action name="actionCopy">
    <property name="icon">
@@ -267,7 +258,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -278,6 +269,18 @@
     <string>Set current origin/scale to new images</string>
    </property>
   </action>
+  <action name="actionRescale">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/icons/rescale.png</normaloff>:/icons/rescale.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rescale</string>
+   </property>
+   <property name="toolTip">
+    <string>Change scale</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -286,8 +289,6 @@
    <header location="global">nTreeWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

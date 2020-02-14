@@ -223,13 +223,13 @@ Thomson_Parabola::run_simulation(void)
 	// associated to curvilinear coordinate from tp-plugin to nSpectrum
 	my_line->setPoints(lp);
 	for (int ii=0; ii<ens.size(); ii++) {
-		QTableWidgetItem *en_it = new QTableWidgetItem(QString::number(ens[ii]));
+		QTableWidgetItem *en_it = new QTableWidgetItem(QLocale().toString(ens[ii]));
 		my_line->my_w.points->setItem(ii, 2, en_it);
 	
-		QTableWidgetItem *charge_it = new QTableWidgetItem(QString::number(sp.Z));
+		QTableWidgetItem *charge_it = new QTableWidgetItem(QLocale().toString(sp.Z));
 		my_line->my_w.points->setItem(ii, 3, charge_it);
 		
-		QTableWidgetItem *mass_it = new QTableWidgetItem(QString::number(sp.A));
+		QTableWidgetItem *mass_it = new QTableWidgetItem(QLocale().toString(sp.A));
 		my_line->my_w.points->setItem(ii, 4, mass_it);
 	
 	}

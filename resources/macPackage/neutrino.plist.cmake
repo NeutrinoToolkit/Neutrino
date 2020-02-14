@@ -35,6 +35,8 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Neutrino session</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>sif</string>
@@ -42,15 +44,16 @@
 				<string>neu</string>
 				<string>fits</string>
 				<string>tiff</string>
+				<string>tif</string>
 				<string>hdf</string>
 				<string>img</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>filetype.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>Neutrino session</string>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
 		</dict>
 	</array>
 </dict>

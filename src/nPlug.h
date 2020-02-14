@@ -50,7 +50,7 @@
 #include <QWidget>
 #include <iostream>
 
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 #ifndef __nplug
 #define __nplug

@@ -80,15 +80,15 @@ Contours::on_draw_pb_released()
 		}
 
 		// 1. find centroid
-		vec2 centr;
-		if (currentBuffer->get_origin() == vec2(0,0)) {
+		vec2i centr;
+		if (currentBuffer->get_origin() == vec2i(0,0)) {
 			centr = decimated.max_Tv;
 		} else {
 			centr = currentBuffer->get_origin();
 		}
 		decimated.set_origin(centr);
 
-		std::list<vec2> contour;
+		std::list<vec2i> contour;
 		double cutoff=my_w.level_dsb->value();
 		if (my_w.percent->isChecked()) {
 			cutoff = decimated.get_min() + (decimated.get_max()-decimated.get_min())*(cutoff/100.0) ;
@@ -111,9 +111,9 @@ Contours::on_draw_pb_released()
 			my_c->setPoints(myp);
 			currentBuffer->set_origin(centr);
 			//my_w.statusBar->showMessage("Contour ok");
-			my_w.statusBar->showMessage(QString::number(cutoff) + " : " + QString::number(contour.size())+" "+tr("points"),5000);
+            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
 		} else {
-            my_w.statusBar->showMessage(QString::number(cutoff) + " : "+tr("cannot trace contour"),5000);
+            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
 		}
 	}
 }

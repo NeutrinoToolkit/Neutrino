@@ -25,16 +25,16 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="topMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="rightMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="bottomMargin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabs">
@@ -64,16 +64,16 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
         <property name="leftMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabPhase">
@@ -99,16 +99,16 @@
          <number>1</number>
         </property>
         <property name="leftMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <item>
          <widget class="QTabWidget" name="tabVelocity">
@@ -138,21 +138,338 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,1">
         <property name="leftMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
-        <property name="verticalSpacing">
-         <number>1</number>
-        </property>
-        <item row="0" column="0" colspan="4">
+        <item row="1" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>SOP calibration T0 A</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_14">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="sopCalibT0">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="decimals">
+              <number>7</number>
+             </property>
+             <property name="maximum">
+              <double>999999.989999999990687</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sopCalibA">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="decimals">
+              <number>7</number>
+             </property>
+             <property name="minimum">
+              <double>-99999999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>99999999.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QGroupBox" name="groupBox_7">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Refl.</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_16">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="whichRefl">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>Zero</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mean</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QGroupBox" name="groupBox_10">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Center &amp;&amp; magnification</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QSpinBox" name="physOriginSpace">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="minimum">
+              <number>-99999</number>
+             </property>
+             <property name="maximum">
+              <number>99999</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="magnification">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [space/px]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Time zero and delta t</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QSpinBox" name="sopOrigin">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="minimum">
+              <number>-99999</number>
+             </property>
+             <property name="maximum">
+              <number>99999</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sopTimeOffset">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="suffix">
+              <string> [t]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-9999999.990000000223517</double>
+             </property>
+             <property name="maximum">
+              <double>9999999.990000000223517</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="4">
+         <widget class="nSOPPlot" name="sopPlot" native="true">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Offset</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QDoubleSpinBox" name="sopOffset">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Background value</string>
+             </property>
+             <property name="suffix">
+              <string> [counts]</string>
+             </property>
+             <property name="minimum">
+              <double>-99999999.989999994635582</double>
+             </property>
+             <property name="maximum">
+              <double>99999999.989999994635582</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
          <widget class="QGroupBox" name="groupBox">
           <property name="font">
            <font>
@@ -214,243 +531,6 @@
              </property>
              <property name="checked">
               <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Offset</string>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QDoubleSpinBox" name="sopOffset">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Background value</string>
-             </property>
-             <property name="suffix">
-              <string> [counts]</string>
-             </property>
-             <property name="minimum">
-              <double>-99999999.989999994635582</double>
-             </property>
-             <property name="maximum">
-              <double>99999999.989999994635582</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Time zero and delta t</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_10">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QSpinBox" name="sopOrigin">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="suffix">
-              <string> [px]</string>
-             </property>
-             <property name="minimum">
-              <number>-99999</number>
-             </property>
-             <property name="maximum">
-              <number>99999</number>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sopTimeOffset">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="suffix">
-              <string> [t]</string>
-             </property>
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>-9999999.990000000223517</double>
-             </property>
-             <property name="maximum">
-              <double>9999999.990000000223517</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QGroupBox" name="groupBox_7">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Refl.</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_16">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QComboBox" name="whichRefl">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <item>
-              <property name="text">
-               <string>Zero</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Mean</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_8">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>SOP calibration T0 A</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_14">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QDoubleSpinBox" name="sopCalibT0">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="decimals">
-              <number>7</number>
-             </property>
-             <property name="maximum">
-              <double>999999.989999999990687</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sopCalibA">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="decimals">
-              <number>7</number>
-             </property>
-             <property name="minimum">
-              <double>-99999999.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>99999999.000000000000000</double>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
@@ -523,18 +603,6 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="0" colspan="4">
-         <widget class="nSOPPlot" name="sopPlot" native="true">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Notes">
@@ -587,6 +655,9 @@
            </property>
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="etalon_lambda">
+             <property name="toolTip">
+              <string>Wavelength</string>
+             </property>
              <property name="prefix">
               <string>λ </string>
              </property>
@@ -609,6 +680,9 @@
            </item>
            <item row="0" column="0">
             <widget class="QDoubleSpinBox" name="etalon_thickness">
+             <property name="toolTip">
+              <string>Etalon thickness</string>
+             </property>
              <property name="prefix">
               <string>Thick </string>
              </property>
@@ -634,6 +708,9 @@
            </item>
            <item row="0" column="2">
             <widget class="QDoubleSpinBox" name="etalon_n0">
+             <property name="toolTip">
+              <string>Etalon refractive index</string>
+             </property>
              <property name="prefix">
               <string>n </string>
              </property>
@@ -678,12 +755,15 @@
             </widget>
            </item>
            <item row="0" column="3">
-            <widget class="QDoubleSpinBox" name="etalon_delta">
+            <widget class="QDoubleSpinBox" name="etalon_dn_over_dlambda">
+             <property name="toolTip">
+              <string>Chromatic dispersion</string>
+             </property>
              <property name="prefix">
-              <string>δ </string>
+              <string>dn/dλ </string>
              </property>
              <property name="suffix">
-              <string>%</string>
+              <string> 1/µm</string>
              </property>
              <property name="decimals">
               <number>6</number>
@@ -754,12 +834,11 @@
    <addaction name="actionAddVisar"/>
    <addaction name="actionDelVisar"/>
    <addaction name="separator"/>
-   <addaction name="actionGuess"/>
    <addaction name="actionRefresh"/>
   </widget>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -767,18 +846,6 @@
    </property>
    <property name="toolTip">
     <string>Export TXT</string>
-   </property>
-  </action>
-  <action name="actionGuess">
-   <property name="icon">
-    <iconset resource="../Ghost_fringes/GhostFringes.qrc">
-     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
-   </property>
-   <property name="text">
-    <string>refresh2</string>
-   </property>
-   <property name="toolTip">
-    <string>Guess both intefringes</string>
    </property>
   </action>
   <action name="actionRefresh">
@@ -795,7 +862,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -807,7 +874,7 @@
   </action>
   <action name="actionRect3">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -819,7 +886,7 @@
   </action>
   <action name="actionSaveTxtMultiple">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
    </property>
    <property name="text">
@@ -831,7 +898,7 @@
   </action>
   <action name="actionAddVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -843,7 +910,7 @@
   </action>
   <action name="actionDelVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -884,12 +951,10 @@
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
-  <tabstop>etalon_delta</tabstop>
+  <tabstop>etalon_dn_over_dlambda</tabstop>
   <tabstop>etalon_sensitivity</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
-  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
  </resources>
  <connections/>

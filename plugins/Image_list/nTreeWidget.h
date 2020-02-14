@@ -43,7 +43,7 @@ public:
     ~nTreeWidget(){};
     QPoint dragposition;
     QList<QTreeWidgetItem*> dragitems;
-    QTime dragtime;
+    QElapsedTimer dragtime;
 
 public slots:
     void dropEvent(QDropEvent *);

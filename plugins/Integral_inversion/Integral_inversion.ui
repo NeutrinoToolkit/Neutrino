@@ -488,7 +488,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
       <property name="title">
        <string>Image</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,0,1">
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -501,18 +501,27 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="refphase_checkb">
-         <property name="enabled">
+       <item row="0" column="0" colspan="4">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
           <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QCheckBox" name="multiply_checkb">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Remove</string>
+          <string>Multiply</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -534,6 +543,24 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
          </property>
          <property name="maximum">
           <double>100.000000000000000</double>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="refphase_checkb">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Subtract</string>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -576,38 +603,11 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QCheckBox" name="multiply_checkb">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Multiply</string>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1" colspan="3">
         <widget class="QComboBox" name="refphase_cb">
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="4">
-        <widget class="QComboBox" name="image">
          <property name="font">
           <font>
            <pointsize>10</pointsize>

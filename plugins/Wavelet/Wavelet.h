@@ -44,9 +44,9 @@ public:
 
     Ui::Wavelet my_w;
 
-    QPointer<nRect> region;
+    nRect region;
 
-    QPointer<nLine> linebarrier;
+    nLine linebarrier;
 
     std::map<std::string, nPhysD *> waveletPhys;
     nPhysD *origSubmatrix, *unwrapPhys, *referencePhys, *carrierPhys, *syntheticPhys;

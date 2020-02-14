@@ -44,8 +44,8 @@ public:
 
 public slots:
     void doRotateLive();
-    void doRotate();
-    double getReplaceVal();
+    void keepCopy();
+    double getReplaceVal(nPhysD*);
 };
 
 NEUTRINO_PLUGIN(Rotate,Analysis);

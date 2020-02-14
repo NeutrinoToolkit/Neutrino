@@ -7,7 +7,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+#    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
     PROJECT (${MY_PROJECT_NAME} CXX)
 
@@ -25,7 +25,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=10")
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
 
     set(CMAKE_CXX_STANDARD 11)
@@ -106,9 +106,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
                 SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_${LANGUAGE}.ts")
                 SET(FILES_TO_TRANSLATE ${SOURCES} ${UIS})
                 qt5_create_translation(qm_files  ${TS_FILE})
-                if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-                    message (STATUS "[Debug] translation file ${TS_FILE} will be created, commit it if you create the translations.")
-                endif()
+#                if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+#                    message (STATUS "[Debug] translation file ${TS_FILE} will be created, commit it if you create the translations.")
+#                endif()
             endif()
         ENDFOREACH()
 
@@ -129,9 +129,12 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${TRANSL_QRC} ${PANDOC_QRC} ${README_MD})
+    add_dependencies(${PROJECT_NAME} Neutrino)
+    add_dependencies(${PROJECT_NAME} nPhysImageF)
 
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
     ENDIF()
 
     if(WIN32)
@@ -155,7 +158,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
                 set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
             endif()
         elseif(LINUX)
-            set (PLUGIN_INSTALL_DIR "share/neutrino/plugins")
+            set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
         elseif(WIN32)
             set (PLUGIN_INSTALL_DIR "bin/plugins")
         endif()

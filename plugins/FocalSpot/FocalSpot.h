@@ -38,6 +38,8 @@ class nLine;
 class FocalSpot : public nGenericPan {
     Q_OBJECT
 
+    using nGenericPan::loadSettings;
+
 public:
     Q_INVOKABLE FocalSpot(neutrino *);
 
@@ -50,6 +52,15 @@ public slots:
     QList<double> find_contour(double);
 
     void bufferChanged(nPhysD*);
+
+    void on_centroid_toggled(bool tog);
+    void setPosZero(QPointF pos);
+
+    void mouseAtPlot(QMouseEvent*);
+    void mouseAtWorld(QPointF);
+
+    void loadSettings(QString=QString());
+
 
 private:
     // blurred image for easier calculations

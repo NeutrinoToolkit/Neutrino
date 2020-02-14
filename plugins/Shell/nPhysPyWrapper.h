@@ -5,7 +5,7 @@
 
 #include <cmath>
 #include "PythonQt.h"
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -15,7 +15,6 @@
 /*!
  You can create or get nPhysD as well applyin some filter
 */
-Q_DECLARE_METATYPE(nPhysD*);
 
 class nPhysPyWrapper : public QObject {
     Q_OBJECT
@@ -23,11 +22,11 @@ class nPhysPyWrapper : public QObject {
 public slots:
     nPhysD* new_nPhysD();
 
-    QList<nPhysD*> static_nPhysD_open(QString=QString());
+    QList<nPhysD> static_nPhysD_open(QString=QString());
 
     nPhysD* new_nPhysD(QVector<double>, QPair<int,int>);
 
-    nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python"));
+//    nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python"));
 
     nPhysD* new_nPhysD(nPhysD*);
 
@@ -71,10 +70,10 @@ public slots:
     
     QVector<double> getData(nPhysD*); // geta data in row major order
 
-//#ifdef HAVE_NUMPY
-//    PyObject* toArray(nPhysD*);
+#ifdef HAVE_NUMPY
+    PyObject* toArray(nPhysD*);
 //    nPhysD* new_nPhysD(PyObject*);
-//#endif
+#endif
 
 };
 

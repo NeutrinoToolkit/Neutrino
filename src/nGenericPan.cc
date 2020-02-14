@@ -27,6 +27,11 @@
 
 #include "nApp.h"
 #include "neutrino.h"
+#include "nLine.h"
+#include "nRect.h"
+#include "nEllipse.h"
+#include "nPoint.h"
+#include "nCustomPlots.h"
 #include <QtSvg>
 
 nGenericPan::nGenericPan(neutrino *myparent)
@@ -77,17 +82,14 @@ QString nGenericPan::panName() {
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
     QString name="";
     if (nparent) {
-        int position = nparent->getBufferList().indexOf(buffer);
         name=QString::fromUtf8(buffer->getName().c_str());
-        if (!combo->property("NeuSave-physNameLength").isValid()) {
-            combo->setProperty("NeuSave-physNameLength",nparent->property("NeuSave-physNameLength"));
-        }
-        int len=combo->property("NeuSave-physNameLength").toInt();
+        int len=nparent->property("NeuSave-physNameLength").toInt();
         qDebug() << combo << len << name << name.length();
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
-        name.prepend(QString::number(position)+" : ");
+        int position = nparent->getBufferList().indexOf(buffer);
+        name.prepend(QLocale().toString(position)+" : ");
     }
     return name;
 }
@@ -98,12 +100,11 @@ void nGenericPan::keyPressEvent(QKeyEvent *event) {
 }
 
 void nGenericPan::physAdd(nPhysD *buffer) {
-    DEBUG("here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>here<>");
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
-            int alreadyThere = combo->findData(qVariantFromValue((void*) buffer));
-            if (alreadyThere == -1) {
-                combo->addItem(getNameForCombo(combo,buffer),qVariantFromValue((void*) buffer));
+            QVariant varBuffer=QVariant::fromValue(buffer);
+            if (combo->findData(varBuffer) == -1) {
+                combo->addItem(getNameForCombo(combo,buffer),varBuffer);
             }
         }
     }
@@ -173,9 +174,9 @@ void nGenericPan::grabSave() {
         QString fname=QDir::homePath()+"/Grab_"+panName()+"_"+QString("%1").arg(progNum++, 5, 10, QChar('0'))+".png";
         if (!QFileInfo(fname).exists()) {
             showMessage(fname);
-            setUnifiedTitleAndToolBarOnMac(false);
+//             setUnifiedTitleAndToolBarOnMac(false);
             grab().save(fname);
-            setUnifiedTitleAndToolBarOnMac(true);
+//             setUnifiedTitleAndToolBarOnMac(true);
             break;
         }
         qInfo() << "Image saved to file" << fname;
@@ -204,14 +205,18 @@ void nGenericPan::decorate(QWidget *main_widget) {
                 qobject_cast<QToolButton*>(wdgt)
                 ) {
             if (wdgt->objectName().isEmpty()) {
-                wdgt->setObjectName(wdgt->metaObject()->className()+QString::number(occurrency++));
+                wdgt->setObjectName(wdgt->metaObject()->className()+QLocale().toString(occurrency++));
             }
             wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
         }
     }
 
     foreach (QAction *wdgt, main_widget->findChildren<QAction *>()) {
-        wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+        if (!wdgt->objectName().isEmpty()) {
+            wdgt->setToolTip(wdgt->toolTip()+" ["+wdgt->objectName()+"]");
+        } else {
+            wdgt->setToolTip(wdgt->toolTip());
+        }
     }
 
 }
@@ -311,26 +316,36 @@ void nGenericPan::show(bool onlyOneAllowed) {
 }
 
 void nGenericPan::physDel(nPhysD * buffer) {
+    DEBUG(panName().toStdString() <<  " >>>>> enter");
+//    currentBuffer=nullptr;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
                 disconnect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
-            int position=combo->findData(qVariantFromValue((void*) buffer));
+            int position=combo->findData(QVariant::fromValue(buffer));
+//            QApplication::processEvents();
             combo->removeItem(position);
+//            QApplication::processEvents();
             if (combo->property("neutrinoImage").toBool()) {
                 connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
         }
     }
+//    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    DEBUG(panName().toStdString() << " >>>>> exit");
 }
 
-void nGenericPan::bufferChanged(nPhysD * buffer)
+void nGenericPan::bufferChanged(nPhysD * my_phys)
 {
-    qDebug() << "here";
-    currentBuffer = buffer;
+    qDebug() << panName() << "here" << my_phys;
+    if (nPhysExists(my_phys)) {
+        DEBUG(my_phys->getFromName());
+    }
+    currentBuffer = my_phys;
+    qDebug() << panName() << "here" ;
 }
 
 void nGenericPan::showMessage(QString message) {
@@ -344,7 +359,7 @@ void nGenericPan::showMessage(QString message,int msec) {
 void nGenericPan::comboChanged(int k) {
     QComboBox *combo = qobject_cast<QComboBox *>(sender());
     if (combo) {
-        nPhysD *image=(nPhysD*) (combo->itemData(k).value<void*>());
+        nPhysD *image=(nPhysD*) (combo->itemData(k).value<nPhysD*>());
         if (image) {
             nparent->showPhys(image);
         }
@@ -355,7 +370,7 @@ nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
     nPhysD* retVal=nullptr;
     QApplication::processEvents();
     if (combo->count())
-        retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<void*>());
+        retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<nPhysD*>());
     return retVal;
 }
 
@@ -435,7 +450,7 @@ nGenericPan::loadUi(QSettings &settings) {
             foreach (nPhysD *physAperto,nparent->getBufferList()) {
                 if (physAperto->getName()==imageName) {
                     for (int i=0; i<widget->count();i++) {
-                        if (physAperto==(nPhysD*) (widget->itemData(i).value<void*>())) {
+                        if (physAperto==(nPhysD*) (widget->itemData(i).value<nPhysD*>())) {
                             widget->setCurrentIndex(i);
                             break;
                         }
@@ -530,8 +545,8 @@ nGenericPan::saveUi(QSettings &settings) {
 
         if (widget->property("neutrinoImage").isValid() && widget->property("neutrinoImage").toBool()) {
             for (int i=0; i< widget->count(); i++) {
-                nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<void*>());
-                if (nparent && nparent->my_w->my_view->physList.contains(phys)) {
+                nPhysD *phys=(nPhysD*) (widget->itemData(widget->currentIndex()).value<nPhysD*>());
+                if (nparent && nparent->nPhysExists(phys)) {
                     settings.setValue(widget->objectName(),QString::fromUtf8(phys->getName().c_str()));
                     settings.setValue(widget->objectName()+"-From",QString::fromUtf8(phys->getFromName().c_str()));
                 }
@@ -616,6 +631,7 @@ void nGenericPan::closeEvent(QCloseEvent*){
 //    }
     nparent->emitPanDel(this);
     QApplication::processEvents();
+    deleteLater();
 }
 
 void nGenericPan::focusOutEvent(QFocusEvent *event) {
@@ -650,6 +666,7 @@ void nGenericPan::saveSettings(QString fname) {
 void nGenericPan::loadDefaults() {
     QSettings settings("neutrino","");
     settings.beginGroup(panName());
+    qInfo() << panName() << " : " << settings.fileName();
     loadSettings(settings);
     settings.endGroup();
 }
@@ -710,10 +727,10 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
             }
         }
         QApplication::processEvents();
-        QThread::msleep(100);
     }
     progress.setValue(0);
     progress.hide();
+    progress.close();
     if (nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }
@@ -732,14 +749,14 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     //			if (my_occurrence==occurrence) {
     //				bool found=false;
     //				for (int i=0;i<obj->count();i++) {
-    //					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<void *>());
-    //					if (*objPhys == *(nPhysD*) (my_val.value<void *>())){
+    //					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<nPhysD *>());
+    //					if (*objPhys == *(nPhysD*) (my_val.value<nPhysD *>())){
     //						obj->setCurrentIndex(i);
     //						found=true;
     //					}
     //				}
     //				if (!found) {
-    //					nparent->addPhys((nPhysD*) (my_val.value<void *>()));
+    //					nparent->addPhys((nPhysD*) (my_val.value<nPhysD *>()));
     //					QApplication::processEvents();
     //					if (obj->findData(my_val)>-1) {
     //						obj->setCurrentIndex(obj->findData(my_val));

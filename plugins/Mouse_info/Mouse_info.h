@@ -54,6 +54,7 @@ public slots:
     void updateLabels();
     void updateOrigin();
     void updateScale();
+    void updateUnits();
     void addPoint(QPointF);
 
     void remove_point();

@@ -80,7 +80,7 @@
 
 #include <gsl/gsl_math.h>
 
-#define _phys_cspeed (2.99e8)
+#define _phys_cspeed (299792458.0)
 #define _phys_echarge (1.602e-19)
 #define _phys_emass (9.1e-31)
 #define _phys_vacuum_eps (8.8e-12)
@@ -90,15 +90,6 @@
 #pragma once
 #ifndef __nPhysImageF_h
 #define __nPhysImageF_h
-
-//enum phys_direction { PHYS_HORIZONTAL, PHYS_VERTICAL, PHYS_X, PHYS_Y, PHYS_ROW, PHYS_COLUMN };
-
-// direction defs moved to bidimvec.h
-//#if (__GNUC_MINOR__ > 5)
-//enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-//#else
-//enum phys_direction { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };
-//#endif
 
 enum phys_way { PHYS_POS, PHYS_NEG };
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
@@ -117,15 +108,6 @@ public:
 	{ return description; }
 
 	const char *description;
-};
-
-//! exception to be used on deprecated functions still in the sources
-class phys_deprecated: public std::exception
-{
-  virtual const char* what() const throw()
-  {
-	return "FATAL: function declared UNSAFE!";
-  }
 };
 
 //! exception to be used on wanna-be deprecated functions
@@ -156,9 +138,6 @@ private:
     std::string msg;
 
 };
-
-typedef bidimvec<double> vec2f;
-typedef bidimvec<int> vec2;
 
 //! image source
 //typedef enum phys_type_en {PHYS_FILE, PHYS_RFILE, PHYS_DYN} phys_type;
@@ -205,7 +184,10 @@ public:
 	phys_properties()
 		: anymap()
 	{
-		(*this)["origin"] = vec2f(0,0);
+        (*this)["phys_name"] = "";
+        (*this)["phys_short_name"] = "";
+        (*this)["phys_from_name"] = "";
+        (*this)["origin"] = vec2f(0,0);
 		(*this)["scale"] = vec2f(1,1);
 	}
 
@@ -221,36 +203,42 @@ public:
 	nPhysImageF(std::string, phys_type=PHYS_DYN);
 	
 	//! creates named nPhys, performing a DEEP copy from the passed reference
-	nPhysImageF(const nPhysImageF<T> &, std::string=std::string("copy")); // copy constructor --->> REALLOCATION!
+    nPhysImageF(const nPhysImageF<T> &, std::string=std::string("")); // copy constructor --->> REALLOCATION!
 
 	//! creates flat, named nPhys
-	nPhysImageF(size_t, size_t, T, std::string = std::string());
+    nPhysImageF(unsigned int, unsigned int, T, std::string = std::string());
 	
 	//! named copy from buffer (to be revisited)
-	nPhysImageF(T *, size_t, size_t, std::string = std::string());
+    nPhysImageF(T *, unsigned int, unsigned int, std::string = std::string());
 	
 	//! memento mori
 	~nPhysImageF();
 
+    template <class U>
+    friend std::ostream& operator<<(std::ostream&, nPhysImageF<U> &phys);
 
-	//! resize existing object. WARNING: existing data is deleted
-	void resize(size_t new_w, size_t new_h)
+    //! resize existing object. WARNING: existing data is deleted
+    void resize(unsigned int new_w, unsigned int new_h)
 	{ if ((getW() != new_w) || (getH() != new_h)) {width = new_w; height = new_h; matrix_points_aligned(); } }
+
+    void resize(vec2u new_Size) { resize(new_Size.x(),new_Size.y()); }
+
+
 	
 	//! re-reads buffer for minimum/maximum value
-	void TscanBrightness(void);
+    void TscanBrightness();
 	
 	//! 1D get functions for row/column access
-	size_t get_Tvector(enum phys_direction, size_t, size_t, T*, size_t, phys_way orient=PHYS_POS);
+    unsigned int get_Tvector(enum phys_direction, unsigned int, unsigned int, T*, unsigned int, phys_way orient=PHYS_POS);
 	
 	//! 1D set functions for row/column access
-	void set_Tvector(enum phys_direction, size_t, size_t, T*, size_t, phys_way orient=PHYS_POS);
+    void set_Tvector(enum phys_direction, unsigned int, unsigned int, T*, unsigned int, phys_way orient=PHYS_POS);
 
 	//! get row specialized function
-	void get_Trow(size_t, size_t, std::vector<T> &);
+    void get_Trow(unsigned int, unsigned int, std::vector<T> &);
 	
 	//! set row specialized function
-	void set_Trow(size_t, size_t, std::vector<T> &);
+    void set_Trow(unsigned int, unsigned int, std::vector<T> &);
 
 	//! old ft functions (DEPRECATED!)
 	nPhysImageF<mcomplex> *getFFT(int);
@@ -258,9 +246,8 @@ public:
 	nPhysImageF<mcomplex> *getSingletonFFT(enum phys_direction, enum phys_fft);
 	//! old ft functions (DEPRECATED!)
 	void fftshift();
-	//! old ft functions (DEPRECATED!)
-	void ifftshift();
-	//! old ft functions (DEPRECATED!)
+
+    //! old ft functions (DEPRECATED!)
 	T get_shifted(int, int);	
 
 	//! 2D Complex FT
@@ -279,12 +266,11 @@ public:
 	{ return std::string(typeid(T).name()); }
 
 	//! min/max point coordinates
-    vec2 min_Tv, max_Tv;
+    vec2i min_Tv, max_Tv;
 
 	//phys_properties property; now on anymap
 	//anymap property; specialized class: phys_properties
-	phys_properties property;
-    phys_properties display_property;
+    phys_properties prop;
 
 	// image derivation
 	//nPhysImageF<T> *get_Tlast()
@@ -295,7 +281,7 @@ public:
 
 	// --------------------- image points and statistics ----------------------------
 	T sum() 
-    { T sumTot=0; for (size_t i=0; i<getSurf(); i++) sumTot+=Timg_buffer[i]; return sumTot; }
+    { T sumTot=0; for (unsigned int i=0; i<getSurf(); i++) sumTot+=Timg_buffer[i]; return sumTot; }
 
 		//! min/max values 
 	bidimvec<T> get_min_max();
@@ -326,7 +312,7 @@ public:
 		}
 
 		// copy everything
-		property = rhs.property; // probably missing DEEP operator
+        prop = rhs.prop; // probably missing DEEP operator
 		
 		Tmaximum_value = rhs.Tmaximum_value;
 		Tminimum_value = rhs.Tminimum_value;
@@ -362,14 +348,14 @@ public:
 //		lhs = new nPhysImageF<U>;
 		lhs.resize(width, height);
 #pragma omp parallel for
-        for (size_t i=0; i<getSurf(); i++)
+        for (unsigned int i=0; i<getSurf(); i++)
 			lhs.Timg_buffer[i] = U(Timg_buffer[i]);	
 
         lhs.TscanBrightness();
 		
 		//lhs->object_name = object_name;
 		//lhs->filename=filename;
-		lhs.property = property;
+        lhs.prop = prop;
 		return lhs;
 	}
 
@@ -381,66 +367,102 @@ public:
 		return *new_img;
 	}
 
-	
-	nPhysImageF<T> sub(size_t, size_t, size_t, size_t);
+    nPhysImageF<T> sub(int x, int y, unsigned int Dx, unsigned int Dy) {
+        DEBUG("-----------------------------------------------");
+        nPhysImageF<T> subphys(Dx, Dy, 0.);
+        subphys.set_origin(get_origin()-vec2f(x,y));
+        subphys.set_scale(get_scale());
+
+        subphys.setType(PHYS_DYN);
+
+        unsigned int end_w = std::min(x+Dx, getW());
+        unsigned int end_h = std::min(y+Dy, getH());
+        unsigned int begin_w = std::max(0,x);
+        unsigned int begin_h = std::max(0,y);
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG("-----------------------------------------------");
+        DEBUG(begin_h << " " << end_h << " " << begin_w << " " << end_w);
+        int pad_w = std::min(0,x);
+        int pad_h = std::min(0,y);
+        for (unsigned int i=begin_h; i<end_h; i++) {
+            std::copy(Timg_matrix[i]+begin_w, Timg_matrix[i]+end_w, subphys.Timg_matrix[i-begin_h-pad_h]-pad_w);
+        }
+
+        std::ostringstream my_name;
+
+        my_name << "submatrix(" << getName() << "," << x << "," << y << "," << Dx << "," << Dy << ")";
+        subphys.setName(my_name.str());
+        subphys.setShortName("submatrix("+getShortName()+")");
+        subphys.setFromName(getFromName());
+
+        subphys.TscanBrightness();
+        return subphys;
+    }
+
+    nPhysImageF<T> sub(int x, int y, unsigned int Dx, unsigned int Dy, unsigned int pad) {
+        return sub(x-pad,y-pad,Dx+2*pad,Dy+2*pad);
+    }
+
 
 	// ! get interpolated stretched image
-	nPhysImageF<T> * stretch(bidimvec<size_t> newSize) {
-		nPhysImageF<T> *stretched = new nPhysImageF<T> (newSize.x(), newSize.y(), 0.);
+    nPhysImageF<T> stretch(bidimvec<unsigned int> newSize) {
+        nPhysImageF<T> stretched(newSize.x(), newSize.y(), 0.);
 		bidimvec<double> ratio=div_P<double>(newSize,get_size());
 		DEBUG(5,"ratio" << newSize << " " << ratio);
 
- 		stretched->set_origin(mul_P(get_origin(),ratio));
- 		stretched->set_origin(mul_P(get_scale(),ratio));
-		stretched->setType(PHYS_DYN);
+        stretched.set_origin(mul_P(get_origin(),ratio));
+        stretched.set_origin(mul_P(get_scale(),ratio));
+        stretched.setType(PHYS_DYN);
 
-        for (size_t j=0; j<stretched->getH(); j++) {
-            for (size_t i=0; i<stretched->getW(); i++) {
+        for (unsigned int j=0; j<stretched.getH(); j++) {
+            for (unsigned int i=0; i<stretched.getW(); i++) {
 				bidimvec<double> p=div_P<double>(bidimvec<double>(i,j),ratio);
-				stretched->set(i,j,getPoint(p.x(),p.y()));
+                stretched.set(i,j,getPoint(p.x(),p.y()));
 			}
 		}
 		return stretched;
 	}
-	nPhysImageF<T> * stretch(size_t newW, size_t newH) { return stretch(bidimvec<size_t>(newW,newH));}
+    nPhysImageF<T> stretch(unsigned int newW, unsigned int newH) { return stretch(bidimvec<unsigned int>(newW,newH));}
 
 	// get rotated matrix
-	nPhysImageF<T> * rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+    nPhysImageF<T> rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated=NULL;
+        nPhysImageF<T> rotated;
 
 		if (alphaDeg==0.0) {
-			rotated = new nPhysImageF<T> (getW(), getH(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(i,j));
+            rotated.resize(getW(), getH());
+            for (unsigned int j=0; j<rotated.getH(); j++) {
+                for (unsigned int i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(i,j));
 				}
 			}
-			rotated->set_origin(get_origin());
+            rotated.set_origin(get_origin());
 		} else if (alphaDeg==90.0) {
-			rotated = new nPhysImageF<T> (getH(), getW(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(getW()-1-j,i));
+            rotated.resize(getH(), getW());
+            for (unsigned int j=0; j<rotated.getH(); j++) {
+                for (unsigned int i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(getW()-1-j,i));
 				}
 			}
-			rotated->set_origin(get_origin().y(),getW()-1-get_origin().x());
+            rotated.set_origin(get_origin().y(),getW()-1-get_origin().x());
 		} else if (alphaDeg==180.0) {
-			rotated = new nPhysImageF<T> (getW(), getH(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(getW()-1-i,getH()-1-j));
+            rotated.resize(getW(), getH());
+            for (unsigned int j=0; j<rotated.getH(); j++) {
+                for (unsigned int i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(getW()-1-i,getH()-1-j));
 				}
 			}
-			rotated->set_origin(getW()-1-get_origin().x(),getH()-1-get_origin().y());
+            rotated.set_origin(getW()-1-get_origin().x(),getH()-1-get_origin().y());
 		} else if (alphaDeg==270.0) {
-			rotated = new nPhysImageF<T> (getH(), getW(), 0.0);
-            for (size_t j=0; j<rotated->getH(); j++) {
-                for (size_t i=0; i<rotated->getW(); i++) {
-					rotated->set(i,j,point(j,getH()-1-i));
+            rotated.resize(getH(), getW());
+            for (unsigned int j=0; j<rotated.getH(); j++) {
+                for (unsigned int i=0; i<rotated.getW(); i++) {
+                    rotated.set(i,j,point(j,getH()-1-i));
 				}
 			}
-			rotated->set_origin(get_origin().y(),getH()-1-get_origin().x());
+            rotated.set_origin(get_origin().y(),getH()-1-get_origin().x());
 		} else {		
 			double sina=sin(alpha);
 			double cosa=cos(alpha);
@@ -449,62 +471,63 @@ public:
 			double dy1=-((double)(getW()-1))*sina;
 			double dy2=((double)(getH()-1))*cosa;
 
-            rotated = new nPhysImageF<T> (fabs(dx1)+fabs(dx2)+1,fabs(dy1)+fabs(dy2)+1, def_value);
+            rotated.resize(fabs(dx1)+fabs(dx2)+1,fabs(dy1)+fabs(dy2)+1);
+            rotated.set(def_value);
 			double shiftx=std::min(dx1,0.0)+std::min(dx2,0.0);
 			double shifty=std::min(dy1,0.0)+std::min(dy2,0.0);
-			size_t i,j;
-#pragma omp parallel for collapse(2)
-			for (j=0; j<rotated->getH(); j++) {
-				for (i=0; i<rotated->getW(); i++) {
+            unsigned int i=0,j=0;
+#pragma omp parallel for private(i) collapse(2)
+            for (j=0; j<rotated.getH(); j++) {
+                for (i=0; i<rotated.getW(); i++) {
 					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
 					double jr=(i+shiftx)*sin(alpha)+(j+shifty)*cos(alpha);
-					rotated->set(i,j,getPoint(ir,jr,def_value));
+                    rotated.set(i,j,getPoint(ir,jr,def_value));
 				}
 			}
 			vec2f orig=get_origin();
 			double ir=(orig.x())*cos(-alpha)-(orig.y())*sin(-alpha);
 			double jr=(orig.x())*sin(-alpha)+(orig.y())*cos(-alpha);
-			rotated->set_origin(ir-shiftx,jr-shifty);
+            rotated.set_origin(ir-shiftx,jr-shifty);
 		}
 		//FIXME: this must be roto-translated
-//		rotated->set_origin(get_origin());
-		rotated->set_scale(get_scale());
+//		rotated.set_origin(get_origin());
+        rotated.set_scale(get_scale());
 
-		rotated->setType(PHYS_DYN);
+        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
 		my_name << getName() << ".rotate(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
+        rotated.setName(my_name.str());
+        rotated.setShortName("rotated");
+        rotated.setFromName(getFromName());
 
-		rotated->TscanBrightness();
+        rotated.TscanBrightness();
 		return rotated;
 	}
 	
-	nPhysImageF<T> * fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {		
+    nPhysImageF<T> fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
-		nPhysImageF<T> *rotated= new nPhysImageF<T> (getW(),getH(), def_value);
+        nPhysImageF<T> rotated(getW(),getH(), def_value);
 		double dx_2=0.5*((double) getW());
 		double dy_2=0.5*((double) getH());
 		double cosa=cos(alpha);
 		double sina=sin(alpha);
-		for (size_t j=0; j<getH(); j++) {
-			for (size_t i=0; i<getW(); i++) {
+        for (unsigned int j=0; j<getH(); j++) {
+            for (unsigned int i=0; i<getW(); i++) {
 				double ir=dx_2+(i-dx_2)*cosa-(j-dy_2)*sina;
 				double jr=dy_2+(i-dx_2)*sina+(j-dy_2)*cosa;
-				rotated->set(i,j,getPoint(ir,jr,def_value));
+                rotated.set(i,j,getPoint(ir,jr,def_value));
 			}
 		}
-		rotated->set_origin(get_origin());
-		rotated->set_scale(get_scale());
-		rotated->setType(PHYS_DYN);
+        rotated.set_origin(get_origin());
+        rotated.set_scale(get_scale());
+        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
         my_name << "(" << getName() << ").fast_rotated(" << alphaDeg << ")";
-		rotated->setName(my_name.str());
-		rotated->setShortName("rotated");
-		rotated->setFromName(getFromName());
+        rotated.setName(my_name.str());
+        rotated.setShortName("rotated");
+        rotated.setFromName(getFromName());
 
-		rotated->TscanBrightness();
+        rotated.TscanBrightness();
 		return rotated;	
 	}
 
@@ -512,114 +535,12 @@ public:
     // correspondence between int/power:
     // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
     double gamma() {
-        if (!property.have("gamma")) {
-            property["gamma"]=(int)1;
+        if (!prop.have("gamma")) {
+            prop["gamma"]=(int)1;
         }
-        int gamma_int= property["gamma"].get_i();
+        int gamma_int= prop["gamma"].get_i();
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
     }
-
-    inline void reset_display() {
-        display_property.erase("display_range");
-        display_property.clear();
-        uchar_buf.clear();
-        DEBUG(uchar_buf.capacity());
-    }
-
-    const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
-        if (getSurf()>0 && palette.size()==768) {
-
-            if (uchar_buf.size() == getSurf()*3 &&
-                    display_property.have("display_range") &&
-                    display_property.have("palette_name") &&
-                    display_property["palette_name"].get_str()==palette_name &&
-                    display_property.have("gamma") &&
-                    display_property["gamma"].get_i()==property["gamma"].get_i()) {
-
-                vec2f old_display_range=display_property["display_range"];
-                vec2f new_display_range=property["display_range"];
-
-                if (old_display_range==new_display_range) {
-                    DEBUG("reusing old uchar_buf");
-                    return &uchar_buf[0];
-                }
-            }
-
-            bidimvec<T> minmax=property.have("display_range") ? property["display_range"] : get_min_max();
-            double mini=minmax.first();
-            double maxi=minmax.second();
-            double my_gamma=gamma();
-
-            DEBUG(6,"8bit ["<<Tminimum_value<<":"<<Tmaximum_value << "] from [" << mini << ":" << maxi<<" , " << my_gamma << "]");
-			uchar_buf.assign(getSurf()*3,255);
-#pragma omp parallel for
-            for (size_t i=0; i<getSurf(); i++) {
-				//int val = mult*(Timg_buffer[i]-lower_cut);
-                if (std::isfinite(Timg_buffer[i])) {
-                    unsigned char val = std::max(0,std::min(255,(int) (255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma))));
-					std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
-				}
-			}
-            display_property["palette_name"]=palette_name;
-            display_property["gamma"]=property["gamma"].get_i();
-            display_property["display_range"]=property["display_range"]=vec2f(mini,maxi);
-
-            return &uchar_buf[0];
-		}
-		WARNING("asking for uchar buffer of empty image");
-
-		return NULL;
-	}
-
-	const double *to_dvector(enum phys_direction direction, size_t index) {
-        throw phys_deprecated();
-
-//		std::cerr<<"[to_dvector] dir: "<<direction<<", index: "<<index<<std::endl;
-		size_t size[2]={width,height};
-			
-		if (vector_buf[direction] == NULL)
-			vector_buf[direction] = new double [size[direction]];
-
-		size_t ndir = (direction+1)%2;	// normal direction
-		index = std::min(index,size[ndir]-1);
-
-		if (direction == PHYS_X) {
-            for (size_t i=0; i<size[direction]; i++)
-				vector_buf[direction][i] = Timg_matrix[index][i];
-				//vector_buf[direction][i] = point(index, i);
-		} else {
-            for (size_t i=0; i<size[direction]; i++)
-				vector_buf[direction][i] = Timg_matrix[i][index];
-				//vector_buf[direction][i] = point(i, index);
-		}
-
-		return vector_buf[direction];
-
-	}
-
-	const double *to_axis(enum phys_direction direction) {
-        throw phys_deprecated();
-        size_t size= direction==PHYS_X ? width : height;
-		
-		if (axis_buf[direction]==NULL) axis_buf[direction] = new double [size];
-		
-        for (size_t i=0; i<size; i++)
-			axis_buf[direction][i] = (i-get_origin(direction))*get_scale(direction);
-
-		return axis_buf[direction];
-
-	}
-
-//	const double *to_evector(int x1, int y1, int x2, int y2) {
-//		// here allocation is dynamic. calling object MUST cleanup
-
-//		double *ovec;
-
-//		if ((x1==x2) && (y1==y2)) {
-
-//		}
-//		return NULL;
-//	}
 
 	// interfacing methods
 
@@ -627,11 +548,11 @@ public:
 	inline T getPoint(double x, double y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
 		if (Timg_matrix != NULL) {
 			if (x>=0 && y>=0) {
-				size_t x1=(size_t)x;
-				size_t y1=(size_t)y;
-				if (x==x1 && y==y1) return point((size_t)x1,(size_t)y1);
-				size_t x2=x1+1;
-				size_t y2=y1+1;
+                unsigned int x1=(unsigned int)x;
+                unsigned int y1=(unsigned int)y;
+                if (x==x1 && y==y1) return point((unsigned int)x1,(unsigned int)y1);
+                unsigned int x2=x1+1;
+                unsigned int y2=y1+1;
 				if (x2<getW() && y2<getH()) {
 					T data11=Timg_matrix[y1][x1];
 					T data12=Timg_matrix[y1][x2];
@@ -648,14 +569,14 @@ public:
 	}
 	
 	// get point (to be used for accessing data - no overload)
-	inline T point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
+    inline T point(unsigned int x, unsigned int y, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
 		if ((Timg_matrix != NULL) && (x<getW()) && (y<getH()))
 			return Timg_matrix[y][x];
 		else
 			return nan_value;
 	}
 
-	inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
+    inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
 		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()) && (p.x()>=0) && (p.y()>=0))
 			return Timg_matrix[p.y()][p.x()];
 		else
@@ -664,7 +585,7 @@ public:
 
 
 	// must check speed
-	inline T clean_point(size_t x, size_t y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
+    inline T clean_point(unsigned int x, unsigned int y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
 		if ((Timg_matrix != NULL) && (x<getW()) && (y<getH())) {
 			if (std::isfinite(Timg_matrix[y][x]))
 				return Timg_matrix[y][x];
@@ -673,31 +594,31 @@ public:
 			return nan_value;
 	}
 
-	inline T point(size_t xy) const {
+    inline T point(unsigned int xy) const {
 		if ((Timg_matrix != NULL) && (xy<getSurf()) )
 			return Timg_buffer[xy];
 		else
 			return 0;
 	}
 
-	inline void set(size_t x, size_t y, T val) {
+    inline void set(unsigned int x, unsigned int y, T val) {
 		if (Timg_matrix && (x<getW()) && (y<getH()))
 			Timg_matrix[y][x] = val;
 	}
 
-	inline void set(size_t xy, T val) {
+    inline void set(unsigned int xy, T val) {
 		if (Timg_matrix && (xy<getSurf()) )
 			Timg_buffer[xy] = val;
 	}
 
-	inline void set(bidimvec<size_t> p, T val) {
+    inline void set(bidimvec<unsigned int> p, T val) {
 		if (Timg_matrix && (p.x()<getW()) && (p.y()<getH()))
 			Timg_matrix[p.y()][p.x()] = val;
 	}
 
 	inline void set(T val) { //! set a value allover the matrix
 		DEBUG(PRINTVAR(val));
-        for (size_t i=0; i<getSurf(); i++) {
+        for (unsigned int i=0; i<getSurf(); i++) {
 			Timg_buffer[i]=val;
 		}
 		TscanBrightness();
@@ -717,14 +638,14 @@ public:
 		if (Tmaximum_value == Tminimum_value)
 			TscanBrightness();
 
-		size_t nbins = std::max<int>(getW()*getH()/10000, 100lu);
-		double binw = (double)(Tmaximum_value-Tminimum_value)/(nbins-1.);
+        unsigned int nbins = std::max<int>(getW()*getH()/10000, 100lu);
+        double binw = static_cast<double>(Tmaximum_value-Tminimum_value)/(nbins-1.);
 		histogram.resize(nbins);
 
 		DEBUG(5,"histogram has "<<nbins<<" bins, bin width: "<<binw);
 
-        for (size_t i=0; i<getSurf(); i++) {
-			size_t bin_n = (size_t)floor((Timg_buffer[i]-Tminimum_value)/(binw));
+        for (unsigned int i=0; i<getSurf(); i++) {
+            unsigned int bin_n = static_cast<unsigned int>(floor((Timg_buffer[i]-Tminimum_value)/(binw)));
 			histogram[bin_n]++;
 		}
 
@@ -735,30 +656,30 @@ public:
 
 	double count_colors() {
 		std::map<T, int> img_colors;
-        for (size_t i=0; i<getSurf(); i++)
+        for (unsigned int i=0; i<getSurf(); i++)
 			img_colors[Timg_buffer[i]]++;
 
 		return img_colors.size();
 	}
 
-	inline bidimvec<size_t> get_size()
-	{ return bidimvec<size_t>(width,height); }
+    inline bidimvec<unsigned int> get_size()
+    { return bidimvec<unsigned int>(width,height); }
 
-	inline size_t getW() const
+    inline unsigned int getW() const
 	{ return width; }
 
-	inline size_t getH() const
+    inline unsigned int getH() const
 	{ return height; }
 
-	inline size_t getSurf() const
+    inline unsigned int getSurf() const
 	{ return width*height; }
 
-	inline vec2 getSize() {return vec2(width,height);}
+    inline vec2i getSize() {return vec2i(width,height);}
 
-	inline size_t getSizeByIndex(enum phys_direction dir)
+    inline unsigned int getSizeByIndex(enum phys_direction dir)
 	{ if (dir==PHYS_X) return getW(); if (dir == PHYS_Y) return getH(); return 0; }
 
-	inline bool isInside(size_t x, size_t y) {
+    inline bool isInside(unsigned int x, unsigned int y) {
 		if ((x < getW()) && (y < getH()))
 			return true;
 		return false;
@@ -766,65 +687,69 @@ public:
 
 	// getting and setting properties
 	inline std::string getName()
-    { return property["phys_name"]; }
+    { return prop["phys_name"]; }
 	void setName(std::string name)
-    { property["phys_name"] = name; }
+    { prop["phys_name"] = name; }
 
 //tom
 	inline std::string getShortName()
-    { return property["phys_short_name"]; }
+    { return prop["phys_short_name"]; }
 	
 	inline void setShortName(std::string name)
-    { property["phys_short_name"] = name; }
+    { prop["phys_short_name"] = name; }
 
 	inline std::string getFromName()
-    { return property["phys_from_name"]; }
+    { return prop["phys_from_name"]; }
 	
 	inline void setFromName(std::string name)
-    { property["phys_from_name"] = name; }
+    { prop["phys_from_name"] = name; }
 
 	inline vec2f get_origin()
-    { return property["origin"]; }
+    { return prop["origin"]; }
 
 	inline double get_origin(enum phys_direction direction)
-    { return (direction==PHYS_X ? vec2f(property["origin"].get_str()).x() : vec2f(property["origin"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(prop["origin"].get_str()).x() : vec2f(prop["origin"].get_str()).y()); }
 
 	inline void set_origin(T val_x, T val_y)
-    { property["origin"] = vec2f(val_x,val_y); }
+    { prop["origin"] = vec2f(val_x,val_y); }
 	
 	inline void set_origin(vec2f val) 
-    { property["origin"] = val; }
+    { prop["origin"] = val; }
 
     inline vec2f get_scale()
-    { return property["scale"]; }
+    { return prop["scale"]; }
 
 	inline double get_scale(enum phys_direction direction)
-    { return (direction==PHYS_X ? vec2f(property["scale"].get_str()).x() : vec2f(property["scale"].get_str()).y()); }
+    { return (direction==PHYS_X ? vec2f(prop["scale"].get_str()).x() : vec2f(prop["scale"].get_str()).y()); }
 
 	inline void set_scale(T val_x, T val_y)
-    { property["scale"] = vec2f(val_x,val_y); }
+    { prop["scale"] = vec2f(val_x,val_y); }
 	
 	inline void set_scale(vec2f val)
-    { property["scale"] = val; }
+    { prop["scale"] = val; }
 	
 	inline vec2f to_real(vec2f val) { 
 		vec2f oo, ss; 
-        oo = property["origin"]; ss = property["scale"];
+        oo = prop["origin"]; ss = prop["scale"];
 		return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
 	}
 
 	inline vec2f to_pixel(vec2f val) { 
 		vec2f oo, ss; 
-        oo = property["origin"]; ss = property["scale"];
+        oo = prop["origin"]; ss = prop["scale"];
 		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
 	}
+
+    inline int copies() {
+        return *_n_inst;
+    }
 
 //end
 
 	inline phys_type getType()
-    { return property["phys_orig"]; }
+    { return prop["phys_orig"]; }
 	void setType(std::string orig)
-	{ property["phys_orig"] = orig; }
+    { prop["phys_orig"] = orig; }
 
 
 	// (dovra' passare protected, prima o poi...)
@@ -832,7 +757,6 @@ public:
 	T **Timg_matrix;
 
 protected:
-    std::vector<unsigned char> uchar_buf;
 	double **vector_buf;
 	double **axis_buf;
 	std::vector<double> histogram;
@@ -840,8 +764,8 @@ protected:
 private:
 	void init_Tvariables();
 	void matrix_points_aligned();
-	size_t width;
-	size_t height;
+    unsigned int width;
+    unsigned int height;
 
 	//! TODO: pass to bicimvec<T>
 	T Tmaximum_value;
@@ -866,11 +790,12 @@ private:
 
 };
 
-typedef nPhysImageF<double> nPhysD;
-typedef nPhysImageF<mcomplex> nPhysC;
 
-typedef std::map<std::string, nPhysImageF<double> > nMapD;
-
+template <class U>
+std::ostream& operator<<(std::ostream& os, nPhysImageF<U> &phys) {
+    os << "\n" << phys.getName() << "\n" << phys.getShortName() << "\nSize: " << phys.getW() << "x" << phys.getH()<< "\nCopies: " << phys.copies() << "\n";
+    return os;
+}
 
 
 // --------------------------------------------------------------------------------------------
@@ -896,7 +821,7 @@ nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp)
 	setType(pp);
 	std::string shortname=obj_name;
 	if (pp==PHYS_FILE) {
-		size_t last_idx = obj_name.find_last_of("\\/");
+        unsigned int last_idx = obj_name.find_last_of("\\/");
 		if (std::string::npos != last_idx) {
 			shortname.erase(0,last_idx + 1);
 		}
@@ -915,22 +840,24 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 	
 //	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
     std::copy(oth.Timg_buffer, oth.Timg_buffer+getSurf(), Timg_buffer);
-	property = oth.property;
+    prop = oth.prop;
 	
-	setShortName(sName);
+    if (!sName.empty()) {
+        setShortName(sName);
+    }
 	TscanBrightness();
 //	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
 }
 
 
 template<class T>
-nPhysImageF<T>::nPhysImageF(size_t w, size_t h, T val, std::string obj_name)
+nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string obj_name)
 {
 	init_Tvariables();
 	setName(obj_name);
 
 	resize(w, h);
-    for (size_t i=0; i<getW()*getH(); i++)
+    for (unsigned int i=0; i<getW()*getH(); i++)
 		Timg_buffer[i] = val;
     TscanBrightness();
 }
@@ -938,7 +865,7 @@ nPhysImageF<T>::nPhysImageF(size_t w, size_t h, T val, std::string obj_name)
 
 
 template<class T>
-nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t w, size_t h, std::string obj_name) {
+nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int w, unsigned int h, std::string obj_name) {
 
 	throw phys_trashable();
 	init_Tvariables();
@@ -954,7 +881,7 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t w, size_t h, std::string obj_nam
 }
 
 /*template<class T>
-nPhysImageF<T>::nPhysImageF(T *o_buffer, size_t o_width, size_t o_height) {
+nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int o_width, unsigned int o_height) {
 	init_Tvariables();
 	width = o_width;
 	height = o_height;
@@ -1018,8 +945,8 @@ nPhysImageF<T>::init_Tvariables()
 
 	//pIF_size.set_msg("size error");
 
-	min_Tv=vec2(-1,-1);
-	max_Tv=vec2(-1,-1);
+    min_Tv=vec2i(-1,-1);
+    max_Tv=vec2i(-1,-1);
 
 	Tmaximum_value = 0;
 	Tminimum_value = 0;
@@ -1067,8 +994,6 @@ nPhysImageF<T>::matrix_points_aligned()
 		Timg_matrix = NULL;
 	}
 
-    uchar_buf.clear();
-
 	if (vector_buf != NULL) {
 		if (vector_buf[0] != NULL)
 			delete vector_buf[0];
@@ -1093,7 +1018,7 @@ nPhysImageF<T>::matrix_points_aligned()
 		DEBUG(11,"[\t\t|--> ] template 32bit contiguous allocated");
 
 		assert( Timg_matrix = new T* [height] );
-        for (size_t i=0; i<height; i++)
+        for (unsigned int i=0; i<height; i++)
 			Timg_matrix[i] = Timg_buffer + i*width;
 		DEBUG(11,"[\t\t|--> ] template matrix translation allocated");
 
@@ -1113,12 +1038,12 @@ nPhysImageF<T>::matrix_points_aligned()
 //	if (direction == 0) {
 //		if ((size+offset > width)) 	// spem longam spatio brevi reseces ;-)
 //			copy_len = width-offset;
-//		for (size_t i=0; i<copy_len; i++)
+//		for (unsigned int i=0; i<copy_len; i++)
 //			ptr[i] = Timg_buffer[index*width+offset+i];
 //	} else if (direction == 1) {
 //		if ((size+offset > height))
 //			copy_len = height-offset;
-//		for (size_t i=0; i<copy_len; i++)
+//		for (unsigned int i=0; i<copy_len; i++)
 //			ptr[i] = Timg_buffer[(offset+i)*width+index];
 //	}
 //}
@@ -1130,12 +1055,12 @@ nPhysImageF<T>::matrix_points_aligned()
 //	if (direction == 0) {
 //		if ((size+offset > width)) 	// spem longam...
 //			copy_len = width-offset;
-//		for (size_t i=0; i<copy_len; i++)
+//		for (unsigned int i=0; i<copy_len; i++)
 //			Timg_buffer[index*width+offset+i] = ptr[i];
 //	} else if (direction == 1) {
 //		if ((size+offset > height)) 	
 //			copy_len = height-offset;
-//		for (size_t i=0; i<copy_len; i++)
+//		for (unsigned int i=0; i<copy_len; i++)
 //			Timg_buffer[(offset+i)*width+index] = ptr[i];
 //	}
 //
@@ -1146,18 +1071,18 @@ nPhysImageF<T>::matrix_points_aligned()
 
 // ----------------------- DATA ACCESS ----------------------------	
 
-template<class T> size_t
-nPhysImageF<T>::get_Tvector(enum phys_direction direction, size_t index, size_t offset, T *ptr, size_t size, phys_way orient)
+template<class T> unsigned int
+nPhysImageF<T>::get_Tvector(enum phys_direction direction, unsigned int index, unsigned int offset, T *ptr, unsigned int size, phys_way orient)
 {
 	// copies a vector to an external buffer (useful for Abel inversion)
 	// vector is taken on direction (0=x, 1=y), starting from offset and for size points
 
-	size_t copy_len = size;
+    unsigned int copy_len = size;
 	if (direction == PHYS_X) {
 		if (orient == PHYS_POS) {
 			if ((size+offset > width)) 	// spem longam spatio brevi reseces ;-)
 				copy_len = width-offset;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				ptr[i] = clean_point(offset+i, index, 0.);
 				//ptr[i] = Timg_matrix[index][offset+i];
 				//ptr[i] = Timg_buffer[index*width+offset+i];
@@ -1165,7 +1090,7 @@ nPhysImageF<T>::get_Tvector(enum phys_direction direction, size_t index, size_t 
 			//if (((offset+1)-size < 0)) 	
 			if (((offset+1) < size)) 	
 				copy_len = offset+1;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				ptr[i] = clean_point(offset-i, index, 0.);
 				//ptr[i] = Timg_matrix[index][offset-i];
 		}
@@ -1174,7 +1099,7 @@ nPhysImageF<T>::get_Tvector(enum phys_direction direction, size_t index, size_t 
 		if (orient == PHYS_POS) {
 			if ((size+offset > height))
 				copy_len = height-offset;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				ptr[i] = clean_point(index, offset+i, 0.);
 				//ptr[i] = Timg_matrix[offset+i][index];
 				//ptr[i] = Timg_buffer[(offset+i)*width+index];
@@ -1182,7 +1107,7 @@ nPhysImageF<T>::get_Tvector(enum phys_direction direction, size_t index, size_t 
 			//if (((offset+1)-size < 0)) 	
 			if (((offset+1) < size)) 	
 				copy_len = offset+1;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				ptr[i] = clean_point(index, offset-i, 0.);
 				//ptr[i] = Timg_matrix[offset-i][index];
 		}
@@ -1191,23 +1116,23 @@ nPhysImageF<T>::get_Tvector(enum phys_direction direction, size_t index, size_t 
 }
 
 template<class T> void
-nPhysImageF<T>::set_Tvector(enum phys_direction direction, size_t index, size_t offset, T *ptr, size_t size, phys_way orient)
+nPhysImageF<T>::set_Tvector(enum phys_direction direction, unsigned int index, unsigned int offset, T *ptr, unsigned int size, phys_way orient)
 {
 	// copies a vector to an external buffer (useful for Abel inversion)
 	// vector is taken on direction (0=x, 1=y), starting from offset and for size points
 
-	size_t copy_len = size;
+    unsigned int copy_len = size;
 	if (direction == PHYS_X) {
 		if (orient == PHYS_POS) {
 			if ((size+offset > width)) 	// spem longam spatio brevi reseces ;-)
 				copy_len = width-offset;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				Timg_matrix[index][offset+i] = ptr[i];
 		} else {
 			//if (((offset+1) -size < 0)) 	
 			if (((offset+1) < size)) 	
 				copy_len = offset+1;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				Timg_matrix[index][offset-i] = ptr[i];
 		}
 
@@ -1215,13 +1140,13 @@ nPhysImageF<T>::set_Tvector(enum phys_direction direction, size_t index, size_t 
 		if (orient == PHYS_POS) {
 			if ((size+offset > height))
 				copy_len = height-offset;
-			for (size_t i=0; i<copy_len; i++)
+            for (unsigned int i=0; i<copy_len; i++)
 				Timg_matrix[offset+i][index] = ptr[i];
 		} else {
 			//if (((offset+1)-size < 0)) 	
 			if (((offset+1) < size)) 	
 				copy_len = offset+1;
-			for (size_t i=0; i<copy_len; i++) {
+            for (unsigned int i=0; i<copy_len; i++) {
 				Timg_matrix[offset-i][index] = ptr[i];
 			}
 		}
@@ -1231,7 +1156,7 @@ nPhysImageF<T>::set_Tvector(enum phys_direction direction, size_t index, size_t 
 //! get_Trow specialization. Row copy/move can be faster for the use of bulk copy methods
 //! WARNING: uses % on index and offset (for more interesting solutions)
 template<class T> void
-nPhysImageF<T>::get_Trow(size_t index, size_t offset, std::vector<T> &vec) {
+nPhysImageF<T>::get_Trow(unsigned int index, unsigned int offset, std::vector<T> &vec) {
 	
 	vec.resize(getW());
 	
@@ -1246,7 +1171,7 @@ nPhysImageF<T>::get_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 }
 
 template<class T> void
-nPhysImageF<T>::set_Trow(size_t index, size_t offset, std::vector<T> &vec) {
+nPhysImageF<T>::set_Trow(unsigned int index, unsigned int offset, std::vector<T> &vec) {
 
 	T* optr;
 	offset = offset%getW();
@@ -1257,43 +1182,13 @@ nPhysImageF<T>::set_Trow(size_t index, size_t offset, std::vector<T> &vec) {
 }
 
 
-//! get submatrix
-template <class T> nPhysImageF<T> 
-nPhysImageF<T>::sub(size_t x, size_t y, size_t Dx, size_t Dy) {
-
-	nPhysImageF<T> subphys(Dx, Dy, 0.);
-	subphys.set_origin(get_origin()-vec2f(x,y));
-	subphys.set_scale(get_scale());
-
-	subphys.setType(PHYS_DYN);
-
-	if (isInside(x, y)) {
-		size_t copy_w = std::min(x+Dx, (size_t)getW()); // FIXME
-		size_t copy_h = std::min(y+Dy, (size_t)getH());
-        for (size_t i=y; i<copy_h; i++) {
-			std::copy(Timg_matrix[i]+x, Timg_matrix[i]+copy_w, subphys.Timg_matrix[i-y]);
-		}
-	}
-	std::ostringstream my_name;
-	
-	my_name << "submatrix(" << getName() << "," << x << "," << y << "," << Dx << "," << Dy << ")";	
-	subphys.setName(my_name.str());
-	subphys.setShortName("submatrix("+getShortName()+")");
-	subphys.setFromName(getFromName());
-
-	subphys.TscanBrightness();
-	return subphys;
-}
-
-
-
 template<class T> void
 nPhysImageF<T>::TscanBrightness() {
     if (getSurf()>0) {
         bool found=false;
 
 #pragma omp parallel for
-        for (size_t i=0; i<getSurf(); i++) {
+        for (unsigned int i=0; i<getSurf(); i++) {
 			if (std::isfinite(Timg_buffer[i])) {	
 				if (!found) {
 					Tminimum_value = Timg_buffer[i];
@@ -1301,10 +1196,10 @@ nPhysImageF<T>::TscanBrightness() {
 					found=true;
 				} else {
 					 if ((Timg_buffer[i]) > Tmaximum_value) {
-                         max_Tv=vec2(i%width, i/width);
+                         max_Tv=vec2i(i%width, i/width);
                          Tmaximum_value = (Timg_buffer[i]);
 					 } else if ((Timg_buffer[i]) < Tminimum_value) {
-                         min_Tv=vec2(i%width, i/width);
+                         min_Tv=vec2i(i%width, i/width);
 						 Tminimum_value = (Timg_buffer[i]);
 					 }
 				}
@@ -1332,13 +1227,13 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 
         // 2. data copy
 #pragma omp parallel for
-        for (size_t i = 0; i < getSurf(); i++) {
+        for (unsigned int i = 0; i < getSurf(); i++) {
             assign_val_to_fftw_complex(Timg_buffer[i], t[i]);
         }
 
 //#pragma omp parallel for collapse(2)
-//        for (size_t  j = 0; j < height; j++){
-//            for (size_t i = 0; i < width; i++) {
+//        for (unsigned int  j = 0; j < height; j++){
+//            for (unsigned int i = 0; i < width; i++) {
 //                assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
 //            }
 //        }
@@ -1348,13 +1243,13 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 		
 		// 4. transplant
 #pragma omp parallel for
-        for (size_t i = 0; i < getSurf(); i++) {
+        for (unsigned int i = 0; i < getSurf(); i++) {
             ftbuf.Timg_buffer[i]=mcomplex(Ft[i][0], Ft[i][1]);
         }
 
 //#pragma omp parallel for collapse(2)
-//        for (size_t  j = 0; j < height; j++){
-//            for (size_t i = 0; i < width; i++) {
+//        for (unsigned int  j = 0; j < height; j++){
+//            for (unsigned int i = 0; i < width; i++) {
 //                ftbuf.Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
 //            }
 //        }
@@ -1390,11 +1285,11 @@ nPhysImageF<T>::ft1(enum phys_direction imgdir, enum phys_fft ftdir)
 			plan_t = fftw_plan_dft_1d(getW(), t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 		// 2. data copy, transform and tralsplant
-        for (size_t row_n = 0; row_n<getH(); row_n++) {
-            for (size_t col_n = 0; col_n<getW(); col_n++)
+        for (unsigned int row_n = 0; row_n<getH(); row_n++) {
+            for (unsigned int col_n = 0; col_n<getW(); col_n++)
 				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[col_n]);
 			fftw_execute(plan_t);
-            for (size_t col_n = 0; col_n<getW(); col_n++)
+            for (unsigned int col_n = 0; col_n<getW(); col_n++)
 				ftbuf.Timg_matrix[row_n][col_n] = mcomplex(Ft[col_n][0], Ft[col_n][1]);
 			
 		}
@@ -1425,11 +1320,11 @@ nPhysImageF<T>::ft1(enum phys_direction imgdir, enum phys_fft ftdir)
 			plan_t = fftw_plan_dft_1d(getH(), t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 		// 2. data copy, transform and tralsplant
-        for (size_t col_n = 0; col_n<getW(); col_n++) {
-            for (size_t row_n = 0; row_n<getH(); row_n++)
+        for (unsigned int col_n = 0; col_n<getW(); col_n++) {
+            for (unsigned int row_n = 0; row_n<getH(); row_n++)
 				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[row_n]);
 			fftw_execute(plan_t);
-            for (size_t row_n = 0; row_n<getH(); row_n++)
+            for (unsigned int row_n = 0; row_n<getH(); row_n++)
 				ftbuf.Timg_matrix[row_n][col_n] = mcomplex(Ft[row_n][0], Ft[row_n][1]);
 			
 		}
@@ -1456,10 +1351,10 @@ nPhysImageF<T>::fftshift() {
 
 	// warning! : definitely a bad idea to back-transform a shifted spectrum
 	T val;
-	size_t hwidth = (width+1)/2;
-	size_t hheight = (height+1)/2;
-    for (size_t i=0; i<width/2; i++) {
-        for (size_t j=0; j<height/2; j++) {
+    unsigned int hwidth = (width+1)/2;
+    unsigned int hheight = (height+1)/2;
+    for (unsigned int i=0; i<width/2; i++) {
+        for (unsigned int j=0; j<height/2; j++) {
 			val = Timg_matrix[j][i];
 			Timg_matrix[j][i] = Timg_matrix[j+hheight][i+hwidth];
 			Timg_matrix[j+hheight][i+hwidth] = val;
@@ -1472,176 +1367,13 @@ nPhysImageF<T>::fftshift() {
 }
 
 template<class T> void
-nPhysImageF<T>::ifftshift() {
-
-
-}
-
-
-template<class T> inline nPhysImageF<mcomplex> * 
-nPhysImageF<T>::getFFT(int direction) {
-	throw phys_deprecated();
-	// tu te la calcoli
-	//if (direction == 0)
-	//	throw pIF_FFT_error;
-	//if (width == 0 || height == 0)
-	//	throw pIF_FFT_error;
-
-	// 1. allocation
-    fftw_complex *t = fftw_alloc_complex(getSurf());
-    fftw_complex *Ft = fftw_alloc_complex(getSurf());
-	nPhysImageF<mcomplex> *ftbuf;
-
-	ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.), "ftbuf");
-	
-	fftw_plan plan_t;
-	if (direction > 0)
-		plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-	else
-		plan_t = fftw_plan_dft_2d(width, height, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-	
-	// 2. data copy	
-    for (size_t  j = 0; j < height; j++){
-        for (size_t i = 0; i < width; i++) {
-			//assign_val_to_fftw_complex(Timg_matrix[j][i], t[i+j*width]);
-			assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
-			//t[i+j*width][0] = Timg_matrix[j][i];
-			//t[i+j*width][1]=0.0;
-		}
-	}
-
-	// 3. transform
-	fftw_execute(plan_t);
-
-	// 4. transplant
-    for (size_t  j = 0; j < height; j++){
-        for (size_t i = 0; i < width; i++) {
-			//ftbuf->Timg_matrix[j][i] = mcomplex(Ft[i+j*width][0], Ft[i+j*width][1]);
-			ftbuf->Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
-		}
-	}
-
-	// 5. return
-	fftw_free(t);
-	fftw_free(Ft);
-	fftw_destroy_plan(plan_t);
-	
-	DEBUG(10,"out of fft");
-
-	return ftbuf;
-}
-
-template<class T> nPhysImageF<mcomplex> * 
-nPhysImageF<T>::getSingletonFFT(enum phys_direction dir, enum phys_fft fftdir) {
-	throw phys_deprecated();
-	
-	int mydir;
-	switch (dir) {
-        case 0:
-			mydir = 0;
-			break;
-
-        case 1:
-			mydir = 1;
-			break;
-
-		default:
-			//throw pIF_FFT_error;
-			return NULL;
-			break;
-	}
-	
-	// che mi sta un po' sul culo lo switch...
-	if (mydir == 0) {
-		// horizontal
-
-		// 1. allocation
-		fftw_complex *t = fftw_alloc_complex(width);
-		fftw_complex *Ft = fftw_alloc_complex(width);
-		nPhysImageF<mcomplex> *ftbuf;
-		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
-
-		fftw_plan plan_t;
-		
-		if (fftdir == PHYS_FORWARD)
-			plan_t = fftw_plan_dft_1d(width, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-		else
-			plan_t = fftw_plan_dft_1d(width, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-		// 2. data copy, transform and tralsplant
-        for (size_t row_n = 0; row_n<height; row_n++) {
-            for (size_t col_n = 0; col_n<width; col_n++)
-				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[col_n]);
-			fftw_execute(plan_t);
-            for (size_t col_n = 0; col_n<width; col_n++)
-				ftbuf->Timg_matrix[row_n][col_n] = mcomplex(Ft[col_n][0], Ft[col_n][1]);
-			
-		}
-
-		// and don't bother to realign..
-
-		fftw_destroy_plan(plan_t);
-		fftw_free(t);
-		fftw_free(Ft);
-
-		// 5. return
-		return ftbuf;
-
-	} else if (mydir == 1) {
-		// vertical
-	
-		// 1. allocation
-		fftw_complex *t = fftw_alloc_complex(height);
-		fftw_complex *Ft = fftw_alloc_complex(height);
-		nPhysImageF<mcomplex> *ftbuf;
-		ftbuf = new nPhysImageF<mcomplex>(width, height, mcomplex(0.,0.));
-
-		fftw_plan plan_t;
-		
-		if (fftdir == PHYS_FORWARD)
-			plan_t = fftw_plan_dft_1d(height, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-		else
-			plan_t = fftw_plan_dft_1d(height, t, Ft, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-		// 2. data copy, transform and tralsplant
-        for (size_t col_n = 0; col_n<width; col_n++) {
-            for (size_t row_n = 0; row_n<height; row_n++)
-				assign_val_to_fftw_complex(Timg_matrix[row_n][col_n], t[row_n]);
-			fftw_execute(plan_t);
-            for (size_t row_n = 0; row_n<height; row_n++)
-				ftbuf->Timg_matrix[row_n][col_n] = mcomplex(Ft[row_n][0], Ft[row_n][1]);
-			
-		}
-
-		// and don't bother to realign..
-
-		fftw_destroy_plan(plan_t);
-		fftw_free(t);
-		fftw_free(Ft);
-
-		// 5. return
-		return ftbuf;
-	}
-
-}
-
-//template<> nPhysImageF<complex<double> > *
-//nPhysImageF<complex<double> >::getFFT(int direction) {
-	// tu pure te la calcoli
-//}
-
-// output
-//
-// --------------------------------------------------------------------------------------------------
-
-template<class T> void
 nPhysImageF<T>::writeASC(const char *ofilename) {
 	// alla bruttissimo dio
 	DEBUG(5,getName() << " Short: " << getShortName() << " from: " << getFromName());
 	std::ofstream ofile(ofilename);
 	if (ofile.good()) {
-        for (size_t i=0; i<height; i++) {
-            for (size_t j=0; j<width-1; j++)
+        for (unsigned int i=0; i<height; i++) {
+            for (unsigned int j=0; j<width-1; j++)
 				ofile<<std::setprecision(8)<<Timg_buffer[j+i*width]<<"\t";
 			ofile<<std::setprecision(8)<<Timg_buffer[width-1+i*width] << "\n";
 		}
@@ -1658,8 +1390,8 @@ nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
 	std::ofstream i_ofile((std::string(ofilename)+".im").c_str());	
 	if (r_ofile.good() && i_ofile.good()) {
 
-        for (size_t i=0; i<height; i++) {
-            for (size_t j=0; j<width; j++) {
+        for (unsigned int i=0; i<height; i++) {
+            for (unsigned int j=0; j<width; j++) {
 				r_ofile<<std::setprecision(8)<<Timg_buffer[j+i*width].real()<<"\t";
 				i_ofile<<std::setprecision(8)<<Timg_buffer[j+i*width].imag()<<"\t";
 			}
@@ -1674,16 +1406,16 @@ nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
 }
 
 
-template<class T> void
-nPhysImageF<T>::writeRAW(const char *ofilename) {
-    throw phys_deprecated();
-    std::ofstream ofile(ofilename);
+//template<class T> void
+//nPhysImageF<T>::writeRAW(const char *ofilename) {
+//    throw phys_deprecated();
+//    std::ofstream ofile(ofilename);
 
-	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
-	// alla bruttissimo dio
-    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
-	ofile.close();
-}
+//	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
+//	// alla bruttissimo dio
+//    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
+//	ofile.close();
+//}
 
 // ------------------------------ operators ------------------------------------
 
@@ -1706,11 +1438,11 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 	nPhysImageF<T> new_img;
 	new_img.resize(width, height);
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+other.property.at("phys_name").get_str()+")");
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
-    for (size_t i=0; i<height*width; i++)
+    for (unsigned int i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = (T)(Timg_buffer[i]) + (T)(other.Timg_buffer[i]);
 		
 	return(new_img);
@@ -1723,9 +1455,9 @@ nPhysImageF<T>::operator+ (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 	
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
-    for (size_t i=0; i<getSurf(); i++)
+    for (unsigned int i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] += val;
 		
 	return(new_img);
@@ -1741,12 +1473,12 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 	new_img.resize(width, height);
 
 
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
-	new_img.setName("("+property.at("phys_name").get_str()+")-("+other.property.at("phys_name").get_str()+")");
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
+    new_img.setName("("+prop.at("phys_name").get_str()+")-("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Subtract");
 	
-    for (size_t i=0; i<height*width; i++)
+    for (unsigned int i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = Timg_buffer[i] - other.Timg_buffer[i];
 		
 	return(new_img);
@@ -1759,9 +1491,9 @@ nPhysImageF<T>::operator- (T &val) const {
 	std::stringstream ss;
 	ss<<val;
 	
-	new_img.setName("("+property.at("phys_name").get_str()+")+("+ss.str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")+("+ss.str()+")");
 	new_img.setShortName("Add "+ss.str());
-    for (size_t i=0; i<getSurf(); i++)
+    for (unsigned int i=0; i<getSurf(); i++)
 		new_img.Timg_buffer[i] -= val;
 		
 	return(new_img);
@@ -1775,13 +1507,13 @@ nPhysImageF<T>::operator* (const nPhysImageF<T> &other) const {
 	
 	nPhysImageF<T> new_img;
 	
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName("("+property.at("phys_name").get_str()+")*("+other.property.at("phys_name").get_str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")*("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Multiply");
 
-    for (size_t i=0; i<height*width; i++)
+    for (unsigned int i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = Timg_buffer[i] * other.Timg_buffer[i];
 		
 	return(new_img);
@@ -1798,13 +1530,13 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 	
 	nPhysImageF<T> new_img;
 	
-	new_img.set_origin(property.at("origin"));
-	new_img.set_scale(property.at("scale"));
+    new_img.set_origin(prop.at("origin"));
+    new_img.set_scale(prop.at("scale"));
 	new_img.resize(width, height);
-	new_img.setName("("+property.at("phys_name").get_str()+")/("+other.property.at("phys_name").get_str()+")");
+    new_img.setName("("+prop.at("phys_name").get_str()+")/("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");
 	
-    for (size_t i=0; i<height*width; i++)
+    for (unsigned int i=0; i<height*width; i++)
 		new_img.Timg_buffer[i] = Timg_buffer[i] / other.Timg_buffer[i];
 		
 	return(new_img);
@@ -1823,6 +1555,16 @@ template<class T> inline T nPhysImageF<T>::get_max() {
 template<class T> inline bidimvec<T> nPhysImageF<T>::get_min_max() {
 	return bidimvec<T>(get_min(),get_max());
 }
+
+
+
+using physC = nPhysImageF<mcomplex>;
+
+using physD = nPhysImageF<double>;
+
+using nMapD = std::map<std::string, physD >;
+
+
 
 
 

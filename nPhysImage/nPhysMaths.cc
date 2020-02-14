@@ -29,10 +29,10 @@
  * @{
  */
 
-inline void physMath::planeFit(nPhysD *pi, double *coeffs)
+inline void physMath::planeFit(physD *pi, vec2f &coeffs)
 {
 #ifdef HAVE_LIBGSL
-    int fit_n = pi->getW()*pi->getH();	// grossino...
+    int fit_n = pi->getSurf();	// grossino...
     int fit_p = 2;				// plane fit
 
     double chi_sq;
@@ -54,11 +54,8 @@ inline void physMath::planeFit(nPhysD *pi, double *coeffs)
     gsl_multifit_linear_workspace *work =  gsl_multifit_linear_alloc (fit_n, fit_p);
     gsl_multifit_linear (X, y, c, cov, &chi_sq, work);
 
-    // e supponendo che abbia davvero fatto qualcosa.. - MIND THE INVERSION!! -
-    if (coeffs != NULL) {
-        coeffs[0] = c->data[0];
-        coeffs[1] = c->data[1];
-    }
+    coeffs.set_first(c->data[0]);
+    coeffs.set_second(c->data[1]);
 
     // free all
     gsl_matrix_free(X);
@@ -67,80 +64,6 @@ inline void physMath::planeFit(nPhysD *pi, double *coeffs)
     gsl_multifit_linear_free(work);
 #endif
 }
-
-// ------------------ general purpose functions for wavelet analysis ------------------------
-inline mcomplex 
-physMath::morlet(double lambda, double tau, double x)
-{
-    double kappa = 2.*3.141592/lambda;
-    return mcomplex(exp(-pow((x/tau),2.))*(cos(kappa*x)),- exp(-pow((x/tau),2.))*(sin(kappa*x)));
-}
-
-
-
-inline mcomplex 
-physMath::morlet(double lambda, double tau_l, double tau_v, double x, double y, double rotation)
-{
-    double kappa = 2.*3.141592/lambda;
-    double cr = cos(rotation); double sr = sin(rotation);
-    double rx = cr*x - sr*y; double ry = sr*x + cr*y;
-    double mult = exp(-pow((ry/tau_v),2.))*exp(-pow((rx/tau_l),2.));
-    return mcomplex(mult*cos(kappa*rx), -mult*sin(kappa*rx));
-}
-
-
-inline void
-physMath::phys_generate_meshgrid(int x1, int x2, int y1, int y2, nPhysImageF<int> &xx, nPhysImageF<int> &yy)
-{
-    int xsize = x2-x1+1;
-    int ysize = y2-y1+1;
-
-    xx.resize(xsize, ysize);
-    yy.resize(xsize, ysize);
-
-    for (int i=0; i<xsize; i++) {
-        for (int j=0; j<ysize; j++) {
-            xx.set(i, j, x1+i);
-            yy.set(i, j, y1+j);
-        }
-    }
-
-}
-
-
-
-// via function pointers (via meshgrids)
-
-inline void 
-physMath::phys_generate_morlet(morlet_data *md, nPhysD &xx, nPhysD &yy, nPhysC &zz)
-{
-
-    if ((xx.getW() != yy.getW()) || (xx.getH() != yy.getH())) {
-        WARNING("size mismatch: op1 is: "<<xx.getW()<<"x"<<xx.getH()<<", op2 is: "<<yy.getW()<<"x"<<yy.getH());
-        return;
-    }
-
-    //	double alpha = 2.*3.141592/(md->lambda*md->sigma);
-    double kappa = 2.*3.141592/md->lambda;
-
-    double cr = cos(md->angle); double sr = sin(md->angle);
-    //	double cs = (1/sqrt(1+exp(-pow(md->sigma, 2.))-2*exp(-3*pow(md->sigma, 2.)/4))) * pow(3.1415, -0.25) * alpha;
-    zz.resize(xx.getW(), xx.getH());
-
-    for (size_t i=0; i<zz.getW(); i++) {
-        for (size_t j=0; j<zz.getH(); j++) {
-            double x = xx.Timg_matrix[j][i];
-            double y = yy.Timg_matrix[j][i];
-            double rx = (cr*x - sr*y); double ry = (sr*x + cr*y);
-            double mult = exp(-pow((ry/md->thickness),2.))*exp(-pow((rx/(md->damp*md->lambda)),2.));
-            //double mult = cs*exp(-pow((ry/md->tau_dump),2.))*exp(-pow(rx,2.)/2);
-            zz.Timg_matrix[j][i] = mcomplex(mult*cos(kappa*rx), -mult*sin(kappa*rx));
-            //			zz.Timg_matrix[j][i] = mcomplex(mult*cos(md->sigma*rx), -mult*sin(md->sigma*rx));
-
-        }
-    }
-}
-
 
 inline void physMath::phys_reverse_vector(double *buf, int size)
 {
@@ -166,7 +89,7 @@ inline void physMath::phys_reverse_vector(double *buf, int size)
 
 
 void 
-physMath::phys_add(nPhysD &iimage, double val) {
+physMath::phys_add(physD &iimage, double val) {
     if (val!=0.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -179,7 +102,7 @@ physMath::phys_add(nPhysD &iimage, double val) {
 }
 
 void 
-physMath::phys_subtract(nPhysD &iimage, double val) {
+physMath::phys_subtract(physD &iimage, double val) {
     if (val!=0.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -192,7 +115,7 @@ physMath::phys_subtract(nPhysD &iimage, double val) {
 }
 
 void 
-physMath::phys_multiply(nPhysD &iimage, double val) {
+physMath::phys_multiply(physD &iimage, double val) {
     if (val!=1.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -205,7 +128,7 @@ physMath::phys_multiply(nPhysD &iimage, double val) {
 }
 
 void 
-physMath::phys_divide(nPhysD &iimage, double val) {
+physMath::phys_divide(physD &iimage, double val) {
     if (val!=1.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -219,7 +142,7 @@ physMath::phys_divide(nPhysD &iimage, double val) {
 }
 
 void
-physMath::phys_divide(nPhysC &iimage, double val) {
+physMath::phys_divide(physC &iimage, double val) {
     if (val!=1.0) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -232,7 +155,7 @@ physMath::phys_divide(nPhysC &iimage, double val) {
 
 }
 
-void physMath::phys_remainder(nPhysD &iimage, double val) {
+void physMath::phys_remainder(physD &iimage, double val) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
         double rem=std::remainder(iimage.point(ii), val);
@@ -245,7 +168,7 @@ void physMath::phys_remainder(nPhysD &iimage, double val) {
 }
 
 void 
-physMath::phys_point_add(nPhysD &iimage, nPhysD &iimage2) {
+physMath::phys_point_add(physD &iimage, physD &iimage2) {
     if (iimage.getSurf()==iimage2.getSurf()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -256,7 +179,7 @@ physMath::phys_point_add(nPhysD &iimage, nPhysD &iimage2) {
 }
 
 void 
-physMath::phys_point_subtract(nPhysD &iimage, nPhysD &iimage2) {
+physMath::phys_point_subtract(physD &iimage, physD &iimage2) {
     if (iimage.getSurf()==iimage2.getSurf()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -267,7 +190,7 @@ physMath::phys_point_subtract(nPhysD &iimage, nPhysD &iimage2) {
 }
 
 void 
-physMath::phys_point_multiply(nPhysD &iimage, nPhysD &iimage2) {
+physMath::phys_point_multiply(physD &iimage, physD &iimage2) {
     if (iimage.getSurf()==iimage2.getSurf()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -278,7 +201,7 @@ physMath::phys_point_multiply(nPhysD &iimage, nPhysD &iimage2) {
 }
 
 void 
-physMath::phys_point_divide(nPhysD &iimage, nPhysD &iimage2) {
+physMath::phys_point_divide(physD &iimage, physD &iimage2) {
     if (iimage.getSurf()==iimage2.getSurf()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
@@ -288,7 +211,7 @@ physMath::phys_point_divide(nPhysD &iimage, nPhysD &iimage2) {
     }
 }
 
-double physMath::phys_sum_points(nPhysD &iimage) {
+double physMath::phys_sum_points(physD &iimage) {
     double retVal=0.0;
 #pragma omp parallel for reduction(+:retVal)
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
@@ -297,7 +220,7 @@ double physMath::phys_sum_points(nPhysD &iimage) {
     return retVal;
 }
 
-double physMath::phys_sum_square_points(nPhysD &iimage) {
+double physMath::phys_sum_square_points(physD &iimage) {
     double retVal=0.0;
 #pragma omp parallel for reduction(+:retVal)
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
@@ -306,7 +229,7 @@ double physMath::phys_sum_square_points(nPhysD &iimage) {
     return retVal;
 }
 
-void physMath::phys_opposite(nPhysD &iimage) {
+void physMath::phys_opposite(physD &iimage) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
         iimage.set(ii,-iimage.point(ii));
@@ -316,7 +239,7 @@ void physMath::phys_opposite(nPhysD &iimage) {
 }
 
 
-void physMath::phys_inverse(nPhysD &iimage) {
+void physMath::phys_inverse(physD &iimage) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
         iimage.set(ii,1.0/iimage.point(ii));
@@ -325,7 +248,7 @@ void physMath::phys_inverse(nPhysD &iimage) {
     iimage.setName("1/("+iimage.getName()+")");
 }
 
-void physMath::phys_replace(nPhysD &iimage, double oldval, double newval) {
+void physMath::phys_replace(physD &iimage, double oldval, double newval) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
         if (iimage.point(ii)==oldval) iimage.set(ii,newval);
@@ -336,7 +259,7 @@ void physMath::phys_replace(nPhysD &iimage, double oldval, double newval) {
     iimage.setName(ostr.str());
 }
 
-void physMath::phys_replace_NaN(nPhysD &iimage, double newval) {
+void physMath::phys_replace_NaN(physD &iimage, double newval) {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
         if (!std::isfinite(iimage.point(ii))) iimage.set(ii,newval);
@@ -349,7 +272,7 @@ void physMath::phys_replace_NaN(nPhysD &iimage, double newval) {
 }
 
 void 
-physMath::phys_add_noise(nPhysD &iimage, double vMax=1.0)
+physMath::add_noise(physD &iimage, double vMax=1.0)
 {
 #pragma omp parallel for
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
@@ -361,49 +284,8 @@ physMath::phys_add_noise(nPhysD &iimage, double vMax=1.0)
     iimage.setName("("+iimage.getName()+")+rand("+ostr.str()+")");
 }
 
-
-// gaussian blur
 void
-physMath::phys_gaussian_blur(nPhysD &m1, double radius)
-{
-    DEBUG(5,"radius: "<<radius);
-    if (!(radius > 0) )
-        return;
-
-    nPhysD xx, yy, gauss;
-    nPhysC out;
-
-    //FIXME: this is probably wrong for odd matrices
-    meshgrid_data md = {-m1.getW()/2., m1.getW()/2., -m1.getH()/2., m1.getH()/2., (int) (m1.getW()), (int) m1.getH()};
-    phys_generate_meshgrid(&md, xx, yy);
-
-    gauss.resize(xx.getW(), xx.getH());
-    double mult = 1/(pow(radius, 2.)*2*M_PI);
-    for (size_t i=0; i<xx.getW(); i++) {
-        size_t j;
-        for (j=0; j<xx.getH(); j++) {
-            gauss.Timg_matrix[j][i] = mult*exp( -(pow(xx.Timg_matrix[j][i],2)+pow(yy.Timg_matrix[j][i],2))/(2.*pow(radius, 2)) );
-        }
-    }
-
-    phys_convolve(m1, gauss, out);
-    out.fftshift();
-
-    for (size_t i=0; i<xx.getW(); i++) {
-        size_t j;
-        for (j=0; j<xx.getH(); j++) {
-            m1.Timg_matrix[j][i] = (out.Timg_matrix[j][i].real())/double(xx.getSurf());
-        }
-    }
-
-    m1.TscanBrightness();
-    std::ostringstream ostr;
-    ostr << radius;
-    m1.setName("blur("+m1.getName()+","+ostr.str()+")");
-}
-
-void
-physMath::phys_sin(nPhysD &m1)
+physMath::phys_sin(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -414,7 +296,7 @@ physMath::phys_sin(nPhysD &m1)
 }
 
 void
-physMath::phys_cos(nPhysD &m1)
+physMath::phys_cos(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -425,7 +307,7 @@ physMath::phys_cos(nPhysD &m1)
 }
 
 void
-physMath::phys_tan(nPhysD &m1)
+physMath::phys_tan(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -436,7 +318,7 @@ physMath::phys_tan(nPhysD &m1)
 }
 
 void
-physMath::phys_pow(nPhysD &m1, double exponent)
+physMath::phys_pow(physD &m1, double exponent)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -449,7 +331,7 @@ physMath::phys_pow(nPhysD &m1, double exponent)
 }
 
 void
-physMath::phys_square(nPhysD &m1)
+physMath::phys_square(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -460,7 +342,7 @@ physMath::phys_square(nPhysD &m1)
 }
 
 void
-physMath::phys_sqrt(nPhysD &m1)
+physMath::phys_sqrt(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -471,7 +353,7 @@ physMath::phys_sqrt(nPhysD &m1)
 }
 
 void
-physMath::phys_abs(nPhysD &m1)
+physMath::phys_abs(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -482,7 +364,7 @@ physMath::phys_abs(nPhysD &m1)
 }
 
 void
-physMath::phys_log(nPhysD &m1)
+physMath::phys_log(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -493,7 +375,7 @@ physMath::phys_log(nPhysD &m1)
 }
 
 void
-physMath::phys_log10(nPhysD &m1)
+physMath::phys_log10(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
@@ -504,9 +386,9 @@ physMath::phys_log10(nPhysD &m1)
 }
 
 void
-physMath::phys_transpose(nPhysD &m1)
+physMath::phys_transpose(physD &m1)
 {
-    nPhysD m2(m1);
+    physD m2(m1);
     m1.resize(m2.getH(),m2.getW());
 #pragma omp parallel for collapse(2)
     for(size_t i = 0 ; i < m1.getW(); i++) {
@@ -516,17 +398,17 @@ physMath::phys_transpose(nPhysD &m1)
     }
 
     m1.TscanBrightness();
-    m1.setName("log("+m1.getName()+")");
+    m1.setName("Traspose("+m1.getName()+")");
 }
 
 void
-physMath::phys_fast_gaussian_blur(nPhysD &m1, double radius)
+physMath::phys_fast_gaussian_blur(physD &m1, double radius)
 {
     phys_fast_gaussian_blur(m1,radius,radius);
 }
 
-void physMath::phys_laplace(nPhysD &image) {
-    nPhysD my_copy=image;
+void physMath::phys_laplace(physD &image) {
+    physD my_copy=image;
     image.setShortName("Laplace");
     image.setName("Laplace "+image.getName());
     image.setFromName(image.getFromName());
@@ -549,15 +431,15 @@ void physMath::phys_laplace(nPhysD &image) {
     image.TscanBrightness();
 }
 
-void physMath::phys_gauss_laplace(nPhysD &image, double radius) {
+void physMath::phys_gauss_laplace(physD &image, double radius) {
     phys_fast_gaussian_blur(image, radius);
     physMath::phys_laplace(image);
 }
 
 
 // get sobel matrix
-void physMath::phys_sobel(nPhysD &image) {
-    nPhysD my_copy=image;
+void physMath::phys_sobel(physD &image) {
+    physD my_copy=image;
     image.setShortName("Sobel");
     image.setName("Sobel "+image.getName());
     image.setFromName(image.getFromName());
@@ -587,13 +469,21 @@ void physMath::phys_sobel(nPhysD &image) {
     image.TscanBrightness();
 }
 
-void physMath::phys_gauss_sobel(nPhysD &image, double radius) {
+void physMath::phys_gauss_sobel(physD &image, double radius) {
     phys_fast_gaussian_blur(image, radius);
     phys_sobel(image);
 }
 
-void physMath::phys_median_filter(nPhysD& image, unsigned int N){
-    nPhysD my_copy=image;
+void physMath::phys_set_all(physD &image, double newval) {
+#pragma omp parallel for
+    for (size_t i=0; i< image.getSurf(); i++) {
+        image.set(i,newval);
+    }
+    image.TscanBrightness();
+}
+
+void physMath::phys_median_filter(physD& image, unsigned int N){
+    physD my_copy=image;
     int median_pos=(N*N)/2;
 #pragma omp parallel for collapse(2)
     for(size_t i = 0 ; i < image.getW(); i++) {
@@ -621,7 +511,7 @@ void physMath::phys_median_filter(nPhysD& image, unsigned int N){
 }
 
 void
-physMath::phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
+physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
 {
     if (radiusX==0  && radiusY==0) return;
     std::vector<double> nan_free_phys(image.getSurf());
@@ -663,25 +553,28 @@ physMath::phys_fast_gaussian_blur(nPhysD &image, double radiusX, double radiusY)
 }
 
 void
-physMath::phys_integratedNe(nPhysD &image, double lambda_m)
+physMath::phys_integratedNe(physD &image, double lambda_m)
 {
-        double toNe = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge*lambda_m);
+    // image is fringeshifts (i.e. phase/2pi)
+    double toNe = 8.0*M_PI*M_PI*_phys_emass*_phys_vacuum_eps*_phys_cspeed*_phys_cspeed/(_phys_echarge*_phys_echarge);
 
-        phys_multiply(image, toNe);
-        image.setShortName("integratedNePlasma");
-        image.property["intergratedNe_lambda_m"]=lambda_m;
-        image.property["unitsCB"]="m-2";
+    WARNING("toNe" << toNe);
+
+    phys_multiply(image, toNe/lambda_m);
+    image.setShortName("integratedNePlasma");
+    image.prop["intergratedNe_lambda_m"]=lambda_m;
+    image.prop["unitsCB"]="m-2";
 
 }
 
-std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(nPhysD* img1, nPhysD* img2) {
+std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(physD* img1, physD* img2) {
     size_t dx=img1->getW();
     size_t dy=img1->getH();
     double maxValue=-1.0;
     bidimvec<int> maxP(0,0);
 
     if (dx == img2->getW() && dy== img2->getH()) {
-        nPhysD *rPhys=new nPhysD(dx,dy,0.0,"Result");
+        physD rPhys(dx,dy,0.0,"Result");
 
         fftw_complex *myData1C=fftw_alloc_complex(dy*(dx/2+1));
         fftw_complex *myData2C=fftw_alloc_complex(dy*(dx/2+1));
@@ -689,7 +582,7 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(nPhysD* img1, n
         fftw_plan plan1R2C=fftw_plan_dft_r2c_2d(dy,dx, img1->Timg_buffer, myData1C, FFTW_ESTIMATE);
         fftw_plan plan2R2C=fftw_plan_dft_r2c_2d(dy,dx, img2->Timg_buffer, myData2C, FFTW_ESTIMATE);
 
-        fftw_plan planC2R=fftw_plan_dft_c2r_2d(dy,dx, myData1C, rPhys->Timg_buffer, FFTW_ESTIMATE);
+        fftw_plan planC2R=fftw_plan_dft_c2r_2d(dy,dx, myData1C, rPhys.Timg_buffer, FFTW_ESTIMATE);
 
         fftw_execute(plan1R2C);
         fftw_execute(plan2R2C);
@@ -704,19 +597,17 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(nPhysD* img1, n
 
         for (size_t i=0;i<dx;i++) {
             for (size_t j=0;j<dy;j++) {
-                if (rPhys->point(i,j) > rPhys->point(maxP.x(),maxP.y())) {
+                if (rPhys.point(i,j) > rPhys.point(maxP.x(),maxP.y())) {
                     maxP=vec2f(i,j);
                 }
             }
         }
-        maxValue=rPhys->point(maxP.x(),maxP.y());
+        maxValue=rPhys.point(maxP.x(),maxP.y());
         bidimvec<int> shift(dx/2+1,dy/2+1);
         maxP+=shift;
         maxP=vec2f(maxP.x()%dx,maxP.y()%dy)-shift;
 
         DEBUG(5,"max corr " << maxP.x() << " " << maxP.y() << " " << maxValue);
-
-        delete rPhys;
 
         fftw_free(myData1C);
         fftw_free(myData2C);
@@ -749,7 +640,7 @@ void physMath::phys_get_vec_brightness(const double *ivec, size_t vlen, double &
     }
 }	
 
-bidimvec<size_t> physMath::phys_max_p(nPhysD &image) {
+bidimvec<size_t> physMath::phys_max_p(physD &image) {
     bidimvec<size_t> p(0,0);
     for (size_t i=0;i<image.getW();i++) {
         for (size_t j=0;j<image.getH();j++) {
@@ -766,9 +657,9 @@ bidimvec<size_t> physMath::phys_max_p(nPhysD &image) {
 // complex functions
 
 //! split mcomplex matrix on polar representation
-std::map<std::string, nPhysD > physMath::to_polar(nPhysC &iphys) {
-    nPhysD rho, theta;
-    std::map<std::string, nPhysD > omap;
+std::map<std::string, physD > physMath::to_polar(physC &iphys) {
+    physD rho, theta;
+    std::map<std::string, physD > omap;
 
     rho.resize(iphys.getW(), iphys.getH());
     theta.resize(iphys.getW(), iphys.getH());
@@ -785,9 +676,9 @@ std::map<std::string, nPhysD > physMath::to_polar(nPhysC &iphys) {
 }
 
 //! split mcomplex matrix on rectangular representation
-std::map<std::string, nPhysD > physMath::to_rect(const nPhysC &iphys) {
-    nPhysD re, im;
-    std::map<std::string, nPhysD > omap;
+std::map<std::string, physD > physMath::to_rect(const physC &iphys) {
+    physD re, im;
+    std::map<std::string, physD > omap;
 
     re.resize(iphys.getW(), iphys.getH());
     im.resize(iphys.getW(), iphys.getH());
@@ -804,9 +695,9 @@ std::map<std::string, nPhysD > physMath::to_rect(const nPhysC &iphys) {
 }
 
 //! split mcomplex matrix on power spectrum, representation
-std::map<std::string, nPhysD > physMath::to_powersp(nPhysC &iphys, bool doLog) {
-    nPhysD psp;
-    std::map<std::string, nPhysD > omap;
+std::map<std::string, physD > physMath::to_powersp(physC &iphys, bool doLog) {
+    physD psp;
+    std::map<std::string, physD > omap;
 
     psp.resize(iphys.getW(), iphys.getH());
 
@@ -825,8 +716,8 @@ std::map<std::string, nPhysD > physMath::to_powersp(nPhysC &iphys, bool doLog) {
 }
 
 // 2 real matrix to complex fftw
-nPhysC physMath::from_real_imaginary (nPhysD& real, nPhysD&imag) {
-    nPhysC ret;
+physC physMath::from_real_imaginary (physD& real, physD&imag) {
+    physC ret;
     if (real.getSize() == imag.getSize()) {
         ret.resize(real.getW(),real.getH());
 #pragma omp parallel for
@@ -838,8 +729,8 @@ nPhysC physMath::from_real_imaginary (nPhysD& real, nPhysD&imag) {
     return ret;
 }
 
-nPhysC physMath::from_real (nPhysD&real, double val){
-    nPhysC ret;
+physC physMath::from_real (physD&real, double val){
+    physC ret;
     ret.resize(real.getW(),real.getH());
 #pragma omp parallel for
     for (size_t ii=0; ii<real.getSurf(); ii++) {
@@ -850,22 +741,22 @@ nPhysC physMath::from_real (nPhysD&real, double val){
 
 // contour functions
 //
-void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float level, bool blur, float blur_radius)
+void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double level, bool blur, double blur_radius)
 {
     // marching squares algorithm
 
     contour.clear();
     bool contour_ok = false;
 
-    nPhysD wimage(iimage); // work image
+    physD wimage(iimage); // work image
     if (blur) {
         DEBUG(5, "Blurring image, radius "<<blur_radius);
         phys_fast_gaussian_blur(wimage, blur_radius);
     }
 
     // 0. find centroid if not supplied
-    vec2 centr;
-    if (wimage.get_origin() == vec2(0,0)) {
+    vec2i centr;
+    if (wimage.get_origin() == vec2i(0,0)) {
         wimage.set_origin(wimage.max_Tv);
         iimage.set_origin(wimage.max_Tv);
     } else {
@@ -874,30 +765,30 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
 
 
     // 1. generate boolean map
-    vec2 orig = wimage.get_origin();
+    vec2i orig = wimage.get_origin();
     //	double c_value = wimage.point(orig.x(),orig.y());
 
     nPhysImageF<short> bmap(wimage.getW(), wimage.getH(), 0);
-    for (size_t ii=0; ii<wimage.getSurf(); ii++)
+    for (unsigned int ii=0; ii<wimage.getSurf(); ii++)
         if (wimage.point(ii) > level)
             bmap.set(ii, 1);
 
     // 2. cell map
     nPhysImageF<short> cmap(wimage.getW()-1, wimage.getH()-1, 0);
-    for (size_t ii=0; ii<cmap.getSurf(); ii++) {
-        int xx = ii%cmap.getW();
-        int yy = ii/cmap.getW();
+    for (unsigned int ii=0; ii<cmap.getSurf(); ii++) {
+        unsigned int xx = ii%cmap.getW();
+        unsigned int yy = ii/cmap.getW();
 
         short cval = (bmap.point(xx,yy)<<3) + (bmap.point(xx+1,yy)<<2) + (bmap.point(xx+1, yy+1)<<1) + bmap.point(xx,yy+1);
         cmap.set(ii, cval);
     }
 
     // close boundary
-    for (size_t ii=0; ii<cmap.getW(); ii++) {
+    for (unsigned int ii=0; ii<cmap.getW(); ii++) {
         cmap.set(ii, 0, cmap.point(ii, 0) &~ 12);
         cmap.set(ii, 0, cmap.point(ii, cmap.getH()-1) &~ 3);
     }
-    for (size_t ii=0; ii<cmap.getH(); ii++) {
+    for (unsigned int ii=0; ii<cmap.getH(); ii++) {
         cmap.set(0, ii, cmap.point(0, ii) &~ 9);
         cmap.set(cmap.getW()-1, ii, cmap.point(cmap.getW()-1, ii) &~ 6);
     }
@@ -906,10 +797,10 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
     int stats[16];
     for (int i=0; i<16; i++)
         stats[i] = 0;
-    for (size_t ii=0; ii<cmap.getSurf(); ii++)
+    for (unsigned int ii=0; ii<cmap.getSurf(); ii++)
         stats[cmap.point(ii)] ++;
 
-    int b_points = 0;
+    int b_points = 1;
     for (int ii=1; ii<15; ii++) b_points+=stats[ii]; // total number of boundary points
 
     DEBUG(5,"There are "<<stats[0]<<" points under threshold, "<<stats[15]<<" points over threshold and "<<b_points<<" boundary points"<<std::endl);
@@ -928,8 +819,8 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
 
 
     contour.resize(b_points);
-    std::list<vec2>::iterator itr = contour.begin(), itr_last = contour.begin();
-    *itr = vec2(ls_x, orig.y());
+    std::list<vec2i>::iterator itr = contour.begin(), itr_last = contour.begin();
+    *itr = vec2i(ls_x, orig.y());
 
     int n_iter=0;
     while (itr != contour.end()) {
@@ -951,7 +842,7 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
             short central = ((.25*wimage.point(xx,yy) + wimage.point(xx+1,yy+1) + wimage.point(xx+1,yy) + wimage.point(xx,yy+1)) > level) ? 1 : -1;
             short saddle_type = (val == 5) ? 1 : -1;
 
-            vec2 last = *itr- *itr_last; // let's hope we're not starting with a saddle...
+            vec2i last = *itr- *itr_last; // let's hope we're not starting with a saddle...
 
             //std::cerr<<"[Walker] Saddle point! central: "<<central<<std::endl;
 
@@ -1007,7 +898,7 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
 
         itr_last = itr;
         itr++;
-        *itr = vec2(xx,yy);
+        *itr = vec2i(xx,yy);
         n_iter++;
 
         if (*itr == *contour.begin()) {
@@ -1026,21 +917,21 @@ void physMath::contour_trace(nPhysD &iimage, std::list<vec2> &contour, float lev
         contour.clear();
         DEBUG(5, "Contour walk failed!");
     } else {
-        DEBUG(5, "Contour walk finished");
+        DEBUG(5, "Contour walk finished " << contour.size());
         contour.resize(std::distance(contour.begin(), itr_last));
     }
 
 
 }
 
-nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> &contour)
+nPhysImageF<char> physMath::contour_surface_map(physD &iimage, std::list<vec2i> &contour)
 {
     DEBUG("------------------------- init contour surface mapping ------------------------");
     DEBUG("got "<<contour.size()<<" points in the contour");
 
-    vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
+    vec2i bbox_inf = contour.front(), bbox_sup = contour.front();
 
-    nPhysD check_image(iimage);
+    physD check_image(iimage);
 
     // image map relative to contour. Legend:
     // 'u': undef
@@ -1056,7 +947,7 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
     //double c_integral = 0;
 
     // set to check_val contour and image boundaries
-    for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
+    for (std::list<vec2i>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
         bbox_inf = vmath::min(bbox_inf, *itr);
         bbox_sup = vmath::max(bbox_sup, *itr);
         check_image.set((*itr).x(), (*itr).y(), check_val);
@@ -1074,21 +965,21 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
 
     // integration on subimage is DISABLED
     // coutour bbox subimage (to perform integral on)
-    //nPhysD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
+    //physD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
     //intg_image.set_origin(iimage.get_origin()-bbox_inf);
 
     // integrate by scanline fill
     //double intg=0, intg_sq=0;
-    std::list<vec2> up_pl, scan_pl, tmplist;
+    std::list<vec2i> up_pl, scan_pl, tmplist;
 
     // starting point needs to be INSIDE the contour. If origin is not set (i.e. 0:0)
     // the center of the bbox is a good starting point.
 
-    vec2 iimage_orig = iimage.get_origin();
+    vec2i iimage_orig = iimage.get_origin();
 
-    vec2 starting_point;
-    if (iimage_orig == vec2(0,0)) {
-        starting_point = bbox_inf+vec2(0.5*(bbox_sup-bbox_inf));
+    vec2i starting_point;
+    if (iimage_orig == vec2i(0,0)) {
+        starting_point = bbox_inf+vec2i(0.5*(bbox_sup-bbox_inf));
         DEBUG("origin is not set: recalculating");
     } else {
         DEBUG("origin is set: using it as starting point");
@@ -1113,10 +1004,10 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
 
     // populate starting vector
     for (int xx=starting_point.x(); check_image.point(xx, starting_point.y()) != check_val; xx++) {
-        up_pl.push_back(vec2(xx, starting_point.y()));
+        up_pl.push_back(vec2i(xx, starting_point.y()));
     }
     for (int xx=starting_point.x(); check_image.point(xx, starting_point.y()) != check_val; xx--) {
-        up_pl.push_front(vec2(xx, starting_point.y()));
+        up_pl.push_front(vec2i(xx, starting_point.y()));
     }
 
     DEBUG("walk starting from "<<up_pl.front()<<" to "<<up_pl.back());
@@ -1142,7 +1033,7 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
 
         tmplist.clear();
         scan_pl.clear();
-        std::list<vec2>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
+        std::list<vec2i>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
         itrf++;
 
         while (itrf != up_pl.end()) {
@@ -1154,14 +1045,14 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
 
 
                 //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<*itr<<" to "<<*itrf<<std::endl;
-                vec2 ref_sx = *itr, ref_dx = *itrf;
+                vec2i ref_sx = *itr, ref_dx = *itrf;
                 while (check_image.point(scan_pl.back(), check_val) != check_val) {
-                    ref_sx+=vec2(1,0);
+                    ref_sx+=vec2i(1,0);
                     scan_pl.push_back(ref_sx);
                 }
                 //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
                 while (check_image.point(tmplist.front(), check_val) != check_val) {
-                    ref_dx -= vec2(1,0);
+                    ref_dx -= vec2i(1,0);
                     tmplist.push_front(ref_dx);
                     //std::cerr<<"\t\tsep/walking to "<<tmplist.front()<<" - "<<intg_image.point(tmplist.front())<<std::endl;
                 }
@@ -1190,23 +1081,23 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
          *
          */
 
-        std::list<vec2>::iterator h_front = scan_pl.begin(); ++h_front;
+        std::list<vec2i>::iterator h_front = scan_pl.begin(); ++h_front;
         while (check_image.point(scan_pl.front(), check_val) != check_val) {
-            scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+            scan_pl.push_front(scan_pl.front()+vec2i(-1, 0));
         }
 
         scan_pl.push_front(*h_front);
         while (check_image.point(scan_pl.front(), check_val) != check_val) {
-            scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+            scan_pl.push_front(scan_pl.front()+vec2i(-1, 0));
         }
 
-        std::list<vec2>::iterator h_back = scan_pl.end(); --h_back; --h_back;
+        std::list<vec2i>::iterator h_back = scan_pl.end(); --h_back; --h_back;
         while (check_image.point(scan_pl.back(), check_val) != check_val) {
-            scan_pl.push_back(scan_pl.back()+vec2(1, 0));
+            scan_pl.push_back(scan_pl.back()+vec2i(1, 0));
         }
         scan_pl.push_back(*h_back);
         while (check_image.point(scan_pl.back(), check_val) != check_val) {
-            scan_pl.push_back(scan_pl.back()+vec2(1, 0));
+            scan_pl.push_back(scan_pl.back()+vec2i(1, 0));
         }
 
         //std::cerr<<"line "<<line_check<<": walk starting from "<<scan_pl.front()<<" to "<<scan_pl.back()<<std::endl;
@@ -1216,7 +1107,7 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
         up_pl.clear();
 
         while (!scan_pl.empty()) {
-            vec2 pp = scan_pl.front();
+            vec2i pp = scan_pl.front();
             scan_pl.pop_front();
             if (check_image.point(pp, check_val) != check_val) {
                 //intg+=check_image.point(pp);
@@ -1228,8 +1119,8 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
                 else ci_map.set(pp.x(),pp.y(), 'o');
                 safety_counter++;
 
-                up_pl.push_back(vec2(pp.x(), pp.y()+1));
-                up_pl.push_back(vec2(pp.x(), pp.y()-1));
+                up_pl.push_back(vec2i(pp.x(), pp.y()+1));
+                up_pl.push_back(vec2i(pp.x(), pp.y()-1));
                 //std::cerr<<"point read: "<<pp<<std::endl;
             }
             //else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
@@ -1258,22 +1149,22 @@ nPhysImageF<char> physMath::contour_surface_map(nPhysD &iimage, std::list<vec2> 
 }
 
 
-std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
+std::list<double> physMath::contour_integrate(physD &iimage, std::list<vec2i> &contour, bool integrate_boundary)
 {
 
     DEBUG("------------------------- init contour integration ------------------------");
     DEBUG("got "<<contour.size()<<" points in the contour");
 
-    vec2 bbox_inf = contour.front(), bbox_sup = contour.front();
+    vec2i bbox_inf = contour.front(), bbox_sup = contour.front();
 
 
-    nPhysD check_image(iimage);
+    physD check_image(iimage);
     check_image.TscanBrightness();
     double check_val = check_image.get_min() - 1;
     int points_count = 0;
     //double c_integral = 0;
 
-    for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
+    for (std::list<vec2i>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
         bbox_inf = vmath::min(bbox_inf, *itr);
         bbox_sup = vmath::max(bbox_sup, *itr);
         check_image.set((*itr).x(), (*itr).y(), check_val);
@@ -1281,28 +1172,28 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
     DEBUG("bounding box corners are "<<bbox_inf<<", "<<bbox_sup);
 
     // coutour bbox subimage (to perform integral on)
-    nPhysD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
+    physD intg_image = check_image.sub(bbox_inf.x(), bbox_inf.y(), bbox_sup.x()-bbox_inf.x()+1, bbox_sup.y()-bbox_inf.y()+1);
     intg_image.set_origin(iimage.get_origin()-bbox_inf);
 
     // integrate by scanline fill
     double intg=0, intg_sq=0;
-    std::list<vec2> up_pl, scan_pl, tmplist;
+    std::list<vec2i> up_pl, scan_pl, tmplist;
 
     // starting point needs to be INSIDE the contour. If origin is not set (i.e. 0:0)
     // the center of the bbox is a good starting point.
 
-    vec2 iimage_orig = iimage.get_origin();
-    vec2 intg_orig = intg_image.get_origin();
+    vec2i iimage_orig = iimage.get_origin();
+    vec2i intg_orig = intg_image.get_origin();
 
     bool orig_is_inside = (
                 intg_orig.x()<=bbox_sup.x() &&
                 intg_orig.y()<=bbox_sup.y() &&
                 intg_orig.x()>=bbox_inf.x() &&
                 intg_orig.y()>=bbox_inf.y()) ? true : false;
-    vec2 starting_point;
+    vec2i starting_point;
 
-    if (iimage_orig == vec2(0,0) || !orig_is_inside) {
-        starting_point = vec2(0.5*(bbox_sup-bbox_inf));
+    if (iimage_orig == vec2i(0,0) || !orig_is_inside) {
+        starting_point = vec2i(0.5*(bbox_sup-bbox_inf));
         DEBUG("origin is not set: recalculating");
     } else {
         DEBUG("origin is set: using it as starting point");
@@ -1312,11 +1203,11 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 
 
     for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx++) {
-        up_pl.push_back(vec2(xx, starting_point.y()));
+        up_pl.push_back(vec2i(xx, starting_point.y()));
     }
 
     for (int xx=starting_point.x(); intg_image.point(xx, starting_point.y()) != check_val; xx--) {
-        up_pl.push_front(vec2(xx, starting_point.y()));
+        up_pl.push_front(vec2i(xx, starting_point.y()));
     }
 
 
@@ -1338,7 +1229,7 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 
         tmplist.clear();
         scan_pl.clear();
-        std::list<vec2>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
+        std::list<vec2i>::iterator itr = up_pl.begin(), itrf = up_pl.begin();
         itrf++;
 
         while (itrf != up_pl.end()) {
@@ -1350,14 +1241,14 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 
 
                 //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<*itr<<" to "<<*itrf<<std::endl;
-                vec2 ref_sx = *itr, ref_dx = *itrf;
+                vec2i ref_sx = *itr, ref_dx = *itrf;
                 while (intg_image.point(scan_pl.back(), check_val) != check_val) {
-                    ref_sx+=vec2(1,0);
+                    ref_sx+=vec2i(1,0);
                     scan_pl.push_back(ref_sx);
                 }
                 //std::cerr<<"line "<<line_check<<": sep/walk starting from "<<scan_pl.back()<<" to "<<tmplist.front()<<std::endl;
                 while (intg_image.point(tmplist.front(), check_val) != check_val) {
-                    ref_dx -= vec2(1,0);
+                    ref_dx -= vec2i(1,0);
                     tmplist.push_front(ref_dx);
                     //std::cerr<<"\t\tsep/walking to "<<tmplist.front()<<" - "<<intg_image.point(tmplist.front())<<std::endl;
                 }
@@ -1378,12 +1269,12 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 
 
         while (intg_image.point(scan_pl.front(), check_val) != check_val) {
-            scan_pl.push_front(scan_pl.front()+vec2(-1, 0));
+            scan_pl.push_front(scan_pl.front()+vec2i(-1, 0));
             //std::cerr<<"--------------"<<intg_image.getPoint(scan_pl.front())<<std::endl;
         }
 
         while (intg_image.point(scan_pl.back(), check_val) != check_val) {
-            scan_pl.push_back(scan_pl.back()+vec2(1, 0));
+            scan_pl.push_back(scan_pl.back()+vec2i(1, 0));
             //std::cerr<<"--------------"<<intg_image.point(scan_pl.back(), check_val)<<std::endl;
         }
 
@@ -1394,7 +1285,7 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
         up_pl.clear();
 
         while (!scan_pl.empty()) {
-            vec2 pp = scan_pl.front();
+            vec2i pp = scan_pl.front();
             scan_pl.pop_front();
             if (intg_image.point(pp, check_val) != check_val) {
                 intg+=intg_image.point(pp);
@@ -1403,8 +1294,8 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 
                 intg_image.set(pp.x(), pp.y(), check_val);
 
-                up_pl.push_back(vec2(pp.x(), pp.y()+1));
-                up_pl.push_back(vec2(pp.x(), pp.y()-1));
+                up_pl.push_back(vec2i(pp.x(), pp.y()+1));
+                up_pl.push_back(vec2i(pp.x(), pp.y()-1));
                 //std::cerr<<"point read: "<<pp<<std::endl;
             }
             //else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
@@ -1425,7 +1316,7 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
     if (integrate_boundary) {
         // add boundary points
         double bps = 0, bps_sq = 0;
-        for (std::list<vec2>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
+        for (std::list<vec2i>::iterator itr = contour.begin(); itr != contour.end(); ++itr) {
             bps+= iimage.point((*itr).x(), (*itr).y());
             bps_sq+= pow(iimage.point((*itr).x(), (*itr).y()), 2);
             points_count++;
@@ -1444,7 +1335,7 @@ std::list<double> physMath::contour_integrate(nPhysD &iimage, std::list<vec2> &c
 }
 
 template<> void
-nPhysC::TscanBrightness() {
+physC::TscanBrightness() {
     return;
 }
 

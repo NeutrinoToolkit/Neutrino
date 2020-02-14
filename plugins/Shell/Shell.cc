@@ -1,34 +1,36 @@
 #include "gui/PythonQtScriptingConsole.h"
-#include <QThread>
 #include <QFont>
+#include <QThread>
 
 #include "nPhysPyWrapper.h"
 
 #include "Shell.h"
 
+//#include "PythonQt_QtAll.h"
 
 
 bool ShellPlug::instantiate(neutrino *neu) {
-    qDebug() << "here";
+    qDebug() << "here" << neu;
     nparent=neu;
 
-    QSettings settings("neutrino","");
-    settings.beginGroup("Shell");
+    qDebug() << "here";
 
-    PythonQt::InitFlags ignoreSite;
+#if defined(Q_OS_WIN)
+    qDebug() << "here1";
+        PythonQt::init();
+#else
+    qDebug() << "here2";
+        PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+#endif
 
-    if (settings.value("useSite").toBool()) {
-        ignoreSite =  PythonQt::IgnoreSiteModule;
-        qDebug() << "here ignoresite";
-    }
 
-    PythonQt::init(PythonQt::RedirectStdOut | ignoreSite);
+//    PythonQt_QtAll::init();
 
     qDebug() << "here";
     PythonQt_init_QtBindings();
     qDebug() << "here";
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
-    PythonQt::self()->registerCPPClass("nPhysD",NULL,"neutrino");
+    PythonQt::self()->registerCPPClass("nPhysD",nullptr,"neutrino");
 
     PythonQt::self()->addDecorators(new nPanPyWrapper());
     PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
@@ -43,18 +45,21 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
 
     qDebug() << "here";
+    QSettings settings("neutrino","");
+    settings.beginGroup("Shell");
+
     QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
 //Re-enable below if numpy start to work again:
-//#if defined(Q_OS_WIN)
-//    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
-//    if (base.exists()) {
-//        sites << base.absolutePath();
-//        sites << base.filePath("plat-win32");
-//        sites << base.filePath("lib-tk");
-//        sites << base.filePath("site-packages");
-//        sites << base.filePath("lib-dynload");
-//    }
-//#endif
+#if defined(Q_OS_WIN)
+    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
+    if (base.exists()) {
+        sites << base.absolutePath();
+        sites << base.filePath("plat-win32");
+        sites << base.filePath("lib-tk");
+        sites << base.filePath("site-packages");
+        sites << base.filePath("lib-dynload");
+    }
+#endif
 
     qDebug() << "here";
     foreach (QString spath, sites) {

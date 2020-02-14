@@ -76,3 +76,4 @@ YlGn; defined ( 0 '#FFFFE5', 1 '#F7FCB9', 2 '#D9F0A3', 3 '#ADDD8E', 4 '#78C679',
 YlGnBu; defined ( 0 '#FFFFD9', 1 '#EDF8B1', 2 '#C7E9B4', 3 '#7FCDBB', 4 '#41B6C4', 5 '#1D91C0', 6 '#225EA8', 7 '#0C2C84' )
 YlOrBr; defined ( 0 '#FFFFE5', 1 '#FFF7BC', 2 '#FEE391', 3 '#FEC44F', 4 '#FE9929', 5 '#EC7014', 6 '#CC4C02', 7 '#8C2D04' )
 YlOrRd; defined ( 0 '#FFFFCC', 1 '#FFEDA0', 2 '#FED976', 3 '#FEB24C', 4 '#FD8D3C', 5 '#FC4E2A', 6 '#E31A1C', 7 '#B10026' )
+Terrain; defined (0.00 0.2 0.2 0.6, 0.15 0.0 0.6 1.0, 0.25 0.0 0.8 0.4, 0.50 1.0 1.0 0.6, 0.75 0.5 0.36 0.33, 1.00 1.0 1.0 1.0)

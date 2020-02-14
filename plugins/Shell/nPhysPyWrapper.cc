@@ -4,8 +4,15 @@
 #include "nApp.h"
 #include "neutrino.h"
 #ifdef HAVE_NUMPY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #endif
+#if PY_VERSION_HEX >= 0x03000000
+#define NUMPY_IMPORT_ARRAY_RETVAL NULL
+#else
+#define NUMPY_IMPORT_ARRAY_RETVAL
+#endif
+
 
 
 /**
@@ -13,8 +20,8 @@
  */
 
 
-QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
-    QList<nPhysD*> my_list;
+QList<nPhysD> nPhysPyWrapper::static_nPhysD_open(QString fname){
+    QList<nPhysD> my_list;
     if (fname.isEmpty()) {
         QString formats("");
         formats+="Neutrino Images (*.txt *.neu *.neus *.tif *.tiff *.hdf *.png *.sif *.b16 *.spe *.pcoraw *.img *.raw *.fits *.inf *.gz);;";
@@ -29,13 +36,11 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
         fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }
     if (!fname.isEmpty( )) {
-        std::vector<nPhysD*> my_vec=physFormat::phys_open(fname.toUtf8().constData());
+        std::vector<physD> my_vec=physFormat::phys_open(fname.toUtf8().constData());
         for(auto it : my_vec) {
-            if (it->getSurf()>0) {
-                it->property["keep_phys_alive"]=42;
+            if (it.getSurf()>0) {
+                it.prop["keep_phys_alive"]=1;
                 my_list << it;
-            } else {
-                delete it;
             }
         }
     }
@@ -45,14 +50,13 @@ QList<nPhysD*> nPhysPyWrapper::static_nPhysD_open(QString fname){
 nPhysD* nPhysPyWrapper::new_nPhysD() {
     nPhysD *my_phys= new nPhysD();
     my_phys->setType(PHYS_DYN);
-    my_phys->property["keep_phys_alive"]=42;
+    my_phys->prop["keep_phys_alive"]=1;
     return my_phys;
 }
 
 nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_shape){
     DEBUG("here");
-    nPhysD *phys=new nPhysD(PHYS_DYN);
-    phys->setType(PHYS_DYN);
+    nPhysD *phys=new_nPhysD();
     int h=my_shape.first; // row major: first rows(yw or height) than columns(xw or widthv)
     int w=my_shape.second;
     
@@ -63,20 +67,19 @@ nPhysD* nPhysPyWrapper::new_nPhysD(QVector<double> tempData, QPair<int,int> my_s
         }
         phys->TscanBrightness();
     }
-    phys->property["keep_phys_alive"]=42;
     return phys;
 }
 
-/**
- nPhysD creates an nPhysD of size x filled with val and name name
- */
-nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
-    DEBUG("here");
-    nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
-    phys->setType(PHYS_DYN);
-    phys->property["keep_phys_alive"]=42;
-    return phys;
-}
+///**
+// nPhysD creates an nPhysD of size x filled with val and name name
+// */
+//nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString name){
+//    DEBUG("here");
+//    nPhysD *phys=new nPhysD (width,height,val,name.toStdString());
+//    phys->setType(PHYS_DYN);
+//    phys->property["keep_phys_alive"]=1;
+//    return phys;
+//}
 
 /**
  nPhysD copy constructor
@@ -84,33 +87,28 @@ nPhysD* nPhysPyWrapper::new_nPhysD(int width, int height, double val, QString na
 nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
     DEBUG("new_nPhysD new_nPhysD new_nPhysD new_nPhysD new_nPhysD ");
     nPhysD *ret_phys = new nPhysD(*phys);
-    ret_phys->property["keep_phys_alive"]=42;
+    ret_phys->prop["keep_phys_alive"]=1;
     return ret_phys;
 }
 
-//#ifdef HAVE_NUMPY
+#ifdef HAVE_NUMPY
+void my_import_array () {
+    _import_array();
+}
 
 
-//#if PY_MAJOR_VERSION >= 3
-//int neutrino_init_numpy()
-//{
-//import_array();
-//}
-//#else
-//void neutrino_init_numpy()
-//{
-//import_array();
-//}
-//#endif
-
-//PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
-//    neutrino_init_numpy();
-//    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
-//    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
-//}
+PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
+    if(PyArray_API == NULL) {
+        my_import_array();
+    }
+    std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};
+    return (PyObject*) PyArray_SimpleNewFromData(2, &dims[0], NPY_DOUBLE, my_phys->Timg_buffer);
+}
 
 //nPhysD* nPhysPyWrapper::new_nPhysD(PyObject* my_py_obj){
-//    neutrino_init_numpy();
+//if(PyArray_API == NULL) {
+//    import_array();
+//}
 //    if (PyArray_Check(my_py_obj)) {
 //        PyArrayObject * my_arr = (PyArrayObject *)my_py_obj;
 //        if (my_arr && PyArray_NDIM(my_arr)==2 && PyArray_ISONESEGMENT(my_arr)){
@@ -165,7 +163,7 @@ nPhysD* nPhysPyWrapper::new_nPhysD(nPhysD* phys) {
 //    return nullptr;
 //}
 
-//#endif
+#endif
 
 /**
  nPhysD Destructor
@@ -182,7 +180,7 @@ void nPhysPyWrapper::delete_nPhysD(nPhysD* my_phys) {
             }
         }
     }
-    if (my_phys->property["keep_phys_alive"].get_i()==42) {
+    if (my_phys->prop.have("keep_phys_alive")) {
         delete my_phys;
     }
 }
@@ -258,19 +256,19 @@ int nPhysPyWrapper::getSurf(nPhysD* phys){
 
 QStringList nPhysPyWrapper::properties(nPhysD* phys){
     QStringList retval;
-    for(anymap::iterator it = phys->property.begin(); it != phys->property.end(); ++it) {
+    for(anymap::iterator it = phys->prop.begin(); it != phys->prop.end(); ++it) {
         retval << QString::fromStdString(it->first);
     }
     return retval;
 }
 
 QVariant nPhysPyWrapper::getProperty(nPhysD* phys, QString my_name){
-    return toVariant(phys->property[my_name.toStdString()]);
+    return toVariant(phys->prop[my_name.toStdString()]);
 }
 
 void nPhysPyWrapper::setProperty(nPhysD* phys, QString prop_name, QVariant prop_val) {
-    anydata pippo=toAnydata(prop_val);
-    phys->property[prop_name.toStdString()]=pippo;
+    anydata my_data=toAnydata(prop_val);
+    phys->prop[prop_name.toStdString()]=my_data;
 }
 
 QVector<double> nPhysPyWrapper::getData(nPhysD* phys){

@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include "panThread.h"
-#include "nPhysImageF.h"
+#include "nPhysD.h"
 
 #include <QMessageBox>
 #include <QApplication>

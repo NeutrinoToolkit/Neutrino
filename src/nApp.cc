@@ -3,15 +3,14 @@
 #include <QtNetwork>
 #include "ui_nLogWin.h"
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QScrollBar>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
     log_win_ui(new Ui::nLogWin)
 #ifndef __clang__
   ,
-#ifdef __phys_debug
-    qerr(std::cerr),
-#endif
     qout(std::cout)
 #endif
 {
@@ -22,7 +21,9 @@ int nApp::exec() {
 
     log_win_ui->setupUi(&log_win);
 
+#ifndef __phys_debug
     qInstallMessageHandler(nApp::myMessageOutput);
+#endif
 
     addDefaultPalettes();
 
@@ -34,16 +35,6 @@ int nApp::exec() {
     QCoreApplication::setApplicationName("Neutrino");
     QCoreApplication::setApplicationVersion(__VER);
 
-#if defined(Q_OS_MAC)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-#endif
-    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+QString("/plugins"));
-
     changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
     if (!my_set.contains("checkUpdates")) {
@@ -53,18 +44,13 @@ int nApp::exec() {
         checkUpdates();
     }
 
-    my_set.endGroup();
-
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
-    QObject::connect(log_win_ui->clearLog,&QPushButton::released,log_win_ui->logger,&QTextEdit::clear);
+    QObject::connect(log_win_ui->clearLog,&QPushButton::released,this,&nApp::clearLog);
     QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
     QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
     QObject::connect(log_win_ui->buttonFind,&QPushButton::released,this,&nApp::findLogText);
     QObject::connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nApp::findLogText);
-
-//    QSettings my_set("neutrino","");
-//    my_set.beginGroup("nPreferences");
 
     log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
     log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
@@ -83,6 +69,12 @@ int nApp::exec() {
 
 
     return QApplication::exec();
+}
+
+void nApp::clearLog() {
+    log_win_ui->logger->clear();
+    log_win_ui->logger->hide();
+    log_win_ui->logger->show();
 }
 
 void nApp::findLogText() {
@@ -109,7 +101,7 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
         QString outstr;
         switch (type) {
             case QtDebugMsg:
-                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QString::number(context.line) +QString(") ") + " :</font><font color=\"black\">";
+                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
                 break;
             case QtInfoMsg:
                 outstr+="I: <font color=\"black\">";
@@ -152,28 +144,32 @@ void nApp::saveLog(){
 void nApp::addDefaultPalettes() {
     qDebug() << "reset Palettes";
     nPalettes.clear();
+    QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString pal=it.next();
+        addPaletteFile(pal);
+    }
 
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
-    QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-    paletteFiles.removeDuplicates();
-    for(auto &my_str : paletteFiles) {
-        addPaletteFile(my_str);
+    QStringList userPalettes=my_set.value("userPalettes","").toStringList();
+    my_set.endGroup();
+    for (auto &pal : userPalettes) {
+        addPaletteFile(pal);
     }
-    my_set.setValue("paletteFiles",paletteFiles);
-    if (nPalettes.size()==0) {
-        QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            addPaletteFile(it.next());
-        }
-    }
+
+
     if (nPalettes.size()==0) {
         QMessageBox::warning(nullptr,tr("Attention"),tr("No colorscales present!"), QMessageBox::Ok);
     }
 }
 
 void nApp::addPaletteFile(QString cmapfile) {
-    if (QFileInfo(cmapfile).exists()) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("Palettes");
+    QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
+    my_set.endGroup();
+    if (QFileInfo(cmapfile).exists() && (! hiddenPalettes.contains(cmapfile))) {
         QFile inputFile(cmapfile);
         if (inputFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&inputFile);
@@ -182,19 +178,13 @@ void nApp::addPaletteFile(QString cmapfile) {
             while (!in.atEnd()) {
                 QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
                 for(auto &strnum : line) {
-                    nPalettes[cmapfile].at(iter) = strnum.toInt();
+                    if (iter < nPalettes[cmapfile].size()) {
+                        nPalettes[cmapfile][iter] = strnum.toInt();
+                    }
                     iter++;
                 }
             }
-            QSettings my_set("neutrino","");
-            my_set.beginGroup("Palettes");
-            QStringList paletteFiles=my_set.value("paletteFiles","").toStringList();
-            paletteFiles << cmapfile;
-            paletteFiles.removeDuplicates();
-            paletteFiles.sort(Qt::CaseInsensitive);
-            my_set.setValue("paletteFiles",paletteFiles);
-            my_set.endGroup();
-            qInfo() << "Adding colormap" << cmapfile;
+            qDebug() << "Adding colormap" << cmapfile;
             inputFile.close();
         }
     }
@@ -307,7 +297,7 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 
 
 bool nApp::event(QEvent *ev) {
-    //    qDebug() << ev;
+    qDebug() << ev;
     if (ev->type() == QEvent::FileOpen) {
         QWidget *widget = QApplication::activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);
@@ -317,6 +307,7 @@ bool nApp::event(QEvent *ev) {
         }
         if (neu == NULL) neu = new neutrino();
         neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
+        ev->accept();
     } else {
         return QApplication::event(ev);
     }

@@ -27,7 +27,10 @@
 #include <QGraphicsObject>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include "nPhysImageF.h"
+#include <QGraphicsSceneMouseEvent>
+#include <QColorDialog>
+#include <QFileDialog>
+#include "nPhysD.h"
 
 #ifndef __nPoint
 #define __nPoint

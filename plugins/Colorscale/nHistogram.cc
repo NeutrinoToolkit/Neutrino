@@ -78,9 +78,9 @@ void nHistogram::mouseReleaseEvent (QMouseEvent *){
     if (parentPan->currentBuffer && property("mousepress").isValid()){
         double oldcolor=property("mousepress").toDouble();
         if (oldcolor!=colorvalue) {
-            parentPan->currentBuffer->property["display_range"]=vec2f(oldcolor,colorvalue);
+            parentPan->currentBuffer->prop["display_range"]=vec2f(oldcolor,colorvalue);
         } else {
-           parentPan->currentBuffer->property["display_range"]=parentPan->currentBuffer->get_min_max();
+           parentPan->currentBuffer->prop["display_range"]=parentPan->currentBuffer->get_min_max();
         }
         parentPan->nparent->updatePhys();
         parentPan->updatecolorbar();
@@ -194,13 +194,13 @@ void nHistogram::drawPicture (QPainter &p) {
 
         int num_labels=0;
         bool too_big=false;
-        vec2f minmax=parentPan->currentBuffer->property.have("display_range") ? parentPan->currentBuffer->property["display_range"] : parentPan->currentBuffer->get_min_max();
+        vec2f minmax=parentPan->currentBuffer->prop.have("display_range") ? parentPan->currentBuffer->prop["display_range"] : parentPan->currentBuffer->get_min_max();
         while (!too_big) {
             num_labels++;
             too_big=false;
             for (int i=0; i<=num_labels; i++) {
                 double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                if (p.fontMetrics().width(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
+                if (p.fontMetrics().horizontalAdvance(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
                     too_big=true;
                 }
             }
@@ -210,7 +210,7 @@ void nHistogram::drawPicture (QPainter &p) {
                     p.drawLine(offsetx+i*dx/num_labels,offsety+4,offsetx+i*dx/num_labels,2*offsety);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
                     QString str1=QLocale().toString(val);
-                    QRectF rect1(0,2,p.fontMetrics().width(str1),offsety);
+                    QRectF rect1(0,2,p.fontMetrics().horizontalAdvance(str1),offsety);
 
                     int align= Qt::AlignVCenter;
                     if (i==0) {
@@ -236,7 +236,7 @@ void nHistogram::drawPicture (QPainter &p) {
             too_big=false;
             for (int i=0; i<=num_labels; i++) {
                 double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
-                if (p.fontMetrics().width(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
+                if (p.fontMetrics().horizontalAdvance(QLocale().toString(val))>double(dx)/(1.5*num_labels)) {
                     too_big=true;
                 }
             }
@@ -246,7 +246,7 @@ void nHistogram::drawPicture (QPainter &p) {
                     p.drawLine(offsetx+i*dx/num_labels,height()-2*offsety,offsetx+i*dx/num_labels,height()-offsety-4);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
                     QString str1=QLocale().toString(val);
-                    QRectF rect1(0,height()-(offsety+2),p.fontMetrics().width(str1),offsety);
+                    QRectF rect1(0,height()-(offsety+2),p.fontMetrics().horizontalAdvance(str1),offsety);
 
                     int align= Qt::AlignVCenter;
                     if (i==0) {

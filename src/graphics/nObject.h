@@ -28,7 +28,11 @@
 #include <QGraphicsObject>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include "nPhysImageF.h"
+#include <QGraphicsSceneContextMenuEvent>
+#include <QColorDialog>
+#include <QFileDialog>
+
+#include "nPhysD.h"
 #include "ui_nObject.h"
 
 #ifndef __nObject

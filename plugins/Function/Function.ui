@@ -191,7 +191,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>f(x,y) width and height defined</string>
+       <string>f(x,y,z) width and height defined (z being the pixel value if image is selected)</string>
       </property>
       <property name="plainText">
        <string>Math.cos(10*2*Math.PI*x/width +5*Math.PI*((Math.random()-0.5)+(y&lt; height/2 ? 0 : 1)))+5*(Math.random()-0.5)</string>

@@ -74,7 +74,7 @@ public slots:
         if (currentBuffer) {
             qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
 
-            vec2 b_p(my_point.x(),my_point.y());
+            vec2i b_p(my_point.x(),my_point.y());
 
             //get bounds from view
             QPointF orig,corner;
@@ -86,8 +86,8 @@ public slots:
                 corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
             }
 
-            vec2 b_o((int)orig.x(),(int)orig.y());
-            vec2 b_c((int)corner.x(),(int)corner.y());
+            vec2i b_o((int)orig.x(),(int)orig.y());
+            vec2i b_c((int)corner.x(),(int)corner.y());
 
             phys_direction other_dir=(cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL);
 
@@ -110,14 +110,14 @@ public slots:
             }
 
             if(my_w.actionLockColors->isChecked()) {
-                vec2f rang=currentBuffer->property["display_range"];
+                vec2f rang=currentBuffer->prop["display_range"];
                 my_w.plot->graph(0)->valueAxis()->setRange(rang.x(),rang.y());
             }
 
             my_w.plot->graph(0)->valueAxis()->setProperty("lock",my_w.actionLockColors->isChecked());
             my_w.plot->rescaleAxes();
 
-            statusBar()->showMessage(tr("Point (")+QString::number(my_point.x())+","+QString::number(my_point.y())+")="+QString::number(currentBuffer->point(my_point.x(),my_point.y())));
+            statusBar()->showMessage(tr("Point (")+QLocale().toString(my_point.x())+","+QLocale().toString(my_point.y())+")="+QLocale().toString(currentBuffer->point(my_point.x(),my_point.y())));
             double pos_mouse=(b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
             my_w.plot->setMousePosition(pos_mouse);
 

@@ -177,6 +177,9 @@ elseif(WIN32)
 elseif(LINUX)
     add_executable(${PROJECT_NAME} ${filedeps})
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/linuxPackage/Neutrino.desktop DESTINATION share/applications)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.svg DESTINATION share/applications RENAME Neutrino.svg)
+
 endif()
 
 

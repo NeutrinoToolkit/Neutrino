@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 ## before project https://stackoverflow.com/a/34208904
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+#set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
 ### top level compile options
 project (Neutrino CXX)
@@ -50,9 +50,7 @@ set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT
 string(TIMESTAMP CURRENT_YEAR "%Y")
 set(PROJECT_COPYRIGHT_YEAR "2011-${CURRENT_YEAR}")
 
-set(DEBUG_LEVEL "10" CACHE string "DEBUG verbosity")
-
-option(DEBUG_LEVEL "DEBUG verbosity" "10")
+set(DEBUG_LEVEL "10" CACHE STRING "DEBUG verbosity")
 
 ## global compile options
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")

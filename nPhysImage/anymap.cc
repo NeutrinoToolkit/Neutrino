@@ -86,10 +86,10 @@ std::istream & operator>> (std::istream &lhs, struct anydata &rhs)
 
 bool check_vec(const std::string &s) {
 	std::string tstr = trim(s, "\t");
-	int ref1 = tstr.find("(",0), ref2 = tstr.find(":",0), ref3 = tstr.find(")",0);
-    if (    ref1 != (int)std::string::npos &&
-            ref2 != (int)std::string::npos &&
-            ref3 != (int)std::string::npos &&
+    size_t ref1 = tstr.find("(",0), ref2 = tstr.find(":",0), ref3 = tstr.find(")",0);
+    if (    ref1 != std::string::npos &&
+            ref2 != std::string::npos &&
+            ref3 != std::string::npos &&
             ref1 < ref2 && ref2 < ref3)
 			return true;
 

@@ -59,10 +59,10 @@ nPoint::nPoint(neutrino *my_parent) :
 	nparent->setProperty("nunPoint",num);
 	setProperty("nunPoint",num);
 
-    setProperty("NeuSave-fileIni",metaObject()->className()+QString::number(num)+".ini");
+    setProperty("NeuSave-fileIni",metaObject()->className()+QLocale().toString(num)+".ini");
 
 	setOrder(0.0);
-	setToolTip(tr("point")+QString(" ")+QString::number(num));
+	setToolTip(tr("point")+QString(" ")+QLocale().toString(num));
 
     connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoint(QPointF)));
 
@@ -225,8 +225,8 @@ void
 nPoint::setPoint (QPointF p) {
 	prepareGeometryChange();
 	ref.setPos(p);
-    my_w->xPos->setText(QString::number(p.x()));
-    my_w->yPos->setText(QString::number(p.y()));
+    my_w->xPos->setText(QLocale().toString(p.x()));
+    my_w->yPos->setText(QLocale().toString(p.y()));
 	ref.setVisible(true);
 	itemChanged();
 }
@@ -328,9 +328,9 @@ nPoint::selectThis(bool val) {
 
 QString nPoint::getPointString() {
 	QPointF myR=getPointF();
-	return QString::number(myR.x())+","+QString::number(myR.y());
+	return QLocale().toString(myR.x())+","+QLocale().toString(myR.y());
 	//.alex. non chiarissima la differenza
-	// return QString::number(getPointF().x())+","+QString::number(getPointF().y());
+	// return QLocale().toString(getPointF().x())+","+QLocale().toString(getPointF().y());
 }
 
 // reimplementation
