@@ -27,13 +27,13 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 	// create tpSystem
 	my_tp = new tpSystem();
 
-	// initialize GL draw area
-    tpDraw = new tpGlDraw(this);
-    my_w.gridGl->addWidget(tpDraw);
-
-	// pass tpSystem boxes to GL for plotting
-	tpDraw->addTribox(my_tp->Efield);
-	tpDraw->addTribox(my_tp->Bfield);
+//	// initialize GL draw area
+//    tpDraw = new tpGlDraw(this);
+//    my_w.gridGl->addWidget(tpDraw);
+//
+//	// pass tpSystem boxes to GL for plotting
+//	tpDraw->addTribox(my_tp->Efield);
+//	tpDraw->addTribox(my_tp->Bfield);
 
     // moved to neutrino load/save system
     //connect(my_w.loadConfig_pb, SIGNAL(clicked()), this, SLOT(load_config()));
@@ -59,7 +59,7 @@ Thomson_Parabola::Thomson_Parabola(neutrino *nparent)
 
 		if (vi != 0) {
 			connect(vi, SIGNAL(vecInput(f3point)), this, SLOT(vecInput(f3point)));
-		} else qDebug()<<"CANNOT find "<<objn;
+        } else DEBUG("CANNOT find "<<objn.toLatin1().constData());
 	}
 
 	// lines
@@ -78,7 +78,7 @@ void
 Thomson_Parabola::vecInput(f3point p)
 {
 	QVecInput *s = (QVecInput *)sender();
-	//std::cout<<"got "<<p<<" from "<<s->objectName().toAscii().constData()<<std::endl;
+    DEBUG(5,"got "<<p<<" from "<<s->objectName().toLatin1().constData());
 	
 	// questa e' palloserrima
 	if (s->objectName() == "boxV1") {
@@ -181,7 +181,7 @@ Thomson_Parabola::run_simulation(void)
     if (currentBuffer) {
         orig = currentBuffer->get_origin();
         scale = currentBuffer->get_scale();
-		//std::cout<<"img scale: "<<scale<<", img orig: "<<orig<<std::endl;
+        DEBUG(5,"img scale: "<<scale<<", img orig: "<<orig);
 	}
 
 	// TODO: I should derive class nSpectrum to support in a more general way line representation with
@@ -311,6 +311,7 @@ Thomson_Parabola::updateSingleTrack(int cr, int cc)
 void
 Thomson_Parabola::updateTracks(void)
 {
+    DEBUG(5, "update tracks called");
 	my_tracks.resize(my_w.trackTable->rowCount());
 	for (int rr=0; rr < my_w.trackTable->rowCount(); rr++) {
 		sp.A = my_w.trackTable->item(rr, 0)->data(0).toInt();
