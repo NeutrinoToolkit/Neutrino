@@ -255,7 +255,7 @@ bool nView::gestureEvent(QGestureEvent *event)
 
 void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
     DEBUG("-------------");
-//    qDebug() << gesture;
+    qDebug() << gesture;
 //    fillimage=true;
 //    setSize();
 //    update();

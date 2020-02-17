@@ -33,6 +33,13 @@ void nTreeWidget::mousePressEvent(QMouseEvent *e) {
     }
     dragposition=e->pos();
     dragtime.start();
+
+    setSortingEnabled(false);
+    header()->setSortIndicatorShown(true);
+    header()->setSectionsClickable(true);
+    connect(header(), SIGNAL(sectionClicked(int)), this, SLOT(customSort(int)));
+    //    customSortByColumn(header()->sortIndicatorSection());
+
     QTreeWidget::mousePressEvent(e);
 }
 
@@ -87,3 +94,31 @@ void nTreeWidget::dropEvent(QDropEvent *e) {
     dragitems.clear();
 }
 
+void nTreeWidget::customSort(int column)
+{
+    DEBUG("CUSTOM SORT")
+    Qt::SortOrder order = header()->sortIndicatorOrder();
+    QTreeWidget::sortItems(column, order);
+    QApplication::processEvents();
+    Image_list* imParent=qobject_cast<Image_list *> (parent()->parent());
+    if (imParent) {
+        QList<nPhysD*> myPhysList;
+        for (int i=0; i < topLevelItemCount(); ++i) {
+            QTreeWidgetItem *thisItem=topLevelItem(i);
+            for (auto &item: imParent->itemsMap) {
+                if (item.second == thisItem) {
+                    myPhysList << item.first;
+                }
+            }
+        }
+        if (myPhysList.size() == imParent->nparent->my_w->my_view->physList.size()) {
+            DEBUG("--------------------------------------------------------------------------")
+            for (int i=0; i < myPhysList.size(); ++i) {
+                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->my_w->my_view->physList.at(i))
+            }
+            DEBUG("--------------------------------------------------------------------------")
+        }
+        imParent->nparent->my_w->my_view->physList=myPhysList;
+
+    }
+}

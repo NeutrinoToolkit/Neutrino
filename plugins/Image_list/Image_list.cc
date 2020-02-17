@@ -30,9 +30,9 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     my_w.setupUi(this);
 
     my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
-    my_w.images->header()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
+    my_w.images->header()->setSectionsMovable(false);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
@@ -64,10 +64,12 @@ void Image_list::selectionChanged() {
     if (sel.size()) {
         QTreeWidgetItem *item=sel.last();
         if (item) {
-            nPhysD *phys=getPhys(item);
-            if (nPhysExists(phys)) {
+            nPhysD *my_phys=getPhys(item);
+            if (nPhysExists(my_phys)) {
                 disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
-                nparent->showPhys(phys);
+                my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
+                my_w.lineEdit->setCursorPosition(0);
+                nparent->showPhys(my_phys);
                 connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
             } else {
                 delete item;

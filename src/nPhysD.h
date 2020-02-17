@@ -18,7 +18,6 @@ class nPhysD : public physD {
         qDebug() << "------------------------------------------------------------ DELETE "<< copies();
     }
 
-
     nPhysD & operator= (const nPhysD &rhs)
     {
         physD *tmpimg=static_cast<physD*>(this);
