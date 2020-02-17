@@ -110,6 +110,8 @@ Image_list::buttonRemovePhys() {
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 }
 
+// WARNING: no consistency check between column name in tree widget and column used for changing properties. Wrong number in
+// set/get data will point you to the wrong column!!
 void
 Image_list::changeProperties() {
     QList<nPhysD*> physSelected;
@@ -135,7 +137,7 @@ Image_list::changeProperties() {
     QString text;
     if (physSelected.size()>0) {
         if (sender()==my_w.actionShort) {
-            text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(0,0).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(0,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
                     item->setData(0,0,text);
@@ -146,7 +148,7 @@ Image_list::changeProperties() {
                 }
             }
         } else if (sender()==my_w.actionOrigin) {
-            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(1,0).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 QStringList lista=text.split(' ', QString::SkipEmptyParts);
                 if (lista.size()==2) {
@@ -164,14 +166,14 @@ Image_list::changeProperties() {
                         }
                         nparent->my_w->my_view->update();
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(1,0,lista.at(0)+" "+lista.at(1));
+                            item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }
                     }
                 }
             }
 
         } else if (sender()==my_w.actionScale) {
-            text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(2,0).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(1,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 QStringList lista=text.split(' ', QString::SkipEmptyParts);
                 bool ok1,ok2;
@@ -190,7 +192,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(2,0,lista.at(0));
+                            item->setData(1,Qt::DisplayRole,lista.at(0));
                         }
                         nparent->my_w->my_view->update();
                     }
@@ -208,7 +210,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(2,0,lista.at(0)+" "+lista.at(1));
+                            item->setData(1,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }
                         nparent->my_w->my_view->update();
                     }
