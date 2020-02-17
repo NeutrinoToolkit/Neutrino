@@ -150,20 +150,20 @@ void Colorscale::invertColors () {
     }
 }
 
-void Colorscale::bufferChanged(nPhysD *phys) {
-    nGenericPan::bufferChanged(phys);
-    if (phys) {
-        vec2f minmax=phys->prop["display_range"];
+void Colorscale::bufferChanged(nPhysD *my_phys) {
+    nGenericPan::bufferChanged(my_phys);
+    if (my_phys && nPhysExists(my_phys)) {
+        vec2f minmax=my_phys->prop["display_range"];
         DEBUG(minmax);
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
         my_w.sliderMin->setValue(sliderValues().first());
+        my_w.gamma->setValue(my_phys->prop["gamma"]);
     } else{
         my_w.lineMin->setText("");
         my_w.lineMax->setText("");
     }
     my_w.sliderMax->setValue(sliderValues().second());
-    my_w.gamma->setValue(phys->prop["gamma"]);
     my_w.histogram->repaint();
 
     disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
@@ -220,6 +220,7 @@ void Colorscale::on_sliderMin_valueChanged(int val) {
     double doubleVal=0.0;
     if (currentBuffer) doubleVal = (double)val/my_w.sliderMin->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
+    minChanged();
     my_w.histogram->repaint();
 }
 
@@ -227,6 +228,7 @@ void Colorscale::on_sliderMax_valueChanged(int val) {
     double doubleVal=1.0;
     if (currentBuffer) doubleVal = (double)val/my_w.sliderMax->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
     my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
+    maxChanged();
     my_w.histogram->repaint();
 }
 

@@ -649,7 +649,7 @@ public:
 			histogram[bin_n]++;
 		}
 
-//        histogram.erase(std::remove(histogram.begin(), histogram.end(), 0.0), histogram.end());
+        histogram.erase(std::remove(histogram.begin(), histogram.end(), 0.0), histogram.end());
 		
 		return histogram;
 	}
