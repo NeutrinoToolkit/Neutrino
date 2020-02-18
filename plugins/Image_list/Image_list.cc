@@ -29,10 +29,10 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
 {
     my_w.setupUi(this);
 
-    my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+//    my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
-    my_w.images->header()->setSectionsMovable(false);
+//    my_w.images->header()->setSectionsMovable(false);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
@@ -112,8 +112,6 @@ Image_list::buttonRemovePhys() {
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 }
 
-// WARNING: no consistency check between column name in tree widget and column used for changing properties. Wrong number in
-// set/get data will point you to the wrong column!!
 void
 Image_list::changeProperties() {
     QList<nPhysD*> physSelected;
@@ -137,43 +135,19 @@ Image_list::changeProperties() {
     }
     bool ok;
     QString text;
+
     if (physSelected.size()>0) {
         if (sender()==my_w.actionShort) {
             text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(0,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
-                    item->setData(0,0,text);
+                    item->setData(0,Qt::DisplayRole,text);
                 }
                 foreach (nPhysD* phys, physSelected) {
                     phys->setShortName(text.toStdString());
                     nparent->emitBufferChanged(phys);
                 }
             }
-        } else if (sender()==my_w.actionOrigin) {
-            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
-            if (ok && !text.isEmpty()) {
-                QStringList lista=text.split(' ', QString::SkipEmptyParts);
-                if (lista.size()==2) {
-                    bool ok1,ok2;
-                    int xOrigin=QLocale().toDouble(lista.at(0),&ok1);
-                    int yOrigin=QLocale().toDouble(lista.at(1),&ok2);
-
-                    // also update ref. origin (in case button was toggled)
-                    frOrigin = vec2f(xOrigin, yOrigin);
-
-                    if (ok1 && ok2) {
-                        foreach (nPhysD* phys, physSelected) {
-                            phys->set_origin(xOrigin,yOrigin);
-                            nparent->emitBufferChanged(phys);
-                        }
-                        nparent->my_w->my_view->update();
-                        foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
-                        }
-                    }
-                }
-            }
-
         } else if (sender()==my_w.actionScale) {
             text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(1,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
@@ -222,6 +196,31 @@ Image_list::changeProperties() {
                     break;
                 }
             }
+        } else if (sender()==my_w.actionOrigin) {
+            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
+            if (ok && !text.isEmpty()) {
+                QStringList lista=text.split(' ', QString::SkipEmptyParts);
+                if (lista.size()==2) {
+                    bool ok1,ok2;
+                    int xOrigin=QLocale().toDouble(lista.at(0),&ok1);
+                    int yOrigin=QLocale().toDouble(lista.at(1),&ok2);
+
+                    // also update ref. origin (in case button was toggled)
+                    frOrigin = vec2f(xOrigin, yOrigin);
+
+                    if (ok1 && ok2) {
+                        foreach (nPhysD* phys, physSelected) {
+                            phys->set_origin(xOrigin,yOrigin);
+                            nparent->emitBufferChanged(phys);
+                        }
+                        nparent->my_w->my_view->update();
+                        foreach (QTreeWidgetItem* item, itemsSelected) {
+                            item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
+                        }
+                    }
+                }
+            }
+
         } else if (sender()==my_w.actionName) {
             text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(3,0).toString(), &ok);
             if (ok && !text.isEmpty()) {

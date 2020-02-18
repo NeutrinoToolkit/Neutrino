@@ -1449,6 +1449,7 @@ neutrino::openRAW() {
 //save and load across restart
 void neutrino::saveDefaults(){
     QSettings my_set("neutrino","");
+    qDebug() << my_set.fileName();
     my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
     my_set.setValue("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1);
@@ -1618,6 +1619,7 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
                             if (iface) {
                                 qDebug() << "reloaded";
                                 my_pan=iface->pan();
+                                break; // without this it might crash....
                             }
                         }
                     }

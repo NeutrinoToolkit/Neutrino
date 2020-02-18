@@ -53,7 +53,6 @@ public:
 
 public slots:
     void selectionChanged();
-
     void updatePad(nPhysD* = nullptr);
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
