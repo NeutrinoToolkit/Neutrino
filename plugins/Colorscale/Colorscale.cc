@@ -151,8 +151,9 @@ void Colorscale::invertColors () {
 }
 
 void Colorscale::bufferChanged(nPhysD *my_phys) {
+    qDebug() << "------------------------------------------------------------ Colorscale::bufferChanged "<< my_phys;
     nGenericPan::bufferChanged(my_phys);
-    if (my_phys && nPhysExists(my_phys)) {
+    if (nPhysExists(my_phys)) {
         vec2f minmax=my_phys->prop["display_range"];
         DEBUG(minmax);
         my_w.lineMin->setText(QLocale().toString(minmax.first()));

@@ -503,8 +503,7 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
     }
     my_w->my_view->update();
     QApplication::processEvents();
-    if (nPhysExists(my_phys))
-        emit bufferChanged(my_phys);
+    emit bufferChanged(my_phys);
     QApplication::processEvents();
 }
 

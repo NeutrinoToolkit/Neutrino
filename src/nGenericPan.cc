@@ -343,8 +343,11 @@ void nGenericPan::bufferChanged(nPhysD * my_phys)
     qDebug() << panName() << "here" << my_phys;
     if (nPhysExists(my_phys)) {
         DEBUG(my_phys->getFromName());
+        currentBuffer = my_phys;
+    } else {
+        currentBuffer = nullptr;
     }
-    currentBuffer = my_phys;
+
     qDebug() << panName() << "here" ;
 }
 
