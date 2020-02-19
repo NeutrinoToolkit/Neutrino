@@ -35,7 +35,7 @@ bool nPanPlug::instantiate(neutrino *neu) {
         qDebug() << "installed translation" << QLocale() << name();
         qApp->installTranslator(translator);
     } else {
-        delete translator;
+        translator->deleteLater();
     }
 
     const QByteArray className(name()+"*");
@@ -58,6 +58,7 @@ bool nPanPlug::instantiate(neutrino *neu) {
 bool nPanPlug::unload() {
     if (my_pan) {
         my_pan->close();
+        my_pan->deleteLater();
         QApplication::processEvents();
         return true;
     } else {

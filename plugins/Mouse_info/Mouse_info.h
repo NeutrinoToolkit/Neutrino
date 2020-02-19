@@ -42,9 +42,6 @@ class Mouse_info : public nGenericPan {
 public:
 
     Q_INVOKABLE Mouse_info (neutrino *parent);
-    neutrino *parent(){
-        return (neutrino *) QWidget::parent();
-    };
 
     Ui::Mouse_info my_w;
     QPointF mouse;

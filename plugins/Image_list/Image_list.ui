@@ -281,7 +281,7 @@
     <string>Rescale</string>
    </property>
    <property name="toolTip">
-    <string>Change scale</string>
+    <string>Change image size</string>
    </property>
   </action>
  </widget>

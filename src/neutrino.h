@@ -131,10 +131,10 @@ public slots:
 
     inline nPhysD* getCurrentBuffer() {
         return (my_w->my_view ? my_w->my_view->currentBuffer : nullptr);
-    };
+    }
 
-    inline QList<nPhysD *> getBufferList() {return (my_w->my_view ? my_w->my_view->physList : QList<nPhysD *>() );};
-    inline QList<nGenericPan*> getPanList() {return panList;};
+    inline QList<nPhysD *> getBufferList() {return (my_w->my_view ? my_w->my_view->physList : QList<nPhysD *>() );}
+    inline QList<nGenericPan*> getPanList() {return panList;}
 
     // menu actions
     void addMenuBuffers(nPhysD*);

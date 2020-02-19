@@ -1546,14 +1546,6 @@ void neutrino::about() {
         }
     }
 
-
-    //    nGenericPan pippo(this);
-    //    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << pippo.metaObject()->classInfoCount();
-    //    for (int i=0; i< pippo.metaObject()->classInfoCount(); i++){
-    //        QMetaClassInfo inf = pippo.metaObject()->classInfo(i);
-    //        qDebug() << inf.name();
-    //    }
-
     myabout.exec();
 }
 
@@ -1564,7 +1556,7 @@ nLine* neutrino::line(QString name) {
             return obj;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 nRect* neutrino::rect(QString name) {
@@ -1574,7 +1566,7 @@ nRect* neutrino::rect(QString name) {
             return obj;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1586,13 +1578,13 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
     int methodIdx=metaObject()->indexOfMethod((pName+"()").toLatin1().constData());
     qDebug() << "methodIdx" << methodIdx;
     if (methodIdx<0 && pName.size()>1) {
-        QString othe_pName=pName;
-        othe_pName.remove(0,1);
-        qDebug() << "methodIdx" << methodIdx << pName << othe_pName;
-        methodIdx=metaObject()->indexOfMethod((othe_pName+"()").toLatin1().constData());
-        qDebug() << "methodIdx" << methodIdx << pName << othe_pName;
+        QString tmp_pName=pName;
+        tmp_pName.remove(0,1);
+        qDebug() << "methodIdx" << methodIdx << pName << tmp_pName;
+        methodIdx=metaObject()->indexOfMethod((tmp_pName+"()").toLatin1().constData());
+        qDebug() << "methodIdx" << methodIdx << pName << tmp_pName;
         if (methodIdx>=0) {
-            pName=othe_pName;
+            pName=tmp_pName;
         }
     }
     qDebug() << "methodIdx" << methodIdx;
@@ -1619,7 +1611,7 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
                             if (iface) {
                                 qDebug() << "reloaded";
                                 my_pan=iface->pan();
-                                break; // without this it might crash....
+                                break; // important otherwise pan might get closed in the meanwhile and give segfault
                             }
                         }
                     }
@@ -1698,14 +1690,14 @@ nGenericPan* neutrino::newPan(QString my_string) {
 // cool functions outside neutrino....
 QVariant toVariant(anydata &my_data) {
     if (my_data.is_i()) {
-        return QVariant::fromValue((int)my_data);
+        return QVariant::fromValue(static_cast<int>(my_data));
     } else if (my_data.is_d()) {
-        return QVariant::fromValue((double)my_data);
+        return QVariant::fromValue(static_cast<double>(my_data));
     } else if (my_data.is_vec()) {
         vec2f my_val(my_data.get_str());
         return QVariant::fromValue(QPointF(my_val.x(),my_val.y()));
     } else if (my_data.is_str()) {
-        return QVariant::fromValue(QString::fromStdString((std::string)my_data));
+        return QVariant::fromValue(QString::fromStdString(static_cast<std::string>(my_data)));
     }
     return QVariant();
 }

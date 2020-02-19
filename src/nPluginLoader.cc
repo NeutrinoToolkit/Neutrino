@@ -53,17 +53,15 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
 
                     QToolButton *my_button = new QToolButton(neu->my_w->toolBar);
 
-                    QAction* my_action;
-                    bool found=false;
+                    QPointer<QAction> my_action;
                     foreach (QAction  *my_action_tmp, my_actions) {
                         QVariant  var=my_action_tmp->property("plugin-order");
                         if (var.toInt() > my_panPlug->order()) {
                             my_action = neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
-                            found=true;
                             break;
                         }
                     }
-                    if(!found) {
+                    if(!my_action) {
                         my_action = neu->my_w->toolBar->addWidget(my_button);
                     }
                     my_action->setProperty("plugin-order",my_panPlug->order());
@@ -86,7 +84,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                         QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
                         if (my_qplugin!=nullptr) {
                             if(my_qplugin->instance()){
-                                delete my_qplugin;
+                                my_qplugin->deleteLater();
                             }
                             my_qplugin=new QPluginLoader(pname);
                             p_obj = my_qplugin->instance();
