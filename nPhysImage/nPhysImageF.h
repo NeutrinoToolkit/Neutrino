@@ -189,6 +189,7 @@ public:
         (*this)["phys_from_name"] = "";
         (*this)["origin"] = vec2f(0,0);
 		(*this)["scale"] = vec2f(1,1);
+        (*this)["phys_orig"] = PHYS_DYN;
 	}
 
 };
@@ -1532,7 +1533,7 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 	
     new_img.set_origin(prop.at("origin"));
     new_img.set_scale(prop.at("scale"));
-	new_img.resize(width, height);
+    new_img.resize(width, height);
     new_img.setName("("+prop.at("phys_name").get_str()+")/("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");
 	

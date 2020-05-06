@@ -13,6 +13,8 @@ bool ShellPlug::instantiate(neutrino *neu) {
     qDebug() << "here" << neu;
     nparent=neu;
 
+
+
     qDebug() << "here";
 
 #if defined(Q_OS_WIN)
@@ -20,7 +22,7 @@ bool ShellPlug::instantiate(neutrino *neu) {
         PythonQt::init();
 #else
     qDebug() << "here2";
-        PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
 #endif
 
 
@@ -32,8 +34,18 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
     PythonQt::self()->registerCPPClass("nPhysD",nullptr,"neutrino");
 
+    foreach (QAction *act, nparent->findChildren<QAction *>()) {
+        if (act->property("neuPlugin").isValid() && act->property("neuPlugin").toBool()) {
+            std::string name=act->text().replace(" ","_").toStdString();
+
+            qDebug() << act;
+
+            PythonQt::self()->registerCPPClass(name.c_str(),nullptr,"neutrino");
+        }
+    }
+
     PythonQt::self()->addDecorators(new nPanPyWrapper());
-    PythonQt::self()->registerClass(& nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
+    PythonQt::self()->registerClass(&nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
 
     PythonQt::self()->registerClass(&nCustomPlot::staticMetaObject, "nPlot");
     PythonQt::self()->registerClass(&nLine::staticMetaObject, "nLine");

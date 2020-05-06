@@ -32,7 +32,7 @@ available methods (here `n` is a generic `neutrino` and a a generic image `nPhys
 
 * `n.getBufferList()` will return the list of the images.
 * `n.getCurrentBuffer()` will return the current image
-* `n.addShowPhys(a) will display an image
+* `n.addShowPhys(a)` will display an image
 
 
 Generic image: `nPhysD`

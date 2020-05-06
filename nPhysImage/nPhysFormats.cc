@@ -260,7 +260,8 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
         // get data
         ifile.seekg(init_matrix);
         DEBUG(5,"size : "<<getW()<< " x " <<getH() << " + " << ifile.tellg() );
-        ss.str(""); ss.clear(); ss << init_matrix << " bytes";
+        ss.str(""); ss.clear();
+        ss << getW()<< " x " <<getH() << " +" << init_matrix << " bytes";
         prop["sif-header"]=ss.str();
         std::vector<float> readb(getSurf());
 
@@ -1507,6 +1508,10 @@ physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
 void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool endian){
     std::ifstream ifile(my_phys->getName().c_str(), std::ios::in | std::ios::binary);
     if (!ifile.fail()) {
+        my_phys->prop["raw-skip"]=skipbyte;
+        my_phys->prop["raw-endian"]= endian? 1:0;
+        my_phys->prop["raw-kind"]= endian? 1:0;
+
         if (my_phys!=NULL && my_phys->getSurf()>0) {
 
             ifile.seekg(skipbyte);
@@ -1515,14 +1520,14 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
 
             DEBUG (my_phys->getSurf());
             switch (kind) {
-                case 0: bpp=sizeof(unsigned char); break;
-                case 1: bpp=sizeof(signed char); break;
-                case 2: bpp=sizeof(unsigned short); break;
-                case 3: bpp=sizeof(signed short); break;
-                case 4: bpp=sizeof(unsigned int); break;
-                case 5: bpp=sizeof(signed int); break;
-                case 6: bpp=sizeof(float); break;
-                case 7: bpp=sizeof(double); break;
+                case 0: bpp=sizeof(unsigned char);      my_phys->prop["raw-kind"]= "unsigned char";     break;
+                case 1: bpp=sizeof(signed char);        my_phys->prop["raw-kind"]= "signed char";       break;
+                case 2: bpp=sizeof(unsigned short);     my_phys->prop["raw-kind"]= "unsigned short";    break;
+                case 3: bpp=sizeof(signed short);       my_phys->prop["raw-kind"]= "signed short";      break;
+                case 4: bpp=sizeof(unsigned int);       my_phys->prop["raw-kind"]= "unsigned int";      break;
+                case 5: bpp=sizeof(signed int);         my_phys->prop["raw-kind"]= "signed int";        break;
+                case 6: bpp=sizeof(float);              my_phys->prop["raw-kind"]= "float";             break;
+                case 7: bpp=sizeof(double);             my_phys->prop["raw-kind"]= "double";            break;
                 default: kind=-1;
             }
 

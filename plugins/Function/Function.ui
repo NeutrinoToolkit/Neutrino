@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>281</width>
-    <height>259</height>
+    <height>216</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,9 +36,57 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
+    <item row="3" column="0">
+     <widget class="QSpinBox" name="sb_height">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>x</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QSpinBox" name="sb_width">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
      <widget class="QWidget" name="widget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -76,105 +124,6 @@
          <property name="text">
           <string>Erase previous</string>
          </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Size</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,1">
-       <property name="leftMargin">
-        <number>4</number>
-       </property>
-       <property name="topMargin">
-        <number>4</number>
-       </property>
-       <property name="rightMargin">
-        <number>4</number>
-       </property>
-       <property name="bottomMargin">
-        <number>4</number>
-       </property>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="sb_width">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>999999</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QComboBox" name="image">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QSpinBox" name="sb_height">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>999999</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QRadioButton" name="radioSize">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="radioImage">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
@@ -183,7 +132,7 @@
       </layout>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="4" column="0">
      <widget class="QPlainTextEdit" name="function">
       <property name="font">
        <font>
@@ -194,22 +143,46 @@
        <string>f(x,y,z) width and height defined (z being the pixel value if image is selected)</string>
       </property>
       <property name="plainText">
-       <string>Math.cos(10*2*Math.PI*x/width +5*Math.PI*((Math.random()-0.5)+(y&lt; height/2 ? 0 : 1)))+5*(Math.random()-0.5)</string>
+       <string>sin(5*pi*x/width)*sin(5*pi*y/height)*phys(2,x,y)</string>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
       </property>
      </widget>
     </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Size:</string>
+      </property>
+     </widget>
+    </item>
    </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
   </widget>
  </widget>
  <tabstops>
-  <tabstop>radioImage</tabstop>
-  <tabstop>radioSize</tabstop>
-  <tabstop>image</tabstop>
-  <tabstop>sb_width</tabstop>
-  <tabstop>sb_height</tabstop>
   <tabstop>doIt</tabstop>
   <tabstop>erasePrevious</tabstop>
  </tabstops>

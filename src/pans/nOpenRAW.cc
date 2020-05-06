@@ -56,7 +56,7 @@ void nOpenRAW::add(QStringList fnames) {
 
 void nOpenRAW::doOpen () {
 	foreach (QString fname, fileList) {
-		nPhysD *datamatrix = new nPhysD(my_w.width->value(), my_w.height->value(), 0.0,fname.toUtf8().constData());
+        nPhysD *datamatrix = new nPhysD(my_w.width->value(), my_w.height->value(), 0.0,fname.toLocal8Bit().constData());
         physFormat::phys_open_RAW(datamatrix,my_w.kind->currentIndex(), my_w.skip->value(), my_w.endian->isChecked());
 		if (datamatrix && datamatrix->getSurf()>0) {
 			datamatrix->setShortName(QFileInfo(fname).fileName().toStdString());

@@ -24,8 +24,6 @@
  */
 #include <QtGui>
 #include <QWidget>
-#include <QtScript>
-#include <QScriptEngine>
 
 #ifndef __Function
 #define __Function
@@ -42,10 +40,9 @@ public:
     Q_INVOKABLE Function(neutrino *);
 
 public slots:
-    void on_function_returnPressed();
+    void on_doIt_released();
 
 private:
-    QScriptEngine engine;
 
     nPhysD *physFunction;
 

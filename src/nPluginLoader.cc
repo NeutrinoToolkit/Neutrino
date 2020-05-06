@@ -103,6 +103,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                 QVariant v;
                 v.setValue(this);
                 my_action->setData(v);
+                my_action->setProperty("neuPlugin",true);
                 connect (my_action, SIGNAL(triggered()), this, SLOT(run()));
                 my_menu->addAction(my_action);
                 qDebug() << "found menu:" << my_menu;
