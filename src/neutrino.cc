@@ -908,7 +908,12 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 
 void neutrino::addPhys(nPhysD* datamatrix) {
     if ((!nPhysExists(datamatrix)) && datamatrix->getSurf()>0)	{
+        datamatrix->prop["uuid"] = property("uuidphys").toInt()+1;
+        setProperty("uuidphys",int(datamatrix->prop["uuid"]));
+
+
         my_w->my_view->physList << datamatrix;
+
         if (property("NeuSave-lockOrigin").isValid()) {
             QPointF p=property("NeuSave-lockOrigin").toPointF();
             datamatrix->set_origin(p.x(),p.y());

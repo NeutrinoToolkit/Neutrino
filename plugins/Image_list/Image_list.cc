@@ -29,7 +29,7 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
 {
     my_w.setupUi(this);
 
-//    my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+    my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
 //    my_w.images->header()->setSectionsMovable(false);
@@ -141,7 +141,7 @@ Image_list::changeProperties() {
             text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(0,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
-                    item->setData(0,Qt::DisplayRole,text);
+                    item->setData(1,Qt::DisplayRole,text);
                 }
                 foreach (nPhysD* phys, physSelected) {
                     phys->setShortName(text.toStdString());
@@ -168,7 +168,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(1,Qt::DisplayRole,lista.at(0));
+                            item->setData(2,Qt::DisplayRole,lista.at(0));
                         }
                         nparent->my_w->my_view->update();
                     }
@@ -186,7 +186,7 @@ Image_list::changeProperties() {
                             nparent->emitBufferChanged(phys);
                         }
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(1,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
+                            item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }
                         nparent->my_w->my_view->update();
                     }
@@ -215,7 +215,7 @@ Image_list::changeProperties() {
                         }
                         nparent->my_w->my_view->update();
                         foreach (QTreeWidgetItem* item, itemsSelected) {
-                            item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
+                            item->setData(3,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }
                     }
                 }
@@ -225,7 +225,7 @@ Image_list::changeProperties() {
             text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(3,0).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
-                    item->setData(3,0,text);
+                    item->setData(4,0,text);
                 }
                 foreach (nPhysD* phys, physSelected) {
                     phys->setName(text.toStdString());
@@ -285,14 +285,15 @@ Image_list::updatePad(nPhysD *my_phys) {
         itemsMap[my_phys]=it;
     }
     if (nPhysExists(my_phys) && it) {
-        it->setData(0,0,QString::fromUtf8(my_phys->getShortName().c_str()));
+        it->setData(0,0,QString::number(int(my_phys->prop["uuid"])));
+        it->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
         if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
-            it->setData(1,0,QLocale().toString(my_phys->get_scale().x()));
+            it->setData(2,0,QLocale().toString(my_phys->get_scale().x()));
         } else {
-            it->setData(1,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
+            it->setData(2,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
         }
-        it->setData(2,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
-        it->setData(3,0,QString::fromUtf8(my_phys->getName().c_str()));
+        it->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
+        it->setData(4,0,QString::fromUtf8(my_phys->getName().c_str()));
         if (nPhysExists(my_phys)) {
             my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
             my_w.lineEdit->setCursorPosition(0);

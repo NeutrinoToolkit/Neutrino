@@ -372,9 +372,13 @@ void nGenericPan::comboChanged(int k) {
 nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
     nPhysD* retVal=nullptr;
     QApplication::processEvents();
-    if (combo->count())
+    if (combo && combo->count()) {
         retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<nPhysD*>());
-    return retVal;
+        if (nparent->nPhysExists(retVal)) {
+            return retVal;
+        }
+    }
+    return nullptr;
 }
 
 void
@@ -780,16 +784,33 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (QComboBox *obj, findChildren<QComboBox *>()) {
         if (obj->objectName()==name) {
             if (my_occurrence==occurrence) {
+
                 int val=my_val.toInt(&ok);
-                if (ok && val>=0 && val < obj->maxVisibleItems()) {
-                    obj->setCurrentIndex(val);
-                } else {
-                    int pos=obj->findData(my_val);
-                    if (pos>-1) {
-                        obj->setCurrentIndex(pos);
+                if (ok) {
+                    if (val>=0 && obj->property("neutrinoImage").isValid()) {
+                        for (auto &phys : nparent->getBufferList()) {
+                            if (int(phys->prop["uuid"]) == val) {
+                                qDebug() << "trovato" << phys << int(phys->prop["uuid"]);
+                                for( int pos = 0; pos < obj->count(); pos++ ) {
+                                    nPhysD* combophys = (nPhysD*) (obj->itemData(pos).value<nPhysD*>());
+                                    if (combophys==phys) {
+                                        obj->setCurrentIndex(pos);
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    if (val>=0 && val < obj->maxVisibleItems()) {
+                        obj->setCurrentIndex(val);
+                    } else {
+                        int pos=obj->findData(my_val);
+                        if (pos>-1) {
+                            obj->setCurrentIndex(pos);
+                        }
+                    }
+                    return;
                 }
-                return;
             }
             my_occurrence++;
         }
@@ -898,10 +919,11 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
             my_occurrence++;
         }
     }
+    // objects
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
         if (widget->parent()==this) {
-            if (my_occurrence==occurrence) {
+            if (my_occurrence==occurrence && widget->toolTip() == name) {
                 QPolygonF poly;
                 foreach (QVariant p, my_val.toList()) {
                     poly << p.toPoint();
@@ -911,11 +933,10 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
             }
             my_occurrence++;
         }
-
     }
     my_occurrence=1;
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent() == this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
@@ -927,7 +948,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::PointF)) {
                     widget->setPoint(my_val.toPointF());
@@ -939,7 +960,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
     my_occurrence=1;
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
@@ -1042,10 +1063,11 @@ QVariant nGenericPan::get(QString name, int occurrence) {
             my_occurrence++;
         }
     }
+    // objects
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
         if (widget->parent()==this) {
-            if (my_occurrence==occurrence) {
+            if (my_occurrence==occurrence && widget->toolTip() == name) {
                 QVariantList variantList;
                 foreach (QPointF p, widget->getPoints()) {
                     variantList << p;
@@ -1058,7 +1080,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     my_occurrence=1;
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
         qDebug() << "here" << widget;
-        if (widget->objectName()==name) {
+        if (widget->objectName()==name && widget->toolTip() == name) {
             qDebug() << widget << my_occurrence;
             if (my_occurrence==occurrence) {
                 return QVariant::fromValue(widget);
@@ -1068,27 +1090,25 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     }
     my_occurrence=1;
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getRectF());
             }
             my_occurrence++;
-
         }
     }
     my_occurrence=1;
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getPointF());
             }
             my_occurrence++;
         }
-
     }
     my_occurrence=1;
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
-        if (widget->parent()==this) {
+        if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
                 return QVariant(widget->getRectF());
             }

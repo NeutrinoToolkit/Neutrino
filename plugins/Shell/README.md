@@ -72,8 +72,8 @@ create new window:
 * `n.newPan('myfile.ui')` create a generic tool from Qt .ui file
 
 operate `p` is a tool window:
-* `p.get('name')` retrieve the 'name' widget value
-* `p.set('name',3)`
+* `p.getIt('name')` retrieve the 'name' widget value
+* `p.setIt('name',3)`
 * `p.button('name')` will press the button 'name'
 
 The name of the wigdets inside a `nPan` is written in square bracket in tooltip window that appears when hoovering over the widget
@@ -87,6 +87,6 @@ p=neu.newPan()
 widget=PythonQt.QtGui.QSpinBox()
 widget.setObjectName('my_widget')
 p.setCentralWidget(win)
-p.get('my_widget')
-p.set('my_widget', 5)
+p.getIt('my_widget')
+p.setIt('my_widget', 5)
 ```

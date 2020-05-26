@@ -261,7 +261,7 @@ public:
     inline void writeASC(const char *);
 
 	//! RAW dump
-	void writeRAW(const char *);
+//	void writeRAW(const char *);
 
 	std::string class_name ()
 	{ return std::string(typeid(T).name()); }
@@ -384,7 +384,8 @@ public:
         DEBUG("-----------------------------------------------");
         DEBUG("-----------------------------------------------");
         DEBUG("-----------------------------------------------");
-        DEBUG(begin_h << " " << end_h << " " << begin_w << " " << end_w);
+        DEBUG(x << " , " << y << " : " << Dx << " x " << Dy);
+        DEBUG(begin_h << " " << end_h << " " << begin_w << " " << end_w << " " << x << " " << y);
         int pad_w = std::min(0,x);
         int pad_h = std::min(0,y);
         for (unsigned int i=begin_h; i<end_h; i++) {

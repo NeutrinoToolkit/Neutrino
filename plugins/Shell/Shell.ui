@@ -38,7 +38,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -95,9 +95,6 @@
            </property>
            <property name="plainText">
             <string notr="true"/>
-           </property>
-           <property name="tabStopWidth">
-            <number>10</number>
            </property>
            <property name="neutrinoSave" stdset="0">
             <bool>true</bool>

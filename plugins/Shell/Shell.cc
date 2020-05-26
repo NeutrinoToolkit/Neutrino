@@ -34,15 +34,13 @@ bool ShellPlug::instantiate(neutrino *neu) {
     PythonQt::self()->addDecorators(new nPhysPyWrapper());
     PythonQt::self()->registerCPPClass("nPhysD",nullptr,"neutrino");
 
-    foreach (QAction *act, nparent->findChildren<QAction *>()) {
-        if (act->property("neuPlugin").isValid() && act->property("neuPlugin").toBool()) {
-            std::string name=act->text().replace(" ","_").toStdString();
-
-            qDebug() << act;
-
-            PythonQt::self()->registerCPPClass(name.c_str(),nullptr,"neutrino");
-        }
-    }
+//    foreach (QAction *act, nparent->findChildren<QAction *>()) {
+//        if (act->property("neuPlugin").isValid() && act->property("neuPlugin").toBool()) {
+//            std::string name=act->text().replace(" ","_").toStdString();
+//            qDebug() << act;
+//            PythonQt::self()->registerCPPClass(name.c_str(),nullptr,"neutrino");
+//        }
+//    }
 
     PythonQt::self()->addDecorators(new nPanPyWrapper());
     PythonQt::self()->registerClass(&nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
@@ -142,7 +140,12 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
     connect(my_shortcut, SIGNAL(activated()), this, SLOT(runScript()));
 
     my_w.script->setFont(my_font);
+    my_w.script->setTabStopDistance(my_w.script->fontMetrics().horizontalAdvance(QString(" ").repeated(1000)) / 250.);
+
+
     my_w.splitter->setSizes(QList<int>({2,1,0}));
+
+
 
     PythonQt::self()->getMainModule().addObject("neu", nparent);
 

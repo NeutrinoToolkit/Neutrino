@@ -68,7 +68,7 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 		connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 		zoom=my_parent->getZoom();
 		if (my_parent->getCurrentBuffer()) {
-			setPos(my_parent->getCurrentBuffer()->get_origin().x(),my_parent->getCurrentBuffer()->get_origin().y());
+            bufferChanged(my_parent->getCurrentBuffer());
 		}
 	}
 
@@ -170,11 +170,11 @@ QRectF nObject::getRectF() {
 }
 
 void nObject::bufferChanged(nPhysD* my_phys) {
-    if (nparent->getBufferList().contains(my_phys)) {
-		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
-	} else {
-		setPos(0,0);
-	}
+//    if (nparent->getBufferList().contains(my_phys)) {
+//		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+//	} else {
+//		setPos(0,0);
+//	}
 }
 
 void nObject::interactive ( ) {

@@ -105,11 +105,17 @@ void Wavelet::physDel(nPhysD* buf) {
 
 
 void Wavelet::guessCarrier() {
+    QApplication::processEvents();
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
         QRect geom2=region.getRect(image);
+        qDebug() << geom2;
+
 		nPhysD datamatrix;
-		datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        DEBUG(image);
+        DEBUG("1");
+        datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        DEBUG("2");
 
         vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
 		

@@ -162,8 +162,10 @@ void nView::updatePhys() {
 void nView::showPhys(nPhysD *my_phys) {
     DEBUG("ENTER")
     if (my_phys) {
-        if (!physList.contains(my_phys)) physList << my_phys;
-
+        if (!physList.contains(my_phys)) {
+            physList << my_phys;
+            qWarning() << "THIS SHOULD NOT HAPPEN";
+        }
         DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
 
         if (currentBuffer) {
