@@ -65,7 +65,6 @@ private:
 
 public slots:
 
-
     void closeAllWindows();
 
     QList<neutrino*> neus();

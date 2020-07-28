@@ -145,7 +145,7 @@ void Wavelet::doWavelet () {
 		timer.start();
 
 		saveDefaults();
-        QRect geom2=region.getRect(image);
+        QRect geom2=region.getRect();
 
 		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
 		
@@ -207,19 +207,18 @@ void Wavelet::doWavelet () {
 
 		my_w.erasePrevious->setEnabled(true);
         for(auto &itr : my_params.olist) {
-            if ((itr.first=="angle"  && my_params.n_angles==1) ||
-                (itr.first=="lambda" && my_params.n_lambdas==1)) {
-                delete itr.second;
-            } else {
+            if (!(itr.first=="angle"  && my_params.n_angles==1) &&
+                !(itr.first=="lambda" && my_params.n_lambdas==1)) {
+                nPhysD *this_phys = new nPhysD(*itr.second);
                 if (my_w.erasePrevious->isChecked()) {
-                    waveletPhys[itr.first]=nparent->replacePhys(new nPhysD(*itr.second),waveletPhys[itr.first],false);
+                    waveletPhys[itr.first]=nparent->replacePhys(this_phys,waveletPhys[itr.first],false);
                 } else {
-                    nPhysD *ceppa = new nPhysD(*itr.second);
-                    nparent->addPhys(ceppa);
-                    waveletPhys[itr.first]=ceppa;
+                    nparent->addPhys(this_phys);
+                    waveletPhys[itr.first]=this_phys;
                 }
             }
-		}
+            delete itr.second;
+        }
         QApplication::processEvents();
         
         for(auto &itr: waveletPhys) {

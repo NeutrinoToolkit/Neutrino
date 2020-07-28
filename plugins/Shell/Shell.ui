@@ -267,6 +267,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRun_script"/>
+   <addaction name="actionCleanup"/>
   </widget>
   <action name="actionRun_script">
    <property name="icon">
@@ -275,6 +276,15 @@
    </property>
    <property name="text">
     <string>Run script</string>
+   </property>
+  </action>
+  <action name="actionCleanup">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-brew_kit-Default/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cleanup</string>
    </property>
   </action>
  </widget>
@@ -287,6 +297,7 @@
  </customwidgets>
  <resources>
   <include location="Shell.qrc"/>
+  <include location="../../../build-neutrinoMaster-brew_kit-Default/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

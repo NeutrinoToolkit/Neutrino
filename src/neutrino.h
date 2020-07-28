@@ -129,6 +129,8 @@ public slots:
 
     nPhysD* getBuffer(int);
 
+    nPhysD* getBuffer(QString);
+
     inline nPhysD* getCurrentBuffer() {
         return (my_w->my_view ? my_w->my_view->currentBuffer : nullptr);
     }
@@ -211,6 +213,10 @@ public slots:
     void changeEvent(QEvent *e);
 
     void on_actionKeyboard_shortcut_triggered();
+
+#ifdef __phys_debug
+    void get_total_number_of_phys();
+#endif
 
 signals:
     void colorValue(double);

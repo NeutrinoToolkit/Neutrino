@@ -79,7 +79,7 @@ public slots:
 
     void on_fileList_itemClicked(QListWidgetItem*);
 
-    vec2f sliderValues();
+    vec2i sliderValues();
     const QIcon getPaletteIconFile(QString my_file);
     void paletteComboChange(int);
 

@@ -50,6 +50,10 @@ int main(int argc, char **argv)
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 
+#ifdef  __phys_debug
+total_number_of_phys=0;
+#endif
+
 #ifdef __WIN32
 #ifdef __phys_debug
     AllocConsole();

@@ -153,12 +153,12 @@ void nObject::setRect(QRectF rect) {
 }
 
 QRect nObject::getRect(nPhysD* image) {
-	QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
-	if (image && nparent->getCurrentBuffer()) {
-		vec2f dx(image->get_origin()-nparent->getCurrentBuffer()->get_origin());
-		geom2.translate(dx.x(),dx.y());
-	}
-	return geom2;
+    QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
+    if (image && nparent->getCurrentBuffer()) {
+        vec2f dx(image->get_origin()-nparent->getCurrentBuffer()->get_origin());
+        geom2.translate(dx.x(),dx.y());
+    }
+    return geom2;
 }
 
 QRectF nObject::getRectF() {

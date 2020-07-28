@@ -751,39 +751,22 @@ bool nGenericPan::nPhysExists(nPhysD* phys){
 void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     bool ok;
     int my_occurrence=1;
-    //	foreach (QComboBox *obj, findChildren<QComboBox *>()) {
-    //		if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
-    //			if (my_occurrence==occurrence) {
-    //				bool found=false;
-    //				for (int i=0;i<obj->count();i++) {
-    //					nPhysD *objPhys=(nPhysD*) (obj->itemData(i).value<nPhysD *>());
-    //					if (*objPhys == *(nPhysD*) (my_val.value<nPhysD *>())){
-    //						obj->setCurrentIndex(i);
-    //						found=true;
-    //					}
-    //				}
-    //				if (!found) {
-    //					nparent->addPhys((nPhysD*) (my_val.value<nPhysD *>()));
-    //					QApplication::processEvents();
-    //					if (obj->findData(my_val)>-1) {
-    //						obj->setCurrentIndex(obj->findData(my_val));
-    //						return;
-    //					} else {
-    //						if (obj->findText(my_val.toString())>-1) {
-    //							obj->setCurrentIndex(obj->findText(my_val.toString()));
-    //							QApplication::processEvents();
-    //							return;
-    //						}
-    //					}
-    //				}
-    //			}
-    //			my_occurrence++;
-    //		}
-    //	}
-    //	my_occurrence=1;
     foreach (QComboBox *obj, findChildren<QComboBox *>()) {
         if (obj->objectName()==name) {
             if (my_occurrence==occurrence) {
+
+                nPhysD* phys = static_cast<nPhysD*>(my_val.value<void*>());
+                if (phys && obj->property("neutrinoImage").isValid()) {
+                    qDebug()<<"trovato" << QString::fromStdString(phys->getShortName());
+                    for( int pos = 0; pos < obj->count(); pos++ ) {
+                        nPhysD* combophys = static_cast<nPhysD*>(obj->itemData(pos).value<nPhysD*>());
+                        if (combophys==phys) {
+                            qDebug()<<"trovato davvero" << pos;
+                            obj->setCurrentIndex(pos);
+                            return;
+                        }
+                    }
+                }
 
                 int val=my_val.toInt(&ok);
                 if (ok) {
@@ -792,9 +775,10 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
                             if (int(phys->prop["uuid"]) == val) {
                                 qDebug() << "trovato" << phys << int(phys->prop["uuid"]);
                                 for( int pos = 0; pos < obj->count(); pos++ ) {
-                                    nPhysD* combophys = (nPhysD*) (obj->itemData(pos).value<nPhysD*>());
+                                    nPhysD* combophys = static_cast<nPhysD*>(obj->itemData(pos).value<nPhysD*>());
                                     if (combophys==phys) {
                                         obj->setCurrentIndex(pos);
+                                        return;
                                     }
                                 }
                             }
@@ -810,6 +794,23 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
                         }
                     }
                     return;
+                } else {
+                    QString name=my_val.toString();
+                    if (obj->property("neutrinoImage").isValid()) {
+                        for (auto &phys : nparent->getBufferList()) {
+                            if ( QString::fromStdString(phys->getShortName()) == name) {
+                                qDebug() << "trovato" << phys << QString::fromStdString( phys->getShortName());
+                                for( int pos = 0; pos < obj->count(); pos++ ) {
+                                    nPhysD* combophys = static_cast<nPhysD*>(obj->itemData(pos).value<nPhysD*>());
+                                    if (combophys==phys) {
+                                        obj->setCurrentIndex(pos);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
             my_occurrence++;

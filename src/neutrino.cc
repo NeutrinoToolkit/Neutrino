@@ -256,6 +256,12 @@ neutrino::neutrino():
     connect(timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
     timerSaveDefaults->start(60000); // 1 min
 
+#ifdef __phys_debug
+    QTimer *timerget_total_number_of_phys =  new QTimer(this);
+    connect(timerget_total_number_of_phys, SIGNAL(timeout()), this, SLOT(get_total_number_of_phys()));
+    timerSaveDefaults->start(1000); // 1 s
+#endif
+
     for (int i=0; i<metaObject()->methodCount(); i++){
         if (strcmp(metaObject()->method(i).typeName(),"nGenericPan*")==0 && metaObject()->method(i).parameterCount() == 0 )
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
@@ -389,6 +395,14 @@ void neutrino::transpose() {
 
 nPhysD* neutrino::getBuffer(int i) {
     return my_w->my_view->physList.value(i);
+}
+
+nPhysD* neutrino::getBuffer(QString name) {
+    for(auto &phys : getBufferList()) {
+        if (phys->getShortName() == name.toStdString() || phys->getName() == name.toStdString() )
+            return phys;
+    }
+    return nullptr;
 }
 
 // ------------------ PLUGINS -----------------------
@@ -911,7 +925,6 @@ void neutrino::addPhys(nPhysD* datamatrix) {
         datamatrix->prop["uuid"] = property("uuidphys").toInt()+1;
         setProperty("uuidphys",int(datamatrix->prop["uuid"]));
 
-
         my_w->my_view->physList << datamatrix;
 
         if (property("NeuSave-lockOrigin").isValid()) {
@@ -965,7 +978,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
 
 void neutrino::removePhys(nPhysD* datamatrix) {
     DEBUG(">>>>>>>>>>>>>>>>> ENTER ")
-    if (datamatrix && nPhysExists(datamatrix)) {
+    if (nPhysExists(datamatrix)) {
         std::string physremovename = datamatrix->getShortName();
         DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << my_w->my_view->physList.size());
         int position=indexOf(datamatrix);
@@ -979,11 +992,13 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             }
         }
         emit physDel(datamatrix);
+        QApplication:processEvents();
         if (datamatrix && !datamatrix->prop.have("keep_phys_alive")){
+            DEBUG("removing from neutrino.cc")
             delete datamatrix;
             datamatrix=nullptr;
         } else {
-            DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
+            DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python")
         }
         if (my_w->my_view->physList.size()>0) {
             int pos = position%my_w->my_view->physList.size();
@@ -1451,8 +1466,16 @@ neutrino::openRAW() {
     return win;
 }
 
+#ifdef __phys_debug
+void neutrino::get_total_number_of_phys() {
+    qWarning() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get_total_number_of_phys " << total_number_of_phys;
+}
+#endif
+
 //save and load across restart
-void neutrino::saveDefaults(){
+void neutrino::saveDefaults() {
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get_total_number_of_phys " << total_number_of_phys);
+
     QSettings my_set("neutrino","");
     qDebug() << my_set.fileName();
     my_set.beginGroup("nPreferences");
@@ -1522,6 +1545,7 @@ void neutrino::about() {
             licenses.append(lic);
         }
     }
+
     for(auto& fname: licenses) {
         QString basename=QFileInfo(fname).completeBaseName();
         QFile lic(fname);
@@ -1535,21 +1559,25 @@ void neutrino::about() {
         }
     }
 
+    my_about.creditsText->insertHtml("<h2>QT version :"+QLibraryInfo::version().toString()+"</h2>");
+
     my_about.creditsText->moveCursor(QTextCursor::Start);
     my_about.creditsText->ensureCursorVisible();
-    for (int id=0; id< 2000; id++){
-        if (QMetaType(id).isRegistered()) {
-            void *myClassPtr = QMetaType::create(id);
-            qDebug() << id << myClassPtr;
-            if(myClassPtr) {
-                QObject *my_qobject = static_cast<QObject*>(myClassPtr);
-                if (my_qobject) {
-                    qDebug() << my_qobject->metaObject()->className();
-                }
-                QMetaType::destroy(id, myClassPtr);
-            }
-        }
-    }
+//    for (int id=QMetaType::User; id< 2000; id++){
+//        qDebug() << id;
+//        if (QMetaType(id).isRegistered()) {
+//            qDebug() << "registered";
+//            void *myClassPtr = QMetaType::create(id);
+//            qDebug() << id << myClassPtr;
+//            if(myClassPtr) {
+//                QObject *my_qobject = static_cast<QObject*>(myClassPtr);
+//                if (my_qobject) {
+//                    qWarning() << my_qobject->metaObject()->className();
+//                }
+//                QMetaType::destroy(id, myClassPtr);
+//            }
+//        }
+//    }
 
     myabout.exec();
 }

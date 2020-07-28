@@ -51,65 +51,45 @@ inline void phys_reverse_vector(double *buf, int size);
 
 // some nice filters
 
-void
-phys_sin(physD &);
+void phys_sin(physD &);
 
-void
-phys_cos(physD &);
+void phys_cos(physD &);
 
-void
-phys_tan(physD &);
+void phys_tan(physD &);
 
-void
-phys_pow(physD &, double);
+void phys_pow(physD &, double);
 
-void
-phys_square(physD &);
+void phys_square(physD &);
 
-void
-phys_sqrt(physD &);
+void phys_sqrt(physD &);
 
-void
-phys_abs(physD &);
+void phys_abs(physD &);
 
-void
-phys_log(physD &);
+void phys_log(physD &);
 
-void
-phys_log10(physD &);
+void phys_log10(physD &);
 
-void
-phys_transpose(physD &);
+void phys_transpose(physD &);
 
-void
-phys_median_filter(physD&, unsigned int);
+void phys_median_filter(physD&, unsigned int);
 
-void
-phys_gaussian_blur(physD &, double);
+void phys_gaussian_blur(physD &, double);
 
-void
-phys_fast_gaussian_blur(physD &, double);
+void phys_fast_gaussian_blur(physD &, double);
 
-void
-phys_fast_gaussian_blur(physD &, double, double);
+void phys_fast_gaussian_blur(physD &, double, double);
 
-void
-phys_integratedNe(physD &, double);
+void phys_integratedNe(physD &, double);
 
-void
-phys_laplace(physD&);
+void phys_laplace(physD&);
 
-void
-phys_gauss_laplace(physD&, double);
+void phys_gauss_laplace(physD&, double);
 
-void
-phys_sobel(physD&);
+void phys_sobel(physD&);
 
-void
-phys_gauss_sobel(physD&, double);
+void phys_gauss_sobel(physD&, double);
 
-void
-phys_set_all(physD &, double);
+void phys_set_all(physD &, double);
 
 // constant operations
 void phys_add(physD &, double);
@@ -136,7 +116,6 @@ void phys_replace(physD &, double, double);
 void phys_replace_NaN(physD &, double);
 
 std::pair<double, bidimvec<int> > phys_cross_correlate(physD*, physD*);
-
 
 // crap functions
 void phys_get_vec_brightness(const double *, size_t, double &, double &);

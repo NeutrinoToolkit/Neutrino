@@ -1,4 +1,3 @@
-#include "gui/PythonQtScriptingConsole.h"
 #include <QFont>
 #include <QThread>
 
@@ -13,78 +12,13 @@ bool ShellPlug::instantiate(neutrino *neu) {
     qDebug() << "here" << neu;
     nparent=neu;
 
-
-
-    qDebug() << "here";
-
-#if defined(Q_OS_WIN)
-    qDebug() << "here1";
-        PythonQt::init();
-#else
-    qDebug() << "here2";
-    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
-#endif
-
-
-//    PythonQt_QtAll::init();
-
-    qDebug() << "here";
-    PythonQt_init_QtBindings();
-    qDebug() << "here";
-    PythonQt::self()->addDecorators(new nPhysPyWrapper());
-    PythonQt::self()->registerCPPClass("nPhysD",nullptr,"neutrino");
-
-//    foreach (QAction *act, nparent->findChildren<QAction *>()) {
-//        if (act->property("neuPlugin").isValid() && act->property("neuPlugin").toBool()) {
-//            std::string name=act->text().replace(" ","_").toStdString();
-//            qDebug() << act;
-//            PythonQt::self()->registerCPPClass(name.c_str(),nullptr,"neutrino");
-//        }
-//    }
-
-    PythonQt::self()->addDecorators(new nPanPyWrapper());
-    PythonQt::self()->registerClass(&nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
-
-    PythonQt::self()->registerClass(&nCustomPlot::staticMetaObject, "nPlot");
-    PythonQt::self()->registerClass(&nLine::staticMetaObject, "nLine");
-    PythonQt::self()->registerClass(&nRect::staticMetaObject, "nRect");
-    PythonQt::self()->registerClass(&nEllipse::staticMetaObject, "nEllipse");
-    PythonQt::self()->registerClass(&nPoint::staticMetaObject, "nPoint");
-
-    PythonQt::self()->addDecorators(new nPyWrapper());
-    PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
-
-    qDebug() << "here";
-    QSettings settings("neutrino","");
-    settings.beginGroup("Shell");
-
-    QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
-//Re-enable below if numpy start to work again:
-#if defined(Q_OS_WIN)
-    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
-    if (base.exists()) {
-        sites << base.absolutePath();
-        sites << base.filePath("plat-win32");
-        sites << base.filePath("lib-tk");
-        sites << base.filePath("site-packages");
-        sites << base.filePath("lib-dynload");
-    }
-#endif
-
-    qDebug() << "here";
-    foreach (QString spath, sites) {
-        qDebug() << "Python site folder " << spath;
-        if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
-    }
-
-    qDebug() << "here";
-    PythonQt::self()->getMainModule().addObject("nApp", qApp);
-    qDebug() << "here";
+    Shell::startup();
 
     QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
     qDebug() << "here";
 
-//        neu->my_w->toolBar->addAction(QIcon(":/icons/python.png"),"Python");
+    QSettings settings("neutrino","");
+    settings.beginGroup("Shell");
 
     neu->my_w->menubar->addMenu(menuPython);
     QDir scriptdir(settings.value("scriptsFolder").toString());
@@ -121,16 +55,14 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
 
-    QFont my_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-
-    my_font.setPointSize(10);
-
     connect(my_w.actionRun_script, SIGNAL(triggered()), this, SLOT(loadScript()));
+    connect(my_w.actionCleanup, SIGNAL(triggered()), this, SLOT(cleanup()));
 
-	PythonQtScriptingConsole *console;
 	console = new PythonQtScriptingConsole(this, PythonQt::self()->getMainModule());
     console->setProperty("neutrinoSave",false);
 	my_w.console->addWidget(console);
+    QFont my_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    my_font.setPointSize(10);
     console->setFont(my_font);
 	console->show();
 
@@ -169,11 +101,83 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
     console->setFocus();
 }
 
+void Shell::startup() {
+#if defined(Q_OS_WIN)
+    qDebug() << "here1";
+        PythonQt::init();
+#else
+    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+#endif
+
+    PythonQt_init_QtBindings();
+    PythonQt::self()->addDecorators(new nPhysPyWrapper());
+    PythonQt::self()->registerCPPClass("nPhysD",nullptr,"neutrino");
+
+//    foreach (QAction *act, nparent->findChildren<QAction *>()) {
+//        if (act->property("neuPlugin").isValid() && act->property("neuPlugin").toBool()) {
+//            std::string name=act->text().replace(" ","_").toStdString();
+//            qDebug() << act;
+//            PythonQt::self()->registerCPPClass(name.c_str(),nullptr,"neutrino");
+//        }
+//    }
+
+    PythonQt::self()->addDecorators(new nPanPyWrapper());
+    PythonQt::self()->registerClass(&nGenericPan::staticMetaObject, "nPan", PythonQtCreateObject<nPanPyWrapper>);
+
+    PythonQt::self()->registerClass(&nCustomPlot::staticMetaObject, "nPlot");
+    PythonQt::self()->registerClass(&nLine::staticMetaObject, "nLine");
+    PythonQt::self()->registerClass(&nRect::staticMetaObject, "nRect");
+    PythonQt::self()->registerClass(&nEllipse::staticMetaObject, "nEllipse");
+    PythonQt::self()->registerClass(&nPoint::staticMetaObject, "nPoint");
+
+    PythonQt::self()->addDecorators(new nPyWrapper());
+    PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
+
+    PythonQt::self()->getMainModule().addObject("nApp", qApp);
+
+    QSettings settings("neutrino","");
+    settings.beginGroup("Shell");
+
+    QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
+//Re-enable below if numpy start to work again:
+#if defined(Q_OS_WIN)
+    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
+    if (base.exists()) {
+        sites << base.absolutePath();
+        sites << base.filePath("plat-win32");
+        sites << base.filePath("lib-tk");
+        sites << base.filePath("site-packages");
+        sites << base.filePath("lib-dynload");
+    }
+#endif
+
+    foreach (QString spath, sites) {
+        qDebug() << "Python site folder " << spath;
+        if (QFileInfo(spath).isDir()) PythonQt::self()->addSysPath(spath);
+    }
+
+    settings.endGroup();
+}
+
+void Shell::cleanup() {
+    PythonQt::cleanup();
+    delete console;
+    startup();
+    PythonQt::self()->getMainModule().addObject("neu", nparent);
+    console = new PythonQtScriptingConsole(this, PythonQt::self()->getMainModule());
+    console->setProperty("neutrinoSave",false);
+    my_w.console->addWidget(console);
+    QFont my_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    my_font.setPointSize(10);
+    console->setFont(my_font);
+    console->show();
+}
+
 void Shell::loadScript(bool execInline) {
 	QString fname;
-	fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("fileTxt").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
+    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("NeuSave-fileScript").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
 	if (!fname.isEmpty()) {
-		setProperty("fileTxt",fname);
+        setProperty("NeuSave-fileScript",fname);
 		if (execInline) {
 			QFile t(fname);
 			t.open(QIODevice::ReadOnly| QIODevice::Text);
@@ -198,7 +202,7 @@ void Shell::runScript(QString cmd) {
     DEBUG("result " << res.type() << "\n" << res.toString().toStdString());
 }
 
-void Shell::runScript(void) {
+void Shell::runScript() {
     runScript(my_w.script->toPlainText());
 }
 

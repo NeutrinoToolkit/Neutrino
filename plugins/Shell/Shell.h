@@ -10,6 +10,7 @@
 
 #include "PythonQt_QtBindings.h"
 #include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
 
 #include "nGenericPan.h"
 #include "ui_Shell.h"
@@ -30,12 +31,18 @@ public:
     Q_INVOKABLE Shell(neutrino *);
     Ui::Shell my_w;
 
+    PythonQtScriptingConsole *console;
+
 public slots:
 	void loadScript(bool execInline = false);
-	void runScript(void);
+    void runScript();
 	void runScript(QString);
 	void changeScriptsFolder();
 	void changeSiteFolder();
+    static void startup();
+    void cleanup();
+
+
 };
 
 class nPyWrapper : public QObject {

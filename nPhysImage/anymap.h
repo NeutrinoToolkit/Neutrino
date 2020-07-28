@@ -36,6 +36,10 @@
 #ifndef __anymap
 #define __anymap
 
+#ifdef  __phys_debug
+extern int total_number_of_phys;
+#endif
+
 #define __pp_init_str "@@ phys_properties"
 #define __pp_end_str "@@ end"
 

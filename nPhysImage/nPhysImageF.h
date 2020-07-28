@@ -148,35 +148,6 @@ typedef std::string phys_type;
 #define PHYS_RFILE "phys_rfile"
 #define PHYS_DYN "phys_dyn"
 
-// new version: using anymap instead of properties
-
-
-//! image properties (transfered upon shallow copy)
-/*struct phys_properties_str {
-
-	phys_properties_str()
-		: phys_name(std::string("")), phys_short_name(std::string("")), phys_from_name(std::string("")), phys_orig(PHYS_DYN), origin(0.0,0.0), scale(1.0,1.0)
-	{ }
-	
-	//! image name
-	std::string phys_name;
-
-	//! image short name
-	std::string phys_short_name;
-
-	//! original file name
-	std::string phys_from_name;
-
-	//! image source
-	phys_type phys_orig;
-
-	//@{
-	//! image origin and scale
-	vec2f origin, scale;
-	//@}
-};
-typedef struct phys_properties_str phys_properties;*/
-
 // phys_properties should be initialised accordingly
 class phys_properties : public anymap {
 
@@ -302,9 +273,7 @@ public:
 	// assignment operator -- SHALLOW COPY
 	nPhysImageF<T> & operator= (const nPhysImageF<T> &rhs)
 	{
-		//std::cerr<<"shallow copy ------------------------------------"<<std::endl;
-
-		// check if other instances are present (prevent leaks)
+        // check if other instances are present (prevent leaks)
 		if (_canResize())
 			resize(0, 0);
 		else {
@@ -326,7 +295,6 @@ public:
 
 		_n_inst = rhs._n_inst;
 		_trash_new();
-//		std::cerr<<"end shallow copy --------------------------------"<<std::endl;
 
 		// not sure about this
 		return *this;
@@ -346,7 +314,6 @@ public:
 	{
 		DEBUG(5,"cast constructor ------------------------------------");
 		nPhysImageF<U> lhs;
-//		lhs = new nPhysImageF<U>;
 		lhs.resize(width, height);
 #pragma omp parallel for
         for (unsigned int i=0; i<getSurf(); i++)
@@ -354,9 +321,7 @@ public:
 
         lhs.TscanBrightness();
 		
-		//lhs->object_name = object_name;
-		//lhs->filename=filename;
-        lhs.prop = prop;
+       lhs.prop = prop;
 		return lhs;
 	}
 
@@ -693,7 +658,6 @@ public:
 	void setName(std::string name)
     { prop["phys_name"] = name; }
 
-//tom
 	inline std::string getShortName()
     { return prop["phys_short_name"]; }
 	
@@ -745,8 +709,6 @@ public:
     inline int copies() {
         return *_n_inst;
     }
-
-//end
 
 	inline phys_type getType()
     { return prop["phys_orig"]; }
@@ -802,15 +764,15 @@ std::ostream& operator<<(std::ostream& os, nPhysImageF<U> &phys) {
 
 // --------------------------------------------------------------------------------------------
 
-template<class T>
-nPhysImageF<T>::nPhysImageF()
-{ init_Tvariables(); }
+template<class T> nPhysImageF<T>::nPhysImageF() {
+#ifdef  __phys_debug
+total_number_of_phys++;
+#endif
+    init_Tvariables();
+}
 
-template<class T>
-nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp)
+template<class T> nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp) : nPhysImageF<T>()
 {
-	init_Tvariables();
-
 	if (pp == PHYS_FILE) {
 		// real file
 		//setName(obj_name);
@@ -834,10 +796,9 @@ nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp)
 
 // copy constructor
 template<class T>
-nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
+nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName) : nPhysImageF<T>()
 {
 //	std::cerr<<"copy constructor ------------------------------------"<<std::endl;
-	init_Tvariables();
 	resize(oth.width, oth.height);
 	
 //	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
@@ -853,9 +814,8 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName)
 
 
 template<class T>
-nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string obj_name)
+nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string obj_name) : nPhysImageF<T>()
 {
-	init_Tvariables();
 	setName(obj_name);
 
 	resize(w, h);
@@ -867,10 +827,9 @@ nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string o
 
 
 template<class T>
-nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int w, unsigned int h, std::string obj_name) {
+nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int w, unsigned int h, std::string obj_name) : nPhysImageF<T>() {
 
 	throw phys_trashable();
-	init_Tvariables();
 
 	setName(obj_name);
 	resize(w, h);
@@ -898,10 +857,12 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int o_width, unsigned int o_he
 template<class T>
 nPhysImageF<T>::~nPhysImageF()
 {
-//	std::cerr<<"Destructor for "<<object_name<<std::endl;
-	// check for copied instances
 
-	int trashDelete=_trash_delete();
+#ifdef  __phys_debug
+    total_number_of_phys--;
+#endif
+
+    int trashDelete=_trash_delete();
 	if ( trashDelete == 0 ) {
         DEBUG(1,"["<<(void *)this<<"] "<<  getShortName() << " : " << getName() << " ALLOWING DELETE! " );
 		if (Timg_buffer != NULL)
@@ -1029,46 +990,6 @@ nPhysImageF<T>::matrix_points_aligned()
 
 }
 
-// previous implementation
-//template<class T> void
-//nPhysImageF<T>::get_Tvector(int direction, int index, int offset, T *ptr, int size)
-//{
-//	// copies a vector to an external buffer (useful for Abel inversion)
-//	// vector is taken on direction (0=x, 1=y), starting from offset and for size points
-//
-//	int copy_len = size;
-//	if (direction == 0) {
-//		if ((size+offset > width)) 	// spem longam spatio brevi reseces ;-)
-//			copy_len = width-offset;
-//		for (unsigned int i=0; i<copy_len; i++)
-//			ptr[i] = Timg_buffer[index*width+offset+i];
-//	} else if (direction == 1) {
-//		if ((size+offset > height))
-//			copy_len = height-offset;
-//		for (unsigned int i=0; i<copy_len; i++)
-//			ptr[i] = Timg_buffer[(offset+i)*width+index];
-//	}
-//}
-//
-//template<class T> void
-//nPhysImageF<T>::set_Tvector(int direction, int index, int offset, T *ptr, int size)
-//{
-//	int copy_len = size;
-//	if (direction == 0) {
-//		if ((size+offset > width)) 	// spem longam...
-//			copy_len = width-offset;
-//		for (unsigned int i=0; i<copy_len; i++)
-//			Timg_buffer[index*width+offset+i] = ptr[i];
-//	} else if (direction == 1) {
-//		if ((size+offset > height)) 	
-//			copy_len = height-offset;
-//		for (unsigned int i=0; i<copy_len; i++)
-//			Timg_buffer[(offset+i)*width+index] = ptr[i];
-//	}
-//
-//}
-//
-//
 
 
 // ----------------------- DATA ACCESS ----------------------------	
