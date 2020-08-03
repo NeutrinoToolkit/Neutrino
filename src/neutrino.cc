@@ -630,26 +630,6 @@ neutrino::fileReopen() {
     }
 }
 
-void neutrino::fileOpen()
-{
-    QString formats("Neutrino Images (");
-    for (auto &format : physFormat::phys_image_formats()) {
-        formats+="*."+ QString::fromStdString(format)+" ";
-    }
-    formats+=" *.neus);; Images (";
-    foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
-        formats+="*."+format+" ";
-    }
-    formats.chop(1);
-    formats+=");;";
-    formats+=("Any files (*)");
-
-    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
-    foreach (QString fname, fnames) {
-        fileOpen(fname);
-    }
-}
-
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
     QList <nPhysD *> imagelist;
     if (QFile(fname).exists()) {
@@ -750,7 +730,22 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
         QApplication::processEvents();
     } else {
-        qWarning() << fname << "does not exists";
+        QString formats("Neutrino Images (");
+        for (auto &format : physFormat::phys_image_formats()) {
+            formats+="*."+ QString::fromStdString(format)+" ";
+        }
+        formats+=" *.neus);; Images (";
+        foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
+            formats+="*."+format+" ";
+        }
+        formats.chop(1);
+        formats+=");;";
+        formats+=("Any files (*)");
+
+        QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
+        foreach (QString fname, fnames) {
+            imagelist.append(fileOpen(fname));
+        }
     }
     return imagelist;
 }
@@ -959,7 +954,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
         bool redisplay = (my_w->my_view->currentBuffer==oldPhys);
         if (nPhysExists(oldPhys)) {
             //			newPhys->property["display_range"]=oldPhys->property["display_range"];
-            if (oldPhys==NULL) oldPhys=new nPhysD();
+            if (oldPhys==nullptr) oldPhys=new nPhysD();
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
@@ -980,7 +975,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
     DEBUG(">>>>>>>>>>>>>>>>> ENTER ")
     if (nPhysExists(datamatrix)) {
         std::string physremovename = datamatrix->getShortName();
-        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << my_w->my_view->physList.size());
+        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << my_w->my_view->physList.size())
         int position=indexOf(datamatrix);
         if (position != -1) {
             my_w->my_view->physList.removeAll(datamatrix);
@@ -992,7 +987,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             }
         }
         emit physDel(datamatrix);
-        QApplication:processEvents();
+        nApp::processEvents();
         if (datamatrix && !datamatrix->prop.have("keep_phys_alive")){
             DEBUG("removing from neutrino.cc")
             delete datamatrix;
@@ -1456,7 +1451,7 @@ nGenericPan*
 neutrino::openRAW() {
     QStringList fnames;
     nGenericPan *win = nullptr;
-    fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),NULL,tr("Any files")+QString(" (*)"));
+    fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),"",tr("Any files")+QString(" (*)"));
     if (fnames.size()) {
         win=getPan("nOpenRAW");
         if (!win) win= new nOpenRAW(this);
