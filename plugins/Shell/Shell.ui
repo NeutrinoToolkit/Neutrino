@@ -69,12 +69,12 @@
        <attribute name="title">
         <string>Script</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+       <layout class="QGridLayout" name="gridLayout_5">
         <property name="leftMargin">
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -82,24 +82,19 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item>
-         <widget class="QSplitter" name="splitter">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="0">
+         <widget class="CodeEditor" name="script">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
           </property>
-          <widget class="CodeEditor" name="script">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="plainText">
-            <string notr="true"/>
-           </property>
-           <property name="neutrinoSave" stdset="0">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <property name="plainText">
+           <string notr="true"/>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -280,7 +275,7 @@
   </action>
   <action name="actionCleanup">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-brew_kit-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -297,7 +292,7 @@
  </customwidgets>
  <resources>
   <include location="Shell.qrc"/>
-  <include location="../../../build-neutrinoMaster-brew_kit-Default/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

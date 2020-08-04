@@ -212,7 +212,7 @@ public:
                 std::string my_val=itr->second;
                 std::replace(my_val.begin(), my_val.end(),'\n', '\t');
 
-				os<<itr->first<<" = "<<my_val<<std::endl;
+                os<<itr->first<<" = "<<my_val<<std::endl;
 			}
 		}
 		os<<__pp_end_str<<std::endl;

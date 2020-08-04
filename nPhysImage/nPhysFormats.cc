@@ -612,7 +612,6 @@ void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
         oo = my_phys->getH();
         ofile.write((const char *)&oo, sizeof(int));
 
-        //ofile << writtendata << "\n"; // TODO: to be written in binary
         ofile.write((const char *)&writtendata, sizeof (int));
         ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
         DEBUG("Binary dump finished");
@@ -1767,6 +1766,8 @@ void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
             throw phys_fileerror(oss.str());
         }
     }
+#else
+    WARNING("phys_write_HDF4: was not compiled with hdf4 enabled");
 #endif
 }
 

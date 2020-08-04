@@ -35,6 +35,8 @@ JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent) {
     engine.globalObject().setProperty("neu", engine.newQObject(nparent));
     engine.globalObject().setProperty("nApp", engine.newQObject(qApp));
 
+    engine.globalObject().setProperty("neujs", engine.newQObject(static_cast<nGenericPan*>(this)));
+
     qScriptRegisterSequenceMetaType<QList<nGenericPan*> >(&engine);
     qScriptRegisterSequenceMetaType<QList<neutrino*> >(&engine);
     qScriptRegisterSequenceMetaType<QList<nPhysD*> >(&engine);
@@ -42,23 +44,36 @@ JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent) {
     qRegisterMetaType<nGenericPan*>("nGenericPan*");
     qRegisterMetaType<nPhysD*>("nPhysD*");
 
+    qDebug() << splitter->sizes();
+    auto mysize = QList<int>({20,1});
+    qDebug() << mysize;
+    splitter->setStretchFactor(0, 10);
+    splitter->setStretchFactor(1, 1);
+    qDebug() << splitter->sizes();
+
+    QKeySequence key_seq=QKeySequence(Qt::CTRL + Qt::Key_Return);
+    command->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute "+toolTip());
+    QShortcut* my_shortcut = new QShortcut(key_seq, command);
+    connect(my_shortcut, SIGNAL(activated()), this, SLOT(on_command_returnPressed()));
+
     show();
 }
 
 void JavaScript::on_command_returnPressed() {
     saveDefaults();
     QScriptValue retval;
-    QString fname=command->text();
-    if(QFileInfo::exists(fname)) {
-        QFile t(fname);
+    output->clear();
+    QString mytext=command->toPlainText();
+    if(QFileInfo::exists(mytext)) {
+        QFile t(mytext);
         t.open(QIODevice::ReadOnly| QIODevice::Text);
         QTextStream out(&t);
         QString toRun=out.readAll();
         t.close();
-        retval = engine.evaluate(toRun, fname);
+        retval = engine.evaluate(toRun, mytext);
     } else {
-        qDebug() << command->text();
-        retval = engine.evaluate(command->text());
+        qDebug() << mytext;
+        retval = engine.evaluate(mytext);
     }
     output->setPlainText(retval.toString());
 }

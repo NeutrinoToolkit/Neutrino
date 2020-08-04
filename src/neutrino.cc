@@ -1208,16 +1208,11 @@ neutrino::mouseposition(QPointF pos_mouse) {
 QString neutrino::getFileSave() {
     QString allformats;
     QStringList formats;
-    formats << "txt" << "neu" << "neus";
-#ifdef HAVE_LIBTIFF
-    formats << "tif" << "tiff";
-#endif
-#ifdef HAVE_LIBCFITSIO
-    formats << "fits";
-#endif
-#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
-    formats << "hdf";
-#endif
+
+    for (auto &format : physFormat::phys_image_formats()) {
+        formats << QString::fromStdString(format);
+    }
+    formats << "neus";
     foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
         if (!formats.contains(format))
             formats << format ;
@@ -1282,10 +1277,8 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
             physFormat::phys_write_tiff(phys,fname.toUtf8().constData());
         } else if (suffix.startsWith("fit")) {
             physFormat::phys_write_fits(phys,("!"+fname).toUtf8().constData(),4);
-#ifdef __phys_HDF
         } else if (suffix.startsWith("hdf")) {
             physFormat::phys_write_HDF4(phys,fname.toUtf8().constData());
-#endif
         } else if (suffix.startsWith("txt") || suffix.startsWith("dat")) {
             phys->writeASC(fname.toUtf8().constData());
         } else {

@@ -75,10 +75,6 @@ Shell::Shell(neutrino *nparent) : nGenericPan(nparent)
     my_w.script->setTabStopDistance(my_w.script->fontMetrics().horizontalAdvance(QString(" ").repeated(1000)) / 250.);
 
 
-    my_w.splitter->setSizes(QList<int>({2,1,0}));
-
-
-
     PythonQt::self()->getMainModule().addObject("neu", nparent);
 
     show(true);
