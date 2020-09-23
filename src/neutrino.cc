@@ -649,7 +649,8 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         } else {
             std::vector<physD> my_vec;
             try {
-                my_vec=physFormat::phys_open(fname.toUtf8().constData(),separate_rgb);
+                //                my_vec=physFormat::phys_open(fname.toUtf8().constData(),separate_rgb);
+                my_vec=physFormat::phys_open(fname.toStdString(),separate_rgb);
             } catch (std::exception &e) {
                 QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
                 dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);

@@ -469,6 +469,38 @@ void physMath::phys_sobel(physD &image) {
     image.TscanBrightness();
 }
 
+void physMath::phys_scharr(physD &image) {
+    physD my_copy=image;
+    image.setShortName("Sobel");
+    image.setName("Sobel "+image.getName());
+    image.setFromName(image.getFromName());
+    double Gx[9];
+    Gx[0] = 3.0; Gx[1] = 0.0; Gx[2] = -3.0;
+    Gx[3] =10.0; Gx[4] = 0.0; Gx[5] =-10.0;
+    Gx[6] = 3.0; Gx[7] = 0.0; Gx[8] = -3.0;
+
+    double Gy[9];
+    Gy[0] = 3.0; Gy[1] =10.0; Gy[2] =  3.0;
+    Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
+    Gy[6] =-3.0; Gy[7] =-10.0; Gy[8] =-3.0;
+
+    for(size_t i = 0 ; i < my_copy.getW() ; i++) {
+        for(size_t j = 0 ; j < my_copy.getH(); j++) {
+            double value_gx = 0.0;
+            double value_gy = 0.0;
+            for(size_t k = 0 ; k < 3 ; k++) {
+                for(size_t l = 0 ; l < 3 ; l++) {
+                    value_gx += Gx[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                    value_gy += Gy[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                }
+            }
+            image.set(i,j,sqrt(value_gx*value_gx + value_gy*value_gy));
+        }
+    }
+    image.TscanBrightness();
+}
+
+
 void physMath::phys_gauss_sobel(physD &image, double radius) {
     phys_fast_gaussian_blur(image, radius);
     phys_sobel(image);

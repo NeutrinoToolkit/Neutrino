@@ -302,6 +302,11 @@
            <string>Sobel</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Scharr</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

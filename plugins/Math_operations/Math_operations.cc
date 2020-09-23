@@ -333,6 +333,8 @@ void Math_operations::doOperation () {
                 physMath::phys_laplace(*myresult);
             } else if (my_w.operation->currentIndex()==separator[1]+11) {
                 physMath::phys_sobel(*myresult);
+            } else if (my_w.operation->currentIndex()==separator[1]+12) {
+                physMath::phys_scharr(*myresult);
             }
         }
         qDebug() << "here";
