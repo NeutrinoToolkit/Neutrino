@@ -304,6 +304,11 @@
          </item>
          <item>
           <property name="text">
+           <string>Sobel Dir</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Scharr</string>
           </property>
          </item>

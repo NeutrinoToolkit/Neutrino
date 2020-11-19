@@ -334,6 +334,8 @@ void Math_operations::doOperation () {
             } else if (my_w.operation->currentIndex()==separator[1]+11) {
                 physMath::phys_sobel(*myresult);
             } else if (my_w.operation->currentIndex()==separator[1]+12) {
+                physMath::phys_sobel_dir(*myresult);
+            } else if (my_w.operation->currentIndex()==separator[1]+13) {
                 physMath::phys_scharr(*myresult);
             }
         }

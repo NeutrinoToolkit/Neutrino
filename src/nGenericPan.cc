@@ -650,7 +650,8 @@ void nGenericPan::focusOutEvent(QFocusEvent *event) {
 void nGenericPan::loadSettings(QString fname) {
     if (fname.isNull()) {
         QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
-        loadSettings(fname);
+        if (!fname.isNull())
+            loadSettings(fname);
     } else {
         setProperty("NeuSave-fileIni",fname);
         QSettings settings(fname,QSettings::IniFormat);
@@ -661,7 +662,8 @@ void nGenericPan::loadSettings(QString fname) {
 void nGenericPan::saveSettings(QString fname) {
     if (fname.isNull()) {
         fname = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
-        saveSettings(fname);
+        if (!fname.isNull())
+            saveSettings(fname);
     } else {
         setProperty("NeuSave-fileIni",fname);
         QSettings settings(fname,QSettings::IniFormat);

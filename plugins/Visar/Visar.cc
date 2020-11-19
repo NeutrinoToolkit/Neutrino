@@ -256,6 +256,7 @@ void Visar::addVisar() {
 
     cPhase.push_back(QVector<double>());
     cPhaseErr.push_back(QVector<double>());
+    cReflErr.push_back(QVector<double>());
     for (unsigned int m=0; m<2;m++) {
         cIntensity[m].push_back(QVector<double>());
         cContrast[m].push_back(QVector<double>());
@@ -359,6 +360,7 @@ void Visar::delVisar() {
 
         cPhase.pop_back();
         cPhaseErr.pop_back();
+        cReflErr.pop_back();
         for (unsigned int m=0; m<2;m++) {
             cIntensity[m].pop_back();
             cContrast[m].pop_back();
@@ -926,6 +928,7 @@ void Visar::updatePlot() {
             velocity[k].resize(time_phase[k].size());
             velError[k].resize(time_phase[k].size());
             reflectivity[k].resize(time_phase[k].size());
+            reflError[k].resize(time_phase[k].size());
             quality[k].resize(time_phase[k].size());
 
             for (int j=0;j<time_phase[k].size();j++) {
@@ -957,6 +960,7 @@ void Visar::updatePlot() {
                 reflectivity[k][j] = refle;
                 quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
                 velError[k][j] = 2.0*abs(cPhaseErr[k][j]*sensitivity/refr_index);
+                reflError[k][j] = cReflErr[k][j]* (Rmat-beta) + beta;
 
                 for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
                     int jloc=i+1;
@@ -1273,7 +1277,7 @@ void Visar::getPhase(int k) {
             cContrast[1][k].clear();
             time_phase[k].clear();
             cPhaseErr[k].clear();
-            reflError[k].clear();
+            cReflErr[k].clear();
 
             int refIntShift= settingsUi[k]->intensityShift->value();
 
@@ -1324,7 +1328,7 @@ void Visar::getPhase(int k) {
                     stdRefle+=pow(intShot/intRef - meanRefle,2);
                 }
                 cPhaseErr[k] << sqrt(sqrTmpPhase/geom2.width());
-                reflError[k] << sqrt(stdRefle / geom2.width());
+                cReflErr[k] << sqrt(stdRefle / geom2.width());
 
             }
 

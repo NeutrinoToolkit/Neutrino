@@ -469,6 +469,37 @@ void physMath::phys_sobel(physD &image) {
     image.TscanBrightness();
 }
 
+void physMath::phys_sobel_dir(physD &image) {
+    physD my_copy=image;
+    image.setShortName("SobelDir");
+    image.setName("SobelDir "+image.getName());
+    image.setFromName(image.getFromName());
+    double Gx[9];
+    Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
+    Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
+    Gx[6] = 1.0; Gx[7] = 0.0; Gx[8] = -1.0;
+
+    double Gy[9];
+    Gy[0] =-1.0; Gy[1] =-2.0; Gy[2] = -1.0;
+    Gy[3] = 0.0; Gy[4] = 0.0; Gy[5] =  0.0;
+    Gy[6] = 1.0; Gy[7] = 2.0; Gy[8] =  1.0;
+
+    for(size_t i = 0 ; i < my_copy.getW() ; i++) {
+        for(size_t j = 0 ; j < my_copy.getH(); j++) {
+            double value_gx = 0.0;
+            double value_gy = 0.0;
+            for(size_t k = 0 ; k < 3 ; k++) {
+                for(size_t l = 0 ; l < 3 ; l++) {
+                    value_gx += Gx[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                    value_gy += Gy[l * 3 + k] * my_copy.point((i+1)+(1-k),(j+1)+(1-l));
+                }
+            }
+            image.set(i,j,atan2(value_gy,value_gx));
+        }
+    }
+    image.TscanBrightness();
+}
+
 void physMath::phys_scharr(physD &image) {
     physD my_copy=image;
     image.setShortName("Sobel");

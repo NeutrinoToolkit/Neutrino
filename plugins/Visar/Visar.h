@@ -99,6 +99,7 @@ private:
 
     std::vector<QVector<double>> time_phase;
     std::vector<QVector<double>> cPhaseErr;
+    std::vector<QVector<double>> cReflErr;
 
     std::vector<QVector<double>> velocity, velError, reflectivity, reflError, quality, time_vel;
 

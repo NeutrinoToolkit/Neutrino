@@ -87,6 +87,8 @@ void phys_gauss_laplace(physD&, double);
 
 void phys_sobel(physD&);
 
+void phys_sobel_dir(physD&);
+
 void phys_scharr(physD&);
 
 void phys_gauss_sobel(physD&, double);
