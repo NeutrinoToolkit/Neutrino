@@ -40,7 +40,9 @@ if (NOT ${FFTW} STREQUAL "FFTW-NOTFOUND")
 endif()
 
 #in precompiled win dlls the threads are included
-if(NOT WIN32)
+if(WIN32)
+	add_definitions(-Wa,-mbig-obj)
+else()
 	# fftw_threads
 	find_library(FFTW_THREADS NAMES fftw3_threads REQUIRED)
 	if (NOT ${FFTW_THREADS} STREQUAL "FFTW_THREADS-NOTFOUND")
