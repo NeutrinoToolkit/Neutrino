@@ -41,7 +41,8 @@ endif()
 
 #in precompiled win dlls the threads are included
 if(WIN32)
-	add_definitions(-Wa,-mbig-obj)
+	add_compile_options(-Wa,-mbig-obj)
+	add_definitions(-DNT_THREADS) 
 else()
 	# fftw_threads
 	find_library(FFTW_THREADS NAMES fftw3_threads REQUIRED)

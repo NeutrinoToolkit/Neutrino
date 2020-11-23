@@ -1,6 +1,7 @@
 #ifndef __Shell
 #define __Shell
 
+#include <Python.h>
 #include <cmath>
 #include <PythonQt.h>
 
