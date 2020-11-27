@@ -138,7 +138,7 @@ Image_list::changeProperties() {
 
     if (physSelected.size()>0) {
         if (sender()==my_w.actionShort) {
-            text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(0,Qt::DisplayRole).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Short Name"),tr("Short name:"), QLineEdit::Normal, itemsSelected.last()->data(1,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
                     item->setData(1,Qt::DisplayRole,text);
@@ -149,7 +149,7 @@ Image_list::changeProperties() {
                 }
             }
         } else if (sender()==my_w.actionScale) {
-            text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(1,Qt::DisplayRole).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 QStringList lista=text.split(' ', QString::SkipEmptyParts);
                 bool ok1,ok2;
@@ -197,7 +197,7 @@ Image_list::changeProperties() {
                 }
             }
         } else if (sender()==my_w.actionOrigin) {
-            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(3,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 QStringList lista=text.split(' ', QString::SkipEmptyParts);
                 if (lista.size()==2) {
@@ -222,7 +222,7 @@ Image_list::changeProperties() {
             }
 
         } else if (sender()==my_w.actionName) {
-            text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(3,0).toString(), &ok);
+            text = QInputDialog::getText(this, tr("Change Name"),tr("Name:"), QLineEdit::Normal, itemsSelected.last()->data(4,0).toString(), &ok);
             if (ok && !text.isEmpty()) {
                 foreach (QTreeWidgetItem* item, itemsSelected) {
                     item->setData(4,0,text);
@@ -233,7 +233,10 @@ Image_list::changeProperties() {
                 }
             }
         } else if (sender()==my_w.actionRescale) {
-            text = QInputDialog::getText(this, tr("Change Size"),tr("Size:"), QLineEdit::Normal, "1024 1024", &ok);
+            vec2i lastsize=physSelected.last()->getSize();
+            std::stringstream ss;
+            ss << lastsize.x() << " " << lastsize.y();
+            text = QInputDialog::getText(this, tr("Change Size"),tr("Size:"), QLineEdit::Normal, QString::fromStdString(ss.str()), &ok);
             if (ok && !text.isEmpty()) {
                 QStringList lista=text.split(' ', QString::SkipEmptyParts);
                 if (lista.size()==1) {
