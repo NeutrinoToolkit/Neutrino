@@ -161,14 +161,10 @@ void nView::updatePhys() {
 
 void nView::showPhys(nPhysD *my_phys) {
     DEBUG("ENTER")
-    if (my_phys) {
-        if (!physList.contains(my_phys)) {
-            physList << my_phys;
-            qWarning() << "THIS SHOULD NOT HAPPEN";
-        }
+    if (my_phys && physList.contains(my_phys)) {
         DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
 
-        if (currentBuffer) {
+        if (physList.contains(currentBuffer)) {
             if (lockColors) {
                 my_phys->prop["display_range"]=currentBuffer->prop["display_range"];
                 my_phys->prop["gamma"]=currentBuffer->prop["gamma"];
