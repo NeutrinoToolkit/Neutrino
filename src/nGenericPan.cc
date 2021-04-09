@@ -435,7 +435,7 @@ nGenericPan::loadUi(QSettings &settings) {
     foreach (QGroupBox *widget, findChildren<QGroupBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
-    
+
     foreach (QComboBox *widget, findChildren<QComboBox *>()) {
         if (widget->property("neutrinoSave").isValid()) {
             QString currText=widget->currentText();
@@ -650,10 +650,11 @@ void nGenericPan::focusOutEvent(QFocusEvent *event) {
 void nGenericPan::loadSettings(QString fname) {
     if (fname.isNull()) {
         QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
-        if (!fname.isNull())
+        if (!fname.isNull()) {
+            setProperty("NeuSave-fileIni",fname);
             loadSettings(fname);
+        }
     } else {
-        setProperty("NeuSave-fileIni",fname);
         QSettings settings(fname,QSettings::IniFormat);
         loadSettings(settings);
     }
@@ -662,10 +663,11 @@ void nGenericPan::loadSettings(QString fname) {
 void nGenericPan::saveSettings(QString fname) {
     if (fname.isNull()) {
         fname = QFileDialog::getSaveFileName(this, tr("Save INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf)"));
-        if (!fname.isNull())
+        if (!fname.isNull()){
+            setProperty("NeuSave-fileIni",fname);
             saveSettings(fname);
+        }
     } else {
-        setProperty("NeuSave-fileIni",fname);
         QSettings settings(fname,QSettings::IniFormat);
         settings.clear();
         saveSettings(settings);

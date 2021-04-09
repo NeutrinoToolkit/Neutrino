@@ -215,7 +215,7 @@ void Visar::addVisar() {
 
     contrast.push_back({{nPhysD(),nPhysD()}});
     intensity.push_back({{nPhysD(),nPhysD()}});
-    for (int m=0;m<2;m++){
+    for (uint m=0;m<2;m++){
         QString name2=name+" "+QLocale().toString(m);
         contrast[numVisars][m].setName(name2.toUtf8().constData());
         contrast[numVisars][m].setShortName("contrast");
@@ -333,9 +333,13 @@ void Visar::delVisar() {
         }
         QApplication::processEvents();
 
-        fringeLine.back()->deleteLater();
+//        fringeLine.back()->deleteLater();
+        delete fringeLine.back();
+        QApplication::processEvents();
         fringeLine.pop_back();
-        fringeRect.back()->deleteLater();
+//        fringeRect.back()->deleteLater();
+        delete fringeRect.back();
+        QApplication::processEvents();
         fringeRect.pop_back();
 
         settingsUi.pop_back();
