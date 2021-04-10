@@ -9,16 +9,6 @@
         <translation>Décalage de frange</translation>
     </message>
     <message>
-        <location filename="Visar.cc" line="146"/>
-        <source>Visar region </source>
-        <translation>Région Visar</translation>
-    </message>
-    <message>
-        <location filename="Visar.cc" line="153"/>
-        <source>SOP region</source>
-        <translation>Région SOP</translation>
-    </message>
-    <message>
         <location filename="Visar.cc" line="159"/>
         <source>Time</source>
         <translation>Temps</translation>

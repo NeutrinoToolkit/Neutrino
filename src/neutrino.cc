@@ -886,6 +886,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                             while(!ifile.eof()) {
                                 getline(ifile,line);
                                 qLine=QString::fromStdString(line);
+                                qDebug() << qLine;
                                 if (qLine.startsWith("NeutrinoPan-end"))
                                     break;
                                 tmpFile.write(line.c_str());
