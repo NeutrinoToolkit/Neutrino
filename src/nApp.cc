@@ -122,7 +122,7 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
 }
 
 void nApp::copyLog() {
-    QApplication::clipboard()->setText(log_win_ui->logger->toPlainText());
+    clipboard()->setText(log_win_ui->logger->toPlainText());
 }
 
 void nApp::saveLog(){
@@ -207,7 +207,7 @@ void nApp::closeAllWindows() {
 
 QList<neutrino*> nApp::neus() {
     QList<neutrino*> retList;
-    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+    foreach (QWidget *widget, topLevelWidgets()) {
         neutrino *my_neu=qobject_cast<neutrino *>(widget);
         if (my_neu) retList<< my_neu;
     }
@@ -230,7 +230,7 @@ bool nApp::notify(QObject *rec, QEvent *ev)
 bool nApp::event(QEvent *ev) {
     qDebug() << ev;
     if (ev->type() == QEvent::FileOpen) {
-        QWidget *widget = QApplication::activeWindow();
+        QWidget *widget = activeWindow();
         neutrino *neu=qobject_cast<neutrino *>(widget);
         if (neu == nullptr) {
             nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
@@ -256,7 +256,6 @@ void nApp::changeThreads(int num) {
 #ifdef HAVE_OPENMP
     omp_set_num_threads(num);
 #endif
-    DEBUG("THREADS " << num);
 }
 
 
