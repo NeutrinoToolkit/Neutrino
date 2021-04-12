@@ -256,12 +256,6 @@ neutrino::neutrino():
     connect(timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
     timerSaveDefaults->start(60000); // 1 min
 
-#ifdef __phys_debug
-    QTimer *timerget_total_number_of_phys =  new QTimer(this);
-    connect(timerget_total_number_of_phys, SIGNAL(timeout()), this, SLOT(get_total_number_of_phys()));
-    timerSaveDefaults->start(1000); // 1 s
-#endif
-
     for (int i=0; i<metaObject()->methodCount(); i++){
         if (strcmp(metaObject()->method(i).typeName(),"nGenericPan*")==0 && metaObject()->method(i).parameterCount() == 0 )
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
@@ -1455,12 +1449,6 @@ neutrino::openRAW() {
     }
     return win;
 }
-
-#ifdef __phys_debug
-void neutrino::get_total_number_of_phys() {
-    qWarning() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get_total_number_of_phys " << total_number_of_phys;
-}
-#endif
 
 //save and load across restart
 void neutrino::saveDefaults() {

@@ -29,14 +29,6 @@
 bool nPanPlug::instantiate(neutrino *neu) {
     qDebug() << "here";
     qDebug() << "Instantiate plugin" << name();
-    qDebug() << "Translation" << QLocale() << QLatin1String(name());
-    QPointer<QTranslator> translator(new QTranslator(qApp));
-    if (translator->load(QLocale(), QLatin1String(name()), QLatin1String("_"), QLatin1String(":/translations"))) {
-        qDebug() << "installed translation" << QLocale() << name();
-        qApp->installTranslator(translator);
-    } else {
-        translator->deleteLater();
-    }
 
     const QByteArray className(name()+"*");
     const int type = QMetaType::type( className );

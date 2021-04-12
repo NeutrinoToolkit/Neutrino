@@ -213,10 +213,6 @@ public slots:
 
     void on_actionKeyboard_shortcut_triggered();
 
-#ifdef __phys_debug
-    void get_total_number_of_phys();
-#endif
-
 signals:
     void colorValue(double);
 

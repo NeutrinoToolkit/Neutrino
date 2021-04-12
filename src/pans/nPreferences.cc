@@ -94,6 +94,8 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
+    connect(my_w.forceDecimalDot, SIGNAL(stateChanged(int)), napp, SLOT(forceDecimalDot(int)));
+
     my_w.openclUnit->setMaximum(physWave::openclEnabled());
 
 
@@ -125,27 +127,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     my_w.physNameLength->setValue(nparent->property("NeuSave-physNameLength").toInt());
 	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
-	QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage,QLocale::AnyScript,QLocale::AnyCountry);
-
-	if(!allLocales.contains(QLocale::system())) { // custom locale defined
-		my_w.localeCombo->addItem(tr("System: ")+nApp::localeToString(QLocale::system()),QLocale::system());
-	}
-
-	if(!allLocales.contains(QLocale())) { // custom locale defined
-		my_w.localeCombo->addItem(tr("Current: ")+nApp::localeToString(QLocale()),QLocale());
-	}
-
-    std::sort(allLocales.begin(),allLocales.end(), nApp::localeLessThan);
-
-	for(auto &locale : allLocales) {
-		QString my_str=nApp::localeToString(locale);
-		my_w.localeCombo->addItem(my_str,locale);
-	}
-
-	my_w.decimal->setText(QLocale().decimalPoint());
-	my_w.localeCombo->setCurrentIndex(my_w.localeCombo->findData(QLocale()));
-	connect(my_w.localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLocale(int)));
-
 	for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
 		my_w.pluginList->addItem(d);
 	}
@@ -156,12 +137,6 @@ void nPreferences::changeThreads(int num) {
 	nApp::changeThreads(num);
 }
 
-void nPreferences::changeLocale(int num) {
-	QLocale  locale=my_w.localeCombo->itemData(num).toLocale();
-	nApp::changeLocale(locale);
-	my_w.decimal->setText(QLocale().decimalPoint());
-	my_w.statusBar->showMessage(nApp::localeToString(QLocale()), 5000);
-}
 
 void nPreferences::openclUnitValueChange(int num) {
 	my_w.openclDescription->clear();
@@ -337,4 +312,3 @@ void nPreferences::on_mouseColor_released() {
         nparent->my_w->my_view->update();
     }
 }
-

@@ -56,7 +56,6 @@ public slots:
     void changephysNameLength(int);
     void openclUnitValueChange(int);
     void resetSettings();
-	void changeLocale(int);
 	void changeThreads(int);
 
     void on_addPlugin_released();
@@ -72,7 +71,6 @@ public slots:
     void on_mouseColor_released();
     void on_gridThickness_valueChanged(double);
     void on_gridColor_released();
-
 };
 
 

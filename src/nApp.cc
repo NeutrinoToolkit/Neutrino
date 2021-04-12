@@ -12,6 +12,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
 #ifndef __clang__
   ,
     qout(std::cout)
+    
 #endif
 {
 
@@ -35,14 +36,9 @@ int nApp::exec() {
     QCoreApplication::setApplicationName("Neutrino");
     QCoreApplication::setApplicationVersion(__VER);
 
-    changeLocale(my_set.value("locale",QLocale()).toLocale());
     changeThreads(my_set.value("threads",1).toInt());
-    if (!my_set.contains("checkUpdates")) {
-        my_set.setValue("checkUpdates",QMessageBox::Yes == QMessageBox::question(nullptr,tr("Attention"),tr("Do you want to check for updates?"), QMessageBox::Yes | QMessageBox::No));
-    }
-    if (my_set.value("checkUpdates",true).toBool()) {
-        checkUpdates();
-    }
+
+    forceDecimalDot(my_set.value("forceDecimalDot",1).toInt());
 
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
@@ -176,7 +172,7 @@ void nApp::addPaletteFile(QString cmapfile) {
             nPalettes[cmapfile]= std::vector<unsigned char>(256*3);
             unsigned int iter=0;
             while (!in.atEnd()) {
-                QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
+                QStringList line = in.readLine().split(" ",Qt::SkipEmptyParts);
                 for(auto &strnum : line) {
                     if (iter < nPalettes[cmapfile].size()) {
                         nPalettes[cmapfile][iter] = strnum.toInt();
@@ -208,71 +204,6 @@ void nApp::closeAllWindows() {
 };
 
 
-void nApp::checkUpdates() {
-    QNetworkProxyFactory::setUseSystemConfiguration(true) ;
-    QNetworkAccessManager manager;
-    QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
-    QEventLoop event;
-    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
-    event.exec();
-    QString html = response->readAll(); // Source should be stored here
-
-    QJsonDocument json = QJsonDocument::fromJson(html.toUtf8());
-
-    QJsonObject responseObject = json.object();
-#ifdef __phys_debug
-    for(const auto &key : responseObject.keys() ) {
-        QJsonValue value = responseObject.value(key);
-        qDebug() << "Key = " << key << ", Value = " << value.toString();
-    }
-    QUrl commenturl(responseObject.value("comments_url").toString());
-    response = manager.get(QNetworkRequest(commenturl));
-    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
-    event.exec();
-    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-    qDebug() << response->readAll();
-    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-#endif
-    if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
-        QString compileSHA = QString(__VER_SHA);
-        QString onlineSHA=responseObject.value("sha").toString();
-        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-        qDebug() << compileSHA;
-        qDebug() << onlineSHA;
-        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-
-        if (compileSHA != onlineSHA) {
-
-            QMessageBox msgBox;
-            QString text=tr("A newer version is available");
-            msgBox.setText(text);
-            msgBox.addButton(tr("Go get it now"), QMessageBox::YesRole);
-            msgBox.addButton(tr("Not now"), QMessageBox::RejectRole);
-            msgBox.addButton(tr("Never"), QMessageBox::NoRole);
-            //            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
-            int ret = msgBox.exec();
-
-            qDebug() << ret << " : " << msgBox.result();
-            switch ( msgBox.buttonRole(msgBox.clickedButton())) {
-                case QMessageBox::YesRole:
-                    QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino/releases"));
-                    break;
-                case QMessageBox::NoRole: {
-                        QSettings my_set("neutrino","");
-                        my_set.beginGroup("nPreferences");
-                        my_set.setValue("checkUpdates",false);
-                        my_set.endGroup();
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-    }
-
-}
 
 QList<neutrino*> nApp::neus() {
     QList<neutrino*> retList;
@@ -314,49 +245,6 @@ bool nApp::event(QEvent *ev) {
     return true;
 }
 
-QString nApp::localeToString(const QLocale &locale) {
-    return QLocale::languageToString(locale.language())+ " " +QLocale::countryToString(locale.country())+ " " +QLocale::scriptToString(locale.script())+ " " +QString(locale.decimalPoint());
-}
-
-bool nApp::localeLessThan(const QLocale &loc1, const QLocale &loc2)
-{
-    return localeToString(loc1) < localeToString(loc2);
-}
-
-
-void nApp::changeLocale(QLocale locale) {
-    QKeySequence key_seq=QKeySequence(Qt::CTRL);
-
-    qDebug() << "here" << key_seq.toString();
-    if (locale!=QLocale()) {
-
-        qDebug() << QLocale::languageToString(locale.language()) <<
-                    QLocale::scriptToString(locale.script()) <<
-                    QLocale::countryToString(locale.country()) <<
-                    locale.bcp47Name() <<
-                    locale.country() <<
-                    locale.name() <<
-                    locale.decimalPoint();
-
-        QLocale().setDefault(locale);
-        QSettings settings("neutrino","");
-        settings.beginGroup("nPreferences");
-        settings.setValue("locale",locale);
-        settings.endGroup();
-
-        QString fileTransl(":translations/neutrino_"+locale.name()+".qm");
-        if(QFileInfo(fileTransl).exists()) {
-            QPointer<QTranslator> translator(new QTranslator(qApp));
-            if (translator->load(fileTransl)) {
-                qApp->installTranslator(translator);
-                qDebug() << "installing translator" << fileTransl;
-            } else {
-                delete translator;
-            }
-        }
-    }
-}
-
 
 void nApp::changeThreads(int num) {
     if (num<=1) {
@@ -372,3 +260,11 @@ void nApp::changeThreads(int num) {
 }
 
 
+void nApp::forceDecimalDot(int num) {
+    if (num==0) {
+        QLocale::setDefault(QLocale::system());
+    } else {
+        QLocale::setDefault(QLocale::c());
+    }
+    qDebug() << num;
+}

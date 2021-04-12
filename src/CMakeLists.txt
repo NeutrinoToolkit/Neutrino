@@ -94,43 +94,9 @@ file(APPEND ${CMAP_QRC} "    </qresource>\n</RCC>")
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics pans pans/colorbar pans/winlist)
 
-#translate ui
-
-SET(Qt5LinguistTools_DIR "${Qt5_DIR}/../Qt5LinguistTools")
-find_package(Qt5LinguistTools)
-if (Qt5LinguistTools_FOUND)
-    SET(LANGUAGES fr_FR it_IT ko_KP)
-    SET(LANGUAGE_TS_FILES)
-    FOREACH(LANGUAGE ${LANGUAGES})
-        SET(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations/neutrino_${LANGUAGE}.ts")
-        if(EXISTS ${TS_FILE})
-            SET(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
-            qt5_add_translation(qm_files ${TS_FILE})
-        else ()
-            qt5_create_translation(qm_files ${SOURCES} ${UIS} ${TS_FILE})
-            if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-                message (STATUS "[Debug] translation file ${TS_FILE} will be created, commit it if you create the translations.")
-            endif()
-        endif()
-    ENDFOREACH()
-
-    IF(LANGUAGE_TS_FILES)
-        set(TRANSL_QRC ${QRCDIR}/translations.qrc)
-        file(WRITE ${TRANSL_QRC} "<RCC>\n    <qresource prefix=\"/translations/\">\n")
-        foreach(my_file ${TRASL_FILES})
-            file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
-            GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-            file(APPEND ${TRANSL_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
-        endforeach()
-        file(APPEND ${TRANSL_QRC} "    </qresource>\n</RCC>")
-    ENDIF(LANGUAGE_TS_FILES)
-
-endif(Qt5LinguistTools_FOUND)
-
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
-set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${TRANSL_QRC} ${CMAP_QRC} ${TRASL_FILES})
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
 
 if(APPLE)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")

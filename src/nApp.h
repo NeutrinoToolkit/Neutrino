@@ -70,11 +70,6 @@ public slots:
     QList<neutrino*> neus();
 
     static void changeThreads(int);
-    static void changeLocale(QLocale locale);
-    static bool localeLessThan(const QLocale&, const QLocale&);
-    static QString localeToString(const QLocale &);
-
-    void checkUpdates();
 
     void addPaletteFile(QString);
     void addDefaultPalettes();
@@ -84,6 +79,7 @@ public slots:
     void saveLog();
     void findLogText();
 
+    void forceDecimalDot(int);
 };
 
 #endif

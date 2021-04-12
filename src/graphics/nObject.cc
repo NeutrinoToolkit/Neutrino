@@ -666,6 +666,7 @@ nObject::saveSettings() {
 void
 nObject::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
+    qWarning() << "here: " << toolTip() << objectName();
     setPos(settings.value("position").toPoint());
 
     int size = settings.beginReadArray("points");
