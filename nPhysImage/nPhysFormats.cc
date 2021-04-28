@@ -839,9 +839,9 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         my_phys.setType(PHYS_FILE);
 
                         DEBUG("here");
-                        for (tiff_uint32 j = 0; j < h; j++) {
+                        for (unsigned int j = 0; j < h; j++) {
                             TIFFReadScanline(tif, buf, j);
-                            for (tiff_uint32 i=0; i<w; i++) {
+                            for (unsigned int i=0; i<w; i++) {
                                 double val=0;
                                 if (bytesperpixel == sizeof(char)) {
                                     if (format==SAMPLEFORMAT_UINT) {
