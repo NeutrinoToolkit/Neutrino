@@ -444,7 +444,7 @@ void nObject::intersection() {
 void nObject::submatrix() {
 	if (nparent->getCurrentBuffer()) {
 		nPhysD *copy=new nPhysD(nparent->getCurrentBuffer()->sub(getRect().x(),getRect().y(),getRect().width(),getRect().height()));
-		nparent->showPhys(copy);
+		nparent->addShowPhys(copy);
 	}
 }
 
