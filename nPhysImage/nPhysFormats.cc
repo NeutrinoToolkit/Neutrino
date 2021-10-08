@@ -451,7 +451,7 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
         
         switch (kind) {
             case 2: // unsigned short int
-                kind=3;
+                kind=2;
                 break;
             case 3: // unsigned int
                 kind=4;
@@ -1089,95 +1089,100 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
         ifilenameimg.replace(ifilenameimg.size()-3,3,"img");
         //        ifilenameimg.resize(ifilenameimg.size()-3);
         //        ifilenameimg = ifilenameimg+"img";
-        DEBUG(">>>>>>>>>>>>>>>>>>>" <<ifilenameimg);
-        std::string line;
-        getline(ifile,line);
-        if (line.compare(std::string("BAS_IMAGE_FILE"))!=0) {
-            throw phys_fileerror("File does not start with BAS_IMAGE_FILE");
-            return imagelist;
-        }
-        getline(ifile,line); //this is the basename
-        DEBUG("basename: " << line);
-        getline(ifile,line); //this we don't know what it is
-        DEBUG("unknown : " << line);
-        getline(ifile,line);
-        double resx=atof(line.c_str());
-        getline(ifile,line);
-        double resy=atof(line.c_str());
-        getline(ifile,line);
-        int bit=atoi(line.c_str());
-        getline(ifile,line);
-        int w=atoi(line.c_str());
-        getline(ifile,line);
-        int h=atoi(line.c_str());
-        physD linearized(w,h,0.0,ifilename);
-        linearized.setType(PHYS_FILE);
-        physD original(w,h,0.0,ifilenameimg.c_str());
-        original.setType(PHYS_FILE);
-        original.setShortName("original");
 
-        switch (bit) {
-            case 8:
-                phys_open_RAW(&original,0,0,true);
-                break;
-            case 16:
-            default:
-                phys_open_RAW(&original,2,0,true);
-                break;
-        }
-
-        linearized.prop["inf-resx"] = resx;
-        linearized.prop["inf-resy"] = resy;
-        linearized.set_scale(resx/1000.,resy/1000.);
-        linearized.prop["unitsX"] = "mm";
-        linearized.prop["unitsY"] = "mm";
-        linearized.prop["unitsCB"] = "PSL";
-
-        getline(ifile,line);
-        double sensitivity=atof(line.c_str());
-        linearized.prop["inf-sensitivity"] = sensitivity;
-        getline(ifile,line);
-        double latitude=atof(line.c_str());
-        linearized.prop["inf-latitude"] = latitude;
-        getline(ifile,line);
-        linearized.prop["inf-date"] = line;
-        getline(ifile,line);
-        linearized.prop["inf-number"] = line;
-        getline(ifile,line); //empty line
-        getline(ifile,line);
-        linearized.prop["inf-scanner"] = line;
-
-        getline(ifile,line); //empty line
-        getline(ifile,line);
-        if (line.compare(std::string("*** more info ***"))==0) {
+        std::ifstream imgstream(ifilenameimg);
+        if (imgstream.good()) {
+            DEBUG(">>>>>>>>>>>>>>>>>>>" <<ifilenameimg);
+            std::string line;
             getline(ifile,line);
-            int nprop=atoi(line.c_str());
-            std::string ss;
-            for (int i=0;i<nprop;i++) {
-                getline(ifile,line); //empty line
-                ss += line + "\n" ;
+            if (line.compare(std::string("BAS_IMAGE_FILE"))!=0) {
+                throw phys_fileerror("File does not start with BAS_IMAGE_FILE");
+                return imagelist;
             }
-            DEBUG(ss);
-            linearized.prop["inf-more-info"] = ss;
-        }
-        double bitVal=pow(2,bit)-1;
+            getline(ifile,line); //this is the basename
+            DEBUG("basename: " << line);
+            getline(ifile,line); //this we don't know what it is
+            DEBUG("unknown : " << line);
+            getline(ifile,line);
+            double resx=atof(line.c_str());
+            getline(ifile,line);
+            double resy=atof(line.c_str());
+            getline(ifile,line);
+            int bit=atoi(line.c_str());
+            getline(ifile,line);
+            int w=atoi(line.c_str());
+            getline(ifile,line);
+            int h=atoi(line.c_str());
+            physD linearized(w,h,0.0,ifilename);
+            linearized.setType(PHYS_FILE);
+            physD original(w,h,0.0,ifilenameimg.c_str());
+            original.setType(PHYS_FILE);
+            original.setShortName("original");
+
+            switch (bit) {
+                case 8:
+                    phys_open_RAW(&original,0,0,true);
+                    break;
+                case 16:
+                default:
+                    phys_open_RAW(&original,2,0,true);
+                    break;
+            }
+
+            linearized.prop["inf-resx"] = resx;
+            linearized.prop["inf-resy"] = resy;
+            linearized.set_scale(resx/1000.,resy/1000.);
+            linearized.prop["unitsX"] = "mm";
+            linearized.prop["unitsY"] = "mm";
+            linearized.prop["unitsCB"] = "PSL";
+
+            getline(ifile,line);
+            double sensitivity=atof(line.c_str());
+            linearized.prop["inf-sensitivity"] = sensitivity;
+            getline(ifile,line);
+            double latitude=atof(line.c_str());
+            linearized.prop["inf-latitude"] = latitude;
+            getline(ifile,line);
+            linearized.prop["inf-date"] = line;
+            getline(ifile,line);
+            linearized.prop["inf-number"] = line;
+            getline(ifile,line); //empty line
+            getline(ifile,line);
+            linearized.prop["inf-scanner"] = line;
+
+            getline(ifile,line); //empty line
+            getline(ifile,line);
+            if (line.compare(std::string("*** more info ***"))==0) {
+                getline(ifile,line);
+                int nprop=atoi(line.c_str());
+                std::string ss;
+                for (int i=0;i<nprop;i++) {
+                    getline(ifile,line); //empty line
+                    ss += line + "\n" ;
+                }
+                DEBUG(ss);
+                linearized.prop["inf-more-info"] = ss;
+            }
+            double bitVal=pow(2,bit)-1;
 #pragma omp parallel for
-        for (size_t i=0;i<original.getSurf();i++) {
-            if (original.point(i) != 0) {
-                linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * exp(M_LN10*latitude*(original.point(i)/bitVal-0.5)));
-            } else {
-                linearized.set(i,0.0);
+            for (size_t i=0;i<original.getSurf();i++) {
+                if (original.point(i) != 0) {
+                    linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * exp(M_LN10*latitude*(original.point(i)/bitVal-0.5)));
+                } else {
+                    linearized.set(i,0.0);
+                }
             }
-        }
-        physMath::phys_flip_lr(linearized);
-        linearized.TscanBrightness();
-        imagelist.push_back(linearized);
+            physMath::phys_flip_lr(linearized);
+            linearized.TscanBrightness();
+            imagelist.push_back(linearized);
 #ifdef __phys_debug
-        original.TscanBrightness();
-        imagelist.push_back(original);
+            original.TscanBrightness();
+            imagelist.push_back(original);
 #endif
+        }
+        ifile.close();
     }
-    ifile.close();
+
     return imagelist;
 }
 
@@ -1858,6 +1863,34 @@ std::string physFormat::gunzip (std::string filezipped) {
     return fileunzipped;
 }
 
+std::vector <physD> physFormat::phys_open_shimadzu(std::string fname) {
+    std::vector <physD> retPhys;
+
+    int w=400;
+    int h=250;
+    int skip=9406;
+
+    std::ifstream ifile(fname.c_str(), std::ios::in | std::ios::binary);
+
+//    std::vector<unsigned short> pippo(skip);
+//    ifile.read((char *)&pippo[0],pippo.size()*sizeof(unsigned short));
+//    for (int i=0;i<skip;i++){
+//        std::cerr << pippo[i] <<std::endl;
+//    }
+    ifile.seekg(skip);
+
+    std::vector<unsigned short> buffer(w*h);
+    for (unsigned int i=0;i<256;i++){
+        physD iimage(400,200,0.0,std::to_string(i));
+        ifile.read((char *)&buffer[0],buffer.size()*sizeof(unsigned short));
+#pragma omp parallel for
+        for (size_t ii=0; ii<iimage.getSurf(); ii++)
+            iimage.set(ii, buffer[ii]);
+        retPhys.push_back(iimage);
+    }
+    return retPhys;
+}
+
 std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) {
     std::vector <physD> retPhys;
     size_t last_idx=0;
@@ -1887,6 +1920,8 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
         retPhys=physFormat::phys_open_tiff(fname, separate_rgb);
     } else if (ext=="spe") {
         retPhys=physFormat::phys_open_spe(fname);
+    } else if (ext=="dat") {
+        retPhys=physFormat::phys_open_shimadzu(fname);
     } else if (ext=="pcoraw") {
         retPhys=physFormat::phys_open_pcoraw(fname);
     } else if (ext=="inf") {
@@ -1945,7 +1980,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
 std::vector<std::string> physFormat::phys_image_formats() {
 
-    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "neu", "gz"};
+    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "neu", "gz", "dat"};
 
 #ifdef HAVE_LIBTIFF
     retval.push_back("tif");

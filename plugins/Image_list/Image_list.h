@@ -66,6 +66,7 @@ public slots:
     void originChanged();
 
     void keyPressEvent(QKeyEvent *);
+    void on_horizontalSlider_valueChanged(int);
 };
 
 NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I, -100);

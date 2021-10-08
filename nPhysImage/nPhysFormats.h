@@ -53,7 +53,7 @@ namespace physFormat {
 // standard formats
 class physDouble_txt : public physD {
 public:
-	physDouble_txt(const char *);
+    physDouble_txt(const char *);
 };
 
 
@@ -162,6 +162,8 @@ std::vector <physD> phys_resurrect_binary(std::string);
 void phys_open_RAW(physD*, int, int, bool);
 
 std::vector <physD> phys_open_tiff(std::string, bool separate_rgb);
+
+std::vector <physD> phys_open_shimadzu(std::string);
 
 //write neutrino tiff files
 void phys_write_tiff(std::vector<physD*>, std::string);

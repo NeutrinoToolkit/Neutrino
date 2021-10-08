@@ -59,6 +59,13 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     updatePad(currentBuffer);
 }
 
+void Image_list::on_horizontalSlider_valueChanged(int val) {
+    int numphys=nparent->getBufferList().size();
+    if (val<numphys) {
+        nparent->showPhys(nparent->getBufferList().at(val));
+    }
+}
+
 void Image_list::selectionChanged() {
     QList<QTreeWidgetItem *> sel=my_w.images->selectedItems();
     if (sel.size()) {
@@ -288,8 +295,10 @@ Image_list::updatePad(nPhysD *my_phys) {
         itemsMap[my_phys]=it;
     }
     if (nPhysExists(my_phys) && it) {
-        it->setData(0,0,QString::number(int(my_phys->prop["uuid"])));
-        it->setData(1,0,QString::fromUtf8(my_phys->getShortName().c_str()));
+        std::ostringstream oss;
+        oss << std::setw(5) << std::setfill(' ') << int(my_phys->prop["uuid"]);
+        it->setData(0,0,QString::fromStdString(oss.str()));
+        it->setData(1,0,QString(my_phys->getShortName().c_str()));
         if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
             it->setData(2,0,QLocale().toString(my_phys->get_scale().x()));
         } else {
@@ -305,6 +314,8 @@ Image_list::updatePad(nPhysD *my_phys) {
     for (auto & my_key : itemsMap) {
         my_key.second->setSelected(my_key.first == my_phys);
     }
+    if (nparent->getBufferList().size())
+        my_w.horizontalSlider->setMaximum(nparent->getBufferList().size()-1);
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 

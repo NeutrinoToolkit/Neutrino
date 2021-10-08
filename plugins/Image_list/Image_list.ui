@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -39,21 +39,6 @@
     <property name="verticalSpacing">
      <number>0</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QLineEdit" name="lineEdit">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>File from which image was open</string>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="nTreeWidget" name="images">
       <property name="enabled">
@@ -149,6 +134,28 @@
         <string>Name</string>
        </property>
       </column>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>File from which image was open</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QSlider" name="horizontalSlider">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </item>
    </layout>
@@ -266,7 +273,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-brew_kit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc">
      <normaloff>:/icons/lockOpen.png</normaloff>
      <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
    </property>
@@ -279,7 +286,7 @@
   </action>
   <action name="actionRescale">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-brew_kit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc">
      <normaloff>:/icons/rescale.png</normaloff>:/icons/rescale.png</iconset>
    </property>
    <property name="text">
@@ -298,7 +305,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-brew_kit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
