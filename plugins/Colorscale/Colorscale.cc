@@ -98,7 +98,7 @@ void Colorscale::paletteComboChange(int val) {
 void Colorscale::on_gamma_valueChanged(int val) {
     if (currentBuffer) {
         currentBuffer->prop["gamma"]=val;
-        nparent->updatePhys();
+        nparent->showPhys();
     }
 }
 
@@ -124,7 +124,7 @@ void Colorscale::minChanged () {
         currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMin->setValue(sliderValues().first());
     }
-    nparent->updatePhys();
+    nparent->showPhys();
     my_w.histogram->repaint();
     my_w.sliderMin->blockSignals(false);
 }
@@ -139,7 +139,7 @@ void Colorscale::maxChanged () {
         currentBuffer->prop["display_range"]=minmax;
         my_w.sliderMax->setValue(sliderValues().second());
     }
-    nparent->updatePhys();
+    nparent->showPhys();
     my_w.histogram->repaint();
     my_w.sliderMax->blockSignals(false);
 }
@@ -148,7 +148,7 @@ void Colorscale::invertColors () {
     if (currentBuffer) {
         vec2f oldrange = currentBuffer->prop["display_range"];
         currentBuffer->prop["display_range"]=oldrange.swap();
-        nparent->updatePhys();
+        nparent->showPhys();
     } else {
         my_w.actionInvert->setChecked(false);
     }

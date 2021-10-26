@@ -83,11 +83,16 @@ void neutrino::changeEvent(QEvent *e)
 
 neutrino::~neutrino()
 {
+    currentBuffer=nullptr;
+    foreach (nPhysD *phys, physList) {
+        delete phys;
+    }
 }
 
 /// Creator
 neutrino::neutrino():
     my_w(new Ui::neutrino),
+    currentBuffer(nullptr),
     my_sbarra(new Ui::nSbarra)
 {
 
@@ -333,10 +338,10 @@ void neutrino::menuFlipRotate() {
 
 void neutrino::rotateLeft() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_left);
-    if (my_w->my_view->currentBuffer) {
-        physMath::phys_rotate_left(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
-        my_w->my_view->currentBuffer->reset_display();
-        updatePhys();
+    if (currentBuffer) {
+        physMath::phys_rotate_left(*dynamic_cast<physD*>(currentBuffer));
+        currentBuffer->reset_display();
+        showPhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -345,10 +350,10 @@ void neutrino::rotateLeft() {
 
 void neutrino::rotateRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionRotate_right);
-    if (my_w->my_view->currentBuffer) {
-        physMath::phys_rotate_right(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
-        my_w->my_view->currentBuffer->reset_display();
-        updatePhys();
+    if (currentBuffer) {
+        physMath::phys_rotate_right(*dynamic_cast<physD*>(currentBuffer));
+        currentBuffer->reset_display();
+        showPhys();
     }
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
@@ -356,10 +361,10 @@ void neutrino::rotateRight() {
 
 void neutrino::flipUpDown() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_up_down);
-    if (my_w->my_view->currentBuffer) {
-        physMath::phys_flip_ud(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
-        my_w->my_view->currentBuffer->reset_display();
-        updatePhys();
+    if (currentBuffer) {
+        physMath::phys_flip_ud(*dynamic_cast<physD*>(currentBuffer));
+        currentBuffer->reset_display();
+        showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -367,10 +372,10 @@ void neutrino::flipUpDown() {
 
 void neutrino::flipLeftRight() {
     my_w->menuTransformation->setDefaultAction(my_w->actionFlip_left_right);
-    if (my_w->my_view->currentBuffer) {
-        physMath::phys_flip_lr(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
-        my_w->my_view->currentBuffer->reset_display();
-        updatePhys();
+    if (currentBuffer) {
+        physMath::phys_flip_lr(*dynamic_cast<physD*>(currentBuffer));
+        currentBuffer->reset_display();
+        showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
@@ -378,17 +383,17 @@ void neutrino::flipLeftRight() {
 
 void neutrino::transpose() {
     my_w->menuTransformation->setDefaultAction(my_w->actionTranspose);
-    if (my_w->my_view->currentBuffer) {
-        physMath::phys_transpose(*dynamic_cast<physD*>(my_w->my_view->currentBuffer));
-        my_w->my_view->currentBuffer->reset_display();
-        updatePhys();
+    if (currentBuffer) {
+        physMath::phys_transpose(*dynamic_cast<physD*>(currentBuffer));
+        currentBuffer->reset_display();
+        showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",my_w->menuTransformation->defaultAction()->text());
     my_w->actionFlipRotate->setIcon(my_w->menuTransformation->defaultAction()->icon());
 }
 
 nPhysD* neutrino::getBuffer(int i) {
-    return my_w->my_view->physList.value(i);
+    return physList.value(i);
 }
 
 nPhysD* neutrino::getBuffer(QString name) {
@@ -618,8 +623,8 @@ neutrino* neutrino::fileNew() {
 
 void
 neutrino::fileReopen() {
-    if(my_w->my_view->currentBuffer && my_w->my_view->currentBuffer->getType()==PHYS_FILE) {
-        QString fname=QString::fromUtf8(my_w->my_view->currentBuffer->getFromName().c_str());
+    if(currentBuffer && currentBuffer->getType()==PHYS_FILE) {
+        QString fname=QString::fromUtf8(currentBuffer->getFromName().c_str());
         fileOpen(fname);
     }
 }
@@ -761,23 +766,23 @@ void neutrino::saveSession (QString fname) {
             setProperty("NeuSave-fileSave", fname);
             //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
-            QProgressDialog progress("Save session", "Cancel", 0, my_w->my_view->physList.size()+1, this);
+            QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
 
             std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
-            ofile << "Neutrino " << __VER << " " << my_w->my_view->physList.size() << " " << panList.size() << std::endl;
+            ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
 
-            for (int i=0;i<my_w->my_view->physList.size(); i++) {
+            for (int i=0;i<physList.size(); i++) {
                 if (progress.wasCanceled()) break;
                 progress.setValue(i);
-                progress.setLabelText(QString::fromUtf8(my_w->my_view->physList.at(i)->getShortName().c_str()));
+                progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
                 QApplication::processEvents();
                 ofile << "NeutrinoImage" << std::endl;
-                physFormat::phys_dump_binary(my_w->my_view->physList.at(i),ofile);
-                my_w->my_view->physList.at(i)->setType(PHYS_FILE);
+                physFormat::phys_dump_binary(physList.at(i),ofile);
+                physList.at(i)->setType(PHYS_FILE);
             }
-            progress.setValue(my_w->my_view->physList.size());
+            progress.setValue(physList.size());
             for (int i=0;i<panList.size(); i++) {
                 QString pName=panList.at(i)->metaObject()->className();
                 progress.setLabelText(pName);
@@ -810,11 +815,11 @@ void neutrino::saveSession (QString fname) {
                     QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName(), QMessageBox::Ok);
                 }
             }
-            progress.setValue(my_w->my_view->physList.size()+1);
+            progress.setValue(physList.size()+1);
             ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
             std::vector <physD *> vecPhys;
-            foreach (nPhysD * my_phys, my_w->my_view->physList) {
+            foreach (nPhysD * my_phys, physList) {
                 vecPhys.push_back(dynamic_cast<physD*>(my_phys));
             }
             physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData());
@@ -830,7 +835,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
     if (!fname.isEmpty()) {
         updateRecentFileActions(fname);
         setProperty("NeuSave-fileOpen", fname);
-        if (my_w->my_view->physList.size()!=0) {
+        if (physList.size()!=0) {
             neutrino*my_neu= new neutrino();
             my_neu->fileOpen(fname);
         } else {
@@ -916,7 +921,7 @@ void neutrino::addPhys(nPhysD* datamatrix) {
         datamatrix->prop["uuid"] = property("uuidphys").toInt()+1;
         setProperty("uuidphys",int(datamatrix->prop["uuid"]));
 
-        my_w->my_view->physList << datamatrix;
+        physList << datamatrix;
 
         if (property("NeuSave-lockOrigin").isValid()) {
             QPointF p=property("NeuSave-lockOrigin").toPointF();
@@ -947,7 +952,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 
 nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
     if (newPhys && newPhys->getSurf()) {
-        bool redisplay = (my_w->my_view->currentBuffer==oldPhys);
+        bool redisplay = (currentBuffer==oldPhys);
         if (nPhysExists(oldPhys)) {
             //			newPhys->property["display_range"]=oldPhys->property["display_range"];
             if (oldPhys==nullptr) oldPhys=new nPhysD();
@@ -971,10 +976,10 @@ void neutrino::removePhys(nPhysD* datamatrix) {
     DEBUG(">>>>>>>>>>>>>>>>> ENTER ")
     if (nPhysExists(datamatrix)) {
         std::string physremovename = datamatrix->getShortName();
-        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << my_w->my_view->physList.size())
+        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << physList.size())
         int position=indexOf(datamatrix);
         if (position != -1) {
-            my_w->my_view->physList.removeAll(datamatrix);
+            physList.removeAll(datamatrix);
             QList<QAction *> lista=my_w->menuBuffers->actions();
             foreach (QAction* action, my_w->menuBuffers->actions()) {
                 if (action->data() == QVariant::fromValue( datamatrix)) {
@@ -982,22 +987,21 @@ void neutrino::removePhys(nPhysD* datamatrix) {
                 }
             }
         }
-        emit physDel(datamatrix);
-        nApp::processEvents();
+//        nApp::processEvents();
         if (datamatrix && !datamatrix->prop.have("keep_phys_alive")){
             DEBUG("removing from neutrino.cc")
             delete datamatrix;
-            datamatrix=nullptr;
+//            datamatrix=nullptr;
         } else {
             DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python")
         }
-        if (my_w->my_view->physList.size()>0) {
-            int pos = position%my_w->my_view->physList.size();
-            qDebug() << my_w->my_view->physList.size() << pos;
-            qDebug() << my_w->my_view->physList;
-            showPhys(my_w->my_view->physList.at(pos));
+        if (physList.size()>0) {
+            int pos = position%physList.size();
+            qDebug() << physList.size() << pos;
+            qDebug() << physList;
+            showPhys(physList.at(pos));
         } else {
-            my_w->my_view->currentBuffer=nullptr;
+            currentBuffer=nullptr;
             emitBufferChanged();
             setWindowTitle(property("winId").toString()+QString(": Neutrino"));
             setWindowFilePath("");
@@ -1006,22 +1010,19 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             my_w->my_view->setSize();
         }
         //    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-        DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << my_w->my_view->physList.size());
+        DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
     }
+    emit physDel(datamatrix);
     DEBUG(">>>>>>>>>>>>>>>>> EXIT ")
 }
 
 void
 neutrino::showPhys(nPhysD* my_phys) {
+    if (!my_phys) my_phys=currentBuffer;
     if (my_phys && !my_phys->prop.have("gamma")) {
         my_phys->prop["gamma"]=property("NeuSave-gamma").toInt();
     }
     my_w->my_view->showPhys(my_phys);
-}
-
-void
-neutrino::updatePhys() {
-    my_w->my_view->updatePhys();
 }
 
 QString graphicsTypes(QString fname) {
@@ -1050,10 +1051,10 @@ void neutrino::exportAllGraphics () {
     QString ftypes=graphicsTypes(property("NeuSave-fileExport").toString());
     QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty()) {
-        for (int i=0;i<my_w->my_view->physList.size() ; i++) {
+        for (int i=0;i<physList.size() ; i++) {
             my_w->my_view->nextBuffer();
             QFileInfo fi(fout);
-            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(my_w->my_view->currentBuffer->getShortName())+"."+fi.completeSuffix());
+            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
         }
         setProperty("NeuSave-fileExport",fout);
     }
@@ -1184,12 +1185,12 @@ neutrino::mouseposition(QPointF pos_mouse) {
     my_sbarra->pos_y->setNum((int)pos_mouse.y());
 
 
-    if (my_w->my_view->currentBuffer) {
-        vec2f vec=my_w->my_view->currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
+    if (nPhysExists(currentBuffer)) {
+        vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
         QPointF pos=QPointF(vec.x(),vec.y());
         my_sbarra->dx->setNum(pos.x());
         my_sbarra->dy->setNum(pos.y());
-        double val=my_w->my_view->currentBuffer->point(pos_mouse.x(),pos_mouse.y());
+        double val=currentBuffer->point(pos_mouse.x(),pos_mouse.y());
         my_sbarra->pos_z->setNum(val);
         emit colorValue(val);
         emit mouseAtWorld(pos);
@@ -1259,7 +1260,7 @@ void neutrino::fileSave(QString fname) {
         if (suffix.startsWith("neus")) {
             saveSession(fname);
         } else {
-            fileSave(my_w->my_view->currentBuffer,fname);
+            fileSave(currentBuffer,fname);
         }
     }
 }
@@ -1292,7 +1293,7 @@ neutrino::fileClose() {
     saveDefaults();
     qDebug() << "here" << sender();
     bool askAll=true;
-    foreach (nPhysD *phys, my_w->my_view->physList) {
+    foreach (nPhysD *phys, physList) {
         DEBUG( phys->getName() << " " << phys->getType());
         if (askAll && phys->getType()==	PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
             int res=QMessageBox::warning(this,tr("Attention"),
@@ -1329,8 +1330,8 @@ neutrino::fileClose() {
 }
 
 void neutrino::on_actionClose_All_Buffers_triggered() {
-    while (my_w->my_view->physList.size()) closeCurrentBuffer();
-//    for (auto &my_phys : my_w->my_view->physList) {
+    while (physList.size()) closeCurrentBuffer();
+//    for (auto &my_phys : physList) {
 //        qDebug() << "->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->" << my_phys;
 //        removePhys(my_phys);
 //    }
@@ -1452,8 +1453,6 @@ neutrino::openRAW() {
 
 //save and load across restart
 void neutrino::saveDefaults() {
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get_total_number_of_phys " << total_number_of_phys);
-
     QSettings my_set("neutrino","");
     qDebug() << my_set.fileName();
     my_set.beginGroup("nPreferences");

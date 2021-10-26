@@ -25,10 +25,6 @@
 
 #include "anymap.h"
 
-#ifdef  __phys_debug
-int total_number_of_phys;
-#endif
-
 // strip leading and trailing spaces (questa l'ho fregata)
 std::string trim(const std::string& str,
                  const std::string& whitespace)

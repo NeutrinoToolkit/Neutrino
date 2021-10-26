@@ -35,19 +35,14 @@ nView::~nView ()
     my_set.setValue("pixmapFile", property("pixmapFile").toString());
     my_set.setValue("colorTable", colorTable);
     my_set.endGroup();
-    currentBuffer=NULL;
-    foreach (nPhysD *phys, physList) {
-        delete phys;
-    }
-    physList.clear();
 }
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
+    nparent(qobject_cast<neutrino *>(parent->parent())),
     nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
     my_scene(this),
     my_tics(this),
     colorTable(":cmaps/Neutrino"),
-    currentBuffer(nullptr),
     lockColors(false)
 {
 
@@ -64,27 +59,27 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_scene.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     setCursor(QCursor(Qt::CrossCursor));
 
-    if (!parent) ERROREXIT("nView problem");
+    if (!nparent) ERROREXIT("nView problem");
 
-    DEBUG(qobject_cast<neutrino *>(parent->parent()));
+//    DEBUG(qobject_cast<neutrino *>(parent->parent()));
 
 
-    if (!qobject_cast<neutrino *>(parent->parent())) {
-        qDebug() << "ACTIVATING LOCAL SHORTCUTS since not part of Neutrino" ;
-        connect(new QShortcut(QKeySequence(Qt::Key_Tab),this), SIGNAL(activated()), this, SLOT(cycleOverItems()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(nextColorTable()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(previousColorTable()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Less),this), SIGNAL(activated()), this, SLOT(decrGamma()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Greater),this), SIGNAL(activated()), this, SLOT(incrGamma()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Period),this), SIGNAL(activated()), this, SLOT(resetGamma()));
-        connect(new QShortcut(QKeySequence(Qt::Key_G),this), SIGNAL(activated()), this, SLOT(toggleGrid()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_0),this), SIGNAL(activated()), this, SLOT(rescaleColor()));
-        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
-        connect(new QShortcut(QKeySequence(Qt::Key_R),this), SIGNAL(activated()), this, SLOT(toggleRuler()));
-        connect(new QShortcut(QKeySequence(Qt::Key_M),this), SIGNAL(activated()), this, SLOT(nextMouseShape()));
-        connect(new QShortcut(QKeySequence(Qt::Key_O),this), SIGNAL (activated()), this, SLOT(nextMouseShape()));
-    }
+//    if (!) {
+//        qDebug() << "ACTIVATING LOCAL SHORTCUTS since not part of Neutrino" ;
+//        connect(new QShortcut(QKeySequence(Qt::Key_Tab),this), SIGNAL(activated()), this, SLOT(cycleOverItems()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(nextColorTable()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(previousColorTable()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Less),this), SIGNAL(activated()), this, SLOT(decrGamma()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Greater),this), SIGNAL(activated()), this, SLOT(incrGamma()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Period),this), SIGNAL(activated()), this, SLOT(resetGamma()));
+//        connect(new QShortcut(QKeySequence(Qt::Key_G),this), SIGNAL(activated()), this, SLOT(toggleGrid()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_0),this), SIGNAL(activated()), this, SLOT(rescaleColor()));
+//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
+//        connect(new QShortcut(QKeySequence(Qt::Key_R),this), SIGNAL(activated()), this, SLOT(toggleRuler()));
+//        connect(new QShortcut(QKeySequence(Qt::Key_M),this), SIGNAL(activated()), this, SLOT(nextMouseShape()));
+//        connect(new QShortcut(QKeySequence(Qt::Key_O),this), SIGNAL (activated()), this, SLOT(nextMouseShape()));
+//    }
 
     my_scene.addItem(&my_pixitem);
     my_scene.addItem(&my_mouse);
@@ -155,19 +150,15 @@ void nView::exportPixmap() {
 
 }
 
-void nView::updatePhys() {
-    showPhys(currentBuffer);
-}
-
 void nView::showPhys(nPhysD *my_phys) {
     DEBUG("ENTER")
-    if (my_phys && physList.contains(my_phys)) {
+    if (my_phys && nparent->physList.contains(my_phys)) {
         DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
 
-        if (physList.contains(currentBuffer)) {
+        if (nparent->physList.contains(nparent->currentBuffer)) {
             if (lockColors) {
-                my_phys->prop["display_range"]=currentBuffer->prop["display_range"];
-                my_phys->prop["gamma"]=currentBuffer->prop["gamma"];
+                my_phys->prop["display_range"]=nparent->currentBuffer->prop["display_range"];
+                my_phys->prop["gamma"]=nparent->currentBuffer->prop["gamma"];
             }
         }
 
@@ -181,7 +172,7 @@ void nView::showPhys(nPhysD *my_phys) {
                                    QImage::Format_RGB888);
 
             my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
-            currentBuffer=my_phys;
+            nparent->currentBuffer=my_phys;
 
             QApplication::processEvents();
 
@@ -389,19 +380,19 @@ void nView::rescaleColor(int val) {
     val=std::max<int>(std::min<int>(val,100),0);
     if (val==100) resetGamma();
     setProperty("percentPixels",val);
-    if (currentBuffer) {
+    if (nparent->currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
-            foreach (nPhysD* phys, physList) {
+            foreach (nPhysD* phys, nparent->physList) {
                 phys->prop["display_range"]=physMath::getColorPrecentPixels(*phys,val);
                 emit bufferChanged(phys);
             }
             qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
-            currentBuffer->prop["display_range"]=physMath::getColorPrecentPixels(*currentBuffer,val);
-            emit bufferChanged(currentBuffer);
+            nparent->currentBuffer->prop["display_range"]=physMath::getColorPrecentPixels(*nparent->currentBuffer,val);
+            emit bufferChanged(nparent->currentBuffer);
             qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }
-        updatePhys();
+        nparent->showPhys();
     }
 }
 
@@ -464,11 +455,11 @@ void nView::toggleGrid() {
 
 
 void nView::incrGamma() {
-    setGamma(int(currentBuffer->prop["gamma"])+1);
+    setGamma(int(nparent->currentBuffer->prop["gamma"])+1);
 }
 
 void nView::decrGamma() {
-    setGamma(int(currentBuffer->prop["gamma"])-1);
+    setGamma(int(nparent->currentBuffer->prop["gamma"])-1);
 }
 
 void nView::resetGamma() {
@@ -477,10 +468,10 @@ void nView::resetGamma() {
 
 
 void nView::setGamma(int value) {
-    if (currentBuffer) {
-        currentBuffer->prop["gamma"]=value;
-        updatePhys();
-        emit bufferChanged(currentBuffer);
+    if (nparent->currentBuffer) {
+        nparent->currentBuffer->prop["gamma"]=value;
+        nparent->showPhys();
+        emit bufferChanged(nparent->currentBuffer);
     }
 }
 
@@ -497,7 +488,7 @@ nView::changeColorTable (QString ctname) {
 
 void
 nView::changeColorTable () {
-    updatePhys();
+    nparent->showPhys();
     qInfo() << "Colortable:" << colorTable;
     my_tics.update();
     emit updatecolorbar(colorTable);
@@ -505,15 +496,15 @@ nView::changeColorTable () {
 
 void nView::setMouseOrigin() {
     if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
-        foreach (nPhysD* phys, physList) {
+        foreach (nPhysD* phys, nparent->physList) {
             phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(phys);
             qInfo() << "Origin set for all images";
         }
     } else {
-        if (currentBuffer) {
-            currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-            emit bufferChanged(currentBuffer);
+        if (nparent->currentBuffer) {
+            nparent->currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+            emit bufferChanged(nparent->currentBuffer);
             qInfo() << "Origin set";
         }
     }
@@ -601,8 +592,8 @@ void nView::mousePressEvent (QMouseEvent *e)
 {
 //    qDebug() << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>";
     QGraphicsView::mousePressEvent(e);
-    if (e->modifiers()&Qt::ControlModifier && currentBuffer) {
-        minMax=currentBuffer->get_min_max().swap();
+    if (e->modifiers()&Qt::ControlModifier && nparent->currentBuffer) {
+        minMax=nparent->currentBuffer->get_min_max().swap();
     }
     emit mousePressEvent_sig(mapToScene(e->pos()));
 }
@@ -613,9 +604,9 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
     if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
-        currentBuffer->prop["display_range"]=minMax;
+        nparent->currentBuffer->prop["display_range"]=minMax;
         setProperty("percentPixels",QVariant());
-        updatePhys();
+        nparent->showPhys();
     }
 }
 
@@ -630,8 +621,8 @@ void nView::mouseMoveEvent (QMouseEvent *e)
 
     QPointF pos_mouse=mapToScene(e->pos());
     my_mouse.setPos(pos_mouse);
-    if (e->modifiers()==Qt::ControlModifier && currentBuffer) {
-        double val=currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
+    if (e->modifiers()==Qt::ControlModifier && nparent->currentBuffer) {
+        double val=nparent->currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
         minMax=vec2f(std::min(minMax.x(),val),std::max(minMax.y(),val));
     }
     emitMouseposition(pos_mouse);
@@ -643,12 +634,12 @@ void nView::emitMouseposition (QPointF p) {
 
 // switch buffers
 void nView::prevBuffer() {
-    int position=physList.indexOf(currentBuffer);
-    if (position>-1) showPhys(physList.at((position+physList.size()-1)%physList.size()));
+    int position=nparent->physList.indexOf(nparent->currentBuffer);
+    if (position>-1) showPhys(nparent->physList.at((position+nparent->physList.size()-1)%nparent->physList.size()));
 }
 
 void nView::nextBuffer() {
-    int position=physList.indexOf(currentBuffer);
-    if (position>-1) showPhys(physList.at((position+1)%physList.size()));
+    int position=nparent->physList.indexOf(nparent->currentBuffer);
+    if (position>-1) showPhys(nparent->physList.at((position+1)%nparent->physList.size()));
 }
 

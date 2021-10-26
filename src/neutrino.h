@@ -79,13 +79,17 @@ public:
     QList <QAction *> recentFileActs;
     void updateRecentFileActions(QString=QString());
 
+    nPhysD* currentBuffer;
+
+    QList<nPhysD*> physList;
 
 private:
     QList<nGenericPan*> panList;
 
+
 public slots:
-    inline bool nPhysExists(nPhysD* my_phys) {return my_w->my_view->physList.contains(my_phys);}
-    inline int indexOf(nPhysD* my_phys){return my_w->my_view->physList.indexOf(my_phys);}
+    inline bool nPhysExists(nPhysD* my_phys) {return physList.contains(my_phys);}
+    inline int indexOf(nPhysD* my_phys){return physList.indexOf(my_phys);}
 
     void setGamma(int value);
 
@@ -123,8 +127,7 @@ public slots:
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);
-    void showPhys(nPhysD*);
-    void updatePhys();
+    void showPhys(nPhysD* my_phys=nullptr);
     void addShowPhys(nPhysD*);
 
     nPhysD* getBuffer(int);
@@ -132,10 +135,10 @@ public slots:
     nPhysD* getBuffer(QString);
 
     inline nPhysD* getCurrentBuffer() {
-        return (my_w->my_view ? my_w->my_view->currentBuffer : nullptr);
+        return (physList.size() ? currentBuffer : nullptr);
     }
 
-    inline QList<nPhysD *> getBufferList() {return (my_w->my_view ? my_w->my_view->physList : QList<nPhysD *>() );}
+    inline QList<nPhysD *> getBufferList() {return physList;}
     inline QList<nGenericPan*> getPanList() {return panList;}
 
     // menu actions

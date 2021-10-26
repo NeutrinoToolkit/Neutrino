@@ -24,12 +24,12 @@
  */
 #include "neutrino.h"
 #include "Properties.h"
-Properties::Properties(neutrino *nparent) : nGenericPan(nparent)
+Properties::Properties(neutrino *nnparent) : nGenericPan(nnparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
-    my_w.splitter->setStretchFactor(0, 1);
-    my_w.splitter->setStretchFactor(1, 2);
+    splitter->setStretchFactor(0, 1);
+    splitter->setStretchFactor(1, 2);
 
     bufferChanged(currentBuffer);
 
@@ -40,20 +40,20 @@ void
 Properties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
     std::string currentProperty("");
-    if (my_w.propertyList->selectedItems().size() > 0) {
-        currentProperty=my_w.propertyList->selectedItems().first()->text().toStdString();
+    if (propertyList->selectedItems().size() > 0) {
+        currentProperty=propertyList->selectedItems().first()->text().toStdString();
     }
-    my_w.propertyList->clear();
-    my_w.propertyValue->clear();
+    propertyList->clear();
+    propertyValue->clear();
     DEBUG(currentProperty);
     if (my_phys) {
         setWindowTitle(QString::fromUtf8(my_phys->getName().c_str()));
         for(anymap::iterator iter=my_phys->prop.begin();iter!=my_phys->prop.end(); iter++ ) {
             QListWidgetItem *item=new QListWidgetItem(QString::fromUtf8(iter->first.c_str()));
-            my_w.propertyList->addItem(item);
+            propertyList->addItem(item);
             if (iter->first==currentProperty) {
                 std::string myval=iter->second.get_str();
-                my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+                propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
                 item->setSelected(true);
             }
         }
@@ -62,19 +62,19 @@ Properties::bufferChanged(nPhysD *my_phys) {
 
 void
 Properties::on_propertyList_itemSelectionChanged() {
-    if (currentBuffer && my_w.propertyList->currentItem()) {
-        std::string currentKey=my_w.propertyList->currentItem()->text().toStdString();
+    if (currentBuffer && propertyList->currentItem()) {
+        std::string currentKey=propertyList->currentItem()->text().toStdString();
         std::string myval=currentBuffer->prop[currentKey];
-        my_w.propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
+        propertyValue->setPlainText(QString::fromUtf8(myval.c_str()));
     }
 }
 
 void Properties::on_changePhysProperty_pressed() {
     if (currentBuffer) {
-        std::string currentProperty =  my_w.propertyList->selectedItems().first()->text().toStdString();
-        QVariant new_value(my_w.propertyValue->toPlainText());
+        std::string currentProperty =  propertyList->selectedItems().first()->text().toStdString();
+        QVariant new_value(propertyValue->toPlainText());
         anydata my_val=toAnydata(new_value);
-        if (my_w.applyToAll->isChecked()) {
+        if (applyToAll->isChecked()) {
             for (auto & phys: nparent->getBufferList()) {
                 phys->prop[currentProperty]=my_val;
             }

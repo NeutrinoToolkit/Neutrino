@@ -108,15 +108,14 @@ Image_list::buttonRemovePhys() {
     disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
     foreach (QTreeWidgetItem * item, my_w.images->selectedItems()) {
-        nPhysD *phys=getPhys(item);
-        if (phys) {
-            delete item;
-            nparent->removePhys(phys);
-        }
+        nPhysD* my_phys=getPhys(item);
+        physDel(my_phys);
+        nparent->removePhys(my_phys);
     }
+    QApplication::processEvents();
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
 }
 
 void
@@ -288,48 +287,62 @@ void Image_list::keyPressEvent(QKeyEvent *e){
 
 void
 Image_list::updatePad(nPhysD *my_phys) {
+    disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+    disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-    QTreeWidgetItem* it=itemsMap[my_phys];
-    if (!it) {
-        it=new QTreeWidgetItem(my_w.images);
-        itemsMap[my_phys]=it;
-    }
-    if (nPhysExists(my_phys) && it) {
-        std::ostringstream oss;
-        oss << std::setw(5) << std::setfill(' ') << int(my_phys->prop["uuid"]);
-        it->setData(0,0,QString::fromStdString(oss.str()));
-        it->setData(1,0,QString(my_phys->getShortName().c_str()));
-        if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
-            it->setData(2,0,QLocale().toString(my_phys->get_scale().x()));
-        } else {
-            it->setData(2,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
+    if (nPhysExists(my_phys)) {
+        qDebug() << "<=><=><=><=><=><=> 1" << itemsMap.size();
+        QTreeWidgetItem* it=itemsMap[my_phys];
+        if (!it) {
+            it=new QTreeWidgetItem(my_w.images, QTreeWidgetItem::UserType);
+            itemsMap[my_phys]=it;
         }
-        it->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
-        it->setData(4,0,QString::fromUtf8(my_phys->getName().c_str()));
-        if (nPhysExists(my_phys)) {
-            my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
-            my_w.lineEdit->setCursorPosition(0);
+        qDebug() << "<=><=><=><=><=><=> 2" << itemsMap.size();
+        if (it) {
+            std::ostringstream oss;
+            oss << std::setw(5) << std::setfill(' ') << int(my_phys->prop["uuid"]);
+            it->setData(0,0,QString::fromStdString(oss.str()));
+            it->setData(1,0,QString(my_phys->getShortName().c_str()));
+            if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
+                it->setData(2,0,QLocale().toString(my_phys->get_scale().x()));
+            } else {
+                it->setData(2,0,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
+            }
+            it->setData(3,0,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
+            it->setData(4,0,QString::fromUtf8(my_phys->getName().c_str()));
+            if (nPhysExists(my_phys)) {
+                my_w.lineEdit->setText(QString::fromUtf8(my_phys->getFromName().c_str()));
+                my_w.lineEdit->setCursorPosition(0);
+            }
+            qDebug() << "<=><=><=><=><=><=> 3 " << itemsMap.size();
+            for (auto const & my_key : itemsMap) {
+                nPhysD* pippo=my_key.first;
+                bool sel (pippo ==my_phys);
+                my_key.second->setSelected(sel);
+            }
+            if (nparent->getBufferList().size())
+                my_w.horizontalSlider->setMaximum(nparent->getBufferList().size()-1);
         }
     }
-    for (auto & my_key : itemsMap) {
-        my_key.second->setSelected(my_key.first == my_phys);
-    }
-    if (nparent->getBufferList().size())
-        my_w.horizontalSlider->setMaximum(nparent->getBufferList().size()-1);
+    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
 
 void
 Image_list::physDel(nPhysD *my_phys) {
-    DEBUG(">> enter");
+    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> enter");
     qDebug() << itemsMap[my_phys];
+    qDebug() << "<=><=><=><=><=><=> del before " << itemsMap.size();
+    qDebug() << "<=><=><=><=><=><=> del before " << my_phys;
+    qDebug() << "<=><=><=><=><=><=> del before " << itemsMap[my_phys];
     delete itemsMap[my_phys];
     itemsMap.erase(my_phys);
     if (itemsMap.size() == 0) {
         my_w.lineEdit->setText(tr("No image"));
     }
-    DEBUG(">> exit");
+    qDebug() << "<=><=><=><=><=><=> del after " << itemsMap.size();
 }
 
 /// new image entry point

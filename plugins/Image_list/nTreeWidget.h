@@ -39,8 +39,7 @@ class neutrino;
 class nTreeWidget : public QTreeWidget {
     Q_OBJECT
 public:	
-    Q_INVOKABLE nTreeWidget(QWidget *parent):QTreeWidget(parent){};
-    ~nTreeWidget(){};
+    Q_INVOKABLE nTreeWidget(QWidget *parent):QTreeWidget(parent){}
     QPoint dragposition;
     QList<QTreeWidgetItem*> dragitems;
     QElapsedTimer dragtime;

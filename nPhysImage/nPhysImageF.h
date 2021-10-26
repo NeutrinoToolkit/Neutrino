@@ -765,9 +765,6 @@ std::ostream& operator<<(std::ostream& os, nPhysImageF<U> &phys) {
 // --------------------------------------------------------------------------------------------
 
 template<class T> nPhysImageF<T>::nPhysImageF() {
-#ifdef  __phys_debug
-total_number_of_phys++;
-#endif
     init_Tvariables();
 }
 
@@ -857,10 +854,6 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int o_width, unsigned int o_he
 template<class T>
 nPhysImageF<T>::~nPhysImageF()
 {
-
-#ifdef  __phys_debug
-    total_number_of_phys--;
-#endif
 
     int trashDelete=_trash_delete();
 	if ( trashDelete == 0 ) {

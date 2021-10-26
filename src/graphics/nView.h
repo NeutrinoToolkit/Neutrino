@@ -33,6 +33,7 @@
 
 #include "nMouse.h"
 #include "nTics.h"
+#include "neutrino.h"
 
 #ifndef __nView_h
 #define __nView_h
@@ -46,6 +47,7 @@ public:
     nView (QWidget *parent=0);
     ~nView ();
 
+    neutrino *nparent;
     QMap<QString, std::vector<unsigned char>>& nPalettes;
 
     void resizeEvent (QResizeEvent *);
@@ -79,9 +81,6 @@ public:
 
     QString colorTable;
 
-    nPhysD* currentBuffer;
-    QList<nPhysD*> physList;
-
 public slots:
 
     void zoomOut();
@@ -94,7 +93,6 @@ public slots:
     void mouseMoveEvent (QMouseEvent *);
     void wheelEvent(QWheelEvent *);
 
-    void updatePhys();
     void showPhys(nPhysD*);
 
     void emitMouseposition (QPointF);

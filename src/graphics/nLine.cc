@@ -1137,7 +1137,7 @@ nLine::getContainedIntegral()
     DEBUG("starting contour intergration");
     std::list<double> c_data = physMath::contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
     DEBUG("contour integration ended");
-    return QList<double>::fromStdList(c_data);
+    return QList<double>(c_data.begin(),c_data.end());
 
 }
 

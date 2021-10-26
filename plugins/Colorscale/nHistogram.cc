@@ -82,7 +82,7 @@ void nHistogram::mouseReleaseEvent (QMouseEvent *){
         } else {
            parentPan->currentBuffer->prop["display_range"]=parentPan->currentBuffer->get_min_max();
         }
-        parentPan->nparent->updatePhys();
+        parentPan->nparent->showPhys();
         parentPan->updatecolorbar();
         setProperty("mousepress",QVariant());
     }

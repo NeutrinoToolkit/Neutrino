@@ -35,12 +35,11 @@
 
 class neutrino;
 
-class Properties : public nGenericPan {
+class Properties : public nGenericPan, private Ui::Properties {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Properties(neutrino*);
-    Ui::Properties my_w;
 
 public slots:
     void bufferChanged(nPhysD*);

@@ -31,7 +31,7 @@
 
 #define HDF5_MAX_NAME 2048
 
-MUSE::MUSE(neutrino *nparent) : nGenericPan(nparent),
+MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	my_offset(0,0),
 	my_offset_val(0,0),
 	my_scale(1,1),
@@ -99,7 +99,7 @@ void MUSE::nextPlane(){
 void MUSE::on_percent_valueChanged(double val) {
     if (meanSlice) meanSlice->prop["display_range"] = physMath::getColorPrecentPixels(*meanSlice,val);
     if (cubeSlice) cubeSlice->prop["display_range"] = physMath::getColorPrecentPixels(*cubeSlice,val);
-    nparent->updatePhys();
+    nparent->showPhys();
 }
 
 

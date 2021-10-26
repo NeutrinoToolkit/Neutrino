@@ -343,7 +343,7 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
     }
 
     ifile.close();
-    delete readb;
+    delete [] readb;
     delete [] ptr;
 }
 
@@ -372,8 +372,8 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
     unsigned short buffer;
     std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
     
-    int w=0;
-    int h=0;
+    unsigned int w=0;
+    unsigned int h=0;
     int skipbyte=0;
     int kind=-1;
     

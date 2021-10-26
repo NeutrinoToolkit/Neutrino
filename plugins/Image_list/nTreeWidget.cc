@@ -111,14 +111,14 @@ void nTreeWidget::customSort(int column)
                 }
             }
         }
-        if (myPhysList.size() == imParent->nparent->my_w->my_view->physList.size()) {
+        if (myPhysList.size() == imParent->nparent->physList.size()) {
             DEBUG("--------------------------------------------------------------------------")
             for (int i=0; i < myPhysList.size(); ++i) {
-                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->my_w->my_view->physList.at(i))
+                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->physList.at(i))
             }
             DEBUG("--------------------------------------------------------------------------")
         }
-        imParent->nparent->my_w->my_view->physList=myPhysList;
+        imParent->nparent->physList=myPhysList;
 
     }
 }
