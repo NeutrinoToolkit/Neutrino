@@ -104,18 +104,13 @@ Image_list::buttonCopyPhys() {
 
 void
 Image_list::buttonRemovePhys() {
-    disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
-    disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    disconnect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-    foreach (QTreeWidgetItem * item, my_w.images->selectedItems()) {
-        nPhysD* my_phys=getPhys(item);
-        physDel(my_phys);
+    QList<nPhysD*> my_list;
+    for (auto& item: my_w.images->selectedItems()) {
+        my_list << getPhys(item);
+    }
+    for (auto& my_phys: my_list) {
         nparent->removePhys(my_phys);
     }
-    QApplication::processEvents();
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
 void
