@@ -4,7 +4,6 @@
 #include <QToolButton>
 #include <QMessageBox>
 
-
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
     QPluginLoader(pname),
     iface(nullptr),

@@ -92,14 +92,12 @@ neutrino::~neutrino()
 /// Creator
 neutrino::neutrino():
     my_w(new Ui::neutrino),
-    currentBuffer(nullptr),
-    my_sbarra(new Ui::nSbarra)
+    my_sbarra(new Ui::nSbarra),
+    currentBuffer(nullptr)
 {
 
     my_w->setupUi(this);
     setAcceptDrops(true);
-
-    //    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
 
     setProperty("winId",qApp->property("numWin").toInt()+1);
     qApp->setProperty("numWin",property("winId"));
@@ -822,7 +820,7 @@ void neutrino::saveSession (QString fname) {
             foreach (nPhysD * my_phys, physList) {
                 vecPhys.push_back(dynamic_cast<physD*>(my_phys));
             }
-            physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData());
+            physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData(), "pippo");
         } else {
             QMessageBox::warning(this,tr("Attention"),tr("Unknown extension: ")+file_info.suffix(), QMessageBox::Ok);
         }
@@ -1206,6 +1204,10 @@ QString neutrino::getFileSave() {
     QString allformats;
     QStringList formats;
 
+    QString suffix=QFileInfo(property("NeuSave-fileSave").toString()).suffix().toLower();
+
+    qDebug() << suffix;
+
     for (auto &format : physFormat::phys_image_formats()) {
         formats << QString::fromStdString(format);
     }
@@ -1215,12 +1217,19 @@ QString neutrino::getFileSave() {
             formats << format ;
     }
 
+    if (allformats.contains(suffix)) {
+        allformats.remove(suffix);
+        allformats.prepend(suffix);
+    }
+
     foreach(QString format, formats ) {
-        allformats += format + " (*."+format+");; ";
+        allformats += format + " files (*."+format+");; ";
     }
 
     allformats+=("Any files (*)");
     qInfo() << allformats;
+
+
     return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
 }
 

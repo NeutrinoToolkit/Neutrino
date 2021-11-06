@@ -66,7 +66,7 @@ physFormat::physDouble_txt::physDouble_txt(const char *ifilename)
     DEBUG(5,"file has "<<nlines<<" lines and "<<ncols<<" cols");
 
     //physImage mycc(ncols, nlines);
-    this->resize(ncols, nlines);
+    resize(ncols, nlines);
 
     // 2. read and save five
     ifile.clear();
@@ -112,7 +112,7 @@ physFormat::physDouble_asc::physDouble_asc(const char *ifilename)
 
     DEBUG(5,"file has "<<nlines<<" lines and "<<ncols<<" cols");
 
-    this->resize(ncols, nlines);
+    resize(ncols, nlines);
 
     // 2. read and save five
     ifile.clear();
@@ -161,7 +161,7 @@ physFormat::physInt_sif::physInt_sif(std::string ifilename)
     ss.str(temp_string);
     ss >> w;
     ss >> h;
-    this->resize(w, h);
+    resize(w, h);
 
     getline(ifile, temp_string);
     ss.str(""); ss.clear(); ss << std::setw(2) << std::setfill('0') << skiplines++;
@@ -326,7 +326,7 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
     ifile.seekg(0x10,std::ios::beg);
     ifile.read((char *)&h,4);
 
-    this->resize(w, h);
+    resize(w, h);
 
 
     DEBUG(5,"width: "<<getW());
@@ -335,13 +335,13 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
 
     ifile.seekg(header_size,std::ios::beg);
     assert (readb = new char [w*bpp]);
-
-    for (int i=0; i<h; i++) {
-        memset(readb,0,w*bpp);
-        ifile.read(readb,w*bpp);
-        memcpy(Timg_matrix[i], readb, w*sizeof(short));
+    if (readb) {
+        for (int i=0; i<h; i++) {
+            memset(readb,0,w*bpp);
+            ifile.read(readb,w*bpp);
+            memcpy(Timg_matrix[i], readb, w*sizeof(short));
+        }
     }
-
     ifile.close();
     delete [] readb;
     delete [] ptr;
@@ -372,8 +372,8 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
     unsigned short buffer;
     std::ifstream ifile(ifilename.c_str(), std::ios::in | std::ios::binary);
     
-    unsigned int w=0;
-    unsigned int h=0;
+    int my_width=0;
+    int my_height=0;
     int skipbyte=0;
     int kind=-1;
     
@@ -385,9 +385,9 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
         ifile.read((char *)&buffer,sizeof(unsigned short));
         skipbyte=buffer;
         ifile.read((char *)&buffer,sizeof(unsigned short));
-        w=buffer;
+        my_width=buffer;
         ifile.read((char *)&buffer,sizeof(unsigned short));
-        h=buffer;
+        my_height=buffer;
         
         for (int i=0;i<2;i++) {
             ifile.read((char *)&buffer,sizeof(unsigned short));
@@ -467,9 +467,9 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
             skipbyte=buffer;
             ifile.seekg(skipbyte,std::ios_base::beg);
             ifile.read((char *)&buffer,sizeof(unsigned short));
-            w=buffer;
+            my_width=buffer;
             ifile.read((char *)&buffer,sizeof(unsigned short));
-            h=buffer;
+            my_height=buffer;
             kind=2;
             ifile.read((char *)&buffer,sizeof(unsigned short));
         }
@@ -480,14 +480,16 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
         if (lil_header[0]==2 && lil_header[3]==1) {
             // lil_header[0] = dimension of the matrix
             // lil_header[3] = kind of data (1=unisgned short, 2=long, 3= float, 4=double)
-            w=lil_header[1];
-            h=lil_header[2];
+            my_width=lil_header[1];
+            my_height=lil_header[2];
             kind=2;
         }
     }
     
     if (kind!=-1) {
-        resize(w, h);
+        DEBUG("->>>>>>>>>>>>")
+        DEBUG("->>>>>>>>>>>>" << this <<  " " <<  my_width <<  " " << my_height)
+        resize(my_width, my_height);
         skipbyte=ifile.tellg();
         ifile.close();
         prop["kind"]=kind;
@@ -495,6 +497,7 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
 
         phys_open_RAW(this,kind,skipbyte,endian);
     }
+    DEBUG("exit physDouble_img")
 }
 
 physFormat::physUint_imd::physUint_imd(std::string ifilename)
@@ -522,7 +525,7 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
             ifile.read((char *)&buffer_header,sizeof(unsigned short));
             h=buffer_header;
 
-            this->resize(w, h);
+            resize(w, h);
             std::vector<unsigned int> buf(w*h);
             ifile.read((char *)(&buf[0]),sizeof(unsigned int)*w*h);
 #pragma omp parallel for
@@ -658,9 +661,11 @@ void physFormat::phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 
 #ifdef HAVE_LIBTIFF
 
-#define TIFFTAG_NEUTRINO  34595
+#define TIFFTAG_PHYSPROP  34595
+#define TIFFTAG_NEUTRINO  34594
 
 static const TIFFFieldInfo xtiffFieldInfo[] = {
+    { TIFFTAG_PHYSPROP,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") },
     { TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
 };
 
@@ -693,6 +698,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
         unsigned short config;
 
         do {
+            DEBUG(vecReturn.size());
             TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
             if (config==PLANARCONFIG_CONTIG ) {
                 phys_properties tiff_prop;
@@ -735,7 +741,6 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 TIFFGetField(tif, TIFFTAG_YPOSITION, &posy);
                 tiff_prop["origin"]=vec2f(posx,posy);
 
-
                 DEBUG("COMPRESSION_NONE " << compression << " " << COMPRESSION_NONE);
                 DEBUG("PLANARCONFIG_CONTIG " << config << " " << PLANARCONFIG_CONTIG);
                 DEBUG("FORMAT " << format);
@@ -747,31 +752,36 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 if (extra!=0) {
                     tiff_prop["Tiff_extra_samples"]=extra;
                 }
-                char *soft=NULL;
+                char *soft=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_SOFTWARE, &soft)) {
                     tiff_prop["TIFF_Software"]=std::string(soft);
                     DEBUG("TIFFTAG_SOFTWARE " << soft);
                 }
-                char *copyright=NULL;
+                char *copyright=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_COPYRIGHT, &copyright)) {
                     tiff_prop["TIFF_copyright"]=std::string(copyright);
                     DEBUG("TIFFTAG_COPYRIGHT " << copyright);
                 }
-                char *docname=NULL;
+                char *docname=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &docname)) {
                     tiff_prop["TIFF_docname"]=std::string(docname);
                     tiff_prop["phys_name"]=docname;
                     DEBUG(docname);
                 }
-                char *neu_prop=NULL;
-                if (TIFFGetField(tif, TIFFTAG_NEUTRINO, &neu_prop)) {
+                char *neu_prop=nullptr;
+                if (TIFFGetField(tif, TIFFTAG_PHYSPROP, &neu_prop)) {
                     std::string str_desc=std::string(neu_prop);
                     DEBUG(str_desc.size() << "\n" << str_desc);
                     std::stringstream ss(str_desc);
                     tiff_prop.loader(ss);
                     ss.str(str_desc);
                 }
-                char *desc=NULL;
+                char *comment=nullptr;
+                if (TIFFGetField(tif, TIFFTAG_NEUTRINO, &comment)) {
+                    tiff_prop["neutrino"]=std::string(comment);
+                    DEBUG(std::string(comment));
+                }
+                char *desc=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc)) {
                     std::string str_desc(desc);
                     tiff_prop["TIFF_description"]=str_desc;
@@ -907,7 +917,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
 
 #ifdef HAVE_LIBTIFF
 void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
-    TIFFSetWarningHandler(NULL);
+    TIFFSetWarningHandler(nullptr);
     TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
     TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
     TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
@@ -923,7 +933,7 @@ void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
 
     DEBUG(description);
 
-    TIFFSetField(tif, TIFFTAG_NEUTRINO, description.c_str());
+    TIFFSetField(tif, TIFFTAG_PHYSPROP, description.c_str());
     TIFFSetField(tif, TIFFTAG_SOFTWARE, "Neutrino");
     TIFFSetField(tif, TIFFTAG_COPYRIGHT, "http://web.luli.polytchnique.fr/neutrino");
 
@@ -966,7 +976,7 @@ void physFormat::phys_write_tiff(physD *my_phys, std::string ofilename) {
 #endif
 }
 
-void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofilename) {
+void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofilename, std::string comment) {
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
@@ -977,6 +987,20 @@ void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofil
                 throw phys_fileerror("Problem writing multiple images in same tiff file");
             }
         }
+        TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
+        TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
+        TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+        TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+        TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+        TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
+        TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1);
+        TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
+        TIFFSetField(tif, TIFFTAG_IMAGELENGTH, 1);
+        TIFFSetField(tif, TIFFTAG_COPYRIGHT, comment.c_str());
+        TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+        char p='t';
+        TIFFWriteScanline(tif, &p, 0, 0);
+
     } else {
         throw phys_fileerror("Problem writing tiff");
     }
@@ -1450,7 +1474,7 @@ physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
     my_phys.prop.loader(ifile);
 
 #ifdef __phys_debug
-    my_phys.prop.dumper(std::cout);
+    my_phys.prop.dumper(std::cerr);
 #endif
 
     // w/h/size binary read
@@ -1540,7 +1564,7 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
                 std::vector<char> buffer(bpp*my_phys->getSurf());
                 ifile.read(&buffer[0], buffer.size());
                 ifile.close();
-                for (size_t i=0;i<my_phys->getSurf();i++) {
+                for (unsigned int i=0;i<my_phys->getSurf();i++) {
                     switch (kind) {
                         case 0: {
                                 unsigned char buf = *((unsigned char*)(&buffer[i*bpp]));
@@ -1596,6 +1620,7 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
         my_phys->resize(0,0);
         throw phys_fileerror("Can't open file "+my_phys->getName());
     }
+    DEBUG("exit phys_open_RAW")
 }
 //! open HDF4 file (works for: Omega LLR  visar images)
 std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
@@ -1931,7 +1956,9 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
     } else if (ext=="b16") {
         retPhys.push_back(physFormat::physShort_b16(fname.c_str()));
     } else if (ext=="img") {
+        DEBUG("++++++++++ calling physDouble_img")
         retPhys.push_back(physFormat::physDouble_img(fname));
+        DEBUG("++++++++++ end calling physDouble_img")
     } else if (ext=="imd" || ext=="imi") {
         retPhys.push_back(physFormat::physUint_imd(fname.c_str()));
     } else if (ext.substr(0,3)=="fit") {
@@ -1975,12 +2002,13 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
         retPhys[i].setFromName(fname);
         retPhys[i].setType(PHYS_FILE);
     }
+    DEBUG("<<<<<<<<<<<<<<<<<<<<")
     return retPhys;
 }
 
 std::vector<std::string> physFormat::phys_image_formats() {
 
-    std::vector<std::string> retval={"txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "neu", "gz", "dat"};
+    std::vector<std::string> retval={"neu", "txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "gz", "dat"};
 
 #ifdef HAVE_LIBTIFF
     retval.push_back("tif");

@@ -190,8 +190,13 @@ public:
     friend std::ostream& operator<<(std::ostream&, nPhysImageF<U> &phys);
 
     //! resize existing object. WARNING: existing data is deleted
-    void resize(unsigned int new_w, unsigned int new_h)
-	{ if ((getW() != new_w) || (getH() != new_h)) {width = new_w; height = new_h; matrix_points_aligned(); } }
+    void resize(unsigned int new_w, unsigned int new_h) {
+        if ((width != new_w) || (height != new_h)) {
+            width = new_w;
+            height = new_h;
+            matrix_points_aligned();
+        }
+    }
 
     void resize(vec2u new_Size) { resize(new_Size.x(),new_Size.y()); }
 
@@ -273,8 +278,8 @@ public:
 	// assignment operator -- SHALLOW COPY
 	nPhysImageF<T> & operator= (const nPhysImageF<T> &rhs)
 	{
-        // check if other instances are present (prevent leaks)
-		if (_canResize())
+        DEBUG("copy shallow ------------------------------------");
+        if (_canResize())
 			resize(0, 0);
 		else {
 			_init_temp_pointers();
@@ -297,7 +302,8 @@ public:
 		_trash_new();
 
 		// not sure about this
-		return *this;
+        DEBUG("END copy shallow ------------------------------------");
+        return *this;
 
 	}
 
@@ -795,7 +801,7 @@ template<class T> nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp
 template<class T>
 nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName) : nPhysImageF<T>()
 {
-//	std::cerr<<"copy constructor ------------------------------------"<<std::endl;
+    DEBUG("copy constructor ------------------------------------");
 	resize(oth.width, oth.height);
 	
 //	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
@@ -806,7 +812,7 @@ nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName) : nPhy
         setShortName(sName);
     }
 	TscanBrightness();
-//	std::cerr<<"end copy constructor ------------------------------------"<<std::endl;
+    DEBUG("END copy constructor ------------------------------------");
 }
 
 
@@ -943,11 +949,6 @@ nPhysImageF<T>::matrix_points_aligned()
 	if (Timg_buffer != NULL) {
 		delete Timg_buffer;
 		Timg_buffer = NULL;
-	}
-
-	if (Timg_matrix != NULL) {
-		delete Timg_matrix;
-		Timg_matrix = NULL;
 	}
 
 	if (vector_buf != NULL) {
@@ -1138,7 +1139,6 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
 	nPhysImageF<mcomplex> ftbuf(getW(), getH(), mcomplex(0.,0.), "ftbuf");
 	
 	if (getSurf()>0) {
-//        fftw_plan plan_t = fftw_plan_dft_2d(width, height, t, Ft, (ftdir == PHYS_FORWARD ? FFTW_FORWARD : FFTW_BACKWARD), FFTW_ESTIMATE);
         fftw_plan plan_t = fftw_plan_dft_2d(height, width, t, Ft, (ftdir == PHYS_FORWARD ? FFTW_FORWARD : FFTW_BACKWARD), FFTW_ESTIMATE);
 
         // 2. data copy
@@ -1147,12 +1147,6 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
             assign_val_to_fftw_complex(Timg_buffer[i], t[i]);
         }
 
-//#pragma omp parallel for collapse(2)
-//        for (unsigned int  j = 0; j < height; j++){
-//            for (unsigned int i = 0; i < width; i++) {
-//                assign_val_to_fftw_complex(Timg_matrix[j][i], t[i*height+j]);
-//            }
-//        }
 		
 		// 3. transform
 		fftw_execute(plan_t);
@@ -1162,13 +1156,6 @@ nPhysImageF<T>::ft2(enum phys_fft ftdir) {
         for (unsigned int i = 0; i < getSurf(); i++) {
             ftbuf.Timg_buffer[i]=mcomplex(Ft[i][0], Ft[i][1]);
         }
-
-//#pragma omp parallel for collapse(2)
-//        for (unsigned int  j = 0; j < height; j++){
-//            for (unsigned int i = 0; i < width; i++) {
-//                ftbuf.Timg_matrix[j][i] = mcomplex(Ft[i*height+j][0], Ft[i*height+j][1]);
-//            }
-//        }
 		
 		// 5. return
 		fftw_free(t);
@@ -1264,7 +1251,6 @@ nPhysImageF<T>::ft1(enum phys_direction imgdir, enum phys_fft ftdir)
 template<class T> void
 nPhysImageF<T>::fftshift() {
 
-
 	// warning! : definitely a bad idea to back-transform a shifted spectrum
 	T val;
     unsigned int hwidth = (width+1)/2;
@@ -1320,30 +1306,6 @@ nPhysImageF<mcomplex>::writeASC(const char *ofilename) {
         throw phys_fileerror("ofstream error");
     }
 }
-
-
-//template<class T> void
-//nPhysImageF<T>::writeRAW(const char *ofilename) {
-//    throw phys_deprecated();
-//    std::ofstream ofile(ofilename);
-
-//	ofile<<"ImagLab-RAW\t"<<width<<"\t"<<height<<"\t"<<typeid(*Timg_buffer).name()<<"\n";
-//	// alla bruttissimo dio
-//    ofile.write((char *)Timg_buffer, getSurf()*sizeof(T));
-//	ofile.close();
-//}
-
-// ------------------------------ operators ------------------------------------
-
-/*template<class T> nPhysImageF<T> &
-nPhysImageF<T>::operator= (const nPhysImageF<T> &other) {
-	resize(other.width, other.height);
-    memcpy(Timg_buffer, other.Timg_buffer, getSurf()*sizeof(T));
-	Tmaximum_value = other.Tmaximum_value;
-	Tminimum_value = other.Tminimum_value;
-	return *this;
-}*/
-
 
 template<class T> nPhysImageF<T>
 nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {

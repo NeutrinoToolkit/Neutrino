@@ -1,7 +1,6 @@
 # check for neutrino root
-IF(APPLE)
-    set(PYVER 2.7)
-ENDIF()
+
+set (PYTHON_CONFIG_PATH /Users/tommaso/.pyenv/shims/python3-config)
 
 find_package(PythonLibs ${PYVER})
 

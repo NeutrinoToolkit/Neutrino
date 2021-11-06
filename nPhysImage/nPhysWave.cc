@@ -1152,7 +1152,7 @@ void physWave::phys_invert_abel(abel_params &params)
         std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
 
         std::vector<double> Fivec;
-        fftw_plan r2rplan;
+        fftw_plan r2rplan=nullptr;
 
         for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
             if ((*params.iter_ptr)!=-1) {

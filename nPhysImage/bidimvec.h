@@ -220,7 +220,7 @@ bidimvec<T>::operator^ (bidimvec<T> rhs)
 {
 	double theta1 = (myval1 == 0) ? M_PI_2 : atan(myval2/myval1);
 	double theta2 = (rhs.x() == 0) ? M_PI_2 : atan(rhs.y()/rhs.x());
-	std::cout<<*this<<", "<<rhs<<"th1 "<<theta1<<", th2 "<<theta2<<std::endl;
+// 	std::cout<<*this<<", "<<rhs<<"th1 "<<theta1<<", th2 "<<theta2<<std::endl;
 	return (theta1-theta2);
 }
 
