@@ -745,15 +745,103 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             imagelist.append(fileOpen(fname));
         }
     }
+    for (auto& img: imagelist) {
+        if (img->prop.have("neutrinoPanData")) {
+            std::string panString=img->prop["neutrinoPanData"];
+            img->prop.erase("neutrinoPanData");
+            setPanData(panString);
+        }
+    }
     return imagelist;
+}
+
+void neutrino::setPanData(std::string panstring){
+    DEBUG(">\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n" << panstring)
+    std::istringstream ifile(panstring);
+    std::string line;
+    while(ifile.peek()!=-1) {
+        getline(ifile,line);
+        QString qLine=QString::fromStdString(line);
+        if (line.find("NeutrinoPan-begin")==0) {
+            QStringList listLine=QString::fromStdString(line).split(" ");
+            QString pName=listLine.at(1);
+
+            nGenericPan *my_pan=openPan(pName, false);
+
+            if (my_pan) {
+                QApplication::processEvents();
+                QTemporaryFile tmpFile(this);
+                tmpFile.open();
+
+                while(!ifile.eof()) {
+                    getline(ifile,line);
+                    qLine=QString::fromStdString(line);
+                    qDebug() << qLine;
+                    if (qLine.startsWith("NeutrinoPan-end"))
+                        break;
+                    tmpFile.write(line.c_str());
+                    tmpFile.write("\n");
+                }
+                tmpFile.flush();
+                QApplication::processEvents();
+                QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
+                QApplication::processEvents();
+                tmpFile.close(); // this should also remove it...
+            } else {
+                QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+pName,  QMessageBox::Ok);
+            }
+        }
+    }
+}
+
+std::string neutrino::getPanData(){
+    std::stringstream ofile;
+    for (int i=0;i<panList.size(); i++) {
+        QString pName=panList.at(i)->metaObject()->className();
+        QTemporaryFile tmpFile(this);
+        if (tmpFile.open()) {
+            QString tmp_filename=tmpFile.fileName();
+            tmpFile.close();
+            tmpFile.remove();
+            panList.at(i)->saveSettings(tmp_filename);
+
+            QFile file(tmp_filename);
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                ofile << "NeutrinoPan-begin " << pName.toStdString() << std::endl;
+                ofile.flush();
+                file.seek(0);
+                while (!file.atEnd()) {
+                    QByteArray line = file.readLine();
+                    qDebug() << line;
+                    ofile << line.toStdString();
+                }
+                file.close();
+                file.remove();
+                ofile << "NeutrinoPan-end " << pName.toStdString() << std::endl;
+                ofile.flush();
+            } else {
+                qWarning() << tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team.");
+            }
+        } else {
+            qWarning() << tr("Cannot write values for ")+panList.at(i)->panName();
+        }
+    }
+    DEBUG("><><><><" << ofile.str())
+    return ofile.str();
 }
 
 void neutrino::saveSession (QString fname) {
     if (fname.isEmpty()) {
         QString extensions=tr("Neutrino session")+QString(" (*.neus);;");
 #ifdef HAVE_LIBTIFF
-        extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
+        if (QFileInfo(property("NeuSave-fileSave").toString()).suffix() == "neus") {
+            extensions+=tr("Tiff session")+" (*.tiff *.tif);;";
+           } else {
+            extensions=tr("Tiff session")+" (*.tiff *.tif);;"+extensions;
+        }
 #endif
+        qDebug() << extensions;
+        qDebug() << extensions;
         QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileSave").toString(),extensions+tr("Any files")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
@@ -781,46 +869,21 @@ void neutrino::saveSession (QString fname) {
                 physList.at(i)->setType(PHYS_FILE);
             }
             progress.setValue(physList.size());
-            for (int i=0;i<panList.size(); i++) {
-                QString pName=panList.at(i)->metaObject()->className();
-                progress.setLabelText(pName);
-                QApplication::processEvents();
-                QTemporaryFile tmpFile(this);
-                if (tmpFile.open()) {
-                    QString tmp_filename=tmpFile.fileName();
-                    tmpFile.close();
-                    tmpFile.remove();
-                    panList.at(i)->saveSettings(tmp_filename);
-
-                    QFile file(tmp_filename);
-                    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                        ofile << "NeutrinoPan-begin " << pName.toStdString() << std::endl;
-                        ofile.flush();
-                        file.seek(0);
-                        while (!file.atEnd()) {
-                            QByteArray line = file.readLine();
-                            qDebug() << line;
-                            ofile << line.toStdString();
-                        }
-                        file.close();
-                        file.remove();
-                        ofile << "NeutrinoPan-end " << pName.toStdString() << std::endl;
-                        ofile.flush();
-                    } else {
-                        QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName()+QString("\n")+tmp_filename+QString("\n")+tr("Contact dev team."), QMessageBox::Ok);
-                    }
-                } else {
-                    QMessageBox::warning(this,tr("Attention"),tr("Cannot write values for ")+panList.at(i)->panName(), QMessageBox::Ok);
-                }
-            }
+            ofile << getPanData();
             progress.setValue(physList.size()+1);
             ofile.close();
         } else if (file_info.suffix().startsWith("tif")) {
+            setProperty("NeuSave-fileSave", fname);
             std::vector <physD *> vecPhys;
             foreach (nPhysD * my_phys, physList) {
                 vecPhys.push_back(dynamic_cast<physD*>(my_phys));
             }
-            physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData(), "pippo");
+            if (vecPhys.size()) {
+                std::string pandata=getPanData();
+                DEBUG(pandata);
+                vecPhys[0]->prop["neutrinoPanData"] = pandata;
+            }
+            physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData());
         } else {
             QMessageBox::warning(this,tr("Attention"),tr("Unknown extension: ")+file_info.suffix(), QMessageBox::Ok);
         }
@@ -850,6 +913,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                 progress.setMaximum(1+qLine.split(" ").at(2).toInt());
                 progress.show();
                 QApplication::processEvents();
+                std::string panString;
                 while(ifile.peek()!=-1) {
                     getline(ifile,line);
                     QString qLine=QString::fromStdString(line);
@@ -868,39 +932,15 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         }
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
-                        QStringList listLine=qLine.split(" ");
-                        QString pName=listLine.at(1);
-                        progress.setLabelText(pName);
-                        QApplication::processEvents();
-
-                        nGenericPan *my_pan=openPan(pName, false);
-
-                        if (my_pan) {
-                            QApplication::processEvents();
-                            QTemporaryFile tmpFile(this);
-                            tmpFile.open();
-
-                            while(!ifile.eof()) {
-                                getline(ifile,line);
-                                qLine=QString::fromStdString(line);
-                                qDebug() << qLine;
-                                if (qLine.startsWith("NeutrinoPan-end"))
-                                    break;
-                                tmpFile.write(line.c_str());
-                                tmpFile.write("\n");
-                            }
-                            tmpFile.flush();
-                            QApplication::processEvents();
-                            QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
-                            QApplication::processEvents();
-                            tmpFile.close(); // this should also remove it...
-                        } else {
-                            QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+pName,  QMessageBox::Ok);
+                        panString+=line+'\n';
+                        while (line.find("NeutrinoPan-end")!=0) {
+                            getline(ifile,line);
+                            panString+=line+'\n';
                         }
-
                     }
                     QApplication::processEvents();
                 }
+                setPanData(panString);
             }
             ifile.close();
         }

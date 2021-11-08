@@ -976,7 +976,7 @@ void physFormat::phys_write_tiff(physD *my_phys, std::string ofilename) {
 #endif
 }
 
-void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofilename, std::string comment) {
+void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofilename) {
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
@@ -987,20 +987,6 @@ void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofil
                 throw phys_fileerror("Problem writing multiple images in same tiff file");
             }
         }
-        TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
-        TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
-        TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-        TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
-        TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
-        TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
-        TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1);
-        TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
-        TIFFSetField(tif, TIFFTAG_IMAGELENGTH, 1);
-        TIFFSetField(tif, TIFFTAG_COPYRIGHT, comment.c_str());
-        TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
-        char p='t';
-        TIFFWriteScanline(tif, &p, 0, 0);
-
     } else {
         throw phys_fileerror("Problem writing tiff");
     }

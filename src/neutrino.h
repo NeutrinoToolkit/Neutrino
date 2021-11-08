@@ -159,6 +159,8 @@ public slots:
 
     QList <nPhysD *> openSession(QString);
     void saveSession(QString=QString());
+    std::string getPanData();
+    void setPanData(std::string);
 
     void exportGraphics();
     void exportAllGraphics();

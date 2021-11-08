@@ -166,7 +166,7 @@ std::vector <physD> phys_open_tiff(std::string, bool separate_rgb);
 std::vector <physD> phys_open_shimadzu(std::string);
 
 //write neutrino tiff files
-void phys_write_tiff(std::vector<physD*>, std::string, std::string);
+void phys_write_tiff(std::vector<physD*>, std::string);
 void phys_write_tiff(physD*, std::string);
 
 #ifdef HAVE_LIBTIFF

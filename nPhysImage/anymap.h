@@ -29,6 +29,7 @@
 #include <ostream>
 #include <sstream>
 #include <map>
+#include <regex>
 
 #include "bidimvec.h"
 #include "tools.h"
@@ -158,63 +159,9 @@ public:
 	    return (find(search_me) != end());
 	}
 
-	void loader(std::istream &is) {
-		std::string st;
-		clear();
+    void loader(std::istream &);
 
-		getline(is, st);
-		while (st.find(__pp_init_str) == std::string::npos && !is.eof()) {
-			DEBUG("get");
-			getline(is, st);
-		}
-
-		getline(is, st);
-		while (st.find(__pp_end_str) == std::string::npos
-				&& !is.eof()) {
-
-			size_t eqpos = st.find("=");
-			if (eqpos == std::string::npos) {
-			    DEBUG(st<<": malformed line");
-				continue;
-			}
-			std::string st_key = trim(st.substr(0, eqpos), "\t ");
-			std::string st_arg = trim(st.substr(eqpos+1, std::string::npos), "\t ");
-			DEBUG(10, "key: "<<st_key);
-			DEBUG(10, "arg: "<<st_arg);
-        
-			// filling
-			std::stringstream ss(st_arg);
-			ss>>(*this)[st_key];
-			
-			getline(is, st);
-		}
-		DEBUG("[anydata] read "<<size()<<" keys");
-	}
-
-
-	void dumper(std::ostream &os) {
-	    DEBUG("[anydata] Starting dump of "<<size()<<" elements");
-		
-		os<<__pp_init_str<<std::endl;
-		
-		// keys iterator
-		std::map<std::string, anydata>::iterator itr;
-		for (itr=begin(); itr != end(); ++itr) {
-			DEBUG(5,"[anydata] Dumping "<<itr->first);
-
-			// check if key was inserted by non-existent access
-			// (strange std::map behaviour...)			
-			if (itr->second.ddescr != anydata::any_none) {
-                std::string my_val=itr->second;
-                std::replace(my_val.begin(), my_val.end(),'\n', '\t');
-
-                os<<itr->first<<" = "<<my_val<<std::endl;
-			}
-		}
-		os<<__pp_end_str<<std::endl;
-		
-		DEBUG("[anydata] Dumping ended");
-	}
+    void dumper(std::ostream &);
 
 };
 
