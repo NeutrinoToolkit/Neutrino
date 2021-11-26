@@ -162,7 +162,7 @@ Thomson_Parabola::run_simulation(void)
 	float iE = sp.iE_mev*MeV;
 	float eE = sp.eE_mev*MeV;
 	int nSim = sp.n_points;
-	float stepE = (eE-iE)/(nSim-1);
+//	float stepE = (eE-iE)/(nSim-1);
 
 	nSpectrum *my_line = sp.nsp;
 	if (my_line == NULL) {
@@ -222,7 +222,7 @@ Thomson_Parabola::run_simulation(void)
 	// WARNING: this is the ONLY mechanism actually passing energy
 	// associated to curvilinear coordinate from tp-plugin to nSpectrum
 	my_line->setPoints(lp);
-	for (int ii=0; ii<ens.size(); ii++) {
+    for (unsigned int ii=0; ii< ens.size(); ii++) {
 		QTableWidgetItem *en_it = new QTableWidgetItem(QLocale().toString(ens[ii]));
 		my_line->my_w.points->setItem(ii, 2, en_it);
 	
@@ -297,7 +297,7 @@ Thomson_Parabola::updateSingleTrack(int cr, int cc)
 		sp.eE_mev = my_w.trackTable->item(cr, 3)->data(0).toFloat();
 		sp.n_points = my_w.trackTable->item(cr, 4)->data(0).toInt();
 
-		if (my_tracks[cr] == NULL) {
+        if (my_tracks[cr] == nullptr) {
 			DEBUG("allocate nsp");
             my_tracks[cr] = new nSpectrum(this);
 		}
@@ -320,7 +320,7 @@ Thomson_Parabola::updateTracks(void)
 		sp.eE_mev = my_w.trackTable->item(rr, 3)->data(0).toFloat();
 		sp.n_points = my_w.trackTable->item(rr, 4)->data(0).toInt();
 
-		if (my_tracks[rr] == NULL) {
+        if (my_tracks[rr] == nullptr) {
 			DEBUG("allocate nsp");
             my_tracks[rr] = new nSpectrum(this);
 		}

@@ -59,8 +59,9 @@ public slots:
     void get_data_graph(QTextStream &out, QCPGraph *graph);
     QString get_data(int g=-1);
 
-    void save_data();
     void copy_data();
+    void save_data();
+    void copy_image();
     void export_image();
 
     void contextMenuEvent (QContextMenuEvent*) override;

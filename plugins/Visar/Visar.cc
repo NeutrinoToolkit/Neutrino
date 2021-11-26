@@ -88,8 +88,7 @@ nSOPPlot::nSOPPlot(QWidget* parent):
 };
 
 
-Visar::Visar(neutrino *nparent)
-    : nGenericPan(nparent),
+Visar::Visar(neutrino *mynparent) : nGenericPan(mynparent),
       numVisars(0)
 {
     setupUi(this);
@@ -1238,7 +1237,7 @@ void Visar::doWave(int k) {
 
     } else {
         if (imgs[0] && imgs[1]) {
-            DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW())
+            DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW());
         } else {
             DEBUG("BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! ");
         }

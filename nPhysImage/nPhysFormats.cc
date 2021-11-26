@@ -487,8 +487,8 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
     }
     
     if (kind!=-1) {
-        DEBUG("->>>>>>>>>>>>")
-        DEBUG("->>>>>>>>>>>>" << this <<  " " <<  my_width <<  " " << my_height)
+        DEBUG("->>>>>>>>>>>>");
+        DEBUG("->>>>>>>>>>>>" << this <<  " " <<  my_width <<  " " << my_height);
         resize(my_width, my_height);
         skipbyte=ifile.tellg();
         ifile.close();
@@ -497,7 +497,7 @@ physFormat::physDouble_img::physDouble_img(std::string ifilename)
 
         phys_open_RAW(this,kind,skipbyte,endian);
     }
-    DEBUG("exit physDouble_img")
+    DEBUG("exit physDouble_img");
 }
 
 physFormat::physUint_imd::physUint_imd(std::string ifilename)
@@ -1606,7 +1606,7 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
         my_phys->resize(0,0);
         throw phys_fileerror("Can't open file "+my_phys->getName());
     }
-    DEBUG("exit phys_open_RAW")
+    DEBUG("exit phys_open_RAW");
 }
 //! open HDF4 file (works for: Omega LLR  visar images)
 std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
@@ -1942,9 +1942,9 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
     } else if (ext=="b16") {
         retPhys.push_back(physFormat::physShort_b16(fname.c_str()));
     } else if (ext=="img") {
-        DEBUG("++++++++++ calling physDouble_img")
+        DEBUG("++++++++++ calling physDouble_img");
         retPhys.push_back(physFormat::physDouble_img(fname));
-        DEBUG("++++++++++ end calling physDouble_img")
+        DEBUG("++++++++++ end calling physDouble_img");
     } else if (ext=="imd" || ext=="imi") {
         retPhys.push_back(physFormat::physUint_imd(fname.c_str()));
     } else if (ext.substr(0,3)=="fit") {
@@ -1988,7 +1988,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
         retPhys[i].setFromName(fname);
         retPhys[i].setType(PHYS_FILE);
     }
-    DEBUG("<<<<<<<<<<<<<<<<<<<<")
+    DEBUG("<<<<<<<<<<<<<<<<<<<<");
     return retPhys;
 }
 

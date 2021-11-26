@@ -119,14 +119,14 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    axisRect()->setRangeDrag(0);
-    axisRect()->setRangeZoom(0);
+    axisRect()->setRangeDrag(nullptr);
+    axisRect()->setRangeZoom(nullptr);
     axisRect()->setMargins(QMargins(0,0,0,0));
     setCursor(QCursor(Qt::CrossCursor));
     repaint();
 }
 
-void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
+void nCustomPlot::rescaleAxes ( bool  ) {
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         if (axis->visible() && !(axis->property("lock").isValid() && axis->property("lock").toBool())) {
             axis->rescale();
@@ -134,7 +134,7 @@ void nCustomPlot::rescaleAxes ( bool  onlyVisiblePlottables) {
     }
 }
 
-void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
+void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
     QString winTitle="Plot "+objectName();
     foreach (QMainWindow *prefTmp, findChildren<QMainWindow *>()) {
         if(prefTmp->windowTitle() == winTitle) {
@@ -154,6 +154,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
     connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
     connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
     connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
+    connect(my_w.actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
     connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
     if (!title.isNull()) {
         my_w.plotTitle->setText(title->text());
@@ -311,14 +312,14 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *ev) {
 void nCustomPlot::showGraph(bool val) {
     if (sender()) {
         if (sender()->property("graph").isValid()){
-            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<QCPGraph *>();
+            QCPGraph *graph = static_cast<QCPGraph *>(sender()->property("graph").value<QCPGraph *>());
             if(hasPlottable(graph)) {
                 graph->setVisible(val);
                 replot();
             }
         }
         if (sender()->property("errbar").isValid()){
-            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<QCPErrorBars *>();
+            QCPErrorBars *errbar = static_cast<QCPErrorBars *>(sender()->property("errbar").value<QCPErrorBars *>());
             if(hasPlottable(errbar)) {
                 errbar->setVisible(val);
                 replot();
@@ -330,7 +331,7 @@ void nCustomPlot::showGraph(bool val) {
 void nCustomPlot::changeGraphThickness(double val) {
     if (sender()) {
         if (sender()->property("graph").isValid()){
-            QCPGraph *graph = (QCPGraph *) sender()->property("graph").value<QCPGraph *>();
+            QCPGraph *graph = static_cast<QCPGraph *>(sender()->property("graph").value<QCPGraph *>());
             if(hasPlottable(graph)) {
                 QPen p=graph->pen();
                 p.setWidthF(val);
@@ -339,7 +340,7 @@ void nCustomPlot::changeGraphThickness(double val) {
             }
         }
         if (sender()->property("errbar").isValid()){
-            QCPErrorBars *errbar = (QCPErrorBars *) sender()->property("errbar").value<QCPErrorBars *>();
+            QCPErrorBars *errbar = static_cast<QCPErrorBars *>(sender()->property("errbar").value<QCPErrorBars *>());
             if(hasPlottable(errbar)) {
                 QPen p=errbar->pen();
                 p.setWidthF(val);
@@ -353,7 +354,7 @@ void nCustomPlot::changeGraphThickness(double val) {
 
 void nCustomPlot::showAxis(bool val) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
+        QCPAxis *axis = static_cast<QCPAxis *> (sender()->property("axis").value<QCPAxis *>());
         if (axis) {
             axis->setVisible(val);
             replot();
@@ -389,7 +390,7 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
             get_data_graph(out,graph);
         } else {
             if (obj->property("graph").isValid()) {
-                graph = (QCPGraph *) sender()->property("graph").value<QCPGraph *>();
+                graph = static_cast<QCPGraph *>(sender()->property("graph").value<QCPGraph *>());
             }
             if (graph) {
                 get_data_graph(out, graph);
@@ -420,6 +421,13 @@ void nCustomPlot::save_data(){
         get_data(out, sender());
         t.close();
     }
+}
+
+void nCustomPlot::copy_image(){
+    qDebug() << "here";
+    QClipboard * clipboard = QApplication::clipboard();
+    QPixmap pixmap= this->toPixmap();
+    clipboard->setPixmap(pixmap);
 }
 
 void nCustomPlot::copy_data(){
@@ -490,7 +498,7 @@ void nCustomPlot::changeTitleFont() {
 
 void nCustomPlot::changeAxisFont() {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
+        QCPAxis *axis = static_cast<QCPAxis *>(sender()->property("axis").value<QCPAxis *>());
         if (axis) {
             bool ok;
             QFont myfont = QFontDialog::getFont(&ok, axis->labelFont(), this, axis->label()+" Font");
@@ -505,7 +513,7 @@ void nCustomPlot::changeAxisFont() {
 
 void nCustomPlot::showGrid(int val) {
     if (sender() && sender()->property("grid").isValid()) {
-        QCPGrid *grid = (QCPGrid *) sender()->property("grid").value<QCPAxis *>();
+        QCPGrid *grid = static_cast<QCPGrid *>(sender()->property("grid").value<QCPGrid *>());
         if (grid) {
             switch (val) {
                 case Qt::Unchecked:
@@ -530,7 +538,7 @@ void nCustomPlot::showGrid(int val) {
 
 void nCustomPlot::setLog(bool val) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
+        QCPAxis *axis = static_cast<QCPAxis *>(sender()->property("axis").value<QCPAxis *>());
         if (axis) {
             axis->setScaleType(val?QCPAxis::stLogarithmic:QCPAxis::stLinear);
             replot();
@@ -540,7 +548,7 @@ void nCustomPlot::setLog(bool val) {
 
 void nCustomPlot::setLabel(QString name) {
     if (sender() && sender()->property("axis").isValid()) {
-        QCPAxis *axis = (QCPAxis *) sender()->property("axis").value<QCPAxis *>();
+        QCPAxis *axis = static_cast<QCPAxis *>(sender()->property("axis").value<QCPAxis *>());
         if (axis) {
             axis->setLabel(name);
             replot();
@@ -552,7 +560,7 @@ void nCustomPlot::setColor() {
     if (sender() && sender()->property("axis").isValid()) {
         QAbstractButton *tb = qobject_cast<QAbstractButton *>(sender());
         if(tb) {
-            QCPAxis *axis = (QCPAxis *) tb->property("axis").value<QCPAxis *>();
+            QCPAxis *axis = static_cast<QCPAxis *>(tb->property("axis").value<QCPAxis *>());
             if (axis) {
                 QColorDialog colordial(axis->labelColor(),this);
                 colordial.setOption(QColorDialog::ShowAlphaChannel);
@@ -788,7 +796,7 @@ nCustomPlotMouseX2Y::nCustomPlotMouseX2Y(QWidget* parent):
 
 nCustomPlotMouseX3Y::nCustomPlotMouseX3Y(QWidget* parent):
     nCustomPlotMouseX2Y(parent),
-    yAxis3(axisRect(0)->addAxis(QCPAxis::atRight,0))
+    yAxis3(axisRect(0)->addAxis(QCPAxis::atRight,nullptr))
 {
     yAxis3->setLabelColor(Qt::darkCyan);
     yAxis3->setTickLabelColor(Qt::darkCyan);

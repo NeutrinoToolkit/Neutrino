@@ -131,7 +131,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     std::vector<hsize_t> dims;
 
     ndims=H5Sget_simple_extent_ndims(sid);
-    DEBUG("t_class : "<< t_class << " ndims " << ndims << " H5T_FLOAT " << H5T_FLOAT)
+    DEBUG("t_class : "<< t_class << " ndims " << ndims << " H5T_FLOAT " << H5T_FLOAT);
     if (t_class == H5T_FLOAT) {
         item2->setData(1,0,"DS Float");
         dims.resize(ndims);

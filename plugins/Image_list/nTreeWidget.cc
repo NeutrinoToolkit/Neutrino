@@ -64,7 +64,7 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
                 drag->setMimeData(mymimeData);
                 drag->exec();
             }
-            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>> FOUND PARENT")
+            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>> FOUND PARENT");
         }
     }
 }
@@ -96,7 +96,7 @@ void nTreeWidget::dropEvent(QDropEvent *e) {
 
 void nTreeWidget::customSort(int column)
 {
-    DEBUG("CUSTOM SORT")
+    DEBUG("CUSTOM SORT");
     Qt::SortOrder order = header()->sortIndicatorOrder();
     QTreeWidget::sortItems(column, order);
     QApplication::processEvents();
@@ -112,11 +112,11 @@ void nTreeWidget::customSort(int column)
             }
         }
         if (myPhysList.size() == imParent->nparent->physList.size()) {
-            DEBUG("--------------------------------------------------------------------------")
+            DEBUG("--------------------------------------------------------------------------");
             for (int i=0; i < myPhysList.size(); ++i) {
-                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->physList.at(i))
+                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->physList.at(i));
             }
-            DEBUG("--------------------------------------------------------------------------")
+            DEBUG("--------------------------------------------------------------------------");
         }
         imParent->nparent->physList=myPhysList;
 

@@ -198,7 +198,7 @@ FocalSpot::find_contour(double th)
             }
             meanr/=myp.size();
             contour.resize(myp.size());
-            DEBUG(myp.size() << " "  << contour.size())
+            DEBUG(myp.size() << " "  << contour.size());
 
             my_w.stats->append(QString("Mean radius: %1").arg(meanr));
             my_w.stats->append(QString("Min Max radius:  %1  %2").arg(min_r).arg(max_r));
@@ -218,10 +218,10 @@ FocalSpot::find_contour(double th)
     #pragma omp parallel for collapse(2)
             for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
                 for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
-                    double r=(vec2f(i,j)-cntr).mod()+0.5;
+                    int r=static_cast<int>((vec2f(i,j)-cntr).mod()+0.5);
                     if (r<len)  {
-                        rplot[(int)r]+=currentBuffer->point(i,j);
-                        rnum[(int)r] ++;
+                        rplot[r]+=currentBuffer->point(i,j);
+                        rnum[r] ++;
                     }
                 }
             }
@@ -230,7 +230,7 @@ FocalSpot::find_contour(double th)
             for (int i=0;i<len;i++) {
                 rdata[i]=i;
                 rplot[i]=rplot[i]/rnum[i];
-                DEBUG(rdata[i]  << " " << rplot[i])
+                DEBUG(rdata[i]  << " " << rplot[i]);
             }
             my_w.plot->graph(0)->setData(rdata,rplot,true);
             my_w.plot->graph(0)->rescaleAxes();

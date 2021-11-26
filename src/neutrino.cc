@@ -678,7 +678,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                         name[0]="Red";
                         name[1]="Green";
                         name[2]="Blue";
-                        for (int k=0;k<3;k++) {
+                        for (unsigned int k=0;k<3;k++) {
                             datamatrix[k] = new nPhysD(QFileInfo(fname).fileName().toStdString());
                             datamatrix[k]->setShortName(name[k]);
                             datamatrix[k]->setName(name[k]+" "+QFileInfo(fname).fileName().toStdString());
@@ -689,12 +689,12 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                         for (int i=0;i<image.height();i++) {
                             for (int j=0;j<image.width();j++) {
                                 QRgb px = image.pixel(j,i);
-                                datamatrix[0]->Timg_matrix[i][j]= (double) (qRed(px));
-                                datamatrix[1]->Timg_matrix[i][j]= (double) (qGreen(px));
-                                datamatrix[2]->Timg_matrix[i][j]= (double) (qBlue(px));
+                                datamatrix[0]->Timg_matrix[i][j]= static_cast<double>(qRed(px));
+                                datamatrix[1]->Timg_matrix[i][j]= static_cast<double>(qGreen(px));
+                                datamatrix[2]->Timg_matrix[i][j]= static_cast<double>(qBlue(px));
                             }
                         }
-                        for (int k=0;k<3;k++) {
+                        for (unsigned int k=0;k<3;k++) {
                             datamatrix[k]->TscanBrightness();
                             imagelist.push_back(datamatrix[k]);
                         }
@@ -756,7 +756,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 }
 
 void neutrino::setPanData(std::string panstring){
-    DEBUG(">\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n" << panstring)
+    DEBUG(">\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n>\n" << panstring);
     std::istringstream ifile(panstring);
     std::string line;
     while(ifile.peek()!=-1) {
@@ -826,11 +826,12 @@ std::string neutrino::getPanData(){
             qWarning() << tr("Cannot write values for ")+panList.at(i)->panName();
         }
     }
-    DEBUG("><><><><" << ofile.str())
+    DEBUG("><><><><" << ofile.str());
     return ofile.str();
 }
 
 void neutrino::saveSession (QString fname) {
+    qDebug() << property("NeuSave-fileSave");
     if (fname.isEmpty()) {
         QString extensions=tr("Neutrino session")+QString(" (*.neus);;");
 #ifdef HAVE_LIBTIFF
@@ -840,8 +841,6 @@ void neutrino::saveSession (QString fname) {
             extensions=tr("Tiff session")+" (*.tiff *.tif);;"+extensions;
         }
 #endif
-        qDebug() << extensions;
-        qDebug() << extensions;
         QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileSave").toString(),extensions+tr("Any files")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
@@ -1011,10 +1010,10 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
 }
 
 void neutrino::removePhys(nPhysD* datamatrix) {
-    DEBUG(">>>>>>>>>>>>>>>>> ENTER ")
+    DEBUG(">>>>>>>>>>>>>>>>> ENTER ");
     if (nPhysExists(datamatrix)) {
         std::string physremovename = datamatrix->getShortName();
-        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << physList.size())
+        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << physList.size());
         int position=indexOf(datamatrix);
         if (position != -1) {
             physList.removeAll(datamatrix);
@@ -1027,11 +1026,11 @@ void neutrino::removePhys(nPhysD* datamatrix) {
         }
 //        nApp::processEvents();
         if (datamatrix && !datamatrix->prop.have("keep_phys_alive")){
-            DEBUG("removing from neutrino.cc")
+            DEBUG("removing from neutrino.cc");
             delete datamatrix;
 //            datamatrix=nullptr;
         } else {
-            DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python")
+            DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
         }
         if (physList.size()>0) {
             int pos = position%physList.size();
@@ -1051,7 +1050,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
         DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
     }
     emit physDel(datamatrix);
-    DEBUG(">>>>>>>>>>>>>>>>> EXIT ")
+    DEBUG(">>>>>>>>>>>>>>>>> EXIT ");
 }
 
 void
@@ -1158,11 +1157,11 @@ void neutrino::on_actionKeyboard_shortcut_triggered() {
     }
 }
 
-void neutrino::keyPressEvent (QKeyEvent *e)
+void neutrino::keyPressEvent (QKeyEvent *)
 {
 }
 
-void neutrino::keyReleaseEvent (QKeyEvent *e)
+void neutrino::keyReleaseEvent (QKeyEvent *)
 {
 }
 
@@ -1184,7 +1183,8 @@ void neutrino::dropEvent(QDropEvent *e) {
         QList<QByteArray> my_data=e->mimeData()->data("data/neutrino").split(' ');
         foreach(QByteArray bytephys, my_data) {
             bool ok=false;
-            nPhysD *my_phys=(nPhysD *) bytephys.toLongLong(&ok);
+            DEBUG("here\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\nhere\ndrop\n");
+            nPhysD *my_phys=reinterpret_cast<nPhysD *> (bytephys.toLongLong(&ok));
             if (ok && my_phys) {
                 if (nPhysExists(my_phys)) {
                     showPhys(my_phys);
@@ -1219,9 +1219,8 @@ neutrino::getZoom() const {
 
 void
 neutrino::mouseposition(QPointF pos_mouse) {
-    my_sbarra->pos_x->setNum((int)pos_mouse.x());
-    my_sbarra->pos_y->setNum((int)pos_mouse.y());
-
+    my_sbarra->pos_x->setNum(static_cast<int>(pos_mouse.x()));
+    my_sbarra->pos_y->setNum(static_cast<int>(pos_mouse.y()));
 
     if (nPhysExists(currentBuffer)) {
         vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
@@ -1357,7 +1356,6 @@ neutrino::fileClose() {
                     break;
                 case QMessageBox::Cancel:
                     return false;
-                    break;
             }
         }
     }
@@ -1476,7 +1474,7 @@ void neutrino::print()
         QPainter painter(&printer);
         foreach (QGraphicsItem *oggetto, getScene().items() ) {
             if (qgraphicsitem_cast<nLine *>(oggetto)) {
-                nLine *my_nline = (nLine *)oggetto;
+                nLine *my_nline = static_cast<nLine*>(oggetto);
                 my_nline->selectThis(false);
             }
         }

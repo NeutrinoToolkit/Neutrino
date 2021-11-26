@@ -59,7 +59,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     my_scene.views().at(0)->viewport()->setCursor(QCursor(Qt::CrossCursor));
     setCursor(QCursor(Qt::CrossCursor));
 
-    if (!nparent) ERROREXIT("nView problem");
+    if (!nparent) ERROREXIT("nView problem")
 
 //    DEBUG(qobject_cast<neutrino *>(parent->parent()));
 
@@ -151,7 +151,7 @@ void nView::exportPixmap() {
 }
 
 void nView::showPhys(nPhysD *my_phys) {
-    DEBUG("ENTER")
+    DEBUG("ENTER");
     if (my_phys && nparent->physList.contains(my_phys)) {
         DEBUG(lockColors << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"  << my_phys->copies());
 
@@ -182,7 +182,7 @@ void nView::showPhys(nPhysD *my_phys) {
             QApplication::processEvents();
         }
     }
-    DEBUG("EXIT")
+    DEBUG("EXIT");
 }
 
 void
@@ -288,7 +288,8 @@ void nView::focusInEvent (QFocusEvent *) {
 
 void nView::zoomEq() {
     fillimage=!fillimage;
-    if (!fillimage) resetMatrix();
+//    if (!fillimage) resetMatrix();
+    if (!fillimage) resetTransform();
     setSize();
 }
 
@@ -545,8 +546,8 @@ void nView::keyReleaseEvent (QKeyEvent *e) {
 void nView::wheelEvent(QWheelEvent *event) {
     switch (event->modifiers()) {
         case Qt::ControlModifier:
-            if (event->orientation()==Qt::Vertical) {
-                if (event->delta()>0) {
+            if (event->angleDelta().y() != 0) {
+                if (event->angleDelta().y()>0) {
                     incrzoom(1.05);
                 } else {
                     incrzoom(1.0/1.05);

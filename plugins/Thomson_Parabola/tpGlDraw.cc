@@ -59,16 +59,16 @@ void tpGlDraw::draw()
 	//
 	// from: https://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
 
-	static GLfloat P1[3] = { 1.0, -1.0, 2. };
-	static GLfloat P2[3] = { 0, -1.0, 2. };
+//	static GLfloat P1[3] = { 1.0, -1.0, 2. };
+//	static GLfloat P2[3] = { 0, -1.0, 2. };
 
-    	static GLfloat P3[3] = { 0, -1.0, 3. };
-    	static GLfloat P4[3] = { 1.0, -1., 3. };
+//    	static GLfloat P3[3] = { 0, -1.0, 3. };
+//    	static GLfloat P4[3] = { 1.0, -1., 3. };
 
-	GLfloat M[16] = {    magnification,0,0,0,
-				    0,magnification,0,0,
-				    0,0,magnification,0,
-				    0,0,0,magnification};
+//	GLfloat M[16] = {    magnification,0,0,0,
+//				    0,magnification,0,0,
+//				    0,0,magnification,0,
+//				    0,0,0,magnification};
 //
 //    static const GLfloat * const coords[4][3] = {
 //        { P1, P2, P3 }, { P1, P3, P4 }, { P1, P4, P2 }, { P2, P4, P3 }
