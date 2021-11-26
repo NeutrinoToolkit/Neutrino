@@ -29,9 +29,9 @@
 
 Camera::Camera(neutrino *nparent)
 : nGenericPan(nparent),
-  camera(NULL),
-  imageCapture(NULL),
-  imgGray(NULL),
+  camera(nullptr),
+  imageCapture(nullptr),
+  imgGray(nullptr),
   imgColor(3,nullptr),
   timeLapse(this)
 {
@@ -127,7 +127,7 @@ void Camera::giveNeutrino(const QImage& image) {
             }
             datamatrix->TscanBrightness();
             if (!my_w.keep_copy->isChecked()) {
-                imgGray=NULL;
+                imgGray=nullptr;
             }
             imgGray=nparent->replacePhys(datamatrix,imgGray);
         } else {

@@ -1122,7 +1122,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
 QList<QList<qreal> >  nGenericPan::getData(QString name, int occurrence) {
     QList<QList<qreal> > myListList;
     int my_occurrence=1;
-    nPhysD *my_phys=NULL;
+    nPhysD *my_phys=nullptr;
     foreach (QComboBox *obj, findChildren<QComboBox *>()) {
         if (obj->property("neutrinoImage").isValid()&&obj->objectName()==name) {
             my_phys=getPhysFromCombo(obj);

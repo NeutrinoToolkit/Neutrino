@@ -34,8 +34,8 @@
 #include "bidimvec.h"
 #include "tools.h"
 
-#ifndef __anymap
-#define __anymap
+#ifndef anymap_h_
+#define anymap_h_
 
 #define __pp_init_str "@@ phys_properties"
 #define __pp_end_str "@@ end"

@@ -78,7 +78,7 @@ physFormat::physDouble_txt::physDouble_txt(const char *ifilename)
         col=0;
         std::stringstream sline(tline);
         while( sline >> word && col<ncols) {
-            set(row*w+col, strtod(word.c_str(),NULL));
+            set(row*w+col, strtod(word.c_str(),nullptr));
             col++;
         }
         row++;
@@ -565,7 +565,7 @@ void physFormat::phys_dump_binary(physD *my_phys, const char *fname) {
 
 void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
 
-    if (!ofile.fail() && my_phys != NULL) {
+    if (!ofile.fail() && my_phys != nullptr) {
 
         //int pos = ofile.tellg();
         //int written_data = 0;
@@ -631,7 +631,7 @@ void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
 void physFormat::phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 {	
 
-    if (ofile.good() && my_phys != NULL) {
+    if (ofile.good() && my_phys != nullptr) {
 
         std::stringstream ss;
         my_phys->prop.dumper(ss);
@@ -669,7 +669,7 @@ static const TIFFFieldInfo xtiffFieldInfo[] = {
     { TIFFTAG_NEUTRINO,  TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,  FIELD_CUSTOM, 0, 0, const_cast<char*>("Neutrino") }
 };
 
-static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+static TIFFExtendProc parent_extender = nullptr;  // In case we want a chain of extensions
 
 static void registerCustomTIFFTags(TIFF *tif)
 {
@@ -1325,7 +1325,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
         vec2f scale=phys.get_scale();
         
         int nkeys;
-        fits_get_hdrspace(fptr, &nkeys, NULL, &status);
+        fits_get_hdrspace(fptr, &nkeys, nullptr, &status);
         DEBUG(5,"nkeys " << nkeys);
 
         for (ii = 1; ii <= nkeys; ii++)  {
@@ -1342,7 +1342,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
                     fits_get_keytype(card, &dtype, &status);
                     if (dtype=='F') {
                         double val;
-                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, NULL, &status );
+                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, nullptr, &status );
                         orig.set_first(val);
                     }
                 }
@@ -1352,7 +1352,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
                     fits_get_keytype(card, &dtype, &status);
                     if (dtype=='F') {
                         double val;
-                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, NULL, &status );
+                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, nullptr, &status );
                         orig.set_second(val);
                     }
                 }
@@ -1362,7 +1362,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
                     fits_get_keytype(card, &dtype, &status);
                     if (dtype=='F') {
                         double val;
-                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, NULL, &status );
+                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, nullptr, &status );
                         scale.set_first(val);
                     }
                 }
@@ -1372,7 +1372,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
                     fits_get_keytype(card, &dtype, &status);
                     if (dtype=='F') {
                         double val;
-                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, NULL, &status );
+                        fits_read_key_dbl(fptr, ctrl.c_str(), &val, nullptr, &status );
                         scale.set_second(val);
                     }
                 }
@@ -1401,7 +1401,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
         if (anaxis==2) {
             phys.resize(axissize[0],axissize[1]);
             
-            fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)phys.Timg_buffer, NULL, &status);
+            fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, nullptr, (void *)phys.Timg_buffer, nullptr, &status);
             if (physFormat::fits_check_error(status)) return retVec;
 
             phys.TscanBrightness();
@@ -1411,7 +1411,7 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
             retVec.push_back(phys);
         }
 
-        fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
+        fits_movrel_hdu(fptr, 1, nullptr, &status);  /* try to move to next HDU */
 
         if (status == END_OF_FILE) {
             status=0;
@@ -1526,7 +1526,7 @@ void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool end
         my_phys->prop["raw-endian"]= endian? 1:0;
         my_phys->prop["raw-kind"]= endian? 1:0;
 
-        if (my_phys!=NULL && my_phys->getSurf()>0) {
+        if (my_phys!=nullptr && my_phys->getSurf()>0) {
 
             ifile.seekg(skipbyte);
             if (ifile.fail() || ifile.eof()) throw phys_fileerror("Not enough space on file");
@@ -1669,7 +1669,7 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
             }
 
             if (data.size()>0) {
-                status=SDreaddata(sds_id,start,NULL,edges,(VOIDP)&data[0]);
+                status=SDreaddata(sds_id,start,nullptr,edges,(VOIDP)&data[0]);
                 if (status!=FAIL && rank>1) {
                     int numMat=(rank==2?1:dim_sizes[0]);
                     if (dim_sizes[rank-1]*dim_sizes[rank-2]>0) {
@@ -1764,7 +1764,7 @@ void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
             comp_info c_info;
             c_info.deflate.level=6;
             istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
-            istat+=SDwritedata(sds_id, start, NULL, dimsizes, (VOIDP)phys->Timg_buffer);
+            istat+=SDwritedata(sds_id, start, nullptr, dimsizes, (VOIDP)phys->Timg_buffer);
             double data[2];
             data[0]=phys->get_origin().x();
             data[1]=phys->get_origin().y();
@@ -1859,11 +1859,11 @@ std::string physFormat::gunzip (std::string filezipped) {
     
     FILE *filein;
     filein = fopen(filezipped.c_str(),"rb");
-    if (filein == NULL) return std::string();
+    if (filein == nullptr) return std::string();
     
     FILE *fileout;
     fileout = fopen(fileunzipped.c_str(),"wb");
-    if (fileout == NULL) return std::string();
+    if (fileout == nullptr) return std::string();
     
     if (inflate(filein, fileout) != Z_OK ) {
         unlink(fileunzipped.c_str());

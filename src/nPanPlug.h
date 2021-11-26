@@ -87,11 +87,11 @@ Q_DECLARE_INTERFACE(nPanPlug, "org.neutrino.plug")
 */Q_OBJECT  Q_INTERFACES(nPanPlug) Q_PLUGIN_METADATA(IID "org.neutrino.panPlug")  /*
 */public: /*
 */__class_name## Plug() {qRegisterMetaType<__class_name *>(name()+"*");} /*
-*/QByteArray name() {return #__class_name;} /*
-*/QString menuEntryPoint() { return QString(tr(#__menu_entry)); } /*
-*/QIcon icon() {return QIcon(__menu_icon);} /*
-*/QKeySequence shortcut() {return QKeySequence(__key_shortcut);} /*
-*/int order() {return int(__order);}/*
+*/QByteArray name() override {return #__class_name;} /*
+*/QString menuEntryPoint() override { return QString(tr(#__menu_entry)); } /*
+*/QIcon icon() override {return QIcon(__menu_icon);} /*
+*/QKeySequence shortcut() override {return QKeySequence(__key_shortcut);} /*
+*/int order() override {return int(__order);}/*
 */};
 
 #define NEUTRINO_PLUGIN4(__class_name,__menu_entry, __menu_icon, __key_shortcut) NEUTRINO_PLUGIN5(__class_name,__menu_entry, __menu_icon, __key_shortcut, 1 )

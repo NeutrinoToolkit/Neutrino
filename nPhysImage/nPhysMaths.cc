@@ -684,7 +684,7 @@ std::pair<double, bidimvec<int> > physMath::phys_cross_correlate(physD* img1, ph
 }
 void physMath::phys_get_vec_brightness(const double *ivec, size_t vlen, double &vmin, double &vmax)
 {
-    if (ivec==NULL || vlen<1) {
+    if (ivec==nullptr || vlen<1) {
         vmin = 0;
         vmax = 0;
         return;

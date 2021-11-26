@@ -46,8 +46,8 @@
 #include "clFFT.h"
 #endif
 
-#ifndef __nPhysWave_h
-#define __nPhysWave_h
+#ifndef nPhysWave_h_
+#define nPhysWave_h_
 
 namespace physWave {
 
@@ -62,7 +62,7 @@ enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_Q
 class wavelet_params {
 public:
     wavelet_params() :
-    data(NULL),	opencl_unit(0), iter(0), iter_ptr(&iter) {
+    data(nullptr),	opencl_unit(0), iter(0), iter_ptr(&iter) {
         DEBUG("wavelet_params created");
     }
     
@@ -128,7 +128,7 @@ enum inversion_algo {ABEL = 10, ABEL_HF = 20};
 enum inversion_physics { ABEL_GAS, ABEL_PLASMA, ABEL_NONE };
 struct abel_params_str {
 	abel_params_str()
-		: iimage(NULL), oimage(NULL), iter_ptr(0)
+        : iimage(nullptr), oimage(nullptr), iter_ptr(nullptr)
 	{ }
 
     physD *iimage;

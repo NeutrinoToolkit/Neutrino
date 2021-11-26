@@ -45,7 +45,7 @@ Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
         my_w.cutValue->setText(QLocale().toString(image2->get_min()));
     }
     updateMiniMaxi();
-    cutoffPhys=NULL;
+    cutoffPhys=nullptr;
 }
 
 

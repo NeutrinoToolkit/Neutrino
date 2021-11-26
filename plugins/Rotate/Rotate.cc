@@ -34,7 +34,7 @@ Rotate::Rotate(neutrino *nparent) : nGenericPan(nparent)
 	connect(my_w.valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
     connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(keepCopy()));
 	connect(my_w.image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
-	rotated=NULL;
+    rotated=nullptr;
 	doRotateLive();
 }
 

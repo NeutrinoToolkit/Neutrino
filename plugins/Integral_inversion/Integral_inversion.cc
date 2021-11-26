@@ -62,7 +62,7 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
 
 void Integral_inversion::physDel(nPhysD* buf) {
     if (buf==invertedPhys) {
-        invertedPhys=NULL;
+        invertedPhys=nullptr;
     }
 }
 

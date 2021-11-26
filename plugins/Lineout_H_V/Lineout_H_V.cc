@@ -67,7 +67,7 @@ void Lineout_H_V::setBehaviour() {
 
 void Lineout_H_V::updatePlot(QPointF p) {
 
-    if (currentBuffer != NULL) {
+    if (currentBuffer) {
         if (p.isNull())
             p=nparent->my_w->my_view->my_mouse.pos();
 

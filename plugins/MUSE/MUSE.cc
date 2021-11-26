@@ -398,7 +398,7 @@ void MUSE::loadCube() {
 			fits_get_img_dim(fptr,&anaxis,&status);
 
 			int nkeys;
-			fits_get_hdrspace(fptr, &nkeys, NULL, &status);
+            fits_get_hdrspace(fptr, &nkeys, nullptr, &status);
 
 			QStringList desc;
 			for (ii = 1; ii <= nkeys; ii++)  {
@@ -479,7 +479,7 @@ void MUSE::loadCube() {
 
 					cubevect.resize(totalsize);
 					cubesize.resize(anaxis);
-					fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, NULL, (void *)&cubevect[0], NULL, &status);
+                    fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, nullptr, (void *)&cubevect[0], nullptr, &status);
 					DEBUG("got a cube : " << totalsize << " = " << axissize[0] << " x " << axissize[1] << " x " << axissize[2]);
 					for(int i=0; i<anaxis; i++) {
 						cubesize[i]=axissize[i];
@@ -552,7 +552,7 @@ void MUSE::loadCube() {
 				}
 			}
 
-			fits_movrel_hdu(fptr, 1, NULL, &status);  /* try to move to next HDU */
+            fits_movrel_hdu(fptr, 1, nullptr, &status);  /* try to move to next HDU */
 
 			if (status == END_OF_FILE) {
 				status=0;

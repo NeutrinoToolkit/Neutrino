@@ -26,13 +26,14 @@
 // physImageF and std::complex
 
 #include <cmath>
+#include <iostream>
 
 #include <fftw3.h>
 
 #pragma once
 
-#ifndef __mcomplex_h
-#define __mcomplex_h
+#ifndef mcomplex_h_
+#define mcomplex_h_
 
 class mcomplex {
 

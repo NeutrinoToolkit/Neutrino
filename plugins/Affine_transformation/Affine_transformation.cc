@@ -62,7 +62,7 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
 	
     connect(my_w.actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
 
-    affined=NULL;
+    affined=nullptr;
     show();
 	apply();
 
@@ -100,8 +100,8 @@ void Affine_transformation::bufferChanged(nPhysD* buf) {
 }
 
 void Affine_transformation::affine() {
-	nPhysD *my_phys=NULL;
-	nPhysD *my_phys_other=NULL;
+    nPhysD *my_phys=nullptr;
+    nPhysD *my_phys_other=nullptr;
 
     std::array<double,6> vecForward,vecBackward;
 	if (sender()==my_w.first) {
@@ -171,7 +171,7 @@ void Affine_transformation::affine() {
 //        affinePhys->set_origin(affine(my_phys_other->get_origin(),vecForward)-vec2f(minx,miny));
 
         QProgressDialog progress("", "Cancel", 0, dx, this);
-        progress.setCancelButton(0);
+        progress.setCancelButton(nullptr);
         progress.setWindowModality(Qt::WindowModal);
         progress.setValue(0);
         progress.show();

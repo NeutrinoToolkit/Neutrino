@@ -35,8 +35,8 @@
 #include "nRect.h"
 
 
-#ifndef __Affine_rectangle
-#define __Affine_rectangle
+#ifndef Affine_rectangle_
+#define Affine_rectangle_
 
 class neutrino;
 
@@ -57,7 +57,7 @@ public:
 public slots:
     std::array<double,6> getAffine(QPolygonF, QPolygonF);
     void affine();
-    void bufferChanged(nPhysD*);
+    void bufferChanged (nPhysD*) override;
     void resetPoints();
 };
 

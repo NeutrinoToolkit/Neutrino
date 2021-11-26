@@ -51,7 +51,7 @@ public slots:
     void showFile();
     void showFile(QString);
     void scanGroup(hid_t, QTreeWidgetItem *);
-    void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = NULL);
+    void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = nullptr);
     void scanDataset(hid_t, QTreeWidgetItem *);
 
     int phys_write_Hdf5(nPhysD *phys, std::string fname);

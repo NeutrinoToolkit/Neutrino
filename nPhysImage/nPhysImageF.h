@@ -40,6 +40,10 @@
 
  */
 
+#pragma once
+#ifndef nPhysImageF_h_
+#define nPhysImageF_h_
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -85,11 +89,6 @@
 #define _phys_emass (9.1e-31)
 #define _phys_vacuum_eps (8.8e-12)
 #define _phys_avogadro (6.022e23)
-
-
-#pragma once
-#ifndef __nPhysImageF_h
-#define __nPhysImageF_h
 
 enum phys_way { PHYS_POS, PHYS_NEG };
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
@@ -251,7 +250,7 @@ public:
 
 	// image derivation
 	//nPhysImageF<T> *get_Tlast()
-	//{ if (derived_pIF != NULL) return derived_pIF->get_Tlast(); else return this; }
+    //{ if (derived_pIF != nullptr) return derived_pIF->get_Tlast(); else return this; }
 
 	//! Exceptions (should use dException)
 	std::exception E_alloc, E_access, E_unsafe;
@@ -439,10 +438,10 @@ public:
 		} else {		
 			double sina=sin(alpha);
 			double cosa=cos(alpha);
-			double dx1=((double)(getH()-1))*sina;
-			double dx2=((double)(getW()-1))*cosa;
-			double dy1=-((double)(getW()-1))*sina;
-			double dy2=((double)(getH()-1))*cosa;
+            double dx1= (getH()-1.0)*sina;
+            double dx2= (getW()-1.0)*cosa;
+            double dy1=-(getW()-1.0)*sina;
+            double dy2= (getH()-1.0)*cosa;
 
             rotated.resize(fabs(dx1)+fabs(dx2)+1,fabs(dy1)+fabs(dy2)+1);
             rotated.set(def_value);
@@ -509,7 +508,7 @@ public:
     // {neg,-1/(neg-2)} {-3,1/5} {-2,1/4} {-1,1/3} {0,1/2} {1,1} {2,2} {3,3} ...
     double gamma() {
         if (!prop.have("gamma")) {
-            prop["gamma"]=(int)1;
+            prop["gamma"]=1;
         }
         int gamma_int= prop["gamma"].get_i();
         return gamma_int < 1 ? -1.0/(gamma_int-2) : gamma_int;
@@ -519,7 +518,7 @@ public:
 
 	// get point (to be used for accessing data - no overload)
 	inline T getPoint(double x, double y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
-		if (Timg_matrix != NULL) {
+        if (Timg_matrix != nullptr) {
 			if (x>=0 && y>=0) {
                 unsigned int x1=(unsigned int)x;
                 unsigned int y1=(unsigned int)y;
@@ -543,14 +542,14 @@ public:
 	
 	// get point (to be used for accessing data - no overload)
     inline T point(unsigned int x, unsigned int y, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
-		if ((Timg_matrix != NULL) && (x<getW()) && (y<getH()))
+        if ((Timg_matrix != nullptr) && (x<getW()) && (y<getH()))
 			return Timg_matrix[y][x];
 		else
 			return nan_value;
 	}
 
     inline T point(bidimvec<int> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) const {
-		if ((Timg_matrix != NULL) && (p.x()<(int)getW()) && (p.y()<(int)getH()) && (p.x()>=0) && (p.y()>=0))
+        if ((Timg_matrix != nullptr) && (p.x()<(int)getW()) && (p.y()<(int)getH()) && (p.x()>=0) && (p.y()>=0))
 			return Timg_matrix[p.y()][p.x()];
 		else
 			return nan_value;
@@ -559,7 +558,7 @@ public:
 
 	// must check speed
     inline T clean_point(unsigned int x, unsigned int y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
-		if ((Timg_matrix != NULL) && (x<getW()) && (y<getH())) {
+        if ((Timg_matrix != nullptr) && (x<getW()) && (y<getH())) {
 			if (std::isfinite(Timg_matrix[y][x]))
 				return Timg_matrix[y][x];
 			return nan_value;
@@ -568,7 +567,7 @@ public:
 	}
 
     inline T point(unsigned int xy) const {
-		if ((Timg_matrix != NULL) && (xy<getSurf()) )
+        if ((Timg_matrix != nullptr) && (xy<getSurf()) )
 			return Timg_buffer[xy];
 		else
 			return 0;
@@ -863,31 +862,31 @@ nPhysImageF<T>::~nPhysImageF()
 
     int trashDelete=_trash_delete();
 	if ( trashDelete == 0 ) {
-        DEBUG(1,"["<<(void *)this<<"] "<<  getShortName() << " : " << getName() << " ALLOWING DELETE! " );
-		if (Timg_buffer != NULL)
+        DEBUG(1,"["<<static_cast<void*>(this)<<"] "<<  getShortName() << " : " << getName() << " ALLOWING DELETE! " );
+        if (Timg_buffer != nullptr)
 			delete Timg_buffer;
 		
-		if (Timg_matrix != NULL) delete Timg_matrix;
+        if (Timg_matrix != nullptr) delete Timg_matrix;
 	
-		if (vector_buf != NULL) {
-			if (vector_buf[0] != NULL)
+        if (vector_buf != nullptr) {
+            if (vector_buf[0] != nullptr)
 				delete vector_buf[0];
-			if (vector_buf[1] != NULL)
+            if (vector_buf[1] != nullptr)
 				delete vector_buf[1];
 			delete vector_buf;
 		}
 	
-		if (axis_buf != NULL) {
-			if (axis_buf[0] != NULL)
+        if (axis_buf != nullptr) {
+            if (axis_buf[0] != nullptr)
 				delete axis_buf[0];
-			if (axis_buf[1] != NULL)
+            if (axis_buf[1] != nullptr)
 				delete axis_buf[1];
 			delete axis_buf;
 		}
         delete _n_inst;
 
 	} else {
-        DEBUG(1,"["<<(void *)this<<"]  NOT ALLOWING DELETE! " << trashDelete );
+        DEBUG(1,"["<<static_cast<void*>(this)<<"]  NOT ALLOWING DELETE! " << trashDelete );
 	}
 
 }
@@ -901,7 +900,7 @@ nPhysImageF<T>::init_Tvariables()
 	height = 0;
 
 	// donne! e' arrivato il monnezzaro
-	vector_buf = axis_buf = NULL;
+    vector_buf = axis_buf = nullptr;
 	_trash_init();
 	_init_temp_pointers();
 
@@ -919,8 +918,8 @@ nPhysImageF<T>::init_Tvariables()
 template<class T> void
 nPhysImageF<T>::_init_temp_pointers()
 {
-	Timg_buffer = NULL;
-	Timg_matrix = NULL;
+    Timg_buffer = nullptr;
+    Timg_matrix = nullptr;
 
 	if (vector_buf)
 		delete vector_buf;
@@ -946,31 +945,31 @@ nPhysImageF<T>::matrix_points_aligned()
 		throw; // (up)
 
 	// clean up before new allocation	
-	if (Timg_buffer != NULL) {
+    if (Timg_buffer != nullptr) {
 		delete Timg_buffer;
-		Timg_buffer = NULL;
+        Timg_buffer = nullptr;
 	}
 
-	if (vector_buf != NULL) {
-		if (vector_buf[0] != NULL)
+    if (vector_buf != nullptr) {
+        if (vector_buf[0] != nullptr)
 			delete vector_buf[0];
-		if (vector_buf[1] != NULL)
+        if (vector_buf[1] != nullptr)
 			delete vector_buf[1];
-		vector_buf[0] = NULL;
-		vector_buf[1] = NULL;
+        vector_buf[0] = nullptr;
+        vector_buf[1] = nullptr;
 	}
 
-	if (axis_buf != NULL) {
-		if (axis_buf[0] != NULL)
+    if (axis_buf != nullptr) {
+        if (axis_buf[0] != nullptr)
 			delete axis_buf[0];
-		if (axis_buf[1] != NULL)
+        if (axis_buf[1] != nullptr)
 			delete axis_buf[1];
-		axis_buf[0] = NULL;
-		axis_buf[1] = NULL;
+        axis_buf[0] = nullptr;
+        axis_buf[1] = nullptr;
 	}
 
 
-    if (Timg_buffer == NULL && getSurf()>0) {
+    if (Timg_buffer == nullptr && getSurf()>0) {
         assert( Timg_buffer = new T[getSurf()] );
 		DEBUG(11,"[\t\t|--> ] template 32bit contiguous allocated");
 
@@ -1321,9 +1320,9 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
     new_img.setName("("+prop.at("phys_name").get_str()+")+("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
     for (unsigned int i=0; i<height*width; i++)
-		new_img.Timg_buffer[i] = (T)(Timg_buffer[i]) + (T)(other.Timg_buffer[i]);
+        new_img.Timg_buffer[i] = static_cast<T>(Timg_buffer[i]) + static_cast<T>(other.Timg_buffer[i]);
 		
-	return(new_img);
+    return new_img;
 }
 
 template<class T> nPhysImageF<T>

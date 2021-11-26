@@ -60,7 +60,7 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
 	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	
-	origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=NULL;
+    origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=nullptr;
 }
 
 void Wavelet::on_relative_toggled(bool tog) {
@@ -98,7 +98,7 @@ void Wavelet::physDel(nPhysD* buf) {
     localPhys.push_back(syntheticPhys);
     for (std::vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
         if (buf==*itr) {
-            *itr=NULL;
+            *itr=nullptr;
         }
     }
 }

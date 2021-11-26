@@ -31,8 +31,8 @@
 #include "nGenericPan.h"
 #include "ui_Integral_inversion.h"
 
-#ifndef __nII
-#define __nII
+#ifndef INTEGRAL_INVERSION_H_
+#define INTEGRAL_INVERSION_H_
 #include "nPhysWave.h"
 
 class neutrino;

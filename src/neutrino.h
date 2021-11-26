@@ -189,7 +189,7 @@ public slots:
 
     double getZoom() const;
 
-    void emitBufferChanged(nPhysD* = NULL);
+    void emitBufferChanged(nPhysD* = nullptr);
 
     nGenericPan* openRAW();
 

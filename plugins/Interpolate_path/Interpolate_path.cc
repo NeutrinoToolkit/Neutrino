@@ -43,14 +43,14 @@ Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
 
 	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
 	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
-	interpolatePhys=NULL;
+    interpolatePhys=nullptr;
 }
 
 void Interpolate_path::duplicate () {
-    if (interpolatePhys==NULL) {
+    if (interpolatePhys==nullptr) {
         doIt();
     }
-	interpolatePhys=NULL;
+    interpolatePhys=nullptr;
 }
 
 void Interpolate_path::doIt() {

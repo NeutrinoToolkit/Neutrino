@@ -39,8 +39,8 @@
 #define _phys_deg (0.017453f)
 
 
-#ifndef __physMaths_h
-#define __physMaths_h
+#ifndef nPhysMaths_h_
+#define nPhysMaths_h_
 
 
 namespace physMath {

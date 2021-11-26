@@ -424,10 +424,7 @@ void nCustomPlot::save_data(){
 }
 
 void nCustomPlot::copy_image(){
-    qDebug() << "here";
-    QClipboard * clipboard = QApplication::clipboard();
-    QPixmap pixmap= this->toPixmap();
-    clipboard->setPixmap(pixmap);
+    QApplication::clipboard()->setPixmap(this->toPixmap());
 }
 
 void nCustomPlot::copy_data(){

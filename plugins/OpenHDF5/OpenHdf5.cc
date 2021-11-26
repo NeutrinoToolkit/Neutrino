@@ -119,7 +119,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         scanAttribute(aid, item2);
         H5Aclose(aid);
     }
-    ssize_t sizeName=1+H5Iget_name(did, NULL,0);
+    ssize_t sizeName=1+H5Iget_name(did, nullptr,0);
     std::vector<char> ds_name(sizeName);
     H5Iget_name(did, &ds_name[0],sizeName);
     hid_t sid = H5Dget_space(did);
@@ -135,12 +135,12 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
     if (t_class == H5T_FLOAT) {
         item2->setData(1,0,"DS Float");
         dims.resize(ndims);
-        H5Sget_simple_extent_dims(sid,&dims[0],NULL);
+        H5Sget_simple_extent_dims(sid,&dims[0],nullptr);
         DEBUG("here");
     } if (t_class == H5T_INTEGER) {
         QString title="DS Integer "+QLocale().toString(ndims)+"D ";
         dims.resize(ndims);
-        H5Sget_simple_extent_dims(sid,&dims[0],NULL);
+        H5Sget_simple_extent_dims(sid,&dims[0],nullptr);
         for (int d=ndims-1;d>=0;d--) title += QLocale().toString(dims[d])+"x";
         title.chop(1);
         item2->setData(1,0,title);
@@ -148,7 +148,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         //! TODO: check this
         QString title="DS Array "+QLocale().toString(ndims)+"D ";
         dims.resize(ndims);
-        H5Sget_simple_extent_dims(sid,&dims[0],NULL);
+        H5Sget_simple_extent_dims(sid,&dims[0],nullptr);
         for (int d=ndims-1;d>=0;d--) title += QLocale().toString(dims[d])+"x";
         title.chop(1);
         item2->setData(1,0,title);
@@ -163,7 +163,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 
         ndims=H5Sget_simple_extent_ndims(sid);
         dims.resize(ndims);
-        H5Sget_simple_extent_dims(sid,&dims[0],NULL);
+        H5Sget_simple_extent_dims(sid,&dims[0],nullptr);
         for (auto &val : dims) {
             size*=val;
         }
@@ -274,7 +274,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
 }
 
 void OpenHdf5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_data) {
-    ssize_t len = 1+H5Aget_name(aid, 0, NULL );
+    ssize_t len = 1+H5Aget_name(aid, 0, nullptr );
     std::vector<char> attrName(len);
     H5Aget_name(aid, len, &attrName[0] );
 
@@ -348,7 +348,7 @@ void OpenHdf5::scanAttribute(hid_t aid, QTreeWidgetItem *parentItem, nPhysD *my_
 }
 
 void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
-    ssize_t sizeName=1+H5Iget_name(gid, NULL,0);
+    ssize_t sizeName=1+H5Iget_name(gid, nullptr,0);
     std::vector<char> group_name(sizeName);
     H5Iget_name(gid, &group_name[0],sizeName);
 
@@ -361,7 +361,7 @@ void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
     H5G_info_t infoGroup;
     H5Gget_info(gid,&infoGroup);
     for (hsize_t i = 0; i < infoGroup.nlinks; i++) {
-        int size = 1+H5Lget_name_by_idx (gid, ".", H5_INDEX_NAME, H5_ITER_INC,i, NULL, 0, H5P_DEFAULT);
+        int size = 1+H5Lget_name_by_idx (gid, ".", H5_INDEX_NAME, H5_ITER_INC,i, nullptr, 0, H5P_DEFAULT);
         std::vector<char> memb_name(size);
         H5Lget_name_by_idx (gid, ".", H5_INDEX_NAME, H5_ITER_INC,i, &memb_name[0], size, H5P_DEFAULT);
 
@@ -406,12 +406,12 @@ void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 
 
 nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
-    nPhysD *my_data=NULL;
+    nPhysD *my_data=nullptr;
     hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     if (fid >= 0) {
         hid_t did = H5Dopen(fid,dataName.c_str(), H5P_DEFAULT);
         if (did>=0) {
-            ssize_t sizeName=1+H5Iget_name(did, NULL,0);
+            ssize_t sizeName=1+H5Iget_name(did, nullptr,0);
             std::vector<char> ds_name(sizeName);
             H5Iget_name(did, &ds_name[0],sizeName);
             hid_t sid = H5Dget_space(did);
@@ -423,14 +423,14 @@ nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
             hid_t nativeType;
             std::vector<char> buffer;
             int ndims=0;
-            hsize_t *dims=NULL;
+            hsize_t *dims=nullptr;
 
             hid_t file_space_id=H5S_ALL;
             int narray=1;
             if (t_class == H5T_FLOAT) {
                 ndims=H5Sget_simple_extent_ndims(sid);
                 dims=new hsize_t[ndims];
-                H5Sget_simple_extent_dims(sid,dims,NULL);
+                H5Sget_simple_extent_dims(sid,dims,nullptr);
                 int npoints=H5Sget_simple_extent_npoints(sid);
                 buffer.resize(tsiz*npoints);
                 nativeType=H5Tget_native_type(tid,H5T_DIR_DEFAULT);
@@ -439,7 +439,7 @@ nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
             } else if(t_class == H5T_ARRAY) {
                 ndims=H5Sget_simple_extent_ndims(sid);
                 std::vector<hsize_t> dims(ndims);
-                H5Sget_simple_extent_dims(sid,&dims[0],NULL);
+                H5Sget_simple_extent_dims(sid,&dims[0],nullptr);
                 for (auto &val :dims) {
                     narray*=val;
                 }
@@ -553,7 +553,7 @@ int OpenHdf5::phys_write_Hdf5(nPhysD *phys, std::string fname) {
                 hid_t file_id = H5Fcreate (fname.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
                 hsize_t dims[2]={phys->getH(),phys->getW()};
-                hid_t space = H5Screate_simple (2, dims, NULL);
+                hid_t space = H5Screate_simple (2, dims, nullptr);
 
                 hid_t dcpl = H5Pcreate (H5P_DATASET_CREATE);
                 H5Pset_deflate (dcpl, 9);
@@ -587,7 +587,7 @@ int OpenHdf5::phys_write_Hdf5(nPhysD *phys, std::string fname) {
 }
 
 void OpenHdf5::scan_attributes(hid_t aid, nPhysD *my_data){
-    ssize_t len = 1+H5Aget_name(aid, 0, NULL );
+    ssize_t len = 1+H5Aget_name(aid, 0, nullptr );
     std::vector<char> attrName(len);
     H5Aget_name(aid, len, &attrName[0] );
     std::string attrNameStr(attrName.begin(),attrName.end());

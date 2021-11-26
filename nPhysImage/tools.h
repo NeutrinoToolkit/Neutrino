@@ -48,15 +48,15 @@
 #define __AVAILABILITY_INTERNAL__MAC_10_13 __AVAILABILITY_INTERNAL_WEAK_IMPORT
 #endif
 
-#ifndef Tools_h
-#define Tools_h
+#ifndef Tools_h_
+#define Tools_h_
 
 #include <csignal>
 #include <iostream>
 
 #define PRINTVAR(x) #x"=" << x
 #define PHYS__MSG  __FILE__ << ":" << __LINE__ << " (" << __FUNCTION__ << ") "
-#define PHYS__HEADER(PHYS__MSG,__txt) std::cerr << "[" << PHYS__MSG << "] " << PHYS__MSG << __txt << std::endl
+#define PHYS__HEADER(PHYS__MSG,PHYS__txt) std::cerr << "[" << PHYS__MSG << "] " << PHYS__MSG << PHYS__txt << std::endl
 
 #define WARNING(__txt) PHYS__HEADER("WARNING", __txt)
 #define ERROREXIT(__txt) {PHYS__HEADER("ERROR", __txt); std::raise(SIGSEGV);}

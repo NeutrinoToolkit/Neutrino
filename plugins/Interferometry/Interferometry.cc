@@ -488,7 +488,7 @@ void Interferometry::doSubtract () {
 void Interferometry::doMaskCutoff() {
     my_w.statusbar->showMessage("Mask");
     nPhysD *phase=localPhys["phase_2pi"];
-    nPhysD *phaseMask=NULL;
+    nPhysD *phaseMask=nullptr;
     if (nPhysExists(phase)) {
         if (my_w.useMask->isChecked()) {
             maskRegion->show();
@@ -514,7 +514,7 @@ void Interferometry::doMaskCutoff() {
             maskRegion->hide();
         }
 
-        if (phaseMask==NULL) {
+        if (phaseMask==nullptr) {
             phaseMask=new nPhysD(*phase);
             phaseMask->setShortName("Mask");
         }
@@ -660,7 +660,7 @@ void Interferometry::addShape(QString name){
 }
 
 void Interferometry::removeShape(QObject *obj){
-    QToolButton *found=NULL;
+    QToolButton *found=nullptr;
     for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
         if ((*it).second==obj) {
             (*it).first->deleteLater();

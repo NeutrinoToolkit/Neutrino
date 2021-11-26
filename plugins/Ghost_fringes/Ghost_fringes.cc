@@ -28,7 +28,7 @@
 // physGhosts
 
 Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
-  ghostBusted(NULL)
+  ghostBusted(nullptr)
 {
 	my_w.setupUi(this);
 

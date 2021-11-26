@@ -33,8 +33,8 @@
 #include <gsl/gsl_math.h>
 #include "tools.h"
 
-#ifndef __bidimvec_h
-#define __bidimvec_h
+#ifndef bidimvec_h_
+#define bidimvec_h_
 
 #if (__GNUC_MINOR__ > 5)
 enum phys_direction : size_t { PHYS_HORIZONTAL = 0, PHYS_X = 0, PHYS_ROW = 0,  PHYS_VERTICAL = 1, PHYS_Y = 1, PHYS_COLUMN = 1 };

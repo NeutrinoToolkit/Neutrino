@@ -77,7 +77,7 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
         px[i].quality = quality.point(i);
         px[i].first = &px[i];
         px[i].last = &px[i];
-        px[i].next = NULL;
+        px[i].next = nullptr;
     }
 
     // calculate Edges
@@ -110,13 +110,13 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
         if (ed->p2->first != ed->p1->first) {
             // Pixel 2 is alone in its group merge this Pixel with Pixel 1 group
             // and find the number of 2 pi to add to or subtract to unwrap it
-            if ((ed->p2->next == NULL) && (ed->p2->first == ed->p2)) {
+            if ((ed->p2->next == nullptr) && (ed->p2->first == ed->p2)) {
                 ed->p1->first->last->next = ed->p2;
                 ed->p1->first->last = ed->p2;
                 (ed->p1->first->nPixels)++;
                 ed->p2->first=ed->p1->first;
                 ed->p2->jumps = ed->p1->jumps-ed->jumps;
-            } else if ((ed->p1->next == NULL) && (ed->p1->first == ed->p1)) {
+            } else if ((ed->p1->next == nullptr) && (ed->p1->first == ed->p1)) {
                 // Pixel 1 is alone in its group merge this Pixel with Pixel 2 group
                 // and find the number of 2 pi to add to or subtract to unwrap it
                 ed->p2->first->last->next = ed->p1;
@@ -138,7 +138,7 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
                     group1->nPixels = group1->nPixels + group2->nPixels;
                     int incr = ed->p1->jumps-ed->jumps - ed->p2->jumps;
                     //merge the other Pixels in Pixel 2 group to Pixel 1 group
-                    while (group2 != NULL) {
+                    while (group2 != nullptr) {
                         group2->first = group1;
                         group2->jumps += incr;
                         group2 = group2->next;
@@ -154,7 +154,7 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
                     group2->nPixels = group2->nPixels + group1->nPixels;
                     int incr = ed->p2->jumps + ed->jumps - ed->p1->jumps;
                     //merge the other Pixels in Pixel 2 group to Pixel 1 group
-                    while (group1 != NULL) {
+                    while (group1 != nullptr) {
                         group1->first = group2;
                         group1->jumps += incr;
                         group1 = group1->next;

@@ -8,7 +8,7 @@
 #include <numpy/arrayobject.h>
 #endif
 #if PY_VERSION_HEX >= 0x03000000
-#define NUMPY_IMPORT_ARRAY_RETVAL NULL
+#define NUMPY_IMPORT_ARRAY_RETVAL nullptr
 #else
 #define NUMPY_IMPORT_ARRAY_RETVAL
 #endif
@@ -33,7 +33,7 @@ QList<nPhysD> nPhysPyWrapper::static_nPhysD_open(QString fname){
         formats+=");;";
         formats+=("Any files (*)");
 
-        fname = QFileDialog::getOpenFileName(NULL,tr("Open Image(s)"),property("fileOpen").toString(),formats);
+        fname = QFileDialog::getOpenFileName(nullptr,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }
     if (!fname.isEmpty( )) {
         std::vector<physD> my_vec=physFormat::phys_open(fname.toUtf8().constData());
@@ -98,7 +98,7 @@ void my_import_array () {
 
 
 PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
-    if(PyArray_API == NULL) {
+    if(PyArray_API == nullptr) {
         my_import_array();
     }
     std::vector<npy_intp> dims={(npy_intp)my_phys->getH(),(npy_intp)my_phys->getW()};

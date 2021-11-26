@@ -1071,7 +1071,7 @@ void Visar::getCarrier() {
 void Visar::getCarrier(int k) {
     disconnections();
 
-    QComboBox *combo=NULL;
+    QComboBox *combo=nullptr;
     if (settingsUi[k]->carrierPhys->currentIndex()==0) {
         combo=settingsUi[k]->refImage;
     } else {

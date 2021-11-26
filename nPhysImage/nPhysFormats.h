@@ -24,8 +24,8 @@
  */
 #include "nPhysImageF.h"
 
-#ifndef n_phys_formats__
-#define n_phys_formats__
+#ifndef n_phys_formats_h_
+#define n_phys_formats_h_
 
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
 extern "C" {

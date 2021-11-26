@@ -33,7 +33,7 @@ Math_operations::Math_operations(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.calculate, SIGNAL(pressed()), this, SLOT(doOperation()));
     connect(my_w.copyButton, SIGNAL(pressed()), this, SLOT(copyResult()));
     connect(my_w.operation, SIGNAL(currentIndexChanged(int)), this, SLOT(enableGroups(int)));
-    operatorResult=NULL;
+    operatorResult=nullptr;
 
     for(int i=0;i<my_w.operation->count();i++){
         my_w.operation->itemText(i);
@@ -95,10 +95,10 @@ void Math_operations::doOperation () {
             DEBUG("Operator " << k << " " << my_w.operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << my_w.operation->itemText(k).toStdString());
         }
         DEBUG("Operator " << my_w.operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << my_w.operation->currentText().toStdString());
-        nPhysD *myresult=NULL;
+        nPhysD *myresult=nullptr;
         if (my_w.operation->currentIndex() < separator[0]) { // two images neeeded
-            nPhysD *operand1=NULL;
-            nPhysD *operand2=NULL;
+            nPhysD *operand1=nullptr;
+            nPhysD *operand2=nullptr;
 
             if (my_w.radioNumber1->isChecked() && my_w.radioNumber2->isChecked()) {
                 my_w.statusbar->showMessage("One operand must be an image",5000);

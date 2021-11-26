@@ -105,7 +105,7 @@ public slots:
 	void interactive();
 
 	void setRect(QRectF);
-	QRect getRect(nPhysD* image =NULL);
+    QRect getRect(nPhysD* image =nullptr);
 	QRectF getRectF();
 	QString getRectString();
 

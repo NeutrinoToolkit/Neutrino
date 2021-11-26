@@ -28,8 +28,8 @@
 #include <sstream>
 #include <algorithm>
 
-#ifndef __nanstream
-#define __nanstream
+#ifndef nanstream_h_
+#define nanstream_h_
 
 // nan overloading for txt classes
 class NaNStream 
