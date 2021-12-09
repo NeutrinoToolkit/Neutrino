@@ -77,9 +77,9 @@ void RCFstats::updateStats() {
         int dx=geomBox.width();
         int dy=geomBox.height();
 
-    //DEBUG( "rect circ x "<<(circ->getRect(currentBuffer).x()) );
-    //DEBUG( "rect circ y "<<(circ->getRect(currentBuffer).y()) );
-    //DEBUG( "rect circ dx "<<dx<<", dy "<<dy );
+        //DEBUG( "rect circ x "<<(circ->getRect(currentBuffer).x()) );
+        //DEBUG( "rect circ y "<<(circ->getRect(currentBuffer).y()) );
+        //DEBUG( "rect circ dx "<<dx<<", dy "<<dy );
 
         vec2f orig=currentBuffer->get_origin();
         vec2f scal=currentBuffer->get_scale();
