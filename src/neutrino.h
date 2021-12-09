@@ -51,6 +51,7 @@
 #include "nLine.h"
 #include "nRect.h"
 #include "nEllipse.h"
+#include "nCircle.h"
 #include "nPoint.h"
 
 #include "ui_neutrino.h"
