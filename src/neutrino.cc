@@ -39,7 +39,7 @@
 #include <QtSvg>
 #include <QDirIterator>
 
-#include <QtUiTools>
+//#include <QtUiTools>
 
 #include <QPrintDialog>
 
@@ -1114,7 +1114,7 @@ void neutrino::exportGraphics (QString fout) {
         QPrinter myPrinter(QPrinter::ScreenResolution);
         myPrinter.setOutputFileName(fout);
         myPrinter.setOutputFormat(QPrinter::PdfFormat);
-        myPrinter.setPaperSize(my_rect.size(),QPrinter::DevicePixel);
+//        myPrinter.setPageSize(my_rect.size(),QPrinter::DevicePixel);
         //        myPrinter.setPageMargins(my_size.width()/10.0, my_size.height()/10.0, my_size.width()/10.0, my_size.height()/10.0, QPrinter::DevicePixel);
         QPainter myPainter(&myPrinter);
         myPainter.setViewport(my_rect);
@@ -1708,43 +1708,43 @@ nGenericPan* neutrino::newPan(QString my_string) {
 
     nGenericPan *my_pan=new nGenericPan(this);
 
-    if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
-        QFile file(my_string);
-        file.open(QFile::ReadOnly);
-        QUiLoader loader;
-        QWidget *uiwidget = loader.load(&file);
-        file.close();
+//    if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
+//        QFile file(my_string);
+//        file.open(QFile::ReadOnly);
+//        QUiLoader loader;
+//        QWidget *uiwidget = loader.load(&file);
+//        file.close();
 
-        qDebug() << uiwidget->objectName();
+//        qDebug() << uiwidget->objectName();
 
-        if (uiwidget) {
-            my_pan->setProperty("panName",uiwidget->objectName());
-            uiwidget->setParent(my_pan);
+//        if (uiwidget) {
+//            my_pan->setProperty("panName",uiwidget->objectName());
+//            uiwidget->setParent(my_pan);
 
-            my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
-            foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
-                if(my_widget->objectName()=="centralwidget") {
-                    my_pan->setCentralWidget(my_widget);
-                }
-            }
-            foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
-                my_pan->setStatusBar(my_widget);
-            }
-            foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
-                my_pan->addToolBar(my_widget);
-            }
+//            my_pan->setUnifiedTitleAndToolBarOnMac(uiwidget->property("unifiedTitleAndToolBarOnMac").toBool());
+//            foreach (QWidget *my_widget, uiwidget->findChildren<QWidget *>()) {
+//                if(my_widget->objectName()=="centralwidget") {
+//                    my_pan->setCentralWidget(my_widget);
+//                }
+//            }
+//            foreach (QStatusBar *my_widget, uiwidget->findChildren<QStatusBar *>()) {
+//                my_pan->setStatusBar(my_widget);
+//            }
+//            foreach (QToolBar *my_widget, uiwidget->findChildren<QToolBar *>()) {
+//                my_pan->addToolBar(my_widget);
+//            }
 
-            const QMetaObject *metaobject=uiwidget->metaObject();
-            for (int i=0; i<metaobject->propertyCount(); ++i) {
-                QMetaProperty metaproperty = metaobject->property(i);
-                const char *name = metaproperty.name();
-                QVariant value = uiwidget->property(name);
-            }
+//            const QMetaObject *metaobject=uiwidget->metaObject();
+//            for (int i=0; i<metaobject->propertyCount(); ++i) {
+//                QMetaProperty metaproperty = metaobject->property(i);
+//                const char *name = metaproperty.name();
+//                QVariant value = uiwidget->property(name);
+//            }
 
-            //            my_pan->setCentralWidget(uiwidget);
-            my_pan->show();
-        }
-    }
+//            //            my_pan->setCentralWidget(uiwidget);
+//            my_pan->show();
+//        }
+//    }
 
 
     return my_pan;

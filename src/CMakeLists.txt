@@ -15,6 +15,8 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
 file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
 
+add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(file_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/grabStream.h")
     list(FIND SOURCES "${file_to_remove}" file_to_remove_found)
@@ -40,14 +42,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
-if (APPLE AND NOT DEFINED Qt5_DIR)
-    set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
-    MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
+if (APPLE AND NOT DEFINED Qt6_DIR)
+    set(Qt6_DIR "/usr/local/opt/qt/lib/cmake/Qt6")
+    MESSAGE(STATUS "Qt6_DIR set to ${Qt6_DIR}")
 endif()
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport UiTools OpenGL Network)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools)
 
-find_package(Qt5 COMPONENTS ${MODULES} REQUIRED)
+find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
 set(QRCDIR ${CMAKE_CURRENT_BINARY_DIR}/qrc)
 
@@ -153,8 +155,10 @@ endif()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 foreach(MODULE ${MODULES})
-    set(MODULES_TWEAK "${MODULES_TWEAK};Qt5::${MODULE}")
+    set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
 endforeach()
+
+add_definitions(-DQT_NO_OPENGL -mmacosx-version-min=10.9)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
 

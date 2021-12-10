@@ -69,13 +69,13 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
-include(Package)
+#include(Package)
 
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
 
 #set(NEU_PLUGIN_LIST "")
-add_subdirectory (plugins)
+#add_subdirectory (plugins)
 #message(STATUS "${NEU_PLUGIN_LIST}")
 #target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
 

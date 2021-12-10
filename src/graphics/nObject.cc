@@ -311,7 +311,7 @@ nObject::tableUpdated (QTableWidgetItem * item) {
 
 void
 nObject::changeColor () {
-	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Background));
+	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Window));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -329,7 +329,7 @@ nObject::changeColor (QColor col) {
 void
 nObject::changeColorHolder () {
 	QColor color;
-	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
+	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Window));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -364,8 +364,8 @@ void nObject::changePointPad(int nrow) {
 	QPointF p=ref[nrow]->pos();
 	QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
-	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+	xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+	yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 	my_w.tableWidget->setItem(nrow, 0, xitem);
 	my_w.tableWidget->setItem(nrow, 1, yitem);
 	my_w.tableWidget->resizeRowToContents(nrow);
@@ -401,8 +401,8 @@ void nObject::addPoint (int pos) {
 	my_w.tableWidget->insertRow(pos);
 	QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
 	QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
-	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+	xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+	yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 	my_w.tableWidget->setItem(pos, 0, xitem);
 	my_w.tableWidget->setItem(pos, 1, yitem);
 	my_w.tableWidget->resizeRowToContents(pos);

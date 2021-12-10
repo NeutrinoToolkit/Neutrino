@@ -182,6 +182,6 @@ signals:
 bool orderMonotone_x(const QPointF &, const QPointF &);
 bool orderMonotone_y(const QPointF &, const QPointF &);
 
-Q_DECLARE_METATYPE(nLine*);
+//Q_DECLARE_METATYPE(nLine*);
 
 #endif

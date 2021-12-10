@@ -205,7 +205,7 @@ nPoint::setOrder (double w) {
 void
 nPoint::changeColorHolder () {
 	QColor color;
-    QColorDialog colordial(my_w->colorHolderLabel->palette().color(QPalette::Background));
+    QColorDialog colordial(my_w->colorHolderLabel->palette().color(QPalette::Window));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {

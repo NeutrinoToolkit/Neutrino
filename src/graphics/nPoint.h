@@ -132,6 +132,6 @@ signals:
 	void sceneChanged();
 };
 
-Q_DECLARE_METATYPE(nPoint*);
+//Q_DECLARE_METATYPE(nPoint*);
 
 #endif
