@@ -48,16 +48,14 @@ public:
 
     nRect(neutrino *neu) : nObject(neu, QString("rect")) {
         changeColorHolder(QColor(0,0,255,200));
-    };
+    }
 
-    nRect(nGenericPan *pan, int level) : nObject(pan,level, QString("rect")) {};
-
-    neutrino *nparent;
+    nRect(nGenericPan *pan, int level) : nObject(pan,level, QString("rect")) {}
 
     enum { Type = QGraphicsItem::UserType + 2 };
-    int type() const { return Type;}
+    int type() const override { return Type;}
 
-    QPainterPath path() const {
+    QPainterPath path() const override {
         QPainterPath my_path;
         if (ref.size()>1) {
             my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
@@ -67,7 +65,7 @@ public:
         return my_path;
     }
 
-    void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) {
+    void paint(QPainter* p, const QStyleOptionGraphicsItem* , QWidget* ) override {
         //	p->setCompositionMode((QPainter::CompositionMode)22);
         QPen pen;
         pen.setWidthF(nWidth/zoom);

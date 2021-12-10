@@ -37,9 +37,6 @@
 #ifndef anymap_h_
 #define anymap_h_
 
-#define __pp_init_str "@@ phys_properties"
-#define __pp_end_str "@@ end"
-
 std::string trim(const std::string&, const std::string&);
 std::ostream & operator<< (std::ostream &, struct anydata &);
 std::istream & operator>> (std::istream &, struct anydata &);

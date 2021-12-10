@@ -1877,25 +1877,25 @@ std::string physFormat::gunzip (std::string filezipped) {
 std::vector <physD> physFormat::phys_open_shimadzu(std::string fname) {
     std::vector <physD> retPhys;
 
-    int w=400;
-    int h=250;
-    int skip=9406;
+    unsigned int w=400;
+    unsigned int h=250;
+    unsigned int z=256;
 
     std::ifstream ifile(fname.c_str(), std::ios::in | std::ios::binary);
 
-//    std::vector<unsigned short> pippo(skip);
-//    ifile.read((char *)&pippo[0],pippo.size()*sizeof(unsigned short));
-//    for (int i=0;i<skip;i++){
-//        std::cerr << pippo[i] <<std::endl;
-//    }
+    std::streampos fsize = ifile.tellg();
+    ifile.seekg( 0, std::ios::end );
+    fsize = ifile.tellg() - fsize;
+
+    unsigned int skip = static_cast<unsigned int>(fsize)-sizeof(unsigned short)*h*w*z;
     ifile.seekg(skip);
 
     std::vector<unsigned short> buffer(w*h);
-    for (unsigned int i=0;i<256;i++){
+    for (unsigned int i=0;i<z;i++){
         physD iimage(400,200,0.0,std::to_string(i));
         ifile.read((char *)&buffer[0],buffer.size()*sizeof(unsigned short));
 #pragma omp parallel for
-        for (size_t ii=0; ii<iimage.getSurf(); ii++)
+        for (unsigned int ii=0; ii<iimage.getSurf(); ii++)
             iimage.set(ii, buffer[ii]);
         retPhys.push_back(iimage);
     }

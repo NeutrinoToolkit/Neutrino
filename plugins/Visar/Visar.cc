@@ -104,13 +104,11 @@ Visar::Visar(neutrino *mynparent) : nGenericPan(mynparent),
     sopPlot->yAxis2->setLabel(tr("Temperature"));
 
 
-    QApplication::processEvents();
     show();
 
 
     setProperty("NeuSave-alphagraph",20);
 
-    QApplication::processEvents();
 
     for (int l=2+(int)numVisars; l<whichRefl->count();l++) {
         whichRefl->removeItem(l);
@@ -139,11 +137,6 @@ Visar::Visar(neutrino *mynparent) : nGenericPan(mynparent),
     connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
-
-
-    //!END SOP stuff
-    QApplication::processEvents();
-
 
     loadDefaults();
     sweepChanged();
@@ -656,12 +649,9 @@ void Visar::connections() {
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-    QApplication::processEvents();
-
 }
 
 void Visar::disconnections() {
-    QApplication::processEvents();
     for (unsigned int k=0;k<numVisars;k++){
         disconnect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
         disconnect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));

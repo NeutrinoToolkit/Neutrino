@@ -49,23 +49,23 @@ public:
     nPoint(neutrino * = nullptr);
     nPoint(nGenericPan*, int level);
 
-    ~nPoint(){};
+    ~nPoint() override {};
 	
     neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 4 };
 	int type() const { return Type;}
 	
-	void mousePressEvent ( QGraphicsSceneMouseEvent * );
-	void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
-	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
-	void keyPressEvent ( QKeyEvent *);
-	void keyReleaseEvent ( QKeyEvent *);
-	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
-	void focusInEvent(QFocusEvent * );
-	void focusOutEvent(QFocusEvent * );
-	void hoverEnterEvent ( QGraphicsSceneHoverEvent * );
-	void hoverLeaveEvent ( QGraphicsSceneHoverEvent * );
+    void mousePressEvent ( QGraphicsSceneMouseEvent * ) override;
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * ) override;
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * ) override;
+    void keyPressEvent ( QKeyEvent *) override;
+    void keyReleaseEvent ( QKeyEvent *) override;
+    void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * ) override;
+    void focusInEvent(QFocusEvent * ) override;
+    void focusOutEvent(QFocusEvent * ) override;
+    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) override;
+    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) override;
 	
 	void moveBy(QPointF);
 	
@@ -73,8 +73,8 @@ public:
 	QColor nColor, holderColor;
 	
 	// pure virtuals in QGraphicsObjec
-	QRectF boundingRect() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+    QRectF boundingRect() const override;
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 	
 	QGraphicsRectItem ref;
 	bool moveRef;
@@ -87,7 +87,7 @@ public:
     Ui::nPoint *my_w;
 	
 	QPainterPath path() const;
-	QPainterPath shape() const;
+    QPainterPath shape() const override;
 	
 	void selectThis(bool);
 		

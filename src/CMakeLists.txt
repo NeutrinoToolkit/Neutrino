@@ -99,6 +99,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QR
 set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
 
 if(APPLE)
+
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${${PROJECT_NAME}_VERSION}")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
@@ -117,7 +118,7 @@ if(APPLE)
     set_source_files_properties(${${PROJECT_NAME}_ICONTYPE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
-    target_link_libraries(Neutrino "-framework IOKit -framework CoreFoundation")
+    target_link_libraries(${PROJECT_NAME} "-framework IOKit -framework CoreFoundation")
 
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)

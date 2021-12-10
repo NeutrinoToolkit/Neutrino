@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>281</width>
-    <height>216</height>
+    <height>236</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,7 +140,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>f(x,y,z) width and height defined (z being the pixel value if image is selected)</string>
+       <string>Use phys(num,x,y) to get an image value</string>
       </property>
       <property name="plainText">
        <string>sin(5*pi*x/width)*sin(5*pi*y/height)*phys(2,x,y)</string>
@@ -158,7 +158,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Size:</string>
+       <string> Size:</string>
       </property>
      </widget>
     </item>

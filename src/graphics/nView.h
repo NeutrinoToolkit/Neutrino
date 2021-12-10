@@ -50,11 +50,11 @@ public:
     neutrino *nparent;
     QMap<QString, std::vector<unsigned char>>& nPalettes;
 
-    void resizeEvent (QResizeEvent *);
+    void resizeEvent (QResizeEvent *) override;
 
     // events
-    void keyPressEvent (QKeyEvent *);
-    void keyReleaseEvent (QKeyEvent *);
+    void keyPressEvent (QKeyEvent *) override;
+    void keyReleaseEvent (QKeyEvent *) override;
 
 
     // zoom
@@ -87,11 +87,11 @@ public slots:
     void zoomIn();
     void zoomEq();
 
-    void mouseDoubleClickEvent (QMouseEvent *);
-    void mousePressEvent (QMouseEvent *);
-    void mouseReleaseEvent (QMouseEvent *);
-    void mouseMoveEvent (QMouseEvent *);
-    void wheelEvent(QWheelEvent *);
+    void mouseDoubleClickEvent (QMouseEvent *) override;
+    void mousePressEvent (QMouseEvent *) override;
+    void mouseReleaseEvent (QMouseEvent *) override;
+    void mouseMoveEvent (QMouseEvent *) override;
+    void wheelEvent(QWheelEvent *) override;
 
     void showPhys(nPhysD*);
 
@@ -145,8 +145,8 @@ private:
 
 protected:
     // what does is this for??
-    void focusInEvent (QFocusEvent *);
-    bool event(QEvent *event);
+    void focusInEvent (QFocusEvent *) override;
+    bool event(QEvent *event) override;
 
 
 signals:

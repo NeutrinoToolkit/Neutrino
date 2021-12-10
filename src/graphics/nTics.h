@@ -34,7 +34,7 @@ class nTics : public QGraphicsItem {
 public:
 
     nTics(nView*);
-    ~nTics();
+    ~nTics() override;
 	
     nView* my_view;
 
@@ -44,8 +44,8 @@ public:
     void setGridThickness(double);
     void changeTicsColor();
 
-    QRectF boundingRect() const;
-    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+    QRectF boundingRect() const override;
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
 	QFont get_font() const;
 

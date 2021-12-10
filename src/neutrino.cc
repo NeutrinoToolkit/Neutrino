@@ -268,6 +268,13 @@ neutrino::neutrino():
 
     my_w->actionLog_info->setChecked(napp->log_win.isVisible());
     connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+
+//#define xxstring(s) xstring(s)
+//#define xstring(s) #s
+
+//    QString lista(xxstring(NEU_PLUGIN_LIST));
+//    QStringList lista2=lista.split("_nplug_",Qt::SkipEmptyParts);
+//    qCritical() <<lista2;
 }
 
 void neutrino::scanDir(QString dirpath, QString pattern)

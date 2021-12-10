@@ -35,8 +35,8 @@
 #include "nPhysD.h"
 #include "ui_nObject.h"
 
-#ifndef __nObject
-#define __nObject
+#ifndef nObject_h
+#define nObject_h
 
 class neutrino;
 class nGenericPan;
@@ -51,24 +51,24 @@ public:
 	
 	nObject(neutrino *, QString name);
 	nObject(nGenericPan *, int level, QString name);
-	~nObject();
+    ~nObject() override;
 	
 	neutrino *nparent;
 	
-	virtual int type() const = 0;
+    virtual int type() const override = 0;
 
-	void mousePressEvent ( QGraphicsSceneMouseEvent * );
-	void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
-	void mouseMoveEvent ( QGraphicsSceneMouseEvent * );
-	void keyPressEvent ( QKeyEvent *);
-	void keyReleaseEvent ( QKeyEvent *);
-	void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * );
-	void hoverEnterEvent( QGraphicsSceneHoverEvent *);
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *);
-	void hoverMoveEvent( QGraphicsSceneHoverEvent *);
-	void focusInEvent(QFocusEvent * event);
-	void focusOutEvent(QFocusEvent * event);
-    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+    void mousePressEvent ( QGraphicsSceneMouseEvent * ) override;
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * ) override;
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * ) override;
+    void keyPressEvent ( QKeyEvent *) override;
+    void keyReleaseEvent ( QKeyEvent *) override;
+    void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * ) override;
+    void hoverEnterEvent( QGraphicsSceneHoverEvent *) override;
+    void hoverLeaveEvent( QGraphicsSceneHoverEvent *) override;
+    void hoverMoveEvent( QGraphicsSceneHoverEvent *) override;
+    void focusInEvent(QFocusEvent * event) override;
+    void focusOutEvent(QFocusEvent * event) override;
+    void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event ) override;
 
 	void moveBy(QPointF);
 	
@@ -76,8 +76,8 @@ public:
 	QColor nColor, holderColor;
 	
 	// pure virtuals in QGraphicsObjec
-	QRectF boundingRect() const;
-	virtual void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) = 0;
+    QRectF boundingRect() const override;
+    virtual void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override = 0;
 	
 	QList<QGraphicsRectItem*> ref;
 	QList<int> moveRef;
@@ -92,10 +92,10 @@ public:
 	Ui::nObject my_w;
 	
 	virtual QPainterPath path() const = 0;
-	QPainterPath shape() const;
+    QPainterPath shape() const override;
 	
 	void selectThis(bool);
-		
+
 public slots:
 	
 	void togglePadella();
@@ -105,7 +105,7 @@ public slots:
 	void interactive();
 
 	void setRect(QRectF);
-    QRect getRect(nPhysD* image =nullptr);
+    QRect getRect(nPhysD* image=nullptr);
 	QRectF getRectF();
 	QString getRectString();
 
@@ -121,7 +121,7 @@ public slots:
 	void changeColor();
 	void changeColor(QColor);
 	void changeColorHolder();
-	void changeColorHolder(QColor);
+    void changeColorHolder(QColor);
 	void tableUpdated(QTableWidgetItem *);
 	
 	void expandX();

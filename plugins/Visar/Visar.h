@@ -80,7 +80,6 @@ class Visar : public nGenericPan, private Ui::Visar1 {
 public:
     
     Q_INVOKABLE Visar(neutrino *);
-    ~Visar(){}
 
 private:
 
@@ -148,9 +147,9 @@ public slots:
     
     void tabChanged(int);
     
-    void mouseAtMatrix(QPointF);
-    void imageMousePress(QPointF);
-    void imageMouseRelease(QPointF);
+    void mouseAtMatrix(QPointF) override;
+    void imageMousePress(QPointF) override;
+    void imageMouseRelease(QPointF) override;
 
     QPointF getTimeSpaceFromPixel(QPointF);
 
@@ -162,21 +161,6 @@ public slots:
     
     void sweepChanged(QLineEdit*line=nullptr);
     
-    void changeEvent(QEvent *e)
-    {
-        qDebug() << panName() << e;
-        
-        QWidget::changeEvent(e);
-        switch (e->type()) {
-            case QEvent::LanguageChange: {
-                    retranslateUi(this);
-                    break;
-                }
-            default:
-                break;
-        }
-    }
-
     void calculate_etalon();
     
 

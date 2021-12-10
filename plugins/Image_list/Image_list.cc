@@ -311,8 +311,8 @@ Image_list::updatePad(nPhysD *my_phys) {
             }
             qDebug() << "<=><=><=><=><=><=> 3 " << itemsMap.size();
             for (auto const & my_key : itemsMap) {
-                nPhysD* pippo=my_key.first;
-                bool sel (pippo ==my_phys);
+                nPhysD* key_phys = my_key.first;
+                bool sel (key_phys == my_phys);
                 my_key.second->setSelected(sel);
             }
             if (nparent->getBufferList().size())

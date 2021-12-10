@@ -25,6 +25,11 @@
 
 #include "anymap.h"
 
+#define __pp_init_str "@@ phys_properties"
+#define __pp_end_str "@@ end"
+#define __pp_newline_str "<br>"
+
+
 // strip leading and trailing spaces (questa l'ho fregata)
 std::string trim(const std::string& str,
                  const std::string& whitespace)
@@ -117,7 +122,7 @@ void anymap::loader(std::istream &is) {
         std::string st_key = trim(st.substr(0, eqpos), "\t ");
         std::string st_arg = trim(st.substr(eqpos+1, std::string::npos), "\t ");
 
-        std::string clean_string = std::regex_replace(st_arg, std::regex("<br>"), "\n");
+        std::string clean_string = std::regex_replace(st_arg, std::regex(__pp_newline_str), "\n");
 
         if (st_key=="neutrinoPanData") {
             DEBUG("key: "<<st_key);
@@ -146,7 +151,7 @@ void anymap::dumper(std::ostream &os) {
         // check if key was inserted by non-existent access
         // (strange std::map behaviour...)
         if (itr->second.ddescr != anydata::any_none) {
-            std::string clean_string = std::regex_replace(itr->second.get_str(), std::regex("\\n"), "<br>");
+            std::string clean_string = std::regex_replace(itr->second.get_str(), std::regex("\\n"), __pp_newline_str);
 
             os<<itr->first<<" = "<<clean_string<<std::endl;
         }

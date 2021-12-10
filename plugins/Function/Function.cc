@@ -32,9 +32,11 @@ struct physFunc : public exprtk::ifunction<double>
     physFunc(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
         exprtk::disable_has_side_effects(*this);
     }
+    virtual ~physFunc() override {}
 
-    inline double operator()(const double &imgnum, const double& x, const double& y) {
-        int imgnumint=(int)imgnum;
+public:
+    virtual double operator()(const double &imgnum, const double& x, const double& y) override {
+        int imgnumint=static_cast<int>(imgnum);
         nPhysD *my_phys(nullptr);
         QList<nPhysD *> mylist=parent->nparent->getBufferList();
         if (imgnumint >= 0  && imgnumint < mylist.size()) {
@@ -54,7 +56,7 @@ private:
 };
 
 
-Function::Function(neutrino *nparent) : nGenericPan(nparent),
+Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     physFunction(nullptr)
 {
     setupUi(this);
@@ -67,7 +69,7 @@ Function::Function(neutrino *nparent) : nGenericPan(nparent),
 
 void Function::on_doIt_released() {
     saveDefaults();
-    nPhysD *my_phys = new nPhysD(sb_width->value(), sb_height->value(), 0.0, "");
+    nPhysD *my_phys = new nPhysD(static_cast<unsigned int>(sb_width->value()), static_cast<unsigned int>(sb_height->value()), 0.0, "");
 
     double x, y;
 
@@ -91,16 +93,16 @@ void Function::on_doIt_released() {
     parser.compile(function->toPlainText().toStdString(),my_exprtk);
 
 
-    QProgressDialog progress("", "Cancel", 0, my_phys->getW(), this);
-    progress.setCancelButton(0);
+    QProgressDialog progress("", "Cancel", 0, static_cast<int>(my_phys->getW()), this);
+    progress.setCancelButton(nullptr);
     progress.setWindowModality(Qt::WindowModal);
     progress.setValue(0);
     progress.show();
 
     for (x=0; x < my_phys->getW(); x++) {
-        progress.setValue(x);
-        for (y=0; y < my_phys->getH(); y++) {
-            my_phys->set(x,y, my_exprtk.value());
+        progress.setValue(static_cast<int>(x));
+        for (y=0; y < static_cast<double>(my_phys->getH()); y++) {
+            my_phys->set(static_cast<unsigned int>(x),static_cast<unsigned int>(y), my_exprtk.value());
         }
     }
     QString name="Function("+function->toPlainText()+", "+QString::number(my_phys->getW())+", "+QString::number(my_phys->getH())+")";

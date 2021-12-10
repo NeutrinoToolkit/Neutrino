@@ -33,8 +33,6 @@
 #include <algorithm>
 
 
-// unnamed namespace only because the implementation is in this
-// header file and we don't want to export symbols to the obj files
 namespace spline
 {
 
@@ -45,9 +43,9 @@ private:
     std::vector< std::vector<double> > m_upper;  // upper band
     std::vector< std::vector<double> > m_lower;  // lower band
 public:
-    band_matrix() {};                             // constructor
-    band_matrix(int dim, int n_u, int n_l);       // constructor
-    ~band_matrix() {};                            // destructor
+    band_matrix() {}                              // constructor
+    band_matrix(int dim, int n_u, int n_l);        // constructor
+    ~band_matrix() {}                             // destructor
     void resize(int dim, int n_u, int n_l);      // init with dim,n_u,n_l
     int dim() const;                             // matrix dimension
     int num_upper() const
@@ -91,7 +89,7 @@ public:
 };
 
 
-} // namespace tk
+}
 
 
-#endif /* TK_SPLINE_H */
+#endif
