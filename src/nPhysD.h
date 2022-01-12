@@ -1,5 +1,5 @@
-#ifndef __nPhysD
-#define __nPhysD
+#ifndef nPhysD_H
+#define nPhysD_H
 
 #include <QDebug>
 #include "nPhysImageF.h"
@@ -14,7 +14,7 @@ class nPhysD : public physD {
         qDebug() << "------------------------------------------------------------ CREATE "<< copies() << " " << this;
     }
 
-    virtual ~nPhysD(){
+    ~nPhysD(){
         qDebug() << "------------------------------------------------------------ DELETE "<< copies() << " " << this;
     }
 
