@@ -1023,7 +1023,7 @@ void Visar::updatePlot() {
                 }
 
             }
-            if (time_vel.size()) {
+            if (time_vel[k].size()) {
                 double mmin = *std::min_element(time_vel[k].constBegin(), time_vel[k].constEnd());
                 double mmax = *std::max_element(time_vel[k].constBegin(), time_vel[k].constEnd());
 
