@@ -16,12 +16,12 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     include(FindNeutrinoDeps)
 
-    if (APPLE AND NOT DEFINED Qt5_DIR)
-        set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+    if (APPLE AND NOT DEFINED Qt6_DIR)
+        set(Qt6_DIR "/usr/local/opt/qt6/lib/cmake/Qt6")
     endif()
 
     SET(MODULES Core Gui Widgets Svg PrintSupport ${LOCAL_MODULES})
-    find_package(Qt5 COMPONENTS ${MODULES} REQUIRED)
+    find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
@@ -92,7 +92,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${README_HTML} SOURCES ${README_MD})
     endif()
 
-    QT5_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
+    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui)
     set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
@@ -112,7 +112,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     endif()
 
     foreach(MODULE ${MODULES})
-        set(MODULES_TWEAK "${MODULES_TWEAK};Qt5::${MODULE}")
+        set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
     endforeach()
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})

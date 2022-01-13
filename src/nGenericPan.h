@@ -29,6 +29,7 @@
 #include <QGestureEvent>
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <QByteArray>
 
 #include <QTextBrowser>
 #include <QPrinter>

@@ -22,8 +22,8 @@ public:
 	QVecInput(QWidget *parent = 0)
 		: QLineEdit(parent)
 	{
-		QRegExp rx("[(]{1}[0-9.eE-]+:[0-9.eE-]+:[0-9.eE-]+[)]{1}");
-		v = new QRegExpValidator(rx, 0);
+        QRegExp rx("[(]{1}[0-9.eE-]+:[0-9.eE-]+:[0-9.eE-]+[)]{1}");
+        v = new QRegExpValidator(rx, 0);
 		setValidator(v);
 
 		connect(this, SIGNAL(editingFinished()), SLOT(editingFinished()));
@@ -40,7 +40,7 @@ signals:
 	void vecInput(f3point);
 
 protected:
-	QRegExpValidator *v;
+    QRegExpValidator *v;
 
 protected slots:
 	void editingFinished()

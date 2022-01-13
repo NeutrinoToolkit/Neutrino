@@ -23,6 +23,8 @@
  *
  */
 #include "Find_peaks.h"
+#include <functional>
+#include <algorithm>
 
 #include <gsl/gsl_fit.h>
 
@@ -204,7 +206,10 @@ void Find_peaks::updatePlot() {
         }
 
         int sizeCut=myData.size();
-        transform(myData.begin(), myData.end(), myData.begin(),bind2nd(std::divides<double>(), sizeCut));
+        for (int i=0;i<myData.size();i++) {
+            myData[i]/=sizeCut;
+        }
+
 
         fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
         fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
@@ -294,8 +299,8 @@ void Find_peaks::updatePlot() {
             points->insertRow(pos);
             QTableWidgetItem *xitem= new QTableWidgetItem(locale().toString(fity[i]));
             QTableWidgetItem *yitem= new QTableWidgetItem(locale().toString(fitz[i]));
-            xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-            yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+            xitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            yitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
             points->setItem(pos, 0, xitem);
             points->setItem(pos, 1, yitem);
             points->resizeRowToContents(pos);

@@ -383,59 +383,82 @@ nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
 
 void
 nGenericPan::loadUi(QSettings &settings) {
+    qDebug() << "here";
     repaint();
+    qDebug() << "here";
     QApplication::processEvents();
+    qDebug() << "here";
     foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->setText(settings.value(widget->objectName(),widget->text()).toString());
         }
     }
+    qDebug() << "here";
     foreach (QSlider *widget, findChildren<QSlider *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->setValue(settings.value(widget->objectName(),widget->value()).toInt());
         }
     }
+    qDebug() << "here";
     foreach (QPlainTextEdit *widget, findChildren<QPlainTextEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->clear();
             widget->setPlainText(settings.value(widget->objectName(),widget->toPlainText()).toString());
         }
     }
+    qDebug() << "here";
     foreach (QTextEdit *widget, findChildren<QTextEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->clear();
             widget->insertHtml(settings.value(widget->objectName(),widget->toHtml()).toString());
         }
     }
+    qDebug() << "here";
     foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
         // do not use Locale for storing values
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings.value(widget->objectName(),widget->value()).toDouble());
+        qDebug() << widget;
+        qDebug() << settings.value(widget->objectName(),widget->value());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            double val=settings.value(widget->objectName(),widget->value()).toDouble();
+            qDebug() << val;
+            widget->setValue(val);
+            qDebug() << "done";
+        }
+        qDebug() << "widget";
     }
+    qDebug() << "here";
     foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             qDebug() << widget << settings.value(widget->objectName());
             widget->setValue(settings.value(widget->objectName(),widget->value()).toInt());
         }
     }
+    qDebug() << "here";
     foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings.value(widget->objectName(),widget->currentIndex()).toInt());
     }
+    qDebug() << "here";
     foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
+    qDebug() << "here";
     foreach (QAction *widget, findChildren<QAction *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
+    qDebug() << "here";
     foreach (QToolButton *widget, findChildren<QToolButton *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
+    qDebug() << "here";
     foreach (QRadioButton *widget, findChildren<QRadioButton *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
+    qDebug() << "here";
     foreach (QGroupBox *widget, findChildren<QGroupBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
     }
 
+    qDebug() << "here";
     foreach (QComboBox *widget, findChildren<QComboBox *>()) {
         if (widget->property("neutrinoSave").isValid()) {
             QString currText=widget->currentText();
@@ -466,26 +489,33 @@ nGenericPan::loadUi(QSettings &settings) {
             }
         }
     }
+    qDebug() << "here";
 
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
         widget->loadSettings(settings);
     }
+    qDebug() << "here";
 
     foreach (nLine *widget, findChildren<nLine *>()) {
         widget->loadSettings(settings);
     }
 
+    qDebug() << "here";
+
     foreach (nRect *widget, findChildren<nRect *>()) {
         widget->loadSettings(settings);
     }
 
+    qDebug() << "here";
     foreach (nEllipse *widget, findChildren<nEllipse *>()) {
         widget->loadSettings(settings);
     }
 
+    qDebug() << "here";
     foreach (nPoint *widget, findChildren<nPoint *>()) {
         widget->loadSettings(settings);
     }
+    qDebug() << "here";
 
 }
 
@@ -677,8 +707,9 @@ void nGenericPan::saveSettings(QString fname) {
 void nGenericPan::loadDefaults() {
     QSettings settings("neutrino","");
     settings.beginGroup(panName());
-    qInfo() << panName() << " : " << settings.fileName();
+    qDebug() << panName() << " : " << settings.fileName();
     loadSettings(settings);
+    qDebug() << "end loadDefaults";
     settings.endGroup();
 }
 

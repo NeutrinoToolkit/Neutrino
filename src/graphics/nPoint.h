@@ -54,7 +54,7 @@ public:
     neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 4 };
-	int type() const { return Type;}
+    int type() const override { return Type;}
 	
     void mousePressEvent ( QGraphicsSceneMouseEvent * ) override;
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * ) override;

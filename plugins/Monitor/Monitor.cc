@@ -31,7 +31,7 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
     show();
 
 	completer = new QCompleter(my_w.lineEdit);
-	completer->setModel(new QDirModel());
+    completer->setModel(new QFileSystemModel());
 	my_w.lineEdit->setCompleter(completer);
 	
 	fileModel=new QFileSystemModel(this);
@@ -81,7 +81,7 @@ Monitor::listViewActivated(QModelIndex index) {
 			num /= 1024.0;
 		}
 		QString sizeF=" ("+QLocale().toString(num,'f',1)+unit+")";
-		my_w.statusBar->showMessage(fInfo.lastModified().toString(Qt::DefaultLocaleShortDate) +sizeF,5000);
+        my_w.statusBar->showMessage(fInfo.lastModified().toString() +sizeF,5000);
 	}
 }
 

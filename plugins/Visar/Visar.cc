@@ -27,7 +27,7 @@
 
 #include "ui_Visar2.h"
 #include "ui_Visar3.h"
-
+#include <QRegularExpression>
 
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
     nCustomPlotMouseX3Y(parent)
@@ -459,8 +459,8 @@ void Visar::sweepChanged(QLineEdit *line) {
         if (vecsweep) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
-            QRegExp separator("[(;| |\t)]");
-            QStringList strSweep=line->text().split(separator, QString::SkipEmptyParts);
+            QRegularExpression separator("[(;| |\t)]");
+            QStringList strSweep=line->text().split(separator, Qt::SkipEmptyParts);
             qDebug() << strSweep;
             foreach(QString str, strSweep) {
                 bool ok;
@@ -471,11 +471,10 @@ void Visar::sweepChanged(QLineEdit *line) {
                     QPalette my_palette=line->palette();
                     my_palette.setColor(QPalette::Base,Qt::red);
                     line->setPalette(my_palette);
-                    statusbar->showMessage("Cannot understant sweep coefficent "+str);
+                    statusbar->showMessage("Cannot understand sweep coefficient "+str);
                     break;
                 }
             }
-
             if (line==sopScale) {
                 updatePlotSOP();
             } else {
@@ -558,7 +557,6 @@ int Visar::direction(int k) {
 }
 
 void Visar::setObjectVisibility(nPhysD*phys) {
-    qDebug() << "here";
     if (phys) {
         for (unsigned int k=0;k<numVisars;k++){
             fringeLine[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
@@ -857,14 +855,14 @@ void Visar::updatePlot() {
             double deltat=velocityUi[k]->offsetTime->value()-getTime(sweepCoeff[k],velocityUi[k]->physOrigin->value());
 
             QVector<double> tjump,njump,rjump;
-            QStringList jumpt=velocityUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
+            QStringList jumpt=velocityUi[k]->jumpst->text().split(";", Qt::SkipEmptyParts);
             velocityUi[k]->jumpst->setPalette(QApplication::palette());
             QPalette my_palette=velocityUi[k]->jumpst->palette();
             my_palette.setColor(QPalette::Base,Qt::red);
 
             foreach (QString piece, jumpt) {
                 QString err_msg=" "+piece+QString("' VISAR ")+QLocale().toString(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
-                QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+                QStringList my_jumps=piece.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
                 if (my_jumps.size()>1 && my_jumps.size()<=3) {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
                         bool ok1, ok2, ok3=true;
@@ -897,7 +895,6 @@ void Visar::updatePlot() {
                     statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
                 }
             }
-
             foreach (double a, tjump) {
                 QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(plotVelocity);
                 QPen pen(Qt::gray);
@@ -1023,7 +1020,7 @@ void Visar::updatePlot() {
                 }
 
             }
-            if (time_vel.size()) {
+            if (time_vel[k].size()) {
                 double mmin = *std::min_element(time_vel[k].constBegin(), time_vel[k].constEnd());
                 double mmax = *std::max_element(time_vel[k].constBegin(), time_vel[k].constEnd());
 
@@ -1039,16 +1036,12 @@ void Visar::updatePlot() {
         double mmin = *std::min_element(minmax.begin(),minmax.end());
         double mmax = *std::max_element(minmax.begin(),minmax.end());
         qDebug() << mmin << mmax;
-
         plotVelocity->xAxis->setRange(mmin,mmax);
     }
 
     plotVelocity->replot();
-
     updatePlotSOP();
-
     connections();
-
 }
 
 void Visar::getCarrier() {
@@ -1415,7 +1408,7 @@ Visar::export_txt_multiple() {
         QTextStream out(&t);
         for (unsigned int k=0;k<numVisars;k++){
             out << export_one(k);
-            out << endl << endl;
+            out << Qt::endl << Qt::endl;
         }
         out << export_sop();
         t.close();
