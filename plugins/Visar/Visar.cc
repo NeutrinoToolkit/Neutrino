@@ -1021,22 +1021,19 @@ void Visar::updatePlot() {
 
             }
             if (time_vel[k].size()) {
-                double mmin = *std::min_element(time_vel[k].constBegin(), time_vel[k].constEnd());
-                double mmax = *std::max_element(time_vel[k].constBegin(), time_vel[k].constEnd());
-
-                minmax.push_back(mmin);
-                minmax.push_back(mmax);
-                qDebug() << k << mmin << mmax;
+                const auto [mmin, mmax] = std::minmax_element(std::begin(time_vel[k]), std::end(time_vel[k]));
+                minmax.push_back(*mmin);
+                minmax.push_back(*mmax);
+                qDebug() << k << *mmin << *mmax;
             }
         }
     }
 
     plotVelocity->rescaleAxes(true);
     if (minmax.size()) {
-        double mmin = *std::min_element(minmax.begin(),minmax.end());
-        double mmax = *std::max_element(minmax.begin(),minmax.end());
-        qDebug() << mmin << mmax;
-        plotVelocity->xAxis->setRange(mmin,mmax);
+        const auto [mmin, mmax] = std::minmax_element(std::begin(minmax), std::end(minmax));
+        qDebug() << *mmin << *mmax;
+        plotVelocity->xAxis->setRange(*mmin,*mmax);
     }
 
     plotVelocity->replot();

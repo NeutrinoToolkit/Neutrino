@@ -25,6 +25,8 @@ include(FindNeutrinoDeps)
 
 target_link_libraries(nPhysImageF m ${LIBS})
 
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 # install
 if (WIN32)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION "bin")
