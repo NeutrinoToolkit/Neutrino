@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
-    <height>351</height>
+    <width>865</width>
+    <height>413</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,7 +88,7 @@
   </widget>
   <action name="actionHome">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
    </property>
    <property name="text">
@@ -97,7 +97,7 @@
   </action>
   <action name="actionBack">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +109,7 @@
   </action>
   <action name="actionForward">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -121,7 +121,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset resource="../resources/icons/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/print.png</normaloff>:/icons/print.png</iconset>
    </property>
    <property name="text">
@@ -136,8 +136,11 @@
    <header>nGenericPan.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>help</tabstop>
+ </tabstops>
  <resources>
-  <include location="../resources/icons/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
