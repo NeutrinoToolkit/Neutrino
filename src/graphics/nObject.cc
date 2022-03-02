@@ -328,7 +328,6 @@ nObject::changeColor (QColor col) {
 
 void
 nObject::changeColorHolder () {
-	QColor color;
 	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();

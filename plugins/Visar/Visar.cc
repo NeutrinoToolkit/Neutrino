@@ -88,7 +88,7 @@ nSOPPlot::nSOPPlot(QWidget* parent):
 };
 
 
-Visar::Visar(neutrino *mynparent) : nGenericPan(mynparent),
+Visar::Visar(neutrino *parent) : nGenericPan(parent),
       numVisars(0)
 {
     setupUi(this);

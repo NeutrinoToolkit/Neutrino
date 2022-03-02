@@ -1,26 +1,25 @@
 VISAR analysis
 ==============
 
-In the Window there are 3 tabs on the left : *Settings*, *Velocity* and
+In the Window there are 3 main tabs on the left : *Settings*, *Velocity* and
 *SOP*
+
+In the main toolbar you can add <img src="../../resources/icons/plus.png" width="20" /> more visars or remove if there are too many <img src="../../resources/icons/remove.png" width="20" />
 
 Settings :
 ----------
 
-Select the *Visar 1* or *Visar 2* tab to set the initial parameters of
-each VISAR:
+For each *Visar* tab to set the parameters:
 
   * Select the *Reference* and the *Shot* images
   * With your mouse, select the ROI (the phase is taken from the middle
     of the ROI, while the intensity is averaged over the entire ROI)
   * Get the *Carrier* (orientation and interfringe): hit on the button <img src="refresh2.png" width="20" />
     (adjusting the *weight* if the values are not correct, to remove
-    either the lower frequencies or the higher frequencies 
-
-    
+    either the lower frequencies or the higher frequencies)    
   * set the *Time resolution* parameter (in px) is corresponding to the
     width of the Gaussian part of the Morlet function in the direction
-    of the fringes, i.e. the time direction.
+    of the fringes, i.e. the time direction (this might weel reasonably be the height of the slit when the streak camera is in focus mode).
   * Fit the interference fringes by hitting <img src="refresh.png" width="20" />
   * Adjust the *intensity parameters*: 
       o adjust the background *offset* of the ref and of the shot. To
@@ -37,10 +36,9 @@ each VISAR:
 Velocity:
 ---------
 
-Select the *Visar 1* or *Visar 2* tab to set the velocity parameters of
-each VISAR:
+For each *Visar* tab to set the velocity parameters:
 
- 1. For each VISAR, specify the sensitivity (Velocity/fringe). In the **Notes** 
+ 1. The sensitivity (Velocity/fringe). In the **Notes** 
     tab you can find a simple sensitivity calculator based on the etalon 
     parameters (thickness, wavelength, refractive index and delta correction 
     for refractive index)    

@@ -93,7 +93,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="Visar.qrc">
+               <iconset resource="../Ghost_fringes/GhostFringes.qrc">
                 <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
               </property>
               <property name="neutrinoSave" stdset="0">
@@ -627,17 +627,23 @@
  <tabstops>
   <tabstop>refImage</tabstop>
   <tabstop>shotImage</tabstop>
+  <tabstop>doWaveButton</tabstop>
   <tabstop>guess</tabstop>
   <tabstop>carrierPhys</tabstop>
   <tabstop>guessWeight</tabstop>
   <tabstop>interfringe</tabstop>
   <tabstop>angle</tabstop>
+  <tabstop>physOriginSpace</tabstop>
+  <tabstop>magnification</tabstop>
   <tabstop>resolution</tabstop>
   <tabstop>offRef</tabstop>
   <tabstop>intensityShift</tabstop>
   <tabstop>multRef</tabstop>
+  <tabstop>sensitivity</tabstop>
+  <tabstop>physScale</tabstop>
  </tabstops>
  <resources>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
  </resources>
  <connections/>

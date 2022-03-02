@@ -32,8 +32,8 @@
 #include <QFileDialog>
 #include "nPhysD.h"
 
-#ifndef __nPoint
-#define __nPoint
+#ifndef nPoint_H
+#define nPoint_H
 
 class neutrino;
 class nGenericPan;
@@ -54,7 +54,7 @@ public:
     neutrino *nparent;
 	
 	enum { Type = QGraphicsItem::UserType + 4 };
-	int type() const { return Type;}
+    int type() const override { return Type;}
 	
     void mousePressEvent ( QGraphicsSceneMouseEvent * ) override;
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * ) override;

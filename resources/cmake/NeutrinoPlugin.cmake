@@ -17,7 +17,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     include(FindNeutrinoDeps)
 
     if (APPLE AND NOT DEFINED Qt5_DIR)
-        set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+        set(Qt5_DIR "/usr/local/opt/qt@5/lib/cmake/Qt5")
     endif()
 
     SET(MODULES Core Gui Widgets Svg PrintSupport ${LOCAL_MODULES})

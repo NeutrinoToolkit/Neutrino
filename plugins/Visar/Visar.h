@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Visar
-#define __Visar
+#ifndef Visar_H
+#define Visar_H
 
 #include <array>
 #include <QtGui>

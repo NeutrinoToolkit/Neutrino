@@ -373,12 +373,16 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>enableVisar</tabstop>
   <tabstop>offsetTime</tabstop>
+  <tabstop>physOrigin</tabstop>
   <tabstop>offsetShift</tabstop>
   <tabstop>reflOffset</tabstop>
   <tabstop>reflRef</tabstop>
   <tabstop>jumpst</tabstop>
   <tabstop>jump</tabstop>
+  <tabstop>plotR</tabstop>
+  <tabstop>plotQ</tabstop>
  </tabstops>
  <resources/>
  <connections/>

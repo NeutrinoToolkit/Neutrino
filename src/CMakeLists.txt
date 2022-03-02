@@ -41,7 +41,7 @@ add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
 if (APPLE AND NOT DEFINED Qt5_DIR)
-    set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+    set(Qt5_DIR "/usr/local/opt/qt@5/lib/cmake/Qt5")
     MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
 endif()
 
