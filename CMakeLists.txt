@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 ## before project https://stackoverflow.com/a/34208904
-set(CMAKE_OSX_DEPLOYMENT_TARGET "11.3" CACHE STRING "Minimum OS X deployment version")
+# set(CMAKE_OSX_DEPLOYMENT_TARGET "11.3" CACHE STRING "Minimum OS X deployment version")
 
 ### top level compile options
 project (Neutrino CXX)
