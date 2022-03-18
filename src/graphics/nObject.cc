@@ -674,7 +674,7 @@ nObject::loadSettings(QSettings &settings) {
         settings.setArrayIndex(i);
         QPointF pp(settings.value("x").toDouble(),settings.value("y").toDouble());
         poly_tmp << pp;
-        qInfo() << toolTip() << i << pp;
+        qDebug() << toolTip() << i << pp;
 	}
     settings.endArray();
     if (poly_tmp.size()>1) {

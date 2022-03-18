@@ -179,22 +179,6 @@ void nPreferences::on_getScale_released() {
     }
 }
 
-void nPreferences::on_lockOrigin_released() {
-    if (my_w.lockOrigin->isChecked()) {
-        nparent->setProperty("NeuSave-lockOrigin",QPointF(locale().toDouble(my_w.originX->text()),locale().toDouble(my_w.originY->text())));
-    } else {
-        nparent->setProperty("NeuSave-lockOrigin",QVariant());
-    }
-}
-
-void nPreferences::on_lockScale_released() {
-    if (my_w.lockScale->isChecked()) {
-        nparent->setProperty("NeuSave-lockScale",QPointF(locale().toDouble(my_w.scaleX->text()),locale().toDouble(my_w.scaleY->text())));
-    } else {
-        nparent->setProperty("NeuSave-lockScale",QVariant());
-    }
-}
-
 void nPreferences::askCloseUnsaved() {
     nparent->setProperty("NeuSave-askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
 }

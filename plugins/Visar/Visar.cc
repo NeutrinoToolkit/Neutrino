@@ -1104,8 +1104,7 @@ void Visar::doWave(int k) {
     disconnections();
     std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
     if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
-
-        QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, property("NeuSave-VisarCounter").toInt(), this);
+        QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 19, this);
         progress.setCancelButton(0);
         progress.setWindowModality(Qt::WindowModal);
         progress.setValue(0);
@@ -1223,7 +1222,6 @@ void Visar::doWave(int k) {
         updatePlot();
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        setProperty("NeuSave-VisarCounter",progress.value()+1);
 
     } else {
         if (imgs[0] && imgs[1]) {

@@ -97,7 +97,7 @@ void Ghost_fringes::doGhost () {
             for (size_t y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr,2))/(1.0+exp(lambda-std::abs(xr)));
+                double e_tot = 1.0-exp(-pow(yr,2)/lambda)/(1.0+exp(lambda-std::abs(xr)));
                 imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
             }
         }

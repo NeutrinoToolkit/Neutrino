@@ -435,23 +435,13 @@ void nView::copyImage() {
 void nView::toggleRuler() {
     my_tics.rulerVisible=!my_tics.rulerVisible;
     my_tics.update();
-    QString log="Ruler";
-    if (!my_tics.rulerVisible) {
-        log.append(" not");
-    }
-    log.append(" visible");
-    qInfo() << log;
+    qInfo() << "Ruler" << (my_tics.rulerVisible? " " : " not") << "visible";
 }
 
 void nView::toggleGrid() {
     my_tics.gridVisible=!my_tics.gridVisible;
     my_tics.update();
-    QString log="Grid";
-    if (!my_tics.gridVisible) {
-        log.append(" not");
-    }
-    log.append(" visible");
-    qInfo() << log;
+    qInfo() << "Grid" << (my_tics.gridVisible? " " : " not") << "visible";
 }
 
 

@@ -677,7 +677,7 @@ void nGenericPan::saveSettings(QString fname) {
 void nGenericPan::loadDefaults() {
     QSettings settings("neutrino","");
     settings.beginGroup(panName());
-    qInfo() << panName() << " : " << settings.fileName();
+    qDebug() << panName() << " : " << settings.fileName();
     loadSettings(settings);
     settings.endGroup();
 }

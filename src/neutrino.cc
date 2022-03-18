@@ -714,6 +714,23 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                 for (auto &my_phys : imagelist) {
                     if (my_phys) {
                         if (my_phys->getSurf()>0) {
+                            QSettings my_set("neutrino","");
+                            my_set.beginGroup("nPreferences");
+
+                            if (my_set.value("lockOrigin",false).toBool()) {
+                                my_phys->set_origin(my_set.value("originX",0.0).toDouble(),my_set.value("originY",0.0).toDouble());
+                            }
+                            if (my_set.value("lockScale",false).toBool()) {
+                                my_phys->set_scale(my_set.value("scaleX",1.0).toDouble(),my_set.value("scaleY",1.0).toDouble());
+                            }
+
+                            if (my_set.value("lockRotate",false).toBool()) {
+                                nPhysD rotated = my_phys->rotated(my_set.value("rotate",0.0).toDouble());
+                                delete my_phys;
+                                my_phys=new nPhysD(rotated);
+                            }
+                            my_set.endGroup();
+
                             addShowPhys(my_phys);
                             imagelistold << my_phys;
                         } else {
@@ -964,17 +981,7 @@ void neutrino::addPhys(nPhysD* datamatrix) {
     if ((!nPhysExists(datamatrix)) && datamatrix->getSurf()>0)	{
         datamatrix->prop["uuid"] = property("uuidphys").toInt()+1;
         setProperty("uuidphys",int(datamatrix->prop["uuid"]));
-
         physList << datamatrix;
-
-        if (property("NeuSave-lockOrigin").isValid()) {
-            QPointF p=property("NeuSave-lockOrigin").toPointF();
-            datamatrix->set_origin(p.x(),p.y());
-        }
-        if (property("NeuSave-lockScale").isValid()) {
-            QPointF p=property("NeuSave-lockScale").toPointF();
-            datamatrix->set_scale(p.x(),p.y());
-        }
         addMenuBuffers(datamatrix);
         emit physAdd(datamatrix);
     }
@@ -1273,7 +1280,7 @@ QString neutrino::getFileSave() {
     }
 
     allformats+=("Any files (*)");
-    qInfo() << allformats;
+    qDebug() << allformats;
 
 
     return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
@@ -1527,7 +1534,7 @@ void neutrino::loadDefaults(){
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     move(my_set.value("geometry",pos()).toPoint());
-    qInfo() << "Reading defaults from" <<   my_set.fileName();
+    qDebug() << "Reading defaults from" <<   my_set.fileName();
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << my_w->toolBar->iconSize();
     int comboIconSizeDefault=my_set.value("comboIconSizeDefault", my_w->toolBar->iconSize().width()/10-1).toInt();
 

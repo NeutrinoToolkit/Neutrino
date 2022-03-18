@@ -76,60 +76,40 @@
            <string>New images defaults</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="scaleX">
-             <property name="toolTip">
-              <string>scale x</string>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
              </property>
              <property name="text">
-              <string>1</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
+              <string>Origin</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="5">
-            <widget class="QToolButton" name="getScale">
+           <item row="0" column="1">
+            <widget class="QToolButton" name="lockOrigin">
              <property name="toolTip">
-              <string>get scale from current image</string>
+              <string>lock origin forn newly opened images</string>
              </property>
              <property name="text">
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QLineEdit" name="scaleY">
-             <property name="toolTip">
-              <string>scale y</string>
-             </property>
-             <property name="text">
-              <string>1</string>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="0" column="4">
-            <widget class="QLineEdit" name="originY">
-             <property name="toolTip">
-              <string>origin y</string>
-             </property>
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
+           <item row="0" column="2">
             <widget class="QLineEdit" name="originX">
              <property name="toolTip">
               <string>origin x</string>
@@ -142,19 +122,34 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_8">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="originY">
+             <property name="toolTip">
+              <string>origin y</string>
              </property>
              <property name="text">
-              <string>Origin</string>
+              <string>0</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="4">
+            <widget class="QToolButton" name="getOrigin">
+             <property name="toolTip">
+              <string>get origin from current image</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
@@ -166,30 +161,16 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="5">
-            <widget class="QToolButton" name="getOrigin">
+           <item row="1" column="1">
+            <widget class="QToolButton" name="lockScale">
              <property name="toolTip">
-              <string>get origin from current image</string>
+              <string>lock scale forn newly opened images</string>
              </property>
              <property name="text">
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QToolButton" name="lockOrigin">
-             <property name="toolTip">
-              <string>lock origin forn newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -202,7 +183,59 @@
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QToolButton" name="lockScale">
+            <widget class="QLineEdit" name="scaleX">
+             <property name="toolTip">
+              <string>scale x</string>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="scaleY">
+             <property name="toolTip">
+              <string>scale y</string>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QToolButton" name="getScale">
+             <property name="toolTip">
+              <string>get scale from current image</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_rotate">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Rotate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QToolButton" name="lockRotate">
              <property name="toolTip">
               <string>lock scale forn newly opened images</string>
              </property>
@@ -210,12 +243,81 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_flip">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Flip</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QToolButton" name="lockFlip">
+             <property name="toolTip">
+              <string>lock scale forn newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QCheckBox" name="flipX">
+             <property name="text">
+              <string>X</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QCheckBox" name="flipY">
+             <property name="text">
+              <string>Y</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QDoubleSpinBox" name="rotate">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="minimum">
+              <double>-360.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
@@ -789,7 +891,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
          </widget>
@@ -803,7 +905,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
          </widget>
@@ -888,7 +990,7 @@
  </tabstops>
  <resources>
   <include location="../plugins/Interferometry/Interferometry.qrc"/>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

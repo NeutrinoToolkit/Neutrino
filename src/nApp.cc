@@ -26,6 +26,8 @@ int nApp::exec() {
     qInstallMessageHandler(nApp::myMessageOutput);
 #endif
 
+    qInfo() << "Default preference file:" << QSettings("neutrino","").fileName();
+
     addDefaultPalettes();
 
     QSettings my_set("neutrino","");
