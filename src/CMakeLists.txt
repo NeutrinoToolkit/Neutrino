@@ -36,7 +36,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/nPhysImage")
 set(LIBS ${LIBS} "nPhysImageF")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
-
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
@@ -157,4 +156,9 @@ foreach(MODULE ${MODULES})
 endforeach()
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+#   target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+endif()
 

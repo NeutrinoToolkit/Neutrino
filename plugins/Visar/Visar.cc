@@ -62,7 +62,7 @@ VisarPhasePlot::VisarPhasePlot(QWidget* parent):
 VisarPlot::VisarPlot(QWidget* parent):
     nCustomPlotMouseX3Y(parent)
 {
-    xAxis->setLabel(tr("Position [time]"));
+    xAxis->setLabel(tr("Time"));
     yAxis->setLabel(tr("Velocity"));
     yAxis2->setLabel(tr("Reflectivity"));
     yAxis3->setLabel(tr("Quality"));
@@ -107,18 +107,18 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     show();
 
 
-    setProperty("NeuSave-alphagraph",20);
+    setProperty("NeuSave-alphagraph",30);
 
 
-    for (int l=2+(int)numVisars; l<whichRefl->count();l++) {
+    for (int l=2+numVisars; l<whichRefl->count();l++) {
         whichRefl->removeItem(l);
     }
 
-    int kMax=1;
+    unsigned int kMax=1;
     if (property("NeuSave-numVisars").isValid()) {
-        kMax=property("NeuSave-numVisars").toInt();
+        kMax=property("NeuSave-numVisars").toUInt();
     }
-    for (int k=0; k<kMax; k++) {
+    for (unsigned int k=0; k<kMax; k++) {
         addVisar();
     }
 
@@ -137,6 +137,26 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
+
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+
+    connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
+    connect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
+    connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
+    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
+
+    connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
     loadDefaults();
     sweepChanged();
@@ -161,7 +181,6 @@ void Visar::calculate_etalon() {
 }
 
 void Visar::addVisar() {
-    disconnections();
     QWidget *tab1 = new QWidget();
     QGridLayout *gridLayout1 = new QGridLayout(tab1);
     gridLayout1->setContentsMargins(0, 0, 0, 0);
@@ -300,17 +319,45 @@ void Visar::addVisar() {
     errorBars->setWhiskerWidth(0);
     errorBars->setSymbolGap(1);
 
+    unsigned int k=numVisars;
+    connect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
+    connect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(settingsUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+
+    connect(velocityUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
+
+    connect(settingsUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
+    connect(settingsUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
+
+    connect(settingsUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
+    connect(settingsUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
+    connect(settingsUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
+
+    connect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
+    connect(velocityUi[k]->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
+
+    connect(settingsUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+
+    connect(settingsUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+
+    connect(settingsUi[k]->interfringe, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
+    connect(settingsUi[k]->angle, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
+    connect(settingsUi[k]->resolution, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
+    connect(settingsUi[k]->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
+    connect(settingsUi[k]->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
+
     numVisars++;
 
     setProperty("NeuSave-numVisars",numVisars);
-
-
-    connections();
-
 }
 
 void Visar::delVisar() {
-    disconnections();
     if (numVisars>0) {
         QWidget* my_widget=tabPhase->widget(numVisars-1);
         tabPhase->removeTab(numVisars-1);
@@ -319,7 +366,7 @@ void Visar::delVisar() {
         tabVelocity->removeTab(numVisars-1);
         my_widget->deleteLater();
         foreach (QAction *action, toolBar->actions()) {
-            if (action->property("id").isValid() && action->property("id").toInt()==(int)numVisars-1) {
+            if (action->property("id").isValid() && action->property("id").toUInt()==numVisars-1) {
                 toolBar->removeAction(action);
             }
         }
@@ -365,7 +412,7 @@ void Visar::delVisar() {
         QList<QCPAbstractPlottable *> listplottable;
         for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
             QVariant id=plotVelocity->plottable(kk)->property("id");
-            if (id.isValid() && id.toInt() == (int)numVisars-1 ){
+            if (id.isValid() && id.toUInt() == numVisars-1 ){
                 listplottable << plotVelocity->plottable(kk);
             }
         }
@@ -377,15 +424,13 @@ void Visar::delVisar() {
         numVisars--;
         setProperty("NeuSave-numVisars",numVisars);
     }
-    connections();
     updatePlot();
 }
 
 void Visar::loadSettings(QString my_settings) {
-    disconnections();
     QSettings settings(my_settings,QSettings::IniFormat);
     settings.beginGroup("Properties");
-    int kMax=settings.value("NeuSave-numVisars",2).toInt();
+    int kMax=settings.value("NeuSave-numVisars",2).toUInt();
     unsigned int numVisars_save=numVisars;
     for (unsigned int k=0;k<numVisars_save;k++) {
         delVisar();
@@ -393,14 +438,13 @@ void Visar::loadSettings(QString my_settings) {
     for (int k=0; k<kMax; k++) {
         addVisar();
     }
-    int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
+    int whichReflSaved=settings.value("NeuSave-whichRefl",0).toUInt();
     settings.endGroup();
 
     nGenericPan::loadSettings(settings);
 
     whichRefl->setCurrentIndex(whichReflSaved);
 
-    connections();
     QApplication::processEvents();
     sweepChanged();
     doWave();
@@ -452,7 +496,7 @@ void Visar::sweepChanged(QLineEdit *line) {
         if (line==sopScale) {
             vecsweep = &sweepCoeffSOP;
         } else {
-            k=line->property("id").toInt();
+            k=line->property("id").toUInt();
             vecsweep = &sweepCoeff[k];
         }
 
@@ -558,7 +602,6 @@ int Visar::direction(int k) {
 }
 
 void Visar::setObjectVisibility(nPhysD*phys) {
-    qDebug() << "here";
     if (phys) {
         for (unsigned int k=0;k<numVisars;k++){
             fringeLine[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
@@ -572,8 +615,6 @@ void Visar::tabChanged(int k) {
     QTabWidget *tabWidget=nullptr;
 
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
-
-    disconnections();
 
     if (tabWidget) {
 
@@ -593,116 +634,16 @@ void Visar::tabChanged(int k) {
         } else {
             if (k<(int)numVisars) {
                 k=tabWidget->currentIndex();
-                if (velocityUi[k]->enableVisar->isChecked()) {
+                if (k>=0 && velocityUi[k]->enableVisar->isChecked()) {
                     nparent->showPhys(getPhysFromCombo(settingsUi[k]->shotImage));
                 }
             }
         }
     }
-    connections();
-}
-
-void Visar::connections() {
-    for (unsigned int k=0;k<numVisars;k++){
-        connect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
-        connect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(settingsUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-
-        connect(velocityUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-
-        connect(settingsUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
-        connect(settingsUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
-
-        connect(settingsUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
-        connect(settingsUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        connect(settingsUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
-
-        connect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
-        connect(velocityUi[k]->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
-
-        connect(settingsUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-
-        connect(settingsUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    }
-    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-
-    connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
-    connect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
-
-    connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-}
-
-void Visar::disconnections() {
-    for (unsigned int k=0;k<numVisars;k++){
-        disconnect(fringeRect[k], SIGNAL(sceneChanged()), this, SLOT(getPhase()));
-        disconnect(velocityUi[k]->offsetShift, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(settingsUi[k]->sensitivity, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->jumpst, SIGNAL(editingFinished()), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->reflRef, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->reflOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->jump, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-
-        disconnect(velocityUi[k]->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-
-        disconnect(settingsUi[k]->guess, SIGNAL(released()), this, SLOT(getCarrier()));
-        disconnect(settingsUi[k]->doWaveButton, SIGNAL(released()), this, SLOT(doWave()));
-
-        disconnect(settingsUi[k]->multRef, SIGNAL(valueChanged(double)), this, SLOT(getPhase()));
-        disconnect(settingsUi[k]->offRef, SIGNAL(editingFinished()), this, SLOT(getPhase()));
-        disconnect(settingsUi[k]->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
-
-        disconnect(velocityUi[k]->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
-        disconnect(velocityUi[k]->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
-
-        disconnect(settingsUi[k]->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
-
-        disconnect(settingsUi[k]->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    }
-    disconnect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    disconnect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    disconnect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-
-    disconnect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
-    disconnect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    disconnect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    disconnect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
-
-    disconnect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    disconnect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    disconnect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 }
 
 void Visar::updatePlotSOP() {
     if (!enableSOP->isChecked()) return;
-    disconnections();
     nPhysD *shot=getPhysFromCombo(sopShot);
     nPhysD *ref=getPhysFromCombo(sopRef);
 
@@ -822,12 +763,9 @@ void Visar::updatePlotSOP() {
         sopPlot->rescaleAxes();
         sopPlot->replot();
     }
-    connections();
 }
 
 void Visar::updatePlot() {
-    disconnections();
-
     bool needReflectivityAxe=false;
     bool needQualityAxe=false;
     for (unsigned int k=0;k<numVisars;k++){
@@ -968,7 +906,7 @@ void Visar::updatePlot() {
 
             for (int kk=0; kk< plotVelocity->graphCount() ; kk++) {
                 QCPGraph *my_graph=plotVelocity->graph(kk);
-                if (my_graph->property("id").toInt() == (int)k ){
+                if (my_graph->property("id").toUInt() == k ){
                     pen=my_graph->pen();
                     pen.setStyle(pstyle);
                     my_graph->setPen(pen);
@@ -996,7 +934,7 @@ void Visar::updatePlot() {
             }
             for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
                 QCPErrorBars *my_err = qobject_cast<QCPErrorBars*>(plotVelocity->plottable(kk));
-                if (my_err && my_err->property("id").toInt() == (int)k ){
+                if (my_err && my_err->property("id").toUInt() == k ){
                     pen=my_err->pen();
                     pen.setStyle(pstyle);
                     my_err->setPen(pen);
@@ -1044,23 +982,17 @@ void Visar::updatePlot() {
     }
 
     plotVelocity->replot();
-
     updatePlotSOP();
-
-    connections();
-
 }
 
 void Visar::getCarrier() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         getCarrier(k);
     }
 }
 
-void Visar::getCarrier(int k) {
-    disconnections();
-
+void Visar::getCarrier(unsigned int k) {
     QComboBox *combo=nullptr;
     if (settingsUi[k]->carrierPhys->currentIndex()==0) {
         combo=settingsUi[k]->refImage;
@@ -1085,12 +1017,11 @@ void Visar::getCarrier(int k) {
             }
         }
     }
-    connections();
 }
 
 void Visar::doWave() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         doWave(k);
     } else {
         for (unsigned int k=0;k<numVisars;k++){
@@ -1099,13 +1030,27 @@ void Visar::doWave() {
     }
 }
 
+void Visar::needWave() {
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>> CALLING IN THE NAME OF" << sender() << sender()->property("id");
+    if (sender() && sender()->property("id").isValid()) {
+        unsigned int k=sender()->property("id").toUInt();
+        settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refreshRed.png"));
+//        QPalette pal = settingsUi[k]->doWaveButton->palette();
+//        pal.setColor(QPalette::Button, QColor(Qt::blue));
+//        settingsUi[k]->doWaveButton->setAutoFillBackground(true);
+//        settingsUi[k]->doWaveButton->setPalette(pal);
+//        settingsUi[k]->doWaveButton->update();
 
-void Visar::doWave(int k) {
-    disconnections();
+//        settingsUi[k]->doWaveButton->setIcon(QIcon());
+
+    }
+}
+
+void Visar::doWave(unsigned int k) {
     std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
     if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
         QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 19, this);
-        progress.setCancelButton(0);
+        progress.setCancelButton(nullptr);
         progress.setWindowModality(Qt::WindowModal);
         progress.setValue(0);
         progress.show();
@@ -1222,6 +1167,7 @@ void Visar::doWave(int k) {
         updatePlot();
         progress.setValue(progress.value()+1);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
 
     } else {
         if (imgs[0] && imgs[1]) {
@@ -1231,13 +1177,11 @@ void Visar::doWave(int k) {
         }
         statusBar()->showMessage("Size mismatch",5000);
     }
-
-    connections();
 }
 
 void Visar::getPhase() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         getPhase(k);
     } else {
         for (unsigned int k=0;k<numVisars;k++){
@@ -1247,9 +1191,7 @@ void Visar::getPhase() {
     updatePlot();
 }
 
-void Visar::getPhase(int k) {
-    disconnections();
-
+void Visar::getPhase(unsigned int k) {
     if (k< (int) numVisars) {
         settingsUi[k]->plotPhaseIntensity->clearGraphs();
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
@@ -1400,7 +1342,6 @@ void Visar::getPhase(int k) {
             settingsUi[k]->plotPhaseIntensity->replot();
         }
     }
-    connections();
 }
 
 void

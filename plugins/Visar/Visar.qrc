@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
         <file>refresh.png</file>
+        <file>refreshRed.png</file>
         <file>refresh2.png</file>
     </qresource>
 </RCC>

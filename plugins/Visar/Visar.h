@@ -119,14 +119,16 @@ public slots:
     void addVisar();
     void delVisar();
 
+    void needWave();
+
     void doWave();
-    void doWave(int);
+    void doWave(unsigned int);
     
     void getCarrier();
-    void getCarrier(int);
+    void getCarrier(unsigned int);
     
     void getPhase();
-    void getPhase(int);
+    void getPhase(unsigned int);
     
     void updatePlot();
     
@@ -139,9 +141,6 @@ public slots:
     QString export_sop();
     
     void export_clipboard();
-    
-    void connections();
-    void disconnections();
     
     void updatePlotSOP();
     

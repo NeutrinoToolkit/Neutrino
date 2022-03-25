@@ -117,19 +117,26 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+# 	  target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	  target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+	endif()
+
     IF(NOT DEFINED PLUGIN_INSTALL_DIR)
         if(APPLE)
-            if(DEFINED Neutrino_BINARY_DIR)
-                set (PLUGIN_INSTALL_DIR "${Neutrino_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
-            else()
+#            if(DEFINED Neutrino_BINARY_DIR)
+#                set (PLUGIN_INSTALL_DIR "${Neutrino_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
+#            else()
                 set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
-            endif()
+#            endif()
         elseif(LINUX)
             set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
         elseif(WIN32)
             set (PLUGIN_INSTALL_DIR "bin/plugins")
         endif()
     endif()
+
 
     install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR} COMPONENT plugins)
 

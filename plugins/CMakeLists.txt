@@ -9,10 +9,18 @@ if (${NEUTRINOPLUGINS})
     message(STATUS "Scanning plugins directory")
 
     FILE(GLOB allfiles "*")
+
+    FOREACH(oneplugin ${NEUTRINO_SKIP_PLUGINS})
+        list(FILTER allfiles EXCLUDE REGEX ".*/plugins/${oneplugin}$")
+    ENDFOREACH()
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        MESSAGE("PLUGINS:\n${allfiles}")
+    endif()
+
     FOREACH(oneplugin ${allfiles})
         IF(IS_DIRECTORY ${oneplugin})
             add_subdirectory(${oneplugin})
-#            set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST}" PARENT_SCOPE)
         ENDIF()
     ENDFOREACH()
 

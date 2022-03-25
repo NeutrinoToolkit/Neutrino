@@ -265,19 +265,16 @@
           </widget>
          </item>
          <item row="1" column="3">
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBox_8">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
-           <property name="toolTip">
-            <string>Time resolution in pixel</string>
-           </property>
            <property name="title">
-            <string>Slit</string>
+            <string>Magnification</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
             <property name="leftMargin">
              <number>2</number>
             </property>
@@ -291,9 +288,20 @@
              <number>2</number>
             </property>
             <item>
-             <widget class="QDoubleSpinBox" name="resolution">
+             <widget class="QDoubleSpinBox" name="magnification">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
               <property name="suffix">
-               <string> [px]</string>
+               <string> [space/px]</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>9999.989999999999782</double>
               </property>
               <property name="value">
                <double>1.000000000000000</double>
@@ -306,7 +314,7 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="1" column="2">
           <widget class="QGroupBox" name="groupBox_9">
            <property name="font">
             <font>
@@ -353,17 +361,20 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="2">
-          <widget class="QGroupBox" name="groupBox_8">
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_4">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
-           <property name="title">
-            <string>Magnification</string>
+           <property name="toolTip">
+            <string>Time resolution in pixel</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <property name="title">
+            <string>Slit</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="leftMargin">
              <number>2</number>
             </property>
@@ -377,20 +388,9 @@
              <number>2</number>
             </property>
             <item>
-             <widget class="QDoubleSpinBox" name="magnification">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
+             <widget class="QDoubleSpinBox" name="resolution">
               <property name="suffix">
-               <string> [space/px]</string>
-              </property>
-              <property name="decimals">
-               <number>3</number>
-              </property>
-              <property name="maximum">
-               <double>9999.989999999999782</double>
+               <string> [px]</string>
               </property>
               <property name="value">
                <double>1.000000000000000</double>
@@ -633,9 +633,9 @@
   <tabstop>guessWeight</tabstop>
   <tabstop>interfringe</tabstop>
   <tabstop>angle</tabstop>
+  <tabstop>resolution</tabstop>
   <tabstop>physOriginSpace</tabstop>
   <tabstop>magnification</tabstop>
-  <tabstop>resolution</tabstop>
   <tabstop>offRef</tabstop>
   <tabstop>intensityShift</tabstop>
   <tabstop>multRef</tabstop>
