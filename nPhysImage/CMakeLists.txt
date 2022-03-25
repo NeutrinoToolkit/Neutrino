@@ -21,7 +21,9 @@ add_library (nPhysImageF SHARED
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 #   target_link_options(nPhysImageF PRIVATE -static-libstdc++)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_link_options(nPhysImageF PRIVATE -static-libgcc -static-libstdc++)
+    if (APPLE)
+        target_link_options(nPhysImageF PRIVATE -static-libgcc -static-libstdc++)
+    endif()
 endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
