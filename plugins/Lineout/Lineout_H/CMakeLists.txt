@@ -13,6 +13,8 @@ set(HEADERS "../Lineout.h")
 
 set(UIS "../Lineout.ui")
 include(NeutrinoPlugin)
+IF(APPLE)
 set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../../Neutrino.app/Contents/Resources/plugins")
+ENDIF()
 ADD_NEUTRINO_PLUGIN()
 
