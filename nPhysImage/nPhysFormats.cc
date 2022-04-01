@@ -708,6 +708,49 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
                 tiff_prop["Tiff_samples"]=samples;
 
+                unsigned int count;
+                long *MD_FileTag = nullptr ;
+                if (TIFFGetField(tif, 33445, &count, &MD_FileTag)){
+                    if (count==1) {
+                        tiff_prop["TIFF_MD_FileTag"] = static_cast<int>(MD_FileTag[0]);
+                        DEBUG("MD_FileTag " << MD_FileTag[0]);
+                    }
+                }
+                unsigned int *MD_ScalePixel=nullptr;
+                if (TIFFGetField(tif, 33446, &count, &MD_ScalePixel)){
+                    if (count==1) {
+                        tiff_prop["TIFF_MD_ScalePixel"] = vec2i(MD_ScalePixel[0],MD_ScalePixel[1]);
+                        DEBUG("MD_ScalePixel " << count << " " << MD_ScalePixel << " " << MD_ScalePixel[0]<< " " << MD_ScalePixel[1] << " " << MD_ScalePixel[0]/MD_ScalePixel[1]);
+                    }
+                }
+                const unsigned short *colortable=nullptr;
+                if (TIFFGetField(tif, 33447, &count, &colortable)) {
+                    if (count>1) {
+                        tiff_prop["TIFF_MD_ColorTable"] = vec2f(colortable[1],colortable[count-2]);
+                    }
+                    DEBUG(colortable[1] << " " << colortable[count-2]);
+                }
+                const char *strdata=nullptr;
+                if (TIFFGetField(tif, 33448, &count, &strdata)) {
+                    tiff_prop["TIFF_MD_LabName"] = std::string(strdata);
+                    DEBUG("33448 " << count << " " << strlen(strdata) << " " << std::string(strdata));
+                }
+                if (TIFFGetField(tif, 33449, &count, &strdata)) {
+                    tiff_prop["TIFF_MD_SampleInfo"] = std::string(strdata);
+                    DEBUG("33449 " << count << " " << std::string(strdata));
+                }
+                if (TIFFGetField(tif, 33450, &count, &strdata)) {
+                    tiff_prop["TIFF_MD_PrepDate"] = std::string(strdata);
+                    DEBUG(count << " " << std::string(strdata));
+                }
+                if (TIFFGetField(tif, 33451, &count, &strdata)) {
+                    tiff_prop["TIFF_MD_PrepTime"] = std::string(strdata);
+                    DEBUG(count << " " << std::string(strdata));
+                }
+                if (TIFFGetField(tif, 33452, &count, &strdata)) {
+                    tiff_prop["TIFF_MD_FileUnits"] = std::string(strdata);
+                    DEBUG(count << " " << std::string(strdata));
+                }
 
                 TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
 
@@ -752,23 +795,23 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 if (extra!=0) {
                     tiff_prop["Tiff_extra_samples"]=extra;
                 }
-                char *soft=nullptr;
+                const char *soft=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_SOFTWARE, &soft)) {
                     tiff_prop["TIFF_Software"]=std::string(soft);
                     DEBUG("TIFFTAG_SOFTWARE " << soft);
                 }
-                char *copyright=nullptr;
+                const char *copyright=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_COPYRIGHT, &copyright)) {
                     tiff_prop["TIFF_copyright"]=std::string(copyright);
                     DEBUG("TIFFTAG_COPYRIGHT " << copyright);
                 }
-                char *docname=nullptr;
+                const char *docname=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &docname)) {
                     tiff_prop["TIFF_docname"]=std::string(docname);
                     tiff_prop["phys_name"]=docname;
                     DEBUG(docname);
                 }
-                char *neu_prop=nullptr;
+                const char *neu_prop=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_PHYSPROP, &neu_prop)) {
                     std::string str_desc=std::string(neu_prop);
                     DEBUG(str_desc.size() << "\n" << str_desc);
@@ -1174,10 +1217,14 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
                 linearized.prop["inf-more-info"] = ss;
             }
             double bitVal=pow(2,bit)-1;
+            double sens=4000.0/sensitivity;
+            double res2=(resx*resy)/10000.0;
 #pragma omp parallel for
             for (size_t i=0;i<original.getSurf();i++) {
                 if (original.point(i) != 0) {
-                    linearized.set(i,((resx*resy)/10000.0) * (4000.0/sensitivity) * exp(M_LN10*latitude*(original.point(i)/bitVal-0.5)));
+                    linearized.set(i, res2 * sens * exp(M_LN10*latitude*(original.point(i)/bitVal-0.5)));
+//                    double a=pow(1/(pow(2,bit)-1),2)*(resx/100)*(resy/100)*(4000/sensitivity)*pow(10,latitude/2.0);
+//                    DEBUG("a = " << a);
                 } else {
                     linearized.set(i,0.0);
                 }
@@ -1927,7 +1974,7 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
     if (ext=="txt") {
         retPhys.push_back(physDouble_txt(fname.c_str()));
-    } else if (ext.substr(0,3)=="tif") {
+    } else if (ext.substr(0,3)=="tif"|| ext=="gel") {
         retPhys=physFormat::phys_open_tiff(fname, separate_rgb);
     } else if (ext=="spe") {
         retPhys=physFormat::phys_open_spe(fname);
@@ -1999,6 +2046,7 @@ std::vector<std::string> physFormat::phys_image_formats() {
 #ifdef HAVE_LIBTIFF
     retval.push_back("tif");
     retval.push_back("tiff");
+    retval.push_back("gel");
 #endif
 #ifdef HAVE_LIBCFITSIO
     retval.push_back("fits");

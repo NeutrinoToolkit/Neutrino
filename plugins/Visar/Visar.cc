@@ -129,7 +129,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
 
-    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
+//    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
     connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_dn_over_dlambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
@@ -1034,148 +1034,144 @@ void Visar::needWave() {
     qDebug() << ">>>>>>>>>>>>>>>>>>>>> CALLING IN THE NAME OF" << sender() << sender()->property("id");
     if (sender() && sender()->property("id").isValid()) {
         unsigned int k=sender()->property("id").toUInt();
-        settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refreshRed.png"));
-//        QPalette pal = settingsUi[k]->doWaveButton->palette();
-//        pal.setColor(QPalette::Button, QColor(Qt::blue));
-//        settingsUi[k]->doWaveButton->setAutoFillBackground(true);
-//        settingsUi[k]->doWaveButton->setPalette(pal);
-//        settingsUi[k]->doWaveButton->update();
-
-//        settingsUi[k]->doWaveButton->setIcon(QIcon());
-
+        if (k< numVisars) {
+            settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refreshRed.png"));
+        }
     }
 }
 
 void Visar::doWave(unsigned int k) {
-    std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
-    if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
-        QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 19, this);
-        progress.setCancelButton(nullptr);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setValue(0);
-        progress.show();
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        sweepChanged(settingsUi[k]->physScale);
+    if (k< numVisars) {
+        std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
+        if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
+            QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 19, this);
+            progress.setCancelButton(nullptr);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.setValue(0);
+            progress.show();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            sweepChanged(settingsUi[k]->physScale);
 
-        std::array<physC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-        vec2i dim(imgs[0]->getSize());
-
-        std::array<physC,2> zz_morlet;
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-        std::array<physD,2> phase({{nPhysD(),nPhysD()}});
-
-        for (int m=0;m<2;m++) {
-            phase[m].resize(dim.x(), dim.y());
-            contrast[k][m].resize(dim.x(), dim.y());
-            intensity[k][m]= imgs[m]->copy();
+            std::array<physC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            physMath::phys_fast_gaussian_blur(intensity[k][m], settingsUi[k]->resolution->value());
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            zz_morlet[m].resize(dim.x(),dim.y());
-            progress.setValue(progress.value()+1);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        }
 
-        std::vector<int> xx(dim.x()), yy(dim.y());
+            vec2i dim(imgs[0]->getSize());
+
+            std::array<physC,2> zz_morlet;
+            progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+            std::array<physD,2> phase({{nPhysD(),nPhysD()}});
+
+            for (int m=0;m<2;m++) {
+                phase[m].resize(dim.x(), dim.y());
+                contrast[k][m].resize(dim.x(), dim.y());
+                intensity[k][m]= imgs[m]->copy();
+                progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+                physMath::phys_fast_gaussian_blur(intensity[k][m], settingsUi[k]->resolution->value());
+                progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+                zz_morlet[m].resize(dim.x(),dim.y());
+                progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            }
+
+            std::vector<int> xx(dim.x()), yy(dim.y());
 #pragma omp parallel for
-        for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
+            for (size_t i=0;i<(size_t)dim.x();i++) xx[i]=(i+(dim.x()+1)/2)%dim.x()-(dim.x()+1)/2; // swap and center
 #pragma omp parallel for
-        for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
+            for (size_t i=0;i<(size_t)dim.y();i++) yy[i]=(i+(dim.y()+1)/2)%dim.y()-(dim.y()+1)/2;
 
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
-        double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
-        double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
-        const double damp_norm=M_PI;
+            progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
+            double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
+            double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dim.x(),2)+pow(cr*dim.y(),2));
+            const double damp_norm=M_PI;
 
-        double lambda_norm=settingsUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
-        for (unsigned int m=0;m<2;m++) {
+            double lambda_norm=settingsUi[k]->interfringe->value()/sqrt(pow(cr*dim.x(),2)+pow(sr*dim.y(),2));
+            for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for collapse(2)
-            for (size_t x=0;x<(size_t)dim.x();x++) {
-                for (size_t y=0;y<(size_t)dim.y();y++) {
-                    double xr = xx[x]*cr - yy[y]*sr; //rotate
-                    double yr = xx[x]*sr + yy[y]*cr;
+                for (size_t x=0;x<(size_t)dim.x();x++) {
+                    for (size_t y=0;y<(size_t)dim.y();y++) {
+                        double xr = xx[x]*cr - yy[y]*sr; //rotate
+                        double yr = xx[x]*sr + yy[y]*cr;
 
-                    double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
-                    double e_y = -pow(yr*thick_norm, 2);
+                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
+                        double e_y = -pow(yr*thick_norm, 2);
 
-                    double gauss = exp(e_x)*exp(e_y);
+                        double gauss = exp(e_x)*exp(e_y);
 
-                    zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
+                        zz_morlet[m].Timg_matrix[y][x]=physfft[m].Timg_matrix[y][x]*gauss;
+                    }
+                }
+                progress.setValue(progress.value()+1);
+            }
+
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+            for (unsigned int m=0;m<2;m++) {
+                physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
+                progress.setValue(progress.value()+1);
+            }
+            progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+            for (unsigned int m=0;m<2;m++) {
+#pragma omp parallel for
+                for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
+                    phase[m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
+                    contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
+                    intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[m].point(kk));
+                }
+            }
+
+            if (direction(k)!=0) {
+                for (unsigned int m=0;m<2;m++) {
+                    physMath::phys_transpose(phase[m]);
+                    physMath::phys_transpose(contrast[k][m]);
+                    physMath::phys_transpose(intensity[k][m]);
                 }
             }
             progress.setValue(progress.value()+1);
-        }
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    //unwrap
 
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            physD diff = phase[1]-phase[0];
+            physD qual = contrast[k][1]*contrast[k][0];
 
-        for (unsigned int m=0;m<2;m++) {
-            physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
+    //        physD diff(dim.x(),dim.y(),0,"diff");
+    //        physD qual(dim.x(),dim.y(),0,"qual");
+    //        for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
+    //            diff.set(kk,phase[1].point(kk)-phase[0].point(kk));
+    //            qual.set(kk,contrast[k][1].point(kk)*contrast[k][0].point(kk));
+    //        }
+
+            physWave::phys_phase_unwrap(diff, qual, physWave::QUALITY, phaseUnwrap[k]);
+
             progress.setValue(progress.value()+1);
-        }
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        for (unsigned int m=0;m<2;m++) {
-#pragma omp parallel for
-            for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
-                phase[m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
-                contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
-                intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[m].point(kk));
-            }
-        }
+            getPhase(k);
 
-        if (direction(k)!=0) {
-            for (unsigned int m=0;m<2;m++) {
-                physMath::phys_transpose(phase[m]);
-                physMath::phys_transpose(contrast[k][m]);
-                physMath::phys_transpose(intensity[k][m]);
-            }
-        }
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-//unwrap
+            progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        physD diff = phase[1]-phase[0];
-        physD qual = contrast[k][1]*contrast[k][0];
+            updatePlot();
+            progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-//        physD diff(dim.x(),dim.y(),0,"diff");
-//        physD qual(dim.x(),dim.y(),0,"qual");
-//        for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
-//            diff.set(kk,phase[1].point(kk)-phase[0].point(kk));
-//            qual.set(kk,contrast[k][1].point(kk)*contrast[k][0].point(kk));
-//        }
-
-        physWave::phys_phase_unwrap(diff, qual, physWave::QUALITY, phaseUnwrap[k]);
-
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-        getPhase(k);
-
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-        updatePlot();
-        progress.setValue(progress.value()+1);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
-
-    } else {
-        if (imgs[0] && imgs[1]) {
-            DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW());
+            settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
         } else {
-            DEBUG("BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! ");
+            if (imgs[0] && imgs[1]) {
+                DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW());
+            } else {
+                DEBUG("BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! ");
+            }
+            statusBar()->showMessage("Size mismatch",5000);
         }
-        statusBar()->showMessage("Size mismatch",5000);
     }
 }
 

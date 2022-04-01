@@ -49,10 +49,13 @@ public:
 	{ ddescr = any_none; }
 
 	// insert ops
-	anydata & operator= (int rhs) 
-	{ i=rhs; ddescr = any_int; return *this; }
+    anydata & operator= (int rhs)
+    { i=rhs; ddescr = any_int; return *this; }
 
-	anydata & operator= (double rhs) 
+    anydata & operator= (unsigned int rhs)
+    { i=static_cast<int>(rhs); ddescr = any_int; return *this; }
+
+    anydata & operator= (double rhs)
 	{ d=rhs; ddescr = any_double; return *this; }
 	
 	template<class T> anydata & operator= (bidimvec<T> rhs) 

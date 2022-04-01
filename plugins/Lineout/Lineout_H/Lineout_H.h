@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nlineout_H
-#define __nlineout_H
+#ifndef nlineoutH_H
+#define nlineoutH_H
 
 #include "../Lineout.h"
 
