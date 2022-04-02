@@ -44,7 +44,7 @@ if(WIN32)
 	if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
 		add_compile_options(-Wa,-mbig-obj)
 	else() # 32bit
-		add_compile_options(-flto -Wl,-allow-multiple-definition)
+#		add_compile_options(-flto -Wl,-allow-multiple-definition)
 	endif()
 	add_definitions(-DNT_THREADS) 
 else()
