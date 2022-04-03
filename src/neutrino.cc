@@ -923,7 +923,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
             my_neu->fileOpen(fname);
         } else {
             QProgressDialog progress("Load session", "Cancel", 0, 0, this);
-            std::ifstream ifile(fname.toUtf8().constData(), std::ios::in | std::ios::binary);
+            std::ifstream ifile(QFile::encodeName(fname).toStdString(), std::ios::in | std::ios::binary);
             std::string line;
             getline(ifile,line);
             QString qLine=QString::fromStdString(line);

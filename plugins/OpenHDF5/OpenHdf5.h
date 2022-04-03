@@ -55,7 +55,7 @@ public slots:
     void scanDataset(hid_t, QTreeWidgetItem *);
 
     int phys_write_Hdf5(nPhysD *phys, std::string fname);
-    nPhysD* phys_open_Hdf5(std::string fileName, std::string dataName);
+    nPhysD* phys_open_Hdf5(QString fname, std::string dataName);
     void scan_attributes(hid_t aid, nPhysD *my_data);
 
     void copyPath();

@@ -75,7 +75,7 @@ QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
 
 void OpenHdf5::openData(QTreeWidgetItem *item, int) {
     QString dataName=item->data(3,0).toString();
-    nparent->showPhys(phys_open_Hdf5(getFilename(item).toStdString(),dataName.toStdString()));
+    nparent->showPhys(phys_open_Hdf5(getFilename(item),dataName.toStdString()));
 }
 
 void OpenHdf5::showFile(QString fname) {
@@ -88,7 +88,7 @@ void OpenHdf5::showFile(QString fname) {
         }
     }
     hid_t faplist_id=H5Pcreate(H5P_FILE_ACCESS);
-    hid_t file_id = H5Fopen (fname.toUtf8(), H5F_ACC_RDONLY, faplist_id);
+    hid_t file_id = H5Fopen (QFile::encodeName(fname).toStdString().c_str(), H5F_ACC_RDONLY, faplist_id);
     if (file_id>0) {
         nparent->updateRecentFileActions(fname);
         hid_t grp = H5Gopen(file_id,"/", H5P_DEFAULT);
@@ -405,9 +405,9 @@ void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
 }
 
 
-nPhysD* OpenHdf5::phys_open_Hdf5(std::string fileName, std::string dataName) {
+nPhysD* OpenHdf5::phys_open_Hdf5(QString fname, std::string dataName) {
     nPhysD *my_data=nullptr;
-    hid_t fid = H5Fopen (fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+    hid_t fid = H5Fopen (QFile::encodeName(fname).toStdString().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     if (fid >= 0) {
         hid_t did = H5Dopen(fid,dataName.c_str(), H5P_DEFAULT);
         if (did>=0) {

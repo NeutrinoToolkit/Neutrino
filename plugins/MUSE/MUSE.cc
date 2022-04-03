@@ -352,19 +352,19 @@ QVariant MUSE::extractData(QString key, QStringList values) {
 
 void MUSE::loadCube() {
 	QFileDialog fd;
-	QString ifilename=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
+    QString fname=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
 
-    if (!ifilename.isEmpty()) {
+    if (!fname.isEmpty()) {
         fd.close();
 		QApplication::processEvents();
-		setProperty("NeuSave-fileMUSE", ifilename);
+        setProperty("NeuSave-fileMUSE", fname);
 
 
 		fitsfile *fptr;
 		char card[FLEN_CARD];
 		int status = 0, ii;
 
-		fits_open_file(&fptr, ifilename.toLatin1().data(), READONLY, &status);
+        fits_open_file(&fptr, QFile::encodeName(fname).toStdString().c_str(), READONLY, &status);
 		int bitpix;
 		int anaxis;
 
