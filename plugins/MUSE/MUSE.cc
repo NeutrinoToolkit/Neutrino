@@ -364,7 +364,7 @@ void MUSE::loadCube() {
 		char card[FLEN_CARD];
 		int status = 0, ii;
 
-        fits_open_file(&fptr, QFile::encodeName(fname).toStdString().c_str(), READONLY, &status);
+        fits_open_file(&fptr, QFile::encodeName(fname).constData(), READONLY, &status);
 		int bitpix;
 		int anaxis;
 

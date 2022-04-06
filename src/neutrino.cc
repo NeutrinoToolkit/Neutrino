@@ -728,6 +728,20 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 delete my_phys;
                                 my_phys=new nPhysD(rotated);
                             }
+                            if (my_set.value("lockFlip",false).toBool()) {
+                                if (my_set.value("flipX").toBool()) {
+                                    physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+                                    my_phys->reset_display();
+                                }
+                                if (my_set.value("flipY").toBool()) {
+                                    physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+                                    my_phys->reset_display();
+                                }
+                                if (my_set.value("transpose").toBool()) {
+                                    physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
+                                    my_phys->reset_display();
+                                }
+                            }
                             my_set.endGroup();
 
                             addShowPhys(my_phys);
@@ -878,7 +892,7 @@ void neutrino::saveSession (QString fname) {
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
 
-            std::ofstream ofile(fname.toUtf8().constData(), std::ios::out | std::ios::binary);
+            std::ofstream ofile(QFile::encodeName(fname).toStdString().c_str(), std::ios::out | std::ios::binary);
             ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
 
             for (int i=0;i<physList.size(); i++) {
@@ -905,7 +919,7 @@ void neutrino::saveSession (QString fname) {
                 DEBUG(pandata);
                 vecPhys[0]->prop["neutrinoPanData"] = pandata;
             }
-            physFormat::phys_write_tiff(vecPhys,fname.toUtf8().constData());
+            physFormat::phys_write_tiff(vecPhys,QFile::encodeName(fname).toStdString().c_str());
         } else {
             QMessageBox::warning(this,tr("Attention"),tr("Unknown extension: ")+file_info.suffix(), QMessageBox::Ok);
         }
@@ -1330,17 +1344,17 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
     if (phys) {
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.startsWith("neu")) {
-            physFormat::phys_dump_binary(phys,fname.toUtf8().constData());
+            physFormat::phys_dump_binary(phys,QFile::encodeName(fname).toStdString().c_str());
         } else if (fname.endsWith("tif") || fname.endsWith("tiff")) {
-            physFormat::phys_write_tiff(phys,fname.toUtf8().constData());
+            physFormat::phys_write_tiff(phys,QFile::encodeName(fname).toStdString().c_str());
         } else if (suffix.startsWith("fit")) {
-            physFormat::phys_write_fits(phys,("!"+fname).toUtf8().constData(),4);
+            physFormat::phys_write_fits(phys,QFile::encodeName("!"+fname).toStdString().c_str(),4);
         } else if (suffix.startsWith("hdf")) {
-            physFormat::phys_write_HDF4(phys,fname.toUtf8().constData());
+            physFormat::phys_write_HDF4(phys,QFile::encodeName(fname).toStdString().c_str());
         } else if (suffix.startsWith("txt") || suffix.startsWith("dat")) {
-            phys->writeASC(fname.toUtf8().constData());
+            phys->writeASC(QFile::encodeName(fname).toStdString().c_str());
         } else {
-            my_w->my_view->my_pixitem.pixmap().save(fname);
+            my_w->my_view->my_pixitem.pixmap().save(QFile::encodeName(fname));
         }
         phys->setType(PHYS_FILE);
         phys->setShortName(QFileInfo(fname).fileName().toStdString());

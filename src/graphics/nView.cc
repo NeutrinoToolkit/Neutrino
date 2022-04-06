@@ -446,11 +446,11 @@ void nView::toggleGrid() {
 
 
 void nView::incrGamma() {
-    setGamma(int(nparent->currentBuffer->prop["gamma"])+1);
+    if (nparent->currentBuffer) setGamma(int(nparent->currentBuffer->prop["gamma"])+1);
 }
 
 void nView::decrGamma() {
-    setGamma(int(nparent->currentBuffer->prop["gamma"])-1);
+    if (nparent->currentBuffer) setGamma(int(nparent->currentBuffer->prop["gamma"])-1);
 }
 
 void nView::resetGamma() {

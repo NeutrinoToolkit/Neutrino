@@ -423,6 +423,8 @@ void Visar::delVisar() {
         QApplication::processEvents();
         numVisars--;
         setProperty("NeuSave-numVisars",numVisars);
+    } else {
+        statusbar->showMessage("Cannot remove last Visar");
     }
     updatePlot();
 }
@@ -480,7 +482,6 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
 }
 
 void Visar::sweepChanged(QLineEdit *line) {
-    int k=0;
     if(line==nullptr) {
         if (sender()) {
             QLineEdit *line=qobject_cast<QLineEdit *>(sender());
@@ -492,6 +493,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             sweepChanged(sopScale);
         }
     } else {
+        int k=0;
         std::vector<double> *vecsweep=nullptr;
         if (line==sopScale) {
             vecsweep = &sweepCoeffSOP;
@@ -1350,7 +1352,7 @@ Visar::export_txt_multiple() {
         QTextStream out(&t);
         for (unsigned int k=0;k<numVisars;k++){
             out << export_one(k);
-            out << endl << endl;
+            out << "\n\n";
         }
         out << export_sop();
         t.close();

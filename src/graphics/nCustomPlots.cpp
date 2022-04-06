@@ -364,9 +364,9 @@ void nCustomPlot::showAxis(bool val) {
 
 
 void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
-    out << "# " << graph->name() << endl;
+    out << "# " << graph->name() << "\n";
     for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
-        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << endl;
+        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << "\n";
     }
 }
 
@@ -378,7 +378,7 @@ QString nCustomPlot::get_data(int g) {
     } else if (g<graphCount()) {
         get_data_graph(out,graph(g));
     }
-    out << endl;
+    out << "\n";
     out.flush();
     return retstr;
 }
@@ -399,13 +399,13 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
             }
         }
     } else {
-        out << "# " <<  title->text() << endl;
-        out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << endl;
+        out << "# " <<  title->text() << "\n";
+        out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << "\n";
         for (int g=0; g<graphCount(); g++) {
             if(graph(g)->visible()) {
                 out << "# " << g <<" ";
                 get_data_graph(out,graph(g));
-                out << endl << endl;
+                out << "\n" << "\n";
             }
         }
     }

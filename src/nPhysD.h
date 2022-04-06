@@ -72,11 +72,11 @@ class nPhysD : public physD {
 
             return &uchar_buf[0];
         }
-
         return nullptr;
     }
 
     phys_properties display_prop;
+    std::vector<unsigned char> uchar_buf;
 
     inline void reset_display() {
         display_prop.clear();
@@ -88,7 +88,6 @@ class nPhysD : public physD {
         reset_display();
         physD::TscanBrightness();
     }
-    std::vector<unsigned char> uchar_buf;
 
 };
 
