@@ -28,6 +28,7 @@
 #include "nPhysMaths.h"
 #include <time.h>
 #include <zlib.h>
+#include <regex>
 
 #ifdef HAVE_LIBCFITSIO
 #include "fitsio.h"
@@ -348,7 +349,6 @@ physFormat::physShort_b16::physShort_b16(const char *ifilename)
 }
 
 
-#include <regex>
 
 std::string splitHamamatsuComments(std::string line) {
     std::string res;
@@ -736,8 +736,20 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                     DEBUG("33448 " << count << " " << strlen(strdata) << " " << std::string(strdata));
                 }
                 if (TIFFGetField(tif, 33449, &count, &strdata)) {
-                    tiff_prop["TIFF_MD_SampleInfo"] = std::string(strdata);
-                    DEBUG("33449 " << count << " " << std::string(strdata));
+                    std::string res(strdata);
+                    tiff_prop["TIFF_MD_SampleInfo"] = res;
+
+                    std::string myreg(R"(PMT:(\d*)V, L(\d*), (\d*)(.*))");
+                    std::regex my_regex(myreg);
+                    std::smatch m;
+                    DEBUG("33449 " << count << "\n" << std::string(strdata));
+                    if(std::regex_search(res,m,my_regex)) {
+                        DEBUG("found GEL");
+                        tiff_prop["gel_V"]=std::stoi(m.str(1));
+                        tiff_prop["gel_L"]=std::stoi(m.str(2));
+                        tiff_prop["gel_R"]=std::stoi(m.str(3));
+                        tiff_prop["gel_U"]=m.str(4);
+                    }
                 }
                 if (TIFFGetField(tif, 33450, &count, &strdata)) {
                     tiff_prop["TIFF_MD_PrepDate"] = std::string(strdata);
@@ -766,6 +778,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 if (resx!=0.0 && resy!=0.0) {
                     tiff_prop["scale"]=vec2f(1.0/resx,1.0/resy);
                 }
+                DEBUG("Resolution " << resx << " " << resy);
                 TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &units);
                 switch (units) {
                     case 1:
@@ -927,6 +940,19 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                                 }
                                 my_phys.set(i,j,my_phys.point(i,j)+val);
                             }
+                        }
+                        if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R")){
+                            DEBUG("here we are");
+                            physMath::phys_flip_ud(my_phys);
+                            double D=pow(2,8*bytesperpixel)-1;
+                            double S=pow(10,-15.845+6.861*0.4343*log(tiff_prop["gel_V"].get_i()));
+                            double a=(pow(tiff_prop["gel_R"].get_i(),2)/10000)*(4000/S)*pow(10,tiff_prop["gel_L"].get_i()/2.);
+                            for (unsigned int i=0; i< my_phys.getSurf(); i++) {
+                                double val=a*pow(my_phys.point(i)/D,2);
+                                my_phys.set(i,val);
+                            }
+                            my_phys.prop["unitsCB"] = "PSL";
+                            my_phys.set_scale(tiff_prop["gel_R"].get_i()/10000.,tiff_prop["gel_R"].get_i()/10000.);
                         }
                         my_phys.TscanBrightness();
                         if (separate_rgb) {
