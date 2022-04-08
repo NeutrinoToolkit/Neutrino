@@ -10,9 +10,7 @@ nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
     log_win_ui(new Ui::nLogWin)
 #ifndef __clang__
-  ,
-    qout(std::cout)
-    
+  , qout(std::cout)
 #endif
 {
 
@@ -25,7 +23,6 @@ int nApp::exec() {
 #ifndef __phys_debug
     qInstallMessageHandler(nApp::myMessageOutput);
 #endif
-
     qInfo() << "Default preference file:" << QSettings("neutrino","").fileName();
 
     addDefaultPalettes();
@@ -61,10 +58,9 @@ int nApp::exec() {
     QStringList args=arguments();
     args.removeFirst();
 
-    neutrino *ny_neu = new neutrino();
+    neutrino *my_neu = new neutrino();
     for (auto &arg : args)
-        ny_neu->fileOpen(arg);
-
+        my_neu->fileOpen(arg);
 
     return QApplication::exec();
 }

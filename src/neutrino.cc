@@ -95,7 +95,6 @@ neutrino::neutrino():
     my_sbarra(new Ui::nSbarra),
     currentBuffer(nullptr)
 {
-
     my_w->setupUi(this);
     setAcceptDrops(true);
 
@@ -246,11 +245,11 @@ neutrino::neutrino():
     updateRecentFileActions();
 
     loadDefaults();
+    show();
 
     // plugins
     scanPlugins();
 
-    show();
 
     QApplication::processEvents();
 
@@ -268,6 +267,7 @@ neutrino::neutrino():
 
     my_w->actionLog_info->setChecked(napp->log_win.isVisible());
     connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+
 
 //#define xxstring(s) xstring(s)
 //#define xstring(s) #s
@@ -431,10 +431,22 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             pluginlist.append(it.next());
         }
         pluginlist.sort();
+        QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.show();
+        progress.setCancelButton(nullptr);
         for (auto &pluginfile : pluginlist) {
+            QString name_plugin=QFileInfo(pluginfile).baseName().replace("_"," ");
+#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
+                if (name_plugin.startsWith("lib")) {
+                    name_plugin.remove(0,3);
+                }
+#endif
+            progress.setLabelText("Plugin: "+name_plugin);
+            progress.setValue(progress.value()+1);
             loadPlugin(pluginfile, false);
         }
-
+        progress.close();
         QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
         qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
         if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
@@ -741,6 +753,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
                                     my_phys->reset_display();
                                 }
+                            }
+                            if (my_set.value("lockMath",false).toBool()) {
+                                physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
+                                physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
                             }
                             my_set.endGroup();
 

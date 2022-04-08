@@ -941,16 +941,16 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                                 my_phys.set(i,j,my_phys.point(i,j)+val);
                             }
                         }
-                        if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R")){
+                        if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R"), tiff_prop.have("TIFF_MD_FileTag")){
                             DEBUG("here we are");
                             physMath::phys_flip_ud(my_phys);
-                            double D=pow(2,8*bytesperpixel)-1;
+                            double D=pow(pow(2,8*bytesperpixel)-1,2);
                             double S=pow(10,-15.845+6.861*0.4343*log(tiff_prop["gel_V"].get_i()));
-                            double a=(pow(tiff_prop["gel_R"].get_i(),2)/10000)*(4000/S)*pow(10,tiff_prop["gel_L"].get_i()/2.);
-                            for (unsigned int i=0; i< my_phys.getSurf(); i++) {
-                                double val=a*pow(my_phys.point(i)/D,2);
-                                my_phys.set(i,val);
+                            double a=(pow(tiff_prop["gel_R"].get_i(),2)/10000)*(4000/S)*pow(10,tiff_prop["gel_L"].get_i()/2.)/D;
+                            if (tiff_prop["TIFF_MD_FileTag"].get_i()==2) {
+                                physMath::phys_square(my_phys);
                             }
+                            physMath::phys_multiply(my_phys,a);
                             my_phys.prop["unitsCB"] = "PSL";
                             my_phys.set_scale(tiff_prop["gel_R"].get_i()/10000.,tiff_prop["gel_R"].get_i()/10000.);
                         }

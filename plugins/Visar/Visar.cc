@@ -1014,7 +1014,7 @@ void Visar::getCarrier(unsigned int k) {
         } else {
             settingsUi[k]->interfringe->setValue(vecCarr.first());
             settingsUi[k]->angle->setValue(vecCarr.second());
-            if (tabPhase->currentIndex()==k) {
+            if (tabPhase->currentIndex() == static_cast<int>(k)) {
                 statusbar->showMessage(tr("Carrier :")+QLocale().toString(vecCarr.first())+tr("px, ")+QLocale().toString(vecCarr.second())+tr("deg"));
             }
         }
@@ -1190,7 +1190,7 @@ void Visar::getPhase() {
 }
 
 void Visar::getPhase(unsigned int k) {
-    if (k< (int) numVisars) {
+    if (k < numVisars) {
         settingsUi[k]->plotPhaseIntensity->clearGraphs();
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
 

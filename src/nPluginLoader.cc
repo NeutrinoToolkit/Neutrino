@@ -84,6 +84,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                         if (my_qplugin!=nullptr) {
                             if(my_qplugin->instance()){
                                 my_qplugin->deleteLater();
+                                QApplication::processEvents();
                             }
                             my_qplugin=new QPluginLoader(pname);
                             p_obj = my_qplugin->instance();
