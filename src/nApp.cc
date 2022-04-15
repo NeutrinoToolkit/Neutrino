@@ -53,6 +53,13 @@ int nApp::exec() {
     setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
     log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
 
+    if (!my_set.contains("checkUpdates")) {
+        my_set.setValue("checkUpdates",QMessageBox::Yes == QMessageBox::question(nullptr,tr("Attention"),tr("Do you want to check for updates?"), QMessageBox::Yes | QMessageBox::No));
+    }
+    if (my_set.value("checkUpdates",true).toBool()) {
+        checkUpdates();
+    }
+
     my_set.endGroup();
 
     QStringList args=arguments();
@@ -173,7 +180,7 @@ void nApp::addPaletteFile(QString cmapfile) {
                 QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
                 for(auto &strnum : line) {
                     if (iter < nPalettes[cmapfile].size()) {
-                        nPalettes[cmapfile][iter] = strnum.toInt();
+                        nPalettes[cmapfile][iter] = static_cast<unsigned char>(strnum.toUInt());
                     }
                     iter++;
                 }
@@ -264,4 +271,74 @@ void nApp::forceDecimalDot(int num) {
         QLocale::setDefault(QLocale::c());
     }
     qDebug() << num;
+}
+
+void nApp::checkUpdates() {
+    QNetworkProxyFactory::setUseSystemConfiguration(true) ;
+    QNetworkAccessManager manager;
+    QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
+    QEventLoop event;
+    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
+    event.exec();
+    QString html = response->readAll(); // Source should be stored here
+
+    QJsonDocument json = QJsonDocument::fromJson(html.toUtf8());
+
+    QJsonObject responseObject = json.object();
+#ifdef __phys_debug
+    for(const auto &key : responseObject.keys() ) {
+        QJsonValue value = responseObject.value(key);
+        qDebug() << "Key = " << key << ", Value = " << value.toString();
+    }
+    QUrl commenturl(responseObject.value("comments_url").toString());
+    response = manager.get(QNetworkRequest(commenturl));
+    QObject::connect(response,&QNetworkReply::finished,&event,&QEventLoop::quit);
+    event.exec();
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    qDebug() << response->readAll();
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+#endif
+    if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
+        QString compileSHA = QString(__VER_SHA);
+        QString onlineSHA=responseObject.value("sha").toString();
+        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+        qDebug() << compileSHA;
+        qDebug() << onlineSHA;
+        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
+        if (compileSHA != onlineSHA) {
+
+            QMessageBox msgBox;
+            QString text=tr("A newer version is available");
+            msgBox.setText(text);
+            msgBox.addButton(tr("Get it now"), QMessageBox::YesRole);
+            msgBox.addButton(tr("Next time"), QMessageBox::RejectRole);
+            msgBox.addButton(tr("Stop checking"), QMessageBox::NoRole);
+            //            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
+            int ret = msgBox.exec();
+
+            qDebug() << ret << " : " << msgBox.result();
+            switch ( msgBox.buttonRole(msgBox.clickedButton())) {
+                case QMessageBox::YesRole:
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+                    QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino/releases"));
+#else
+                    QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino"));
+#endif
+                    break;
+                case QMessageBox::NoRole: {
+                        QSettings my_set("neutrino","");
+                        my_set.beginGroup("nPreferences");
+                        my_set.setValue("checkUpdates",false);
+                        my_set.endGroup();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+    }
+
 }

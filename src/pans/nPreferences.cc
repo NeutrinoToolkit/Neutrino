@@ -100,7 +100,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 
 	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
-	connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 
     show(true);
 
@@ -117,12 +117,37 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
 	connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
-	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+    connect(my_w.lockOrigin, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.originX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+    connect(my_w.originY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
+    connect(my_w.lockScale, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.scaleX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+    connect(my_w.scaleY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
+    connect(my_w.lockRotate, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.rotate, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+
+    connect(my_w.lockFlip, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.flipX, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.flipY, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.transpose, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+
+    connect(my_w.lockMath, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.subtract, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+    connect(my_w.multiply, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
 
     my_w.askCloseUnsaved->setChecked(nparent->property("NeuSave-askCloseUnsaved").toBool());
 	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
+    connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+
+	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
     my_w.physNameLength->setValue(nparent->property("NeuSave-physNameLength").toInt());
 	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
@@ -135,6 +160,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 void nPreferences::changeThreads(int num) {
 	nApp::changeThreads(num);
+    saveDefaults();
 }
 
 
@@ -146,6 +172,7 @@ void nPreferences::openclUnitValueChange(int num) {
 		setProperty("openclUnit",num);
 	}
 #endif
+    saveDefaults();
 }
 
 void nPreferences::resetSettings() {
@@ -166,6 +193,7 @@ void nPreferences::on_getOrigin_released() {
         my_w.originX->repaint();
         my_w.originY->repaint();
     }
+    saveDefaults();
 }
 
 void nPreferences::on_getScale_released() {
@@ -213,6 +241,7 @@ void nPreferences::changeFont() {
 	settings.setValue("defaultFont",font.toString());
 	settings.endGroup();
 	nparent->my_w->my_view->setSize();
+    saveDefaults();
 }
 
 void nPreferences::changeIconSize(int val) {
@@ -234,6 +263,7 @@ void nPreferences::changeIconSize(int val) {
 			}
 		}
 	}
+    saveDefaults();
 }
 
 void nPreferences::hideEvent(QHideEvent*e){
@@ -256,6 +286,8 @@ void nPreferences::on_addPlugin_released() {
 		nparent->scanPlugins(dir);
 		my_w.pluginList->addItem(dir);
 	}
+    saveDefaults();
+    nparent->saveDefaults();
 }
 
 void nPreferences::on_removePlugin_released() {
@@ -265,6 +297,7 @@ void nPreferences::on_removePlugin_released() {
 		pluginList.append(my_w.pluginList->item(i)->text());
 	}
 	nparent->setProperty("NeuSave-plugindirs",pluginList);
+    nparent->saveDefaults();
 }
 
 void nPreferences::on_mouseThickness_valueChanged(double val){

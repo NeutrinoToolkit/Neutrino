@@ -28,8 +28,8 @@ scalarMap::getField(fp look_point)
 		
 			return scalar_field*myfield_versor;
 		}
-	} else
-		return fp(0.0,0.0,0.0);
+    }
+    return fp(0.0,0.0,0.0);
 }
 
 // costruzione da vettore

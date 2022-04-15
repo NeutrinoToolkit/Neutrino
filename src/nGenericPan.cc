@@ -706,7 +706,7 @@ void nGenericPan::saveSettings(QSettings &settings) {
     settings.beginGroup("Properties");
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
-            qDebug() << ba, property(ba);
+            qDebug() << ba << property(ba);
             settings.setValue(ba, property(ba));
         }
     }

@@ -22,6 +22,10 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+
+#ifndef generic_pan_H
+#define generic_pan_H
+
 #include <QtGui>
 #include <QWidget>
 
@@ -38,8 +42,6 @@
 #include "nPhysD.h"
 #include "panThread.h"
 
-#ifndef __generic_pan
-#define __generic_pan
 
 #include "nPanPlug.h"
 

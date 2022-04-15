@@ -3,8 +3,8 @@
 
 #include "nPlug.h"
 
-#ifndef __nPluginLoader
-#define __nPluginLoader
+#ifndef nPluginLoader_H_
+#define nPluginLoader_H_
 
 // holds plugin initialization (basic problem: nPlug is not a QObject
 

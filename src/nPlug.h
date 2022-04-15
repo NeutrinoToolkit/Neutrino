@@ -52,8 +52,8 @@
 
 #include "nPhysD.h"
 
-#ifndef __nplug
-#define __nplug
+#ifndef nplug_H
+#define nplug_H
 
 class neutrino;
 

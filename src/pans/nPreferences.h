@@ -50,9 +50,9 @@ public slots:
 
 
     void changeFont();
-    void hideEvent(QHideEvent*);
-    void showEvent(QShowEvent*);
     void askCloseUnsaved();
+    void hideEvent (QHideEvent*) override;
+    void showEvent(QShowEvent*) override;
     void changephysNameLength(int);
     void openclUnitValueChange(int);
     void resetSettings();

@@ -51,8 +51,8 @@
 #include <iostream>
 
 #include "nPlug.h"
-#ifndef __npanplug
-#define __npanplug
+#ifndef npanplug_H
+#define npanplug_H
 
 class neutrino;
 class nGenericPan;

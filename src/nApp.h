@@ -80,6 +80,7 @@ public slots:
     void findLogText();
 
     void forceDecimalDot(int);
+    void checkUpdates();
 };
 
 #endif
