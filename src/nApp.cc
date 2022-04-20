@@ -310,6 +310,9 @@ void nApp::checkUpdates() {
 
             QMessageBox msgBox;
             QString text=tr("A newer version is available");
+#ifdef __phys_debug
+            text+="\n"+compileSHA.left(7)+"\n"+onlineSHA.left(7);
+#endif
             msgBox.setText(text);
             msgBox.addButton(tr("Get it now"), QMessageBox::YesRole);
             msgBox.addButton(tr("Next time"), QMessageBox::RejectRole);

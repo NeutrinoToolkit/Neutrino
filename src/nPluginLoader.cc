@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
-    QPluginLoader(pname),
+    QPluginLoader(pname, neu),
     iface(nullptr),
     nParent(neu)
 {

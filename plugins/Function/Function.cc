@@ -27,12 +27,32 @@
 #include "nPhysImageF.h"
 #include "exprtk.hpp"
 
-struct physFunc : public exprtk::ifunction<double>
+struct physFunc2 : public exprtk::ifunction<double>
 {
-    physFunc(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
+    physFunc2(Function *fparent) : exprtk::ifunction<double>(2), parent(fparent) {
         exprtk::disable_has_side_effects(*this);
     }
-    virtual ~physFunc() override {}
+    virtual ~physFunc2() override {}
+
+public:
+    virtual double operator()(const double& x, const double& y) override {
+        if (parent->currentBuffer) {
+            return parent->currentBuffer->getPoint(x,y);
+        } else {
+            return std::numeric_limits<double>::quiet_NaN();
+        }
+    }
+
+private:
+    Function* parent;
+};
+
+struct physFunc3 : public exprtk::ifunction<double>
+{
+    physFunc3(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
+        exprtk::disable_has_side_effects(*this);
+    }
+    virtual ~physFunc3() override {}
 
 public:
     virtual double operator()(const double &imgnum, const double& x, const double& y) override {
@@ -54,6 +74,36 @@ public:
 private:
     Function* parent;
 };
+
+struct physFuncID : public exprtk::ifunction<double>
+{
+    physFuncID(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
+        exprtk::disable_has_side_effects(*this);
+    }
+    virtual ~physFuncID() override {}
+
+public:
+    virtual double operator()(const double &imgnum, const double& x, const double& y) override {
+        int imgnumint=static_cast<int>(imgnum);
+        nPhysD *my_phys(nullptr);
+        QList<nPhysD *> mylist=parent->nparent->getBufferList();
+        for (auto img :parent->nparent->getBufferList()) {
+            if (img->prop["uuid"].get_i()==imgnumint) {
+                my_phys = img;
+                break;
+            }
+        }
+        if (my_phys) {
+            return my_phys->getPoint(x,y);
+        } else {
+            return std::numeric_limits<double>::quiet_NaN();
+        }
+    }
+
+private:
+    Function* parent;
+};
+
 
 
 Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
@@ -77,8 +127,14 @@ void Function::on_doIt_released() {
     symbol_table.add_variable("x",x);
     symbol_table.add_variable("y",y);
 
-    physFunc mf(this);
+    physFunc3 mf(this);
     symbol_table.add_function("phys",mf);
+
+    physFunc2 mf2(this);
+    symbol_table.add_function("img",mf2);
+
+    physFuncID mfID(this);
+    symbol_table.add_function("id",mfID);
 
     symbol_table.add_constant("width",my_phys->getW());
     symbol_table.add_constant("height",my_phys->getH());
@@ -90,7 +146,9 @@ void Function::on_doIt_released() {
     my_exprtk.register_symbol_table(symbol_table);
 
     exprtk::parser<double> parser;
-    parser.compile(function->toPlainText().toStdString(),my_exprtk);
+    if (!parser.compile(function->toPlainText().toStdString(),my_exprtk)) {
+        qWarning() << "Error in expression \n" << function->toPlainText();
+    }
 
 
     QProgressDialog progress("", "Cancel", 0, static_cast<int>(my_phys->getW()), this);
