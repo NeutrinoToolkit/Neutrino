@@ -117,6 +117,16 @@ Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     show();
 }
 
+void Function::on_actionCopy_Size_triggered() {
+    qDebug() << "here";
+    if (currentBuffer) {
+        auto size=currentBuffer->getSize();
+        sb_width->setValue(size.x());
+        sb_height->setValue(size.y());
+    }
+
+}
+
 void Function::on_doIt_released() {
     saveDefaults();
     nPhysD *my_phys = new nPhysD(static_cast<unsigned int>(sb_width->value()), static_cast<unsigned int>(sb_height->value()), 0.0, "");

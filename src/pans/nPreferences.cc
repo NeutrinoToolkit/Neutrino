@@ -149,12 +149,26 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
+    connect(my_w.pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
+
     my_w.physNameLength->setValue(nparent->property("NeuSave-physNameLength").toInt());
 	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
 
-	for (auto& d : nparent->property("NeuSave-plugindirs").toStringList()) {
-		my_w.pluginList->addItem(d);
-	}
+    QMap<QString, QVariant> pluginList(nparent->property("NeuSave-plugindirs").toMap());
+    qDebug() << pluginList;
+    for (auto& k : pluginList.keys()) {
+        qDebug() << k << pluginList[k];
+        QListWidgetItem *dd=new QListWidgetItem(my_w.pluginList);
+        dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
+        if (pluginList[k].toInt() == 0) {
+            dd->setCheckState(Qt::Unchecked);
+        } else {
+            dd->setCheckState(Qt::Checked);
+        }
+        dd->setText(k);
+        my_w.pluginList->addItem(dd);
+//        my_w.pluginList->addItem(d);
+    }
 
 }
 
@@ -284,20 +298,29 @@ void nPreferences::on_addPlugin_released() {
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
 	if (QFileInfo(dir).exists()) {
 		nparent->scanPlugins(dir);
-		my_w.pluginList->addItem(dir);
+        QListWidgetItem *dd=new QListWidgetItem(my_w.pluginList);
+        dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
+        dd->setCheckState(Qt::Checked);
+        dd->setText(dir);
+        my_w.pluginList->addItem(dd);
 	}
     saveDefaults();
     nparent->saveDefaults();
 }
 
+void nPreferences::updatePlugindirs() {
+    QMap<QString, QVariant> pluginList;
+    for(int i = 0; i < my_w.pluginList->count(); ++i) {
+        pluginList[my_w.pluginList->item(i)->text()]=QVariant(my_w.pluginList->item(i)->checkState());
+    }
+    nparent->setProperty("NeuSave-plugindirs",pluginList);
+    qDebug() << nparent->property("NeuSave-plugindirs");
+    nparent->saveDefaults();
+}
+
 void nPreferences::on_removePlugin_released() {
 	qDeleteAll(my_w.pluginList->selectedItems());
-	QStringList pluginList;
-	for(int i = 0; i < my_w.pluginList->count(); ++i) {
-		pluginList.append(my_w.pluginList->item(i)->text());
-	}
-	nparent->setProperty("NeuSave-plugindirs",pluginList);
-    nparent->saveDefaults();
+    updatePlugindirs();
 }
 
 void nPreferences::on_mouseThickness_valueChanged(double val){

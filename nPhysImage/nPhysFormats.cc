@@ -991,7 +991,7 @@ void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
     TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
     TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
     TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
     TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
     std::stringstream prop_ss;

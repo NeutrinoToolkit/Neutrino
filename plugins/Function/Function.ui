@@ -180,12 +180,27 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionCopy_Size"/>
   </widget>
+  <action name="actionCopy_Size">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/fillBoth.png</normaloff>:/icons/fillBoth.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Size</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy size from current image</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>doIt</tabstop>
   <tabstop>erasePrevious</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -48,7 +48,7 @@ public slots:
     void changeShowColorbar();
     void changeIconSize(int);
 
-
+    void updatePlugindirs();
     void changeFont();
     void askCloseUnsaved();
     void hideEvent (QHideEvent*) override;

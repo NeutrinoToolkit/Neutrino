@@ -41,10 +41,12 @@ public:
 
 public slots:
     void on_doIt_released();
+    void on_actionCopy_Size_triggered();
 
 private:
 
     nPhysD *physFunction;
+
 
 };
 

@@ -447,11 +447,11 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             loadPlugin(pluginfile, false);
         }
         progress.close();
-        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
-        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
-        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
-            listdirPlugins.append(pluginsDir.absolutePath());
-        setProperty("NeuSave-plugindirs",listdirPlugins);
+//        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
+//        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
+//        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
+//            listdirPlugins.append(pluginsDir.absolutePath());
+//        setProperty("NeuSave-plugindirs",listdirPlugins);
     }
 }
 
@@ -474,12 +474,27 @@ neutrino::scanPlugins() {
     setProperty("defaultPluginDir",pluginsDir.absolutePath());
     scanPlugins(pluginsDir.absolutePath());
 
-    if (property("NeuSave-plugindirs").isValid()) {
-        for (auto& d : property("NeuSave-plugindirs").toStringList()) {
-            if (d!=pluginsDir.absolutePath())
-                scanPlugins(d);
+    QMap<QString, QVariant> pluginList(property("NeuSave-plugindirs").toMap());
+    qDebug() << pluginList;
+    for (auto& k : pluginList.keys()) {
+        qDebug() << k << pluginList[k];
+        if (pluginList[k].toInt() == 2) {
+            scanPlugins(k);
         }
     }
+
+
+//    if (property("NeuSave-plugindirs").isValid()) {
+//        for (auto& d : property("NeuSave-plugindirs").toStringList()) {
+//            QStringList dir_flag=d.split("!#!");
+//            qDebug() << dir_flag;
+//            if (dir_flag.size()>1) {
+//                qDebug() << dir_flag[1].toInt();
+//            }
+//            if (dir_flag.size()>1 && dir_flag[1].toInt() == 1 && d!=pluginsDir.absolutePath())
+//                scanPlugins(dir_flag[0]);
+//        }
+//    }
 }
 
 void
