@@ -1303,8 +1303,6 @@ QString neutrino::getFileSave() {
 
     QString suffix=QFileInfo(property("NeuSave-fileSave").toString()).suffix().toLower();
 
-    qDebug() << suffix;
-
     for (auto &format : physFormat::phys_image_formats()) {
         formats << QString::fromStdString(format);
     }
@@ -1314,9 +1312,9 @@ QString neutrino::getFileSave() {
             formats << format ;
     }
 
-    if (allformats.contains(suffix)) {
-        allformats.remove(suffix);
-        allformats.prepend(suffix);
+    if (formats.contains(suffix)) {
+        formats.removeAll(suffix);
+        formats.prepend(suffix);
     }
 
     foreach(QString format, formats ) {
@@ -1324,8 +1322,6 @@ QString neutrino::getFileSave() {
     }
 
     allformats+=("Any files (*)");
-    qDebug() << allformats;
-
 
     return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
 }
@@ -1354,10 +1350,8 @@ void neutrino::fileSave(QString fname) {
                     case QMessageBox::No:
                         fileSave();
                         return;
-                        break;
                     case QMessageBox::Cancel:
                         return;
-                        break;
                 }
             }
 
