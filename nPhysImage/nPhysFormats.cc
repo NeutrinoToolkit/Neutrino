@@ -795,7 +795,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 float posx=0.0, posy=0.0;
                 TIFFGetField(tif, TIFFTAG_XPOSITION, &posx);
                 TIFFGetField(tif, TIFFTAG_YPOSITION, &posy);
-                tiff_prop["origin"]=vec2f(posx,posy);
+                tiff_prop["tiff_origin"]=vec2f(posx,posy);
 
                 DEBUG("COMPRESSION_NONE " << compression << " " << COMPRESSION_NONE);
                 DEBUG("PLANARCONFIG_CONTIG " << config << " " << PLANARCONFIG_CONTIG);
@@ -830,7 +830,6 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                     DEBUG(str_desc.size() << "\n" << str_desc);
                     std::stringstream ss(str_desc);
                     tiff_prop.loader(ss);
-                    ss.str(str_desc);
                 }
                 char *comment=nullptr;
                 if (TIFFGetField(tif, TIFFTAG_NEUTRINO, &comment)) {
@@ -901,7 +900,10 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                             ss << " c" << samples;
                         }
                         my_phys.setName(ss.str());
-                        my_phys.prop.insert(tiff_prop.begin(),tiff_prop.end());
+                        for (auto &pro : tiff_prop) {
+                            my_phys.prop[pro.first] =pro.second;
+                            DEBUG(pro.first << " : " << pro.second);
+                        }
                         my_phys.setType(PHYS_FILE);
 
                         DEBUG("here");
@@ -1013,10 +1015,10 @@ void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
     TIFFSetField(tif, TIFFTAG_XRESOLUTION, 1.0/scalex);
     float scaley=my_phys->get_scale().y();
     TIFFSetField(tif, TIFFTAG_YRESOLUTION, 1.0/scaley);
-    float origx=my_phys->get_origin().x();
-    TIFFSetField(tif, TIFFTAG_XPOSITION, origx);
-    float origy=my_phys->get_origin().y();
-    TIFFSetField(tif, TIFFTAG_XPOSITION, origy);
+//    float origx=my_phys->get_origin().x();
+//    TIFFSetField(tif, TIFFTAG_XPOSITION, origx);
+//    float origy=my_phys->get_origin().y();
+//    TIFFSetField(tif, TIFFTAG_XPOSITION, origy);
     TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8*sizeof(float));
     DEBUG("tiff " << TIFFScanlineSize(tif) << " " << my_phys->getW() <<  " " << my_phys->getH());
     unsigned char *buf = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(tif));
