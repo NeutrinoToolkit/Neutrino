@@ -170,11 +170,11 @@ QRectF nObject::getRectF() {
 }
 
 void nObject::bufferChanged(nPhysD* my_phys) {
-//    if (nparent->getBufferList().contains(my_phys)) {
-//		setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
-//	} else {
-//		setPos(0,0);
-//	}
+    if (nparent->getBufferList().contains(my_phys)) {
+        setPos(my_phys->get_origin().x(),my_phys->get_origin().y());
+    } else {
+        setPos(0,0);
+    }
 }
 
 void nObject::interactive ( ) {
@@ -604,16 +604,16 @@ QString nObject::getRectString() {
 // reimplementation
 QRectF
 nObject::boundingRect() const {
-	return shape().boundingRect();
+    return shape().boundingRect();
 }
 
 QPainterPath nObject::shape() const {
 	QPainterPathStroker stroker;
-	double thickness=std::max(nWidth,10.0)/zoom;
+    double thickness=std::max(nWidth,10.0)/zoom;
 	stroker.setWidth(thickness);
 	QPainterPath my_shape = path();
 	for (int i =0; i<ref.size(); i++) {
-		my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
+        my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
 	}
 	return stroker.createStroke(my_shape);
 }
@@ -621,7 +621,7 @@ QPainterPath nObject::shape() const {
 QPainterPath nObject::path() const {
 	QPainterPath my_path;
 	if (ref.size()>1) {
-		my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
+        my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
 	} else {
 		my_path.addRect(QRectF(0,0,0,0));
 	}

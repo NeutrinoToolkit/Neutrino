@@ -57,8 +57,9 @@ public:
 
     QPainterPath path() const override {
         QPainterPath my_path;
+        double oversize=nSizeHolder/zoom;
         if (ref.size()>1) {
-            my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
+            my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()).marginsAdded(QMarginsF(oversize,oversize,oversize,oversize)));
         } else {
             my_path.addRect(QRectF(0,0,0,0));
         }
@@ -71,7 +72,13 @@ public:
         pen.setWidthF(nWidth/zoom);
         pen.setColor(nColor);
         p->setPen(pen);
-        p->drawPath(path());
+        QPainterPath my_path;
+        if (ref.size()>1) {
+            my_path.addRect(QRectF(ref[0]->pos(),ref[1]->pos()));
+        } else {
+            my_path.addRect(QRectF(0,0,0,0));
+        }
+        p->drawPath(my_path);
     }
 
 };
