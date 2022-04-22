@@ -1013,10 +1013,10 @@ void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
     TIFFSetField(tif, TIFFTAG_XRESOLUTION, 1.0/scalex);
     float scaley=my_phys->get_scale().y();
     TIFFSetField(tif, TIFFTAG_YRESOLUTION, 1.0/scaley);
-//    float origx=my_phys->get_origin().x();
-//    TIFFSetField(tif, TIFFTAG_XPOSITION, origx);
-//    float origy=my_phys->get_origin().y();
-//    TIFFSetField(tif, TIFFTAG_XPOSITION, origy);
+    float origx=my_phys->get_origin().x();
+    TIFFSetField(tif, TIFFTAG_XPOSITION, origx);
+    float origy=my_phys->get_origin().y();
+    TIFFSetField(tif, TIFFTAG_XPOSITION, origy);
     TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8*sizeof(float));
     DEBUG("tiff " << TIFFScanlineSize(tif) << " " << my_phys->getW() <<  " " << my_phys->getH());
     unsigned char *buf = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(tif));
