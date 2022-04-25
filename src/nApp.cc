@@ -311,7 +311,7 @@ void nApp::checkUpdates() {
             QMessageBox msgBox;
             QString text=tr("A newer version is available");
 #ifdef __phys_debug
-            text+="\n"+compileSHA.left(7)+"\n"+onlineSHA.left(7);
+            text+="\nThis:\t"+compileSHA.left(7)+"\nOnline:\t"+onlineSHA.left(7)+"\nNB: in debug mode you need to run cmake to align versions";
 #endif
             msgBox.setText(text);
             msgBox.addButton(tr("Get it now"), QMessageBox::YesRole);

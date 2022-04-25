@@ -822,6 +822,13 @@
           </property>
          </widget>
         </item>
+        <item row="12" column="1">
+         <widget class="QPushButton" name="checkUpdatesNow">
+          <property name="text">
+           <string>Check now</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="computation">

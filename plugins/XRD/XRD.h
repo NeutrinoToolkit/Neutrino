@@ -34,28 +34,27 @@
 #include "nPhysWave.h"
 #include "neutrino.h"
 
-#include "ui_XRD1.h"
+#include "ui_XRD.h"
 
 class nRect;
 
 namespace Ui {
-class XRD2;
+class IP;
 }
 
-class XRD : public nGenericPan, private Ui::XRD1 {
+class XRD : public nGenericPan, private Ui::XRD {
     Q_OBJECT
     
     using nGenericPan::nGenericPan;
     using nGenericPan::loadSettings;
-    using Ui::XRD1::retranslateUi;
+    using Ui::XRD::retranslateUi;
 public:
     
     Q_INVOKABLE XRD(neutrino *);
-    ~XRD() override;
 
 private:
 
-    std::vector<Ui::XRD2*> settingsUi;
+    std::vector<Ui::IP*> settingsUi;
     
     std::vector<nRect*> IPrect;
 
@@ -64,14 +63,21 @@ private:
 public slots:
     
     void setObjectVisibility(nPhysD*);
-    void addXRD();
-    void delXRD();    
     void loadSettings(QString=QString());
     void showOriginal();
 
     void cropImage();
     void cropImage(int, bool=true);
-    void saveAllIPs();
+    void saveImage();
+
+    void on_actionAddIP_triggered();
+    void on_actionDelIP_triggered();
+    void on_actionSaveIPs_triggered();
+    void on_cropAll_triggered();
+    void on_removeTransformed_triggered();
+    void on_tabIPs_tabBarClicked(int);
+    void on_tabIPs_tabBarDoubleClicked(int);
+
 };
 
 NEUTRINO_PLUGIN(XRD,Analysis);

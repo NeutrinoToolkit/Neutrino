@@ -68,6 +68,7 @@ public slots:
     void on_mouseColor_released();
     void on_gridThickness_valueChanged(double);
     void on_gridColor_released();
+    void on_checkUpdatesNow_released();
 };
 
 

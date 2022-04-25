@@ -418,7 +418,13 @@ nGenericPan::loadUi(QSettings &settings) {
         }
     }
     foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setCurrentIndex(settings.value(widget->objectName(),widget->currentIndex()).toInt());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            widget->setCurrentIndex(settings.value(widget->objectName(),widget->currentIndex()).toInt());
+            QStringList labels=settings.value(widget->objectName()+"neutrinoLabels").toStringList();
+            for (int k=0; k< std::min(labels.size(),widget->count());k++) {
+                widget->setTabText(k,labels[k]);
+            }
+        }
     }
     foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
@@ -521,7 +527,14 @@ nGenericPan::saveUi(QSettings &settings) {
         }
     }
     foreach (QTabWidget *widget, findChildren<QTabWidget *>()) {
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings.setValue(widget->objectName(),widget->currentIndex());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            settings.setValue(widget->objectName(),widget->currentIndex());
+            QStringList labels;
+            for (int k=0; k<widget->count();k++) {
+                labels.append(widget->tabText(k));
+            }
+            settings.setValue(widget->objectName()+"neutrinoLabels",labels);
+        }
     }
     foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) settings.setValue(widget->objectName(),widget->isChecked());

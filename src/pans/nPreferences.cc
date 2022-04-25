@@ -352,3 +352,7 @@ void nPreferences::on_mouseColor_released() {
         nparent->my_w->my_view->update();
     }
 }
+
+void nPreferences::on_checkUpdatesNow_released() {
+    napp->checkUpdates();
+}

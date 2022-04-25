@@ -268,6 +268,7 @@ neutrino::neutrino():
     my_w->actionLog_info->setChecked(napp->log_win.isVisible());
     connect (my_w->actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
 
+    connect(my_w->actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
 
 //#define xxstring(s) xstring(s)
 //#define xstring(s) #s
@@ -1055,7 +1056,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
             delete newPhys;
             newPhys=oldPhys;
         } else {
-            newPhys->prop.erase("display_range");
+//            newPhys->prop.erase("display_range");
             addPhys(newPhys);
         }
         if (show || redisplay) {
