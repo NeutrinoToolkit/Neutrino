@@ -962,7 +962,9 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         }
                     }
                     if (!separate_rgb && samples>0) {
+                        phys_properties prop_save=my_phys.prop;
                         physMath::phys_divide(my_phys,samples);
+                        my_phys.prop=prop_save;
                         vecReturn.push_back(my_phys);
                     }
                     _TIFFfree(buf);

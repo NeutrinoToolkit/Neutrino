@@ -189,10 +189,10 @@ void Visar::addVisar() {
     gridLayout1->addWidget(wvisar1, 0, 0, 1, 1);
     tabPhase->addTab(tab1, "Visar"+QLocale().toString(numVisars+1));
 
-    Ui::Visar2* ui_vel=new Ui::Visar2();
-    ui_vel->setupUi(wvisar1);
+    Ui::Visar2* ui_settings=new Ui::Visar2();
+    ui_settings->setupUi(wvisar1);
 
-    settingsUi.push_back(ui_vel);
+    settingsUi.push_back(ui_settings);
 
     QWidget *tab2 = new QWidget();
     QGridLayout *gridLayout2 = new QGridLayout(tab2);
@@ -202,11 +202,11 @@ void Visar::addVisar() {
     gridLayout2->addWidget(wvisar2, 0, 0, 1, 1);
     tabVelocity->addTab(tab2, "Visar"+QLocale().toString(numVisars+1));
 
-    Ui::Visar3* ui_set=new Ui::Visar3();
-    ui_set->setupUi(wvisar2);
+    Ui::Visar3* ui_velocity=new Ui::Visar3();
+    ui_velocity->setupUi(wvisar2);
 
 
-    velocityUi.push_back(ui_set);
+    velocityUi.push_back(ui_velocity);
 
     //hack to save diffrent uis!!!
     foreach (QWidget *obj, wvisar1->findChildren<QWidget*>()+wvisar2->findChildren<QWidget*>()) {
