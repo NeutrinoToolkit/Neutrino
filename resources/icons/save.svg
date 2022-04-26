@@ -47,7 +47,7 @@
      id="namedview3544"
      showgrid="false"
      inkscape:zoom="0.5"
-     inkscape:cx="7"
+     inkscape:cx="-24"
      inkscape:cy="697"
      inkscape:window-x="0"
      inkscape:window-y="25"
@@ -1107,18 +1107,51 @@
     </linearGradient>
   </defs>
   <path
-     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:13.337;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-linejoin:round"
+     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:13.337;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect2834"
-     d="M 300.00001,302.90882 86.67607,115.84475 l 106.66197,0 0,-99.064073 213.32393,0 0,99.064073 106.66196,0 z"
+     d="M 300.00001,322.90882 86.67607,135.84475 H 193.33804 V 36.780677 h 213.32393 v 99.064073 h 106.66196 z"
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="cccccccc" />
   <rect
-     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:3.77953;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:1.51302;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
      id="rect1253"
-     width="408"
-     height="116"
-     x="110"
-     y="388"
-     rx="10"
-     ry="10" />
+     width="410.267"
+     height="18.486979"
+     x="108.86674"
+     y="376.86676"
+     rx="3"
+     ry="3"
+     inkscape:tile-cx="313.99999"
+     inkscape:tile-cy="366.11025"
+     inkscape:tile-w="411.77953"
+     inkscape:tile-h="19.999999"
+     inkscape:tile-x0="108.11023"
+     inkscape:tile-y0="356.11025" />
+  <use
+     x="0"
+     y="0"
+     inkscape:tiled-clone-of="#rect1253"
+     xlink:href="#rect1253"
+     id="use1089"
+     transform="translate(0,40)"
+     width="100%"
+     height="100%" />
+  <use
+     x="0"
+     y="0"
+     inkscape:tiled-clone-of="#rect1253"
+     xlink:href="#rect1253"
+     transform="translate(0,79.999999)"
+     id="use1091"
+     width="100%"
+     height="100%" />
+  <use
+     x="0"
+     y="0"
+     inkscape:tiled-clone-of="#rect1253"
+     xlink:href="#rect1253"
+     transform="translate(0,120)"
+     id="use1093"
+     width="100%"
+     height="100%" />
 </svg>

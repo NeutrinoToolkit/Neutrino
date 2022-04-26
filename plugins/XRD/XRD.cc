@@ -84,6 +84,9 @@ void XRD::on_actionAddIP_triggered() {
     my_rect->changeToolTip("IP region "+QLocale().toString(numIPs+1));
     IPrect.push_back(my_rect);
 
+    connect(my_rect, SIGNAL(sceneChanged()), this, SLOT(cropImage(false)));
+    connect(my_rect, SIGNAL(mouseDoubleClickEvent(QGraphicsSceneMouseEvent*)), this, SLOT(cropImage()));
+
     connect(ui_IP->rectROI, SIGNAL(released()),my_rect, SLOT(togglePadella()));
     connect(ui_IP->saveImage, SIGNAL(released()),this, SLOT(saveImage()));
 
@@ -91,6 +94,7 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->flipLR, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->flipUD, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->transpose, SIGNAL(released()),this, SLOT(cropImage()));
+    connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
 
     numIPs++;
 
@@ -115,7 +119,7 @@ void XRD::on_actionDelIP_triggered() {
         numIPs--;
         setProperty("NeuSave-numIPs",numIPs);
     } else {
-        statusbar->showMessage("Cannot remove last IP");
+        statusbar->showMessage("Cannot remove last IP",5);
     }
     qDebug() << numIPs;
 }
@@ -134,22 +138,26 @@ void XRD::loadSettings(QString my_settings) {
 
     nGenericPan::loadSettings(settings);
 
+    for (int k=0; k<tabIPs->count(); k++) {
+        IPrect[k]->changeToolTip(tabIPs->tabText(k));
+    }
     on_cropAll_triggered();
 
 }
 
 
 void XRD::on_source_released() {
+    tabIPs->setCurrentIndex(-1);
     nPhysD *img=getPhysFromCombo(image);
     if (img) {
         nparent->showPhys(img);
     }
 }
 
-void XRD::cropImage() {
+void XRD::cropImage(bool show) {
     if (sender() && sender()->property("id").isValid()) {
         int k=sender()->property("id").toInt();
-        cropImage(k);
+        cropImage(k,show);
     }
 }
 
@@ -189,6 +197,7 @@ void XRD::cropImage(int k, bool show) {
             nparent->showPhys(IPs[k]);
         }
         qDebug() << IPs[k]->getSize().x() << " " << IPs[k]->getSize().y();
+        statusbar->showMessage("IP " + tabIPs->tabText(k) + " cropped",3);
 
     }
 }
@@ -227,10 +236,10 @@ void XRD::on_removeTransformed_triggered() {
     qDebug() <<"here";
 }
 
-void XRD::on_tabIPs_tabBarClicked(int k) {
+void XRD::on_tabIPs_currentChanged(int k) {
     qDebug() << k;
     if(k<static_cast<int>(IPs.size())) {
-        cropImage(k,true);
+        cropImage(k);
     }
 }
 
@@ -239,6 +248,7 @@ void XRD::on_tabIPs_tabBarDoubleClicked(int k) {
     QString text = QInputDialog::getText(this, tr("Change IP Name"),tr("IP name:"), QLineEdit::Normal,tabIPs->tabText(k) , &ok);
     if (ok && !text.isEmpty()) {
         tabIPs->setTabText(k,text);
+        IPrect[k]->changeToolTip(text);
         qDebug() << k;
     }
 }

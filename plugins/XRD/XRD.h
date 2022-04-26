@@ -65,7 +65,7 @@ public slots:
     void setObjectVisibility(nPhysD*);
     void loadSettings(QString=QString());
 
-    void cropImage();
+    void cropImage(bool=true);
     void cropImage(int, bool=true);
     void saveImage();
 
@@ -75,7 +75,7 @@ public slots:
     void on_actionSaveIPs_triggered();
     void on_cropAll_triggered();
     void on_removeTransformed_triggered();
-    void on_tabIPs_tabBarClicked(int);
+    void on_tabIPs_currentChanged(int);
     void on_tabIPs_tabBarDoubleClicked(int);
 
 };

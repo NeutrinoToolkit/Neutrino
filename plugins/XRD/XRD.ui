@@ -67,14 +67,21 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="source">
+        <widget class="QToolButton" name="source">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
+         <property name="toolTip">
+          <string>Show source image</string>
+         </property>
          <property name="text">
           <string>Show</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
          </property>
         </widget>
        </item>
@@ -83,6 +90,11 @@
     </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabIPs">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="tabPosition">
        <enum>QTabWidget::North</enum>
       </property>
@@ -164,7 +176,7 @@
   </action>
   <action name="removeTransformed">
    <property name="icon">
-    <iconset resource="../Interferometry/Interferometry.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -176,7 +188,7 @@
   </action>
   <action name="cropAll">
    <property name="icon">
-    <iconset resource="../Interferometry/Interferometry.qrc">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
    </property>
    <property name="text">
@@ -187,8 +199,12 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>image</tabstop>
+  <tabstop>source</tabstop>
+  <tabstop>tabIPs</tabstop>
+ </tabstops>
  <resources>
-  <include location="../Interferometry/Interferometry.qrc"/>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>

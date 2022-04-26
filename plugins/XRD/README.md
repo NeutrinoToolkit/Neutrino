@@ -1,7 +1,3 @@
-XRD analysis
-==============
-
-
 <img src="../../resources/icons/save.png" width="16" /> to save all the IPs (the suffix of each file will be the tab name). To change this suffix (and to change the tab name), double click on the tab name 
 
 <img src="../../resources/icons/run.png" width="16" /> will do all the crops at once
