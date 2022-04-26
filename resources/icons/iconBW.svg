@@ -8,10 +8,10 @@
    viewBox="0 0 480 480"
    id="svg2814"
    inkscape:version="1.1.2 (b8e25be8, 2022-02-05)"
-   sodipodi:docname="icon.svg"
-   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/icon.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90"
+   sodipodi:docname="iconBW.svg"
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/iconBW.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -40,16 +40,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1296"
-     inkscape:window-height="969"
+     inkscape:window-width="1920"
+     inkscape:window-height="1147"
      id="namedview78"
      showgrid="false"
-     inkscape:zoom="1.0392593"
-     inkscape:cx="288.18602"
-     inkscape:cy="299.73271"
+     inkscape:zoom="1.809748"
+     inkscape:cx="299.76549"
+     inkscape:cy="299.76549"
      inkscape:window-x="0"
      inkscape:window-y="25"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg2814"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -356,24 +356,6 @@
        y2="323.83237"
        gradientTransform="matrix(0.72070468,0,0,0.72474263,20.333387,93.258382)" />
   </defs>
-  <rect
-     ry="41.713867"
-     y="42.435749"
-     x="42.393452"
-     height="395.12851"
-     width="395.2131"
-     id="rect3900"
-     style="fill:#1f4466;fill-opacity:0.92888892000000001;fill-rule:evenodd;stroke:#000000;stroke-width:12;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-  <polygon
-     points="93.581,485.725 93.581,485.725 535.637,485.725 314.611,102.892 "
-     style="fill:#000000"
-     id="polygon2288"
-     transform="matrix(0.63352057,0,0,0.64471785,40.695868,49.484914)" />
-  <polygon
-     id="polygon2293"
-     style="fill:#ffff00"
-     points="314.61,102.892 535.635,485.725 93.58,485.725 93.58,485.725 "
-     transform="matrix(0.63352057,0,0,0.64471785,40.695868,49.484914)" />
   <path
      inkscape:connector-curvature="0"
      id="path3988"

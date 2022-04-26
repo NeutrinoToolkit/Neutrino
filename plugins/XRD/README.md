@@ -4,5 +4,7 @@
 
 <img src="../../resources/icons/trash.png" width="16" /> will remove all the crops
 
-<img src="../../resources/icons/plus.png" width="16" /> to add more IP crops or remove if there are too many with <img src="../../resources/icons/remove.png" width="16" />
+<img src="../../resources/icons/plus.png" width="16" /> to add more IP crops 
+
+<img src="../../resources/icons/remove.png" width="16" /> to remove the rightmost
 

@@ -249,7 +249,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
             spacer->setProperty("helpSpacer",true);
             my_tool->addWidget(spacer);
 
-            my_tool->addAction(QIcon(":icons/icon.png"),tr("Raise viewer"),this,SLOT(raiseNeutrino()));
+            my_tool->addAction(QIcon(":icons/iconBW.png"),tr("Raise viewer"),this,SLOT(raiseNeutrino()));
 
             bool needPrefToolButtons=false;
             foreach (QWidget *wdgt, findChildren<QWidget *>()) {

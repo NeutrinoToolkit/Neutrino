@@ -65,6 +65,7 @@ public slots:
     void setObjectVisibility(nPhysD*);
     void loadSettings(QString=QString());
 
+    void cropImageNoShow();
     void cropImage(bool=true);
     void cropImage(int, bool=true);
     void saveImage();

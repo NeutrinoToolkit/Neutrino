@@ -156,7 +156,7 @@ public:
 	//}	
 	
 	bool have(std::string search_me) {
-	    return (find(search_me) != end());
+        return (size() && find(search_me) != end());
 	}
 
     void loader(std::istream &);
