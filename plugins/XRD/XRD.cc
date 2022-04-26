@@ -39,7 +39,6 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
     }
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
-    connect(source, SIGNAL(released()),this, SLOT(on_source_released()));
 
     show();
 
@@ -52,7 +51,7 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
 void XRD::setObjectVisibility(nPhysD*phys) {
     for (int k=0;k<tabIPs->count();k++){
-        IPrect[k]->setVisible(phys == getPhysFromCombo(image));
+        IPrect[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->image));
     }
 }
 
@@ -75,6 +74,8 @@ void XRD::on_actionAddIP_triggered() {
         obj->setObjectName(obj->objectName()+"-IP"+QLocale().toString(numIPs+1));
         obj->setProperty("id", numIPs);
     }
+
+    connect(ui_IP->source, SIGNAL(released()),this, SLOT(on_source_released()));
 
     decorate(tab1);
     IPs.push_back(nullptr);
@@ -143,10 +144,12 @@ void XRD::loadSettings(QString my_settings) {
 
 
 void XRD::on_source_released() {
-    tabIPs->setCurrentIndex(-1);
-    nPhysD *img=getPhysFromCombo(image);
-    if (img) {
-        nparent->showPhys(img);
+    if (sender() && sender()->property("id").isValid()) {
+        int k=sender()->property("id").toInt();
+        nPhysD *img=getPhysFromCombo(settingsUi[k]->image);
+        if (img) {
+            nparent->showPhys(img);
+        }
     }
 }
 
@@ -174,35 +177,35 @@ void XRD::saveImage() {
 
 void XRD::cropImage(int k, bool show) {
     qDebug() << k;
+    if (k<IPs.size()) {
+        nPhysD* img=getPhysFromCombo(settingsUi[k]->image);
+        if (img) {
+            QRect geom2=IPrect[k]->getRect(img);
+            nPhysD cropped(img->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()));
+            nPhysD *my_phys=new nPhysD(cropped.rotated(settingsUi[k]->angle->value()));
+            qDebug() << my_phys->getSize().x() << " " << my_phys->getSize().y();
 
-    nPhysD* img=getPhysFromCombo(image);
-    if (img) {
-        QRect geom2=IPrect[k]->getRect(img);
-        nPhysD cropped(img->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()));
-        nPhysD *my_phys=new nPhysD(cropped.rotated(settingsUi[k]->angle->value()));
-        qDebug() << my_phys->getSize().x() << " " << my_phys->getSize().y();
-
-        if (settingsUi[k]->flipLR->isChecked()) {
-            physMath::phys_flip_lr(*dynamic_cast<physD*>(my_phys));
+            if (settingsUi[k]->flipLR->isChecked()) {
+                physMath::phys_flip_lr(*dynamic_cast<physD*>(my_phys));
+            }
+            if (settingsUi[k]->flipUD->isChecked()) {
+                physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+            }
+            if (settingsUi[k]->transpose->isChecked()) {
+                physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
+            }
+            my_phys->set_scale(1,1);
+            my_phys->set_origin(0,0);
+            my_phys->prop["display_range"]=img->prop["display_range"];
+            my_phys->setShortName(tabIPs->tabText(k).toStdString());
+            IPs[k]=nparent->replacePhys(my_phys,IPs[k],false);
+            if(show) {
+                IPs[k]->prop["display_range"]=img->prop["display_range"];
+                nparent->showPhys(IPs[k]);
+            }
+            qDebug() << IPs[k]->getSize().x() << " " << IPs[k]->getSize().y();
+            statusbar->showMessage("IP " + QString::number(k) + " : " + tabIPs->tabText(k) + " cropped",2000);
         }
-        if (settingsUi[k]->flipUD->isChecked()) {
-            physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
-        }
-        if (settingsUi[k]->transpose->isChecked()) {
-            physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
-        }
-        my_phys->set_scale(1,1);
-        my_phys->set_origin(0,0);
-        my_phys->prop["display_range"]=img->prop["display_range"];
-        my_phys->setShortName(tabIPs->tabText(k).toStdString());
-        IPs[k]=nparent->replacePhys(my_phys,IPs[k],false);
-        if(show) {
-            IPs[k]->prop["display_range"]=img->prop["display_range"];
-            nparent->showPhys(IPs[k]);
-        }
-        qDebug() << IPs[k]->getSize().x() << " " << IPs[k]->getSize().y();
-        statusbar->showMessage("IP " + tabIPs->tabText(k) + " cropped",2000);
-
     }
 }
 
