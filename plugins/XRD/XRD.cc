@@ -63,7 +63,6 @@ void XRD::on_actionAddIP_triggered() {
     wIP1->setObjectName(QStringLiteral("wIP1"));
     gridLayout1->addWidget(wIP1, 0, 0, 1, 1);
     int numIPs=tabIPs->count();
-    tabIPs->addTab(tab1, "IP"+QLocale().toString(numIPs+1));
 
     Ui::IP* ui_IP=new Ui::IP();
     ui_IP->setupUi(wIP1);
@@ -74,8 +73,6 @@ void XRD::on_actionAddIP_triggered() {
         obj->setObjectName(obj->objectName()+"-IP"+QLocale().toString(numIPs+1));
         obj->setProperty("id", numIPs);
     }
-
-    connect(ui_IP->source, SIGNAL(released()),this, SLOT(on_source_released()));
 
     decorate(tab1);
     IPs.push_back(nullptr);
@@ -97,10 +94,13 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->flipUD, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->transpose, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
+    connect(ui_IP->source, SIGNAL(released()),this, SLOT(on_source_released()));
 
     numIPs++;
 
+    tabIPs->addTab(tab1, "IP"+QLocale().toString(tabIPs->count()+1));
     setProperty("NeuSave-numIPs",tabIPs->count());
+
 }
 
 void XRD::on_actionDelIP_triggered() {
@@ -177,7 +177,7 @@ void XRD::saveImage() {
 
 void XRD::cropImage(int k, bool show) {
     qDebug() << k;
-    if (k<IPs.size()) {
+    if (k<static_cast<int>(IPs.size())) {
         nPhysD* img=getPhysFromCombo(settingsUi[k]->image);
         if (img) {
             QRect geom2=IPrect[k]->getRect(img);

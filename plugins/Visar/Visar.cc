@@ -23,6 +23,7 @@
  *
  */
 #include "Visar.h"
+#include "nPhysImageF.h"
 #include "neutrino.h"
 
 #include "ui_Visar2.h"
@@ -432,15 +433,14 @@ void Visar::delVisar() {
 void Visar::loadSettings(QString my_settings) {
     QSettings settings(my_settings,QSettings::IniFormat);
     settings.beginGroup("Properties");
-    int kMax=settings.value("NeuSave-numVisars",2).toUInt();
-    unsigned int numVisars_save=numVisars;
-    for (unsigned int k=0;k<numVisars_save;k++) {
+    unsigned int kMax=settings.value("NeuSave-numVisars",2).toUInt();
+    while(numVisars>kMax){
         delVisar();
     }
-    for (int k=0; k<kMax; k++) {
+    while (numVisars<kMax) {
         addVisar();
     }
-    int whichReflSaved=settings.value("NeuSave-whichRefl",0).toUInt();
+    int whichReflSaved=settings.value("NeuSave-whichRefl",0).toInt();
     settings.endGroup();
 
     nGenericPan::loadSettings(settings);
@@ -1046,7 +1046,7 @@ void Visar::doWave(unsigned int k) {
     if (k< numVisars) {
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
         if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
-            QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 19, this);
+            QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 26, this);
             progress.setCancelButton(nullptr);
             progress.setWindowModality(Qt::WindowModal);
             progress.setValue(0);
@@ -1054,8 +1054,11 @@ void Visar::doWave(unsigned int k) {
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             sweepChanged(settingsUi[k]->physScale);
 
-            std::array<physC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
-            progress.setValue(progress.value()+1);
+            std::array<physC,2> physfft;
+            for (int m=0;m<2;m++) {
+                physfft[m]=imgs[m]->ft2(PHYS_FORWARD);
+                progress.setValue(progress.value()+1);
+            }
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             vec2i dim(imgs[0]->getSize());
@@ -1115,7 +1118,7 @@ void Visar::doWave(unsigned int k) {
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (unsigned int m=0;m<2;m++) {
-                physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
+                physfft[m] = zz_morlet[m].ft2(PHYS_FORWARD);
                 progress.setValue(progress.value()+1);
             }
             progress.setValue(progress.value()+1);
@@ -1125,15 +1128,27 @@ void Visar::doWave(unsigned int k) {
 #pragma omp parallel for
                 for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
                     phase[m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
-                    contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
-                    intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[m].point(kk));
                 }
+                progress.setValue(progress.value()+1);
+#pragma omp parallel for
+                for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
+                    contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dim.x()*dim.y());
+                }
+                progress.setValue(progress.value()+1);
+#pragma omp parallel for
+                for (size_t kk=0; kk<(size_t)(dim.x()*dim.y()); kk++) {
+                    intensity[k][m].Timg_buffer[kk] -= contrast[k][m].Timg_buffer[kk]*cos(2*M_PI*phase[m].Timg_buffer[kk]);
+                }
+                progress.setValue(progress.value()+1);
             }
 
             if (direction(k)!=0) {
                 for (unsigned int m=0;m<2;m++) {
+                    progress.setValue(progress.value()+1);
                     physMath::phys_transpose(phase[m]);
+                    progress.setValue(progress.value()+1);
                     physMath::phys_transpose(contrast[k][m]);
+                    progress.setValue(progress.value()+1);
                     physMath::phys_transpose(intensity[k][m]);
                 }
             }
@@ -1166,6 +1181,8 @@ void Visar::doWave(unsigned int k) {
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
+
+            qDebug() << progress.value();
         } else {
             if (imgs[0] && imgs[1]) {
                 DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW());
