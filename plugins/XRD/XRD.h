@@ -64,12 +64,12 @@ public slots:
     
     void setObjectVisibility(nPhysD*);
     void loadSettings(QString=QString());
-    void showOriginal();
 
     void cropImage();
     void cropImage(int, bool=true);
     void saveImage();
 
+    void on_source_released();
     void on_actionAddIP_triggered();
     void on_actionDelIP_triggered();
     void on_actionSaveIPs_triggered();

@@ -139,7 +139,7 @@ void XRD::loadSettings(QString my_settings) {
 }
 
 
-void XRD::showOriginal() {
+void XRD::on_source_released() {
     nPhysD *img=getPhysFromCombo(image);
     if (img) {
         nparent->showPhys(img);
@@ -218,7 +218,7 @@ void XRD::on_cropAll_triggered() {
 }
 
 void XRD::on_removeTransformed_triggered() {
-    showOriginal();
+    on_source_released();
     for (int k=0; k<tabIPs->count(); k++) {
         qDebug() <<"here" << k;
         nparent->removePhys(IPs[k]);
