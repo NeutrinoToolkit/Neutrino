@@ -137,7 +137,7 @@ void XRD::loadSettings(QString my_settings) {
             actionAddIP->trigger();
         }
         settings.endGroup();
-        nGenericPan::loadSettings(settings);
+        nGenericPan::loadSettings(my_settings);
     }
 
     on_cropAll_triggered();

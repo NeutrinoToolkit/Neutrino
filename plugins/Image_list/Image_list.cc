@@ -32,6 +32,7 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     my_w.images->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 
     my_w.images->header()->setStretchLastSection (true);
+    my_w.images->sortByColumn(0,Qt::AscendingOrder);
 //    my_w.images->header()->setSectionsMovable(false);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
@@ -40,7 +41,6 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent),
     connect(nparent->my_w->my_view, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 
     connect(my_w.images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-
 
 	foreach (nPhysD *phys, nparent->getBufferList()) {
 		physAdd(phys);
@@ -125,7 +125,7 @@ Image_list::changeProperties() {
         }
     }
     if (physSelected.isEmpty() && currentBuffer) {
-        for( int i = 0; i < my_w.images	->topLevelItemCount(); ++i ) {
+        for( int i = 0; i < my_w.images->topLevelItemCount(); ++i ) {
             QTreeWidgetItem *item = my_w.images->topLevelItem( i );
             nPhysD *phys=getPhys(item);
             if (phys==currentBuffer) {
@@ -296,6 +296,7 @@ Image_list::updatePad(nPhysD *my_phys) {
         if (it) {
             std::ostringstream oss;
             oss << std::setw(5) << std::setfill(' ') << int(my_phys->prop["uuid"]);
+            qDebug() << nparent->getBufferList().indexOf(my_phys);
             it->setData(0,0,QString::fromStdString(oss.str()));
             it->setData(1,0,QString(my_phys->getShortName().c_str()));
             if (my_phys->get_scale().x()==my_phys->get_scale().y()) {

@@ -88,7 +88,8 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
-        int position = nparent->getBufferList().indexOf(buffer);
+//        int position = nparent->getBufferList().indexOf(buffer);
+        int position = buffer->prop["uuid"].get_i();
         name.prepend(QLocale().toString(position)+" : ");
     }
     return name;

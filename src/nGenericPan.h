@@ -126,8 +126,8 @@ public slots:
     //settings
     void loadDefaults();
     void saveDefaults();
-    void loadSettings(QString=QString());
-    void saveSettings(QString=QString());
+    virtual void loadSettings(QString=QString());
+    virtual void saveSettings(QString=QString());
     virtual void loadSettings(QSettings&);
     virtual void saveSettings(QSettings&);
     void loadUi(QSettings&);

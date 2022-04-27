@@ -1024,8 +1024,9 @@ void neutrino::addShowPhys(nPhysD* datamatrix) {
 
 void neutrino::addPhys(nPhysD* datamatrix) {
     if ((!nPhysExists(datamatrix)) && datamatrix->getSurf()>0)	{
-        datamatrix->prop["uuid"] = property("uuidphys").toInt()+1;
-        setProperty("uuidphys",int(datamatrix->prop["uuid"]));
+        int pp= property("uuidphys").toInt()+1;
+        datamatrix->prop["uuid"] = pp;
+        setProperty("uuidphys",pp);
         physList << datamatrix;
         addMenuBuffers(datamatrix);
         emit physAdd(datamatrix);
@@ -1051,10 +1052,16 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
         bool redisplay = (currentBuffer==oldPhys);
         if (nPhysExists(oldPhys)) {
             //			newPhys->property["display_range"]=oldPhys->property["display_range"];
-            if (oldPhys==nullptr) oldPhys=new nPhysD();
+            if (oldPhys==nullptr) {
+                oldPhys=new nPhysD();
+                int pp= property("uuidphys").toInt()+1;
+                oldPhys->prop["uuid"] = pp;
+                setProperty("uuidphys",pp);
+            }
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
+            newPhys->prop["uuid"] = oldPhys->prop["uuid"];
         } else {
 //            newPhys->prop.erase("display_range");
             addPhys(newPhys);
