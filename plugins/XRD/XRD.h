@@ -67,7 +67,7 @@ public slots:
 
     void cropImageNoShow();
     void cropImage(bool=true);
-    void cropImage(int, bool=true);
+    void cropImage(unsigned int, bool=true);
     void saveImage();
 
     void on_source_released();

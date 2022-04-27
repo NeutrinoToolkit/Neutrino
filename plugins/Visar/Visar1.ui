@@ -179,6 +179,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="toolTip">
+              <string>Color temperature of the SOP filters</string>
+             </property>
              <property name="decimals">
               <number>7</number>
              </property>
@@ -196,6 +199,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>Photon calibration parameter</string>
              </property>
              <property name="decimals">
               <number>7</number>
@@ -244,6 +250,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="toolTip">
+              <string>Reflectivity correction</string>
+             </property>
              <item>
               <property name="text">
                <string>Zero</string>
@@ -289,6 +298,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="toolTip">
+              <string>TCC central pixel</string>
+             </property>
              <property name="suffix">
               <string> [px]</string>
              </property>
@@ -309,6 +321,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>Image magnification</string>
              </property>
              <property name="suffix">
               <string> [space/px]</string>
@@ -360,6 +375,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="toolTip">
+              <string>Temporal zero pixel</string>
+             </property>
              <property name="suffix">
               <string> [px]</string>
              </property>
@@ -380,6 +398,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>Shot delay</string>
              </property>
              <property name="suffix">
               <string> [t]</string>
@@ -499,6 +520,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="toolTip">
+              <string>SOP shot image</string>
+             </property>
              <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
              </property>
@@ -510,6 +534,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>SOP reference image (maybe the same as the shot)</string>
              </property>
              <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
@@ -584,6 +611,9 @@
               <font>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="toolTip">
+              <string>Time direction</string>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
@@ -743,6 +773,9 @@
            </item>
            <item row="0" column="7">
             <widget class="QDoubleSpinBox" name="etalon_sensitivity">
+             <property name="toolTip">
+              <string>calculated sentitivity</string>
+             </property>
              <property name="suffix">
               <string> km/s</string>
              </property>
@@ -790,7 +823,7 @@
               </font>
              </property>
              <property name="text">
-              <string>sensitivity</string>
+              <string>Sensitivity</string>
              </property>
             </widget>
            </item>
@@ -919,26 +952,28 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabs</tabstop>
   <tabstop>tabPhase</tabstop>
-  <tabstop>tabVelocity</tabstop>
+  <tabstop>enableSOP</tabstop>
   <tabstop>sopRef</tabstop>
   <tabstop>sopShot</tabstop>
   <tabstop>sopOffset</tabstop>
-  <tabstop>sopOrigin</tabstop>
-  <tabstop>sopTimeOffset</tabstop>
-  <tabstop>whichRefl</tabstop>
   <tabstop>sopCalibT0</tabstop>
   <tabstop>sopCalibA</tabstop>
+  <tabstop>whichRefl</tabstop>
+  <tabstop>physOriginSpace</tabstop>
+  <tabstop>magnification</tabstop>
+  <tabstop>sopOrigin</tabstop>
+  <tabstop>sopTimeOffset</tabstop>
   <tabstop>sopScale</tabstop>
   <tabstop>sopDirection</tabstop>
-  <tabstop>enableSOP</tabstop>
-  <tabstop>tabs</tabstop>
-  <tabstop>notes</tabstop>
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
   <tabstop>etalon_dn_over_dlambda</tabstop>
   <tabstop>etalon_sensitivity</tabstop>
+  <tabstop>tabVelocity</tabstop>
+  <tabstop>notes</tabstop>
  </tabstops>
  <resources>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>

@@ -95,7 +95,7 @@
     <string>add IP</string>
    </property>
    <property name="toolTip">
-    <string>add IP subimage</string>
+    <string>Add IP subimage</string>
    </property>
   </action>
   <action name="actionDelIP">
@@ -107,7 +107,7 @@
     <string>del IP</string>
    </property>
    <property name="toolTip">
-    <string>delete IP subimage</string>
+    <string>Delete IP subimage</string>
    </property>
   </action>
   <action name="actionSaveIPs">

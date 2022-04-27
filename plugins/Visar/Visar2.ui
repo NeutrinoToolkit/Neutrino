@@ -147,6 +147,9 @@
             </item>
             <item row="0" column="1">
              <widget class="QComboBox" name="carrierPhys">
+              <property name="toolTip">
+               <string>Image used to calculate interfringe</string>
+              </property>
               <property name="neutrinoSave" stdset="0">
                <bool>true</bool>
               </property>
@@ -165,7 +168,7 @@
             <item row="0" column="4">
              <widget class="QDoubleSpinBox" name="angle">
               <property name="toolTip">
-               <string>Fringes orientation</string>
+               <string>Fringes orientation (0˚ means vertical)</string>
               </property>
               <property name="suffix">
                <string>˚</string>
@@ -224,6 +227,9 @@
                </property>
                <item row="0" column="0">
                 <widget class="QComboBox" name="refImage">
+                 <property name="toolTip">
+                  <string>Reference image</string>
+                 </property>
                  <property name="neutrinoImage" stdset="0">
                   <bool>true</bool>
                  </property>
@@ -231,6 +237,9 @@
                </item>
                <item row="0" column="1">
                 <widget class="QComboBox" name="shotImage">
+                 <property name="toolTip">
+                  <string>Shot image</string>
+                 </property>
                  <property name="neutrinoImage" stdset="0">
                   <bool>true</bool>
                  </property>
@@ -294,6 +303,9 @@
                 <pointsize>10</pointsize>
                </font>
               </property>
+              <property name="toolTip">
+               <string>Image magnification</string>
+              </property>
               <property name="suffix">
                <string> [space/px]</string>
               </property>
@@ -344,6 +356,9 @@
                 <pointsize>10</pointsize>
                </font>
               </property>
+              <property name="toolTip">
+               <string>TCC central pixel</string>
+              </property>
               <property name="suffix">
                <string> [px]</string>
               </property>
@@ -389,6 +404,9 @@
             </property>
             <item>
              <widget class="QDoubleSpinBox" name="resolution">
+              <property name="toolTip">
+               <string>Slit thickness (temporal convolution)</string>
+              </property>
               <property name="suffix">
                <string> [px]</string>
               </property>
@@ -450,7 +468,7 @@
          <item row="2" column="3">
           <widget class="QDoubleSpinBox" name="multRef">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference multiplication factor:&lt;/p&gt;&lt;p&gt;Fix jitter between ref. and shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Reference intensity multiplication factor: Fix jitter between ref. and shot</string>
            </property>
            <property name="suffix">
             <string/>
@@ -536,6 +554,9 @@
             <font>
              <pointsize>10</pointsize>
             </font>
+           </property>
+           <property name="toolTip">
+            <string>Visar sensitivity</string>
            </property>
            <property name="suffix">
             <string> [v/fr]</string>

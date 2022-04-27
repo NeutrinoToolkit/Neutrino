@@ -50,41 +50,38 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 }
 
 void XRD::setObjectVisibility(nPhysD*phys) {
-    for (int k=0;k<tabIPs->count();k++){
+    for (unsigned int k=0;k < static_cast<unsigned int>(tabIPs->count());k++){
         IPrect[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->image));
     }
 }
 
 void XRD::on_actionAddIP_triggered() {
-    QWidget *tab1 = new QWidget();
-    QGridLayout *gridLayout1 = new QGridLayout(tab1);
-    gridLayout1->setContentsMargins(0, 0, 0, 0);
-    QWidget*wIP1 = new QWidget(tab1);
-    wIP1->setObjectName(QStringLiteral("wIP1"));
-    gridLayout1->addWidget(wIP1, 0, 0, 1, 1);
-    int numIPs=tabIPs->count();
+    QWidget *newtab = new QWidget();
+    QGridLayout *gridLayout = new QGridLayout(newtab);
+    gridLayout->setContentsMargins(0, 0, 0, 0);
+    QWidget*newtab_widget = new QWidget(newtab);
+    newtab_widget->setObjectName(QStringLiteral("wIP1"));
+    gridLayout->addWidget(newtab_widget, 0, 0, 1, 1);
 
     Ui::IP* ui_IP=new Ui::IP();
-    ui_IP->setupUi(wIP1);
+    ui_IP->setupUi(newtab_widget);
     settingsUi.push_back(ui_IP);
 
     //hack to save diffrent uis!!!
-    foreach (QWidget *obj, wIP1->findChildren<QWidget*>()) {
-        obj->setObjectName(obj->objectName()+"-IP"+QLocale().toString(numIPs+1));
-        obj->setProperty("id", numIPs);
+    foreach (QWidget *obj, newtab_widget->findChildren<QWidget*>()) {
+        obj->setObjectName(obj->objectName()+"-IP"+QLocale().toString(tabIPs->count()+1));
+        obj->setProperty("id", tabIPs->count());
     }
 
-    decorate(tab1);
     IPs.push_back(nullptr);
 
     nRect *my_rect=new nRect(this,1);
     my_rect->setRect(QRectF(0,0,100,100));
-    my_rect->setProperty("id", numIPs);
-    my_rect->changeToolTip("IP "+QLocale().toString(numIPs+1));
+    my_rect->setProperty("id", tabIPs->count());
+    my_rect->changeToolTip("IP "+QLocale().toString(tabIPs->count()+1));
     IPrect.push_back(my_rect);
 
     connect(my_rect, SIGNAL(sceneChanged()), this, SLOT(cropImageNoShow()));
-    connect(my_rect, SIGNAL(mouseDoubleClickEvent(QGraphicsSceneMouseEvent*)), this, SLOT(cropImage()));
 
     connect(ui_IP->rectROI, SIGNAL(released()),my_rect, SLOT(togglePadella()));
     connect(ui_IP->saveImage, SIGNAL(released()),this, SLOT(saveImage()));
@@ -96,9 +93,7 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->source, SIGNAL(released()),this, SLOT(on_source_released()));
 
-    numIPs++;
-
-    tabIPs->addTab(tab1, "IP"+QLocale().toString(tabIPs->count()+1));
+    tabIPs->addTab(newtab, "IP"+QLocale().toString(tabIPs->count()+1));
     setProperty("NeuSave-numIPs",tabIPs->count());
 
 }
@@ -145,7 +140,7 @@ void XRD::loadSettings(QString my_settings) {
 
 void XRD::on_source_released() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         nPhysD *img=getPhysFromCombo(settingsUi[k]->image);
         if (img) {
             nparent->showPhys(img);
@@ -156,32 +151,32 @@ void XRD::on_source_released() {
 
 void XRD::cropImageNoShow() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         cropImage(k,false);
     }
 }
 
 void XRD::cropImage(bool show) {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         cropImage(k,show);
     }
 }
 
 void XRD::saveImage() {
     if (sender() && sender()->property("id").isValid()) {
-        int k=sender()->property("id").toInt();
+        unsigned int k=sender()->property("id").toUInt();
         nparent->fileSave(IPs[k]);
     }
 }
 
-void XRD::cropImage(int k, bool show) {
+void XRD::cropImage(unsigned int k, bool show) {
     qDebug() << k;
-    if (k<static_cast<int>(IPs.size())) {
+    if (k < IPs.size()) {
         nPhysD* img=getPhysFromCombo(settingsUi[k]->image);
         if (img) {
             QRect geom2=IPrect[k]->getRect(img);
-            nPhysD cropped(img->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height()));
+            nPhysD cropped(img->sub(geom2.x(),geom2.y(),static_cast<unsigned int>(geom2.width()),static_cast<unsigned int>(geom2.height())));
             nPhysD *my_phys=new nPhysD(cropped.rotated(settingsUi[k]->angle->value()));
             qDebug() << my_phys->getSize().x() << " " << my_phys->getSize().y();
 
@@ -197,14 +192,14 @@ void XRD::cropImage(int k, bool show) {
             my_phys->set_scale(1,1);
             my_phys->set_origin(0,0);
             my_phys->prop["display_range"]=img->prop["display_range"];
-            my_phys->setShortName(tabIPs->tabText(k).toStdString());
+            my_phys->setShortName(tabIPs->tabText(static_cast<int>(k)).toStdString());
             IPs[k]=nparent->replacePhys(my_phys,IPs[k],false);
             if(show) {
                 IPs[k]->prop["display_range"]=img->prop["display_range"];
                 nparent->showPhys(IPs[k]);
             }
             qDebug() << IPs[k]->getSize().x() << " " << IPs[k]->getSize().y();
-            statusbar->showMessage("IP " + QString::number(k) + " : " + tabIPs->tabText(k) + " cropped",2000);
+            statusbar->showMessage("IP " + QString::number(k) + " : " + tabIPs->tabText(static_cast<int>(k)) + " cropped",2000);
         }
     }
 }
@@ -216,10 +211,10 @@ void XRD::on_actionSaveIPs_triggered() {
         QString my_prefix= my_file.baseName();
         QString my_ext=my_file.suffix();
 
-        for (int k=0; k<tabIPs->count(); k++) {
+        for (unsigned int k=0; k<static_cast<unsigned int>(tabIPs->count()); k++) {
             if (IPs[k]) {
                 cropImage(k,false);
-                QString my_name=my_dir.filePath(my_prefix+"_"+tabIPs->tabText(k)+"."+my_ext);
+                QString my_name=my_dir.filePath(my_prefix+"_"+tabIPs->tabText(static_cast<int>(k))+"."+my_ext);
                 qDebug() << my_name;
                 nparent->fileSave(IPs[k],my_name);
             }
@@ -229,7 +224,7 @@ void XRD::on_actionSaveIPs_triggered() {
 
 void XRD::on_cropAll_triggered() {
     for (int k=0; k<tabIPs->count(); k++) {
-        cropImage(k,false);
+        cropImage(static_cast<unsigned int>(k),false);
     }
 }
 
@@ -245,16 +240,21 @@ void XRD::on_removeTransformed_triggered() {
 
 void XRD::on_tabIPs_currentChanged(int k) {
     qDebug() << k;
-    if(k<static_cast<int>(IPs.size())) {
-        cropImage(k);
+    unsigned int uk=static_cast<unsigned int>(k);
+    if(uk<IPs.size()) {
+        cropImage(uk);
     }
 }
 
 void XRD::on_tabIPs_tabBarDoubleClicked(int k) {
     bool ok;
     QString text = QInputDialog::getText(this, tr("Change IP Name"),tr("IP name:"), QLineEdit::Normal,tabIPs->tabText(k) , &ok);
-    if (ok && !text.isEmpty()) {
-        tabIPs->setTabText(k,text);
+    if (ok) {
+        if (text.isEmpty()) {
+            tabIPs->setTabText(k,"IP "+QString::number(k+1));
+        } else {
+            tabIPs->setTabText(k,text);
+        }
         qDebug() << k;
     }
 }

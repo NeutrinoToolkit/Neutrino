@@ -77,6 +77,9 @@
           <pointsize>10</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Shot delay</string>
+        </property>
         <property name="suffix">
          <string/>
         </property>
@@ -106,6 +109,9 @@
          <font>
           <pointsize>10</pointsize>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Temporal zero pixel</string>
         </property>
         <property name="suffix">
          <string> [px]</string>
@@ -158,7 +164,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>phase offset (in fraction of fringe)</string>
+         <string>Phase offset (in fraction of fringe)</string>
         </property>
         <property name="decimals">
          <number>3</number>
@@ -341,6 +347,9 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>Hide/Show reflectivity</string>
+     </property>
      <property name="text">
       <string>R</string>
      </property>
@@ -358,6 +367,9 @@
       <font>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>Hide/Show quality</string>
      </property>
      <property name="text">
       <string>Q</string>
