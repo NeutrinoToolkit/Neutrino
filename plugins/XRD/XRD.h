@@ -69,8 +69,8 @@ public slots:
     void cropImage(bool=true);
     void cropImage(unsigned int, bool=true);
     void saveImage();
+    void showSource();
 
-    void on_source_released();
     void on_actionAddIP_triggered();
     void on_actionDelIP_triggered();
     void on_actionSaveIPs_triggered();

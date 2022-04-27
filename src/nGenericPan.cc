@@ -661,6 +661,7 @@ void nGenericPan::focusOutEvent(QFocusEvent *event) {
 
 //////////////////// SETTINGS
 void nGenericPan::loadSettings(QString fname) {
+    qDebug() << fname;
     if (fname.isNull()) {
         QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
         if (!fname.isNull()) {

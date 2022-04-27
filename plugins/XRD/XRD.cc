@@ -44,7 +44,7 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
     QApplication::processEvents();
 
-    on_source_released();
+    showSource();
     qDebug() << std::max(1,property("NeuSave-numIPs").toInt()) << property("NeuSave-numIPs");
 
 }
@@ -91,7 +91,7 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->flipUD, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->transpose, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
-    connect(ui_IP->source, SIGNAL(released()),this, SLOT(on_source_released()));
+    connect(ui_IP->source, SIGNAL(released()),this, SLOT(showSource()));
 
     tabIPs->addTab(newtab, "IP"+QLocale().toString(tabIPs->count()+1));
     setProperty("NeuSave-numIPs",tabIPs->count());
@@ -120,25 +120,32 @@ void XRD::on_actionDelIP_triggered() {
 
 void XRD::loadSettings(QString my_settings) {
     qDebug() << "here";
-    QSettings settings(my_settings,QSettings::IniFormat);
-    settings.beginGroup("Properties");
-    int kMax=settings.value("NeuSave-numIPs",1).toInt();
-    while (tabIPs->count()>kMax) {
-        actionDelIP->trigger();
+    if (my_settings.isEmpty()) {
+        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+        if (!fname.isNull()) {
+            setProperty("NeuSave-fileIni",fname);
+            loadSettings(fname);
+        }
+    } else {
+        QSettings settings(my_settings,QSettings::IniFormat);
+        settings.beginGroup("Properties");
+        int kMax=settings.value("NeuSave-numIPs",1).toInt();
+        while (tabIPs->count()>kMax) {
+            actionDelIP->trigger();
+        }
+        while (tabIPs->count()<kMax) {
+            actionAddIP->trigger();
+        }
+        settings.endGroup();
+        nGenericPan::loadSettings(settings);
     }
-    while (tabIPs->count()<kMax) {
-        actionAddIP->trigger();
-    }
-    settings.endGroup();
-
-    nGenericPan::loadSettings(settings);
 
     on_cropAll_triggered();
 
 }
 
 
-void XRD::on_source_released() {
+void XRD::showSource() {
     if (sender() && sender()->property("id").isValid()) {
         unsigned int k=sender()->property("id").toUInt();
         nPhysD *img=getPhysFromCombo(settingsUi[k]->image);
@@ -234,7 +241,7 @@ void XRD::on_removeTransformed_triggered() {
         nparent->removePhys(IPs[k]);
         IPs[k]=nullptr;
     }
-    on_source_released();
+    showSource();
     qDebug() <<"here";
 }
 
