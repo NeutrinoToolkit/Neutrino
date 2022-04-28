@@ -162,6 +162,7 @@ public slots:
     
     void calculate_etalon();
     
+    void copy_image();
 
 };
 

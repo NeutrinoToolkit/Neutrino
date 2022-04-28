@@ -23,6 +23,7 @@
  *
  */
 #include "Visar.h"
+#include "nCustomPlots.h"
 #include "neutrino.h"
 
 #include "ui_Visar2.h"
@@ -128,6 +129,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
+    connect(actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
 
 //    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
@@ -1487,4 +1489,21 @@ QString Visar::export_one(unsigned int k) {
         }
     }
     return out;
+}
+
+void Visar::copy_image() {
+    switch (tabs->currentIndex()) {
+        case 0:
+            settingsUi[tabPhase->currentIndex()]->plotPhaseIntensity->copy_image();
+            statusbar->showMessage("Phase image copied to clipboard",3000);
+            break;
+        case 1:
+            plotVelocity->copy_image();
+            statusbar->showMessage("Velocity image copied to clipboard",3000);
+            break;
+        case 2:
+            sopPlot->copy_image();
+            statusbar->showMessage("SOP image copied to clipboard",3000);
+            break;
+    }
 }

@@ -1055,9 +1055,8 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
-        } else {
+//        } else {
 //            newPhys->prop.erase("display_range");
-            addPhys(newPhys);
         }
         if (show || redisplay) {
             showPhys(newPhys);

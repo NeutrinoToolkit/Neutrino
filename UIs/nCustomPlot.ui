@@ -657,7 +657,7 @@
      <normaloff>:/icons/copyImage.png</normaloff>:/icons/copyImage.png</iconset>
    </property>
    <property name="text">
-    <string>Export</string>
+    <string>Copy image to clipboard</string>
    </property>
    <property name="toolTip">
     <string>Copy image</string>

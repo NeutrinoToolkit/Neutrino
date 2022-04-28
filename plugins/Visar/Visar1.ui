@@ -862,6 +862,7 @@
    <addaction name="actionSaveTxt"/>
    <addaction name="actionSaveTxtMultiple"/>
    <addaction name="actionCopy"/>
+   <addaction name="actionCopyImage"/>
    <addaction name="separator"/>
    <addaction name="actionRect3"/>
    <addaction name="actionAddVisar"/>
@@ -934,6 +935,18 @@
    </property>
    <property name="text">
     <string>delVisar</string>
+   </property>
+  </action>
+  <action name="actionCopyImage">
+   <property name="icon">
+    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/copyImage.png</normaloff>:/icons/copyImage.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy image to clipboard</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy image</string>
    </property>
   </action>
  </widget>
