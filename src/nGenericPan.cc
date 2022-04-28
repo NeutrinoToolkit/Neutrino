@@ -88,8 +88,7 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
-//        int position = nparent->getBufferList().indexOf(buffer);
-        int position = buffer->prop["uuid"].get_i();
+        int position = nparent->getBufferList().indexOf(buffer);
         name.prepend(QLocale().toString(position)+" : ");
     }
     return name;
@@ -783,49 +782,15 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
                     }
                 }
 
+
                 int val=my_val.toInt(&ok);
-                if (ok) {
-                    if (val>=0 && obj->property("neutrinoImage").isValid()) {
-                        for (auto &phys : nparent->getBufferList()) {
-                            if (int(phys->prop["uuid"]) == val) {
-                                qDebug() << "trovato" << phys << int(phys->prop["uuid"]);
-                                for( int pos = 0; pos < obj->count(); pos++ ) {
-                                    nPhysD* combophys = static_cast<nPhysD*>(obj->itemData(pos).value<nPhysD*>());
-                                    if (combophys==phys) {
-                                        obj->setCurrentIndex(pos);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (val>=0 && val < obj->maxVisibleItems()) {
-                        obj->setCurrentIndex(val);
-                    } else {
-                        int pos=obj->findData(my_val);
-                        if (pos>-1) {
-                            obj->setCurrentIndex(pos);
-                        }
-                    }
-                    return;
+                if (ok && val>=0 && val < obj->maxVisibleItems()) {
+                    obj->setCurrentIndex(val);
                 } else {
-                    QString name=my_val.toString();
-                    if (obj->property("neutrinoImage").isValid()) {
-                        for (auto &phys : nparent->getBufferList()) {
-                            if ( QString::fromStdString(phys->getShortName()) == name) {
-                                qDebug() << "trovato" << phys << QString::fromStdString( phys->getShortName());
-                                for( int pos = 0; pos < obj->count(); pos++ ) {
-                                    nPhysD* combophys = static_cast<nPhysD*>(obj->itemData(pos).value<nPhysD*>());
-                                    if (combophys==phys) {
-                                        obj->setCurrentIndex(pos);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
+                    int pos=obj->findData(my_val);
+                    if (pos>-1) {
+                        obj->setCurrentIndex(pos);
                     }
-
                 }
             }
             my_occurrence++;

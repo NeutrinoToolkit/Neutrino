@@ -75,36 +75,6 @@ private:
     Function* parent;
 };
 
-struct physFuncID : public exprtk::ifunction<double>
-{
-    physFuncID(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
-        exprtk::disable_has_side_effects(*this);
-    }
-    virtual ~physFuncID() override {}
-
-public:
-    virtual double operator()(const double &imgnum, const double& x, const double& y) override {
-        int imgnumint=static_cast<int>(imgnum);
-        nPhysD *my_phys(nullptr);
-        QList<nPhysD *> mylist=parent->nparent->getBufferList();
-        for (auto img :parent->nparent->getBufferList()) {
-            if (img->prop["uuid"].get_i()==imgnumint) {
-                my_phys = img;
-                break;
-            }
-        }
-        if (my_phys) {
-            return my_phys->getPoint(x,y);
-        } else {
-            return std::numeric_limits<double>::quiet_NaN();
-        }
-    }
-
-private:
-    Function* parent;
-};
-
-
 
 Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     physFunction(nullptr)
@@ -142,9 +112,6 @@ void Function::on_doIt_released() {
 
     physFunc2 mf2(this);
     symbol_table.add_function("img",mf2);
-
-    physFuncID mfID(this);
-    symbol_table.add_function("id",mfID);
 
     symbol_table.add_constant("width",my_phys->getW());
     symbol_table.add_constant("height",my_phys->getH());

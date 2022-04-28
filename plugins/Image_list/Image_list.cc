@@ -294,10 +294,6 @@ Image_list::updatePad(nPhysD *my_phys) {
         }
         qDebug() << "<=><=><=><=><=><=> 2" << itemsMap.size();
         if (it) {
-            std::ostringstream oss;
-            oss << std::setw(5) << std::setfill(' ') << int(my_phys->prop["uuid"]);
-            qDebug() << nparent->getBufferList().indexOf(my_phys);
-            it->setData(0,0,QString::fromStdString(oss.str()));
             it->setData(1,0,QString(my_phys->getShortName().c_str()));
             if (my_phys->get_scale().x()==my_phys->get_scale().y()) {
                 it->setData(2,0,QLocale().toString(my_phys->get_scale().x()));
@@ -314,11 +310,27 @@ Image_list::updatePad(nPhysD *my_phys) {
             for (auto const & my_key : itemsMap) {
                 nPhysD* key_phys = my_key.first;
                 bool sel (key_phys == my_phys);
-                my_key.second->setSelected(sel);
+                if (my_key.first && my_key.second) {
+                    my_key.second->setSelected(sel);
+                }
             }
             if (nparent->getBufferList().size())
                 my_w.horizontalSlider->setMaximum(nparent->getBufferList().size()-1);
         }
+        // renumber everything in case some images are removed
+        for (int k=0;k<nparent->getBufferList().size();k++){
+            nPhysD* phys=nparent->getBuffer(k);
+            if (phys) {
+                    QTreeWidgetItem* it2=itemsMap[phys];
+                    if (it2) {
+                        QString mynum=QString::number(k);
+                        if (mynum!=it2->data(0,Qt::DisplayRole).toString()) {
+                            it2->setData(0,0,mynum);
+                        }
+                    }
+            }
+        }
+
     }
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
