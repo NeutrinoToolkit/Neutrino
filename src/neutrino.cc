@@ -1045,18 +1045,16 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 }
 
 nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
+    qDebug() << newPhys << oldPhys;
     if (newPhys && newPhys->getSurf()) {
         bool redisplay = (currentBuffer==oldPhys);
-        if (nPhysExists(oldPhys)) {
-            //			newPhys->property["display_range"]=oldPhys->property["display_range"];
-            if (oldPhys==nullptr) {
-                oldPhys=new nPhysD();
-            }
+        if (oldPhys && nPhysExists(oldPhys)) {
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
-//        } else {
+        } else {
 //            newPhys->prop.erase("display_range");
+            addPhys(newPhys);
         }
         if (show || redisplay) {
             showPhys(newPhys);
