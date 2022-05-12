@@ -47,6 +47,18 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
     showSource();
     qDebug() << std::max(1,property("NeuSave-numIPs").toInt()) << property("NeuSave-numIPs");
 
+    for (int k=0; k< tabIPs->count(); k++) {
+        qDebug() << tabIPs->tabText(k);
+        for (auto& my_phys: nparent->getBufferList()) {
+            if (tabIPs->tabText(k) == QString::fromStdString(my_phys->getShortName())) {
+                qDebug() << "\t found !" << my_phys << IPs[k];
+                if (!IPs[k]) {
+                    IPs[k]=my_phys;
+                }
+            }
+        }
+    }
+
 }
 
 void XRD::setObjectVisibility(nPhysD*phys) {

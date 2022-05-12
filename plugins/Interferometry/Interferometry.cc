@@ -675,6 +675,7 @@ void Interferometry::doCutoff(){
     nPhysD *image=localPhys["interpPhase_2piMask"];
     if (nPhysExists(image)) {
         nPhysD *intNe = new nPhysD(*image);
+        intNe->setShortName("interpPhase_2piMaskCutoff");
         if (my_w.display99->isChecked()) {
             physMath::cutoff(*intNe,physMath::getColorPrecentPixels(*intNe,99));
         }
@@ -734,6 +735,15 @@ void Interferometry::loadSettings(QSettings &settings){
     settings.endGroup();
 
     nGenericPan::loadSettings(settings);
+
+    for (const auto& one : property("NeuSave-localPhysNames").toStringList()) {
+        std::string onestring=one.toStdString();
+        for (const auto& img: nparent->getBufferList()) {
+            if (img->getShortName() == onestring) {
+                localPhys[onestring]=img;
+            }
+        }
+    }
 }
 
 void Interferometry::saveSettings(QSettings &settings){
@@ -754,6 +764,13 @@ void Interferometry::saveSettings(QSettings &settings){
         }
     }
     settings.endGroup();
+
+    QStringList localPhysNames;
+    for (const auto& one : localPhys) {
+        localPhysNames.append(QString::fromStdString(one.first));
+    }
+    setProperty("NeuSave-localPhysNames",localPhysNames);
+    qDebug() << localPhysNames;
 
     nGenericPan::saveSettings(settings);
 }
