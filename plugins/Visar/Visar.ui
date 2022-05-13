@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Visar1</class>
- <widget class="QMainWindow" name="Visar1">
+ <class>Visar</class>
+ <widget class="QMainWindow" name="Visar">
   <property name="geometry">
    <rect>
     <x>0</x>

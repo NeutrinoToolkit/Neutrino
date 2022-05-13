@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Visar3</class>
- <widget class="QWidget" name="Visar3">
+ <class>VisarVelocity</class>
+ <widget class="QWidget" name="VisarVelocity">
   <property name="geometry">
    <rect>
     <x>0</x>

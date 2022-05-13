@@ -26,8 +26,8 @@
 #include "nCustomPlots.h"
 #include "neutrino.h"
 
-#include "ui_Visar2.h"
-#include "ui_Visar3.h"
+#include "ui_VisarSettings.h"
+#include "ui_VisarVelocity.h"
 
 
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
@@ -183,38 +183,36 @@ void Visar::calculate_etalon() {
 }
 
 void Visar::addVisar() {
+    qDebug() << numVisars << tabPhase->count();
+
     QWidget *tab1 = new QWidget();
     QGridLayout *gridLayout1 = new QGridLayout(tab1);
     gridLayout1->setContentsMargins(0, 0, 0, 0);
-    QWidget*wvisar1 = new QWidget(tab1);
-    wvisar1->setObjectName(QStringLiteral("wvisar1"));
-    gridLayout1->addWidget(wvisar1, 0, 0, 1, 1);
-
-    qDebug() << numVisars << tabPhase->count();
+    QWidget*wVisarSettings = new QWidget(tab1);
+    wVisarSettings->setObjectName(QStringLiteral("wVisarVelocity"));
+    gridLayout1->addWidget(wVisarSettings, 0, 0, 1, 1);
 
     tabPhase->addTab(tab1, "Visar"+QLocale().toString(numVisars+1));
 
-    Ui::Visar2* ui_settings=new Ui::Visar2();
-    ui_settings->setupUi(wvisar1);
-
+    Ui::VisarSettings* ui_settings=new Ui::VisarSettings();
+    ui_settings->setupUi(wVisarSettings);
     settingsUi.push_back(ui_settings);
 
     QWidget *tab2 = new QWidget();
     QGridLayout *gridLayout2 = new QGridLayout(tab2);
     gridLayout2->setContentsMargins(0, 0, 0, 0);
-    QWidget*wvisar2 = new QWidget(tab2);
-    wvisar2->setObjectName(QStringLiteral("wvisar1"));
-    gridLayout2->addWidget(wvisar2, 0, 0, 1, 1);
+    QWidget*wVisarVelocity = new QWidget(tab2);
+    wVisarVelocity->setObjectName(QStringLiteral("wvisarVelocity"));
+    gridLayout2->addWidget(wVisarVelocity, 0, 0, 1, 1);
+
     tabVelocity->addTab(tab2, "Visar"+QLocale().toString(numVisars+1));
 
-    Ui::Visar3* ui_velocity=new Ui::Visar3();
-    ui_velocity->setupUi(wvisar2);
-
-
+    Ui::VisarVelocity* ui_velocity=new Ui::VisarVelocity();
+    ui_velocity->setupUi(wVisarVelocity);
     velocityUi.push_back(ui_velocity);
 
     //hack to save diffrent uis!!!
-    foreach (QWidget *obj, wvisar1->findChildren<QWidget*>()+wvisar2->findChildren<QWidget*>()) {
+    foreach (QWidget *obj, wVisarSettings->findChildren<QWidget*>()+wVisarVelocity->findChildren<QWidget*>()) {
         obj->setObjectName(obj->objectName()+"-VISAR"+QLocale().toString(numVisars+1));
         obj->setProperty("id", numVisars);
     }

@@ -56,13 +56,14 @@ public:
     nSOPPlot(QWidget*);
 };
 
-#include "ui_Visar1.h"
+#include "ui_Visar.h"
 
 class nLine;
 class nRect;
+
 namespace Ui {
-class Visar2;
-class Visar3;
+    class VisarSettings;
+    class VisarVelocity;
 }
 
 template<class T>
@@ -71,20 +72,20 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 
 
 
-class Visar : public nGenericPan, private Ui::Visar1 {
+class Visar : public nGenericPan, private Ui::Visar {
     Q_OBJECT
     
     using nGenericPan::nGenericPan;
     using nGenericPan::loadSettings;
-    using Ui::Visar1::retranslateUi;
+
 public:
     
     Q_INVOKABLE Visar(neutrino *);
 
 private:
 
-    std::vector<Ui::Visar2*> settingsUi;
-    std::vector<Ui::Visar3*> velocityUi;
+    std::vector<Ui::VisarSettings*> settingsUi;
+    std::vector<Ui::VisarVelocity*> velocityUi;
     
     double getTime(std::vector<double> &vecsweep,double p);
     
