@@ -4,13 +4,16 @@
 <svg
    height="600"
    id="svg1"
-   inkscape:version="1.1.2 (b8e25be8, 2022-02-05)"
+   inkscape:version="1.2-alpha (0bd5040e, 2022-02-05)"
    sodipodi:docname="refreshRed.svg"
    sodipodi:version="0.32"
    version="1.0"
    width="600"
    x="0"
    y="0"
+   inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/plugins/Visar/refreshRed.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -74,20 +77,22 @@
      bordercolor="#666666"
      borderopacity="1.0"
      id="base"
-     inkscape:cx="306.69145"
-     inkscape:cy="311.15242"
+     inkscape:cx="297.76951"
+     inkscape:cy="313.38289"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:window-height="997"
-     inkscape:window-width="1680"
+     inkscape:window-height="1147"
+     inkscape:window-width="1920"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:zoom="0.44833334"
      pagecolor="#ffffff"
      showgrid="true"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg1"
-     inkscape:pagecheckerboard="0">
+     inkscape:pagecheckerboard="0"
+     inkscape:blackoutopacity="0.0"
+     showguides="false">
     <inkscape:grid
        type="xygrid"
        id="grid3074" />
@@ -2967,50 +2972,16 @@
        x2="45.380436"
        y2="50.939667" />
   </defs>
-  <rect
-     style="fill:#ff2929;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:round"
-     id="rect1453"
-     width="580"
-     height="580"
-     x="10"
-     y="10"
-     rx="20"
-     ry="20" />
+  <path
+     style="fill:#ff0000;stroke-width:5;stroke-linejoin:round"
+     d="M 543.12267,300 A 243.12267,243.12267 0 0 1 300,543.12267 243.12267,243.12267 0 0 1 56.877335,300 243.12267,243.12267 0 0 1 300,56.877335 243.12267,243.12267 0 0 1 543.12267,300 Z"
+     id="path3472" />
   <g
-     id="g8378"
-     transform="translate(0,12.499989)">
-    <g
-       transform="matrix(1,0,0,1.2704403,0,-9.4654088)"
-       id="g8372">
-      <g
-         id="g8367"
-         transform="translate(-30.250001,0)">
-        <path
-           sodipodi:nodetypes="cscc"
-           inkscape:connector-curvature="0"
-           id="path6862"
-           d="m 330.25,35 c 0,0 -132.5,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.5,66.25 0,132.5"
-           style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-        <path
-           style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           d="m 502.5,35 c 0,0 -132.5,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.5,66.25 0,132.5"
-           id="path6867"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cscc" />
-        <path
-           sodipodi:nodetypes="cscc"
-           inkscape:connector-curvature="0"
-           id="path6869"
-           d="m 158,35 c 0,0 -132.499997,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.499997,66.25 0,132.5"
-           style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      </g>
-    </g>
+     id="g8367"
+     transform="matrix(1,0,0,1.2704403,-30.250001,3.0345802)">
+    <path
+       id="path6869"
+       style="fill:none;stroke:#000000;stroke-width:40;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 158,35 c 0,0 -132.499997,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.499997,66.25 0,132.5 M 502.5,35 c 0,0 -132.5,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.5,66.25 0,132.5 M 330.25,35 c 0,0 -132.5,66.25 0,132.5 132.5,66.25 0,132.5 0,132.5 0,0 -132.5,66.25 0,132.5" />
   </g>
-  <rect
-     style="fill:#ff2929;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:round"
-     id="rect1710"
-     width="200"
-     height="160"
-     x="-440"
-     y="-260" />
 </svg>

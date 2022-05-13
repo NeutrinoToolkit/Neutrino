@@ -189,7 +189,7 @@
          </item>
          <item row="0" column="0" colspan="4">
           <widget class="QWidget" name="widget_3" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -212,7 +212,7 @@
               <property name="title">
                <string>Reference and Shot</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
+              <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,0,0,0">
                <property name="leftMargin">
                 <number>2</number>
                </property>
@@ -242,6 +242,30 @@
                  </property>
                  <property name="neutrinoImage" stdset="0">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QCheckBox" name="DeghostCheck">
+                 <property name="text">
+                  <string>Deghost</string>
+                 </property>
+                 <property name="neutrinoSave" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QToolButton" name="Deghost">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+                   <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -648,6 +672,8 @@
  <tabstops>
   <tabstop>refImage</tabstop>
   <tabstop>shotImage</tabstop>
+  <tabstop>DeghostCheck</tabstop>
+  <tabstop>Deghost</tabstop>
   <tabstop>doWaveButton</tabstop>
   <tabstop>guess</tabstop>
   <tabstop>carrierPhys</tabstop>
@@ -666,6 +692,7 @@
  <resources>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
+  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -11,11 +11,11 @@ class nPhysD : public physD {
     using physD::physD;
 
     nPhysD(physD in=physD()): physD(in) {
-        qDebug() << "------------------------------------------------------------ CREATE "<< copies() << " " << this;
+        qDebug() << "------------------------------------------------------------ CREATE "<< copies() << " " << this << QString::fromStdString(this->getName());
     }
 
     ~nPhysD(){
-        qDebug() << "------------------------------------------------------------ DELETE "<< copies() << " " << this;
+        qDebug() << "------------------------------------------------------------ DELETE "<< copies() << " " << this << QString::fromStdString(this->getName());
     }
 
     nPhysD & operator= (const nPhysD &rhs)

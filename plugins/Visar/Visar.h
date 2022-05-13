@@ -86,7 +86,9 @@ private:
 
     std::vector<Ui::VisarSettings*> settingsUi;
     std::vector<Ui::VisarVelocity*> velocityUi;
-    
+
+    std::vector<QPointer<nLine>> maskRegion;
+
     double getTime(std::vector<double> &vecsweep,double p);
     
     std::vector<std::vector<double>> sweepCoeff;
@@ -164,6 +166,8 @@ public slots:
     void calculate_etalon();
     
     void copy_image();
+
+    void ghostChecked();
 
 };
 

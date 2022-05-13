@@ -92,9 +92,9 @@ public:
 	QPolygonF poly(int) const;
 	QPainterPath shape() const;
 
-	void selectThis(bool);
-
 public slots:
+
+    void selectThis(bool);
 
 	void interactive();
 	void togglePadella();
