@@ -14,6 +14,7 @@ Settings :
 For each *Visar* tab to set the parameters:
 
   * Select the *Reference* and the *Shot* images
+  * Choose *Deghost* to activate the region in which remove ghost fringes. The checkbox is a bit "special" since it ca have three valus: unchecked (no ghost fringes), checked (ghost fringes will be removed) and patially checked (will remove ghost fringes and will show the processed image)
   * With your mouse, select the ROI in the main window (the phase is taken from the middle
     of the ROI, while the intensity is averaged over the entire ROI)
   * Get the *Carrier* (orientation and interfringe): hit on the button <img src="refresh2.png" width="16" />
