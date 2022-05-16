@@ -864,6 +864,8 @@
    <addaction name="actionCopy"/>
    <addaction name="actionCopyImage"/>
    <addaction name="separator"/>
+   <addaction name="actionFilterAll"/>
+   <addaction name="separator"/>
    <addaction name="actionRect3"/>
    <addaction name="actionAddVisar"/>
    <addaction name="actionDelVisar"/>
@@ -949,6 +951,18 @@
     <string>Copy image</string>
    </property>
   </action>
+  <action name="actionFilterAll">
+   <property name="icon">
+    <iconset resource="Visar.qrc">
+     <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Visars</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter Visar images</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -989,6 +1003,7 @@
   <tabstop>notes</tabstop>
  </tabstops>
  <resources>
+  <include location="Visar.qrc"/>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>

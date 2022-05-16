@@ -132,6 +132,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
     connect(actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
+    connect(actionFilterAll, SIGNAL(triggered()), this, SLOT(doWave()));
 
 //    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
@@ -217,6 +218,8 @@ void Visar::addVisar() {
     connect(ui_settings->resolution, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
+
+    ui_settings->doWaveButton->setProperty("needWave",true);
 
     settingsUi.push_back(ui_settings);
     decorate(wVisarSettings);
@@ -1075,18 +1078,25 @@ void Visar::doWave() {
         doWave(k);
     } else {
         for (unsigned int k=0;k<numVisars;k++){
-            doWave(k);
+            if (settingsUi[k]->doWaveButton->property("needWave").toBool()) {
+                doWave(k);
+            }
         }
+        actionFilterAll->setIcon(QIcon(":icons/refresh.png"));
+
     }
 }
 
 void Visar::needWave() {
     qDebug() << ">>>>>>>>>>>>>>>>>>>>> CALLING IN THE NAME OF" << sender() << sender()->property("id");
     if (sender() && sender()->property("id").isValid()) {
+        QIcon my_icon=QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
         unsigned int k=sender()->property("id").toUInt();
         if (k< numVisars) {
-            settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refreshRed.png"));
+            settingsUi[k]->doWaveButton->setIcon(my_icon);
+            settingsUi[k]->doWaveButton->setProperty("needWave",true);
         }
+        actionFilterAll->setIcon(my_icon);
     }
 }
 
@@ -1248,13 +1258,6 @@ void Visar::doWave(unsigned int k) {
             physD diff = phase[1]-phase[0];
             physD qual = contrast[k][1]*contrast[k][0];
 
-    //        physD diff(dx,dy,0,"diff");
-    //        physD qual(dx,dy,0,"qual");
-    //        for (size_t kk=0; kk<(size_t)(dx*dy); kk++) {
-    //            diff.set(kk,phase[1].point(kk)-phase[0].point(kk));
-    //            qual.set(kk,contrast[k][1].point(kk)*contrast[k][0].point(kk));
-    //        }
-
             physWave::phys_phase_unwrap(diff, qual, physWave::QUALITY, phaseUnwrap[k]);
 
             progress.setValue(progress.value()+1);
@@ -1270,6 +1273,7 @@ void Visar::doWave(unsigned int k) {
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
+            settingsUi[k]->doWaveButton->setProperty("needWave",false);
 
             if (physDeghost){
                 qDebug() << settingsUi[k]->DeghostCheck->checkState();
@@ -1279,8 +1283,8 @@ void Visar::doWave(unsigned int k) {
                 } else if (settingsUi[k]->DeghostCheck->checkState()==2) {
                     qDebug() << nPhysExists(physDeghost) << ghostPhys[k];
                     delete physDeghost;
-//                    ghostPhys[k]=nullptr;
                     nparent->removePhys(ghostPhys[k]);
+                    qDebug() << ghostPhys[k];
                 }
             }
 

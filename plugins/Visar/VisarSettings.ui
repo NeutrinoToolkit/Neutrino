@@ -93,7 +93,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="../Ghost_fringes/GhostFringes.qrc">
+               <iconset resource="Visar.qrc">
                 <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
               </property>
               <property name="neutrinoSave" stdset="0">
@@ -286,7 +286,7 @@
                </font>
               </property>
               <property name="toolTip">
-               <string>Do filter on this Visar</string>
+               <string>Do filter on this Visar image</string>
               </property>
               <property name="text">
                <string/>
@@ -696,7 +696,6 @@
   <tabstop>physScale</tabstop>
  </tabstops>
  <resources>
-  <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
