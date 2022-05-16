@@ -323,7 +323,7 @@ Image_list::updatePad(nPhysD *my_phys) {
             if (phys) {
                     QTreeWidgetItem* it2=itemsMap[phys];
                     if (it2) {
-                        QString mynum=QString::number(k);
+                        QString mynum=QString::number(k).rightJustified(1+log10(nparent->getBufferList().size()), ' ');;
                         if (mynum!=it2->data(0,Qt::DisplayRole).toString()) {
                             it2->setData(0,0,mynum);
                         }

@@ -116,6 +116,7 @@ private:
     std::vector<nLine*> fringeLine;
     std::vector<nRect*> fringeRect;
     QPointer<nRect> sopRect;
+    std::vector<nPhysD*> ghostPhys;
 
 public slots:
     

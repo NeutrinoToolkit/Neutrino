@@ -273,6 +273,7 @@ void Visar::addVisar() {
         intensity[numVisars][m].setShortName("intensity");
     }
 
+
     QApplication::processEvents();
 
     sweepCoeff.push_back(std::vector<double>());
@@ -309,6 +310,7 @@ void Visar::addVisar() {
     connect(my_mask, SIGNAL(sceneChanged()), this, SLOT(needWave()));
 
     maskRegion.push_back(my_mask);
+    ghostPhys.push_back(nullptr);
 
     velocity.push_back(QVector<double>());
     velError.push_back(QVector<double>());
@@ -431,6 +433,9 @@ void Visar::delVisar() {
             cIntensity[m].pop_back();
             cContrast[m].pop_back();
         }
+
+        if (ghostPhys.back()) delete ghostPhys.back();
+        ghostPhys.pop_back();
 
         QList<QCPAbstractPlottable *> listplottable;
         for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
@@ -642,7 +647,7 @@ void Visar::setObjectVisibility(nPhysD*phys) {
             bool ismyimg = (phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
             fringeLine[k]->setVisible(ismyimg);
             fringeRect[k]->setVisible(ismyimg);
-            maskRegion[k]->setVisible(settingsUi[k]->DeghostCheck->isChecked() && ismyimg);
+            maskRegion[k]->setVisible(settingsUi[k]->DeghostCheck->isChecked() && (ismyimg || phys == ghostPhys[k]));
         }
         sopRect->setVisible(enableSOP->isChecked() && (phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot)));
     }
@@ -1109,17 +1114,16 @@ void Visar::doWave(unsigned int k) {
             for (size_t i=0;i<dy;i++)
                 yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
+            double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
+            double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
+
             nPhysD* physDeghost=nullptr;
 
-            if (settingsUi[k]->DeghostCheck->isChecked()) {
-
+            if (settingsUi[k]->DeghostCheck->checkState()>0) {
 
                 physC imageFFT = imgs[1]->ft2(PHYS_FORWARD);
 
                 progress.setValue(progress.value()+1);
-
-                double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
-                double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
 
                 double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
 
@@ -1138,7 +1142,7 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
 
-                physDeghost=new nPhysD(*imgs[1],"deghost");
+                physDeghost=new nPhysD(*imgs[1],"deghost VISAR "+std::to_string(tabPhase->currentIndex()+1));
 
                 QRect geom=maskRegion[k]->path().boundingRect().toRect();
 
@@ -1158,7 +1162,6 @@ void Visar::doWave(unsigned int k) {
                     }
                 }
                 progress.setValue(progress.value()+1);
-
                 physDeghost->TscanBrightness();
                 imgs[1]=physDeghost;
             }
@@ -1191,8 +1194,6 @@ void Visar::doWave(unsigned int k) {
 
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            double cr = cos((settingsUi[k]->angle->value()) * _phys_deg);
-            double sr = sin((settingsUi[k]->angle->value()) * _phys_deg);
             double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
             const double damp_norm=M_PI;
 
@@ -1270,8 +1271,17 @@ void Visar::doWave(unsigned int k) {
 
             settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
 
-            if (physDeghost) {
-                delete physDeghost;
+            if (physDeghost){
+                qDebug() << settingsUi[k]->DeghostCheck->checkState();
+                qDebug() << physDeghost->getSize().x() << physDeghost->getSize().y();
+                if (settingsUi[k]->DeghostCheck->checkState()==1) {
+                    ghostPhys[k]=nparent->replacePhys(physDeghost,ghostPhys[k],false);
+                } else if (settingsUi[k]->DeghostCheck->checkState()==2) {
+                    qDebug() << nPhysExists(physDeghost) << ghostPhys[k];
+                    delete physDeghost;
+//                    ghostPhys[k]=nullptr;
+                    nparent->removePhys(ghostPhys[k]);
+                }
             }
 
         } else {
@@ -1473,10 +1483,10 @@ Visar::export_txt() {
     QString title=tr("Export ");
     switch (tabs->currentIndex()) {
         case 0:
-            title=tr("VISAR")+QString(" ")+QLocale().toString(tabPhase->currentIndex()+1);
+            title=tr("VISAR ")+QLocale().toString(tabPhase->currentIndex()+1);
             break;
         case 1:
-            title=tr("VISAR")+QString(" ")+QLocale().toString(tabVelocity->currentIndex()+1);
+            title=tr("VISAR ")+QLocale().toString(tabVelocity->currentIndex()+1);
             break;
         case 2:
             title=tr("SOP");

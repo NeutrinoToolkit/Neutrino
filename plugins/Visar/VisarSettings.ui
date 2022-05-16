@@ -247,8 +247,14 @@
                </item>
                <item row="0" column="3">
                 <widget class="QCheckBox" name="DeghostCheck">
+                 <property name="toolTip">
+                  <string>Completely checked to remove ghost fringes. Partially checked box will show the image.</string>
+                 </property>
                  <property name="text">
                   <string>Deghost</string>
+                 </property>
+                 <property name="tristate">
+                  <bool>true</bool>
                  </property>
                  <property name="neutrinoSave" stdset="0">
                   <bool>true</bool>
