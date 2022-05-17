@@ -1343,7 +1343,9 @@ void Visar::getPhase(unsigned int k) {
                 double contrastTmpRef=0.0;
                 double contrastTmpShot=0.0;
                 double meanPhaseTmp=0.0;
+                double meanPhaseTmpSqr=0.0;
                 double meanRefle=0.0;
+                double meanRefleSqr=0.0;
                 for (int i=geom2.left(); i<geom2.right();i++) {
                     double intRef=(intensity[k][0].point(i,j-refIntShift,0)-settingsUi[k]->offRef->value())*settingsUi[k]->multRef->value();
                     double intShot=intensity[k][1].point(i,j,0)-settingsUi[k]->offRef->value();
@@ -1352,36 +1354,32 @@ void Visar::getPhase(unsigned int k) {
                     meanIntShot+=intShot;
 
                     meanRefle+= intShot/intRef;
+                    meanRefleSqr+= pow(intShot/intRef,2);
 
                     contrastTmpRef+=contrast[k][0].point(i,j-refIntShift,0);
                     contrastTmpShot+=contrast[k][1].point(i,j,0);
                     meanPhaseTmp += phaseUnwrap[k].point(i,j);
+                    meanPhaseTmpSqr += pow(phaseUnwrap[k].point(i,j),2);
                 }
 
 
                 meanIntRef/=geom2.width();
                 meanIntShot/=geom2.width();
                 meanRefle/=geom2.width();
+                meanRefleSqr/=geom2.width();
 
                 contrastTmpRef/=geom2.width();
                 contrastTmpShot/=geom2.width();
                 meanPhaseTmp /= geom2.width();
+                meanPhaseTmpSqr /= geom2.width();
+
                 cIntensity[0][k] << meanIntRef;
                 cIntensity[1][k] << meanIntShot;
                 cContrast[0][k]  << contrastTmpRef*settingsUi[k]->multRef->value();
                 cContrast[1][k]  << contrastTmpShot;
-                double sqrTmpPhase=0.0;
-                double stdRefle=0.0;
-                for (int i=geom2.left(); i<geom2.right();i++) {
-                    sqrTmpPhase += pow(phaseUnwrap[k].point(i,j)-meanPhaseTmp,2);
+                cPhaseErr[k] << sqrt(meanPhaseTmpSqr -pow(meanPhaseTmp,2));
+                cReflErr[k] << sqrt(meanRefleSqr -pow(meanRefle,2));
 
-                    double intRef=(intensity[k][0].point(i,j-refIntShift,0)-settingsUi[k]->offRef->value())*settingsUi[k]->multRef->value();
-                    double intShot=intensity[k][1].point(i,j,0)-settingsUi[k]->offRef->value();
-
-                    stdRefle+=pow(intShot/intRef - meanRefle,2);
-                }
-                cPhaseErr[k] << sqrt(sqrTmpPhase/geom2.width());
-                cReflErr[k] << sqrt(stdRefle / geom2.width());
 
             }
 
