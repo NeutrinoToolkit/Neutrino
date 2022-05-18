@@ -437,8 +437,7 @@ void Visar::delVisar() {
             cContrast[m].pop_back();
         }
 
-        if (ghostPhys.back()) delete ghostPhys.back();
-        ghostPhys.pop_back();
+
 
         QList<QCPAbstractPlottable *> listplottable;
         for (int kk=0; kk< plotVelocity->plottableCount() ; kk++) {
@@ -453,6 +452,13 @@ void Visar::delVisar() {
 
         QApplication::processEvents();
         numVisars--;
+        nPhysD *my_phys=ghostPhys.back();
+        ghostPhys.pop_back();
+        if (nPhysExists(my_phys)) {
+            nparent->removePhys(my_phys);
+        } else {
+            delete my_phys;
+        }
         setProperty("NeuSave-numVisars",numVisars);
     } else {
         statusbar->showMessage("Cannot remove last Visar");
@@ -490,7 +496,7 @@ void Visar::loadSettings(QString my_settings) {
         doWave();
         calculate_etalon();
         QApplication::processEvents();
-        setObjectVisibility(currentBuffer);
+        setObjectVisibility (currentBuffer);
         QApplication::processEvents();
     }
 }
@@ -645,7 +651,8 @@ int Visar::direction(int k) {
 }
 
 void Visar::setObjectVisibility(nPhysD*phys) {
-    if (phys) {
+    qDebug() << "here in " << numVisars;
+    if (nPhysExists(phys)) {
         for (unsigned int k=0;k<numVisars;k++){
             bool ismyimg = (phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
             fringeLine[k]->setVisible(ismyimg);
@@ -654,6 +661,7 @@ void Visar::setObjectVisibility(nPhysD*phys) {
         }
         sopRect->setVisible(enableSOP->isChecked() && (phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot)));
     }
+    qDebug() << "here out";
 }
 
 void Visar::ghostChecked() {
@@ -942,7 +950,7 @@ void Visar::updatePlot() {
 
                 velocity[k][j] = speed;
                 reflectivity[k][j] = refle;
-                quality[k][j] = cContrast[1][k][j]/cContrast[0][k][j];
+                quality[k][j] = cContrast[1][k][j]*cContrast[0][k][j];
                 velError[k][j] = 2.0*abs(cPhaseErr[k][j]*sensitivity/refr_index);
                 reflError[k][j] = cReflErr[k][j]* (Rmat-beta) + beta;
 
