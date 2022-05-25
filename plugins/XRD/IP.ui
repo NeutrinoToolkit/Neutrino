@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>391</width>
-    <height>104</height>
+    <width>292</width>
+    <height>144</height>
    </rect>
   </property>
   <property name="font">
@@ -85,7 +85,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0,0,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -98,26 +98,47 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QDoubleSpinBox" name="angle">
+      <item row="2" column="1" colspan="3">
+       <widget class="QComboBox" name="IPmodel">
         <property name="toolTip">
-         <string>Rotation angle</string>
-        </property>
-        <property name="suffix">
-         <string>˚</string>
-        </property>
-        <property name="minimum">
-         <double>-360.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>360.000000000000000</double>
+         <string>IP model</string>
         </property>
         <property name="neutrinoSave" stdset="0">
          <bool>true</bool>
         </property>
+        <item>
+         <property name="text">
+          <string>No fading</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MS</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>TR</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SR</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ND</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MP</string>
+         </property>
+        </item>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1">
        <widget class="QToolButton" name="flipLR">
         <property name="toolTip">
          <string>Flip Left/Right</string>
@@ -137,7 +158,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="2">
        <widget class="QToolButton" name="flipUD">
         <property name="toolTip">
          <string>Flip Up/Down</string>
@@ -157,7 +178,45 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="7">
+       <widget class="QToolButton" name="crop">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Show cropped image</string>
+        </property>
+        <property name="text">
+         <string>Show</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+          <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QDoubleSpinBox" name="angle">
+        <property name="toolTip">
+         <string>Rotation angle</string>
+        </property>
+        <property name="suffix">
+         <string>˚</string>
+        </property>
+        <property name="minimum">
+         <double>-360.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>360.000000000000000</double>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
        <widget class="QToolButton" name="transpose">
         <property name="toolTip">
          <string>Transpose</string>
@@ -177,28 +236,23 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="rectROI">
+      <item row="2" column="0">
+       <widget class="QSpinBox" name="fadeMin">
         <property name="toolTip">
-         <string>Crop region window</string>
+         <string>Minutes between exposure and scan</string>
         </property>
-        <property name="text">
-         <string>...</string>
+        <property name="suffix">
+         <string> min</string>
         </property>
-        <property name="icon">
-         <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-          <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+        <property name="maximum">
+         <number>99999</number>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="6">
        <widget class="QToolButton" name="saveImage">
         <property name="toolTip">
          <string>Save cropped image</string>
@@ -212,22 +266,24 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QToolButton" name="crop">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
+      <item row="1" column="4" rowspan="2">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="7">
+       <widget class="QToolButton" name="rectROI">
         <property name="toolTip">
-         <string>Show cropped image</string>
+         <string>Crop region window</string>
         </property>
         <property name="text">
-         <string>Show</string>
+         <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-          <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
+          <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
         </property>
        </widget>
       </item>
@@ -249,11 +305,17 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>image</tabstop>
+  <tabstop>source</tabstop>
   <tabstop>angle</tabstop>
+  <tabstop>flipLR</tabstop>
   <tabstop>flipUD</tabstop>
   <tabstop>transpose</tabstop>
+  <tabstop>fadeMin</tabstop>
+  <tabstop>IPmodel</tabstop>
   <tabstop>rectROI</tabstop>
   <tabstop>saveImage</tabstop>
+  <tabstop>crop</tabstop>
  </tabstops>
  <resources>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>

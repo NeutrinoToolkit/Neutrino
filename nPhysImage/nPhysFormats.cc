@@ -769,6 +769,8 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 if (!TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &format)) {
                     format=SAMPLEFORMAT_UINT;
                 }
+                std::map<unsigned short, std::string> mapping = { {1, "1 UINT"}, {2, "2 INT"}, {3, "3 IEEEFP"}, {4, "4 VOID"}, {5, "5 COMPLEXINT"}, {6, "6 COMPLEXIEEEFP"}};
+                tiff_prop["TIFF_SAMPLEFORMAT"] = mapping[format];
 
                 TIFFGetField(tif, TIFFTAG_FILLORDER, &fillorder);
 

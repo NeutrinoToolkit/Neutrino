@@ -208,10 +208,28 @@ void XRD::cropImage(unsigned int k, bool show) {
             if (settingsUi[k]->transpose->isChecked()) {
                 physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
             }
+
+
+            if (settingsUi[k]->IPmodel->currentIndex() > 0 ) {
+                QString kind=settingsUi[k]->IPmodel->currentText();
+                double tfad=settingsUi[k]->fadeMin->value();
+                std::map<QString, std::array<double,4>> fad = {
+                    {"MS", {0.334, 0.666, 107.320, 33974}},
+                    {"TR", {0.535, 0.465, 28.812,  3837.2}},
+                    {"SR", {0.579, 0.421, 15.052,  3829.5}},
+                    {"ND", {0.559, 0.441, 18.179,  3907.0}},
+                    {"MP", {0.565, 0.435, 18.461,  6117.5}}};
+                double myfad = 1/(fad[kind][0]*exp(-tfad/fad[kind][2])+fad[kind][1]*exp(-tfad/fad[kind][3]));
+                physMath::phys_multiply(*my_phys,myfad);
+            }
+
+
             my_phys->set_scale(1,1);
             my_phys->set_origin(0,0);
+
             my_phys->prop["display_range"]=img->prop["display_range"];
             my_phys->setShortName(tabIPs->tabText(static_cast<int>(k)).toStdString());
+
             IPs[k]=nparent->replacePhys(my_phys,IPs[k],false);
             if(show) {
                 IPs[k]->prop["display_range"]=img->prop["display_range"];
