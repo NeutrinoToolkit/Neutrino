@@ -774,6 +774,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
                                 physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
                             }
+                            if (my_set.value("lockBlur",false).toBool()) {
+                                physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
+                            }
+
                             my_set.endGroup();
 
                             addShowPhys(my_phys);
