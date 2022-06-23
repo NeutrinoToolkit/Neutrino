@@ -37,7 +37,7 @@ elseif (LINUX)
 
         set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${DISTRO}-${DISTRO_CODE}")
 
-        if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "LinuxMint")
+        if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "Linuxmint")
 
 			set(CPACK_INSTALL_PREFIX "/usr")
                         set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB)
