@@ -344,8 +344,6 @@ public:
         subphys.set_origin(get_origin()-vec2f(x,y));
         subphys.set_scale(get_scale());
 
-        subphys.setType(PHYS_DYN);
-
         unsigned int end_w = std::min(x+Dx, getW());
         unsigned int end_h = std::min(y+Dy, getH());
         unsigned int begin_w = std::max(0,x);
@@ -386,7 +384,6 @@ public:
 
         stretched.set_origin(mul_P(get_origin(),ratio));
         stretched.set_origin(mul_P(get_scale(),ratio));
-        stretched.setType(PHYS_DYN);
 
         for (unsigned int j=0; j<stretched.getH(); j++) {
             for (unsigned int i=0; i<stretched.getW(); i++) {
@@ -465,7 +462,6 @@ public:
 //		rotated.set_origin(get_origin());
         rotated.set_scale(get_scale());
 
-        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
 		my_name << getName() << ".rotate(" << alphaDeg << ")";
         rotated.setName(my_name.str());
@@ -492,7 +488,6 @@ public:
 		}
         rotated.set_origin(get_origin());
         rotated.set_scale(get_scale());
-        rotated.setType(PHYS_DYN);
 		std::ostringstream my_name;
         my_name << "(" << getName() << ").fast_rotated(" << alphaDeg << ")";
         rotated.setName(my_name.str());

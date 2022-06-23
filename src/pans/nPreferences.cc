@@ -116,39 +116,11 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     connect(my_w.showColorbar, SIGNAL(released()), this, SLOT(changeShowColorbar()));
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
-//	connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-
-//    connect(my_w.lockOrigin, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.originX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-//    connect(my_w.originY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-//    connect(my_w.lockScale, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.scaleX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-//    connect(my_w.scaleY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-//    connect(my_w.lockRotate, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.rotate, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
-
-//    connect(my_w.lockFlip, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.flipX, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.flipY, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.transpose, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-
-//    connect(my_w.lockMath, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-//    connect(my_w.subtract, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-//    connect(my_w.multiply, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-//    connect(my_w.lockBlur, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
 
     my_w.askCloseUnsaved->setChecked(nparent->property("NeuSave-askCloseUnsaved").toBool());
-	connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
-//    connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-//    connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
 
-	connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
     connect(my_w.pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
 
@@ -170,6 +142,38 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         my_w.pluginList->addItem(dd);
 //        my_w.pluginList->addItem(d);
     }
+
+  connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockOrigin, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.originX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+  connect(my_w.originY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockScale, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.scaleX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+  connect(my_w.scaleY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockRotate, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.rotate, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockFlip, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.flipX, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.flipY, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.transpose, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockMath, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.subtract, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+  connect(my_w.multiply, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+  connect(my_w.lockBlur, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.blurX, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+  connect(my_w.blurY, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+
+  connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
 
 }
 

@@ -104,9 +104,6 @@ neutrino::neutrino():
     setProperty("NeuSave-gamma",1);
     setProperty("NeuSave-physNameLength",40);
 
-    setProperty("NeuSave-lockOrigin",QVariant());
-    setProperty("NeuSave-lockScale",QVariant());
-
     setProperty("NeuSave-askCloseUnsaved",true);
 
     setWindowTitle(property("winId").toString()+QString(": Neutrino"));
@@ -934,11 +931,15 @@ void neutrino::saveSession (QString fname) {
             for (int i=0;i<physList.size(); i++) {
                 if (progress.wasCanceled()) break;
                 progress.setValue(i);
-                progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
-                QApplication::processEvents();
-                ofile << "NeutrinoImage" << std::endl;
-                physFormat::phys_dump_binary(physList.at(i),ofile);
-                physList.at(i)->setType(PHYS_FILE);
+                if (! (physList.at(i)->getType()==PHYS_DYN)) {
+                    progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
+                    QApplication::processEvents();
+                    ofile << "NeutrinoImage" << std::endl;
+                    physFormat::phys_dump_binary(physList.at(i),ofile);
+                    physList.at(i)->setType(PHYS_FILE);
+                } else {
+                    qWarning() << "not saving " << QString::fromUtf8(physList.at(i)->getShortName().c_str());
+                }
             }
             progress.setValue(physList.size());
             ofile << getPanData();
@@ -948,7 +949,11 @@ void neutrino::saveSession (QString fname) {
             setProperty("NeuSave-fileSave", fname);
             std::vector <physD *> vecPhys;
             foreach (nPhysD * my_phys, physList) {
-                vecPhys.push_back(dynamic_cast<physD*>(my_phys));
+                if (! (my_phys->getType()==PHYS_DYN)) {
+                    vecPhys.push_back(dynamic_cast<physD*>(my_phys));
+                } else {
+                    qWarning() << "not saving " << QString::fromUtf8(my_phys->getShortName().c_str());
+                }
             }
             if (vecPhys.size()) {
                 std::string pandata=getPanData();

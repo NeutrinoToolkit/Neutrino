@@ -226,6 +226,7 @@ void XRD::cropImage(unsigned int k, bool show) {
 
             my_phys->set_scale(1,1);
             my_phys->set_origin(0,0);
+            my_phys->setType(PHYS_DYN);
 
             my_phys->prop["display_range"]=img->prop["display_range"];
             my_phys->setShortName(tabIPs->tabText(static_cast<int>(k)).toStdString());
@@ -256,6 +257,7 @@ void XRD::on_actionSaveIPs_triggered() {
                 nparent->fileSave(IPs[k],my_name);
             }
         }
+        saveSettings(my_dir.filePath(my_prefix+".ini"));
     }
 }
 
