@@ -44,7 +44,7 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
     QApplication::processEvents();
 
-    showSource();
+    connect(source, SIGNAL(released()),this, SLOT(showSource()));
     qDebug() << std::max(1,property("NeuSave-numIPs").toInt()) << property("NeuSave-numIPs");
 
     for (int k=0; k< tabIPs->count(); k++) {
@@ -63,7 +63,7 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
 void XRD::setObjectVisibility(nPhysD*phys) {
     for (unsigned int k=0;k < static_cast<unsigned int>(tabIPs->count());k++){
-        IPrect[k]->setVisible(phys == getPhysFromCombo(settingsUi[k]->image));
+        IPrect[k]->setVisible(phys == getPhysFromCombo(image));
     }
 }
 
@@ -103,8 +103,6 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->flipUD, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->transpose, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
-    connect(ui_IP->source, SIGNAL(released()),this, SLOT(showSource()));
-
     tabIPs->addTab(newtab, "IP"+QLocale().toString(tabIPs->count()+1));
     setProperty("NeuSave-numIPs",tabIPs->count());
 
@@ -153,17 +151,15 @@ void XRD::loadSettings(QString my_settings) {
     }
 
     on_cropAll_triggered();
+    showSource();
 
 }
 
 
 void XRD::showSource() {
-    if (sender() && sender()->property("id").isValid()) {
-        unsigned int k=sender()->property("id").toUInt();
-        nPhysD *img=getPhysFromCombo(settingsUi[k]->image);
-        if (img) {
-            nparent->showPhys(img);
-        }
+    nPhysD *img=getPhysFromCombo(image);
+    if (img) {
+        nparent->showPhys(img);
     }
 }
 
@@ -192,7 +188,7 @@ void XRD::saveImage() {
 void XRD::cropImage(unsigned int k, bool show) {
     qDebug() << k;
     if (k < IPs.size()) {
-        nPhysD* img=getPhysFromCombo(settingsUi[k]->image);
+        nPhysD* img=getPhysFromCombo(image);
         if (img) {
             QRect geom2=IPrect[k]->getRect(img);
             nPhysD cropped(img->sub(geom2.x(),geom2.y(),static_cast<unsigned int>(geom2.width()),static_cast<unsigned int>(geom2.height())));

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>359</width>
-    <height>173</height>
+    <width>357</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,12 +23,12 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>4</number>
     </property>
     <property name="topMargin">
-     <number>8</number>
+     <number>4</number>
     </property>
     <property name="rightMargin">
      <number>4</number>
@@ -36,7 +36,59 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Source</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="source">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Show source image</string>
+         </property>
+         <property name="text">
+          <string>Show</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QTabWidget" name="tabIPs">
       <property name="font">
        <font>
