@@ -35,10 +35,11 @@ elseif (LINUX)
         execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO OUTPUT_STRIP_TRAILING_WHITESPACE)
         execute_process(COMMAND "lsb_release" "-cs" OUTPUT_VARIABLE DISTRO_CODE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${DISTRO}-${DISTRO_CODE}")
         if (DISTRO_CODE MATCHES "n/a")
         	set(DISTRO_CODE "all")
         ENDIF()
+
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${DISTRO}-${DISTRO_CODE}")
 
         if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "Linuxmint")
 
