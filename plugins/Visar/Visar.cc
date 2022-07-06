@@ -106,6 +106,13 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
 
+    shotNumber->setValidator( new QIntValidator(0, 100000, this) );
+
+    shotNumber->setFixedWidth(50);
+
+    toolBar->insertWidget(actionRect3, shotNumberLabel);
+    toolBar->insertWidget(actionRect3, shotNumber);
+    toolBar->insertSeparator(actionRect3);
 
     show();
 
@@ -132,9 +139,6 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
     connect(actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
-    connect(actionFilterAll, SIGNAL(triggered()), this, SLOT(doWave()));
-
-//    connect(actionRefresh, SIGNAL(triggered()), this, SLOT(doWave()));
 
     connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
     connect(etalon_dn_over_dlambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
@@ -159,13 +163,155 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
 
+    connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
+
+
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
+    connect(shotNumber, SIGNAL(returnPressed()), this, SLOT(changeShotNumber()));
+
     loadDefaults();
     sweepChanged();
     calculate_etalon();
+}
+
+void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
+    QApplication::processEvents();
+    QList <nPhysD *> my_phys=nparent->fileOpen(finfo.absoluteFilePath());
+    QApplication::processEvents();
+    if (my_phys.size()) {
+        for (int i=0; i<combo->count(); i++) {
+            nPhysD* phys= combo->itemData(i).value<nPhysD*>();
+            if (phys == my_phys[0]) {
+                combo->setCurrentIndex(i);
+                nparent->showPhys(phys);
+            }
+        }
+    }
+    QApplication::processEvents();
+}
+
+void Visar::changeShotNumber() {
+    QSet<nPhysD*> old_phys;
+    for (unsigned int k=0; k< numVisars; k++) {
+        old_phys << getPhysFromCombo(settingsUi[k]->refImage) << getPhysFromCombo(settingsUi[k]->shotImage) ;
+        old_phys << getPhysFromCombo(sopRef) << getPhysFromCombo(sopShot) ;
+    }
+    for(auto & phys : old_phys) {
+        nparent->removePhys(phys);
+    }
+    for (unsigned int k=0; k< numVisars; k++) {
+        QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
+        QFileInfo fileRef;
+        QFileInfo fileShot;
+        QRegularExpressionMatch my_match;
+        foreach(QFileInfo finfo, list) {
+            QString fname=finfo.fileName();
+
+            my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                bool convert;
+                int num=my_match.captured(1).toInt(&convert);
+                if (convert && num==shotNumber->text().toInt()) {
+                    fileRef=finfo;
+                }
+            }
+            my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                bool convert;
+                int num=my_match.captured(1).toInt(&convert);
+                if (convert && num==shotNumber->text().toInt()) {
+                    fileShot=finfo;
+                }
+            }
+        }
+        qDebug() << fileRef;
+        qDebug() << fileShot;
+        if (fileRef.isFile() && fileShot.isFile()) {
+            getPhysFromNameSetCombo(fileRef,settingsUi[k]->refImage);
+            getPhysFromNameSetCombo(fileShot,settingsUi[k]->shotImage);
+            QApplication::processEvents();
+            settingsUi[k]->doWaveButton->animateClick();
+            QApplication::processEvents();
+        } else {
+            statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +settingsUi[k]->globDir->text());
+        }
+
+    }
+// SOP
+
+    QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
+    QFileInfo fileRef;
+    QFileInfo fileShot;
+    QRegularExpressionMatch my_match;
+    foreach(QFileInfo finfo, list) {
+        QString fname=finfo.fileName();
+
+        my_match=QRegularExpression(globRef->text()).match(fname);
+        if (my_match.lastCapturedIndex()==1) {
+            bool convert;
+            int num=my_match.captured(1).toInt(&convert);
+            if (convert && num==shotNumber->text().toInt()) {
+                fileRef=finfo;
+            }
+        }
+        my_match=QRegularExpression(globShot->text()).match(fname);
+        if (my_match.lastCapturedIndex()==1) {
+            bool convert;
+            int num=my_match.captured(1).toInt(&convert);
+            if (convert && num==shotNumber->text().toInt()) {
+                fileShot=finfo;
+            }
+        }
+    }
+    qDebug() << fileRef;
+    qDebug() << fileShot;
+    if (fileRef.isFile() && fileShot.isFile()) {
+        getPhysFromNameSetCombo(fileRef,sopRef);
+        getPhysFromNameSetCombo(fileShot,sopShot);
+        updatePlotSOP();
+    } else {
+        statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +globDir->text());
+    }
+
+
+
+    QApplication::processEvents();
+}
+
+void Visar::globRefreshPressed() {
+    QToolButton *button=qobject_cast<QToolButton *>(sender());
+    if (button) {
+        if (button->property("id").isValid()) {
+            unsigned int k=button->property("id").toUInt();
+            qDebug() << k << button->property("id");
+            std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
+            if (imgs[0]) {
+                QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
+                settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
+                settingsUi[k]->globRef->setText(finfo.fileName());
+            }
+            if (imgs[1]) {
+                QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
+                settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
+                settingsUi[k]->globShot->setText(finfo.fileName());
+            }
+        } else {
+            std::array<nPhysD*,2> imgs={{getPhysFromCombo(sopRef),getPhysFromCombo(sopShot)}};
+            if (imgs[0]) {
+                QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
+                globDir->setText(finfo.absoluteDir().path());
+                globRef->setText(finfo.fileName());
+            }
+            if (imgs[1]) {
+                QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
+                globDir->setText(finfo.absoluteDir().path());
+                globShot->setText(finfo.fileName());
+            }
+        }
+    }
 }
 
 void Visar::calculate_etalon() {
@@ -218,6 +364,8 @@ void Visar::addVisar() {
     connect(ui_settings->resolution, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
+
+    connect(ui_settings->globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
 
     ui_settings->doWaveButton->setProperty("needWave",true);
 
@@ -1090,7 +1238,6 @@ void Visar::doWave() {
                 doWave(k);
             }
         }
-        actionFilterAll->setIcon(QIcon(":icons/refresh.png"));
 
     }
 }
@@ -1104,7 +1251,6 @@ void Visar::needWave() {
             settingsUi[k]->doWaveButton->setIcon(my_icon);
             settingsUi[k]->doWaveButton->setProperty("needWave",true);
         }
-        actionFilterAll->setIcon(my_icon);
     }
 }
 

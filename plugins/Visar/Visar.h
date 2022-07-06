@@ -123,6 +123,10 @@ public slots:
     void addVisar();
     void delVisar();
 
+    void globRefreshPressed();
+    void changeShotNumber();
+    void getPhysFromNameSetCombo(QFileInfo, QComboBox*);
+
     void needWave();
 
     void doWave();

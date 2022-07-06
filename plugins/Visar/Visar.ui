@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>752</width>
-    <height>523</height>
+    <width>745</width>
+    <height>572</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -149,6 +149,72 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
+        <item row="2" column="2" colspan="2">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Sweep time and direction</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="sopScale">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="sopDirection">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Time direction</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>V</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>H</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QGroupBox" name="groupBox_8">
           <property name="font">
@@ -211,131 +277,6 @@
              </property>
              <property name="maximum">
               <double>99999999.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QGroupBox" name="groupBox_7">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Refl.</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_16">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QComboBox" name="whichRefl">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Reflectivity correction</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Zero</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Mean</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QGroupBox" name="groupBox_10">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Center &amp;&amp; magnification</string>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <property name="leftMargin">
-            <number>2</number>
-           </property>
-           <property name="topMargin">
-            <number>2</number>
-           </property>
-           <property name="rightMargin">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QSpinBox" name="physOriginSpace">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>TCC central pixel</string>
-             </property>
-             <property name="suffix">
-              <string> [px]</string>
-             </property>
-             <property name="minimum">
-              <number>-99999</number>
-             </property>
-             <property name="maximum">
-              <number>99999</number>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="magnification">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Image magnification</string>
-             </property>
-             <property name="suffix">
-              <string> [space/px]</string>
-             </property>
-             <property name="decimals">
-              <number>3</number>
-             </property>
-             <property name="maximum">
-              <double>9999.989999999999782</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
@@ -490,17 +431,94 @@
           </layout>
          </widget>
         </item>
-        <item row="0" column="0" colspan="3">
-         <widget class="QGroupBox" name="groupBox">
+        <item row="1" column="3">
+         <widget class="QGroupBox" name="groupBox_10">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
            </font>
           </property>
           <property name="title">
-           <string>Reference and Shot</string>
+           <string>Center &amp;&amp; magnification</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1,1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QSpinBox" name="physOriginSpace">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>TCC central pixel</string>
+             </property>
+             <property name="suffix">
+              <string> [px]</string>
+             </property>
+             <property name="minimum">
+              <number>-99999</number>
+             </property>
+             <property name="maximum">
+              <number>99999</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="magnification">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Image magnification</string>
+             </property>
+             <property name="suffix">
+              <string> [space/px]</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QGroupBox" name="groupBox_7">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Refl.</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_16">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -513,36 +531,54 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="2">
-            <widget class="QComboBox" name="sopShot">
+           <item row="0" column="0">
+            <widget class="QComboBox" name="whichRefl">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
              <property name="toolTip">
-              <string>SOP shot image</string>
+              <string>Reflectivity correction</string>
              </property>
-             <property name="neutrinoImage" stdset="0">
-              <bool>true</bool>
-             </property>
+             <item>
+              <property name="text">
+               <string>Zero</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mean</string>
+              </property>
+             </item>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="sopRef">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>SOP reference image (maybe the same as the shot)</string>
-             </property>
-             <property name="neutrinoImage" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Reference and Shot</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,1,1">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item row="0" column="0">
             <widget class="QCheckBox" name="enableSOP">
              <property name="font">
@@ -564,70 +600,119 @@
              </property>
             </widget>
            </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="2" colspan="2">
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string>Sweep time and direction</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLineEdit" name="sopScale">
+           <item row="0" column="1">
+            <widget class="QComboBox" name="sopRef">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>SOP reference image (maybe the same as the shot)</string>
              </property>
-             <property name="neutrinoSave" stdset="0">
+             <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="sopDirection">
+           <item row="0" column="2">
+            <widget class="QComboBox" name="sopShot">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
               </font>
              </property>
              <property name="toolTip">
-              <string>Time direction</string>
+              <string>SOP shot image</string>
              </property>
-             <property name="neutrinoSave" stdset="0">
+             <property name="neutrinoImage" stdset="0">
               <bool>true</bool>
              </property>
-             <item>
-              <property name="text">
-               <string>V</string>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="QWidget" name="widget_5" native="true">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,0,0,0,0">
+              <property name="leftMargin">
+               <number>0</number>
               </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>H</string>
+              <property name="topMargin">
+               <number>0</number>
               </property>
-             </item>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Dir:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="globDir">
+                <property name="toolTip">
+                 <string>Directory containing all the shots</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Ref:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="globRef">
+                <property name="toolTip">
+                 <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Shot:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="globShot">
+                <property name="toolTip">
+                 <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="globRefresh">
+                <property name="text">
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+                  <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -834,6 +919,39 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="shotNumber">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Shot number (return to validate)</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="shotNumberLabel">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Shot number (return to validate)</string>
+      </property>
+      <property name="text">
+       <string>Shot #</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -863,8 +981,6 @@
    <addaction name="actionSaveTxtMultiple"/>
    <addaction name="actionCopy"/>
    <addaction name="actionCopyImage"/>
-   <addaction name="separator"/>
-   <addaction name="actionFilterAll"/>
    <addaction name="separator"/>
    <addaction name="actionRect3"/>
    <addaction name="actionAddVisar"/>
@@ -951,18 +1067,6 @@
     <string>Copy image</string>
    </property>
   </action>
-  <action name="actionFilterAll">
-   <property name="icon">
-    <iconset resource="Visar.qrc">
-     <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
-   </property>
-   <property name="text">
-    <string>Filter Visars</string>
-   </property>
-   <property name="toolTip">
-    <string>Filter Visar images</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -985,6 +1089,10 @@
   <tabstop>sopRef</tabstop>
   <tabstop>sopShot</tabstop>
   <tabstop>sopOffset</tabstop>
+  <tabstop>globDir</tabstop>
+  <tabstop>globRef</tabstop>
+  <tabstop>globShot</tabstop>
+  <tabstop>globRefresh</tabstop>
   <tabstop>sopCalibT0</tabstop>
   <tabstop>sopCalibA</tabstop>
   <tabstop>whichRefl</tabstop>
@@ -994,16 +1102,16 @@
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>sopScale</tabstop>
   <tabstop>sopDirection</tabstop>
+  <tabstop>notes</tabstop>
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
   <tabstop>etalon_dn_over_dlambda</tabstop>
   <tabstop>etalon_sensitivity</tabstop>
   <tabstop>tabVelocity</tabstop>
-  <tabstop>notes</tabstop>
+  <tabstop>shotNumber</tabstop>
  </tabstops>
  <resources>
-  <include location="Visar.qrc"/>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
