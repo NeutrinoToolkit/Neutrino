@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>865</width>
-    <height>413</height>
+    <width>541</width>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,10 +85,13 @@
    <addaction name="actionForward"/>
    <addaction name="separator"/>
    <addaction name="actionPrint"/>
+   <addaction name="separator"/>
+   <addaction name="actionDecreaseFont"/>
+   <addaction name="actionIncreaseFont"/>
   </widget>
   <action name="actionHome">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
    </property>
    <property name="text">
@@ -97,7 +100,7 @@
   </action>
   <action name="actionBack">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +112,7 @@
   </action>
   <action name="actionForward">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -121,11 +124,35 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/print.png</normaloff>:/icons/print.png</iconset>
    </property>
    <property name="text">
     <string>Print</string>
+   </property>
+  </action>
+  <action name="actionIncreaseFont">
+   <property name="icon">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Increase font</string>
+   </property>
+   <property name="toolTip">
+    <string>Increase font</string>
+   </property>
+  </action>
+  <action name="actionDecreaseFont">
+   <property name="icon">
+    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>decrease</string>
+   </property>
+   <property name="toolTip">
+    <string>Decrease font</string>
    </property>
   </action>
  </widget>
@@ -140,7 +167,7 @@
   <tabstop>help</tabstop>
  </tabstops>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew_clang-Debug/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

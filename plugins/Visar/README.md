@@ -1,6 +1,3 @@
-VISAR analysis
-==============
-
 In the Window there are 3 main tabs on the left : *Settings*, *Velocity* and
 *SOP*
 
@@ -9,7 +6,7 @@ In the main toolbar you can add <img src="../../resources/icons/plus.png" width=
 The main tabs on the laft are *Settings* (for parameters that you just have to change once) and *Velocity* (to tune the velocity measurements (e.g. jumps and delays)
 
 Settings :
-----------
+==========
 
 For each *Visar* tab to set the parameters:
 
@@ -34,7 +31,7 @@ For each *Visar* tab to set the parameters:
       * **Sweep Time** is the temporal calibration of the streak camera. The is a list of values ($A_1$ ... $A_n$) as defined by th Hamamatsu cameras (i.e $T(X)=A_1x+A_2 X^2 /2+A_3 X^3 /3+...+A_n X^n /n$). One value is linear response.
 
 Velocity:
----------
+=========
 
 For each *Visar* tab to set the velocity parameters:
 
@@ -57,7 +54,7 @@ For each *Visar* tab to set the velocity parameters:
          2. a second change of velocity at the time `3.5` with a jump of `5` fringes in a medium with refractive index of `1.7`.
 
 Temperaure:
------------
+===========
 
   *  Select *Reference* and *Shot* images. In case only shot image is present it will use the same on bot combo-box and use the *background* spin-box to adjust the background level
   *  set the pixel *time zero* and the delay *delta t*
@@ -69,5 +66,33 @@ Temperaure:
   *  **Sweep Time**: conversion px to time (same as above with Hamamatsu polynomial expansion)
   *  Direction: **H**orizontal or **V**ertical
   *  SOP calibration: **$T_0$** and **A** : calibration values ($T_0$ is the color temperature of the light collected by optical system and "A" is the efficiency of the streak).
+
+
+Shot number change:
+===================
+
+In order to be able to swap from one shot to another, it's possible to fill the **Dir** field for each **Visar** (all refs and shots of a Visar are in the same directory) in the *Settings* tab and both *RegEx* pattern for refrence and shot.
+
+The *RegEx* pattern:
+
+Imagine you have all shots like this:
+
+```
+Visar_2_001_ref.img
+Visar_2_001_shot.img
+Visar_2_002_ref.img
+Visar_2_002_shot.img
+...
+Visar_2_051_ref.img
+Visar_2_051_shot.img
+```
+
+so the **Ref:** *RegEx* will be `Visar_2_(\d+)_ref.img` and **Shot:** will be `Visar_2_(\d+)_ref.img`. 
+
+This is just an example because *RegEx* is really powerful, here the important part is `(\d+)` which will match "one or more digits".
+
+The button <img src="../../resources/icons/autoRefresh.png" width="16" /> will fill the values for the actual images.
+
+Once this in place, in the top tollbar, you can change the number of the shot and hit "return" in order to close the actual image, open the ref and shot corresponding to the shot number provided on top and filter the images.
 
 

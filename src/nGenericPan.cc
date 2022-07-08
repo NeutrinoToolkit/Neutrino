@@ -134,6 +134,8 @@ void nGenericPan::help() {
             connect(my_help.actionBack, SIGNAL(triggered()), my_help.help, SLOT(backward()));
             connect(my_help.actionForward, SIGNAL(triggered()), my_help.help, SLOT(forward()));
             connect(my_help.actionPrint, SIGNAL(triggered()), my_help.help, SLOT(print()));
+            connect(my_help.actionIncreaseFont, SIGNAL(triggered()), my_help.help, SLOT(zoomIn()));
+            connect(my_help.actionDecreaseFont, SIGNAL(triggered()), my_help.help, SLOT(zoomOut()));
             helpwin->show();
         }
     } else {
