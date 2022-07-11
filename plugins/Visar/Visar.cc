@@ -219,38 +219,43 @@ void Visar::changeShotNumber() {
         nparent->removePhys(phys);
     }
     for (unsigned int k=0; k< numVisars; k++) {
-        QDir my_dir(settingsUi[k]->globDir->text());
-        QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
-        QFileInfo fileRef=getFileFromGlob(list,settingsUi[k]->globRef->text(),shotNumber->text().toInt()) ;
-        QFileInfo fileShot=getFileFromGlob(list,settingsUi[k]->globShot->text(),shotNumber->text().toInt());
+        if (velocityUi[k]->enableVisar->isChecked()) {
+            QDir my_dir(settingsUi[k]->globDir->text());
+            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
+            QFileInfo fileRef=getFileFromGlob(list,settingsUi[k]->globRef->text(),shotNumber->text().toInt()) ;
+            QFileInfo fileShot=getFileFromGlob(list,settingsUi[k]->globShot->text(),shotNumber->text().toInt());
+            qDebug() << fileRef;
+            qDebug() << fileShot;
+            if (fileRef.isFile() && fileShot.isFile()) {
+                getPhysFromNameSetCombo(fileRef,settingsUi[k]->refImage);
+                getPhysFromNameSetCombo(fileShot,settingsUi[k]->shotImage);
+                QApplication::processEvents();
+                settingsUi[k]->doWaveButton->animateClick();
+                QApplication::processEvents();
+            } else {
+                statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +settingsUi[k]->globDir->text());
+            }
+        } else {
+            statusbar->showMessage("Visar number "+QString::number(k+1)+ " is disabled");
+        }
+    }
+// SOP
+    if (enableSOP->isChecked()) {
+        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
+        QFileInfo fileRef=getFileFromGlob(list,globRef->text(),shotNumber->text().toInt()) ;
+        QFileInfo fileShot=getFileFromGlob(list,globShot->text(),shotNumber->text().toInt());
         qDebug() << fileRef;
         qDebug() << fileShot;
         if (fileRef.isFile() && fileShot.isFile()) {
-            getPhysFromNameSetCombo(fileRef,settingsUi[k]->refImage);
-            getPhysFromNameSetCombo(fileShot,settingsUi[k]->shotImage);
-            QApplication::processEvents();
-            settingsUi[k]->doWaveButton->animateClick();
-            QApplication::processEvents();
+            getPhysFromNameSetCombo(fileRef,sopRef);
+            getPhysFromNameSetCombo(fileShot,sopShot);
+            updatePlotSOP();
         } else {
-            statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +settingsUi[k]->globDir->text());
+            statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +globDir->text());
         }
-
-    }
-// SOP
-
-    QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
-    QFileInfo fileRef=getFileFromGlob(list,globRef->text(),shotNumber->text().toInt()) ;
-    QFileInfo fileShot=getFileFromGlob(list,globShot->text(),shotNumber->text().toInt());
-    qDebug() << fileRef;
-    qDebug() << fileShot;
-    if (fileRef.isFile() && fileShot.isFile()) {
-        getPhysFromNameSetCombo(fileRef,sopRef);
-        getPhysFromNameSetCombo(fileShot,sopShot);
-        updatePlotSOP();
     } else {
-        statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +globDir->text());
+        statusbar->showMessage("SOP is disabled");
     }
-
 
 
     QApplication::processEvents();
