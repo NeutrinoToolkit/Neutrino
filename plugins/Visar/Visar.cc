@@ -193,6 +193,22 @@ void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
     QApplication::processEvents();
 }
 
+QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, int num) {
+    QFileInfo my_file;
+    foreach(QFileInfo finfo, list) {
+        QString fname=finfo.fileName();
+        QRegularExpressionMatch my_match=QRegularExpression(my_glob).match(fname);
+        if (my_match.lastCapturedIndex()==1) {
+            bool convert;
+            int my_num=my_match.captured(1).toInt(&convert);
+            if (convert && my_num==num) {
+                my_file=finfo;
+            }
+        }
+    }
+    return my_file;
+}
+
 void Visar::changeShotNumber() {
     QSet<nPhysD*> old_phys;
     for (unsigned int k=0; k< numVisars; k++) {
@@ -203,30 +219,10 @@ void Visar::changeShotNumber() {
         nparent->removePhys(phys);
     }
     for (unsigned int k=0; k< numVisars; k++) {
+        QDir my_dir(settingsUi[k]->globDir->text());
         QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
-        QFileInfo fileRef;
-        QFileInfo fileShot;
-        QRegularExpressionMatch my_match;
-        foreach(QFileInfo finfo, list) {
-            QString fname=finfo.fileName();
-
-            my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
-            if (my_match.lastCapturedIndex()==1) {
-                bool convert;
-                int num=my_match.captured(1).toInt(&convert);
-                if (convert && num==shotNumber->text().toInt()) {
-                    fileRef=finfo;
-                }
-            }
-            my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
-            if (my_match.lastCapturedIndex()==1) {
-                bool convert;
-                int num=my_match.captured(1).toInt(&convert);
-                if (convert && num==shotNumber->text().toInt()) {
-                    fileShot=finfo;
-                }
-            }
-        }
+        QFileInfo fileRef=getFileFromGlob(list,settingsUi[k]->globRef->text(),shotNumber->text().toInt()) ;
+        QFileInfo fileShot=getFileFromGlob(list,settingsUi[k]->globShot->text(),shotNumber->text().toInt());
         qDebug() << fileRef;
         qDebug() << fileShot;
         if (fileRef.isFile() && fileShot.isFile()) {
@@ -243,29 +239,8 @@ void Visar::changeShotNumber() {
 // SOP
 
     QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
-    QFileInfo fileRef;
-    QFileInfo fileShot;
-    QRegularExpressionMatch my_match;
-    foreach(QFileInfo finfo, list) {
-        QString fname=finfo.fileName();
-
-        my_match=QRegularExpression(globRef->text()).match(fname);
-        if (my_match.lastCapturedIndex()==1) {
-            bool convert;
-            int num=my_match.captured(1).toInt(&convert);
-            if (convert && num==shotNumber->text().toInt()) {
-                fileRef=finfo;
-            }
-        }
-        my_match=QRegularExpression(globShot->text()).match(fname);
-        if (my_match.lastCapturedIndex()==1) {
-            bool convert;
-            int num=my_match.captured(1).toInt(&convert);
-            if (convert && num==shotNumber->text().toInt()) {
-                fileShot=finfo;
-            }
-        }
-    }
+    QFileInfo fileRef=getFileFromGlob(list,globRef->text(),shotNumber->text().toInt()) ;
+    QFileInfo fileShot=getFileFromGlob(list,globShot->text(),shotNumber->text().toInt());
     qDebug() << fileRef;
     qDebug() << fileShot;
     if (fileRef.isFile() && fileShot.isFile()) {
@@ -291,24 +266,23 @@ void Visar::globRefreshPressed() {
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
                 settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
-                settingsUi[k]->globRef->setText(finfo.fileName());
+                settingsUi[k]->globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
                 settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
-                settingsUi[k]->globShot->setText(finfo.fileName());
+                settingsUi[k]->globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
         } else {
             std::array<nPhysD*,2> imgs={{getPhysFromCombo(sopRef),getPhysFromCombo(sopShot)}};
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
-                globDir->setText(finfo.absoluteDir().path());
-                globRef->setText(finfo.fileName());
+                globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
                 globDir->setText(finfo.absoluteDir().path());
-                globShot->setText(finfo.fileName());
+                globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
         }
     }
