@@ -256,7 +256,7 @@ void Visar::changeShotNumber() {
     } else {
         statusbar->showMessage("SOP is disabled");
     }
-
+    tabChanged(0);
 
     QApplication::processEvents();
 }
@@ -803,6 +803,17 @@ void Visar::tabChanged(int k) {
     QTabWidget *tabWidget=nullptr;
 
     if (sender()) tabWidget=qobject_cast<QTabWidget *>(sender());
+    if (!tabWidget) {
+        if (tabs->currentIndex()==0) {
+            tabWidget=tabPhase;
+            k=tabPhase->currentIndex();
+        } else if (tabs->currentIndex()==1) {
+            tabWidget=tabVelocity;
+            k=tabVelocity->currentIndex();
+        } else {
+            tabWidget=tabs;
+        }
+    }
 
     if (tabWidget) {
 
