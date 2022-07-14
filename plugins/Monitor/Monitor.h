@@ -40,18 +40,16 @@ class Monitor : public nGenericPan {
 public:
     Q_INVOKABLE Monitor(neutrino *);
     Ui::Monitor my_w;
-    QFileSystemModel *fileModel, *dirModel;
+    QFileSystemModel *fileModel;
+//    QSortFilterProxyModel *proxyModel;
     QCompleter *completer;
 
 public slots:
     void listViewDoubleClicked(QModelIndex);
     void listViewActivated(QModelIndex);
-    void textChanged(QString);
+    void textChanged();
 
     void changeDir();
-
-    void rowsInserted(QModelIndex, int, int);
-    void rowsRemoved(QModelIndex, int, int);
 
 };
 

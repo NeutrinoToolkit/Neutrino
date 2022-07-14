@@ -2,24 +2,28 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="600"
    height="600"
    id="svg4477"
    version="1.1"
-   inkscape:version="0.48+devel r9772"
-   sodipodi:docname="home.svg">
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   sodipodi:docname="home.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4479">
     <filter
        inkscape:collect="always"
-       id="filter4817">
+       id="filter4817"
+       x="-0.0062307691"
+       y="-0.005785714"
+       width="1.0124615"
+       height="1.0115714">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="0.47834645"
@@ -34,8 +38,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.205"
-     inkscape:cx="300"
-     inkscape:cy="300"
+     inkscape:cx="202.48963"
+     inkscape:cy="300.41494"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -43,14 +47,17 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1276"
-     inkscape:window-height="980"
-     inkscape:window-x="4"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1309"
+     inkscape:window-height="456"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
      inkscape:snap-global="true"
      objecttolerance="10000"
-     guidetolerance="10000">
+     guidetolerance="10000"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid3932"
@@ -59,8 +66,10 @@
        enabled="true"
        snapvisiblegridlinesonly="false"
        units="mm"
-       spacingx="2mm"
-       spacingy="2mm" />
+       spacingx="6.6437008"
+       spacingy="6.6437008"
+       originx="0"
+       originy="0" />
   </sodipodi:namedview>
   <metadata
      id="metadata4482">

@@ -36,28 +36,22 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 	
 	fileModel=new QFileSystemModel(this);
 	fileModel->setFilter(QDir::Files);
-	my_w.listView->setModel(fileModel);
+    fileModel->setNameFilterDisables(false);
+//    proxyModel = new QSortFilterProxyModel(this);
+//    proxyModel->setSourceModel(fileModel);
 
-	connect(my_w.lineEdit, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));	
+    my_w.listView->setModel(fileModel);
+    connect(my_w.lineEdit, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+    connect(my_w.pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+
 	connect(my_w.listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
 	connect(my_w.listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
 	
-	textChanged(my_w.lineEdit->text());
+    textChanged();
 
 	connect(my_w.changeDir, SIGNAL(released()), this, SLOT(changeDir()));
-	connect(fileModel, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(rowsInserted(QModelIndex, int, int)));
-	connect(fileModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(rowsRemoved(QModelIndex, int, int)));
 }
 
-void
-Monitor::rowsInserted(QModelIndex index, int inizio, int fine) {
-	qDebug() << ">>>>>>>>>>>>>>>> " << __PRETTY_FUNCTION__ << fileModel->fileInfo(index).absoluteFilePath() << inizio << fine;
-}
-
-void
-Monitor::rowsRemoved(QModelIndex index, int inizio, int fine) {
-	qDebug() << ">>>>>>>>>>>>>>>> " << __PRETTY_FUNCTION__ << fileModel->fileInfo(index).absoluteFilePath() << inizio << fine;
-}
 
 void
 Monitor::listViewDoubleClicked(QModelIndex index) {
@@ -86,11 +80,14 @@ Monitor::listViewActivated(QModelIndex index) {
 }
 
 void
-Monitor::textChanged(QString dirName) {
-	my_w.listView->setRootIndex(fileModel->setRootPath(dirName));
+Monitor::textChanged() {
+//    fileModel->setRootPath(dirName);
+//    my_w.listView->setRootIndex(proxyModel->mapFromSource(fileModel->index(dirName)));
+    fileModel->setNameFilters(my_w.pattern->text().split(" "));
+    my_w.listView->setRootIndex(fileModel->setRootPath(my_w.lineEdit->text()));
 	// FIXME: this an absolute bug in qt check here:
 	// http://qt-project.org/forums/viewthread/7265
-	fileModel->setNameFilters(QStringList());
+//    fileModel->setNameFilters(QStringList());
 }
 
 void
