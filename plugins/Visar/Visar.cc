@@ -159,7 +159,6 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
 
     connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
 
-
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
@@ -296,7 +295,10 @@ void Visar::fillComboShot() {
 
     comboShot->clear();
 
-    QStringList my_list(match.begin(),match.end());
+    QStringList my_list;
+    for (auto &e : match) {
+        my_list << e;
+    }
     my_list.sort();
     qDebug() << my_list;
     for (auto &e: my_list) {
