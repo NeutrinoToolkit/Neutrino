@@ -36,6 +36,7 @@
 #include "nPhysWave.h"
 #include "neutrino.h"
 
+
 class VisarPhasePlot : public nCustomPlotMouseX3Y {
     Q_OBJECT
     
@@ -119,12 +120,14 @@ private:
     std::vector<nPhysD*> ghostPhys;
 
 public slots:
-    
+
+    void fillComboShot();
+    void changeShot(QString);
+
     void addVisar();
     void delVisar();
 
     void globRefreshPressed();
-    void changeShotNumber();
     void getPhysFromNameSetCombo(QFileInfo, QComboBox*);
 
     void needWave();

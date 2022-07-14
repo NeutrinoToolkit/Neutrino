@@ -348,6 +348,9 @@
                   </item>
                   <item>
                    <widget class="QToolButton" name="globRefresh">
+                    <property name="toolTip">
+                     <string>Guess Dir, Ref and Shot from current images</string>
+                    </property>
                     <property name="text">
                      <string>...</string>
                     </property>

@@ -90,7 +90,6 @@ nSOPPlot::nSOPPlot(QWidget* parent):
 
 };
 
-
 Visar::Visar(neutrino *parent) : nGenericPan(parent),
       numVisars(0)
 {
@@ -106,13 +105,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
 
-    shotNumber->setValidator( new QIntValidator(0, 100000, this) );
-
-    shotNumber->setFixedWidth(50);
-
-    toolBar->insertWidget(actionRect3, shotNumberLabel);
-    toolBar->insertWidget(actionRect3, shotNumber);
-    toolBar->insertSeparator(actionRect3);
+    toolBar->addWidget(comboShot);
 
     show();
 
@@ -162,6 +155,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
+    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
     connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
 
@@ -170,11 +164,146 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
-    connect(shotNumber, SIGNAL(returnPressed()), this, SLOT(changeShotNumber()));
+    connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+
+    connect(globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+
 
     loadDefaults();
     sweepChanged();
     calculate_etalon();
+}
+
+void Visar::changeShot(QString num) {
+    qDebug() << num;
+    QSet<nPhysD*> old_phys;
+    for (unsigned int k=0; k< numVisars; k++) {
+        old_phys << getPhysFromCombo(settingsUi[k]->refImage) << getPhysFromCombo(settingsUi[k]->shotImage) ;
+        old_phys << getPhysFromCombo(sopRef) << getPhysFromCombo(sopShot) ;
+    }
+    for(auto & phys : old_phys) {
+        nparent->removePhys(phys);
+    }
+
+    for (unsigned int k=0; k< numVisars; k++) {
+        if (velocityUi[k]->enableVisar->isChecked()) {
+            QSet<QString> matchRef;
+            QSet<QString> matchShot;
+            QDir my_dir(settingsUi[k]->globDir->text());
+            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, list) {
+                QString fname=finfo.fileName();
+                QRegularExpressionMatch my_match;
+                my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
+                if (my_match.lastCapturedIndex()==1) {
+                    if (my_match.captured(1) == num) {
+                        getPhysFromNameSetCombo(finfo,settingsUi[k]->refImage);
+                    }
+                }
+                my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
+                if (my_match.lastCapturedIndex()==1) {
+                    if (my_match.captured(1) == num) {
+                        getPhysFromNameSetCombo(finfo,settingsUi[k]->shotImage);
+                    }
+                }
+            }
+            QApplication::processEvents();
+            settingsUi[k]->doWaveButton->animateClick();
+            QApplication::processEvents();
+        }
+    }
+    // SOP
+    if (enableSOP->isChecked()) {
+        QSet<QString> matchRef;
+        QSet<QString> matchShot;
+        QDir my_dir(globDir->text());
+        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, list) {
+            QString fname=finfo.fileName();
+            QRegularExpressionMatch my_match;
+            my_match=QRegularExpression(globRef->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                if (my_match.captured(1) == num) {
+                    getPhysFromNameSetCombo(finfo,sopRef);
+                }
+            }
+            my_match=QRegularExpression(globShot->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                if (my_match.captured(1) == num) {
+                    getPhysFromNameSetCombo(finfo,sopShot);
+                }
+            }
+        }
+        updatePlotSOP();
+    }
+
+    tabChanged(0);
+
+    QApplication::processEvents();
+}
+
+void Visar::fillComboShot() {
+    qDebug() << "here";
+    disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+    QSet<QString> match;
+    for (unsigned int k=0; k< numVisars; k++) {
+        if (velocityUi[k]->enableVisar->isChecked()) {
+            QSet<QString> matchRef;
+            QSet<QString> matchShot;
+            QDir my_dir(settingsUi[k]->globDir->text());
+            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, list) {
+                QString fname=finfo.fileName();
+                QRegularExpressionMatch my_match;
+                my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
+                if (my_match.lastCapturedIndex()==1) {
+                    matchRef << my_match.captured(1);
+                }
+                my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
+                if (my_match.lastCapturedIndex()==1) {
+                    matchShot << my_match.captured(1);
+                }
+            }
+            if (matchRef.size()==0 || matchShot.size()==0) {
+                statusbar->showMessage("Error: Visar "+QString::number(k+1)+" "+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images", 1000);
+            }
+            matchRef.intersect(matchShot);
+            match+=matchRef;
+        }
+    }
+    if (enableSOP->isChecked()) {
+        QSet<QString> matchRef;
+        QSet<QString> matchShot;
+        QDir my_dir(globDir->text());
+        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, list) {
+            QString fname=finfo.fileName();
+            QRegularExpressionMatch my_match;
+            my_match=QRegularExpression(globRef->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                matchRef << my_match.captured(1);
+            }
+            my_match=QRegularExpression(globShot->text()).match(fname);
+            if (my_match.lastCapturedIndex()==1) {
+                matchShot << my_match.captured(1);
+            }
+        }
+        matchRef.intersect(matchShot);
+        match+=matchRef;
+    }
+
+    comboShot->clear();
+
+    QStringList my_list(match.begin(),match.end());
+    my_list.sort();
+    qDebug() << my_list;
+    for (auto &e: my_list) {
+        comboShot->addItem(e);
+    }
+    statusbar->showMessage("Found "+QString::number(my_list.size())+" images", 1000);
+    connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 }
 
 void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
@@ -193,15 +322,13 @@ void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
     QApplication::processEvents();
 }
 
-QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, int num) {
+QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, QString num) {
     QFileInfo my_file;
     foreach(QFileInfo finfo, list) {
         QString fname=finfo.fileName();
         QRegularExpressionMatch my_match=QRegularExpression(my_glob).match(fname);
         if (my_match.lastCapturedIndex()==1) {
-            bool convert;
-            int my_num=my_match.captured(1).toInt(&convert);
-            if (convert && my_num==num) {
+            if (my_match.captured(1) == num) {
                 my_file=finfo;
             }
         }
@@ -209,57 +336,6 @@ QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, int num) {
     return my_file;
 }
 
-void Visar::changeShotNumber() {
-    QSet<nPhysD*> old_phys;
-    for (unsigned int k=0; k< numVisars; k++) {
-        old_phys << getPhysFromCombo(settingsUi[k]->refImage) << getPhysFromCombo(settingsUi[k]->shotImage) ;
-        old_phys << getPhysFromCombo(sopRef) << getPhysFromCombo(sopShot) ;
-    }
-    for(auto & phys : old_phys) {
-        nparent->removePhys(phys);
-    }
-    for (unsigned int k=0; k< numVisars; k++) {
-        if (velocityUi[k]->enableVisar->isChecked()) {
-            QDir my_dir(settingsUi[k]->globDir->text());
-            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
-            QFileInfo fileRef=getFileFromGlob(list,settingsUi[k]->globRef->text(),shotNumber->text().toInt()) ;
-            QFileInfo fileShot=getFileFromGlob(list,settingsUi[k]->globShot->text(),shotNumber->text().toInt());
-            qDebug() << fileRef;
-            qDebug() << fileShot;
-            if (fileRef.isFile() && fileShot.isFile()) {
-                getPhysFromNameSetCombo(fileRef,settingsUi[k]->refImage);
-                getPhysFromNameSetCombo(fileShot,settingsUi[k]->shotImage);
-                QApplication::processEvents();
-                settingsUi[k]->doWaveButton->animateClick();
-                QApplication::processEvents();
-            } else {
-                statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +settingsUi[k]->globDir->text());
-            }
-        } else {
-            statusbar->showMessage("Visar number "+QString::number(k+1)+ " is disabled");
-        }
-    }
-// SOP
-    if (enableSOP->isChecked()) {
-        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
-        QFileInfo fileRef=getFileFromGlob(list,globRef->text(),shotNumber->text().toInt()) ;
-        QFileInfo fileShot=getFileFromGlob(list,globShot->text(),shotNumber->text().toInt());
-        qDebug() << fileRef;
-        qDebug() << fileShot;
-        if (fileRef.isFile() && fileShot.isFile()) {
-            getPhysFromNameSetCombo(fileRef,sopRef);
-            getPhysFromNameSetCombo(fileShot,sopShot);
-            updatePlotSOP();
-        } else {
-            statusbar->showMessage("Cannot find shot #"+QString::number(shotNumber->text().toInt())+ " in dir " +globDir->text());
-        }
-    } else {
-        statusbar->showMessage("SOP is disabled");
-    }
-    tabChanged(0);
-
-    QApplication::processEvents();
-}
 
 void Visar::globRefreshPressed() {
     QToolButton *button=qobject_cast<QToolButton *>(sender());
@@ -290,6 +366,7 @@ void Visar::globRefreshPressed() {
                 globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
         }
+        fillComboShot();
     }
 }
 
@@ -345,6 +422,10 @@ void Visar::addVisar() {
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
 
     connect(ui_settings->globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
+    connect(ui_settings->globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(ui_settings->globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(ui_settings->globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+
 
     ui_settings->doWaveButton->setProperty("needWave",true);
 
@@ -373,6 +454,7 @@ void Visar::addVisar() {
     connect(ui_velocity->physOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
     connect(ui_velocity->offsetTime, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
     connect(ui_velocity->enableVisar, SIGNAL(released()), this, SLOT(updatePlot()));
+    connect(ui_velocity->enableVisar, SIGNAL(released()), this, SLOT(fillComboShot()));
     connect(ui_velocity->plotR, SIGNAL(released()), this, SLOT(updatePlot()));
     connect(ui_velocity->plotQ, SIGNAL(released()), this, SLOT(updatePlot()));
 
