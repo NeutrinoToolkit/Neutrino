@@ -56,6 +56,9 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 void
 Monitor::listViewDoubleClicked(QModelIndex index) {
 	if (fileModel->fileInfo(index).isFile() && fileModel->fileInfo(index).isReadable())
+        if (my_w.erase->isChecked()) {
+            nparent->removePhys(currentBuffer);
+        }
 		nparent->fileOpen(fileModel->fileInfo(index).absoluteFilePath());
 }
 
