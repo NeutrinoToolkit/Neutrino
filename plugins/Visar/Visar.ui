@@ -660,9 +660,13 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label_2">
+               <widget class="QToolButton" name="globDirButton">
                 <property name="text">
-                 <string>Dir:</string>
+                 <string>...</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+                  <normaloff>:/icons/dir.png</normaloff>:/icons/dir.png</iconset>
                 </property>
                </widget>
               </item>
@@ -1066,6 +1070,7 @@
   <tabstop>sopRef</tabstop>
   <tabstop>sopShot</tabstop>
   <tabstop>sopOffset</tabstop>
+  <tabstop>globDirButton</tabstop>
   <tabstop>globDir</tabstop>
   <tabstop>globRef</tabstop>
   <tabstop>globShot</tabstop>
@@ -1079,13 +1084,14 @@
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>sopScale</tabstop>
   <tabstop>sopDirection</tabstop>
-  <tabstop>notes</tabstop>
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
   <tabstop>etalon_dn_over_dlambda</tabstop>
   <tabstop>etalon_sensitivity</tabstop>
   <tabstop>tabVelocity</tabstop>
+  <tabstop>comboShot</tabstop>
+  <tabstop>notes</tabstop>
  </tabstops>
  <resources>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>

@@ -157,7 +157,6 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
-    connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
 
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -168,11 +167,33 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
+    connect(globDirButton, SIGNAL(released()), this, SLOT(changeGlobDir()));
 
 
     loadDefaults();
     sweepChanged();
     calculate_etalon();
+}
+
+void
+Visar::changeGlobDir() {
+    QToolButton *button=qobject_cast<QToolButton *>(sender());
+    QLineEdit *ledit=nullptr;
+    if (button) {
+        if (button->property("id").isValid()) {
+            unsigned int k=button->property("id").toUInt();
+            ledit=settingsUi[k]->globDir;
+        } else {
+            ledit=globDir;
+        }
+    }
+    if (ledit) {
+        QString dirName = QFileDialog::getExistingDirectory(this,tr("Change glob directory"),ledit->text());
+        if (!dirName.isEmpty()) {
+            ledit->setText(dirName);
+        }
+    }
 }
 
 void Visar::changeShot(QString num) {
@@ -248,11 +269,12 @@ void Visar::fillComboShot() {
     disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
     QSet<QString> match;
     for (unsigned int k=0; k< numVisars; k++) {
-        if (velocityUi[k]->enableVisar->isChecked()) {
+        if (velocityUi[k]->enableVisar->isChecked() && (!settingsUi[k]->globDir->text().isEmpty())) {
             QSet<QString> matchRef;
             QSet<QString> matchShot;
             QDir my_dir(settingsUi[k]->globDir->text());
-            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
+            qDebug() << my_dir;
+            QFileInfoList list = my_dir.entryInfoList(QDir::Files);
             foreach(QFileInfo finfo, list) {
                 QString fname=finfo.fileName();
                 QRegularExpressionMatch my_match;
@@ -272,11 +294,12 @@ void Visar::fillComboShot() {
             match+=matchRef;
         }
     }
-    if (enableSOP->isChecked()) {
+    if (enableSOP->isChecked() && (!globDir->text().isEmpty())) {
         QSet<QString> matchRef;
         QSet<QString> matchShot;
         QDir my_dir(globDir->text());
-        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
+        qDebug() << my_dir;
+        QFileInfoList list = my_dir.entryInfoList(QDir::Files);
         foreach(QFileInfo finfo, list) {
             QString fname=finfo.fileName();
             QRegularExpressionMatch my_match;
@@ -292,8 +315,10 @@ void Visar::fillComboShot() {
         matchRef.intersect(matchShot);
         match+=matchRef;
     }
-
+    qDebug() << comboShot->count();
     comboShot->clear();
+    qDebug() << comboShot->count();
+    qDebug() << match;
 
     QStringList my_list;
     for (auto &e : match) {
@@ -304,6 +329,12 @@ void Visar::fillComboShot() {
     for (auto &e: my_list) {
         comboShot->addItem(e);
     }
+    if(match.size()==0) {
+        comboShot->hide();
+    } else {
+        comboShot->show();
+    }
+    comboShot->setEnabled(match.size()!=0);
     statusbar->showMessage("Found "+QString::number(my_list.size())+" images", 1000);
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 }
@@ -423,10 +454,11 @@ void Visar::addVisar() {
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
 
-    connect(ui_settings->globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
     connect(ui_settings->globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(ui_settings->globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
+    connect(ui_settings->globDirButton, SIGNAL(released()), this, SLOT(changeGlobDir()));
 
 
     ui_settings->doWaveButton->setProperty("needWave",true);

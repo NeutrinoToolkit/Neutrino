@@ -44,8 +44,9 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.lineEdit, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
     connect(my_w.pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 
-	connect(my_w.listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
-	connect(my_w.listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
+    connect(my_w.listView, SIGNAL(clicked(QModelIndex)), this, SLOT(listViewClicked(QModelIndex)));
+    connect(my_w.listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
+    connect(my_w.listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
 	
     textChanged();
 
@@ -54,19 +55,27 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 
 
 void
+Monitor::listViewClicked(QModelIndex index) {
+    if (my_w.oneClick->isChecked()) {
+        listViewDoubleClicked(index);
+    }
+}
+
+void
 Monitor::listViewDoubleClicked(QModelIndex index) {
-	if (fileModel->fileInfo(index).isFile() && fileModel->fileInfo(index).isReadable())
+    QFileInfo fInfo=fileModel->fileInfo(index);
+    if (fInfo.isFile() && fInfo.isReadable()) {
         if (my_w.erase->isChecked()) {
             nparent->removePhys(currentBuffer);
         }
-		nparent->fileOpen(fileModel->fileInfo(index).absoluteFilePath());
+        nparent->fileOpen(fInfo.absoluteFilePath());
+    }
 }
 
 void
 Monitor::listViewActivated(QModelIndex index) {
-	if (fileModel->fileInfo(index).isFile() && fileModel->fileInfo(index).isReadable()){
-		QFileInfo fInfo=fileModel->fileInfo(index);
-
+    QFileInfo fInfo=fileModel->fileInfo(index);
+    if (fInfo.isFile() && fInfo.isReadable()){
 		QStringList list;
 		list << tr("Kb") << tr("Mb") << tr("Gb") << tr("Tb");
 		

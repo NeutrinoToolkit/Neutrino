@@ -2064,7 +2064,9 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
         DEBUG( "<" << retPhys[i].getName() << "> <" <<  retPhys[i].getShortName() << ">");
 
-        retPhys[i].setFromName(fname);
+        if (retPhys[i].getFromName().empty())
+            retPhys[i].setFromName(fname);
+
         retPhys[i].setType(PHYS_FILE);
     }
     DEBUG("<<<<<<<<<<<<<<<<<<<<");

@@ -129,6 +129,7 @@ public slots:
 
     void globRefreshPressed();
     void getPhysFromNameSetCombo(QFileInfo, QComboBox*);
+    void changeGlobDir();
 
     void needWave();
 

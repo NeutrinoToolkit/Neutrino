@@ -45,6 +45,7 @@ public:
     QCompleter *completer;
 
 public slots:
+    void listViewClicked(QModelIndex);
     void listViewDoubleClicked(QModelIndex);
     void listViewActivated(QModelIndex);
     void textChanged();
