@@ -95,6 +95,8 @@ void phys_gauss_sobel(physD&, double);
 
 void phys_set_all(physD &, double);
 
+void phys_crop(physD&, int, int, int, int);
+
 // constant operations
 void phys_add(physD &, double);
 void phys_subtract(physD &, double);

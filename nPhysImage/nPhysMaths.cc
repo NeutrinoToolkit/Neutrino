@@ -545,6 +545,18 @@ void physMath::phys_set_all(physD &image, double newval) {
     image.TscanBrightness();
 }
 
+void physMath::phys_crop(physD& img, int new_w, int new_h, int dx, int dy) {
+    physD my_copy=img;
+    img.resize(new_w,new_h);
+    for (size_t j=0; j<new_h; j++) {
+        for (size_t i=0; i<new_w; i++) {
+            img.set(i,j,my_copy.point(i+dx,j+dy));
+        }
+    }
+    img.TscanBrightness();
+}
+
+
 void physMath::phys_median_filter(physD& image, unsigned int N){
     physD my_copy=image;
     int median_pos=(N*N)/2;

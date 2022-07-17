@@ -775,6 +775,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
                             }
 
+                            if (my_set.value("lockCrop",false).toBool()) {
+                                physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
+                            }
+
                             my_set.endGroup();
 
                             addShowPhys(my_phys);

@@ -80,9 +80,7 @@ Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     physFunction(nullptr)
 {
     setupUi(this);
-    toolBar->addWidget(label_2);
     toolBar->addWidget(sb_width);
-    toolBar->addWidget(label);
     toolBar->addWidget(sb_height);
     show();
 }
@@ -123,35 +121,34 @@ void Function::on_doIt_released() {
     my_exprtk.register_symbol_table(symbol_table);
 
     exprtk::parser<double> parser;
-    if (!parser.compile(function->toPlainText().toStdString(),my_exprtk)) {
+    if (parser.compile(function->toPlainText().toStdString(),my_exprtk)) {
+        QProgressDialog progress("", "Cancel", 0, static_cast<int>(my_phys->getW()), this);
+        progress.setCancelButton(nullptr);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setValue(0);
+        progress.show();
+
+        for (x=0; x < my_phys->getW(); x++) {
+            progress.setValue(static_cast<int>(x));
+            for (y=0; y < static_cast<double>(my_phys->getH()); y++) {
+                my_phys->set(static_cast<unsigned int>(x),static_cast<unsigned int>(y), my_exprtk.value());
+            }
+        }
+        QString name="Function("+function->toPlainText()+", "+QString::number(my_phys->getW())+", "+QString::number(my_phys->getH())+")";
+
+        my_phys->TscanBrightness();
+        my_phys->setName(name.toStdString());
+        my_phys->setShortName("Function");
+
+        if (erasePrevious->isChecked()) {
+            physFunction=nparent->replacePhys(my_phys,physFunction,true);
+        } else {
+            nparent->addShowPhys(my_phys);
+            physFunction=my_phys;
+        }
+
+        erasePrevious->setEnabled(true);
+    } else {
         qWarning() << "Error in expression \n" << function->toPlainText();
     }
-
-
-    QProgressDialog progress("", "Cancel", 0, static_cast<int>(my_phys->getW()), this);
-    progress.setCancelButton(nullptr);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setValue(0);
-    progress.show();
-
-    for (x=0; x < my_phys->getW(); x++) {
-        progress.setValue(static_cast<int>(x));
-        for (y=0; y < static_cast<double>(my_phys->getH()); y++) {
-            my_phys->set(static_cast<unsigned int>(x),static_cast<unsigned int>(y), my_exprtk.value());
-        }
-    }
-    QString name="Function("+function->toPlainText()+", "+QString::number(my_phys->getW())+", "+QString::number(my_phys->getH())+")";
-
-    my_phys->TscanBrightness();
-    my_phys->setName(name.toStdString());
-    my_phys->setShortName("Function");
-
-    if (erasePrevious->isChecked()) {
-        physFunction=nparent->replacePhys(my_phys,physFunction,true);
-    } else {
-        nparent->addShowPhys(my_phys);
-        physFunction=my_phys;
-    }
-
-    erasePrevious->setEnabled(true);
 }
