@@ -165,9 +165,16 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
   connect(my_w.lockMath, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
   connect(my_w.subtract, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
   connect(my_w.multiply, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
   connect(my_w.lockBlur, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
   connect(my_w.blurX, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
   connect(my_w.blurY, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+
+  connect(my_w.lockCrop, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.cropH, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.cropW, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.cropDx, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+  connect(my_w.cropDy, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
   connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
   connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
