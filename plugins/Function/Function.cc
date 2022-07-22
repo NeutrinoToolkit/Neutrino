@@ -24,32 +24,31 @@
  */
 
 #include "Function.h"
+#include "nPhysD.h"
 #include "nPhysImageF.h"
 #include "exprtk.hpp"
 
-struct physFunc2 : public exprtk::ifunction<double>
+
+struct fPhys : public exprtk::ifunction<double>
 {
-    physFunc2(Function *fparent) : exprtk::ifunction<double>(2), parent(fparent) {
+    fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
         exprtk::disable_has_side_effects(*this);
     }
-    virtual ~physFunc2() override {}
+    virtual ~fPhys() override {}
 
 public:
     virtual double operator()(const double& x, const double& y) override {
-        if (parent->currentBuffer) {
-            return parent->currentBuffer->getPoint(x,y);
-        } else {
-            return std::numeric_limits<double>::quiet_NaN();
-        }
+        return my_phys->getPoint(x,y);
     }
 
 private:
-    Function* parent;
+    nPhysD* my_phys;
 };
+
 
 struct physFunc3 : public exprtk::ifunction<double>
 {
-    physFunc3(Function *fparent) : exprtk::ifunction<double>(3), parent(fparent) {
+    physFunc3(Function *fparent) : exprtk::ifunction<double>(3), mylist(fparent->nparent->getBufferList()) {
         exprtk::disable_has_side_effects(*this);
     }
     virtual ~physFunc3() override {}
@@ -57,22 +56,15 @@ struct physFunc3 : public exprtk::ifunction<double>
 public:
     virtual double operator()(const double &imgnum, const double& x, const double& y) override {
         int imgnumint=static_cast<int>(imgnum);
-        nPhysD *my_phys(nullptr);
-        QList<nPhysD *> mylist=parent->nparent->getBufferList();
         if (imgnumint >= 0  && imgnumint < mylist.size()) {
-            my_phys = mylist[imgnumint];
-        } else {
-            my_phys=parent->currentBuffer;
-        }
-        if (my_phys) {
-            return my_phys->getPoint(x,y);
+            return mylist[imgnumint]->getPoint(x,y);
         } else {
             return std::numeric_limits<double>::quiet_NaN();
         }
     }
 
 private:
-    Function* parent;
+    QList<nPhysD *> mylist;
 };
 
 
@@ -104,18 +96,30 @@ void Function::on_doIt_released() {
     exprtk::symbol_table<double> symbol_table;
     symbol_table.add_variable("x",x);
     symbol_table.add_variable("y",y);
+    symbol_table.add_constant("num_phys",nparent->getBufferList().size());
 
     physFunc3 mf(this);
-    symbol_table.add_function("phys",mf);
+    symbol_table.add_function("n_phys",mf);
 
-    physFunc2 mf2(this);
-    symbol_table.add_function("img",mf2);
+    fPhys my_func(currentBuffer);
+    if (currentBuffer) {
+        symbol_table.add_function("phys",my_func);
+    }
+
+    std::list<fPhys*> my_list;
+    for (int i=0; i<nparent->getBufferList().size(); i++) {
+        std::ostringstream oss;
+        oss << "phys" << std::setfill('0') << std::setw(int(log10(nparent->getBufferList().size()))) << i;
+        qDebug() << QString::fromStdString(oss.str());
+        fPhys *my_fun= new fPhys(nparent->getBuffer(i));
+        my_list.push_back(my_fun);
+        symbol_table.add_function(oss.str().c_str(),*my_fun);
+    }
 
     symbol_table.add_constant("width",my_phys->getW());
     symbol_table.add_constant("height",my_phys->getH());
 
     symbol_table.add_constants();
-
 
     exprtk::expression<double> my_exprtk;
     my_exprtk.register_symbol_table(symbol_table);
@@ -149,6 +153,16 @@ void Function::on_doIt_released() {
 
         erasePrevious->setEnabled(true);
     } else {
-        qWarning() << "Error in expression \n" << function->toPlainText();
+        qWarning() << "Error: " << QString::fromStdString(parser.error());
+        for (std::size_t i = 0; i < parser.error_count(); ++i) {
+            exprtk::parser_error::type error = parser.get_error(i);
+            QTextCursor my_cursor=function->textCursor();
+            my_cursor.setPosition(error.token.position);
+            function->setTextCursor(my_cursor);
+            qWarning() << i << error.token.position << QString::fromStdString(exprtk::parser_error::to_str(error.mode)) << QString::fromStdString(error.diagnostic.c_str());
+        }
+    }
+    for (auto &my_fun: my_list) {
+        delete my_fun;
     }
 }

@@ -660,6 +660,15 @@ neutrino::fileReopen() {
 }
 
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
+    neutrino *my_neu=this;
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    if (getBufferList().size()!=0 && my_set.value("openNewWindow",false).toBool()) {
+        my_neu=fileNew();
+    }
+    my_set.endGroup();
+
     QList <nPhysD *> imagelist;
     if (QFile(fname).exists()) {
 
@@ -667,7 +676,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         if (!property("NeuSave-fileSave").isValid()) {
             setProperty("NeuSave-fileSave",property("NeuSave-fileOpen"));
         }
-        QSettings my_set("neutrino","");
         my_set.beginGroup("nPreferences");
         bool separate_rgb= my_set.value("separateRGB",false).toBool();
         my_set.endGroup();
@@ -738,7 +746,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                 for (auto &my_phys : imagelist) {
                     if (my_phys) {
                         if (my_phys->getSurf()>0) {
-                            QSettings my_set("neutrino","");
                             my_set.beginGroup("nPreferences");
 
                             if (my_set.value("lockOrigin",false).toBool()) {
@@ -753,6 +760,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 delete my_phys;
                                 my_phys=new nPhysD(rotated);
                             }
+
                             if (my_set.value("lockFlip",false).toBool()) {
                                 if (my_set.value("flipX").toBool()) {
                                     physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
@@ -767,10 +775,12 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     my_phys->reset_display();
                                 }
                             }
+
                             if (my_set.value("lockMath",false).toBool()) {
                                 physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
                                 physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
                             }
+
                             if (my_set.value("lockBlur",false).toBool()) {
                                 physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
                             }
@@ -779,9 +789,18 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
                             }
 
+                            if (my_set.value("lockColors",false).toBool()) {
+                                bool ok1, ok2;
+                                double mymin=my_set.value("colorMin").toDouble(&ok1);
+                                double mymax=my_set.value("colorMax").toDouble(&ok2);
+                                if (ok1 && ok2) {
+                                    my_phys->prop["display_range"]=vec2f(mymin,mymax);
+                                }
+                            }
+
                             my_set.endGroup();
 
-                            addShowPhys(my_phys);
+                            my_neu->addShowPhys(my_phys);
                             imagelistold << my_phys;
                         } else {
                             delete my_phys;
@@ -792,13 +811,13 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             } else if (suffix!="neus") {
                 nOpenRAW *openRAW=(nOpenRAW *)getPan("OpenRaw");
                 if (!openRAW) {
-                    openRAW = new nOpenRAW(this);
+                    openRAW = new nOpenRAW(my_neu);
                 }
                 openRAW->add(fname);
             }
         }
 
-        updateRecentFileActions(fname);
+        my_neu->updateRecentFileActions(fname);
 
         QApplication::processEvents();
     } else {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>255</height>
+    <width>381</width>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -36,28 +36,7 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QSpinBox" name="sb_height">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="prefix">
-       <string>h: </string>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>99999</number>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
+    <item>
      <widget class="QSpinBox" name="sb_width">
       <property name="font">
        <font>
@@ -78,7 +57,28 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item>
+     <widget class="QSpinBox" name="sb_height">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="prefix">
+       <string>h: </string>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>99999</number>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPlainTextEdit" name="function">
       <property name="font">
        <font>
@@ -89,19 +89,14 @@
        <string>Use phys(num,x,y) to get an image value</string>
       </property>
       <property name="plainText">
-       <string># this is a comemnt
-# next is a variable declaration
-var xzero:=1500;
-var yzero:=300;
-# next is our function:
-sin(5*pi*x/width)*sin(5*pi*y/height)*phys(2,x,y)+img(x,y)/img(xzero,yzero)</string>
+       <string># see help for more details</string>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item>
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
        <property name="leftMargin">

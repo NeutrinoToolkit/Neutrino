@@ -140,10 +140,11 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         }
         dd->setText(k);
         my_w.pluginList->addItem(dd);
-//        my_w.pluginList->addItem(d);
     }
 
   connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+
   connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
   connect(my_w.lockOrigin, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
@@ -176,6 +177,11 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
   connect(my_w.cropDx, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
   connect(my_w.cropDy, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
+  connect(my_w.lockColors, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+  connect(my_w.colorMin, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+  connect(my_w.colorMin, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+
+
   connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
   connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
   connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
@@ -198,7 +204,6 @@ void nPreferences::openclUnitValueChange(int num) {
 		setProperty("openclUnit",num);
 	}
 #endif
-//    saveDefaults();
 }
 
 void nPreferences::resetSettings() {
@@ -219,7 +224,15 @@ void nPreferences::on_getOrigin_released() {
         my_w.originX->repaint();
         my_w.originY->repaint();
     }
-//    saveDefaults();
+}
+
+void nPreferences::on_getColors_released() {
+    if (currentBuffer) {
+        vec2f my_vec=currentBuffer->prop["display_range"];
+        DEBUG(my_vec);
+        my_w.colorMin->setText(QLocale().toString(my_vec.x()));
+        my_w.colorMax->setText(QLocale().toString(my_vec.y()));
+    }
 }
 
 void nPreferences::on_getScale_released() {
@@ -267,7 +280,6 @@ void nPreferences::changeFont() {
 	settings.setValue("defaultFont",font.toString());
 	settings.endGroup();
 	nparent->my_w->my_view->setSize();
-//    saveDefaults();
 }
 
 void nPreferences::changeIconSize(int val) {

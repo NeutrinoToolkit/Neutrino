@@ -30,8 +30,8 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 	my_w.setupUi(this);
     show();
 
-	completer = new QCompleter(my_w.lineEdit);
-	completer->setModel(new QDirModel());
+    completer = new QCompleter(my_w.lineEdit);
+    completer->setModel(new QFileSystemModel());
 	my_w.lineEdit->setCompleter(completer);
 	
 	fileModel=new QFileSystemModel(this);

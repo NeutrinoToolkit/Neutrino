@@ -63,6 +63,7 @@ public slots:
 
     void on_getOrigin_released();
     void on_getScale_released();
+    void on_getColors_released();
 
     void on_mouseThickness_valueChanged(double);
     void on_mouseColor_released();
