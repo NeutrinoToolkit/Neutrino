@@ -47,7 +47,7 @@
     </item>
     <item row="0" column="0">
      <widget class="QWidget" name="widget" native="true">
-      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,0">
+      <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -77,30 +77,6 @@
            <width>20</width>
            <height>20</height>
           </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="3">
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Pattern</string>
          </property>
         </widget>
        </item>
@@ -134,6 +110,30 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1" colspan="4">
+        <widget class="QLineEdit" name="dirName">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Pattern</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="3">
         <widget class="QCheckBox" name="oneClick">
          <property name="font">
@@ -146,6 +146,18 @@
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QPushButton" name="openAll">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>All</string>
          </property>
         </widget>
        </item>

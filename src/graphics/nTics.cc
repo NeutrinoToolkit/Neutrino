@@ -27,6 +27,9 @@
 #include "neutrino.h"
 #include <QColorDialog>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+#define horizontalAdvance width
+#endif
 
 nTics::~nTics() {
     QSettings my_set("neutrino","");

@@ -26,47 +26,30 @@
 #include "Function.h"
 #include "nPhysD.h"
 #include "nPhysImageF.h"
-#include "exprtk.hpp"
 
 
-struct fPhys : public exprtk::ifunction<double>
-{
-    fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
-        exprtk::disable_has_side_effects(*this);
+fPhys::fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
+    exprtk::disable_has_side_effects(*this);
+}
+fPhys::~fPhys() {}
+double fPhys::operator()(const double& x, const double& y) {
+    return my_phys->getPoint(x,y);
+}
+
+
+physFunc3::physFunc3(Function *fparent) : exprtk::ifunction<double>(3), mylist(fparent->nparent->getBufferList()) {
+    exprtk::disable_has_side_effects(*this);
+}
+physFunc3::~physFunc3() {}
+
+double physFunc3::operator()(const double &imgnum, const double& x, const double& y) {
+    int imgnumint=static_cast<int>(imgnum);
+    if (imgnumint >= 0  && imgnumint < mylist.size()) {
+        return mylist[imgnumint]->getPoint(x,y);
+    } else {
+        return std::numeric_limits<double>::quiet_NaN();
     }
-    virtual ~fPhys() override {}
-
-public:
-    virtual double operator()(const double& x, const double& y) override {
-        return my_phys->getPoint(x,y);
-    }
-
-private:
-    nPhysD* my_phys;
-};
-
-
-struct physFunc3 : public exprtk::ifunction<double>
-{
-    physFunc3(Function *fparent) : exprtk::ifunction<double>(3), mylist(fparent->nparent->getBufferList()) {
-        exprtk::disable_has_side_effects(*this);
-    }
-    virtual ~physFunc3() override {}
-
-public:
-    virtual double operator()(const double &imgnum, const double& x, const double& y) override {
-        int imgnumint=static_cast<int>(imgnum);
-        if (imgnumint >= 0  && imgnumint < mylist.size()) {
-            return mylist[imgnumint]->getPoint(x,y);
-        } else {
-            return std::numeric_limits<double>::quiet_NaN();
-        }
-    }
-
-private:
-    QList<nPhysD *> mylist;
-};
-
+}
 
 Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     physFunction(nullptr)

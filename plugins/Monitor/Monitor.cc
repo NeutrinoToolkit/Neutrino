@@ -30,9 +30,9 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 	my_w.setupUi(this);
     show();
 
-    completer = new QCompleter(my_w.lineEdit);
+    completer = new QCompleter(my_w.dirName);
     completer->setModel(new QFileSystemModel());
-	my_w.lineEdit->setCompleter(completer);
+    my_w.dirName->setCompleter(completer);
 	
 	fileModel=new QFileSystemModel(this);
 	fileModel->setFilter(QDir::Files);
@@ -41,7 +41,7 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 //    proxyModel->setSourceModel(fileModel);
 
     my_w.listView->setModel(fileModel);
-    connect(my_w.lineEdit, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+    connect(my_w.dirName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
     connect(my_w.pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 
     connect(my_w.listView, SIGNAL(clicked(QModelIndex)), this, SLOT(listViewClicked(QModelIndex)));
@@ -93,19 +93,20 @@ Monitor::listViewActivated(QModelIndex index) {
 
 void
 Monitor::textChanged() {
-//    fileModel->setRootPath(dirName);
-//    my_w.listView->setRootIndex(proxyModel->mapFromSource(fileModel->index(dirName)));
     fileModel->setNameFilters(my_w.pattern->text().split(" "));
-    my_w.listView->setRootIndex(fileModel->setRootPath(my_w.lineEdit->text()));
-	// FIXME: this an absolute bug in qt check here:
-	// http://qt-project.org/forums/viewthread/7265
-//    fileModel->setNameFilters(QStringList());
+    my_w.listView->setRootIndex(fileModel->setRootPath(my_w.dirName->text()));
 }
 
-void
-Monitor::changeDir() {
-	QString dirName;
-	dirName = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),my_w.lineEdit->text());
-	if (!dirName.isEmpty()) my_w.lineEdit->setText(dirName);
+void Monitor::on_openAll_released() {
+    qDebug() << "Here";
+//    for (int i=0; i< fileModel->size(); i++) {
+//        qDebug() << fileModel->fileInfo(i);
+//    }
+}
+
+void Monitor::changeDir() {
+    QString newDir;
+    newDir = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),my_w.dirName->text());
+    if (!newDir.isEmpty()) my_w.dirName->setText(newDir);
 }
 

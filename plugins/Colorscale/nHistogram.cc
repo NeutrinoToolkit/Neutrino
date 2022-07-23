@@ -26,6 +26,10 @@
 #include "nHistogram.h"
 #include "neutrino.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+#define horizontalAdvance width
+#endif
+
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
@@ -51,7 +55,7 @@ void nHistogram::colorValue(double val) {
 void nHistogram::mouseMoveEvent (QMouseEvent *e)
 {
     if (parentPan->currentBuffer) {
-        double  frac_value=(e->pos().x()-offsetx)/((double) width()-2*offsetx);
+        double  frac_value=(e->pos().x()-offsetx)/(width()-2.0*offsetx);
         frac_value=std::max(0.0,std::min(1.0, frac_value));
         //        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
         double my_min,my_max;

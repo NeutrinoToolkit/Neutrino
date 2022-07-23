@@ -25,12 +25,16 @@
 #include <QtGui>
 #include <QWidget>
 
-#ifndef __Function
-#define __Function
+#ifndef Function_H
+#define Function_H
 
 #include "nGenericPan.h"
 #include "ui_Function.h"
 #include "neutrino.h"
+#include "exprtk.hpp"
+
+
+
 
 class Function : public nGenericPan, private Ui::Function {
     Q_OBJECT
@@ -51,5 +55,30 @@ private:
 };
 
 NEUTRINO_PLUGIN(Function,Analysis);
+
+struct fPhys : public exprtk::ifunction<double>
+{
+    fPhys(nPhysD *);
+    virtual ~fPhys() override;
+
+public:
+    virtual double operator()(const double&, const double&) override;
+
+private:
+    nPhysD* my_phys;
+};
+
+struct physFunc3 : public exprtk::ifunction<double>
+{
+    physFunc3(Function*);
+    virtual ~physFunc3() override;
+
+public:
+    virtual double operator()(const double &, const double&, const double&) override;
+
+private:
+    QList<nPhysD *> mylist;
+};
+
 
 #endif

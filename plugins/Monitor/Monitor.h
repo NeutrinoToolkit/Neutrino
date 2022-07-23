@@ -41,7 +41,6 @@ public:
     Q_INVOKABLE Monitor(neutrino *);
     Ui::Monitor my_w;
     QFileSystemModel *fileModel;
-//    QSortFilterProxyModel *proxyModel;
     QCompleter *completer;
 
 public slots:
@@ -49,6 +48,7 @@ public slots:
     void listViewDoubleClicked(QModelIndex);
     void listViewActivated(QModelIndex);
     void textChanged();
+    void on_openAll_released();
 
     void changeDir();
 
