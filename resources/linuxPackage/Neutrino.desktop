@@ -15,6 +15,3 @@ StartupNotify=true
 MimeType=application/x-neutrino;image/png;image/tiff;image/x-portable-pixmap;image/x-portable-floatmap;
 
 Icon=icon
-
-
-X-AppImage-Version=77b88bf
