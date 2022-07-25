@@ -164,37 +164,17 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
 
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 
-    connect(globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globDirShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
-    connect(globDirButton, SIGNAL(released()), this, SLOT(changeGlobDir()));
-
 
     loadDefaults();
     sweepChanged();
     calculate_etalon();
 }
 
-void
-Visar::changeGlobDir() {
-    QToolButton *button=qobject_cast<QToolButton *>(sender());
-    QLineEdit *ledit=nullptr;
-    if (button) {
-        if (button->property("id").isValid()) {
-            unsigned int k=button->property("id").toUInt();
-            ledit=settingsUi[k]->globDir;
-        } else {
-            ledit=globDir;
-        }
-    }
-    if (ledit) {
-        QString dirName = QFileDialog::getExistingDirectory(this,tr("Change glob directory"),ledit->text());
-        if (!dirName.isEmpty()) {
-            ledit->setText(dirName);
-        }
-    }
-}
 
 void Visar::changeShot(QString num) {
     qDebug() << num;
@@ -211,9 +191,8 @@ void Visar::changeShot(QString num) {
         if (velocityUi[k]->enableVisar->isChecked()) {
             QSet<QString> matchRef;
             QSet<QString> matchShot;
-            QDir my_dir(settingsUi[k]->globDir->text());
-            QFileInfoList list = QDir(settingsUi[k]->globDir->text()).entryInfoList(QDir::Files);
-            foreach(QFileInfo finfo, list) {
+            QFileInfoList listref = QDir(settingsUi[k]->globDirRef->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, listref) {
                 QString fname=finfo.fileName();
                 QRegularExpressionMatch my_match;
                 my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
@@ -222,6 +201,11 @@ void Visar::changeShot(QString num) {
                         getPhysFromNameSetCombo(finfo,settingsUi[k]->refImage);
                     }
                 }
+            }
+            QFileInfoList listshot = QDir(settingsUi[k]->globDirShot->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, listshot) {
+                QString fname=finfo.fileName();
+                QRegularExpressionMatch my_match;
                 my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
                 if (my_match.lastCapturedIndex()==1) {
                     if (my_match.captured(1) == num) {
@@ -238,9 +222,8 @@ void Visar::changeShot(QString num) {
     if (enableSOP->isChecked()) {
         QSet<QString> matchRef;
         QSet<QString> matchShot;
-        QDir my_dir(globDir->text());
-        QFileInfoList list = QDir(globDir->text()).entryInfoList(QDir::Files);
-        foreach(QFileInfo finfo, list) {
+        QFileInfoList listref = QDir(globDirRef->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, listref) {
             QString fname=finfo.fileName();
             QRegularExpressionMatch my_match;
             my_match=QRegularExpression(globRef->text()).match(fname);
@@ -249,6 +232,11 @@ void Visar::changeShot(QString num) {
                     getPhysFromNameSetCombo(finfo,sopRef);
                 }
             }
+        }
+        QFileInfoList listshot = QDir(globDirShot->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, listshot) {
+            QString fname=finfo.fileName();
+            QRegularExpressionMatch my_match;
             my_match=QRegularExpression(globShot->text()).match(fname);
             if (my_match.lastCapturedIndex()==1) {
                 if (my_match.captured(1) == num) {
@@ -269,19 +257,22 @@ void Visar::fillComboShot() {
     disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
     QSet<QString> match;
     for (unsigned int k=0; k< numVisars; k++) {
-        if (velocityUi[k]->enableVisar->isChecked() && (!settingsUi[k]->globDir->text().isEmpty())) {
+        if (velocityUi[k]->enableVisar->isChecked() && (!settingsUi[k]->globDirRef->text().isEmpty()) && (!settingsUi[k]->globDirShot->text().isEmpty())) {
             QSet<QString> matchRef;
             QSet<QString> matchShot;
-            QDir my_dir(settingsUi[k]->globDir->text());
-            qDebug() << my_dir;
-            QFileInfoList list = my_dir.entryInfoList(QDir::Files);
-            foreach(QFileInfo finfo, list) {
+            QFileInfoList listref = QDir(settingsUi[k]->globDirRef->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, listref) {
                 QString fname=finfo.fileName();
                 QRegularExpressionMatch my_match;
                 my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
                 if (my_match.lastCapturedIndex()==1) {
                     matchRef << my_match.captured(1);
                 }
+            }
+            QFileInfoList listshot = QDir(settingsUi[k]->globDirShot->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, listshot) {
+                QString fname=finfo.fileName();
+                QRegularExpressionMatch my_match;
                 my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
                 if (my_match.lastCapturedIndex()==1) {
                     matchShot << my_match.captured(1);
@@ -294,23 +285,29 @@ void Visar::fillComboShot() {
             match+=matchRef;
         }
     }
-    if (enableSOP->isChecked() && (!globDir->text().isEmpty())) {
+    if (enableSOP->isChecked() && (!globDirRef->text().isEmpty()) && (!globDirShot->text().isEmpty())) {
         QSet<QString> matchRef;
         QSet<QString> matchShot;
-        QDir my_dir(globDir->text());
-        qDebug() << my_dir;
-        QFileInfoList list = my_dir.entryInfoList(QDir::Files);
-        foreach(QFileInfo finfo, list) {
+        QFileInfoList listref = QDir(globDirRef->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, listref) {
             QString fname=finfo.fileName();
             QRegularExpressionMatch my_match;
             my_match=QRegularExpression(globRef->text()).match(fname);
             if (my_match.lastCapturedIndex()==1) {
                 matchRef << my_match.captured(1);
             }
+        }
+        QFileInfoList listshot = QDir(globDirShot->text()).entryInfoList(QDir::Files);
+        foreach(QFileInfo finfo, listshot) {
+            QString fname=finfo.fileName();
+            QRegularExpressionMatch my_match;
             my_match=QRegularExpression(globShot->text()).match(fname);
             if (my_match.lastCapturedIndex()==1) {
                 matchShot << my_match.captured(1);
             }
+        }
+        if (matchRef.size()==0 || matchShot.size()==0) {
+            statusbar->showMessage("Error: SOP"+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images", 1000);
         }
         matchRef.intersect(matchShot);
         match+=matchRef;
@@ -379,23 +376,24 @@ void Visar::globRefreshPressed() {
             std::array<nPhysD*,2> imgs={{getPhysFromCombo(settingsUi[k]->refImage),getPhysFromCombo(settingsUi[k]->shotImage)}};
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
-                settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
+                settingsUi[k]->globDirRef->setText(finfo.absoluteDir().path());
                 settingsUi[k]->globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
-                settingsUi[k]->globDir->setText(finfo.absoluteDir().path());
+                settingsUi[k]->globDirShot->setText(finfo.absoluteDir().path());
                 settingsUi[k]->globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
         } else {
             std::array<nPhysD*,2> imgs={{getPhysFromCombo(sopRef),getPhysFromCombo(sopShot)}};
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
+                globDirRef->setText(finfo.absoluteDir().path());
                 globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
-                globDir->setText(finfo.absoluteDir().path());
+                globDirShot->setText(finfo.absoluteDir().path());
                 globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
             }
         }
@@ -454,11 +452,11 @@ void Visar::addVisar() {
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
 
-    connect(ui_settings->globDir, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(ui_settings->globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(ui_settings->globDirShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globRefresh, SIGNAL(released()), this, SLOT(globRefreshPressed()));
-    connect(ui_settings->globDirButton, SIGNAL(released()), this, SLOT(changeGlobDir()));
 
 
     ui_settings->doWaveButton->setProperty("needWave",true);
@@ -1308,12 +1306,7 @@ void Visar::getCarrier() {
 }
 
 void Visar::getCarrier(unsigned int k) {
-    QComboBox *combo=nullptr;
-    if (settingsUi[k]->carrierPhys->currentIndex()==0) {
-        combo=settingsUi[k]->refImage;
-    } else {
-        combo=settingsUi[k]->shotImage;
-    }
+    QComboBox *combo=settingsUi[k]->refImage;
 
     nPhysD *phys=getPhysFromCombo(combo);
     if (phys && fringeRect[k]) {
