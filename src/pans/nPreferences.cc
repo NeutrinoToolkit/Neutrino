@@ -251,17 +251,17 @@ void nPreferences::askCloseUnsaved() {
 }
 
 void nPreferences::changeShowDimPixel() {
-    nparent->my_w->my_view->showDimPixel=my_w.showDimPixel->isChecked();
+    nparent->my_w->my_view->my_tics.showDimPixel=my_w.showDimPixel->isChecked();
     nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeShowXYaxes() {
-    nparent->my_w->my_view->showXYaxes=my_w.showXYaxes->isChecked();
+    nparent->my_w->my_view->my_tics.showXYaxes=my_w.showXYaxes->isChecked();
     nparent->my_w->my_view->update();
 }
 
 void nPreferences::changeShowColorbar() {
-    nparent->my_w->my_view->showColorbar=my_w.showColorbar->isChecked();
+    nparent->my_w->my_view->my_tics.showColorbar=my_w.showColorbar->isChecked();
     nparent->my_w->my_view->update();
 }
 

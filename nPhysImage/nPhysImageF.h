@@ -257,7 +257,7 @@ public:
 
 	// --------------------- image points and statistics ----------------------------
 	T sum() 
-    { T sumTot=0; for (unsigned int i=0; i<getSurf(); i++) sumTot+=Timg_buffer[i]; return sumTot; }
+    { T sumTot=0; for (unsigned int i=0; i<getSurf(); i++) if (!isnan(Timg_buffer[i])) sumTot+=Timg_buffer[i]; return sumTot; }
 
 		//! min/max values 
 	bidimvec<T> get_min_max();

@@ -1107,10 +1107,16 @@
  <tabstops>
   <tabstop>tabs</tabstop>
   <tabstop>tabPhase</tabstop>
-  <tabstop>enableSOP</tabstop>
+  <tabstop>tabVelocity</tabstop>
   <tabstop>sopRef</tabstop>
   <tabstop>sopShot</tabstop>
   <tabstop>sopOffset</tabstop>
+  <tabstop>enableSOP</tabstop>
+  <tabstop>globDirRef</tabstop>
+  <tabstop>globRef</tabstop>
+  <tabstop>globDirShot</tabstop>
+  <tabstop>globShot</tabstop>
+  <tabstop>globRefresh</tabstop>
   <tabstop>sopCalibT0</tabstop>
   <tabstop>sopCalibA</tabstop>
   <tabstop>whichRefl</tabstop>
@@ -1120,14 +1126,13 @@
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>sopScale</tabstop>
   <tabstop>sopDirection</tabstop>
+  <tabstop>comboShot</tabstop>
+  <tabstop>notes</tabstop>
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
   <tabstop>etalon_dn_over_dlambda</tabstop>
   <tabstop>etalon_sensitivity</tabstop>
-  <tabstop>tabVelocity</tabstop>
-  <tabstop>comboShot</tabstop>
-  <tabstop>notes</tabstop>
  </tabstops>
  <resources>
   <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>

@@ -164,6 +164,7 @@ public slots:
 
     void exportGraphics();
     void exportAllGraphics();
+    void exportAllGraphicsOriginalName();
     void exportGraphics(QString);
 
     void createDrawLine();

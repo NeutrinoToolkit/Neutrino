@@ -152,7 +152,7 @@ neutrino::neutrino():
 
     connect(my_w->actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
     connect(my_w->actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
-
+    connect(my_w->actionExport_all_original_name, SIGNAL(triggered()), this, SLOT(exportAllGraphicsOriginalName()));
     connect(my_w->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
     connect(my_w->actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
@@ -747,59 +747,65 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                     if (my_phys) {
                         if (my_phys->getSurf()>0) {
                             my_set.beginGroup("nPreferences");
+                            if (my_set.value("enableNewImageSettings",false).toBool()) {
 
-                            if (my_set.value("lockOrigin",false).toBool()) {
-                                my_phys->set_origin(my_set.value("originX",0.0).toDouble(),my_set.value("originY",0.0).toDouble());
-                            }
-                            if (my_set.value("lockScale",false).toBool()) {
-                                my_phys->set_scale(my_set.value("scaleX",1.0).toDouble(),my_set.value("scaleY",1.0).toDouble());
-                            }
-
-                            if (my_set.value("lockRotate",false).toBool()) {
-                                nPhysD rotated = my_phys->rotated(my_set.value("rotate",0.0).toDouble());
-                                delete my_phys;
-                                my_phys=new nPhysD(rotated);
-                            }
-
-                            if (my_set.value("lockFlip",false).toBool()) {
-                                if (my_set.value("flipX").toBool()) {
-                                    physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
-                                    my_phys->reset_display();
+                                if (my_set.value("lockOrigin",false).toBool()) {
+                                    my_phys->set_origin(my_set.value("originX",0.0).toDouble(),my_set.value("originY",0.0).toDouble());
                                 }
-                                if (my_set.value("flipY").toBool()) {
-                                    physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
-                                    my_phys->reset_display();
+                                if (my_set.value("lockScale",false).toBool()) {
+                                    my_phys->set_scale(my_set.value("scaleX",1.0).toDouble(),my_set.value("scaleY",1.0).toDouble());
                                 }
-                                if (my_set.value("transpose").toBool()) {
-                                    physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
-                                    my_phys->reset_display();
+
+                                if (my_set.value("lockRotate",false).toBool()) {
+                                    nPhysD rotated = my_phys->rotated(my_set.value("rotate",0.0).toDouble());
+                                    delete my_phys;
+                                    my_phys=new nPhysD(rotated);
+                                }
+
+                                if (my_set.value("lockFlip",false).toBool()) {
+                                    if (my_set.value("flipX").toBool()) {
+                                        physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+                                        my_phys->reset_display();
+                                    }
+                                    if (my_set.value("flipY").toBool()) {
+                                        physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+                                        my_phys->reset_display();
+                                    }
+                                    if (my_set.value("transpose").toBool()) {
+                                        physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
+                                        my_phys->reset_display();
+                                    }
+                                }
+
+                                if (my_set.value("lockMath",false).toBool()) {
+                                    physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
+                                    physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
+                                }
+
+                                if (my_set.value("lockBlur",false).toBool()) {
+                                    physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
+                                }
+
+                                if (my_set.value("lockCrop",false).toBool()) {
+                                    physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
+                                }
+
+                                if (my_set.value("lockColors",false).toBool()) {
+                                    bool ok1, ok2;
+                                    double mymin=my_set.value("colorMin").toDouble(&ok1);
+                                    double mymax=my_set.value("colorMax").toDouble(&ok2);
+                                    if (ok1 && ok2) {
+                                        my_phys->prop["display_range"]=vec2f(mymin,mymax);
+                                    }
+                                    if (my_set.value("colorSpin").toInt() != 100) {
+                                        DEBUG(my_phys->prop["display_range"]);
+                                        qDebug() << my_set.value("colorSpin").toInt();
+                                        my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,my_set.value("colorSpin").toInt());
+                                        DEBUG(my_phys->prop["display_range"]);
+                                    }
                                 }
                             }
-
-                            if (my_set.value("lockMath",false).toBool()) {
-                                physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
-                                physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
-                            }
-
-                            if (my_set.value("lockBlur",false).toBool()) {
-                                physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
-                            }
-
-                            if (my_set.value("lockCrop",false).toBool()) {
-                                physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
-                            }
-
-                            if (my_set.value("lockColors",false).toBool()) {
-                                bool ok1, ok2;
-                                double mymin=my_set.value("colorMin").toDouble(&ok1);
-                                double mymax=my_set.value("colorMax").toDouble(&ok2);
-                                if (ok1 && ok2) {
-                                    my_phys->prop["display_range"]=vec2f(mymin,mymax);
-                                }
-                            }
-
                             my_set.endGroup();
-
                             my_neu->addShowPhys(my_phys);
                             imagelistold << my_phys;
                         } else {
@@ -1172,14 +1178,33 @@ void neutrino::exportGraphics () {
         exportGraphics(fout);
 }
 
+
 void neutrino::exportAllGraphics () {
     QString ftypes=graphicsTypes(property("NeuSave-fileExport").toString());
     QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
     if (!fout.isEmpty()) {
         for (int i=0;i<physList.size() ; i++) {
             my_w->my_view->nextBuffer();
-            QFileInfo fi(fout);
-            exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
+            if (currentBuffer) {
+                QFileInfo fi(fout);
+                exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+QString::fromStdString(currentBuffer->getShortName())+"."+fi.completeSuffix());
+            }
+        }
+        setProperty("NeuSave-fileExport",fout);
+    }
+}
+
+void neutrino::exportAllGraphicsOriginalName () {
+    QString ftypes=graphicsTypes(property("NeuSave-fileExport").toString());
+    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
+    if (!fout.isEmpty()) {
+        for (int i=0;i<physList.size() ; i++) {
+            my_w->my_view->nextBuffer();
+            if (currentBuffer) {
+                QFileInfo fi(fout);
+                QString origfname=QFileInfo(QString::fromStdString(currentBuffer->getFromName())).baseName();
+                exportGraphics(fi.path()+"/"+origfname+"."+fi.completeSuffix());
+            }
         }
         setProperty("NeuSave-fileExport",fout);
     }

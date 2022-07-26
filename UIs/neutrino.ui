@@ -107,6 +107,7 @@
     <addaction name="actionExport_pixmap"/>
     <addaction name="actionExport"/>
     <addaction name="actionExport_all"/>
+    <addaction name="actionExport_all_original_name"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -740,6 +741,11 @@
   <action name="actionCheck_for_updates">
    <property name="text">
     <string>Check for updates</string>
+   </property>
+  </action>
+  <action name="actionExport_all_original_name">
+   <property name="text">
+    <string>Export all original name</string>
    </property>
   </action>
  </widget>

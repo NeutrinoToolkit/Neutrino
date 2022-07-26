@@ -25,6 +25,7 @@
 
 
 #include "FocalSpot.h"
+#include "nPhysImageF.h"
 #include "neutrino.h"
 
 FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
@@ -45,6 +46,7 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
 
     connect(my_w.plot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     show();
+    QApplication::processEvents();
     calculate_stats();
 
 }
@@ -110,15 +112,18 @@ FocalSpot::calculate_stats()
     double th = my_w.check_dsb->value()/100.*(c_value-my_w.zero_dsb->value()) +my_w.zero_dsb->value() ;
     double zl = my_w.zero_dsb->value();
     for (size_t ii=0; ii<currentBuffer->getSurf(); ii++) {
-        if (currentBuffer->point(ii) > th) {
-            above_th_energy += currentBuffer->point(ii);
-            point_count++;
-        } else if (currentBuffer->point(ii) < zl) {
-            below_zero_energy += currentBuffer->point(ii); // to minimize stupid results when zero level is far from reality
-            zero_point_count++;
-        } else {
-            below_zero_energy += zl;
-            zero_point_count++;
+        double zz=currentBuffer->point(ii);
+        if (! isnan(zz)) {
+            if (zz > th) {
+                above_th_energy += zz;
+                point_count++;
+            } else if (zz < zl) {
+                below_zero_energy += zz; // to minimize stupid results when zero level is far from reality
+                zero_point_count++;
+            } else {
+                below_zero_energy += zl;
+                zero_point_count++;
+            }
         }
     }
     double zero_energy_in_peak = (below_zero_energy/zero_point_count)*point_count;
@@ -182,10 +187,11 @@ FocalSpot::find_contour(double th)
             centroid/=contour.size();
             my_w.stats->append(QString("Barycenter: ( %1  , %2 )").arg(centroid.x()).arg(centroid.y()));
 
-//            vec2f centroid = currentBuffer->get_origin();
+
 
             // get stats
             vec2f c_scale = currentBuffer->get_scale();
+            DEBUG(c_scale);
             double min_r = std::numeric_limits<double>::max();
             double max_r = std::numeric_limits<double>::min();
             double meanr=0;
@@ -211,24 +217,42 @@ FocalSpot::find_contour(double th)
             }
 
 // PLOT radius
-            int len=max_r*5 ; //std::min(currentBuffer->get_size().x(),currentBuffer->get_size().y());
+
+            physD rvals(currentBuffer->getW(),currentBuffer->getH(),0.0,"r");
+
+            vec2f c_origin = currentBuffer->get_origin();
+#pragma omp parallel for collapse(2)
+            for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
+                for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
+                    rvals.set(i,j,vec2f((i-c_origin.x())*c_scale.x(),(j-c_origin.y())*c_scale.y()).mod());
+                }
+            }
+            rvals.TscanBrightness();
+            double rmax=rvals.get_max();
+
+            int len=100 ; //std::min(currentBuffer->get_size().x(),currentBuffer->get_size().y());
             QVector <double> rplot(len,0.0);
             QVector <double> rnum(len,0.0);
-            vec2f cntr= currentBuffer->get_origin();
     #pragma omp parallel for collapse(2)
             for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
                 for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
-                    int r=static_cast<int>((vec2f(i,j)-cntr).mod()+0.5);
-                    if (r<len)  {
-                        rplot[r]+=currentBuffer->point(i,j);
-                        rnum[r] ++;
+                    if (! isnan(currentBuffer->point(i,j))) {
+                        int r = static_cast<int>(len*rvals.point(i,j)/rmax);
+                        if (r<len) {
+                            rplot[r]+=currentBuffer->point(i,j);
+                            rnum[r] ++;
+                        } else {
+                            qDebug() << i << j << r;
+                        }
                     }
                 }
             }
 
+            qDebug() << len;
+
             QVector <double> rdata(len);
             for (int i=0;i<len;i++) {
-                rdata[i]=i;
+                rdata[i]=i*rmax/len;
                 rplot[i]=rplot[i]/rnum[i];
                 DEBUG(rdata[i]  << " " << rplot[i]);
             }
@@ -255,7 +279,7 @@ void FocalSpot::mouseAtWorld(QPointF p){
     double trueLength = std::sqrt(std::pow(p.x(), 2) + std::pow(p.y(), 2));
     my_w.plot->setMousePosition(trueLength);
     QString msg;
-    QTextStream(&msg) << trueLength;
+    QTextStream(&msg) << "Distance to center: " << trueLength;
     my_w.statusBar->showMessage(msg);
     my_w.plot->setMousePosition(trueLength);
 }

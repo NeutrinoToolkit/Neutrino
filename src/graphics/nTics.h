@@ -49,8 +49,12 @@ public:
 
 	QFont get_font() const;
 
-private:
     double gridThickness;
+    bool showTicks;
+    bool showColorbar;
+    bool showDimPixel;
+    bool showXYaxes;
+
 
 };
 

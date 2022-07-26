@@ -61,26 +61,6 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
     if (!nparent) ERROREXIT("nView problem")
 
-//    DEBUG(qobject_cast<neutrino *>(parent->parent()));
-
-
-//    if (!) {
-//        qDebug() << "ACTIVATING LOCAL SHORTCUTS since not part of Neutrino" ;
-//        connect(new QShortcut(QKeySequence(Qt::Key_Tab),this), SIGNAL(activated()), this, SLOT(cycleOverItems()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(nextColorTable()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(previousColorTable()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Less),this), SIGNAL(activated()), this, SLOT(decrGamma()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Greater),this), SIGNAL(activated()), this, SLOT(incrGamma()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Period),this), SIGNAL(activated()), this, SLOT(resetGamma()));
-//        connect(new QShortcut(QKeySequence(Qt::Key_G),this), SIGNAL(activated()), this, SLOT(toggleGrid()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_0),this), SIGNAL(activated()), this, SLOT(rescaleColor()));
-//        connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_9),this), SIGNAL(activated()), this, SLOT(rescale99()));
-//        connect(new QShortcut(QKeySequence(Qt::Key_R),this), SIGNAL(activated()), this, SLOT(toggleRuler()));
-//        connect(new QShortcut(QKeySequence(Qt::Key_M),this), SIGNAL(activated()), this, SLOT(nextMouseShape()));
-//        connect(new QShortcut(QKeySequence(Qt::Key_O),this), SIGNAL (activated()), this, SLOT(nextMouseShape()));
-//    }
-
     my_scene.addItem(&my_pixitem);
     my_scene.addItem(&my_mouse);
     my_scene.addItem(&my_tics);
@@ -95,25 +75,22 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     grabGesture(Qt::PanGesture);
     grabGesture(Qt::PinchGesture);
 
-    QSettings settings("neutrino","");
-    settings.beginGroup("nPreferences");
-    QVariant fontString=settings.value("defaultFont");
+
+    setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    QVariant fontString=my_set.value("defaultFont");
     if (fontString.isValid()) {
         QFont fontTmp;
         if (fontTmp.fromString(fontString.toString())) {
             setFont(fontTmp);
         }
     }
-    showDimPixel=settings.value("showDimPixel",true).toBool();
-    showXYaxes=settings.value("showXYaxes",true).toBool();
-    showColorbar=settings.value("showColorbar",true).toBool();
 
-    currentStepScaleFactor=settings.value("currentStepScaleFactor",15).toInt();
+    currentStepScaleFactor=my_set.value("currentStepScaleFactor",15).toInt();
 
-    setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
     setProperty("pixmapFile",my_set.value("pixmapFile","Pixmap.png"));
     changeColorTable(my_set.value("colorTable",colorTable).toString());
     my_set.endGroup();
