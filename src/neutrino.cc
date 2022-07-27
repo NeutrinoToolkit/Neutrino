@@ -24,6 +24,7 @@
  */
 
 
+#include "nPhysImageF.h"
 #ifdef Q_CC_GNU
 #define QT_INIT_METAOBJECT
 #endif
@@ -804,6 +805,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                         DEBUG(my_phys->prop["display_range"]);
                                     }
                                 }
+                                my_phys->setType(PHYS_FILE);
                             }
                             my_set.endGroup();
                             my_neu->addShowPhys(my_phys);

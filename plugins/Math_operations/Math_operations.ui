@@ -244,6 +244,11 @@
          </item>
          <item>
           <property name="text">
+           <string>Crop (WxH+X+Y)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>---------------------</string>
           </property>
          </item>

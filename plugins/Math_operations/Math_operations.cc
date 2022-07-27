@@ -305,6 +305,31 @@ void Math_operations::doOperation () {
                     } else {
                         my_w.statusbar->showMessage(tr("ERROR: Value should be a float"));
                     }
+                } else if (my_w.operation->currentIndex()==separator[0]+11) { //add noise
+                    qDebug() << "here";
+                    QRegularExpression myexp("^\\s*(\\d+)\\s*x\\s*(\\d+)\\s*\\+(\\d+)\\s*\\+(\\d+)\\s*$|^\\s*(\\d+)\\s*x\\s*(\\d+)\\s*$");
+
+
+
+                    qDebug() << myexp;
+                    QString my_vals=my_w.num2->text();
+                    qDebug() << my_vals;
+                    QRegularExpressionMatch my_match=myexp.match(my_vals);
+                    qDebug() << my_match.lastCapturedIndex();
+                    if (my_match.lastCapturedIndex()==2 || my_match.lastCapturedIndex()==4) {
+                        QVector<int> vals;
+                        for (int i=1;i<=my_match.lastCapturedIndex(); i++) {
+                             vals.push_back(my_match.captured(i).toInt());
+                        }
+                        while (vals.size()<4) {
+                            vals.push_back(0);
+                        }
+                        qDebug() << vals;
+                        myresult=new nPhysD(*image1);
+                        physMath::phys_crop(*myresult,vals[0],vals[1],vals[2],vals[3]);
+                    } else {
+                        my_w.statusbar->showMessage(tr("ERROR: need 2 or 4 numbers of the form WxH or WxH+X+Y"));
+                    }
                 }
             }
 
