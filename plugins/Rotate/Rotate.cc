@@ -43,7 +43,11 @@ void Rotate::doRotateLive () {
 	nPhysD *image=getPhysFromCombo(my_w.image);
 	if (image) {
 		if (image!=rotated) {
-            rotated=nparent->replacePhys(new nPhysD(image->rotated(alpha,getReplaceVal(image))),rotated, true);
+            if (my_w.sameSize->isChecked()) {
+                rotated=nparent->replacePhys(new nPhysD(image->fast_rotated(alpha,getReplaceVal(image))),rotated, true);
+            } else {
+                rotated=nparent->replacePhys(new nPhysD(image->rotated(alpha,getReplaceVal(image))),rotated, true);
+            }
 		} else {
 			my_w.statusbar->showMessage("Can't work on this image",5000);
 		}
