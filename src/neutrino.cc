@@ -750,17 +750,19 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                             my_set.beginGroup("nPreferences");
                             if (my_set.value("enableNewImageSettings",false).toBool()) {
 
-                                if (my_set.value("lockOrigin",false).toBool()) {
-                                    my_phys->set_origin(my_set.value("originX",0.0).toDouble(),my_set.value("originY",0.0).toDouble());
-                                }
-                                if (my_set.value("lockScale",false).toBool()) {
-                                    my_phys->set_scale(my_set.value("scaleX",1.0).toDouble(),my_set.value("scaleY",1.0).toDouble());
-                                }
-
                                 if (my_set.value("lockRotate",false).toBool()) {
-                                    nPhysD rotated = my_phys->rotated(my_set.value("rotate",0.0).toDouble());
+                                    nPhysD rotated;
+                                    if (my_set.value("rotateSameSize",true).toBool()) {
+                                        rotated = my_phys->fast_rotated(my_set.value("rotate",0.0).toDouble());
+                                    } else {
+                                        rotated = my_phys->rotated(my_set.value("rotate",0.0).toDouble());
+                                    }
                                     delete my_phys;
                                     my_phys=new nPhysD(rotated);
+                                }
+
+                                if (my_set.value("lockCrop",false).toBool()) {
+                                    physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
                                 }
 
                                 if (my_set.value("lockFlip",false).toBool()) {
@@ -778,6 +780,13 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     }
                                 }
 
+                                if (my_set.value("lockOrigin",false).toBool()) {
+                                    my_phys->set_origin(my_set.value("originX",0.0).toDouble(),my_set.value("originY",0.0).toDouble());
+                                }
+                                if (my_set.value("lockScale",false).toBool()) {
+                                    my_phys->set_scale(my_set.value("scaleX",1.0).toDouble(),my_set.value("scaleY",1.0).toDouble());
+                                }
+
                                 if (my_set.value("lockMath",false).toBool()) {
                                     physMath::phys_subtract(*dynamic_cast<physD*>(my_phys),my_set.value("subtract",0).toDouble());
                                     physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
@@ -785,10 +794,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
                                 if (my_set.value("lockBlur",false).toBool()) {
                                     physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
-                                }
-
-                                if (my_set.value("lockCrop",false).toBool()) {
-                                    physMath::phys_crop(*my_phys,my_set.value("cropW",my_phys->getW()).toInt(),my_set.value("cropH",my_phys->getH()).toInt(),my_set.value("cropDx",0).toInt(),my_set.value("cropDy",0).toInt());
                                 }
 
                                 if (my_set.value("lockColors",false).toBool()) {

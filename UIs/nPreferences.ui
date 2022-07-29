@@ -38,7 +38,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -101,339 +101,10 @@
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>New images defaults</string>
+           <string>New images defaults (in this order)</string>
           </property>
           <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1,1,0">
-           <item row="0" column="0" colspan="2">
-            <widget class="QCheckBox" name="enableNewImageSettings">
-             <property name="text">
-              <string>Enable</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Origin</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QToolButton" name="lockOrigin">
-             <property name="toolTip">
-              <string>lock origin for newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/lockOpen.png</normaloff>
-               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QLineEdit" name="originX">
-             <property name="toolTip">
-              <string>origin x</string>
-             </property>
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="originY">
-             <property name="toolTip">
-              <string>origin y</string>
-             </property>
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QToolButton" name="getOrigin">
-             <property name="toolTip">
-              <string>get origin from current image</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Scale</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QToolButton" name="lockScale">
-             <property name="toolTip">
-              <string>lock scale for newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/lockOpen.png</normaloff>
-               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QLineEdit" name="scaleX">
-             <property name="toolTip">
-              <string>scale x</string>
-             </property>
-             <property name="text">
-              <string>1</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QLineEdit" name="scaleY">
-             <property name="toolTip">
-              <string>scale y</string>
-             </property>
-             <property name="text">
-              <string>1</string>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="4">
-            <widget class="QToolButton" name="getScale">
-             <property name="toolTip">
-              <string>get scale from current image</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_rotate">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Rotate</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QToolButton" name="lockRotate">
-             <property name="toolTip">
-              <string>lock rotate for newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/lockOpen.png</normaloff>
-               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QDoubleSpinBox" name="rotate">
-             <property name="decimals">
-              <number>4</number>
-             </property>
-             <property name="minimum">
-              <double>-360.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>360.000000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_flip">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Flip</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QToolButton" name="lockFlip">
-             <property name="toolTip">
-              <string>lock filp/transpose forn newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/lockOpen.png</normaloff>
-               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2" colspan="2">
-            <widget class="QWidget" name="widget_1" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QCheckBox" name="flipX">
-                <property name="text">
-                 <string>flip X</string>
-                </property>
-                <property name="neutrinoSave" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="flipY">
-                <property name="text">
-                 <string>flip Y</string>
-                </property>
-                <property name="neutrinoSave" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="transpose">
-                <property name="text">
-                 <string>transpose T</string>
-                </property>
-                <property name="neutrinoSave" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Math</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QToolButton" name="lockMath">
-             <property name="toolTip">
-              <string>lock scale forn newly opened images</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-               <normaloff>:/icons/lockOpen.png</normaloff>
-               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="2" colspan="3">
+           <item row="8" column="2" colspan="3">
             <widget class="QWidget" name="widget_2" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <property name="leftMargin">
@@ -492,20 +163,34 @@
              </layout>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_14">
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_7">
              <property name="text">
-              <string>Blur</string>
+              <string>Math</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QToolButton" name="lockBlur">
+           <item row="5" column="4">
+            <widget class="QToolButton" name="getScale">
              <property name="toolTip">
-              <string>lock blur for newly opened images</string>
+              <string>get scale from current image</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="QToolButton" name="lockColors">
+             <property name="toolTip">
+              <string>lock colors for newly opened images</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -523,69 +208,92 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="2" colspan="2">
-            <widget class="QWidget" name="widget_7" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0,1">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="label_16">
-                <property name="text">
-                 <string>X</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="blurX">
-                <property name="maximum">
-                 <double>999.990000000000009</double>
-                </property>
-                <property name="neutrinoSave" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_17">
-                <property name="text">
-                 <string>Y</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="blurY">
-                <property name="maximum">
-                 <double>999.000000000000000</double>
-                </property>
-                <property name="neutrinoSave" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_15">
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Crop</string>
+              <string>Scale</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
+           <item row="4" column="2">
+            <widget class="QLineEdit" name="originX">
+             <property name="toolTip">
+              <string>origin x</string>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QCheckBox" name="enableNewImageSettings">
+             <property name="text">
+              <string>Enable</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="3">
+            <widget class="QLineEdit" name="scaleY">
+             <property name="toolTip">
+              <string>scale y</string>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QToolButton" name="lockRotate">
+             <property name="toolTip">
+              <string>lock rotate for newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QLineEdit" name="scaleX">
+             <property name="toolTip">
+              <string>scale x</string>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
             <widget class="QToolButton" name="lockCrop">
              <property name="toolTip">
               <string>lock crop for newly opened images</string>
@@ -606,7 +314,38 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="2" colspan="2">
+           <item row="8" column="1">
+            <widget class="QToolButton" name="lockMath">
+             <property name="toolTip">
+              <string>lock scale forn newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Blur</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2" colspan="3">
             <widget class="QWidget" name="widget_8" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0,1,0,1,0,1">
               <property name="spacing">
@@ -688,20 +427,112 @@
              </layout>
             </widget>
            </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_21">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_rotate">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>Colorbar</string>
+              <string>Rotate</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
-           <item row="8" column="1">
-            <widget class="QToolButton" name="lockColors">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Crop</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QCheckBox" name="rotateSameSize">
+             <property name="text">
+              <string>keep same size</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="2" colspan="2">
+            <widget class="QWidget" name="widget_7" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0,1">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>X</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="blurX">
+                <property name="maximum">
+                 <double>999.990000000000009</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>Y</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="blurY">
+                <property name="maximum">
+                 <double>999.000000000000000</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Origin</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QToolButton" name="lockScale">
              <property name="toolTip">
-              <string>lock colors for newly opened images</string>
+              <string>lock scale for newly opened images</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -719,7 +550,51 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="2" colspan="3">
+           <item row="4" column="1">
+            <widget class="QToolButton" name="lockOrigin">
+             <property name="toolTip">
+              <string>lock origin for newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QLineEdit" name="originY">
+             <property name="toolTip">
+              <string>origin y</string>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Colorbar</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2" colspan="3">
             <widget class="QWidget" name="widget_10" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1,1,0">
               <property name="leftMargin">
@@ -797,6 +672,141 @@
                 <property name="icon">
                  <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
                   <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="4" column="4">
+            <widget class="QToolButton" name="getOrigin">
+             <property name="toolTip">
+              <string>get origin from current image</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QDoubleSpinBox" name="rotate">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="minimum">
+              <double>-360.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <widget class="QToolButton" name="lockBlur">
+             <property name="toolTip">
+              <string>lock blur for newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QToolButton" name="lockFlip">
+             <property name="toolTip">
+              <string>lock filp/transpose forn newly opened images</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+               <normaloff>:/icons/lockOpen.png</normaloff>
+               <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_flip">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Flip</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2" colspan="3">
+            <widget class="QWidget" name="widget_1" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QCheckBox" name="flipX">
+                <property name="text">
+                 <string>flip X</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="flipY">
+                <property name="text">
+                 <string>flip Y</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="transpose">
+                <property name="text">
+                 <string>transpose T</string>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -1487,6 +1497,19 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>separateRGB</tabstop>
   <tabstop>openNewWindow</tabstop>
+  <tabstop>enableNewImageSettings</tabstop>
+  <tabstop>lockRotate</tabstop>
+  <tabstop>rotate</tabstop>
+  <tabstop>rotateSameSize</tabstop>
+  <tabstop>lockCrop</tabstop>
+  <tabstop>cropW</tabstop>
+  <tabstop>cropH</tabstop>
+  <tabstop>cropDx</tabstop>
+  <tabstop>cropDy</tabstop>
+  <tabstop>lockFlip</tabstop>
+  <tabstop>flipX</tabstop>
+  <tabstop>flipY</tabstop>
+  <tabstop>transpose</tabstop>
   <tabstop>lockOrigin</tabstop>
   <tabstop>originX</tabstop>
   <tabstop>originY</tabstop>
@@ -1495,24 +1518,17 @@
   <tabstop>scaleX</tabstop>
   <tabstop>scaleY</tabstop>
   <tabstop>getScale</tabstop>
-  <tabstop>lockRotate</tabstop>
-  <tabstop>rotate</tabstop>
-  <tabstop>lockFlip</tabstop>
-  <tabstop>flipX</tabstop>
-  <tabstop>flipY</tabstop>
-  <tabstop>transpose</tabstop>
   <tabstop>lockMath</tabstop>
   <tabstop>subtract</tabstop>
   <tabstop>multiply</tabstop>
   <tabstop>lockBlur</tabstop>
   <tabstop>blurX</tabstop>
   <tabstop>blurY</tabstop>
-  <tabstop>lockCrop</tabstop>
-  <tabstop>cropW</tabstop>
-  <tabstop>cropH</tabstop>
-  <tabstop>cropDx</tabstop>
-  <tabstop>cropDy</tabstop>
   <tabstop>lockColors</tabstop>
+  <tabstop>colorSpin</tabstop>
+  <tabstop>colorMin</tabstop>
+  <tabstop>colorMax</tabstop>
+  <tabstop>getColors</tabstop>
   <tabstop>comboIconSize</tabstop>
   <tabstop>fontFace</tabstop>
   <tabstop>fontSize</tabstop>
@@ -1535,8 +1551,8 @@
   <tabstop>openclDescription</tabstop>
   <tabstop>defaultPluginDir</tabstop>
   <tabstop>addPlugin</tabstop>
-  <tabstop>pluginList</tabstop>
   <tabstop>removePlugin</tabstop>
+  <tabstop>pluginList</tabstop>
  </tabstops>
  <resources>
   <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>

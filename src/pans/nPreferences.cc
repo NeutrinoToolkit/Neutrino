@@ -141,52 +141,32 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         dd->setText(k);
         my_w.pluginList->addItem(dd);
     }
+    qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
+    connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
 
-  connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
 
-  connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockOrigin, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.originX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-  connect(my_w.originY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockScale, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.scaleX, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-  connect(my_w.scaleY, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockRotate, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.rotate, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockFlip, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.flipX, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.flipY, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.transpose, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockMath, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.subtract, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-  connect(my_w.multiply, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockBlur, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.blurX, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
-  connect(my_w.blurY, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockCrop, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.cropH, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.cropW, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.cropDx, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.cropDy, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-
-  connect(my_w.lockColors, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-  connect(my_w.colorMin, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-  connect(my_w.colorMin, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
-
-
-  connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-  connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    foreach (QCheckBox *wdg, my_w.groupBox->findChildren<QCheckBox *>()) {
+        connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    }
+    foreach (QToolButton *wdg, my_w.groupBox->findChildren<QToolButton *>()) {
+        connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    }
+    foreach (QLineEdit *wdg, my_w.groupBox->findChildren<QLineEdit *>()) {
+        connect(wdg, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+    }
+    foreach (QSpinBox *wdg, my_w.groupBox->findChildren<QSpinBox *>()) {
+        connect(wdg, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    }
+    foreach (QDoubleSpinBox *wdg, my_w.groupBox->findChildren<QDoubleSpinBox *>()) {
+        connect(wdg, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+    }
 
 }
 
