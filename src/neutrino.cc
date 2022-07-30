@@ -102,10 +102,13 @@ neutrino::neutrino():
     setProperty("winId",qApp->property("numWin").toInt()+1);
     qApp->setProperty("numWin",property("winId"));
 
-    setProperty("NeuSave-gamma",1);
-    setProperty("NeuSave-physNameLength",40);
 
-    setProperty("NeuSave-askCloseUnsaved",true);
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    setProperty("NeuSave-askCloseUnsaved",my_set.value("askCloseUnsaved",true).toInt());
+    my_set.endGroup();
+
+    setProperty("NeuSave-gamma",1);
 
     setWindowTitle(property("winId").toString()+QString(": Neutrino"));
 

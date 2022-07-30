@@ -43,17 +43,14 @@ public:
     Ui::nPreferences my_w;
 
 public slots:
-    void changeShowDimPixel();
-    void changeShowXYaxes();
-    void changeShowColorbar();
+    void changeDecorations();
     void changeIconSize(int);
 
     void updatePlugindirs();
     void changeFont();
-    void askCloseUnsaved();
     void hideEvent (QHideEvent*) override;
     void showEvent(QShowEvent*) override;
-    void changephysNameLength(int);
+
     void openclUnitValueChange(int);
     void resetSettings();
 	void changeThreads(int);
@@ -65,9 +62,7 @@ public slots:
     void on_getScale_released();
     void on_getColors_released();
 
-    void on_mouseThickness_valueChanged(double);
     void on_mouseColor_released();
-    void on_gridThickness_valueChanged(double);
     void on_gridColor_released();
     void on_checkUpdatesNow_released();
 };

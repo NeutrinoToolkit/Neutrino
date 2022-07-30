@@ -80,10 +80,13 @@ QString nGenericPan::panName() {
 
 
 QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    int len=my_set.value("physNameLength",35).toInt();
+    my_set.endGroup();
     QString name="";
     if (nparent) {
         name=QString::fromUtf8(buffer->getName().c_str());
-        int len=nparent->property("NeuSave-physNameLength").toInt();
         qDebug() << combo << len << name << name.length();
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);

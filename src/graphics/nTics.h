@@ -41,7 +41,6 @@ public:
     QColor ticsColor, gridColor;
     bool rulerVisible, gridVisible;
 
-    void setGridThickness(double);
     void changeTicsColor();
 
     QRectF boundingRect() const override;
@@ -52,6 +51,7 @@ public:
     double gridThickness;
     bool showTicks;
     bool showColorbar;
+    bool showColorbarValues;
     bool showDimPixel;
     bool showXYaxes;
 

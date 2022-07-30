@@ -111,21 +111,19 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
 	connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
-    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeShowDimPixel()));
-    connect(my_w.showXYaxes, SIGNAL(released()), this, SLOT(changeShowXYaxes()));
-    connect(my_w.showColorbar, SIGNAL(released()), this, SLOT(changeShowColorbar()));
+    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(my_w.showXYaxes, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(my_w.showColorbar, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(my_w.showColorbarValues , SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(my_w.mouseThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
+    connect(my_w.gridThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
     connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
-
-
-    my_w.askCloseUnsaved->setChecked(nparent->property("NeuSave-askCloseUnsaved").toBool());
-    connect(my_w.askCloseUnsaved, SIGNAL(released()), this, SLOT(askCloseUnsaved()));
 
     connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
     connect(my_w.pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
 
-    my_w.physNameLength->setValue(nparent->property("NeuSave-physNameLength").toInt());
-	connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(changephysNameLength(int)));
+    connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(savedefaults()));
 
     QMap<QString, QVariant> pluginList(nparent->property("NeuSave-plugindirs").toMap());
     qDebug() << pluginList;
@@ -142,14 +140,9 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         my_w.pluginList->addItem(dd);
     }
     qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
-    connect(my_w.separateRGB, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
     connect(my_w.openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-
     connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
     connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-    connect(my_w.showXYaxes, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-    connect(my_w.showDimPixel, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-    connect(my_w.showColorbar, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
     connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
 
     foreach (QCheckBox *wdg, my_w.groupBox->findChildren<QCheckBox *>()) {
@@ -206,15 +199,6 @@ void nPreferences::on_getOrigin_released() {
     }
 }
 
-void nPreferences::on_getColors_released() {
-    if (currentBuffer) {
-        vec2f my_vec=currentBuffer->prop["display_range"];
-        DEBUG(my_vec);
-        my_w.colorMin->setText(QLocale().toString(my_vec.x()));
-        my_w.colorMax->setText(QLocale().toString(my_vec.y()));
-    }
-}
-
 void nPreferences::on_getScale_released() {
     if (currentBuffer) {
         vec2f my_vec=currentBuffer->get_scale();
@@ -226,22 +210,25 @@ void nPreferences::on_getScale_released() {
     }
 }
 
-void nPreferences::askCloseUnsaved() {
-    nparent->setProperty("NeuSave-askCloseUnsaved",my_w.askCloseUnsaved->isChecked());
+void nPreferences::on_getColors_released() {
+    if (currentBuffer) {
+        vec2f my_vec=currentBuffer->prop["display_range"];
+        DEBUG(my_vec);
+        my_w.colorMin->setText(QLocale().toString(my_vec.x()));
+        my_w.colorMax->setText(QLocale().toString(my_vec.y()));
+    }
 }
 
-void nPreferences::changeShowDimPixel() {
+void nPreferences::changeDecorations() {
+    saveDefaults();
+    nparent->my_w->my_view->my_mouse.pen.setWidthF(my_w.mouseThickness->value());
+    nparent->my_w->my_view->my_tics.gridThickness=my_w.gridThickness->value();
     nparent->my_w->my_view->my_tics.showDimPixel=my_w.showDimPixel->isChecked();
-    nparent->my_w->my_view->update();
-}
-
-void nPreferences::changeShowXYaxes() {
     nparent->my_w->my_view->my_tics.showXYaxes=my_w.showXYaxes->isChecked();
-    nparent->my_w->my_view->update();
-}
-
-void nPreferences::changeShowColorbar() {
     nparent->my_w->my_view->my_tics.showColorbar=my_w.showColorbar->isChecked();
+    nparent->my_w->my_view->my_tics.showColorbarValues=my_w.showColorbarValues->isChecked();
+    nparent->my_w->my_view->my_mouse.update();
+    nparent->my_w->my_view->my_tics.update();
     nparent->my_w->my_view->update();
 }
 
@@ -281,7 +268,7 @@ void nPreferences::changeIconSize(int val) {
 			}
 		}
 	}
-//    saveDefaults();
+    saveDefaults();
 }
 
 void nPreferences::hideEvent(QHideEvent*e){
@@ -292,10 +279,6 @@ void nPreferences::hideEvent(QHideEvent*e){
 void nPreferences::showEvent(QShowEvent*e){
 	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	nGenericPan::showEvent(e);
-}
-
-void nPreferences::changephysNameLength(int k) {
-    nparent->setProperty("NeuSave-physNameLength",k);
 }
 
 void nPreferences::on_addPlugin_released() {
@@ -325,16 +308,6 @@ void nPreferences::updatePlugindirs() {
 void nPreferences::on_removePlugin_released() {
 	qDeleteAll(my_w.pluginList->selectedItems());
     updatePlugindirs();
-}
-
-void nPreferences::on_mouseThickness_valueChanged(double val){
-    nparent->my_w->my_view->my_mouse.pen.setWidthF(val);
-    nparent->my_w->my_view->update();
-    qDebug() << "here";
-}
-
-void nPreferences::on_gridThickness_valueChanged(double val) {
-    nparent->my_w->my_view->my_tics.setGridThickness(val);
 }
 
 void nPreferences::on_gridColor_released() {

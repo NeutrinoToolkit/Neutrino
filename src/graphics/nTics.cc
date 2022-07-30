@@ -53,19 +53,15 @@ nTics::nTics(nView *view) : QGraphicsItem(),
     rulerVisible=my_set.value("rulerVisible",rulerVisible).toBool();
     gridVisible=my_set.value("gridVisible",gridVisible).toBool();
     gridColor=my_set.value("gridColor",gridColor).value<QColor>();
-    setGridThickness(my_set.value("gridThickness",gridThickness).toDouble());
+    gridThickness=my_set.value("gridThickness",gridThickness).toDouble();
 
     showDimPixel=my_set.value("showDimPixel",true).toBool();
     showXYaxes=my_set.value("showXYaxes",true).toBool();
     showColorbar=my_set.value("showColorbar",true).toBool();
+    showColorbarValues=my_set.value("showColorbarValues",true).toBool();
 
     my_set.endGroup();
 
-}
-
-void nTics::setGridThickness(double val) {
-    gridThickness=val;
-    update();
 }
 
 QFont nTics::get_font() const {
@@ -392,13 +388,13 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             }
         }
 
-        vec2f range=my_view->nparent->currentBuffer->get_min_max();
+        if (showColorbarValues) {
+            vec2f range=my_view->nparent->currentBuffer->get_min_max();
             label="CB "+QLocale().toString(mini)+":"+QLocale().toString(maxi)+ " (" +QLocale().toString(range.first())+":"+QLocale().toString(range.second())+")";
 
             QSize labelSizeCB=QSize(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
-            if (showColorbar) {
-                p->drawText(QRectF(0,size.height()+2*p->fontMetrics().height(),labelSizeCB.width(),labelSizeCB.height()),Qt::AlignTop|Qt::AlignHCenter,label);
-            }
+            p->drawText(QRectF(0,size.height()+2*p->fontMetrics().height(),labelSizeCB.width(),labelSizeCB.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+        }
 
 
         allTics.addRect(0,size.height()+p->fontMetrics().height()/4.0,size.width(), p->fontMetrics().height()/2.0);
