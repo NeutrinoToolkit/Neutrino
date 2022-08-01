@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>672</width>
-    <height>566</height>
+    <width>557</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -51,6 +51,18 @@
            <string>Ion species</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="1" column="0">
             <widget class="QLabel" name="label_12">
              <property name="font">
@@ -117,6 +129,18 @@
            <string>Simulation Parameters</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_10" columnstretch="0,1">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_2">
              <property name="font">
@@ -335,6 +359,21 @@
            <string>Simulation Box</string>
           </property>
           <layout class="QFormLayout" name="formLayout">
+           <property name="horizontalSpacing">
+            <number>4</number>
+           </property>
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_4">
              <property name="font">
@@ -422,6 +461,18 @@
            <string>B field</string>
           </property>
           <layout class="QFormLayout" name="formLayout_3">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_7">
              <property name="font">
@@ -530,6 +581,18 @@
            <string>E field</string>
           </property>
           <layout class="QFormLayout" name="formLayout_2">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_11">
              <property name="font">

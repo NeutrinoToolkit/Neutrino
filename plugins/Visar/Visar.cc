@@ -793,7 +793,7 @@ void Visar::sweepChanged(QLineEdit *line) {
         if (vecsweep) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
-            QRegExp separator("[(;| |\t)]");
+            QRegularExpression separator("[(;| |\t)]");
             QStringList strSweep=line->text().split(separator, QString::SkipEmptyParts);
             qDebug() << strSweep;
             foreach(QString str, strSweep) {
@@ -1115,7 +1115,7 @@ void Visar::updatePlot() {
 
             foreach (QString piece, jumpt) {
                 QString err_msg=" "+piece+QString("' VISAR ")+QLocale().toString(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
-                QStringList my_jumps=piece.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+                QStringList my_jumps=piece.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
                 if (my_jumps.size()>1 && my_jumps.size()<=3) {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
                         bool ok1, ok2, ok3=true;

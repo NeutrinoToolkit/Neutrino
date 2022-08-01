@@ -135,7 +135,7 @@ void Shell::startup() {
     QSettings settings("neutrino","");
     settings.beginGroup("Shell");
 
-    QStringList sites=settings.value("siteFolder").toString().split(QRegExp("\\s*:\\s*"));
+    QStringList sites=settings.value("siteFolder").toString().split(QRegularExpression("\\s*:\\s*"));
 //Re-enable below if numpy start to work again:
 #if defined(Q_OS_WIN)
     QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
