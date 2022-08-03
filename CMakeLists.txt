@@ -56,7 +56,7 @@ set(DEBUG_LEVEL "10" CACHE STRING "DEBUG verbosity")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_compile_options(-Wall)
@@ -69,13 +69,13 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
-include(Package)
+#include(Package)
 
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
 
-#set(NEU_PLUGIN_LIST "")
+set(NEU_PLUGIN_LIST "")
 add_subdirectory (plugins)
-#message(STATUS "${NEU_PLUGIN_LIST}")
-#target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
+message(STATUS "${NEU_PLUGIN_LIST}")
+target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
 

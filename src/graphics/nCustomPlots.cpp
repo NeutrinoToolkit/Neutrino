@@ -56,7 +56,7 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     connect(my_lock,SIGNAL(toggled(bool)),this,SLOT(setLock(bool)));
 
     QHBoxLayout* gridLayout = new QHBoxLayout(this);
-    gridLayout->setMargin(0);
+    gridLayout->setContentsMargins(QMargins(0,0,0,0));
     gridLayout->addWidget(my_min);
     gridLayout->addWidget(new QLabel(":",this));
     gridLayout->addWidget(my_max);
@@ -119,8 +119,8 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    axisRect()->setRangeDrag(nullptr);
-    axisRect()->setRangeZoom(nullptr);
+//     axisRect()->setRangeDrag(nullptr);
+//     axisRect()->setRangeZoom(nullptr);
     axisRect()->setMargins(QMargins(0,0,0,0));
     setCursor(QCursor(Qt::CrossCursor));
     repaint();
@@ -364,9 +364,9 @@ void nCustomPlot::showAxis(bool val) {
 
 
 void nCustomPlot::get_data_graph(QTextStream &out, QCPGraph *graph) {
-    out << "# " << graph->name() << "\n";
+    out << "# " << graph->name() << Qt::endl;
     for (QCPGraphDataContainer::const_iterator it=graph->data()->begin(); it!=graph->data()->end(); ++it) {
-        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << "\n";
+        out << QLocale().toString(it->key) << " " << QLocale().toString(it->value) << Qt::endl;
     }
 }
 
@@ -378,7 +378,7 @@ QString nCustomPlot::get_data(int g) {
     } else if (g<graphCount()) {
         get_data_graph(out,graph(g));
     }
-    out << "\n";
+    out << Qt::endl;
     out.flush();
     return retstr;
 }
@@ -399,13 +399,13 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
             }
         }
     } else {
-        out << "# " <<  title->text() << "\n";
-        out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << "\n";
+        out << "# " <<  title->text() << Qt::endl;
+        out << "# " <<  objectName() << " (" << graphCount() << " graphs)" << Qt::endl;
         for (int g=0; g<graphCount(); g++) {
             if(graph(g)->visible()) {
                 out << "# " << g <<" ";
                 get_data_graph(out,graph(g));
-                out << "\n" << "\n";
+                out << Qt::endl << Qt::endl;
             }
         }
     }

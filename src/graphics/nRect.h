@@ -76,6 +76,6 @@ public:
 
 };
 
-Q_DECLARE_METATYPE(nRect*);
+//Q_DECLARE_METATYPE(nRect*);
 
 #endif

@@ -52,6 +52,6 @@ public slots:
 
 };
 
-NEUTRINO_PLUGIN(ZoomWin,Image,"",Qt::CTRL+Qt::ALT+Qt::Key_Z);
+NEUTRINO_PLUGIN(ZoomWin,Image,"",Qt::CTRL | Qt::ALT | Qt::Key_Z);
 
 #endif

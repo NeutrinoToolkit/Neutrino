@@ -31,7 +31,6 @@
 #include "ui_VisarVelocity.h"
 #include <cmath>
 
-
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
     nCustomPlotMouseX3Y(parent)
 {
@@ -794,7 +793,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
             QRegularExpression separator("[(;| |\t)]");
-            QStringList strSweep=line->text().split(separator, QString::SkipEmptyParts);
+            QStringList strSweep=line->text().split(separator, Qt::SkipEmptyParts);
             qDebug() << strSweep;
             foreach(QString str, strSweep) {
                 bool ok;
@@ -805,11 +804,10 @@ void Visar::sweepChanged(QLineEdit *line) {
                     QPalette my_palette=line->palette();
                     my_palette.setColor(QPalette::Base,Qt::red);
                     line->setPalette(my_palette);
-                    statusbar->showMessage("Cannot understant sweep coefficent "+str);
+                    statusbar->showMessage("Cannot understand sweep coefficient "+str);
                     break;
                 }
             }
-
             if (line==sopScale) {
                 updatePlotSOP();
             } else {
@@ -1108,14 +1106,14 @@ void Visar::updatePlot() {
             double deltat=velocityUi[k]->offsetTime->value()-getTime(sweepCoeff[k],velocityUi[k]->physOrigin->value());
 
             QVector<double> tjump,njump,rjump;
-            QStringList jumpt=velocityUi[k]->jumpst->text().split(";", QString::SkipEmptyParts);
+            QStringList jumpt=velocityUi[k]->jumpst->text().split(";", Qt::SkipEmptyParts);
             velocityUi[k]->jumpst->setPalette(QApplication::palette());
             QPalette my_palette=velocityUi[k]->jumpst->palette();
             my_palette.setColor(QPalette::Base,Qt::red);
 
             foreach (QString piece, jumpt) {
                 QString err_msg=" "+piece+QString("' VISAR ")+QLocale().toString(k+1)+tr(" Decimal separator is: ")+locale().decimalPoint();
-                QStringList my_jumps=piece.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+                QStringList my_jumps=piece.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
                 if (my_jumps.size()>1 && my_jumps.size()<=3) {
                     if (my_jumps.size()>1 && my_jumps.size()<=3) {
                         bool ok1, ok2, ok3=true;
@@ -1148,7 +1146,6 @@ void Visar::updatePlot() {
                     statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
                 }
             }
-
             foreach (double a, tjump) {
                 QCPItemStraightLine* my_jumpLine=new QCPItemStraightLine(plotVelocity);
                 QPen pen(Qt::gray);
@@ -1275,23 +1272,19 @@ void Visar::updatePlot() {
 
             }
             if (time_vel[k].size()) {
-                double mmin = *std::min_element(time_vel[k].constBegin(), time_vel[k].constEnd());
-                double mmax = *std::max_element(time_vel[k].constBegin(), time_vel[k].constEnd());
-
-                minmax.push_back(mmin);
-                minmax.push_back(mmax);
-                qDebug() << k << mmin << mmax;
+                const auto [mmin, mmax] = std::minmax_element(std::begin(time_vel[k]), std::end(time_vel[k]));
+                minmax.push_back(*mmin);
+                minmax.push_back(*mmax);
+                qDebug() << k << *mmin << *mmax;
             }
         }
     }
 
     plotVelocity->rescaleAxes(true);
     if (minmax.size()) {
-        double mmin = *std::min_element(minmax.begin(),minmax.end());
-        double mmax = *std::max_element(minmax.begin(),minmax.end());
-        qDebug() << mmin << mmax;
-
-        plotVelocity->xAxis->setRange(mmin,mmax);
+        const auto [mmin, mmax] = std::minmax_element(std::begin(minmax), std::end(minmax));
+        qDebug() << *mmin << *mmax;
+        plotVelocity->xAxis->setRange(*mmin,*mmax);
     }
 
     plotVelocity->replot();
@@ -1725,7 +1718,7 @@ Visar::export_txt_multiple() {
         QTextStream out(&t);
         for (unsigned int k=0;k<numVisars;k++){
             out << export_one(k);
-            out << "\n\n";
+            out << Qt::endl << Qt::endl;
         }
         out << export_sop();
         t.close();

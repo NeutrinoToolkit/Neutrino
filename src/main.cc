@@ -42,8 +42,8 @@ void my_handler(int s){
 int main(int argc, char **argv)
 {
 #if defined(Q_OS_MAC)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+//     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)

@@ -158,11 +158,11 @@ void MUSE::on_actionExportTxt_triggered() {
 	if (t.isOpen()) {
 		QTextStream out(&t);
 		QLocale loc("C");
-		out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << endl;
-		out << "# r = " << radius->value() << " px. Tot pixels: (2r+1)^2 = " << pow(radius->value()*2+1,2) << endl;
-		out << "# " << plot->graph(1)->name() << endl;
+        out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << Qt::endl;
+        out << "# r = " << radius->value() << " px. Tot pixels: (2r+1)^2 = " << pow(radius->value()*2+1,2) << Qt::endl;
+        out << "# " << plot->graph(1)->name() << Qt::endl;
 		for (int xx=0; xx< xvals.size(); xx++) {
-			out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << endl;
+            out << loc.toString(xvals[xx],'g',6) << " "<< loc.toString(yvals[xx],'g',6) << " "<< loc.toString(ymean[xx],'g',6) << Qt::endl;
 		}
 		t.close();
 	}
@@ -327,11 +327,11 @@ QVariant MUSE::extractData(QString key, QStringList values) {
 	QVariant retval;
 	for(auto &my_str: values) {
 		qDebug() << "\t " << my_str;
-		QStringList wavelist1(QString(my_str).split("=",QString::SkipEmptyParts));
+        QStringList wavelist1(QString(my_str).split("=",Qt::SkipEmptyParts));
 		if (wavelist1.size()>1) {
 			qDebug() << "here" << wavelist1.first();
 			if(wavelist1.first()==key) {
-				QStringList wavelist2(wavelist1.at(1).split(' ',QString::SkipEmptyParts));
+                QStringList wavelist2(wavelist1.at(1).split(' ',Qt::SkipEmptyParts));
 				qDebug() << wavelist2;
 				if (wavelist2.size()>1) {
 					bool ok;

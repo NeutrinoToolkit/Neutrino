@@ -179,9 +179,9 @@ void nGenericPan::grabSave() {
         QString fname=QDir::homePath()+"/Grab_"+panName()+"_"+QString("%1").arg(progNum++, 5, 10, QChar('0'))+".png";
         if (!QFileInfo(fname).exists()) {
             showMessage(fname);
-//             setUnifiedTitleAndToolBarOnMac(false);
+            setUnifiedTitleAndToolBarOnMac(false);
             grab().save(fname);
-//             setUnifiedTitleAndToolBarOnMac(true);
+            setUnifiedTitleAndToolBarOnMac(true);
             break;
         }
         qInfo() << "Image saved to file" << fname;
@@ -238,7 +238,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
     }
     qDebug() << metaObject()->className();
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::META + Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
+    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
 
     // these properties will be automatically saved
     setProperty("NeuSave-fileIni",panName()+".ini");
@@ -414,7 +414,15 @@ nGenericPan::loadUi(QSettings &settings) {
     }
     foreach (QDoubleSpinBox *widget, findChildren<QDoubleSpinBox *>()) {
         // do not use Locale for storing values
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) widget->setValue(settings.value(widget->objectName(),widget->value()).toDouble());
+        qDebug() << widget;
+        qDebug() << settings.value(widget->objectName(),widget->value());
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            double val=settings.value(widget->objectName(),widget->value()).toDouble();
+            qDebug() << val;
+            widget->setValue(val);
+            qDebug() << "done";
+        }
+        qDebug() << "widget";
     }
     foreach (QSpinBox *widget, findChildren<QSpinBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
@@ -426,7 +434,7 @@ nGenericPan::loadUi(QSettings &settings) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->setCurrentIndex(settings.value(widget->objectName(),widget->currentIndex()).toInt());
             QStringList labels=settings.value(widget->objectName()+"neutrinoLabels").toStringList();
-            for (int k=0; k< std::min(labels.size(),widget->count());k++) {
+            for (int k=0; k< std::min(static_cast<int>(labels.size()),widget->count());k++) {
                 widget->setTabText(k,labels[k]);
             }
         }
@@ -480,27 +488,21 @@ nGenericPan::loadUi(QSettings &settings) {
             }
         }
     }
-
     foreach (nCustomPlot *widget, findChildren<nCustomPlot *>()) {
         widget->loadSettings(settings);
     }
-
     foreach (nLine *widget, findChildren<nLine *>()) {
         widget->loadSettings(settings);
     }
-
     foreach (nRect *widget, findChildren<nRect *>()) {
         widget->loadSettings(settings);
     }
-
     foreach (nEllipse *widget, findChildren<nEllipse *>()) {
         widget->loadSettings(settings);
     }
-
     foreach (nPoint *widget, findChildren<nPoint *>()) {
         widget->loadSettings(settings);
     }
-
 }
 
 void
@@ -704,6 +706,7 @@ void nGenericPan::loadDefaults() {
     settings.beginGroup(panName());
     qDebug() << panName() << " : " << settings.fileName();
     loadSettings(settings);
+    qDebug() << "end loadDefaults";
     settings.endGroup();
 }
 

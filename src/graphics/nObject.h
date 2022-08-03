@@ -154,6 +154,6 @@ signals:
 	void key_pressed(int);
 };
 
-Q_DECLARE_METATYPE(nObject*);
+//Q_DECLARE_METATYPE(nObject*);
 
 #endif

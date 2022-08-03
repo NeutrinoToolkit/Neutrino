@@ -60,10 +60,10 @@ void Mouse_info::addPoint(QPointF position) {
 		QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
 		QTableWidgetItem *x2item= new QTableWidgetItem(my_w.px->text());
 		QTableWidgetItem *y2item= new QTableWidgetItem(my_w.py->text());
-		xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-		yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-		x2item->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-		y2item->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+        xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+        yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+        x2item->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+        y2item->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 		xitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 		yitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 		x2item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
@@ -79,7 +79,7 @@ void Mouse_info::addPoint(QPointF position) {
 			zitem->setText(QString(""));
 		}
 
-		zitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+        zitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 		zitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 		my_w.points->setItem(pos, 4, zitem);
 		my_w.points->resizeRowToContents(pos);

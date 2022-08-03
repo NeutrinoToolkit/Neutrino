@@ -87,6 +87,6 @@ public:
 };
 
 
-Q_DECLARE_METATYPE(nEllipse*);
+//Q_DECLARE_METATYPE(nEllipse*);
 
 #endif
