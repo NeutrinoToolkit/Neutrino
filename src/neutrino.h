@@ -215,8 +215,6 @@ public slots:
     nGenericPan* newPan(QString=QString());
     nGenericPan* getPan(QString);
 
-    void changeEvent(QEvent *e);
-
     void on_actionKeyboard_shortcut_triggered();
 
 signals:

@@ -61,27 +61,6 @@
 #include "ui_nSbarra.h"
 #include "ui_nAbout.h"
 
-void neutrino::changeEvent(QEvent *e)
-{
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-        case QEvent::LanguageChange: {
-                for(auto& pan: getPanList())
-                    for(int i =  0; i < pan->metaObject()->methodCount(); ++i) {
-                        if (pan->metaObject()->method(i).methodSignature() == "retranslateUi(QMainWindow*)") {
-                            qDebug() << "found retranslateUi";
-                            QMetaObject::invokeMethod(pan,"retranslateUi",Q_ARG(QMainWindow *,pan));
-                        }
-                    }
-                my_w->retranslateUi(this);
-                break;
-            }
-        default:
-            break;
-    }
-}
-
-
 neutrino::~neutrino()
 {
     currentBuffer=nullptr;
@@ -240,9 +219,6 @@ neutrino::neutrino():
     connect(act, SIGNAL(triggered()),this, SLOT(clearRecentFile()));
     my_w->menuOpen_Recent->addAction(act);
 
-    // lasciamo questo per ultimo
-    //	my_w->scrollArea->setWidget(my_view);
-
     updateRecentFileActions();
 
     loadDefaults();
@@ -250,7 +226,6 @@ neutrino::neutrino():
 
     // plugins
     scanPlugins();
-
 
     QApplication::processEvents();
 
@@ -271,12 +246,18 @@ neutrino::neutrino():
 
     connect(my_w->actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
 
+    // the next lines should be useful once we get rid of the plugin stuff...
 //#define xxstring(s) xstring(s)
 //#define xstring(s) #s
-
 //    QString lista(xxstring(NEU_PLUGIN_LIST));
-//    QStringList lista2=lista.split("_nplug_",Qt::SkipEmptyParts);
-//    qCritical() <<lista2;
+//    QStringList lista2=lista.split(" ",Qt::SkipEmptyParts);
+//    for(auto &l : lista2) {
+//        qDebug() << l;
+//        int id = QMetaType::type((l+"*").toStdString().c_str());
+//        if (id != QMetaType::UnknownType) {
+//            qDebug() << id;
+//        }
+//    }
 }
 
 void neutrino::scanDir(QString dirpath, QString pattern)
