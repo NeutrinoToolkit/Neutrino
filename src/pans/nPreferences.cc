@@ -25,13 +25,9 @@
 
 #include <unistd.h>
 
-#include "nApp.h"
-
 #include "nPreferences.h"
-#include "neutrino.h"
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QColorDialog>
+#include "nApp.h"
+#include "nPhysWave.h"
 
 #ifdef	__WIN32
 #include <windows.h>

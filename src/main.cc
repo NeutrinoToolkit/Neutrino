@@ -22,8 +22,6 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <string>
-#include <iostream>
 #include <cmath>
 #include <signal.h>
 
@@ -31,8 +29,6 @@
 
 #include "neutrino.h"
 #include "nApp.h"
-
-#include <QTranslator>
 
 void my_handler(int s){
     qCritical() << "Caught signal" << s;

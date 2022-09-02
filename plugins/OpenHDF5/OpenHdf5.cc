@@ -175,7 +175,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
         std::vector<char> buffer(size*nCompund);
         hid_t dataread=H5Dread(did, tid, sid, H5S_ALL, H5P_DEFAULT, &buffer[0]);
         if (dataread>=0) {
-            int position=0;
+//            int position=0;
             for (int i=0; i< nCompund ; i++) {
                 std::string compoundName(H5Tget_member_name (tid,i));
                 QTreeWidgetItem *item3=new QTreeWidgetItem(item2,QStringList(QString(&compoundName[0])));
@@ -238,7 +238,7 @@ void OpenHdf5::scanDataset(hid_t did, QTreeWidgetItem *item2) {
                     item3->setData(2,0,QLocale().toString((qintptr)H5Tget_size(nativeType)));
                 }
 
-                position+=H5Tget_size(nativeType);
+//                position+=H5Tget_size(nativeType);
             }
         }
     }

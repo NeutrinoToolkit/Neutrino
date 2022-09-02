@@ -25,14 +25,11 @@
 #ifndef __nPreferences_h
 #define __nPreferences_h
 
-#include <iostream>
-
 #include <QtGui>
 #include <QWidget>
 
 #include "ui_nPreferences.h"
-#include "nGenericPan.h"
-#include "nPhysWave.h"
+#include "neutrino.h"
 
 class nPreferences : public nGenericPan
 {

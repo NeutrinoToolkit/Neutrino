@@ -222,6 +222,7 @@ neutrino::neutrino():
     updateRecentFileActions();
 
     loadDefaults();
+
     show();
 
     // plugins
@@ -430,6 +431,7 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             loadPlugin(pluginfile, false);
         }
         progress.close();
+
 //        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
 //        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
 //        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
