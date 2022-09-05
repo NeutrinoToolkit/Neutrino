@@ -506,7 +506,7 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
     // Optronics luli
 
     unsigned short buffer_header;
-    std::vector<std::string> exts = {"imd", "IMD", ifilename.substr(ifilename.size()-3,3)};
+    std::vector<std::string> exts = {"imd", "IMD"};
     std::string ifilenamebase=ifilename;
     ifilenamebase.resize(ifilenamebase.size()-3);
 
@@ -524,6 +524,8 @@ physFormat::physUint_imd::physUint_imd(std::string ifilename)
             w=buffer_header;
             ifile.read((char *)&buffer_header,sizeof(unsigned short));
             h=buffer_header;
+
+            DEBUG(sizeof(unsigned short) << " " << prop["imd-version"] << " " << w << " " << h);
 
             resize(w, h);
             std::vector<unsigned int> buf(w*h);
