@@ -97,8 +97,7 @@ private:
 
     unsigned int numVisars;
 
-    std::array<std::vector<QVector<double>>,2> cIntensity, cContrast; // indices = [ref/shot][numVisar][time]
-    std::vector<QVector<double>> cPhase;
+    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // indices = [ref/shot][numVisar][time]
 
     std::vector<QVector<double>> time_phase;
     std::vector<QVector<double>> cPhaseErr;
@@ -109,8 +108,7 @@ private:
     std::array<QVector<double>,3> sopCurve;
     QVector<double> time_sop;
 
-    std::vector<nPhysD> phaseUnwrap;
-
+    std::vector<std::array<nPhysD,2>> phaseUnwrap;
     std::vector<std::array<nPhysD,2>> contrast;
     std::vector<std::array<nPhysD,2>> intensity;
 
@@ -165,7 +163,7 @@ public slots:
 
     void mouseAtPlot(QMouseEvent* e);
     
-    void loadSettings(QString=QString());
+    void loadSettings(QString=QString()) override;
     
     void setObjectVisibility(nPhysD*);
     
