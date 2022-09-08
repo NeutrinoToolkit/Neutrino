@@ -1031,6 +1031,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         }
                         QApplication::processEvents();
                     } else if (qLine.startsWith("NeutrinoPan-begin")) {
+                        progress.setLabelText("Restoring windows");
                         panString+=line+'\n';
                         while (line.find("NeutrinoPan-end")!=0) {
                             getline(ifile,line);
