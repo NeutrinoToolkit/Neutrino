@@ -194,8 +194,7 @@ void Visar::changeShot(QString num) {
             QFileInfoList listref = QDir(settingsUi[k]->globDirRef->text()).entryInfoList(QDir::Files);
             foreach(QFileInfo finfo, listref) {
                 QString fname=finfo.fileName();
-                QRegularExpressionMatch my_match;
-                my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
+                QRegularExpressionMatch my_match=QRegularExpression(settingsUi[k]->globRef->text()).match(fname);
                 if (my_match.lastCapturedIndex()==1) {
                     if (my_match.captured(1) == num) {
                         getPhysFromNameSetCombo(finfo,settingsUi[k]->refImage);
@@ -205,16 +204,20 @@ void Visar::changeShot(QString num) {
             QFileInfoList listshot = QDir(settingsUi[k]->globDirShot->text()).entryInfoList(QDir::Files);
             foreach(QFileInfo finfo, listshot) {
                 QString fname=finfo.fileName();
-                QRegularExpressionMatch my_match;
-                my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
+                QRegularExpressionMatch my_match=QRegularExpression(settingsUi[k]->globShot->text()).match(fname);
                 if (my_match.lastCapturedIndex()==1) {
                     if (my_match.captured(1) == num) {
                         getPhysFromNameSetCombo(finfo,settingsUi[k]->shotImage);
                     }
                 }
             }
+        }
+    }
+    for (unsigned int k=0; k< numVisars; k++) {
+        if (velocityUi[k]->enableVisar->isChecked()) {
             QApplication::processEvents();
-            settingsUi[k]->doWaveButton->animateClick();
+            doWave(k);
+//            settingsUi[k]->doWaveButton->animateClick();
             QApplication::processEvents();
         }
     }
@@ -233,16 +236,20 @@ void Visar::changeShot(QString num) {
                 }
             }
         }
-        QFileInfoList listshot = QDir(globDirShot->text()).entryInfoList(QDir::Files);
-        foreach(QFileInfo finfo, listshot) {
-            QString fname=finfo.fileName();
-            QRegularExpressionMatch my_match;
-            my_match=QRegularExpression(globShot->text()).match(fname);
-            if (my_match.lastCapturedIndex()==1) {
-                if (my_match.captured(1) == num) {
-                    getPhysFromNameSetCombo(finfo,sopShot);
+        if (globDirShot->text() != globDirRef->text() && globShot->text() != globRef->text()) {
+            QFileInfoList listshot = QDir(globDirShot->text()).entryInfoList(QDir::Files);
+            foreach(QFileInfo finfo, listshot) {
+                QString fname=finfo.fileName();
+                QRegularExpressionMatch my_match;
+                my_match=QRegularExpression(globShot->text()).match(fname);
+                if (my_match.lastCapturedIndex()==1) {
+                    if (my_match.captured(1) == num) {
+                        getPhysFromNameSetCombo(finfo,sopShot);
+                    }
                 }
             }
+        } else {
+            sopShot->setCurrentIndex(sopRef->currentIndex());
         }
         updatePlotSOP();
     }
