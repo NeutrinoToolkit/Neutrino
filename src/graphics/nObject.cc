@@ -585,12 +585,12 @@ void nObject::copy_points() {
 }
 
 void nObject::paste_points() {
-    QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
+    QStringList my_l=QApplication::clipboard()->text().split("\n",QString::SkipEmptyParts);
     qDebug() << my_l;
 
     QPolygonF my_poly;
     for (int i=0; i<my_l.size(); i++) {
-        QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
+        QStringList my_p=my_l[i].split(" ",QString::SkipEmptyParts);
         qDebug() << my_p;
         if (my_p.size()==2) {
             bool ok0=false, ok1=false;

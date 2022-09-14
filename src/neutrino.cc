@@ -251,7 +251,7 @@ neutrino::neutrino():
 //#define xxstring(s) xstring(s)
 //#define xstring(s) #s
 //    QString lista(xxstring(NEU_PLUGIN_LIST));
-//    QStringList lista2=lista.split(" ",Qt::SkipEmptyParts);
+//    QStringList lista2=lista.split(" ",QString::SkipEmptyParts);
 //    for(auto &l : lista2) {
 //        qDebug() << l;
 //        int id = QMetaType::type((l+"*").toStdString().c_str());
