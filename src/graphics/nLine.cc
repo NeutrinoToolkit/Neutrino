@@ -194,7 +194,7 @@ void nLine::paste_points() {
     if (my_poly.size()>0) {
         moveRef.clear();
         while (ref.size()<my_poly.size()) {
-            addPoint(0);
+            appendPoint();
         }
         while (ref.size()>my_poly.size()) {
             removeLastPoint();
@@ -696,24 +696,15 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_B:
 			toggleBezier();
-			// .alex.
-			//redundant
-			//updatePlot();
 			break;
 		case Qt::Key_S:
 			toggleAntialias();
-			// .alex.
-			//redundant
-			//updatePlot();
 			break;
 		case Qt::Key_C:
 			if (e->modifiers() & Qt::ShiftModifier) {
 				centerOnImage();
 			} else {
 				toggleClosedLine();
-				// .alex.
-				//redundant
-				//updatePlot();
 			}
 			break;
 		case Qt::Key_A:
@@ -733,8 +724,12 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 				makeVertical();
 				break;
 			}
-		case Qt::Key_R:{
-				makeRectangle();
+        case Qt::Key_R:{
+                if (e->modifiers() & Qt::ShiftModifier) {
+                    makeRectangleExpand();
+                } else {
+                    makeRectangle();
+                }
 				break;
 			}
 		default:
@@ -789,6 +784,8 @@ void nLine::makeRectangle() {
 	if(property("parentPanControlLevel").toInt()<2) {
 		QRectF my_rect=path().boundingRect();
 
+        toggleClosedLine(true);
+
 		while (ref.size()<4) appendPoint();
 		while (ref.size()>4) removePoint(4);
 
@@ -800,6 +797,23 @@ void nLine::makeRectangle() {
 		changeP(2, p2);
 		changeP(3, QPointF(p2.x(),p1.y()));
 	}
+}
+
+void nLine::makeRectangleExpand() {
+    if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
+
+        toggleClosedLine(true);
+
+        while (ref.size()<4) appendPoint();
+        while (ref.size()>4) removePoint(4);
+
+        vec2f p1=nparent->getCurrentBuffer()->getSize();
+
+        changeP(0, QPointF(0     ,0      ));
+        changeP(1, QPointF(p1.x(),0      ));
+        changeP(2, QPointF(p1.x(),p1.y() ));
+        changeP(3, QPointF(0     ,p1.y() ));
+    }
 }
 
 void
@@ -868,9 +882,11 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	connect(twoHoriz, SIGNAL(triggered()), this, SLOT(makeHorizontal()));
 	QAction *twoVert = menu.addAction("2 points Vertical (y)");
 	connect(twoVert, SIGNAL(triggered()), this, SLOT(makeVertical()));
-	QAction *makeRect = menu.addAction("4 points Rectangle (r)");
-	connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
-	menu.addAction(menu.addSeparator());
+    QAction *makeRect = menu.addAction("4 points Rectangle (r)");
+    connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
+    QAction *makeRectExp = menu.addAction("4 points Rectangle image (shift-r)");
+    connect(makeRectExp, SIGNAL(triggered()), this, SLOT(makeRectangleExpand()));
+    menu.addAction(menu.addSeparator());
     QAction *copy = menu.addAction("Copy points (shift-c)");
     connect(copy, SIGNAL(triggered()), this, SLOT(copy_points()));
     QAction *paste = menu.addAction("Paste points (shift-v)");

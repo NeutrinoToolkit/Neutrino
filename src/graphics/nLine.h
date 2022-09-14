@@ -154,7 +154,8 @@ public slots:
 
 	void makeHorizontal();
 	void makeVertical();
-	void makeRectangle();
+    void makeRectangle();
+    void makeRectangleExpand();
 
 	void itemChanged();
 

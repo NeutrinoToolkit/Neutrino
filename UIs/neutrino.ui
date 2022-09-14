@@ -366,7 +366,7 @@
     <string>Show colortable</string>
    </property>
    <property name="shortcut">
-    <string>C</string>
+    <string>Ctrl+Shift+C</string>
    </property>
   </action>
   <action name="actionPrint">
@@ -414,7 +414,7 @@
     <string>Show /Hide ruler</string>
    </property>
    <property name="shortcut">
-    <string>R</string>
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="actionShow_mouse">
@@ -422,7 +422,7 @@
     <string>Change mouse</string>
    </property>
    <property name="shortcut">
-    <string>M</string>
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionLine">
@@ -561,7 +561,7 @@
     <string>Show/Hide grid</string>
    </property>
    <property name="shortcut">
-    <string>G</string>
+    <string>Ctrl+G</string>
    </property>
   </action>
   <action name="actionPoint">
@@ -644,7 +644,7 @@
     <string>Set origin</string>
    </property>
    <property name="shortcut">
-    <string>O</string>
+    <string>Ctrl+0</string>
    </property>
   </action>
   <action name="actionKeyboard_shortcut">
