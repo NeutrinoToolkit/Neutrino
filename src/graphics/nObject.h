@@ -141,6 +141,9 @@ public slots:
 	void appendPoint();
 	void addPoint(int);
 	
+    void copy_points();
+    void paste_points();
+
 
 	//SETTINGS
 	void loadSettings();

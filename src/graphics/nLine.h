@@ -159,8 +159,9 @@ public slots:
 	void itemChanged();
 
 	QString getPointsStr();
-	void copy_points();
-	void save_points();
+    void copy_points();
+    void paste_points();
+    void save_points();
 
 	//SETTINGS
 	void loadSettings();

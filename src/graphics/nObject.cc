@@ -119,6 +119,9 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
 	connect(my_w.actionCenter, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
 
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+    connect(my_w.pastePoints, SIGNAL(released()),this, SLOT(paste_points()));
+
 	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
 	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
 
@@ -127,8 +130,6 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 
 void nObject::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QMenu menu;
-	QAction *showPan = menu.addAction("Show control (w)");
-	connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
 	QAction *expandx = menu.addAction("Expand width (x)");
 	connect(expandx, SIGNAL(triggered()), this, SLOT(expandX()));
 	QAction *expandy = menu.addAction("Expand height (y)");
@@ -140,6 +141,14 @@ void nObject::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
     connect(centerIt, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
     QAction *submat = menu.addAction("Submatrix (s)");
     connect(submat, SIGNAL(triggered()), this, SLOT(submatrix()));
+    menu.addAction(menu.addSeparator());
+    QAction *copy = menu.addAction("Copy points (shift-c)");
+    connect(copy, SIGNAL(triggered()), this, SLOT(copy_points()));
+    QAction *paste = menu.addAction("Paste points (shift-v)");
+    connect(paste, SIGNAL(triggered()), this, SLOT(paste_points()));
+    menu.addAction(menu.addSeparator());
+    QAction *showPan = menu.addAction("Show control (w)");
+    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
 
 	menu.exec(e->screenPos());
 }
@@ -379,7 +388,7 @@ void nObject::addPoint (int pos) {
 	QPen refPen;
 	if (ref.size()>0) {
 		int copyfrom=std::max(pos, 1);
-		position=ref[copyfrom-1]->pos();
+        position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
 	} else {
@@ -547,14 +556,67 @@ nObject::keyPressEvent ( QKeyEvent * e ) {
 		case Qt::Key_S:
 			submatrix();
 			break;
-		case Qt::Key_C:
-			centerInBuffer();
-			break;
-		default:
+        case Qt::Key_C:
+            if (e->modifiers() & Qt::ShiftModifier) {
+                copy_points();
+            } else {
+                centerInBuffer();
+            }
+            break;
+        case Qt::Key_V:
+            if (e->modifiers() & Qt::ShiftModifier) {
+                paste_points();
+            }
+            break;
+        default:
 			emit key_pressed(e->key());
 			break;
 	}
 }
+
+void nObject::copy_points() {
+    QString str_points;
+    foreach(QGraphicsRectItem *r, ref) {
+        str_points += QString::number(r->pos().x()) + " " + QString::number(r->pos().y()) + "\n";
+    }
+    DEBUG(str_points.toStdString());
+    QApplication::clipboard()->setText(str_points);
+    my_pad.statusBar()->showMessage("Points copied to clipboard",2000);
+}
+
+void nObject::paste_points() {
+    QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
+    qDebug() << my_l;
+
+    QPolygonF my_poly;
+    for (int i=0; i<my_l.size(); i++) {
+        QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
+        qDebug() << my_p;
+        if (my_p.size()==2) {
+            bool ok0=false, ok1=false;
+            double p0=my_p[0].toDouble(&ok0);
+            double p1=my_p[1].toDouble(&ok1);
+            if (ok0 && ok1) {
+                my_poly << QPointF(p0,p1);
+            } else {
+                my_poly.resize(0);
+                break;
+            }
+        }
+    }
+    qDebug() << my_poly;
+    if (my_poly.size()>1) {
+        moveRef.clear();
+        for (int i=0; i<2; i++) {
+            changeP(i,my_poly[i], true);
+        }
+        moveRef.clear();
+        my_pad.statusBar()->showMessage("Points pasted from clipboard",2000);
+    } else {
+        my_pad.statusBar()->showMessage("Error pasting from clipboard",2000);
+    }
+}
+
 
 void
 nObject::keyReleaseEvent ( QKeyEvent *  ) {

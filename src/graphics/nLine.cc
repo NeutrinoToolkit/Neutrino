@@ -139,8 +139,9 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 
 	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
 	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
-	connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
+    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
+    connect(my_w.pastePoints, SIGNAL(released()),this, SLOT(paste_points()));
+    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
 
 	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
 	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
@@ -158,7 +159,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 QString nLine::getPointsStr(){
 	QString str_points;
 	foreach(QPointF p, poly(1)) {
-        str_points += QLocale().toString(p.x()) + " " + QLocale().toString(p.y()) + "\n";
+        str_points += QString::number(p.x()) + " " + QString::number(p.y()) + "\n";
 	}
 	DEBUG(str_points.toStdString());
 	return str_points;
@@ -166,6 +167,47 @@ QString nLine::getPointsStr(){
 
 void nLine::copy_points() {
 	QApplication::clipboard()->setText(getPointsStr());
+    my_pad.statusBar()->showMessage("Points copied to clipboard",2000);
+}
+
+void nLine::paste_points() {
+    QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
+    qDebug() << my_l;
+
+    QPolygonF my_poly;
+    for (int i=0; i<my_l.size(); i++) {
+        QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
+        qDebug() << my_p;
+        if (my_p.size()==2) {
+            bool ok0=false, ok1=false;
+            double p0=my_p[0].toDouble(&ok0);
+            double p1=my_p[1].toDouble(&ok1);
+            if (ok0 && ok1) {
+                my_poly << QPointF(p0,p1);
+            } else {
+                my_poly.resize(0);
+                break;
+            }
+        }
+    }
+    qDebug() << my_poly;
+    if (my_poly.size()>0) {
+        moveRef.clear();
+        while (ref.size()<my_poly.size()) {
+            addPoint(0);
+        }
+        while (ref.size()>my_poly.size()) {
+            removeLastPoint();
+        }
+
+        for (int i=0; i<my_poly.size(); i++) {
+            changeP(i,my_poly[i], true);
+        }
+        moveRef.clear();
+        my_pad.statusBar()->showMessage("Points pasted from clipboard",2000);
+    } else {
+        my_pad.statusBar()->showMessage("Error pasting from clipboard",2000);
+    }
 }
 
 void nLine::save_points() {
@@ -192,7 +234,7 @@ void nLine::setPoints(QPolygonF my_poly) {
 	}
 	while (ref.size()<my_poly.size()) appendPoint();
 	for (int i=0; i<ref.size();i++) {
-		changeP(i, my_poly.at(i));
+        changeP(i, my_poly.at(i));
 	}
 	moveRef.clear();
 }
@@ -520,7 +562,7 @@ void nLine::changePointPad(int nrow) {
 	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
 }
 
-void nLine::addPoint () {
+void nLine::addPoint() {
 	int i=ref.size();
 	if (my_w.points->selectedRanges().size()>0) {
 		i=my_w.points->selectedRanges().first().topRow();
@@ -829,7 +871,12 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QAction *makeRect = menu.addAction("4 points Rectangle (r)");
 	connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
 	menu.addAction(menu.addSeparator());
-	QAction *showPan = menu.addAction("Show control (w)");
+    QAction *copy = menu.addAction("Copy points (shift-c)");
+    connect(copy, SIGNAL(triggered()), this, SLOT(copy_points()));
+    QAction *paste = menu.addAction("Paste points (shift-v)");
+    connect(paste, SIGNAL(triggered()), this, SLOT(paste_points()));
+    menu.addAction(menu.addSeparator());
+    QAction *showPan = menu.addAction("Show control (w)");
 	connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
 	menu.exec(e->screenPos());
 }
