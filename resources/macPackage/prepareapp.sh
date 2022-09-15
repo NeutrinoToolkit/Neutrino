@@ -11,11 +11,11 @@ cp -r Neutrino.app dmg_dir
 
 #ln -sf /usr/local/opt/python@3.9/Frameworks/Python.framework/ /usr/local/opt/python@3.9/lib/Python.framework
 
-/usr/local/opt/qt@5/bin/macdeployqt dmg_dir/Neutrino.app
+`brew --prefix qt@5`/bin/macdeployqt dmg_dir/Neutrino.app
 
-python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino /usr/local
+python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix`
 
-cp /usr/local/lib/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks
+cp `brew --prefix hdf4`/lib/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks
 install_name_tool -change @rpath/libxdr.4.dylib @executable_path/../Frameworks/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
 install_name_tool -change @rpath/libdf.4.dylib @executable_path/../Frameworks/libdf.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
 
