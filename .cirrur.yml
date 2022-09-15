@@ -3,6 +3,7 @@ macos_instance:
 
 task:
   script: |
+     pwd
      brew update
      brew install objc-codegenutils objc-run
      brew install python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc llvm go
@@ -12,4 +13,6 @@ task:
      cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
      make -j$(sysctl -n hw.ncpu) install
      ../Neutrino/resources/macPackage/prepareapp.sh
+     ls
+     
 
