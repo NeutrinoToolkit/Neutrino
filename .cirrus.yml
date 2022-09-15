@@ -7,8 +7,8 @@ task:
      brew update
      brew install objc-codegenutils objc-run
      brew install python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc llvm go
-     mdfind -name macdeployqt
-     find /opt/homebrew/opt/qt@5
+     mdfind -name macdeployqt >&2
+     find /opt/homebrew/opt/qt@5 >&2
      brew install iltommi/brews/hdf4
      ls
      mkdir -p build_gcc && cd build_gcc
