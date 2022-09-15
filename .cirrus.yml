@@ -10,7 +10,7 @@ task:
      brew install iltommi/brews/hdf4
      ls
      mkdir -p build_gcc && cd build_gcc
-     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=/usr/local/opt/qt5/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
+     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=/opt/homebrew/opt/qt@5/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
      make -j$(sysctl -n hw.ncpu) install
      ../Neutrino/resources/macPackage/prepareapp.sh
      ls
