@@ -91,6 +91,6 @@ class nPhysD : public physD {
 
 };
 
-Q_DECLARE_METATYPE(nPhysD*);
+//Q_DECLARE_METATYPE(nPhysD*);
 
 #endif

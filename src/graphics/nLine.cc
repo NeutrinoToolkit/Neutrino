@@ -171,12 +171,12 @@ void nLine::copy_points() {
 }
 
 void nLine::paste_points() {
-    QStringList my_l=QApplication::clipboard()->text().split("\n",QString::SkipEmptyParts);
+    QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
     qDebug() << my_l;
 
     QPolygonF my_poly;
     for (int i=0; i<my_l.size(); i++) {
-        QStringList my_p=my_l[i].split(" ",QString::SkipEmptyParts);
+        QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
         qDebug() << my_p;
         if (my_p.size()==2) {
             bool ok0=false, ok1=false;
@@ -497,7 +497,7 @@ nLine::tableUpdated (QTableWidgetItem * item) {
 
 void
 nLine::changeColor () {
-	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Background));
+	QColorDialog colordial(my_w.colorLabel->palette().color(QPalette::Window));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -514,7 +514,7 @@ nLine::changeColor (QColor col) {
 
 void
 nLine::changeColorHolder () {
-	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Background));
+	QColorDialog colordial(my_w.colorHolderLabel->palette().color(QPalette::Window));
 	colordial.setOption(QColorDialog::ShowAlphaChannel);
 	colordial.exec();
 	if (colordial.result() && colordial.currentColor().isValid()) {
@@ -554,8 +554,8 @@ void nLine::changePointPad(int nrow) {
 	QPointF p=ref[nrow]->pos();
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
-	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 	my_w.points->setItem(nrow, 0, xitem);
 	my_w.points->setItem(nrow, 1, yitem);
 	my_w.points->resizeRowToContents(nrow);
@@ -579,7 +579,7 @@ void nLine::addPoint (int npos) {
 	QBrush refBrush;
 	QPen refPen;
 	if (ref.size()>0) {
-		int copyfrom=std::max(1,std::min(ref.size()-1,npos));
+		int copyfrom=std::max(1,std::min(static_cast<int>(ref.size()-1),npos));
 		position=ref[copyfrom-1]->pos();
 		refBrush=ref[copyfrom-1]->brush();
 		refPen=ref[copyfrom-1]->pen();
@@ -603,8 +603,8 @@ void nLine::addPoint (int npos) {
 	my_w.points->insertRow(npos);
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
-	xitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
-	yitem->setTextAlignment(Qt::AlignHCenter + Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 	my_w.points->setItem(npos, 0, xitem);
 	my_w.points->setItem(npos, 1, yitem);
 	my_w.points->resizeRowToContents(npos);
@@ -1199,7 +1199,7 @@ nLine::getContainedIntegral()
     DEBUG("starting contour intergration");
     std::list<double> c_data = physMath::contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
     DEBUG("contour integration ended");
-    return QList<double>::fromStdList(c_data);
+    return QList<double>(c_data.begin(),c_data.end());
 }
 
 void nLine::extractPath() {

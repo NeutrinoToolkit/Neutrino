@@ -48,6 +48,6 @@ public slots:
 
 };
 
-NEUTRINO_PLUGIN(Properties,Image,"",Qt::SHIFT+Qt::Key_P);
+NEUTRINO_PLUGIN(Properties,Image,"",Qt::SHIFT | Qt::Key_P);
 
 #endif

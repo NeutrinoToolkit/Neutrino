@@ -15,6 +15,8 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
 file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
 
+add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(file_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/grabStream.h")
     list(FIND SOURCES "${file_to_remove}" file_to_remove_found)
@@ -39,14 +41,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 add_definitions(-D__VER="${${PROJECT_NAME}_VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${${PROJECT_NAME}_VERSION_GIT_SHA}")
 
-if (APPLE AND NOT DEFINED Qt5_DIR)
-    set(Qt5_DIR "/usr/local/opt/qt@5/lib/cmake/Qt5")
-    MESSAGE(STATUS "Qt5_DIR set to ${Qt5_DIR}")
+if (APPLE AND NOT DEFINED Qt6_DIR)
+    set(Qt6_DIR "/usr/local/opt/qt/lib/cmake/Qt6")
+    MESSAGE(STATUS "Qt6_DIR set to ${Qt6_DIR}")
 endif()
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport UiTools OpenGL Network)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools)
 
-find_package(Qt5 COMPONENTS ${MODULES} REQUIRED)
+find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
 set(QRCDIR ${CMAKE_CURRENT_BINARY_DIR}/qrc)
 
@@ -122,6 +124,7 @@ if(APPLE)
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
+
     set (CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
     set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_RPATH} INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -129,7 +132,7 @@ if(APPLE)
 
 elseif(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
-    list (APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--export-all-symbols -Wl,-allow-multiple-definition")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-all-symbols -Wl,-allow-multiple-definition")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_executable(${PROJECT_NAME} ${RC_WIN} ${filedeps})
     else()
@@ -152,8 +155,12 @@ endif()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 foreach(MODULE ${MODULES})
-    set(MODULES_TWEAK "${MODULES_TWEAK};Qt5::${MODULE}")
+    set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
 endforeach()
+
+if(APPLE)
+add_definitions(-DQT_NO_OPENGL -mmacosx-version-min=10.9)
+endif()
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

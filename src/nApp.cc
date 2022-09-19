@@ -177,7 +177,7 @@ void nApp::addPaletteFile(QString cmapfile) {
             nPalettes[cmapfile]= std::vector<unsigned char>(256*3);
             unsigned int iter=0;
             while (!in.atEnd()) {
-                QStringList line = in.readLine().split(" ",QString::SkipEmptyParts);
+                QStringList line = in.readLine().split(" ",Qt::SkipEmptyParts);
                 for(auto &strnum : line) {
                     if (iter < nPalettes[cmapfile].size()) {
                         nPalettes[cmapfile][iter] = static_cast<unsigned char>(strnum.toUInt());

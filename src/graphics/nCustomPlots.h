@@ -148,12 +148,12 @@ public:
 };
 
 
-Q_DECLARE_METATYPE(nCustomPlot*);
-Q_DECLARE_METATYPE(nCustomPlotMouseX*);
-Q_DECLARE_METATYPE(nCustomPlotMouseXY*);
-Q_DECLARE_METATYPE(nCustomDoublePlot*);
-Q_DECLARE_METATYPE(nCustomPlotMouseX2Y*);
-Q_DECLARE_METATYPE(nCustomPlotMouseX3Y*);
+//Q_DECLARE_METATYPE(nCustomPlot*);
+//Q_DECLARE_METATYPE(nCustomPlotMouseX*);
+//Q_DECLARE_METATYPE(nCustomPlotMouseXY*);
+//Q_DECLARE_METATYPE(nCustomDoublePlot*);
+//Q_DECLARE_METATYPE(nCustomPlotMouseX2Y*);
+//Q_DECLARE_METATYPE(nCustomPlotMouseX3Y*);
 
 #endif // nCustomPlots_H
 

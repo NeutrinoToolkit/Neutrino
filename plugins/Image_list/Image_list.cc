@@ -152,7 +152,7 @@ Image_list::changeProperties() {
         } else if (sender()==my_w.actionScale) {
             text = QInputDialog::getText(this, tr("Change Scale"),tr("Scale:"), QLineEdit::Normal, itemsSelected.last()->data(2,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
-                QStringList lista=text.split(' ', QString::SkipEmptyParts);
+                QStringList lista=text.split(' ', Qt::SkipEmptyParts);
                 bool ok1,ok2;
                 switch (lista.size()) {
                 case 1: {
@@ -200,7 +200,7 @@ Image_list::changeProperties() {
         } else if (sender()==my_w.actionOrigin) {
             text = QInputDialog::getText(this, tr("Change Origin"),tr("Origin:"), QLineEdit::Normal, itemsSelected.last()->data(3,Qt::DisplayRole).toString(), &ok);
             if (ok && !text.isEmpty()) {
-                QStringList lista=text.split(' ', QString::SkipEmptyParts);
+                QStringList lista=text.split(' ', Qt::SkipEmptyParts);
                 if (lista.size()==2) {
                     bool ok1,ok2;
                     int xOrigin=QLocale().toDouble(lista.at(0),&ok1);
@@ -239,7 +239,7 @@ Image_list::changeProperties() {
             ss << lastsize.x() << " " << lastsize.y();
             text = QInputDialog::getText(this, tr("Change Size"),tr("Size:"), QLineEdit::Normal, QString::fromStdString(ss.str()), &ok);
             if (ok && !text.isEmpty()) {
-                QStringList lista=text.split(' ', QString::SkipEmptyParts);
+                QStringList lista=text.split(' ', Qt::SkipEmptyParts);
                 if (lista.size()==1) {
                     bool ok1;
                     double scale=QLocale().toDouble(lista.at(0),&ok1);

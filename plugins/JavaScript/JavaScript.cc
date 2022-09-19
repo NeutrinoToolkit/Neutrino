@@ -24,44 +24,38 @@
  */
 
 #include "JavaScript.h"
-#include <QScriptEngine>
 #include "nPhysImageF.h"
 
 Q_DECLARE_METATYPE(QList<nGenericPan*>);
 Q_DECLARE_METATYPE(QList<neutrino*>);
 
-JavaScript::JavaScript(neutrino *nparent) : nGenericPan(nparent) {
+JavaScript::JavaScript(neutrino *my_nparent) : nGenericPan(my_nparent),
+my_eng(my_nparent)
+{
     setupUi(this);
-    engine.globalObject().setProperty("neu", engine.newQObject(nparent));
-    engine.globalObject().setProperty("nApp", engine.newQObject(qApp));
+    my_eng.globalObject().setProperty("neu", my_eng.newQObject(nparent));
+    my_eng.globalObject().setProperty("nApp", my_eng.newQObject(qApp));
+    my_eng.setObjectOwnership(nparent, QJSEngine::CppOwnership);
+    my_eng.setObjectOwnership(qApp, QJSEngine::CppOwnership);
 
-    engine.globalObject().setProperty("neujs", engine.newQObject(static_cast<nGenericPan*>(this)));
-
-    qScriptRegisterSequenceMetaType<QList<nGenericPan*> >(&engine);
-    qScriptRegisterSequenceMetaType<QList<neutrino*> >(&engine);
-    qScriptRegisterSequenceMetaType<QList<nPhysD*> >(&engine);
+    my_eng.installExtensions(QJSEngine::ConsoleExtension);
 
     qRegisterMetaType<nGenericPan*>("nGenericPan*");
     qRegisterMetaType<nPhysD*>("nPhysD*");
 
-    qDebug() << splitter->sizes();
-    auto mysize = QList<int>({20,1});
-    qDebug() << mysize;
     splitter->setStretchFactor(0, 10);
     splitter->setStretchFactor(1, 1);
-    qDebug() << splitter->sizes();
 
-    QKeySequence key_seq=QKeySequence(Qt::CTRL + Qt::Key_Return);
+    QKeySequence key_seq=QKeySequence(Qt::CTRL | Qt::Key_Return);
     command->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute "+toolTip());
     QShortcut* my_shortcut = new QShortcut(key_seq, command);
     connect(my_shortcut, SIGNAL(activated()), this, SLOT(on_command_returnPressed()));
-
     show();
 }
 
 void JavaScript::on_command_returnPressed() {
     saveDefaults();
-    QScriptValue retval;
+    QJSValue retval;
     output->clear();
     QString mytext=command->toPlainText();
     if(QFileInfo::exists(mytext)) {
@@ -70,10 +64,10 @@ void JavaScript::on_command_returnPressed() {
         QTextStream out(&t);
         QString toRun=out.readAll();
         t.close();
-        retval = engine.evaluate(toRun, mytext);
+        retval = my_eng.evaluate(toRun, mytext);
     } else {
         qDebug() << mytext;
-        retval = engine.evaluate(mytext);
+        retval = my_eng.evaluate(mytext);
     }
     output->setPlainText(retval.toString());
 }

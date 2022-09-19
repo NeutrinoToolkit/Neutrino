@@ -24,7 +24,7 @@
  */
 #include <QtGui>
 #include <QWidget>
-#include <QtScript>
+#include <QJSEngine>
 
 #ifndef __JavaScript
 #define __JavaScript
@@ -37,17 +37,16 @@ class JavaScript : public nGenericPan, private Ui::JavaScript {
     Q_OBJECT
 
 public:
-
     Q_INVOKABLE JavaScript(neutrino *);
 
 public slots:
     void on_command_returnPressed();
 
 private:
-    QScriptEngine engine;
+    QJSEngine my_eng;
 
 };
 
-NEUTRINO_PLUGIN(JavaScript,Scripts,":icons/JavaScript.png", QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_J), 99);
+NEUTRINO_PLUGIN(JavaScript,Scripts,":icons/JavaScript.png", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_J), 99);
 
 #endif

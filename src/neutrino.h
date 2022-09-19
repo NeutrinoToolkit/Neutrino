@@ -242,6 +242,4 @@ QVariant toVariant(anydata &my_data);
 
 anydata toAnydata(QVariant &my_variant);
 
-Q_DECLARE_METATYPE(nPhysD);
-
 #endif

@@ -33,6 +33,7 @@
 #include <QGestureEvent>
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <QByteArray>
 
 #include <QTextBrowser>
 #include <QPrinter>
@@ -152,6 +153,6 @@ protected:
 
 };
 
-Q_DECLARE_METATYPE(nGenericPan*);
+//Q_DECLARE_METATYPE(nGenericPan*);
 
 #endif
