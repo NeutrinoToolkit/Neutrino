@@ -74,8 +74,8 @@ include(Package)
 add_subdirectory (nPhysImage)
 add_subdirectory (src)
 
-set(NEU_PLUGIN_LIST "")
+# set(NEU_PLUGIN_LIST "")
 add_subdirectory (plugins)
-message(STATUS "${NEU_PLUGIN_LIST}")
-target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
+# message(STATUS "${NEU_PLUGIN_LIST}")
+# target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
 

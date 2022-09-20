@@ -10,7 +10,7 @@ if (WIN32)
 
     # looks for runtime deps in CMAKE_FIND_ROOT_PATH/bin
     file (GLOB RUNTIME_DEPS ${CMAKE_FIND_ROOT_PATH}/bin/*dll)
-    file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt5/plugins/platforms/*dll)
+    file (GLOB RUNTIME_PLATFORM_DEPS ${CMAKE_FIND_ROOT_PATH}/lib/qt6/plugins/platforms/*dll)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         message (STATUS "nsis runtime: ${RUNTIME_DEPS} ${RUNTIME_PLATFORM_DEPS}")
     endif()

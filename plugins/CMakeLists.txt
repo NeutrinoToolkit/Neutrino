@@ -22,12 +22,12 @@ if (${NEUTRINOPLUGINS})
         IF(IS_DIRECTORY ${oneplugin})
             add_subdirectory(${oneplugin})
             get_filename_component(MY_PROJECT_NAME ${oneplugin} NAME)
-            set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST} ${MY_PROJECT_NAME}")
+#             set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST} ${MY_PROJECT_NAME}")
 
         ENDIF()
     ENDFOREACH()
 
-    message(STATUS "${NEU_PLUGIN_LIST}")
-    target_compile_definitions(Neutrino PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})
+#     message(STATUS "${NEU_PLUGIN_LIST}")
+#     target_compile_definitions(Neutrino PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})
 
 endif()
