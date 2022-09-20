@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <QObject>
-#include <QGLFormat>
+#include <QOpenGLWidget>
 #include <QColorDialog>
 #include <QMouseEvent>
 #include <QResizeEvent>
@@ -20,7 +20,7 @@
 #ifndef __tpGlDraw
 #define __tpGlDraw
 
-class tpGlDraw : public QGLWidget
+class tpGlDraw : public QOpenGLWidget 
 {
     Q_OBJECT
 

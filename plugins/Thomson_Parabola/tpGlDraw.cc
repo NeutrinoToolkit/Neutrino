@@ -2,11 +2,12 @@
 #include "tpGlDraw.h"
 
 tpGlDraw::tpGlDraw(QWidget *parent)
-    : QGLWidget(parent),
+    : QOpenGLWidget(parent),
       faceColors({Qt::red,Qt::green,Qt::blue,Qt::yellow})
 {
     grabKeyboard();
-    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+    QSurfaceFormat fmt;
+    fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     rotationX = -21.0;
     rotationY = -57.0;
     rotationZ = 0.0;
@@ -17,15 +18,15 @@ tpGlDraw::tpGlDraw(QWidget *parent)
 
     magnification = 1.;
 
-    initializeOverlayGL();
-    makeOverlayCurrent();
+//fixme    initializeOverlayOpenGL();
+//fixme    makeOverlayCurrent();
 
 }
 
 void tpGlDraw::initializeGL()
 {
 
-    qglClearColor(Qt::white);
+//fixme    qglClearColor(Qt::white);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -106,7 +107,7 @@ void tpGlDraw::draw()
     // draw axis
 	glLoadName(1);
 	glBegin(GL_LINES);
-	qglColor(Qt::black);
+//fixme	qglColor(Qt::black);
 
 
 	// get min/max
@@ -127,9 +128,9 @@ void tpGlDraw::draw()
 	glVertex3f(0,0,1.5*maxv.z());
 	glEnd();
 
-	renderText(1.6*maxv.x(),0,0,"x");
-	renderText(0,1.6*maxv.y(),0,"y");
-	renderText(0,0,1.6*maxv.z(),"z");
+//fixme	renderText(1.6*maxv.x(),0,0,"x");
+//fixme	renderText(0,1.6*maxv.y(),0,"y");
+//fixme	renderText(0,0,1.6*maxv.z(),"z");
 
 /*
 //
@@ -164,14 +165,14 @@ void tpGlDraw::draw()
 }
 
 void tpGlDraw::wheelEvent(QWheelEvent *ev) {
-	int nDeg = ev->delta()/8;
-	int nSteps = nDeg/15;
+	QPoint nDeg = ev->angleDelta()/8;
+	QPoint numPixels = ev->pixelDelta();
 
 	ev->accept();
 
-	magnification += nSteps/10.;
+//fixme	magnification += nSteps/10.;
 	//qDebug()<<"magnification: "<<magnification;
-	updateGL();
+//fixme	updateGL();
 }
 
 void tpGlDraw::mousePressEvent(QMouseEvent *event)
@@ -187,15 +188,15 @@ void tpGlDraw::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton) {
         rotationX -= 180 * dy;
         rotationY -= 180 * dx;
-        updateGL();
+//fixme        updateGL();
     } else if (event->buttons() & Qt::RightButton) {
         rotationX -= 180 * dy;
         rotationZ -= 180 * dx;
-        updateGL();
-    } else if (event->buttons() & Qt::MidButton) {
+//fixme        updateGL();
+    } else if (event->buttons() & Qt::MiddleButton) {
 	translationX += dx;
 	translationY += dy;
-	updateGL();
+//fixme	updateGL();
     }
     lastPos = event->pos();
 
@@ -208,7 +209,7 @@ void tpGlDraw::mouseDoubleClickEvent(QMouseEvent *event)
         QColor color = QColorDialog::getColor(faceColors[face], this);
         if (color.isValid()) {
             faceColors[face] = color;
-            updateGL();
+//fixme            updateGL();
         }
     }
 }
@@ -291,7 +292,7 @@ void tpGlDraw::generateCube(GLfloat *P1, GLfloat *P2, int num)
 // draw tribox
 void tpGlDraw::generateTribox(tribox my_box, QColor color)
 {
-	qglColor(color);
+//fixme	qglColor(color);
 	GLfloat cp1[3] = {(GLfloat) my_box.myvertex1.x(),
 		(GLfloat) my_box.myvertex1.y(),
 		(GLfloat) my_box.myvertex1.z()};
