@@ -11,7 +11,7 @@ task:
      cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
-     cp Neutrino-`uname -s`-`uname -a`.* ..
+     cp Neutrino-`uname -s`-`uname -m`.* ..
   m1_artifacts:
     path: "Neutrino-Darwin-arm64.*"
 
