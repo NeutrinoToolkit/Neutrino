@@ -10,7 +10,6 @@ task:
      mkdir -p build_gcc && cd build_gcc
      cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
      make -j$(sysctl -n hw.ncpu) install
-     codesign --force --deep --sign - ./Neutrino.app
      ../resources/macPackage/prepareapp.sh
   dmg_artifacts:
     path: "build_gcc/Neutrino-Darwin-arm64.dmg"
