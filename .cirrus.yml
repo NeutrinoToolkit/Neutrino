@@ -8,11 +8,10 @@ task:
      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc llvm go
      brew install iltommi/brews/hdf4
      mkdir -p build_gcc && cd build_gcc
-     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=/`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
+     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
      make -j$(sysctl -n hw.ncpu) install
+     codesign --force --deep --sign - ./Neutrino.app
      ../resources/macPackage/prepareapp.sh
-     otool -L dmg_dir/Neutrino.app/Contents/MacOS/Neutrino
-     find dmg_dir/Neutrino.app -name \*.dylib -exec otool -L {} \;
   dmg_artifacts:
     path: "build_gcc/Neutrino-Darwin-arm64.dmg"
 
