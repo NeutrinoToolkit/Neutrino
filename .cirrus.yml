@@ -25,7 +25,7 @@ MacM1_task:
      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
      brew install iltommi/brews/hdf4
      mkdir -p build_gcc && cd build_gcc
-     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
+     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
      cp Neutrino-`uname -s`-`uname -m`.* ..
@@ -47,7 +47,7 @@ AppImage_task:
       wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
       chmod +x linuxdeploy*.AppImage
       mkdir build && cd build
-      cmake -DNEUTRINO_SKIP_PLUGINS='Shell' -DCMAKE_INSTALL_PREFIX=/usr ..
+      cmake -DCMAKE_INSTALL_PREFIX=/usr ..
       make install DESTDIR=AppDir
       LD_LIBRARY_PATH=AppDir/usr/lib ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
       cp Neutrino-*.AppImage ..
@@ -87,7 +87,7 @@ Cross64_task:
       make -C mfhdf/libsrc -j 1 install
       cd ..
       mkdir build && cd build
-      mingw64-cmake -DNEUTRINO_SKIP_PLUGINS='Shell' ..
+      mingw64-cmake ..
       make -j2 package
       cp Neutrino*.exe Neutrino*.zip ..
       
