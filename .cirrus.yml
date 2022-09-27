@@ -34,7 +34,7 @@ AppImage_task:
       mkdir build && cd build
       cmake -DNEUTRINO_SKIP_PLUGINS='Shell' -DCMAKE_INSTALL_PREFIX=/usr ..
       make install DESTDIR=AppDir
-      ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
+      ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
       cp Neutrino-*.AppImage ..
     AppImage_artifacts:
       path: "Neutrino-*.AppImage"
