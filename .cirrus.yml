@@ -129,11 +129,13 @@ Cross64_task:
     artifacts:
       path: "Neutrino-*.*"
       
-# publish_task:
-#   depends_on:
-#     - MacIntel
-#     - MacM1
-#     - AppImage
-#     - Cross32
-#     - Cross64
-#   script: 
+publish_task:
+  depends_on:
+    - MacIntel
+    - MacM1
+    - AppImage
+    - Cross32
+    - Cross64
+  script: |
+      find .
+     
