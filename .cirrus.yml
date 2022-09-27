@@ -1,4 +1,21 @@
-M1_task:
+MacIntel_task:
+  macos_instance:
+    image: big-sur-base
+
+  script: |
+     brew update
+     brew install objc-codegenutils objc-run
+     brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+     brew install iltommi/brews/hdf4
+     mkdir -p build_gcc && cd build_gcc
+     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
+     make -j$(sysctl -n hw.ncpu) install
+     ../resources/macPackage/prepareapp.sh
+     cp Neutrino-`uname -s`-`uname -m`.* ..
+  artifacts:
+    path: "Neutrino-Darwin-arm64.*"
+
+MacM1_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
 
