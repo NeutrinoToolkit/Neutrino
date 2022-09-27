@@ -1,7 +1,8 @@
-macos_instance:
-  image: ghcr.io/cirruslabs/macos-monterey-base:latest
-
 task:
+  name: M1
+  osx_instance:
+    image: big-sur-base
+
   script: |
      brew update
      brew install objc-codegenutils objc-run
