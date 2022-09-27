@@ -1,6 +1,6 @@
 M1_task:
-  osx_instance:
-    image: big-sur-base
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
 
   script: |
      brew update
@@ -12,7 +12,7 @@ M1_task:
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
      cp Neutrino-`uname -s`-`uname -m`.* ..
-  m1_artifacts:
+  artifacts:
     path: "Neutrino-Darwin-arm64.*"
 
 AppImage_task:
@@ -25,16 +25,15 @@ AppImage_task:
         LD_LIBRARY_PATH: /build/AppDir/usr/lib
 
     # Instructions:
-    update_script: apt-get update -qq && apt-get install -yy vim wget file git pandoc cmake libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff5-dev libgsl-dev qt5-default qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5scripttools5 qtscript5-dev libqt5multimediawidgets5 qttools5-dev-tools libqt5multimedia5 libqt5multimedia5-plugins lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-100
-    get_script: |
+    script: |
+      apt-get update -qq && apt-get install -yy wget git pandoc cmake libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff5-dev libgsl-dev qt5-default qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5scripttools5 qtscript5-dev libqt5multimediawidgets5 qttools5-dev-tools libqt5multimedia5 libqt5multimedia5-plugins lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-100
       wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
       wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
       chmod +x linuxdeploy*.AppImage
-    build_script: |
       mkdir build && cd build
       cmake -DNEUTRINO_SKIP_PLUGINS='Shell' -DCMAKE_INSTALL_PREFIX=/usr ..
       make install DESTDIR=AppDir
       ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
       cp Neutrino-*.AppImage ..
-    AppImage_artifacts:
+    artifacts:
       path: "Neutrino-*.AppImage"
