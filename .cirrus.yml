@@ -13,7 +13,7 @@ MacIntel_task:
      ../resources/macPackage/prepareapp.sh
      cp Neutrino-`uname -s`-`uname -m`.* ..
   artifacts:
-    path: "Neutrino-Darwin-arm64.*"
+    path: "Neutrino-Darwin-*.*"
 
 MacM1_task:
   macos_instance:
@@ -30,7 +30,7 @@ MacM1_task:
      ../resources/macPackage/prepareapp.sh
      cp Neutrino-`uname -s`-`uname -m`.* ..
   artifacts:
-    path: "Neutrino-Darwin-arm64.*"
+    path: "Neutrino-Darwin-*.*"
 
 AppImage_task:
     container:
@@ -52,4 +52,4 @@ AppImage_task:
       LD_LIBRARY_PATH=AppDir/usr/lib ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
       cp Neutrino-*.AppImage ..
     artifacts:
-      path: "Neutrino-*.AppImage"
+      path: "Neutrino-*.*"
