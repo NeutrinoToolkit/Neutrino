@@ -130,6 +130,8 @@ Cross64_task:
       path: "Neutrino-*.*"
       
 publish_task:
+  container:
+    image: fedora:32
   depends_on:
     - MacIntel
     - MacM1
