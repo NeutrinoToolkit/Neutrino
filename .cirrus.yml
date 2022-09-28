@@ -1,4 +1,4 @@
-tag:
+tag_task:
   container:
     image: fedora:32
   script: |
