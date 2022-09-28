@@ -139,7 +139,8 @@ publish_task:
 #     - Cross32
 #     - Cross64
   script: |
-    apt-get update -qq
-    apt-get install -yy file findutils
+    dnf clean all
+    dnf -y --nogpgcheck update 
+    dnf -y install findutils
     find .
      
