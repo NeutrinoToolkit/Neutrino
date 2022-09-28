@@ -142,5 +142,5 @@ publish_task:
     dnf clean all
     dnf -y --nogpgcheck update 
     dnf -y install findutils
-    find .
+    find ..
      
