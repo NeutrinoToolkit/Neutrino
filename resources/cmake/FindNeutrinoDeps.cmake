@@ -1,6 +1,8 @@
 
-find_package(OpenMP REQUIRED)
-set(LIBS ${LIBS} OpenMP::OpenMP_CXX )
+find_package(OpenMP QUIET)
+if(OpenMP_FOUND)
+	set(LIBS ${LIBS} OpenMP::OpenMP_CXX )
+endif() 
 
 find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
@@ -35,8 +37,6 @@ endif()
 if(WIN32)
 	if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
 		add_compile_options(-Wa,-mbig-obj)
-#	else() # 32bit
-#		add_compile_options(-flto -Wl,-allow-multiple-definition)
 	endif()
 	add_definitions(-DNT_THREADS) 
 else()
