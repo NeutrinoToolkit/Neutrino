@@ -11,7 +11,7 @@ cp -r Neutrino.app dmg_dir
 
 #ln -sf /usr/local/opt/python@3.9/Frameworks/Python.framework/ /usr/local/opt/python@3.9/lib/Python.framework
 
-`brew --prefix qt@5`/bin/macdeployqt dmg_dir/Neutrino.app
+`brew --prefix qt`/bin/macdeployqt dmg_dir/Neutrino.app
 
 python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix`
 
