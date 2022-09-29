@@ -33,23 +33,21 @@ MacIntel_task:
   artifacts:
     path: "Neutrino-Darwin-*.*"
 
-# MacM1_task:
-#   macos_instance:
-#     image: ghcr.io/cirruslabs/macos-monterey-base:latest
-#   depends_on: tag
-#   script: |
-#      brew update
-#      brew install objc-codegenutils objc-run gh
-#      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-#      brew install iltommi/brews/hdf4
-#      mkdir -p build_gcc && cd build_gcc
-#      cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 ..
-#      make -j$(sysctl -n hw.ncpu) install
-#      ../resources/macPackage/prepareapp.sh
-#      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
-#      cp Neutrino-`uname -s`-`uname -m`.* ..
-#   artifacts:
-#     path: "Neutrino-Darwin-*.*"
+MacM1_task:
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+  script: |
+     brew update
+     brew install objc-codegenutils objc-run
+     brew install git cmake fftw qt libomp lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+     brew install iltommi/brews/hdf4
+     mkdir -p build_gcc && cd build_gcc
+     cmake ..
+     make -j$(sysctl -n hw.ncpu) install
+     ../resources/macPackage/prepareapp.sh
+     cp Neutrino-`uname -s`-`uname -m`.* ..
+  artifacts:
+    path: "Neutrino-Darwin-*.*"
 
 # AppImage_task:
 #   container:
