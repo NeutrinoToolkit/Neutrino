@@ -19,7 +19,7 @@
 MacIntel_task:
   macos_instance:
     image: big-sur-base
-  depends_on: tag
+#   depends_on: tag
   script: |
      brew update
      brew install objc-codegenutils objc-run gh
