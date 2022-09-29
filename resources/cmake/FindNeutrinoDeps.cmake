@@ -1,8 +1,6 @@
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_FOUND)
-	set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
-endif() 
+find_package(OpenMP)
+set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
 
 find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
