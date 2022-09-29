@@ -23,10 +23,10 @@ MacIntel_task:
   script: |
      brew update
      brew install objc-codegenutils objc-run gh
-     brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+     brew install git python cmake fftw qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
      brew install iltommi/brews/hdf4
      mkdir -p build_gcc && cd build_gcc
-     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 -DNEUTRINO_SKIP_PLUGINS=Shell ..
+     cmake ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
