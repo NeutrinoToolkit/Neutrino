@@ -2,6 +2,7 @@
 find_package(OpenMP QUIET)
 if(OpenMP_FOUND)
 	set(LIBS ${LIBS} OpenMP::OpenMP_CXX )
+	message (STATUS "my openmp: ${OpenMP::OpenMP_CXX}")
 endif() 
 
 find_package(ZLIB REQUIRED)
