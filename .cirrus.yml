@@ -1,20 +1,20 @@
-tag_task:
-  container:
-    image: fedora:32
-  env:
-    GH_TOKEN: ENCRYPTED[4a0c76693ef74ec9f461535aa131a67485e028d9e2bd05eba96bcc753bec061b1110ab1e8fd28f6193b6b623d54f42f8]
-  script: |
-    dnf clean all
-    dnf -y --nogpgcheck update 
-    dnf -y install 'dnf-command(config-manager)'
-    dnf -y config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-    dnf -y install gh
-    gh release delete latest -y 
-    git push origin :refs/tags/latest 
-    git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
-    git push --follow-tags
-    gh release create latest --generate-notes
-
+# tag_task:
+#   container:
+#     image: fedora:32
+#   env:
+#     GH_TOKEN: ENCRYPTED[4a0c76693ef74ec9f461535aa131a67485e028d9e2bd05eba96bcc753bec061b1110ab1e8fd28f6193b6b623d54f42f8]
+#   script: |
+#     dnf clean all
+#     dnf -y --nogpgcheck update 
+#     dnf -y install 'dnf-command(config-manager)'
+#     dnf -y config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+#     dnf -y install gh
+#     gh release delete latest -y 
+#     git push origin :refs/tags/latest 
+#     git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
+#     git push --follow-tags
+#     gh release create latest --generate-notes
+# 
 
 MacIntel_task:
   macos_instance:
