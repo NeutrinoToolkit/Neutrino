@@ -9,7 +9,7 @@
 #include <QDebug>
 
 #if defined(Q_OS_MAC)
-#include <glu.h>
+#include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
 #endif

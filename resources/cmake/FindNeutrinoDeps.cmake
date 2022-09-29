@@ -1,25 +1,6 @@
 
-
-find_package(OpenMP)
-if (OPENMP_FOUND AND NOT "${CMAKE_CXX_FLAGS}" MATCHES "^(${OpenMP_CXX_FLAGS})")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
-    add_definitions(-DHAVE_OPENMP)
-
-#    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-#        add_definitions(-D_GLIBCXX_PARALLEL)
-#    endif()
-
-endif()
-
-if(APPLE)
-    if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-        set(OpenMP_C_FLAG "-fopenmp=libomp -Wno-unused-command-line-argument")
-    endif()
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(OpenMP_CXX_FLAG "-fopenmp=libomp -Wno-unused-command-line-argument")
-    endif()
-endif()
+find_package(OpenMP REQUIRED)
+set(LIBS ${LIBS} OpenMP::OpenMP_CXX )
 
 find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)

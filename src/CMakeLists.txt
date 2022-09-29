@@ -159,7 +159,7 @@ foreach(MODULE ${MODULES})
 endforeach()
 
 if(APPLE)
-add_definitions(-DQT_NO_OPENGL -mmacosx-version-min=10.9)
+add_definitions(-DQT_NO_OPENGL)
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
