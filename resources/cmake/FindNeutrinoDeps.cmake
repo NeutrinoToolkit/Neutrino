@@ -1,6 +1,3 @@
-
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
-
 find_package(OpenMP REQUIRED)
 set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
 
