@@ -4,7 +4,7 @@ MacIntel_task:
   script: |
      brew update
      brew install objc-codegenutils objc-run gh
-     brew install git python cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+     brew install libomp git python cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
      brew install iltommi/brews/hdf4
      mkdir -p build_gcc && cd build_gcc
      cmake ..
