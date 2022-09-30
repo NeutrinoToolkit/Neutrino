@@ -1,9 +1,10 @@
+env:
+  GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
+  GH_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
+
 MacIntel_task:
   macos_instance:
     image: big-sur-base
-  env:
-    GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
-    GH_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
   script: |
      brew update
      brew install objc-codegenutils objc-run gh
@@ -14,29 +15,27 @@ MacIntel_task:
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
      gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
-     cp Neutrino-`uname -s`-`uname -m`.* ..
-#      ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
-         
+     cp Neutrino-`uname -s`-`uname -m`.* ..         
   artifacts:
     path: "Neutrino-Darwin-*.*"
 
-# MacM1_task:
-#   macos_instance:
-#     image: ghcr.io/cirruslabs/macos-monterey-base:latest
-#   depends_on: tag
-#   script: |
-#      brew update
-#      brew install objc-codegenutils objc-run gh
-#      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-#      brew install iltommi/brews/hdf4
-#      mkdir -p build_gcc && cd build_gcc
-#      cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 ..
-#      make -j$(sysctl -n hw.ncpu) install
-#      ../resources/macPackage/prepareapp.sh
-#      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
-#      cp Neutrino-`uname -s`-`uname -m`.* ..
-#   artifacts:
-#     path: "Neutrino-Darwin-*.*"
+MacM1_task:
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+  depends_on: tag
+  script: |
+     brew update
+     brew install objc-codegenutils objc-run gh
+     brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+     brew install iltommi/brews/hdf4
+     mkdir -p build_gcc && cd build_gcc
+     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 ..
+     make -j$(sysctl -n hw.ncpu) install
+     ../resources/macPackage/prepareapp.sh
+     gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
+     cp Neutrino-`uname -s`-`uname -m`.* ..
+  artifacts:
+    path: "Neutrino-Darwin-*.*"
 
 # AppImage_task:
 #   container:
