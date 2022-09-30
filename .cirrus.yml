@@ -3,8 +3,6 @@ tag_task:
     image: fedora:32
   env:
     GITHUB_TOKEN: ENCRYPTED[0d6c4c0139712292dff0175ddfe980e5365a5eea59a3e86c414b5d0e429bc44b0a2afbd63059db8da426faecfcc2c4e3]
-  clone_script: |
-    git clone --recursive https://x-access-token:${GITHUB_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
   script: |
     dnf clean all
     dnf -y --nogpgcheck update 
