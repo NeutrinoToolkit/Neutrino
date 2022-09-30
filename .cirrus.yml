@@ -1,7 +1,7 @@
 MacIntel_task:
   macos_instance:
     image: big-sur-base
-  depends_on: tag  script: |
+  script: |
      brew update
      brew install objc-codegenutils objc-run gh
      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
