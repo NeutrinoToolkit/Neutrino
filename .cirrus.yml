@@ -2,8 +2,9 @@ tag_task:
   container:
     image: fedora:32
   env:
-    PIPPO: ENCRYPTED[27ecb96cf3cc082cc96a9aabed0d1776907fe073d4dc4116ca3c2dff459bb1c10c8369fbbe7debce8a5475c190a9b700]
     GITHUB_TOKEN: ENCRYPTED[0d6c4c0139712292dff0175ddfe980e5365a5eea59a3e86c414b5d0e429bc44b0a2afbd63059db8da426faecfcc2c4e3]
+  clone_script: |
+    git clone --recursive https://x-access-token:${GITHUB_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
   script: |
     dnf clean all
     dnf -y --nogpgcheck update 
@@ -12,7 +13,6 @@ tag_task:
     dnf -y install gh
     gh release list 
     gh release delete latest -y || true
-    echo $PIPPO
     git push origin :refs/tags/latest 
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
     git push --follow-tags
