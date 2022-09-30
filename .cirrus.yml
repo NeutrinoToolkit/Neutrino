@@ -6,16 +6,16 @@ MacIntel_task:
   macos_instance:
     image: big-sur-base
   script: |
-     brew update
-     brew install objc-codegenutils objc-run gh
-     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-     brew install iltommi/brews/hdf4
-     mkdir -p build_gcc && cd build_gcc
-     cmake ..
-     make -j$(sysctl -n hw.ncpu) install
-     ../resources/macPackage/prepareapp.sh
-     gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
-     cp Neutrino-`uname -s`-`uname -m`.* ..         
+    brew update
+    brew install objc-codegenutils objc-run gh
+    brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+    brew install iltommi/brews/hdf4
+    mkdir -p build_gcc && cd build_gcc
+    cmake ..
+    make -j$(sysctl -n hw.ncpu) install
+    ../resources/macPackage/prepareapp.sh
+    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
+    cp Neutrino-`uname -s`-`uname -m`.* ..         
   artifacts:
     path: "Neutrino-Darwin-*.*"
 
@@ -23,38 +23,35 @@ MacM1_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
-     brew update
-     brew install objc-codegenutils objc-run gh
-     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-     brew install iltommi/brews/hdf4
-     mkdir -p build_gcc && cd build_gcc
-     cmake ..
-     make -j$(sysctl -n hw.ncpu) install
-     ../resources/macPackage/prepareapp.sh
-     gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
-     cp Neutrino-`uname -s`-`uname -m`.* ..
+    brew update
+    brew install objc-codegenutils objc-run gh
+    brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+    brew install iltommi/brews/hdf4
+    mkdir -p build_gcc && cd build_gcc
+    cmake ..
+    make -j$(sysctl -n hw.ncpu) install
+    ../resources/macPackage/prepareapp.sh
+    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
+    cp Neutrino-`uname -s`-`uname -m`.* ..
   artifacts:
     path: "Neutrino-Darwin-*.*"
 
-# AppImage_task:
-#   container:
-#     image: appimagecrafters/appimage-builder:latest
-#   depends_on: tag
-#   env:
-#     DEBIAN_FRONTEND: noninteractive
-#     APPIMAGE_EXTRACT_AND_RUN: 1
-#   script: |
-#     apt-get update -qq && apt-get install -yy wget git pandoc cmake libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff5-dev libgsl-dev qt5-default qtmultimedia5-dev qttools5-dev libqt5svg5-dev libqt5scripttools5 qtscript5-dev libqt5multimediawidgets5 qttools5-dev-tools libqt5multimedia5 libqt5multimedia5-plugins lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-100
-#     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
-#     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-#     chmod +x linuxdeploy*.AppImage
-#     mkdir build && cd build
-#     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-#     make install DESTDIR=AppDir
-#     LD_LIBRARY_PATH=AppDir/usr/lib ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun
-#     cp Neutrino-*.AppImage ..
-#   artifacts:
-#     path: "Neutrino-*.*"
+AppImage_task:
+  container:
+    image: fedora:36
+  script: |
+    dnf -y install gcc gcc-c++ python2 python2-devel qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git vim wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make install DESTDIR=AppDir
+    APPIMAGE_EXTRACT_AND_RUN=1 LD_LIBRARY_PATH=AppDir/usr/lib ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ..
+    gh release upload --clobber latest Neutrino-*.AppImage
+  artifacts:
+    path: "Neutrino-*.AppImage"
 
 # Cross32_task:
 #   container:
