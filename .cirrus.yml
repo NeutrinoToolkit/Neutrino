@@ -10,7 +10,7 @@ tag_task:
     dnf -y config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
     dnf -y install gh
     gh release list 
-    gh release delete latest -y 2> /dev/null
+    gh release delete latest -y || true
     cat err
     git push origin :refs/tags/latest 
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
