@@ -40,7 +40,7 @@ AppImage_task:
   container:
     image: fedora:36
   script: |
-    dnf -y install gcc gcc-c++ python2 python2-devel qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git vim wget
+    dnf -y install gcc gcc-c++ python2 python2-devel qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git vim wget gh
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
     chmod +x linuxdeploy*.AppImage
