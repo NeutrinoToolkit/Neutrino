@@ -1,27 +1,7 @@
-tag_task:
-  container:
-    image: fedora:32
-  env:
-    GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
-  script: |
-    dnf clean all
-    dnf -y --nogpgcheck update 
-    dnf -y install 'dnf-command(config-manager)'
-    dnf -y config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-    dnf -y install gh
-    gh release list 
-    gh release delete latest -y || true
-    git push origin :refs/tags/latest 
-    git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
-    git push --follow-tags
-    gh release create latest --generate-notes
-
-
 MacIntel_task:
   macos_instance:
     image: big-sur-base
-  depends_on: tag
-  script: |
+  depends_on: tag  script: |
      brew update
      brew install objc-codegenutils objc-run gh
      brew install git python cmake fftw gcc qt5 lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
@@ -32,6 +12,44 @@ MacIntel_task:
      ../resources/macPackage/prepareapp.sh
      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
      cp Neutrino-`uname -s`-`uname -m`.* ..
+
+     if [[ "$GITHUB_TOKEN" == "" ]]; then
+       echo "GitHub access token GITHUB_TOKEN env is not provided!"
+       exit 1
+     fi
+     RETRIES=0
+     until [ $RETRIES -eq 20 ]
+     do
+       echo "Finding the GitHub release associated with '$CIRRUS_TAG' tag..."
+       CIRRUS_RELEASE=$(curl -sL -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases | jq -c "[ .[] | select( .tag_name | contains(\"$CIRRUS_TAG\")) ] | .[0]" | jq -r '.id')
+       [[ "$CIRRUS_RELEASE" != "null" ]] && break
+       RETRIES=$((RETRIES+1))
+       sleep 30
+     done
+     if [[ "$CIRRUS_RELEASE" == "null" ]]; then
+         echo "Can not find the associated GitHub '$CIRRUS_TAG' release!"
+         exit 1
+     fi
+     echo "GitHub release '$CIRRUS_TAG' found. Preparing asset files to upload..."
+     file_content_type="application/octet-stream"
+     files_to_upload=(
+       Neutrino-`uname -s`-`uname -m`.dmg
+       Neutrino-`uname -s`-`uname -m`.zip
+     )
+     for fpath in "${files_to_upload[@]}"
+     do
+       echo "Uploading GitHub release asset '$fpath'..."
+       name=$(basename "$fpath")
+       url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$name"
+       curl -LX POST \
+         --data-binary @$fpath \
+         --header "Authorization: token $GITHUB_TOKEN" \
+         --header "Content-Type: $file_content_type" \
+         $url_to_upload
+     done
+     echo
+     echo "GitHub release '$CIRRUS_TAG' assets uploaded successfully."
+    
   artifacts:
     path: "Neutrino-Darwin-*.*"
 
