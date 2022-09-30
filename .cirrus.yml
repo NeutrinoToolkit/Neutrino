@@ -12,7 +12,7 @@ MacIntel_task:
      ../resources/macPackage/prepareapp.sh
      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
      cp Neutrino-`uname -s`-`uname -m`.* ..
-     ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
+     bash ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
          
   artifacts:
     path: "Neutrino-Darwin-*.*"
