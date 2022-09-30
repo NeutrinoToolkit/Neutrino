@@ -2,7 +2,7 @@ tag_task:
   container:
     image: fedora:32
   env:
-    GITHUB_TOKEN: ENCRYPTED[0d6c4c0139712292dff0175ddfe980e5365a5eea59a3e86c414b5d0e429bc44b0a2afbd63059db8da426faecfcc2c4e3]
+    GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
   script: |
     dnf clean all
     dnf -y --nogpgcheck update 
