@@ -28,7 +28,7 @@ MacM1_task:
      brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
      brew install iltommi/brews/hdf4
      mkdir -p build_gcc && cd build_gcc
-     cmake -DCMAKE_CXX_COMPILER=g++-12 -DQt5_DIR=`brew --prefix qt@5`/lib/cmake/Qt5 ..
+     cmake ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
      gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
