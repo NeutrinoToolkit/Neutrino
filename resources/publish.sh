@@ -4,6 +4,12 @@ if [[ "$GITHUB_TOKEN" == "" ]]; then
   echo "GitHub access token GITHUB_TOKEN env is not provided!"
   exit 1
 fi
+
+git config --global user.name 'iltommi'
+git config --global user.email 'iltommi@users.noreply.github.com'
+git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$CIRRUS_REPO_FULL_NAME
+
+
 RETRIES=0
 until [ $RETRIES -eq 20 ]
 do
