@@ -9,7 +9,7 @@ tag_task:
     dnf -y install 'dnf-command(config-manager)'
     dnf -y config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
     dnf -y install gh
-    gh release delete latest -y 
+    gh release delete latest -y --silent
     git push origin :refs/tags/latest 
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)" 
     git push --follow-tags
