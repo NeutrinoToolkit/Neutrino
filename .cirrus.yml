@@ -13,9 +13,9 @@ MacIntel_task:
      cmake ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
-#      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
+     gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
      cp Neutrino-`uname -s`-`uname -m`.* ..
-     ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
+#      ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
          
   artifacts:
     path: "Neutrino-Darwin-*.*"
