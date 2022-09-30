@@ -1,6 +1,9 @@
 MacIntel_task:
   macos_instance:
     image: big-sur-base
+  env:
+    GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
+    GH_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
   script: |
      brew update
      brew install objc-codegenutils objc-run gh
@@ -10,9 +13,9 @@ MacIntel_task:
      cmake ..
      make -j$(sysctl -n hw.ncpu) install
      ../resources/macPackage/prepareapp.sh
-     gh release upload latest Neutrino-`uname -s`-`uname -m`.*
+#      gh release upload latest Neutrino-`uname -s`-`uname -m`.*
      cp Neutrino-`uname -s`-`uname -m`.* ..
-     bash ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
+     ../resources/publish.sh Neutrino-`uname -s`-`uname -m`.*
          
   artifacts:
     path: "Neutrino-Darwin-*.*"
