@@ -80,11 +80,11 @@ Cross32_task:
     libtoolize --force
     autoreconf --install
     mingw32-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
-    make -C mfhdf/xdr LDFLAGS=-no-undefined
-    make -C hdf/src  LDFLAGS=-no-undefined
+    make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src LDFLAGS="-no-undefined -lssp"
     make -C hdf/src install
     make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-    make -C mfhdf/libsrc install 
+    make -C mfhdf/libsrc install
     cd ..
     mkdir build && cd build
     mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
