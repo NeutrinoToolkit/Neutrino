@@ -6,6 +6,7 @@ tag_task:
   container:
     image: maniator/gh
   script: |
+    echo $CIRRUS_USER_PERMISSION
     gh release delete latest -y
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
@@ -14,6 +15,7 @@ tag_task:
     git status
 
 MacIntel_task:
+  depends_on: tag
   macos_instance:
     image: big-sur-base
   script: |
@@ -31,6 +33,7 @@ MacIntel_task:
     path: "Neutrino-Darwin-*.*"
 
 MacM1_task:
+  depends_on: tag
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
@@ -48,6 +51,7 @@ MacM1_task:
     path: "Neutrino-Darwin-*.*"
 
 AppImage_task:
+  depends_on: tag
   container:
     image: fedora:36
   env:
@@ -69,6 +73,7 @@ AppImage_task:
     path: "Neutrino-*.AppImage"
 
 Cross32_task:
+  depends_on: tag
   container:
     image: fedora:36
   script: |
@@ -107,6 +112,7 @@ Cross32_task:
 
 
 Cross64_task:
+  depends_on: tag
   container:
       image: fedora:36
   script: |
