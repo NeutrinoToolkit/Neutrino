@@ -7,7 +7,7 @@ tag_task:
     image: maniator/gh
   script: |
     git remote -v
-    git remote set-url origin https://iltommi:$GITHUB_TOKEN@github.com/repo
+    git remote set-url origin git@github.com:NeutrinoToolkit/Neutrino.git
     gh release delete latest -y || true
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
