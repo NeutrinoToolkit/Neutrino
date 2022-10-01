@@ -2,22 +2,22 @@ env:
   GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
   GH_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
 
-# tag_task:
-#   container:
-#     image: maniator/gh
-#   script: |
-#     apk add --update openssh
-#     git remote -v
-#     git remote set-url origin https://iltommi:${TV_TOKEN}@github.com/NeutrinoToolkit/Neutrino.git
-#     gh release delete latest -y || true
-#     git push origin :refs/tags/latest
-#     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
-#     git push --follow-tags
-#     gh release create latest --generate-notes
-#     git status
+tag_task:
+  container:
+    image: maniator/gh
+  script: |
+    apk add --update openssh
+    git remote -v
+    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/NeutrinoToolkit/Neutrino.git
+    gh release delete latest -y || true
+    git push origin :refs/tags/latest
+    git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
+    git push --follow-tags
+    gh release create latest --generate-notes
+    git status
 
 MacIntel_task:
-#   depends_on: tag
+  depends_on: tag
   macos_instance:
     image: big-sur-base
   script: |
@@ -35,7 +35,7 @@ MacIntel_task:
     path: "Neutrino-Darwin-*.*"
 
 MacM1_task:
-#   depends_on: tag
+  depends_on: tag
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
@@ -53,7 +53,7 @@ MacM1_task:
     path: "Neutrino-Darwin-*.*"
 
 AppImage_task:
-#   depends_on: tag
+  depends_on: tag
   container:
     image: fedora:36
   env:
@@ -75,7 +75,7 @@ AppImage_task:
     path: "Neutrino-*.AppImage"
 
 Cross32_task:
-#   depends_on: tag
+  depends_on: tag
   container:
     image: fedora:36
   script: |
@@ -114,7 +114,7 @@ Cross32_task:
 
 
 Cross64_task:
-#   depends_on: tag
+  depends_on: tag
   container:
       image: fedora:36
   script: |
