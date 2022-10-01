@@ -1,6 +1,7 @@
 env:
   GITHUB_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
   GH_TOKEN: ENCRYPTED[18193866998b557c5b35bf6c73d2cd10722ac207b132cdf6e537fcbc712b01266303cc5b950b4ec6b1a69b9a48231190]
+  TV_TOKEN: ENCRYPTED[3b2fe2625c615ecf100eff0ae4d0489dd13850cf4d9d70793ced214762b791dbae4dae53c4da97d5bd703645a11b36ae]
 
 tag_task:
   container:
@@ -8,7 +9,7 @@ tag_task:
   script: |
     apk add --update openssh
     git remote -v
-    git remote set-url origin https://github.com/NeutrinoToolkit/Neutrino.git
+    git remote set-url origin https://iltommi:${TV_TOKEN}@github.com/NeutrinoToolkit/Neutrino.git
     gh release delete latest -y || true
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
