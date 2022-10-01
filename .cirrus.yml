@@ -6,6 +6,7 @@ tag_task:
   container:
     image: maniator/gh
   script: |
+    git remote -v
     git remote set-url origin https://iltommi:$GITHUB_TOKEN@github.com/repo
     gh release delete latest -y || true
     git push origin :refs/tags/latest
