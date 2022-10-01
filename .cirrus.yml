@@ -56,7 +56,6 @@ AppImage_task:
 # Cross32_task:
 #   container:
 #     image: fedora:32
-#   depends_on: tag
 #   script: |
 #     dnf clean all
 #     dnf -y --nogpgcheck update
@@ -95,7 +94,6 @@ AppImage_task:
 Cross64_task:
   container:
       image: fedora:32
-  depends_on: tag
   script: |
     dnf clean all
     dnf -y --nogpgcheck update
