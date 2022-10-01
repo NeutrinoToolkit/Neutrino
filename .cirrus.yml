@@ -6,6 +6,7 @@ tag_task:
   container:
     image: maniator/gh
   script: |
+    apk add --update openssh
     git remote -v
     git remote set-url origin git@github.com:NeutrinoToolkit/Neutrino.git
     gh release delete latest -y || true
