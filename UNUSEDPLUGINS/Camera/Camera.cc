@@ -24,13 +24,10 @@
  */
 #include "Camera.h"
 #include "neutrino.h"
-#include <QCameraInfo>
-#include <QCameraImageCapture>
 
 Camera::Camera(neutrino *nparent)
 : nGenericPan(nparent),
   camera(nullptr),
-  imageCapture(nullptr),
   imgGray(nullptr),
   imgColor(3,nullptr),
   timeLapse(this)
@@ -42,10 +39,11 @@ Camera::Camera(neutrino *nparent)
     show();
 
     cameraMenu=new QMenu(this);
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, cameras) {
+
+    const QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+    for (const QCameraDevice &cameraInfo : cameras) {
         QAction *my_act = new QAction(cameraInfo.description(),cameraMenu);
-        my_act->setData(cameraInfo.deviceName());
+        my_act->setData(cameraInfo.description());
         connect(my_act, SIGNAL(triggered()), this, SLOT(changeCameraAction()));
         cameraMenu->addAction(my_act);
     }
@@ -60,7 +58,6 @@ Camera::Camera(neutrino *nparent)
 
 Camera::~Camera()
 {
-    delete imageCapture;
     delete camera;
 }
 
@@ -76,36 +73,41 @@ void Camera::on_timeLapse_valueChanged(int val) {
 
 void Camera::on_grab_clicked() {
     saveDefaults();
-    if (imageCapture)
-        imageCapture->capture();
+//    if (imageCapture)
+//        imageCapture->capture();
 }
 
 void Camera::changeCameraAction() {
     QAction *action = qobject_cast<QAction *>(sender());
     if (action) {
-        QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-        foreach (const QCameraInfo &cameraInfo, cameras) {
-            if (cameraInfo.deviceName() == action->data().toString())
-                setupCam(cameraInfo);
+        const QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+        for (const QCameraDevice &cameraInfo : cameras) {
+                if (cameraInfo.description() == action->data().toString())
+                    setupCam(cameraInfo);
         }
     }
 
 }
 
-void Camera::setupCam (const QCameraInfo &cameraInfo) {
-    delete imageCapture;
+void Camera::setupCam (const QCameraDevice &cameraInfo) {
     delete camera;
 
     camera = new QCamera(cameraInfo);
-    imageCapture = new QCameraImageCapture(camera);
-    imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-    if (imageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer)) {
-        connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(processCapturedImage(int,QImage)));
-    } else {
-        connect(imageCapture, SIGNAL(imageSaved(int,QString)), this, SLOT(processCapturedImage(int,QString)));
-    }
+    QMediaCaptureSession captureSession;
+    captureSession.setCamera(camera);
+    captureSession.setVideoOutput(my_w.viewfinder);
+//    QImageCapture *imageCapture = new QImageCapture();
+//    captureSession.setImageCapture(imageCapture);
 
-    camera->setViewfinder(my_w.viewfinder);
+//    imageCapture = new QImageCapture(camera);
+//    imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+//    if (imageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer)) {
+//        connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(processCapturedImage(int,QImage)));
+//    } else {
+//        connect(imageCapture, SIGNAL(imageSaved(int,QString)), this, SLOT(processCapturedImage(int,QString)));
+//    }
+
+//    camera->setViewfinder(my_w.viewfinder);
     camera->start();
 }
 

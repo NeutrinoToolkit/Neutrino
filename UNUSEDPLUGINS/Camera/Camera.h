@@ -26,7 +26,9 @@
 #define __Camera
 
 #include <QCamera>
-#include <QCameraImageCapture>
+#include <QImageCapture>
+#include <QMediaDevices>
+#include <QMediaCaptureSession>
 
 #include "nGenericPan.h"
 #include "ui_Camera.h"
@@ -44,7 +46,6 @@ public:
 
     Ui::Camera my_w;
     QCamera* camera;
-    QCameraImageCapture *imageCapture;
 
     QMenu *cameraMenu;
     nPhysD *imgGray;
@@ -52,9 +53,11 @@ public:
 
     QTimer timeLapse;
 
+    QMediaCaptureSession captureSession;
+
 public slots:
     void on_grab_clicked();
-    void setupCam (const QCameraInfo &cameraInfo);
+    void setupCam (const QCameraDevice &cameraInfo);
     void processCapturedImage(int requestId, const QImage &img);
     void processCapturedImage(int requestId, const QString &img);
     void giveNeutrino(const QImage &img);
