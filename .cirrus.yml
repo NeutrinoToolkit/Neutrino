@@ -8,7 +8,7 @@ tag_task:
   script: |
     apk add --update openssh
     git remote -v
-    git remote set-url origin git@github.com:NeutrinoToolkit/Neutrino.git
+    git remote set-url origin https://github.com/NeutrinoToolkit/Neutrino.git
     gh release delete latest -y || true
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
