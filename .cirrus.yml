@@ -39,6 +39,10 @@ MacM1_task:
 AppImage_task:
   container:
     image: fedora:36
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib
   script: |
     dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget gh
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
@@ -47,7 +51,7 @@ AppImage_task:
     mkdir build && cd build
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make install DESTDIR=AppDir
-    APPIMAGE_EXTRACT_AND_RUN=1 LD_LIBRARY_PATH=AppDir/usr/lib ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ..
     gh release upload --clobber latest Neutrino-*.AppImage
   artifacts:
@@ -66,6 +70,21 @@ Cross32_task:
     mingw32-configure --disable-static --enable-shared --enable-threads --with-combined-threads 
     make bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS= 
     make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=  
+    cd ..
+    wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+    tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+    patch -p1 -u < hdf4-1-portability-fixes.patch
+    patch -p1 -u < hdf4-2-dllimport.patch
+    libtoolize --force
+    autoreconf --install
+    mingw32-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+    make -C mfhdf/xdr LDFLAGS=-no-undefined
+    make -C hdf/src  LDFLAGS=-no-undefined
+    make -C hdf/src install
+    make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+    make -C mfhdf/libsrc install 
     cd ..
     mkdir build && cd build
     mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
