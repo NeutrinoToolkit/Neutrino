@@ -6,8 +6,8 @@ tag_task:
   container:
     image: maniator/gh
   script: |
-    echo $CIRRUS_USER_PERMISSION
-    gh release delete latest -y
+    git remote set-url origin https://iltommi:$GITHUB_TOKEN@github.com/repo
+    gh release delete latest -y || true
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
     git push --follow-tags
