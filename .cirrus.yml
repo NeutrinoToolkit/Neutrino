@@ -10,7 +10,7 @@ tag_task:
     gh release delete latest -y || true
     git push origin :refs/tags/latest
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
-    git push --follow-tags
+    git push origin HEAD:$CIRRUS_BRANCH --follow-tags
     gh release create latest --generate-notes
     git status
 
