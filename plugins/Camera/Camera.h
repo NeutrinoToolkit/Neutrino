@@ -1,3 +1,6 @@
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
@@ -22,49 +25,72 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Camera
-#define __Camera
 
+#ifndef CAMERA_H
+#define CAMERA_H
+
+#include <QAudioInput>
 #include <QCamera>
 #include <QImageCapture>
-#include <QMediaDevices>
 #include <QMediaCaptureSession>
+#include <QMediaDevices>
+#include <QMediaMetaData>
+#include <QMediaRecorder>
+#include <QScopedPointer>
 
+#include <QMainWindow>
 #include "nGenericPan.h"
-#include "ui_Camera.h"
+#include "neutrino.h"
 
-#include <QTimer>
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class Camera;
+}
+class QActionGroup;
+QT_END_NAMESPACE
 
-class neutrino;
+class MetaDataDialog;
 
 class Camera : public nGenericPan {
     Q_OBJECT
 
-public:	
+public:
     Q_INVOKABLE Camera(neutrino *);
-    ~Camera();
 
-    Ui::Camera my_w;
-    QCamera* camera;
+private slots:
+    void setCamera(const QCameraDevice &cameraDevice);
 
-    QMenu *cameraMenu;
-    nPhysD *imgGray;
-    std::vector<nPhysD *> imgColor;
+    void takeImage();
+    void displayCaptureError(int, QImageCapture::Error, const QString &errorString);
 
-    QTimer timeLapse;
+    void displayCameraError();
 
-    QMediaCaptureSession captureSession;
+    void updateCameraDevice(QAction *action);
+
+    void updateCameras();
+
+    void contextMenuEvent (QContextMenuEvent *) override;
+
+    void processCapturedImage(int requestId, const QImage &img);
+
+    void giveNeutrino(const QImage &img);
 
 public slots:
     void on_grab_clicked();
-    void setupCam (const QCameraDevice &cameraInfo);
-    void processCapturedImage(int requestId, const QImage &img);
-    void processCapturedImage(int requestId, const QString &img);
-    void giveNeutrino(const QImage &img);
-    void contextMenuEvent (QContextMenuEvent *);
-    void changeCameraAction();
-    void on_timeLapse_valueChanged(int);
 
+private:
+    nPhysD *imgGray;
+    std::array<nPhysD *,3> imgColor;
+
+    Ui::Camera *ui;
+
+    QActionGroup *videoDevicesGroup = nullptr;
+
+    QMediaDevices m_devices;
+    QMediaCaptureSession m_captureSession;
+    QScopedPointer<QCamera> m_camera;
+    QImageCapture *m_imageCapture;
+    QMenu cameraMenu;
 };
 
 NEUTRINO_PLUGIN(Camera,File);
