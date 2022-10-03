@@ -41,17 +41,9 @@
 #include <QMainWindow>
 #include "nGenericPan.h"
 #include "neutrino.h"
+#include "ui_Camera.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class Camera;
-}
-class QActionGroup;
-QT_END_NAMESPACE
-
-class MetaDataDialog;
-
-class Camera : public nGenericPan {
+class Camera : public nGenericPan, private Ui::Camera {
     Q_OBJECT
 
 public:
@@ -81,10 +73,6 @@ public slots:
 private:
     nPhysD *imgGray;
     std::array<nPhysD *,3> imgColor;
-
-    Ui::Camera *ui;
-
-    QActionGroup *videoDevicesGroup = nullptr;
 
     QMediaDevices m_devices;
     QMediaCaptureSession m_captureSession;
