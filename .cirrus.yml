@@ -27,10 +27,10 @@ MacIntel_task:
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
-    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
-    cp Neutrino-`uname -s`-`uname -m`.* ..         
+    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.dmg
+    cp Neutrino-`uname -s`-`uname -m`.dmg ..
   artifacts:
-    path: "Neutrino-Darwin-*.*"
+    path: "Neutrino-Darwin-*.dmg"
 
 MacM1_task:
 #   depends_on: tag
@@ -45,10 +45,10 @@ MacM1_task:
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
-    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.*
-    cp Neutrino-`uname -s`-`uname -m`.* ..
+    gh release upload --clobber latest Neutrino-`uname -s`-`uname -m`.dmg
+    cp Neutrino-`uname -s`-`uname -m`.dmg ..
   artifacts:
-    path: "Neutrino-Darwin-*.*"
+    path: "Neutrino-Darwin-*.dmg"
 
 AppImage_task:
 #   depends_on: tag
