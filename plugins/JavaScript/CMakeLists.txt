@@ -7,8 +7,6 @@ if (NOT IS_ABSOLUTE ${NEUTRINO_ROOT})
     set (NEUTRINO_ROOT "${CMAKE_BINARY_DIR}/${NEUTRINO_ROOT}")
 endif()
 
-set(LOCAL_MODULES "Qml")
-
 set (CMAKE_MODULE_PATH ${NEUTRINO_ROOT}/resources/cmake)
 include(NeutrinoPlugin)
 ADD_NEUTRINO_PLUGIN()

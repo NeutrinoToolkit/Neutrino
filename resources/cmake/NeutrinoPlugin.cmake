@@ -19,7 +19,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         set(Qt6_DIR "/usr/local/opt/qt6/lib/cmake/Qt6")
     endif()
 
-    SET(MODULES Core Gui Widgets Svg PrintSupport ${LOCAL_MODULES})
+    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml ${LOCAL_MODULES})
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})

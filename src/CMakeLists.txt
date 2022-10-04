@@ -49,7 +49,7 @@ if (APPLE AND NOT DEFINED Qt6_DIR)
     MESSAGE(STATUS "Qt6_DIR set to ${Qt6_DIR}")
 endif()
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml)
 
 find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
