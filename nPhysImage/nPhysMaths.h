@@ -31,6 +31,8 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>
 #endif
 
 #include "nPhysImageF.h"
@@ -44,6 +46,8 @@
 
 
 namespace physMath {
+
+std::array<double,6> getAffine(std::vector<vec2f>, std::vector<vec2f>);
 
 inline void planeFit(physD *pi, vec2f &coeffs);
 

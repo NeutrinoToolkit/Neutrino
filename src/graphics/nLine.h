@@ -101,6 +101,7 @@ public slots:
 
 	void setPoints(QPolygonF);
 	QPolygonF getPoints();
+    std::vector<vec2f> getPointsVec2f();
 	QPolygonF getLine(int np=1);
 	void bufferChanged(nPhysD*);
 

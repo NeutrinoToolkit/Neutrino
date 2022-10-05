@@ -25,10 +25,6 @@
 #include <QtGui>
 #include <QWidget>
 
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_blas.h>   
-
-
 #include "nGenericPan.h"
 #include "ui_Affine_rectangle.h"
 #include "nLine.h"
@@ -55,7 +51,6 @@ public:
     vec2f affine(vec2f, std::array<double,6>&);
 
 public slots:
-    std::array<double,6> getAffine(QPolygonF, QPolygonF);
     void affine();
     void bufferChanged (nPhysD*) override;
     void resetPoints();

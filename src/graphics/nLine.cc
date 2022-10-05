@@ -247,6 +247,14 @@ QPolygonF nLine::getPoints() {
 	return my_poly;
 }
 
+std::vector<vec2f> nLine::getPointsVec2f() {
+    std::vector<vec2f> my_poly;
+    foreach (QGraphicsEllipseItem* r, ref) {
+        my_poly.push_back(vec2f(r->pos().x(),r->pos().y()));
+    }
+    return my_poly;
+}
+
 void nLine::bufferChanged(nPhysD* my_phys) {    
     if (nparent->nPhysExists(my_phys)) {
 		// qui si definisce la posizione dell'origine (quindi non deve dipendere dalla scala)

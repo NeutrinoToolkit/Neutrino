@@ -25,10 +25,6 @@
 #include <QtGui>
 #include <QWidget>
 
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_blas.h>   
-
-
 #include "nGenericPan.h"
 #include "ui_Affine_transformation.h"
 #include "nLine.h"
@@ -40,13 +36,11 @@
 
 class neutrino;
 
-class Affine_transformation : public nGenericPan {
+class Affine_transformation : public nGenericPan, private Ui::Affine_transformation {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Affine_transformation(neutrino *);
-
-    Ui::Affine_transformation my_w;
 
     nPhysD *affined;
 
@@ -56,9 +50,9 @@ public:
     vec2f affine(vec2f, std::array<double,6>&);
 
     std::array<double,6> forward, backward;
+    std::array<QLineEdit*,6> forwardLine, backwardLine;
 
 public slots:
-    std::array<double,6> getAffine(QPolygonF, QPolygonF);
     void apply();
     void affine();
     void bufferChanged(nPhysD*);

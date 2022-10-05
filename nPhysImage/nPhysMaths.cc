@@ -29,6 +29,45 @@
  * @{
  */
 
+
+std::array<double,6> physMath::getAffine(std::vector<vec2f> poly1, std::vector<vec2f> poly2) {
+    std::array<double,6>ret;
+    poly1.resize(3);
+    poly2.resize(3);
+
+    std::array<double,9> p1, p2, mat, inva;
+
+    p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
+    p1[3] = poly1[0].y(); p1[4] = poly1[1].y(); p1[5] = poly1[2].y();
+    p1[6] = 1.0;          p1[7] = 1.0;          p1[8] = 1.0;
+
+
+    p2[0] = poly2[0].x(); p2[1] = poly2[1].x(); p2[2] = poly2[2].x();
+    p2[3] = poly2[0].y(); p2[4] = poly2[1].y(); p2[5] = poly2[2].y();
+    p2[6] = 1.0;          p2[7] = 1.0;          p2[8] = 1.0;
+
+    gsl_matrix_view m1 = gsl_matrix_view_array(&p1[0], 3, 3);
+    gsl_matrix_view m2 = gsl_matrix_view_array(&p2[0], 3, 3);
+    gsl_matrix_view affineMat = gsl_matrix_view_array(&mat[0], 3, 3);
+
+    gsl_matrix_view inv = gsl_matrix_view_array(&inva[0],3,3);
+    gsl_permutation *p = gsl_permutation_alloc (3);
+
+    int s;
+    gsl_linalg_LU_decomp (&m1.matrix, p, &s);
+
+    gsl_linalg_LU_invert (&m1.matrix, p, &inv.matrix);
+
+    gsl_permutation_free (p);
+
+    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, &m2.matrix, &inv.matrix, 0.0, &affineMat.matrix);
+
+    for (unsigned int i=0; i<ret.size(); i++) {
+        ret[i]=gsl_matrix_get(&affineMat.matrix,i/3,i%3);
+    }
+    return ret;
+}
+
 inline void physMath::planeFit(physD *pi, vec2f &coeffs)
 {
 #ifdef HAVE_LIBGSL
