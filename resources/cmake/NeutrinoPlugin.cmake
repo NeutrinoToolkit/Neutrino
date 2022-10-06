@@ -83,12 +83,12 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         file(APPEND ${PANDOC_QRC} "        <file alias=\"${my_file_basename}\">${README_HTML}</file>\n")
         file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
 
+        execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
         add_custom_command(
             OUTPUT ${README_HTML}
             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --self-contained -o ${README_HTML}
 # starting pandoc > 2.19 will accept this new command:
 #           COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --embed-resources --standalone -o ${README_HTML}
-            execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
             MAIN_DEPENDENCY ${README_MD}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
