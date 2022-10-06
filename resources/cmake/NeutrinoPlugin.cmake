@@ -70,11 +70,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
         if(NOT DEFINED PANDOC)
             find_program(PANDOC pandoc REQUIRED)
-                execute_process(COMMAND ${PANDOC} --version
-                    OUTPUT_VARIABLE PANDOC_VERSION_RAW_OUTPUT)
-                string(REPLACE "\n" ";" PANDOC_VERSION_RAW_OUTPUT ${PANDOC_VERSION_RAW_OUTPUT})
-
-                message (STATUS "PANDOC: ${PANDOC_VERSION_RAW_OUTPUT}")
         endif(NOT DEFINED PANDOC)
 
         set(README_MD "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
@@ -91,7 +86,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_command(
             OUTPUT ${README_HTML}
             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --self-contained -o ${README_HTML}
-#             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --embed-resources --standalone -o ${README_HTML}
+# starting pandoc > 2.19 will accept this new command:
+#           COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --embed-resources --standalone -o ${README_HTML}
+            execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
             MAIN_DEPENDENCY ${README_MD}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
@@ -124,9 +121,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-# 	  target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++)
-	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         if (APPLE)
             target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
         endif()
