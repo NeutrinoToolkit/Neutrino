@@ -1,4 +1,3 @@
-
 Neutrino
 ========
 
@@ -24,6 +23,8 @@ Neutrino includes:
 Build
 -----
 
-To compile for osx, please follow the `.travis.yml` recipe file.
+We use Cirrus-ci for providing an update release executable for windows, linux and macos. Have a loot at the `.cyrrus.yml` if you want to recompile it.
 
-Other compile recipes : https://github.com/iltommi/dockerfiles/tree/master/neutrino
+Binary versions are available at this page: https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest
+
+[![Build Status](https://api.cirrus-ci.com/github/NeutrinoToolki/Neutrino.svg)](https://cirrus-ci.com/github/NeutrinoToolki/Neutrino)
