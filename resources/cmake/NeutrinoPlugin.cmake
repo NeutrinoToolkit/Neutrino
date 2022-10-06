@@ -70,6 +70,13 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
         if(NOT DEFINED PANDOC)
             find_program(PANDOC pandoc REQUIRED)
+            if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+                execute_process(COMMAND ${PANDOC} --version
+                    OUTPUT_VARIABLE PANDOC_VERSION_RAW_OUTPUT)
+                string(REPLACE "\n" ";" PANDOC_VERSION_RAW_OUTPUT ${PANDOC_VERSION_RAW_OUTPUT})
+
+                message (STATUS "PANDOC: ${PANDOC_VERSION_RAW_OUTPUT}")
+            endif()
         endif(NOT DEFINED PANDOC)
 
         set(README_MD "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
