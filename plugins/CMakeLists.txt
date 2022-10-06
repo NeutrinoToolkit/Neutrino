@@ -2,9 +2,11 @@ cmake_minimum_required (VERSION 3.9)
 
 option(NEUTRINOPLUGINS "Compile Neutrino plugins" ON)
 
-set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
-
 if (${NEUTRINOPLUGINS})
+
+    set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/resources/cmake)
+
+    include(NeutrinoPlugin)
 
     message(STATUS "Scanning plugins directory")
 

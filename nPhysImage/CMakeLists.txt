@@ -18,17 +18,9 @@ add_library (nPhysImageF SHARED
     unwrap/unwrap.h unwrap/goldstein.cc unwrap/quality.cc unwrap/simple.cc
     )
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-#   target_link_options(nPhysImageF PRIVATE -static-libstdc++)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (APPLE)
-        target_link_options(nPhysImageF PRIVATE -static-libgcc -static-libstdc++)
-    endif()
-endif()
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources/cmake)
+set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/resources/cmake)
 include(FindNeutrinoDeps)
 
 target_link_libraries(nPhysImageF m ${LIBS})
@@ -41,7 +33,7 @@ if (WIN32)
 elseif(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 elseif (APPLE)
-    install (TARGETS nPhysImageF COMPONENT binary DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../Neutrino.app/Contents/Frameworks")
+    install (TARGETS nPhysImageF COMPONENT binary DESTINATION "${PROJECT_BINARY_DIR}/Neutrino.app/Contents/Frameworks")
 endif()
 
 

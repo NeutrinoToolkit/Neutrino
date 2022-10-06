@@ -1,8 +1,10 @@
 MACRO(ADD_NEUTRINO_PLUGIN)
 
-
-    if (NOT EXISTS "${NEUTRINO_ROOT}/src/neutrino.h")
-        message(FATAL_ERROR "Please specify neutrino source tree with cmake -DNEUTRINO_ROOT=<path/to/neutrino>")
+    if (NOT DEFINED NEUTRINO_ROOT)
+        set (NEUTRINO_ROOT ${PROJECT_SOURCE_DIR})
+        if (NOT EXISTS "${NEUTRINO_ROOT}/src/neutrino.h")
+            message(FATAL_ERROR "Please specify neutrino source tree with cmake -DNEUTRINO_ROOT=<path/to/neutrino>")
+        endif()
     endif()
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -127,11 +129,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     IF(NOT DEFINED PLUGIN_INSTALL_DIR)
         if(APPLE)
-#            if(DEFINED Neutrino_BINARY_DIR)
-#                set (PLUGIN_INSTALL_DIR "${Neutrino_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
-#            else()
-                set (PLUGIN_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../Neutrino.app/Contents/Resources/plugins")
-#            endif()
+            set (PLUGIN_INSTALL_DIR "${CMAKE_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
         elseif(LINUX)
             set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
         elseif(WIN32)
