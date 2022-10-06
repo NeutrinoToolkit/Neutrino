@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>279</width>
-    <height>267</height>
+    <height>280</height>
    </rect>
   </property>
   <property name="font">
@@ -251,7 +251,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QPushButton" name="doIt">
+        <widget class="QPushButton" name="doItB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -291,7 +291,7 @@
  <tabstops>
   <tabstop>shot</tabstop>
   <tabstop>offset</tabstop>
-  <tabstop>doIt</tabstop>
+  <tabstop>doItB</tabstop>
   <tabstop>erasePrevious</tabstop>
  </tabstops>
  <resources/>

@@ -30,19 +30,19 @@
 
 Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
     show();
 
-    connect(my_w.cutValue,SIGNAL(editingFinished()), this, SLOT(doOperation()));
-    connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(doOperation()));
-    connect(my_w.slider,SIGNAL(valueChanged(int)),this,SLOT(sliderChanged(int)));
-    connect(my_w.image2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMiniMaxi()));
-    connect(my_w.replaceVal, SIGNAL(currentIndexChanged(int)), this, SLOT(doOperation()));
+    connect(cutValue,SIGNAL(editingFinished()), this, SLOT(doOperation()));
+    connect(doIt,SIGNAL(pressed()),this,SLOT(doOperation()));
+    connect(slider,SIGNAL(valueChanged(int)),this,SLOT(sliderChanged(int)));
+    connect(image2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMiniMaxi()));
+    connect(replaceVal, SIGNAL(currentIndexChanged(int)), this, SLOT(doOperation()));
 
-    nPhysD *image2=getPhysFromCombo(my_w.image2);
-    if (image2) {
-        my_w.cutValue->setText(QLocale().toString(image2->get_min()));
+    nPhysD *my_phys2=getPhysFromCombo(image2);
+    if (my_phys2) {
+        cutValue->setText(QLocale().toString(my_phys2->get_min()));
     }
     updateMiniMaxi();
     cutoffPhys=nullptr;
@@ -50,58 +50,58 @@ Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
 
 
 void Cutoff_mask::updateMiniMaxi () {
-    nPhysD *image2=getPhysFromCombo(my_w.image2);
-    if (image2) {
-        my_w.mini->setText(QLocale().toString(image2->get_min()));
-        my_w.maxi->setText(QLocale().toString(image2->get_max()));
+    nPhysD *my_phys2=getPhysFromCombo(image2);
+    if (my_phys2) {
+        mini->setText(QLocale().toString(my_phys2->get_min()));
+        maxi->setText(QLocale().toString(my_phys2->get_max()));
     }
 }
 
 void Cutoff_mask::sliderChanged(int val) {
-    nPhysD *image2=getPhysFromCombo(my_w.image2);
-    if (image2) {
-        double valDouble=(val-my_w.slider->minimum())*(image2->get_max()-image2->get_min())/(my_w.slider->maximum()-my_w.slider->minimum());
-        my_w.cutValue->setText(QLocale().toString(valDouble));
+    nPhysD *my_phys2=getPhysFromCombo(image2);
+    if (my_phys2) {
+        double valDouble=(val-slider->minimum())*(my_phys2->get_max()-my_phys2->get_min())/(slider->maximum()-slider->minimum());
+        cutValue->setText(QLocale().toString(valDouble));
         doOperation();
     }
 }
 
 void Cutoff_mask::doOperation () {
     bool ok;
-    double val=locale().toDouble(my_w.cutValue->text(),&ok);
+    double val=locale().toDouble(cutValue->text(),&ok);
     if (ok) {
-        nPhysD *image1=getPhysFromCombo(my_w.image1);
-        nPhysD *image2=getPhysFromCombo(my_w.image2);
-        if (image1 && image2 && image1->getW() == image2->getW() && image1->getH() == image2->getH()) {
-            double replaceVal=std::numeric_limits<double>::quiet_NaN();
-            if (my_w.replaceVal->currentText().toLower() == "min") {
-                replaceVal=image1->get_min();
-            } else if (my_w.replaceVal->currentText().toLower() == "max") {
-                replaceVal=image1->get_max();
-            } else if (my_w.replaceVal->currentText().toLower() == "mean") {
-                replaceVal=0.5*(image1->get_min()+image1->get_max());
-            } else if (my_w.replaceVal->currentText().toLower() == "zero") {
-                replaceVal=0.0;
+        nPhysD *my_phys1=getPhysFromCombo(image1);
+        nPhysD *my_phys2=getPhysFromCombo(image2);
+        if (my_phys1 && my_phys2 && my_phys1->getW() == my_phys2->getW() && my_phys1->getH() == my_phys2->getH()) {
+            double replaceDbl=std::numeric_limits<double>::quiet_NaN();
+            if (replaceVal->currentText().toLower() == "min") {
+                replaceDbl=my_phys1->get_min();
+            } else if (replaceVal->currentText().toLower() == "max") {
+                replaceDbl=my_phys1->get_max();
+            } else if (replaceVal->currentText().toLower() == "mean") {
+                replaceDbl=0.5*(my_phys1->get_min()+my_phys1->get_max());
+            } else if (replaceVal->currentText().toLower() == "zero") {
+                replaceDbl=0.0;
             }
-            nPhysD *masked = new nPhysD(image1->getW(),image1->getH(), replaceVal);
-            masked->set_origin(image1->get_origin());
-            masked->set_scale(image1->get_scale());
+            nPhysD *masked = new nPhysD(my_phys1->getW(),my_phys1->getH(), replaceDbl);
+            masked->set_origin(my_phys1->get_origin());
+            masked->set_scale(my_phys1->get_scale());
             size_t k;
-            if (!my_w.opposite->isChecked()) {
-                for (k=0; k<image1->getSurf(); k++)
-                    if (image2->Timg_buffer[k] >= val)
-                        masked->Timg_buffer[k]=image1->Timg_buffer[k];
+            if (!opposite->isChecked()) {
+                for (k=0; k<my_phys1->getSurf(); k++)
+                    if (my_phys2->Timg_buffer[k] >= val)
+                        masked->Timg_buffer[k]=my_phys1->Timg_buffer[k];
             } else {
-                for (k=0; k<image1->getSurf(); k++)
-                    if (image2->Timg_buffer[k] <= val)
-                        masked->Timg_buffer[k]=image1->Timg_buffer[k];
+                for (k=0; k<my_phys1->getSurf(); k++)
+                    if (my_phys2->Timg_buffer[k] <= val)
+                        masked->Timg_buffer[k]=my_phys1->Timg_buffer[k];
             }
 
             std::ostringstream my_name;
-            my_name << "mask(" << image2->getName() << "," << val << ")";
+            my_name << "mask(" << my_phys2->getName() << "," << val << ")";
             masked->setName(my_name.str());
             masked->setShortName("mask");
-            masked->setFromName(image1->getFromName());
+            masked->setFromName(my_phys1->getFromName());
             masked->TscanBrightness();
 
             cutoffPhys=nparent->replacePhys(masked,cutoffPhys);
@@ -109,7 +109,7 @@ void Cutoff_mask::doOperation () {
             statusBar()->showMessage("Error image size do not match", 5000);
         }
     } else {
-        statusBar()->showMessage("Error "+my_w.cutValue->text(), 5000);
+        statusBar()->showMessage("Error "+cutValue->text(), 5000);
     }
 }
 

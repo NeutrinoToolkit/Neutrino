@@ -274,7 +274,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../Ghost_fringes/GhostFringes.qrc">
            <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
          </property>
         </widget>
@@ -382,13 +382,13 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="doUnwrap">
+        <widget class="QToolButton" name="doUnwrapB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -398,7 +398,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="Interferometry.qrc">
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -477,7 +477,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
          </property>
          <property name="checkable">
@@ -535,7 +535,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="doSubtract">
+        <widget class="QToolButton" name="doSubtractB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -545,7 +545,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="Interferometry.qrc">
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -593,7 +593,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
          <property name="checkable">
@@ -634,7 +634,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="doMaskCutoff">
+        <widget class="QToolButton" name="doMaskCutoffB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -644,7 +644,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="Interferometry.qrc">
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -708,12 +708,12 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="addShape">
+        <widget class="QToolButton" name="addShapeB">
          <property name="text">
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
          </property>
         </widget>
@@ -732,7 +732,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="Interferometry.qrc">
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -832,7 +832,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="doCutoff">
+        <widget class="QToolButton" name="doCutoffB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -845,7 +845,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="Interferometry.qrc">
+          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
            <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
          </property>
         </widget>
@@ -906,7 +906,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>
      <normalon>:/icons/noAutoRefresh.png</normalon>:/icons/autoRefresh.png</iconset>
    </property>
@@ -922,7 +922,7 @@
   </action>
   <action name="actionDoWavelet">
    <property name="icon">
-    <iconset resource="Interferometry.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
    </property>
    <property name="text">
@@ -934,7 +934,7 @@
   </action>
   <action name="actionDuplicate">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -946,7 +946,7 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="Interferometry.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -965,18 +965,19 @@
   <tabstop>method</tabstop>
   <tabstop>useBarrier</tabstop>
   <tabstop>lineBarrier</tabstop>
-  <tabstop>doUnwrap</tabstop>
+  <tabstop>doUnwrapB</tabstop>
   <tabstop>posZeroX</tabstop>
   <tabstop>posZeroY</tabstop>
   <tabstop>posZeroButton</tabstop>
   <tabstop>rotAngle</tabstop>
-  <tabstop>doSubtract</tabstop>
+  <tabstop>doSubtractB</tabstop>
   <tabstop>maskRegion</tabstop>
   <tabstop>cutoffValue</tabstop>
-  <tabstop>doMaskCutoff</tabstop>
+  <tabstop>doMaskCutoffB</tabstop>
  </tabstops>
  <resources>
-  <include location="Interferometry.qrc"/>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

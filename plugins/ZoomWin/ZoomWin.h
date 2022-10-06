@@ -35,13 +35,11 @@
 
 class neutrino;
 
-class ZoomWin : public nGenericPan {
+class ZoomWin : public nGenericPan, private Ui::ZoomWin {
     Q_OBJECT
 
 public:
     Q_INVOKABLE ZoomWin(neutrino *);
-
-    Ui::ZoomWin my_w;
 
 public slots:
 

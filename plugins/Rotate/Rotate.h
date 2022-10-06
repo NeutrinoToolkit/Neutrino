@@ -33,18 +33,16 @@
 
 class neutrino;
 
-class Rotate : public nGenericPan {
+class Rotate : public nGenericPan, private Ui::Rotate {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Rotate(neutrino *);
 
-    Ui::Rotate my_w;
     nPhysD *rotated;
 
 public slots:
     void doRotateLive();
-    void keepCopy();
     double getReplaceVal(nPhysD*);
 };
 

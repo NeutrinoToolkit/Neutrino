@@ -27,37 +27,37 @@
 Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent),
      line(this,1)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
     // signals
     QPolygonF poly;
     poly << QPointF(0,0) << QPointF(100,100);
     line.setPoints(poly);
 
-    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
-    connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
+    connect(actionSaveClipboard, SIGNAL(triggered()), plot, SLOT(copy_data()));
+    connect(actionSaveTxt      , SIGNAL(triggered()), plot, SLOT(save_data()));
+    connect(actionSavePDF      , SIGNAL(triggered()), plot, SLOT(export_image()));
 
-    connect(my_w.actionAddAll, SIGNAL(triggered()), this, SLOT(addImages()));
-    connect(my_w.actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeImages()));
+    connect(actionAddAll, SIGNAL(triggered()), this, SLOT(addImages()));
+    connect(actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeImages()));
 
 
-    connect(my_w.addImage, SIGNAL(released()), this, SLOT(addImage()));
-    connect(my_w.removeImage, SIGNAL(released()), this, SLOT(removeImage()));
+    connect(addImageB, SIGNAL(released()), this, SLOT(addImage()));
+    connect(removeImageB, SIGNAL(released()), this, SLOT(removeImage()));
 
-    connect(my_w.current, SIGNAL(released()), this, SLOT(updatePlot()));
+    connect(current, SIGNAL(released()), this, SLOT(updatePlot()));
 
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
     connect(nparent, SIGNAL(physReplace(std::pair<nPhysD*,nPhysD*>)), this, SLOT(physReplace(std::pair<nPhysD*,nPhysD*>)));
 
-    my_w.plot->xAxis->setLabel(tr("Distance"));
-    my_w.plot->yAxis->setLabel(tr("Value"));
+    plot->xAxis->setLabel(tr("Distance"));
+    plot->yAxis->setLabel(tr("Value"));
 
-    my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
-    my_w.plot->graph(0)->setName("Compare Lines");
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph(0)->setName("Compare Lines");
 
     show();
-    connect(my_w.actionLine, SIGNAL(triggered()), &line, SLOT(togglePadella()));
+    connect(actionLine, SIGNAL(triggered()), &line, SLOT(togglePadella()));
     connect(&line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
     updatePlot();
@@ -76,7 +76,7 @@ void Compare_lines::physReplace(std::pair<nPhysD*,nPhysD*> my_mod) {
 }
 
 void Compare_lines::addImage() {
-    nPhysD *my_phys=nGenericPan::getPhysFromCombo(my_w.image);
+    nPhysD *my_phys=nGenericPan::getPhysFromCombo(image);
     if(!images.contains(my_phys)) {
         images.append(my_phys);
     }
@@ -84,7 +84,7 @@ void Compare_lines::addImage() {
 }
 
 void Compare_lines::removeImage() {
-    images.removeAll(nGenericPan::getPhysFromCombo(my_w.image));
+    images.removeAll(nGenericPan::getPhysFromCombo(image));
     updatePlot();
 }
 
@@ -109,7 +109,7 @@ void Compare_lines::sceneChanged() {
 void Compare_lines::updatePlot() {
     if (currentBuffer && isVisible()) {
 
-        my_w.plot->clearGraphs();
+        plot->clearGraphs();
 
         QPolygonF my_poly=line.poly(line.numPoints);
 		qDebug() << my_poly;
@@ -117,7 +117,7 @@ void Compare_lines::updatePlot() {
         for (int i=0; i<nparent->getBufferList().size(); i++) {
             nPhysD *phys=nparent->getBufferList().at(i);
 
-            if (images.contains(phys) || (my_w.current->isChecked() && phys==currentBuffer)) {
+            if (images.contains(phys) || (current->isChecked() && phys==currentBuffer)) {
                 QVector<double> toPlotx;
                 QVector<double> toPloty;
 
@@ -140,15 +140,15 @@ void Compare_lines::updatePlot() {
                     toPlotx << dist;
                     toPloty << my_val;
                 }
-                QCPGraph* graph=my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
+                QCPGraph* graph=plot->addGraph(plot->xAxis, plot->yAxis);
                 graph->setName(QString::fromStdString(phys->getName()));
-                graph->setPen(QPen((phys==currentBuffer?my_w.plot->yAxis->labelColor():Qt::red)));
+                graph->setPen(QPen((phys==currentBuffer?plot->yAxis->labelColor():Qt::red)));
                 graph->setData(toPlotx,toPloty);
             }
 
         }
-        my_w.plot->rescaleAxes();
-        my_w.plot->replot();
+        plot->rescaleAxes();
+        plot->replot();
     }
 }
 

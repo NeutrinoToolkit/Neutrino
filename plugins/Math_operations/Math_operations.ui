@@ -397,18 +397,6 @@
       </layout>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QPushButton" name="copyButton">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Copy</string>
-      </property>
-     </widget>
-    </item>
     <item row="5" column="0">
      <widget class="QPushButton" name="calculate">
       <property name="font">
@@ -433,6 +421,24 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="5" column="1">
+     <widget class="QCheckBox" name="erasePrevious">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>erase previous</string>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

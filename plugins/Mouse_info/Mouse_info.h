@@ -36,14 +36,13 @@
 
 class neutrino;
 
-class Mouse_info : public nGenericPan {
+class Mouse_info : public nGenericPan, private Ui::Mouse_info {
     Q_OBJECT
 
 public:
 
     Q_INVOKABLE Mouse_info (neutrino *parent);
 
-    Ui::Mouse_info my_w;
     QPointF mouse;
 
 public slots:

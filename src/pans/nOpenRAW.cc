@@ -30,17 +30,17 @@
 
 nOpenRAW::nOpenRAW(neutrino *nparent) : nGenericPan(nparent)
 {
-	my_w.setupUi(this);
-	connect(my_w.okButton, SIGNAL(pressed()), this, SLOT(doOpen()));
+    setupUi(this);
+    connect(okButton, SIGNAL(pressed()), this, SLOT(doOpen()));
     show();
 }
 
 void nOpenRAW::checkStringList() {
 	fileList.removeDuplicates();
 	if (fileList.size()>0) {
-		my_w.okButton->setText(tr("Open ")+QLocale().toString(fileList.size())+tr(" image")+(fileList.size()>1?tr("s"):""));
+        okButton->setText(tr("Open ")+QLocale().toString(fileList.size())+tr(" image")+(fileList.size()>1?tr("s"):""));
 	} else {
-		my_w.okButton->setText(tr("No image"));
+        okButton->setText(tr("No image"));
 	}
 }
 
@@ -56,8 +56,8 @@ void nOpenRAW::add(QStringList fnames) {
 
 void nOpenRAW::doOpen () {
 	foreach (QString fname, fileList) {
-        nPhysD *datamatrix = new nPhysD(my_w.width->value(), my_w.height->value(), 0.0,fname.toLocal8Bit().constData());
-        physFormat::phys_open_RAW(datamatrix,my_w.kind->currentIndex(), my_w.skip->value(), my_w.endian->isChecked());
+        nPhysD *datamatrix = new nPhysD(widthSB->value(), heightSB->value(), 0.0,fname.toLocal8Bit().constData());
+        physFormat::phys_open_RAW(datamatrix,kind->currentIndex(), skipSB->value(), endian->isChecked());
 		if (datamatrix && datamatrix->getSurf()>0) {
 			datamatrix->setShortName(QFileInfo(fname).fileName().toStdString());
 			datamatrix->setFromName(fname.toStdString());

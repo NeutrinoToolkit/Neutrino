@@ -33,13 +33,11 @@
 
 class neutrino;
 
-class Reflectivity : public nGenericPan {
+class Reflectivity : public nGenericPan, private Ui::Reflectivity {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Reflectivity(neutrino *);
-
-    Ui::Reflectivity my_w;
 
     nPhysD *Refle;
 

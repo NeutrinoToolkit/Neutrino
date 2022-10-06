@@ -37,20 +37,17 @@
 
 class neutrino;
 
-class RegionPath : public nGenericPan {
+class RegionPath : public nGenericPan, private Ui::RegionPath {
     Q_OBJECT
 
 public:
     Q_INVOKABLE RegionPath(neutrino *);
-
-    Ui::RegionPath my_w;
 
     nLine region;
 
     nPhysD *regionPhys;
 public slots:
     void doIt();
-    void duplicate();
 
 private:
     double getReplaceVal();

@@ -37,13 +37,12 @@
 
 class neutrino;
 
-class Interferometry : public nGenericPan {
+class Interferometry : public nGenericPan, private Ui::Interferometry {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Interferometry(neutrino *);
 
-    Ui::Interferometry my_w;
     std::array<Ui::Interferometry1, 2> my_image;
 
     QPointer<nRect> region;

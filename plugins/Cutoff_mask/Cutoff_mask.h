@@ -33,13 +33,12 @@
 
 class neutrino;
 
-class Cutoff_mask : public nGenericPan {
+class Cutoff_mask : public nGenericPan, private Ui::Cutoff_mask {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Cutoff_mask(neutrino *);
 
-    Ui::Cutoff_mask my_w;
     nPhysD *cutoffPhys;
 
 public slots:

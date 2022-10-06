@@ -27,12 +27,12 @@
 
 Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 {
-	my_w.setupUi(this);
+    setupUi(this);
     show();
 
-    completer = new QCompleter(my_w.dirName);
+    completer = new QCompleter(dirName);
     completer->setModel(new QFileSystemModel());
-    my_w.dirName->setCompleter(completer);
+    dirName->setCompleter(completer);
 	
 	fileModel=new QFileSystemModel(this);
 	fileModel->setFilter(QDir::Files);
@@ -40,23 +40,23 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 //    proxyModel = new QSortFilterProxyModel(this);
 //    proxyModel->setSourceModel(fileModel);
 
-    my_w.listView->setModel(fileModel);
-    connect(my_w.dirName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
-    connect(my_w.pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+    listView->setModel(fileModel);
+    connect(dirName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+    connect(pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 
-    connect(my_w.listView, SIGNAL(clicked(QModelIndex)), this, SLOT(listViewClicked(QModelIndex)));
-    connect(my_w.listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
-    connect(my_w.listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
+    connect(listView, SIGNAL(clicked(QModelIndex)), this, SLOT(listViewClicked(QModelIndex)));
+    connect(listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
+    connect(listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
 	
     textChanged();
 
-	connect(my_w.changeDir, SIGNAL(released()), this, SLOT(changeDir()));
+    connect(changeDirB, SIGNAL(released()), this, SLOT(changeDir()));
 }
 
 
 void
 Monitor::listViewClicked(QModelIndex index) {
-    if (my_w.oneClick->isChecked()) {
+    if (oneClick->isChecked()) {
         listViewDoubleClicked(index);
     }
 }
@@ -65,7 +65,7 @@ void
 Monitor::listViewDoubleClicked(QModelIndex index) {
     QFileInfo fInfo=fileModel->fileInfo(index);
     if (fInfo.isFile() && fInfo.isReadable()) {
-        if (my_w.erase->isChecked()) {
+        if (erase->isChecked()) {
             nparent->removePhys(currentBuffer);
         }
         nparent->fileOpen(fInfo.absoluteFilePath());
@@ -87,26 +87,34 @@ Monitor::listViewActivated(QModelIndex index) {
 			num /= 1024.0;
 		}
 		QString sizeF=" ("+QLocale().toString(num,'f',1)+unit+")";
-        my_w.statusBar->showMessage(fInfo.lastModified().toString() +sizeF,5000);
+        statusBar()->showMessage(fInfo.lastModified().toString() +sizeF,5000);
 	}
 }
 
 void
 Monitor::textChanged() {
-    fileModel->setNameFilters(my_w.pattern->text().split(" "));
-    my_w.listView->setRootIndex(fileModel->setRootPath(my_w.dirName->text()));
+    fileModel->setNameFilters(pattern->text().split(" "));
+    listView->setRootIndex(fileModel->setRootPath(dirName->text()));
 }
 
 void Monitor::on_openAll_released() {
-    qDebug() << "Here";
-//    for (int i=0; i< fileModel->size(); i++) {
-//        qDebug() << fileModel->fileInfo(i);
-//    }
+    QList<QFileInfo> path_list;
+    QModelIndex parentIndex = fileModel->index(fileModel->rootPath());
+    int numRows = fileModel->rowCount(parentIndex);
+
+    for (int row = 0; row < numRows; ++row) {
+        QModelIndex childIndex = fileModel->index(row, 0, parentIndex);
+        QFileInfo path = QFileInfo(fileModel->rootPath(), fileModel->data(childIndex).toString());
+        if (path.isFile())  {
+            nparent->fileOpen(path.absoluteFilePath());
+        }
+    }
+
 }
 
 void Monitor::changeDir() {
     QString newDir;
-    newDir = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),my_w.dirName->text());
-    if (!newDir.isEmpty()) my_w.dirName->setText(newDir);
+    newDir = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),dirName->text());
+    if (!newDir.isEmpty()) dirName->setText(newDir);
 }
 

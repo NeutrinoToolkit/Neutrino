@@ -33,7 +33,7 @@
 
 class neutrino;
 
-class Math_operations : public nGenericPan {
+class Math_operations : public nGenericPan, private Ui::Math_operations {
     Q_OBJECT
 
     std::vector<int> separator;
@@ -41,12 +41,10 @@ class Math_operations : public nGenericPan {
 public:	
     Q_INVOKABLE Math_operations(neutrino *);
 
-    Ui::Math_operations my_w;
     nPhysD *operatorResult;
 
 public slots:
     void doOperation();
-    void copyResult();
     void enableGroups(int);
 };
 

@@ -36,18 +36,11 @@
 
 class neutrino;
 
-class Image_list : public nGenericPan {
+class Image_list : public nGenericPan, private Ui::Image_list {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Image_list(neutrino*);
-
-    Ui::Image_list my_w;
-
-    // stuff for static scale/origin
-    // (should pass to nPhysProperties once this has been merged to Image_list)
-    bool freezedFrame;
-    vec2f frScale, frOrigin;
 
     std::map<nPhysD*,QTreeWidgetItem*> itemsMap;
 
@@ -61,9 +54,6 @@ public slots:
 
     nPhysD*	getPhys(QTreeWidgetItem*);
     void changeProperties();
-
-    void setFreezed(bool);
-    void originChanged();
 
     void keyPressEvent(QKeyEvent *);
     void on_horizontalSlider_valueChanged(int);

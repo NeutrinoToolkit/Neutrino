@@ -29,19 +29,19 @@
 Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 {
 
-	my_w.setupUi(this);
+    setupUi(this);
 
-	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(remove_point()));
-	connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copyPoints()));
-	connect(my_w.exportTxt, SIGNAL(released()),this, SLOT(export_txt()));
+    connect(removeRowB, SIGNAL(released()),this, SLOT(remove_point()));
+    connect(copyPointsB, SIGNAL(released()),this, SLOT(copyPoints()));
+    connect(exportTxtB, SIGNAL(released()),this, SLOT(export_txt()));
 
     connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(setMouse(QPointF)));
-	connect(my_w.rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
-	connect(my_w.ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
-	connect(my_w.sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
-    connect(my_w.sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
-    connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
-    connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+    connect(rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
+    connect(ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
+    connect(sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
+    connect(sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
+    connect(unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+    connect(unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
 
     connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
@@ -53,13 +53,13 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 }
 
 void Mouse_info::addPoint(QPointF position) {
-	if (my_w.getpoints->isChecked()) {
-		int pos=my_w.points->rowCount();
-		my_w.points->insertRow(pos);
+    if (getpoints->isChecked()) {
+        int pos=points->rowCount();
+        points->insertRow(pos);
 		QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
 		QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
-		QTableWidgetItem *x2item= new QTableWidgetItem(my_w.px->text());
-		QTableWidgetItem *y2item= new QTableWidgetItem(my_w.py->text());
+        QTableWidgetItem *x2item= new QTableWidgetItem(px->text());
+        QTableWidgetItem *y2item= new QTableWidgetItem(py->text());
         xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
         yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
         x2item->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
@@ -68,10 +68,10 @@ void Mouse_info::addPoint(QPointF position) {
 		yitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 		x2item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 		y2item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-		my_w.points->setItem(pos, 0, xitem);
-		my_w.points->setItem(pos, 1, yitem);
-		my_w.points->setItem(pos, 2, x2item);
-		my_w.points->setItem(pos, 3, y2item);
+        points->setItem(pos, 0, xitem);
+        points->setItem(pos, 1, yitem);
+        points->setItem(pos, 2, x2item);
+        points->setItem(pos, 3, y2item);
 		QTableWidgetItem *zitem= new QTableWidgetItem();
 		if (currentBuffer) {
 			zitem->setText(QLocale().toString(currentBuffer->point(position.x(),position.y())));
@@ -81,8 +81,8 @@ void Mouse_info::addPoint(QPointF position) {
 
         zitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
 		zitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-		my_w.points->setItem(pos, 4, zitem);
-		my_w.points->resizeRowToContents(pos);
+        points->setItem(pos, 4, zitem);
+        points->resizeRowToContents(pos);
 		statusBar()->showMessage(tr("Added point ")+QLocale().toString(pos+1),2000);
 	}
 }
@@ -90,8 +90,8 @@ void Mouse_info::addPoint(QPointF position) {
 void Mouse_info::updateOrigin() {
 	if (currentBuffer) {
 		bool ok1, ok2;
-        double valx=QLocale().toDouble(my_w.rx->text(),&ok1);
-        double valy=QLocale().toDouble(my_w.ry->text(),&ok2);
+        double valx=QLocale().toDouble(rx->text(),&ok1);
+        double valy=QLocale().toDouble(ry->text(),&ok2);
 		if (ok1&&ok2) {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
@@ -102,8 +102,8 @@ void Mouse_info::updateOrigin() {
 void Mouse_info::updateScale() {
 	if (currentBuffer) {
 		bool ok1, ok2;
-        double valx=QLocale().toDouble(my_w.sc_x->text(),&ok1);
-        double valy=QLocale().toDouble(my_w.sc_y->text(),&ok2);
+        double valx=QLocale().toDouble(sc_x->text(),&ok1);
+        double valy=QLocale().toDouble(sc_y->text(),&ok2);
 		if (ok1&&ok2) {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}
@@ -113,8 +113,8 @@ void Mouse_info::updateScale() {
 
 void Mouse_info::updateUnits() {
     if (currentBuffer) {
-        currentBuffer->prop["unitsX"] = my_w.unit_x->text().toStdString();
-        currentBuffer->prop["unitsY"] = my_w.unit_y->text().toStdString();
+        currentBuffer->prop["unitsX"] = unit_x->text().toStdString();
+        currentBuffer->prop["unitsY"] = unit_y->text().toStdString();
     }
     nparent->my_w->my_view->update();
 }
@@ -126,52 +126,52 @@ void Mouse_info::setMouse(QPointF pos) {
 }
 
 void Mouse_info::updateLabels() {
-	my_w.ix->setText(QLocale().toString(mouse.x()));
-	my_w.iy->setText(QLocale().toString(mouse.y()));
+    ix->setText(QLocale().toString(mouse.x()));
+    iy->setText(QLocale().toString(mouse.y()));
 		
 	QPointF dist=QPointF(mouse);
 	QPointF resolution=QPointF(1,1);
 	if (currentBuffer) {
 		dist=mouse-QPointF(currentBuffer->get_origin().x(),currentBuffer->get_origin().y());
 		resolution=QPointF(currentBuffer->get_scale().x(),currentBuffer->get_scale().y());
-		disconnect(my_w.rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-		disconnect(my_w.ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-		disconnect(my_w.sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
-		disconnect(my_w.sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));	
-        connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
-        connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
-        my_w.rx->setText(QLocale().toString(currentBuffer->get_origin().x()));
-		my_w.ry->setText(QLocale().toString(currentBuffer->get_origin().y()));
-        my_w.sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
-        my_w.sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
-        my_w.unit_x->setText(QString::fromStdString(currentBuffer->prop["unitsX"].get_str()));
-        my_w.unit_y->setText(QString::fromStdString(currentBuffer->prop["unitsY"].get_str()));
-        connect(my_w.rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-		connect(my_w.ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
-		connect(my_w.sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
-		connect(my_w.sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
-        connect(my_w.unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
-        connect(my_w.unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        disconnect(rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
+        disconnect(ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
+        disconnect(sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
+        disconnect(sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
+        connect(unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        connect(unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        rx->setText(QLocale().toString(currentBuffer->get_origin().x()));
+        ry->setText(QLocale().toString(currentBuffer->get_origin().y()));
+        sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
+        sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
+        unit_x->setText(QString::fromStdString(currentBuffer->prop["unitsX"].get_str()));
+        unit_y->setText(QString::fromStdString(currentBuffer->prop["unitsY"].get_str()));
+        connect(rx, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
+        connect(ry, SIGNAL(textChanged(QString)), this, SLOT(updateOrigin()));
+        connect(sc_x, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
+        connect(sc_y, SIGNAL(textChanged(QString)), this, SLOT(updateScale()));
+        connect(unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+        connect(unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
     }
 
 	QPointF p=QPointF(resolution.x()*dist.x(),resolution.y()*dist.y());
 
-	my_w.px->setText(QLocale().toString(p.x()));
-	my_w.py->setText(QLocale().toString(p.y()));
-	my_w.dx_dy->setText(QLocale().toString(p.x()/p.y()));
-	my_w.dy_dx->setText(QLocale().toString(p.y()/p.x()));
-    my_w.atan_dx_dy->setText(QLocale().toString(180.0/M_PI*atan2(p.x(),p.y())));
-    my_w.atan_dy_dx->setText(QLocale().toString(180.0/M_PI*atan2(p.y(),p.x())));
-	my_w.dist_px->setText(QLocale().toString(qSqrt(dist.x()*dist.x()+dist.y()*dist.y())));
-	my_w.dist_real->setText(QLocale().toString(qSqrt(p.x()*p.x()+p.y()*p.y())));
+    px->setText(QLocale().toString(p.x()));
+    py->setText(QLocale().toString(p.y()));
+    dx_dy->setText(QLocale().toString(p.x()/p.y()));
+    dy_dx->setText(QLocale().toString(p.y()/p.x()));
+    atan_dx_dy->setText(QLocale().toString(180.0/M_PI*atan2(p.x(),p.y())));
+    atan_dy_dx->setText(QLocale().toString(180.0/M_PI*atan2(p.y(),p.x())));
+    dist_px->setText(QLocale().toString(qSqrt(dist.x()*dist.x()+dist.y()*dist.y())));
+    dist_real->setText(QLocale().toString(qSqrt(p.x()*p.x()+p.y()*p.y())));
 }
 
 QString 
 Mouse_info::getPointText() {
 	QString retText;
-	for (int i=0; i<my_w.points->rowCount(); i++) {
-		for (int j=0; j<my_w.points->columnCount();j++) {
-			retText += my_w.points->item(i, j)->text() + "\t";
+    for (int i=0; i<points->rowCount(); i++) {
+        for (int j=0; j<points->columnCount();j++) {
+            retText += points->item(i, j)->text() + "\t";
 		}
 		retText += "\n";
 	}
@@ -203,9 +203,9 @@ Mouse_info::export_txt() {
 void
 Mouse_info::remove_point() {
 	QString removedrows;
-	foreach (QTableWidgetSelectionRange r, my_w.points->selectedRanges()) {
+    foreach (QTableWidgetSelectionRange r, points->selectedRanges()) {
 		for (int i=r.topRow(); i <=r.bottomRow(); i++) {
-			my_w.points->removeRow(r.topRow());
+            points->removeRow(r.topRow());
 			removedrows+=QString(" ")+QLocale().toString(i+1);
 		}
 	}

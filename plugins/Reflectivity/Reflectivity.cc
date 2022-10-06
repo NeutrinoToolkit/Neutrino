@@ -29,47 +29,47 @@
 
 Reflectivity::Reflectivity(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
 
-    connect(my_w.doIt, SIGNAL(pressed()), this, SLOT(doIt()));
-    connect(my_w.offset, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
-    connect(my_w.multiplier, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
-    connect(my_w.min_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
-    connect(my_w.max_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
-    connect(my_w.blur, SIGNAL(valueChanged(int)), this, SLOT(doIt()));
+    connect(doItB, SIGNAL(pressed()), this, SLOT(doIt()));
+    connect(offset, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
+    connect(multiplier, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
+    connect(min_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
+    connect(max_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
+    connect(blur, SIGNAL(valueChanged(int)), this, SLOT(doIt()));
     show();
 
 }
 
 void Reflectivity::doIt () {
-    nPhysD *imageShot=getPhysFromCombo(my_w.shot);
-    nPhysD *imageRef=getPhysFromCombo(my_w.ref);
+    nPhysD *imageShot=getPhysFromCombo(shot);
+    nPhysD *imageRef=getPhysFromCombo(ref);
     if (imageShot && imageRef) {
         saveDefaults();
 
         nPhysD *shot=new nPhysD(*imageShot);
-        physMath::phys_fast_gaussian_blur(*shot,my_w.blur->value());
-        physMath::phys_subtract(*shot,my_w.offset->value());
+        physMath::phys_fast_gaussian_blur(*shot,blur->value());
+        physMath::phys_subtract(*shot,offset->value());
 
         nPhysD ref(*imageRef);
-        physMath::phys_fast_gaussian_blur(ref,my_w.blur->value());
-        physMath::phys_subtract(ref,my_w.offset->value());
-        physMath::phys_multiply(ref,my_w.multiplier->value());
+        physMath::phys_fast_gaussian_blur(ref,blur->value());
+        physMath::phys_subtract(ref,offset->value());
+        physMath::phys_multiply(ref,multiplier->value());
 
         physMath::phys_point_divide(*shot,ref);
 
-        physMath::cutoff(*shot,my_w.min_val->value(),my_w.max_val->value());
+        physMath::cutoff(*shot,min_val->value(),max_val->value());
 
         shot->prop["display_range"]=shot->get_min_max();
 
-        if (my_w.erasePrevious->isChecked()) {
+        if (erasePrevious->isChecked()) {
             Refle=nparent->replacePhys(shot,Refle,true);
         } else {
             nparent->addShowPhys(shot);
             Refle=shot;
         }
-        my_w.erasePrevious->setEnabled(true);
+        erasePrevious->setEnabled(true);
     }
 }
 

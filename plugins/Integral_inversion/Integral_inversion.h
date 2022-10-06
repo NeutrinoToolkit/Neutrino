@@ -41,13 +41,11 @@ class nLine;
 
 void phys_invert_abel_transl(void *params, int&);
 
-class Integral_inversion : public nGenericPan {
+class Integral_inversion : public nGenericPan, private Ui::Integral_inversion {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Integral_inversion(neutrino *);
-
-    Ui::Integral_inversion my_w;
 
     QPointer<nLine> axis;
     nPhysD *invertedPhys;

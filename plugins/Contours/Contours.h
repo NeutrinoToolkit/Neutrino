@@ -35,13 +35,11 @@
 class neutrino;
 class nLine;
 
-class Contours : public nGenericPan {
+class Contours : public nGenericPan, private Ui::Contours {
 	Q_OBJECT
 public:
     Q_INVOKABLE Contours(neutrino*);
 	
-    Ui::Contours my_w;
-
 	QPointer<nLine> my_c;
 
 public slots:

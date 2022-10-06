@@ -173,7 +173,7 @@
    <addaction name="actionCenter"/>
    <addaction name="actionLine"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
+  <widget class="QStatusBar" name="statusbar">
    <property name="font">
     <font>
      <pointsize>10</pointsize>
@@ -197,7 +197,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -209,7 +209,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

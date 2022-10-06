@@ -193,7 +193,6 @@
    <addaction name="actionName"/>
    <addaction name="actionOrigin"/>
    <addaction name="actionScale"/>
-   <addaction name="actionFreeze"/>
    <addaction name="actionRescale"/>
   </widget>
   <action name="actionCopy">
@@ -268,25 +267,9 @@
     <string>Change scale</string>
    </property>
   </action>
-  <action name="actionFreeze">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc">
-     <normaloff>:/icons/lockOpen.png</normaloff>
-     <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
-   </property>
-   <property name="text">
-    <string>freeze</string>
-   </property>
-   <property name="toolTip">
-    <string>Set current origin/scale to new images</string>
-   </property>
-  </action>
   <action name="actionRescale">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/rescale.png</normaloff>:/icons/rescale.png</iconset>
    </property>
    <property name="text">
@@ -305,7 +288,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-MinSizeRel/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

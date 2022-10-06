@@ -27,44 +27,43 @@
 
 Rotate::Rotate(neutrino *nparent) : nGenericPan(nparent)
 {
-	my_w.setupUi(this);
+    setupUi(this);
 
     show();
 
-	connect(my_w.valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
-    connect(my_w.doIt,SIGNAL(pressed()),this,SLOT(keepCopy()));
-	connect(my_w.image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
+    connect(valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
+    connect(image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
     rotated=nullptr;
 	doRotateLive();
 }
 
 void Rotate::doRotateLive () {
-	double alpha=my_w.valueAngle->value();
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
-		if (image!=rotated) {
-            if (my_w.sameSize->isChecked()) {
-                rotated=nparent->replacePhys(new nPhysD(image->fast_rotated(alpha,getReplaceVal(image))),rotated, true);
+    double alpha=valueAngle->value();
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
+        if (my_phys!=rotated) {
+            nPhysD *my_rot;
+            if (sameSize->isChecked()) {
+                my_rot=new nPhysD(my_phys->fast_rotated(alpha,getReplaceVal(my_phys)));
             } else {
-                rotated=nparent->replacePhys(new nPhysD(image->rotated(alpha,getReplaceVal(image))),rotated, true);
+                my_rot=new nPhysD(my_phys->rotated(alpha,getReplaceVal(my_phys)));
             }
-		} else {
-			my_w.statusbar->showMessage("Can't work on this image",5000);
+            erasePrevious->setEnabled(true);
+            if (erasePrevious->isChecked()) {
+                rotated=nparent->replacePhys(my_rot,rotated, true);
+            } else {
+                nparent->addShowPhys(my_rot);
+                rotated=my_rot;
+            }
+        } else {
+            statusbar->showMessage("Can't work on this image",5000);
 		}
-	}
-}
-
-void Rotate::keepCopy () {
-	doRotateLive();
-	if (rotated) {
-        nPhysD *newRotated=new nPhysD(*rotated);
-		nparent->addPhys(newRotated);
 	}
 }
 
 double Rotate::getReplaceVal(nPhysD* image) {
 	double val=0.0;
-    switch (my_w.defaultValue->currentIndex()) {
+    switch (defaultValue->currentIndex()) {
         case 0:
             val=std::numeric_limits<double>::quiet_NaN();
             break;

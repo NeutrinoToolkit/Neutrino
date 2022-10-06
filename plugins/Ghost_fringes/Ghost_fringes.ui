@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>250</height>
+    <height>259</height>
    </rect>
   </property>
   <property name="font">
@@ -206,7 +206,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QPushButton" name="doGhost">
+        <widget class="QPushButton" name="doGhostB">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -251,7 +251,7 @@
   </widget>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
@@ -278,12 +278,12 @@
   <tabstop>shot</tabstop>
   <tabstop>widthCarrier</tabstop>
   <tabstop>angleCarrier</tabstop>
-  <tabstop>doGhost</tabstop>
+  <tabstop>doGhostB</tabstop>
   <tabstop>erasePrevious</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
   <include location="GhostFringes.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

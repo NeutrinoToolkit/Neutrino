@@ -39,7 +39,7 @@
 
 
 nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
-	my_w.setupUi(this);
+    setupUi(this);
 
 	int coreNum =1;
 
@@ -69,91 +69,91 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 			nested = omp_get_nested();
 
 			/* Print environment information */
-            my_w.infoCores->insertPlainText("Number of processors : "+QLocale().toString(procs));
-			my_w.infoCores->insertPlainText("\nNumber of threads : "+QLocale().toString(nthreads));
-			my_w.infoCores->insertPlainText("\nMax threads : "+QLocale().toString(maxt));
-			my_w.infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
-			my_w.infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
-			my_w.infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
+            infoCores->insertPlainText("Number of processors : "+QLocale().toString(procs));
+            infoCores->insertPlainText("\nNumber of threads : "+QLocale().toString(nthreads));
+            infoCores->insertPlainText("\nMax threads : "+QLocale().toString(maxt));
+            infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
+            infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
+            infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
 		}
 	}
 
 
-	my_w.threads->setMaximum(coreNum);
+    threads->setMaximum(coreNum);
 #endif
 
 	if (coreNum==1) {
-		my_w.threads->hide();
-		my_w.labelThreads->hide();
+        threads->hide();
+        labelThreads->hide();
 	}
 
-	my_w.defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
+    defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
-    connect(my_w.forceDecimalDot, SIGNAL(stateChanged(int)), napp, SLOT(forceDecimalDot(int)));
+    connect(forceDecimalDot, SIGNAL(stateChanged(int)), napp, SLOT(forceDecimalDot(int)));
 
-    my_w.openclUnit->setMaximum(physWave::openclEnabled());
+    openclUnit->setMaximum(physWave::openclEnabled());
 
 
-	connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
-    connect(my_w.threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+    connect(openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
+    connect(threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
 
     show(true);
 
-	my_w.comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
+    comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
 
 	changeFont();
 
-	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-	connect(my_w.fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
-	connect(my_w.fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
-    connect(my_w.showDimPixel, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(my_w.showXYaxes, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(my_w.showColorbar, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(my_w.showColorbarValues , SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(my_w.mouseThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
-    connect(my_w.gridThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
-    connect(my_w.actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+    connect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    connect(fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
+    connect(fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
+    connect(showDimPixel, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(showXYaxes, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(showColorbar, SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(showColorbarValues , SIGNAL(released()), this, SLOT(changeDecorations()));
+    connect(mouseThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
+    connect(gridThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
+    connect(actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
-    connect(my_w.currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+    connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
 
-    connect(my_w.pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
+    connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
 
-    connect(my_w.physNameLength, SIGNAL(valueChanged(int)), this, SLOT(savedefaults()));
+    connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(savedefaults()));
 
-    QMap<QString, QVariant> pluginList(nparent->property("NeuSave-plugindirs").toMap());
-    qDebug() << pluginList;
-    for (auto& k : pluginList.keys()) {
-        qDebug() << k << pluginList[k];
-        QListWidgetItem *dd=new QListWidgetItem(my_w.pluginList);
+    QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
+    qDebug() << pluginListMap;
+    for (auto& k : pluginListMap.keys()) {
+        qDebug() << k << pluginListMap[k];
+        QListWidgetItem *dd=new QListWidgetItem(pluginList);
         dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
-        if (pluginList[k].toInt() == 0) {
+        if (pluginListMap[k].toInt() == 0) {
             dd->setCheckState(Qt::Unchecked);
         } else {
             dd->setCheckState(Qt::Checked);
         }
         dd->setText(k);
-        my_w.pluginList->addItem(dd);
+        pluginList->addItem(dd);
     }
     qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
-    connect(my_w.openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-    connect(my_w.openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-    connect(my_w.separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-    connect(my_w.askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+    connect(openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    connect(separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
 
-    foreach (QCheckBox *wdg, my_w.groupBox->findChildren<QCheckBox *>()) {
+    foreach (QCheckBox *wdg, groupBox->findChildren<QCheckBox *>()) {
         connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
     }
-    foreach (QToolButton *wdg, my_w.groupBox->findChildren<QToolButton *>()) {
+    foreach (QToolButton *wdg, groupBox->findChildren<QToolButton *>()) {
         connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
     }
-    foreach (QLineEdit *wdg, my_w.groupBox->findChildren<QLineEdit *>()) {
+    foreach (QLineEdit *wdg, groupBox->findChildren<QLineEdit *>()) {
         connect(wdg, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
     }
-    foreach (QSpinBox *wdg, my_w.groupBox->findChildren<QSpinBox *>()) {
+    foreach (QSpinBox *wdg, groupBox->findChildren<QSpinBox *>()) {
         connect(wdg, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
     }
-    foreach (QDoubleSpinBox *wdg, my_w.groupBox->findChildren<QDoubleSpinBox *>()) {
+    foreach (QDoubleSpinBox *wdg, groupBox->findChildren<QDoubleSpinBox *>()) {
         connect(wdg, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
     }
 
@@ -166,10 +166,10 @@ void nPreferences::changeThreads(int num) {
 
 
 void nPreferences::openclUnitValueChange(int num) {
-	my_w.openclDescription->clear();
+    openclDescription->clear();
 #ifdef HAVE_LIBCLFFT
 	if (num>0) {
-        my_w.openclDescription->setPlainText(QString::fromStdString(physWave::get_platform_device_info_opencl(num)));
+        openclDescription->setPlainText(QString::fromStdString(physWave::get_platform_device_info_opencl(num)));
 		setProperty("openclUnit",num);
 	}
 #endif
@@ -188,10 +188,10 @@ void nPreferences::on_getOrigin_released() {
     if (currentBuffer) {
         vec2f my_vec=currentBuffer->get_origin();
         DEBUG(my_vec);
-        my_w.originX->setText(QLocale().toString(my_vec.x()));
-        my_w.originY->setText(QLocale().toString(my_vec.y()));
-        my_w.originX->repaint();
-        my_w.originY->repaint();
+        originX->setText(QLocale().toString(my_vec.x()));
+        originY->setText(QLocale().toString(my_vec.y()));
+        originX->repaint();
+        originY->repaint();
     }
 }
 
@@ -199,10 +199,10 @@ void nPreferences::on_getScale_released() {
     if (currentBuffer) {
         vec2f my_vec=currentBuffer->get_scale();
         DEBUG(my_vec);
-        my_w.scaleX->setText(locale().toString(my_vec.x()));
-        my_w.scaleY->setText(locale().toString(my_vec.y()));
-        my_w.scaleX->repaint();
-        my_w.scaleY->repaint();
+        scaleX->setText(locale().toString(my_vec.x()));
+        scaleY->setText(locale().toString(my_vec.y()));
+        scaleX->repaint();
+        scaleY->repaint();
     }
 }
 
@@ -210,19 +210,19 @@ void nPreferences::on_getColors_released() {
     if (currentBuffer) {
         vec2f my_vec=currentBuffer->prop["display_range"];
         DEBUG(my_vec);
-        my_w.colorMin->setText(QLocale().toString(my_vec.x()));
-        my_w.colorMax->setText(QLocale().toString(my_vec.y()));
+        colorMin->setText(QLocale().toString(my_vec.x()));
+        colorMax->setText(QLocale().toString(my_vec.y()));
     }
 }
 
 void nPreferences::changeDecorations() {
     saveDefaults();
-    nparent->my_w->my_view->my_mouse.pen.setWidthF(my_w.mouseThickness->value());
-    nparent->my_w->my_view->my_tics.gridThickness=my_w.gridThickness->value();
-    nparent->my_w->my_view->my_tics.showDimPixel=my_w.showDimPixel->isChecked();
-    nparent->my_w->my_view->my_tics.showXYaxes=my_w.showXYaxes->isChecked();
-    nparent->my_w->my_view->my_tics.showColorbar=my_w.showColorbar->isChecked();
-    nparent->my_w->my_view->my_tics.showColorbarValues=my_w.showColorbarValues->isChecked();
+    nparent->my_w->my_view->my_mouse.pen.setWidthF(mouseThickness->value());
+    nparent->my_w->my_view->my_tics.gridThickness=gridThickness->value();
+    nparent->my_w->my_view->my_tics.showDimPixel=showDimPixel->isChecked();
+    nparent->my_w->my_view->my_tics.showXYaxes=showXYaxes->isChecked();
+    nparent->my_w->my_view->my_tics.showColorbar=showColorbar->isChecked();
+    nparent->my_w->my_view->my_tics.showColorbarValues=showColorbarValues->isChecked();
     nparent->my_w->my_view->my_mouse.update();
     nparent->my_w->my_view->my_tics.update();
     nparent->my_w->my_view->update();
@@ -231,11 +231,11 @@ void nPreferences::changeDecorations() {
 void nPreferences::changeFont() {
 	QFont font=nparent->my_w->my_view->font();
 	if (sender()) {
-		font=my_w.fontFace->currentFont();
-		font.setPointSize(my_w.fontSize->value());
+        font=fontFace->currentFont();
+        font.setPointSize(fontSize->value());
 	} else {
-		my_w.fontFace->setCurrentFont(font);
-		my_w.fontSize->setValue(font.pointSize());
+        fontFace->setCurrentFont(font);
+        fontSize->setValue(font.pointSize());
 	}
 	nparent->my_w->my_view->setFont(font);
 	QSettings settings("neutrino","");
@@ -268,12 +268,12 @@ void nPreferences::changeIconSize(int val) {
 }
 
 void nPreferences::hideEvent(QHideEvent*e){
-	disconnect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    disconnect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	nGenericPan::hideEvent(e);
 }
 
 void nPreferences::showEvent(QShowEvent*e){
-	connect(my_w.comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    connect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
 	nGenericPan::showEvent(e);
 }
 
@@ -281,28 +281,28 @@ void nPreferences::on_addPlugin_released() {
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
 	if (QFileInfo(dir).exists()) {
 		nparent->scanPlugins(dir);
-        QListWidgetItem *dd=new QListWidgetItem(my_w.pluginList);
+        QListWidgetItem *dd=new QListWidgetItem(pluginList);
         dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
         dd->setCheckState(Qt::Checked);
         dd->setText(dir);
-        my_w.pluginList->addItem(dd);
+        pluginList->addItem(dd);
 	}
 //    saveDefaults();
 //    nparent->saveDefaults();
 }
 
 void nPreferences::updatePlugindirs() {
-    QMap<QString, QVariant> pluginList;
-    for(int i = 0; i < my_w.pluginList->count(); ++i) {
-        pluginList[my_w.pluginList->item(i)->text()]=QVariant(my_w.pluginList->item(i)->checkState());
+    QMap<QString, QVariant> pluginListMap;
+    for(int i = 0; i < pluginList->count(); ++i) {
+        pluginListMap[pluginList->item(i)->text()]=QVariant(pluginList->item(i)->checkState());
     }
-    nparent->setProperty("NeuSave-plugindirs",pluginList);
+    nparent->setProperty("NeuSave-plugindirs",pluginListMap);
     qDebug() << nparent->property("NeuSave-plugindirs");
 //    nparent->saveDefaults();
 }
 
 void nPreferences::on_removePlugin_released() {
-	qDeleteAll(my_w.pluginList->selectedItems());
+    qDeleteAll(pluginList->selectedItems());
     updatePlugindirs();
 }
 

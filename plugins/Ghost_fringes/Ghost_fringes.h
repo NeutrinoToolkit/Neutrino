@@ -35,13 +35,11 @@
 
 class neutrino;
 
-class Ghost_fringes : public nGenericPan {
+class Ghost_fringes : public nGenericPan, private Ui::Ghost_fringes {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Ghost_fringes(neutrino *);
-
-    Ui::Ghost_fringes my_w;
 
     QPointer<nLine> maskRegion;
 

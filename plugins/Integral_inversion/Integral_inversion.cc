@@ -30,7 +30,7 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
   invertedPhys(nullptr)
 {
 
-	my_w.setupUi(this);
+    setupUi(this);
 
     axis =  new nLine(this,1);
 	axis->forceMonotone = true;
@@ -40,23 +40,23 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
 
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
-	my_w.molarRefr_le->setValidator(dVal);
-    my_w.molarRefr_le->setText(QLocale().toString(5.23e-7));
+    molarRefr_le->setValidator(dVal);
+    molarRefr_le->setText(QLocale().toString(5.23e-7));
 
-	connect(my_w.actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
-    connect(my_w.actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
-	connect(my_w.actionBezier, SIGNAL(triggered()), axis, SLOT(toggleBezier()));
-	connect(my_w.refphase_checkb, SIGNAL(stateChanged(int)), this, SLOT(refphase_checkbChanged(int)));
+    connect(actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
+    connect(actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
+    connect(actionBezier, SIGNAL(triggered()), axis, SLOT(toggleBezier()));
+    connect(refphase_checkb, SIGNAL(stateChanged(int)), this, SLOT(refphase_checkbChanged(int)));
 
-	connect(my_w.doInversion, SIGNAL(clicked()), SLOT(doInversion()));
+    connect(doInversionB, SIGNAL(clicked()), SLOT(doInversion()));
 
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
-	my_w.invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
-	my_w.invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
-//	my_w.invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
+    invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
+    invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));
+//	invAlgo_cb->addItem("Abel-derived (experimental!)", QVariant::fromValue(30));
     
-	refphase_checkbChanged(my_w.refphase_checkb->checkState());
+    refphase_checkbChanged(refphase_checkb->checkState());
     show();
 }
 
@@ -68,21 +68,21 @@ void Integral_inversion::physDel(nPhysD* buf) {
 
 
 void Integral_inversion::refphase_checkbChanged(int val) {
-	my_w.refphase_cb->setEnabled(val==2);
+    refphase_cb->setEnabled(val==2);
 }
 
 void
 Integral_inversion::sceneChanged()
 {
-	if (sender()==axis && my_w.autoUpdate->isChecked()) {
+    if (sender()==axis && autoUpdate->isChecked()) {
 		doInversion();
 	}
 }
 
 void Integral_inversion::doInversion() {
 	saveDefaults();
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
 		//axis->rearrange_monotone();
 		bool isHorizontal = axis->getHMonotone();
 
@@ -94,13 +94,13 @@ void Integral_inversion::doInversion() {
 		axis_poly = axis->getLine(npoints);
 		
 		//!fixme we should cut the line when it goes outside and not move the point
-        int xpos= std::max<int>(0lu,std::min((unsigned int)axis_poly.first().x(),image->getW()-1));
-        int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.first().y(),image->getH()-1));
+        int xpos= std::max<int>(0lu,std::min((unsigned int)axis_poly.first().x(),my_phys->getW()-1));
+        int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.first().y(),my_phys->getH()-1));
 		axis_clean << QPoint(xpos,ypos);
 
 		for (int i=1; i<axis_poly.size(); i++) {
-            int xpos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).x(),image->getW()-1));
-            int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).y(),image->getH()-1));
+            int xpos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).x(),my_phys->getW()-1));
+            int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).y(),my_phys->getH()-1));
 			if (isHorizontal) {
 				if (xpos != axis_clean.last().x()) axis_clean << QPoint(xpos,ypos);
 			} else {
@@ -114,10 +114,10 @@ void Integral_inversion::doInversion() {
 		}
 
 		// launch inversion
-        physD iimage(static_cast<physD*>(image)->copy());
+        physD iimage(static_cast<physD*>(my_phys)->copy());
         // deep copy and perform operations
-        if (my_w.refphase_checkb->isChecked()) {
-            physD *ref=static_cast<physD*>(getPhysFromCombo(my_w.refphase_cb));
+        if (refphase_checkb->isChecked()) {
+            physD *ref=static_cast<physD*>(getPhysFromCombo(refphase_cb));
             if (ref && iimage.getW() == ref->getW() && iimage.getH() == ref->getH()) {
                 iimage = iimage - (*ref);
             } else {
@@ -127,12 +127,12 @@ void Integral_inversion::doInversion() {
         iimage.setFromName(iimage.getName());
         iimage.setName("inverted");
 
-        if (my_w.blurRadius_checkb->isChecked()) {	// blur
-            physMath::phys_fast_gaussian_blur(iimage, my_w.blurRadius_sb->value());
+        if (blurRadius_checkb->isChecked()) {	// blur
+            physMath::phys_fast_gaussian_blur(iimage, blurRadius_sb->value());
         }
 
-        if (my_w.multiply_checkb->isChecked()) {	// multiply
-            physMath::phys_multiply(iimage, my_w.multiply_sb->value());
+        if (multiply_checkb->isChecked()) {	// multiply
+            physMath::phys_multiply(iimage, multiply_sb->value());
         }
 
 
@@ -149,8 +149,8 @@ void Integral_inversion::doInversion() {
 		// questo sara' da risolvere ma se bestemmio ancora un po' poi non eleggono piu' il papa
 		// (workaround)
 
-		int cb_idx = my_w.invAlgo_cb->currentIndex();
-        my_abel_params.ialgo = (enum physWave::inversion_algo) my_w.invAlgo_cb->itemData(cb_idx).value<int>();
+        int cb_idx = invAlgo_cb->currentIndex();
+        my_abel_params.ialgo = (enum physWave::inversion_algo) invAlgo_cb->itemData(cb_idx).value<int>();
 
         my_abel_params.iphysics = physWave::ABEL_NONE;
 
@@ -170,30 +170,30 @@ void Integral_inversion::doInversion() {
         if (my_abel_params.oimage) {
             nPhysD inv_image(my_abel_params.oimage->copy());
 
-            switch (my_w.physTabs->currentIndex()) {
+            switch (physTabs->currentIndex()) {
             case 0:
                 DEBUG("Inversions: no physics applied");
                 break;
             case 1:
-                physWave::phys_apply_inversion_gas(inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6, locale().toDouble(my_w.molarRefr_le->text()));
+                physWave::phys_apply_inversion_gas(inv_image, probeLambda_sb->value()*1e-9, imgRes_sb->value()*1e-6, locale().toDouble(molarRefr_le->text()));
                 break;
             case 2:
                 DEBUG("Inversions: applying plasma physics");
-                physWave::phys_apply_inversion_plasma(inv_image, my_w.probeLambda_sb->value()*1e-9, my_w.imgRes_sb->value()*1e-6);
+                physWave::phys_apply_inversion_plasma(inv_image, probeLambda_sb->value()*1e-9, imgRes_sb->value()*1e-6);
                 break;
             case 3: {
                 DEBUG("Inversions: applying proton  physics");
-                physWave::phys_apply_inversion_protons(inv_image, my_w.energy->value()*1e6, my_w.imgRes_sb->value()*1e-6, my_w.distance->value()*1e-2, my_w.magnificaton->value());
+                physWave::phys_apply_inversion_protons(inv_image, energy->value()*1e6, imgRes_sb->value()*1e-6, distance->value()*1e-2, magnificaton->value());
                 break;
             }
             default:
                 break;
             }
-            inv_image.setShortName(my_w.invAlgo_cb->currentText().toUtf8().constData());
+            inv_image.setShortName(invAlgo_cb->currentText().toUtf8().constData());
 
             bool ok1,ok2;
-            double mini=locale().toDouble(my_w.minCut->text(),&ok1);
-            double maxi=locale().toDouble(my_w.maxCut->text(),&ok2);
+            double mini=locale().toDouble(minCut->text(),&ok1);
+            double maxi=locale().toDouble(maxCut->text(),&ok2);
             if (ok1 || ok2) {
                 physMath::cutoff(inv_image,
                             ok1?mini:inv_image.get_min(),
@@ -201,7 +201,7 @@ void Integral_inversion::doInversion() {
             }
             
             nPhysD *invert = new nPhysD(inv_image);
-			if (my_w.erasePrevious->isChecked()) {
+            if (erasePrevious->isChecked()) {
                 invertedPhys=nparent->replacePhys(invert,invertedPhys);
 			} else {
                 invertedPhys=invert;

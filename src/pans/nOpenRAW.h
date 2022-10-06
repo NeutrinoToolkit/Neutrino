@@ -33,12 +33,11 @@
 
 class neutrino;
 
-class nOpenRAW : public nGenericPan {
+class nOpenRAW : public nGenericPan, private Ui::nOpenRAW {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE nOpenRAW(neutrino *);
-    Ui::nOpenRAW my_w;
 
 public slots:
     void add(QString);

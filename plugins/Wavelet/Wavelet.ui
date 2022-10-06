@@ -482,7 +482,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QPushButton" name="doWavelet">
+            <widget class="QPushButton" name="doWaveletB">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -692,7 +692,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
              </property>
             </widget>
@@ -716,7 +716,7 @@
             <number>0</number>
            </property>
            <item row="1" column="0">
-            <widget class="QPushButton" name="doUnwrap">
+            <widget class="QPushButton" name="doUnwrapB">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -1044,7 +1044,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QPushButton" name="doRemove">
+            <widget class="QPushButton" name="doRemoveB">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -1152,7 +1152,7 @@
   </action>
   <action name="actionDoAll">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -1176,7 +1176,7 @@
   <tabstop>damp</tabstop>
   <tabstop>showSource</tabstop>
   <tabstop>synthetic</tabstop>
-  <tabstop>doWavelet</tabstop>
+  <tabstop>doWaveletB</tabstop>
   <tabstop>erasePrevious</tabstop>
   <tabstop>imageUnwrap</tabstop>
   <tabstop>qualityUnwrap</tabstop>
@@ -1184,7 +1184,7 @@
   <tabstop>useBarrier</tabstop>
   <tabstop>lineBarrier</tabstop>
   <tabstop>removeCarrierAfterUnwrap</tabstop>
-  <tabstop>doUnwrap</tabstop>
+  <tabstop>doUnwrapB</tabstop>
   <tabstop>erasePreviousUnwrap</tabstop>
   <tabstop>unwrapped</tabstop>
   <tabstop>phaseOffset</tabstop>
@@ -1195,12 +1195,12 @@
   <tabstop>liveView</tabstop>
   <tabstop>reference</tabstop>
   <tabstop>refUnwrap</tabstop>
-  <tabstop>doRemove</tabstop>
+  <tabstop>doRemoveB</tabstop>
   <tabstop>erasePreviuos</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc"/>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

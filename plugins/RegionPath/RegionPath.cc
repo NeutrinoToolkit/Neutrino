@@ -30,7 +30,7 @@ RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent),
     regionPhys(nullptr)
 {
 
-	my_w.setupUi(this);
+    setupUi(this);
 
 	// TODO: create something better to avoid line removal
     region.setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(10, 50)<<QPointF(50, 50));
@@ -38,27 +38,19 @@ RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
-    connect(my_w.actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
-    connect(my_w.actionBezier, SIGNAL(triggered()), &region, SLOT(toggleBezier()));
+    connect(actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
+    connect(actionBezier, SIGNAL(triggered()), &region, SLOT(toggleBezier()));
 
-	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
-	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
-}
-
-void RegionPath::duplicate () {
-    if (regionPhys==nullptr) {
-        doIt();
-    }
-    regionPhys=nullptr;
+    connect(doItB, SIGNAL(clicked()), SLOT(doIt()));
 }
 
 void RegionPath::doIt() {
     saveDefaults();
-    nPhysD *image=getPhysFromCombo(my_w.image);
-    if (image) {
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
         double replaceVal=getReplaceVal();
         QPolygonF regPoly=region.poly(1);
-        regPoly=regPoly.translated(image->get_origin().x(),image->get_origin().y());
+        regPoly=regPoly.translated(my_phys->get_origin().x(),my_phys->get_origin().y());
         
         std::vector<vec2f> vecPoints(regPoly.size());
         for(int k=0;k<regPoly.size();k++) {
@@ -67,9 +59,9 @@ void RegionPath::doIt() {
         
         QRect regRect=regPoly.boundingRect().toRect();
         
-        nPhysD *regPath = new nPhysD(*image);
+        nPhysD *regPath = new nPhysD(*my_phys);
         
-        if (!my_w.inverse->isChecked()) {
+        if (!inverse->isChecked()) {
             regPath->set(replaceVal);
         } 
         
@@ -84,44 +76,51 @@ void RegionPath::doIt() {
 #pragma omp parallel for
             for (int j=regRect.top(); j<=regRect.bottom(); j++) {
                 vec2f pp(i,j);
-                if (point_inside_poly(pp,vecPoints)==my_w.inverse->isChecked()) {
+                if (point_inside_poly(pp,vecPoints)==inverse->isChecked()) {
                     regPath->set(pp,replaceVal);
                 } else {
-                    regPath->set(pp,image->point(i,j));
+                    regPath->set(pp,my_phys->point(i,j));
                 }
             }
             progress.setValue(i-regRect.left());
         }
-        if (my_w.crop->isChecked()) {
+        if (crop->isChecked()) {
             *regPath=regPath->sub(regRect.x(), regRect.y(), regRect.width(), regRect.height());
         }
         regPath->TscanBrightness();
-        regionPhys=nparent->replacePhys(regPath,regionPhys);
+        erasePrevious->setEnabled(true);
+        if (erasePrevious->isChecked()) {
+            regionPhys=nparent->replacePhys(regPath,regionPhys, true);
+        } else {
+            nparent->addShowPhys(regPath);
+            regionPhys=regPath;
+        }
+
     }
 }
 
 double RegionPath::getReplaceVal() {
 	double val=0.0;
-	nPhysD *image=getPhysFromCombo(my_w.image);
+    nPhysD *my_phys=getPhysFromCombo(image);
 	if (image) {
-		switch (my_w.defaultValue->currentIndex()) {
+        switch (defaultValue->currentIndex()) {
 			case 0:
 				val=std::numeric_limits<double>::quiet_NaN();
 				break;
 			case 1:
-				val=image->get_min();
+                val=my_phys->get_min();
 				break;
 			case 2:
-				val=image->get_max();
+                val=my_phys->get_max();
 				break;
 			case 3:
-				val=0.5*(image->get_min()+image->get_max());
+                val=0.5*(my_phys->get_min()+my_phys->get_max());
 				break;
 			case 4:
 				val=0.0;
 				break;
 			default:
-				val=my_w.replace->text().toDouble();
+                val=replace->text().toDouble();
 				break;
 		}
 	}

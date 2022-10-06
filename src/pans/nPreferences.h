@@ -31,13 +31,12 @@
 #include "ui_nPreferences.h"
 #include "neutrino.h"
 
-class nPreferences : public nGenericPan
+class nPreferences : public nGenericPan, private Ui::nPreferences
 {
     Q_OBJECT
 
 public:
     Q_INVOKABLE nPreferences(neutrino*);
-    Ui::nPreferences my_w;
 
 public slots:
     void changeDecorations();

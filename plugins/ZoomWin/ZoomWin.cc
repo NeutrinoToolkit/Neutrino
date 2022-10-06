@@ -29,33 +29,33 @@
 
 ZoomWin::ZoomWin(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
-    my_w.toolBar->addWidget(my_w.my_scale);
-    connect(my_w.actionLockClick, SIGNAL(triggered()), this, SLOT(setBehaviour()));
-    my_w.my_view->setInteractive(true);
-    connect(my_w.my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
+    toolBar->addWidget(my_scale);
+    connect(actionLockClick, SIGNAL(triggered()), this, SLOT(setBehaviour()));
+    my_view->setInteractive(true);
+    connect(my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
 
     show();
     setBehaviour();
 
-    my_w.my_view->setScene(&(nparent->getScene()));
-    my_w.my_view->scale(2,2);
+    my_view->setScene(&(nparent->getScene()));
+    my_view->scale(2,2);
 
 }
 
 void ZoomWin::updatePlot(QPointF p) {
-    my_w.my_view->centerOn(p);
+    my_view->centerOn(p);
 }
 
 void ZoomWin::changeZoom(double val) {
-    my_w.my_view->resetTransform();
-    my_w.my_view->scale(val,val);
+    my_view->resetTransform();
+    my_view->scale(val,val);
 }
 
 
 void ZoomWin::setBehaviour() {
-    if (my_w.actionLockClick->isChecked()) {
+    if (actionLockClick->isChecked()) {
         disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
         connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {

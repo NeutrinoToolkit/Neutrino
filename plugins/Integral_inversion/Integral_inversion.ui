@@ -315,7 +315,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QPushButton" name="doInversion">
+     <widget class="QPushButton" name="doInversionB">
       <property name="font">
        <font>
         <pointsize>10</pointsize>

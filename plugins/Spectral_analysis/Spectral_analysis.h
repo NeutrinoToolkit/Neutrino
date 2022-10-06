@@ -33,12 +33,10 @@
 
 class neutrino;
 
-class Spectral_analysis : public nGenericPan {
+class Spectral_analysis : public nGenericPan, private Ui::Spectral_analysis {
     Q_OBJECT
 public:
     Q_INVOKABLE Spectral_analysis(neutrino *);
-
-    Ui::Spectral_analysis my_w;
 
 public slots:
     void on_calculate_released();

@@ -29,24 +29,24 @@
 
 Contours::Contours(neutrino *nparent) : nGenericPan(nparent)
 {
-	my_w.setupUi(this);
+    setupUi(this);
 	my_c = new nLine(this,3);
 	my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
-	connect(my_w.actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
+    connect(actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
 
 	show();
 	on_percent_released();
 	//connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
-	//connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
-	connect(my_w.draw_pb, SIGNAL(released()), this, SLOT(draw()));
+    //connect(zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
+    connect(draw_pb, SIGNAL(released()), this, SLOT(draw()));
 
 	//calculate_stats();
 }
 
 void
 Contours::on_percent_released() {
-	my_w.level_dsb->setSuffix(my_w.percent->isChecked()?"%":"");
+    level_dsb->setSuffix(percent->isChecked()?"%":"");
 }
 
 void
@@ -64,7 +64,7 @@ Contours::setOrigin(QPointF p) {
 		currentBuffer->set_origin(p.x(),p.y());
         nparent->showPhys();
 	}
-	my_w.actionCenter->setChecked(false);
+    actionCenter->setChecked(false);
 }
 
 void
@@ -75,8 +75,8 @@ Contours::on_draw_pb_released()
 
 		// 0. build decimated
 		decimated = nPhysD(*currentBuffer);
-		if(my_w.blur_radius_sb->value()>0) {
-            physMath::phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
+        if(blur_radius_sb->value()>0) {
+            physMath::phys_fast_gaussian_blur(decimated, blur_radius_sb->value());
 		}
 
 		// 1. find centroid
@@ -89,8 +89,8 @@ Contours::on_draw_pb_released()
 		decimated.set_origin(centr);
 
 		std::list<vec2i> contour;
-		double cutoff=my_w.level_dsb->value();
-		if (my_w.percent->isChecked()) {
+        double cutoff=level_dsb->value();
+        if (percent->isChecked()) {
 			cutoff = decimated.get_min() + (decimated.get_max()-decimated.get_min())*(cutoff/100.0) ;
 		}
 
@@ -110,10 +110,9 @@ Contours::on_draw_pb_released()
 			}
 			my_c->setPoints(myp);
 			currentBuffer->set_origin(centr);
-			//my_w.statusBar->showMessage("Contour ok");
-            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
+            statusBar()->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
 		} else {
-            my_w.statusBar->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
+            statusBar()->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
 		}
 	}
 }

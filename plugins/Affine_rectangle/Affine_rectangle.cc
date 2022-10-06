@@ -28,14 +28,14 @@
 Affine_rectangle::Affine_rectangle(neutrino *nparent) : nGenericPan(nparent),
     affined(nullptr), l1(this,1)
 {
-	my_w.setupUi(this);
+    setupUi(this);
     l1.changeToolTip(panName()+"Points");
     l1.changeColorHolder("red");
     resetPoints();
 
-    connect(my_w.actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
-    connect(my_w.actionLine, SIGNAL(triggered()), &l1, SLOT(togglePadella()));
-    connect(my_w.transform,SIGNAL(pressed()),this,SLOT(affine()));
+    connect(actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
+    connect(actionLine, SIGNAL(triggered()), &l1, SLOT(togglePadella()));
+    connect(transform,SIGNAL(pressed()),this,SLOT(affine()));
 
     show();
 }
@@ -48,7 +48,7 @@ void Affine_rectangle::resetPoints() {
 
 void Affine_rectangle::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
-    if (buf && buf==getPhysFromCombo(my_w.image1)) {
+    if (buf && buf==getPhysFromCombo(image1)) {
         l1.show();
     } else {
         l1.hide();
@@ -56,15 +56,15 @@ void Affine_rectangle::bufferChanged(nPhysD* buf) {
 }
 
 void Affine_rectangle::affine() {
-    std::vector<vec2f> rectPoly={ vec2f(my_w.newWidth->value(),0), vec2f(0,0),  vec2f(0,my_w.newHeight->value())};
+    std::vector<vec2f> rectPoly={ vec2f(newWidth->value(),0), vec2f(0,0),  vec2f(0,newHeight->value())};
 
     std::array<double,6> transVect=physMath::getAffine(rectPoly,l1.getPointsVec2f());
 
-    nPhysD *my_phys=getPhysFromCombo(my_w.image1);
+    nPhysD *my_phys=getPhysFromCombo(image1);
     if (my_phys) {
 		
 		double replaceVal=0.0;
-		switch (my_w.defaultValue->currentIndex()) {
+        switch (defaultValue->currentIndex()) {
 			case 0:
 				replaceVal=std::numeric_limits<double>::quiet_NaN();
 				break;
@@ -85,8 +85,8 @@ void Affine_rectangle::affine() {
 				break;
 		}
 
-        unsigned int dx=my_w.newWidth->value();
-        unsigned int dy=my_w.newHeight->value();
+        unsigned int dx=newWidth->value();
+        unsigned int dy=newHeight->value();
 		
         DEBUG(affine(vec2f(0,0),transVect).x() << " " << affine(vec2f(0,0),transVect).y());
 
@@ -106,7 +106,7 @@ void Affine_rectangle::affine() {
 		}
         affinePhys.TscanBrightness();
 
-        if (my_w.erasePrevious->isChecked()) {
+        if (erasePrevious->isChecked()) {
             affined=nparent->replacePhys(new nPhysD(affinePhys),affined,true);
         } else {
             affined=new nPhysD(affinePhys);

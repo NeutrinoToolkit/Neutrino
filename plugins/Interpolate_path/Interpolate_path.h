@@ -36,20 +36,17 @@
 class neutrino;
 class nLine;
 
-class Interpolate_path : public nGenericPan {
+class Interpolate_path : public nGenericPan, private Ui::Interpolate_path {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Interpolate_path(neutrino *);
-
-    Ui::Interpolate_path my_w;
 
     QPointer<nLine> region;
 
     nPhysD *interpolatePhys;
 public slots:
     void doIt();
-    void duplicate();
 
 };
 

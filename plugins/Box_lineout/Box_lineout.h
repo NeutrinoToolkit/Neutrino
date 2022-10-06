@@ -35,13 +35,12 @@
 
 class nRect;
 
-class Box_lineout : public nGenericPan {
+class Box_lineout : public nGenericPan, private Ui::Box_lineout {
     Q_OBJECT
 
 public:
 
     Q_INVOKABLE Box_lineout(neutrino *);
-    Ui::Box_lineout my_w;
 
 public slots:
 

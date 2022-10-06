@@ -30,7 +30,7 @@
 Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
   ghostBusted(nullptr)
 {
-	my_w.setupUi(this);
+    setupUi(this);
 
     maskRegion =  new nLine(this,1);
     maskRegion->changeToolTip("MaskLine");
@@ -42,32 +42,32 @@ Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
-    connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-    connect(my_w.actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
-	connect(my_w.doGhost, SIGNAL(pressed()), this, SLOT(doGhost()));
-    connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
+    connect(actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
+    connect(actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
+    connect(doGhostB, SIGNAL(pressed()), this, SLOT(doGhost()));
+    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
 }
 
 void Ghost_fringes::guessCarrier() {
-    nPhysD *image=getPhysFromCombo(my_w.ref);
+    nPhysD *image=getPhysFromCombo(ref);
 	if (image) {
         QRect geom2=maskRegion->path().boundingRect().toRect();
 		nPhysD datamatrix;
         datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 		if (vecCarr.first()==0) {
-			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+            statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-			my_w.widthCarrier->setValue(vecCarr.first());
-			my_w.angleCarrier->setValue(vecCarr.second());
+            widthCarrier->setValue(vecCarr.first());
+            angleCarrier->setValue(vecCarr.second());
 		}
 	}
 }
 
 void Ghost_fringes::doGhost () {
-	nPhysD *imageShot=getPhysFromCombo(my_w.shot);
+    nPhysD *imageShot=getPhysFromCombo(shot);
     if (imageShot) {
         saveDefaults();
 
@@ -85,10 +85,10 @@ void Ghost_fringes::doGhost () {
         for (size_t i=0;i<dy;i++)
             yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
-        double cr = cos((my_w.angleCarrier->value()) * _phys_deg);
-        double sr = sin((my_w.angleCarrier->value()) * _phys_deg);
+        double cr = cos((angleCarrier->value()) * _phys_deg);
+        double sr = sin((angleCarrier->value()) * _phys_deg);
 
-        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*my_w.widthCarrier->value());
+        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
 
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
 
@@ -129,15 +129,15 @@ void Ghost_fringes::doGhost () {
         }
         deepcopy->TscanBrightness();
         
-        if (my_w.erasePrevious->isChecked()) {
+        if (erasePrevious->isChecked()) {
             ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,true);
         } else {
             nparent->addShowPhys(deepcopy);
             ghostBusted=deepcopy;
         }
 
-        my_w.erasePrevious->setEnabled(true);
-        my_w.statusbar->showMessage(QString(tr("Time: %1 msec")).arg(timer.elapsed()));
+        erasePrevious->setEnabled(true);
+        statusbar->showMessage(QString(tr("Time: %1 msec")).arg(timer.elapsed()));
 
 	}
 }

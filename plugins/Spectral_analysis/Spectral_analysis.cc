@@ -27,34 +27,34 @@
 
 Spectral_analysis::Spectral_analysis(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
-    my_w.direction->setIcon(my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
+    setupUi(this);
+    direction->setIcon(direction->style()->standardIcon(QStyle::SP_ArrowRight));
     show();
 }
 
 void Spectral_analysis::on_direction_toggled(bool val) {
-    my_w.direction->setIcon(val? my_w.direction->style()->standardIcon(QStyle::SP_ArrowLeft) : my_w.direction->style()->standardIcon(QStyle::SP_ArrowRight));
+    direction->setIcon(val? direction->style()->standardIcon(QStyle::SP_ArrowLeft) : direction->style()->standardIcon(QStyle::SP_ArrowRight));
 }
 
 void Spectral_analysis::on_calculate_released() {
     saveDefaults();
-    int kind = my_w.spectral_transform->currentIndex();
-    nPhysD *image=getPhysFromCombo(my_w.image);
-    phys_fft dir = my_w.direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
-    if (image) {
+    int kind = spectral_transform->currentIndex();
+    nPhysD *my_phys=getPhysFromCombo(image);
+    phys_fft dir = direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
+    if (my_phys) {
         physC ft;
         physC temp_complex;
-        if (my_w.useImaginary->isChecked()) {
-            nPhysD *imaginary=getPhysFromCombo(my_w.imaginary);
-            if (imaginary) {
-                temp_complex= physMath::from_real_imaginary(*image, *imaginary);
+        if (useImaginary->isChecked()) {
+            nPhysD *my_phys_img=getPhysFromCombo(imaginary);
+            if (my_phys_img) {
+                temp_complex= physMath::from_real_imaginary(*my_phys, *my_phys_img);
             }
         } else {
-            temp_complex= physMath::from_real(*image);
+            temp_complex= physMath::from_real(*my_phys);
         }
 
         // ftshift before if backward
-        if (my_w.doshift_cb->isChecked() && dir==PHYS_BACKWARD) {
+        if (doshift_cb->isChecked() && dir==PHYS_BACKWARD) {
             switch (kind) {
             case 0: temp_complex = physMath::ftshift1(temp_complex, PHYS_X); break;   // 1D horizontal
             case 1: temp_complex = physMath::ftshift1(temp_complex, PHYS_Y); break;   // 1D vertical
@@ -69,7 +69,7 @@ void Spectral_analysis::on_calculate_released() {
         }
 
         // ftshift after if forward
-        if (my_w.doshift_cb->isChecked()&& dir==PHYS_FORWARD) {
+        if (doshift_cb->isChecked()&& dir==PHYS_FORWARD) {
             switch (kind) {
             case 0: ft = physMath::ftshift1(ft, PHYS_X); break;   // 1D horizontal
             case 1: ft = physMath::ftshift1(ft, PHYS_Y); break;   // 1D vertical
@@ -77,12 +77,12 @@ void Spectral_analysis::on_calculate_released() {
             }
         }
 
-        if (my_w.normalize->isChecked()) {
-            physMath::phys_divide(ft, sqrt(image->getSurf()));
+        if (normalize->isChecked()) {
+            physMath::phys_divide(ft, sqrt(my_phys->getSurf()));
         }
 
         std::map<std::string, physD> omap;
-        switch (my_w.output_format->currentIndex()) {
+        switch (output_format->currentIndex()) {
         case 0: omap = physMath::to_polar(ft); break; // polar
         case 1: omap = physMath::to_rect(ft); break; // rectangular
         case 2: omap = physMath::to_powersp(ft, false); break; // power spectrum linear

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>218</width>
-    <height>144</height>
+    <height>147</height>
    </rect>
   </property>
   <property name="font">
@@ -76,7 +76,7 @@
      </widget>
     </item>
     <item row="2" column="0">
-     <widget class="QPushButton" name="doIt">
+     <widget class="QPushButton" name="doInterpolate">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
@@ -88,14 +88,15 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QPushButton" name="duplicate">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
+     <widget class="QCheckBox" name="erasePrevious">
+      <property name="enabled">
+       <bool>false</bool>
       </property>
       <property name="text">
-       <string>Keep a copy</string>
+       <string>erase previous</string>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -140,7 +141,7 @@
   </action>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
@@ -155,7 +156,7 @@
   <tabstop>image</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -26,13 +26,13 @@
 #include "Shortcuts.h"
 Shortcuts::Shortcuts(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
     setWindowFlags(Qt::Tool);
     
     QFile lic(":/html/Shortcuts.html");
     if (lic.open(QFile::ReadOnly | QFile::Text)) {
         QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
-        my_w.textBrowser->insertHtml(htmltext);
+        textBrowser->insertHtml(htmltext);
     }
     show(true);
 }

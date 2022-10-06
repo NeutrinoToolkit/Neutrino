@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
-    <height>171</height>
+    <width>222</width>
+    <height>180</height>
    </rect>
   </property>
   <property name="font">
@@ -23,18 +23,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
-    <item row="6" column="1">
-     <widget class="QPushButton" name="duplicate">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Keep a copy</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0" colspan="2">
      <widget class="QComboBox" name="image">
       <property name="font">
@@ -92,7 +80,7 @@
      </widget>
     </item>
     <item row="6" column="0">
-     <widget class="QPushButton" name="doIt">
+     <widget class="QPushButton" name="doItB">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
@@ -151,6 +139,16 @@
       </layout>
      </widget>
     </item>
+    <item row="6" column="1">
+     <widget class="QCheckBox" name="erasePrevious">
+      <property name="text">
+       <string>erase previous</string>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -192,7 +190,7 @@
   </action>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
@@ -207,7 +205,7 @@
   <tabstop>image</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Default/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

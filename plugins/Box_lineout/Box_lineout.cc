@@ -27,24 +27,24 @@
 
 Box_lineout::Box_lineout(neutrino *nparent) : nGenericPan(nparent)
 {
-    my_w.setupUi(this);
+    setupUi(this);
 
     // signals
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
-    connect(my_w.actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
+    connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 
-    connect(my_w.actionSaveClipboard, SIGNAL(triggered()), my_w.plot, SLOT(copy_data()));
-    connect(my_w.actionSaveTxt      , SIGNAL(triggered()), my_w.plot, SLOT(save_data()));
-    connect(my_w.actionSavePDF      , SIGNAL(triggered()), my_w.plot, SLOT(export_image()));
+    connect(actionSaveClipboard, SIGNAL(triggered()), plot, SLOT(copy_data()));
+    connect(actionSaveTxt      , SIGNAL(triggered()), plot, SLOT(save_data()));
+    connect(actionSavePDF      , SIGNAL(triggered()), plot, SLOT(export_image()));
 
-    my_w.plot->graph(0)->setName("Horizontal");
-    my_w.plot->graph(1)->setName("Vertical");
+    plot->graph(0)->setName("Horizontal");
+    plot->graph(1)->setName("Vertical");
 
     show();
     connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
-    connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
 
     updatePlot();
 }
@@ -55,17 +55,17 @@ void Box_lineout::sceneChanged() {
 
 void Box_lineout::mouseAtWorld(QPointF p) {
     if (currentBuffer) {
-        my_w.plot->setMousePosition(p.x(),p.y());
+        plot->setMousePosition(p.x(),p.y());
     }
 }
 
 void Box_lineout::updatePlot() {
-    DEBUG( my_w.tabWidget->currentIndex());
+    DEBUG( tabWidget->currentIndex());
 
     if (currentBuffer) {
         QRect geomBox=box->getRect(currentBuffer);
         if (geomBox.isEmpty()) {
-            my_w.statusBar->showMessage(tr("Attention: the region is outside the image!"),2000);
+            statusBar()->showMessage(tr("Attention: the region is outside the image!"),2000);
             return;
         }
         int dx=geomBox.width();
@@ -74,7 +74,7 @@ void Box_lineout::updatePlot() {
         vec2f orig=currentBuffer->get_origin();
         vec2f scal=currentBuffer->get_scale();
 
-        if (my_w.tabWidget->currentIndex()==0) {
+        if (tabWidget->currentIndex()==0) {
             QVector<double> xd(dx);
             QVector<double> yd(dy);
             for (int j=0;j<dy;j++){
@@ -95,11 +95,11 @@ void Box_lineout::updatePlot() {
             for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
             for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
 
-            my_w.plot->graph(0)->setData(xdata,xd);
-            my_w.plot->graph(1)->setData(ydata,yd);
+            plot->graph(0)->setData(xdata,xd);
+            plot->graph(1)->setData(ydata,yd);
 
-            my_w.plot->rescaleAxes();
-            my_w.plot->replot();
+            plot->rescaleAxes();
+            plot->replot();
         } else {
             double sum = 0;
             double mean = 0;
@@ -122,10 +122,10 @@ void Box_lineout::updatePlot() {
             variance = sqrt(variance/(dx*dy-1));
 
 
-            my_w.sum->setText(QLocale().toString(sum));
-            my_w.mean->setText(QLocale().toString(mean));
-            my_w.variance->setText(QLocale().toString(variance));
-            my_w.surface->setText(QLocale().toString(surface));
+            sumLE->setText(QLocale().toString(sum));
+            meanLE->setText(QLocale().toString(mean));
+            varianceLE->setText(QLocale().toString(variance));
+            surfaceLE->setText(QLocale().toString(surface));
 
         }
     }

@@ -34,12 +34,11 @@
 
 class neutrino;
 
-class Monitor : public nGenericPan {
+class Monitor : public nGenericPan, private Ui::Monitor {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Monitor(neutrino *);
-    Ui::Monitor my_w;
     QFileSystemModel *fileModel;
     QCompleter *completer;
 

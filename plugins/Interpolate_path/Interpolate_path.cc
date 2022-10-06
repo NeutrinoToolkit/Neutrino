@@ -29,7 +29,7 @@
 Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
 {
 
-	my_w.setupUi(this);
+    setupUi(this);
 
     region =  new nLine(this,1);
 	// TODO: create something better to avoid line removal
@@ -38,35 +38,27 @@ Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
 
     show();
 
-    connect(my_w.actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
-	connect(my_w.actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
+    connect(actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
+    connect(actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
-	connect(my_w.doIt, SIGNAL(clicked()), SLOT(doIt()));
-	connect(my_w.duplicate, SIGNAL(clicked()), SLOT(duplicate()));
-    interpolatePhys=nullptr;
-}
-
-void Interpolate_path::duplicate () {
-    if (interpolatePhys==nullptr) {
-        doIt();
-    }
+    connect(doInterpolate, SIGNAL(clicked()), SLOT(doIt()));
     interpolatePhys=nullptr;
 }
 
 void Interpolate_path::doIt() {
     saveDefaults();
-    nPhysD *image=getPhysFromCombo(my_w.image);
-    if (image) {
-        QPolygonF regionPoly=region->poly(1).translated(image->get_origin().x(),image->get_origin().y());
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
+        QPolygonF regionPoly=region->poly(1).translated(my_phys->get_origin().x(),my_phys->get_origin().y());
 
         std::vector<vec2f> vecPoints(regionPoly.size());
         for(int k=0;k<regionPoly.size();k++) {
             vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
         }
         
-        nPhysD *regionPath = new nPhysD(*image);
+        nPhysD *regionPath = new nPhysD(*my_phys);
 
-        QPolygonF regionPoly2=region->poly(20).translated(image->get_origin().x(),image->get_origin().y());
+        QPolygonF regionPoly2=region->poly(20).translated(my_phys->get_origin().x(),my_phys->get_origin().y());
 
         std::vector<std::pair<vec2f, double> > vals;
         for(int k=0;k<regionPoly2.size();k++) {
@@ -79,7 +71,7 @@ void Interpolate_path::doIt() {
         
         QRect rectRegion=regionPoly2.boundingRect().toRect();
         
-        double ex=my_w.weight->value();
+        double ex=weight->value();
         
         regionPath->setShortName("Region path");
         regionPath->setName("path");
@@ -108,6 +100,14 @@ void Interpolate_path::doIt() {
             progress.setValue(i-rectRegion.left());
         }
         regionPath->reset_display();
-        interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys);
+
+        erasePrevious->setEnabled(true);
+        if (erasePrevious->isChecked()) {
+            interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys,true);
+        } else {
+            nparent->addShowPhys(regionPath);
+            interpolatePhys=regionPath;
+        }
+
     }
 }

@@ -36,18 +36,6 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="6" column="1">
-     <widget class="QPushButton" name="doIt">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Keep a copy</string>
-      </property>
-     </widget>
-    </item>
     <item row="6" column="0">
      <widget class="QCheckBox" name="sameSize">
       <property name="font">
@@ -156,6 +144,21 @@
        </font>
       </property>
       <property name="neutrinoImage" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QCheckBox" name="erasePrevious">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>erase previous</string>
+      </property>
+      <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
       </property>
      </widget>

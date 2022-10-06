@@ -36,13 +36,11 @@
 
 class neutrino;
 
-class Wavelet : public nGenericPan {
+class Wavelet : public nGenericPan, private Ui::Wavelet {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Wavelet(neutrino *);
-
-    Ui::Wavelet my_w;
 
     nRect region;
 

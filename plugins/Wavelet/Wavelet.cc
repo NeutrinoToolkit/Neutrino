@@ -29,7 +29,7 @@
 
 Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), linebarrier(this,1)
 {
-	my_w.setupUi(this);
+    setupUi(this);
 
     region.setRect(QRectF(100,100,100,100));
 	
@@ -38,36 +38,36 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
     linebarrier.setPoints(poly);
     show();
 
-	connect(my_w.actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-	connect(my_w.actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
+    connect(actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
+    connect(actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
 
-    connect(my_w.actionRect, SIGNAL(triggered()), &region, SLOT(togglePadella()));
+    connect(actionRect, SIGNAL(triggered()), &region, SLOT(togglePadella()));
 	
-	connect(my_w.doWavelet, SIGNAL(pressed()), this, SLOT(doWavelet()));
-	connect(my_w.doUnwrap, SIGNAL(pressed()), this, SLOT(doUnwrap()));
+    connect(doWaveletB, SIGNAL(pressed()), this, SLOT(doWavelet()));
+    connect(doUnwrapB, SIGNAL(pressed()), this, SLOT(doUnwrap()));
 
-	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
+    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
-	connect(my_w.doRemove, SIGNAL(pressed()), this, SLOT(doRemove()));
+    connect(doRemoveB, SIGNAL(pressed()), this, SLOT(doRemove()));
 	
-	connect(my_w.useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
-    connect(my_w.lineBarrier, SIGNAL(released()), &linebarrier, SLOT(togglePadella()));
-	useBarrierToggled(my_w.useBarrier->isChecked());
+    connect(useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
+    connect(lineBarrier, SIGNAL(released()), &linebarrier, SLOT(togglePadella()));
+    useBarrierToggled(useBarrier->isChecked());
 
-	my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-	my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
-	connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-	connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-	connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+    widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
+    angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
+    connect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+    connect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 	
     origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=nullptr;
 }
 
 void Wavelet::on_relative_toggled(bool tog) {
-    my_w.minStretch->setSuffix(tog?" X":" [px]");
-    my_w.maxStretch->setSuffix(tog?" X":" [px]");
-    my_w.minThick->setSuffix(tog?" X":" [px]");
-    my_w.maxThick->setSuffix(tog?" X":" [px]");
+    minStretch->setSuffix(tog?" X":" [px]");
+    maxStretch->setSuffix(tog?" X":" [px]");
+    minThick->setSuffix(tog?" X":" [px]");
+    maxThick->setSuffix(tog?" X":" [px]");
 }
 
 void Wavelet::useBarrierToggled(bool val) {
@@ -81,7 +81,7 @@ void Wavelet::useBarrierToggled(bool val) {
 void Wavelet::bufferChanged(nPhysD* buf) {
     nGenericPan::bufferChanged(buf);
     if (buf) {
-		if (buf==getPhysFromCombo(my_w.image)) {
+        if (buf==getPhysFromCombo(image)) {
             region.show();
 		} else {
             region.hide();
@@ -106,54 +106,54 @@ void Wavelet::physDel(nPhysD* buf) {
 
 void Wavelet::guessCarrier() {
     QApplication::processEvents();
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
-        QRect geom2=region.getRect(image);
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
+        QRect geom2=region.getRect(my_phys);
         qDebug() << geom2;
 
 		nPhysD datamatrix;
-        DEBUG(image);
+        DEBUG(my_phys);
         DEBUG("1");
-        datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        datamatrix = my_phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
         DEBUG("2");
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, my_w.weightCarrier->value());
+        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 		
 		if (vecCarr.first()==0) {
-			my_w.statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+            statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-			my_w.statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
-			disconnect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-			disconnect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-			disconnect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-			my_w.widthCarrier->setValue(vecCarr.first());
-			my_w.angleCarrier->setValue(vecCarr.second());
-			my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-			my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
-			connect(my_w.widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-			connect(my_w.angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-			connect(my_w.weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
+            disconnect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            disconnect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            disconnect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            widthCarrier->setValue(vecCarr.first());
+            angleCarrier->setValue(vecCarr.second());
+            widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
+            angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
+            connect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            connect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
 		}
 	}
 }
 
 void Wavelet::doWavelet () {
     setEnabled(false);
-	nPhysD *image=getPhysFromCombo(my_w.image);
-	if (image) {
+    nPhysD *my_phys=getPhysFromCombo(image);
+    if (my_phys) {
         QElapsedTimer timer;
 		timer.start();
 
 		saveDefaults();
         QRect geom2=region.getRect();
 
-		nPhysD datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());		
+        nPhysD datamatrix = my_phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
 		
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
-		if (my_w.relative->isChecked()) {
-			conversionAngle=my_w.angleCarrier->value();
-			conversionStretch=my_w.widthCarrier->value();
+        if (relative->isChecked()) {
+            conversionAngle=angleCarrier->value();
+            conversionStretch=widthCarrier->value();
 		}
 
 		//qCalculation_th my_qt;
@@ -161,34 +161,34 @@ void Wavelet::doWavelet () {
 		QSettings settings("neutrino","");
         settings.beginGroup("nPreferences");
 
-		if (my_w.numAngle->value()==0) {
-			my_params.init_angle=my_w.angleCarrier->value();
-			my_params.end_angle=my_w.angleCarrier->value();
+        if (numAngle->value()==0) {
+            my_params.init_angle=angleCarrier->value();
+            my_params.end_angle=angleCarrier->value();
 			my_params.n_angles=1;
 		} else {
-			my_params.init_angle=my_w.minAngle->value()+conversionAngle;
-			my_params.end_angle=my_w.maxAngle->value()+conversionAngle;
-			my_params.n_angles=my_w.numAngle->value();
+            my_params.init_angle=minAngle->value()+conversionAngle;
+            my_params.end_angle=maxAngle->value()+conversionAngle;
+            my_params.n_angles=numAngle->value();
 		}
-        if (my_w.numStretch->value()==0) {
-            my_params.init_lambda=my_w.widthCarrier->value();
-            my_params.end_lambda=my_w.widthCarrier->value();
+        if (numStretch->value()==0) {
+            my_params.init_lambda=widthCarrier->value();
+            my_params.end_lambda=widthCarrier->value();
             my_params.n_lambdas=1;
         } else {
-            my_params.init_lambda=my_w.minStretch->value()*conversionStretch;
-            my_params.end_lambda=my_w.maxStretch->value()*conversionStretch;
-            my_params.n_lambdas=my_w.numStretch->value();
+            my_params.init_lambda=minStretch->value()*conversionStretch;
+            my_params.end_lambda=maxStretch->value()*conversionStretch;
+            my_params.n_lambdas=numStretch->value();
         }
-        if (my_w.numThick->value()==0) {
-            my_params.init_thick=my_w.widthCarrier->value();
-            my_params.end_thick=my_w.widthCarrier->value();
+        if (numThick->value()==0) {
+            my_params.init_thick=widthCarrier->value();
+            my_params.end_thick=widthCarrier->value();
             my_params.n_thick=1;
         } else {
-            my_params.init_thick=my_w.minThick->value()*conversionStretch;
-            my_params.end_thick=my_w.maxThick->value()*conversionStretch;
-            my_params.n_thick=my_w.numThick->value();
+            my_params.init_thick=minThick->value()*conversionStretch;
+            my_params.end_thick=maxThick->value()*conversionStretch;
+            my_params.n_thick=numThick->value();
         }
-        my_params.damp=my_w.damp->value();
+        my_params.damp=damp->value();
         my_params.data=&datamatrix;
 
         QString out;
@@ -205,12 +205,12 @@ void Wavelet::doWavelet () {
         }
 
 
-		my_w.erasePrevious->setEnabled(true);
+        erasePrevious->setEnabled(true);
         for(auto &itr : my_params.olist) {
             if (!(itr.first=="angle"  && my_params.n_angles==1) &&
                 !(itr.first=="lambda" && my_params.n_lambdas==1)) {
                 nPhysD *this_phys = new nPhysD(*itr.second);
-                if (my_w.erasePrevious->isChecked()) {
+                if (erasePrevious->isChecked()) {
                     waveletPhys[itr.first]=nparent->replacePhys(this_phys,waveletPhys[itr.first],false);
                 } else {
                     nparent->addPhys(this_phys);
@@ -223,25 +223,25 @@ void Wavelet::doWavelet () {
         
         for(auto &itr: waveletPhys) {
             if (itr.first=="phase_2pi") {
-                my_w.imageUnwrap->setCurrentIndex(my_w.imageUnwrap->findData(QVariant::fromValue(itr.second)));
+                imageUnwrap->setCurrentIndex(imageUnwrap->findData(QVariant::fromValue(itr.second)));
             } else if (itr.first=="contrast") {
-                my_w.qualityUnwrap->setCurrentIndex(my_w.qualityUnwrap->findData(QVariant::fromValue(itr.second)));
+                qualityUnwrap->setCurrentIndex(qualityUnwrap->findData(QVariant::fromValue(itr.second)));
             }
         }
         
-		if (my_w.showSource->isChecked()) {
+        if (showSource->isChecked()) {
 			datamatrix.setShortName("wavelet source");
             nPhysD *deepcopy=new nPhysD(datamatrix);
-			if (my_w.erasePrevious->isChecked()) {
+            if (erasePrevious->isChecked()) {
 				origSubmatrix=nparent->replacePhys(deepcopy,origSubmatrix,false);
 			} else {
 				nparent->addPhys(deepcopy);
 				origSubmatrix=deepcopy;
 			}
 		}
-        if (my_w.synthetic->isChecked()) {
+        if (synthetic->isChecked()) {
             nPhysD *tmpSynthetic = new nPhysD(physWave::phys_synthetic_interferogram(waveletPhys["phase_2pi"],waveletPhys["contrast"]));
-            if (my_w.erasePrevious->isChecked()) {
+            if (erasePrevious->isChecked()) {
                 syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
             } else {
                 nparent->addPhys(tmpSynthetic);
@@ -250,10 +250,10 @@ void Wavelet::doWavelet () {
         }
         
         QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
-        my_w.statusbar->showMessage(out+status_bar_measure, 50000);
+        statusbar->showMessage(out+status_bar_measure, 50000);
         DEBUG(status_bar_measure.toStdString());
     } else {
-        my_w.statusbar->showMessage("Canceled", 5000);
+        statusbar->showMessage("Canceled", 5000);
     }
     QApplication::processEvents();
     setEnabled(true);
@@ -263,8 +263,8 @@ void Wavelet::doWavelet () {
 // --------------------------------------------------------------------------
 
 void Wavelet::doUnwrap () {
-    physD *phase=static_cast<physD*>(getPhysFromCombo(my_w.imageUnwrap));
-    physD *qual=static_cast<physD*>(getPhysFromCombo(my_w.qualityUnwrap));
+    physD *phase=static_cast<physD*>(getPhysFromCombo(imageUnwrap));
+    physD *qual=static_cast<physD*>(getPhysFromCombo(qualityUnwrap));
 	nPhysD barrierPhys;
 	
     QElapsedTimer timer;
@@ -273,9 +273,9 @@ void Wavelet::doUnwrap () {
 	if (qual && phase) {
         physD uphase;
 
-		QString methodName=my_w.method->currentText();
+        QString methodName=method->currentText();
 
-		if (my_w.useBarrier->isChecked()) {
+        if (useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
             QPolygonF my_poly=linebarrier.poly(phase->getW()+phase->getH());
             my_poly.translate(qual->get_origin().x(),qual->get_origin().y());
@@ -324,22 +324,22 @@ void Wavelet::doUnwrap () {
         uphase.setShortName("unwrap");
         uphase.setName(uphase.getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());
         uphase.setFromName(phase->getFromName());
-        my_w.erasePreviousUnwrap->setEnabled(true);
+        erasePreviousUnwrap->setEnabled(true);
 
-        if (my_w.removeCarrierAfterUnwrap->isChecked()) {
-            physWave::phys_subtract_carrier(uphase, my_w.angleCarrier->value(), my_w.widthCarrier->value());
+        if (removeCarrierAfterUnwrap->isChecked()) {
+            physWave::phys_subtract_carrier(uphase, angleCarrier->value(), widthCarrier->value());
         }
 
-        if (my_w.erasePreviousUnwrap->isChecked()) {
+        if (erasePreviousUnwrap->isChecked()) {
             unwrapPhys=nparent->replacePhys(new nPhysD(uphase),unwrapPhys);
         } else {
             unwrapPhys=new nPhysD(uphase);
             nparent->addShowPhys(unwrapPhys);
         }
-        my_w.unwrapped->setCurrentIndex(my_w.unwrapped->findData(QVariant::fromValue(unwrapPhys)));
+        unwrapped->setCurrentIndex(unwrapped->findData(QVariant::fromValue(unwrapPhys)));
 
 	}
-    my_w.statusbar->showMessage(QString("%1 msec").arg(timer.elapsed()));
+    statusbar->showMessage(QString("%1 msec").arg(timer.elapsed()));
 }
 
 void Wavelet::doAll () {
@@ -348,40 +348,40 @@ void Wavelet::doAll () {
 }
 
 void Wavelet::doRemove () {
-	if (my_w.carrier->isChecked()) {
+    if (carrier->isChecked()) {
 		doRemoveCarrier();
 	}
-	if (my_w.reference->isChecked()) {
+    if (reference->isChecked()) {
 		doRemoveReference();
 	}
 }
 
 void Wavelet::doRemoveCarrier () {
-	my_w.widthCarrierLabel->setText(QLocale().toString(my_w.widthCarrier->value())+my_w.widthCarrier->suffix());
-	my_w.angleCarrierLabel->setText(QLocale().toString(my_w.angleCarrier->value())+my_w.angleCarrier->suffix());
-	if (sender() && (sender()==my_w.widthCarrier || sender()==my_w.angleCarrier || sender()==my_w.weightCarrier) && (!my_w.liveView->isChecked())) {
+    widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
+    angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
+    if (sender() && (sender()==widthCarrier || sender()==angleCarrier || sender()==weightCarrier) && (!liveView->isChecked())) {
 		return;
 	}
-	my_w.carrier->setChecked(true);
+    carrier->setChecked(true);
 	// check normalize
-	nPhysD *unwrapped=getPhysFromCombo(my_w.unwrapped);
-	if (unwrapped) {
+    nPhysD *my_phys=getPhysFromCombo(unwrapped);
+    if (my_phys) {
 		nPhysD *unwrappedSubtracted;
-		unwrappedSubtracted = new nPhysD(*unwrapped);
+        unwrappedSubtracted = new nPhysD(*my_phys);
 
-		double alpha=my_w.angleCarrier->value();
-		double lambda=my_w.widthCarrier->value();
+        double alpha=angleCarrier->value();
+        double lambda=widthCarrier->value();
 
 		unwrappedSubtracted->setName("No carrier ("+QLocale().toString(lambda).toStdString()+","+
 																 QLocale().toString(alpha).toStdString()+") "+
-																 QFileInfo(QString::fromUtf8(unwrapped->getFromName().c_str())).fileName().toStdString());
+                                                                 QFileInfo(QString::fromUtf8(my_phys->getFromName().c_str())).fileName().toStdString());
 		unwrappedSubtracted->setShortName("No carrier");
-		unwrappedSubtracted->setFromName(unwrapped->getFromName());
+        unwrappedSubtracted->setFromName(my_phys->getFromName());
 
         physWave::phys_subtract_carrier(*unwrappedSubtracted, alpha, lambda);
-        physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
-		my_w.erasePreviuos->setEnabled(true);
-		if (my_w.erasePreviuos->isChecked()) {
+        physMath::phys_subtract(*unwrappedSubtracted, phaseOffset->value());
+        erasePreviuos->setEnabled(true);
+        if (erasePreviuos->isChecked()) {
 			carrierPhys=nparent->replacePhys(unwrappedSubtracted,carrierPhys);
 		} else {
 			nparent->addShowPhys(unwrappedSubtracted);
@@ -391,24 +391,24 @@ void Wavelet::doRemoveCarrier () {
 
 void Wavelet::doRemoveReference () {
 	// check normalize
-	nPhysD *ref=getPhysFromCombo(my_w.refUnwrap);
-	nPhysD *unwrapped=getPhysFromCombo(my_w.unwrapped);
-	if (unwrapped && ref) {
-		if (unwrapped->getW() == ref->getW() && unwrapped->getH() == ref->getH()) {
+    nPhysD *ref=getPhysFromCombo(refUnwrap);
+    nPhysD *my_phys=getPhysFromCombo(unwrapped);
+    if (my_phys && ref) {
+        if (my_phys->getW() == ref->getW() && my_phys->getH() == ref->getH()) {
 			nPhysD *unwrappedSubtracted;
 			unwrappedSubtracted = new nPhysD();
-			*unwrappedSubtracted=(*unwrapped)-(*ref);
-            physMath::phys_subtract(*unwrappedSubtracted, my_w.phaseOffset->value());
-			unwrappedSubtracted->setName(unwrapped->getName()+" - "+ref->getName());
+            *unwrappedSubtracted=(*my_phys)-(*ref);
+            physMath::phys_subtract(*unwrappedSubtracted, phaseOffset->value());
+            unwrappedSubtracted->setName(my_phys->getName()+" - "+ref->getName());
 			unwrappedSubtracted->setName("Reference removed : "+ref->getName());
 			unwrappedSubtracted->setShortName("Ref removed");
-			if (unwrapped->getFromName()==ref->getFromName()) {
-				unwrappedSubtracted->setFromName(unwrapped->getFromName());
+            if (my_phys->getFromName()==ref->getFromName()) {
+                unwrappedSubtracted->setFromName(my_phys->getFromName());
 			} else {
-				unwrappedSubtracted->setFromName(unwrapped->getFromName()+" "+ref->getFromName());
+                unwrappedSubtracted->setFromName(my_phys->getFromName()+" "+ref->getFromName());
 			}
-			my_w.erasePreviuos->setEnabled(true);
-			if (my_w.erasePreviuos->isChecked()) {
+            erasePreviuos->setEnabled(true);
+            if (erasePreviuos->isChecked()) {
 				referencePhys=nparent->replacePhys(unwrappedSubtracted,referencePhys);
 			} else {
 				nparent->addShowPhys(unwrappedSubtracted);

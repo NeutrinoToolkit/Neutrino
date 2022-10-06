@@ -36,13 +36,11 @@
 
 class neutrino;
 
-class Affine_rectangle : public nGenericPan {
+class Affine_rectangle : public nGenericPan, private Ui::Affine_rectangle {
     Q_OBJECT
 
 public:	
     Q_INVOKABLE Affine_rectangle(neutrino *);
-
-    Ui::Affine_rectangle my_w;
 
     nPhysD *affined;
 

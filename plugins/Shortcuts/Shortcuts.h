@@ -35,12 +35,11 @@
 
 class neutrino;
 
-class Shortcuts : public nGenericPan {
+class Shortcuts : public nGenericPan, private Ui::Shortcuts {
     Q_OBJECT
 
 public:
     Q_INVOKABLE Shortcuts(neutrino*);
-    Ui::Shortcuts my_w;
 
 };
 

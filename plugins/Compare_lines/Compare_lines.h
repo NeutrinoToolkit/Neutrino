@@ -34,13 +34,12 @@
 #include "neutrino.h"
 class nLine;
 
-class Compare_lines : public nGenericPan {
+class Compare_lines : public nGenericPan, private Ui::Compare_lines {
     Q_OBJECT
 
 public:
 
     Q_INVOKABLE Compare_lines(neutrino *);
-    Ui::Compare_lines my_w;
 
 public slots:
     
