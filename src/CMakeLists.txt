@@ -43,12 +43,6 @@ add_definitions(-D__VER_SHA="${VERSION_GIT_SHA}")
 MESSAGE(STATUS "-D__VER=${VERSION_AHEAD}")
 MESSAGE(STATUS "-D__VER_SHA=${VERSION_GIT_SHA}")
 
-
-if (APPLE AND NOT DEFINED Qt6_DIR)
-    set(Qt6_DIR "/usr/local/opt/qt/lib/cmake/Qt6")
-    MESSAGE(STATUS "Qt6_DIR set to ${Qt6_DIR}")
-endif()
-
 set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml)
 
 find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)

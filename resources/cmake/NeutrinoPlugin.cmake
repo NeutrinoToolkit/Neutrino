@@ -2,24 +2,18 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     if (NOT DEFINED NEUTRINO_ROOT)
         set (NEUTRINO_ROOT ${PROJECT_SOURCE_DIR})
-        if (NOT EXISTS "${NEUTRINO_ROOT}/src/neutrino.h")
-            message(FATAL_ERROR "Please specify neutrino source tree with cmake -DNEUTRINO_ROOT=<path/to/neutrino>")
-        endif()
+    endif()
+    if (NOT EXISTS "${NEUTRINO_ROOT}/src/neutrino.h")
+        message(FATAL_ERROR "Please specify neutrino source tree with cmake -DNEUTRINO_ROOT=<path/to/neutrino>")
     endif()
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-
-#    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
     PROJECT (${MY_PROJECT_NAME} CXX)
 
     MESSAGE(STATUS "Plugin : ${PROJECT_NAME}")
 
     include(FindNeutrinoDeps)
-
-    if (APPLE AND NOT DEFINED Qt6_DIR)
-        set(Qt6_DIR "/usr/local/opt/qt6/lib/cmake/Qt6")
-    endif()
 
     SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml ${LOCAL_MODULES})
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
@@ -120,12 +114,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     endforeach()
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
-
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        if (APPLE)
-            target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
-        endif()
-	endif()
 
     IF(NOT DEFINED PLUGIN_INSTALL_DIR)
         if(APPLE)

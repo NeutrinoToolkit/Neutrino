@@ -71,11 +71,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
 include(Package)
 
+if (APPLE AND NOT DEFINED Qt6_DIR)
+    set(Qt6_DIR "/usr/local/opt/qt/lib/cmake/Qt6")
+    MESSAGE(STATUS "Qt6_DIR set to ${Qt6_DIR}")
+endif()
+
 add_subdirectory (nPhysImage)
-add_subdirectory (src)
-
-# set(NEU_PLUGIN_LIST "")
 add_subdirectory (plugins)
-# message(STATUS "${NEU_PLUGIN_LIST}")
-# target_compile_definitions(Neutrino PRIVATE "NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST}")
-
+add_subdirectory (src)
