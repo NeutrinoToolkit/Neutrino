@@ -13,6 +13,13 @@ cp -r Neutrino.app dmg_dir
 
 # install_name_tool -rpath /usr/local/opt/qt/lib "@executable_path/../Frameworks" dmg_dir/Neutrino.app/Contents/MacOS/Neutrino
 
+# if [[ `uname -m` == x86_64 ]]
+# then
+# else
+# fi
+
+cp `brew --prefix brotli`/lib/libbrotlicommon.1.dylib dmg_dir/Neutrino.app/Contents/Frameworks
+
 `brew --prefix qt`/bin/macdeployqt dmg_dir/Neutrino.app
 
 python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix qt`
