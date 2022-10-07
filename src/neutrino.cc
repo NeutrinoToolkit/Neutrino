@@ -1684,7 +1684,7 @@ void neutrino::about() {
         }
     }
 
-    my_about.creditsText->insertHtml("<h2>QT version :"+QLibraryInfo::version().toString()+"</h2>");
+    my_about.creditsText->insertHtml("<h2>QT version : "+QLibraryInfo::version().toString()+"</h2>");
 
     my_about.creditsText->moveCursor(QTextCursor::Start);
     my_about.creditsText->ensureCursorVisible();

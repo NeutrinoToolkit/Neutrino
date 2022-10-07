@@ -4,21 +4,11 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 echo $DIR
 rm -rf Neutrino.dmg dmg_dir
-
 mkdir dmg_dir
-
 cp -r Neutrino.app dmg_dir
 
-#ln -sf /usr/local/opt/python@3.9/Frameworks/Python.framework/ /usr/local/opt/python@3.9/lib/Python.framework
-
-# install_name_tool -rpath /usr/local/opt/qt/lib "@executable_path/../Frameworks" dmg_dir/Neutrino.app/Contents/MacOS/Neutrino
-
-# if [[ `uname -m` == x86_64 ]]
-# then
-# else
-# fi
-
 cp `brew --prefix brotli`/lib/libbrotlicommon.1.dylib dmg_dir/Neutrino.app/Contents/Frameworks
+install_name_tool -change @loader_path/libbrotlicommon.1.dylib @executable_path/../Frameworks/libbrotlicommon.1.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libbrotlicommon.1.dylib
 
 `brew --prefix qt`/bin/macdeployqt dmg_dir/Neutrino.app
 
@@ -33,4 +23,4 @@ codesign --force --deep --sign - dmg_dir/Neutrino.app
 
 # ditto -c -k --sequesterRsrc --keepParent dmg_dir/Neutrino.app Neutrino-`uname -s`-`uname -m`.zip
 
-$DIR/createdmg.sh --icon-size 96 --volname Neutrino --volicon $DIR/dmg-icon.icns --background $DIR/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino-`uname -s`-`uname -m`.dmg dmg_dir
+create-dmg --icon-size 96 --volname Neutrino --volicon $DIR/dmg-icon.icns --background $DIR/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino-`uname -s`-`uname -m`.dmg dmg_dir
