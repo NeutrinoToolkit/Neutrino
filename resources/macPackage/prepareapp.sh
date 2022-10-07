@@ -15,7 +15,7 @@ cp -r Neutrino.app dmg_dir
 
 `brew --prefix qt`/bin/macdeployqt dmg_dir/Neutrino.app
 
-python $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix qt`
+python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix qt`
 
 cp `brew --prefix hdf4`/lib/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks
 
