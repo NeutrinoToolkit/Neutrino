@@ -4,17 +4,17 @@ MacIntel_task:
     image: big-sur-base
   script: |
     brew update
-    brew install objc-codegenutils objc-run gh
+    brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
     mkdir -p build_gcc && cd build_gcc
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
-    gh release upload --clobber latest Neutrino*.zip
-    cp Neutrino*.zip ..
+    gh release upload --clobber latest Neutrino*.dmg
+    cp Neutrino-*.dmg ..
   artifacts:
-    path: "Neutrino*.zip"
+    path: "Neutrino*.dmg"
 
 MacM1_task:
   only_if: $CIRRUS_BRANCH == 'master'
@@ -22,17 +22,17 @@ MacM1_task:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
     brew update
-    brew install objc-codegenutils objc-run gh
+    brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
     mkdir -p build_gcc && cd build_gcc
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
-    gh release upload --clobber latest Neutrino*.zip
-    cp Neutrino*.zip ..
+    gh release upload --clobber latest Neutrino*.dmg
+    cp Neutrino-*.dmg ..
   artifacts:
-    path: "Neutrino*.zip"
+    path: "Neutrino*.dmg"
 
 AppImage_task:
   only_if: $CIRRUS_BRANCH == 'master'
