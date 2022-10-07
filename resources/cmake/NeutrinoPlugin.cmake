@@ -15,7 +15,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     include(FindNeutrinoDeps)
 
-    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml ${LOCAL_MODULES})
+    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml DBus ${LOCAL_MODULES})
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})
@@ -77,7 +77,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         file(APPEND ${PANDOC_QRC} "        <file alias=\"${my_file_basename}\">${README_HTML}</file>\n")
         file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
 
-        execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
+#        execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
         add_custom_command(
             OUTPUT ${README_HTML}
             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --self-contained -o ${README_HTML}
@@ -98,6 +98,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 
     IF(APPLE)
+        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+        set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
         target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
     ENDIF()

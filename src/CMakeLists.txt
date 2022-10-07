@@ -43,7 +43,7 @@ add_definitions(-D__VER_SHA="${VERSION_GIT_SHA}")
 MESSAGE(STATUS "-D__VER=${VERSION_AHEAD}")
 MESSAGE(STATUS "-D__VER_SHA=${VERSION_GIT_SHA}")
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus)
 
 find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
@@ -98,6 +98,7 @@ set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
 
 if(APPLE)
 
+
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${VERSION}")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
@@ -122,6 +123,7 @@ if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
 
+    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set (CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
     set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_RPATH} INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -149,7 +151,6 @@ elseif(LINUX)
 endif()
 
 
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 foreach(MODULE ${MODULES})
     set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
