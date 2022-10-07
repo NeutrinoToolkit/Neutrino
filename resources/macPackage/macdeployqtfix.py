@@ -159,7 +159,7 @@ def normalize_qtlib_name(filename):
 
     # qtlib normalization settings
     qtlib = rgxret.groups()[0]
-    qtversion = 5
+    qtversion = 6
 
     templ = Template(QTLIB_NORMALIZED)
 
