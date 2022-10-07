@@ -13,9 +13,6 @@ import argparse
 import re
 from collections import namedtuple
 
-#ln -s /usr/local/opt/python@3.9/Frameworks/Python.framework/ /usr/local/opt/python@3.9/lib/Python.framework
-#install_name_tool -change /usr/local/lib/gcc/11/libgcc_s.1.dylib @executable_path/../Frameworks/libgcc_s.1.dylib dmg_dir/Neutrino.app/Contents/MacOS/Neutrino
-#for i in dmg_dir/Neutrino.app/Contents/Resources/plugins/lib*; do install_name_tool -change /usr/local/lib/gcc/11/libgcc_s.1.dylib @executable_path/../Frameworks/libgcc_s.1.dylib $i; done
 
 QTLIB_NAME_REGEX = r'^(?:@executable_path)?/.*/(Qt[a-zA-Z]*).framework/(?:Versions/\d/)?\1$'
 QTLIB_NORMALIZED = r'$prefix/Frameworks/$qtlib.framework/Versions/$qtversion/$qtlib'
@@ -25,10 +22,6 @@ QTPLUGIN_NORMALIZED = r'$prefix/PlugIns/$plugintype/$pluginname.dylib'
 
 BREWLIB_REGEX = r'^/usr/local/.*/(.*)'
 BREWLIB_NORMALIZED = r'$prefix/Frameworks/$brewlib'
-
-qtplugin_name_rgx = re.compile(QTPLUGIN_NAME_REGEX)
-qtlib_name_rgx = re.compile(QTLIB_NAME_REGEX)
-brewlib_name_rgx = re.compile(BREWLIB_REGEX)
 
 
 class GlobalConfig(object):
@@ -67,7 +60,7 @@ def get_dependencies(filename):
     deps = []
     if proc_out.retcode == 0:
         # some string splitting
-        deps = [str(s.strip().split(b' ')[0]) for s in proc_out.stdout.splitlines()[1:] if s]
+        deps = [s.strip().split(' ')[0] for s in proc_out.stdout.splitlines()[1:] if s]
         # prevent infinite recursion when a binary depends on itself (seen with QtWidgets)...
         deps = [s for s in deps if os.path.basename(filename) not in s]
     return deps
@@ -78,7 +71,8 @@ def is_qt_plugin(filename):
     Checks if a given file is a qt plugin.
     Accepts absolute path as well as path containing @executable_path
     """
-    return qtplugin_name_rgx.match(filename) is not None
+    qtlib_name_rgx = re.compile(QTPLUGIN_NAME_REGEX)
+    return qtlib_name_rgx.match(filename) is not None
 
 
 def is_qt_lib(filename):
@@ -86,8 +80,7 @@ def is_qt_lib(filename):
     Checks if a given file is a qt library.
     Accepts absolute path as well as path containing @executable_path
     """
-    if "Python" in filename:
-        print("ppp", filename, qtlib_name_rgx.match(filename) )
+    qtlib_name_rgx = re.compile(QTLIB_NAME_REGEX)
     return qtlib_name_rgx.match(filename) is not None
 
 
@@ -96,9 +89,8 @@ def is_brew_lib(filename):
     Checks if a given file is a brew library
     Accepts absolute path as well as path containing @executable_path
     """
-    if "Python" in filename:
-        print("ppp", filename, brewlib_name_rgx.match(filename) )
-    return brewlib_name_rgx.match(filename) is not None
+    qtlib_name_rgx = re.compile(BREWLIB_REGEX)
+    return qtlib_name_rgx.match(filename) is not None
 
 
 def normalize_qtplugin_name(filename):
