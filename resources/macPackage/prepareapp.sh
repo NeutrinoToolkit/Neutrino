@@ -19,8 +19,8 @@ cp `brew --prefix hdf4`/lib/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Framewo
 
 if [[ `uname -m` == x86_64 ]]
 then
-  install_name_tool -change @rpath/libxdr.4.dylib @executable_path/../Frameworks/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
-  install_name_tool -change @rpath/libdf.4.dylib @executable_path/../Frameworks/libdf.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
+  install_name_tool -change /usr/local/Cellar/hdf4/4.2.15_4/lib/libxdr.4.dylib @executable_path/../Frameworks/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
+  install_name_tool -change /usr/local/Cellar/hdf4/4.2.15_4/lib/libdf.4.dylib @executable_path/../Frameworks/libdf.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
 else
   install_name_tool -change /opt/homebrew/Cellar/hdf4/4.2.15_4/lib/libxdr.4.dylib @executable_path/../Frameworks/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
   install_name_tool -change /opt/homebrew/Cellar/hdf4/4.2.15_4/lib/libdf.4.dylib  @executable_path/../Frameworks/libdf.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libmfhdf.4.dylib
