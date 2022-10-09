@@ -9,9 +9,6 @@
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
     log_win_ui(new Ui::nLogWin)
-#ifndef __clang__
-  , qout(std::cout)
-#endif
 {
 
 }

@@ -136,7 +136,7 @@ public slots:
 
     bool nPhysExists(nPhysD*);
 
-    // python stuff
+    // script stuff
     void set(QString, QVariant, int=1);
     QVariant get(QString, int=1);
     QList<QList<qreal> >  getData(QString, int=1);

@@ -25,9 +25,6 @@
 
 
 #include "nPhysImageF.h"
-#ifdef Q_CC_GNU
-#define QT_INIT_METAOBJECT
-#endif
 
 #include <QVector>
 #include <QList>
@@ -39,8 +36,6 @@
 #include <QMetaObject>
 #include <QtSvg>
 #include <QDirIterator>
-
-//#include <QtUiTools>
 
 #include <QPrintDialog>
 
@@ -85,6 +80,7 @@ neutrino::neutrino():
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     setProperty("NeuSave-askCloseUnsaved",my_set.value("askCloseUnsaved",true).toInt());
+    setProperty("NeuSave-MaxRecentFiles",my_set.value("MaxRecentFiles",20).toInt());
     my_set.endGroup();
 
     setProperty("NeuSave-gamma",1);
@@ -190,8 +186,6 @@ neutrino::neutrino():
     connect(my_w->actionExport_pixmap, SIGNAL(triggered()), my_w->my_view, SLOT(exportPixmap()));
 
 
-    // ---------------------------------------------------------------------------------------------
-
     QWidget *sbarra=new QWidget(this);
     my_sbarra->setupUi(sbarra);
     my_w->statusbar->addPermanentWidget(sbarra, 0);
@@ -206,7 +200,7 @@ neutrino::neutrino():
 
     //recent file stuff
 
-    for (int i = 0; i < MaxRecentFiles; ++i) {
+    for (int i = 0; i < property("NeuSave-MaxRecentFiles").toInt(); ++i) {
         QAction *act = new QAction(this);
         act->setVisible(false);
         connect(act, SIGNAL(triggered()),this, SLOT(openRecentFile()));
@@ -1688,22 +1682,6 @@ void neutrino::about() {
 
     my_about.creditsText->moveCursor(QTextCursor::Start);
     my_about.creditsText->ensureCursorVisible();
-//    for (int id=QMetaType::User; id< 2000; id++){
-//        qDebug() << id;
-//        if (QMetaType(id).isRegistered()) {
-//            qDebug() << "registered";
-//            void *myClassPtr = QMetaType::create(id);
-//            qDebug() << id << myClassPtr;
-//            if(myClassPtr) {
-//                QObject *my_qobject = static_cast<QObject*>(myClassPtr);
-//                if (my_qobject) {
-//                    qWarning() << my_qobject->metaObject()->className();
-//                }
-//                QMetaType::destroy(id, myClassPtr);
-//            }
-//        }
-//    }
-
     myabout.exec();
 }
 

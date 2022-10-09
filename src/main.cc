@@ -30,41 +30,10 @@
 #include "neutrino.h"
 #include "nApp.h"
 
-void my_handler(int s){
-    qCritical() << "Caught signal" << s;
-    QCoreApplication::quit();
-}
-
-int main(int argc, char **argv)
-{
-#if defined(Q_OS_MAC)
-//     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-//     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+int main(int argc, char **argv) {
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-#endif
 
-#ifdef __WIN32
-#ifdef __phys_debug
-    AllocConsole();
-    freopen("conin$", "r", stdin);
-    freopen("conout$", "w", stdout);
-    freopen("conout$", "w", stderr);
-    qSetMessagePattern("%{message}");
-#else
     qSetMessagePattern("%{file}(%{line}): %{message}");
-#endif
-#else
-    struct sigaction sigIntHandler;
-
-    sigIntHandler.sa_handler = my_handler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-
-    sigaction(SIGINT, &sigIntHandler, nullptr);
-#endif
 
     nApp my_app(argc,argv);
 

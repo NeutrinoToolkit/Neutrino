@@ -74,8 +74,6 @@ public:
     Ui::neutrino *my_w;
     Ui::nSbarra *my_sbarra;
 
-    static const int MaxRecentFiles=20;
-
     QList <QAction *> recentFileActs;
     void updateRecentFileActions(QString=QString());
 

@@ -17,14 +17,6 @@ file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
 
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(file_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/grabStream.h")
-    list(FIND SOURCES "${file_to_remove}" file_to_remove_found)
-    if (${file_to_remove_found})
-        list(REMOVE_ITEM SOURCES "${file_to_remove}")
-    endif()
-endif()
-
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     MESSAGE("SOURCES:\n${SOURCES}")
 endif()
@@ -161,11 +153,3 @@ add_definitions(-DQT_NO_OPENGL)
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-#   target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (APPLE)
-        target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
-    endif()
-endif()
-

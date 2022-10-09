@@ -26,10 +26,6 @@
 #include "nHistogram.h"
 #include "neutrino.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-#define horizontalAdvance width
-#endif
-
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
     qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
