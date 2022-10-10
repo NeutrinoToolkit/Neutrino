@@ -70,10 +70,6 @@ elseif (LINUX)
         endif()
     endif()
 
-elseif(APPLE)
-
-    MESSAGE(WARNING "for macos use the script prepareapp.sh")
-
 endif()
 
 include (CPack)
