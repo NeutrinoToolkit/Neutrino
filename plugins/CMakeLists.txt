@@ -4,8 +4,6 @@ option(NEUTRINOPLUGINS "Compile Neutrino plugins" ON)
 
 if (${NEUTRINOPLUGINS})
 
-    set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/resources/cmake)
-
     include(NeutrinoPlugin)
 
     message(STATUS "Scanning plugins directory")
@@ -23,13 +21,8 @@ if (${NEUTRINOPLUGINS})
     FOREACH(oneplugin ${allfiles})
         IF(IS_DIRECTORY ${oneplugin})
             add_subdirectory(${oneplugin})
-            get_filename_component(MY_PROJECT_NAME ${oneplugin} NAME)
-#             set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST} ${MY_PROJECT_NAME}")
-
         ENDIF()
     ENDFOREACH()
 
-#     message(STATUS "${NEU_PLUGIN_LIST}")
-#     target_compile_definitions(Neutrino PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})
-
+#    set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST}" PARENT_SCOPE)
 endif()

@@ -39,7 +39,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB UIS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs/*.ui)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../UIs)
 
-file(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
+file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
 
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
@@ -52,7 +52,6 @@ message(STATUS "${LIST_LENGTH} source files")
 
 include(FindNeutrinoDeps)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/nPhysImage")
 set(LIBS ${LIBS} "nPhysImageF")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
@@ -166,8 +165,6 @@ elseif(LINUX)
 
 endif()
 
-
-
 foreach(MODULE ${MODULES})
     set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
 endforeach()
@@ -175,5 +172,7 @@ endforeach()
 if(APPLE)
 add_definitions(-DQT_NO_OPENGL)
 endif()
+
+#target_compile_definitions(${PROJECT_NAME} PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})

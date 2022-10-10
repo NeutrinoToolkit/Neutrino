@@ -1,26 +1,12 @@
 # this is the frigging nPhysImage cmakelists
 cmake_minimum_required (VERSION 3.9)
 
-add_library (nPhysImageF SHARED
-    NaNStream.h
-    anymap.cc
-    anymap.h
-    bidimvec.h
-    mcomplex.h
-    nPhysFormats.cc
-    nPhysFormats.h
-    nPhysImageF.h
-    nPhysMaths.cc
-    nPhysMaths.h
-    nPhysWave.cc
-    nPhysWave.h
-    tools.h
-    unwrap/unwrap.h unwrap/goldstein.cc unwrap/quality.cc unwrap/simple.cc
-    )
+file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
+
+add_library (nPhysImageF SHARED ${SOURCES})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/resources/cmake)
 include(FindNeutrinoDeps)
 
 target_link_libraries(nPhysImageF m ${LIBS})
