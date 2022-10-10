@@ -43,11 +43,11 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
     connect(unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
     connect(unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
 
-    connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
+    connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
 
-    mouse=nparent->my_w->my_view->my_mouse.pos();
+    mouse=nparent->my_view->my_mouse.pos();
 	updateLabels();
     show(true);
 }
@@ -96,7 +96,7 @@ void Mouse_info::updateOrigin() {
 			currentBuffer->set_origin(vec2f(valx,valy));
 		}
 	}
-    nparent->my_w->my_view->update();
+    nparent->my_view->update();
 }
 
 void Mouse_info::updateScale() {
@@ -108,7 +108,7 @@ void Mouse_info::updateScale() {
 			currentBuffer->set_scale(vec2f(valx,valy));
 		}
 	}
-    nparent->my_w->my_view->update();
+    nparent->my_view->update();
 }
 
 void Mouse_info::updateUnits() {
@@ -116,7 +116,7 @@ void Mouse_info::updateUnits() {
         currentBuffer->prop["unitsX"] = unit_x->text().toStdString();
         currentBuffer->prop["unitsY"] = unit_y->text().toStdString();
     }
-    nparent->my_w->my_view->update();
+    nparent->my_view->update();
 }
 
 

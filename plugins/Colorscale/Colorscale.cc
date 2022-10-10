@@ -34,7 +34,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
 
     my_w.histogram->parentPan=this;
 
-    connect(nparent->my_w->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
+    connect(nparent->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
     connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 
     connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(repaint()));
@@ -62,7 +62,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
     connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
 
-    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
+    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
     my_w.toolBar->addWidget(my_w.percent);
 
     loadPalettes();
@@ -82,8 +82,8 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     QApplication::processEvents();
     my_w.histogram->repaint();
 
-    if (nparent->my_w->my_view->property("percentPixels").isValid()) {
-        my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
+    if (nparent->my_view->property("percentPixels").isValid()) {
+        my_w.percent->setValue(nparent->my_view->property("percentPixels").toInt());
     }
 
 }
@@ -92,7 +92,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
 void Colorscale::paletteComboChange(int val) {
     QString pname=my_w.palettes->itemData(val).toString();
     qDebug() << pname;
-    nparent->my_w->my_view->changeColorTable(pname);
+    nparent->my_view->changeColorTable(pname);
 }
 
 void Colorscale::on_gamma_valueChanged(int val) {
@@ -176,11 +176,11 @@ void Colorscale::bufferChanged(nPhysD *my_phys) {
     }
     my_w.histogram->repaint();
 
-    disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
-    if (nparent->my_w->my_view->property("percentPixels").isValid()) {
-        my_w.percent->setValue(nparent->my_w->my_view->property("percentPixels").toInt());
+    disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
+    if (nparent->my_view->property("percentPixels").isValid()) {
+        my_w.percent->setValue(nparent->my_view->property("percentPixels").toInt());
     }
-    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_w->my_view, SLOT(rescaleColor(int)));
+    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
 
 }
 
@@ -197,7 +197,7 @@ vec2i Colorscale::sliderValues() {
 void Colorscale::updatecolorbar(QString) {
     qDebug() << "-------------------------------";
     disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
-    my_w.palettes->setCurrentIndex(my_w.palettes->findData(nparent->my_w->my_view->colorTable));
+    my_w.palettes->setCurrentIndex(my_w.palettes->findData(nparent->my_view->colorTable));
     connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
 
     if (currentBuffer) {
@@ -322,7 +322,7 @@ void Colorscale::removePaletteFile() {
 }
 
 void Colorscale::on_fileList_itemClicked(QListWidgetItem *item){
-    nparent->my_w->my_view->changeColorTable(item->text());
+    nparent->my_view->changeColorTable(item->text());
 }
 
 void Colorscale::resetPalettes() {

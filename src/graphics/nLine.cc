@@ -70,7 +70,7 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
 		setProperty("numLine",num);
         setToolTip("line"+QLocale().toString(num));
         connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(nparent->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
 
         zoom=nparent->getZoom();
@@ -271,7 +271,7 @@ QPolygonF nLine::getLine(int np) {
 
 void nLine::interactive ( ) {
 	showMessage(tr("Click for first point, press Esc to finish"));
-	connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
 	appendPoint();
 }
 
@@ -344,8 +344,8 @@ void nLine::updatePlot () {
 			my_w.plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 			my_w.plot->xAxis->setLabelPadding(-1);
 			my_w.plot->yAxis->setLabelPadding(-1);
-			my_w.plot->xAxis->setTickLabelFont(nparent->my_w->my_view->font());
-			my_w.plot->yAxis->setTickLabelFont(nparent->my_w->my_view->font());
+            my_w.plot->xAxis->setTickLabelFont(nparent->my_view->font());
+            my_w.plot->yAxis->setTickLabelFont(nparent->my_view->font());
 		}
 
 		double colore;
@@ -679,7 +679,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-			if (disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+            if (disconnect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
 				ungrabKeyboard();
@@ -939,10 +939,10 @@ nLine::selectThis(bool val) {
 	}
 	if (val) {
 		grabKeyboard();
-		nparent->my_w->statusbar->showMessage(toolTip());
+        nparent->statusbar->showMessage(toolTip());
 	} else {
 		ungrabKeyboard();
-		nparent->my_w->statusbar->clearMessage();
+        nparent->statusbar->clearMessage();
 	}
 }
 

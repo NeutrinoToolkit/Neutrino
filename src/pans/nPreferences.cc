@@ -100,7 +100,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     show(true);
 
-    comboIconSize->setCurrentIndex(nparent->my_w->toolBar->iconSize().width()/10-1);
+    comboIconSize->setCurrentIndex(nparent->toolBar->iconSize().width()/10-1);
 
 	changeFont();
 
@@ -115,7 +115,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     connect(gridThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
     connect(actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
-    connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_w->my_view,SLOT(setZoomFactor(int)));
+    connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_view,SLOT(setZoomFactor(int)));
 
     connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
 
@@ -217,19 +217,19 @@ void nPreferences::on_getColors_released() {
 
 void nPreferences::changeDecorations() {
     saveDefaults();
-    nparent->my_w->my_view->my_mouse.pen.setWidthF(mouseThickness->value());
-    nparent->my_w->my_view->my_tics.gridThickness=gridThickness->value();
-    nparent->my_w->my_view->my_tics.showDimPixel=showDimPixel->isChecked();
-    nparent->my_w->my_view->my_tics.showXYaxes=showXYaxes->isChecked();
-    nparent->my_w->my_view->my_tics.showColorbar=showColorbar->isChecked();
-    nparent->my_w->my_view->my_tics.showColorbarValues=showColorbarValues->isChecked();
-    nparent->my_w->my_view->my_mouse.update();
-    nparent->my_w->my_view->my_tics.update();
-    nparent->my_w->my_view->update();
+    nparent->my_view->my_mouse.pen.setWidthF(mouseThickness->value());
+    nparent->my_view->my_tics.gridThickness=gridThickness->value();
+    nparent->my_view->my_tics.showDimPixel=showDimPixel->isChecked();
+    nparent->my_view->my_tics.showXYaxes=showXYaxes->isChecked();
+    nparent->my_view->my_tics.showColorbar=showColorbar->isChecked();
+    nparent->my_view->my_tics.showColorbarValues=showColorbarValues->isChecked();
+    nparent->my_view->my_mouse.update();
+    nparent->my_view->my_tics.update();
+    nparent->my_view->update();
 }
 
 void nPreferences::changeFont() {
-	QFont font=nparent->my_w->my_view->font();
+    QFont font=nparent->my_view->font();
 	if (sender()) {
         font=fontFace->currentFont();
         font.setPointSize(fontSize->value());
@@ -237,12 +237,12 @@ void nPreferences::changeFont() {
         fontFace->setCurrentFont(font);
         fontSize->setValue(font.pointSize());
 	}
-	nparent->my_w->my_view->setFont(font);
+    nparent->my_view->setFont(font);
 	QSettings settings("neutrino","");
 	settings.beginGroup("nPreferences");
 	settings.setValue("defaultFont",font.toString());
 	settings.endGroup();
-	nparent->my_w->my_view->setSize();
+    nparent->my_view->setSize();
 }
 
 void nPreferences::changeIconSize(int val) {
@@ -307,22 +307,22 @@ void nPreferences::on_removePlugin_released() {
 }
 
 void nPreferences::on_gridColor_released() {
-    QColorDialog colordial(nparent->my_w->my_view->my_tics.gridColor,this);
+    QColorDialog colordial(nparent->my_view->my_tics.gridColor,this);
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        nparent->my_w->my_view->my_tics.gridColor=colordial.currentColor();
-        nparent->my_w->my_view->update();
+        nparent->my_view->my_tics.gridColor=colordial.currentColor();
+        nparent->my_view->update();
     }
 }
 
 void nPreferences::on_mouseColor_released() {
-    QColorDialog colordial(nparent->my_w->my_view->my_mouse.pen.color());
+    QColorDialog colordial(nparent->my_view->my_mouse.pen.color());
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        nparent->my_w->my_view->my_mouse.pen.setColor(colordial.currentColor());
-        nparent->my_w->my_view->update();
+        nparent->my_view->my_mouse.pen.setColor(colordial.currentColor());
+        nparent->my_view->update();
     }
 }
 

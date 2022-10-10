@@ -39,29 +39,29 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
 
                 if (!icon_plugin.isNull()) {
 
-                    QList<QAction*> my_actions = neu->my_w->toolBar->actions();
+                    QList<QAction*> my_actions = neu->toolBar->actions();
                     foreach (QAction *my_action_tmp, my_actions) {
                         qDebug() << my_action_tmp->text();
                         if (!(my_action_tmp->isSeparator() || my_action_tmp->menu()) &&
                                 my_action_tmp->text()==name_plugin &&
                                 my_action_tmp->isEnabled() &&
                                 !my_action_tmp->data().isNull()) {
-                            neu->my_w->toolBar->removeAction(my_action_tmp);
+                            neu->toolBar->removeAction(my_action_tmp);
                         }
                     }
 
-                    QToolButton *my_button = new QToolButton(neu->my_w->toolBar);
+                    QToolButton *my_button = new QToolButton(neu->toolBar);
 
                     QPointer<QAction> my_action;
                     foreach (QAction  *my_action_tmp, my_actions) {
                         QVariant  var=my_action_tmp->property("plugin-order");
                         if (var.toInt() > my_panPlug->order()) {
-                            my_action = neu->my_w->toolBar->insertWidget(my_action_tmp,my_button);
+                            my_action = neu->toolBar->insertWidget(my_action_tmp,my_button);
                             break;
                         }
                     }
                     if(!my_action) {
-                        my_action = neu->my_w->toolBar->addWidget(my_button);
+                        my_action = neu->toolBar->addWidget(my_button);
                     }
                     my_action->setProperty("plugin-order",my_panPlug->order());
                     QVariant v;
@@ -124,11 +124,11 @@ QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
     QPointer<QMenu> my_menu;
 
     if (menuEntry.isEmpty()) {
-        my_menu=neu->my_w->menuAnalysis;
+        my_menu=neu->menuAnalysis;
     } else {
         QStringList my_list=menuEntry.split(";");
         // need a QWidget because it might be a QToolBar or QMenu
-        QWidget *parentMenu=neu->my_w->menubar;
+        QWidget *parentMenu=neu->menubar;
         for (int i=0; i<my_list.size(); i++) {
             bool found=false;
             foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {

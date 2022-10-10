@@ -64,7 +64,7 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 
         setToolTip(cname+QString(" ")+QLocale().toString(num));
         connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(my_parent->my_w->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+        connect(my_parent->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
         connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
         zoom=my_parent->getZoom();
         if (my_parent->getCurrentBuffer()) {
@@ -191,8 +191,8 @@ void nObject::interactive ( ) {
     qDebug() << "here" << moveRef << sender();
     switch (ref.size()) {
         case 0:
-            connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-            connect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
+            connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
             appendPoint();
             moveRef << 0 ;
             break;
@@ -201,8 +201,8 @@ void nObject::interactive ( ) {
             moveRef.clear();
             moveRef << 1 ;
         case 2:
-            disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-            disconnect(nparent->my_w->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+            disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
+            disconnect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
         default:
             break;
     }
@@ -649,9 +649,9 @@ nObject::selectThis(bool val) {
     }
     update();
     if (val) {
-        nparent->my_w->statusbar->showMessage(toolTip());
+        nparent->statusbar->showMessage(toolTip());
     } else {
-        nparent->my_w->statusbar->showMessage("");
+        nparent->statusbar->showMessage("");
     }
 }
 

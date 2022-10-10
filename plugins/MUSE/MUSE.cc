@@ -70,7 +70,7 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	my_timer.setInterval(property("NeuSave-interval").toInt());
 	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
-	connect(nparent->my_w->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
+    connect(nparent->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
 
 	show();
 	on_actionMode_toggled();
@@ -297,12 +297,12 @@ void MUSE::setstatusbar() {
 
 void MUSE::on_actionMode_toggled() {
 	if (actionMode->isChecked()) {
-		disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
-		connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
         my_point->show();
     } else {
-		disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
-		connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
         my_point->hide();
 	}
 }

@@ -55,12 +55,7 @@
 
 #include "ui_neutrino.h"
 
-
-namespace Ui {
-class nSbarra;
-}
-
-class neutrino : public QMainWindow {
+class neutrino : public QMainWindow, public Ui::neutrino {
 
     Q_OBJECT
 
@@ -70,9 +65,6 @@ public:
     ~neutrino();
 
     QGraphicsScene& getScene();
-
-    Ui::neutrino *my_w;
-    Ui::nSbarra *my_sbarra;
 
     QList <QAction *> recentFileActs;
     void updateRecentFileActions(QString=QString());

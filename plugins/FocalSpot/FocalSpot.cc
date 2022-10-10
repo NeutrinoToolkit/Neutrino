@@ -38,7 +38,7 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
     connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     connect(my_w.blur_radius_sb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     if (my_w.centroid->isChecked()) {
-        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     }
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
@@ -58,16 +58,16 @@ void FocalSpot::loadSettings(QString my_settings) {
 
 void FocalSpot::on_centroid_toggled(bool tog) {
     if (tog) {
-        connect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     } else {
-        disconnect(nparent->my_w->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        disconnect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
     }
 }
 
 void FocalSpot::setPosZero(QPointF pos) {
     if (currentBuffer) {
         currentBuffer->set_origin(vec2f(pos.x(),pos.y()));
-        nparent->my_w->my_view->update();
+        nparent->my_view->update();
         QApplication::processEvents();
         calculate_stats();
     }

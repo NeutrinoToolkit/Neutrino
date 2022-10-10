@@ -36,7 +36,7 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    connect(nparent->my_w->my_view, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
+    connect(nparent->my_view, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 
     connect(images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
@@ -163,7 +163,7 @@ Image_list::changeProperties() {
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(2,Qt::DisplayRole,lista.at(0));
                         }
-                        nparent->my_w->my_view->update();
+                        nparent->my_view->update();
                     }
                     break;
                 }
@@ -178,7 +178,7 @@ Image_list::changeProperties() {
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(2,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }
-                        nparent->my_w->my_view->update();
+                        nparent->my_view->update();
                     }
                     break;
                 }
@@ -199,7 +199,7 @@ Image_list::changeProperties() {
                             phys->set_origin(xOrigin,yOrigin);
                             nparent->emitBufferChanged(phys);
                         }
-                        nparent->my_w->my_view->update();
+                        nparent->my_view->update();
                         foreach (QTreeWidgetItem* item, itemsSelected) {
                             item->setData(3,Qt::DisplayRole,lista.at(0)+" "+lista.at(1));
                         }

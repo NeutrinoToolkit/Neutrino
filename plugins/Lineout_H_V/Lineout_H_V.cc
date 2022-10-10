@@ -57,11 +57,11 @@ Lineout_H_V::Lineout_H_V(neutrino *parent) : nGenericPan(parent)
 
 void Lineout_H_V::setBehaviour() {
     if (my_w.lockClick->isChecked()) {
-        disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
     } else {
-        disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+        disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+        connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
     }
 }
 
@@ -69,13 +69,13 @@ void Lineout_H_V::updatePlot(QPointF p) {
 
     if (currentBuffer) {
         if (p.isNull())
-            p=nparent->my_w->my_view->my_mouse.pos();
+            p=nparent->my_view->my_mouse.pos();
 
         vec2i b_p(p.x(),p.y());
 
         //get bounds from view
-        QPointF orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
-        QPointF corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
+        QPointF orig = nparent->my_view->mapToScene(QPoint(0,0));
+        QPointF corner = nparent->my_view->mapToScene(QPoint(nparent->my_view->width(), nparent->my_view->height()));
 
         vec2i b_o((int)orig.x(),(int)orig.y());
         vec2i b_c((int)corner.x(),(int)corner.y());

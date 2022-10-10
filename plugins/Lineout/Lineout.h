@@ -68,7 +68,7 @@ public:
 public slots:
     void updatePlot(QPointF my_point=QPointF()) {
         if (my_point.isNull())
-            my_point=nparent->my_w->my_view->my_mouse.pos();
+            my_point=nparent->my_view->my_mouse.pos();
 
         qDebug() << my_point;
         if (currentBuffer) {
@@ -79,8 +79,8 @@ public slots:
             //get bounds from view
             QPointF orig,corner;
             if (my_w.actionToggleZoom->isChecked()) {
-                orig = nparent->my_w->my_view->mapToScene(QPoint(0,0));
-                corner = nparent->my_w->my_view->mapToScene(QPoint(nparent->my_w->my_view->width(), nparent->my_w->my_view->height()));
+                orig = nparent->my_view->mapToScene(QPoint(0,0));
+                corner = nparent->my_view->mapToScene(QPoint(nparent->my_view->width(), nparent->my_view->height()));
             } else {
                 orig = QPoint(0,0);
                 corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
@@ -132,11 +132,11 @@ public slots:
 
     void setBehaviour() {
         if (my_w.actionLockClick->isChecked()) {
-            disconnect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+            disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
         } else {
-            disconnect(nparent->my_w->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_w->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+            disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+            connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
         }
         updatePlot();
     };
