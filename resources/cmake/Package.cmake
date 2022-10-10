@@ -41,7 +41,7 @@ elseif (LINUX)
         ENDIF()
 
         if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "Linuxmint")
-            set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB)
+            list(APPEND CPACK_GENERATOR DEB)
 
             set(CPACK_INSTALL_PREFIX "/usr")
 
@@ -63,7 +63,7 @@ elseif (LINUX)
             install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/pixmaps RENAME neutrino.svg)
             install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.svg DESTINATION share/icons RENAME neutrino.svg)
         elseif (DISTRO MATCHES "Fedora" OR DISTRO MATCHES "openSUSE")
-            set(CPACK_GENERATOR ${CPACK_GENERATOR} RPM)
+            list(APPEND CPACK_GENERATOR RPM)
             execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_RPM_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
             set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
             set(CPACK_RPM_PACKAGE_AUTOREQ YES)
@@ -71,31 +71,9 @@ elseif (LINUX)
     endif()
 
 elseif(APPLE)
-    
-    set(MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-    message(STATUS "MACOSX_BUNDLE_INFO_PLIST: ${MACOSX_BUNDLE_INFO_PLIST}")
 
-    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-MacOS")
-    set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
+    MESSAGE(WARNING "for macos use the script prepareapp.sh")
 
-    set(CPACK_BUNDLE_NAME "Neutrino")
-    set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon.icns")
-    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
-    set(CPACK_GENERATOR ${CPACK_GENERATOR} Bundle)
-    set(CPACK_DMG_FORMAT "UDBZ")
-    set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
-    set(CPACK_SYSTEM_NAME "OSX")
-    set(CPACK_DMG_DS_STORE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/DS_Store")
-    set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/background.png")
-
-#    install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/resources/macPackage/prepareapp.sh)")
-
-#    INSTALL(CODE "
-#        include(BundleUtilities)
-#        fixup_bundle(\"${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.app\"   \"\"   \"/usr/local/opt/qt5/lib/cmake/Qt5/lib\")
-#        " COMPONENT Runtime)
 endif()
 
 include (CPack)

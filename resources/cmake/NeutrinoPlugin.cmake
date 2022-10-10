@@ -15,14 +15,14 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     include(FindNeutrinoDeps)
 
-    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml DBus ${LOCAL_MODULES})
+    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml DBus)
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DQT_NO_DEBUG_OUTPUT")
 
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -40,7 +40,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     # add neutrino deps
     include_directories(${NEUTRINO_ROOT}/nPhysImage)
-    include_directories(${NEUTRINO_ROOT}/src) # for base stuff
+    include_directories(${NEUTRINO_ROOT}/src)
     include_directories(${NEUTRINO_ROOT}/src/graphics)
 
     file(GLOB MY_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -77,12 +77,10 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         file(APPEND ${PANDOC_QRC} "        <file alias=\"${my_file_basename}\">${README_HTML}</file>\n")
         file(APPEND ${PANDOC_QRC} "    </qresource>\n</RCC>")
 
-#        execute_process(COMMAND ${PANDOC} --version ERROR_QUIET)
         add_custom_command(
             OUTPUT ${README_HTML}
             COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --self-contained -o ${README_HTML}
-# starting pandoc > 2.19 will accept this new command:
-#           COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --embed-resources --standalone -o ${README_HTML}
+# starting pandoc > 2.19 will accept this:  COMMAND ${PANDOC} --metadata title="${MY_PROJECT_NAME}" -V fontsize=14 -s README.md --embed-resources --standalone -o ${README_HTML}
             MAIN_DEPENDENCY ${README_MD}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             )
@@ -105,7 +103,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     ENDIF()
 
     if(WIN32)
-        add_dependencies(${PROJECT_NAME} Neutrino)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
         target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
         # to check: --enable-runtime-pseudo-reloc
@@ -117,18 +114,14 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
-    IF(NOT DEFINED PLUGIN_INSTALL_DIR)
-        if(APPLE)
-            set (PLUGIN_INSTALL_DIR "${CMAKE_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins")
-        elseif(LINUX)
-            set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
-        elseif(WIN32)
-            set (PLUGIN_INSTALL_DIR "bin/plugins")
-        endif()
+    if(APPLE)
+        install(TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins" COMPONENT plugins)
+    elseif(LINUX)
+        install(TARGETS ${PROJECT_NAME} DESTINATION "lib/neutrino/plugins" COMPONENT plugins)
+        set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
+    elseif(WIN32)
+        install(TARGETS ${PROJECT_NAME} DESTINATION "bin/plugins" COMPONENT plugins)
     endif()
-
-
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PLUGIN_INSTALL_DIR} COMPONENT plugins)
 
 ENDMACRO()
 

@@ -4,6 +4,34 @@ if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 endif()
 
+
+find_package(Git REQUIRED)
+if (GIT_FOUND)
+
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --match "v[0-9]*\\.[0-9]*" --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE VERSION_GIT_VER
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "VERSION_GIT_VER ${VERSION_GIT_VER}")
+
+    string(REGEX REPLACE "^v([0-9]*)\\.([0-9]*)" "\\1.\\2" VERSION "${VERSION_GIT_VER}")
+    message(STATUS "VERSION ${VERSION}")
+
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE VERSION_AHEAD
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    set(VERSION_AHEAD "${VERSION}+${VERSION_AHEAD}")
+
+    # Get current commit SHA from git
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE VERSION_GIT_SHA
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+endif(GIT_FOUND)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -32,8 +60,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
 add_definitions(-D__VER="${VERSION_AHEAD}")
 add_definitions(-D__VER_SHA="${VERSION_GIT_SHA}")
-MESSAGE(STATUS "-D__VER=${VERSION_AHEAD}")
-MESSAGE(STATUS "-D__VER_SHA=${VERSION_GIT_SHA}")
 
 set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus)
 
