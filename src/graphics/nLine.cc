@@ -27,7 +27,6 @@
 #include "nGenericPan.h"
 #include <iostream>
 
-//https://github.com/graiola/spline
 #include "spline.h"
 
 nLine::~nLine() {
@@ -1017,7 +1016,7 @@ QPolygonF nLine::poly(int steps) const {
 				}
 			}
 
-			spline::spline sX(T,X), sY(T,Y);
+            tk::spline sX(T,X), sY(T,Y);
 
 			steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
 			int size=steps*(my_poly.size()-(closedLine?0:1));

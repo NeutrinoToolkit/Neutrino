@@ -58,15 +58,11 @@ NEUTRINO_PLUGIN(Function,Analysis);
 
 struct fPhys : public exprtk::ifunction<double>
 {
-    fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
-        exprtk::disable_has_side_effects(*this);
-    }
-    virtual ~fPhys() override {}
+    fPhys(nPhysD *);
+    virtual ~fPhys() override;
 
 public:
-    virtual double operator()(const double& x, const double& y) override {
-        return my_phys->getPoint(x,y);
-    }
+    virtual double operator()(const double&, const double&) override;
 
 private:
     nPhysD* my_phys;
@@ -74,10 +70,8 @@ private:
 
 struct physFunc3 : public exprtk::ifunction<double>
 {
-    physFunc3(Function *fparent) : exprtk::ifunction<double>(3), mylist(fparent->nparent->getBufferList()) {
-        exprtk::disable_has_side_effects(*this);
-    }
-    virtual ~physFunc3() override {}
+    physFunc3(Function*);
+    virtual ~physFunc3() override;
 
 public:
     virtual double operator()(const double &, const double&, const double&) override;
