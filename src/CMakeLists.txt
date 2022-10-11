@@ -7,23 +7,7 @@ endif()
 
 find_package(Git REQUIRED)
 if (GIT_FOUND)
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} describe --match "v[0-9]*\\.[0-9]*" --abbrev=0
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE VERSION_GIT_VER
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    string(REGEX REPLACE "^v([0-9]*)\\.([0-9]*)" "\\1.\\2" VERSION "${VERSION_GIT_VER}")
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE VERSION_AHEAD
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    set(VERSION_AHEAD "${VERSION}+${VERSION_AHEAD}")
-
-    # Get current commit SHA from git
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE VERSION_GIT_SHA
         OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -55,8 +39,7 @@ include(FindNeutrinoDeps)
 set(LIBS ${LIBS} "nPhysImageF")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
-add_definitions(-D__VER="${VERSION_AHEAD}")
-add_definitions(-D__VER_SHA="${VERSION_GIT_SHA}")
+add_definitions(-DSHAVERSION__="${VERSION_GIT_SHA}")
 
 set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus)
 
@@ -80,7 +63,7 @@ file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
 # write automatically the qrc file for html
 set(LICENSESDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/licenses)
 #parse neutrino license file
-file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*)
+file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*.txt)
 list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
@@ -115,13 +98,13 @@ if(APPLE)
 
 
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${VERSION}")
+    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} ${VERSION_GIT_SHA}")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
 
     set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_AHEAD}")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
-    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_AHEAD} sha: ${VERSION_GIT_SHA}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_GIT_SHA}")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_GIT_SHA}")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_GIT_SHA}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright ${PROJECT_COPYRIGHT_YEAR} Tommaso Vinci, Alessandro Flacco. GNU General Public License v2.0")
 
     set(MACOSX_BUNDLE_ICON_FILE icon.icns)

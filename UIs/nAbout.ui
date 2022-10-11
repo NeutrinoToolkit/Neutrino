@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>537</width>
-    <height>390</height>
+    <width>498</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,7 +68,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">:/icons/icon.png</pixmap>
+         <pixmap resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">:/icons/icon.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -83,7 +83,6 @@
         <property name="font">
          <font>
           <pointsize>20</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -140,10 +139,11 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="html">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+hr { height: 1px; border-width: 0; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.SF NS Text';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textInteractionFlags">
       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -152,7 +152,7 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0,1,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -190,28 +190,17 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="text">
-         <string>SHA</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="sha">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
+       </spacer>
       </item>
       <item>
        <widget class="QDialogButtonBox" name="buttonBox">
@@ -249,7 +238,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

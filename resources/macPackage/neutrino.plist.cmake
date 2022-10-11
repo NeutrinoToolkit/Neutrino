@@ -48,7 +48,7 @@
     <true/>
 
     <key>NSCameraUsageDescription</key>
-    <string>This app needs you camera to grab images</string>
+    <string>to grab images</string>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>

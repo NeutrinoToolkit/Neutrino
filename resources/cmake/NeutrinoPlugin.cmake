@@ -111,7 +111,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     endif()
 
     foreach(MODULE ${MODULES})
-        set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
+        list(APPEND MODULES_TWEAK "Qt6::${MODULE}")
     endforeach()
 
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})

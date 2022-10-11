@@ -30,7 +30,7 @@ int nApp::exec() {
     QCoreApplication::setOrganizationName("polytechnique");
     QCoreApplication::setOrganizationDomain("edu");
     QCoreApplication::setApplicationName("Neutrino");
-    QCoreApplication::setApplicationVersion(__VER);
+    QCoreApplication::setApplicationVersion(SHAVERSION__);
 
     changeThreads(my_set.value("threads",1).toInt());
 
@@ -296,7 +296,7 @@ void nApp::checkUpdates() {
     qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
 #endif
     if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
-        QString compileSHA = QString(__VER_SHA);
+        QString compileSHA = QString(SHAVERSION__);
         QString onlineSHA=responseObject.value("sha").toString();
         qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
         qDebug() << compileSHA;

@@ -926,7 +926,7 @@ void neutrino::saveSession (QString fname) {
             progress.show();
 
             std::ofstream ofile(QFile::encodeName(fname).toStdString().c_str(), std::ios::out | std::ios::binary);
-            ofile << "Neutrino " << __VER << " " << physList.size() << " " << panList.size() << std::endl;
+            ofile << "Neutrino " << SHAVERSION__ << " " << physList.size() << " " << panList.size() << std::endl;
 
             for (int i=0;i<physList.size(); i++) {
                 if (progress.wasCanceled()) break;
@@ -1637,7 +1637,6 @@ void neutrino::about() {
     connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
     my_about.version->setText(QApplication::applicationVersion());
-    my_about.sha->setText(QString(__VER_SHA));
     QDirIterator it(":licenses/", QDirIterator::Subdirectories);
     QStringList licenses;
     while (it.hasNext()) {

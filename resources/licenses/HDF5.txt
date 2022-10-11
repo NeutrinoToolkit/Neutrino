@@ -40,7 +40,6 @@ suffered by the users arising out of the use of this software, even if
 advised of the possibility of such damage. 
 
 -----------------------------------------------------------------------------
------------------------------------------------------------------------------
 
 Contributors:   National Center for Supercomputing Applications (NCSA) at 
 the University of Illinois, Fortner Software, Unidata Program Center (netCDF), 

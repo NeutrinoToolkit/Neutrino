@@ -28,29 +28,6 @@
 #include "nPhysImageF.h"
 
 
-fPhys::fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
-    exprtk::disable_has_side_effects(*this);
-}
-fPhys::~fPhys() {}
-double fPhys::operator()(const double& x, const double& y) {
-    return my_phys->getPoint(x,y);
-}
-
-
-physFunc3::physFunc3(Function *fparent) : exprtk::ifunction<double>(3), mylist(fparent->nparent->getBufferList()) {
-    exprtk::disable_has_side_effects(*this);
-}
-physFunc3::~physFunc3() {}
-
-double physFunc3::operator()(const double &imgnum, const double& x, const double& y) {
-    int imgnumint=static_cast<int>(imgnum);
-    if (imgnumint >= 0  && imgnumint < mylist.size()) {
-        return mylist[imgnumint]->getPoint(x,y);
-    } else {
-        return std::numeric_limits<double>::quiet_NaN();
-    }
-}
-
 Function::Function(neutrino *mynparent) : nGenericPan(mynparent),
     physFunction(nullptr)
 {
