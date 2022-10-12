@@ -298,12 +298,8 @@ void nApp::checkUpdates() {
     if (responseObject.contains("sha") && responseObject.value("sha").isString()) {
         QString compileSHA = QString(SHAVERSION__);
         QString onlineSHA=responseObject.value("sha").toString();
-        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-        qDebug() << compileSHA;
-        qDebug() << onlineSHA;
-        qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-
         if (compileSHA != onlineSHA) {
+            qInfo() << "[update] this version:" << compileSHA << " Online version:" << onlineSHA;
 
             QMessageBox msgBox;
             QString text=tr("A newer version is available");
@@ -336,6 +332,9 @@ void nApp::checkUpdates() {
                 default:
                     break;
             }
+
+        } else {
+            qInfo() << "[update] you're on the last version:" << compileSHA ;
 
         }
 
