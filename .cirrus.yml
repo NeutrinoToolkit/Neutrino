@@ -7,7 +7,7 @@ MacIntel_task:
     brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
-    mkdir -p build_gcc && cd build_gcc
+    mkdir -p build && cd build
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
@@ -25,7 +25,7 @@ MacM1_task:
     brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
-    mkdir -p build_gcc && cd build_gcc
+    mkdir -p build && cd build
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh

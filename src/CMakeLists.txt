@@ -7,11 +7,10 @@ endif()
 
 find_package(Git REQUIRED)
 if (GIT_FOUND)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE VERSION_GIT_SHA
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-
 endif(GIT_FOUND)
 
 set(CMAKE_AUTOMOC ON)
