@@ -12,6 +12,7 @@ MacIntel_task:
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
+    gh release edit latest -n "build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     cp Neutrino-*.dmg ..
   artifacts:
     path: "Neutrino*.dmg"
