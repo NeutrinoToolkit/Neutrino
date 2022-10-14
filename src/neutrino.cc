@@ -658,8 +658,8 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                 dlg.exec();
             }
             for(std::vector<physD>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
-                nPhysD *ceppa = new nPhysD(*it);
-                imagelist.push_back(ceppa);
+                nPhysD *new_phys = new nPhysD(*it);
+                imagelist.push_back(new_phys);
             }
             if (imagelist.size()==0) {
                 QImage image(fname);

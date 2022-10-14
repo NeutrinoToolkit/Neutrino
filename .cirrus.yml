@@ -7,9 +7,10 @@ MacIntel_task:
     brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
-    brew link --force libomp
     mkdir -p build && cd build
-    cmake ..
+    export CPPFLAGS="-I$(brew --prefix libomp)/include" 
+    export LDFLAGS="-L$(brew --prefix libomp)/lib"
+    cmake .. -DOpenMP_CXX_INCLUDE_DIR="$(brew --prefix libomp)/include"
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
@@ -27,9 +28,10 @@ MacM1_task:
     brew install objc-codegenutils objc-run gh create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
-    brew link --force libomp
     mkdir -p build && cd build
-    cmake ..
+    export CPPFLAGS="-I$(brew --prefix libomp)/include" 
+    export LDFLAGS="-L$(brew --prefix libomp)/lib"
+    cmake .. -DOpenMP_CXX_INCLUDE_DIR="$(brew --prefix libomp)/include"
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
