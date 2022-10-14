@@ -30,7 +30,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
 add_subdirectory (nPhysImage)
-# add_subdirectory (plugins)
+add_subdirectory (plugins)
 add_subdirectory (src)
 
 include(Package)
