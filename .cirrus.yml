@@ -8,16 +8,14 @@ MacIntel_task:
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
     mkdir -p build && cd build
-    export CPPFLAGS="-I$(brew --prefix libomp)/include" 
-    export LDFLAGS="-L$(brew --prefix libomp)/lib"
-    cmake .. -DOpenMP_CXX_INCLUDE_DIR="$(brew --prefix libomp)/include"
+    cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
     gh release edit latest -n "build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     cp Neutrino-*.dmg ..
   artifacts:
-    path: "Neutrino*.dmg"
+    path: "Neutrino-*.*"
 
 MacM1_task:
   only_if: $CIRRUS_BRANCH == 'master'
@@ -29,15 +27,13 @@ MacM1_task:
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
     brew install iltommi/brews/hdf4
     mkdir -p build && cd build
-    export CPPFLAGS="-I$(brew --prefix libomp)/include" 
-    export LDFLAGS="-L$(brew --prefix libomp)/lib"
-    cmake .. -DOpenMP_CXX_INCLUDE_DIR="$(brew --prefix libomp)/include"
+    cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
     cp Neutrino-*.dmg ..
   artifacts:
-    path: "Neutrino*.dmg"
+    path: "Neutrino-*.*"
 
 AppImage_task:
   only_if: $CIRRUS_BRANCH == 'master'
