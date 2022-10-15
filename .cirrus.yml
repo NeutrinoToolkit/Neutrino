@@ -150,3 +150,19 @@ ubuntu_task:
   artifacts:
     path: "Neutrino-*.*"
 
+debian_task:
+  only_if: $CIRRUS_BRANCH == 'master'
+  container:
+      image: debian:unstable
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file gh pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    gh release upload --clobber latest Neutrino-*.deb
+    cp Neutrino*.* ..
+  artifacts:
+    path: "Neutrino-*.*"
+
