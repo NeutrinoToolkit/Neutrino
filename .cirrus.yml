@@ -52,8 +52,8 @@ AppImage_task:
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-    cp Neutrino-*.AppImage ..
     gh release upload --clobber latest Neutrino-*.AppImage
+    cp Neutrino-*.AppImage ..
   artifacts:
     path: "Neutrino-*.AppImage"
 
@@ -91,7 +91,7 @@ Cross32_task:
     mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
     make -j2 package
     gh release upload --clobber latest Neutrino*.exe
-    cp Neutrino*.exe Neutrino*.zip ..
+    cp Neutrino*.* ..
   artifacts:
     path: "Neutrino-*.*"
 
@@ -130,7 +130,23 @@ Cross64_task:
     mingw64-cmake ..
     make -j2 package
     gh release upload --clobber latest Neutrino*.exe
-    cp Neutrino*.exe Neutrino*.zip ..      
+    cp Neutrino*.* ..
+  artifacts:
+    path: "Neutrino-*.*"
+
+ubuntu_task:
+  only_if: $CIRRUS_BRANCH == 'master'
+  container:
+      image: ubuntu:22.04
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file gh pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    gh release upload --clobber latest Neutrino-*.deb
+    cp Neutrino*.* ..
   artifacts:
     path: "Neutrino-*.*"
 
