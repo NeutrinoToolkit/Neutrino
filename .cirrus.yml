@@ -206,7 +206,7 @@ opensuse_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y 
-    zypper install -y hdf-devel gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-devel rpm-build git
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-devel rpm-build git
     ln -s /usr/lib64/libfftw3_threads.so.3 /usr/lib64/libfftw3_threads.so
     mkdir build && cd build
     cmake ..
