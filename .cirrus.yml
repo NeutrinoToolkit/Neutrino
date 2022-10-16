@@ -201,7 +201,7 @@ fedora_task:
 opensuse_task:
   only_if: $CIRRUS_BRANCH == 'master'
   container:
-    image: opensuse/leap:15
+    image: opensuse/tumbleweed
   script: |
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
