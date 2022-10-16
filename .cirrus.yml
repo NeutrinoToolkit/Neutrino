@@ -166,3 +166,19 @@ debian_task:
   artifacts:
     path: "Neutrino-*.*"
 
+mint_task:
+  only_if: $CIRRUS_BRANCH == 'master'
+  container:
+      image: linuxmintd/mint21-amd64:latest
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file gh lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    gh release upload --clobber latest Neutrino-*.deb
+    cp Neutrino*.* ..
+  artifacts:
+    path: "Neutrino-*.*"
+
