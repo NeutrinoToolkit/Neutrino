@@ -67,7 +67,7 @@ Cross32_task:
     cd ..
     mkdir build && cd build
     mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino*.exe
     cp Neutrino*.* ..
   artifacts:
@@ -106,7 +106,7 @@ Cross64_task:
     cd ..
     mkdir build && cd build
     mingw64-cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino*.exe
     cp Neutrino*.* ..
   artifacts:
@@ -117,7 +117,7 @@ AppImage_task:
   container:
     image: fedora:36
   env:
-    VERSION: Linux
+    VERSION: allLinux
     APPIMAGE_EXTRACT_AND_RUN: 1
     LD_LIBRARY_PATH: AppDir/usr/lib
   script: |
@@ -127,7 +127,7 @@ AppImage_task:
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-    make install DESTDIR=AppDir
+    make -j $(nproc) install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     gh release upload --clobber latest Neutrino-*.AppImage
     cp Neutrino-*.AppImage ..
@@ -144,7 +144,7 @@ ubuntu_task:
     apt-get install -yy git file gh pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
     mkdir build && cd build
     cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
   artifacts:
@@ -160,7 +160,7 @@ debian_task:
     apt-get install -yy git file gh pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
     mkdir build && cd build
     cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
   artifacts:
@@ -176,7 +176,7 @@ mint_task:
     apt-get install -yy git file gh lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 
     mkdir build && cd build
     cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
   artifacts:
@@ -192,7 +192,7 @@ fedora_task:
     dnf -y install gcc gcc-c++ qconf git gh qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
     mkdir build && cd build
     cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino-*.rpm
     cp Neutrino*.* ..
   artifacts:
@@ -210,7 +210,7 @@ opensuse_task:
     ln -s /usr/lib64/libfftw3_threads.so.3 /usr/lib64/libfftw3_threads.so
     mkdir build && cd build
     cmake ..
-    make -j2 package
+    make -j$(nproc) package
     gh release upload --clobber latest Neutrino-*.rpm
     cp Neutrino*.* ..
   artifacts:
