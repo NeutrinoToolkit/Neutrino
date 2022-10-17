@@ -69,7 +69,6 @@ win32_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
-
 win64_task:
   container:
     image: fedora:36
@@ -146,12 +145,13 @@ upload_task:
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
     git push origin :refs/tags/latest;
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-    git push --follow-tags origin HEAD:master
+    git push --follow-tags origin HEAD:master || true
     gh release delete latest -y || true
     gh release create latest -n "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     gh release upload --clobber latest package/*
 
 # waiting linuxdeploy for arm
+#   allow_failures: true
 # linuxArm_task:
 #   arm_container:
 #     image: arm64v8/fedora
