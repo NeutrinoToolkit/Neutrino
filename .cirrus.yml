@@ -1,4 +1,4 @@
-MacIntel_task:
+macIntel_task:
   only_if: $CIRRUS_BRANCH == 'master'
   macos_instance:
     image: big-sur-base
@@ -14,10 +14,13 @@ MacIntel_task:
     gh release upload --clobber latest Neutrino*.dmg
     gh release edit latest -n "build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     cp Neutrino-*.dmg ..
-  artifacts:
-    path: "Neutrino-*.*"
+    echo "https://api.cirrus-ci.com/v1/artifact/github/<USER OR ORGANIZATION>/<REPOSITORY>/<TASK NAME OR ALIAS>/<ARTIFACTS_NAME>/Neutrino-Darwin-x86_64.dmg"
+  dmg_artifacts:
+    path: "Neutrino-*.dmg"
+  zip_artifacts:
+    path: "Neutrino-*.zip"
 
-MacM1_task:
+macM1_task:
   only_if: $CIRRUS_BRANCH == 'master'
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
@@ -35,7 +38,7 @@ MacM1_task:
   artifacts:
     path: "Neutrino-*.*"
 
-Cross32_task:
+win32_task:
   only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
@@ -74,7 +77,7 @@ Cross32_task:
     path: "Neutrino-*.*"
 
 
-Cross64_task:
+win64_task:
   only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
