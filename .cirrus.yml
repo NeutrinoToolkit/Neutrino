@@ -1,5 +1,4 @@
 macIntel_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   macos_instance:
     image: big-sur-base
   script: |
@@ -14,12 +13,11 @@ macIntel_task:
     gh release upload --clobber latest Neutrino*.dmg
     gh release edit latest -n "build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     cp Neutrino-*.dmg ..
-    echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID//Neutrino-Darwin-x86_64.dmg"
+    echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip"
   package_artifacts:
     path: "Neutrino-*.*"
 
 macM1_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
@@ -37,7 +35,6 @@ macM1_task:
     path: "Neutrino-*.*"
 
 win32_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
   script: |
@@ -76,7 +73,6 @@ win32_task:
 
 
 win64_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
   script: |
@@ -114,7 +110,6 @@ win64_task:
     path: "Neutrino-*.*"
 
 AppImage_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
   env:
@@ -136,7 +131,6 @@ AppImage_task:
     path: "Neutrino-*.AppImage"
 
 ubuntu_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: ubuntu:22.04
   script: |
@@ -152,7 +146,6 @@ ubuntu_task:
     path: "Neutrino-*.*"
 
 debian_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: debian:unstable
   script: |
@@ -168,7 +161,6 @@ debian_task:
     path: "Neutrino-*.*"
 
 mint_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: linuxmintd/mint21-amd64:latest
   script: |
@@ -184,7 +176,6 @@ mint_task:
     path: "Neutrino-*.*"
 
 fedora_task:
-  only_if: $CIRRUS_BRANCH == 'master'
   container:
     image: fedora:36
   script: |
@@ -200,7 +191,7 @@ fedora_task:
     path: "Neutrino-*.*"
 
 opensuse_task:
-  only_if: $CIRRUS_BRANCH == 'master'
+  allow_failures:
   container:
     image: opensuse/tumbleweed
   script: |
@@ -217,3 +208,11 @@ opensuse_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
+upload_task:
+  depends_on:
+    - macIntel 
+    - macM1 
+    - win32 
+    - win64 
+    - AppImage
+    
