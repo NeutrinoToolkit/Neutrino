@@ -131,6 +131,7 @@ AppImage_task:
     path: "Neutrino-*.AppImage"
 
 ubuntu_task:
+  allow_failures: true
   container:
     image: ubuntu:22.04
   script: |
@@ -146,6 +147,7 @@ ubuntu_task:
     path: "Neutrino-*.*"
 
 debian_task:
+  allow_failures: true
   container:
     image: debian:unstable
   script: |
@@ -161,6 +163,7 @@ debian_task:
     path: "Neutrino-*.*"
 
 mint_task:
+  allow_failures: true
   container:
     image: linuxmintd/mint21-amd64:latest
   script: |
@@ -176,6 +179,7 @@ mint_task:
     path: "Neutrino-*.*"
 
 fedora_task:
+  allow_failures: true
   container:
     image: fedora:36
   script: |
@@ -191,7 +195,7 @@ fedora_task:
     path: "Neutrino-*.*"
 
 opensuse_task:
-  allow_failures:
+  allow_failures: true
   container:
     image: opensuse/tumbleweed
   script: |
