@@ -1029,7 +1029,6 @@ void Visar::updatePlotSOP() {
 
         for (int i=0; i<time_sop.size(); i++) {
             double my_reflectivity=0;
-            double my_velocity=0;
 
             int numrefl=0;
             for (int numk=0;numk<reflList.size();numk++) {
@@ -1048,7 +1047,6 @@ void Visar::updatePlotSOP() {
                             double valVj=velocity[k][j];
 
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
-                            my_velocity+=valVj_1+(time_sop[i]-t_j1)*(valVj-valVj_1)/(t_j-t_j1);
 
                             numrefl++;
                         }
@@ -1057,7 +1055,6 @@ void Visar::updatePlotSOP() {
             }
             if (numrefl) {
                 my_reflectivity/=numrefl;
-                my_velocity/=numrefl;
             }
 
             my_reflectivity=std::min(std::max(my_reflectivity,0.0),1.0);

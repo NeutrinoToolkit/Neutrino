@@ -33,24 +33,19 @@ macM1_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
-win_task:
+win32_task:
   container:
     image: fedora:36
-  env:
-    matrix:
-      - bits: 32
-      - bits: 64
   script: |
     dnf clean all
     dnf -y --nogpgcheck update
-    export bits=$(getconf LONG_BIT)
-    dnf -y install cmake git mingw${bits}-qt6* mingw${bits}-gcc-c++ mingw${bits}-gcc mingw${bits}-gcc-gfortran mingw${bits}-libgomp mingw${bits}-gsl mingw${bits}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw${bits}-portablexdr pandoc mingw${bits}-cfitsio
+    dnf -y install cmake git mingw32-qt6* mingw32-gcc-c++ mingw32-gcc mingw32-gcc-gfortran mingw32-libgomp mingw32-gsl mingw32-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw32-portablexdr pandoc mingw32-cfitsio
     wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
     tar -zxvf fftw-3.3.6-pl2.tar.gz
     cd fftw-3.3.6-pl2
-    mingw${bits}-configure --disable-static --enable-shared --enable-threads --with-combined-threads 
-    make bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS= 
-    make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=  
+    mingw32-configure --disable-static --enable-shared --enable-threads --with-combined-threads
+    make bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
     cd ..
     wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
     tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
@@ -60,7 +55,7 @@ win_task:
     patch -p1 -u < hdf4-2-dllimport.patch
     libtoolize --force
     autoreconf --install
-    mingw${bits}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+    mingw32-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
     make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
     make -C hdf/src LDFLAGS="-no-undefined -lssp"
     make -C hdf/src install
@@ -68,48 +63,48 @@ win_task:
     make -C mfhdf/libsrc install
     cd ..
     mkdir build && cd build
-    mingw${bits}-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
+    mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
     make -j2 package
     cp Neutrino*.exe ..
   package_artifacts:
     path: "Neutrino-*.*"
 
-# win64_task:
-#   container:
-#     image: fedora:36
-#   script: |
-#     dnf clean all
-#     dnf -y --nogpgcheck update
-#     dnf -y install cmake git mingw64-qt6* mingw64-gcc-c++ mingw64-gcc-gfortran mingw64-libgomp mingw64-gsl mingw64-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw64-portablexdr pandoc mingw64-cfitsio
-#     wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
-#     tar -zxvf fftw-3.3.6-pl2.tar.gz
-#     cd fftw-3.3.6-pl2
-#     mingw64-configure --disable-static --enable-shared --enable-threads --with-combined-threads
-#     make -j bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=    
-#     make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=   
-#     cd ..
-#     wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
-#     tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
-#     patch -p1 -u < hdf4-1-portability-fixes.patch
-#     patch -p1 -u < hdf4-2-dllimport.patch 
-#     libtoolize --force
-#     autoreconf --install
-#     mingw64-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
-#     make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src install
-#     make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-#     make -C mfhdf/libsrc install
-#     cd ..
-#     mkdir build && cd build
-#     mingw64-cmake ..
-#     make -j2 package
-#     cp Neutrino*.exe ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
-# 
+win64_task:
+  container:
+    image: fedora:36
+  script: |
+    dnf clean all
+    dnf -y --nogpgcheck update
+    dnf -y install cmake git mingw64-qt6* mingw64-gcc-c++ mingw64-gcc-gfortran mingw64-libgomp mingw64-gsl mingw64-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw64-portablexdr pandoc mingw64-cfitsio
+    wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
+    tar -zxvf fftw-3.3.6-pl2.tar.gz
+    cd fftw-3.3.6-pl2
+    mingw64-configure --disable-static --enable-shared --enable-threads --with-combined-threads
+    make -j bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    cd ..
+    wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+    tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+    patch -p1 -u < hdf4-1-portability-fixes.patch
+    patch -p1 -u < hdf4-2-dllimport.patch
+    libtoolize --force
+    autoreconf --install
+    mingw64-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+    make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src install
+    make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+    make -C mfhdf/libsrc install
+    cd ..
+    mkdir build && cd build
+    mingw64-cmake ..
+    make -j2 package
+    cp Neutrino*.exe ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
 AppImage_task:
   container:
     image: fedora:36
@@ -119,7 +114,7 @@ AppImage_task:
     LD_LIBRARY_PATH: AppDir/usr/lib
   script: |
     dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage 
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
@@ -134,7 +129,8 @@ upload_task:
   depends_on:
     - macIntel
     - macM1
-    - win
+    - win32
+    - win64
     - AppImage
   container:
     image: ubuntu:22.04
@@ -151,7 +147,7 @@ upload_task:
     git push --follow-tags origin HEAD:master || true
     gh release delete latest -y || true
     gh release create latest -n "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-    gh release upload --clobber latest package/Neutrino-*
+    gh release upload --clobber latest package/*
 
 # waiting linuxdeploy for arm
 #   allow_failures: true
@@ -181,7 +177,7 @@ upload_task:
 #     cp Neutrino*.deb ..
 #   package_artifacts:
 #     path: "Neutrino-*.*"
-# 
+#
 # debian_task:
 #   allow_failures: true
 #   container:
@@ -196,7 +192,7 @@ upload_task:
 #     cp Neutrino*.deb ..
 #   package_artifacts:
 #     path: "Neutrino-*.*"
-# 
+#
 # mint_task:
 #   allow_failures: true
 #   container:
@@ -204,14 +200,14 @@ upload_task:
 #   script: |
 #     export DEBIAN_FRONTEND=noninteractive
 #     apt-get update -qq
-#     apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 
+#     apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
 #     mkdir build && cd build
 #     cmake ..
 #     make -j2 package
 #     cp Neutrino*.deb ..
 #   package_artifacts:
 #     path: "Neutrino-*.*"
-# 
+#
 # fedora_task:
 #   allow_failures: true
 #   container:
@@ -226,7 +222,7 @@ upload_task:
 #     cp Neutrino*.rpm ..
 #   package_artifacts:
 #     path: "Neutrino-*.*"
-# 
+#
 # opensuse_task:
 #   allow_failures: true
 #   container:
@@ -234,7 +230,7 @@ upload_task:
 #   script: |
 #     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
 #     zypper --gpg-auto-import-keys ref
-#     zypper update -y 
+#     zypper update -y
 #     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
 #     mkdir build && cd build
 #     cmake ..
@@ -242,4 +238,3 @@ upload_task:
 #     cp Neutrino*.rpm ..
 #   package_artifacts:
 #     path: "Neutrino-*.*"
-
