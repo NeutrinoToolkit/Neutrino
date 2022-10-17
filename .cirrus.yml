@@ -1,3 +1,12 @@
+linuxArm_task:
+  arm_container:
+    image: arm64v8/fedora
+  script: |
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir    
+
 macIntel_task:
   macos_instance:
     image: big-sur-base
@@ -219,9 +228,8 @@ upload_task:
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
     gh release delete latest -y || true
     git push origin :refs/tags/latest;
-    git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
+    git tag -fa latest -m "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     git push --follow-tags
     gh release create latest --generate-notes
     gh release upload --clobber latest package/*
-    gh release edit latest -n "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     
