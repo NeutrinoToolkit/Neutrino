@@ -223,5 +223,6 @@ upload_task:
     image: ubuntu:22.04
   script: |
     apt-get update -qq
-    apt-get install -yy gh
+    apt-get install -yy gh wget zip
     echo $CIRRUS_BUILD_ID
+    wget https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip
