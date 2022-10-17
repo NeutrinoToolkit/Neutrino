@@ -230,12 +230,11 @@ upload_task:
     git config --global user.name "Cirrus CI"
     git config --global user.name "hello@cirruslabs.org"
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-    
-    gh release delete latest -y;
+    gh release delete latest -y
     git push origin :refs/tags/latest;
-    git tag -fa latest -m "Commit $(git rev-list HEAD --count)";
-    git push --follow-tags;
-    gh release create latest --generate-notes;
+    git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
+    git push --follow-tags
+    gh release create latest --generate-notes
     gh release upload --clobber latest package/*
     gh release edit latest -n "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     
