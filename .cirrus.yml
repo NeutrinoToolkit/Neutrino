@@ -144,7 +144,7 @@ ubuntu_task:
     mkdir build && cd build
     cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.deb ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -159,7 +159,7 @@ debian_task:
     mkdir build && cd build
     cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.deb ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -174,7 +174,7 @@ mint_task:
     mkdir build && cd build
     cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.deb ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -189,7 +189,7 @@ fedora_task:
     mkdir build && cd build
     cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.rpm ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -205,7 +205,7 @@ opensuse_task:
     mkdir build && cd build
     cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.rpm ..
   package_artifacts:
     path: "Neutrino-*.*"
 
