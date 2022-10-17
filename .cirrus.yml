@@ -14,11 +14,9 @@ macIntel_task:
     gh release upload --clobber latest Neutrino*.dmg
     gh release edit latest -n "build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     cp Neutrino-*.dmg ..
-    echo "https://api.cirrus-ci.com/v1/artifact/github/<USER OR ORGANIZATION>/<REPOSITORY>/<TASK NAME OR ALIAS>/<ARTIFACTS_NAME>/Neutrino-Darwin-x86_64.dmg"
-  dmg_artifacts:
-    path: "Neutrino-*.dmg"
-  zip_artifacts:
-    path: "Neutrino-*.zip"
+    echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID//Neutrino-Darwin-x86_64.dmg"
+  package_artifacts:
+    path: "Neutrino-*.*"
 
 macM1_task:
   only_if: $CIRRUS_BRANCH == 'master'
@@ -35,7 +33,7 @@ macM1_task:
     ../resources/macPackage/prepareapp.sh
     gh release upload --clobber latest Neutrino*.dmg
     cp Neutrino-*.dmg ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 win32_task:
@@ -73,7 +71,7 @@ win32_task:
     make -j2 package
     gh release upload --clobber latest Neutrino*.exe
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 
@@ -112,7 +110,7 @@ win64_task:
     make -j2 package
     gh release upload --clobber latest Neutrino*.exe
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 AppImage_task:
@@ -134,7 +132,7 @@ AppImage_task:
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     gh release upload --clobber latest Neutrino-*.AppImage
     cp Neutrino-*.AppImage ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.AppImage"
 
 ubuntu_task:
@@ -150,7 +148,7 @@ ubuntu_task:
     make -j2 package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 debian_task:
@@ -166,7 +164,7 @@ debian_task:
     make -j2 package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 mint_task:
@@ -182,7 +180,7 @@ mint_task:
     make -j2 package
     gh release upload --clobber latest Neutrino-*.deb
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 fedora_task:
@@ -198,7 +196,7 @@ fedora_task:
     make -j2 package
     gh release upload --clobber latest Neutrino-*.rpm
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
 opensuse_task:
@@ -216,6 +214,6 @@ opensuse_task:
     make -j2 package
     gh release upload --clobber latest Neutrino-*.rpm
     cp Neutrino*.* ..
-  artifacts:
+  package_artifacts:
     path: "Neutrino-*.*"
 
