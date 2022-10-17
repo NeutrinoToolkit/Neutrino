@@ -72,7 +72,7 @@ win32_task:
     mkdir build && cd build
     mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.exe ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -109,7 +109,7 @@ win64_task:
     mkdir build && cd build
     mingw64-cmake ..
     make -j2 package
-    cp Neutrino*.* ..
+    cp Neutrino*.exe ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -133,81 +133,81 @@ AppImage_task:
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
-ubuntu_task:
-  allow_failures: true
-  container:
-    image: ubuntu:22.04
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-debian_task:
-  allow_failures: true
-  container:
-    image: debian:unstable
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-mint_task:
-  allow_failures: true
-  container:
-    image: linuxmintd/mint21-amd64:latest
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-fedora_task:
-  allow_failures: true
-  container:
-    image: fedora:36
-  script: |
-    dnf clean all
-    dnf -y --nogpgcheck update
-    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.rpm ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-opensuse_task:
-  allow_failures: true
-  container:
-    image: opensuse/tumbleweed
-  script: |
-    zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
-    zypper --gpg-auto-import-keys ref
-    zypper update -y 
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.rpm ..
-  package_artifacts:
-    path: "Neutrino-*.*"
+# ubuntu_task:
+#   allow_failures: true
+#   container:
+#     image: ubuntu:22.04
+#   script: |
+#     export DEBIAN_FRONTEND=noninteractive
+#     apt-get update -qq
+#     apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+#     mkdir build && cd build
+#     cmake ..
+#     make -j2 package
+#     cp Neutrino*.deb ..
+#   package_artifacts:
+#     path: "Neutrino-*.*"
+# 
+# debian_task:
+#   allow_failures: true
+#   container:
+#     image: debian:unstable
+#   script: |
+#     export DEBIAN_FRONTEND=noninteractive
+#     apt-get update -qq
+#     apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+#     mkdir build && cd build
+#     cmake ..
+#     make -j2 package
+#     cp Neutrino*.deb ..
+#   package_artifacts:
+#     path: "Neutrino-*.*"
+# 
+# mint_task:
+#   allow_failures: true
+#   container:
+#     image: linuxmintd/mint21-amd64:latest
+#   script: |
+#     export DEBIAN_FRONTEND=noninteractive
+#     apt-get update -qq
+#     apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 
+#     mkdir build && cd build
+#     cmake ..
+#     make -j2 package
+#     cp Neutrino*.deb ..
+#   package_artifacts:
+#     path: "Neutrino-*.*"
+# 
+# fedora_task:
+#   allow_failures: true
+#   container:
+#     image: fedora:36
+#   script: |
+#     dnf clean all
+#     dnf -y --nogpgcheck update
+#     dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
+#     mkdir build && cd build
+#     cmake ..
+#     make -j2 package
+#     cp Neutrino*.rpm ..
+#   package_artifacts:
+#     path: "Neutrino-*.*"
+# 
+# opensuse_task:
+#   allow_failures: true
+#   container:
+#     image: opensuse/tumbleweed
+#   script: |
+#     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+#     zypper --gpg-auto-import-keys ref
+#     zypper update -y 
+#     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+#     mkdir build && cd build
+#     cmake ..
+#     make -j2 package
+#     cp Neutrino*.rpm ..
+#   package_artifacts:
+#     path: "Neutrino-*.*"
 
 upload_task:
   depends_on:
@@ -221,6 +221,7 @@ upload_task:
   script: |
     apt-get update -qq
     apt-get install -yy git gh wget zip findutils
+    echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip"
     wget -q https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip
     unzip package.zip -d package
     git config --global user.name "Cirrus CI"
@@ -230,6 +231,6 @@ upload_task:
     git push origin :refs/tags/latest;
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     git push --follow-tags origin HEAD:master 
-    gh release create latest --generate-notes
+    gh release create latest -n "Commit $(git rev-list HEAD --count)\nBuild info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
     gh release upload --clobber latest package/*
     
