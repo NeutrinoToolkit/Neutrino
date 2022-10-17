@@ -192,8 +192,7 @@ opensuse_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y 
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-devel rpm-build git
-    ln -s /usr/lib64/libfftw3_threads.so.3 /usr/lib64/libfftw3_threads.so
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
     mkdir build && cd build
     cmake ..
     make -j2 package
@@ -213,13 +212,12 @@ upload_task:
   script: |
     apt-get update -qq
     apt-get install -yy git gh wget zip findutils
-    echo $CIRRUS_BUILD_ID
     wget -q https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip
     unzip package.zip -d package
     git config --global user.name "Cirrus CI"
     git config --global user.email "hello@cirruslabs.org"
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-    gh release delete latest -y
+    gh release delete latest -y || true
     git push origin :refs/tags/latest;
     git tag -fa latest -m "Commit $(git rev-list HEAD --count)"
     git push --follow-tags
