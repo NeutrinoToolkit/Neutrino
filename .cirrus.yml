@@ -1,3 +1,5 @@
+only_if: $CIRRUS_BRANCH == 'master'
+
 linuxArm_task:
   arm_container:
     image: arm64v8/fedora
