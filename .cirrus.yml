@@ -219,4 +219,5 @@ upload_task:
     - win32 
     - win64 
     - AppImage
-    
+  script: |
+    echo $CIRRUS_BUILD_ID
