@@ -219,5 +219,9 @@ upload_task:
     - win32 
     - win64 
     - AppImage
+  container:
+    image: ubuntu:22.04
   script: |
+    apt-get update -qq
+    apt-get install -yy gh
     echo $CIRRUS_BUILD_ID
