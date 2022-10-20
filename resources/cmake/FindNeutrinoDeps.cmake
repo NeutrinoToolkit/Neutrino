@@ -1,3 +1,10 @@
+find_package(OpenGL REQUIRED)
+if (OPENGL_FOUND)
+    list(APPEND LOCAL_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
+else ()
+    message(WARNING "OpenGL not found")
+endif()
+
 find_package(OpenMP REQUIRED)
 set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
 

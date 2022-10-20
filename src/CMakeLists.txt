@@ -38,7 +38,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
 add_definitions(-DSHAVERSION__="${VERSION_GIT_SHA}")
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus)
+set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus OpenGL OpenGLWidgets)
 
 find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 

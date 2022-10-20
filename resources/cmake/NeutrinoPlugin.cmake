@@ -17,7 +17,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     include(FindNeutrinoDeps)
 
-    SET(MODULES Core Gui Widgets Svg PrintSupport Multimedia MultimediaWidgets Qml DBus)
+    set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus OpenGL OpenGLWidgets)
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})
