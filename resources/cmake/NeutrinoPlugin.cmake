@@ -98,8 +98,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 
     IF(APPLE)
-        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-        set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
         target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
     ENDIF()
