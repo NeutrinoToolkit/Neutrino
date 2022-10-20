@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>455</width>
-    <height>412</height>
+    <width>349</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,46 +23,88 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout_3">
     <property name="leftMargin">
-     <number>4</number>
+     <number>2</number>
     </property>
     <property name="topMargin">
-     <number>4</number>
+     <number>2</number>
     </property>
     <property name="rightMargin">
-     <number>4</number>
+     <number>2</number>
     </property>
     <property name="bottomMargin">
-     <number>4</number>
+     <number>2</number>
     </property>
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QPlainTextEdit" name="command">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Commands</string>
        </property>
-       <property name="neutrinoSave" stdset="0">
-        <bool>true</bool>
-       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="command">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QPlainTextEdit" name="output">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Output</string>
        </property>
-       <property name="undoRedoEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="output">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -74,6 +116,23 @@
      <pointsize>10</pointsize>
     </font>
    </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
   </widget>
  </widget>
  <resources/>

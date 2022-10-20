@@ -1043,9 +1043,6 @@ void Visar::updatePlotSOP() {
                             double valRj_1=reflectivity[k][j-1];
                             double valRj=reflectivity[k][j];
 
-                            double valVj_1=velocity[k][j-1];
-                            double valVj=velocity[k][j];
-
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
 
                             numrefl++;
