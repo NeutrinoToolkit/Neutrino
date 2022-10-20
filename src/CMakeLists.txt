@@ -84,7 +84,7 @@ file(APPEND ${CMAP_QRC} "    </qresource>\n</RCC>")
 
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
-include_directories(graphics pans pans/colorbar pans/winlist)
+include_directories(graphics pans)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
