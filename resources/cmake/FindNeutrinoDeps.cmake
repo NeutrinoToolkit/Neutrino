@@ -1,20 +1,3 @@
-find_package(OpenGL REQUIRED)
-if (OPENGL_FOUND)
-    list(APPEND LOCAL_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
-else ()
-    message(WARNING "OpenGL not found")
-endif()
-
-# GLU
-
-find_library(GLU NAMES GLU)
-if (NOT ${GLU} STREQUAL "GLU-NOTFOUND")
-        list(APPEND LOCAL_LIBS ${GLU})
-        message (STATUS "using GLU ${GLU}")
-else()
-        message (WARNING "Cannot find GLU: Skipping plugin")
-        return()
-endif()
 find_package(OpenMP REQUIRED)
 set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
 
