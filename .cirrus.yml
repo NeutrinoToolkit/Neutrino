@@ -118,7 +118,7 @@ AppImage_task:
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DOpenGL_GL_PREFERENCE="LEGACY" ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ..
@@ -169,7 +169,7 @@ ubuntu_task:
     apt-get update -qq
     apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
     mkdir build && cd build
-    cmake ..
+    cmake .. -DOpenGL_GL_PREFERENCE="LEGACY"
     make -j2 package
     cp Neutrino*.deb ..
   package_artifacts:
@@ -184,7 +184,7 @@ debian_task:
     apt-get update -qq
     apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
     mkdir build && cd build
-    cmake ..
+    cmake .. -DOpenGL_GL_PREFERENCE="LEGACY"
     make -j2 package
     cp Neutrino*.deb ..
   package_artifacts:
@@ -199,7 +199,7 @@ mint_task:
     apt-get update -qq
     apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
     mkdir build && cd build
-    cmake ..
+    cmake .. -DOpenGL_GL_PREFERENCE="LEGACY"
     make -j2 package
     cp Neutrino*.deb ..
   package_artifacts:
@@ -214,7 +214,7 @@ fedora_task:
     dnf -y --nogpgcheck update
     dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
     mkdir build && cd build
-    cmake ..
+    cmake .. -DOpenGL_GL_PREFERENCE="LEGACY"
     make -j2 package
     cp Neutrino*.rpm ..
   package_artifacts:
@@ -230,7 +230,7 @@ opensuse_task:
     zypper update -y
     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
     mkdir build && cd build
-    cmake ..
+    cmake .. -DOpenGL_GL_PREFERENCE="LEGACY"
     make -j2 package
     cp Neutrino*.rpm ..
   package_artifacts:
