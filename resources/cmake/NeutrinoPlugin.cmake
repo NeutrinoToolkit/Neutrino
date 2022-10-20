@@ -90,8 +90,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${README_HTML} SOURCES ${README_MD})
     endif()
 
-    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/UIs/neutrino.ui ${NEUTRINO_ROOT}/src/UIs/nLine.ui ${NEUTRINO_ROOT}/src/UIs/nObject.ui ${NEUTRINO_ROOT}/src/UIs/nPoint.ui)
-    set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
+    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
+#    set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
     add_dependencies(${PROJECT_NAME} Neutrino)
