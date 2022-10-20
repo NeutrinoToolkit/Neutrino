@@ -35,8 +35,8 @@
 #include "nTics.h"
 #include "neutrino.h"
 
-#ifndef __nView_h
-#define __nView_h
+#ifndef nView_h__
+#define nView_h__
 
 class neutrino;
 
@@ -44,8 +44,8 @@ class nView : public QGraphicsView {
     Q_OBJECT
 
 public:
-    nView (QWidget *parent=0);
-    ~nView ();
+    nView (QWidget *parent=nullptr);
+    ~nView() override;
 
     neutrino *nparent;
     QMap<QString, std::vector<unsigned char>>& nPalettes;

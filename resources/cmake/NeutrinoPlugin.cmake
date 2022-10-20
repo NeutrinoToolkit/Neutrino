@@ -38,7 +38,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     set(CMAKE_AUTOUIC ON)
     set(CMAKE_AUTORCC ON)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
-    set(CMAKE_AUTOUIC_SEARCH_PATHS "${NEUTRINO_ROOT}/UIs ${CMAKE_CURRENT_SOURCE_DIR}")
+    set(CMAKE_AUTOUIC_SEARCH_PATHS "${NEUTRINO_ROOT}/src ${NEUTRINO_ROOT}/graphics ${NEUTRINO_ROOT}/pans ${CMAKE_CURRENT_SOURCE_DIR}")
 
     # add neutrino deps
     include_directories(${NEUTRINO_ROOT}/nPhysImage)
@@ -90,7 +90,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${README_HTML} SOURCES ${README_MD})
     endif()
 
-    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/UIs/neutrino.ui ${NEUTRINO_ROOT}/UIs/nLine.ui ${NEUTRINO_ROOT}/UIs/nObject.ui ${NEUTRINO_ROOT}/UIs/nPoint.ui)
+    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
     set_property(SOURCE ${nUIs} PROPERTY SKIP_AUTOGEN ON)
 
     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})

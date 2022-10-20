@@ -395,6 +395,7 @@ neutrino::scanPlugins(QString pluginsDirStr) {
         pluginlist.sort();
         QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
         progress.setWindowModality(Qt::WindowModal);
+        progress.setAutoClose(true);
         progress.show();
         progress.setCancelButton(nullptr);
         for (auto &pluginfile : pluginlist) {
@@ -408,6 +409,7 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             progress.setValue(progress.value()+1);
             loadPlugin(pluginfile, false);
         }
+        progress.accept();
         progress.close();
 
 //        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
