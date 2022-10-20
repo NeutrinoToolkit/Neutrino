@@ -62,7 +62,7 @@ class neutrino : public QMainWindow, public Ui::neutrino {
 public:
 
     neutrino();
-    ~neutrino() override;
+    ~neutrino();
 
     QGraphicsScene& getScene();
 
@@ -79,12 +79,12 @@ private:
 
 public slots:
     inline bool nPhysExists(nPhysD* my_phys) {return physList.contains(my_phys);}
-    inline int indexOf(nPhysD* my_phys){return static_cast<int>(physList.indexOf(my_phys));}
+    inline int indexOf(nPhysD* my_phys){return physList.indexOf(my_phys);}
 
     void setGamma(int value);
 
     void processEvents();
-    void contextMenuEvent(QContextMenuEvent *) override;
+    void contextMenuEvent(QContextMenuEvent *);
     void menuFlipRotate();
     void rotateLeft();
     void rotateRight();
@@ -171,10 +171,10 @@ public slots:
 
     void zoomChanged(double);
 
-    void keyPressEvent (QKeyEvent *) override;
-    void keyReleaseEvent (QKeyEvent *) override;
+    void keyPressEvent (QKeyEvent *);
+    void keyReleaseEvent (QKeyEvent *);
 
-    void closeEvent(QCloseEvent *) override;
+    void closeEvent(QCloseEvent *);
 
     void print();
 
@@ -198,9 +198,9 @@ public slots:
     nLine* line(QString);
     nRect* rect(QString);
 
-    void dragEnterEvent(QDragEnterEvent *) override;
-    void dragMoveEvent(QDragMoveEvent *) override;
-    void dropEvent(QDropEvent *) override;
+    void dragEnterEvent(QDragEnterEvent *);
+    void dragMoveEvent(QDragMoveEvent *);
+    void dropEvent(QDropEvent *);
 
     nGenericPan* newPan(QString=QString());
     nGenericPan* getPan(QString);

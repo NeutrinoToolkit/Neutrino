@@ -1043,6 +1043,9 @@ void Visar::updatePlotSOP() {
                             double valRj_1=reflectivity[k][j-1];
                             double valRj=reflectivity[k][j];
 
+                            double valVj_1=velocity[k][j-1];
+                            double valVj=velocity[k][j];
+
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
 
                             numrefl++;
@@ -1352,11 +1355,12 @@ void Visar::doWave(unsigned int k) {
 
         if (imgs[0] && imgs[1]  && imgs[0]->getSize() == imgs[1]->getSize()) {
 
-            QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 26, this);
+            QProgressDialog progress("Filter visar "+QLocale().toString(k+1), "Cancel", 0, 23, this);
             progress.setCancelButton(nullptr);
             progress.setWindowModality(Qt::WindowModal);
             progress.setValue(0);
             progress.show();
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             size_t dx=imgs[1]->getW();
             size_t dy=imgs[1]->getH();
@@ -1373,20 +1377,19 @@ void Visar::doWave(unsigned int k) {
 
             nPhysD* physDeghost=nullptr;
 
-            progress.setValue(progress.value()+1);
             if (settingsUi[k]->DeghostCheck->checkState()>0) {
 
                 physC imageFFT = imgs[1]->ft2(PHYS_FORWARD);
 
                 progress.setValue(progress.value()+1);
 
-                double lambda_ghost=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
+                double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
 
                 for (size_t x=0;x<dx;x++) {
                     for (size_t y=0;y<dy;y++) {
                         double xr = xx[x]*cr - yy[y]*sr;
                         double yr = xx[x]*sr + yy[y]*cr;
-                        double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda_ghost-std::abs(xr)));
+                        double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
                         imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                     }
                 }
@@ -1408,7 +1411,6 @@ void Visar::doWave(unsigned int k) {
                     vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
                 }
 
-                progress.setValue(progress.value()+1);
                 for(int i=geom.left();i<geom.right(); i++) {
                     for(int j=geom.top();j<geom.bottom(); j++) {
                         vec2f pp(i,j);
@@ -1420,17 +1422,17 @@ void Visar::doWave(unsigned int k) {
                 progress.setValue(progress.value()+1);
                 physDeghost->TscanBrightness();
                 imgs[1]=physDeghost;
-            } else {
-                 progress.setValue(progress.value()+5);
             }
 
             sweepChanged(settingsUi[k]->physScale);
 
             std::array<physC,2> physfft={{imgs[0]->ft2(PHYS_FORWARD),imgs[1]->ft2(PHYS_FORWARD)}};
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             std::array<physC,2> zz_morlet;
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             std::array<physD,2> phase({{nPhysD(),nPhysD()}});
 
@@ -1439,13 +1441,17 @@ void Visar::doWave(unsigned int k) {
                 contrast[k][m].resize(dx, dy);
                 intensity[k][m]= imgs[m]->copy();
                 progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 physMath::phys_fast_gaussian_blur(intensity[k][m], settingsUi[k]->resolution->value());
                 progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 zz_morlet[m].resize(dx,dy);
                 progress.setValue(progress.value()+1);
+                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
 
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
             const double damp_norm=M_PI;
 
@@ -1468,11 +1474,14 @@ void Visar::doWave(unsigned int k) {
                 progress.setValue(progress.value()+1);
             }
 
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
             for (unsigned int m=0;m<2;m++) {
                 physfft[m] = zz_morlet[m].ft2(PHYS_BACKWARD);
                 progress.setValue(progress.value()+1);
             }
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for
@@ -1491,23 +1500,26 @@ void Visar::doWave(unsigned int k) {
                 }
             }
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     //unwrap
 
             physD diff = phase[1]-phase[0];
             physD qual = contrast[k][1]*contrast[k][0];
 
             physWave::phys_phase_unwrap(phase[0], qual, physWave::QUALITY, phaseUnwrap[k][0]);
-            progress.setValue(progress.value()+1);
             physWave::phys_phase_unwrap(diff,     qual, physWave::QUALITY, phaseUnwrap[k][1]);
 
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             getPhase(k);
 
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             updatePlot();
             progress.setValue(progress.value()+1);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
             settingsUi[k]->doWaveButton->setProperty("needWave",false);
@@ -1524,7 +1536,7 @@ void Visar::doWave(unsigned int k) {
                     qDebug() << ghostPhys[k];
                 }
             }
-            progress.setValue(progress.value()+1);
+
         } else {
             if (imgs[0] && imgs[1]) {
                 DEBUG(imgs[0]->getH() << "," << imgs[0]->getW() << " " << imgs[1]->getH() << "," << imgs[1]->getW());
