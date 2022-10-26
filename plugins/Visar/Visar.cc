@@ -1380,13 +1380,14 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
 
-                double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
+                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
                 for (size_t x=0;x<dx;x++) {
                     for (size_t y=0;y<dy;y++) {
                         double xr = xx[x]*cr - yy[y]*sr;
                         double yr = xx[x]*sr + yy[y]*cr;
-                        double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
+                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
                         imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                     }
                 }
@@ -1412,7 +1413,7 @@ void Visar::doWave(unsigned int k) {
                     for(int j=geom.top();j<geom.bottom(); j++) {
                         vec2f pp(i,j);
                         if (point_inside_poly(pp,vecPoints)==true) {
-                            physDeghost->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                            physDeghost->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
                         }
                     }
                 }
@@ -1450,8 +1451,6 @@ void Visar::doWave(unsigned int k) {
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             double thick_norm=settingsUi[k]->resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-            const double damp_norm=M_PI;
-
             double lambda_norm=settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
             for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for collapse(2)
@@ -1460,7 +1459,7 @@ void Visar::doWave(unsigned int k) {
                         double xr = xx[x]*cr - yy[y]*sr; //rotate
                         double yr = xx[x]*sr + yy[y]*cr;
 
-                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2);
+                        double e_x = -pow(M_PI*(xr*lambda_norm-1.0), 2);
                         double e_y = -pow(yr*thick_norm, 2);
 
                         double gauss = exp(e_x)*exp(e_y);

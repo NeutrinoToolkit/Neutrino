@@ -126,9 +126,9 @@ void nGenericPan::raiseNeutrino() {
 
 void nGenericPan::help() {
     if (helpwin.isNull()) {
-        helpwin= new QMainWindow(this);
         QString helpFile(property("helpFile").toString());
         if (QFileInfo(helpFile).exists()) {
+            helpwin= new QMainWindow(this);
             Ui::PanHelp my_help;
             my_help.setupUi(helpwin);
             helpwin->setWindowTitle(panName()+" help");
@@ -145,6 +145,7 @@ void nGenericPan::help() {
         helpwin->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
         helpwin->raise();  // for MacOS
         helpwin->activateWindow(); // for Windows
+        helpwin->show();
     }
 }
 

@@ -28,7 +28,8 @@
 // physGhosts
 
 Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
-  ghostBusted(nullptr)
+    ghostBusted(nullptr)
+//  , filter(nullptr), spectrum(nullptr)
 {
     setupUi(this);
 
@@ -74,33 +75,41 @@ void Ghost_fringes::doGhost () {
         QElapsedTimer timer;
         timer.start();
 
-        size_t dx=imageShot->getW();
-        size_t dy=imageShot->getH();
+        unsigned int dx=imageShot->getW();
+        unsigned int dy=imageShot->getH();
         
         physC imageFFT = imageShot->ft2(PHYS_FORWARD);
         std::vector<int> xx(dx), yy(dy);
 
-        for (size_t i=0;i<dx;i++)
+        for (unsigned int i=0;i<dx;i++)
             xx[i]=(i+(dx+1)/2)%dx-(dx+1)/2; // swap and center
-        for (size_t i=0;i<dy;i++)
+        for (unsigned int i=0;i<dy;i++)
             yy[i]=(i+(dy+1)/2)%dy-(dy+1)/2;
 
         double cr = cos((angleCarrier->value()) * _phys_deg);
         double sr = sin((angleCarrier->value()) * _phys_deg);
 
-        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
+        double thick_norm= M_PI*  resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+        double lambda_norm=M_PI*widthCarrier->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
+        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda_norm);
 
-
-        for (size_t x=0;x<dx;x++) {
-            for (size_t y=0;y<dy;y++) {
+//        nPhysD *myfilter=new nPhysD(dx,dy,0.0,"Filter");
+//        nPhysD *myspectrum=new nPhysD(dx,dy,0.0,"Spectrum");
+        for (unsigned int x=0;x<dx;x++) {
+            for (unsigned int y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr,2)/lambda)/(1.0+exp(lambda-std::abs(xr)));
+                double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
+//                myfilter->set(x,y,e_tot);
+//                myspectrum->set(x,y,imageFFT.point(x,y).mod());
                 imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
             }
         }
+//        myfilter->TscanBrightness();
+//        myspectrum->TscanBrightness();
+//        myfilter->fftshift();
+//        myspectrum->fftshift();
 
         imageFFT = imageFFT.ft2(PHYS_BACKWARD);
 
@@ -123,17 +132,23 @@ void Ghost_fringes::doGhost () {
             for(int j=geom.top();j<geom.bottom(); j++) {
                 vec2f pp(i,j);
                 if (point_inside_poly(pp,vecPoints)==true) {
-                    deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                    deepcopy->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
                 }
             }
         }
         deepcopy->TscanBrightness();
         
         if (erasePrevious->isChecked()) {
+//            filter=nparent->replacePhys(myfilter,filter,true);
+//            spectrum=nparent->replacePhys(myspectrum,spectrum,true);
             ghostBusted=nparent->replacePhys(deepcopy,ghostBusted,true);
         } else {
-            nparent->addShowPhys(deepcopy);
+//            filter=myfilter;
+//            nparent->addShowPhys(filter);
+//            spectrum=myspectrum;
+//            nparent->addShowPhys(spectrum);
             ghostBusted=deepcopy;
+            nparent->addShowPhys(ghostBusted);
         }
 
         erasePrevious->setEnabled(true);

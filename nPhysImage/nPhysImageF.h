@@ -814,6 +814,7 @@ template<class T>
 nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string obj_name) : nPhysImageF<T>()
 {
 	setName(obj_name);
+    setShortName(obj_name);
 
 	resize(w, h);
     for (unsigned int i=0; i<getW()*getH(); i++)
