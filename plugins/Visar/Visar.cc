@@ -1380,7 +1380,7 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
 
-                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                double thick_norm= settingsUi[k]->resolution->value()/M_PI;
                 double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
                 for (size_t x=0;x<dx;x++) {

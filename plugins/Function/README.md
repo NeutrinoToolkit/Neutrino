@@ -9,6 +9,8 @@ There are also 2 values:
  - `width`    : width of the new image
  - `height`   : height of the new image
  - `num_phys` : number of images in the stack (this might contain also a previous function image)
+ 
+It is possible to create multiple images by separing them with a `<br>`
 
 Examples:
 ---------
@@ -33,6 +35,8 @@ for(var i:=0; i<num_phys; i+=1) {
 my_sum+=n_phys(i,x,y)/num_phys;
 }
 ```
+
+
 
 
 # Features

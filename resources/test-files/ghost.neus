@@ -1,0 +1,51 @@
+Neutrino 407451cb08c0bac46e3180e850d87d31dc4456a2 3 2
+NeutrinoPan-begin Ghost_fringes
+[General]
+angleCarrier=0
+erasePrevious=2
+ref="Function(exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height)+0.3*cos(pi*50*x/width))\n, 500, 500)"
+ref-From=
+shot="Function(exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height)+0.3*cos(pi*50*x/width))\n, 500, 500)"
+shot-From=
+weightCarrier=1
+widthCarrier=20.21
+
+[MaskLine]
+Properties\NeuSave-fileIni=line5.ini
+Properties\NeuSave-fileTxt=line5.txt
+antialias=false
+bezier=false
+closedLine=true
+colorHolder=@Variant(\0\0\0\x43\x1\xc8\xc8\xff\xff\0\0\0\0\0\0)
+colorLine=@Variant(\0\0\0\x43\x1\xff\xff\0\0\0\0\0\0\0\0)
+depth=0
+name=MaskLine
+points\1\x=252.7049180327869
+points\1\y=215.16018735362994
+points\2\x=252.7049180327869
+points\2\y=473.6412177985948
+points\3\x=438.984543325527
+points\3\y=473.6412177985948
+points\4\x=438.984543325527
+points\4\y=215.16018735362994
+points\size=4
+position=@Variant(\0\0\0\x1a\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0)
+samplePoints=300
+sizeHolder=5
+width=1
+
+[Properties]
+NeuSave-fileIni=Ghost fringes.ini
+NeuSave-fileTxt=Ghost fringes.txt
+NeutrinoPan-end Ghost_fringes
+NeutrinoPan-begin Function
+[General]
+erasePrevious=2
+function=exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height))\n<br>\nexp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height)+0.3*cos(pi*50*x/width))\n
+sb_height=500
+sb_width=500
+
+[Properties]
+NeuSave-fileIni=Function.ini
+NeuSave-fileTxt=Function.txt
+NeutrinoPan-end Function

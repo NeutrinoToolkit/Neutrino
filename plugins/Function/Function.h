@@ -49,7 +49,7 @@ public slots:
 
 private:
 
-    nPhysD *physFunction;
+    std::vector<nPhysD*> physFunction;
 
 
 };
