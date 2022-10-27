@@ -6,14 +6,14 @@ echo $DIR
 rm -rf Neutrino.dmg dmg_dir
 mkdir dmg_dir
 cp -r Neutrino.app dmg_dir
-install_name_tool -add_rpath @executable_path/../Frameworks/ dmg_dir/Neutrino.app/Contents/MacOS/Neutrino 
+# install_name_tool -add_rpath @executable_path/../Frameworks/ dmg_dir/Neutrino.app/Contents/MacOS/Neutrino 
 
 cp `brew --prefix brotli`/lib/libbrotlicommon.1.dylib dmg_dir/Neutrino.app/Contents/Frameworks
 install_name_tool -change @loader_path/libbrotlicommon.1.dylib @executable_path/../Frameworks/libbrotlicommon.1.dylib dmg_dir/Neutrino.app/Contents/Frameworks/libbrotlicommon.1.dylib
 
 `brew --prefix qt`/bin/macdeployqt dmg_dir/Neutrino.app
 
-python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix qt`
+# python3 $DIR/macdeployqtfix.py dmg_dir/Neutrino.app/Contents/MacOS/Neutrino `brew --prefix qt`
 
 cp `brew --prefix hdf4`/lib/libxdr.4.dylib dmg_dir/Neutrino.app/Contents/Frameworks
 

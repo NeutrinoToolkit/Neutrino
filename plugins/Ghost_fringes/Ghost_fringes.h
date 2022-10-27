@@ -44,7 +44,7 @@ public:
     QPointer<nLine> maskRegion;
 
     nPhysD *ghostBusted;
-//    nPhysD *filter, *spectrum;
+    nPhysD *filter, *spectrum;
 
 public slots:
 
