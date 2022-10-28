@@ -10,7 +10,7 @@ There are also 2 values:
  - `height`   : height of the new image
  - `num_phys` : number of images in the stack (this might contain also a previous function image)
  
-It is possible to create multiple images by separing them with a `<br>`
+It is possible to create multiple images by separing them with a line with just `<br>`
 
 Examples:
 ---------
@@ -34,6 +34,15 @@ var my_sum:=0;
 for(var i:=0; i<num_phys; i+=1) {
 my_sum+=n_phys(i,x,y)/num_phys;
 }
+```
+
+ * create 3 interferometry patterns:
+```
+exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width))
+<br>
+exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height))
+<br>
+exp(-(2.5*(x-width/2)/width)^8)*exp(-(2.5*(y-height/2)/height)^8)*(cos(pi*50*x/width+10*pi*y/height)+0.3*cos(pi*50*x/width))
 ```
 
 

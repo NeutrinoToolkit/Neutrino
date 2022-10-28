@@ -113,7 +113,7 @@ void Function::on_doIt_released() {
 
 
 
-    QStringList functions_str=function->toPlainText().split("<br>",Qt::SkipEmptyParts);
+    QStringList functions_str=function->toPlainText().split("\n<br>\n",Qt::SkipEmptyParts);
 
     for (auto &function_str :functions_str) {
         nPhysD *my_phys = new nPhysD(static_cast<unsigned int>(sb_width->value()), static_cast<unsigned int>(sb_height->value()), 0.0, "");
@@ -132,7 +132,7 @@ void Function::on_doIt_released() {
                     my_phys->set(static_cast<unsigned int>(x),static_cast<unsigned int>(y), my_exprtk.value());
                 }
             }
-            QString name="Function("+function->toPlainText()+", "+QString::number(my_phys->getW())+", "+QString::number(my_phys->getH())+")";
+            QString name="Function("+function_str.trimmed()+", "+QString::number(my_phys->getW())+", "+QString::number(my_phys->getH())+")";
 
             my_phys->TscanBrightness();
             my_phys->setName(name.toStdString());
