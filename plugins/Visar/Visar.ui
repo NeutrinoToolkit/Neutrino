@@ -764,7 +764,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
              </property>
             </widget>
@@ -1007,10 +1007,11 @@
    <addaction name="actionAddVisar"/>
    <addaction name="actionDelVisar"/>
    <addaction name="separator"/>
+   <addaction name="actionRefreshComboShot"/>
   </widget>
   <action name="actionSaveTxt">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -1022,7 +1023,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
@@ -1034,7 +1035,7 @@
   </action>
   <action name="actionRect3">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -1046,7 +1047,7 @@
   </action>
   <action name="actionSaveTxtMultiple">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/saveTxtMultiple.png</normaloff>:/icons/saveTxtMultiple.png</iconset>
    </property>
    <property name="text">
@@ -1058,7 +1059,7 @@
   </action>
   <action name="actionAddVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
@@ -1070,7 +1071,7 @@
   </action>
   <action name="actionDelVisar">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -1079,7 +1080,7 @@
   </action>
   <action name="actionCopyImage">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/copyImage.png</normaloff>:/icons/copyImage.png</iconset>
    </property>
    <property name="text">
@@ -1087,6 +1088,18 @@
    </property>
    <property name="toolTip">
     <string>Copy image</string>
+   </property>
+  </action>
+  <action name="actionRefreshComboShot">
+   <property name="icon">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>delVisar</string>
+   </property>
+   <property name="toolTip">
+    <string>refresh paths</string>
    </property>
   </action>
  </widget>
@@ -1135,7 +1148,7 @@
   <tabstop>etalon_sensitivity</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
