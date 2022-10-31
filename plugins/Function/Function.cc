@@ -143,13 +143,13 @@ void Function::on_doIt_released() {
             erasePrevious->setEnabled(true);
 
         } else {
-            qWarning() << "Error: " << QString::fromStdString(parser.error());
+            statusbar->showMessage(QString::fromStdString(parser.error())+" Check log",5000);
             for (std::size_t i = 0; i < parser.error_count(); ++i) {
                 exprtk::parser_error::type error = parser.get_error(i);
                 QTextCursor my_cursor=function->textCursor();
                 my_cursor.setPosition(error.token.position);
                 function->setTextCursor(my_cursor);
-                qWarning() << i << error.token.position << QString::fromStdString(exprtk::parser_error::to_str(error.mode)) << QString::fromStdString(error.diagnostic.c_str());
+                qWarning() << "Error #" << i << error.token.position << QString::fromStdString(exprtk::parser_error::to_str(error.mode)) << QString::fromStdString(error.diagnostic.c_str());
             }
         }
     }

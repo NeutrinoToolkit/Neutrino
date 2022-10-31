@@ -63,7 +63,7 @@ win32_task:
     make -C mfhdf/libsrc install
     cd ..
     mkdir build && cd build
-    mingw32-cmake -DNEUTRINO_SKIP_PLUGINS='Function' ..
+    mingw32-cmake ..
     make -j2 package
     cp Neutrino*.exe ..
   package_artifacts:
