@@ -1504,10 +1504,11 @@ void Visar::doWave(unsigned int k) {
 
             physD diff = phase[1]-phase[0];
             physD qual = contrast[k][1]*contrast[k][0];
+            physMath::phys_sqrt(qual);
 
             physWave::phys_phase_unwrap(phase[0], qual, physWave::QUALITY, phaseUnwrap[k][0]);
             physWave::phys_phase_unwrap(diff,     qual, physWave::QUALITY, phaseUnwrap[k][1]);
-
+            
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
