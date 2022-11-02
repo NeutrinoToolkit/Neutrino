@@ -158,7 +158,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
-    connect(actionRefreshComboShot, SIGNAL(released()), this, SLOT(fillComboShot()));
+    connect(actionRefreshComboShot, SIGNAL(triggered()), this, SLOT(fillComboShot()));
 
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
