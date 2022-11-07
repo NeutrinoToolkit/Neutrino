@@ -94,7 +94,9 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${README_HTML} SOURCES ${README_MD})
     endif()
 
-    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${QRCS} ${PANDOC_QRC} ${README_MD})
+    QT6_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
+
+    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
     add_dependencies(${PROJECT_NAME} Neutrino)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 
