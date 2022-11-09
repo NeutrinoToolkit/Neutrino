@@ -158,12 +158,11 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
-    connect(actionRefreshComboShot, SIGNAL(triggered()), this, SLOT(fillComboShot()));
-
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
+    connect(actionRefreshComboShot, SIGNAL(triggered()), this, SLOT(fillComboShot()));
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 
     connect(globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
@@ -1201,8 +1200,8 @@ void Visar::updatePlot() {
 
                 velocity[k][j] = speed;
                 reflectivity[k][j] = refle;
-                quality[k][j] = cContrast[1][k][j]*cContrast[0][k][j];
-                velError[k][j] = 2.0*abs(cPhaseErr[k][j]*sensitivity/refr_index);
+                quality[k][j] = sqrt(cContrast[1][k][j]*cContrast[0][k][j]);
+                velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
                 reflError[k][j] = cReflErr[k][j]* (Rmat-beta) + beta;
 
                 for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
