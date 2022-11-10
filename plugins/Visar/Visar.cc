@@ -1200,7 +1200,7 @@ void Visar::updatePlot() {
 
                 velocity[k][j] = speed;
                 reflectivity[k][j] = refle;
-                quality[k][j] = sqrt(cContrast[1][k][j]*cContrast[0][k][j]);
+                quality[k][j] = 0.5*(cContrast[1][k][j]+cContrast[0][k][j]);
                 velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
                 reflError[k][j] = cReflErr[k][j]* (Rmat-beta) + beta;
 

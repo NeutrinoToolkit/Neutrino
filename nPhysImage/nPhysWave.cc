@@ -150,6 +150,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                             lambda->Timg_buffer[k] = lambdas[i];
                             angle->Timg_buffer[k] = angles[j];
                             thick->Timg_buffer[k] = thickness[l];
+                            intensity->Timg_buffer[k] = Ftmorlet[k][0];
                         }
                     }
 
@@ -172,9 +173,9 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                qmap->Timg_buffer[k]=sqrt(thick->Timg_buffer[k] * qmap->Timg_buffer[k])/(surf);
-                intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
+                qmap->Timg_buffer[k]=sqrt(thick->Timg_buffer[k] * qmap->Timg_buffer[k])/surf;
                 wphase->Timg_buffer[k]/=2*M_PI;
+                intensity->Timg_buffer[k]/=surf;
             }
 
             physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);

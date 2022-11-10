@@ -269,12 +269,12 @@ void Interferometry::doWavelet (int iimage) {
         }
 
         if (my_image[iimage].numThick->value()==0) {
-            my_params.init_thick=widthCarrier->value();
-            my_params.end_thick=widthCarrier->value();
-        my_params.n_thick=1;
+            my_params.init_thick=widthCarrier->value()*thickness->value();
+            my_params.end_thick=widthCarrier->value()*thickness->value();
+            my_params.n_thick=1;
         } else {
-            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value();
-            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value();
+            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value()*thickness->value();
+            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value()*thickness->value();
             my_params.n_thick=my_image[iimage].numThick->value();
         }
 
