@@ -62,9 +62,7 @@
 #include <assert.h>
 #include <fftw3.h>
 
-#ifdef HAVE_OPENMP
 #include <omp.h>
-#endif
 
 #include <time.h>
 

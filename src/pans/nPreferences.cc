@@ -43,7 +43,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	int coreNum =1;
 
-#ifdef HAVE_OPENMP
 
 #ifdef	__WIN32
 	SYSTEM_INFO sysinfo;
@@ -80,7 +79,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 
     threads->setMaximum(coreNum);
-#endif
 
 	if (coreNum==1) {
         threads->hide();

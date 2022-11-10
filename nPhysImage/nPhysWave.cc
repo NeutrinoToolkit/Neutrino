@@ -696,6 +696,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         size_t totalJobs=N;
 
+        unsigned int iter=0;
         for (size_t nthick=0; nthick <params.n_thick; nthick++) {
 
             float thick_norm=thickness[nthick] * M_PI;
@@ -706,7 +707,6 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 float angle_rad=angles[nangle]*_phys_deg;
                 err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
                 check_opencl_error(err, "clSetKernelArg");
-                unsigned int iter=0;
                 for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
 
                     if ((*params.iter_ptr)==-1) {

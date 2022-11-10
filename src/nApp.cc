@@ -255,9 +255,8 @@ void nApp::changeThreads(int num) {
         fftw_init_threads();
         fftw_plan_with_nthreads(num);
     }
-#ifdef HAVE_OPENMP
     omp_set_num_threads(num);
-#endif
+
 }
 
 
