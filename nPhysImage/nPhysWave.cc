@@ -178,7 +178,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                 intensity->Timg_buffer[k]/=surf;
             }
 
-            physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
+//            physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
 
             params.olist["phase_2pi"] = wphase;
             params.olist["contrast"] = qmap;
@@ -817,7 +817,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                         unsigned int k=j*dx+i;
                         unsigned int val=lambdaangle[k]/params.n_lambdas;
                         if (val >= angles.size()) {
-                            DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx )
+                            DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx );
                         } else {
                             nAngle->set(i,j,angles[val]);
                         }
