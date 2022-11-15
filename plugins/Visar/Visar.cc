@@ -124,6 +124,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
         addVisar();
     }
 
+    connect(actionDoWavelets, SIGNAL(triggered()), this, SLOT(doWave()));
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
 

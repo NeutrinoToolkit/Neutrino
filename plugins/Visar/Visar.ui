@@ -1007,6 +1007,8 @@
    <addaction name="actionAddVisar"/>
    <addaction name="actionDelVisar"/>
    <addaction name="separator"/>
+   <addaction name="actionDoWavelets"/>
+   <addaction name="separator"/>
    <addaction name="actionRefreshComboShot"/>
   </widget>
   <action name="actionSaveTxt">
@@ -1102,6 +1104,18 @@
     <string>refresh paths</string>
    </property>
   </action>
+  <action name="actionDoWavelets">
+   <property name="icon">
+    <iconset resource="Visar.qrc">
+     <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>loadPref</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter all VISARs</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1148,6 +1162,7 @@
   <tabstop>etalon_sensitivity</tabstop>
  </tabstops>
  <resources>
+  <include location="Visar.qrc"/>
   <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
