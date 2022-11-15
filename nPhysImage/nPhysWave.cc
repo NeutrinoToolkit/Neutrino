@@ -62,21 +62,20 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
-            for (size_t i=0; i<params.n_angles; i++)
-                angles[i] = params.init_angle + i*(params.end_angle-params.init_angle)/(params.n_angles-1);
+            for (size_t nangle=0; nangle<params.n_angles; nangle++)
+                angles[nangle] = params.init_angle + nangle*(params.end_angle-params.init_angle)/(params.n_angles-1);
         }
         if (params.n_lambdas==1) {
             lambdas[0]=0.5*(params.end_lambda+params.init_lambda);
         } else {
-            for (size_t i=0; i<params.n_lambdas; i++)
-                lambdas[i] = params.init_lambda + i*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
+            for (size_t nlambda=0; nlambda<params.n_lambdas; nlambda++)
+                lambdas[nlambda] = params.init_lambda + nlambda*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
-
         if (params.n_thick==1) {
             thickness[0]=0.5*(params.end_thick+params.init_thick);
         } else {
-            for (size_t i=0; i<params.n_thick; i++)
-                thickness[i] = params.init_thick + i*(params.end_thick-params.init_thick)/(params.n_thick-1);
+            for (size_t nthick=0; nthick<params.n_thick; nthick++)
+                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thick-1);
         }
 
         params.iter=0;
@@ -110,9 +109,10 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                     }
                     params.iter++;
                     (*params.iter_ptr)++;
-                    DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<"\% lam "<<lambdas[i]<<", ang "<<angles[j]);
-                    double cr = cos(angles[j] * _phys_deg);
-                    double sr = sin(angles[j] * _phys_deg);
+                    DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<" lam "<<lambdas[i]<<", ang "<<angles[j]);
+                    double angle_rad=angles[j]*_phys_deg;
+                    double cr = cos(angle_rad);
+                    double sr = sin(angle_rad);
 
                     double thick_norm=thickness[l]*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
                     double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
@@ -131,7 +131,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                         double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
                         double e_y = -pow(yr*thick_norm, 2.);
 
-                        double gauss = exp(e_x)*exp(e_y)*sqrt(thick_norm);
+                        double gauss = exp(e_x)*exp(e_y);
 
                         t[k][0]=Ft[k][0]*gauss;
                         t[k][1]=Ft[k][1]*gauss;
@@ -150,7 +150,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                             lambda->Timg_buffer[k] = lambdas[i];
                             angle->Timg_buffer[k] = angles[j];
                             thick->Timg_buffer[k] = thickness[l];
-                            intensity->Timg_buffer[k] = Ftmorlet[k][0];
                         }
                     }
 
@@ -173,12 +172,12 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                qmap->Timg_buffer[k]=sqrt(thick->Timg_buffer[k] * qmap->Timg_buffer[k])/surf;
+                qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/surf;
+                intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
                 wphase->Timg_buffer[k]/=2*M_PI;
-                intensity->Timg_buffer[k]/=surf;
             }
 
-//            physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
+            physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
 
             params.olist["phase_2pi"] = wphase;
             params.olist["contrast"] = qmap;
@@ -471,8 +470,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    sr=sincos(angle,&cr);\n"
                 "    float xr=i*cr-j*sr;\n"
                 "    float yr=i*sr+j*cr;\n"
-                "    float thick_rot=thick_norm/sqrt(pown(sr*dx,2)+pown(cr*dy,2));\n"
-                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_rot,2));\n"
+                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
                 "    outReal[id] = gauss * inReal[id];\n"
                 "    outImag[id] = gauss * inImag[id];\n"
                 "}\n"
@@ -481,7 +479,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
                 "    if (quality>=outQual[id]) {\n"
                 "        outQual[id]=quality;\n"
-                "        outPhase[id]=atan2pi(inImag[id],inReal[id]);\n"
+                "        outPhase[id]=atan2(inImag[id],inReal[id]);\n"
                 "        outLambdaAngle[id]=nlambdaangle;\n"
                 "    }\n"
                 "}\n";
@@ -627,7 +625,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         /* Set plan parameters. */
         err = clfftSetPlanPrecision(planHandle, CLFFT_SINGLE);
-        check_opencl_error(err, "clfftSetPlanPrecision");
+        check_opencl_error(err, "clfftSetPlanPrecision")
         err = clfftSetLayout(planHandle, CLFFT_COMPLEX_PLANAR, CLFFT_COMPLEX_PLANAR);
         check_opencl_error(err, "clfftSetLayout");
         err = clfftSetResultLocation(planHandle, CLFFT_INPLACE);
@@ -697,16 +695,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         size_t totalJobs=N;
 
         unsigned int iter=0;
-        for (size_t nthick=0; nthick <params.n_thick; nthick++) {
 
-            float thick_norm=thickness[nthick] * M_PI;
-            err=clSetKernelArg(kernelGabor,7, sizeof(float), &thick_norm);
+        for (size_t nthick=0; nthick <params.n_thick; nthick++) {
 
             for (size_t nangle=0; nangle <params.n_angles; nangle++) {
 
-                float angle_rad=angles[nangle]*_phys_deg;
-                err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
-                check_opencl_error(err, "clSetKernelArg");
                 for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
 
                     if ((*params.iter_ptr)==-1) {
@@ -718,8 +711,16 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
                     DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] );
 
+                    float angle_rad=angles[nangle]*_phys_deg;
                     float sr=sin(angle_rad);
                     float cr=cos(angle_rad);
+
+                    float thick_norm=thickness[nthick] * M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                    err=clSetKernelArg(kernelGabor,7, sizeof(float), &thick_norm);
+
+                    err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
+                    check_opencl_error(err, "clSetKernelArg");
+
                     float lambda_norm=lambdas[nlambda]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
                     err=clSetKernelArg(kernelGabor, 9, sizeof(float), &lambda_norm);
                     check_opencl_error(err, "clSetKernelArg");
@@ -798,8 +799,8 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=(j+offset.y())*dx+i+offset.x();
                     nQuality->set(i,j,sqrt(quality_sqr[k]));
-                    nPhase->set(i,j,phase[k]/2.0);
-                    nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(M_PI*phase[k]));
+                    nPhase->set(i,j,phase[k]/(2*M_PI));
+                    nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k]));
                 }
             }
 

@@ -124,8 +124,6 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
         addVisar();
     }
 
-
-
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
     connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
 
@@ -158,11 +156,11 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
+
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
 
-    connect(actionRefreshComboShot, SIGNAL(triggered()), this, SLOT(fillComboShot()));
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 
     connect(globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
@@ -1200,8 +1198,8 @@ void Visar::updatePlot() {
 
                 velocity[k][j] = speed;
                 reflectivity[k][j] = refle;
-                quality[k][j] = 0.5*(cContrast[1][k][j]+cContrast[0][k][j]);
-                velError[k][j] = abs(cPhaseErr[k][j]*sensitivity/refr_index);
+                quality[k][j] = cContrast[1][k][j]*cContrast[0][k][j];
+                velError[k][j] = 2.0*abs(cPhaseErr[k][j]*sensitivity/refr_index);
                 reflError[k][j] = cReflErr[k][j]* (Rmat-beta) + beta;
 
                 for (int i=0;i<abs(velocityUi[k]->jump->value());i++) {
@@ -1382,7 +1380,7 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
 
-                double thick_norm= settingsUi[k]->resolution->value()/M_PI;
+                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
                 double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
                 for (size_t x=0;x<dx;x++) {
@@ -1503,11 +1501,10 @@ void Visar::doWave(unsigned int k) {
 
             physD diff = phase[1]-phase[0];
             physD qual = contrast[k][1]*contrast[k][0];
-            physMath::phys_sqrt(qual);
 
             physWave::phys_phase_unwrap(phase[0], qual, physWave::QUALITY, phaseUnwrap[k][0]);
             physWave::phys_phase_unwrap(diff,     qual, physWave::QUALITY, phaseUnwrap[k][1]);
-            
+
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 

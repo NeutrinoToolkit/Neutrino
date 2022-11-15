@@ -269,12 +269,12 @@ void Interferometry::doWavelet (int iimage) {
         }
 
         if (my_image[iimage].numThick->value()==0) {
-            my_params.init_thick=widthCarrier->value()*thickness->value();
-            my_params.end_thick=widthCarrier->value()*thickness->value();
+            my_params.init_thick=widthCarrier->value();
+            my_params.end_thick=widthCarrier->value();
             my_params.n_thick=1;
         } else {
-            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value()*thickness->value();
-            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value()*thickness->value();
+            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value();
+            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value();
             my_params.n_thick=my_image[iimage].numThick->value();
         }
 
@@ -349,6 +349,7 @@ void Interferometry::doUnwrap () {
         nPhysD quality_loc= localPhys["contrast_shot"]->copy();
         if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
             physMath::phys_point_multiply(quality_loc,localPhys["contrast_ref"]->copy());
+            physMath::phys_sqrt(quality_loc);
         }
         localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["phase_quality"]);
         localPhys["phase_quality"]->setShortName("phase_quality");
@@ -358,9 +359,6 @@ void Interferometry::doUnwrap () {
 
         physD *phase = static_cast<physD*>(localPhys["phase_2pi_wrap"]);
         physD *qual = static_cast<physD*>(localPhys["phase_quality"]);
-
-        QElapsedTimer timer;
-        timer.start();
 
         qDebug() << "here";
         if (qual && phase) {
