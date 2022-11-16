@@ -217,7 +217,6 @@ void Visar::changeShot(QString num) {
         if (velocityUi[k]->enableVisar->isChecked()) {
             QApplication::processEvents();
             doWave(k);
-//            settingsUi[k]->doWaveButton->animateClick();
             QApplication::processEvents();
         }
     }
@@ -1332,6 +1331,15 @@ void Visar::doWave() {
         }
 
     }
+    bool allDone=true;
+    for (unsigned int k=0;k<numVisars;k++){
+        if (settingsUi[k]->doWaveButton->property("needWave").toBool()) {
+            allDone=false;
+        }
+    }
+    if(allDone) {
+        actionDoWavelets->setIcon(QIcon(":icons/refresh.png"));
+    }
 }
 
 void Visar::needWave() {
@@ -1340,8 +1348,13 @@ void Visar::needWave() {
         QIcon my_icon=QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
         unsigned int k=sender()->property("id").toUInt();
         if (k< numVisars) {
+            tabVelocity->setTabIcon(k,my_icon);
+            tabPhase->setTabIcon(k,my_icon);
             settingsUi[k]->doWaveButton->setIcon(my_icon);
             settingsUi[k]->doWaveButton->setProperty("needWave",true);
+            actionDoWavelets->setIcon(my_icon);
+
+
         }
     }
 }
@@ -1520,6 +1533,11 @@ void Visar::doWave(unsigned int k) {
 
             settingsUi[k]->doWaveButton->setIcon(QIcon(":icons/refresh.png"));
             settingsUi[k]->doWaveButton->setProperty("needWave",false);
+
+            tabVelocity->setTabIcon(k,QIcon());
+            tabPhase->setTabIcon(k,QIcon());
+
+
 
             if (physDeghost){
                 qDebug() << settingsUi[k]->DeghostCheck->checkState();
