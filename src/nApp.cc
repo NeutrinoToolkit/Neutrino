@@ -34,7 +34,7 @@ int nApp::exec() {
 
     changeThreads(my_set.value("threads",1).toInt());
 
-    forceDecimalDot(my_set.value("forceDecimalDot",1).toInt());
+    forceDecimalDot(my_set.value("forceDecimalDot",1).toInt());  // must be equal to the nPreferences.ui
 
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 

@@ -38,7 +38,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="neutrinoSave" stdset="0">
        <bool>true</bool>
@@ -182,7 +182,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
              </property>
             </widget>
@@ -196,7 +196,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -268,7 +268,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -302,7 +302,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -323,7 +323,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -538,7 +538,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -559,7 +559,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -670,7 +670,7 @@
                  <string>...</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+                 <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                   <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
                 </property>
                </widget>
@@ -687,7 +687,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
              </property>
             </widget>
@@ -717,7 +717,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -738,7 +738,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -934,8 +934,11 @@
         </item>
         <item row="2" column="1">
          <widget class="QSpinBox" name="physNameLength">
+          <property name="minimum">
+           <number>5</number>
+          </property>
           <property name="value">
-           <number>35</number>
+           <number>45</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
@@ -1218,6 +1221,9 @@
           <property name="text">
            <string>Force use of dot decimal separator</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
           </property>
@@ -1440,7 +1446,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
          </widget>
@@ -1454,7 +1460,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
             <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
          </widget>
@@ -1518,7 +1524,7 @@
   </widget>
   <action name="actionReset_settings">
    <property name="icon">
-    <iconset resource="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -1569,6 +1575,7 @@
   <tabstop>fontFace</tabstop>
   <tabstop>fontSize</tabstop>
   <tabstop>physNameLength</tabstop>
+  <tabstop>MaxRecentFiles</tabstop>
   <tabstop>currentStepScaleFactor</tabstop>
   <tabstop>askCloseUnsaved</tabstop>
   <tabstop>forceDecimalDot</tabstop>
@@ -1588,11 +1595,11 @@
   <tabstop>openclDescription</tabstop>
   <tabstop>defaultPluginDir</tabstop>
   <tabstop>addPlugin</tabstop>
-  <tabstop>removePlugin</tabstop>
   <tabstop>pluginList</tabstop>
+  <tabstop>removePlugin</tabstop>
  </tabstops>
  <resources>
-  <include location="../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
