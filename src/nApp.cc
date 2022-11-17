@@ -32,9 +32,15 @@ int nApp::exec() {
     QCoreApplication::setApplicationName("Neutrino");
     QCoreApplication::setApplicationVersion(SHAVERSION__);
 
-    changeThreads(my_set.value("threads",1).toInt());
+    if (!my_set.contains("threads")) {
+        my_set.setValue("threads",1);
+    }
+    changeThreads(my_set.value("threads").toInt());
 
-    forceDecimalDot(my_set.value("forceDecimalDot",1).toInt());  // must be equal to the nPreferences.ui
+    if (!my_set.contains("forceDecimalDot")) {
+        my_set.setValue("forceDecimalDot",true);
+    }
+    forceDecimalDot(my_set.value("forceDecimalDot").toInt());
 
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 

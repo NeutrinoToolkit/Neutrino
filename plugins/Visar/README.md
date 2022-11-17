@@ -91,8 +91,8 @@ so the **Ref:** *RegEx* will be `Visar_2_(\d+)_ref.img` and **Shot:** will be `V
 
 This is just an example because *RegEx* is really powerful, here the important part is `(\d+)` which will match "one or more digits".
 
-The button <img src="../../resources/icons/autoRefresh.png" width="16" /> will guess the values for the actual images.
+The button <img src="../../resources/icons/autoRefresh.png" width="16" /> next to the regexf field will guess the values for the actual images.
 
 Once this in place, in the top tollbar, you can change the number of the shot in order to close the actual images, open the ref and shot corresponding to the shot number provided on top and filter the images.
 
-
+If more files are added tot he directory, click the <img src="../../resources/icons/autoRefresh.png" width="16" /> button in the top toolbar to update the combo values.

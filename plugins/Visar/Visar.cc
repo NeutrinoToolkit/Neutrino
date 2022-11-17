@@ -155,8 +155,8 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
     connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
     connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
-    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(fillComboShot()));
 
+    connect(actionRefreshComboShot, SIGNAL(triggered), this, SLOT(fillComboShot()));
 
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
@@ -213,13 +213,7 @@ void Visar::changeShot(QString num) {
             }
         }
     }
-    for (unsigned int k=0; k< numVisars; k++) {
-        if (velocityUi[k]->enableVisar->isChecked()) {
-            QApplication::processEvents();
-            doWave(k);
-            QApplication::processEvents();
-        }
-    }
+    doWave();
     // SOP
     if (enableSOP->isChecked()) {
         QSet<QString> matchRef;
@@ -261,6 +255,8 @@ void Visar::changeShot(QString num) {
 void Visar::fillComboShot() {
     qDebug() << "here";
     disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+    QString oldvalue=comboShot->currentText();
+
     QSet<QString> match;
     for (unsigned int k=0; k< numVisars; k++) {
         if (velocityUi[k]->enableVisar->isChecked() && (!settingsUi[k]->globDirRef->text().isEmpty()) && (!settingsUi[k]->globDirShot->text().isEmpty())) {
@@ -331,6 +327,9 @@ void Visar::fillComboShot() {
     qDebug() << my_list;
     for (auto &e: my_list) {
         comboShot->addItem(e);
+        if (e==oldvalue) {
+            comboShot->setCurrentText(oldvalue);
+        }
     }
     if(match.size()==0) {
         comboShot->hide();
@@ -375,6 +374,8 @@ QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, QString num) {
 
 void Visar::globRefreshPressed() {
     QToolButton *button=qobject_cast<QToolButton *>(sender());
+    const QString mymatch("(\\d\\d+)"); // we look for at least 2 digits for the number
+    const QString myreplace("(\\d+)"); // but we replace for multiple digits
     if (button) {
         if (button->property("id").isValid()) {
             unsigned int k=button->property("id").toUInt();
@@ -383,24 +384,24 @@ void Visar::globRefreshPressed() {
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
                 settingsUi[k]->globDirRef->setText(finfo.absoluteDir().path());
-                settingsUi[k]->globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
+                settingsUi[k]->globRef->setText(finfo.fileName().replace(QRegularExpression(mymatch),myreplace));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
                 settingsUi[k]->globDirShot->setText(finfo.absoluteDir().path());
-                settingsUi[k]->globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
+                settingsUi[k]->globShot->setText(finfo.fileName().replace(QRegularExpression(mymatch),myreplace));
             }
         } else {
             std::array<nPhysD*,2> imgs={{getPhysFromCombo(sopRef),getPhysFromCombo(sopShot)}};
             if (imgs[0]) {
                 QFileInfo finfo(QString::fromStdString(imgs[0]->getFromName()));
                 globDirRef->setText(finfo.absoluteDir().path());
-                globRef->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
+                globRef->setText(finfo.fileName().replace(QRegularExpression(mymatch),myreplace));
             }
             if (imgs[1]) {
                 QFileInfo finfo(QString::fromStdString(imgs[1]->getFromName()));
                 globDirShot->setText(finfo.absoluteDir().path());
-                globShot->setText(finfo.fileName().replace(QRegularExpression("(\\d+)"),"(\\d+)"));
+                globShot->setText(finfo.fileName().replace(QRegularExpression(mymatch),myreplace));
             }
         }
         fillComboShot();

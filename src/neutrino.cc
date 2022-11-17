@@ -1018,6 +1018,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     }
                     QApplication::processEvents();
                 }
+                qDebug() << "resurrect pan:\n" << QString::fromStdString(panString);
                 setPanData(panString);
             }
             ifile.close();
