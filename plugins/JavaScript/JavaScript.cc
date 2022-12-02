@@ -42,18 +42,19 @@ my_eng(my_nparent)
 
     qRegisterMetaType<nGenericPan*>("nGenericPan*");
     qRegisterMetaType<nPhysD*>("nPhysD*");
+    qRegisterMetaType<QRectF*>("QRectF*");
 
     splitter->setStretchFactor(0, 10);
     splitter->setStretchFactor(1, 1);
 
     QKeySequence key_seq=QKeySequence(Qt::CTRL | Qt::Key_Return);
-    command->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute "+toolTip());
+    command->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute"+command->toolTip());
     QShortcut* my_shortcut = new QShortcut(key_seq, command);
-    connect(my_shortcut, SIGNAL(activated()), this, SLOT(on_command_returnPressed()));
+    connect(my_shortcut, SIGNAL(activated()), this, SLOT(runIt()));
     show();
 }
 
-void JavaScript::on_command_returnPressed() {
+void JavaScript::runIt() {
     saveDefaults();
     QJSValue retval;
     output->clear();
@@ -70,4 +71,29 @@ void JavaScript::on_command_returnPressed() {
         retval = my_eng.evaluate(mytext);
     }
     output->setPlainText(retval.toString());
+}
+
+void JavaScript::on_actionOpen_File_triggered() {
+    QString fname=QFileDialog::getOpenFileName(this,tr("Open JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any files")+QString(" (*)"));
+    if (!fname.isEmpty()) {
+        setProperty("NeuSave-fileJS", fname);
+        QFile f(fname);
+        if (f.open(QFile::ReadOnly | QFile::Text)) {
+            QTextStream in(&f);
+            command->setPlainText(in.readAll());
+        }
+    }
+}
+
+void JavaScript::on_actionSave_File_triggered() {
+    QString fname=QFileDialog::getSaveFileName(this,tr("Save JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any files")+QString(" (*)"));
+    if (!fname.isEmpty()) {
+        setProperty("NeuSave-fileJS", fname);
+        QFile f(fname);
+        if (f.open(QFile::ReadWrite | QFile::Text)) {
+            QTextStream in(&f);
+            in << command->toPlainText();
+        }
+        command->setPlainText(fname);
+    }
 }

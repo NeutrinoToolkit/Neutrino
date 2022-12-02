@@ -133,8 +133,42 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionOpen_File"/>
+   <addaction name="actionSave_File"/>
   </widget>
+  <action name="actionOpen_File">
+   <property name="icon">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open File</string>
+   </property>
+   <property name="toolTip">
+    <string>Open script file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave_File">
+   <property name="icon">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save File</string>
+   </property>
+   <property name="toolTip">
+    <string>Save script file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

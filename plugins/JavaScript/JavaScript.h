@@ -40,7 +40,9 @@ public:
     Q_INVOKABLE JavaScript(neutrino *);
 
 public slots:
-    void on_command_returnPressed();
+    void runIt();
+    void on_actionOpen_File_triggered();
+    void on_actionSave_File_triggered();
 
 private:
     QJSEngine my_eng;

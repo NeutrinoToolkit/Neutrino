@@ -393,10 +393,10 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             pluginlist.append(it.next());
         }
         pluginlist.sort();
-        QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.show();
-        progress.setCancelButton(nullptr);
+//        QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
+//        progress.setWindowModality(Qt::WindowModal);
+//        progress.show();
+//        progress.setCancelButton(nullptr);
         for (auto &pluginfile : pluginlist) {
             QString name_plugin=QFileInfo(pluginfile).baseName().replace("_"," ");
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
@@ -404,11 +404,11 @@ neutrino::scanPlugins(QString pluginsDirStr) {
                     name_plugin.remove(0,3);
                 }
 #endif
-            progress.setLabelText("Plugin: "+name_plugin);
-            progress.setValue(progress.value()+1);
+//            progress.setLabelText("Plugin: "+name_plugin);
+//            progress.setValue(progress.value()+1);
             loadPlugin(pluginfile, false);
         }
-        progress.close();
+//        progress.close();
 
 //        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
 //        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
@@ -900,7 +900,7 @@ std::string neutrino::getPanData(){
     return ofile.str();
 }
 
-void neutrino::saveSession (QString fname) {
+void neutrino::saveSession (QString fname, bool forceAll) {
     qDebug() << property("NeuSave-fileSave");
     if (fname.isEmpty()) {
         QString extensions=tr("Neutrino session")+QString(" (*.neus);;");
@@ -919,7 +919,6 @@ void neutrino::saveSession (QString fname) {
         QFileInfo file_info(fname);
         if (file_info.suffix()=="neus") {
             setProperty("NeuSave-fileSave", fname);
-            //            for(int k = 0; k < (panList.size()/2); k++) panList.swap(k,panList.size()-(1+k));
 
             QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
             progress.setWindowModality(Qt::WindowModal);
@@ -931,7 +930,7 @@ void neutrino::saveSession (QString fname) {
             for (int i=0;i<physList.size(); i++) {
                 if (progress.wasCanceled()) break;
                 progress.setValue(i);
-                if (! (physList.at(i)->getType()==PHYS_DYN)) {
+                if (forceAll || physList.at(i)->getType()!=PHYS_DYN) {
                     progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
                     QApplication::processEvents();
                     ofile << "NeutrinoImage" << std::endl;

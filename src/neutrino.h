@@ -148,7 +148,7 @@ public slots:
     //	void file_quit_slot();
 
     QList <nPhysD *> openSession(QString);
-    void saveSession(QString=QString());
+    void saveSession(QString=QString(), bool=false);
     std::string getPanData();
     void setPanData(std::string);
 
