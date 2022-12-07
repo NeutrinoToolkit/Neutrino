@@ -213,18 +213,31 @@ unsigned int physWave::opencl_closest_size(unsigned int num) {
     unsigned int i2,i3,i5,i7,i11,i13;
     i2=i3=i5=i7=i11=i13=0;
     // REMEMBER to use clfft 2.12 to support radix 11 and 13!
-    for (i13=0; i13<=log(num)/log(13); i13++ ) {
-        for (i11=0; i11<=log(num)/log(11); i11++ ) {
-            for (i7=0; i7<=log(num)/log(7); i7++ ) {
-                for (i5=0; i5<=log(num)/log(5); i5++ ) {
-                    for (i3=0; i3<=log(num)/log(3); i3++ ) {
-                        for (i2=0; i2<=log(num)/log(2); i2++ ) {
-                            unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
-                            if (test_val>=num && test_val<closest) {
-                                closest=test_val;
-                                if (closest==num) return num;
-                            }
-                        }
+//    for (i13=0; i13<=log(num)/log(13); i13++ ) {
+//        for (i11=0; i11<=log(num)/log(11); i11++ ) {
+//            for (i7=0; i7<=log(num)/log(7); i7++ ) {
+//                for (i5=0; i5<=log(num)/log(5); i5++ ) {
+//                    for (i3=0; i3<=log(num)/log(3); i3++ ) {
+//                        for (i2=0; i2<=log(num)/log(2); i2++ ) {
+//                            unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7)*pow(11,i11)*pow(13,i13);
+//                            if (test_val>=num && test_val<closest) {
+//                                closest=test_val;
+//                                if (closest==num) return num;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+    for (i7=0; i7<=log(num)/log(7); i7++ ) {
+        for (i5=0; i5<=log(num)/log(5); i5++ ) {
+            for (i3=0; i3<=log(num)/log(3); i3++ ) {
+                for (i2=0; i2<=log(num)/log(2); i2++ ) {
+                    unsigned int test_val=pow(2,i2)*pow(3,i3)*pow(5,i5)*pow(7,i7);
+                    if (test_val>=num && test_val<closest) {
+                        closest=test_val;
+                        if (closest==num) return num;
                     }
                 }
             }
@@ -709,7 +722,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                         (*params.iter_ptr)++;
                     }
 
-                    DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] );
+                    DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] << " Thick: " << (int)nthick << " " << thickness[nthick] );
 
                     float angle_rad=angles[nangle]*_phys_deg;
                     float sr=sin(angle_rad);
@@ -739,120 +752,132 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
                     err=clSetKernelArg(kernelBest, 5, sizeof(unsigned int), &iter);
                     check_opencl_error(err, "clSetKernelArg");
-                    iter++;
 
                     clEnqueueNDRangeKernel(queue, kernelBest, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
                     err = clFinish(queue);
                     check_opencl_error(err, "clFinish");
+                    iter++;
                     params.iter++;
 
                 }
             }
+        }
 
-            std::vector<float> quality_sqr(N,0);
-            err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality_sqr[0], 0, NULL, NULL);
-            check_opencl_error(err, "clEnqueueReadBuffer");
+        std::vector<float> quality_sqr(N,0);
+        err = clEnqueueReadBuffer(queue, best[0], CL_TRUE, 0, N * sizeof(float), &quality_sqr[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
 
-            std::vector<float> phase(N,0);
-            err = clEnqueueReadBuffer(queue, best[1], CL_TRUE, 0, N * sizeof(float), &phase[0], 0, NULL, NULL);
-            check_opencl_error(err, "clEnqueueReadBuffer");
+        std::vector<float> phase(N,0);
+        err = clEnqueueReadBuffer(queue, best[1], CL_TRUE, 0, N * sizeof(float), &phase[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
 
-            err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
-            check_opencl_error(err, "clEnqueueReadBuffer");
+        err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
 
-            err = clFinish(queue);
-            check_opencl_error(err, "clFinish");
+        err = clFinish(queue);
+        check_opencl_error(err, "clFinish");
 
-            /* Release OpenCL memory objects. */
-            clReleaseMemObject(buffersIn[0]);
-            clReleaseMemObject(buffersIn[1]);
-            clReleaseMemObject(buffersOut[0]);
-            clReleaseMemObject(buffersOut[1]);
-            clReleaseMemObject(best[0]);
-            clReleaseMemObject(best[1]);
-            clReleaseMemObject(best[2]);
-            clReleaseMemObject(tmpBuffer);
-            clReleaseKernel(kernelBest);
-            clReleaseKernel(kernelGabor);
-            clReleaseProgram(program);
+        /* Release OpenCL memory objects. */
+        clReleaseMemObject(buffersIn[0]);
+        clReleaseMemObject(buffersIn[1]);
+        clReleaseMemObject(buffersOut[0]);
+        clReleaseMemObject(buffersOut[1]);
+        clReleaseMemObject(best[0]);
+        clReleaseMemObject(best[1]);
+        clReleaseMemObject(best[2]);
+        clReleaseMemObject(tmpBuffer);
+        clReleaseKernel(kernelBest);
+        clReleaseKernel(kernelGabor);
+        clReleaseProgram(program);
 
-            delete [] inReal;
-            delete [] inImag;
-            /* Release the plan. */
-            err = clfftDestroyPlan(&planHandle );
-            check_opencl_error(err, "clfftDestroyPlan");
+        delete [] inReal;
+        delete [] inImag;
+        /* Release the plan. */
+        err = clfftDestroyPlan(&planHandle );
+        check_opencl_error(err, "clfftDestroyPlan");
 
-            /* Release clFFT library. */
-            clfftTeardown( );
+        /* Release clFFT library. */
+        clfftTeardown( );
 
-            /* Release OpenCL working objects. */
-            clReleaseCommandQueue(queue);
-            clReleaseContext(ctx);
+        /* Release OpenCL working objects. */
+        clReleaseCommandQueue(queue);
+        clReleaseContext(ctx);
 
-            params.olist.clear();
+        params.olist.clear();
 
-            physD *nQuality = new physD(params.data->getW(),params.data->getH(),0,"Quality");
-            physD *nPhase = new physD(params.data->getW(),params.data->getH(),0,"Phase");
-            physD *nIntensity = new physD(params.data->getW(),params.data->getH(),0,"Intensity");
+        physD *nQuality = new physD(params.data->getW(),params.data->getH(),0,"Quality");
+        physD *nPhase = new physD(params.data->getW(),params.data->getH(),0,"Phase");
+        physD *nIntensity = new physD(params.data->getW(),params.data->getH(),0,"Intensity");
 
-            for (size_t j=0; j<params.data->getH(); j++) {
-                for (size_t i=0; i<params.data->getW(); i++) {
-                    unsigned int k=(j+offset.y())*dx+i+offset.x();
-                    nQuality->set(i,j,sqrt(quality_sqr[k]));
-                    nPhase->set(i,j,phase[k]/(2*M_PI));
-                    nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k]));
-                }
+        for (size_t j=0; j<params.data->getH(); j++) {
+            for (size_t i=0; i<params.data->getW(); i++) {
+                unsigned int k=(j+offset.y())*dx+i+offset.x();
+                nQuality->set(i,j,sqrt(quality_sqr[k]));
+                nPhase->set(i,j,phase[k]/(2*M_PI));
+                nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k]));
             }
+        }
 
 //            physMath::phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
 
-            params.olist["phase_2pi"] = nPhase;
-            params.olist["contrast"] = nQuality;
-            params.olist["intensity"] = nIntensity;
+        params.olist["phase_2pi"] = nPhase;
+        params.olist["contrast"] = nQuality;
+        params.olist["intensity"] = nIntensity;
 
 
-            if (params.n_angles>1) {
-                physD *nAngle = new physD(params.data->getW(),params.data->getH(),0,"Angle");
-                for (size_t j=0; j<params.data->getH(); j++) {
-                    for (size_t i=0; i<params.data->getW(); i++) {
-                        unsigned int k=j*dx+i;
-                        unsigned int val=lambdaangle[k]/params.n_lambdas;
-                        if (val >= angles.size()) {
-                            DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx );
-                        } else {
-                            nAngle->set(i,j,angles[val]);
-                        }
+        if (params.n_thick>1) {
+            physD *nThick = new physD(params.data->getW(),params.data->getH(),0,"Thick");
+            for (size_t j=0; j<params.data->getH(); j++) {
+                for (size_t i=0; i<params.data->getW(); i++) {
+                    unsigned int k=j*dx+i;
+                    unsigned int val=lambdaangle[k]/params.n_lambdas/params.n_angles;
+                    nThick->set(i,j,thickness[val]);
+                }
+            }
+            params.olist["thick"] = nThick;
+        }
+
+        if (params.n_angles>1) {
+            physD *nAngle = new physD(params.data->getW(),params.data->getH(),0,"Angle");
+            for (size_t j=0; j<params.data->getH(); j++) {
+                for (size_t i=0; i<params.data->getW(); i++) {
+                    unsigned int k=j*dx+i;
+                    unsigned int val=lambdaangle[k]/params.n_lambdas%params.n_angles;
+                    if (val >= angles.size()) {
+                        DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx );
+                    } else {
+                        nAngle->set(i,j,angles[val]);
                     }
                 }
-                params.olist["angle"] = nAngle;
             }
+            params.olist["angle"] = nAngle;
+        }
 
-            if (params.n_lambdas>1) {
-                physD *nLambda = new physD(params.data->getW(),params.data->getH(),0,"Lambda");
-                for (size_t j=0; j<params.data->getH(); j++) {
-                    for (size_t i=0; i<params.data->getW(); i++) {
-                        unsigned int k=j*dx+i;
-                        nLambda->set(i,j,lambdas[lambdaangle[k]%params.n_lambdas]);
-                    }
+        if (params.n_lambdas>1) {
+            physD *nLambda = new physD(params.data->getW(),params.data->getH(),0,"Lambda");
+            for (size_t j=0; j<params.data->getH(); j++) {
+                for (size_t i=0; i<params.data->getW(); i++) {
+                    unsigned int k=j*dx+i;
+                    unsigned int val=lambdaangle[k]%params.n_lambdas;
+                    nLambda->set(i,j,lambdas[val]);
                 }
-                params.olist["lambda"] = nLambda;
             }
+            params.olist["lambda"] = nLambda;
+        }
 
-            for(std::map<std::string, physD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
-                itr->second->TscanBrightness();
-                itr->second->set_origin(params.data->get_origin());
-                itr->second->set_scale(params.data->get_scale());
-                itr->second->setFromName(params.data->getFromName());
-                itr->second->setShortName(itr->first);
-                itr->second->setName(itr->first+ " "+params.data->getName());
+        for(std::map<std::string, physD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+            itr->second->TscanBrightness();
+            itr->second->set_origin(params.data->get_origin());
+            itr->second->set_scale(params.data->get_scale());
+            itr->second->setFromName(params.data->getFromName());
+            itr->second->setShortName(itr->first);
+            itr->second->setName(itr->first+ " "+params.data->getName());
 #pragma omp parallel for
-                for (size_t k=0; k<params.data->getSurf(); k++) {
-                    if (std::isnan(params.data->point(k))) {
-                        itr->second->set(k,std::numeric_limits<double>::quiet_NaN());
-                    }
+            for (size_t k=0; k<params.data->getSurf(); k++) {
+                if (std::isnan(params.data->point(k))) {
+                    itr->second->set(k,std::numeric_limits<double>::quiet_NaN());
                 }
             }
-
         }
     }
 #endif
@@ -985,7 +1010,7 @@ physWave::phys_guess_carrier(physD &phys, double weight)
 
     if (imax!=0 || jmax!=0) {
         mcomplex freq(imax/((double)dx),jmax/((double)dy));
-        retCarrier = bidimvec<double>(1.0/freq.mod(),fmod(freq.arg()*180.0/M_PI+360.0,180.0));
+        retCarrier = bidimvec<double>(1.0/freq.mod(),fmod(freq.arg()*180.0/M_PI,180.0));
     } else {
         retCarrier = bidimvec<double>(0.0,0.0);
     }

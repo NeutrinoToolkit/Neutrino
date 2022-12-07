@@ -249,7 +249,7 @@ void Wavelet::doWavelet () {
             }
         }
         
-        QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
+        QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*my_params.n_thick*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
         statusbar->showMessage(out+status_bar_measure, 50000);
         DEBUG(status_bar_measure.toStdString());
     } else {
