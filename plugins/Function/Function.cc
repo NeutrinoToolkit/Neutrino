@@ -28,9 +28,15 @@
 #include "nPhysImageF.h"
 
 
+
+inline double my_rand(double my_max) {
+   return ((double) rand() / (RAND_MAX))*my_max;
+}
+
 fPhys::fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {
     exprtk::disable_has_side_effects(*this);
 }
+
 fPhys::~fPhys() {}
 double fPhys::operator()(const double& x, const double& y) {
     return my_phys->getPoint(x,y);
@@ -98,6 +104,8 @@ void Function::on_doIt_released() {
     if (currentBuffer) {
         symbol_table.add_function("phys",my_func);
     }
+
+    symbol_table.add_function("rand",my_rand);
 
     std::list<fPhys*> my_list;
     for (int i=0; i<nparent->getBufferList().size(); i++) {

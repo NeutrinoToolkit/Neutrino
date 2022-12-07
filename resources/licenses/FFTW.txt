@@ -1,4 +1,4 @@
- FFTW is copyright © 1997--1999 Massachusetts Institute of Technology.
+FFTW is copyright © 1997--1999 Massachusetts Institute of Technology.
 
 FFTW is free software; you can redistribute it and/or modify it under the terms 
 of the GNU General Public License as published by the Free Software Foundation; 
