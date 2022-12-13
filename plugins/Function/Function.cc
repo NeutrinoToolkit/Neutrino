@@ -30,7 +30,7 @@
 
 
 inline double my_rand(double my_max) {
-   return ((double) rand() / (RAND_MAX))*my_max;
+   return my_max*static_cast<double>(rand())/RAND_MAX;
 }
 
 fPhys::fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physparent) {

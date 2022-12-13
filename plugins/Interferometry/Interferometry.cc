@@ -271,11 +271,11 @@ void Interferometry::doWavelet (int iimage) {
         if (my_image[iimage].numThick->value()==0) {
             my_params.init_thick=widthCarrier->value();
             my_params.end_thick=widthCarrier->value();
-            my_params.n_thick=1;
+            my_params.n_thicks=1;
         } else {
             my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value();
             my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value();
-            my_params.n_thick=my_image[iimage].numThick->value();
+            my_params.n_thicks=my_image[iimage].numThick->value();
         }
 
         double thick = widthCarrier->value()*my_image[iimage].maxThick->value();
@@ -289,7 +289,7 @@ void Interferometry::doWavelet (int iimage) {
 
         my_params.data=&datamatrix;
 
-        int niter=my_params.n_angles*my_params.n_lambdas*my_params.n_thick+1;
+        int niter=my_params.n_angles*my_params.n_lambdas*my_params.n_thicks+1;
 
         QSettings settings("neutrino","");
         settings.beginGroup("nPreferences");

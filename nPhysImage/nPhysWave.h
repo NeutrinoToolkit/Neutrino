@@ -78,7 +78,7 @@ public:
 
     double init_thick;
     double end_thick;
-    size_t n_thick;
+    size_t n_thicks;
 
     double damp;
 	

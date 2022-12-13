@@ -58,7 +58,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         physD *intensity = new physD(dx,dy,0.0,"intensity");
 
 
-        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thick);
+        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thicks);
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
@@ -71,11 +71,11 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             for (size_t nlambda=0; nlambda<params.n_lambdas; nlambda++)
                 lambdas[nlambda] = params.init_lambda + nlambda*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
-        if (params.n_thick==1) {
+        if (params.n_thicks==1) {
             thickness[0]=0.5*(params.end_thick+params.init_thick);
         } else {
-            for (size_t nthick=0; nthick<params.n_thick; nthick++)
-                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thick-1);
+            for (size_t nthick=0; nthick<params.n_thicks; nthick++)
+                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thicks-1);
         }
 
         params.iter=0;
@@ -588,7 +588,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         err = clEnqueueWriteBuffer(queue, buffersIn[1], CL_TRUE, 0, N * sizeof(float), &inImag[0], 0, NULL, NULL);
         check_opencl_error(err, "inImag buffersIn[1] clEnqueueWriteBuffer");
 
-        cl_mem buffersOut[2] = {0, 0};
+        cl_mem buffersOut[2] = {0, nullptr};
         /* Prepare OpenCL memory objects : create buffer for output. */
         buffersOut[0] = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, N * sizeof(cl_float), NULL, &err);
         check_opencl_error(err, "buffersOut[0] clCreateBuffer");
@@ -684,7 +684,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 
 
-        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thick);
+        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thicks);
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
@@ -697,11 +697,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             for (size_t nlambda=0; nlambda<params.n_lambdas; nlambda++)
                 lambdas[nlambda] = params.init_lambda + nlambda*(params.end_lambda-params.init_lambda)/(params.n_lambdas-1);
         }
-        if (params.n_thick==1) {
+        if (params.n_thicks==1) {
             thickness[0]=0.5*(params.end_thick+params.init_thick);
         } else {
-            for (size_t nthick=0; nthick<params.n_thick; nthick++)
-                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thick-1);
+            for (size_t nthick=0; nthick<params.n_thicks; nthick++)
+                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thicks-1);
         }
 
 
@@ -709,7 +709,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         unsigned int iter=0;
 
-        for (size_t nthick=0; nthick <params.n_thick; nthick++) {
+        for (size_t nthick=0; nthick <params.n_thicks; nthick++) {
 
             for (size_t nangle=0; nangle <params.n_angles; nangle++) {
 
@@ -825,7 +825,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         params.olist["intensity"] = nIntensity;
 
 
-        if (params.n_thick>1) {
+        if (params.n_thicks>1) {
             physD *nThick = new physD(params.data->getW(),params.data->getH(),0,"Thick");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
