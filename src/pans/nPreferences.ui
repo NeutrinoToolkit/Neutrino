@@ -836,166 +836,7 @@
         <string>Decorations</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Image name length</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Global font</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Zoom increment</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="comboIconSize">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-          <item>
-           <property name="text">
-            <string>Small</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Normal</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Large</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="showDimPixel">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Show image size in pixels</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="physNameLength">
-          <property name="minimum">
-           <number>5</number>
-          </property>
-          <property name="value">
-           <number>45</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0">
-         <widget class="QCheckBox" name="showXYaxes">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Show x-y axes</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="1">
-         <widget class="QSpinBox" name="currentStepScaleFactor">
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>999</number>
-          </property>
-          <property name="value">
-           <number>15</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
+        <item row="15" column="0">
          <widget class="QCheckBox" name="checkUpdates">
           <property name="text">
            <string>Check for updates</string>
@@ -1005,7 +846,66 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="0" colspan="2">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Number of last files</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
+         <widget class="QCheckBox" name="showColorbar">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Show colorbar</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0" colspan="2">
+         <widget class="QCheckBox" name="showColorbarValues">
+          <property name="text">
+           <string>Show image and colorbar extremes values</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="neutirnoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QCheckBox" name="askCloseUnsaved">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ask before closing unsaved images</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0" colspan="2">
          <widget class="QWidget" name="widget_6" native="true">
           <layout class="QGridLayout" name="gridLayout_9" columnstretch="0,1,0,0,0,1,0">
            <item row="0" column="1">
@@ -1092,15 +992,36 @@
           </layout>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QCheckBox" name="askCloseUnsaved">
+        <item row="10" column="0">
+         <widget class="QCheckBox" name="showDimPixel">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
-           <string>Ask before closing unsaved images</string>
+           <string>Show image size in pixels</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QCheckBox" name="showXYaxes">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Show x-y axes</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -1110,47 +1031,41 @@
           </property>
          </widget>
         </item>
-        <item row="14" column="1">
+        <item row="4" column="1">
+         <widget class="QSpinBox" name="currentStepScaleFactor">
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>999</number>
+          </property>
+          <property name="value">
+           <number>15</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
          <widget class="QPushButton" name="checkUpdatesNow">
           <property name="text">
            <string>Check now</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
-         <widget class="QCheckBox" name="showColorbar">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
+        <item row="8" column="1">
+         <widget class="QCheckBox" name="forceDecimalDot">
           <property name="text">
-           <string>Show colorbar</string>
+           <string>Force use of dot decimal separator</string>
           </property>
           <property name="checked">
            <bool>true</bool>
           </property>
           <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0" colspan="2">
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0" colspan="2">
-         <widget class="QCheckBox" name="showColorbarValues">
-          <property name="text">
-           <string>Show image and colorbar extremes values</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="neutirnoSave" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
@@ -1183,6 +1098,116 @@
           </layout>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Global font</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="0" colspan="2">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Image name length</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Zoom increment</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Icon size</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="comboIconSize">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>Small</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Large</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="MaxRecentFiles">
+          <property name="maximum">
+           <number>990</number>
+          </property>
+          <property name="value">
+           <number>20</number>
+          </property>
+          <property name="neutrinoSave" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item row="5" column="0">
          <widget class="QWidget" name="widget_21" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -1201,51 +1226,36 @@
           </layout>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="physNameLength">
+          <property name="minimum">
+           <number>5</number>
           </property>
-          <property name="text">
-           <string>Icon size</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QCheckBox" name="forceDecimalDot">
-          <property name="text">
-           <string>Force use of dot decimal separator</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+          <property name="value">
+           <number>45</number>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_22">
-          <property name="text">
-           <string>Number of last files</string>
+        <item row="16" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
           </property>
-         </widget>
+         </spacer>
         </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="MaxRecentFiles">
-          <property name="maximum">
-           <number>990</number>
-          </property>
-          <property name="value">
-           <number>20</number>
+        <item row="7" column="1">
+         <widget class="QCheckBox" name="dont_save_phys_dyn">
+          <property name="text">
+           <string>Do not save dynamical images</string>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>

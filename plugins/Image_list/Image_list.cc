@@ -36,7 +36,6 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    connect(nparent->my_view, SIGNAL(bufferOriginChanged()), this, SLOT(originChanged()));
 
     connect(images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 

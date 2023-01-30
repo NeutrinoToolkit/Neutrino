@@ -117,7 +117,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
 
-    connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(savedefaults()));
+    connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
     QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
     qDebug() << pluginListMap;

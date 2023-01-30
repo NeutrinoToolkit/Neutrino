@@ -900,8 +900,12 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
     connect(paste, SIGNAL(triggered()), this, SLOT(paste_points()));
     menu.addAction(menu.addSeparator());
     QAction *showPan = menu.addAction("Show control (w)");
-	connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
-	menu.exec(e->screenPos());
+    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+    if (property("parentPanControlLevel").toInt()==0) {
+        QAction *removePan = menu.addAction("Remove");
+        connect(removePan, SIGNAL(triggered()), this, SLOT(deleteLater()));
+    }
+    menu.exec(e->screenPos());
 }
 
 

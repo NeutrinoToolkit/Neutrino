@@ -900,7 +900,13 @@ std::string neutrino::getPanData(){
     return ofile.str();
 }
 
-void neutrino::saveSession (QString fname, bool forceAll) {
+void neutrino::saveSession (QString fname) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    bool dont_save_phys_dyn = my_set.value("dont_save_phys_dyn",false).toBool();
+    my_set.endGroup();
+
+
     qDebug() << property("NeuSave-fileSave");
     if (fname.isEmpty()) {
         QString extensions=tr("Neutrino session")+QString(" (*.neus);;");
@@ -930,7 +936,7 @@ void neutrino::saveSession (QString fname, bool forceAll) {
             for (int i=0;i<physList.size(); i++) {
                 if (progress.wasCanceled()) break;
                 progress.setValue(i);
-                if (forceAll || physList.at(i)->getType()!=PHYS_DYN) {
+                if ((!dont_save_phys_dyn) || physList.at(i)->getType()!=PHYS_DYN) {
                     progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
                     QApplication::processEvents();
                     ofile << "NeutrinoImage" << std::endl;
@@ -948,7 +954,7 @@ void neutrino::saveSession (QString fname, bool forceAll) {
             setProperty("NeuSave-fileSave", fname);
             std::vector <physD *> vecPhys;
             foreach (nPhysD * my_phys, physList) {
-                if (! (my_phys->getType()==PHYS_DYN)) {
+                if ((!dont_save_phys_dyn) || my_phys->getType()!=PHYS_DYN) {
                     vecPhys.push_back(dynamic_cast<physD*>(my_phys));
                 } else {
                     qWarning() << "not saving " << QString::fromUtf8(my_phys->getShortName().c_str());

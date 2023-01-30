@@ -69,7 +69,7 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
     connect(lineBarrier, SIGNAL(released()), unwrapBarrier, SLOT(togglePadella()));
-    connect(maskRegion, SIGNAL(released()), maskRegion, SLOT(togglePadella()));
+    connect(maskRegionTB, SIGNAL(released()), maskRegion, SLOT(togglePadella()));
 
     connect(doCarrier, SIGNAL(released()), this, SLOT(guessCarrier()));
     connect(doUnwrapB, SIGNAL(released()), this, SLOT(doUnwrap()));
@@ -466,7 +466,6 @@ void Interferometry::doSubtract () {
         }
 
         double offset=phase.point(localPhys["phase_2pi_unwrap"]->to_pixel(vec2f(posZeroX->value(),posZeroY->value())));
-        qDebug() << "Ofest phase " << offset;
         if (std::isfinite(offset)) {
             physMath::phys_subtract(phase,offset);
         } else {
