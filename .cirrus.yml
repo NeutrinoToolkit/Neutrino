@@ -1,21 +1,21 @@
 only_if: $CIRRUS_BRANCH == 'master'
 
-macIntel_task:
-  macos_instance:
-    image: big-sur-base
-  script: |
-    brew update
-    brew install objc-codegenutils objc-run create-dmg
-    brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-    brew install iltommi/brews/hdf4
-    mkdir -p build && cd build
-    cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
-    make -j$(sysctl -n hw.ncpu) install
-    ../resources/macPackage/prepareapp.sh
-    cp Neutrino-*.dmg ..
-    echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip"
-  package_artifacts:
-    path: "Neutrino-*.*"
+# macIntel_task:
+#   macos_instance:
+#     image: big-sur-base
+#   script: |
+#     brew update
+#     brew install objc-codegenutils objc-run create-dmg
+#     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+#     brew install iltommi/brews/hdf4
+#     mkdir -p build && cd build
+#     cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
+#     make -j$(sysctl -n hw.ncpu) install
+#     ../resources/macPackage/prepareapp.sh
+#     cp Neutrino-*.dmg ..
+#     echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip"
+#   package_artifacts:
+#     path: "Neutrino-*.*"
 
 macM1_task:
   macos_instance:
@@ -127,7 +127,7 @@ AppImage_task:
 
 upload_task:
   depends_on:
-    - macIntel
+#     - macIntel
     - macM1
     - win32
     - win64
