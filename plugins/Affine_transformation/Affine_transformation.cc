@@ -190,13 +190,14 @@ void Affine_transformation::affine() {
                 affinePhys.set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
 			}
 		}
-        affinePhys.TscanBrightness();
 
         if (crop->isChecked()){
             QRectF reg=region.getRect();
-            nPhysD mycopy(affinePhys.sub(reg.x(),reg.y(),reg.width(),reg.height()));
+            nPhysD mycopy(affinePhys.sub(reg));
             affinePhys=mycopy;
         }
+
+        affinePhys.TscanBrightness();
 
         if (erasePrevious->isChecked()) {
             affined=nparent->replacePhys(new nPhysD(affinePhys),affined,true);

@@ -88,6 +88,14 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     maskRegionToggled(useMask->isChecked());
     interpolateToggled(useInterpolate->isChecked());
 
+    cropRegion =  new nRect(this,1);
+    cropRegion->changeToolTip("CropRegion");
+    cropRegion->setRect(QRectF(150,150,100,100));
+    connect(useCropRegion, SIGNAL(toggled(bool)), this, SLOT(useCropRegionToggled(bool)));
+    useCropRegionToggled(useCropRegion->isChecked());
+    connect(cropRegionTB, SIGNAL(released()), cropRegion, SLOT(togglePadella()));
+
+
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
 
     connect(rotAngle,SIGNAL(valueChanged(double)), this, SLOT(doSubtract()));
@@ -165,9 +173,8 @@ void Interferometry::setPosZero(QPointF point) {
         disconnect(posZeroX,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
         disconnect(posZeroY,SIGNAL(valueChanged(int)), this, SLOT(doSubtract()));
 
-        vec2f my_pos=currentBuffer->to_real(vec2f(point.x(),point.y()));
-        posZeroX->setValue(my_pos.x());
-        posZeroY->setValue(my_pos.y());
+        posZeroX->setValue(point.x());
+        posZeroY->setValue(point.y());
         Zero->setChecked(true);
         doSubtract();
 
@@ -178,6 +185,11 @@ void Interferometry::setPosZero(QPointF point) {
 
 void Interferometry::useBarrierToggled(bool val) {
     unwrapBarrier->setVisible(val);
+}
+
+void Interferometry::useCropRegionToggled(bool val) {
+    qDebug() << "HERE" << val;
+    cropRegion->setVisible(val);
 }
 
 void Interferometry::maskRegionToggled(bool val) {
@@ -214,7 +226,7 @@ void Interferometry::guessCarrier() {
     if (image) {
         QRect geom2=region->getRect(image);
         nPhysD datamatrix;
-        datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        datamatrix = image->sub(geom2);
 
         vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 
@@ -278,12 +290,12 @@ void Interferometry::doWavelet (int iimage) {
             my_params.n_thicks=my_image[iimage].numThick->value();
         }
 
-        double thick = widthCarrier->value()*my_image[iimage].maxThick->value();
+        double thick = widthCarrier->value();
         my_params.damp=correlation->value();
 
         QRect geom2=region->getRect(image);
 
-        nPhysD datamatrix = image->sub(geom2.left(),geom2.top(),geom2.width(),geom2.height(),padding->isChecked()?thick:0);
+        nPhysD datamatrix = image->sub(geom2,padding->isChecked()?thick:0);
 
         std::ostringstream my_name;
 
@@ -465,7 +477,29 @@ void Interferometry::doSubtract () {
             physMath::phys_multiply(phase,-1.0);
         }
 
-        double offset=phase.point(localPhys["phase_2pi_unwrap"]->to_pixel(vec2f(posZeroX->value(),posZeroY->value())));
+        double offset=phase.point(posZeroX->value(),posZeroY->value());
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "";
+        qDebug() << "";
+        qDebug() << "";
+        qDebug() << posZeroX->value() << posZeroY->value() << offset;
+        qDebug() << "";
+        qDebug() << "";
+        qDebug() << "";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
+        qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
         if (std::isfinite(offset)) {
             physMath::phys_subtract(phase,offset);
         } else {
@@ -671,7 +705,14 @@ void Interferometry::doCutoff(){
     statusbar->showMessage("Cutoff");
     nPhysD *image=localPhys["interpPhase_2piMask"];
     if (nPhysExists(image)) {
-        nPhysD *intNe = new nPhysD(*image);
+        nPhysD *intNe= nullptr;
+        if (useCropRegion->isChecked()) {
+                QRect geom2=cropRegion->getRect(image);
+                nPhysD datamatrix = image->sub(geom2);
+                intNe=new nPhysD(datamatrix);
+        } else {
+            intNe = new nPhysD(*image);
+        }
         intNe->setShortName("interpPhase_2piMaskCutoff");
         if (display99->isChecked()) {
             physMath::cutoff(*intNe,physMath::getColorPrecentPixels(*intNe,99));
@@ -689,6 +730,8 @@ void Interferometry::doCutoff(){
                 localPhys["interpPhase_2piMaskCutoff"]->prop["display_range"]=intNe->get_min_max();
             }
         }
+        intNe->TscanBrightness();
+        intNe->reset_display();
         localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
     }
     statusbar->clearMessage();

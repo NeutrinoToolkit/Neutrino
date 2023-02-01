@@ -45,7 +45,7 @@ public:
 
     std::array<Ui::Interferometry1, 2> my_image;
 
-    QPointer<nRect> region;
+    QPointer<nRect> region, cropRegion;
     QPointer<nLine> unwrapBarrier;
     QPointer<nLine> maskRegion;
 
@@ -65,6 +65,7 @@ public slots:
 
     void physDel(nPhysD*);
     void useBarrierToggled(bool);
+    void useCropRegionToggled(bool);
     void maskRegionToggled(bool);
     void interpolateToggled(bool);
     

@@ -2,6 +2,7 @@
 #define nPhysD_H
 
 #include <QDebug>
+#include <QRectF>
 #include "nPhysImageF.h"
 
 class nPhysD : public physD {
@@ -89,6 +90,9 @@ class nPhysD : public physD {
         physD::TscanBrightness();
     }
 
+    nPhysD sub(QRectF geom2, unsigned int pad=0) {
+        return physD::sub(geom2.left(),geom2.top(),geom2.width(),geom2.height(), pad);
+    }
 };
 
 //Q_DECLARE_METATYPE(nPhysD*);

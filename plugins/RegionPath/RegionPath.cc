@@ -85,7 +85,7 @@ void RegionPath::doIt() {
             progress.setValue(i-regRect.left());
         }
         if (crop->isChecked()) {
-            *regPath=regPath->sub(regRect.x(), regRect.y(), regRect.width(), regRect.height());
+            *regPath=regPath->sub(regRect);
         }
         regPath->TscanBrightness();
         erasePrevious->setEnabled(true);

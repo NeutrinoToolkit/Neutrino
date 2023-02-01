@@ -1304,7 +1304,7 @@ void Visar::getCarrier(unsigned int k) {
     nPhysD *phys=getPhysFromCombo(combo);
     if (phys && fringeRect[k]) {
         QRect geom2=fringeRect[k]->getRect(phys);
-        nPhysD datamatrix = phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        nPhysD datamatrix = phys->sub(geom2);
 
         vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, settingsUi[k]->guessWeight->value());
 

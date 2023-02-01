@@ -55,7 +55,7 @@ void Ghost_fringes::guessCarrier() {
 	if (image) {
         QRect geom2=maskRegion->path().boundingRect().toRect();
 		nPhysD datamatrix;
-        datamatrix = image->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        datamatrix = image->sub(geom2);
 
         vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 		if (vecCarr.first()==0) {

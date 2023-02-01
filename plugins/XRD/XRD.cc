@@ -191,7 +191,7 @@ void XRD::cropImage(unsigned int k, bool show) {
         nPhysD* img=getPhysFromCombo(image);
         if (img) {
             QRect geom2=IPrect[k]->getRect(img);
-            nPhysD cropped(img->sub(geom2.x(),geom2.y(),static_cast<unsigned int>(geom2.width()),static_cast<unsigned int>(geom2.height())));
+            nPhysD cropped(img->sub(geom2));
             nPhysD *my_phys=new nPhysD(cropped.rotated(settingsUi[k]->angle->value()));
             qDebug() << my_phys->getSize().x() << " " << my_phys->getSize().y();
 

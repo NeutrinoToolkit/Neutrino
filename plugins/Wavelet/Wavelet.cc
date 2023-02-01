@@ -114,7 +114,7 @@ void Wavelet::guessCarrier() {
 		nPhysD datamatrix;
         DEBUG(my_phys);
         DEBUG("1");
-        datamatrix = my_phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        datamatrix = my_phys->sub(geom2);
         DEBUG("2");
 
         vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
@@ -145,9 +145,9 @@ void Wavelet::doWavelet () {
 		timer.start();
 
 		saveDefaults();
-        QRect geom2=region.getRect();
+        QRect geom2=region.getRect(my_phys);
 
-        nPhysD datamatrix = my_phys->sub(geom2.x(),geom2.y(),geom2.width(),geom2.height());
+        nPhysD datamatrix = my_phys->sub(geom2);
 		
 		double conversionAngle=0.0;
 		double conversionStretch=1.0;
