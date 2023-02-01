@@ -22,3 +22,11 @@ jobs:
         cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
+    - name: upload
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "Neutrino*.dmg"
+        overwrite: true
+    
