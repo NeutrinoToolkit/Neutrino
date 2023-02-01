@@ -1,4 +1,4 @@
-name: docs
+name: macosBuild
 
 on:
   push:
@@ -27,6 +27,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "Neutrino*.dmg"
+        file: "build/Neutrino*.dmg"
         overwrite: true
     
