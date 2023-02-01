@@ -1,0 +1,38 @@
+language: cpp
+
+os: osx
+osx_image: xcode9.2
+
+branches:
+  only:
+  - master
+  
+git:
+  depth: 9999999
+  
+before_install:
+ - brew update
+ - brew install objc-codegenutils objc-run create-dmg
+ - brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
+ - brew install iltommi/brews/hdf4
+
+script:
+ - mkdir -p build_dir && cd build_dir
+ - cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
+ - make install
+
+install:
+
+before_deploy:
+ - ../resources/macPackage/prepareapp.sh
+    
+deploy:
+  provider: releases
+  api_key: $github_token
+  file_glob: true
+  file: Neutrino-*.dmg
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
+    branch: master
