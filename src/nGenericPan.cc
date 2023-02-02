@@ -445,8 +445,11 @@ nGenericPan::loadUi(QSettings &settings) {
     }
     foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
-            widget->setCheckState(static_cast<Qt::CheckState>(settings.value(widget->objectName(),widget->checkState()).toInt()));
-//                    widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
+            if (widget->isTristate()) {
+                widget->setCheckState(static_cast<Qt::CheckState>(settings.value(widget->objectName(),widget->checkState()).toInt()));
+            } else {
+                widget->setChecked(settings.value(widget->objectName(),widget->isChecked()).toBool());
+            }
         }
     }
     foreach (QAction *widget, findChildren<QAction *>()) {
@@ -555,7 +558,12 @@ nGenericPan::saveUi(QSettings &settings) {
     }
     foreach (QCheckBox *widget, findChildren<QCheckBox *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
-            settings.setValue(widget->objectName(),widget->checkState());
+            if (widget->isTristate()) {
+                settings.setValue(widget->objectName(),widget->checkState());
+            } else {
+                settings.setValue(widget->objectName(),widget->isChecked());
+            }
+
         }
     }
     foreach (QAction *widget, findChildren<QAction *>()) {
