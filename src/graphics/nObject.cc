@@ -163,9 +163,13 @@ void nObject::setRect(QRectF rect) {
 
 QRect nObject::getRect(nPhysD* image) {
     QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
+    qDebug() << geom2;
     if (image && nparent->getCurrentBuffer()) {
         vec2f dx(image->get_origin()-nparent->getCurrentBuffer()->get_origin());
         geom2.translate(dx.x(),dx.y());
+        qDebug() << geom2;
+        geom2=geom2.intersected(QRect(0,0,image->getW(), image->getH()));
+        qDebug() << geom2;
     }
     return geom2;
 }

@@ -66,13 +66,15 @@ public:
 
 
 public slots:
+
     void updatePlot(QPointF my_point=QPointF()) {
         if (my_point.isNull())
             my_point=nparent->my_view->my_mouse.pos();
 
-        qDebug() << my_point;
-        if (currentBuffer) {
-            qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+        if (nparent->getCurrentBuffer() && nparent->nPhysExists(currentBuffer)) {
+            vec2f curbuf_or=currentBuffer->get_origin();
+            vec2f curbuf_sc=currentBuffer->get_scale();
+            vec2i curbuf_si=currentBuffer->get_size();
 
             vec2i b_p(my_point.x(),my_point.y());
 
@@ -83,7 +85,7 @@ public slots:
                 corner = nparent->my_view->mapToScene(QPoint(nparent->my_view->width(), nparent->my_view->height()));
             } else {
                 orig = QPoint(0,0);
-                corner = QPoint(currentBuffer->getW(),currentBuffer->getH());
+                corner = QPoint(curbuf_si.x(),curbuf_si.y());
             }
 
             vec2i b_o((int)orig.x(),(int)orig.y());
@@ -92,11 +94,11 @@ public slots:
             phys_direction other_dir=(cut_dir==PHYS_HORIZONTAL?PHYS_VERTICAL:PHYS_HORIZONTAL);
 
             size_t lat_skip = std::max(b_o(cut_dir), 0);
-            size_t z_size = std::min(b_c(cut_dir)-lat_skip, currentBuffer->getSizeByIndex(cut_dir)-lat_skip);
+            size_t z_size = std::min(b_c(cut_dir)-lat_skip, curbuf_si(cut_dir)-lat_skip);
 
             QVector<double> x(z_size);
             for (unsigned int i=0;i<z_size;i++){
-                x[i]=(i+lat_skip-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
+                x[i]=(i+lat_skip-curbuf_or(cut_dir))*curbuf_sc(cut_dir);
             }
             QVector<double> y(z_size);
             if (cut_dir==PHYS_HORIZONTAL) {
@@ -118,11 +120,14 @@ public slots:
             my_w.plot->rescaleAxes();
 
             statusBar()->showMessage(tr("Point (")+QLocale().toString(my_point.x())+","+QLocale().toString(my_point.y())+")="+QLocale().toString(currentBuffer->point(my_point.x(),my_point.y())));
-            double pos_mouse=(b_p(cut_dir)-currentBuffer->get_origin(cut_dir))*currentBuffer->get_scale(cut_dir);
+            double pos_mouse=(b_p(cut_dir)-curbuf_or(cut_dir))*curbuf_sc(cut_dir);
             my_w.plot->setMousePosition(pos_mouse);
 
             my_w.plot->graph(0)->setData(x,y,true);
 
+        } else {
+            my_w.plot->graph(0)->data()->clear();
+            my_w.plot->replot();
         }
     }
 

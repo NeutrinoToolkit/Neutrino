@@ -50,8 +50,6 @@
 #include <QWidget>
 #include <iostream>
 
-#include "nPhysD.h"
-
 #ifndef nplug_H
 #define nplug_H
 

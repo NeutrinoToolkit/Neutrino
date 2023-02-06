@@ -292,9 +292,11 @@ nView::setSize() {
     if (fillimage) {
         fitInView(bBox, Qt::KeepAspectRatio);
     }
-    my_mouse.setSize(my_pixitem.pixmap().size());
+    if (my_mouse.size != my_pixitem.pixmap().size()) {
+        my_mouse.setSize(my_pixitem.pixmap().size());
+        emit zoomChanged(transform().m11());
+    }
     repaint();
-    emit zoomChanged(transform().m11());
 
 }
 

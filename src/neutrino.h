@@ -125,7 +125,7 @@ public slots:
     nPhysD* getBuffer(QString);
 
     inline nPhysD* getCurrentBuffer() {
-        return (physList.size() ? currentBuffer : nullptr);
+        return (physList.size() ? (nPhysExists(currentBuffer)? currentBuffer : nullptr) : nullptr);
     }
 
     inline QList<nPhysD *> getBufferList() {return physList;}
