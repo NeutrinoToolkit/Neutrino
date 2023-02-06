@@ -1,6 +1,5 @@
 only_if: $CIRRUS_BRANCH == 'master'
 
-
 prepare_task:
   container:
     image: ubuntu:22.04
@@ -15,6 +14,7 @@ prepare_task:
     git push --follow-tags origin HEAD:master || true
     gh release delete latest -y || true
     gh release create latest -n "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
+    gh release edit latest --draft=false
 
 macM1_task:
   depends_on:
@@ -148,8 +148,7 @@ upload_task:
     git config --global user.name "Cirrus CI"
     git config --global user.email "hello@cirruslabs.org"
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-    git push origin :refs/tags/latest
-    gh release edit latest --draft=false 
+    git push origin :refs/tags/latest 
     gh release upload --clobber latest package/*
 
 # waiting linuxdeploy for arm
