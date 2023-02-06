@@ -14,7 +14,6 @@ prepare_task:
     git push --follow-tags origin HEAD:master || true
     gh release delete latest -y || true
     gh release create latest -n "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-    gh release edit latest --draft=false
 
 macM1_task:
   depends_on:
