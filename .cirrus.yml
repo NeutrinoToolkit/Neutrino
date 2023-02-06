@@ -147,6 +147,7 @@ upload_task:
     git config --global user.name "Cirrus CI"
     git config --global user.email "hello@cirruslabs.org"
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
+    git pull
     gh release upload --clobber latest package/*
 
 # waiting linuxdeploy for arm
