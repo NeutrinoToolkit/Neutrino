@@ -1,23 +1,6 @@
 only_if: $CIRRUS_BRANCH == 'master'
 
-# prepare_task:
-#   container:
-#     image: ubuntu:22.04
-#   script: |
-#     apt-get update -qq
-#     apt-get install -yy git gh
-#     git config --global user.name "Cirrus CI"
-#     git config --global user.email "hello@cirruslabs.org"
-#     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-#     git push origin :refs/tags/latest
-#     git tag -fa latest -m "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-#     git push --follow-tags origin HEAD:master || true
-#     gh release delete latest -y || true
-#     gh release create latest -n "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-
 macM1_task:
-#   depends_on:
-#     - prepare
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
@@ -34,8 +17,6 @@ macM1_task:
     path: "Neutrino-*.*"
 
 win32_task:
-#   depends_on:
-#     - prepare
   container:
     image: fedora:36
   script: |
@@ -72,8 +53,6 @@ win32_task:
     path: "Neutrino-*.*"
 
 win64_task:
-#   depends_on:
-#     - prepare
   container:
     image: fedora:36
   script: |
@@ -110,8 +89,6 @@ win64_task:
     path: "Neutrino-*.*"
 
 AppImage_task:
-#   depends_on:
-#     - prepare
   container:
     image: fedora:36
   env:
@@ -237,6 +214,23 @@ opensuse_task:
     cp Neutrino*.rpm ..
   package_artifacts:
     path: "Neutrino-*.*"
+
+# ARCHIVED RULES
+
+# prepare_task:
+#   container:
+#     image: ubuntu:22.04
+#   script: |
+#     apt-get update -qq
+#     apt-get install -yy git gh
+#     git config --global user.name "Cirrus CI"
+#     git config --global user.email "hello@cirruslabs.org"
+#     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
+#     git push origin :refs/tags/latest
+#     git tag -fa latest -m "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
+#     git push --follow-tags origin HEAD:master || true
+#     gh release delete latest -y || true
+#     gh release create latest -n "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
 
 # macIntel_task:
 #   macos_instance:

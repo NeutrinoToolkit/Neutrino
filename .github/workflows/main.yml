@@ -1,4 +1,4 @@
-name: macosBuild
+name: macIntel
 
 on:
   push:
@@ -9,10 +9,11 @@ jobs:
   build:
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Latest-tag
+    - name: Tag latest
       uses: EndBug/latest-tag@latest
     - name: Build
       run: |
@@ -24,12 +25,12 @@ jobs:
         cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
-    - name: Archive dmg file
+    - name: Archive
       uses: actions/upload-artifact@v3
       with:
-        name: dmg
+        name: Neutrino.dmg
         path: "build/Neutrino*.dmg"
-    - name: upload
+    - name: Upload
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
