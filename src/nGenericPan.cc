@@ -326,7 +326,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
 
 void nGenericPan::physDel(nPhysD * buffer) {
     DEBUG(panName().toStdString() <<  " >>>>> enter");
-//    currentBuffer=nullptr;
+    currentBuffer=nullptr;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
@@ -334,16 +334,13 @@ void nGenericPan::physDel(nPhysD * buffer) {
                 disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
             int position=combo->findData(QVariant::fromValue(buffer));
-//            QApplication::processEvents();
             combo->removeItem(position);
-//            QApplication::processEvents();
             if (combo->property("neutrinoImage").toBool()) {
                 connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
                 connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
             }
         }
     }
-//    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
     DEBUG(panName().toStdString() << " >>>>> exit");
 }
 

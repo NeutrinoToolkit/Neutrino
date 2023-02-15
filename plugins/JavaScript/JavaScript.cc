@@ -49,6 +49,9 @@ my_eng(my_nparent)
 
     QKeySequence key_seq=QKeySequence(Qt::CTRL | Qt::Key_Return);
     command->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute"+command->toolTip());
+    command->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    output->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
     QShortcut* my_shortcut = new QShortcut(key_seq, command);
     connect(my_shortcut, SIGNAL(activated()), this, SLOT(runIt()));
     show();

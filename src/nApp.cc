@@ -50,6 +50,8 @@ int nApp::exec() {
     QObject::connect(log_win_ui->buttonFind,&QPushButton::released,this,&nApp::findLogText);
     QObject::connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nApp::findLogText);
 
+    log_win_ui->logger->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
     log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
     log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
     log_win.setVisible(my_set.value("log_winVisible",false).toBool());
@@ -102,22 +104,22 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
     if (napp /*&& napp->log_win.isVisible()*/) {
         if (napp->log_win_ui->levelLog->currentIndex() > type) return;
         QByteArray localMsg = msg.toLocal8Bit();
-        QString outstr;
+        QString outstr=QDateTime::currentDateTime().toString("yyyy-MM-dd.hh:mm:ss.zzz");
         switch (type) {
             case QtDebugMsg:
-                outstr += "D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
+                outstr += " D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
                 break;
             case QtInfoMsg:
-                outstr+="I: <font color=\"black\">";
+                outstr +=" I: <font color=\"black\">";
                 break;
             case QtWarningMsg:
-                outstr+="W: <font color=\"#C71585\">";
+                outstr +=" W: <font color=\"#C71585\">";
                 break;
             case QtCriticalMsg:
-                outstr+="C: <font color=\"#9932CC\">";
+                outstr +=" C: <font color=\"#9932CC\">";
                 break;
             case QtFatalMsg:
-                outstr+="F: <font color=\"#FF0000\">";
+                outstr +=" F: <font color=\"#FF0000\">";
                 abort();
         }
         outstr +=  msg + "</font>";
