@@ -976,6 +976,11 @@ physWave::phys_subtract_carrier(physD &iphys, double alpha, double lambda)
     iphys.TscanBrightness();
 }
 
+vec2f lambda_angle (int imax, int jmax, int dx, int dy) {
+    mcomplex freq(imax/((double)dx),jmax/((double)dy));
+    return vec2f(1.0/freq.mod(),fmod(freq.arg()*180.0/M_PI,180.0));
+}
+
 //! this function returns the carrier bidimvec<double(angle[deg],interfringe[px])>
 bidimvec<double>
 physWave::phys_guess_carrier(physD &phys, double weight)
@@ -1009,13 +1014,21 @@ physWave::phys_guess_carrier(physD &phys, double weight)
         fftw_destroy_plan(plan);
     }
 
-    bidimvec<double> retCarrier;
+    bidimvec<double> retCarrier(0,0);
 
     if (imax!=0 || jmax!=0) {
-        mcomplex freq(imax/((double)dx),jmax/((double)dy));
-        retCarrier = bidimvec<double>(1.0/freq.mod(),fmod(freq.arg()*180.0/M_PI,180.0));
-    } else {
-        retCarrier = bidimvec<double>(0.0,0.0);
+        retCarrier=lambda_angle(imax,jmax,dx,dy);
+        vec2f carr_m10=lambda_angle(imax-1,jmax,dx,dy);
+        vec2f carr_p10=lambda_angle(imax+1,jmax,dx,dy);
+        vec2f carr_0m1=lambda_angle(imax,jmax-1,dx,dy);
+        vec2f carr_0p1=lambda_angle(imax,jmax+1,dx,dy);
+        std::stringstream ss;
+        ss << retCarrier << "; " << carr_m10 << ":" << carr_p10 << "; " << carr_0m1 << ":" << carr_0p1 << std::endl;
+        throw phys_fileerror(ss.str());
+        DEBUG("-------------------------");
+        DEBUG(retCarrier);
+        DEBUG(ss.str());
+        DEBUG("-------------------------");
     }
 
     return retCarrier;

@@ -104,7 +104,7 @@ void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, co
     if (napp /*&& napp->log_win.isVisible()*/) {
         if (napp->log_win_ui->levelLog->currentIndex() > type) return;
         QByteArray localMsg = msg.toLocal8Bit();
-        QString outstr=QDateTime::currentDateTime().toString("yyyy-MM-dd.hh:mm:ss.zzz");
+        QString outstr=QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz");
         switch (type) {
             case QtDebugMsg:
                 outstr += " D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
