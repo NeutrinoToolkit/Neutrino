@@ -42,7 +42,7 @@ public slots:
     void changeDecorations();
     void changeIconSize(int);
 
-    void updatePlugindirs();
+    void updatePlugindirs(QListWidgetItem*);
     void changeFont();
     void hideEvent (QHideEvent*) override;
     void showEvent(QShowEvent*) override;

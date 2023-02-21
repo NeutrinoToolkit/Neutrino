@@ -115,7 +115,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_view,SLOT(setZoomFactor(int)));
 
-    connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs()));
+    connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs(QListWidgetItem*)));
 
     connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
@@ -280,7 +280,7 @@ void nPreferences::on_addPlugin_released() {
 	if (QFileInfo(dir).exists()) {
 		nparent->scanPlugins(dir);
         QListWidgetItem *dd=new QListWidgetItem(pluginList);
-        dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
+        dd->setFlags(dd->flags() | Qt::ItemIsUserCheckable);
         dd->setCheckState(Qt::Checked);
         dd->setText(dir);
         pluginList->addItem(dd);
@@ -289,7 +289,15 @@ void nPreferences::on_addPlugin_released() {
 //    nparent->saveDefaults();
 }
 
-void nPreferences::updatePlugindirs() {
+void nPreferences::updatePlugindirs(QListWidgetItem* item=nullptr) {
+    if (item) {
+        if (item->checkState() == Qt::Checked) {
+            QString dir= item->text();
+            if (QFileInfo(dir).exists()) {
+                nparent->scanPlugins(dir);
+            }
+        }
+    }
     QMap<QString, QVariant> pluginListMap;
     for(int i = 0; i < pluginList->count(); ++i) {
         pluginListMap[pluginList->item(i)->text()]=QVariant(pluginList->item(i)->checkState());

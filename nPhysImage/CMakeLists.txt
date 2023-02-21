@@ -17,6 +17,7 @@ if (WIN32)
 elseif(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 elseif (APPLE)
+	SET_TARGET_PROPERTIES(nPhysImageF PROPERTIES INSTALL_NAME_DIR "@executable_path/../Frameworks")
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION "${PROJECT_BINARY_DIR}/Neutrino.app/Contents/Frameworks")
 endif()
 

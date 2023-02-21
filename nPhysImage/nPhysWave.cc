@@ -1024,9 +1024,7 @@ physWave::phys_guess_carrier(physD &phys, double weight)
         vec2f carr_0p1=lambda_angle(imax,jmax+1,dx,dy);
         std::stringstream ss;
         ss << retCarrier << "; " << carr_m10 << ":" << carr_p10 << "; " << carr_0m1 << ":" << carr_0p1 << std::endl;
-        throw phys_fileerror(ss.str());
         DEBUG("-------------------------");
-        DEBUG(retCarrier);
         DEBUG(ss.str());
         DEBUG("-------------------------");
     }
