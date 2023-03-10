@@ -117,17 +117,17 @@ void Wavelet::guessCarrier() {
         datamatrix = my_phys->sub(geom2);
         DEBUG("2");
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
+        std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 		
-		if (vecCarr.first()==0) {
+        if (vecCarr.size()==0) {
             statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
+            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg", 5000);
             disconnect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
             disconnect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
             disconnect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-            widthCarrier->setValue(vecCarr.first());
-            angleCarrier->setValue(vecCarr.second());
+            widthCarrier->setValue(vecCarr[0].first());
+            angleCarrier->setValue(vecCarr[0].second());
             widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
             angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
             connect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));

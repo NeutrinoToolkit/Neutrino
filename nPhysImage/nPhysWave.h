@@ -119,7 +119,7 @@ void phys_subtract_carrier (nPhysImageF<double> &, double, double);
 // create a synthetic interferogram from phase and quality
 nPhysImageF<double> phys_synthetic_interferogram (nPhysImageF<double> *, nPhysImageF<double> *);
 
-bidimvec<double> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
+std::vector<vec2f> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
 
 // integral inversions
 

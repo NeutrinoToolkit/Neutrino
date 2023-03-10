@@ -981,10 +981,11 @@ vec2f lambda_angle (int imax, int jmax, int dx, int dy) {
     return vec2f(1.0/freq.mod(),fmod(freq.arg()*180.0/M_PI,180.0));
 }
 
-//! this function returns the carrier bidimvec<double(angle[deg],interfringe[px])>
-bidimvec<double>
+//! this function returns the carrier vec2f(angle[deg],interfringe[px])
+std::vector<vec2f>
 physWave::phys_guess_carrier(physD &phys, double weight)
 {
+    std::vector<vec2f> retlist;
     size_t dx=phys.getW();
     size_t dy=phys.getH();
 
@@ -996,40 +997,71 @@ physWave::phys_guess_carrier(physD &phys, double weight)
         fftw_execute(plan);
 
         double valmax=0.0;
-        for (size_t i=0; i<dx/2+1; i++) {
-            for (size_t j=0; j<dy; j++) {
+        std::vector<std::pair<vec2f,double>> my_vec;
+
+        for (int i=0; i<dx/2+1; i++) {
+            for (int j=0; j<dy; j++) {
                 int j1=(dy/2+1)-(j+dy/2+1)%dy;
                 double r=sqrt(i*i+j1*j1);
-                size_t k=i+j*(dx/2+1);
+                int k=i+j*(dx/2+1);
                 double val=pow(r,weight)*vec2f(myData[k][0],myData[k][1]).mod();
                 if (val>valmax && (i>0||j>0)) {
                     valmax=val;
                     imax=i;
                     jmax=j1;
+                    DEBUG(">>>" << i << " " << j << " " << j1 << " " << k << "  =  " << valmax);
+                    my_vec.clear();
+                    for (int ii=i-1;ii<=i+1;ii++) {
+                        DEBUG("here"<< j-1 << " " << j+1);
+                        for (int jj=j-1;jj<=j+1;jj++) {
+                            DEBUG("here2");
+                            int iiclean=(ii+dx/2+1)%(dx/2+1);
+                            int jjclean=(jj+dy)%(dy);
+                            int j1clean=(dy/2+1)-(jjclean+dy/2+1)%dy;
+                            int kk=k=iiclean+jjclean*(dx/2+1);
+                            double rclean=sqrt(iiclean*iiclean+j1clean*j1clean);
+                            vec2f my_l_a=lambda_angle(iiclean,j1clean,dx,dy);
+                            double my_weight=pow(rclean,weight)*vec2f(myData[kk][0],myData[kk][1]).mod();
+                            DEBUG(my_l_a << " " << my_weight);
+                            my_vec.push_back(std::make_pair(my_l_a, my_weight));
+                        }
+                    }
                 }
             }
         }
+        DEBUG(dx << " " << dy << " " << dx/2+1 << " " << dy/2+1);
+        vec2f a_l_mean(0,0);
+        double sum_weights=0;
+        for (auto &a: my_vec) {
+            a_l_mean += a.first*a.second;
+            sum_weights += a.second;
+        }
+        a_l_mean/=sum_weights;
+        DEBUG(a_l_mean);
 
         fftw_free(myData);
         fftw_destroy_plan(plan);
     }
 
-    bidimvec<double> retCarrier(0,0);
-
     if (imax!=0 || jmax!=0) {
-        retCarrier=lambda_angle(imax,jmax,dx,dy);
+        vec2f retCarrier=lambda_angle(imax,jmax,dx,dy);
         vec2f carr_m10=lambda_angle(imax-1,jmax,dx,dy);
         vec2f carr_p10=lambda_angle(imax+1,jmax,dx,dy);
         vec2f carr_0m1=lambda_angle(imax,jmax-1,dx,dy);
         vec2f carr_0p1=lambda_angle(imax,jmax+1,dx,dy);
         std::stringstream ss;
-        ss << retCarrier << "; " << carr_m10 << ":" << carr_p10 << "; " << carr_0m1 << ":" << carr_0p1 << std::endl;
+        ss << "carrier:" << retCarrier << "; i-" << carr_m10 << " i+" << carr_p10 << "; j-" << carr_0m1 << " j+" << carr_0p1 << std::endl;
         DEBUG("-------------------------");
         DEBUG(ss.str());
         DEBUG("-------------------------");
+        retlist.push_back(retCarrier);
+        retlist.push_back(carr_m10);
+        retlist.push_back(carr_p10);
+        retlist.push_back(carr_0m1);
+        retlist.push_back(carr_0p1);
     }
 
-    return retCarrier;
+    return retlist;
 }
 
 // --------------------------------------------------------------------- integral inversions --

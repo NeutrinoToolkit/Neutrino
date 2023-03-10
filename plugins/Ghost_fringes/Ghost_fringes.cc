@@ -57,12 +57,12 @@ void Ghost_fringes::guessCarrier() {
 		nPhysD datamatrix;
         datamatrix = image->sub(geom2);
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
-		if (vecCarr.first()==0) {
+        std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
+        if (vecCarr.size()==0) {
             statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
 		} else {
-            widthCarrier->setValue(vecCarr.first());
-            angleCarrier->setValue(vecCarr.second());
+            widthCarrier->setValue(vecCarr[0].first());
+            angleCarrier->setValue(vecCarr[0].second());
 		}
 	}
 }

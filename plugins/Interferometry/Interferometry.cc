@@ -228,14 +228,14 @@ void Interferometry::guessCarrier() {
         nPhysD datamatrix;
         datamatrix = image->sub(geom2);
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
+        std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 
-        if (vecCarr.first()==0) {
+        if (vecCarr.size()==0) {
             statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
         } else {
-            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr.first())+"px "+QLocale().toString(vecCarr.second())+"deg", 5000);
-            widthCarrier->setValue(vecCarr.first());
-            angleCarrier->setValue(vecCarr.second());
+            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg", 5000);
+            widthCarrier->setValue(vecCarr[0].first());
+            angleCarrier->setValue(vecCarr[0].second());
         }
     }
 }

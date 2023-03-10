@@ -1306,15 +1306,20 @@ void Visar::getCarrier(unsigned int k) {
         QRect geom2=fringeRect[k]->getRect(phys);
         nPhysD datamatrix = phys->sub(geom2);
 
-        vec2f vecCarr=physWave::phys_guess_carrier(datamatrix, settingsUi[k]->guessWeight->value());
+        std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, settingsUi[k]->guessWeight->value());
 
-        if (vecCarr.first()==0) {
+        if (vecCarr.size()==0) {
             statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
         } else {
-            settingsUi[k]->interfringe->setValue(vecCarr.first());
-            settingsUi[k]->angle->setValue(vecCarr.second());
+            settingsUi[k]->interfringe->setValue(vecCarr[0].first());
+            settingsUi[k]->angle->setValue(vecCarr[0].second());
+            std::stringstream ss;
+            for (auto &v: vecCarr) {
+                ss << v << " ";
+            }
+            qInfo() << QString::fromStdString(ss.str());
             if (tabPhase->currentIndex() == static_cast<int>(k)) {
-                statusbar->showMessage(tr("Carrier :")+QLocale().toString(vecCarr.first())+tr("px, ")+QLocale().toString(vecCarr.second())+tr("deg"));
+                statusbar->showMessage(tr("Carrier :")+QLocale().toString(vecCarr[0].first())+tr("px, ")+QLocale().toString(vecCarr[0].second())+tr("deg"));
             }
         }
     }
