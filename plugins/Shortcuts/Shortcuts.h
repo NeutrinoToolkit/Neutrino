@@ -43,6 +43,6 @@ public:
 
 };
 
-NEUTRINO_PLUGIN(Shortcuts,Help,"",Qt::Key_Question);
+NEUTRINO_PLUGIN(Shortcuts,Help,"",Qt::CTRL | Qt::Key_K);
 
 #endif

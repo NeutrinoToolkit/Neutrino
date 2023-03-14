@@ -236,6 +236,25 @@ bool nApp::notify(QObject *rec, QEvent *ev)
     return retval;
 }
 
+//#include <QEvent>
+//#include <QMetaEnum>
+//#include <QDebug>
+
+///// Gives human-readable event type information.
+//QDebug operator<<(QDebug str, const QEvent * ev) {
+//   static int eventEnumIndex = QEvent::staticMetaObject
+//         .indexOfEnumerator("Type");
+//   str << "QEvent";
+//   if (ev) {
+//      QString name = QEvent::staticMetaObject
+//            .enumerator(eventEnumIndex).valueToKey(ev->type());
+//      if (!name.isEmpty()) str << name; else str << ev->type();
+//   } else {
+//      str << (void*)ev;
+//   }
+//   return str.maybeSpace();
+//}
+
 
 bool nApp::event(QEvent *ev) {
     qDebug() << ev;

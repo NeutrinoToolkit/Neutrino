@@ -30,6 +30,8 @@
 #include <QSettings>
 #include <QDebug>
 
+
+
 class neutrino;
 class nGenericPan;
 namespace Ui {

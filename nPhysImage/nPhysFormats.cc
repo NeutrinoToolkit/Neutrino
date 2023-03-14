@@ -762,6 +762,8 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
 
                 float resx=1.0, resy=1.0;
                 TIFFGetField(tif, TIFFTAG_XRESOLUTION, &resx);
+                tiff_prop["TIFF_resx"]=resx;
+                tiff_prop["TIFF_resy"]=resx;
                 TIFFGetField(tif, TIFFTAG_YRESOLUTION, &resy);
                 if (resx!=0.0 && resy!=0.0) {
                     tiff_prop["scale"]=vec2f(1.0/resx,1.0/resy);
@@ -781,14 +783,14 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 }
 
                 if (TIFFGetField(tif, 33449, &count, &strdata)) {
-                    std::string res(strdata);
-                    tiff_prop["TIFF_MD_SampleInfo"] = res;
+                    std::string res_str(strdata);
+                    tiff_prop["TIFF_MD_SampleInfo"] = res_str;
 
                     std::string myreg(R"(PMT:(\d*)V, L(\d*), (\d*)(.*))");
                     std::regex my_regex(myreg);
                     std::smatch m;
                     DEBUG("33449 " << count << "\n" << std::string(strdata));
-                    if(std::regex_search(res,m,my_regex)) {
+                    if(std::regex_search(res_str,m,my_regex)) {
                         DEBUG("found GEL");
                         tiff_prop["gel_V"]=std::stoi(m.str(1));
                         tiff_prop["gel_L"]=std::stoi(m.str(2));
@@ -801,11 +803,11 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         std::string myreg2(R"(Latitude=(\d+)[\s|\S]*PMT=(\d+)V)");
                         std::regex my_regex2(myreg2);
                         std::smatch m2;
-                        if(std::regex_search(res,m2,my_regex2)) {
+                        if(std::regex_search(res_str,m2,my_regex2)) {
                             for (int ii=0;ii<m2.size();ii++) {
-                                DEBUG(ii << " " << m2.str(ii));
+                                DEBUG( "tiff regex2 " << ii << " " << m2.str(ii));
                             }
-                            tiff_prop["gel_R"] = resx;
+                            tiff_prop["gel_R"] = resx/4;
                             tiff_prop["gel_L"]=std::stoi(m2.str(1));
                             tiff_prop["gel_V"]=std::stoi(m2.str(2));
                         }
@@ -921,10 +923,12 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         }
                         my_phys.setName(ss.str());
                         for (auto &pro : tiff_prop) {
-                            my_phys.prop[pro.first] =pro.second;
+                            my_phys.prop[pro.first] = pro.second;
                             DEBUG(pro.first << " : " << pro.second);
                         }
                         my_phys.setType(PHYS_FILE);
+                        my_phys.set_scale(1.0/resx,1.0/resy);
+
 
                         DEBUG("here");
                         for (unsigned int j = 0; j < h; j++) {
@@ -966,20 +970,19 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R"), tiff_prop.have("TIFF_MD_FileTag")){
                             DEBUG("here we are");
                             physMath::phys_flip_ud(my_phys);
+                            DEBUG(tiff_prop["gel_R"].get_d() << " " << tiff_prop["gel_L"].get_i());
+                            DEBUG(tiff_prop["gel_R"] << " " << tiff_prop["gel_L"]);
                             double D=pow(pow(2,8*bytesperpixel)-1,2);
                             double S=pow(10,-15.845+6.861*0.4343*log(tiff_prop["gel_V"].get_i()));
-                            double a=(pow(tiff_prop["gel_R"].get_i(),2)/10000)*(4000/S)*pow(10,tiff_prop["gel_L"].get_i()/2.)/D;
+                            double a=(pow(tiff_prop["gel_R"].get_d(),2)/10000)*(4000/S)*pow(10,tiff_prop["gel_L"].get_i()/2.)/D;
 
                             DEBUG(D << " " << S << " " << a);
-                            DEBUG(tiff_prop["gel_R"].get_i() << " " << tiff_prop["gel_L"].get_i());
-                            DEBUG(tiff_prop["gel_R"] << " " << tiff_prop["gel_L"]);
 
                             if (tiff_prop["TIFF_MD_FileTag"].get_i()==2) {
                                 physMath::phys_square(my_phys);
                             }
                             physMath::phys_multiply(my_phys,a);
                             my_phys.prop["unitsCB"] = "PSL";
-                            my_phys.set_scale(tiff_prop["gel_R"].get_i()/10000.,tiff_prop["gel_R"].get_i()/10000.);
                         }
                         my_phys.TscanBrightness();
                         if (separate_rgb) {
@@ -1239,9 +1242,9 @@ std::vector <physD> physFormat::phys_open_inf(std::string ifilename) {
 
             linearized.prop["inf-resx"] = resx;
             linearized.prop["inf-resy"] = resy;
-            linearized.set_scale(resx/1000.,resy/1000.);
-            linearized.prop["unitsX"] = "mm";
-            linearized.prop["unitsY"] = "mm";
+            linearized.set_scale(resx/10000.,resy/10000.);
+            linearized.prop["unitsX"] = "cm";
+            linearized.prop["unitsY"] = "cm";
             linearized.prop["unitsCB"] = "PSL";
 
             getline(ifile,line);
