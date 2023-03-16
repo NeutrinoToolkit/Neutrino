@@ -205,10 +205,10 @@ void XRD::cropImage(unsigned int k, bool show) {
                 physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
             }
 
-
-            if (settingsUi[k]->IPmodel->currentIndex() > 0 ) {
-                QString kind=settingsUi[k]->IPmodel->currentText();
-                double tfad=settingsUi[k]->fadeMin->value();
+            double tfad=fadeMin->value();
+            if (tfad > 0 ) {
+                QString kind=IPmodel->currentText();
+                double tfad=fadeMin->value();
                 std::map<QString, std::array<double,4>> fad = {
                     {"MS", {0.334, 0.666, 107.320, 33974}},
                     {"TR", {0.535, 0.465, 28.812,  3837.2}},

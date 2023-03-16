@@ -718,10 +718,19 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         DEBUG("MD_FileTag " << MD_FileTag[0]);
                     }
                 }
-                unsigned int *MD_ScalePixel=nullptr;
+                uint32_t *MD_ScalePixel=nullptr;
                 if (TIFFGetField(tif, 33446, &count, &MD_ScalePixel)){
                     if (count==1) {
                         tiff_prop["TIFF_MD_ScalePixel"] = vec2i(MD_ScalePixel[0],MD_ScalePixel[1]);
+
+                        DEBUG("MD_ScalePixel " << count << " " << MD_ScalePixel << " " << MD_ScalePixel[0]<< " " << MD_ScalePixel[1] << " " << MD_ScalePixel[0]/MD_ScalePixel[1]);
+                        if (MD_ScalePixel[0] > 4294967295 || MD_ScalePixel[1] > 4294967295) {
+                            DEBUG("CHANGING numerator or denominator");
+                            double my_scalefactor = 4294967295 / std::max(MD_ScalePixel[0], MD_ScalePixel[1]);
+                            MD_ScalePixel[0] = round(MD_ScalePixel[0] * my_scalefactor);
+                            MD_ScalePixel[1] = round(MD_ScalePixel[1] * my_scalefactor);
+
+                        }
                         DEBUG("MD_ScalePixel " << count << " " << MD_ScalePixel << " " << MD_ScalePixel[0]<< " " << MD_ScalePixel[1] << " " << MD_ScalePixel[0]/MD_ScalePixel[1]);
                     }
                 }

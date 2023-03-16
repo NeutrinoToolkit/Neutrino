@@ -756,6 +756,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     physMath::phys_multiply(*dynamic_cast<physD*>(my_phys),my_set.value("multiply",1).toDouble());
                                 }
 
+                                if (my_set.value("lockMedian",false).toBool()) {
+                                    physMath::phys_median_filter(*my_phys,my_set.value("median",1).toUInt());
+                                }
+
                                 if (my_set.value("lockBlur",false).toBool()) {
                                     physMath::phys_fast_gaussian_blur(*my_phys,my_set.value("blurX",1).toDouble(),my_set.value("blurY",1).toDouble());
                                 }
@@ -1586,7 +1590,7 @@ neutrino::openRAW() {
 //save and load across restart
 void neutrino::saveDefaults() {
     QSettings my_set("neutrino","");
-    qDebug() << my_set.fileName();
+//    qDebug() << my_set.fileName();
     my_set.beginGroup("nPreferences");
     my_set.setValue("geometry", pos());
     my_set.setValue("comboIconSizeDefault", toolBar->iconSize().width()/10-1);
