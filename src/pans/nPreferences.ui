@@ -525,18 +525,18 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QSpinBox" name="colorSpin">
+               <widget class="QDoubleSpinBox" name="colorSpin">
                 <property name="toolTip">
                  <string>Scale colorbar so that this percentage of pixels fall within extremes</string>
                 </property>
-                <property name="suffix">
-                 <string>%</string>
+                <property name="decimals">
+                 <number>1</number>
                 </property>
-                <property name="maximum">
-                 <number>100</number>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
                 </property>
                 <property name="value">
-                 <number>100</number>
+                 <double>100.000000000000000</double>
                 </property>
                 <property name="neutrinoSave" stdset="0">
                  <bool>true</bool>

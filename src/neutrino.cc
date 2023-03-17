@@ -771,10 +771,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     if (ok1 && ok2) {
                                         my_phys->prop["display_range"]=vec2f(mymin,mymax);
                                     }
-                                    if (my_set.value("colorSpin").toInt() != 100) {
+                                    if (my_set.value("colorSpin").toDouble() != 100) {
                                         DEBUG(my_phys->prop["display_range"]);
                                         qDebug() << my_set.value("colorSpin").toInt();
-                                        my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,my_set.value("colorSpin").toInt());
+                                        my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,my_set.value("colorSpin").toDouble());
                                         DEBUG(my_phys->prop["display_range"]);
                                     }
                                 }
