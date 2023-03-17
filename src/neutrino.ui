@@ -327,9 +327,9 @@
      </widget>
      <addaction name="actionNext_LUT"/>
      <addaction name="actionPrevious_LUT"/>
-     <addaction name="actionRescale99"/>
-     <addaction name="actionRescale_max"/>
      <addaction name="menuGamma"/>
+     <addaction name="actionRescale_max"/>
+     <addaction name="actionRescale99"/>
      <addaction name="actionShow_more_pixels"/>
      <addaction name="actionShow_less_pixels"/>
     </widget>
@@ -813,7 +813,7 @@
   </action>
   <action name="actionRescale99">
    <property name="text">
-    <string>Rescale 99%</string>
+    <string>Rescale 99.9%</string>
    </property>
    <property name="toolTip">
     <string>rescale colorbar to show 99% of the pixel</string>

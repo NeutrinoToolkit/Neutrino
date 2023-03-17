@@ -62,7 +62,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
     connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
 
-    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
+    connect(my_w.percent, SIGNAL(valueChanged(double)), nparent->my_view, SLOT(rescaleColor(double)));
     my_w.toolBar->addWidget(my_w.percent);
 
     loadPalettes();
@@ -83,7 +83,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     my_w.histogram->repaint();
 
     if (nparent->my_view->property("percentPixels").isValid()) {
-        my_w.percent->setValue(nparent->my_view->property("percentPixels").toInt());
+        my_w.percent->setValue(nparent->my_view->property("percentPixels").toDouble());
     }
 
 }
@@ -176,11 +176,11 @@ void Colorscale::bufferChanged(nPhysD *my_phys) {
     }
     my_w.histogram->repaint();
 
-    disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
+    disconnect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(double)));
     if (nparent->my_view->property("percentPixels").isValid()) {
-        my_w.percent->setValue(nparent->my_view->property("percentPixels").toInt());
+        my_w.percent->setValue(nparent->my_view->property("percentPixels").toDouble());
     }
-    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(int)));
+    connect(my_w.percent, SIGNAL(valueChanged(int)), nparent->my_view, SLOT(rescaleColor(double)));
 
 }
 

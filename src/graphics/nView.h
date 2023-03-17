@@ -115,7 +115,7 @@ public slots:
 
     void cycleOverItems();
     void rescale99();
-    void rescaleColor(int=100);
+    void rescaleColor(double=100.0);
     void rescaleLess();
     void rescaleMore();
 

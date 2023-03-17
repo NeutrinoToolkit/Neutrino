@@ -356,8 +356,8 @@ void nView::keyPressEvent (QKeyEvent *e)
     emit keypressed(e);
 }
 
-void nView::rescaleColor(int val) {
-    val=std::max<int>(std::min<int>(val,100),0);
+void nView::rescaleColor(double val) {
+    val=std::max<double>(std::min<double>(val,100),0);
     if (val==100) resetGamma();
     setProperty("percentPixels",val);
     if (nparent->currentBuffer) {
@@ -377,15 +377,15 @@ void nView::rescaleColor(int val) {
 }
 
 void nView::rescale99() {
-    rescaleColor(99);
+    rescaleColor(99.9);
 }
 
 void nView::rescaleLess() {
-    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()-1 : 99);
+    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toDouble()-0.1 : 99.9);
 }
 
 void nView::rescaleMore() {
-    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toInt()+1 : 100);
+    rescaleColor(property("percentPixels").isValid() ? property("percentPixels").toDouble()+0.1 : 100);
 }
 
 void nView::cycleOverItems() {
