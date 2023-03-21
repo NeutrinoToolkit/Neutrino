@@ -777,6 +777,9 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                         my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,my_set.value("colorSpin").toDouble());
                                         DEBUG(my_phys->prop["display_range"]);
                                     }
+                                    if (my_set.value("gamma",1).toInt() != 1) {
+                                        my_phys->prop["gamma"]=my_set.value("gamma",0).toInt();
+                                    }
                                 }
                                 my_phys->setType(PHYS_FILE);
                             }

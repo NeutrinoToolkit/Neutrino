@@ -511,7 +511,7 @@
            </item>
            <item row="12" column="2" colspan="3">
             <widget class="QWidget" name="widget_10" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1,1,0">
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,1,1,0">
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -537,6 +537,28 @@
                 </property>
                 <property name="value">
                  <double>100.000000000000000</double>
+                </property>
+                <property name="neutrinoSave" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="gamma">
+                <property name="toolTip">
+                 <string>Set default gamma value for colorbar</string>
+                </property>
+                <property name="minimum">
+                 <number>-4</number>
+                </property>
+                <property name="maximum">
+                 <number>6</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="neutrinoSave" stdset="0">
                  <bool>true</bool>
@@ -1539,7 +1561,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
+  <widget class="QStatusBar" name="statusbar">
    <property name="font">
     <font>
      <pointsize>10</pointsize>

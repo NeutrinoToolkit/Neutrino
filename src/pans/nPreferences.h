@@ -42,6 +42,8 @@ public slots:
     void changeDecorations();
     void changeIconSize(int);
 
+    void changeGamma(int);
+
     void updatePlugindirs(QListWidgetItem*);
     void changeFont();
     void hideEvent (QHideEvent*) override;
@@ -49,7 +51,7 @@ public slots:
 
     void openclUnitValueChange(int);
     void resetSettings();
-	void changeThreads(int);
+    void changeThreads(int);
 
     void on_addPlugin_released();
     void on_removePlugin_released();

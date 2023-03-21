@@ -154,14 +154,20 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     foreach (QDoubleSpinBox *wdg, groupBox->findChildren<QDoubleSpinBox *>()) {
         connect(wdg, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
     }
+    foreach (QSlider *wdg, groupBox->findChildren<QSlider *>()) {
+        connect(wdg, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    }
 
+    connect(gamma, SIGNAL(valueChanged(int)), this, SLOT(changeGamma(int)));
+}
+
+void nPreferences::changeGamma(int gamma_val) {
+    statusbar->showMessage(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QLocale().toString(2-gamma_val) : QLocale().toString(gamma_val)),1000);
 }
 
 void nPreferences::changeThreads(int num) {
 	nApp::changeThreads(num);
-//    saveDefaults();
 }
-
 
 void nPreferences::openclUnitValueChange(int num) {
     openclDescription->clear();
