@@ -88,7 +88,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
-    connect(forceDecimalDot, SIGNAL(stateChanged(int)), napp, SLOT(forceDecimalDot(int)));
+    connect(forceDecimalDot, SIGNAL(toggled(bool)), napp, SLOT(forceDecimalDot(bool)));
 
     openclUnit->setMaximum(physWave::openclEnabled());
 

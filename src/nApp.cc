@@ -40,7 +40,7 @@ int nApp::exec() {
     if (!my_set.contains("forceDecimalDot")) {
         my_set.setValue("forceDecimalDot",true);
     }
-    forceDecimalDot(my_set.value("forceDecimalDot").toInt());
+    forceDecimalDot(my_set.value("forceDecimalDot").toBool());
 
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
@@ -287,11 +287,13 @@ void nApp::changeThreads(int num) {
 }
 
 
-void nApp::forceDecimalDot(int num) {
-    if (num==0) {
-        QLocale::setDefault(QLocale::system());
+void nApp::forceDecimalDot(bool num) {
+    if (num) {
+        qInfo() << "Force decimal dot separator ";
+        QLocale::setDefault(QLocale::English);
     } else {
-        QLocale::setDefault(QLocale::c());
+        qInfo() << "Locale decimal separator ";
+        QLocale::setDefault(QLocale::system());
     }
     qDebug() << num;
 }

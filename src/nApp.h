@@ -73,7 +73,7 @@ public slots:
     void saveLog();
     void findLogText();
 
-    void forceDecimalDot(int);
+    void forceDecimalDot(bool);
     void checkUpdates();
 };
 

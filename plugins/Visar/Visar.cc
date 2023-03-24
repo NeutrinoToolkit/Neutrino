@@ -109,7 +109,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     show();
 
 
-    setProperty("NeuSave-alphagraph",30);
+    setProperty("NeuSave-alphagraph",100);
 
 
     for (int l=2+numVisars; l<whichRefl->count();l++) {
