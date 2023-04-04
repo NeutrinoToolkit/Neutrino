@@ -24,6 +24,16 @@
  */
 #include "neutrino.h"
 #include "Image_list.h"
+
+Image_list::~Image_list() {
+    qDebug() << "close Image_list";
+    disconnect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
+    disconnect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
+    disconnect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    disconnect(images, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    qDebug() << "close Image_list ...... really";
+}
+
 Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
     setupUi(this);
 
@@ -31,7 +41,6 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
 
     images->header()->setStretchLastSection (true);
     images->sortByColumn(0,Qt::AscendingOrder);
-//    images->header()->setSectionsMovable(false);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePad(nPhysD*)));
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
@@ -58,7 +67,10 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
 void Image_list::on_horizontalSlider_valueChanged(int val) {
     int numphys=nparent->getBufferList().size();
     if (val<numphys) {
-        nparent->showPhys(nparent->getBufferList().at(val));
+        nPhysD *to_display=nparent->getBufferList().at(val);
+        if (nPhysExists(to_display)) {
+            nparent->showPhys(to_display);
+        }
     }
 }
 

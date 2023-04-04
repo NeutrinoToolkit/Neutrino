@@ -41,6 +41,7 @@ class Image_list : public nGenericPan, private Ui::Image_list {
 
 public:
     Q_INVOKABLE Image_list(neutrino*);
+    ~Image_list();
 
     std::map<nPhysD*,QTreeWidgetItem*> itemsMap;
 

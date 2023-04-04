@@ -31,7 +31,7 @@ Shortcuts::Shortcuts(neutrino *nparent) : nGenericPan(nparent)
     
     QFile lic(":/html/Shortcuts.html");
     if (lic.open(QFile::ReadOnly | QFile::Text)) {
-        QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
+        QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText)).replace("%OPTION%",QKeySequence(Qt::META).toString(QKeySequence::NativeText)).replace("%COMMAND%",QKeySequence(Qt::ALT).toString(QKeySequence::NativeText));
         textBrowser->insertHtml(htmltext);
     }
     show(true);

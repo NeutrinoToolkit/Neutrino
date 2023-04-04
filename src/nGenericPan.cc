@@ -188,7 +188,7 @@ void nGenericPan::grabSave() {
             setUnifiedTitleAndToolBarOnMac(true);
             break;
         }
-        qInfo() << "Image saved to file" << fname;
+        nparent->statusBar()->showMessage("Image saved to file " + fname);
     }
 }
 
