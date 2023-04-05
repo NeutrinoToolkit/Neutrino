@@ -1363,7 +1363,12 @@ QString neutrino::getFileSave() {
 
     allformats+=("Any files (*)");
 
-    return QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
+    QString fname=QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
+
+    if (!fname.isEmpty()) {
+        setProperty("NeuSave-fileSave", fname);
+    }
+    return fname;
 }
 
 void
@@ -1377,7 +1382,6 @@ void neutrino::fileSave(nPhysD *phys) {
 
 void neutrino::fileSave(QString fname) {
     if (!fname.isEmpty()) {
-        setProperty("NeuSave-fileSave", fname);
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.isEmpty()) {
             fname+=".neus";
