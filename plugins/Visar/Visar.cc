@@ -109,7 +109,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     show();
 
 
-    setProperty("NeuSave-alphagraph",100);
+    setProperty("NeuSave-alphagraph",50);
 
 
     for (int l=2+numVisars; l<whichRefl->count();l++) {
@@ -1263,7 +1263,7 @@ void Visar::updatePlot() {
                     graph->setProperty("JumpGraph",k);
                     graph->setName("VelJump Visar"+QLocale().toString(k+1) + " #" +QLocale().toString(i));
                     QColor color(plotVelocity->yAxis->labelColor());
-                    color.setAlpha(property("NeuSave-alphagraph").toInt());
+                    color.setAlpha(property("NeuSave-alphagraph").toInt()*3);
                     pen.setColor(color);
                     graph->setPen(pen);
                     graph->setData(time_vel[k],velJump_array[i]);

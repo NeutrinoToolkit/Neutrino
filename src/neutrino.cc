@@ -731,7 +731,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
                                 if (my_set.value("lockFlip",false).toBool()) {
                                     if (my_set.value("flipX").toBool()) {
-                                        physMath::phys_flip_ud(*dynamic_cast<physD*>(my_phys));
+                                        physMath::phys_flip_lr(*dynamic_cast<physD*>(my_phys));
                                         my_phys->reset_display();
                                     }
                                     if (my_set.value("flipY").toBool()) {
@@ -765,12 +765,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                 }
 
                                 if (my_set.value("lockColors",false).toBool()) {
-                                    bool ok1, ok2;
-                                    double mymin=my_set.value("colorMin").toDouble(&ok1);
-                                    double mymax=my_set.value("colorMax").toDouble(&ok2);
-                                    if (ok1 && ok2) {
-                                        my_phys->prop["display_range"]=vec2f(mymin,mymax);
-                                    }
                                     if (my_set.value("colorSpin").toDouble() != 100) {
                                         DEBUG(my_phys->prop["display_range"]);
                                         qDebug() << my_set.value("colorSpin").toInt();
@@ -779,6 +773,12 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
                                     }
                                     if (my_set.value("gamma",1).toInt() != 1) {
                                         my_phys->prop["gamma"]=my_set.value("gamma",0).toInt();
+                                    }
+                                    bool ok1, ok2;
+                                    double mymin=my_set.value("colorMin").toDouble(&ok1);
+                                    double mymax=my_set.value("colorMax").toDouble(&ok2);
+                                    if (ok1 && ok2) {
+                                        my_phys->prop["display_range"]=vec2f(mymin,mymax);
                                     }
                                 }
                                 my_phys->setType(PHYS_FILE);

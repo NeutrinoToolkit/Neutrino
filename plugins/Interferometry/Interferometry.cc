@@ -281,12 +281,12 @@ void Interferometry::doWavelet (int iimage) {
         }
 
         if (my_image[iimage].numThick->value()==0) {
-            my_params.init_thick=widthCarrier->value();
-            my_params.end_thick=widthCarrier->value();
+            my_params.init_thick=widthCarrier->value()*thickness->value();
+            my_params.end_thick=widthCarrier->value()*thickness->value();
             my_params.n_thicks=1;
         } else {
-            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value();
-            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value();
+            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value()*thickness->value();
+            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value()*thickness->value();
             my_params.n_thicks=my_image[iimage].numThick->value();
         }
 
@@ -713,6 +713,7 @@ void Interferometry::doCutoff(){
         } else {
             intNe = new nPhysD(*image);
         }
+        intNe->reset_display();
         intNe->setShortName("interpPhase_2piMaskCutoff");
         if (display99->isChecked()) {
             physMath::cutoff(*intNe,physMath::getColorPrecentPixels(*intNe,99));
@@ -726,12 +727,12 @@ void Interferometry::doCutoff(){
             physMath::cutoff(*intNe,mini,maxi);
             intNe->reset_display();
 
-            if (localPhys["interpPhase_2piMaskCutoff"]) {
+            if (nPhysExists(localPhys["interpPhase_2piMaskCutoff"])) {
                 localPhys["interpPhase_2piMaskCutoff"]->prop["display_range"]=intNe->get_min_max();
+                localPhys["interpPhase_2piMaskCutoff"]->reset_display();
             }
         }
         intNe->TscanBrightness();
-        intNe->reset_display();
         localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
     }
     statusbar->clearMessage();
