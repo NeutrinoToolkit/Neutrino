@@ -1271,7 +1271,7 @@ void Visar::updatePlot() {
                 }
 
             }
-            if (time_vel[k].size()) {
+            if (velocityUi[k]->enableVisar->isChecked() && time_vel[k].size()) {
                 const auto [mmin, mmax] = std::minmax_element(std::begin(time_vel[k]), std::end(time_vel[k]));
                 minmax.push_back(*mmin);
                 minmax.push_back(*mmax);
