@@ -32,8 +32,7 @@
 #include <cmath>
 
 VisarPhasePlot::VisarPhasePlot(QWidget* parent):
-    nCustomPlotMouseX3Y(parent)
-{
+    nCustomPlotMouseX3Y(parent) {
 
     xAxis->setLabel(tr("Pixel"));
     yAxis->setLabel(tr("Fringeshift"));
@@ -62,8 +61,7 @@ VisarPhasePlot::VisarPhasePlot(QWidget* parent):
 }
 
 VisarPlot::VisarPlot(QWidget* parent):
-    nCustomPlotMouseX3Y(parent)
-{
+    nCustomPlotMouseX3Y(parent) {
     xAxis->setLabel(tr("Time"));
     yAxis->setLabel(tr("Velocity"));
     yAxis2->setLabel(tr("Reflectivity"));
@@ -72,8 +70,7 @@ VisarPlot::VisarPlot(QWidget* parent):
 
 
 nSOPPlot::nSOPPlot(QWidget* parent):
-    nCustomPlotMouseX2Y(parent)
-{
+    nCustomPlotMouseX2Y(parent) {
     QCPGraph* graph;
     graph = addGraph(xAxis, yAxis);
     graph->setName("SOP");
@@ -87,7 +84,7 @@ nSOPPlot::nSOPPlot(QWidget* parent):
     graph->setName("SOP 2");
     graph->setPen(QPen(yAxis2->labelColor(),0.3));
 
-};
+}
 
 Visar::Visar(neutrino *parent) : nGenericPan(parent),
       numVisars(0)

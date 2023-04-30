@@ -660,7 +660,6 @@ nCustomPlot::loadSettings(QSettings &my_set) {
         my_set.endGroup();
     }
 
-
     my_set.endGroup();
 
 }
@@ -715,6 +714,7 @@ nCustomPlot::saveSettings(QSettings &my_set) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // plot as nCustomPlot but with x mouse line
 nCustomPlotMouseX::nCustomPlotMouseX(QWidget* parent): nCustomPlot(parent) {
+    setMousePosition(0);
 }
 
 #include "tools.h"

@@ -61,8 +61,8 @@ public slots:
 
     void copy_data();
     void save_data();
-    void copy_image();
-    void export_image();
+    virtual void copy_image();
+    virtual void export_image();
 
     void contextMenuEvent (QContextMenuEvent*) override;
 
@@ -103,7 +103,22 @@ private:
 
 public slots:
     void setMousePosition(double);
-
+    void copy_image() override {
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
+        nCustomPlot::copy_image();
+        mouseMarker->setVisible(false);
+    }
+    void export_image() override {
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
+        nCustomPlot::export_image();
+        if(mouseMarker) {
+            mouseMarker->setVisible(true);
+        }
+    }
 };
 
 
@@ -120,6 +135,36 @@ private:
 
 public slots:
     void setMousePosition(double,double);
+    void copy_image() override {
+        if(mouseMarkerX) {
+            mouseMarkerX->setVisible(false);
+        }
+        if(mouseMarkerY) {
+            mouseMarkerY->setVisible(false);
+        }
+        nCustomPlot::copy_image();
+        if(mouseMarkerX) {
+            mouseMarkerX->setVisible(true);
+        }
+        if(mouseMarkerY) {
+            mouseMarkerY->setVisible(true);
+        }
+    }
+    void export_image() override {
+        if(mouseMarkerX) {
+            mouseMarkerX->setVisible(false);
+        }
+        if(mouseMarkerY) {
+            mouseMarkerY->setVisible(false);
+        }
+        nCustomPlot::export_image();
+        if(mouseMarkerX) {
+            mouseMarkerX->setVisible(true);
+        }
+        if(mouseMarkerY) {
+            mouseMarkerY->setVisible(true);
+        }
+    }
 
 };
 
