@@ -31,6 +31,8 @@
 XRD::XRD(neutrino *parent) : nGenericPan(parent) {
     setupUi(this);
 
+    toolBar->insertWidget(cropAll,createDir);
+
     loadDefaults();
 
     int ksave=std::max(1,property("NeuSave-numIPs").toInt());
@@ -239,21 +241,40 @@ void XRD::cropImage(unsigned int k, bool show) {
 }
 
 void XRD::on_actionSaveIPs_triggered() {
-    QFileInfo my_file(nparent->getFileSave());
-    if (!my_file.filePath().isEmpty()) {
-        QDir my_dir(my_file.absolutePath());
-        QString my_prefix= my_file.baseName();
-        QString my_ext=my_file.suffix();
-
-        for (unsigned int k=0; k<static_cast<unsigned int>(tabIPs->count()); k++) {
-            if (IPs[k]) {
-                cropImage(k,false);
-                QString my_name=my_dir.filePath(my_prefix+"_"+tabIPs->tabText(static_cast<int>(k))+"."+my_ext);
-                qDebug() << my_name;
-                nparent->fileSave(IPs[k],my_name);
+    if (nPhysExists(currentBuffer)) {
+        QDir my_dir ("");
+        QString my_prefix("");
+        QString my_ext("tiff");
+        if (createDir->isChecked()) {
+            QString currentdir = QFileInfo(QString::fromStdString(currentBuffer->getFromName())).dir().absolutePath();
+            QString my_dir_str = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),currentdir);
+            if (!my_dir_str.isEmpty()) {
+                my_dir=QDir(my_dir_str);
+            }
+            qDebug() << my_dir;
+        } else {
+            QFileInfo my_file(nparent->getFileSave());
+            if (!my_file.filePath().isEmpty()) {
+                my_dir= my_file.absolutePath();
+                my_prefix= my_file.baseName()+"_";
+                my_ext=my_file.suffix();
             }
         }
-        saveSettings(my_dir.filePath(my_prefix+".ini"));
+        if (my_dir.exists()) {
+            for (unsigned int k=0; k<static_cast<unsigned int>(tabIPs->count()); k++) {
+                if (IPs[k]) {
+                    cropImage(k,false);
+                    QString my_name=my_dir.filePath(my_prefix+tabIPs->tabText(static_cast<int>(k))+"."+my_ext);
+                    qDebug() << my_name;
+                    nparent->fileSave(IPs[k],my_name);
+                }
+            }
+            if(my_prefix.isEmpty()) {
+                saveSettings(my_dir.filePath("crop.ini"));
+            } else {
+                saveSettings(my_dir.filePath(my_prefix+".ini"));
+            }
+        }
     }
 }
 

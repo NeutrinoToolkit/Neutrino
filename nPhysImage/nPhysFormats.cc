@@ -780,18 +780,19 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                 DEBUG("Resolution " << resx << " " << resy);
                 TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &units);
                 switch (units) {
-                    case 1:
-                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="";
-                        break;
-                    case 2:
-                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="in";
-                        break;
-                    case 3:
-                        tiff_prop["unitsX"]=tiff_prop["unitsY"]="cm";
-                        break;
+                case 1:
+                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="";
+                    break;
+                case 2:
+                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="in";
+                    break;
+                case 3:
+                    tiff_prop["unitsX"]=tiff_prop["unitsY"]="cm";
+                    break;
                 }
-
+                bool is_gel_file=false;
                 if (TIFFGetField(tif, 33449, &count, &strdata)) {
+                    DEBUG("reading gel attributes");
                     std::string res_str(strdata);
                     tiff_prop["TIFF_MD_SampleInfo"] = res_str;
 
@@ -805,6 +806,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                             tiff_prop["gel_R"] = 10000/resx;
                             tiff_prop["gel_L"]=std::stoi(my_match.str(1));
                             tiff_prop["gel_V"]=std::stoi(my_match.str(2));
+                            is_gel_file=true;
                         }
                     }
                 }
@@ -963,7 +965,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                             }
                         }
 
-                        if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R"), tiff_prop.have("TIFF_MD_FileTag")){
+                        if (is_gel_file && tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R") && tiff_prop.have("TIFF_MD_FileTag")){
                             DEBUG("here we are");
                             physMath::phys_flip_ud(my_phys);
                             DEBUG(tiff_prop["gel_R"].get_d() << " " << tiff_prop["gel_L"].get_i());

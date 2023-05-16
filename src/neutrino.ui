@@ -238,7 +238,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>γ color</string>
+          <string>Colorbar gamma</string>
          </property>
          <property name="lineWidth">
           <number>0</number>

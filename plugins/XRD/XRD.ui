@@ -54,58 +54,6 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="fadeMin">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="toolTip">
-          <string>Minutes between exposure and scan</string>
-         </property>
-         <property name="suffix">
-          <string> min</string>
-         </property>
-         <property name="maximum">
-          <number>99999</number>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QToolButton" name="source">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="toolTip">
-          <string>Show source image</string>
-         </property>
-         <property name="text">
-          <string>Show</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
-           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="image">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QComboBox" name="IPmodel">
          <property name="font">
@@ -144,6 +92,73 @@
            <string>MP</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="source">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Show source image</string>
+         </property>
+         <property name="text">
+          <string>Show</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QCheckBox" name="createDir">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>dir</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QSpinBox" name="fadeMin">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Minutes between exposure and scan</string>
+         </property>
+         <property name="suffix">
+          <string> min</string>
+         </property>
+         <property name="maximum">
+          <number>99999</number>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
