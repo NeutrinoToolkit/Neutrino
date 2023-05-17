@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
-    <height>179</height>
+    <width>411</width>
+    <height>232</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -41,7 +41,7 @@
       <property name="title">
        <string>Source</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
        <property name="leftMargin">
         <number>4</number>
        </property>
@@ -55,6 +55,85 @@
         <number>4</number>
        </property>
        <item row="1" column="0">
+        <widget class="QComboBox" name="image">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="neutrinoImage" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QToolButton" name="source">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Show source image</string>
+         </property>
+         <property name="text">
+          <string>Show</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="createDir">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>dir</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QWidget" name="widget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,2">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>IP model:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QComboBox" name="IPmodel">
          <property name="font">
           <font>
@@ -94,53 +173,19 @@
          </item>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QToolButton" name="source">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="toolTip">
-          <string>Show source image</string>
-         </property>
-         <property name="text">
-          <string>Show</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
-           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="image">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="neutrinoImage" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QCheckBox" name="createDir">
+       <item>
+        <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>dir</string>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
+          <string>Scan delay:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" colspan="2">
+       <item>
         <widget class="QSpinBox" name="fadeMin">
          <property name="font">
           <font>
@@ -154,7 +199,7 @@
           <string> min</string>
          </property>
          <property name="maximum">
-          <number>99999</number>
+          <number>999999</number>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -181,6 +226,19 @@
        <bool>true</bool>
       </property>
      </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>

@@ -50,7 +50,8 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
     qDebug() << std::max(1,property("NeuSave-numIPs").toInt()) << property("NeuSave-numIPs");
 
     for (int k=0; k< tabIPs->count(); k++) {
-        qDebug() << tabIPs->tabText(k);
+        qDebug() << "TOTO" << k <<  tabIPs->tabText(k);
+        IPrect[k]->changeToolTip(tabIPs->tabText(k));
         for (auto& my_phys: nparent->getBufferList()) {
             if (tabIPs->tabText(k) == QString::fromStdString(my_phys->getShortName())) {
                 qDebug() << "\t found !" << my_phys << IPs[k];
@@ -152,15 +153,16 @@ void XRD::loadSettings(QString my_settings) {
         nGenericPan::loadSettings(my_settings);
     }
 
-    on_cropAll_triggered();
-    showSource();
 
+    on_cropAll_triggered();
+    QApplication::processEvents();
+    showSource();
 }
 
 
 void XRD::showSource() {
     nPhysD *img=getPhysFromCombo(image);
-    if (img) {
+    if (nPhysExists(img)) {
         nparent->showPhys(img);
     }
 }
@@ -227,7 +229,9 @@ void XRD::cropImage(unsigned int k, bool show) {
             my_phys->setType(PHYS_DYN);
 
             my_phys->prop["display_range"]=img->prop["display_range"];
-            my_phys->setShortName(tabIPs->tabText(static_cast<int>(k)).toStdString());
+            QString tabName=tabIPs->tabText(static_cast<int>(k));
+
+            my_phys->setShortName(tabName.toStdString());
 
             IPs[k]=nparent->replacePhys(my_phys,IPs[k],false);
             if(show) {
@@ -235,9 +239,10 @@ void XRD::cropImage(unsigned int k, bool show) {
                 nparent->showPhys(IPs[k]);
             }
             qDebug() << IPs[k]->getSize().x() << " " << IPs[k]->getSize().y();
-            statusbar->showMessage("IP " + QString::number(k) + " : " + tabIPs->tabText(static_cast<int>(k)) + " cropped",2000);
+            statusbar->showMessage("IP" + QString::number(k) + " : " + tabName + " cropped",2000);
         }
     }
+    saveDefaults();
 }
 
 void XRD::on_actionSaveIPs_triggered() {
@@ -276,6 +281,7 @@ void XRD::on_actionSaveIPs_triggered() {
             }
         }
     }
+    saveDefaults();
 }
 
 void XRD::on_cropAll_triggered() {
@@ -307,10 +313,13 @@ void XRD::on_tabIPs_tabBarDoubleClicked(int k) {
     QString text = QInputDialog::getText(this, tr("Change IP Name"),tr("IP name:"), QLineEdit::Normal,tabIPs->tabText(k) , &ok);
     if (ok) {
         if (text.isEmpty()) {
-            tabIPs->setTabText(k,"IP "+QString::number(k+1));
+            text="IP "+QString::number(k+1);
         } else {
-            tabIPs->setTabText(k,text);
+
         }
+        tabIPs->setTabText(k,text);
+        IPrect[k]->changeToolTip(text);
+        saveDefaults();
         qDebug() << k;
     }
 }
