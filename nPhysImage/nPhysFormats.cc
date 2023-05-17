@@ -790,7 +790,6 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                     tiff_prop["unitsX"]=tiff_prop["unitsY"]="cm";
                     break;
                 }
-                bool is_gel_file=false;
                 if (TIFFGetField(tif, 33449, &count, &strdata)) {
                     DEBUG("reading gel attributes");
                     std::string res_str(strdata);
@@ -806,7 +805,6 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                             tiff_prop["gel_R"] = 10000/resx;
                             tiff_prop["gel_L"]=std::stoi(my_match.str(1));
                             tiff_prop["gel_V"]=std::stoi(my_match.str(2));
-                            is_gel_file=true;
                         }
                     }
                 }
@@ -920,8 +918,8 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         }
                         my_phys.setName(ss.str());
                         for (auto &pro : tiff_prop) {
-                            my_phys.prop[pro.first] = pro.second;
-                            DEBUG(pro.first << " : " << pro.second);
+                            my_phys.prop["n_"+pro.first] = pro.second;
+                            DEBUG("n_"+pro.first << " : " << pro.second);
                         }
                         my_phys.setType(PHYS_FILE);
                         my_phys.set_scale(1.0/resx,1.0/resy);
@@ -964,8 +962,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                                 my_phys.set(i,j,my_phys.point(i,j)+val);
                             }
                         }
-
-                        if (is_gel_file && tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R") && tiff_prop.have("TIFF_MD_FileTag")){
+                        if (tiff_prop.have("gel_V") && tiff_prop.have("gel_L") && tiff_prop.have("gel_R") && tiff_prop.have("TIFF_MD_FileTag")){
                             DEBUG("here we are");
                             physMath::phys_flip_ud(my_phys);
                             DEBUG(tiff_prop["gel_R"].get_d() << " " << tiff_prop["gel_L"].get_i());

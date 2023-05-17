@@ -244,14 +244,14 @@ void XRD::on_actionSaveIPs_triggered() {
     if (nPhysExists(currentBuffer)) {
         QDir my_dir ("");
         QString my_prefix("");
-        QString my_ext("tiff");
+        QString my_ext("tif");
         if (createDir->isChecked()) {
             QString currentdir = QFileInfo(QString::fromStdString(currentBuffer->getFromName())).dir().absolutePath();
             QString my_dir_str = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),currentdir);
             if (!my_dir_str.isEmpty()) {
                 my_dir=QDir(my_dir_str);
+                my_prefix=QFileInfo(my_dir_str).baseName()+"_";
             }
-            qDebug() << my_dir;
         } else {
             QFileInfo my_file(nparent->getFileSave());
             if (!my_file.filePath().isEmpty()) {
