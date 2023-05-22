@@ -63,13 +63,6 @@ neutrino::neutrino():
     setProperty("winId",qApp->property("numWin").toInt()+1);
     qApp->setProperty("numWin",property("winId"));
 
-
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
-    setProperty("NeuSave-askCloseUnsaved",my_set.value("askCloseUnsaved",true).toInt());
-    setProperty("NeuSave-MaxRecentFiles",my_set.value("MaxRecentFiles",20).toInt());
-    my_set.endGroup();
-
     setProperty("NeuSave-gamma",1);
 
     setWindowTitle(property("winId").toString()+QString(": Neutrino"));
@@ -184,13 +177,17 @@ neutrino::neutrino():
 
     //recent file stuff
 
-    for (int i = 0; i < property("NeuSave-MaxRecentFiles").toInt(); ++i) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    for (int i = 0; i < my_set.value("MaxRecentFiles",20).toInt(); ++i) {
         QAction *act = new QAction(this);
         act->setVisible(false);
         connect(act, SIGNAL(triggered()),this, SLOT(openRecentFile()));
         menuOpen_Recent->addAction(act);
         recentFileActs << act;
     }
+    my_set.endGroup();
+
     menuOpen_Recent->addSeparator();
     QAction *act = new QAction("Clear Menu", this);
     act->setVisible(true);
@@ -589,7 +586,10 @@ void neutrino::updateRecentFileActions(QString fname)
         }
     }
     listarecentfiles.removeDuplicates();
-    while (listarecentfiles.size()>property("NeuSave-MaxRecentFiles").toInt()) listarecentfiles.removeLast();
+
+    my_set.beginGroup("nPreferences");
+    while (listarecentfiles.size()>my_set.value("MaxRecentFiles",20).toInt()) listarecentfiles.removeLast();
+    my_set.endGroup();
 
     int i=0;
     foreach (QString fname, listarecentfiles) {
@@ -1436,10 +1436,11 @@ bool
 neutrino::fileClose() {
     saveDefaults();
     qDebug() << "here" << sender();
-    bool askAll=true;
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
     foreach (nPhysD *phys, physList) {
         DEBUG( phys->getName() << " " << phys->getType());
-        if (askAll && phys->getType()==	PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
+        if (phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
@@ -1448,13 +1449,13 @@ neutrino::fileClose() {
                     fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
                     break;
                 case QMessageBox::NoToAll:
-                    askAll=false;
-                    break;
+                    my_set.setValue("askCloseUnsaved",false);
                 case QMessageBox::Cancel:
                     return false;
             }
         }
     }
+    my_set.endGroup();
 
     QApplication::processEvents();
     for (auto &pan : getPanList()) {
@@ -1480,16 +1481,21 @@ void neutrino::on_actionClose_All_Buffers_triggered() {
 //    }
 }
 void neutrino::closeBuffer(nPhysD* my_phys) {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+
     QApplication::processEvents();
     if (nPhysExists(my_phys))  {
-        if (my_phys->getType()==PHYS_DYN && property("NeuSave-askCloseUnsaved").toBool()==true) {
+        if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
-                                         tr("The image")+QString("\n")+QString::fromUtf8(my_phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
-                                         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+                                         tr("The image")+QString::fromUtf8(my_phys->getShortName().c_str())+QString("\n")+QString::fromUtf8(my_phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
+                                         QMessageBox::Yes | QMessageBox::No | QMessageBox::NoToAll | QMessageBox::Cancel);
             switch (res) {
                 case QMessageBox::Yes:
                     fileSave(my_phys); // TODO: add here a check for a cancel to avoid exiting
                     break;
+                case QMessageBox::NoToAll:
+                    my_set.setValue("askCloseUnsaved",false);
                 case QMessageBox::No:
                     removePhys(my_phys);
                     break;
@@ -1498,6 +1504,8 @@ void neutrino::closeBuffer(nPhysD* my_phys) {
             removePhys(my_phys);
         }
     }
+    my_set.endGroup();
+
     QApplication::processEvents();
 }
 

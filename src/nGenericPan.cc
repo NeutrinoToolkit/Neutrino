@@ -45,10 +45,6 @@ nGenericPan::nGenericPan(neutrino *myparent)
 
     if (nparent==nullptr || napp==nullptr) return;
 
-
-    setProperty("numpan",nparent->property("numpan").toInt()+1);
-    nparent->setProperty("numpan",property("numpan"));
-
     connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
 
     connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
@@ -152,31 +148,6 @@ void nGenericPan::help() {
     }
 }
 
-void nGenericPan::changeEvent(QEvent *e)
-{
-    qDebug() << panName() << e;
-
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-        case QEvent::LanguageChange: {
-                QMainWindow *my_mainWindow=qobject_cast<QMainWindow *>(nparent);
-                if(my_mainWindow) {
-                    qDebug() << "found!";
-                    for(auto& pan: nparent->getPanList())
-                        for(int i =  0; i < pan->metaObject()->methodCount(); ++i) {
-                            if (pan->metaObject()->method(i).methodSignature() == "retranslateUi(QMainWindow*)") {
-                                qDebug() << "found retranslateUi";
-                                QMetaObject::invokeMethod(pan,"retranslateUi",Q_ARG(QMainWindow *,my_mainWindow));
-                            }
-                        }
-                }
-                break;
-            }
-        default:
-            break;
-    }
-}
-
 void nGenericPan::grabSave() {
     int progNum=0;
     while (progNum<10000) {
@@ -248,7 +219,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
     setProperty("NeuSave-fileIni",panName()+".ini");
     setProperty("NeuSave-fileTxt",panName()+".txt");
 
-    setWindowTitle(nparent->property("winId").toString()+": "+panName()+" "+property("numpan").toString());
+    setWindowTitle(nparent->property("winId").toString()+": "+panName());
 
     foreach (QToolBar *my_tool, findChildren<QToolBar *>()) {
         if (my_tool->objectName() == "toolBar") { // this has been created by the designer

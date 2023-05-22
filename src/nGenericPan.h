@@ -90,8 +90,6 @@ public slots:
 
     void raiseNeutrino();
 
-    void changeEvent(QEvent *e) override;
-
     QString panName();
     void grabSave();
     void help();

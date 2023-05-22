@@ -39,7 +39,7 @@
 class nRect;
 
 namespace Ui {
-class IP;
+class IPframe;
 }
 
 class XRD : public nGenericPan, private Ui::XRD {
@@ -54,7 +54,7 @@ public:
 
 private:
 
-    std::vector<Ui::IP*> settingsUi;
+    std::vector<Ui::IPframe*> settingsUi;
     
     std::vector<nRect*> IPrect;
 
@@ -63,7 +63,7 @@ private:
 public slots:
     
     void setObjectVisibility(nPhysD*);
-    void loadSettings(QString=QString());
+    void loadSettings(QSettings &settings);
 
     void cropImageNoShow();
     void cropImage(bool=true);

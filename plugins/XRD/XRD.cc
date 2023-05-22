@@ -25,7 +25,7 @@
 #include "XRD.h"
 #include "neutrino.h"
 
-#include "ui_IP.h"
+#include "ui_IPframe.h"
 
 
 XRD::XRD(neutrino *parent) : nGenericPan(parent) {
@@ -33,25 +33,19 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
     toolBar->insertWidget(cropAll,createDir);
 
-    loadDefaults();
-
-    int ksave=std::max(1,property("NeuSave-numIPs").toInt());
-    for (int k=0; k<ksave; k++) {
-        actionAddIP->trigger();
-    }
+    actionAddIP->trigger();
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
 
-    show();
+    show(true);
 
     QApplication::processEvents();
 
     connect(source, SIGNAL(released()),this, SLOT(showSource()));
-    qDebug() << std::max(1,property("NeuSave-numIPs").toInt()) << property("NeuSave-numIPs");
 
     for (int k=0; k< tabIPs->count(); k++) {
         qDebug() << "TOTO" << k <<  tabIPs->tabText(k);
-        IPrect[k]->changeToolTip(tabIPs->tabText(k));
+
         for (auto& my_phys: nparent->getBufferList()) {
             if (tabIPs->tabText(k) == QString::fromStdString(my_phys->getShortName())) {
                 qDebug() << "\t found !" << my_phys << IPs[k];
@@ -61,6 +55,8 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
             }
         }
     }
+
+    qDebug() << "here";
 
 }
 
@@ -78,7 +74,7 @@ void XRD::on_actionAddIP_triggered() {
     newtab_widget->setObjectName(QStringLiteral("wIP1"));
     gridLayout->addWidget(newtab_widget, 0, 0, 1, 1);
 
-    Ui::IP* ui_IP=new Ui::IP();
+    Ui::IPframe* ui_IP=new Ui::IPframe();
     ui_IP->setupUi(newtab_widget);
     settingsUi.push_back(ui_IP);
 
@@ -93,7 +89,7 @@ void XRD::on_actionAddIP_triggered() {
     nRect *my_rect=new nRect(this,1);
     my_rect->setRect(QRectF(0,0,100,100));
     my_rect->setProperty("id", tabIPs->count());
-    my_rect->changeToolTip("IP "+QLocale().toString(tabIPs->count()+1));
+    my_rect->changeToolTip("IP"+QLocale().toString(tabIPs->count()+1));
     IPrect.push_back(my_rect);
 
     connect(my_rect, SIGNAL(sceneChanged()), this, SLOT(cropImageNoShow()));
@@ -107,8 +103,6 @@ void XRD::on_actionAddIP_triggered() {
     connect(ui_IP->transpose, SIGNAL(released()),this, SLOT(cropImage()));
     connect(ui_IP->crop, SIGNAL(released()),this, SLOT(cropImage()));
     tabIPs->addTab(newtab, "IP"+QLocale().toString(tabIPs->count()+1));
-    setProperty("NeuSave-numIPs",tabIPs->count());
-
 }
 
 void XRD::on_actionDelIP_triggered() {
@@ -124,35 +118,27 @@ void XRD::on_actionDelIP_triggered() {
 
         QApplication::processEvents();
 
-        setProperty("NeuSave-numIPs",tabIPs->count());
     } else {
         statusbar->showMessage("Cannot remove last IP",5000);
     }
     qDebug() << tabIPs->count();
 }
 
-void XRD::loadSettings(QString my_settings) {
-    qDebug() << "here";
-    if (my_settings.isEmpty()) {
-        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
-        if (!fname.isNull()) {
-            setProperty("NeuSave-fileIni",fname);
-            loadSettings(fname);
-        }
-    } else {
-        QSettings settings(my_settings,QSettings::IniFormat);
-        settings.beginGroup("Properties");
-        int kMax=settings.value("NeuSave-numIPs",1).toInt();
-        while (tabIPs->count()>kMax) {
-            actionDelIP->trigger();
-        }
-        while (tabIPs->count()<kMax) {
-            actionAddIP->trigger();
-        }
-        settings.endGroup();
-        nGenericPan::loadSettings(my_settings);
+void XRD::loadSettings(QSettings &my_settings) {
+    QStringList labels= my_settings.value(tabIPs->objectName()+"neutrinoLabels").toStringList();
+    int kMax=labels.size();
+    qDebug() << labels << kMax << tabIPs->count();
+    while (kMax>0 && tabIPs->count()>kMax) {
+        actionDelIP->trigger();
     }
-
+    while (tabIPs->count()<kMax) {
+        actionAddIP->trigger();
+    }
+    for (int k=0; k< kMax; k++) {
+        tabIPs->setTabText(k,labels[k]);
+        IPrect[k]->changeToolTip(labels[k]);
+        IPrect[k]->loadSettings(my_settings);
+    }
 
     on_cropAll_triggered();
     QApplication::processEvents();
@@ -242,7 +228,6 @@ void XRD::cropImage(unsigned int k, bool show) {
             statusbar->showMessage("IP" + QString::number(k) + " : " + tabName + " cropped",2000);
         }
     }
-    saveDefaults();
 }
 
 void XRD::on_actionSaveIPs_triggered() {
@@ -281,7 +266,6 @@ void XRD::on_actionSaveIPs_triggered() {
             }
         }
     }
-    saveDefaults();
 }
 
 void XRD::on_cropAll_triggered() {
@@ -312,14 +296,8 @@ void XRD::on_tabIPs_tabBarDoubleClicked(int k) {
     bool ok;
     QString text = QInputDialog::getText(this, tr("Change IP Name"),tr("IP name:"), QLineEdit::Normal,tabIPs->tabText(k) , &ok);
     if (ok) {
-        if (text.isEmpty()) {
-            text="IP "+QString::number(k+1);
-        } else {
-
-        }
         tabIPs->setTabText(k,text);
         IPrect[k]->changeToolTip(text);
-        saveDefaults();
         qDebug() << k;
     }
 }

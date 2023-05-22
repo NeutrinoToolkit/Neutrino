@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>IP</class>
- <widget class="QWidget" name="IP">
+ <class>IPframe</class>
+ <widget class="QWidget" name="IPframe">
   <property name="geometry">
    <rect>
     <x>0</x>
