@@ -294,10 +294,9 @@ nView::setSize() {
     }
     if (my_mouse.size != my_pixitem.pixmap().size()) {
         my_mouse.setSize(my_pixitem.pixmap().size());
-        emit zoomChanged(transform().m11());
     }
+    emit zoomChanged(transform().m11());
     repaint();
-
 }
 
 void

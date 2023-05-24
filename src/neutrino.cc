@@ -1104,10 +1104,9 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             }
         }
 //        nApp::processEvents();
-        if (datamatrix && !datamatrix->prop.have("keep_phys_alive")){
+        if (datamatrix){
             DEBUG("removing from neutrino.cc");
             delete datamatrix;
-//            datamatrix=nullptr;
         } else {
             DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
         }
@@ -1129,6 +1128,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
         DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
     }
     emit physDel(datamatrix);
+    datamatrix=nullptr;
     DEBUG(">>>>>>>>>>>>>>>>> EXIT ");
 }
 
