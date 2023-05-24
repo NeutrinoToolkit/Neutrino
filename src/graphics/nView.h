@@ -83,6 +83,8 @@ public slots:
     void zoomIn();
     void zoomEq();
 
+    void setPixmap(QPixmap pxmap);
+
     void mouseDoubleClickEvent (QMouseEvent *) override;
     void mousePressEvent (QMouseEvent *) override;
     void mouseReleaseEvent (QMouseEvent *) override;

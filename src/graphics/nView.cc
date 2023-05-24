@@ -48,7 +48,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
 
     setScene(&my_scene);
 
-    my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+    setPixmap(QPixmap(":icons/icon.png"));
     //	my_pixitem.setFlag(QGraphicsItem::ItemIsMovable);
 
     my_pixitem.setEnabled(true);
@@ -127,6 +127,14 @@ void nView::exportPixmap() {
 
 }
 
+
+void nView::setPixmap(QPixmap pxmap) {
+    my_pixitem.setPixmap(pxmap);
+    my_mouse.setSize(pxmap.size());
+    setSize();
+    repaint();
+}
+
 void nView::showPhys(nPhysD *my_phys) {
     DEBUG("ENTER");
     if (my_phys && nparent->physList.contains(my_phys)) {
@@ -148,13 +156,9 @@ void nView::showPhys(nPhysD *my_phys) {
                                    my_phys->getW()*3,
                                    QImage::Format_RGB888);
 
-            my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
+            setPixmap(QPixmap::fromImage(tempImage));
             nparent->currentBuffer=my_phys;
-
             QApplication::processEvents();
-
-            setSize();
-
             emit bufferChanged(my_phys);
             QApplication::processEvents();
         }
@@ -222,9 +226,6 @@ bool nView::gestureEvent(QGestureEvent *event)
 void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
     DEBUG("-------------");
     qDebug() << gesture;
-//    fillimage=true;
-//    setSize();
-//    update();
 }
 
 void nView::pinchTriggered(QPinchGesture *gesture)
@@ -265,7 +266,6 @@ void nView::focusInEvent (QFocusEvent *) {
 
 void nView::zoomEq() {
     fillimage=!fillimage;
-//    if (!fillimage) resetMatrix();
     if (!fillimage) resetTransform();
     setSize();
 }
@@ -291,9 +291,6 @@ nView::setSize() {
     setSceneRect(bBox);
     if (fillimage) {
         fitInView(bBox, Qt::KeepAspectRatio);
-    }
-    if (my_mouse.size != my_pixitem.pixmap().size()) {
-        my_mouse.setSize(my_pixitem.pixmap().size());
     }
     emit zoomChanged(transform().m11());
     repaint();

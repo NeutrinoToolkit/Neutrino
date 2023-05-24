@@ -47,9 +47,12 @@
 
 neutrino::~neutrino()
 {
+    nApp::processEvents();
     currentBuffer=nullptr;
+    qDebug() << "close neutrino";
     foreach (nPhysD *phys, physList) {
-        delete phys;
+        nApp::processEvents();
+        delayedDeletePhsy(phys);
     }
 }
 
@@ -1088,6 +1091,12 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
     return newPhys;
 }
 
+void neutrino::delayedDeletePhsy(nPhysD* datamatrix) {
+    nApp::processEvents();
+    qDebug() << "REMOVING REMOVING REMOVING REMOVING REMOVING REMOVING " << datamatrix;
+    delete datamatrix;
+}
+
 void neutrino::removePhys(nPhysD* datamatrix) {
     DEBUG(">>>>>>>>>>>>>>>>> ENTER ");
     if (nPhysExists(datamatrix)) {
@@ -1106,7 +1115,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 //        nApp::processEvents();
         if (datamatrix){
             DEBUG("removing from neutrino.cc");
-            delete datamatrix;
+            QTimer::singleShot(5000, this, [=]() {delayedDeletePhsy(datamatrix);});
         } else {
             DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
         }
@@ -1121,8 +1130,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             setWindowTitle(property("winId").toString()+QString(": Neutrino"));
             setWindowFilePath("");
             zoomChanged(1);
-            my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-            my_view->setSize();
+            my_view->setPixmap(QPixmap(":icons/icon.png"));
         }
         //    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
         DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
