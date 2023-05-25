@@ -58,7 +58,6 @@ QRectF nMouse::boundingRect() const {
 
 void nMouse::setSize(QSize my_size) {
     size=my_size;
-    update();
 }
 
 QPainterPath nMouse::shape() const {

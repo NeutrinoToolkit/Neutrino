@@ -47,12 +47,9 @@
 
 neutrino::~neutrino()
 {
-    nApp::processEvents();
     currentBuffer=nullptr;
-    qDebug() << "close neutrino";
     foreach (nPhysD *phys, physList) {
-        nApp::processEvents();
-        delayedDeletePhsy(phys);
+        delete phys;
     }
 }
 
@@ -814,7 +811,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     } else {
         QString formats("Neutrino Images (");
         for (auto &format : physFormat::phys_image_formats()) {
-            formats+="*"+ QString::fromStdString(format)+" ";
+            formats+="*."+ QString::fromStdString(format)+" ";
         }
         formats+=" *.neus);; Images (";
         foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
@@ -1095,12 +1092,6 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
     return newPhys;
 }
 
-void neutrino::delayedDeletePhsy(nPhysD* datamatrix) {
-    nApp::processEvents();
-    qDebug() << "REMOVING REMOVING REMOVING REMOVING REMOVING REMOVING " << datamatrix;
-    delete datamatrix;
-}
-
 void neutrino::removePhys(nPhysD* datamatrix) {
     DEBUG(">>>>>>>>>>>>>>>>> ENTER ");
     if (nPhysExists(datamatrix)) {
@@ -1119,7 +1110,7 @@ void neutrino::removePhys(nPhysD* datamatrix) {
 //        nApp::processEvents();
         if (datamatrix){
             DEBUG("removing from neutrino.cc");
-            QTimer::singleShot(5000, this, [=]() {delayedDeletePhsy(datamatrix);});
+            delete datamatrix;
         } else {
             DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
         }
@@ -1134,7 +1125,8 @@ void neutrino::removePhys(nPhysD* datamatrix) {
             setWindowTitle(property("winId").toString()+QString(": Neutrino"));
             setWindowFilePath("");
             zoomChanged(1);
-            my_view->setPixmap(QPixmap(":icons/icon.png"));
+            my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+            my_view->setSize();
         }
         //    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
         DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
@@ -1358,10 +1350,10 @@ QString neutrino::getFileSave() {
     for (auto &format : physFormat::phys_image_formats()) {
         formats << QString::fromStdString(format);
     }
-    formats << ".neus";
+    formats << "neus";
     foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
         if (!formats.contains(format))
-            formats << "."+format ;
+            formats << format ;
     }
 
     if (formats.contains(suffix)) {
@@ -1370,7 +1362,7 @@ QString neutrino::getFileSave() {
     }
 
     foreach(QString format, formats ) {
-        allformats += format + " files (*"+format+");; ";
+        allformats += format + " files (*."+format+");; ";
     }
 
     allformats+=("Any files (*)");

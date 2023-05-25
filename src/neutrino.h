@@ -56,6 +56,7 @@
 #include "ui_neutrino.h"
 
 class neutrino : public QMainWindow, public Ui::neutrino {
+
     Q_OBJECT
 
 public:
@@ -116,7 +117,6 @@ public slots:
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);
-    void delayedDeletePhsy(nPhysD*);
     void showPhys(nPhysD* my_phys=nullptr);
     void addShowPhys(nPhysD*);
 
