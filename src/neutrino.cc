@@ -654,11 +654,15 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         } else {
             std::vector<physD> my_vec;
             try {
-                my_vec=physFormat::phys_open(QFile::encodeName(fname).toStdString(),separate_rgb);
+                    std::string my_fname=QFile::encodeName(fname).toStdString();
+                    if (!std::filesystem::exists(my_fname)) {
+                        qWarning() << fname << my_fname;
+                    }
+                    my_vec=physFormat::phys_open(my_fname,separate_rgb);
             } catch (std::exception &e) {
-                QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
-                dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
-                dlg.exec();
+                    QMessageBox dlg(QMessageBox::Critical, tr("Exception"), e.what());
+                    dlg.setWindowFlags(dlg.windowFlags() | Qt::WindowStaysOnTopHint);
+                    dlg.exec();
             }
             for(std::vector<physD>::iterator it=my_vec.begin();it!=my_vec.end();it++) {
                 nPhysD *new_phys = new nPhysD(*it);
