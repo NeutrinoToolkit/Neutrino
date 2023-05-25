@@ -810,7 +810,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
     } else {
         QString formats("Neutrino Images (");
         for (auto &format : physFormat::phys_image_formats()) {
-            formats+="*."+ QString::fromStdString(format)+" ";
+            formats+="*"+ QString::fromStdString(format)+" ";
         }
         formats+=" *.neus);; Images (";
         foreach (QByteArray format, QImageReader::supportedImageFormats() ) {
@@ -1354,10 +1354,10 @@ QString neutrino::getFileSave() {
     for (auto &format : physFormat::phys_image_formats()) {
         formats << QString::fromStdString(format);
     }
-    formats << "neus";
+    formats << ".neus";
     foreach (QByteArray format, QImageWriter::supportedImageFormats() ) {
         if (!formats.contains(format))
-            formats << format ;
+            formats << "."+format ;
     }
 
     if (formats.contains(suffix)) {
@@ -1366,7 +1366,7 @@ QString neutrino::getFileSave() {
     }
 
     foreach(QString format, formats ) {
-        allformats += format + " files (*."+format+");; ";
+        allformats += format + " files (*"+format+");; ";
     }
 
     allformats+=("Any files (*)");

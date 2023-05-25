@@ -29,6 +29,8 @@
 #include <time.h>
 #include <zlib.h>
 #include <regex>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #ifdef HAVE_LIBCFITSIO
 #include "fitsio.h"
@@ -1855,23 +1857,17 @@ void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
         intn istat=0;
         int32 sd_id = SDstart(fname, DFACC_CREATE);
         if (sd_id != FAIL) {
-            int32 start[2], dimsizes[2];
-            dimsizes[0]=phys->getH();
-            dimsizes[1]=phys->getW();
-            start[0]=0;
-            start[1]=0;
+            int32 start[2] ={0,0};
+            int32 dimsizes[2] = {static_cast<int32>(phys->getH()), static_cast<int32>(phys->getW())};
             int32 sds_id=SDcreate(sd_id, phys->getName().c_str(), DFNT_FLOAT64, 2, dimsizes);
             comp_info c_info;
             c_info.deflate.level=6;
             istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
             istat+=SDwritedata(sds_id, start, nullptr, dimsizes, (VOIDP)phys->Timg_buffer);
-            double data[2];
-            data[0]=phys->get_origin().x();
-            data[1]=phys->get_origin().y();
+            double data[2] ={phys->get_origin().x(), phys->get_origin().y()};
             istat+=SDsetattr(sds_id, "physOrigin", DFNT_FLOAT64, 2, data);
-            data[0]=phys->get_scale().x();
-            data[1]=phys->get_scale().y();
-            istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, data);
+            double scale[2] = {phys->get_scale().x(), phys->get_scale().y()};
+            istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, scale);
             istat+=SDendaccess(sds_id);
             istat += SDend(sd_id);
         }
@@ -2004,56 +2000,41 @@ std::vector <physD> physFormat::phys_open_shimadzu(std::string fname) {
 
 std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) {
     std::vector <physD> retPhys;
-    size_t last_idx=0;
 
-    std::string ext=fname;
-    last_idx = fname.find_last_of(".");
-    if (std::string::npos != last_idx) {
-        ext.erase(0,last_idx + 1);
-    }
-
+    std::string ext=fs::path(fname).extension().native();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << fname << " " << ext);
-
-
-    std::string name=fname;
-    last_idx = fname.find_last_of("\\/");
-    if (std::string::npos != last_idx) {
-        name.erase(0,last_idx + 1);
-    }
+    std::string name=fs::path(fname).stem().native();
 
     DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << name << " " << ext);
 
     if (ext=="txt") {
         retPhys.push_back(physDouble_txt(fname.c_str()));
-    } else if (ext.substr(0,3)=="tif"|| ext=="gel") {
+    } else if (ext.substr(0,4)==".tif"|| ext==".gel") {
         retPhys=physFormat::phys_open_tiff(fname, separate_rgb);
-    } else if (ext=="spe") {
+    } else if (ext==".spe") {
         retPhys=physFormat::phys_open_spe(fname);
-    } else if (ext=="dat") {
+    } else if (ext==".dat") {
         retPhys=physFormat::phys_open_shimadzu(fname);
-    } else if (ext=="pcoraw") {
+    } else if (ext==".pcoraw") {
         retPhys=physFormat::phys_open_pcoraw(fname);
-    } else if (ext=="inf") {
+    } else if (ext==".inf") {
         retPhys=physFormat::phys_open_inf(fname);
-    } else if (ext=="sif") {
+    } else if (ext==".sif") {
         retPhys.push_back(physFormat::physInt_sif(fname.c_str()));
-    } else if (ext=="b16") {
+    } else if (ext==".b16") {
         retPhys.push_back(physFormat::physShort_b16(fname.c_str()));
-    } else if (ext=="img") {
-        DEBUG("++++++++++ calling physDouble_img");
+    } else if (ext==".img") {
         retPhys.push_back(physFormat::physDouble_img(fname));
-        DEBUG("++++++++++ end calling physDouble_img");
-    } else if (ext=="imd" || ext=="imi") {
+    } else if (ext==".imd" || ext==".imi") {
         retPhys.push_back(physFormat::physUint_imd(fname.c_str()));
-    } else if (ext.substr(0,3)=="fit") {
+    } else if (ext.substr(0,4)==".fit") {
         retPhys=physFormat::phys_open_fits(fname);
-    } else if (ext=="hdf") {
+    } else if (ext==".hdf") {
         retPhys=physFormat::phys_open_HDF4(fname);
-    } else if (ext=="neu") {
+    } else if (ext==".neu") {
         retPhys=physFormat::phys_resurrect_binary(fname);
-    } else if (ext=="gz") {
+    } else if (ext==".gz") {
         std::string filenameunzipped = physFormat::gunzip(fname);
         if ((!filenameunzipped.empty()) && (filenameunzipped!=fname)) {
             std::vector <physD> imagelist=physFormat::phys_open(filenameunzipped);
@@ -2096,18 +2077,18 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
 
 std::vector<std::string> physFormat::phys_image_formats() {
 
-    std::vector<std::string> retval={"neu", "txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "gz", "dat"};
+    std::vector<std::string> retval={".neu", ".txt", ".spe", ".pcoraw", ".inf", ".sif", ".b16", ".img", ".imd", ".imi", ".gz", ".dat"};
 
 #ifdef HAVE_LIBTIFF
-    retval.push_back("tif");
-    retval.push_back("tiff");
-    retval.push_back("gel");
+    retval.push_back(".tif");
+    retval.push_back(".tiff");
+    retval.push_back(".gel");
 #endif
 #ifdef HAVE_LIBCFITSIO
-    retval.push_back("fits");
+    retval.push_back(".fits");
 #endif
 #if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
-    retval.push_back("hdf");
+    retval.push_back(".hdf");
 #endif
 
     return retval;
