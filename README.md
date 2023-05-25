@@ -3,6 +3,7 @@ Neutrino
 
 A light, expandable and full featured image analysis tool for research
 
+To install grab the file for your system here: https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest
 
 Rationale
 ---------
@@ -23,8 +24,8 @@ Neutrino includes:
 Build 
 -----
 
-We use Cirrus-ci for providing an update release executable for windows, linux and macos. Have a loot at the `.cyrrus.yml` if you want to recompile it.
+If you want to recompile, have a look at the :
+[`.cyrrus.yml`](https://github.com/NeutrinoToolkit/Neutrino/blob/master/.cirrus.yml) 
+[`main.yml`](https://github.com/NeutrinoToolkit/Neutrino/blob/master/.github/workflows/main.yml) 
 
-Binary versions are available at this page: https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest
-
-Status: [![Build Status](https://api.cirrus-ci.com/github/NeutrinoToolkit/Neutrino.svg?branch=master)](https://cirrus-ci.com/github/NeutrinoToolkit/Neutrino)
+Status: [![Build Status](https://api.cirrus-ci.com/github/NeutrinoToolkit/Neutrino.svg?branch=master)](https://cirrus-ci.com/github/NeutrinoToolkit/Neutrino) [![macIntel](https://github.com/NeutrinoToolkit/Neutrino/actions/workflows/main.yml/badge.svg)](https://github.com/NeutrinoToolkit/Neutrino/actions/workflows/main.yml)
