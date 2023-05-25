@@ -1850,28 +1850,22 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
 
 
 void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
-#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)	
+#if defined(HAVE_LIBMFHDF) || defined(HAVE_LIBMFHDFDLL)
     if (phys) {
         intn istat=0;
         int32 sd_id = SDstart(fname, DFACC_CREATE);
         if (sd_id != FAIL) {
-            int32 start[2], dimsizes[2];
-            dimsizes[0]=phys->getH();
-            dimsizes[1]=phys->getW();
-            start[0]=0;
-            start[1]=0;
+            int32 start[2] ={0,0};
+            int32 dimsizes[2] = {static_cast<int32>(phys->getH()), static_cast<int32>(phys->getW())};
             int32 sds_id=SDcreate(sd_id, phys->getName().c_str(), DFNT_FLOAT64, 2, dimsizes);
             comp_info c_info;
             c_info.deflate.level=6;
             istat+=SDsetcompress(sds_id, COMP_CODE_DEFLATE, &c_info);
             istat+=SDwritedata(sds_id, start, nullptr, dimsizes, (VOIDP)phys->Timg_buffer);
-            double data[2];
-            data[0]=phys->get_origin().x();
-            data[1]=phys->get_origin().y();
+            double data[2] ={phys->get_origin().x(), phys->get_origin().y()};
             istat+=SDsetattr(sds_id, "physOrigin", DFNT_FLOAT64, 2, data);
-            data[0]=phys->get_scale().x();
-            data[1]=phys->get_scale().y();
-            istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, data);
+            double scale[2] = {phys->get_scale().x(), phys->get_scale().y()};
+            istat+=SDsetattr(sds_id, "physScale", DFNT_FLOAT64, 2, scale);
             istat+=SDendaccess(sds_id);
             istat += SDend(sd_id);
         }
@@ -1886,7 +1880,6 @@ void physFormat::phys_write_HDF4(physD *phys, const char* fname) {
     WARNING("phys_write_HDF4: was not compiled with hdf4 enabled");
 #endif
 }
-
 
 int inflate(FILE *source, FILE *dest)
 {
