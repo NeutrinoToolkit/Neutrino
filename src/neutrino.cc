@@ -653,7 +653,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             try {
                     std::string my_fname=QFile::encodeName(fname).toStdString();
                     if (!std::filesystem::exists(my_fname)) {
-                        qWarning() << fname << my_fname;
+                        qWarning() << my_fname;
                     }
                     my_vec=physFormat::phys_open(my_fname,separate_rgb);
             } catch (std::exception &e) {
