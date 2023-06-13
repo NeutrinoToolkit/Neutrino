@@ -20,8 +20,7 @@ jobs:
     - name: Build
       run: |
         brew update
-        rm -f '/usr/local/bin/2to3'
-        brew install python3
+        brew install --force python3
         brew install objc-codegenutils objc-run create-dmg
         brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc vulkan-headers
         brew install iltommi/brews/hdf4
