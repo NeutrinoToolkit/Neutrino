@@ -17,14 +17,18 @@ jobs:
       uses: EndBug/latest-tag@latest
       with:
         description: Latest
-    - name: Build
+    - name: Prepare
       run: |
         brew uninstall pipenv
         brew update --force
         brew install --force python3 
         brew install --force objc-codegenutils objc-run create-dmg
         brew install --force libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc vulkan-headers
+    - name: Deps
+      run: |
         brew install --force iltommi/brews/hdf4
+    - name: Build
+      run: |
         mkdir -p build && cd build
         cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
         make -j$(sysctl -n hw.ncpu) install
