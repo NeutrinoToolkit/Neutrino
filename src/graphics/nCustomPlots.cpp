@@ -729,6 +729,26 @@ void nCustomPlotMouseX::setMousePosition(double position) {
     replot();
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// plot as nCustomPlot but with y mouse line
+nCustomPlotMouseY::nCustomPlotMouseY(QWidget* parent): nCustomPlot(parent) {
+    setMousePosition(0);
+}
+
+#include "tools.h"
+void nCustomPlotMouseY::setMousePosition(double position) {
+    if (!mouseMarker) mouseMarker = new QCPItemStraightLine(this);
+    if (mouseMarker) {
+        mouseMarker->point1->setTypeX(QCPItemPosition::ptAbsolute);
+        mouseMarker->point2->setTypeX(QCPItemPosition::ptAbsolute);
+        mouseMarker->point1->setCoords(0,position);
+        mouseMarker->point2->setCoords(0,position);
+    }
+    replot();
+}
+
+
 // plot as nCustomPlot but with x and y mouse lines
 nCustomPlotMouseXY::nCustomPlotMouseXY(QWidget* parent): nCustomPlot(parent) {
     setMousePosition(0,0);
@@ -750,7 +770,6 @@ void nCustomPlotMouseXY::setMousePosition(double positionX, double positionY) {
     }
     replot();
 }
-
 
 // plot as nCustomPlot but with x and y mouse lines
 nCustomDoublePlot::nCustomDoublePlot(QWidget* parent):

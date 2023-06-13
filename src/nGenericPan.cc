@@ -952,6 +952,21 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
 }
 
+void nGenericPan::print() {
+    qDebug() << "here";
+    QString my_pan="neu.getPan(\""+panName()+"\").set";
+    QString out;
+    foreach (QWidget *widget, findChildren<QWidget *>()) {
+        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+            QString name=widget->objectName();
+            QString val=get(name).toString();
+            out+=my_pan+"(\""+name+"\",\""+val+"\")\n";
+        }
+    }
+    QApplication::clipboard()->setText(out);
+    nparent->statusBar()->showMessage("Copied to clipboard",1000);
+}
+
 QStringList nGenericPan::widgets() {
     QStringList retList;
     foreach (QWidget *obj, findChildren<QWidget *>()) {
@@ -1048,11 +1063,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
         if (widget->parent()==this) {
             if (my_occurrence==occurrence && widget->toolTip() == name) {
-                QVariantList variantList;
-                foreach (QPointF p, widget->getPoints()) {
-                    variantList << p;
-                }
-                return QVariant(variantList);
+                return QVariant::fromValue(widget);
             }
             my_occurrence++;
         }
@@ -1072,7 +1083,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant(widget->getRectF());
+                return QVariant::fromValue(widget);
             }
             my_occurrence++;
         }
@@ -1081,7 +1092,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant(widget->getPointF());
+                return QVariant::fromValue(widget);
             }
             my_occurrence++;
         }
@@ -1090,7 +1101,7 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant(widget->getRectF());
+                return QVariant::fromValue(widget);
             }
             my_occurrence++;
         }

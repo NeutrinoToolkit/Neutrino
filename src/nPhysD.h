@@ -7,7 +7,7 @@
 
 class nPhysD : public physD {
 
-  public:
+public:
 
     using physD::physD;
 

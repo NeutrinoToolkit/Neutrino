@@ -121,6 +121,36 @@ public slots:
     }
 };
 
+//plot with mouse (horizontal)
+class nCustomPlotMouseY : public nCustomPlot {
+    Q_OBJECT
+
+public:
+    nCustomPlotMouseY(QWidget*);
+
+private:
+    QPointer<QCPItemStraightLine> mouseMarker;
+
+public slots:
+    void setMousePosition(double);
+    void copy_image() override {
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
+        nCustomPlot::copy_image();
+        mouseMarker->setVisible(false);
+    }
+    void export_image() override {
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
+        nCustomPlot::export_image();
+        if(mouseMarker) {
+            mouseMarker->setVisible(true);
+        }
+    }
+};
+
 
 //plot with mouse (horizontal and vertical)
 class nCustomPlotMouseXY : public nCustomPlot {

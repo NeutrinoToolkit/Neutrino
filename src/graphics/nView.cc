@@ -392,6 +392,8 @@ void nView::cycleOverItems() {
     foreach (QGraphicsItem *oggetto, scene()->items() ) {
         if (oggetto->type() > QGraphicsItem::UserType) {
             if (oggetto->isVisible()) lista << oggetto;
+        } else {
+            qDebug() << oggetto;
         }
     }
     scene()->clearSelection();

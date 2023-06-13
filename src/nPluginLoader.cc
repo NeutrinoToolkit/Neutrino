@@ -37,6 +37,9 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                 icon_plugin=my_panPlug->icon();
                 shortcut_key = my_panPlug->shortcut();
 
+                qDebug() << shortcut_key.toString(QKeySequence::NativeText);
+
+
                 if (!icon_plugin.isNull()) {
 
                     QList<QAction*> my_actions = neu->toolBar->actions();
@@ -100,6 +103,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
 
                 QPointer<QAction>  my_action = new QAction(icon_plugin, name_plugin.replace("_"," "), nParent);
                 my_action->setShortcut(shortcut_key);
+                my_action->setToolTip(my_action->toolTip()+" "+ shortcut_key.toString(QKeySequence::NativeText));
                 QVariant v;
                 v.setValue(this);
                 my_action->setData(v);

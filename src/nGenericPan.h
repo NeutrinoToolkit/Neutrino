@@ -144,6 +144,8 @@ public slots:
     void show(bool onlyOneAllowed=false);
 
     void keyPressEvent(QKeyEvent *event) override;
+    void print();
+
 
 protected:
     void decorate(QWidget *wdg);

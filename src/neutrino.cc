@@ -1338,6 +1338,7 @@ neutrino::mouseposition(QPointF pos_mouse) {
         dy->setText("");
     }
 
+
     emit mouseAtMatrix(pos_mouse);
 }
 

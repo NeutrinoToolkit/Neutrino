@@ -88,7 +88,7 @@ signals:
 
 };
 
-NEUTRINO_PLUGIN(Colorscale,Image;Colortable,":icons/colors.png", Qt::Key_C, 0);
+NEUTRINO_PLUGIN(Colorscale,Image;Colortable,":icons/colors.png", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_C), 0);
 
 
 #endif

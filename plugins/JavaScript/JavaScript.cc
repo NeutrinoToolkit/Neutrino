@@ -42,7 +42,6 @@ my_eng(my_nparent)
 
     qRegisterMetaType<nGenericPan*>("nGenericPan*");
     qRegisterMetaType<nPhysD*>("nPhysD*");
-    qRegisterMetaType<QRectF*>("QRectF*");
 
     splitter->setStretchFactor(0, 10);
     splitter->setStretchFactor(1, 1);
