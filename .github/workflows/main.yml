@@ -19,8 +19,9 @@ jobs:
         description: Latest
     - name: Build
       run: |
+        brew uninstall pipenv
         brew update --force
-        brew install --force python3
+        brew install --force python3 
         brew install --force objc-codegenutils objc-run create-dmg
         brew install --force libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc vulkan-headers
         brew install --force iltommi/brews/hdf4
