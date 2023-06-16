@@ -82,7 +82,12 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
                 QPointer<QMenu> my_menu=getMenu(my_panPlug->menuEntryPoint(),nParent);
                 QList<QAction*> my_actions=my_menu->actions();
                 foreach (QAction *my_action,my_actions) {
-                    if (!(my_action->isSeparator() || my_action->menu()) && my_action->text()==name_plugin && my_action->isEnabled() && !my_action->data().isNull()) {
+                    if (!my_action->isSeparator() &&
+                        !my_action->menu() &&
+                        my_action->text()==name_plugin &&
+                        my_action->isEnabled() &&
+                        !my_action->data().isNull())
+                    {
                         QPluginLoader *my_qplugin=my_action->data().value<QPluginLoader*>();
                         if (my_qplugin!=nullptr) {
                             if(my_qplugin->instance()){
@@ -146,8 +151,29 @@ QPointer<QMenu> nPluginLoader::getMenu(QString menuEntry, neutrino* neu) {
             }
             if (!found) {
                 if (qobject_cast<QMenuBar*>(parentMenu)) {
-                    my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                    qDebug() << "cippalippa" << menuEntry;
+                    // looking for help menu to insert this before
+                    QAction *menuHelp=nullptr;
+                    foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                        if (menu->title() == "Help") {
+                            qDebug() << "cippalippa5" << menu->title();
+                            menuHelp=menu->activeAction();
+                            qDebug() << "cippalippa5" << menuHelp;
+                            qDebug() << "cippalippa5" << menu->isEmpty();
+
+                            break;
+                        }
+                    }
+                    qDebug() << "cippalippa4" << menuHelp;
+                    if (menuHelp) {
+                        qDebug() << "cippalippa3" << my_list.at(i);
+                        my_menu=new QMenu(my_list.at(i),parentMenu);
+                        (qobject_cast<QMenuBar*>(parentMenu))->insertMenu(menuHelp,my_menu);
+                    } else {
+                        my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                    }
                 } else if(qobject_cast<QMenu*>(parentMenu)) {
+                    qDebug() << "cippalippa2" << menuEntry;
                     my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
                 }
                 my_menu->setTitle(my_list.at(i));

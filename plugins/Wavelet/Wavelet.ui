@@ -57,7 +57,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="widget_1">
+      <widget class="QWidget" name="WaveletTab">
        <attribute name="title">
         <string>Wavelet</string>
        </attribute>
@@ -553,7 +553,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="Unwrap">
+      <widget class="QWidget" name="UnwrapTab">
        <attribute name="title">
         <string>Unwrap</string>
        </attribute>
@@ -692,7 +692,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
                <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
              </property>
             </widget>
@@ -768,9 +768,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="Carrier">
+      <widget class="QWidget" name="CarrierTab">
        <attribute name="title">
-        <string>Subtract</string>
+        <string>Carrier</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_10">
         <property name="leftMargin">
@@ -1152,7 +1152,7 @@
   </action>
   <action name="actionDoAll">
    <property name="icon">
-    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -1172,6 +1172,9 @@
   <tabstop>minAngle</tabstop>
   <tabstop>maxAngle</tabstop>
   <tabstop>numAngle</tabstop>
+  <tabstop>minThick</tabstop>
+  <tabstop>maxThick</tabstop>
+  <tabstop>numThick</tabstop>
   <tabstop>relative</tabstop>
   <tabstop>damp</tabstop>
   <tabstop>showSource</tabstop>
@@ -1200,7 +1203,7 @@
  </tabstops>
  <resources>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
-  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1779,11 +1779,14 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
 
 // ----------------------------------- scripting --------------------------------------
 
-nGenericPan* neutrino::getPan(QString name) {
+nGenericPan* neutrino::getPan(QString name, int occurrence) {
+    int my_occurrence=0;
     foreach(nGenericPan* pan, getPanList()) {
         if(pan->panName()==name) {
-            pan->raiseIt();
-            return pan;
+            if (occurrence == ++my_occurrence) {
+                pan->raiseIt();
+                return pan;
+            }
         }
     }
     return nullptr;

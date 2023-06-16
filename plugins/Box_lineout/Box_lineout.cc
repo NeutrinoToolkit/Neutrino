@@ -49,6 +49,13 @@ Box_lineout::Box_lineout(neutrino *nparent) : nGenericPan(nparent)
     updatePlot();
 }
 
+void Box_lineout::on_actionExpand_triggered() {
+    if (currentBuffer) {
+        box->expandX();
+        box->expandY();
+    }
+}
+
 void Box_lineout::sceneChanged() {
     if (sender()==box) updatePlot();
 }

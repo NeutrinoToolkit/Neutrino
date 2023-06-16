@@ -232,6 +232,7 @@
    <addaction name="actionSaveClipboard"/>
    <addaction name="actionSaveTxt"/>
    <addaction name="actionSavePDF"/>
+   <addaction name="actionExpand"/>
    <addaction name="separator"/>
    <addaction name="actionRect"/>
   </widget>
@@ -290,6 +291,18 @@
     <string>Show Region</string>
    </property>
   </action>
+  <action name="actionExpand">
+   <property name="icon">
+    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+     <normaloff>:/icons/fillBoth.png</normaloff>:/icons/fillBoth.png</iconset>
+   </property>
+   <property name="text">
+    <string>expand</string>
+   </property>
+   <property name="toolTip">
+    <string>Expand region to this image</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -299,6 +312,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -30,7 +30,7 @@
     <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
 
     <key>LSMinimumSystemVersion</key>
-    <string>11.7</string>
+    <string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
 
     <key>NSHumanReadableCopyright</key>
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>

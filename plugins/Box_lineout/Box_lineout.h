@@ -48,6 +48,7 @@ public slots:
     void updatePlot();
 
     void sceneChanged();
+    void on_actionExpand_triggered();
 
 private:
 

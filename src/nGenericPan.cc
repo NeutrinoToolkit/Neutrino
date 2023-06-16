@@ -213,7 +213,8 @@ void nGenericPan::show(bool onlyOneAllowed) {
     }
     qDebug() << metaObject()->className();
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_G),this), SIGNAL(activated()), this, SLOT(grabSave()) );
+    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_S),this), SIGNAL(activated()), this, SLOT(grabSave()) );
+    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_J),this), SIGNAL(activated()), this, SLOT(print()) );
 
     // these properties will be automatically saved
     setProperty("NeuSave-fileIni",panName()+".ini");
@@ -957,7 +958,9 @@ void nGenericPan::print() {
     QString my_pan="neu.getPan(\""+panName()+"\").set";
     QString out;
     foreach (QWidget *widget, findChildren<QWidget *>()) {
-        if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
+        qDebug() << widget->objectName() << widget->property("neutrinoSave");
+        if ((widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) ||
+            (widget->property("neutrinoImage").isValid()) ) {
             QString name=widget->objectName();
             QString val=get(name).toString();
             out+=my_pan+"(\""+name+"\",\""+val+"\")\n";
@@ -965,6 +968,7 @@ void nGenericPan::print() {
     }
     QApplication::clipboard()->setText(out);
     nparent->statusBar()->showMessage("Copied to clipboard",1000);
+    qWarning().noquote() << out;
 }
 
 QStringList nGenericPan::widgets() {
