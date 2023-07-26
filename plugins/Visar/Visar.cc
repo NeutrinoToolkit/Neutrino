@@ -1396,15 +1396,16 @@ void Visar::doWave(unsigned int k) {
                 physC imageFFT = imgs[1]->ft2(PHYS_FORWARD);
 
                 progress.setValue(progress.value()+1);
-
-                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-                double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
+//doesntwork                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+//doesntwork                double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
                 for (size_t x=0;x<dx;x++) {
                     for (size_t y=0;y<dy;y++) {
                         double xr = xx[x]*cr - yy[y]*sr;
                         double yr = xx[x]*sr + yy[y]*cr;
-                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
+                        double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
+//doesntwork                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
                         imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                     }
                 }
@@ -1430,7 +1431,8 @@ void Visar::doWave(unsigned int k) {
                     for(int j=geom.top();j<geom.bottom(); j++) {
                         vec2f pp(i,j);
                         if (point_inside_poly(pp,vecPoints)==true) {
-                            physDeghost->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
+                            physDeghost->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+//doesntwork                            physDeghost->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
                         }
                     }
                 }
