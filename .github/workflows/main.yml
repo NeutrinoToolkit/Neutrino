@@ -3,7 +3,7 @@ name: macIntel
 on:
   push:
     branches:    
-      - master
+      - testing
 
 jobs:
   build:
