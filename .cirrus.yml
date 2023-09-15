@@ -159,7 +159,7 @@ debian_task:
   script: |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103-1
     apt-get install -yy qml6-module*
     mkdir build && cd build
     cmake ..
@@ -206,7 +206,7 @@ opensuse_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    zypper -n install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
     mkdir build && cd build
     cmake ..
     make -j2 package
