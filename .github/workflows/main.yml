@@ -3,7 +3,7 @@ name: macIntel
 on:
   push:
     branches:    
-      - testing
+      - *
 
 jobs:
   build:
@@ -36,6 +36,7 @@ jobs:
         name: Neutrino.dmg
         path: "build/Neutrino*.dmg"
     - name: Upload
+      if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
