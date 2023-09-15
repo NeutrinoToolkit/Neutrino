@@ -1,10 +1,6 @@
 name: macIntel
 
-on:
-  push:
-    branches:    
-      - *
-
+on: push
 jobs:
   build:
     runs-on: macos-11
