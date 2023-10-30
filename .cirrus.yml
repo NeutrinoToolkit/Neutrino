@@ -1,5 +1,3 @@
-only_if: $CIRRUS_BRANCH == 'master'
-
 macM1_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
@@ -109,6 +107,7 @@ AppImage_task:
     path: "Neutrino-*.AppImage"
 
 upload_task:
+  only_if: $CIRRUS_BRANCH == 'master'
   depends_on:
     - macM1
     - win32
@@ -207,7 +206,7 @@ opensuse_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    zypper -n install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
     mkdir build && cd build
     cmake ..
     make -j2 package
