@@ -8,7 +8,7 @@ endif()
 
 ## default build type is release
 if (CMAKE_BUILD_TYPE STREQUAL "")
-	set (CMAKE_BUILD_TYPE "Release")
+    set (CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(PROJECT_DOMAIN_FIRST "neutrino")

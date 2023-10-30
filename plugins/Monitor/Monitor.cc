@@ -101,15 +101,16 @@ void Monitor::on_openAll_released() {
     QList<QFileInfo> path_list;
     QModelIndex parentIndex = fileModel->index(fileModel->rootPath());
     int numRows = fileModel->rowCount(parentIndex);
+    QStringList filestoopen;
 
     for (int row = 0; row < numRows; ++row) {
         QModelIndex childIndex = fileModel->index(row, 0, parentIndex);
         QFileInfo path = QFileInfo(fileModel->rootPath(), fileModel->data(childIndex).toString());
         if (path.isFile())  {
-            nparent->fileOpen(path.absoluteFilePath());
+            filestoopen.append(path.absoluteFilePath());
         }
     }
-
+    nparent->fileOpen(filestoopen);
 }
 
 void Monitor::changeDir() {
