@@ -999,8 +999,8 @@ physWave::phys_guess_carrier(physD &phys, double weight)
         double valmax=0.0;
         std::vector<std::pair<vec2f,double>> my_vec;
 
-        for (int i=0; i<dx/2+1; i++) {
-            for (int j=0; j<dy; j++) {
+        for (long unsigned int i=0; i<dx/2+1; i++) {
+            for (long unsigned int j=0; j<dy; j++) {
                 int j1=(dy/2+1)-(j+dy/2+1)%dy;
                 double r=sqrt(i*i+j1*j1);
                 int k=i+j*(dx/2+1);

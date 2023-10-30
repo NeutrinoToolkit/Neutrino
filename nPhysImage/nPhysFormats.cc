@@ -798,7 +798,7 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                     std::regex my_regex(R"(Latitude=(\d+)[\s|\S]*PMT=(\d+)V)");
                     std::smatch my_match;
                     if(std::regex_search(res_str,my_match,my_regex)) {
-                        for (int ii=0;ii<my_match.size();ii++) {
+                        for (long unsigned int ii=0;ii<my_match.size();ii++) {
                             DEBUG( "tiff regex2 " << ii << " " << my_match.str(ii));
                         }
                         if (my_match.size()==3) {
