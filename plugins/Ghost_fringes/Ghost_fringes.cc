@@ -92,8 +92,7 @@ void Ghost_fringes::doGhost () {
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
 //        double thick_norm= resolution->value()/M_PI;
 //        double lambda_norm=M_PI*widthCarrier->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << lambda_norm << " " << thick_norm << " : " << sqrt(pow(cr*dx,2)+pow(sr*dy,2)));
+//        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << lambda_norm << " " << thick_norm << " : " << sqrt(pow(cr*dx,2)+pow(sr*dy,2)));
 
         nPhysD *myfilter=new nPhysD(dx,dy,0.0,"Filter");
         nPhysD *myspectrum=new nPhysD(dx,dy,0.0,"Spectrum");

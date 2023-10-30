@@ -101,7 +101,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
 
-    toolBar->addWidget(comboShot);
+    toolBar->insertWidget(actionNext,comboShot);
 
     show();
 
@@ -171,6 +171,27 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     sweepChanged();
     calculate_etalon();
 }
+
+void Visar::on_actionNext_triggered() {
+    if(comboShot->isVisible()) {
+        QStringList itemsInComboBox;
+        for (int index = 0; index < comboShot->count(); index++)
+            itemsInComboBox << comboShot->itemText(index);
+        int nextpos=(comboShot->currentIndex()+1)%comboShot->count();
+        comboShot->setCurrentIndex(nextpos);
+    }
+}
+
+void Visar::on_actionPrevious_triggered() {
+    if(comboShot->isVisible()) {
+        QStringList itemsInComboBox;
+        for (int index = 0; index < comboShot->count(); index++)
+            itemsInComboBox << comboShot->itemText(index);
+        int nextpos=(comboShot->currentIndex()+comboShot->count()-1)%comboShot->count();
+        comboShot->setCurrentIndex(nextpos);
+    }
+}
+
 
 
 void Visar::changeShot(QString num) {

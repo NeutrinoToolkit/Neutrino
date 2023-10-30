@@ -624,6 +624,14 @@ neutrino::fileReopen() {
     }
 }
 
+QList <nPhysD *> neutrino::fileOpen(QStringList fnames) {
+    QList <nPhysD *> imagelist;
+    for(auto fname: fnames){
+        imagelist.append(fileOpen(fname));
+    }
+    return imagelist;
+}
+
 QList <nPhysD *> neutrino::fileOpen(QString fname) {
     neutrino *my_neu=this;
 
@@ -1034,6 +1042,7 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     }
                     QApplication::processEvents();
                 }
+                qDebug() << ifile.tellg();
                 qDebug() << "resurrect pan:\n" << QString::fromStdString(panString);
                 setPanData(panString);
             }

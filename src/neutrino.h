@@ -137,6 +137,7 @@ public slots:
     neutrino* fileNew();
 
     QList<nPhysD*> fileOpen(QString=QString(""));
+    QList<nPhysD*> fileOpen(QStringList);
     void fileReopen();
 
     QString getFileSave();

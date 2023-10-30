@@ -175,6 +175,9 @@ public slots:
 
     void ghostChecked();
 
+    void on_actionNext_triggered();
+    void on_actionPrevious_triggered();
+
 };
 
 NEUTRINO_PLUGIN(Visar,Analysis);

@@ -144,108 +144,6 @@
                <property name="bottomMargin">
                 <number>4</number>
                </property>
-               <item row="0" column="3">
-                <widget class="QToolButton" name="Deghost">
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-                   <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QWidget" name="widget_7" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLineEdit" name="globDirShot">
-                    <property name="toolTip">
-                     <string>Directory containing all the shots</string>
-                    </property>
-                    <property name="placeholderText">
-                     <string>Shot image directory</string>
-                    </property>
-                    <property name="neutrinoSave" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="globShot">
-                    <property name="toolTip">
-                     <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
-                    </property>
-                    <property name="placeholderText">
-                     <string>Shot pattern</string>
-                    </property>
-                    <property name="neutrinoSave" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QWidget" name="widget_6" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLineEdit" name="globDirRef">
-                    <property name="toolTip">
-                     <string>Directory containing all the references</string>
-                    </property>
-                    <property name="placeholderText">
-                     <string>Reference image directory</string>
-                    </property>
-                    <property name="neutrinoSave" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="globRef">
-                    <property name="toolTip">
-                     <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
-                    </property>
-                    <property name="placeholderText">
-                     <string>Reference pattern</string>
-                    </property>
-                    <property name="neutrinoSave" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
                <item row="0" column="0">
                 <widget class="QComboBox" name="refImage">
                  <property name="toolTip">
@@ -253,30 +151,6 @@
                  </property>
                  <property name="neutrinoImage" stdset="0">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QComboBox" name="shotImage">
-                 <property name="toolTip">
-                  <string>Shot image</string>
-                 </property>
-                 <property name="neutrinoImage" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QToolButton" name="globRefresh">
-                 <property name="toolTip">
-                  <string>Guess Dir, Ref and Shot from current images</string>
-                 </property>
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
-                   <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -294,6 +168,102 @@
                  <property name="neutrinoSave" stdset="0">
                   <bool>true</bool>
                  </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QToolButton" name="Deghost">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QToolButton" name="globRefresh">
+                 <property name="toolTip">
+                  <string>Guess Dir, Ref and Shot from current images</string>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QSplitter" name="splitter">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <widget class="QLineEdit" name="globDirRef">
+                  <property name="toolTip">
+                   <string>Directory containing all the references</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Reference image directory</string>
+                  </property>
+                  <property name="neutrinoSave" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                 <widget class="QLineEdit" name="globRef">
+                  <property name="toolTip">
+                   <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Reference pattern</string>
+                  </property>
+                  <property name="neutrinoSave" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="shotImage">
+                 <property name="toolTip">
+                  <string>Shot image</string>
+                 </property>
+                 <property name="neutrinoImage" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSplitter" name="splitter_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <widget class="QLineEdit" name="globDirShot">
+                  <property name="toolTip">
+                   <string>Directory containing all the shots</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Shot image directory</string>
+                  </property>
+                  <property name="neutrinoSave" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                 <widget class="QLineEdit" name="globShot">
+                  <property name="toolTip">
+                   <string>RegEx match filename:  use (\d+) to replace a shot number. e.g. visar1_(\d+)_ref.img</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>Shot pattern</string>
+                  </property>
+                  <property name="neutrinoSave" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
                 </widget>
                </item>
               </layout>
@@ -556,6 +526,9 @@
            <property name="toolTip">
             <string>offset reference (dark value)</string>
            </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
            <property name="maximum">
             <double>99999.000000000000000</double>
            </property>
@@ -592,7 +565,7 @@
             <string/>
            </property>
            <property name="decimals">
-            <number>3</number>
+            <number>4</number>
            </property>
            <property name="minimum">
             <double>-99.989999999999995</double>
@@ -758,7 +731,6 @@
  <resources>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
   <include location="Visar.qrc"/>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
