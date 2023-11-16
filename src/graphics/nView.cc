@@ -305,20 +305,37 @@ nView::resizeEvent(QResizeEvent *e) {
     setSize();
 }
 
-void nView::keyPressEvent (QKeyEvent *e)
-{
+void nView::keyPressEvent (QKeyEvent *e) {
     qDebug() << e;
     QGraphicsView::keyPressEvent(e);
     if (scene()->selectedItems().size()) {
         if (e->key() == Qt::Key_Backspace) {
             foreach (QGraphicsItem *item, scene()->selectedItems()){
                 QGraphicsObject *itemObj=item->toGraphicsObject();
-                if (itemObj && itemObj->property("parentPanControlLevel").toInt()==0){
-                    qInfo() << tr("Removed ") << item->toolTip();
-                    itemObj->deleteLater();
+                if(itemObj) {
+                    if (itemObj->property("parentPanControlLevel").toInt()==0){
+                        qInfo() << tr("Removed ") << item->toolTip();
+                        itemObj->deleteLater();
+                    } else {
+                        nObject *nobj=qobject_cast<nObject*>(itemObj);
+                        nGenericPan *ppan=nullptr;
+                        if(nobj) {
+                            ppan=qobject_cast<nGenericPan*>(nobj->parent());
+                        } else {
+                            nLine *nline=qobject_cast<nLine*>(itemObj);
+                            if (nline) {
+                                 ppan=qobject_cast<nGenericPan*>(nline->parent());
+                            }
+                        }
+                        if (ppan) {
+                            int res=QMessageBox::warning(ppan->nparent,tr("Attention"), "Really close "+ppan->panName()+"?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+                            if (res==QMessageBox::Ok) {
+                                ppan->closeEvent(nullptr);
+                                break;
+                            }
+                        }
+                    }
                     break;
-                } else {
-                    qInfo() << tr("Can't remove ") << item->toolTip();
                 }
             }
         }

@@ -61,7 +61,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     LIST(APPEND UIS ${MY_UIS})
     file(GLOB MY_QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
     LIST(APPEND QRCS ${MY_QRCS})
-
     ## add help
 
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
@@ -94,7 +93,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
 
-    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
+    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} "${CMAKE_BINARY_DIR}/src/qrc/icons.qrc" ${PANDOC_QRC} ${README_MD})
     add_dependencies(${PROJECT_NAME} Neutrino)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 

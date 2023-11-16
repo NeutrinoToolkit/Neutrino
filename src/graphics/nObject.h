@@ -53,8 +53,8 @@ public:
 	nObject(nGenericPan *, int level, QString name);
     ~nObject() override;
 	
-	neutrino *nparent;
-	
+    neutrino *nparent;
+
     virtual int type() const override = 0;
 
     void mousePressEvent ( QGraphicsSceneMouseEvent * ) override;

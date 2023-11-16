@@ -25,7 +25,6 @@
 #ifndef Visar_H
 #define Visar_H
 
-#include <array>
 #include <QtGui>
 #include <QWidget>
 
@@ -35,6 +34,8 @@
 
 #include "nPhysWave.h"
 #include "neutrino.h"
+#include <array>
+#include <vector>
 
 
 class VisarPhasePlot : public nCustomPlotMouseX3Y {

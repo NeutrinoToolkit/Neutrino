@@ -26,6 +26,7 @@
 #include "nView.h"
 #include "neutrino.h"
 #include <QColorDialog>
+#include <array>
 
 nTics::~nTics() {
     QSettings my_set("neutrino","");
@@ -75,10 +76,9 @@ QRectF nTics::boundingRect() const {
     QSize my_size=my_view->my_pixitem.pixmap().size();
 	QRectF bBox=QRectF(0,0,my_size.width(),my_size.height());
     if (my_view->nparent->currentBuffer) {
-		double fSize=QFontMetrics(get_font()).size(Qt::TextSingleLine,"M").height();
-		bBox.adjust(-2.2*fSize,-2.3*fSize,1.5*fSize, 3*fSize);
-	}
-
+        double fSize=QFontMetrics(get_font()).size(Qt::TextSingleLine,"M").height();
+        bBox.adjust(-2.3*fSize, -2.3*fSize, 1.5*fSize, 3.1*fSize);
+    }
     return bBox;
 }
 
@@ -113,7 +113,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 
         p->setPen(pen);
 
-        int ticsPerDecade[5]={1,2,4,5,10};
+        std::array<int,5> ticsPerDecade={1,2,4,5,10};
         typedef QPair <QString,QRectF > my_pair;
         QList<my_pair> rects;
         QPainterPath allTics;
@@ -126,7 +126,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QSizeF size(my_view->nparent->currentBuffer->getW(),my_view->nparent->currentBuffer->getH());
 
         int exponentX=log10(std::abs(my_sc.x()*size.width()));
-        for (int k=0;k<5;k++) {
+        for (int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
@@ -196,7 +196,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             label+=QString::fromStdString(my_view->nparent->currentBuffer->prop["unitsX"]);
         QSizeF labelSize=QSizeF(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
         if (showXYaxes) {
-            if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+            if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),-2.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignRight,label);
         }
         if (showXYaxes) {
             p->drawPath(allTics);
@@ -210,7 +210,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->setPen(pen);
 
         int exponentY=log10(std::abs(my_sc.y()*size.height()));
-        for (int k=0;k<5;k++) {
+        for (int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
@@ -270,7 +270,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->rotate(90);
         if (showXYaxes) {
             foreach (my_pair pair, rects) {
-                p->drawText(pair.second,Qt::AlignBottom|Qt::AlignHCenter,pair.first);
+                p->drawText(pair.second,Qt::AlignTop|Qt::AlignHCenter,pair.first);
             }
         }
         QString labelDim=QLocale().toString((int)my_view->nparent->currentBuffer->getW())+" x "+QLocale().toString((int)my_view->nparent->currentBuffer->getH());
@@ -291,7 +291,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             label+=QString::fromStdString(my_view->nparent->currentBuffer->prop["unitsY"]);
         labelSize=QSizeF(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
         if (showXYaxes) {
-            if (label.trimmed().size()) p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+            if (label.trimmed().size()) p->drawText(QRectF(size.height()-labelSize.width(),1.3*labelSize.height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignRight,label);
         }
         p->rotate(-90);
 
@@ -380,7 +380,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
                 label+=QString::fromStdString(my_view->nparent->currentBuffer->prop["unitsCB"]);
             QSizeF labelSize=QSizeF(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
             if (showColorbar) {
-                if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width()/2,size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+                if (label.trimmed().size()) p->drawText(QRectF(size.width()-labelSize.width(),size.height()+2.0*p->fontMetrics().height(),labelSize.width(),labelSize.height()),Qt::AlignTop|Qt::AlignRight,label);
             }
         }
 
@@ -389,7 +389,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
             label="CB "+QLocale().toString(mini)+":"+QLocale().toString(maxi)+ " (" +QLocale().toString(range.first())+":"+QLocale().toString(range.second())+")";
 
             QSize labelSizeCB=QSize(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
-            p->drawText(QRectF(0,size.height()+2*p->fontMetrics().height(),labelSizeCB.width(),labelSizeCB.height()),Qt::AlignTop|Qt::AlignHCenter,label);
+            p->drawText(QRectF(0,size.height()+2*p->fontMetrics().height(),labelSizeCB.width(),labelSizeCB.height()),Qt::AlignTop|Qt::AlignLeft,label);
         }
 
 

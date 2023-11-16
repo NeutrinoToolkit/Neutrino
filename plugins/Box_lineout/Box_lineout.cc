@@ -63,6 +63,8 @@ void Box_lineout::sceneChanged() {
 void Box_lineout::mouseAtWorld(QPointF p) {
     if (currentBuffer) {
         plot->setMousePosition(p.x(),p.y());
+        QString msg= QString::number(p.x()) + " , " + QString::number(p.y());
+        statusBar()->showMessage(msg);
     }
 }
 

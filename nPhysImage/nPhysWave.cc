@@ -1011,9 +1011,9 @@ physWave::phys_guess_carrier(physD &phys, double weight)
                     jmax=j1;
                     DEBUG(">>>" << i << " " << j << " " << j1 << " " << k << "  =  " << valmax);
                     my_vec.clear();
-                    for (int ii=i-1;ii<=i+1;ii++) {
+                    for (long unsigned int ii=i-1;ii<=i+1;ii++) {
                         DEBUG("here"<< j-1 << " " << j+1);
-                        for (int jj=j-1;jj<=j+1;jj++) {
+                        for (long unsigned int jj=j-1;jj<=j+1;jj++) {
                             DEBUG("here2");
                             int iiclean=(ii+dx/2+1)%(dx/2+1);
                             int jjclean=(jj+dy)%(dy);
