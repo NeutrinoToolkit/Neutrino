@@ -9,6 +9,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     get_filename_component(MY_PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
+#    set(NEU_PLUGIN_LIST "${NEU_PLUGIN_LIST} ${MY_PROJECT_NAME}" PARENT_SCOPE)
+
     PROJECT (${MY_PROJECT_NAME} CXX)
 
     MESSAGE(STATUS "Plugin : ${PROJECT_NAME}")
@@ -49,7 +51,6 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     file(GLOB MY_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
     LIST(APPEND HEADERS ${MY_HEADERS})
-    LIST(APPEND HEADERS ${NEUTRINO_ROOT}/src/nGenericPan.h)
     file(GLOB MY_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
     LIST(APPEND HEADERS ${MY_HEADERS})
     file(GLOB MY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
@@ -94,7 +95,8 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
 
-    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} "${CMAKE_BINARY_DIR}/src/qrc/icons.qrc" ${PANDOC_QRC} ${README_MD})
+#    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} "${CMAKE_BINARY_DIR}/src/qrc/icons.qrc" ${PANDOC_QRC} ${README_MD})
+    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
     add_dependencies(${PROJECT_NAME} Neutrino)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 

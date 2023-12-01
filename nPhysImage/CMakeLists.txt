@@ -18,9 +18,6 @@ elseif(LINUX)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION lib)
 elseif (APPLE)
 	SET_TARGET_PROPERTIES(nPhysImageF PROPERTIES INSTALL_NAME_DIR "@executable_path/../Frameworks")
-    add_custom_command(TARGET nPhysImageF POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../../Frameworks/" $<TARGET_FILE:nPhysImageF>)
     install (TARGETS nPhysImageF COMPONENT binary DESTINATION "${PROJECT_BINARY_DIR}/Neutrino.app/Contents/Frameworks")
 endif()
-
-message(STATUS $<TARGET_FILE:nPhysImageF>)
 

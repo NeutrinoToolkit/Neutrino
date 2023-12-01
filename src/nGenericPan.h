@@ -153,6 +153,6 @@ protected:
 
 };
 
-Q_DECLARE_METATYPE(nGenericPan);
+//Q_DECLARE_METATYPE(nGenericPan*);
 
 #endif
