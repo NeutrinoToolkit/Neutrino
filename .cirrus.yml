@@ -102,7 +102,7 @@ AppImageTest_task:
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-    cp Neutrino-*.AppImage ..
+    cp Neutrino-*.AppImage ../Neutrino-Linux-test.AppImage
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
