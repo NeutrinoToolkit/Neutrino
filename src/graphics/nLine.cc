@@ -334,7 +334,7 @@ void nLine::togglePadella() {
 void nLine::updatePlot () {
 
 	nPhysD *my_phys=nparent->getCurrentBuffer();
-    if (my_w.plot->isVisible() && my_phys && ref.size() ) {
+    if (my_pad.isVisible() && my_w.plot->isVisible() && my_phys && ref.size() ) {
 
 		if (my_w.plot->graphCount()==0) {
 			my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
@@ -361,8 +361,8 @@ void nLine::updatePlot () {
 
 		my_w.plot->clearItems();
 
-		QPen penna;
-		penna.setColor(ref[0]->brush().color());
+        QPen mypen;
+        mypen.setColor(ref[0]->brush().color());
 
 		vec2f orig = my_phys->get_origin();
 		double dist=0.0;
@@ -375,7 +375,7 @@ void nLine::updatePlot () {
 				colore=my_phys->getPoint(p.x()+orig.x(),p.y()+orig.y());
 			} else {
 				colore=my_phys->point((int)(p.x()+orig.x()),(int)(p.y()+orig.y()));
-			}
+            }
 			if (std::isfinite(colore)) {
 				toPlotx << dist;
 				toPloty << colore;
@@ -386,7 +386,7 @@ void nLine::updatePlot () {
 				marker->point2->setTypeY(QCPItemPosition::ptAbsolute);
 				marker->point1->setCoords(dist,0);
 				marker->point2->setCoords(dist,1);
-				marker->setPen(penna);
+                marker->setPen(mypen);
 			}
 			dist+=sqrt(pow((my_poly.at(i+1)-my_poly.at(i)).x(),2)+pow((my_poly.at(i+1)-my_poly.at(i)).y(),2));
 		}
