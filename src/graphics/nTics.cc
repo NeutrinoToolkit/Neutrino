@@ -126,7 +126,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         QSizeF size(my_view->nparent->currentBuffer->getW(),my_view->nparent->currentBuffer->getH());
 
         int exponentX=log10(std::abs(my_sc.x()*size.width()));
-        for (int k=0;k<ticsPerDecade.size();k++) {
+        for (long unsigned int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
@@ -210,7 +210,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->setPen(pen);
 
         int exponentY=log10(std::abs(my_sc.y()*size.height()));
-        for (int k=0;k<ticsPerDecade.size();k++) {
+        for (long unsigned int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
