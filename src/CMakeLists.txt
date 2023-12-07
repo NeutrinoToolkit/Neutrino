@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+
 if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 endif()
@@ -141,6 +141,8 @@ elseif(LINUX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.svg DESTINATION share/applications RENAME Neutrino.svg)
 
 endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS ON POSITION_INDEPENDENT_CODE ON)
 
 foreach(MODULE ${MODULES})
     set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
