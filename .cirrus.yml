@@ -7,7 +7,7 @@ macM1_task:
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc vulkan-headers
     brew install iltommi/brews/hdf4
     mkdir -p build && cd build
-    cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
+    cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     cp Neutrino-*.dmg ..
@@ -260,7 +260,7 @@ opensuse_task:
 #     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
 #     brew install iltommi/brews/hdf4
 #     mkdir -p build && cd build
-#     cmake .. -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include" -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib"
+#     cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
 #     make -j$(sysctl -n hw.ncpu) install
 #     ../resources/macPackage/prepareapp.sh
 #     cp Neutrino-*.dmg ..
