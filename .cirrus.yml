@@ -126,6 +126,23 @@ AppImage_task:
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
+AppImageArm_task:
+  allow_failures: true
+  arm_container:
+    image: arm64v8/fedora
+  script: |
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-aarch64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir
+    ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ../Neutrino-Linux-ARM.AppImage
+  package_artifacts:
+    path: "Neutrino-*.AppImage"
+
 upload_task:
   only_if: $CIRRUS_BRANCH == 'master'
   depends_on:
@@ -145,18 +162,7 @@ upload_task:
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
     git pull
     gh release upload --clobber latest package/*
-
-# waiting linuxdeploy for arm
-#   allow_failures: true
-# linuxArm_task:
-#   arm_container:
-#     image: arm64v8/fedora
-#   script: |
-#     dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-#     mkdir build && cd build
-#     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-#     make -j2 install DESTDIR=AppDir
-
+    
 ubuntu_task:
   allow_failures: true
   container:
