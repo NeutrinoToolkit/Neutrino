@@ -20,8 +20,7 @@ jobs:
     - name: Deps
       run: |
         brew install --force iltommi/brews/hdf4
-        wget https://raw.githubusercontent.com/Homebrew/homebrew-core/3ef7d3e13549bdb977d180600b77d2ae02962378/Formula/c/clfft.rb
-        brew install ./clfft.rb
+        brew install --force iltommi/brews/clfft
     - name: Build
       run: |
         mkdir -p build && cd build
