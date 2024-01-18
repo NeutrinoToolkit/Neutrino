@@ -7,6 +7,7 @@ macM1_task:
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
     brew unlink hdf5
     brew install iltommi/brews/hdf4
+    rm /opt/homebrew/share/COPYING
     brew link -f hdf5
     brew install iltommi/brews/clfft
     mkdir -p build && cd build
@@ -134,7 +135,7 @@ AppImageArm_task:
   arm_container:
     image: arm64v8/fedora
   script: |
-    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-aarch64.AppImage
     chmod +x linuxdeploy*.AppImage
