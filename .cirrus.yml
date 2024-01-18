@@ -134,6 +134,10 @@ AppImageArm_task:
   allow_failures: true
   arm_container:
     image: arm64v8/fedora
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib    
   script: |
     dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
