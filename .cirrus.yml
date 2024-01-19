@@ -147,7 +147,7 @@ AppImageArm_task:
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-    cp Neutrino-*.AppImage ../Neutrino-Linux-ARM.AppImage
+    cp Neutrino-*.AppImage ../Neutrino-Linux-arm64.AppImage
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
