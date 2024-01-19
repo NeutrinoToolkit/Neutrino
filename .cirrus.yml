@@ -5,10 +5,10 @@ macM1_task:
     brew update
     brew install objc-codegenutils objc-run create-dmg
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
-    brew unlink hdf5
+#    brew unlink hdf5
     brew install iltommi/brews/hdf4
-    rm /opt/homebrew/share/COPYING
-    brew link -f hdf5
+#    rm /opt/homebrew/share/COPYING
+#    brew link -f hdf5
     brew install iltommi/brews/clfft
     mkdir -p build && cd build
     cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
