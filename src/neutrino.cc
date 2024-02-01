@@ -1385,6 +1385,25 @@ QString neutrino::getFileSave() {
     return fname;
 }
 
+void neutrino::on_actionSave_numebered_serie_triggered() {
+    QFileInfo fname=QFileInfo(getFileSave());
+
+    QString base=QDir(fname.absolutePath()).filePath(fname.completeBaseName());
+    QString suffix="."+fname.suffix();
+
+
+    int i=0;
+    int num_digits=1+int(log10(physList.size()));
+    foreach (nPhysD *phys, physList) {
+        QString num=QString::number(i).rightJustified(num_digits, '0');
+        QString fname_number=base+num+suffix;
+        fileSave(phys,fname_number);
+        qDebug() << "here" << num_digits << fname_number;
+        i++;
+    }
+
+}
+
 void
 neutrino::fileSave() {
     fileSave(getFileSave());

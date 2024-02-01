@@ -145,6 +145,7 @@ public slots:
     void fileSave(nPhysD*);
     void fileSave(QString);
     void fileSave(nPhysD*,QString);
+    void on_actionSave_numebered_serie_triggered();
     bool fileClose();
     //	void file_quit_slot();
 

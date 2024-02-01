@@ -298,7 +298,7 @@ void nApp::forceDecimalDot(bool num) {
     qDebug() << num;
 }
 
-void nApp::checkUpdates() {
+int nApp::checkUpdates() {
     QNetworkProxyFactory::setUseSystemConfiguration(true) ;
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
@@ -363,9 +363,9 @@ void nApp::checkUpdates() {
 
         } else {
             qInfo() << "[update] you're on the last version:" << compileSHA ;
-
+            return 0;
         }
 
     }
-
+    return 1;
 }

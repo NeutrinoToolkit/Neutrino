@@ -74,7 +74,7 @@ public slots:
     void findLogText();
 
     void forceDecimalDot(bool);
-    void checkUpdates();
+    int checkUpdates();
 };
 
 #endif

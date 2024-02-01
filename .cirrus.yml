@@ -8,7 +8,7 @@ macM1_task:
     brew install iltommi/brews/hdf4
     brew install iltommi/brews/clfft
     mkdir -p build && cd build
-    cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
+    cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
     cp Neutrino-*.dmg ..
@@ -87,7 +87,7 @@ win64_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
-AppImageTest_task:
+AppImage_olderLinux_task:
   container:
     image: fedora:34
   env:
@@ -103,7 +103,7 @@ AppImageTest_task:
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-    cp Neutrino-*.AppImage ../Neutrino-Linux-test.AppImage
+    cp Neutrino-*.AppImage ../Neutrino-olderLinux.AppImage
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
@@ -244,38 +244,4 @@ opensuse_task:
     cp Neutrino*.rpm ..
   package_artifacts:
     path: "Neutrino-*.*"
-
-# ARCHIVED RULES
-
-# prepare_task:
-#   container:
-#     image: ubuntu:22.04
-#   script: |
-#     apt-get update -qq
-#     apt-get install -yy git gh
-#     git config --global user.name "Cirrus CI"
-#     git config --global user.email "hello@cirruslabs.org"
-#     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-#     git push origin :refs/tags/latest
-#     git tag -fa latest -m "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-#     git push --follow-tags origin HEAD:master || true
-#     gh release delete latest -y || true
-#     gh release create latest -n "Commit # $(git rev-list HEAD --count) Build info: https://cirrus-ci.com/build/$CIRRUS_BUILD_ID"
-
-# macIntel_task:
-#   macos_instance:
-#     image: big-sur-base
-#   script: |
-#     brew update
-#     brew install objc-codegenutils objc-run create-dmg
-#     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl clfft pandoc
-#     brew install iltommi/brews/hdf4
-#     mkdir -p build && cd build
-#     cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
-#     make -j$(sysctl -n hw.ncpu) install
-#     ../resources/macPackage/prepareapp.sh
-#     cp Neutrino-*.dmg ..
-#     echo "https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip"
-#   package_artifacts:
-#     path: "Neutrino-*.*"
 

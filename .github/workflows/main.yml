@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: |
         mkdir -p build && cd build
-        cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix libomp)
+        cmake ..
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
     - name: Archive

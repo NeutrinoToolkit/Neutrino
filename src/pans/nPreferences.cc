@@ -339,5 +339,7 @@ void nPreferences::on_mouseColor_released() {
 }
 
 void nPreferences::on_checkUpdatesNow_released() {
-    napp->checkUpdates();
+    if (napp->checkUpdates() ==0) {
+        QMessageBox::information(this, tr("Update"), tr("You're at the latest version"), QMessageBox::Ok);
+    }
 }
