@@ -107,6 +107,33 @@ AppImage_olderLinux_task:
   package_artifacts:
     path: "Neutrino-*.AppImage"
 
+AppImage_almalinux_task:
+  container:
+    image: almalinux:9
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib
+  script: |
+    dnf install --assumeyes wget
+    wget $(echo "https://pkgs.dyn.su/el9/base/x86_64/raven-release.el9.noarch.rpm" | sed "s/el9/el$(rpm -q --queryformat '%{RELEASE}' rpm | grep -oP 'el\K[0-9]+')/g")
+    rpm -ivh raven-release*.rpm
+    dnf install --assumeyes epel-release
+    dnf install --assumeyes almalinux-release-devel
+    dnf config-manager --set-enabled crb
+    dnf update --assumeyes
+    dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir
+    ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ../Neutrino-almaLinux.AppImage
+  package_artifacts:
+    path: "Neutrino-*.AppImage"
+
 AppImage_task:
   container:
     image: fedora:36
@@ -232,7 +259,7 @@ fedora_task:
 opensuse_task:
   allow_failures: true
   container:
-    image: opensuse/tumbleweed
+    image: opensuse/tumbleweed:latest
   script: |
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
