@@ -1,3 +1,80 @@
+ubuntu_task:
+  allow_failures: true
+  container:
+    image: ubuntu:22.04
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
+debian_task:
+  allow_failures: true
+  container:
+    image: debian:testing
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103-1 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
+    apt-get install -yy qml6-module*
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
+mint_task:
+  allow_failures: true
+  container:
+    image: linuxmintd/mint21-amd64:latest
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
+fedora_task:
+  allow_failures: true
+  container:
+    image: fedora:36
+  script: |
+    dnf clean all
+    dnf -y --nogpgcheck update
+    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.rpm ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
+opensuse_task:
+  allow_failures: true
+  container:
+    image: opensuse/tumbleweed:latest
+  script: |
+    zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+    zypper --gpg-auto-import-keys ref
+    zypper update -y
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.rpm ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
 macM1_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
@@ -197,80 +274,3 @@ upload_task:
     git pull
     gh release upload --clobber latest package/*
     
-ubuntu_task:
-  allow_failures: true
-  container:
-    image: ubuntu:22.04
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-debian_task:
-  allow_failures: true
-  container:
-    image: debian:testing
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103-1 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
-    apt-get install -yy qml6-module*
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-mint_task:
-  allow_failures: true
-  container:
-    image: linuxmintd/mint21-amd64:latest
-  script: |
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.deb ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-fedora_task:
-  allow_failures: true
-  container:
-    image: fedora:36
-  script: |
-    dnf clean all
-    dnf -y --nogpgcheck update
-    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.rpm ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
-opensuse_task:
-  allow_failures: true
-  container:
-    image: opensuse/tumbleweed:latest
-  script: |
-    zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
-    zypper --gpg-auto-import-keys ref
-    zypper update -y
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
-    mkdir build && cd build
-    cmake ..
-    make -j2 package
-    cp Neutrino*.rpm ..
-  package_artifacts:
-    path: "Neutrino-*.*"
-
