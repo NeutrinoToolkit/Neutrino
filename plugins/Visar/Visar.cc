@@ -247,7 +247,7 @@ void Visar::changeShot(QString num) {
                 }
             }
         }
-        if (globDirShot->text() != globDirRef->text() && globShot->text() != globRef->text()) {
+        if (globDirShot->text() != globDirRef->text() || globShot->text() != globRef->text()) {
             QFileInfoList listshot = QDir(globDirShot->text()).entryInfoList(QDir::Files);
             foreach(QFileInfo finfo, listshot) {
                 QString fname=finfo.fileName();

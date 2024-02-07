@@ -182,6 +182,8 @@ upload_task:
     - win32
     - win64
     - AppImage
+    - AppImageArm
+    
   container:
     image: ubuntu:22.04
   script: |
