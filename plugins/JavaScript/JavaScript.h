@@ -49,6 +49,6 @@ private:
 
 };
 
-NEUTRINO_PLUGIN(JavaScript,File,":icons/JavaScript.png", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_J), 99);
+NEUTRINO_PLUGIN(JavaScript,File;Scripting,":icons/JavaScript.png", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_J), 99);
 
 #endif

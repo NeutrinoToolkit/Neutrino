@@ -29,7 +29,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
-
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
         COMMAND brew --prefix libomp
@@ -40,6 +39,8 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     if (BREW_libomp EQUAL 0 AND EXISTS "${BREW_libomp_PREFIX}")
         message(STATUS "Found libomp keg installed by Homebrew at ${BREW_libomp_PREFIX}")
         set(CMAKE_PREFIX_PATH "${BREW_libomp_PREFIX}")
+    else()
+    	message(STATUS "Brew not found. You should install it and install the libomp package")
     endif()
 endif()
 
