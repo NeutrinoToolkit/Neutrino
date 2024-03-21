@@ -27,5 +27,5 @@ codesign --force --deep --sign - dmg_dir/Neutrino.app
 
 ditto -c -k --sequesterRsrc --keepParent dmg_dir/Neutrino.app Neutrino-$(uname -s)-$(uname -m).zip
 
-# create-dmg --icon-size 96 --volname Neutrino --volicon $DIR/dmg-icon.icns --background $DIR/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino-$(uname -s)-$(uname -m).dmg dmg_dir
+create-dmg --icon-size 96 --volname Neutrino --volicon $DIR/dmg-icon.icns --background $DIR/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino-$(uname -s)-$(uname -m).dmg dmg_dir
 
