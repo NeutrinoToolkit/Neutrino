@@ -1,5 +1,4 @@
 # this is the frigging nPhysImage cmakelists
-cmake_minimum_required (VERSION 3.9)
 
 file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
 

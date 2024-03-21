@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Shortcuts_h
-#define __Shortcuts_h
+#ifndef Shortcuts_H_
+#define Shortcuts_H_
 
 #include <QtGui>
 #include <QWidget>

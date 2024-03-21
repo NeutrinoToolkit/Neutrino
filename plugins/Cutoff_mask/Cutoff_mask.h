@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Cutoff_mask.h"
 
-#ifndef __Cutoff_mask
-#define __Cutoff_mask
+#ifndef Cutoff_mask_H_
+#define Cutoff_mask_H_
 
 class neutrino;
 

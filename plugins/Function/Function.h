@@ -33,9 +33,6 @@
 #include "neutrino.h"
 #include "exprtk.hpp"
 
-
-
-
 class Function : public nGenericPan, private Ui::Function {
     Q_OBJECT
 

@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Wavelet.h"
 
-#ifndef __Wavelet
-#define __Wavelet
+#ifndef Wavelet_H_
+#define Wavelet_H_
 #include "nPhysWave.h"
 #include "nRect.h"
 #include "nLine.h"

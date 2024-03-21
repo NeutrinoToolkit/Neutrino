@@ -1,7 +1,7 @@
 #include <QtCore>
 
-#ifndef __panThread
-#define __panThread
+#ifndef panThread_H_
+#define panThread_H_
 
 class panThread : public QThread {
     Q_OBJECT

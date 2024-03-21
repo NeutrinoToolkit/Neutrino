@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Properties_h
-#define __Properties_h
+#ifndef _H_Properties_H_
+#define _H_Properties_H_
 
 #include <QtGui>
 #include <QWidget>

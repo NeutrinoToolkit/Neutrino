@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Lineout_H_V
-#define __Lineout_H_V
+#ifndef Lineout_H_V_H_
+#define Lineout_H_V_H_
 
 #include <QtGui>
 #include <QWidget>

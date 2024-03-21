@@ -1,5 +1,5 @@
-#ifndef __ZoomView
-#define __ZoomView
+#ifndef ZoomView_H_
+#define ZoomView_H_
 
 #include <QGraphicsView>
 

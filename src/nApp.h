@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef nApp_H
-#define nApp_H
+#ifndef nApp_H_
+#define nApp_H_
 
 #include <QApplication>
 #include <QPlainTextEdit>

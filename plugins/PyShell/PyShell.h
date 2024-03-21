@@ -1,5 +1,5 @@
-#ifndef __PyShell
-#define __PyShell
+#ifndef PyShell_H_
+#define PyShell_H_
 
 #include <Python.h>
 #include <cmath>

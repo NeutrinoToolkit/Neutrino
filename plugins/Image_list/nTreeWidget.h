@@ -30,8 +30,8 @@
 
 #include <QTreeWidget>
 
-#ifndef __nTreeWidget_h
-#define __nTreeWidget_h
+#ifndef nTreeWidget_H_
+#define nTreeWidget_H_
 
 class nWinList;
 class neutrino;

@@ -29,8 +29,8 @@
 #include "ui_MUSE.h"
 #include "nPoint.h"
 
-#ifndef __MUSE
-#define __MUSE
+#ifndef MUSE_H_
+#define MUSE_H_
 
 class neutrino;
 

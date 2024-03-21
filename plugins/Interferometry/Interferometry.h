@@ -29,8 +29,8 @@
 #include "ui_Interferometry.h"
 #include "ui_Interferometry1.h"
 
-#ifndef __Interferometry
-#define __Interferometry
+#ifndef Interferometry_H_
+#define Interferometry_H_
 #include "nPhysWave.h"
 #include "nLine.h"
 #include "nRect.h"

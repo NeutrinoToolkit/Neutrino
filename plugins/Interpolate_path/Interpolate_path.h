@@ -30,8 +30,8 @@
 #include "nGenericPan.h"
 #include "ui_Interpolate_path.h"
 
-#ifndef __Interpolate_path
-#define __Interpolate_path
+#ifndef Interpolate_path_H_
+#define Interpolate_path_H_
 
 class neutrino;
 class nLine;

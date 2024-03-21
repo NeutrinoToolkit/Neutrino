@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Reflectivity.h"
 
-#ifndef __Reflectivity
-#define __Reflectivity
+#ifndef Reflectivity_H_
+#define Reflectivity_H_
 
 class neutrino;
 

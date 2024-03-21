@@ -1,3 +1,0 @@
-[submodule "plugins/PyShell/pythonqt"]
-	path = plugins/PyShell/pythonqt
-	url = https://github.com/iltommi/pythonqt.git

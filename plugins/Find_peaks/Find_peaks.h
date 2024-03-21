@@ -25,8 +25,8 @@
 #include <QtGui>
 #include <QWidget>
 
-#ifndef __Find_peaks
-#define __Find_peaks
+#ifndef Find_peaks_H_
+#define Find_peaks_H_
 
 #include "nGenericPan.h"
 #include "ui_Find_peaks.h"

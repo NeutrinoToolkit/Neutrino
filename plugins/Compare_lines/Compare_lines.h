@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Compare_lines.h"
 
-#ifndef __Compare_lines
-#define __Compare_lines
+#ifndef Compare_lines_H_
+#define Compare_lines_H_
 
 #include "neutrino.h"
 class nLine;

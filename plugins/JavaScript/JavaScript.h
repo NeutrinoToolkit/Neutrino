@@ -26,8 +26,8 @@
 #include <QWidget>
 #include <QJSEngine>
 
-#ifndef JavaScript__H
-#define JavaScript__H
+#ifndef JavaScript_H_
+#define JavaScript_H_
 
 #include "nGenericPan.h"
 #include "ui_JavaScript.h"

@@ -22,14 +22,14 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#ifndef Ghost_fringes_H_
+#define Ghost_fringes_H_
 #include <QtGui>
 #include <QWidget>
 
 #include "nGenericPan.h"
 #include "ui_Ghost_fringes.h"
 
-#ifndef __Ghost_fringes
-#define __Ghost_fringes
 #include "nPhysWave.h"
 #include "nLine.h"
 

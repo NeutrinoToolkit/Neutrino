@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Colorscale_h
-#define __Colorscale_h
+#ifndef Colorscale_h_
+#define Colorscale_h_
 
 #include <iostream>
 

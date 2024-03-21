@@ -30,8 +30,8 @@
 #include <QTableWidgetItem>
 #include "nPhysD.h"
 
-#ifndef __nEllipse
-#define __nEllipse
+#ifndef nEllipse_H_
+#define nEllipse_H_
 
 #include "nObject.h"
 

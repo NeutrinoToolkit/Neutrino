@@ -35,8 +35,8 @@
 #include "nTics.h"
 #include "neutrino.h"
 
-#ifndef __nView_h
-#define __nView_h
+#ifndef nView_H_
+#define nView_H_
 
 class neutrino;
 

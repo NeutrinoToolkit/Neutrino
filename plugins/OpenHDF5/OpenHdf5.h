@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_OpenHdf5.h"
 
-#ifndef __OpenHdf5
-#define __OpenHdf5
+#ifndef OpenHdf5_H_
+#define OpenHdf5_H_
 
 #include "hdf5.h"
 #include "hdf5_hl.h"

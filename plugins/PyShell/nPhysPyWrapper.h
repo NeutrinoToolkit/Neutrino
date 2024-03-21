@@ -1,5 +1,5 @@
-#ifndef __nphys_py_wrapper
-#define __nphys_py_wrapper
+#ifndef nphys_py_wrapper_H_
+#define nphys_py_wrapper_H_
 
 #include "Python.h"
 

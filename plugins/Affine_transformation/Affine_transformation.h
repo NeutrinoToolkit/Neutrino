@@ -31,8 +31,8 @@
 #include "nRect.h"
 
 
-#ifndef __Affine_transformation
-#define __Affine_transformation
+#ifndef Affine_transformation_h_
+#define Affine_transformation_h_
 
 class neutrino;
 

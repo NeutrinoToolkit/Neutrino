@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Spectral_analysis.h"
 
-#ifndef __Spectral_analysis
-#define __Spectral_analysis
+#ifndef Spectral_analysis_H_
+#define Spectral_analysis_H_
 
 class neutrino;
 

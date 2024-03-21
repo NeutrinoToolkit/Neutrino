@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Box_lineout.h"
 
-#ifndef __Box_lineout
-#define __Box_lineout
+#ifndef Box_lineout_h_
+#define Box_lineout_h_
 
 #include "neutrino.h"
 

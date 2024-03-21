@@ -31,8 +31,8 @@
 #include "ui_RegionPath.h"
 #include "nLine.h"
 
-#ifndef __RegionPath
-#define __RegionPath
+#ifndef RegionPath_H_
+#define RegionPath_H_
 
 
 class neutrino;

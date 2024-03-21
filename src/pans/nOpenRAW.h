@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_nOpenRAW.h"
 
-#ifndef __nOpenRAW
-#define __nOpenRAW
+#ifndef nOpenRAW_H_
+#define nOpenRAW_H_
 
 class neutrino;
 

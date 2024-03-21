@@ -25,8 +25,8 @@
 #include <QtGui>
 #include <QGraphicsItem>
 
-#ifndef __nMouse
-#define __nMouse
+#ifndef nMouse_H_
+#define nMouse_H_
 
 
 class nMouse : public QGraphicsItem {

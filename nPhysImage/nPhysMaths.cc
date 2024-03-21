@@ -1126,7 +1126,7 @@ nPhysImageF<char> physMath::contour_surface_map(physD &iimage, std::list<vec2i> 
 
     DEBUG("walk starting from "<<up_pl.front()<<" to "<<up_pl.back());
 
-    int line_check =0;
+    // int line_check =0;
 
     // the maximum possible surface w/in a given contour is the circular case;
     // 20% for additional safety
@@ -1240,7 +1240,7 @@ nPhysImageF<char> physMath::contour_surface_map(physD &iimage, std::list<vec2i> 
             //else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
         }
 
-        line_check++;
+        // line_check++;
 
 
     }
@@ -1328,7 +1328,7 @@ std::list<double> physMath::contour_integrate(physD &iimage, std::list<vec2i> &c
 
     //std::cerr<<"walk starting from "<<up_pl.front()<<" to "<<up_pl.back()<<std::endl;
 
-    int line_check =0;
+    // int line_check =0;
 
     // the maximum possible surface w/in a given contour is the circular case;
     // 20% for additional safety
@@ -1415,7 +1415,7 @@ std::list<double> physMath::contour_integrate(physD &iimage, std::list<vec2i> &c
             //else std::cerr<<"--------------- cippacazzo ------------------"<<pp<<std::endl;
         }
 
-        line_check++;
+        // line_check++;
 
         safety_counter++;
 

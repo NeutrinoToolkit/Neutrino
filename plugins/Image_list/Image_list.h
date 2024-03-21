@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __Image_list_h
-#define __Image_list_h
+#ifndef Image_list_h
+#define Image_list_h
 
 #include <QtGui>
 #include <QWidget>

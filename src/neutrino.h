@@ -38,8 +38,8 @@
 #include <QPrinter>
 #include <QMap>
 
-#ifndef __neutrino_h
-#define __neutrino_h
+#ifndef neutrino_H_
+#define neutrino_H_
 
 // physImage
 #include "nPhysD.h"

@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nLine
-#define __nLine
+#ifndef nLine_H_
+#define nLine_H_
 
 #include <QtGui>
 #include <QClipboard>

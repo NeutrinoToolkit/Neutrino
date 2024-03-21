@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERA_H_
+#define CAMERA_H_
 
 #include <QAudioInput>
 #include <QCamera>

@@ -65,7 +65,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 			maxt = omp_get_max_threads();
 			inpar = omp_in_parallel();
 			dynamic = omp_get_dynamic();
-			nested = omp_get_nested();
 
 			/* Print environment information */
             infoCores->insertPlainText("Number of processors : "+QLocale().toString(procs));
@@ -73,7 +72,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
             infoCores->insertPlainText("\nMax threads : "+QLocale().toString(maxt));
             infoCores->insertPlainText("\nIn parallel? : "+QString(inpar==0?"No":"Yes"));
             infoCores->insertPlainText("\nDynamic threads enabled? = "+QString(dynamic==0?"No":"Yes"));
-            infoCores->insertPlainText("\nNested supported? : "+QString(nested==0?"No":"Yes"));
 		}
 	}
 

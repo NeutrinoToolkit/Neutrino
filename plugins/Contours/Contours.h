@@ -29,8 +29,8 @@
 #include "nGenericPan.h"
 #include "ui_Contours.h"
 
-#ifndef __Contours
-#define __Contours
+#ifndef Contours_h_
+#define Contours_h_
 
 class neutrino;
 class nLine;

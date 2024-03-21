@@ -1,19 +1,24 @@
 find_package(Python COMPONENTS Interpreter Development)
 if(Python_FOUND)
     include_directories(${Python_INCLUDE_DIRS})
-
-    find_library(PYTHONQT    NAMES PythonQt-Qt6       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/lib")
-    find_library(PYTHONQTALL NAMES PythonQt_QtAll-Qt6 PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/lib")
+	list(APPEND LOCAL_LIBS ${PYTHON})
+    find_library(PYTHONQT    NAMES PythonQt-Qt6      )
+    find_library(PYTHONQTALL NAMES PythonQt_QtAll-Qt6)
+    # find_library(PYTHONQT    NAMES PythonQt-Qt6       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/lib")
+    # find_library(PYTHONQTALL NAMES PythonQt_QtAll-Qt6 PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/lib")
 
     if (NOT (${PYTHONQT} STREQUAL "PYTHONQT-NOTFOUND" OR ${PYTHONQTALL} STREQUAL "PYTHONQTALL-NOTFOUND"))
 
         list(APPEND LOCAL_LIBS ${PYTHONQT})
         list(APPEND LOCAL_LIBS ${PYTHONQTALL})
 
-        FIND_PATH(PYTHONQT_INCDIR    PythonQt.h       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/include")
-        FIND_PATH(PYTHONQTALL_INCDIR PythonQt_QtAll.h PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/include")
-                
+        FIND_PATH(PYTHONQT_INCDIR    PythonQt.h       )
+        FIND_PATH(PYTHONQTALL_INCDIR PythonQt_QtAll.h )
+        # FIND_PATH(PYTHONQT_INCDIR    PythonQt.h       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/include")
+        # FIND_PATH(PYTHONQTALL_INCDIR PythonQt_QtAll.h PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/include")
+
         IF (NOT (${PYTHONQT_INCDIR} STREQUAL "PYTHONQT_INCDIR-NOTFOUND" OR ${PYTHONQTALL_INCDIR} STREQUAL "PYTHONQTALL_INCDIR-NOTFOUND"))
+
             set (PYTHONQT_FOUND_COMPLETE "TRUE")
             add_definitions(-DHAVE_PYTHONQT)
             include_directories(${PYTHONQT_INCDIR})

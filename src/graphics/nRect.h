@@ -30,8 +30,8 @@
 #include <QTableWidgetItem>
 #include "nPhysD.h"
 
-#ifndef __nRect
-#define __nRect
+#ifndef nRect_H_
+#define nRect_H_
 
 #include "nObject.h"
 

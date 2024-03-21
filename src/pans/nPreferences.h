@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nPreferences_h
-#define __nPreferences_h
+#ifndef nPreferences_H_
+#define nPreferences_H_
 
 #include <QtGui>
 #include <QWidget>

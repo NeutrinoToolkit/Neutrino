@@ -192,8 +192,6 @@ void Visar::on_actionPrevious_triggered() {
     }
 }
 
-
-
 void Visar::changeShot(QString num) {
     qDebug() << num;
     QSet<nPhysD*> old_phys;
@@ -851,6 +849,8 @@ double Visar::getTime(std::vector<double> &vecsweep, double p) {
 }
 
 QPointF Visar::getTimeSpaceFromPixel(QPointF p) {
+    return QPointF(0,0);
+
     int k=0;
     double posTime=0.0;
     double posSpace=0.0;

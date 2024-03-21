@@ -25,8 +25,8 @@
 #include <QtGui>
 #include <QGraphicsObject>
 
-#ifndef __nTics
-#define __nTics
+#ifndef nTics_H_
+#define nTics_H_
 
 class nView;
 

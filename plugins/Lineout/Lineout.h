@@ -22,8 +22,8 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#ifndef __nlineout
-#define __nlineout
+#ifndef nlineout_H_
+#define nlineout_H_
 
 #include <QtGui>
 #include <QWidget>

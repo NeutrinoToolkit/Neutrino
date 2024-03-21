@@ -1,5 +1,5 @@
-#ifndef __unwrap
-#define __unwrap
+#ifndef unwrap_h_
+#define unwrap_h_
 #include "../nPhysImageF.h"
 
 inline double grad(double p1, double p2) {
@@ -10,14 +10,12 @@ inline double grad(double p1, double p2) {
 }
 
 namespace unwrap {
-
-void goldstein (physD &, physD &);
-void miguel (physD &, physD &);
-void miguel_quality (physD &, physD &, physD&);
-void quality (physD &, physD &, physD &);
-void simple_h (physD&, physD&);
-void simple_v (physD&, physD&);
-
+  void goldstein (physD &, physD &);
+  void miguel (physD &, physD &);
+  void miguel_quality (physD &, physD &, physD&);
+  void quality (physD &, physD &, physD &);
+  void simple_h (physD&, physD&);
+  void simple_v (physD&, physD&);
 }
 
 #endif

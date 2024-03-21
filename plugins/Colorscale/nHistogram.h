@@ -28,8 +28,8 @@
 #include <QWidget>
 #include <QtSvg>
 
-#ifndef __nhistogram_h
-#define __nhistogram_h
+#ifndef nhistogram_H_
+#define nhistogram_H_
 
 #include "nPhysImageF.h"
 

@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_ZoomWin.h"
 
-#ifndef __ZoomWin
-#define __ZoomWin
+#ifndef ZoomWin_H_
+#define ZoomWin_H_
 #include "nLine.h"
 #include "nRect.h"
 

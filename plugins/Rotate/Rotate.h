@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Rotate.h"
 
-#ifndef __Rotate
-#define __Rotate
+#ifndef Rotate_H_
+#define Rotate_H_
 
 class neutrino;
 

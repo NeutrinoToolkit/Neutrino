@@ -31,8 +31,8 @@
 
 #include "ui_Mouse_info.h"
 
-#ifndef __Mouse_info_h
-#define __Mouse_info_h
+#ifndef Mouse_info_H_
+#define Mouse_info_H_
 
 class neutrino;
 

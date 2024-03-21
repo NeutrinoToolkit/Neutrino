@@ -28,8 +28,8 @@
 #include "nGenericPan.h"
 #include "ui_Math_operations.h"
 
-#ifndef __Math_operations
-#define __Math_operations
+#ifndef Math_operations_H_
+#define Math_operations_H_
 
 class neutrino;
 

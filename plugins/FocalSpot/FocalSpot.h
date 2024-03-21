@@ -29,8 +29,8 @@
 #include "nGenericPan.h"
 #include "ui_FocalSpot.h"
 
-#ifndef __FocalSpot
-#define __FocalSpot
+#ifndef FocalSpot_H_
+#define FocalSpot_H_
 
 class neutrino;
 class nLine;

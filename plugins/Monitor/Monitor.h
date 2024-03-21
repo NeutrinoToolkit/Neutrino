@@ -29,8 +29,8 @@
 #include "nGenericPan.h"
 #include "ui_Monitor.h"
 
-#ifndef __Monitor
-#define __Monitor
+#ifndef Monitor_H_
+#define Monitor_H_
 
 class neutrino;
 
