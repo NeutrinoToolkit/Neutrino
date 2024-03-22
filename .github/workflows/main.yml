@@ -30,7 +30,7 @@ jobs:
     - name: Archive
       uses: actions/upload-artifact@v3
       with:
-        name: Neutrino.dmg
+        name: Neutrino.zip
         path: "build/Neutrino*.zip"
     - name: Upload
       if: github.ref == 'refs/heads/master'
@@ -38,7 +38,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "build/Neutrino*.dmg"
+        file: "build/Neutrino*.zip"
         update_latest_release: true
         overwrite: true
     
