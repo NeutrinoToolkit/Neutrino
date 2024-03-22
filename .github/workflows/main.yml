@@ -15,7 +15,7 @@ jobs:
         description: Latest
     - name: Prepare
       run: |
-        brew install objc-codegenutils objc-run create-dmg
+        brew install objc-codegenutils objc-run
         brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers
     - name: Deps
       run: |
@@ -31,7 +31,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Neutrino.dmg
-        path: "build/Neutrino*.dmg"
+        path: "build/Neutrino*.zip"
     - name: Upload
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
