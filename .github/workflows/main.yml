@@ -21,27 +21,27 @@ jobs:
       run: |
         brew install --force iltommi/brews/hdf4
         brew install --force iltommi/brews/clfft
-    - name: PyhtonQt
-      run: |
-        git clone https://github.com/iltommi/pythonqt.git
-        cd pythonqt
-        wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
-        tar -zxf Python-3.12.2.tgz
-        cd Python-3.12.2
-        ./configure --prefix=$(pwd)/../python
-        make -j$(sysctl -n hw.ncpu)
-        make install
-        cd ..
-        find python
-        cd generator
-        qmake -r generator.pro
-        make -j10
-        QTDIR=$(brew --prefix qt) ./pythonqt_generator
-        cd ..
-        PYTHON_VERSION=$(./python/bin/python3 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=$(pwd)/python QTDIR=$(brew --prefix qt) qmake -r
-        make -j10
-        INSTALL_ROOT=$(brew --prefix) make install
-        cd ..
+#     - name: PyhtonQt
+#       run: |
+#         git clone https://github.com/iltommi/pythonqt.git
+#         cd pythonqt
+#         wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
+#         tar -zxf Python-3.12.2.tgz
+#         cd Python-3.12.2
+#         ./configure --prefix=$(pwd)/../python
+#         make -j$(sysctl -n hw.ncpu)
+#         make install
+#         cd ..
+#         find python/bin
+#         cd generator
+#         qmake -r generator.pro
+#         make -j10
+#         QTDIR=$(brew --prefix qt) ./pythonqt_generator
+#         cd ..
+#         PYTHON_VERSION=$(./python/bin/python3 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=$(pwd)/python QTDIR=$(brew --prefix qt) qmake -r
+#         make -j10
+#         INSTALL_ROOT=$(brew --prefix) make install
+#         cd ..
     - name: Build
       run: |
         mkdir -p build && cd build
