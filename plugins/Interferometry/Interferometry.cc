@@ -621,14 +621,12 @@ void Interferometry::doShape(){
                         if (point_inside_poly(pp,vecPoints)) {
                             double mean=0;
                             double weight=0;
-                            int m=0;
                             for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
                                 vec2f p=it->first;
                                 double pval=it->second;
                                 double wi=1.0/(pp-p).mod2();
                                 mean+=wi*pval;
                                 weight+=wi;
-                                m++;
                             }
                             double ppval=mean/weight;
                             regionPath->set(pp,ppval);

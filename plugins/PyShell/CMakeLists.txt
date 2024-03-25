@@ -1,7 +1,7 @@
 find_package(Python COMPONENTS Interpreter Development)
 if(Python_FOUND)
     include_directories(${Python_INCLUDE_DIRS})
-	list(APPEND LOCAL_LIBS ${PYTHON})
+    list(APPEND LOCAL_LIBS ${PYTHON})
     find_library(PYTHONQT    NAMES PythonQt-Qt6      )
     find_library(PYTHONQTALL NAMES PythonQt_QtAll-Qt6)
     # find_library(PYTHONQT    NAMES PythonQt-Qt6       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/local/lib")

@@ -23,7 +23,7 @@ jobs:
         brew install --force iltommi/brews/clfft
     - name: PyhtonQt
       run: |
-        git clone git@github.com:iltommi/pythonqt.git
+        git clone https://github.com/iltommi/pythonqt.git
         cd pythonqt
         wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
         tar -zxvf Python-3.12.2.tgz

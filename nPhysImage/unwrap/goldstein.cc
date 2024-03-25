@@ -284,7 +284,7 @@ void unwrap::goldstein (physD &phase, physD &soln) {
     }
 
     /*  UNWRAP AROUND CUTS */
-    unsigned int  a, b, num_pieces=0;
+    unsigned int  a, b;
     double  value;
     unsigned int num_index=0;
 
@@ -295,7 +295,6 @@ void unwrap::goldstein (physD &phase, physD &soln) {
         for (unsigned int i=0; i<dx; i++) {
             if (!(bits.point(i,j) & (AVOID | UNWRAPPED))) {
                 bits.set(i,j,bits.point(i,j) | UNWRAPPED);
-                ++num_pieces;
                 value = phase.point(i,j);
                 soln.set(i,j,value);
                 UpdateList(qual_map, i, j, value, phase, soln, bits, index_list, num_index);
@@ -323,6 +322,4 @@ void unwrap::goldstein (physD &phase, physD &soln) {
             }
         }
     }
-
-    DEBUG("Disconnected pieces : " << num_pieces << std::endl);
 }

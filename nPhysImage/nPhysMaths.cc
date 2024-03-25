@@ -936,7 +936,7 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double le
     std::list<vec2i>::iterator itr = contour.begin(), itr_last = contour.begin();
     *itr = vec2i(ls_x, orig.y());
 
-    int n_iter=0;
+    // int n_iter=0;
     while (itr != contour.end()) {
         short xx = (*itr).x();
         short yy = (*itr).y();
@@ -1013,11 +1013,11 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double le
         itr_last = itr;
         itr++;
         *itr = vec2i(xx,yy);
-        n_iter++;
+        // n_iter++;
 
         if (*itr == *contour.begin()) {
             DEBUG(5,"Closed contour!! (distance: "<<std::distance(contour.begin(), itr_last));
-            DEBUG(5, "Contour size: "<<contour.size()<<", n_iter: "<<n_iter);
+            // DEBUG(5, "Contour size: "<<contour.size()<<", n_iter: "<<n_iter);
             contour_ok = true;
 
             itr_last++;

@@ -54,7 +54,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 #endif
 
 
-	int nthreads, procs, maxt, inpar, dynamic, nested;
+    int nthreads, procs, maxt, inpar, dynamic;
 #pragma omp parallel private(nthreads)
 	{
 		if (omp_get_thread_num() == 0)

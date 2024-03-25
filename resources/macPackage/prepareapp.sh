@@ -8,7 +8,7 @@ mkdir dmg_dir
 cp -r Neutrino.app dmg_dir
 
 
-$(brew --prefix qt)/bin/macdeployqt  dmg_dir/Neutrino.app -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4) 
+$(brew --prefix qt)/bin/macdeployqt  dmg_dir/Neutrino.app -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib 
 
 #fix pythonqt
 # cp -r $(brew --prefix python)/Frameworks/Python.framework dmg_dir/Neutrino.app/Contents/Frameworks
