@@ -38,7 +38,7 @@ jobs:
         make -j10
         QTDIR=$(brew --prefix qt) ./pythonqt_generator
         cd ..
-        PYTHON_VERSION=$(./python/bin/python3 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=./python QTDIR=$(brew --prefix qt) qmake -r
+        PYTHON_VERSION=$(./python/bin/python3 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=$(pwd)/python QTDIR=$(brew --prefix qt) qmake -r
         make -j10
         INSTALL_ROOT=$(brew --prefix) make install
         cd ..
