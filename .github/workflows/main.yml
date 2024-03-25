@@ -24,22 +24,22 @@ jobs:
     - name: PyhtonQt
       run: |
         git clone git@github.com:iltommi/pythonqt.git
-		    cd pythonqt
-    		wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
-    		tar -zxvf Python-3.12.2.tgz
-    		cd Python-3.12.2
-    		./configure --prefix=$(pwd)/../python
-    		make -j10 install
-    		cd ..
-    		cd generator
-    		qmake -r generator.pro
-    		make -j10
-    		QTDIR=$(brew --prefix qt) ./pythonqt_generator
-    		cd ..
-    		PYTHON_VERSION=$(./python/bin/python3.12 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=./python QTDIR=$(brew --prefix qt) qmake -r
-    		make -j10
-    		INSTALL_ROOT=$(brew --prefix) make install
-    		cd ..
+        cd pythonqt
+        wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
+        tar -zxvf Python-3.12.2.tgz
+        cd Python-3.12.2
+        ./configure --prefix=$(pwd)/../python
+        make -j10 install
+        cd ..
+        cd generator
+        qmake -r generator.pro
+        make -j10
+        QTDIR=$(brew --prefix qt) ./pythonqt_generator
+        cd ..
+        PYTHON_VERSION=$(./python/bin/python3.12 --version | cut -d " " -f 2 | cut -d "." -f1,2) PYTHON_DIR=./python QTDIR=$(brew --prefix qt) qmake -r
+        make -j10
+        INSTALL_ROOT=$(brew --prefix) make install
+        cd ..
     - name: Build
       run: |
         mkdir -p build && cd build
