@@ -86,13 +86,6 @@ macM1_task:
     brew install iltommi/brews/clfft
     git clone https://github.com/iltommi/pythonqt.git
     cd pythonqt
-#     wget https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz
-#     tar -zxf Python-3.12.2.tgz
-#     cd Python-3.12.2
-#     ./configure --prefix=$(pwd)/../python --prefix=$(pwd)/../python --disable-shared --enable-optimizations --without-readline --with-lto=yes  --disable-test-modules
-#     make -j$(sysctl -n hw.ncpu)
-#     make install
-#     cd ..
     cd generator
     qmake -r generator.pro
     make -j10
