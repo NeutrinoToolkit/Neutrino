@@ -23,6 +23,9 @@ $(brew --prefix qt)/bin/macdeployqt  dmg_dir/Neutrino.app -always-overwrite -lib
 # install_name_tool -change $(brew --prefix)/opt/python@3.12/Frameworks/Python.framework/Versions/3.12/Python @executable_path/../Frameworks/Python  dmg_dir/Neutrino.app/Contents/Frameworks/$filename
 # done
 
+cp -aH /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework dmg_dir/Neutrino.app/Contents/Frameworks
+codesign --force --deep --sign - dmg_dir/Neutrino.app/Contents/Frameworks/Python3.framework
+
 codesign --force --deep --sign - dmg_dir/Neutrino.app
 
 ditto -c -k --sequesterRsrc --keepParent dmg_dir/Neutrino.app Neutrino-$(uname -s)-$(uname -m).zip
