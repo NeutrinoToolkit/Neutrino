@@ -390,10 +390,10 @@ neutrino::scanPlugins(QString pluginsDirStr) {
             pluginlist.append(it.next());
         }
         pluginlist.sort();
-//        QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
-//        progress.setWindowModality(Qt::WindowModal);
-//        progress.show();
-//        progress.setCancelButton(nullptr);
+       QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
+       progress.setWindowModality(Qt::WindowModal);
+       progress.show();
+       progress.setCancelButton(nullptr);
         for (auto &pluginfile : pluginlist) {
             QString name_plugin=QFileInfo(pluginfile).baseName().replace("_"," ");
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
@@ -401,11 +401,11 @@ neutrino::scanPlugins(QString pluginsDirStr) {
                     name_plugin.remove(0,3);
                 }
 #endif
-//            progress.setLabelText("Plugin: "+name_plugin);
-//            progress.setValue(progress.value()+1);
+           progress.setLabelText("Plugin: "+name_plugin);
+           progress.setValue(progress.value()+1);
             loadPlugin(pluginfile, false);
         }
-//        progress.close();
+       progress.close();
 
 //        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
 //        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
@@ -455,6 +455,7 @@ neutrino::scanPlugins() {
 //                scanPlugins(dir_flag[0]);
 //        }
 //    }
+    QApplication::processEvents();
 }
 
 void

@@ -849,8 +849,6 @@ double Visar::getTime(std::vector<double> &vecsweep, double p) {
 }
 
 QPointF Visar::getTimeSpaceFromPixel(QPointF p) {
-    return QPointF(0,0);
-
     int k=0;
     double posTime=0.0;
     double posSpace=0.0;
@@ -1837,22 +1835,24 @@ Visar::export_clipboard() {
 
 QString Visar::export_sop() {
     QString out;
-    out += QString("#SOP Origin       : %L1\n").arg(sopOrigin->value());
-    out += QString("#SOP Offset       : %L1\n").arg(sopTimeOffset->value());
-    out += QString("#Center & magnif. : %L1 %L2\n").arg(physOriginSpace->value()).arg(magnification->value());
-    out += QString("#SOP Time scale   : %L1\n").arg(sopScale->text());
-    out += QString("#SOP Direction    : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
-    out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
-    out += QString("#Calib            : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
-    out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
+    if (enableSOP->isChecked()) {
+        out += QString("#SOP Origin       : %L1\n").arg(sopOrigin->value());
+        out += QString("#SOP Offset       : %L1\n").arg(sopTimeOffset->value());
+        out += QString("#Center & magnif. : %L1 %L2\n").arg(physOriginSpace->value()).arg(magnification->value());
+        out += QString("#SOP Time scale   : %L1\n").arg(sopScale->text());
+        out += QString("#SOP Direction    : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
+        out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
+        out += QString("#Calib            : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
+        out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
-    for (int i=0;i<time_sop.size();i++) {
-        out += QLocale().toString(time_sop[i])+ " ";
-        for (int j=0;j<4;j++) {
-            double val=sopCurve[j][i];
-            out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
+        for (int i=0;i<time_sop.size();i++) {
+            out += QLocale().toString(time_sop[i])+ " ";
+            for (int j=0;j<4;j++) {
+                double val=sopCurve[j][i];
+                out+=(val>=0?"+":"-")+QLocale().toString(fabs(val),'E',4)+ " ";
+            }
+            out += "\n";
         }
-        out += "\n";
     }
     return out;
 }
