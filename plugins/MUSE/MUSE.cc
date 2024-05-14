@@ -307,22 +307,7 @@ void MUSE::on_actionMode_toggled() {
 	}
 }
 
-//void MUSE::on_actionExport_triggered () {
-//    QString ftypes="SVG (*.svg);; PDF (*.PDF);; PNG (*.png);; Any files (*)";
-//    QString fout = QFileDialog::getSaveFileName(this,tr("Save All Drawings"),property("NeuSave-fileExport").toString(),ftypes);
-//    if (!fout.isEmpty()) {
-//        for (int i=0;i<slices->maximum() ; i++) {
-//            showImagePlane(i);
-//            QFileInfo fi(fout);
-//            nparent->exportGraphics(fi.path()+"/"+fi.baseName()+QString("_")+QString("%1").arg(i, 3, 10, QChar('0'))+QString("_")+"."+fi.completeSuffix());
-//        }
-//        setProperty("NeuSave-fileExport",fout);
-//    }
-
-//}
-
 QVariant MUSE::extractData(QString key, QStringList values) {
-	qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << key;
 	key=key.leftJustified(8,' ',true);
 	QVariant retval;
 	for(auto &my_str: values) {
@@ -352,7 +337,7 @@ QVariant MUSE::extractData(QString key, QStringList values) {
 
 void MUSE::loadCube() {
 	QFileDialog fd;
-    QString fname=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any files")+QString(" (*)"));
+    QString fname=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any file")+QString(" (*)"));
 
     if (!fname.isEmpty()) {
         fd.close();

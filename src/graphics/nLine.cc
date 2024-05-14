@@ -210,7 +210,7 @@ void nLine::paste_points() {
 }
 
 void nLine::save_points() {
-    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(&my_pad,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
 	if (!fnametmp.isEmpty()) {
 		setProperty("NeuSave-fileTxt", fnametmp);
 		QFile t(fnametmp);

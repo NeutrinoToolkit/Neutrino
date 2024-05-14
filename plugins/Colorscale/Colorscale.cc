@@ -281,7 +281,7 @@ void Colorscale::addItem(QString my_file) {
 }
 
 void Colorscale::addPaletteFile() {
-    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),nullptr,tr("Any files")+QString(" (*)"));
+    QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Palette File"),nullptr,tr("Any file")+QString(" (*)"));
     foreach (QString my_file, fnames) {
         napp->addPaletteFile(my_file);
         QSettings my_set("neutrino","");

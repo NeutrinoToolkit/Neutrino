@@ -186,7 +186,7 @@ void Mouse_info::copyPoints() {
 
 void
 Mouse_info::export_txt() {
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
 	if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
 		QFile t(fnametmp);

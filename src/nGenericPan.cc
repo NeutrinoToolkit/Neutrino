@@ -662,7 +662,7 @@ void nGenericPan::focusOutEvent(QFocusEvent *event) {
 void nGenericPan::loadSettings(QString fname) {
     qDebug() << fname;
     if (fname.isNull()) {
-        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any file (*.*)"));
         if (!fname.isNull()) {
             setProperty("NeuSave-fileIni",fname);
             loadSettings(fname);
@@ -707,9 +707,12 @@ void nGenericPan::saveDefaults() {
 void nGenericPan::loadSettings(QSettings &settings) {
     if (settings.childGroups().contains("Properties")) {
         settings.beginGroup("Properties");
+        qDebug() << "----------------- Properties ----------------- " << panName();
         foreach(QString my_key, settings.allKeys()) {
+            qDebug() << my_key << settings.value(my_key);
             setProperty(my_key.toStdString().c_str(), settings.value(my_key));
         }
+        qDebug() << "----------------- END Properties ----------------- " << panName();
         settings.endGroup();
     }
     loadUi(settings);
@@ -718,12 +721,14 @@ void nGenericPan::loadSettings(QSettings &settings) {
 void nGenericPan::saveSettings(QSettings &settings) {
     saveUi(settings);
     settings.beginGroup("Properties");
+    qDebug() << "----------------- Properties ----------------- " << panName();
     foreach(QByteArray ba, dynamicPropertyNames()) {
         if(ba.startsWith("NeuSave")) {
             qDebug() << ba << property(ba);
             settings.setValue(ba, property(ba));
         }
     }
+    qDebug() << "----------------- END Properties ----------------- " << panName();
     settings.endGroup();
 }
 

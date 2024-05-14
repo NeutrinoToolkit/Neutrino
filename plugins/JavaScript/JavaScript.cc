@@ -76,7 +76,7 @@ void JavaScript::runIt() {
 }
 
 void JavaScript::on_actionOpen_File_triggered() {
-    QString fname=QFileDialog::getOpenFileName(this,tr("Open JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any files")+QString(" (*)"));
+    QString fname=QFileDialog::getOpenFileName(this,tr("Open JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any file")+QString(" (*)"));
     if (!fname.isEmpty()) {
         setProperty("NeuSave-fileJS", fname);
         QFile f(fname);
@@ -88,7 +88,7 @@ void JavaScript::on_actionOpen_File_triggered() {
 }
 
 void JavaScript::on_actionSave_File_triggered() {
-    QString fname=QFileDialog::getSaveFileName(this,tr("Save JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any files")+QString(" (*)"));
+    QString fname=QFileDialog::getSaveFileName(this,tr("Save JS file"),property("NeuSave-fileJS").toString(),tr("JS file")+QString(" (*.js);;")+tr("Any file")+QString(" (*)"));
     if (!fname.isEmpty()) {
         setProperty("NeuSave-fileJS", fname);
         QFile f(fname);

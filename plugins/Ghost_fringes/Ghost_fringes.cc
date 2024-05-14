@@ -89,10 +89,10 @@ void Ghost_fringes::doGhost () {
         double cr = cos((angleCarrier->value()) * _phys_deg);
         double sr = sin((angleCarrier->value()) * _phys_deg);
 
-        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
-//        double thick_norm= resolution->value()/M_PI;
-//        double lambda_norm=M_PI*widthCarrier->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-//        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << lambda_norm << " " << thick_norm << " : " << sqrt(pow(cr*dx,2)+pow(sr*dy,2)));
+        // double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
+        double thick_norm= resolution->value()/M_PI;
+        double lambda_norm=M_PI*widthCarrier->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+        // DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << lambda_norm << " " << thick_norm << " : " << sqrt(pow(cr*dx,2)+pow(sr*dy,2)));
 
         nPhysD *myfilter=new nPhysD(dx,dy,0.0,"Filter");
         nPhysD *myspectrum=new nPhysD(dx,dy,0.0,"Spectrum");
@@ -100,8 +100,8 @@ void Ghost_fringes::doGhost () {
             for (unsigned int y=0;y<dy;y++) {
                 double xr = xx[x]*cr - yy[y]*sr;
                 double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr,2)/lambda)/(1.0+exp(lambda-std::abs(xr)));
-//                double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
+                // double e_tot = 1.0-exp(-pow(yr,2)/lambda)/(1.0+exp(lambda-std::abs(xr)));
+                double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
                 myfilter->set(x,y,e_tot);
                 myspectrum->set(x,y,imageFFT.point(x,y).mod());
                 imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);

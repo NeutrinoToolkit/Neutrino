@@ -106,7 +106,7 @@ void OpenHdf5::showFile(QString fname) {
 }
 
 void OpenHdf5::showFile() {
-    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any files")+QString(" (*)"));
+    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5);;")+tr("Any file")+QString(" (*)"));
     foreach (QString fname, fnames) {
         showFile(fname);
     }

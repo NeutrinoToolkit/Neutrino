@@ -31,7 +31,7 @@ QList<nPhysD> nPhysPyWrapper::static_nPhysD_open(QString fname){
         }
         formats.chop(1);
         formats+=");;";
-        formats+=("Any files (*)");
+        formats+=("Any file (*)");
 
         fname = QFileDialog::getOpenFileName(nullptr,tr("Open Image(s)"),property("fileOpen").toString(),formats);
     }

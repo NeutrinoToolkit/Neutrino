@@ -108,7 +108,9 @@ public slots:
             mouseMarker->setVisible(false);
         }
         nCustomPlot::copy_image();
-        mouseMarker->setVisible(false);
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
     }
     void export_image() override {
         if(mouseMarker) {
@@ -138,7 +140,9 @@ public slots:
             mouseMarker->setVisible(false);
         }
         nCustomPlot::copy_image();
-        mouseMarker->setVisible(false);
+        if(mouseMarker) {
+            mouseMarker->setVisible(false);
+        }
     }
     void export_image() override {
         if(mouseMarker) {

@@ -161,40 +161,6 @@ bool polynomialfit(std::vector<double> dx, std::vector<double> dy, std::vector<d
     return true;
 }
 
-//template <typename T>
-//void MovingAverage(QVector <T> &values, int view) {
-//    const auto len = values.size();
-//    if (len == 0 || view < 2) { return; }
-
-//    QVector<T> result;
-//    result.resize(len+view);
-
-//    int i = 0;
-//    const T viewf = static_cast<T>(view);
-//    T sum = values[0] * viewf;
-//    while (i < view) {
-//        sum += values[i] - values[0];
-//        result[i]=sum;
-//        i++;
-//    }
-//    while (i < len) {
-//        sum += values[i] - values[i - view];
-//        result[i]=sum;
-//        i++;
-//    }
-//    while (i < len+view) {
-//        sum += values[len-1] - values[i - view];
-//        result[i]=sum;
-//        i++;
-//    }
-
-//    const T invViewf = 1.0 / viewf;
-//    for (int i=0; i<values.size();i++) {
-//        values[i]=result[i+view/2]*invViewf;
-//    }
-
-//}
-
 void Find_peaks::updatePlot() {
     if (currentBuffer && isVisible()) {
         saveDefaults();
@@ -358,7 +324,7 @@ void Find_peaks::on_actionClipboard_triggered() {
 }
 
 void Find_peaks::on_actionTxt_triggered() {
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);

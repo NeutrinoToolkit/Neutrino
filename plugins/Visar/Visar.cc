@@ -730,7 +730,7 @@ void Visar::delVisar() {
 
 void Visar::loadSettings(QString my_settings) {
     if (my_settings.isEmpty()) {
-        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+        QString fname = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any file (*.*)"));
         if (!fname.isNull()) {
             setProperty("NeuSave-fileIni",fname);
             loadSettings(fname);
@@ -1415,16 +1415,16 @@ void Visar::doWave(unsigned int k) {
                 physC imageFFT = imgs[1]->ft2(PHYS_FORWARD);
 
                 progress.setValue(progress.value()+1);
-                double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
-//doesntwork                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-//doesntwork                double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                // double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*settingsUi[k]->interfringe->value());
+                double thick_norm= M_PI* settingsUi[k]->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                double lambda_norm=M_PI*settingsUi[k]->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
 
                 for (size_t x=0;x<dx;x++) {
                     for (size_t y=0;y<dy;y++) {
                         double xr = xx[x]*cr - yy[y]*sr;
                         double yr = xx[x]*sr + yy[y]*cr;
-                        double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
-//doesntwork                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
+                        // double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
+                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
                         imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                     }
                 }
@@ -1753,7 +1753,8 @@ void Visar::getPhase(unsigned int k) {
 
 void
 Visar::export_txt_multiple() {
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    qDebug() << property("NeuSave-fileTxt");
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
@@ -1783,7 +1784,7 @@ Visar::export_txt() {
             title=tr("SOP");
             break;
     }
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save ")+title,property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save ")+title,property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);

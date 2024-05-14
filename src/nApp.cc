@@ -136,7 +136,7 @@ void nApp::copyLog() {
 }
 
 void nApp::saveLog(){
-    QString fnametmp=QFileDialog::getSaveFileName(&log_win,tr("Save Log"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(&log_win,tr("Save Log"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);

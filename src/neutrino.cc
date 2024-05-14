@@ -461,7 +461,7 @@ neutrino::scanPlugins() {
 void
 neutrino::loadPlugin()
 {
-    QStringList pnames=QFileDialog::getOpenFileNames(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any files")+QString(" (*)"));
+    QStringList pnames=QFileDialog::getOpenFileNames(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any file")+QString(" (*)"));
     bool launch(pnames.size()==1);
     for(auto& pname: pnames) {
         loadPlugin(pname, launch);
@@ -828,7 +828,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         }
         formats.chop(1);
         formats+=");;";
-        formats+=("Any files (*)");
+        formats+=("Any file (*)");
 
         QStringList fnames = QFileDialog::getOpenFileNames(this,tr("Open Image(s)"),property("NeuSave-fileOpen").toString(),formats);
         foreach (QString fname, fnames) {
@@ -937,7 +937,7 @@ void neutrino::saveSession (QString fname) {
             extensions=tr("Tiff session")+" (*.tiff *.tif);;"+extensions;
         }
 #endif
-        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileSave").toString(),extensions+tr("Any files")+QString(" (*)"));
+        QString fnameSave = QFileDialog::getSaveFileName(this,tr("Save Session"),property("NeuSave-fileSave").toString(),extensions+tr("Any file")+QString(" (*)"));
         if (!fnameSave.isEmpty()) {
             saveSession(fnameSave);
         }
@@ -1163,7 +1163,7 @@ QString graphicsTypes(QString fname) {
         exts.removeAll(ext);
         exts.push_back(ext);
     }
-    QString ftypes="Any files (*)";
+    QString ftypes="Any file (*)";
     for (auto &str: exts) {
         ftypes.prepend(str.toUpper()+" (*."+str+");; ");
     }
@@ -1376,7 +1376,7 @@ QString neutrino::getFileSave() {
         allformats += format + " files (*."+format+");; ";
     }
 
-    allformats+=("Any files (*)");
+    allformats+=("Any file (*)");
 
     QString fname=QFileDialog::getSaveFileName(this, "Save to...",property("NeuSave-fileSave").toString(),allformats);
 
@@ -1626,7 +1626,7 @@ nGenericPan*
 neutrino::openRAW() {
     QStringList fnames;
     nGenericPan *win = nullptr;
-    fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),"",tr("Any files")+QString(" (*)"));
+    fnames = QFileDialog::getOpenFileNames(this,tr("Open RAW"),"",tr("Any file")+QString(" (*)"));
     if (fnames.size()) {
         win=getPan("nOpenRAW");
         if (!win) win= new nOpenRAW(this);

@@ -412,7 +412,7 @@ void nCustomPlot::get_data(QTextStream &out, QObject *obj) {
 }
 
 void nCustomPlot::save_data(){
-    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any files (*)"));
+    QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save data in text"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
@@ -594,7 +594,7 @@ void nCustomPlot::myAxisDoubleClick(QCPAxis*ax,QCPAxis::SelectablePart,QMouseEve
 // SETTINGS
 void
 nCustomPlot::loadSettings() {
-    QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any files (*.*)"));
+    QString fnametmp = QFileDialog::getOpenFileName(this, tr("Open INI File"),property("NeuSave-fileIni").toString(), tr("INI Files (*.ini *.conf);; Any file (*.*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileIni",fnametmp);
         QSettings my_set(fnametmp,QSettings::IniFormat);

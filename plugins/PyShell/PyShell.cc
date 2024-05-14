@@ -173,7 +173,7 @@ void PyShell::cleanup() {
 
 void PyShell::loadScript(bool execInline) {
 	QString fname;
-    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("NeuSave-fileScript").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any files")+QString(" (*)"));
+    fname = QFileDialog::getOpenFileName(this,tr("Open python source"),property("NeuSave-fileScript").toString(),tr("Python script")+QString(" (*.py);;")+tr("Any file")+QString(" (*)"));
 	if (!fname.isEmpty()) {
         setProperty("NeuSave-fileScript",fname);
 		if (execInline) {
@@ -197,7 +197,7 @@ void PyShell::runScript(QString cmd) {
     saveDefaults();
     DEBUG("\n" << cmd.toStdString());
     QVariant res=PythonQt::self()->getMainModule().evalScript(cmd);
-    DEBUG("result " << res.type() << "\n" << res.toString().toStdString());
+    DEBUG("result " << res.typeId() << "\n" << res.toString().toStdString());
 }
 
 void PyShell::runScript() {
