@@ -84,17 +84,17 @@ macM1_task:
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
     brew install iltommi/brews/hdf4
     brew install iltommi/brews/clfft
-    git clone https://github.com/iltommi/pythonqt.git
-    cd pythonqt
-    cd generator
-    qmake -r generator.pro
-    make -j10
-    QTDIR=$(brew --prefix qt) ./pythonqt_generator
-    cd ..
-    QTDIR=$(brew --prefix qt) qmake -r
-    make -j10
-    INSTALL_ROOT=$(brew --prefix) make install
-    cd ..
+    # git clone https://github.com/iltommi/pythonqt.git
+    # cd pythonqt
+    # cd generator
+    # qmake -r generator.pro
+    # make -j10
+    # QTDIR=$(brew --prefix qt) ./pythonqt_generator
+    # cd ..
+    # QTDIR=$(brew --prefix qt) qmake -r
+    # make -j10
+    # INSTALL_ROOT=$(brew --prefix) make install
+    # cd ..
     mkdir -p build && cd build
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
