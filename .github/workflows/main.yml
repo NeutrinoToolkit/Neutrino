@@ -6,7 +6,7 @@ jobs:
     runs-on: macos-12
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Tag latest
@@ -42,7 +42,7 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
     - name: Archive
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Neutrino.zip
         path: "build/Neutrino*.zip"
