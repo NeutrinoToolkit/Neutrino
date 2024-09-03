@@ -1012,13 +1012,13 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
 }
 
 #ifdef HAVE_LIBTIFF
-void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif) {
+void physFormat::phys_write_one_tiff(physD *my_phys, TIFF* tif, uint16_t compression) {
     TIFFSetWarningHandler(nullptr);
     TIFFSetField(tif, TIFFTAG_SUBFILETYPE, 0);
     TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, 1);
     TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
     TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
     TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, my_phys->getName().c_str());
     std::stringstream prop_ss;
@@ -1061,8 +1061,15 @@ void physFormat::phys_write_tiff(physD *my_phys, std::string ofilename) {
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
+    uint16_t compression = COMPRESSION_LZW;
+
+// hack: in case of tiff with 2 "f" ant the end, we save without compression
+    if (ofilename.size() >= 2 && ofilename.substr(ofilename.size() - 2, 2) == "ff") {
+        compression = COMPRESSION_NONE;
+    }
+
     if (tif && my_phys) {
-        physFormat::phys_write_one_tiff(my_phys, tif);
+        physFormat::phys_write_one_tiff(my_phys, tif, compression);
     } else {
         throw phys_fileerror("Problem writing tiff");
     }
@@ -1076,9 +1083,15 @@ void physFormat::phys_write_tiff(std::vector <physD *> vecPhys, std::string ofil
 #ifdef HAVE_LIBTIFF
     augment_libtiff_with_custom_tags();
     TIFF* tif = TIFFOpen(ofilename.c_str(), "w");
+    uint16_t compression = COMPRESSION_LZW;
+
+    // hack: in case of tiff with 2 "f" ant the end, we save without compression
+    if (ofilename.size() >= 2 && ofilename.substr(ofilename.size() - 2, 2) == "ff") {
+        compression = COMPRESSION_NONE;
+    }
     if (tif) {
         for (unsigned int i=0; i<vecPhys.size(); i++) {
-            phys_write_one_tiff(vecPhys[i], tif);
+            phys_write_one_tiff(vecPhys[i], tif, compression);
             if(TIFFWriteDirectory(tif)==0) {
                 throw phys_fileerror("Problem writing multiple images in same tiff file");
             }

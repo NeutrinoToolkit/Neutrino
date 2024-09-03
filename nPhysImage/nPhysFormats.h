@@ -170,7 +170,7 @@ void phys_write_tiff(std::vector<physD*>, std::string);
 void phys_write_tiff(physD*, std::string);
 
 #ifdef HAVE_LIBTIFF
-void phys_write_one_tiff(physD*, TIFF*);
+void phys_write_one_tiff(physD*, TIFF*, uint16_t);
 #endif
 
 //! HDF stuff
