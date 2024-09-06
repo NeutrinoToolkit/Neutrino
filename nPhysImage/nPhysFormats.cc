@@ -2100,9 +2100,18 @@ std::vector <physD> physFormat::phys_open(std::string fname, bool separate_rgb) 
     return retPhys;
 }
 
-std::vector<std::string> physFormat::phys_image_formats() {
+std::vector<std::string> physFormat::phys_image_open_formats() {
 
-    std::vector<std::string> retval={"neu", "txt", "spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "gz", "dat"};
+    std::vector<std::string> retval=phys_image_save_formats();
+
+    retval.insert(retval.end(), {"spe", "pcoraw", "inf", "sif", "b16", "img", "imd", "imi", "gz", "dat"});
+
+    return retval;
+}
+
+std::vector<std::string> physFormat::phys_image_save_formats() {
+
+    std::vector<std::string> retval={"neu", "txt"};
 
 #ifdef HAVE_LIBTIFF
     retval.push_back("tif");

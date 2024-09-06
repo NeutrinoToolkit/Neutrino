@@ -819,7 +819,7 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         QApplication::processEvents();
     } else {
         QString formats("Neutrino Images (");
-        for (auto &format : physFormat::phys_image_formats()) {
+        for (auto &format : physFormat::phys_image_open_formats()) {
             formats+="*."+ QString::fromStdString(format)+" ";
         }
         formats+=" *.neus);; Images (";
@@ -1325,7 +1325,7 @@ neutrino::zoomChanged(double zoom) {
 }
 
 double
-neutrino::getZoom() const {
+neutrino::getZoom() {
     return my_view->transform().m11();
 }
 
@@ -1358,7 +1358,7 @@ QString neutrino::getFileSave() {
 
     QString suffix=QFileInfo(property("NeuSave-fileSave").toString()).suffix().toLower();
 
-    for (auto &format : physFormat::phys_image_formats()) {
+    for (auto &format : physFormat::phys_image_save_formats()) {
         formats << QString::fromStdString(format);
     }
     formats << "neus";

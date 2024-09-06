@@ -843,7 +843,7 @@ void Visar::sweepChanged(QLineEdit *line) {
 double Visar::getTime(std::vector<double> &vecsweep, double p) {
     double time=0;
     for (unsigned int i=0;i<vecsweep.size();i++) {
-        time+=vecsweep.at(i)/(i+1.0)*pow(p,i+1);
+        time+=vecsweep.at(i)*(i+1.0)*pow(p,i+1);
     }
     return time;
 }

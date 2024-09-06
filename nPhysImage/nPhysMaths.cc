@@ -31,7 +31,8 @@
 
 
 std::array<double,6> physMath::getAffine(std::vector<vec2f> poly1, std::vector<vec2f> poly2) {
-    std::array<double,6>ret;
+    std::array<double,6>ret = {};
+#ifdef HAVE_LIBGSL
     poly1.resize(3);
     poly2.resize(3);
 
@@ -65,6 +66,7 @@ std::array<double,6> physMath::getAffine(std::vector<vec2f> poly1, std::vector<v
     for (unsigned int i=0; i<ret.size(); i++) {
         ret[i]=gsl_matrix_get(&affineMat.matrix,i/3,i%3);
     }
+#endif
     return ret;
 }
 

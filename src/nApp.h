@@ -29,6 +29,7 @@
 #include <QPlainTextEdit>
 #include <QSettings>
 #include <QDebug>
+#include <QMenu>
 
 
 

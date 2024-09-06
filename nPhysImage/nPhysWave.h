@@ -128,7 +128,7 @@ enum inversion_algo {ABEL = 10, ABEL_HF = 20};
 enum inversion_physics { ABEL_GAS, ABEL_PLASMA, ABEL_NONE };
 struct abel_params_str {
 	abel_params_str()
-        : iimage(nullptr), oimage(nullptr), iter_ptr(nullptr)
+        : iimage(nullptr), oimage(nullptr), symmetric(false), iter_ptr(nullptr)
 	{ }
 
     physD *iimage;
@@ -139,6 +139,8 @@ struct abel_params_str {
 	phys_direction idir;
 	inversion_algo ialgo;
 	inversion_physics iphysics;
+
+    bool symmetric;
 	
 	int iter;
 	int *iter_ptr;

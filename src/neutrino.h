@@ -180,7 +180,7 @@ public slots:
 
     void print();
 
-    double getZoom() const;
+    double getZoom();
 
     void emitBufferChanged(nPhysD* = nullptr);
 

@@ -186,7 +186,8 @@ std::vector <physD> phys_open(std::string, bool separate_rgb=false);
 
 std::string gunzip(std::string);
 
-std::vector<std::string> phys_image_formats();
+std::vector<std::string> phys_image_open_formats();
+std::vector<std::string> phys_image_save_formats();
 
 }
 #endif
