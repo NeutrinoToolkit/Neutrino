@@ -135,7 +135,7 @@ win32_task:
     mkdir build && cd build
     mingw32-cmake ..
     make -j2 package
-    cp Neutrino*.exe ..
+    cp Neutrino*.exe Neutrino*.zip ..
   package_artifacts:
     path: "Neutrino-*.*"
 
@@ -171,7 +171,7 @@ win64_task:
     mkdir build && cd build
     mingw64-cmake ..
     make -j2 package
-    cp Neutrino*.exe ..
+    cp Neutrino*.exe Neutrino*.zip ..
   package_artifacts:
     path: "Neutrino-*.*"
 
