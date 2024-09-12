@@ -836,9 +836,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
         }
     }
     for (auto& img: imagelist) {
-        if (img->prop.have("neutrinoPanData")) {
-            std::string panString=img->prop["neutrinoPanData"];
-            img->prop.erase("neutrinoPanData");
+        if (img->prop.have("n_neutrinoPanData")) {
+            std::string panString=img->prop["n_neutrinoPanData"];
+            qDebug() << panString;
+            img->prop.erase("n_neutrinoPanData");
             setPanData(panString);
         }
     }
