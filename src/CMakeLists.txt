@@ -122,8 +122,6 @@ if(APPLE)
         $<TARGET_FILE:${PROJECT_NAME}>)
 
 elseif(WIN32)
-    set(LIBS ${LIBS} "OpenSSL::SSL OpenSSL::Crypto")
-
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-all-symbols -Wl,-allow-multiple-definition")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
