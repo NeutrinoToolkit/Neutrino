@@ -35,6 +35,7 @@ Lineout_H_V::Lineout_H_V(neutrino *parent) : nGenericPan(parent)
     connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
 
     connect(parent, SIGNAL(nZoom(double)), this, SLOT(updatePlot()));
+    connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
 
     connect(my_w.lockClick,SIGNAL(released()), this, SLOT(setBehaviour()));
 

@@ -53,6 +53,8 @@ public:
 
         connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
 
+        connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
+
         my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
         my_w.plot->graph(0)->setPen(QPen(Qt::black));
         QString namedirection(plot_dir==PHYS_HORIZONTAL?"Horizontal":"Vertical");

@@ -887,7 +887,6 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         tiff_prop["display_range"] =display_range;
                     }
                 }
-                tiff_prop["phys_from_name"]=ifilename;
                 unsigned short bytesperpixel=0;
                 TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bytesperpixel);
                 bytesperpixel/=8;

@@ -269,7 +269,6 @@ void Visar::changeShot(QString num) {
 }
 
 void Visar::fillComboShot() {
-    qDebug() << "here";
     disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
     QString oldvalue=comboShot->currentText();
 
@@ -912,7 +911,6 @@ int Visar::direction(int k) {
 }
 
 void Visar::setObjectVisibility(nPhysD*phys) {
-    qDebug() << "here in " << numVisars;
     if (nPhysExists(phys)) {
         for (unsigned int k=0;k<numVisars;k++){
             bool ismyimg = (phys == getPhysFromCombo(settingsUi[k]->shotImage) || phys == getPhysFromCombo(settingsUi[k]->refImage));
@@ -922,7 +920,6 @@ void Visar::setObjectVisibility(nPhysD*phys) {
         }
         sopRect->setVisible(enableSOP->isChecked() && (phys == getPhysFromCombo(sopRef) || phys == getPhysFromCombo(sopShot)));
     }
-    qDebug() << "here out";
 }
 
 void Visar::ghostChecked() {
