@@ -158,6 +158,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     connect(sopScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+    connect(sopScaleType,SIGNAL(currentIndexChanged(int)), this, SLOT(sweepChanged()));
 
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 
@@ -465,6 +466,7 @@ void Visar::addVisar() {
     connect(ui_settings->intensityShift, SIGNAL(valueChanged(int)), this, SLOT(getPhase()));
 
     connect(ui_settings->physScale,SIGNAL(editingFinished()), this, SLOT(sweepChanged()));
+    connect(ui_settings->physScaleType,SIGNAL(currentIndexChanged(int)), this, SLOT(sweepChanged()));
 
     connect(ui_settings->plotPhaseIntensity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
 
@@ -789,11 +791,9 @@ void Visar::mouseAtPlot(QMouseEvent* e) {
 
 void Visar::sweepChanged(QLineEdit *line) {
     if(line==nullptr) {
-        if (sender()) {
-            QLineEdit *line=qobject_cast<QLineEdit *>(sender());
-            if (line) {
-                sweepChanged(line);
-            }
+        if (sender() && sender()->property("id").isValid()) {
+            int k=sender()->property("id").toInt();
+            sweepChanged(settingsUi[k]->physScale);
         } else {
             for (unsigned int n=0; n< numVisars; n++) {
                 sweepChanged(settingsUi[n]->physScale);
@@ -803,24 +803,32 @@ void Visar::sweepChanged(QLineEdit *line) {
     } else {
         int k=0;
         std::vector<double> *vecsweep=nullptr;
+        bool normalPoly=true;
         if (line==sopScale) {
             vecsweep = &sweepCoeffSOP;
+            normalPoly = sopScaleType->currentText() == "Normal";
         } else {
             k=line->property("id").toInt();
             vecsweep = &sweepCoeff[k];
+            normalPoly =  settingsUi[k]->physScaleType->currentText() == "Normal";
         }
-
         if (vecsweep) {
             vecsweep->clear();
             line->setPalette(QApplication::palette());
             QRegularExpression separator("[(;| |\t)]");
             QStringList strSweep=line->text().split(separator, Qt::SkipEmptyParts);
             qDebug() << strSweep;
+            int index=0;
             foreach(QString str, strSweep) {
                 bool ok;
                 double coeff=locale().toDouble(str,&ok);
                 if(ok) {
-                    vecsweep->push_back(coeff);
+                    index++;
+                    if (normalPoly) {
+                        vecsweep->push_back(coeff);
+                    } else {
+                        vecsweep->push_back(coeff/index);
+                    }
                 } else {
                     QPalette my_palette=line->palette();
                     my_palette.setColor(QPalette::Base,Qt::red);
@@ -835,6 +843,7 @@ void Visar::sweepChanged(QLineEdit *line) {
                 getPhase(k);
                 updatePlot();
             }
+            qDebug() << normalPoly << vecsweep;
         }
     }
 }
@@ -842,7 +851,7 @@ void Visar::sweepChanged(QLineEdit *line) {
 double Visar::getTime(std::vector<double> &vecsweep, double p) {
     double time=0;
     for (unsigned int i=0;i<vecsweep.size();i++) {
-        time+=vecsweep.at(i)/(i+1.0)*pow(p,i+1);
+        time+=vecsweep.at(i)*pow(p,i+1);
     }
     return time;
 }
@@ -1195,7 +1204,7 @@ void Visar::updatePlot() {
                     iRef=1.0;
                 }
 
-                int njumps=0;
+                double njumps=0;
                 double refr_index=1.0;
                 for (int i=0;i<tjump.size();i++) {
                     if (time_vel[k][j]>tjump.at(i)) {

@@ -59,7 +59,7 @@
        </font>
       </property>
       <property name="tabPosition">
-       <enum>QTabWidget::West</enum>
+       <enum>QTabWidget::TabPosition::West</enum>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -87,7 +87,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabPhase">
           <property name="tabPosition">
-           <enum>QTabWidget::North</enum>
+           <enum>QTabWidget::TabPosition::North</enum>
           </property>
           <property name="currentIndex">
            <number>-1</number>
@@ -122,7 +122,7 @@
         <item>
          <widget class="QTabWidget" name="tabVelocity">
           <property name="tabPosition">
-           <enum>QTabWidget::North</enum>
+           <enum>QTabWidget::TabPosition::North</enum>
           </property>
           <property name="currentIndex">
            <number>-1</number>
@@ -166,9 +166,9 @@
            </font>
           </property>
           <property name="title">
-           <string>Sweep time and direction</string>
+           <string>Sweep time Polynome and direction</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -181,7 +181,7 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="0" column="0">
+           <item>
             <widget class="QLineEdit" name="sopScale">
              <property name="font">
               <font>
@@ -189,14 +189,31 @@
               </font>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;p&gt;T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sweep time: &lt;/p&gt;&lt;p&gt;Hamamatsu polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n &lt;/span&gt; meaning T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;/2+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;/3 ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;/n&lt;/p&gt;&lt;p&gt;Normal polynomial expansion A1 A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt; A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n &lt;/span&gt; meaning T(X)=A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;X +A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;3&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; ... A&lt;span style=&quot; vertical-align:sub;&quot;&gt;n&lt;/span&gt;X&lt;span style=&quot; vertical-align:super;&quot;&gt;n&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item>
+            <widget class="QComboBox" name="sopScaleType">
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Hamamatsu</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Normal</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
             <widget class="QComboBox" name="sopDirection">
              <property name="font">
               <font>
@@ -900,7 +917,7 @@
            <item row="0" column="5">
             <spacer name="horizontalSpacer_4">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
