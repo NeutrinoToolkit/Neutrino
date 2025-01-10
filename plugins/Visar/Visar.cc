@@ -95,8 +95,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     sopRect =  new nRect(this,1);
     sopRect->changeToolTip("SOP region");
     sopRect->setRect(QRectF(0,0,100,100));
-    connect(actionRect3, SIGNAL(triggered()), sopRect, SLOT(togglePadella()));
-
+    connect(actionRect3, &QAction::triggered, sopRect, &nRect::togglePadella);
     sopPlot->xAxis->setLabel(tr("Time"));
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
@@ -130,10 +129,10 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent),
     connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
     connect(actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
 
-    connect(etalon_thickness, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
-    connect(etalon_dn_over_dlambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
-    connect(etalon_n0, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
-    connect(etalon_lambda, SIGNAL(valueChanged(double)), this, SLOT(calculate_etalon()));
+    connect(etalon_thickness, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
+    connect(etalon_dn_over_dlambda, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
+    connect(etalon_n0, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
+    connect(etalon_lambda, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
 
@@ -432,12 +431,14 @@ void Visar::calculate_etalon() {
     double c=_phys_cspeed;
 
     double delta= -1e-3*lam*n0/(n0*n0-1)*dn_dl;
+    double deplace= e*(1-1/n0);
     double tau=2*e/c*(n0-1.0/n0);
 
     double sens=lam*1e-9/(2*tau*(1+delta)); // km/s
 
-    qDebug() << "delta tau sens"  << delta << tau << sens;
-    etalon_sensitivity->setValue(sens);
+    qDebug() << "delta tau sens deplace"  << delta << tau << sens << deplace;
+    visar_sensitivity->setText(QString::number(sens));
+    mirror_displacement->setText(QString::number(deplace));
 
 }
 

@@ -839,6 +839,53 @@
            <property name="horizontalSpacing">
             <number>1</number>
            </property>
+           <item row="0" column="3">
+            <widget class="QDoubleSpinBox" name="etalon_dn_over_dlambda">
+             <property name="toolTip">
+              <string>Chromatic dispersion</string>
+             </property>
+             <property name="prefix">
+              <string>dn/dλ </string>
+             </property>
+             <property name="suffix">
+              <string> 1/µm</string>
+             </property>
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>-9.999900000000000</double>
+             </property>
+             <property name="maximum">
+              <double>9.990000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="8">
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Sensitivity:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Displacement:</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="etalon_lambda">
              <property name="toolTip">
@@ -858,6 +905,48 @@
              </property>
              <property name="value">
               <double>532.000000000000000</double>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="9">
+            <widget class="QLineEdit" name="visar_sensitivity">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="2">
+            <widget class="QDoubleSpinBox" name="etalon_n0">
+             <property name="toolTip">
+              <string>Etalon refractive index</string>
+             </property>
+             <property name="prefix">
+              <string>n </string>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.500000000000000</double>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
@@ -892,94 +981,10 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QDoubleSpinBox" name="etalon_n0">
-             <property name="toolTip">
-              <string>Etalon refractive index</string>
-             </property>
-             <property name="prefix">
-              <string>n </string>
-             </property>
-             <property name="decimals">
-              <number>5</number>
-             </property>
-             <property name="singleStep">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.500000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item row="0" column="7">
-            <widget class="QDoubleSpinBox" name="etalon_sensitivity">
-             <property name="toolTip">
-              <string>calculated sentitivity</string>
-             </property>
-             <property name="suffix">
-              <string> km/s</string>
-             </property>
-             <property name="decimals">
-              <number>5</number>
-             </property>
-             <property name="maximum">
-              <double>999.990000000000009</double>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QDoubleSpinBox" name="etalon_dn_over_dlambda">
-             <property name="toolTip">
-              <string>Chromatic dispersion</string>
-             </property>
-             <property name="prefix">
-              <string>dn/dλ </string>
-             </property>
-             <property name="suffix">
-              <string> 1/µm</string>
-             </property>
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>-9.999900000000000</double>
-             </property>
-             <property name="maximum">
-              <double>9.990000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="neutrinoSave" stdset="0">
+            <widget class="QLineEdit" name="mirror_displacement">
+             <property name="readOnly">
               <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="6">
-            <widget class="QLabel" name="label">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Sensitivity</string>
              </property>
             </widget>
            </item>
@@ -1195,14 +1200,16 @@
   <tabstop>sopOrigin</tabstop>
   <tabstop>sopTimeOffset</tabstop>
   <tabstop>sopScale</tabstop>
+  <tabstop>sopScaleType</tabstop>
   <tabstop>sopDirection</tabstop>
-  <tabstop>comboShot</tabstop>
   <tabstop>notes</tabstop>
   <tabstop>etalon_thickness</tabstop>
   <tabstop>etalon_lambda</tabstop>
   <tabstop>etalon_n0</tabstop>
   <tabstop>etalon_dn_over_dlambda</tabstop>
-  <tabstop>etalon_sensitivity</tabstop>
+  <tabstop>mirror_displacement</tabstop>
+  <tabstop>visar_sensitivity</tabstop>
+  <tabstop>comboShot</tabstop>
  </tabstops>
  <resources>
   <include location="Visar.qrc"/>
