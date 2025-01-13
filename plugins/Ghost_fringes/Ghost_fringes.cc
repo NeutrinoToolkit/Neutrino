@@ -182,27 +182,36 @@ void Ghost_fringes::doGhost () {
 
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
 
+        double thick_norm= resolution->value()/M_PI;
+
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
 
-
-        for (size_t x=0;x<dx;x++) {
-            for (size_t y=0;y<dy;y++) {
-                double xr = xx[x]*cr - yy[y]*sr;
-                double yr = xx[x]*sr + yy[y]*cr;
-                double e_tot = 1.0-exp(-pow(yr,2))/(1.0+exp(lambda-std::abs(xr)));
-                imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
+        if (filter_model->currentText()=="1") {
+            for (size_t x=0;x<dx;x++) {
+                for (size_t y=0;y<dy;y++) {
+                    double xr = xx[x]*cr - yy[y]*sr;
+                    double yr = xx[x]*sr + yy[y]*cr;
+                    double e_tot = 1.0-exp(-pow(yr/thick_norm,2))/(1.0+exp(lambda-std::abs(xr)));
+                    imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
+                }
+            }
+        } else if (filter_model->currentText()=="2") {
+            for (size_t x=0;x<dx;x++) {
+                for (size_t y=0;y<dy;y++) {
+                    double xr = xx[x]*cr - yy[y]*sr;
+                    double yr = xx[x]*sr + yy[y]*cr;
+                    double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)/lambda-M_PI, 2));
+                    imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
+                }
             }
         }
-
         imageFFT = imageFFT.ft2(PHYS_BACKWARD);
 
         nPhysD *deepcopy=new nPhysD(*imageShot);
         deepcopy->setShortName("deghost");
-        deepcopy->setName("deghost("+imageShot->getName()+")");
+        deepcopy->setName("deghost("+imageShot->getName()+","+filter_model->currentText().toStdString()+","+QString::number(resolution->value()).toStdString()+")");
 
         QRect geom=maskRegion->path().boundingRect().toRect();
-
-
 
         QPolygonF regionPoly=maskRegion->poly(1);
         regionPoly=regionPoly.translated(imageShot->get_origin().x(),imageShot->get_origin().y());
