@@ -68,6 +68,8 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
 	
     connect(actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
 
+    connect(actionShift, &QAction::triggered, this, &Affine_transformation::findshift);
+
     qDebug() << "here";
     show();
     qDebug() << "here";
@@ -231,6 +233,59 @@ void Affine_transformation::apply() {
         backwardLine[i]->setText(QLocale().toString(backward[i]));
     }
     qDebug() << "here";
+
+}
+
+void Affine_transformation::findshift() {
+    qDebug() << "here in";
+    nPhysD *my_phys=nullptr;
+    nPhysD *my_phys_other=nullptr;
+
+    std::array<double,6> vecForward,vecBackward;
+    my_phys=getPhysFromCombo(image1);
+    my_phys_other=getPhysFromCombo(image2);
+    vecForward=forward;
+    vecBackward=backward;
+    if (my_phys) {
+        physC imageFFT = my_phys->ft2(PHYS_FORWARD);
+        physC imageFFTother = my_phys_other->ft2(PHYS_FORWARD);
+        size_t dx=my_phys->getW();
+        size_t dy=my_phys->getH();
+
+        for (int i=0; i<dx*dy;i++) {
+            mcomplex A=imageFFT.point(i);
+            mcomplex B=imageFFTother.point(i);
+            double vreal=A.real()*B.real()+A.imag()*B.imag();
+            double vimag=A.imag()*B.real()-A.real()*B.imag();
+            mcomplex val = mcomplex(vreal, vimag);
+            imageFFT.set(i,val/(A.mod()*B.mod()));
+        }
+        imageFFTother = imageFFT.ft2(PHYS_BACKWARD);
+        double max_val = 0.0;
+        int maxx = 0;
+        int maxy = 0;
+        for (int i = 0; i < dy; i++) {
+            for (int j = 0; j < dx; j++) {
+                int k=i * dx + j;
+                double magnitude = imageFFTother.point(k).mcabs();
+
+                if (magnitude > max_val) {
+                    max_val = magnitude;
+                    maxx = j;
+                    maxy = i;
+                }
+            }
+        }
+        QPolygonF poly;
+        poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
+        l1.setPoints(poly);
+        poly.translate(-maxx,-maxy);
+        l2.setPoints(poly);
+        qDebug() << maxx << maxy;
+        apply();
+
+    }
+    qDebug() << "here out";
 
 }
 

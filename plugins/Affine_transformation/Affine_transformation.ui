@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>244</width>
-    <height>283</height>
+    <height>290</height>
    </rect>
   </property>
   <property name="font">
@@ -250,7 +250,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+          <iconset>
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -261,7 +261,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+          <iconset>
            <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
          </property>
         </widget>
@@ -371,10 +371,11 @@
    </attribute>
    <addaction name="actionReset"/>
    <addaction name="actionRegion"/>
+   <addaction name="actionShift"/>
   </widget>
   <action name="actionReset">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -386,7 +387,7 @@
   </action>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc">
+    <iconset>
      <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
@@ -394,6 +395,18 @@
    </property>
    <property name="toolTip">
     <string>Crop rectangle</string>
+   </property>
+  </action>
+  <action name="actionShift">
+   <property name="icon">
+    <iconset resource="../Ghost_fringes/GhostFringes.qrc">
+     <normaloff>:/icons/refresh2.png</normaloff>:/icons/refresh2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="toolTip">
+    <string>Find shift</string>
    </property>
   </action>
  </widget>
@@ -419,7 +432,7 @@
   <tabstop>B12</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrinoMaster-Qt_5_11_0_5_11_0_temporary_22340a-Debug/src/qrc/icons.qrc"/>
+  <include location="../Ghost_fringes/GhostFringes.qrc"/>
  </resources>
  <connections/>
 </ui>

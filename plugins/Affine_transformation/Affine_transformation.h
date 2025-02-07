@@ -57,6 +57,7 @@ public slots:
     void affine();
     void bufferChanged(nPhysD*);
     void resetPoints();
+    void findshift();
 };
 
 NEUTRINO_PLUGIN(Affine_transformation, Analysis);

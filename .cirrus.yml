@@ -20,7 +20,7 @@ debian_task:
   script: |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103-1 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
+    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
     apt-get install -yy qml6-module*
     mkdir build && cd build
     cmake ..
@@ -258,7 +258,7 @@ AppImageArm_task:
     mkdir build && cd build
     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     make -j2 install DESTDIR=AppDir
-    ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    NO_STRIP=true ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ../Neutrino-Linux-arm64.AppImage
   package_artifacts:
     path: "Neutrino-*.AppImage"
