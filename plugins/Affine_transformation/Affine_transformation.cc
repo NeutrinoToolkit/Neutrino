@@ -154,25 +154,23 @@ void Affine_transformation::affine() {
 		
 		double minx=0.0;
 		double miny=0.0;
-        if (!crop->isChecked()){
-            std::vector<vec2f> corners(4); //clockwise...
-            corners[0]=affine(vec2f(0,0),vecForward);
-            corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
-            corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
-            corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);
-            minx=corners[0].x();
-            double maxx=corners[0].x();
-            miny=corners[0].y();
-            double maxy=corners[0].y();
-            for (unsigned int i=1;i<4;i++) {
-                if (minx>corners[i].x()) minx=corners[i].x();
-                if (maxx<corners[i].x()) maxx=corners[i].x();
-                if (miny>corners[i].y()) miny=corners[i].y();
-                if (maxy<corners[i].y()) maxy=corners[i].y();
-            }
-            dx=(unsigned int) (maxx-minx);
-            dy=(unsigned int) (maxy-miny);
+        std::vector<vec2f> corners(4); //clockwise...
+        corners[0]=affine(vec2f(0,0),vecForward);
+        corners[1]=affine(vec2f(my_phys->getW(),0),vecForward);
+        corners[2]=affine(vec2f(my_phys->getW(),my_phys->getH()),vecForward);
+        corners[3]=affine(vec2f(0,my_phys->getH()),vecForward);
+        minx=corners[0].x();
+        double maxx=corners[0].x();
+        miny=corners[0].y();
+        double maxy=corners[0].y();
+        for (unsigned int i=1;i<4;i++) {
+            if (minx>corners[i].x()) minx=corners[i].x();
+            if (maxx<corners[i].x()) maxx=corners[i].x();
+            if (miny>corners[i].y()) miny=corners[i].y();
+            if (maxy<corners[i].y()) maxy=corners[i].y();
         }
+        dx=(unsigned int) (maxx-minx);
+        dy=(unsigned int) (maxy-miny);
 		
         DEBUG(affine(vec2f(0,0),vecForward).x() << " " << affine(vec2f(0,0),vecForward).y());
         DEBUG(affine(vec2f(0,0),vecBackward).x() << " " << affine(vec2f(0,0),vecBackward).y());
@@ -189,7 +187,7 @@ void Affine_transformation::affine() {
 		for (unsigned int i=0; i<dx; i++) {
             progress.setValue(i);
 			for (unsigned int j=0; j<dy; j++) {
-                affinePhys.set(i,j,my_phys->getPoint(affine(vec2f(i,j)+vec2f(minx,miny),vecBackward),replaceVal));
+                affinePhys.set(i,j,my_phys->getPoint(affine(vec2f(i,j),vecBackward),replaceVal));
 			}
 		}
 
@@ -261,14 +259,15 @@ void Affine_transformation::findshift() {
             imageFFT.set(i,val/(A.mod()*B.mod()));
         }
         imageFFTother = imageFFT.ft2(PHYS_BACKWARD);
+        // nPhysD *magphys=new nPhysD(dx,dy,0.0,"mag");
         double max_val = 0.0;
         int maxx = 0;
         int maxy = 0;
-        for (int i = 0; i < dy; i++) {
-            for (int j = 0; j < dx; j++) {
+        for (int i = 1; i < dy; i++) {
+            for (int j = 1; j < dx; j++) {
                 int k=i * dx + j;
                 double magnitude = imageFFTother.point(k).mcabs();
-
+                // magphys->set(j,i,magnitude);
                 if (magnitude > max_val) {
                     max_val = magnitude;
                     maxx = j;
@@ -276,6 +275,7 @@ void Affine_transformation::findshift() {
                 }
             }
         }
+        // magphys->TscanBrightness();
         QPolygonF poly;
         poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
         l1.setPoints(poly);
@@ -283,6 +283,7 @@ void Affine_transformation::findshift() {
         l2.setPoints(poly);
         qDebug() << maxx << maxy;
         apply();
+        // nparent->addShowPhys(magphys);
 
     }
     qDebug() << "here out";

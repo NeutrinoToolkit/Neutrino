@@ -924,7 +924,10 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
         if (widget->parent() == this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                if (my_val.canConvert(QVariant::RectF)) {
+                qDebug() << "pippo nrect" << QMetaType::fromName("RectF");
+                if (my_val.canConvert(QMetaType::fromName("RectF"))) {
+                    qDebug() << "here" << my_val.toRectF();
+                    // if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
                     return;
                 }
@@ -936,7 +939,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                if (my_val.canConvert(QVariant::PointF)) {
+                qDebug() << "pippo npoint" << QMetaType::fromName("PointF");
+                if (my_val.canConvert(QMetaType::fromName("PointF"))) {
+                // if (my_val.canConvert(QVariant::PointF)) {
                     widget->setPoint(my_val.toPointF());
                     return;
                 }
@@ -948,7 +953,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                if (my_val.canConvert(QVariant::RectF)) {
+                qDebug() << "pippo nellipse" << QMetaType::fromName("RectF");
+                if (my_val.canConvert(QMetaType::fromName("RectF"))) {
+                    // if (my_val.canConvert(QVariant::RectF)) {
                     widget->setRect(my_val.toRectF());
                     return;
                 }

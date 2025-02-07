@@ -31,17 +31,14 @@ bool nPanPlug::instantiate(neutrino *neu) {
     qDebug() << "Instantiate plugin" << name();
 
     const QByteArray className(name()+"*");
-    const int type = QMetaType::type( className );
-    qDebug() << className << type;
 
-    if(type != QMetaType::UnknownType) {
-        const QMetaObject *mo = QMetaType::metaObjectForType(type);
-        if(mo) {
-            QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
-            if(objectPtr) {
-                my_pan=qobject_cast<nGenericPan*>(objectPtr);
-                return true;
-            }
+    const QMetaObject *mo = QMetaType::fromName(className).metaObject();
+
+    if(mo) {
+        QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
+        if(objectPtr) {
+            my_pan=qobject_cast<nGenericPan*>(objectPtr);
+            return true;
         }
     }
     return false;

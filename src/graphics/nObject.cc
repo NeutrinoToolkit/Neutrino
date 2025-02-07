@@ -731,7 +731,7 @@ nObject::saveSettings() {
 void
 nObject::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
-    qDebug() << "herepippo: " << toolTip() << objectName();
+    qDebug() << "here: " << toolTip() << objectName();
     setPos(settings.value("position").toPointF());
 
     int size = settings.beginReadArray("points");
@@ -769,7 +769,7 @@ nObject::loadSettings(QSettings &settings) {
 
 void
 nObject::saveSettings(QSettings &settings) {
-    qDebug() << "herepippo: " << toolTip() << objectName();
+    qDebug() << "here: " << toolTip() << objectName();
     settings.beginGroup(toolTip());
     settings.remove("");
     settings.setValue("position",pos());
