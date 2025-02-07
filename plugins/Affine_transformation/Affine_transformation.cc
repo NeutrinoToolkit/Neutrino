@@ -263,15 +263,17 @@ void Affine_transformation::findshift() {
         double max_val = 0.0;
         int maxx = 0;
         int maxy = 0;
-        for (int i = 1; i < dy; i++) {
-            for (int j = 1; j < dx; j++) {
-                int k=i * dx + j;
-                double magnitude = imageFFTother.point(k).mcabs();
-                // magphys->set(j,i,magnitude);
-                if (magnitude > max_val) {
-                    max_val = magnitude;
-                    maxx = j;
-                    maxy = i;
+        for (int i = 0; i < dy; i++) {
+            for (int j = 0; j < dx; j++) {
+                if (i!=0 and j!=0) {
+                    int k=i * dx + j;
+                    double magnitude = imageFFTother.point(k).mcabs();
+                    // magphys->set(j,i,magnitude);
+                    if (magnitude > max_val) {
+                        max_val = magnitude;
+                        maxx = j;
+                        maxy = i;
+                    }
                 }
             }
         }
