@@ -277,7 +277,6 @@ void Affine_transformation::findshift() {
                 }
             }
         }
-        // magphys->TscanBrightness();
         QPolygonF poly;
         poly << QPointF(100,0) << QPointF(0,0) << QPointF(0,100);
         l1.setPoints(poly);
@@ -285,6 +284,7 @@ void Affine_transformation::findshift() {
         l2.setPoints(poly);
         qDebug() << maxx << maxy;
         apply();
+        // magphys->TscanBrightness();
         // nparent->addShowPhys(magphys);
 
     }
