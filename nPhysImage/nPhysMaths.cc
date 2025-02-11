@@ -668,6 +668,33 @@ physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
     fftw_free(b2);
 }
 
+void physMath::phys_hanning_window(physD &image){
+    int width=image.getW();
+    int height = image.getH();
+#pragma omp parallel for collapse(2)
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            double w = 0.5 * (1 - cos(2 * M_PI * x / (width  - 1))) *
+                       0.5 * (1 - cos(2 * M_PI * y / (height - 1)));
+            image.Timg_buffer[y * width + x] *= w;
+        }
+    }
+}
+
+void physMath::phys_gauss_window(physD &image, double sigmax, double sigmay, int power){
+    int x, y;
+    int width=image.getW();
+    int height = image.getH();
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            double w = exp(-(pow(x-width/2,power)/(2*pow(sigmax,power))+pow(y-height/2,power)/(2*pow(sigmay,power))));
+            image.Timg_buffer[y * width + x] *= w;
+        }
+    }
+
+}
+
+
 void
 physMath::phys_integratedNe(physD &image, double lambda_m)
 {

@@ -878,6 +878,7 @@ void neutrino::setPanData(std::string panstring){
                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
                 QApplication::processEvents();
                 tmpFile.close(); // this should also remove it...
+                my_pan->raiseIt();
             } else {
                 QMessageBox::critical(this,tr("Session error"),tr("Cannot find method or plugin for ")+pName,  QMessageBox::Ok);
             }

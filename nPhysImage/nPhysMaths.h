@@ -83,6 +83,10 @@ void phys_fast_gaussian_blur(physD &, double);
 
 void phys_fast_gaussian_blur(physD &, double, double);
 
+void phys_hanning_window(physD &);
+
+void phys_gauss_window(physD &, double sigmax=10, double sigmay=10, int power=2);
+
 void phys_integratedNe(physD &, double);
 
 void phys_laplace(physD&);

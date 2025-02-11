@@ -74,6 +74,7 @@ int nApp::exec() {
     for (auto &arg : args)
         my_neu->fileOpen(arg);
 
+    my_neu->activateWindow();
     return QApplication::exec();
 }
 
