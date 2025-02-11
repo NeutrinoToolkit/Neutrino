@@ -1844,15 +1844,15 @@ Visar::export_clipboard() {
 QString Visar::export_sop() {
     QString out;
     if (enableSOP->isChecked()) {
-        out += QString("#SOP Origin       : %L1\n").arg(sopOrigin->value());
-        out += QString("#SOP Offset       : %L1\n").arg(sopTimeOffset->value());
-        out += QString("#Center & magnif. : %L1 %L2\n").arg(physOriginSpace->value()).arg(magnification->value());
-        out += QString("#SOP Time scale   : %L1\n").arg(sopScale->text());
-        out += QString("#SOP Direction    : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
-        out += QString("#Reflectivity     : %L1\n").arg(whichRefl->currentText());
-        out += QString("#Calib            : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
+        out += QString("#SOP Origin         : %L1\n").arg(sopOrigin->value());
+        out += QString("#SOP Offset         : %L1\n").arg(sopTimeOffset->value());
+        out += QString("#Center & magnif.   : %L1 %L2\n").arg(physOriginSpace->value()).arg(magnification->value());
+        out += QString("#SOP Time scale     : %L1\n").arg(sopScale->text());
+        out += QString("#SOP Direction      : %L1\n").arg(sopDirection->currentIndex()==0 ? "Vertical" : "Horizontal");
+        out += QString("#Reflectivity       : %L1\n").arg(whichRefl->currentText());
+        out += QString("#Calib              : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
         QRectF geom2=sopRect->getRectF();
-        out += QString("#Region (px)      : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
+        out += QString("#Region (px)        : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
         out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
 
         for (int i=0;i<time_sop.size();i++) {
@@ -1874,13 +1874,16 @@ QString Visar::export_one(unsigned int k) {
             out += "#VISAR " + QLocale().toString(k+1) + "\n";
             out += QString("#Offset shift       : %L1\n").arg(velocityUi[k]->offsetShift->value());
             out += QString("#Sensitivity        : %L1\n").arg(settingsUi[k]->sensitivity->value());
+            out += QString("#Slit               : %L1\n").arg(settingsUi[k]->resolution->value());
+            out += QString("#Interfr. & angle   : %L1 %L2\n").arg(settingsUi[k]->interfringe->value()).arg(settingsUi[k]->angle->value());
+            out += QString("#Intensity params   : %L1 %L2 %L3\n").arg(settingsUi[k]->offRef->value()).arg(settingsUi[k]->intensityShift->value()).arg(settingsUi[k]->multRef->value());
             out += QString("#Reflectivity       : %L1 %L2\n").arg(velocityUi[k]->reflOffset->value()).arg(velocityUi[k]->reflRef->value());
-            out += QString("#Sweep Time         : %L1\n").arg(settingsUi[k]->physScale->text());
+            out += QString("#Sweep Time         : %L1 %L2\n").arg(settingsUi[k]->physScaleType->currentText()).arg(settingsUi[k]->physScale->text());
             out += QString("#Time zero & delay  : %L1 %L2\n").arg(velocityUi[k]->physOrigin->value()).arg(velocityUi[k]->offsetTime->value());
             out += QString("#Center & magnif.   : %L1 %L2\n").arg(settingsUi[k]->physOriginSpace->value()).arg(settingsUi[k]->magnification->value());
             out += QString("#Jumps              : %L1\n").arg(velocityUi[k]->jumpst->text());
             QRectF geom2=fringeRect[k]->getRectF();
-            out += QString("#Region (px)      : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
+            out += QString("#Region (px)        : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
             out += QString("# Time       Velocity    ErrVel      Reflect     ErrRefl     Quality     Pixel       Shift       ErrShift    RefInt      ShotInt     RefContr    ShotContr.\n");
             for (int j=0;j<time_phase[k].size();j++) {
                 QVector<double> values {time_vel[k][j],velocity[k][j], velError[k][j],
