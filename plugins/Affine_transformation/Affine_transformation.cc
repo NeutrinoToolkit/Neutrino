@@ -236,44 +236,55 @@ void Affine_transformation::apply() {
 
 void Affine_transformation::findshift() {
     qDebug() << "here in";
-    nPhysD *my_phys=nullptr;
-    nPhysD *my_phys_other=nullptr;
+    nPhysD *my_phys=getPhysFromCombo(image1);;
+    nPhysD *my_phys_other=getPhysFromCombo(image2);
+    if (my_phys && my_phys_other) {
+        std::array<double,6> vecForward,vecBackward;
 
-    std::array<double,6> vecForward,vecBackward;
-    my_phys=getPhysFromCombo(image1);
-    my_phys_other=getPhysFromCombo(image2);
-    vecForward=forward;
-    vecBackward=backward;
-    if (my_phys) {
-        physC imageFFT = my_phys->ft2(PHYS_FORWARD);
-        physC imageFFTother = my_phys_other->ft2(PHYS_FORWARD);
-        size_t dx=my_phys->getW();
-        size_t dy=my_phys->getH();
+        nPhysD my_phys_copy(*my_phys);
+        nPhysD my_phys_other_copy(*my_phys_other);
 
-        for (int i=0; i<dx*dy;i++) {
-            mcomplex A=imageFFT.point(i);
-            mcomplex B=imageFFTother.point(i);
+
+        size_t dx=my_phys_copy.getW();
+        size_t dy=my_phys_copy.getH();
+
+        physMath::phys_hanning_window(my_phys_copy);
+        physMath::phys_hanning_window(my_phys_other_copy);
+
+        nparent->addShowPhys(new nPhysD(my_phys_copy));
+
+        // physMath::phys_gauss_window(my_phys_copy       ,dx/3, dy/3, 4);
+        // physMath::phys_gauss_window(my_phys_other_copy, dx/3, dy/3, 4);
+
+        vecForward=forward;
+        vecBackward=backward;
+        physC imageFFT = my_phys_copy.ft2(PHYS_FORWARD);
+        physC imageFFTother = my_phys_other_copy.ft2(PHYS_FORWARD);
+
+        for (int k=0; k<dx*dy;k++) {
+            mcomplex A=imageFFT.point(k);
+            mcomplex B=imageFFTother.point(k);
             double vreal=A.real()*B.real()+A.imag()*B.imag();
             double vimag=A.imag()*B.real()-A.real()*B.imag();
             mcomplex val = mcomplex(vreal, vimag);
-            imageFFT.set(i,val/(A.mod()*B.mod()));
+            imageFFT.set(k,val/(A.mod()*B.mod()));
         }
         imageFFTother = imageFFT.ft2(PHYS_BACKWARD);
+
         // nPhysD *magphys=new nPhysD(dx,dy,0.0,"mag");
+
         double max_val = 0.0;
         int maxx = 0;
         int maxy = 0;
         for (int i = 0; i < dy; i++) {
             for (int j = 0; j < dx; j++) {
-                if (i!=0 and j!=0) {
-                    int k=i * dx + j;
-                    double magnitude = imageFFTother.point(k).mcabs();
-                    // magphys->set(j,i,magnitude);
-                    if (magnitude > max_val) {
-                        max_val = magnitude;
-                        maxx = j;
-                        maxy = i;
-                    }
+                int k=i * dx + j;
+                double magnitude = imageFFTother.point(k).mcabs();
+                // magphys->set(j,i,magnitude);
+                if (magnitude > max_val) {
+                    max_val = magnitude;
+                    maxx = j;
+                    maxy = i;
                 }
             }
         }
