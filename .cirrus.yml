@@ -87,7 +87,7 @@ opensuseleap_task:
     ls -l /usr/bin/gcc*
     g++ --version
     ls -l /usr/bin/gcc-[0-9]*
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/gcc-[0-9][0-9] 50
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-[0-9][0-9] 50
     g++ --version
     ls -l /usr/bin/gcc*
     mkdir build && cd build
