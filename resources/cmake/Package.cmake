@@ -35,8 +35,10 @@ elseif (LINUX)
     find_program(LSB_RELEASE lsb_release REQUIRED)
     if(LSB_RELEASE)
         execute_process(COMMAND "lsb_release" "-is" OUTPUT_VARIABLE DISTRO OUTPUT_STRIP_TRAILING_WHITESPACE)
-        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-${DISTRO}")
-        
+	execute_process(COMMAND "lsb_release" "-rs" OUTPUT_VARIABLE VERS OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-${DISTRO}-${VERS}")
+
         if (DISTRO MATCHES "Debian" OR DISTRO MATCHES "Ubuntu" OR DISTRO MATCHES "Linuxmint")
             list(APPEND CPACK_GENERATOR DEB)
 
