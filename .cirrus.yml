@@ -84,6 +84,7 @@ opensuseleap_task:
     zypper --gpg-auto-import-keys ref
     zypper update -y
     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-[0-9]* 50
     mkdir build && cd build
     cmake ..
     make -j2 package
