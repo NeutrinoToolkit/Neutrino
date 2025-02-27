@@ -75,7 +75,7 @@ opensuse_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
-opensuse_leap:
+opensuseleap_task:
   allow_failures: true
   container:
     image: opensuse/leap:latest
