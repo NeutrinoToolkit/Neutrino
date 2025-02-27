@@ -75,6 +75,22 @@ opensuse_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
+opensuse_leap:
+  allow_failures: true
+  container:
+    image: opensuse/leap:latest
+  script: |
+    zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+    zypper --gpg-auto-import-keys ref
+    zypper update -y
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.rpm ..
+  package_artifacts:
+    path: "Neutrino-*.*"
+
 macM1_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
