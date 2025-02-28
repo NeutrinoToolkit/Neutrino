@@ -1,79 +1,79 @@
-# ubuntu_task:
-#   allow_failures: true
-#   container:
-#     image: ubuntu:22.04
-#   script: |
-#     export DEBIAN_FRONTEND=noninteractive
-#     apt-get update -qq
-#     apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
-#     mkdir build && cd build
-#     cmake ..
-#     make -j2 package
-#     cp Neutrino*.deb ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+ubuntu_task:
+  allow_failures: true
+  container:
+    image: ubuntu:22.04
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# debian_task:
-#   allow_failures: true
-#   container:
-#     image: debian:testing
-#   script: |
-#     export DEBIAN_FRONTEND=noninteractive
-#     apt-get update -qq
-#     apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
-#     apt-get install -yy qml6-module*
-#     mkdir build && cd build
-#     cmake ..
-#     make -j2 package
-#     cp Neutrino*.deb ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+debian_task:
+  allow_failures: true
+  container:
+    image: debian:testing
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
+    apt-get install -yy qml6-module*
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# mint_task:
-#   allow_failures: true
-#   container:
-#     image: linuxmintd/mint21-amd64:latest
-#   script: |
-#     export DEBIAN_FRONTEND=noninteractive
-#     apt-get update -qq
-#     apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
-#     mkdir build && cd build
-#     cmake ..
-#     make -j2 package
-#     cp Neutrino*.deb ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+mint_task:
+  allow_failures: true
+  container:
+    image: linuxmintd/mint21-amd64:latest
+  script: |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.deb ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# fedora_task:
-#   allow_failures: true
-#   container:
-#     image: fedora:36
-#   script: |
-#     dnf clean all
-#     dnf -y --nogpgcheck update
-#     dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
-#     mkdir build && cd build
-#     cmake ..
-#     make -j2 package
-#     cp Neutrino*.rpm ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+fedora_task:
+  allow_failures: true
+  container:
+    image: fedora:36
+  script: |
+    dnf clean all
+    dnf -y --nogpgcheck update
+    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.rpm ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# opensuse_task:
-#   allow_failures: true
-#   container:
-#     image: opensuse/tumbleweed:latest
-#   script: |
-#     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
-#     zypper --gpg-auto-import-keys ref
-#     zypper update -y
-#     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
-#     mkdir build && cd build
-#     cmake ..
-#     make -j2 package
-#     cp Neutrino*.rpm ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+opensuse_task:
+  allow_failures: true
+  container:
+    image: opensuse/tumbleweed:latest
+  script: |
+    zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+    zypper --gpg-auto-import-keys ref
+    zypper update -y
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    mkdir build && cd build
+    cmake ..
+    make -j2 package
+    cp Neutrino*.rpm ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
 opensuseleap_task:
   allow_failures: true
@@ -93,213 +93,213 @@ opensuseleap_task:
   package_artifacts:
     path: "Neutrino-*.*"
 
-# macM1_task:
-#   macos_instance:
-#     image: ghcr.io/cirruslabs/macos-monterey-base:latest
-#   script: |
-#     brew update
-#     brew install objc-codegenutils objc-run 
-#     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
-#     brew install iltommi/brews/hdf4
-#     brew install iltommi/brews/clfft
-#     # git clone https://github.com/iltommi/pythonqt.git
-#     # cd pythonqt
-#     # cd generator
-#     # qmake -r generator.pro
-#     # make -j10
-#     # QTDIR=$(brew --prefix qt) ./pythonqt_generator
-#     # cd ..
-#     # QTDIR=$(brew --prefix qt) qmake -r
-#     # make -j10
-#     # INSTALL_ROOT=$(brew --prefix) make install
-#     # cd ..
-#     mkdir -p build && cd build
-#     cmake ..
-#     make -j$(sysctl -n hw.ncpu) install
-#     ../resources/macPackage/prepareapp.sh
-#     cp Neutrino-*.zip ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+macM1_task:
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+  script: |
+    brew update
+    brew install objc-codegenutils objc-run 
+    brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
+    brew install iltommi/brews/hdf4
+    brew install iltommi/brews/clfft
+    # git clone https://github.com/iltommi/pythonqt.git
+    # cd pythonqt
+    # cd generator
+    # qmake -r generator.pro
+    # make -j10
+    # QTDIR=$(brew --prefix qt) ./pythonqt_generator
+    # cd ..
+    # QTDIR=$(brew --prefix qt) qmake -r
+    # make -j10
+    # INSTALL_ROOT=$(brew --prefix) make install
+    # cd ..
+    mkdir -p build && cd build
+    cmake ..
+    make -j$(sysctl -n hw.ncpu) install
+    ../resources/macPackage/prepareapp.sh
+    cp Neutrino-*.zip ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# win32_task:
-#   container:
-#     image: fedora:36
-#   script: |
-#     dnf clean all
-#     dnf -y --nogpgcheck update
-#     dnf -y install cmake git mingw32-qt6* mingw32-gcc-c++ mingw32-gcc mingw32-gcc-gfortran mingw32-libgomp mingw32-gsl mingw32-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw32-portablexdr pandoc mingw32-cfitsio
-#     wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
-#     tar -zxvf fftw-3.3.6-pl2.tar.gz
-#     cd fftw-3.3.6-pl2
-#     mingw32-configure --disable-static --enable-shared --enable-threads --with-combined-threads
-#     make bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
-#     make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
-#     cd ..
-#     wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
-#     tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
-#     patch -p1 -u < hdf4-1-portability-fixes.patch
-#     patch -p1 -u < hdf4-2-dllimport.patch
-#     libtoolize --force
-#     autoreconf --install
-#     mingw32-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
-#     make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src install
-#     make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-#     make -C mfhdf/libsrc install
-#     cd ..
-#     mkdir build && cd build
-#     mingw32-cmake ..
-#     make -j2 package
-#     cp Neutrino*.exe Neutrino*.zip ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+win32_task:
+  container:
+    image: fedora:36
+  script: |
+    dnf clean all
+    dnf -y --nogpgcheck update
+    dnf -y install cmake git mingw32-qt6* mingw32-gcc-c++ mingw32-gcc mingw32-gcc-gfortran mingw32-libgomp mingw32-gsl mingw32-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw32-portablexdr pandoc mingw32-cfitsio
+    wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
+    tar -zxvf fftw-3.3.6-pl2.tar.gz
+    cd fftw-3.3.6-pl2
+    mingw32-configure --disable-static --enable-shared --enable-threads --with-combined-threads
+    make bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    cd ..
+    wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+    tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+    patch -p1 -u < hdf4-1-portability-fixes.patch
+    patch -p1 -u < hdf4-2-dllimport.patch
+    libtoolize --force
+    autoreconf --install
+    mingw32-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+    make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src install
+    make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+    make -C mfhdf/libsrc install
+    cd ..
+    mkdir build && cd build
+    mingw32-cmake ..
+    make -j2 package
+    cp Neutrino*.exe Neutrino*.zip ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# win64_task:
-#   container:
-#     image: fedora:36
-#   script: |
-#     dnf clean all
-#     dnf -y --nogpgcheck update
-#     dnf -y install cmake git mingw64-qt6* mingw64-gcc-c++ mingw64-gcc-gfortran mingw64-libgomp mingw64-gsl mingw64-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw64-portablexdr pandoc mingw64-cfitsio
-#     wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
-#     tar -zxvf fftw-3.3.6-pl2.tar.gz
-#     cd fftw-3.3.6-pl2
-#     mingw64-configure --disable-static --enable-shared --enable-threads --with-combined-threads
-#     make -j bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
-#     make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
-#     cd ..
-#     wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
-#     tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
-#     wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
-#     patch -p1 -u < hdf4-1-portability-fixes.patch
-#     patch -p1 -u < hdf4-2-dllimport.patch
-#     libtoolize --force
-#     autoreconf --install
-#     mingw64-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
-#     make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src LDFLAGS="-no-undefined -lssp"
-#     make -C hdf/src install
-#     make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-#     make -C mfhdf/libsrc install
-#     cd ..
-#     mkdir build && cd build
-#     mingw64-cmake ..
-#     make -j2 package
-#     cp Neutrino*.exe Neutrino*.zip ..
-#   package_artifacts:
-#     path: "Neutrino-*.*"
+win64_task:
+  container:
+    image: fedora:36
+  script: |
+    dnf clean all
+    dnf -y --nogpgcheck update
+    dnf -y install cmake git mingw64-qt6* mingw64-gcc-c++ mingw64-gcc-gfortran mingw64-libgomp mingw64-gsl mingw64-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf mingw64-portablexdr pandoc mingw64-cfitsio
+    wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
+    tar -zxvf fftw-3.3.6-pl2.tar.gz
+    cd fftw-3.3.6-pl2
+    mingw64-configure --disable-static --enable-shared --enable-threads --with-combined-threads
+    make -j bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+    cd ..
+    wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+    tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+    wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+    patch -p1 -u < hdf4-1-portability-fixes.patch
+    patch -p1 -u < hdf4-2-dllimport.patch
+    libtoolize --force
+    autoreconf --install
+    mingw64-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+    make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src LDFLAGS="-no-undefined -lssp"
+    make -C hdf/src install
+    make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+    make -C mfhdf/libsrc install
+    cd ..
+    mkdir build && cd build
+    mingw64-cmake ..
+    make -j2 package
+    cp Neutrino*.exe Neutrino*.zip ..
+  package_artifacts:
+    path: "Neutrino-*.*"
 
-# AppImage_olderLinux_task:
+AppImage_olderLinux_task:
+  container:
+    image: fedora:34
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib
+  script: |
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir
+    ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ../Neutrino-olderLinux.AppImage
+  package_artifacts:
+    path: "Neutrino-*.AppImage"
+
+# AppImage_almalinux_task:
 #   container:
-#     image: fedora:34
+#     image: almalinux:9
 #   env:
 #     VERSION: Linux
 #     APPIMAGE_EXTRACT_AND_RUN: 1
 #     LD_LIBRARY_PATH: AppDir/usr/lib
 #   script: |
-#     dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-#     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-#     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-#     chmod +x linuxdeploy*.AppImage
-#     mkdir build && cd build
-#     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-#     make -j2 install DESTDIR=AppDir
-#     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-#     cp Neutrino-*.AppImage ../Neutrino-olderLinux.AppImage
-#   package_artifacts:
-#     path: "Neutrino-*.AppImage"
-
-# # AppImage_almalinux_task:
-# #   container:
-# #     image: almalinux:9
-# #   env:
-# #     VERSION: Linux
-# #     APPIMAGE_EXTRACT_AND_RUN: 1
-# #     LD_LIBRARY_PATH: AppDir/usr/lib
-# #   script: |
-# #     dnf install --assumeyes wget
-# #     wget $(echo "https://pkgs.dyn.su/el9/base/x86_64/raven-release.el9.noarch.rpm" | sed "s/el9/el$(rpm -q --queryformat '%{RELEASE}' rpm | grep -oP 'el\K[0-9]+')/g")
-# #     rpm -ivh raven-release*.rpm
-# #     dnf install --assumeyes epel-release
-# #     dnf install --assumeyes almalinux-release-devel
-# #     dnf config-manager --set-enabled crb
-# #     dnf update --assumeyes
-# #     dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-# #     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-# #     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-# #     chmod +x linuxdeploy*.AppImage
-# #     mkdir build && cd build
-# #     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-# #     make -j2 install DESTDIR=AppDir
-# #     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-# #     cp Neutrino-*.AppImage ../Neutrino-almaLinux.AppImage
-# #   package_artifacts:
-# #     path: "Neutrino-*.AppImage"
-
-# AppImage_task:
-#   container:
-#     image: fedora:36
-#   env:
-#     VERSION: Linux
-#     APPIMAGE_EXTRACT_AND_RUN: 1
-#     LD_LIBRARY_PATH: AppDir/usr/lib
-#   script: |
-#     dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-#     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-#     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-#     chmod +x linuxdeploy*.AppImage
-#     mkdir build && cd build
-#     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-#     make -j2 install DESTDIR=AppDir
-#     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-#     cp Neutrino-*.AppImage ..
-#   package_artifacts:
-#     path: "Neutrino-*.AppImage"
-
-# AppImageArm_task:
-#   allow_failures: true
-#   arm_container:
-#     image: arm64v8/fedora
-#   env:
-#     VERSION: Linux
-#     APPIMAGE_EXTRACT_AND_RUN: 1
-#     LD_LIBRARY_PATH: AppDir/usr/lib    
-#   script: |
+#     dnf install --assumeyes wget
+#     wget $(echo "https://pkgs.dyn.su/el9/base/x86_64/raven-release.el9.noarch.rpm" | sed "s/el9/el$(rpm -q --queryformat '%{RELEASE}' rpm | grep -oP 'el\K[0-9]+')/g")
+#     rpm -ivh raven-release*.rpm
+#     dnf install --assumeyes epel-release
+#     dnf install --assumeyes almalinux-release-devel
+#     dnf config-manager --set-enabled crb
+#     dnf update --assumeyes
 #     dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
-#     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
-#     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-aarch64.AppImage
+#     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+#     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
 #     chmod +x linuxdeploy*.AppImage
 #     mkdir build && cd build
 #     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 #     make -j2 install DESTDIR=AppDir
-#     NO_STRIP=true ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
-#     cp Neutrino-*.AppImage ../Neutrino-Linux-arm64.AppImage
+#     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+#     cp Neutrino-*.AppImage ../Neutrino-almaLinux.AppImage
 #   package_artifacts:
 #     path: "Neutrino-*.AppImage"
 
-# upload_task:
-#   only_if: $CIRRUS_BRANCH == 'master'
-#   depends_on:
-#     - macM1
-#     - win32
-#     - win64
-#     - AppImage
-#     - AppImageArm
+AppImage_task:
+  container:
+    image: fedora:36
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib
+  script: |
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir
+    ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ..
+  package_artifacts:
+    path: "Neutrino-*.AppImage"
+
+AppImageArm_task:
+  allow_failures: true
+  arm_container:
+    image: arm64v8/fedora
+  env:
+    VERSION: Linux
+    APPIMAGE_EXTRACT_AND_RUN: 1
+    LD_LIBRARY_PATH: AppDir/usr/lib    
+  script: |
+    dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-aarch64.AppImage
+    chmod +x linuxdeploy*.AppImage
+    mkdir build && cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j2 install DESTDIR=AppDir
+    NO_STRIP=true ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+    cp Neutrino-*.AppImage ../Neutrino-Linux-arm64.AppImage
+  package_artifacts:
+    path: "Neutrino-*.AppImage"
+
+upload_task:
+  only_if: $CIRRUS_BRANCH == 'master'
+  depends_on:
+    - macM1
+    - win32
+    - win64
+    - AppImage
+    - AppImageArm
     
-#   container:
-#     image: ubuntu:22.04
-#   script: |
-#     apt-get update -qq
-#     apt-get install -yy git gh wget zip
-#     wget -q https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip
-#     unzip package.zip -d package
-#     git config --global user.name "Cirrus CI"
-#     git config --global user.email "hello@cirruslabs.org"
-#     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
-#     git pull
-#     gh release upload --clobber latest package/*
+  container:
+    image: ubuntu:22.04
+  script: |
+    apt-get update -qq
+    apt-get install -yy git gh wget zip
+    wget -q https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/package.zip
+    unzip package.zip -d package
+    git config --global user.name "Cirrus CI"
+    git config --global user.email "hello@cirruslabs.org"
+    git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
+    git pull
+    gh release upload --clobber latest package/*
     
