@@ -84,14 +84,8 @@ opensuseleap_task:
     zypper --gpg-auto-import-keys ref
     zypper update -y
     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
-    ls -l /usr/bin/g++*
-    g++ --version
-    ls -l /usr/bin/g??-[0-9]*
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-[0-9][0-9] 50
-    g++ --version
-    ls -l /usr/bin/g++*
-    ls -l /etc/alternatives
     mkdir build && cd build
+    cmake -DCMAKE_C_COMPILER=/usr/bin/gcc-[0-9][0-9] -DCMAKE_CXX_COMPILER=/usr/bin/g++-[0-9][0-9]  ..
     cmake ..
     make -j2 package
     cp Neutrino*.rpm ..
