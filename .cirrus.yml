@@ -86,7 +86,10 @@ opensuseleap_task:
     zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
     mkdir build && cd build
     ls -l /usr/bin/g??-??
-    cmake -DCMAKE_C_COMPILER=/usr/bin/gcc-13 -DCMAKE_CXX_COMPILER=/usr/bin/g++-13  ..
+    ls -l /usr/bin/g++-[0-9]*
+    ls -l /usr/bin/g++-[0-9][0-9]
+    export compiler=/usr/bin/g++-[0-9][0-9]
+    cmake -DCMAKE_CXX_COMPILER=$compiler  ..
     cmake ..
     make -j2 package
     cp Neutrino*.rpm ..
