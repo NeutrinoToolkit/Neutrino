@@ -89,6 +89,7 @@ opensuseleap_task:
     ls -l /usr/bin/g++-[0-9]*
     ls -l /usr/bin/g++-[0-9][0-9]
     export compiler=/usr/bin/g++-[0-9][0-9]
+    echo $compiler
     cmake -DCMAKE_CXX_COMPILER=$compiler  ..
     cmake ..
     make -j2 package
