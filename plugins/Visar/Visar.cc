@@ -477,6 +477,8 @@ void Visar::addVisar() {
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
 
+    connect(ui_settings->border, SIGNAL(valueChanged(int)), this, SLOT(needWave()));
+
     connect(ui_settings->globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globDirShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
     connect(ui_settings->globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
@@ -1382,8 +1384,6 @@ void Visar::needWave() {
             settingsUi[k]->doWaveButton->setIcon(my_icon);
             settingsUi[k]->doWaveButton->setProperty("needWave",true);
             actionDoWavelets->setIcon(my_icon);
-
-
         }
     }
 }
@@ -1525,11 +1525,26 @@ void Visar::doWave(unsigned int k) {
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
             for (unsigned int m=0;m<2;m++) {
-#pragma omp parallel for
+                #pragma omp parallel for
                 for (size_t kk=0; kk<(size_t)(dx*dy); kk++) {
                     phase[m].Timg_buffer[kk] = -physfft[m].Timg_buffer[kk].arg()/(2*M_PI);
                     contrast[k][m].Timg_buffer[kk] = 2.0*physfft[m].Timg_buffer[kk].mod()/(dx*dy);
                     intensity[k][m].Timg_buffer[kk] -= contrast[k][m].point(kk)*cos(2*M_PI*phase[m].point(kk));
+                }
+                // removing left and right border
+                int border=settingsUi[k]->border->value();
+                if ( border > 0) {
+                    for (size_t y=0;y<(size_t)dy;y++) {
+                        int b=0;
+                        for (int x=0;x<border;x++) {
+                            b+=intensity[k][m].point(x,y);
+                            b+=intensity[k][m].point(dx-x,y);
+                        }
+                        b=b/(2*border);
+                        for (size_t x=0;x<(size_t)dx;x++) {
+                            intensity[k][m].set(x,y,intensity[k][m].point(x,y)-b);
+                        }
+                    }
                 }
             }
 
