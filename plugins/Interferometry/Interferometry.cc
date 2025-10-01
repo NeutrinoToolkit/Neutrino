@@ -374,7 +374,6 @@ void Interferometry::doUnwrap () {
 
         qDebug() << "here";
         if (qual && phase) {
-
             physD loc_qual(*qual);
             double mini=loc_qual.get_min();
             double maxi=loc_qual.get_max();
@@ -385,7 +384,6 @@ void Interferometry::doUnwrap () {
                     loc_qual.Timg_buffer[k]=0.0;
             qDebug() << "here";
             physD unwrap;
-            QString methodName=method->currentText();
 
             physD barrierPhys = physD(phase->getW(),phase->getH(),1.0,"barrier");
             if (useBarrier->isChecked()) {
@@ -406,20 +404,62 @@ void Interferometry::doUnwrap () {
                     barrierPhys.set(p.x()+1,p.y()+1,0);
                 }
             }
+
+            QString methodName=method->currentText();
+
+            physD phase2=phase->copy();
+            if (unwrapAngles->isChecked()) {
+                physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
+                physMath::phys_point_subtract(angle,(static_cast<physD*>(localPhys["angle_ref"]))->copy());
+                physMath::phys_divide(angle,180);
+                physD orig_angle=angle.copy();
+                physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
+                if (methodName=="Simple H+V") {
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::SIMPLE_HV, unwrapAngle);
+                } else if (methodName=="Simple V+H") {
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::SIMPLE_VH, unwrapAngle);
+                } else if (methodName=="Goldstein") {
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::GOLDSTEIN, unwrapAngle);
+                } else if (methodName=="Miguel") {
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::MIGUEL_QUALITY, unwrapAngle);
+                } else if (methodName=="Miguel+Quality") {
+                    physMath::phys_point_multiply(barrierPhys,loc_qual);
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::MIGUEL_QUALITY, unwrapAngle);
+                } else if (methodName=="Quality") {
+                    physMath::phys_point_multiply(barrierPhys,loc_qual);
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::QUALITY, unwrapAngle);
+                }
+                physMath::phys_point_subtract(unwrapAngle,orig_angle);
+                physMath::phys_add(unwrapAngle,100);
+                for (size_t k=0; k<unwrapAngle.getSurf(); k++)
+                    if (int(unwrapAngle.Timg_buffer[k]) % 2 == 1) {
+                        phase2.Timg_buffer[k] = 1.0-phase2.Timg_buffer[k];
+                        unwrapAngle.Timg_buffer[k]=1;
+                    } else {
+                        unwrapAngle.Timg_buffer[k]=0;
+                    }
+                phase2.TscanBrightness();
+                unwrapAngle.TscanBrightness();
+                localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),localPhys["unwrap_angles"]);
+                localPhys["unwrap_angles"]->setShortName("unwrap angles");
+                localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),localPhys["phase2"]);
+                localPhys["phase2"]->setShortName("phase2");
+            }
+
             if (methodName=="Simple H+V") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::SIMPLE_HV, unwrap);
             } else if (methodName=="Simple V+H") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::SIMPLE_VH, unwrap);
             } else if (methodName=="Goldstein") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::GOLDSTEIN, unwrap);
             } else if (methodName=="Miguel") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::MIGUEL_QUALITY, unwrap);
             } else if (methodName=="Miguel+Quality") {
                 physMath::phys_point_multiply(barrierPhys,loc_qual);
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::MIGUEL_QUALITY, unwrap);
             } else if (methodName=="Quality") {
                 physMath::phys_point_multiply(barrierPhys,loc_qual);
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY, unwrap);
+                physWave::phys_phase_unwrap(phase2, barrierPhys, physWave::QUALITY, unwrap);
             }
 #ifdef __phys_debug
             if (useBarrier->isChecked()) {

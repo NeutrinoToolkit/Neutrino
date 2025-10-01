@@ -1058,6 +1058,9 @@
    <property name="toolTip">
     <string>Copy to clipboard</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
+   </property>
   </action>
   <action name="actionRect3">
    <property name="icon">
@@ -1081,6 +1084,9 @@
    </property>
    <property name="toolTip">
     <string>Export all curves in TXT</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
    </property>
   </action>
   <action name="actionAddVisar">

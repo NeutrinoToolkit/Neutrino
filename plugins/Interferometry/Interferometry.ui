@@ -68,7 +68,7 @@
           <string>Frequency weight (&lt;0 for lower freq; &gt;0 for higher freq)</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
          <property name="decimals">
           <number>1</number>
@@ -116,7 +116,7 @@
              <string>Thick</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -159,7 +159,7 @@
              <string>Correlation</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -215,7 +215,7 @@
           <string>orientation</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
          <property name="suffix">
           <string> ˚</string>
@@ -243,7 +243,7 @@
           <string>Interfringe</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
          <property name="suffix">
           <string> px</string>
@@ -307,7 +307,7 @@
       <property name="title">
        <string>Unwrap</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0,0,0">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -320,6 +320,22 @@
        <property name="bottomMargin">
         <number>2</number>
        </property>
+       <item>
+        <widget class="QCheckBox" name="unwrapAngles">
+         <property name="font">
+          <font>
+           <family>.AppleSystemUIFont</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>angle</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QComboBox" name="method">
          <property name="toolTip">
@@ -488,7 +504,7 @@
        <item>
         <widget class="Line" name="line_4">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -508,7 +524,7 @@
        <item>
         <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -607,7 +623,7 @@
        <item>
         <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -688,7 +704,7 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -703,7 +719,7 @@
        <item>
         <widget class="Line" name="line_3">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -821,7 +837,7 @@
        <item>
         <widget class="Line" name="line_5">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -855,7 +871,7 @@
        <item>
         <widget class="Line" name="line_6">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
         </widget>
        </item>

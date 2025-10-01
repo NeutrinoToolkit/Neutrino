@@ -1750,7 +1750,8 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
             }
 
             int surf=1;
-            int32 start[rank], edges[rank];
+            std::vector<int32_t> start(rank);
+            std::vector<int32_t> edges(rank);
             for (i=0;i<rank;i++) {
                 surf*=dim_sizes[i];
                 start[i]=0;
@@ -1781,7 +1782,7 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
             }
 
             if (data.size()>0) {
-                status=SDreaddata(sds_id,start,nullptr,edges,(VOIDP)&data[0]);
+                status=SDreaddata(sds_id,start.data(),nullptr,edges.data(),(VOIDP)&data[0]);
                 if (status!=FAIL && rank>1) {
                     int numMat=(rank==2?1:dim_sizes[0]);
                     if (dim_sizes[rank-1]*dim_sizes[rank-2]>0) {
