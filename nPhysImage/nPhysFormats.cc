@@ -1750,8 +1750,8 @@ std::vector <physD> physFormat::phys_open_HDF4(std::string fname) {
             }
 
             int surf=1;
-            std::vector<int32_t> start(rank);
-            std::vector<int32_t> edges(rank);
+            std::vector<int32> start(rank);
+            std::vector<int32> edges(rank);
             for (i=0;i<rank;i++) {
                 surf*=dim_sizes[i];
                 start[i]=0;
