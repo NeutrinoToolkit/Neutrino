@@ -101,6 +101,7 @@ macM1_task:
     brew update
     brew install objc-codegenutils objc-run 
     brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio gsl pandoc vulkan-headers hdf5
+    brew install boost
     brew install iltommi/brews/hdf4
     brew install iltommi/brews/clfft
     # git clone https://github.com/iltommi/pythonqt.git
