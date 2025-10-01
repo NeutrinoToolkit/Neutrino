@@ -95,7 +95,8 @@ opensuseleap_task:
 
 macM1_task:
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-runner:sonoma
+    # image: ghcr.io/cirruslabs/macos-monterey-base:latest
   script: |
     brew update
     brew install objc-codegenutils objc-run 
