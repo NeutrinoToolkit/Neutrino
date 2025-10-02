@@ -15,6 +15,8 @@ jobs:
         description: Latest
     - name: Prepare
       run: |
+        brew update
+        brew upgrade
         brew install objc-codegenutils objc-run
         brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers
     - name: Deps
