@@ -1695,7 +1695,7 @@ void Visar::getPhase(unsigned int k) {
             }
 
             double buffer,bufferold,dummy=0.0;
-            double offsetShift=0;
+            offsetShift=0;
             if(cPhase[1][k].size()) {
                 if (sweepCoeff[k].size() && sweepCoeff[k].front()>0) {
                     bufferold=cPhase[1][k].first();
@@ -1887,7 +1887,7 @@ QString Visar::export_one(unsigned int k) {
     if (k<numVisars) {
         if (velocityUi[k]->enableVisar->isChecked()) {
             out += "#VISAR " + QLocale().toString(k+1) + "\n";
-            out += QString("#Offset shift       : %L1\n").arg(velocityUi[k]->offsetShift->value());
+            out += QString("#Offset shift       : %L1 (%L2)\n").arg(velocityUi[k]->offsetShift->value()).arg(offsetShift);
             out += QString("#Sensitivity        : %L1\n").arg(settingsUi[k]->sensitivity->value());
             out += QString("#Slit               : %L1\n").arg(settingsUi[k]->resolution->value());
             out += QString("#Interfr. & angle   : %L1 %L2\n").arg(settingsUi[k]->interfringe->value()).arg(settingsUi[k]->angle->value());
