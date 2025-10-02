@@ -1023,7 +1023,7 @@ physWave::phys_guess_carrier(physD &phys, double weight)
                             vec2f my_l_a=lambda_angle(iiclean,j1clean,dx,dy);
                             double my_weight=pow(rclean,weight)*vec2f(myData[kk][0],myData[kk][1]).mod();
                             DEBUG(my_l_a << " " << my_weight);
-                            my_vec.push_back(std::make_pair(my_l_a, my_weight));
+                            my_vec.emplace_back(my_l_a, my_weight);
                         }
                     }
                 }
