@@ -104,7 +104,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="physOrigin">
+       <widget class="QDoubleSpinBox" name="physOrigin">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
@@ -114,13 +114,13 @@
          <string>Temporal zero pixel</string>
         </property>
         <property name="suffix">
-         <string> [px]</string>
+         <string>px</string>
         </property>
-        <property name="minimum">
-         <number>-99999</number>
+        <property name="decimals">
+         <number>1</number>
         </property>
         <property name="maximum">
-         <number>99999</number>
+         <double>10000.000000000000000</double>
         </property>
         <property name="neutrinoSave" stdset="0">
          <bool>true</bool>
