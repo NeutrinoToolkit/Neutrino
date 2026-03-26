@@ -45,8 +45,19 @@ Box_lineout::Box_lineout(neutrino *nparent) : nGenericPan(nparent)
     connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
     connect(box, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
-
+    connect(plot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
     updatePlot();
+}
+
+void Box_lineout::mouseMove(QMouseEvent* e) {
+    double x1 = plot->xAxis->pixelToCoord(e->pos().x());
+    double y1 = plot->yAxis->pixelToCoord(e->pos().y());
+    double x2 = plot->xAxis2->pixelToCoord(e->pos().x());
+    double y2 = plot->yAxis2->pixelToCoord(e->pos().y());
+
+    QString msg= plot->xAxis->label() + ": " + QString::number(x1) + " , " + plot->yAxis->label() + ": " + QString::number(y1) + " ; " +\
+                 plot->xAxis2->label() + ": " + QString::number(x2) + " , " + plot->yAxis2->label() + ": " + QString::number(y2);
+    statusBar()->showMessage(msg);
 }
 
 void Box_lineout::on_actionExpand_triggered() {

@@ -117,7 +117,6 @@ private:
     std::vector<nRect*> fringeRect;
     QPointer<nRect> sopRect;
     std::vector<nPhysD*> ghostPhys;
-    double offsetShift;
 
 public slots:
 

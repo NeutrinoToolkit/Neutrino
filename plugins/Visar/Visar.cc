@@ -1695,7 +1695,7 @@ void Visar::getPhase(unsigned int k) {
             }
 
             double buffer,bufferold,dummy=0.0;
-            offsetShift=0;
+            double offsetShift=0;
             if(cPhase[1][k].size()) {
                 if (sweepCoeff[k].size() && sweepCoeff[k].front()>0) {
                     bufferold=cPhase[1][k].first();

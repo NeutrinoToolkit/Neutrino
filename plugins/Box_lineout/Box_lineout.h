@@ -43,6 +43,7 @@ public:
     Q_INVOKABLE Box_lineout(neutrino *);
 
 public slots:
+    void mouseMove(QMouseEvent*);
 
     void mouseAtWorld(QPointF);
     void updatePlot();

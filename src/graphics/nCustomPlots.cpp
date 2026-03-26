@@ -781,11 +781,11 @@ nCustomDoublePlot::nCustomDoublePlot(QWidget* parent):
     yAxis->setRangeReversed(true);
 
     xAxis->setLabel(tr("X"));
-    yAxis2->setLabel(tr("X value"));
+    yAxis2->setLabel(tr("Xvalue"));
     yAxis2->setLabelColor(Qt::red);
     yAxis2->setTickLabelColor(Qt::red);
     yAxis->setLabel(tr("Y"));
-    xAxis2->setLabel(tr("Y value"));
+    xAxis2->setLabel(tr("Yvalue"));
     xAxis2->setLabelColor(Qt::blue);
     xAxis2->setTickLabelColor(Qt::blue);
 
