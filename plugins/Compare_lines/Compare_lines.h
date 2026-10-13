@@ -56,6 +56,9 @@ public slots:
     void physDel(nPhysD*);
     void physReplace(std::pair<nPhysD*,nPhysD*>);
     
+protected:
+    void showEvent(QShowEvent *) override;
+
 private:
     QList <nPhysD*> images;
 

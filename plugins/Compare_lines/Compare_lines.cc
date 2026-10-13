@@ -80,7 +80,7 @@ void Compare_lines::physReplace(std::pair<nPhysD*,nPhysD*> my_mod) {
 
 void Compare_lines::addImage() {
     nPhysD *my_phys=nGenericPan::getPhysFromCombo(image);
-    if(!images.contains(my_phys)) {
+    if(my_phys && !images.contains(my_phys)) {
         images.append(my_phys);
     }
     updatePlot();
@@ -109,49 +109,57 @@ void Compare_lines::sceneChanged() {
     if (sender()== &line) updatePlot();
 }
 
+// refreshed while hidden is skipped: catch up when shown
+void Compare_lines::showEvent(QShowEvent *e) {
+    nGenericPan::showEvent(e);
+    updatePlot();
+}
+
 void Compare_lines::updatePlot() {
-    if (currentBuffer && isVisible()) {
+    if (!isVisible()) return;
 
-        plot->clearGraphs();
+    plot->clearGraphs();
+    if (!currentBuffer) { // nothing displayed: no stale curves
+        plot->replot();
+        return;
+    }
 
-        QPolygonF my_poly=line.poly(line.numPoints);
-		qDebug() << my_poly;
+    // Qt's 10 standard chart colors; the displayed image is drawn thicker
+    static const std::array<QColor,10> colors={{QColor(0x1f77b4),QColor(0xff7f0e),QColor(0x2ca02c),QColor(0xd62728),QColor(0x9467bd),
+                                                QColor(0x8c564b),QColor(0xe377c2),QColor(0x7f7f7f),QColor(0xbcbd22),QColor(0x17becf)}};
 
-        for (int i=0; i<nparent->getBufferList().size(); i++) {
-            nPhysD *phys=nparent->getBufferList().at(i);
+    QPolygonF my_poly=line.poly(line.numPoints);
+    // qDebug() << my_poly;
 
-            if (images.contains(phys) || (current->isChecked() && phys==currentBuffer)) {
-                QVector<double> toPlotx;
-                QVector<double> toPloty;
+    const QList<nPhysD*> buffers=nparent->getBufferList();
+    int ncurve=0;
+    for (nPhysD *phys : buffers) {
+        if (images.contains(phys) || (current->isChecked() && phys==currentBuffer)) {
+            QVector<double> toPlotx;
+            QVector<double> toPloty;
 
-                double dist=0.0;
-                double my_val=0.0;
-                vec2f scale=phys->get_scale();
-                for(int ii=0;ii<my_poly.size()-1;ii++) {
-                    QPointF p=my_poly.at(ii);
-					my_val=phys->getPoint(p.x()+phys->get_origin().x(),p.y()+phys->get_origin().y());
-                    if (std::isfinite(my_val)) {
-                        toPlotx << dist;
-                        toPloty << my_val;
-                    }
-                    QPointF deltaP=my_poly.at(ii+1)-my_poly.at(ii);
-                    dist+=sqrt(pow(deltaP.x()*scale.x(),2)+pow(deltaP.y()*scale.y(),2));
-                }
-                QPointF p=my_poly.last();
-                my_val=phys->getPoint(p.x(),p.y());
+            // the line is in pixels of the displayed image: same shift as nObject::getRect
+            vec2f shift=phys->get_origin()-currentBuffer->get_origin();
+            vec2f scale=phys->get_scale();
+            double dist=0.0;
+            for(int ii=0;ii<my_poly.size();ii++) {
+                const QPointF p=my_poly.at(ii);
+                double my_val=phys->getPoint(p.x()+shift.x(),p.y()+shift.y());
                 if (std::isfinite(my_val)) {
                     toPlotx << dist;
                     toPloty << my_val;
                 }
-                QCPGraph* graph=plot->addGraph(plot->xAxis, plot->yAxis);
-                graph->setName(QString::fromStdString(phys->getName()));
-                graph->setPen(QPen((phys==currentBuffer?plot->yAxis->labelColor():Qt::red)));
-                graph->setData(toPlotx,toPloty);
+                if (ii+1<my_poly.size()) {
+                    QPointF deltaP=my_poly.at(ii+1)-p;
+                    dist+=sqrt(pow(deltaP.x()*scale.x(),2)+pow(deltaP.y()*scale.y(),2));
+                }
             }
-
+            QCPGraph* graph=plot->addGraph(plot->xAxis, plot->yAxis);
+            graph->setName(QString::fromStdString(phys->getName()));
+            graph->setPen(QPen(colors[ncurve++ % colors.size()], phys==currentBuffer ? 2.5 : 1.0));
+            graph->setData(toPlotx,toPloty);
         }
-        plot->rescaleAxes();
-        plot->replot();
     }
+    plot->rescaleAxes();
+    plot->replot();
 }
-
