@@ -1552,7 +1552,10 @@ neutrino::fileClose() {
 }
 
 void neutrino::on_actionClose_All_Buffers_triggered() {
-    for (auto &my_phys : getBufferList()) {
+    // the displayed image last: removing the others doesn't redisplay anything
+    QList<nPhysD*> toClose=getBufferList();
+    if (toClose.removeAll(currentBuffer)) toClose.append(currentBuffer);
+    for (auto &my_phys : toClose) {
         if (!closeBuffer(my_phys)) break; // Cancel
     }
 //    for (auto &my_phys : physList) {
@@ -1566,7 +1569,6 @@ bool neutrino::closeBuffer(nPhysD* my_phys) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
 
-    QApplication::processEvents();
     if (nPhysExists(my_phys))  {
         if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
@@ -1595,7 +1597,6 @@ bool neutrino::closeBuffer(nPhysD* my_phys) {
     }
     my_set.endGroup();
 
-    QApplication::processEvents();
     return ret;
 }
 

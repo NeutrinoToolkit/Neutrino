@@ -351,7 +351,6 @@ void nGenericPan::comboChanged(int k) {
 
 nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
     nPhysD* retVal=nullptr;
-    QApplication::processEvents();
     if (combo && combo->count()) {
         retVal = (nPhysD*) (combo->itemData(combo->currentIndex()).value<nPhysD*>());
         if (nparent->nPhysExists(retVal)) {
