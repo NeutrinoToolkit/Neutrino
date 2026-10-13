@@ -38,6 +38,18 @@ std::array<double,6> physMath::getAffine(std::vector<vec2f> poly1, std::vector<v
     poly1.resize(3);
     poly2.resize(3);
 
+    // the matrix to invert has the points of poly1 as columns (x, y, 1): its determinant is twice
+    // the area of the triangle. Aligned/coincident points: no transformation (and GSL would abort)
+    double det = poly1[0].x()*(poly1[1].y()-poly1[2].y())
+               - poly1[1].x()*(poly1[0].y()-poly1[2].y())
+               + poly1[2].x()*(poly1[0].y()-poly1[1].y());
+    double scale = 0;
+    for (auto &pt : poly1) scale = std::max({scale, std::abs(pt.x()), std::abs(pt.y())});
+    if (!std::isfinite(det) || std::abs(det) <= 1e-12*std::max(scale*scale,1.0)) {
+        ret.fill(std::numeric_limits<double>::quiet_NaN());
+        return ret;
+    }
+
     std::array<double,9> p1, p2, mat, inva;
 
     p1[0] = poly1[0].x(); p1[1] = poly1[1].x(); p1[2] = poly1[2].x();
