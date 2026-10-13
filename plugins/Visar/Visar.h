@@ -89,7 +89,6 @@ public:
     std::unique_ptr<Ui::VisarSettings> settingsUi;
     std::unique_ptr<Ui::VisarVelocity> velocityUi;
     QPointer<QWidget> tabSettings, tabVelocity;
-    QPointer<QAction> actionRect;
 
     QPointer<nLine> fringeLine;
     QPointer<nRect> fringeRect;

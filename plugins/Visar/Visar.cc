@@ -94,7 +94,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
     sopRect =  new nRect(this,1);
     sopRect->changeToolTip("SOP region");
     sopRect->setRect(QRectF(0,0,100,100));
-    connect(actionRect3, &QAction::triggered, sopRect, &nRect::togglePadella);
+    connect(sopRegion, &QAbstractButton::released, sopRect, &nRect::togglePadella);
     sopPlot->xAxis->setLabel(tr("Time"));
     sopPlot->yAxis->setLabel(tr("Counts"));
     sopPlot->yAxis2->setLabel(tr("Temperature"));
@@ -452,7 +452,6 @@ VisarChannel::~VisarChannel() {
     // nothing can reach this channel's widgets once the channel is gone
     delete tabSettings;
     delete tabVelocity;
-    delete actionRect;
     delete fringeLine;
     delete fringeRect;
     delete maskRegion;
@@ -504,8 +503,6 @@ void Visar::addVisar() {
         ch->intensity[m].setShortName("intensity");
     }
 
-    ch->actionRect = new QAction(QIcon(":icons/rect.png"), QString(), this);
-    toolBar->insertAction(actionDelVisar,ch->actionRect);
 
     whichRefl->addItem(QString());
 
@@ -591,7 +588,7 @@ void Visar::addVisar() {
 
     connect(ui_settings->DeghostCheck, &QCheckBox::toggled, c, [c](bool checked) { c->maskRegion->setVisible(checked); });
     connect(ui_settings->Deghost, SIGNAL(released()), c->maskRegion, SLOT(togglePadella()));
-    connect(c->actionRect, SIGNAL(triggered()), c->fringeRect, SLOT(togglePadella()));
+    connect(ui_settings->fringeRegion, SIGNAL(released()), c->fringeRect, SLOT(togglePadella()));
 
     connect(ui_settings->globDirRef, &QLineEdit::textChanged, this, &Visar::fillComboShot);
     connect(ui_settings->globDirShot, &QLineEdit::textChanged, this, &Visar::fillComboShot);
@@ -619,7 +616,6 @@ void Visar::nameVisar(VisarChannel &c) {
     tabPhase->setTabText(c.k, "Visar"+n);
     tabVelocity->setTabText(c.k, "Visar"+n);
     whichRefl->setItemText(c.k+2, "Visar"+n);
-    if (c.actionRect) c.actionRect->setText("Region Visar"+n);
     if (c.fringeLine) c.fringeLine->changeToolTip("Fringeshift Visar "+n);
     if (c.fringeRect) c.fringeRect->changeToolTip("Visar region "+n);
     if (c.maskRegion) c.maskRegion->changeToolTip("Ghost Mask Visar"+n);
@@ -1736,7 +1732,10 @@ Visar::export_txt_multiple() {
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            return;
+        }
         QTextStream out(&t);
         for (unsigned int k=0;k<visars.size();k++){
             out << export_one(k);
@@ -1766,7 +1765,10 @@ Visar::export_txt() {
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            return;
+        }
         QTextStream out(&t);
         switch (tabs->currentIndex()) {
             case 0:

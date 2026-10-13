@@ -772,6 +772,20 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="3">
+            <widget class="QToolButton" name="sopRegion">
+             <property name="toolTip">
+              <string>Show/edit the SOP region</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="3">
             <widget class="QToolButton" name="globRefresh">
              <property name="toolTip">
@@ -1025,7 +1039,6 @@
    <addaction name="actionCopy"/>
    <addaction name="actionCopyImage"/>
    <addaction name="separator"/>
-   <addaction name="actionRect3"/>
    <addaction name="actionAddVisar"/>
    <addaction name="actionDelVisar"/>
    <addaction name="separator"/>
@@ -1060,18 +1073,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+I</string>
-   </property>
-  </action>
-  <action name="actionRect3">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
-   </property>
-   <property name="text">
-    <string>rect3</string>
-   </property>
-   <property name="toolTip">
-    <string>Rectangle SOP</string>
    </property>
   </action>
   <action name="actionSaveTxtMultiple">
