@@ -111,6 +111,11 @@
        </item>
        <item row="2" column="2">
         <widget class="QDoubleSpinBox" name="prominence">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="toolTip">
           <string>Minimum prominence of a peak (height above its surrounding valleys), in % of the profile range</string>
          </property>

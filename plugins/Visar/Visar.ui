@@ -774,6 +774,11 @@
            </item>
            <item row="0" column="3">
             <widget class="QToolButton" name="sopRegion">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="toolTip">
               <string>Show/edit the SOP region</string>
              </property>

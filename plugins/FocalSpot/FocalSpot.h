@@ -65,6 +65,8 @@ public slots:
 private:
     // blurred image for easier calculations
     nPhysD decimated;
+    vec2i centre;          // spot centre used for the statistics (pixels)
+    bool computing=false;  // calculate_stats may change the origin, which triggers it again
 
 };
 

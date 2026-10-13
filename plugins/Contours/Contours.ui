@@ -65,6 +65,11 @@
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QCheckBox" name="moveOrigin">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
          <property name="toolTip">
           <string>Move the origin of the image to the centre used for the contour</string>
          </property>

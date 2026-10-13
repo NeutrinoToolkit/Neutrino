@@ -92,6 +92,27 @@
       </property>
      </widget>
     </item>
+    <item row="5" column="3">
+     <widget class="QCheckBox" name="moveOrigin">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Move the origin of the image to the spot centre</string>
+      </property>
+      <property name="text">
+       <string>Set origin</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item row="6" column="0" colspan="4">
      <widget class="QTabWidget" name="tabWidget">
       <property name="font">

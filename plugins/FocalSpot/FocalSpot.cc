@@ -33,7 +33,7 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
     my_w.setupUi(this);
     nContour = new nLine(this,3);
     nContour->toggleClosedLine(true);
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
+    // (bufferChanged is already handled by the bufferChanged override)
     connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
     connect(my_w.blur_radius_sb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
@@ -67,22 +67,21 @@ void FocalSpot::on_centroid_toggled(bool tog) {
 void FocalSpot::setPosZero(QPointF pos) {
     if (currentBuffer) {
         currentBuffer->set_origin(vec2f(pos.x(),pos.y()));
-        nparent->my_view->update();
-        QApplication::processEvents();
-        calculate_stats();
+        nparent->emitPhysChanged(currentBuffer); // Image_list, pans, view; recomputes the stats via bufferChanged
     }
 }
 
 void
 FocalSpot::calculate_stats()
 {
-    if (!currentBuffer)
+    if (!currentBuffer || computing)
         return;
 
     if (currentBuffer->prop.count("FocalSpotDynamic") > 0) {
-        DEBUG("nFocal dynamic image --- skip");
+        // DEBUG("nFocal dynamic image --- skip");
         return;
     }
+    computing=true;
 
     my_w.stats->clear();
     // 0. build decimated
@@ -90,21 +89,24 @@ FocalSpot::calculate_stats()
     physMath::phys_fast_gaussian_blur(decimated, my_w.blur_radius_sb->value());
     decimated.TscanBrightness();
 
-    // 1. find centroid
-    vec2i centr;
+    // 1. find centroid: the origin if set, otherwise the maximum of the blurred image
     if (currentBuffer->get_origin() == vec2i(0,0)) {
-        centr = decimated.max_Tv;
-        currentBuffer->set_origin(centr);
+        centre = decimated.max_Tv;
+        if (my_w.moveOrigin->isChecked()) {
+            currentBuffer->set_origin(centre);
+            nparent->emitPhysChanged(currentBuffer);
+        }
     } else {
-        centr = currentBuffer->get_origin();
+        centre = currentBuffer->get_origin();
     }
-    decimated.set_origin(centr);
+    decimated.set_origin(centre);
 
-    my_w.centroid_lbl->setText(QString("%1:%2").arg(centr.x()).arg(centr.y()));
+    my_w.centroid_lbl->setText(QString("%1:%2").arg(centre.x()).arg(centre.y()));
 
 
     // 2. calculate integrals
-    double c_value = currentBuffer->point(centr.x(),centr.y());
+    // reference value at the centre from the blurred image (a single raw pixel is too noisy)
+    double c_value = decimated.point(centre.x(),centre.y());
     double total_energy = 0;
     double above_th_energy = 0;
     double below_zero_energy = 0;
@@ -126,7 +128,9 @@ FocalSpot::calculate_stats()
             }
         }
     }
-    double zero_energy_in_peak = (below_zero_energy/zero_point_count)*point_count;
+    // background per pixel: no pixel below threshold -> use the zero level
+    double background = zero_point_count ? below_zero_energy/zero_point_count : zl;
+    double zero_energy_in_peak = background*point_count;
     total_energy = currentBuffer->sum()-below_zero_energy-zero_energy_in_peak;
     above_th_energy -= zero_energy_in_peak;
 
@@ -155,12 +159,13 @@ FocalSpot::calculate_stats()
     // populate numerics
     my_w.stats->append(QString("total: %1").arg(currentBuffer->sum()));
 
-    my_w.stats->append(QString("below zero average: %1").arg(below_zero_energy/zero_point_count));
+    my_w.stats->append(QString("below zero average: %1").arg(background));
 
     my_w.stats->append(QString("points stats (bz / az) %1 / %2").arg(zero_point_count).arg(point_count));
 
     my_w.stats->append(QString("contour integral (contour points) %1 (%2)").arg(ath_integral).arg(ath_points));
 
+    computing=false;
 }
 
 QList<double>
@@ -171,11 +176,11 @@ FocalSpot::find_contour(double th)
         std::list<vec2i> contour;
         physMath::contour_trace(decimated, contour, th);
 
-        DEBUG(5, "got contour of "<<contour.size()<<" points");
+        // DEBUG(5, "got contour of "<<contour.size()<<" points");
 
         QPolygonF myp;
 
-        if (contour.size() > 0) {
+        if (contour.size() > 1) {
 
             // set polygon
             vec2f centroid(0,0);
@@ -185,15 +190,15 @@ FocalSpot::find_contour(double th)
                 centroid+=itr;
             }
             centroid/=contour.size();
-            my_w.stats->append(QString("Barycenter: ( %1  , %2 )").arg(centroid.x()).arg(centroid.y()));
+            my_w.stats->append(QString("Contour centre: ( %1  , %2 )").arg(centroid.x()).arg(centroid.y()));
 
 
 
             // get stats
             vec2f c_scale = currentBuffer->get_scale();
-            DEBUG(c_scale);
+            // DEBUG(c_scale);
             double min_r = std::numeric_limits<double>::max();
-            double max_r = std::numeric_limits<double>::min();
+            double max_r = 0;
             double meanr=0;
             for (auto &itr : contour) {
                 double dd = vmath::td<double>(itr-centroid, c_scale).mod();
@@ -203,8 +208,6 @@ FocalSpot::find_contour(double th)
 //                DEBUG(itr <<  " - "  << centroid)
             }
             meanr/=myp.size();
-            contour.resize(myp.size());
-            DEBUG(myp.size() << " "  << contour.size());
 
             my_w.stats->append(QString("Mean radius: %1").arg(meanr));
             my_w.stats->append(QString("Min Max radius:  %1  %2").arg(min_r).arg(max_r));
@@ -216,60 +219,47 @@ FocalSpot::find_contour(double th)
                 ql.append(ci.front()); ci.pop_front();
             }
 
-// PLOT radius
-
-            physD rvals(currentBuffer->getW(),currentBuffer->getH(),0.0,"r");
-
-            vec2f c_origin = currentBuffer->get_origin();
-#pragma omp parallel for collapse(2)
-            for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
-                for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
-                    rvals.set(i,j,vec2f((i-c_origin.x())*c_scale.x(),(j-c_origin.y())*c_scale.y()).mod());
-                }
+// PLOT radius: mean value in 100 rings around the centre (single pass, no shared accumulation between threads)
+            const int len=100;
+            vec2f c_origin(centre.x(),centre.y());
+            const double W=currentBuffer->getW(), H=currentBuffer->getH();
+            double rmax=0; // farthest corner
+            for (double cx : {0.0, W-1}) for (double cy : {0.0, H-1}) {
+                rmax=std::max(rmax, vec2f((cx-c_origin.x())*c_scale.x(),(cy-c_origin.y())*c_scale.y()).mod());
             }
-            rvals.TscanBrightness();
-            double rmax=rvals.get_max();
-
-            int len=100 ; //std::min(currentBuffer->get_size().x(),currentBuffer->get_size().y());
             QVector <double> rplot(len,0.0);
             QVector <double> rnum(len,0.0);
-    #pragma omp parallel for collapse(2)
-            for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
+            if (rmax>0) {
                 for(size_t j = 0 ; j < currentBuffer->getH(); j++) {
-                    if (! isnan(currentBuffer->point(i,j))) {
-                        int r = static_cast<int>(len*rvals.point(i,j)/rmax);
-                        if (r<len) {
-                            rplot[r]+=currentBuffer->point(i,j);
-                            rnum[r] ++;
-                        } else {
-                            qDebug() << i << j << r;
+                    for(size_t i = 0 ; i < currentBuffer->getW(); i++) {
+                        double val=currentBuffer->point(i,j);
+                        if (std::isfinite(val)) {
+                            double rr=vec2f((i-c_origin.x())*c_scale.x(),(j-c_origin.y())*c_scale.y()).mod();
+                            int r = std::min(len-1, static_cast<int>(len*rr/rmax));
+                            rplot[r]+=val;
+                            rnum[r]++;
                         }
                     }
                 }
             }
 
-            qDebug() << len;
-
             QVector <double> rdata(len);
             for (int i=0;i<len;i++) {
                 rdata[i]=i*rmax/len;
-                rplot[i]=rplot[i]/rnum[i];
-                DEBUG(rdata[i]  << " " << rplot[i]);
+                rplot[i] = rnum[i] ? rplot[i]/rnum[i] : std::numeric_limits<double>::quiet_NaN();
             }
             my_w.plot->graph(0)->setData(rdata,rplot,true);
             my_w.plot->graph(0)->rescaleAxes();
-            qDebug() << my_w.plot->graph(0)->valueAxis()->range();
 
             my_w.plot->replot();
 //  END PLOT radius
 
-
-
+            nContour->setPoints(myp);
+            nContour->show();
         } else {
             my_w.statusBar->showMessage("Contour not ok", 5000);
+            nContour->hide(); // don't show the contour of another image/threshold
         }
-        nContour->setPoints(myp);
-        DEBUG("==================================" << nContour->closedLine);
 
     }
     return ql;
@@ -277,6 +267,10 @@ FocalSpot::find_contour(double th)
 
 void FocalSpot::mouseAtWorld(QPointF p){
     double trueLength = std::sqrt(std::pow(p.x(), 2) + std::pow(p.y(), 2));
+    if (currentBuffer) { // world -> pixel -> distance from the spot centre
+        vec2f sc=currentBuffer->get_scale(), og=currentBuffer->get_origin();
+        trueLength = vec2f((p.x()/sc.x()+og.x()-centre.x())*sc.x(), (p.y()/sc.y()+og.y()-centre.y())*sc.y()).mod();
+    }
     my_w.plot->setMousePosition(trueLength);
     QString msg;
     QTextStream(&msg) << "Distance to center: " << trueLength;
