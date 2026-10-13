@@ -214,7 +214,10 @@ void nLine::save_points() {
 	if (!fnametmp.isEmpty()) {
 		setProperty("NeuSave-fileTxt", fnametmp);
 		QFile t(fnametmp);
-		t.open(QIODevice::WriteOnly| QIODevice::Text);
+		if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+			my_pad.statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+			return;
+		}
 		QTextStream out(&t);
 		out << getPointsStr();
 		t.close();
@@ -224,6 +227,10 @@ void nLine::save_points() {
 
 
 void nLine::setPoints(QPolygonF my_poly) {
+	if (my_poly.isEmpty()) { // a line without points can't be drawn, edited or plotted
+		qWarning() << "nLine" << toolTip() << ": ignoring empty list of points";
+		return;
+	}
 	while (ref.size()>my_poly.size()) {
 		prepareGeometryChange();
         delete ref.at(0);
@@ -362,7 +369,7 @@ void nLine::updatePlot () {
 		my_w.plot->clearItems();
 
         QPen mypen;
-        mypen.setColor(ref[0]->brush().color());
+        if (ref.size()) mypen.setColor(ref[0]->brush().color());
 
 		vec2f orig = my_phys->get_origin();
 		double dist=0.0;
@@ -1031,7 +1038,7 @@ QPolygonF nLine::poly(int steps) const {
 			}
 
 		} else {
-			if (closedLine) my_poly << ref[0]->pos();
+			if (closedLine && ref.size()) my_poly << ref[0]->pos();
 			for(int i=0;i<my_poly.size()-1;i++) {
 				QPointF p1=my_poly.at(i);
 				QPointF p2=my_poly.at(i+1);

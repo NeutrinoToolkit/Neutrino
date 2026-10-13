@@ -39,7 +39,6 @@ Contours::Contours(neutrino *nparent) : nGenericPan(nparent)
 	on_percent_released();
 	//connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(calculate_stats()));
     //connect(zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
-    connect(draw_pb, SIGNAL(released()), this, SLOT(draw()));
 
 	//calculate_stats();
 }
@@ -62,7 +61,7 @@ void
 Contours::setOrigin(QPointF p) {
 	if (currentBuffer) {
 		currentBuffer->set_origin(p.x(),p.y());
-        nparent->showPhys();
+        nparent->emitPhysChanged(currentBuffer); // Image_list, other pans and the view
 	}
     actionCenter->setChecked(false);
 }
@@ -94,14 +93,14 @@ Contours::on_draw_pb_released()
 			cutoff = decimated.get_min() + (decimated.get_max()-decimated.get_min())*(cutoff/100.0) ;
 		}
 
-		DEBUG("cutoff" << cutoff);
+		// DEBUG("cutoff" << cutoff);
 
         physMath::contour_trace(decimated, contour, cutoff);
 
 
-		my_c->setPoints(QPolygonF());
-		if (contour.size() > 0) {
-			qDebug() << contour.size();
+		// keep the previous contour if tracing fails (an nLine can't be empty)
+		if (contour.size() > 1) {
+			// qDebug() << contour.size();
 
 			// set polygon
             QPolygonF myp;
@@ -109,7 +108,11 @@ Contours::on_draw_pb_released()
 				myp<<QPointF(p.x(), p.y());
 			}
 			my_c->setPoints(myp);
-			currentBuffer->set_origin(centr);
+			my_c->toggleClosedLine(true);
+			if (moveOrigin->isChecked() && currentBuffer->get_origin()!=vec2f(centr.x(),centr.y())) {
+				currentBuffer->set_origin(centr);
+				nparent->emitPhysChanged(currentBuffer);
+			}
             statusBar()->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
 		} else {
             statusBar()->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);

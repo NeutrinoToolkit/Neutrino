@@ -63,6 +63,22 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="moveOrigin">
+         <property name="toolTip">
+          <string>Move the origin of the image to the centre used for the contour</string>
+         </property>
+         <property name="text">
+          <string>Set image origin to contour centre</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
          <item>
