@@ -52,7 +52,6 @@ public:
 private slots:
     void setCamera(const QCameraDevice &cameraDevice);
 
-    void takeImage();
     void displayCaptureError(int, QImageCapture::Error, const QString &errorString);
 
     void displayCameraError();
@@ -67,18 +66,21 @@ private slots:
 
     void giveNeutrino(const QImage &img);
 
+    void startCamera();
+
 public slots:
     void on_grab_clicked();
 
 private:
-    nPhysD *imgGray;
-    std::array<nPhysD *,3> imgColor;
+    nPhysD *imgGray=nullptr;
+    std::array<nPhysD *,3> imgColor{{nullptr,nullptr,nullptr}};
 
     QMediaDevices m_devices;
     QMediaCaptureSession m_captureSession;
     QScopedPointer<QCamera> m_camera;
-    QImageCapture *m_imageCapture;
+    QImageCapture *m_imageCapture=nullptr;
     QMenu cameraMenu;
+    QActionGroup *cameraGroup=nullptr;
 };
 
 NEUTRINO_PLUGIN(Camera,File);

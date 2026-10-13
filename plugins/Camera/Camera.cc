@@ -11,27 +11,60 @@
 #include <QMediaDevices>
 #include <QMediaFormat>
 #include <QVideoWidget>
+#if QT_CONFIG(permissions)
+#include <QPermissions>
+#endif
 
 Camera::Camera(neutrino *nparent) :
     nGenericPan(nparent),
-    imgColor{{nullptr,nullptr,nullptr}},
     cameraMenu(this)
 {
     setupUi(this);
     updateCameras();
     connect(&m_devices, &QMediaDevices::videoInputsChanged, this, &Camera::updateCameras);
-    setCamera(QMediaDevices::defaultVideoInput());
+    connect(&cameraMenu, &QMenu::triggered, this, &Camera::updateCameraDevice);
+    // images we created and the user closed
+    connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) {
+        if (buf==imgGray) imgGray=nullptr;
+        for (auto &img : imgColor) if (buf==img) img=nullptr;
+    });
     show();
+    startCamera();
+}
+
+// since Qt 6.5 the camera must be explicitly allowed (macOS asks the user once)
+void Camera::startCamera() {
+#if QT_CONFIG(permissions)
+    QCameraPermission cameraPermission;
+    switch (qApp->checkPermission(cameraPermission)) {
+        case Qt::PermissionStatus::Undetermined:
+            qApp->requestPermission(cameraPermission, this, &Camera::startCamera);
+            return;
+        case Qt::PermissionStatus::Denied:
+            statusbar->showMessage(tr("Camera access denied: allow Neutrino in System Settings > Privacy & Security > Camera"));
+            return;
+        case Qt::PermissionStatus::Granted:
+            break;
+    }
+#endif
+    setCamera(QMediaDevices::defaultVideoInput());
 }
 
 void Camera::setCamera(const QCameraDevice &cameraDevice) {
+    if (cameraDevice.isNull()) {
+        statusbar->showMessage(tr("No camera found!"),5000);
+        return;
+    }
     m_camera.reset(new QCamera(cameraDevice));
     m_captureSession.setCamera(m_camera.data());
 
     connect(m_camera.data(), &QCamera::errorOccurred, this, &Camera::displayCameraError);
 
-    m_imageCapture = new QImageCapture;
+    // replace (not leak) the previous capture object and its connections
+    QImageCapture *oldCapture=m_imageCapture;
+    m_imageCapture = new QImageCapture(this);
     m_captureSession.setImageCapture(m_imageCapture);
+    delete oldCapture;
 
     m_captureSession.setVideoOutput(viewfinder);
 
@@ -59,17 +92,13 @@ void Camera::setCamera(const QCameraDevice &cameraDevice) {
     }
 
     m_camera->start();
+    updateCameras(); // check mark on the camera in use
 }
 
 void Camera::on_grab_clicked() {
     saveDefaults();
     if (m_imageCapture)
         m_imageCapture->capture();
-}
-
-void Camera::takeImage()
-{
-    m_imageCapture->captureToFile();
 }
 
 void Camera::displayCaptureError(int id, const QImageCapture::Error error, const QString &errorString) {
@@ -91,18 +120,20 @@ void Camera::updateCameraDevice(QAction *action)
 
 void Camera::updateCameras() {
     cameraMenu.clear();
+    delete cameraGroup;
+    cameraGroup=new QActionGroup(&cameraMenu);
+    cameraGroup->setExclusive(true);
+    const QCameraDevice current = m_camera ? m_camera->cameraDevice() : QMediaDevices::defaultVideoInput();
     const QList<QCameraDevice> availableCameras = QMediaDevices::videoInputs();
     for (const QCameraDevice &cameraDevice : availableCameras) {
-        QAction *videoDeviceAction = new QAction(cameraDevice.description(), &cameraMenu);
+        QAction *videoDeviceAction = new QAction(cameraDevice.description(), cameraGroup);
         videoDeviceAction->setCheckable(true);
         videoDeviceAction->setData(QVariant::fromValue(cameraDevice));
-        if (cameraDevice == QMediaDevices::defaultVideoInput())
-            videoDeviceAction->setChecked(true);
-
+        videoDeviceAction->setChecked(cameraDevice == current);
         cameraMenu.addAction(videoDeviceAction);
     }
     if (availableCameras.size()==0) {
-        statusbar->showMessage("No camera found!",5000);
+        statusbar->showMessage(tr("No camera found!"),5000);
     }
 }
 
@@ -115,20 +146,22 @@ void Camera::processCapturedImage(int requestId, const QImage& image) {
     giveNeutrino(image);
 }
 
-void Camera::giveNeutrino(const QImage& image) {
+void Camera::giveNeutrino(const QImage& capture) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     bool separate_rgb= my_set.value("separateRGB",false).toBool();
     my_set.endGroup();
 
-    if(!image.isNull()) {
+    if(!capture.isNull()) {
+        // one conversion, then direct access to the lines (QImage::pixel is slow)
+        const QImage image=capture.convertToFormat(QImage::Format_RGB32);
         if (!separate_rgb) {
             nPhysD *datamatrix = new nPhysD(image.width(), image.height(),0,"Camera gray");
             datamatrix->setShortName("gray");
             for (int i=0;i<image.height();i++) {
+                const QRgb *line=reinterpret_cast<const QRgb*>(image.constScanLine(i));
                 for (int j=0;j<image.width();j++) {
-                    QRgb px = image.pixel(j,i);
-                    datamatrix->Timg_matrix[i][j]= (qRed(px)+qGreen(px)+qBlue(px))/3.0;
+                    datamatrix->Timg_matrix[i][j]= (qRed(line[j])+qGreen(line[j])+qBlue(line[j]))/3.0;
                 }
             }
             datamatrix->TscanBrightness();
@@ -144,11 +177,11 @@ void Camera::giveNeutrino(const QImage& image) {
             loc_gre->setShortName("green");
             loc_blu->setShortName("blue");
             for (int i=0;i<image.height();i++) {
+                const QRgb *line=reinterpret_cast<const QRgb*>(image.constScanLine(i));
                 for (int j=0;j<image.width();j++) {
-                    QRgb px = image.pixel(j,i);
-                    loc_red->Timg_matrix[i][j]= qRed(px);
-                    loc_gre->Timg_matrix[i][j]= qGreen(px);
-                    loc_blu->Timg_matrix[i][j]= qBlue(px);
+                    loc_red->Timg_matrix[i][j]= qRed(line[j]);
+                    loc_gre->Timg_matrix[i][j]= qGreen(line[j]);
+                    loc_blu->Timg_matrix[i][j]= qBlue(line[j]);
                 }
             }
             loc_red->TscanBrightness();
