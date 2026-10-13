@@ -25,6 +25,7 @@
 #include "Find_peaks.h"
 #include <functional>
 #include <algorithm>
+#include <numeric>
 
 #include <gsl/gsl_fit.h>
 
@@ -36,14 +37,15 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
 
-    connect(setOrigin, SIGNAL(pressed()), this, SLOT(set_origin()));
-    connect(setScale, SIGNAL(pressed()), this, SLOT(set_scale()));
+    connect(setOrigin, SIGNAL(clicked()), this, SLOT(set_origin()));
+    connect(setScale, SIGNAL(clicked()), this, SLOT(set_scale()));
 
     connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
 
     toolBar->addWidget(direction);
     toolBar->addWidget(param);
     toolBar->addWidget(order);
+    toolBar->addWidget(prominence);
 
 
     show();
@@ -62,6 +64,7 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     connect(direction, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
     connect(param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
     connect(order, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
+    connect(prominence, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
     connect(transpose, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
     updatePlot();
 }
@@ -73,14 +76,15 @@ void Find_peaks::set_origin() {
         double my_origin=0.0;
         if (!originOffset->text().isEmpty()) my_origin=locale().toDouble(originOffset->text(),&ok);
         if (ok) {
-            double origin=locale().toDouble(originOffset->text(),&ok)-my_origin;
-            if (ok) {
+            // fitted position of the first peak, minus the requested offset
+            double new_origin=locale().toDouble(origin->text(),&ok)-my_origin;
+            if (ok && std::isfinite(new_origin)) {
                 if (direction->isChecked()) {
-                    currentBuffer->set_origin(currentBuffer->get_origin().x(),origin);
+                    currentBuffer->set_origin(currentBuffer->get_origin().x(),new_origin);
                 } else {
-                    currentBuffer->set_origin(origin,currentBuffer->get_origin().y());
+                    currentBuffer->set_origin(new_origin,currentBuffer->get_origin().y());
                 }
-                nparent->my_view->update();
+                nparent->emitPhysChanged(currentBuffer);
             }
         }
     }
@@ -93,13 +97,15 @@ void Find_peaks::set_scale() {
         if (!scaleOffset->text().isEmpty()) scaleMult=locale().toDouble(scaleOffset->text(),&ok);
         if (ok) {
             double my_scale=scaleMult/locale().toDouble(scale->text(),&ok);
-            if (ok) {
+            if (ok && std::isfinite(my_scale) && my_scale!=0) {
                 if (direction->isChecked()) {
                     currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
                 } else {
                     currentBuffer->set_scale(my_scale,currentBuffer->get_scale().y());
                 }
-                nparent->my_view->update();
+                nparent->emitPhysChanged(currentBuffer);
+            } else {
+                statusbar->showMessage(tr("Invalid scale: the fitted period is zero or missing"),5000);
             }
         }
     }
@@ -162,29 +168,43 @@ bool polynomialfit(std::vector<double> dx, std::vector<double> dy, std::vector<d
 }
 
 void Find_peaks::updatePlot() {
-    if (currentBuffer && isVisible()) {
-        saveDefaults();
-        QRect geom2=box->getRect(currentBuffer);
-        if (geom2.isEmpty()) {
-            statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
-            return;
+    if (!isVisible()) return;
+    QRect geom2;
+    if (currentBuffer) {
+        geom2=box->getRect(currentBuffer);
+        if (geom2.isEmpty()) statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
+    }
+    if (!currentBuffer || geom2.isEmpty()) { // no stale results
+        for (int i=plot->itemCount()-1; i>=0; i--) {
+            if (plot->item(i)->property(panName().toLatin1()).isValid()) plot->removeItem(plot->item(i));
         }
-
+        plot->graph(0)->data()->clear();
+        plot->graph(1)->data()->clear();
+        plot->replot();
+        points->setRowCount(0);
+        coeff->clear();
+        fourier->clear();
+        return;
+    }
+    {
         int dx=geom2.width();
         int dy=geom2.height();
 
-        QVector<double> xd(dx,0.0);
-        QVector<double> yd(dy,0.0);
+        // averages over the finite pixels only (NaN would spread over everything through the FFT)
+        QVector<double> xd(dx,0.0), yd(dy,0.0);
+        QVector<int> xn(dx,0), yn(dy,0);
 
         for (int j=0;j<dy;j++){
             for (int i=0;i<dx; i++) {
                 double val=currentBuffer->point(i+geom2.x(),j+geom2.y(),0.0);
-                xd[i]+=val;
-                yd[j]+=val;
+                if (std::isfinite(val)) {
+                    xd[i]+=val; xn[i]++;
+                    yd[j]+=val; yn[j]++;
+                }
             }
         }
-        std::transform(xd.begin(), xd.end(), xd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dy));
-        std::transform(yd.begin(), yd.end(), yd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dx));
+        for (int i=0;i<dx;i++) xd[i] = xn[i] ? xd[i]/xn[i] : std::numeric_limits<double>::quiet_NaN();
+        for (int j=0;j<dy;j++) yd[j] = yn[j] ? yd[j]/yn[j] : std::numeric_limits<double>::quiet_NaN();
 
         QVector<double> xdata(dx);
         QVector<double> ydata(dy);
@@ -205,53 +225,119 @@ void Find_peaks::updatePlot() {
             std::copy ( xd.begin(), xd.end(), myData.begin() );
         }
 
-        int sizeCut=myData.size();
-        for (int i=0;i<myData.size();i++) {
-            myData[i]/=sizeCut;
-        }
+        const int N=myData.size();
+        const double offset=(direction->isChecked()?geom2.y():geom2.x());
 
+        // empty rows/columns (all NaN): use the mean of the profile so the FFT stays finite
+        double meanFinite=0; int nFinite=0;
+        for (auto &v : myData) if (std::isfinite(v)) { meanFinite+=v; nFinite++; }
+        meanFinite = nFinite ? meanFinite/nFinite : 0.0;
+        std::vector<double> raw(N);
+        for (int i=0;i<N;i++) raw[i] = std::isfinite(myData[i]) ? myData[i] : meanFinite;
 
-        fftw_complex *myDataC=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(sizeCut/2+1));
-        fftw_plan planR2C=fftw_plan_dft_r2c_1d(sizeCut, &myData[0], myDataC, FFTW_ESTIMATE);
-        fftw_plan planC2R2=fftw_plan_dft_c2r_1d(sizeCut, myDataC, &myData[0], FFTW_ESTIMATE);
-
+        // 1. smoothing: Gaussian low-pass on the mirrored profile (2N points), so that the two
+        //    ends don't wrap into each other as they would in a plain periodic FFT
+        const int M=2*N;
+        std::vector<double> ext(M);
+        for (int i=0;i<N;i++) { ext[i]=raw[i]/M; ext[M-1-i]=raw[i]/M; }
+        fftw_complex *spec=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(M/2+1));
+        fftw_plan planR2C=fftw_plan_dft_r2c_1d(M, ext.data(), spec, FFTW_ESTIMATE);
+        fftw_plan planC2R=fftw_plan_dft_c2r_1d(M, spec, ext.data(), FFTW_ESTIMATE);
         fftw_execute(planR2C);
-
-        for (int i=0;i<sizeCut/2+1;i++) {
-            myDataC[i][0]=myDataC[i][0];
-            myDataC[i][1]=myDataC[i][1];
-        }
-
-        double sx=pow(sizeCut/param->value(),2)/2.0;
-
-        for (int i=0;i<sizeCut/2+1;i++) {
+        double sx=pow(M/param->value(),2)/2.0;
+        for (int i=0;i<M/2+1;i++) {
             double blur=exp(-i*i/sx);
-            myDataC[i][0]*=blur;
-            myDataC[i][1]*=blur;
+            spec[i][0]*=blur;
+            spec[i][1]*=blur;
         }
-        fftw_execute(planC2R2);
+        fftw_execute(planC2R);
+        fftw_destroy_plan(planR2C);
+        fftw_destroy_plan(planC2R);
+        fftw_free(spec);
+        QVector<double> smooth(N);
+        for (int i=0;i<N;i++) smooth[i]=ext[i];
 
+        if (direction->isChecked()) {
+            plot->graph(1)->setData(ydata,smooth);
+        } else {
+            plot->graph(1)->setData(xdata,smooth);
+        }
+
+        // 2. local maxima, kept if prominent enough, at sub-pixel position (parabola through 3 points)
+        struct Peak { double pos, val; };
+        std::vector<Peak> peaks;
+        if (N>2) {
+            const auto [lo,hi]=std::minmax_element(smooth.begin(),smooth.end());
+            const double minProm=prominence->value()/100.0*(*hi-*lo);
+            for (int i=1;i<N-1;i++) {
+                if (smooth[i]>smooth[i-1] && smooth[i]>=smooth[i+1]) { // a 2-point flat top counts once
+                    // prominence: height above the higher of the two valleys reached before a higher point
+                    double lmin=smooth[i], rmin=smooth[i];
+                    for (int j=i-1; j>=0 && smooth[j]<=smooth[i]; j--) lmin=std::min(lmin,smooth[j]);
+                    for (int j=i+1; j<N && smooth[j]<=smooth[i]; j++) rmin=std::min(rmin,smooth[j]);
+                    if (smooth[i]-std::max(lmin,rmin) < minProm) continue;
+                    const double a1=smooth[i-1], b1=smooth[i], c1=smooth[i+1];
+                    const double den=a1-2*b1+c1;
+                    double d = den<0 ? 0.5*(a1-c1)/den : 0.0;
+                    d=std::min(0.5,std::max(-0.5,d));
+                    peaks.push_back({i+d+offset, b1-0.25*(a1-c1)*d});
+                }
+            }
+        }
+
+        // 3. peak number from the distance to the first one in units of the typical spacing:
+        //    a missing peak leaves a gap instead of shifting all the following ones
         std::vector<double> fitx;
         std::vector<double> fity;
         std::vector<double> fitz;
-
-        if (direction->isChecked()) {
-            plot->graph(1)->setData(ydata,myData);
-        } else {
-            plot->graph(1)->setData(xdata,myData);
+        double spacing=0;
+        if (peaks.size()>=2) {
+            std::vector<double> gaps;
+            for (size_t i=1;i<peaks.size();i++) gaps.push_back(peaks[i].pos-peaks[i-1].pos);
+            std::nth_element(gaps.begin(),gaps.begin()+gaps.size()/2,gaps.end());
+            spacing=gaps[gaps.size()/2];
+        }
+        for (size_t i=0;i<peaks.size();i++) {
+            fitx.push_back(spacing>0 ? std::round((peaks[i].pos-peaks[0].pos)/spacing) : double(i));
+            fity.push_back(peaks[i].pos);
+            fitz.push_back(peaks[i].val);
         }
 
-
-        int k=0;
-        for (int i=1;i<sizeCut-1;i++) {
-            if (myData[i]>myData[i-1] && myData[i]>myData[i+1]){
-                double posx=i+(direction->isChecked()?geom2.y():geom2.x());
-
-                fitx.push_back(k);
-                fity.push_back(posx);
-                fitz.push_back(myData[i]);
-                k++;
-
+        // 4. independent estimate: period and origin from the dominant frequency of the (raw) profile
+        fourier->setText(tr("Fourier: no dominant frequency"));
+        if (N>=8) {
+            double mean=std::accumulate(raw.begin(),raw.end(),0.0)/N;
+            std::vector<double> win(N);
+            for (int i=0;i<N;i++) win[i]=(raw[i]-mean)*(0.5-0.5*cos(2*M_PI*i/(N-1))); // Hann
+            fftw_complex *fs=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(N/2+1));
+            fftw_plan pf=fftw_plan_dft_r2c_1d(N, win.data(), fs, FFTW_ESTIMATE);
+            fftw_execute(pf);
+            int kmax=0; double mmax=0;
+            std::vector<double> mag(N/2+1);
+            for (int k=0;k<N/2+1;k++) {
+                mag[k]=sqrt(fs[k][0]*fs[k][0]+fs[k][1]*fs[k][1]);
+                if (k>=1 && mag[k]>mmax) { mmax=mag[k]; kmax=k; }
+            }
+            fftw_destroy_plan(pf);
+            fftw_free(fs);
+            if (kmax>=1 && mmax>0) {
+                double d=0;
+                if (kmax<N/2 && mag[kmax-1]>0 && mag[kmax+1]>0) { // gaussian interpolation of the peak bin
+                    double l0=log(mag[kmax-1]), l1=log(mag[kmax]), l2=log(mag[kmax+1]);
+                    double den=l0-2*l1+l2;
+                    if (den<0) d=std::min(0.5,std::max(-0.5,0.5*(l0-l2)/den));
+                }
+                const double f=(kmax+d)/N; // cycles per pixel
+                double re=0, im=0;
+                for (int i=0;i<N;i++) { // phase of the profile at that frequency
+                    double w=(raw[i]-mean)*(0.5-0.5*cos(2*M_PI*i/(N-1)));
+                    re+=w*cos(2*M_PI*f*i);
+                    im-=w*sin(2*M_PI*f*i);
+                }
+                const double period=1.0/f;
+                double first=std::fmod(-atan2(im,re)/(2*M_PI)*period, period); // first maximum of cos(2 pi f n + phase)
+                if (first<0) first+=period;
+                fourier->setText(tr("Fourier: period %1 px, first maximum at %2 px").arg(QLocale().toString(period,'f',4)).arg(QLocale().toString(first+offset,'f',3)));
             }
         }
 
@@ -282,7 +368,7 @@ void Find_peaks::updatePlot() {
             scale->setText(locale().toString(c1));
         }
 
-        for (int i=0; i< plot->itemCount(); i++) {
+        for (int i=plot->itemCount()-1; i>=0; i--) { // backwards: removing shifts the following items
             if (plot->item(i)->property(panName().toLatin1()).isValid()) plot->removeItem(plot->item(i));
         }
         points->setRowCount(0);
@@ -306,10 +392,6 @@ void Find_peaks::updatePlot() {
             points->resizeRowToContents(pos);
         }
 
-        fftw_destroy_plan(planR2C);
-        fftw_destroy_plan(planC2R2);
-        fftw_free(myDataC);
-
         plot->rescaleAxes();
         plot->replot();
 
@@ -328,7 +410,10 @@ void Find_peaks::on_actionTxt_triggered() {
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+            statusbar->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            return;
+        }
         QTextStream out(&t);
         out << getPoints();
         t.close();
