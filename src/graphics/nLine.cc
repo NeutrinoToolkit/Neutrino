@@ -1187,37 +1187,18 @@ nLine::getContourSubImage(double fill_value)
     }
 }
 
+// {integral, integral of squares, number of pixels} over the polygon of the line (plus the pixels it crosses)
 QList<double>
 nLine::getContainedIntegral()
 {
-    // 1. get point list
-    QPolygonF my_poly;
-    std::list<vec2i> cp_list;
-
-    if (ref.size()>0) {
-        foreach (QGraphicsEllipseItem *item, ref){
-            my_poly<< item->pos();
-        }
-        // force closed path
-        my_poly << ref[0]->pos();
-
-        for (int ii=0; ii<my_poly.size()-1; ii++) {
-            QPointF p1 = my_poly.at(ii);
-            QPointF p2 = my_poly.at(ii+1);
-
-            double steps = (p2-p1).manhattanLength();
-            for(int jj = 0; jj<=steps; jj++) {
-                QPointF np = p1+jj*(p2-p1)/steps;
-                cp_list.push_back(vec2i(np.x(), np.y()));
-            }
-        }
+    nPhysD *img=nparent->getCurrentBuffer();
+    if (!img || ref.size()<3) return QList<double>();
+    std::list<vec2f> poly;
+    foreach (QGraphicsEllipseItem *item, ref){
+        poly.push_back(vec2f(item->pos().x(), item->pos().y()));
     }
-
-    // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
-    DEBUG("starting contour intergration");
-    std::list<double> c_data = physMath::contour_integrate(*(nparent->getCurrentBuffer()), cp_list, true);
-    DEBUG("contour integration ended");
-    return QList<double>(c_data.begin(),c_data.end());
+    physMath::contour_integral c_data = physMath::contour_integrate(*img, poly, true);
+    return QList<double>({c_data.integral, c_data.integral_sq, double(c_data.count)});
 }
 
 void nLine::extractPath() {

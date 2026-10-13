@@ -899,6 +899,125 @@ physC physMath::from_real (physD&real, double val){
 
 // contour functions
 //
+void physMath::contour_trace(physD &iimage, std::list<vec2f> &contour, double level, bool blur, double blur_radius)
+{
+    // marching squares on the cells between pixel centres, following one closed iso-line.
+    // The image is surrounded by a virtual border below the level, so every contour closes.
+    contour.clear();
+
+    physD wimage(iimage); // work image
+    if (blur) {
+        phys_fast_gaussian_blur(wimage, blur_radius);
+    }
+    const int W=wimage.getW(), H=wimage.getH();
+    if (W<1 || H<1) return;
+
+    // missing pixels (NaN) take the mean of their finite neighbours (repeated until none is left):
+    // otherwise a NaN hole would look like the edge of the spot. Only the work copy is changed.
+    for (bool changed=true; changed; ) {
+        changed=false;
+        std::vector<std::pair<size_t,double>> fills;
+        for (int y=0;y<H;y++) for (int x=0;x<W;x++) {
+            if (std::isfinite(wimage.point(x,y))) continue;
+            double sum=0; int n=0;
+            for (int dy=-1;dy<=1;dy++) for (int dx=-1;dx<=1;dx++) {
+                int xx=x+dx, yy=y+dy;
+                if ((dx||dy) && xx>=0 && yy>=0 && xx<W && yy<H && std::isfinite(wimage.point(xx,yy))) { sum+=wimage.point(xx,yy); n++; }
+            }
+            if (n) fills.push_back({size_t(y)*W+x, sum/n});
+        }
+        for (auto &f : fills) { wimage.set(f.first, f.second); changed=true; }
+    }
+
+    // centre: origin if set, otherwise the maximum (the caller's image is not modified)
+    vec2i centr = (wimage.get_origin() == vec2i(0,0)) ? wimage.max_Tv : vec2i(wimage.get_origin());
+    const int cx=centr.x(), cy=centr.y();
+
+    auto val=[&](int x, int y) -> double {
+        return (x>=0 && y>=0 && x<W && y<H) ? wimage.point(x,y) : std::numeric_limits<double>::quiet_NaN();
+    };
+    auto inside=[&](int x, int y) { double v=val(x,y); return std::isfinite(v) && v>level; };
+
+    if (!inside(cx,cy)) {
+        DEBUG(5, "contour: the centre is not above the level");
+        return;
+    }
+
+    // cell (i,j), i in [-1,W-1], j in [-1,H-1], has corners TL=(i,j) TR=(i+1,j) BR=(i+1,j+1) BL=(i,j+1)
+    // edges: 0 top (TL-TR), 1 right (TR-BR), 2 bottom (BL-BR), 3 left (TL-BL)
+    auto corners=[](int e, int i, int j, int &x0, int &y0, int &x1, int &y1) {
+        switch (e) {
+            case 0: x0=i;   y0=j;   x1=i+1; y1=j;   break;
+            case 1: x0=i+1; y0=j;   x1=i+1; y1=j+1; break;
+            case 2: x0=i;   y0=j+1; x1=i+1; y1=j+1; break;
+            default:x0=i;   y0=j;   x1=i;   y1=j+1; break;
+        }
+    };
+    auto crossed=[&](int e, int i, int j) {
+        int x0,y0,x1,y1; corners(e,i,j,x0,y0,x1,y1);
+        return inside(x0,y0)!=inside(x1,y1);
+    };
+    // level crossing on an edge, linearly interpolated (half way if a value is missing)
+    auto crossing=[&](int e, int i, int j) {
+        int x0,y0,x1,y1; corners(e,i,j,x0,y0,x1,y1);
+        double v0=val(x0,y0), v1=val(x1,y1);
+        double t=0.5;
+        if (std::isfinite(v0) && std::isfinite(v1) && v1!=v0) t=std::min(1.0,std::max(0.0,(level-v0)/(v1-v0)));
+        return vec2f(x0+t*(x1-x0), y0+t*(y1-y0));
+    };
+    // exit edge of a cell entered through edge `in`
+    auto exitEdge=[&](int in, int i, int j) -> int {
+        int n=0, other=-1;
+        for (int e=0;e<4;e++) if (crossed(e,i,j)) { n++; if (e!=in) other=e; }
+        if (n==2) return other;
+        if (n!=4) return -1;
+        // saddle: pair the edges around each corner whose side differs from the cell centre
+        double sum=0; int nfin=0;
+        for (auto c : {val(i,j),val(i+1,j),val(i+1,j+1),val(i,j+1)}) if (std::isfinite(c)) { sum+=c; nfin++; }
+        const bool centreIn = nfin && (sum/nfin > level);
+        const bool tlIn=inside(i,j), trIn=inside(i+1,j), brIn=inside(i+1,j+1), blIn=inside(i,j+1);
+        // corner k sits between edges (3,0) TL, (0,1) TR, (1,2) BR, (2,3) BL
+        const int pairs[4][2]={{3,0},{0,1},{1,2},{2,3}};
+        const bool cornerIn[4]={tlIn,trIn,brIn,blIn};
+        for (int k=0;k<4;k++) {
+            if (cornerIn[k]!=centreIn) {
+                if (pairs[k][0]==in) return pairs[k][1];
+                if (pairs[k][1]==in) return pairs[k][0];
+            }
+        }
+        return -1;
+    };
+
+    // start: first crossing to the right of the centre, on the top edge of cell (x0,cy)
+    int x0=cx;
+    while (inside(x0+1,cy)) x0++;
+    const int si=x0, sj=cy, se=0;
+
+    int i=si, j=sj, in=se;
+    contour.push_back(crossing(in,i,j));
+    const long maxSteps=4L*(W+2)*(H+2);
+    for (long step=0; step<maxSteps; step++) {
+        int out=exitEdge(in,i,j);
+        if (out<0) {
+            DEBUG(5, "contour walk lost at cell "<<i<<":"<<j);
+            contour.clear();
+            return;
+        }
+        // move to the neighbouring cell across the exit edge
+        switch (out) {
+            case 0: j--; in=2; break;
+            case 1: i++; in=3; break;
+            case 2: j++; in=0; break;
+            default:i--; in=1; break;
+        }
+        if (i==si && j==sj && in==se) return; // closed
+        contour.push_back(crossing(in,i,j));
+    }
+    DEBUG(5, "contour walk did not close");
+    contour.clear();
+}
+
+/* previous implementation of contour_trace (kept for reference, replaced by the version above)
 void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double level, bool blur, double blur_radius)
 {
     // marching squares algorithm
@@ -1081,6 +1200,7 @@ void physMath::contour_trace(physD &iimage, std::list<vec2i> &contour, double le
 
 
 }
+*/
 
 nPhysImageF<char> physMath::contour_surface_map(physD &iimage, std::list<vec2i> &contour)
 {
@@ -1307,6 +1427,60 @@ nPhysImageF<char> physMath::contour_surface_map(physD &iimage, std::list<vec2i> 
 }
 
 
+physMath::contour_integral physMath::contour_integrate(physD &iimage, const std::list<vec2f> &contour, bool integrate_boundary)
+{
+    contour_integral ret;
+    const int W=iimage.getW(), H=iimage.getH();
+    if (contour.size()<3 || W<1 || H<1) return ret;
+
+    std::vector<vec2f> poly(contour.begin(), contour.end());
+    double xmin=poly[0].x(), xmax=xmin, ymin=poly[0].y(), ymax=ymin;
+    for (auto &p : poly) {
+        xmin=std::min(xmin,p.x()); xmax=std::max(xmax,p.x());
+        ymin=std::min(ymin,p.y()); ymax=std::max(ymax,p.y());
+    }
+    const int bx0=std::max(0,int(std::floor(xmin))-1), bx1=std::min(W-1,int(std::ceil(xmax))+1);
+    const int by0=std::max(0,int(std::floor(ymin))-1), by1=std::min(H-1,int(std::ceil(ymax))+1);
+    if (bx0>bx1 || by0>by1) return ret;
+
+    // pixels already summed (bounding box only)
+    const int bw=bx1-bx0+1;
+    std::vector<char> done((size_t)bw*(by1-by0+1),0);
+    auto add=[&](int x, int y) {
+        char &d=done[(size_t)(y-by0)*bw+(x-bx0)];
+        if (d) return;
+        d=1;
+        double v=iimage.point(x,y);
+        if (std::isfinite(v)) { ret.integral+=v; ret.integral_sq+=v*v; ret.count++; }
+    };
+
+    // scanline even-odd fill on the pixel centres
+    std::vector<double> xs;
+    const size_t n=poly.size();
+    for (int y=by0; y<=by1; y++) {
+        xs.clear();
+        for (size_t k=0;k<n;k++) {
+            vec2f p=poly[k], q=poly[(k+1)%n];
+            if ((p.y()<=y && q.y()>y) || (q.y()<=y && p.y()>y)) {
+                xs.push_back(p.x()+(y-p.y())*(q.x()-p.x())/(q.y()-p.y()));
+            }
+        }
+        std::sort(xs.begin(),xs.end());
+        for (size_t k=0;k+1<xs.size();k+=2) {
+            for (int x=std::max(bx0,int(std::ceil(xs[k]))); x<=std::min(bx1,int(std::floor(xs[k+1]))); x++) add(x,y);
+        }
+    }
+
+    if (integrate_boundary) { // pixels the contour passes through
+        for (auto &p : poly) {
+            int x=std::lround(p.x()), y=std::lround(p.y());
+            if (x>=bx0 && x<=bx1 && y>=by0 && y<=by1) add(x,y);
+        }
+    }
+    return ret;
+}
+
+/* previous implementation of contour_integrate (kept for reference, replaced by the version above)
 std::list<double> physMath::contour_integrate(physD &iimage, std::list<vec2i> &contour, bool integrate_boundary)
 {
 
@@ -1491,6 +1665,7 @@ std::list<double> physMath::contour_integrate(physD &iimage, std::list<vec2i> &c
     return ret;
 
 }
+*/
 
 template<> void
 physC::TscanBrightness() {

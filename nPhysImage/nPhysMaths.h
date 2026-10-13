@@ -208,10 +208,18 @@ physC from_real_imaginary (physD&, physD&);
 
 physC from_real (physD&, double=0.0);
 
-//! contour trace function
-void contour_trace(physD &, std::list<vec2i> &, double, bool blur=false, double blur_radius=10.);
+//! closed iso-line at `level` around the image origin (its blurred maximum if the origin is 0:0).
+//! Marching squares with sub-pixel points (pixel (x,y) is at coordinate (x,y)); empty if not found.
+void contour_trace(physD &, std::list<vec2f> &, double level, bool blur=false, double blur_radius=10.);
 nPhysImageF<char> contour_surface_map(physD &iimage, std::list<vec2i> &contour); // generate in/out/boundary map based on the contour
-std::list<double> contour_integrate(physD &, std::list<vec2i> &, bool integrate_boundary=false);
+
+//! sums over the finite pixels whose centre is inside the closed polygon `contour`
+//! (with integrate_boundary also the pixels crossed by the contour)
+struct contour_integral {
+    double integral=0, integral_sq=0;
+    size_t count=0;
+};
+contour_integral contour_integrate(physD &, const std::list<vec2f> &contour, bool integrate_boundary=false);
 
 
 template <class T>

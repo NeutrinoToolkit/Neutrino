@@ -87,7 +87,7 @@ Contours::on_draw_pb_released()
 		}
 		decimated.set_origin(centr);
 
-		std::list<vec2i> contour;
+		std::list<vec2f> contour;
         double cutoff=level_dsb->value();
         if (percent->isChecked()) {
 			cutoff = decimated.get_min() + (decimated.get_max()-decimated.get_min())*(cutoff/100.0) ;

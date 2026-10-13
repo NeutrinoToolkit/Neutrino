@@ -173,7 +173,7 @@ FocalSpot::find_contour(double th)
 {
     QList<double> ql;
     if (currentBuffer) {
-        std::list<vec2i> contour;
+        std::list<vec2f> contour;
         physMath::contour_trace(decimated, contour, th);
 
         // DEBUG(5, "got contour of "<<contour.size()<<" points");
@@ -183,13 +183,21 @@ FocalSpot::find_contour(double th)
         if (contour.size() > 1) {
 
             // set polygon
-            vec2f centroid(0,0);
-
             for (auto& itr : contour) {
                 myp<<QPointF(itr.x(), itr.y());
-                centroid+=itr;
             }
-            centroid/=contour.size();
+            // centroid of the enclosed area (the vertices of a marching-squares line are unevenly spaced)
+            vec2f centroid(0,0);
+            {
+                double a2=0, gx=0, gy=0;
+                for (int k=0;k<myp.size();k++) {
+                    const QPointF &p=myp[k], &q=myp[(k+1)%myp.size()];
+                    double cr=p.x()*q.y()-q.x()*p.y();
+                    a2+=cr; gx+=(p.x()+q.x())*cr; gy+=(p.y()+q.y())*cr;
+                }
+                if (a2!=0) centroid=vec2f(gx/(3*a2), gy/(3*a2));
+                else { for (auto& itr : contour) centroid+=itr; centroid/=contour.size(); }
+            }
             my_w.stats->append(QString("Contour centre: ( %1  , %2 )").arg(centroid.x()).arg(centroid.y()));
 
 
@@ -214,10 +222,10 @@ FocalSpot::find_contour(double th)
 
             my_w.statusBar->showMessage("Contour ok", 2000);
 
-            std::list<double> ci = physMath::contour_integrate(*currentBuffer, contour, true);
-            while (ci.size() > 0) {
-                ql.append(ci.front()); ci.pop_front();
-            }
+            // {integral, number of pixels} inside the contour (boundary included)
+            // the contour is sub-pixel: the pixels whose centre is inside are the right estimate (no boundary pixels)
+            physMath::contour_integral ci = physMath::contour_integrate(*currentBuffer, contour, false);
+            ql << ci.integral << double(ci.count);
 
 // PLOT radius: mean value in 100 rings around the centre (single pass, no shared accumulation between threads)
             const int len=100;
