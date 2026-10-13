@@ -80,73 +80,82 @@ void Box_lineout::mouseAtWorld(QPointF p) {
 }
 
 void Box_lineout::updatePlot() {
-    DEBUG( tabWidget->currentIndex());
+    // DEBUG( tabWidget->currentIndex());
 
+    QRect geomBox;
     if (currentBuffer) {
-        QRect geomBox=box->getRect(currentBuffer);
+        geomBox=box->getRect(currentBuffer);
         if (geomBox.isEmpty()) {
             statusBar()->showMessage(tr("Attention: the region is outside the image!"),2000);
-            return;
         }
-        int dx=geomBox.width();
-        int dy=geomBox.height();
+    }
+    if (!currentBuffer || geomBox.isEmpty()) {
+        // don't leave the results of another image/region on screen
+        plot->graph(0)->data()->clear();
+        plot->graph(1)->data()->clear();
+        plot->replot();
+        for (QLineEdit *le : {sumLE, meanLE, varianceLE, surfaceLE}) le->clear();
+        return;
+    }
+    int dx=geomBox.width();
+    int dy=geomBox.height();
 
-        vec2f orig=currentBuffer->get_origin();
-        vec2f scal=currentBuffer->get_scale();
+    vec2f orig=currentBuffer->get_origin();
+    vec2f scal=currentBuffer->get_scale();
 
-        if (tabWidget->currentIndex()==0) {
-            QVector<double> xd(dx);
-            QVector<double> yd(dy);
-            for (int j=0;j<dy;j++){
-                for (int i=0;i<dx; i++) {
-                    double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
-                    xd[i]+=val;
-                    yd[j]+=val;
+    // only finite pixels count (NaN are common: masks, transformations...)
+    if (tabWidget->currentIndex()==0) {
+        QVector<double> xd(dx), yd(dy);
+        QVector<int> xn(dx), yn(dy);
+        for (int j=0;j<dy;j++){
+            for (int i=0;i<dx; i++) {
+                double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
+                if (std::isfinite(val)) {
+                    xd[i]+=val; xn[i]++;
+                    yd[j]+=val; yn[j]++;
                 }
             }
+        }
+        for (int i=0;i<dx;i++) xd[i] = xn[i] ? xd[i]/xn[i] : std::numeric_limits<double>::quiet_NaN();
+        for (int j=0;j<dy;j++) yd[j] = yn[j] ? yd[j]/yn[j] : std::numeric_limits<double>::quiet_NaN();
 
-            std::transform(xd.begin(), xd.end(), xd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dy));
-            std::transform(yd.begin(), yd.end(), yd.begin(),std::bind(std::divides<double>(), std::placeholders::_1, dx));
+        QVector <double> xdata(dx);
+        QVector <double> ydata(dy);
 
-            QVector <double> xdata(dx);
-            QVector <double> ydata(dy);
+        for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
+        for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
 
+        plot->graph(0)->setData(xdata,xd);
+        plot->graph(1)->setData(ydata,yd);
 
-            for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
-            for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
-
-            plot->graph(0)->setData(xdata,xd);
-            plot->graph(1)->setData(ydata,yd);
-
-            plot->rescaleAxes();
-            plot->replot();
-        } else {
-            double sum = 0;
-            double mean = 0;
-            double variance = 0;
-            double surface = dx*dy*scal.x()*scal.y();
-
-            for (int j=0;j<dy;j++){
-                for (int i=0;i<dx; i++) {
-                    double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
+        plot->rescaleAxes();
+        plot->replot();
+    } else {
+        double sum = 0;
+        long long count = 0;
+        for (int j=0;j<dy;j++){
+            for (int i=0;i<dx; i++) {
+                double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
+                if (std::isfinite(val)) {
                     sum+=val;
+                    count++;
                 }
             }
-            mean=sum/(dx*dy);
-            for (int j=0;j<dy;j++){
-                for (int i=0;i<dx; i++) {
-                    double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
-                    variance+=pow(val-mean,2);
-                }
-            }
-            variance = sqrt(variance/(dx*dy-1));
-
-
-            sumLE->setText(QLocale().toString(sum));
-            meanLE->setText(QLocale().toString(mean));
-            varianceLE->setText(QLocale().toString(variance));
-            surfaceLE->setText(QLocale().toString(surface));
-
         }
+        double mean = count ? sum/count : std::numeric_limits<double>::quiet_NaN();
+        double sumsq = 0;
+        for (int j=0;j<dy;j++){
+            for (int i=0;i<dx; i++) {
+                double val=currentBuffer->point(i+geomBox.x(),j+geomBox.y(),0.0);
+                if (std::isfinite(val)) sumsq+=pow(val-mean,2);
+            }
+        }
+        double stddev = count>1 ? sqrt(sumsq/(count-1)) : 0.0;
+        double surface = std::abs(dx*dy*scal.x()*scal.y());
+
+        sumLE->setText(QLocale().toString(sum));
+        meanLE->setText(QLocale().toString(mean));
+        varianceLE->setText(QLocale().toString(stddev));
+        surfaceLE->setText(QLocale().toString(surface));
     }
 }
