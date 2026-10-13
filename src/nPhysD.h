@@ -63,7 +63,12 @@ public:
             for (size_t i=0; i<getSurf(); i++) {
                 //int val = mult*(Timg_buffer[i]-lower_cut);
                 if (std::isfinite(Timg_buffer[i])) {
-                    unsigned char val = static_cast<unsigned char>(std::max(0,std::min(255,static_cast<int>(255.0*pow((Timg_buffer[i]-mini)/(maxi-mini),my_gamma)))));
+                    // fraction of the display range, clamped first: pow of a negative number is NaN
+                    // (inverted range) and min==max would divide by zero
+                    double frac = (maxi!=mini) ? (Timg_buffer[i]-mini)/(maxi-mini)
+                                               : (Timg_buffer[i]>mini ? 1.0 : (Timg_buffer[i]<mini ? 0.0 : 0.5));
+                    frac = std::min(1.0,std::max(0.0,frac));
+                    unsigned char val = static_cast<unsigned char>(std::max(0,std::min(255,static_cast<int>(255.0*pow(frac,my_gamma)))));
                     std::copy ( palette.begin()+val*3, palette.begin()+val*3+3, uchar_buf.begin()+3*i);
                 }
             }

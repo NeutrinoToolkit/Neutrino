@@ -66,7 +66,7 @@ public slots:
 
     static void changeThreads(int);
 
-    void addPaletteFile(QString);
+    bool addPaletteFile(QString);
     void addDefaultPalettes();
 
     void clearLog();

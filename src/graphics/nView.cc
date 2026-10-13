@@ -141,7 +141,10 @@ void nView::showPhys(nPhysD *my_phys) {
 
 
         QApplication::processEvents();
-        if (my_phys->getSurf()>0) {
+        if (!nPalettes.contains(colorTable) && !nPalettes.isEmpty()) {
+            colorTable=nPalettes.firstKey(); // the palette in use was removed
+        }
+        if (my_phys->getSurf()>0 && nPalettes.contains(colorTable)) {
             const QImage tempImage(my_phys->to_uchar_palette(nPalettes[colorTable], colorTable.toStdString()),
                                    my_phys->getW(),
                                    my_phys->getH(),

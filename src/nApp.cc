@@ -171,7 +171,8 @@ void nApp::addDefaultPalettes() {
     }
 }
 
-void nApp::addPaletteFile(QString cmapfile) {
+// a palette file is 256 RGB triplets (768 integers 0-255). Returns false if not loaded
+bool nApp::addPaletteFile(QString cmapfile) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
@@ -180,21 +181,34 @@ void nApp::addPaletteFile(QString cmapfile) {
         QFile inputFile(cmapfile);
         if (inputFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&inputFile);
-            nPalettes[cmapfile]= std::vector<unsigned char>(256*3);
+            std::vector<unsigned char> palette(256*3);
             unsigned int iter=0;
             while (!in.atEnd()) {
                 QStringList line = in.readLine().split(" ",Qt::SkipEmptyParts);
                 for(auto &strnum : line) {
-                    if (iter < nPalettes[cmapfile].size()) {
-                        nPalettes[cmapfile][iter] = static_cast<unsigned char>(strnum.toUInt());
+                    bool ok;
+                    unsigned int val=strnum.toUInt(&ok);
+                    if (!ok || val>255) {
+                        qWarning() << "Not a palette file (bad value" << strnum << "):" << cmapfile;
+                        return false;
+                    }
+                    if (iter < palette.size()) {
+                        palette[iter] = static_cast<unsigned char>(val);
                     }
                     iter++;
                 }
             }
-            qDebug() << "Adding colormap" << cmapfile;
             inputFile.close();
+            if (iter < palette.size()) {
+                qWarning() << "Not a palette file (" << iter << "values instead of 768):" << cmapfile;
+                return false;
+            }
+            nPalettes[cmapfile]=palette;
+            qDebug() << "Adding colormap" << cmapfile;
+            return true;
         }
     }
+    return false;
 }
 
 void nApp::closeAllWindows() {
