@@ -150,7 +150,7 @@ void anymap::dumper(std::ostream &os) {
 
         // check if key was inserted by non-existent access
         // (strange std::map behaviour...)
-        if (itr->second.ddescr != anydata::any_none) {
+        if (!itr->second.is_none()) {
             std::string clean_string = std::regex_replace(itr->second.get_str(), std::regex("\\n"), __pp_newline_str);
 
             os<<itr->first<<" = "<<clean_string<<std::endl;

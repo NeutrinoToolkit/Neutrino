@@ -218,7 +218,6 @@ void Wavelet::doWavelet () {
                     waveletPhys[itr.first]=this_phys;
                 }
             }
-            delete itr.second;
         }
         QApplication::processEvents();
         

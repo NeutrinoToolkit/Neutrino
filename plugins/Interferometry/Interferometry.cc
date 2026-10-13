@@ -323,7 +323,6 @@ void Interferometry::doWavelet (int iimage) {
             }
             DEBUG(my_phys);
             retList[it.first] = new nPhysD(my_phys);
-            delete it.second;
         }
 
         if (retList["phase_2pi"] && retList["contrast"]) {
@@ -360,7 +359,7 @@ void Interferometry::doUnwrap () {
     if (localPhys["contrast_shot"]) {
         nPhysD quality_loc= localPhys["contrast_shot"]->copy();
         if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
-            physMath::phys_point_multiply(quality_loc,localPhys["contrast_ref"]->copy());
+            physMath::phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
             physMath::phys_sqrt(quality_loc);
         }
         localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["phase_quality"]);
@@ -410,7 +409,7 @@ void Interferometry::doUnwrap () {
             physD phase2=phase->copy();
             if (unwrapAngles->isChecked()) {
                 physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
-                physMath::phys_point_subtract(angle,(static_cast<physD*>(localPhys["angle_ref"]))->copy());
+                physMath::phys_point_subtract(angle,*static_cast<physD*>(localPhys["angle_ref"]));
                 physMath::phys_divide(angle,180);
                 physD orig_angle=angle.copy();
                 physD unwrapAngle = physD(angle.getW(),angle.getH(),0);

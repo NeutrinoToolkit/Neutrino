@@ -182,7 +182,7 @@ void Ghost_fringes::doGhost () {
 
         double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
 
-        double thick_norm= resolution->value()/M_PI;
+        double thick_norm= resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
 
         DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
 
@@ -191,7 +191,7 @@ void Ghost_fringes::doGhost () {
                 for (size_t y=0;y<dy;y++) {
                     double xr = xx[x]*cr - yy[y]*sr;
                     double yr = xx[x]*sr + yy[y]*cr;
-                    double e_tot = 1.0-exp(-pow(yr/thick_norm,2))/(1.0+exp(lambda-std::abs(xr)));
+                    double e_tot = 1.0-parameter->value()*exp(-pow(yr*thick_norm,2))/(1.0+exp(lambda-std::abs(xr)));
                     imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                 }
             }
@@ -200,7 +200,7 @@ void Ghost_fringes::doGhost () {
                 for (size_t y=0;y<dy;y++) {
                     double xr = xx[x]*cr - yy[y]*sr;
                     double yr = xx[x]*sr + yy[y]*cr;
-                    double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)/lambda-M_PI, 2));
+                    double e_tot = 1.0-parameter->value()*exp(-pow(yr*thick_norm,2))*exp(-pow(std::abs(xr)/lambda-M_PI, 2));
                     imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                 }
             }

@@ -23,6 +23,8 @@
  *
  */
 #include "nPhysMaths.h"
+#include <random>
+#include <limits>
 #include <time.h>
 
 /*! \addtogroup nPhysMaths
@@ -312,12 +314,13 @@ void physMath::phys_replace_NaN(physD &iimage, double newval) {
     iimage.setName(ostr.str());
 }
 
-void 
+void
 physMath::add_noise(physD &iimage, double vMax=1.0)
 {
-#pragma omp parallel for
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
     for (size_t ii=0; ii<iimage.getSurf(); ii++) {
-        iimage.set(ii, iimage.point(ii) + vMax*((double)rand() / RAND_MAX));
+        iimage.set(ii, iimage.point(ii) + vMax * dist(rng));
     }
     iimage.TscanBrightness();
     std::ostringstream ostr;
@@ -398,7 +401,7 @@ physMath::phys_abs(physD &m1)
 {
 #pragma omp parallel for
     for (size_t i=0; i< m1.getSurf(); i++) {
-        m1.set(i,abs(m1.point(i)));
+        m1.set(i,std::abs(m1.point(i)));
     }
     m1.TscanBrightness();
     m1.setName("abs("+m1.getName()+")");
@@ -543,8 +546,8 @@ void physMath::phys_sobel_dir(physD &image) {
 
 void physMath::phys_scharr(physD &image) {
     physD my_copy=image;
-    image.setShortName("Sobel");
-    image.setName("Sobel "+image.getName());
+    image.setShortName("Scharr");
+    image.setName("Scharr "+image.getName());
     image.setFromName(image.getFromName());
     double Gx[9];
     Gx[0] = 3.0; Gx[1] = 0.0; Gx[2] = -3.0;
@@ -642,8 +645,8 @@ physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
 
     fftw_execute(fb);
 
-    double sx=pow(image.getW()/(radiusX),2)/2.0;
-    double sy=pow(image.getH()/(radiusY),2)/2.0;
+    double sx = (radiusX == 0) ? std::numeric_limits<double>::infinity() : pow(image.getW()/radiusX, 2)/2.0;
+    double sy = (radiusY == 0) ? std::numeric_limits<double>::infinity() : pow(image.getH()/radiusY, 2)/2.0;
 
 #pragma omp parallel for collapse(2)
     for (size_t j = 0 ; j < image.getH(); j++) {

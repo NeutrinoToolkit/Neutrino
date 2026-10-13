@@ -356,7 +356,7 @@ namespace vmath {
 
 typedef bidimvec<double> vec2f;
 typedef bidimvec<int> vec2i;
-typedef bidimvec<int> vec2u;
+typedef bidimvec<unsigned int> vec2u;
 
 
 #endif

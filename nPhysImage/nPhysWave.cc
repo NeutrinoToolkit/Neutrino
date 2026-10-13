@@ -50,12 +50,12 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         zz_morlet.resize(dx,dy);
 
-        physD *qmap = new physD(dx, dy, 0.0, "quality");
-        physD *wphase = new physD(dx,dy,0.0,"phase_2pi");
-        physD *lambda = new physD(dx,dy,0.0,"lambda");
-        physD *angle = new physD(dx,dy,0.0,"angle");
-        physD *thick = new physD(dx,dy,0.0,"thick");
-        physD *intensity = new physD(dx,dy,0.0,"intensity");
+        auto qmap     = std::make_unique<physD>(dx, dy, 0.0, "quality");
+        auto wphase   = std::make_unique<physD>(dx, dy, 0.0, "phase_2pi");
+        auto lambda   = std::make_unique<physD>(dx, dy, 0.0, "lambda");
+        auto angle    = std::make_unique<physD>(dx, dy, 0.0, "angle");
+        auto thick    = std::make_unique<physD>(dx, dy, 0.0, "thick");
+        auto intensity= std::make_unique<physD>(dx, dy, 0.0, "intensity");
 
 
         std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thicks);
@@ -179,15 +179,14 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
             physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
 
-            params.olist["phase_2pi"] = wphase;
-            params.olist["contrast"] = qmap;
-            params.olist["lambda"] = lambda;
-            params.olist["angle"] = angle;
-            params.olist["intensity"] = intensity;
-            params.olist["thick"] = thick;
+            params.olist["phase_2pi"] = std::move(wphase);
+            params.olist["contrast"]  = std::move(qmap);
+            params.olist["lambda"]    = std::move(lambda);
+            params.olist["angle"]     = std::move(angle);
+            params.olist["intensity"] = std::move(intensity);
+            params.olist["thick"]     = std::move(thick);
 
-            std::map<std::string, physD *>::const_iterator itr;
-            for(itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+            for(auto itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
                 itr->second->TscanBrightness();
                 itr->second->set_origin(params.data->get_origin());
                 itr->second->set_scale(params.data->get_scale());
@@ -805,9 +804,9 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         params.olist.clear();
 
-        physD *nQuality = new physD(params.data->getW(),params.data->getH(),0,"Quality");
-        physD *nPhase = new physD(params.data->getW(),params.data->getH(),0,"Phase");
-        physD *nIntensity = new physD(params.data->getW(),params.data->getH(),0,"Intensity");
+        auto nQuality  = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Quality");
+        auto nPhase    = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Phase");
+        auto nIntensity= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Intensity");
 
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
@@ -820,13 +819,13 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
 //            physMath::phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
 
-        params.olist["phase_2pi"] = nPhase;
-        params.olist["contrast"] = nQuality;
-        params.olist["intensity"] = nIntensity;
+        params.olist["phase_2pi"] = std::move(nPhase);
+        params.olist["contrast"]  = std::move(nQuality);
+        params.olist["intensity"] = std::move(nIntensity);
 
 
         if (params.n_thicks>1) {
-            physD *nThick = new physD(params.data->getW(),params.data->getH(),0,"Thick");
+            auto nThick = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Thick");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=j*dx+i;
@@ -834,11 +833,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     nThick->set(i,j,thickness[val]);
                 }
             }
-            params.olist["thick"] = nThick;
+            params.olist["thick"] = std::move(nThick);
         }
 
         if (params.n_angles>1) {
-            physD *nAngle = new physD(params.data->getW(),params.data->getH(),0,"Angle");
+            auto nAngle = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Angle");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=j*dx+i;
@@ -850,11 +849,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     }
                 }
             }
-            params.olist["angle"] = nAngle;
+            params.olist["angle"] = std::move(nAngle);
         }
 
         if (params.n_lambdas>1) {
-            physD *nLambda = new physD(params.data->getW(),params.data->getH(),0,"Lambda");
+            auto nLambda = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Lambda");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
                     unsigned int k=j*dx+i;
@@ -862,10 +861,10 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     nLambda->set(i,j,lambdas[val]);
                 }
             }
-            params.olist["lambda"] = nLambda;
+            params.olist["lambda"] = std::move(nLambda);
         }
 
-        for(std::map<std::string, physD *>::const_iterator itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+        for(auto itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
             itr->second->TscanBrightness();
             itr->second->set_origin(params.data->get_origin());
             itr->second->set_scale(params.data->get_scale());
@@ -1118,7 +1117,7 @@ void physWave::phys_invert_abel(abel_params &params)
         return;
     }
 
-    params.oimage = new physD (params.iimage->getW(), params.iimage->getH(),/*std::numeric_limits<double>::quiet_NaN()*/ 0.0,"Inverted");
+    params.oimage = std::make_unique<physD>(params.iimage->getW(), params.iimage->getH(), 0.0, "Inverted");
     params.oimage->set_origin(params.iimage->get_origin());
     params.oimage->set_scale(params.iimage->get_scale());
 

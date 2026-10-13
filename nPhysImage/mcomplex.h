@@ -82,7 +82,7 @@ public:
 	mcomplex operator* (mcomplex oth)
 	{ return mcomplex(re*oth.real()-im*oth.imag(), im*oth.real()+re*oth.imag()); }
 	mcomplex operator/ (mcomplex oth)
-	{ double den = oth.re*oth.re - oth.im*oth.im; return mcomplex((re+oth.re)/den, (im+oth.im)/den); }
+	{ double den = oth.re*oth.re + oth.im*oth.im; return mcomplex((re*oth.re + im*oth.im)/den, (im*oth.re - re*oth.im)/den); }
 
 private:
 	double re, im;

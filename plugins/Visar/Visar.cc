@@ -476,6 +476,7 @@ void Visar::addVisar() {
     connect(ui_settings->resolution, SIGNAL(valueChanged(double)), this, SLOT(needWave()));
     connect(ui_settings->refImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
     connect(ui_settings->shotImage, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
+    // connect(ui_settings->method, SIGNAL(currentIndexChanged(int)), this, SLOT(needWave()));
 
     connect(ui_settings->border, SIGNAL(valueChanged(int)), this, SLOT(needWave()));
 
@@ -650,11 +651,15 @@ void Visar::addVisar() {
 
 void Visar::delVisar() {
     if (numVisars>0) {
+        // detach before deleteLater: processEvents() does not flush deferred deletes, so the
+        // widgets would otherwise stay in findChildren() (e.g. loadUi) with a stale "id"
         QWidget* my_widget=tabPhase->widget(numVisars-1);
         tabPhase->removeTab(numVisars-1);
+        my_widget->setParent(nullptr);
         my_widget->deleteLater();
         my_widget=tabVelocity->widget(numVisars-1);
         tabVelocity->removeTab(numVisars-1);
+        my_widget->setParent(nullptr);
         my_widget->deleteLater();
         foreach (QAction *action, toolBar->actions()) {
             if (action->property("id").isValid() && action->property("id").toUInt()==numVisars-1) {
@@ -812,6 +817,7 @@ void Visar::sweepChanged(QLineEdit *line) {
             normalPoly = sopScaleType->currentText() == "Normal";
         } else {
             k=line->property("id").toInt();
+            if (k<0 || k>=(int)sweepCoeff.size() || k>=(int)settingsUi.size()) return;
             vecsweep = &sweepCoeff[k];
             normalPoly =  settingsUi[k]->physScaleType->currentText() == "Normal";
         }
@@ -1562,8 +1568,22 @@ void Visar::doWave(unsigned int k) {
             physD diff = phase[1]-phase[0];
             physD qual = contrast[k][1]*contrast[k][0];
 
-            physWave::phys_phase_unwrap(phase[0], qual, physWave::QUALITY, phaseUnwrap[k][0]);
-            physWave::phys_phase_unwrap(diff,     qual, physWave::QUALITY, phaseUnwrap[k][1]);
+            // QString methodName=settingsUi[k]->method->currentText();
+            physWave::unwrap_strategy strategy=physWave::QUALITY;
+            // if (methodName=="H+V") {
+            //     strategy=physWave::SIMPLE_HV;
+            // } else if (methodName=="V+H") {
+            //     strategy=physWave::SIMPLE_VH;
+            // } else if (methodName=="Miguel") {
+            //     strategy=physWave::MIGUEL;
+            // } else if (methodName=="Mig+Qual") {
+            //     strategy=physWave::MIGUEL_QUALITY;
+            // } else if (methodName=="Quality") {
+            //     strategy=physWave::QUALITY;
+            // }
+
+            physWave::phys_phase_unwrap(phase[0], qual, strategy, phaseUnwrap[k][0]);
+            physWave::phys_phase_unwrap(diff,     qual, strategy, phaseUnwrap[k][1]);
 
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);

@@ -38,12 +38,10 @@
 #include "nPhysImageF.h"
 #include "mcomplex.h"
 
-#define _phys_deg (0.017453f)
-
-
 #ifndef nPhysMaths_h_
 #define nPhysMaths_h_
 
+constexpr double _phys_deg = 0.017453292519943295769;  // pi/180
 
 namespace physMath {
 

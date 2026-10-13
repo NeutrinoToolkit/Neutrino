@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of nPhysImage library.
  *
  *    nPhysImage is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
@@ -30,6 +30,7 @@
 #include <sstream>
 #include <map>
 #include <regex>
+#include <variant>
 
 #include "bidimvec.h"
 #include "tools.h"
@@ -42,135 +43,109 @@ std::ostream & operator<< (std::ostream &, struct anydata &);
 std::istream & operator>> (std::istream &, struct anydata &);
 bool check_vec(const std::string &);
 
-// generic data holder
-struct anydata{
+// Tag type that distinguishes a serialised bidimvec string from a plain string.
+// Stored as "(x:y)" — same wire format as before.
+struct vec_string { std::string s; };
+
+// Generic data holder — backed by std::variant instead of a manual tagged union.
+struct anydata {
 public:
-	anydata()
-	{ ddescr = any_none; }
+    anydata() = default;
 
-	// insert ops
-    anydata & operator= (int rhs)
-    { i=rhs; ddescr = any_int; return *this; }
+    // ----- assignment --------------------------------------------------------
 
-    anydata & operator= (unsigned int rhs)
-    { i=static_cast<int>(rhs); ddescr = any_int; return *this; }
+    anydata& operator=(int rhs)          { _v = rhs; return *this; }
+    anydata& operator=(unsigned int rhs) { _v = static_cast<int>(rhs); return *this; }
+    anydata& operator=(double rhs)       { _v = rhs; return *this; }
 
-    anydata & operator= (double rhs)
-	{ d=rhs; ddescr = any_double; return *this; }
-	
-	template<class T> anydata & operator= (bidimvec<T> rhs) 
-	{ 
-		std::stringstream ss; ss<<rhs; 
-		str = ss.str(); ddescr = any_vec; return *this; 
-	}
-	
-	anydata & operator= (std::string rhs) 
-	{
-		// can be a vector though, lets check
-		if (check_vec(rhs)) {
-			DEBUG(10, "Got vector in string operator: "<<rhs);
-			str = rhs; ddescr = any_vec; return *this;
-		} else str=rhs; ddescr = any_str; return *this;
-	}
+    anydata& operator=(std::string rhs) {
+        if (check_vec(rhs)) {
+            DEBUG(10, "Got vector in string operator: " << rhs);
+            _v = vec_string{rhs};
+        } else {
+            _v = std::move(rhs);
+        }
+        return *this;
+    }
 
-	// extr. ops
-	operator int() const { 
-		return get_i();
-	}
+    template<class T>
+    anydata& operator=(bidimvec<T> rhs) {
+        std::ostringstream ss; ss << rhs;
+        _v = vec_string{ss.str()};
+        return *this;
+    }
 
-	operator double() const { 
-		return get_d();
-	}
+    // ----- type predicates ---------------------------------------------------
 
-	operator std::string() const {
-		if (ddescr == any_none) {
-			DEBUG("accessing uninitialized value");
-		}
-		return get_str();
-	}
+    bool is_none() const { return std::holds_alternative<std::monostate>(_v); }
+    bool is_i()   const { return std::holds_alternative<int>(_v); }
+    bool is_d()   const { return std::holds_alternative<double>(_v); }
+    bool is_str() const { return std::holds_alternative<std::string>(_v); }
+    bool is_vec() const { return std::holds_alternative<vec_string>(_v); }
 
-	template<class T> operator bidimvec<T>() const {
-		if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");
-		DEBUG(11, "string is: "<<get_str());
-		bidimvec<T> vv(get_str());
-		return vv;
-	}	
+    // ----- value extraction --------------------------------------------------
 
+    int get_i() const {
+        if (is_i()) return std::get<int>(_v);
+        if (is_d()) { WARNING("double to int conversion"); return static_cast<int>(std::get<double>(_v)); }
+        return 0;
+    }
 
-	enum anydata_type {any_int, any_double, any_str, any_vec, any_none} ddescr;
+    double get_d() const {
+        if (is_d()) return std::get<double>(_v);
+        if (is_i()) return static_cast<double>(std::get<int>(_v));
+        return 0.0;
+    }
 
-	inline bool is_d() const { return ddescr == any_double; }
-	inline bool is_i() const { return ddescr == any_int; }
-	inline bool is_str() const { return ddescr == any_str; }
-	inline bool is_vec() const { return ddescr == any_vec; }
-	inline bool is_none() const {return ddescr==any_none;}
+    std::string get_str() const {
+        return std::visit([](auto&& v) -> std::string {
+            using T = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<T, std::monostate>)  return {};
+            else if constexpr (std::is_same_v<T, int>)        return std::to_string(v);
+            else if constexpr (std::is_same_v<T, double>)     { std::ostringstream ss; ss << v; return ss.str(); }
+            else if constexpr (std::is_same_v<T, std::string>) return v;
+            else                                               return v.s;  // vec_string
+        }, _v);
+    }
 
-	double get_d() const { if (ddescr == any_double) return d; else if (ddescr == any_int) return i; else return 0; }
+    template<class T>
+    bidimvec<T> get_vec() const {
+        return is_vec() ? bidimvec<T>(std::get<vec_string>(_v).s) : bidimvec<T>("(0:0)");
+    }
 
-	int get_i() const { 
-		if (ddescr == any_int) 
-			return i;
-		else if (ddescr == any_double) {
-		       	WARNING("double to int conversion");
-			return (int)d;
-		} else return 0;
-	}
+    // ----- implicit conversions (kept for call-site compatibility) -----------
 
-	template<class T> bidimvec<T> get_vec() const { return (ddescr == any_vec) ? bidimvec<T>(str) : bidimvec<T>("(0:0)"); }
-	std::string get_str() const { 
-		if (ddescr == any_str || ddescr == any_vec) return str; 
-		else {
-			std::stringstream ss;
-			if (is_d()) ss<<d;
-			else if (is_i()) ss<<i;
+    operator int() const    { return get_i(); }
+    operator double() const { return get_d(); }
 
-			return ss.str();
-		}
-	}
+    operator std::string() const {
+        if (is_none()) DEBUG("accessing uninitialized anydata");
+        return get_str();
+    }
+
+    template<class T>
+    operator bidimvec<T>() const {
+        if (!is_vec()) WARNING("wrong datatype (vec) required for map member!!");
+        return bidimvec<T>(get_str());
+    }
 
 private:
-	double d;
-	int i;
-	std::string str;
+    std::variant<std::monostate, int, double, std::string, vec_string> _v;
 };
-
-
-
-
-
 
 
 // final data structure
 class anymap : public std::map<std::string, anydata> {
 
 public:
-	anymap()
-	{ }
+    anymap() = default;
 
-	//anydata operator() (std::string val) const {
-		/*if (find(val) != end())
-		{
-			return find(val)->second;
-		}*/
-	//	return at(val);
-	//}	
-	
-	bool have(std::string search_me) {
-        return (size() && find(search_me) != end());
-	}
+    bool have(std::string search_me) const {
+        return size() && find(search_me) != end();
+    }
 
     void loader(std::istream &);
-
     void dumper(std::ostream &);
-
 };
 
 #endif
-
-// TODO
-//  - deep operator, probably
-//  - initializers
-//  - a working std::string () operator
-//  - check std::string vec2f constructor
-//  - purtroppo gestire gli enum sara' abbastanza complicato. per il momento passo a conversione a std::string (poi si vedra')
-//  - in teoria i metodi di get/set saltano

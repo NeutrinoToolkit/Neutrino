@@ -72,10 +72,6 @@ protected:
   std::istream& in;
 };
 
-template<> const NaNStream& 
-NaNStream::operator>>(double& ) const;
-
-
 // override << operator for float type
 //template <> const NaNStream& NaNStream::operator<<(const float& v) const 
 //{

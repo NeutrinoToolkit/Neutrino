@@ -82,11 +82,11 @@
 
 #include <gsl/gsl_math.h>
 
-#define _phys_cspeed (299792458.0)
-#define _phys_echarge (1.602e-19)
-#define _phys_emass (9.1e-31)
-#define _phys_vacuum_eps (8.8e-12)
-#define _phys_avogadro (6.022e23)
+constexpr double _phys_cspeed     = 299792458.0;
+constexpr double _phys_echarge    = 1.602e-19;
+constexpr double _phys_emass      = 9.1e-31;
+constexpr double _phys_vacuum_eps = 8.8e-12;
+constexpr double _phys_avogadro   = 6.022e23;
 
 enum phys_way { PHYS_POS, PHYS_NEG };
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
@@ -172,7 +172,10 @@ public:
 	nPhysImageF(std::string, phys_type=PHYS_DYN);
 	
 	//! creates named nPhys, performing a DEEP copy from the passed reference
-    nPhysImageF(const nPhysImageF<T> &, std::string=std::string("")); // copy constructor --->> REALLOCATION!
+    nPhysImageF(const nPhysImageF<T> &, std::string=std::string(""));
+
+    //! move constructor (O(1), transfers buffer ownership)
+    nPhysImageF(nPhysImageF<T> &&) noexcept;
 
 	//! creates flat, named nPhys
     nPhysImageF(unsigned int, unsigned int, T, std::string = std::string());
@@ -272,37 +275,50 @@ public:
 	nPhysImageF<T> operator* (const nPhysImageF<T> &) const;
 	nPhysImageF<T> operator/ (const nPhysImageF<T> &) const;
 
-	// assignment operator -- SHALLOW COPY
-	nPhysImageF<T> & operator= (const nPhysImageF<T> &rhs)
-	{
-        DEBUG("copy shallow ------------------------------------");
-        if (_canResize())
-			resize(0, 0);
-		else {
-			_init_temp_pointers();
-			_trash_delete();
-		}
-
-		// copy everything
-        prop = rhs.prop; // probably missing DEEP operator
-		
-		Tmaximum_value = rhs.Tmaximum_value;
-		Tminimum_value = rhs.Tminimum_value;
-		Timg_matrix = rhs.Timg_matrix;
-		Timg_buffer = rhs.Timg_buffer;
-		width = rhs.width;
-		height = rhs.height;
-		histogram=rhs.histogram;
-
-
-		_n_inst = rhs._n_inst;
-		_trash_new();
-
-		// not sure about this
-        DEBUG("END copy shallow ------------------------------------");
+	// copy assignment — deep copy
+	nPhysImageF<T>& operator=(const nPhysImageF<T>& rhs) {
+        if (this != &rhs) {
+            width             = rhs.width;
+            height            = rhs.height;
+            prop              = rhs.prop;
+            Tmaximum_value    = rhs.Tmaximum_value;
+            Tminimum_value    = rhs.Tminimum_value;
+            min_Tv            = rhs.min_Tv;
+            max_Tv            = rhs.max_Tv;
+            histogram         = rhs.histogram;
+            _storage          = rhs._storage;
+            _rows.resize(height);
+            for (unsigned int i = 0; i < height; i++)
+                _rows[i] = _storage.data() + i * width;
+            Timg_buffer = _storage.empty() ? nullptr : _storage.data();
+            Timg_matrix = _rows.empty()    ? nullptr : _rows.data();
+        }
         return *this;
+    }
 
-	}
+    // move assignment — O(1)
+    nPhysImageF<T>& operator=(nPhysImageF<T>&& rhs) noexcept {
+        if (this != &rhs) {
+            width             = rhs.width;
+            height            = rhs.height;
+            prop              = std::move(rhs.prop);
+            Tmaximum_value    = rhs.Tmaximum_value;
+            Tminimum_value    = rhs.Tminimum_value;
+            min_Tv            = rhs.min_Tv;
+            max_Tv            = rhs.max_Tv;
+            histogram         = std::move(rhs.histogram);
+            _storage          = std::move(rhs._storage);
+            _rows             = std::move(rhs._rows);
+            for (unsigned int i = 0; i < height; i++)
+                _rows[i] = _storage.data() + i * width;
+            Timg_buffer       = _storage.empty() ? nullptr : _storage.data();
+            Timg_matrix       = _rows.empty()    ? nullptr : _rows.data();
+            rhs.width = rhs.height = 0;
+            rhs.Timg_buffer = nullptr;
+            rhs.Timg_matrix = nullptr;
+        }
+        return *this;
+    }
 
 
 	// check for shallowness
@@ -328,12 +344,9 @@ public:
 		return lhs;
 	}
 
-	//! Returns a DEEP copy of the object 
-	nPhysImageF<T> &copy()
-	{
-		nPhysImageF<T> *new_img = new nPhysImageF<T>(*this);
-		new_img->_trash_return();
-		return *new_img;
+	//! Returns a deep copy of the object
+	nPhysImageF<T> copy() const {
+		return nPhysImageF<T>(*this);
 	}
 
     nPhysImageF<T> sub(int x, int y, unsigned int Dx, unsigned int Dy) {
@@ -381,7 +394,7 @@ public:
 		DEBUG(5,"ratio" << newSize << " " << ratio);
 
         stretched.set_origin(mul_P(get_origin(),ratio));
-        stretched.set_origin(mul_P(get_scale(),ratio));
+        stretched.set_scale(mul_P(get_scale(),ratio));
 
         for (unsigned int j=0; j<stretched.getH(); j++) {
             for (unsigned int i=0; i<stretched.getW(); i++) {
@@ -704,9 +717,7 @@ public:
 		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
 	}
 
-    inline int copies() {
-        return *_n_inst;
-    }
+    inline int copies() { return 1; }
 
 	inline phys_type getType()
     { return prop["phys_orig"]; }
@@ -714,41 +725,21 @@ public:
     { prop["phys_orig"] = orig; }
 
 
-	// (dovra' passare protected, prima o poi...)
-	T *Timg_buffer;
-	T **Timg_matrix;
+    T *Timg_buffer  = nullptr;   // raw alias into _storage — kept for plugin ABI compatibility
+    T **Timg_matrix = nullptr;   // raw alias into _rows
 
 protected:
-	double **vector_buf;
-	double **axis_buf;
-	std::vector<double> histogram;
+    std::vector<double> histogram;
 
 private:
-	void init_Tvariables();
-	void matrix_points_aligned();
-    unsigned int width;
-    unsigned int height;
-
-	//! TODO: pass to bicimvec<T>
-	T Tmaximum_value;
-	T Tminimum_value;
-
-
-	// gestione rifiuti
-	void _trash_init()		// for constructors
-	{ _n_inst = new int; *_n_inst = 1; }
-	void _init_temp_pointers();	// for pointers needing refresh in shallow copy
-	void _trash_new()		// for assignment operators
-	{ (*_n_inst)++; }
-	int _trash_delete()		// for destructors
-	{ (*_n_inst)--; return *_n_inst; }
-	void _trash_return()		// to be called before returning
-	{ (*_n_inst)--; }
-
-	bool _canResize()		// check for parallel instances
-	{ return (*_n_inst == 1) ? true : false; }
-
-    int *_n_inst;
+    void init_Tvariables();
+    void matrix_points_aligned();
+    unsigned int width  = 0;
+    unsigned int height = 0;
+    T Tmaximum_value{};
+    T Tminimum_value{};
+    std::vector<T>  _storage;   // owns the pixel data
+    std::vector<T*> _rows;      // row-pointer index into _storage
 
 };
 
@@ -769,11 +760,8 @@ template<class T> nPhysImageF<T>::nPhysImageF() {
 template<class T> nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp) : nPhysImageF<T>()
 {
 	if (pp == PHYS_FILE) {
-		// real file
-		//setName(obj_name);
 		setFromName(obj_name);
 	} else if (pp == PHYS_DYN){
-		//setName(obj_name);
 		setFromName(std::string("(undefined)"));
 	}
 	setName(obj_name);
@@ -786,55 +774,70 @@ template<class T> nPhysImageF<T>::nPhysImageF(std::string obj_name, phys_type pp
 		}
 	}
 	DEBUG("shortname: "<<shortname);
-	setShortName(shortname);	
+	setShortName(shortname);
 }
 
-// copy constructor
+// deep copy constructor
 template<class T>
 nPhysImageF<T>::nPhysImageF(const nPhysImageF<T> &oth, std::string sName) : nPhysImageF<T>()
 {
     DEBUG("copy constructor ------------------------------------");
-	resize(oth.width, oth.height);
-	
-//	memcpy(Timg_buffer, oth.Timg_buffer, getSurf()*sizeof(T));
-    std::copy(oth.Timg_buffer, oth.Timg_buffer+getSurf(), Timg_buffer);
-    prop = oth.prop;
-	
-    if (!sName.empty()) {
-        setShortName(sName);
-    }
-	TscanBrightness();
+    width          = oth.width;
+    height         = oth.height;
+    _storage       = oth._storage;
+    _rows.resize(height);
+    for (unsigned int i = 0; i < height; i++)
+        _rows[i] = _storage.data() + i * width;
+    Timg_buffer    = _storage.empty() ? nullptr : _storage.data();
+    Timg_matrix    = _rows.empty()    ? nullptr : _rows.data();
+    prop           = oth.prop;
+    Tmaximum_value = oth.Tmaximum_value;
+    Tminimum_value = oth.Tminimum_value;
+    min_Tv         = oth.min_Tv;
+    max_Tv         = oth.max_Tv;
+    histogram      = oth.histogram;
+    if (!sName.empty()) setShortName(sName);
     DEBUG("END copy constructor ------------------------------------");
 }
 
+// move constructor — O(1), no allocation
+template<class T>
+nPhysImageF<T>::nPhysImageF(nPhysImageF<T> &&oth) noexcept : nPhysImageF<T>()
+{
+    width          = oth.width;
+    height         = oth.height;
+    _storage       = std::move(oth._storage);
+    _rows          = std::move(oth._rows);
+    for (unsigned int i = 0; i < height; i++)
+        _rows[i] = _storage.data() + i * width;
+    Timg_buffer    = _storage.empty() ? nullptr : _storage.data();
+    Timg_matrix    = _rows.empty()    ? nullptr : _rows.data();
+    prop           = std::move(oth.prop);
+    Tmaximum_value = oth.Tmaximum_value;
+    Tminimum_value = oth.Tminimum_value;
+    min_Tv         = oth.min_Tv;
+    max_Tv         = oth.max_Tv;
+    histogram      = std::move(oth.histogram);
+    oth.width = oth.height = 0;
+    oth.Timg_buffer = nullptr;
+    oth.Timg_matrix = nullptr;
+}
 
 template<class T>
 nPhysImageF<T>::nPhysImageF(unsigned int w, unsigned int h, T val, std::string obj_name) : nPhysImageF<T>()
 {
 	setName(obj_name);
     setShortName(obj_name);
-
 	resize(w, h);
     for (unsigned int i=0; i<getW()*getH(); i++)
 		Timg_buffer[i] = val;
     TscanBrightness();
 }
 
-
-
 template<class T>
 nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int w, unsigned int h, std::string obj_name) : nPhysImageF<T>() {
-
-	throw phys_trashable();
-
-	setName(obj_name);
-	resize(w, h);
-	
-	// not calling correspondent physImage constructor for matrix_points_aligned
-	//
-	// TODO: pass to std::copy
-    memcpy(Timg_buffer, o_buffer, getSurf()*sizeof(T));
-	
+    throw phys_trashable();
+    (void)o_buffer; (void)w; (void)h; (void)obj_name;
 }
 
 /*template<class T>
@@ -853,36 +856,8 @@ nPhysImageF<T>::nPhysImageF(T *o_buffer, unsigned int o_width, unsigned int o_he
 template<class T>
 nPhysImageF<T>::~nPhysImageF()
 {
-
-    int trashDelete=_trash_delete();
-	if ( trashDelete == 0 ) {
-        DEBUG(1,"["<<static_cast<void*>(this)<<"] "<<  getShortName() << " : " << getName() << " ALLOWING DELETE! " );
-        if (Timg_buffer != nullptr)
-			delete Timg_buffer;
-		
-        if (Timg_matrix != nullptr) delete Timg_matrix;
-	
-        if (vector_buf != nullptr) {
-            if (vector_buf[0] != nullptr)
-				delete vector_buf[0];
-            if (vector_buf[1] != nullptr)
-				delete vector_buf[1];
-			delete vector_buf;
-		}
-	
-        if (axis_buf != nullptr) {
-            if (axis_buf[0] != nullptr)
-				delete axis_buf[0];
-            if (axis_buf[1] != nullptr)
-				delete axis_buf[1];
-			delete axis_buf;
-		}
-        delete _n_inst;
-
-	} else {
-        DEBUG(1,"["<<static_cast<void*>(this)<<"]  NOT ALLOWING DELETE! " << trashDelete );
-	}
-
+    // _storage and _rows are std::vector — freed automatically (RAII)
+    DEBUG(1,"["<<static_cast<void*>(this)<<"] "<<getShortName()<<" : "<<getName()<<" destroyed");
 }
 
 // -----------------------------------------------------------------------
@@ -890,42 +865,10 @@ nPhysImageF<T>::~nPhysImageF()
 template<class T> void
 nPhysImageF<T>::init_Tvariables()
 {
-	width = 0;
-	height = 0;
-
-	// donne! e' arrivato il monnezzaro
-    vector_buf = axis_buf = nullptr;
-	_trash_init();
-	_init_temp_pointers();
-
-	//pIF_size.set_msg("size error");
-
-    min_Tv=vec2i(-1,-1);
-    max_Tv=vec2i(-1,-1);
-
-	Tmaximum_value = 0;
-	Tminimum_value = 0;
-
-
-}
-
-template<class T> void
-nPhysImageF<T>::_init_temp_pointers()
-{
-    Timg_buffer = nullptr;
-    Timg_matrix = nullptr;
-
-	if (vector_buf)
-		delete vector_buf;
-	if (axis_buf)
-		delete axis_buf;
-
-	vector_buf = new double *[2];
-	memset(vector_buf, 0, 2*sizeof(double *));
-	axis_buf = new double *[2];
-	memset(axis_buf, 0, 2*sizeof(double *));
-
-	histogram.resize(0);
+    min_Tv = vec2i(-1,-1);
+    max_Tv = vec2i(-1,-1);
+    // width, height, Tmaximum_value, Tminimum_value, _storage, _rows,
+    // Timg_buffer, Timg_matrix all initialised by default member initialisers
 }
 
 
@@ -934,47 +877,18 @@ nPhysImageF<T>::matrix_points_aligned()
 {
     DEBUG(1,(void*) this << " allocate "<<width<<"x"<<height << " name: "<<getName() << " short: " << getShortName() << " from: " << getFromName());
 
-	// check for other sessions
-	if (! _canResize())
-		throw; // (up)
-
-	// clean up before new allocation	
-    if (Timg_buffer != nullptr) {
-		delete Timg_buffer;
-        Timg_buffer = nullptr;
-	}
-
-    if (vector_buf != nullptr) {
-        if (vector_buf[0] != nullptr)
-			delete vector_buf[0];
-        if (vector_buf[1] != nullptr)
-			delete vector_buf[1];
-        vector_buf[0] = nullptr;
-        vector_buf[1] = nullptr;
-	}
-
-    if (axis_buf != nullptr) {
-        if (axis_buf[0] != nullptr)
-			delete axis_buf[0];
-        if (axis_buf[1] != nullptr)
-			delete axis_buf[1];
-        axis_buf[0] = nullptr;
-        axis_buf[1] = nullptr;
-	}
-
-
-    if (Timg_buffer == nullptr && getSurf()>0) {
-        assert( Timg_buffer = new T[getSurf()] );
-		DEBUG(11,"[\t\t|--> ] template 32bit contiguous allocated");
-
-		assert( Timg_matrix = new T* [height] );
-        for (unsigned int i=0; i<height; i++)
-			Timg_matrix[i] = Timg_buffer + i*width;
-		DEBUG(11,"[\t\t|--> ] template matrix translation allocated");
-
-	}
-
-
+    histogram.clear();
+    if (getSurf() > 0) {
+        _storage.resize(getSurf());
+        _rows.resize(height);
+        for (unsigned int i = 0; i < height; i++)
+            _rows[i] = _storage.data() + i * width;
+    } else {
+        _storage.clear();
+        _rows.clear();
+    }
+    Timg_buffer = _storage.empty() ? nullptr : _storage.data();
+    Timg_matrix = _rows.empty()    ? nullptr : _rows.data();
 }
 
 
@@ -1097,9 +1011,8 @@ nPhysImageF<T>::TscanBrightness() {
     if (getSurf()>0) {
         bool found=false;
 
-#pragma omp parallel for
         for (unsigned int i=0; i<getSurf(); i++) {
-			if (std::isfinite(Timg_buffer[i])) {	
+			if (std::isfinite(Timg_buffer[i])) {
 				if (!found) {
 					Tminimum_value = Timg_buffer[i];
 					Tmaximum_value = Tminimum_value;

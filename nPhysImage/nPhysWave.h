@@ -35,6 +35,7 @@
 
 
 #include <list>
+#include <memory>
 
 #include "nPhysImageF.h"
 #include "nPhysMaths.h"
@@ -87,7 +88,7 @@ public:
 	int iter;
 	int *iter_ptr;
 
-    std::map<std::string, physD*> olist;
+    std::map<std::string, std::unique_ptr<physD>> olist;
 };
 
 void phys_wavelet_field_2D_morlet(wavelet_params &);
@@ -128,11 +129,11 @@ enum inversion_algo {ABEL = 10, ABEL_HF = 20};
 enum inversion_physics { ABEL_GAS, ABEL_PLASMA, ABEL_NONE };
 struct abel_params_str {
 	abel_params_str()
-        : iimage(nullptr), oimage(nullptr), symmetric(false), iter_ptr(nullptr)
+        : iimage(nullptr), symmetric(false), iter_ptr(nullptr)
 	{ }
 
     physD *iimage;
-    physD *oimage;
+    std::unique_ptr<physD> oimage;
 //     physD rimage;
     
     std::vector<vec2i> iaxis;

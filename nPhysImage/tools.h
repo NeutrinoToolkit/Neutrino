@@ -59,7 +59,7 @@
 #define PHYS__HEADER(PHYS__MSG,PHYS__txt) std::cerr << "[" << PHYS__MSG << "] " << PHYS__MSGID << PHYS__txt << std::endl
 
 #define WARNING(__txt) PHYS__HEADER("WARNING", __txt)
-#define ERROREXIT(__txt) {PHYS__HEADER("ERROR", __txt); std::raise(SIGSEGV);}
+#define ERROREXIT(__txt) {PHYS__HEADER("ERROR", __txt); std::abort();}
 
 
 #ifdef  __phys_debug
