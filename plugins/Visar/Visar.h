@@ -35,6 +35,7 @@
 #include "nPhysWave.h"
 #include "neutrino.h"
 #include <array>
+#include <memory>
 #include <vector>
 
 
@@ -74,6 +75,40 @@ inline T SIGN(T x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
 
 
 
+// everything belonging to a single VISAR: widgets, image objects, intermediate images and curves.
+// It is the context object of all its connections, so they die with it.
+class VisarChannel : public QObject {
+    Q_OBJECT
+
+public:
+    VisarChannel(unsigned int, QObject*);
+    ~VisarChannel();
+
+    const unsigned int k; // position in Visar::visars (and in the tabs)
+
+    std::unique_ptr<Ui::VisarSettings> settingsUi;
+    std::unique_ptr<Ui::VisarVelocity> velocityUi;
+    QPointer<QWidget> tabSettings, tabVelocity;
+    QPointer<QAction> actionRect;
+
+    QPointer<nLine> fringeLine;
+    QPointer<nRect> fringeRect;
+    QPointer<nLine> maskRegion;
+    nPhysD* ghostPhys=nullptr; // owned by neutrino
+
+    QPointer<QCPGraph> graphVelocity, graphReflectivity, graphQuality;
+    QPointer<QCPErrorBars> errVelocity, errReflectivity;
+
+    std::vector<double> sweepCoeff;
+
+    std::array<nPhysD,2> phaseUnwrap, contrast, intensity; // [ref/shot]
+
+    std::array<QVector<double>,2> cPhase, cIntensity, cContrast; // [ref/shot][time]
+    QVector<double> time_phase, cPhaseErr, cReflErr;
+    QVector<double> velocity, velError, reflectivity, reflError, quality, time_vel;
+};
+
+
 class Visar : public nGenericPan, private Ui::Visar {
     Q_OBJECT
     
@@ -86,37 +121,18 @@ public:
 
 private:
 
-    std::vector<Ui::VisarSettings*> settingsUi;
-    std::vector<Ui::VisarVelocity*> velocityUi;
-
-    std::vector<QPointer<nLine>> maskRegion;
+    std::vector<std::unique_ptr<VisarChannel>> visars;
 
     double getTime(std::vector<double> &vecsweep,double p);
-    
-    std::vector<std::vector<double>> sweepCoeff;
+    bool parseSweep(QLineEdit*, bool, std::vector<double>&);
+    void refreshWaveIcon();
+
     std::vector<double> sweepCoeffSOP;
-
-    unsigned int numVisars;
-
-    std::array<std::vector<QVector<double>>,2> cPhase, cIntensity, cContrast; // indices = [ref/shot][numVisar][time]
-
-    std::vector<QVector<double>> time_phase;
-    std::vector<QVector<double>> cPhaseErr;
-    std::vector<QVector<double>> cReflErr;
-
-    std::vector<QVector<double>> velocity, velError, reflectivity, reflError, quality, time_vel;
 
     std::array<QVector<double>,3> sopCurve;
     QVector<double> time_sop;
 
-    std::vector<std::array<nPhysD,2>> phaseUnwrap;
-    std::vector<std::array<nPhysD,2>> contrast;
-    std::vector<std::array<nPhysD,2>> intensity;
-
-    std::vector<nLine*> fringeLine;
-    std::vector<nRect*> fringeRect;
     QPointer<nRect> sopRect;
-    std::vector<nPhysD*> ghostPhys;
 
 public slots:
 
@@ -126,15 +142,14 @@ public slots:
     void addVisar();
     void delVisar();
 
-    void globRefreshPressed();
+    void refreshGlob(int);
     void getPhysFromNameSetCombo(QFileInfo, QComboBox*);
 
-    void needWave();
+    void needWave(unsigned int);
 
     void doWave();
     void doWave(unsigned int);
     
-    void getCarrier();
     void getCarrier(unsigned int);
     
     void getPhase();
@@ -168,13 +183,13 @@ public slots:
     
     void setObjectVisibility(nPhysD*);
     
-    void sweepChanged(QLineEdit*line=nullptr);
+    void sweepChanged();
+    void sweepChanged(unsigned int);
+    void sweepChangedSOP();
     
     void calculate_etalon();
     
     void copy_image();
-
-    void ghostChecked();
 
     void on_actionNext_triggered();
     void on_actionPrevious_triggered();
