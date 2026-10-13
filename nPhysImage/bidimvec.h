@@ -241,6 +241,7 @@ bidimvec<T>::bidimvec(T v1, T v2)
 
 template <class T>
 bidimvec<T>::bidimvec(std::string str)
+	: myval1(0), myval2(0) // kept if the string can't be parsed
 {
 	int ref1 = str.find("(",0), ref2 = str.find(":",0), ref3 = str.find(")",0);
 	if (! bd_from_string<T>(myval1, str.substr(ref1+1, ref2-ref1-1) ))

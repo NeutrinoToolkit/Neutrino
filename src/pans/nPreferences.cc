@@ -210,7 +210,7 @@ void nPreferences::on_getScale_released() {
 
 void nPreferences::on_getColors_released() {
     if (currentBuffer) {
-        vec2f my_vec=currentBuffer->prop["display_range"];
+        vec2f my_vec=currentBuffer->displayRange();
         DEBUG(my_vec);
         colorMin->setText(QLocale().toString(my_vec.x()));
         colorMax->setText(QLocale().toString(my_vec.y()));

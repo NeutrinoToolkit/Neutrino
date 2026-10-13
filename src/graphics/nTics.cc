@@ -343,7 +343,7 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->setPen(pen);
         p->setBrush(QColor(0,0,0,0));
 
-        vec2f minmax=my_view->nparent->currentBuffer->prop["display_range"];
+        vec2f minmax=my_view->nparent->currentBuffer->displayRange();
         double mini=minmax.first();
         double maxi=minmax.second();
 

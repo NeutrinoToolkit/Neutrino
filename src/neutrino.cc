@@ -779,10 +779,10 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
                                 if (my_set.value("lockColors",false).toBool()) {
                                     if (my_set.value("colorSpin").toDouble() != 100) {
-                                        DEBUG(my_phys->prop["display_range"]);
+                                        DEBUG(my_phys->displayRange());
                                         qDebug() << my_set.value("colorSpin").toInt();
                                         my_phys->prop["display_range"]=physMath::getColorPrecentPixels(*my_phys,my_set.value("colorSpin").toDouble());
-                                        DEBUG(my_phys->prop["display_range"]);
+                                        DEBUG(my_phys->displayRange());
                                     }
                                     if (my_set.value("gamma",1).toInt() != 1) {
                                         my_phys->prop["gamma"]=my_set.value("gamma",0).toInt();
@@ -1099,13 +1099,16 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
-            emitPhysChanged(newPhys);
         } else {
 //            newPhys->prop.erase("display_range");
             addPhys(newPhys);
         }
         if (show || redisplay) {
             showPhys(newPhys);
+        }
+        if (newPhys==oldPhys) {
+            // replaced in place: tell the pans only now that it has been redisplayed (display range recomputed)
+            emitPhysChanged(newPhys);
         }
         emit physReplace(std::make_pair(oldPhys, newPhys));
     }

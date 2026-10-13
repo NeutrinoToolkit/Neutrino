@@ -48,7 +48,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     my_w.lineMax->setValidator(&dVal);
 
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->prop["display_range"];
+        vec2f minmax=currentBuffer->displayRange();
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
     }
@@ -123,7 +123,7 @@ void Colorscale::minChanged () {
     QString value(my_w.lineMin->text());
     my_w.sliderMin->blockSignals(true);
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->prop["display_range"];
+        vec2f minmax=currentBuffer->displayRange();
         // DEBUG(QLocale().toDouble(value) << " " << minmax);
         minmax.set_first(QLocale().toDouble(value));
         currentBuffer->prop["display_range"]=minmax;
@@ -138,7 +138,7 @@ void Colorscale::maxChanged () {
     my_w.sliderMax->blockSignals(true);
     QString value(my_w.lineMax->text());
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->prop["display_range"];
+        vec2f minmax=currentBuffer->displayRange();
         // DEBUG(QLocale().toDouble(value) << " " << minmax);
         minmax.set_second(QLocale().toDouble(value));
         currentBuffer->prop["display_range"]=minmax;
@@ -151,7 +151,7 @@ void Colorscale::maxChanged () {
 
 void Colorscale::invertColors () {
     if (currentBuffer) {
-        vec2f oldrange = currentBuffer->prop["display_range"];
+        vec2f oldrange=currentBuffer->displayRange();
         currentBuffer->prop["display_range"]=oldrange.swap();
         nparent->showPhys();
     } else {
@@ -165,7 +165,7 @@ void Colorscale::bufferChanged(nPhysD *my_phys) {
     // only show the values of the new image: nothing here must write back into it or re-render
     const QSignalBlocker blockMin(my_w.sliderMin), blockMax(my_w.sliderMax), blockGamma(my_w.gamma), blockPercent(my_w.percent), blockInvert(my_w.actionInvert);
     if (nPhysExists(my_phys)) {
-        vec2f minmax=my_phys->prop["display_range"];
+        vec2f minmax=my_phys->displayRange();
         // DEBUG(minmax);
         auto sval=sliderValues();
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
@@ -187,7 +187,7 @@ void Colorscale::bufferChanged(nPhysD *my_phys) {
 
 vec2i Colorscale::sliderValues() {
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->prop["display_range"];
+        vec2f minmax=currentBuffer->displayRange();
         double range=currentBuffer->get_max()-currentBuffer->get_min();
         if (std::isfinite(range) && range>0) { // constant image: no meaningful position
             auto pos=[&](QSlider *slider, double v) {
@@ -209,7 +209,7 @@ void Colorscale::updatecolorbar(QString) {
     // the sliders only show the range: their (quantized) values must not be written back to the image
     const QSignalBlocker blockMin(my_w.sliderMin), blockMax(my_w.sliderMax);
     if (currentBuffer) {
-        vec2f minmax=currentBuffer->prop["display_range"];
+        vec2f minmax=currentBuffer->displayRange();
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
         my_w.sliderMin->setValue(sliderValues().first());

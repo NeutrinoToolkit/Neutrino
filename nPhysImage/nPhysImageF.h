@@ -184,7 +184,7 @@ public:
     nPhysImageF(T *, unsigned int, unsigned int, std::string = std::string());
 	
 	//! memento mori
-	~nPhysImageF();
+	virtual ~nPhysImageF();
 
     template <class U>
     friend std::ostream& operator<<(std::ostream&, nPhysImageF<U> &phys);
@@ -203,7 +203,8 @@ public:
 
 	
 	//! re-reads buffer for minimum/maximum value
-    void TscanBrightness();
+    // virtual: nPhysD also resets its display cache, also when called from the physMath functions
+    virtual void TscanBrightness();
 	
 	//! 1D get functions for row/column access
     unsigned int get_Tvector(enum phys_direction, unsigned int, unsigned int, T*, unsigned int, phys_way orient=PHYS_POS);
@@ -1016,6 +1017,8 @@ nPhysImageF<T>::TscanBrightness() {
 				if (!found) {
 					Tminimum_value = Timg_buffer[i];
 					Tmaximum_value = Tminimum_value;
+					// the first finite pixel may already be the extreme
+					min_Tv = max_Tv = vec2i(i%width, i/width);
 					found=true;
 				} else {
 					 if ((Timg_buffer[i]) > Tmaximum_value) {
@@ -1027,6 +1030,9 @@ nPhysImageF<T>::TscanBrightness() {
 					 }
 				}
 			}
+		}
+		if (!found) { // no finite pixel: don't keep the values of a previous content
+			Tminimum_value = Tmaximum_value = std::numeric_limits<T>::quiet_NaN();
 		}
 		DEBUG(5,"[brightness scan] "<<Tminimum_value<<" -- "<<Tmaximum_value);
 	}

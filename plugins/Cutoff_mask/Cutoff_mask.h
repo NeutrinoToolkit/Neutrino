@@ -39,12 +39,17 @@ class Cutoff_mask : public nGenericPan, private Ui::Cutoff_mask {
 public:	
     Q_INVOKABLE Cutoff_mask(neutrino *);
 
-    nPhysD *cutoffPhys;
+    nPhysD *cutoffPhys=nullptr;
 
 public slots:
     void doOperation();
     void updateMiniMaxi();
     void sliderChanged(int);
+    void sliderMoved(int);
+    void syncSlider();
+
+private:
+    double sliderToValue(int);
 };
 
 NEUTRINO_PLUGIN(Cutoff_mask,Analysis);

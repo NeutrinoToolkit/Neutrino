@@ -194,7 +194,7 @@ void nHistogram::drawPicture (QPainter &p) {
 
         int num_labels=0;
         bool too_big=false;
-        vec2f minmax=parentPan->currentBuffer->prop.have("display_range") ? parentPan->currentBuffer->prop["display_range"] : parentPan->currentBuffer->get_min_max();
+        vec2f minmax=parentPan->currentBuffer->displayRange();
         while (!too_big) {
             num_labels++;
             too_big=false;

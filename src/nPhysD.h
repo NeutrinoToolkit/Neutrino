@@ -35,6 +35,12 @@ public:
         return *this;
     }
 
+    // display range without side effects: prop["display_range"] would insert an empty entry if missing
+    vec2f displayRange() {
+        if (prop.have("display_range") && prop["display_range"].is_vec()) return prop["display_range"];
+        return get_min_max();
+    }
+
     const unsigned char *to_uchar_palette(std::vector<unsigned char>  &palette, std::string palette_name) {
         if (getSurf()>0 && palette.size()==768) {
             if (uchar_buf.size() == getSurf()*3 &&
@@ -45,7 +51,7 @@ public:
                     display_prop["gamma"].get_i()==prop["gamma"].get_i()) {
 
                 vec2f old_display_range=display_prop["display_range"];
-                vec2f new_display_range=prop["display_range"];
+                vec2f new_display_range=displayRange();
 
                 if (old_display_range==new_display_range) {
                     DEBUG("reusing old uchar_buf");
@@ -53,7 +59,7 @@ public:
                 }
             }
 
-            vec2f minmax=prop.have("display_range") ? prop["display_range"] : get_min_max();
+            vec2f minmax=displayRange();
             double mini=minmax.first();
             double maxi=minmax.second();
             double my_gamma=gamma();
@@ -90,7 +96,7 @@ public:
         DEBUG(uchar_buf.capacity());
     }
 
-    void TscanBrightness() {
+    void TscanBrightness() override {
         reset_display();
         physD::TscanBrightness();
     }
