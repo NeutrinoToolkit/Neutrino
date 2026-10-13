@@ -84,7 +84,7 @@ public:
     VisarChannel(unsigned int, QObject*);
     ~VisarChannel();
 
-    const unsigned int k; // position in Visar::visars (and in the tabs)
+    unsigned int k; // position in Visar::visars (and in the tabs): change it only via Visar::renumberVisar
 
     std::unique_ptr<Ui::VisarSettings> settingsUi;
     std::unique_ptr<Ui::VisarVelocity> velocityUi;
@@ -118,6 +118,7 @@ class Visar : public nGenericPan, private Ui::Visar {
 public:
     
     Q_INVOKABLE Visar(neutrino *);
+    ~Visar() override;
 
 private:
 
@@ -126,6 +127,8 @@ private:
     double getTime(std::vector<double> &vecsweep,double p);
     bool parseSweep(QLineEdit*, bool, std::vector<double>&);
     void refreshWaveIcon();
+    void nameVisar(VisarChannel&);
+    void renumberVisar(VisarChannel&, unsigned int);
 
     std::vector<double> sweepCoeffSOP;
 
@@ -141,6 +144,8 @@ public slots:
 
     void addVisar();
     void delVisar();
+    void delVisarAsk();
+    void removeVisar(unsigned int);
 
     void refreshGlob(int);
     void getPhysFromNameSetCombo(QFileInfo, QComboBox*);

@@ -121,7 +121,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
 
     connect(actionDoWavelets, SIGNAL(triggered()), this, SLOT(doWave()));
     connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
-    connect(actionDelVisar, SIGNAL(triggered()), this, SLOT(delVisar()));
+    connect(actionDelVisar, &QAction::triggered, this, &Visar::delVisarAsk);
 
     connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
     connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
@@ -169,6 +169,16 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
     loadDefaults();
     sweepChanged();
     calculate_etalon();
+}
+
+Visar::~Visar() {
+    // deleting a channel deletes its tab pages, and QTabWidget then emits currentChanged:
+    // block that (nothing to recompute while closing) and keep visars consistent at every step
+    const QSignalBlocker blockTabs(tabs), blockPhase(tabPhase), blockVelocity(tabVelocity), blockRefl(whichRefl);
+    while (!visars.empty()) {
+        std::unique_ptr<VisarChannel> ch=std::move(visars.back());
+        visars.pop_back();
+    }
 }
 
 void Visar::on_actionNext_triggered() {
@@ -488,31 +498,23 @@ void Visar::addVisar() {
 
     decorate(wVisarVelocity);
 
-    QString name="Visar "+QLocale().toString(k+1);
     for (uint m=0;m<2;m++){
-        QString name2=name+" "+QLocale().toString(m);
-        ch->phaseUnwrap[m].setName(name2.toUtf8().constData());
         ch->phaseUnwrap[m].setShortName("phase");
-        ch->contrast[m].setName(name2.toUtf8().constData());
         ch->contrast[m].setShortName("contrast");
-        ch->intensity[m].setName(name2.toUtf8().constData());
         ch->intensity[m].setShortName("intensity");
     }
 
-    ch->actionRect = new QAction(QIcon(":icons/rect.png"), "Region Visar"+QLocale().toString(k+1),this);
+    ch->actionRect = new QAction(QIcon(":icons/rect.png"), QString(), this);
     toolBar->insertAction(actionDelVisar,ch->actionRect);
 
-    whichRefl->addItem("Visar"+QLocale().toString(k+1));
+    whichRefl->addItem(QString());
 
     ch->fringeLine=new nLine(this,3);
-    ch->fringeLine->changeToolTip("Fringeshift Visar "+QLocale().toString(k+1));
 
     ch->fringeRect=new nRect(this,1);
     ch->fringeRect->setRect(QRectF(0,0,100,100));
-    ch->fringeRect->changeToolTip("Visar region "+QLocale().toString(k+1));
 
     ch->maskRegion=new nLine(this,1);
-    ch->maskRegion->changeToolTip("Ghost Mask Visar"+QLocale().toString(k+1));
     QPolygonF poly;
     poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
     ch->maskRegion->setPoints(poly);
@@ -522,17 +524,14 @@ void Visar::addVisar() {
     QColor my_color;
 
     ch->graphQuality = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis3);
-    ch->graphQuality->setName("Quality Visar "+QLocale().toString(k+1));
     pen.setColor(plotVelocity->yAxis3->labelColor());
     ch->graphQuality->setPen(pen);
 
     ch->graphReflectivity = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis2);
-    ch->graphReflectivity->setName("Reflectivity Visar "+QLocale().toString(k+1));
     pen.setColor(plotVelocity->yAxis2->labelColor());
     ch->graphReflectivity->setPen(pen);
 
     ch->errReflectivity = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis2);
-    ch->errReflectivity->setName("Reflectivity error Visar "+QLocale().toString(k+1));
     ch->errReflectivity->setDataPlottable(ch->graphReflectivity);
     my_color=plotVelocity->yAxis2->labelColor();
     my_color.setAlpha(property("NeuSave-alphagraph").toInt());
@@ -542,12 +541,10 @@ void Visar::addVisar() {
     ch->errReflectivity->setSymbolGap(1);
 
     ch->graphVelocity = plotVelocity->addGraph(plotVelocity->xAxis, plotVelocity->yAxis);
-    ch->graphVelocity->setName("Velocity Visar "+QLocale().toString(k+1));
     pen.setColor(plotVelocity->yAxis->labelColor());
     ch->graphVelocity->setPen(pen);
 
     ch->errVelocity = new QCPErrorBars(plotVelocity->xAxis, plotVelocity->yAxis);
-    ch->errVelocity->setName("Velocity error Visar "+QLocale().toString(k+1));
     ch->errVelocity->setDataPlottable(ch->graphVelocity);
     my_color=plotVelocity->yAxis->labelColor();
     my_color.setAlpha(property("NeuSave-alphagraph").toInt());
@@ -555,6 +552,8 @@ void Visar::addVisar() {
     ch->errVelocity->setPen(pen);
     ch->errVelocity->setWhiskerWidth(0);
     ch->errVelocity->setSymbolGap(1);
+
+    nameVisar(*ch);
 
     // the channel is complete: publish it, then connect (no slot can see a half-built channel)
     VisarChannel *c=ch.get();
@@ -613,30 +612,116 @@ void Visar::addVisar() {
     connect(ui_velocity->plotQ, &QAbstractButton::released, this, &Visar::updatePlot);
 }
 
+// sets every name that depends on the VISAR number. The tooltips of the image objects are
+// also their QSettings group (nObject::saveSettings): keep these strings as they are.
+void Visar::nameVisar(VisarChannel &c) {
+    const QString n=QLocale().toString(c.k+1);
+    tabPhase->setTabText(c.k, "Visar"+n);
+    tabVelocity->setTabText(c.k, "Visar"+n);
+    whichRefl->setItemText(c.k+2, "Visar"+n);
+    if (c.actionRect) c.actionRect->setText("Region Visar"+n);
+    if (c.fringeLine) c.fringeLine->changeToolTip("Fringeshift Visar "+n);
+    if (c.fringeRect) c.fringeRect->changeToolTip("Visar region "+n);
+    if (c.maskRegion) c.maskRegion->changeToolTip("Ghost Mask Visar"+n);
+    if (c.graphQuality) c.graphQuality->setName("Quality Visar "+n);
+    if (c.graphReflectivity) c.graphReflectivity->setName("Reflectivity Visar "+n);
+    if (c.errReflectivity) c.errReflectivity->setName("Reflectivity error Visar "+n);
+    if (c.graphVelocity) c.graphVelocity->setName("Velocity Visar "+n);
+    if (c.errVelocity) c.errVelocity->setName("Velocity error Visar "+n);
+    for (uint m=0;m<2;m++){
+        std::string name=("Visar "+n+" "+QLocale().toString(m)).toStdString();
+        c.phaseUnwrap[m].setName(name);
+        c.contrast[m].setName(name);
+        c.intensity[m].setName(name);
+    }
+}
+
+// change the number of a VISAR: saved widget names ("-VISARn" suffix) and all the other names
+void Visar::renumberVisar(VisarChannel &c, unsigned int newk) {
+    const QString oldSuffix="-VISAR"+QLocale().toString(c.k+1);
+    const QString newSuffix="-VISAR"+QLocale().toString(newk+1);
+    for (QWidget *tab : {c.tabSettings.data(), c.tabVelocity.data()}) {
+        if (!tab) continue;
+        foreach (QWidget *obj, tab->findChildren<QWidget*>()) {
+            QString name=obj->objectName();
+            if (name.endsWith(oldSuffix)) {
+                name.chop(oldSuffix.size());
+                obj->setObjectName(name+newSuffix);
+                // decorate() appended " [objectName]" to the tooltip
+                obj->setToolTip(obj->toolTip().replace(oldSuffix+"]", newSuffix+"]"));
+            }
+        }
+    }
+    c.k=newk;
+    nameVisar(c);
+}
+
+// toolbar action: remove the VISAR currently shown, after asking
+void Visar::delVisarAsk() {
+    if (visars.size()==0) {
+        statusbar->showMessage("Cannot remove last Visar");
+        return;
+    }
+    int k=visars.size()-1;
+    if (tabs->currentIndex()==0) {
+        k=tabPhase->currentIndex();
+    } else if (tabs->currentIndex()==1) {
+        k=tabVelocity->currentIndex();
+    }
+    if (k<0 || k>=(int)visars.size()) return;
+    if (QMessageBox::question(this, tr("Remove VISAR"), tr("Remove VISAR ")+QLocale().toString(k+1)+"?") == QMessageBox::Yes) {
+        removeVisar(k);
+    }
+}
+
+// remove the last VISAR (used when loading settings)
 void Visar::delVisar() {
     if (visars.size()>0) {
-        // take it out first: from here on no slot can find it through visars
-        std::unique_ptr<VisarChannel> ch=std::move(visars.back());
-        visars.pop_back();
-        setProperty("NeuSave-numVisars",(unsigned int)visars.size());
-
-        tabPhase->removeTab(ch->k);
-        tabVelocity->removeTab(ch->k);
-        whichRefl->removeItem(ch->k+2);
-
-        for (QCPAbstractPlottable *plot : {(QCPAbstractPlottable*)ch->errVelocity.data(), (QCPAbstractPlottable*)ch->errReflectivity.data(),
-                                           (QCPAbstractPlottable*)ch->graphVelocity.data(), (QCPAbstractPlottable*)ch->graphReflectivity.data(),
-                                           (QCPAbstractPlottable*)ch->graphQuality.data()}) {
-            if (plot) plotVelocity->removePlottable(plot);
-        }
-
-        if (nPhysExists(ch->ghostPhys)) {
-            nparent->removePhys(ch->ghostPhys);
-        }
-        // ch destroyed here: widgets, action, lines and its connections go with it
+        removeVisar(visars.size()-1);
     } else {
         statusbar->showMessage("Cannot remove last Visar");
     }
+}
+
+void Visar::removeVisar(unsigned int k) {
+    if (k>=visars.size()) return;
+
+    // take it out first: from here on no slot can find it through visars
+    std::unique_ptr<VisarChannel> ch=std::move(visars[k]);
+    visars.erase(visars.begin()+k);
+    setProperty("NeuSave-numVisars",(unsigned int)visars.size());
+
+    const int reflIndex=whichRefl->currentIndex();
+
+    tabPhase->removeTab(k);
+    tabVelocity->removeTab(k);
+    whichRefl->removeItem(k+2);
+
+    for (QCPAbstractPlottable *plot : {(QCPAbstractPlottable*)ch->errVelocity.data(), (QCPAbstractPlottable*)ch->errReflectivity.data(),
+                                       (QCPAbstractPlottable*)ch->graphVelocity.data(), (QCPAbstractPlottable*)ch->graphReflectivity.data(),
+                                       (QCPAbstractPlottable*)ch->graphQuality.data()}) {
+        if (plot) plotVelocity->removePlottable(plot);
+    }
+
+    if (nPhysExists(ch->ghostPhys)) {
+        nparent->removePhys(ch->ghostPhys);
+    }
+    ch.reset(); // widgets, action, lines and its connections go with it
+
+    for (unsigned int j=k; j<visars.size(); j++) {
+        renumberVisar(*visars[j], j);
+    }
+
+    // SOP reflectivity: follow the VISAR it was using, or fall back to the mean
+    if (reflIndex==(int)k+2) {
+        whichRefl->setCurrentIndex(1);
+    } else if (reflIndex>(int)k+2) {
+        whichRefl->setCurrentIndex(reflIndex-1);
+    } else {
+        whichRefl->setCurrentIndex(reflIndex);
+    }
+    setProperty("NeuSave-whichRefl",whichRefl->currentIndex());
+
     updatePlot();
 }
 
