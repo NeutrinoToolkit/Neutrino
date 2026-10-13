@@ -26,6 +26,22 @@
 #include "Image_list.h"
 #include "neutrino.h"
 
+// the Image_list pan this tree belongs to
+Image_list* nTreeWidget::imageList() {
+    QObject *p=parent();
+    while (p && !qobject_cast<Image_list *>(p)) p=p->parent();
+    return qobject_cast<Image_list *>(p);
+}
+
+// header clicks sort through customSort (which also reorders neutrino's list): Qt's own sorting
+// would only reorder the view. Call once, after setupUi.
+void nTreeWidget::setupSorting() {
+    setSortingEnabled(false);
+    header()->setSortIndicatorShown(true);
+    header()->setSectionsClickable(true);
+    connect(header(), &QHeaderView::sectionClicked, this, &nTreeWidget::customSort, Qt::UniqueConnection);
+}
+
 void nTreeWidget::mousePressEvent(QMouseEvent *e) {
     dragitems.clear();
     foreach (QTreeWidgetItem * item, selectedItems()) {
@@ -34,24 +50,17 @@ void nTreeWidget::mousePressEvent(QMouseEvent *e) {
     dragposition=e->pos();
     dragtime.start();
 
-    setSortingEnabled(false);
-    header()->setSortIndicatorShown(true);
-    header()->setSectionsClickable(true);
-    connect(header(), SIGNAL(sectionClicked(int)), this, SLOT(customSort(int)));
-    //    customSortByColumn(header()->sortIndicatorSection());
-
     QTreeWidget::mousePressEvent(e);
 }
-
 void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
     if (dragitems.size() && (dragposition - e->pos()).manhattanLength()>=QApplication::startDragDistance() && dragtime.elapsed() > qApp->startDragTime() ) {
-        Image_list* imParent=qobject_cast<Image_list *> (parent()->parent());
+        Image_list* imParent=imageList();
         if(imParent) {
             QByteArray dragPhysPointers;
             QList<QUrl> lista;
             foreach (QTreeWidgetItem * item, dragitems) {
                 nPhysD *my_phys=imParent->getPhys(item);
-                if (my_phys) {
+                if (imParent->nPhysExists(my_phys)) {
                     dragPhysPointers+=QByteArray::number((qlonglong) my_phys)+ " ";
                     lista << QUrl(QString::fromUtf8(my_phys->getName().c_str()));
                 }
@@ -64,7 +73,6 @@ void nTreeWidget::mouseMoveEvent(QMouseEvent *e) {
                 drag->setMimeData(mymimeData);
                 drag->exec();
             }
-            DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>> FOUND PARENT");
         }
     }
 }
@@ -86,9 +94,9 @@ void nTreeWidget::dragMoveEvent(QDragMoveEvent *e)
 }
 
 void nTreeWidget::dropEvent(QDropEvent *e) {
-    neutrino* nparent=qobject_cast<neutrino *> (parent()->parent()->parent());
-    if (nparent) {
-        nparent->dropEvent(e);
+    Image_list* imParent=imageList();
+    if (imParent && imParent->nparent) {
+        imParent->nparent->dropEvent(e);
     }
     e->acceptProposedAction();
     dragitems.clear();
@@ -96,29 +104,18 @@ void nTreeWidget::dropEvent(QDropEvent *e) {
 
 void nTreeWidget::customSort(int column)
 {
-    DEBUG("CUSTOM SORT");
-    Qt::SortOrder order = header()->sortIndicatorOrder();
-    QTreeWidget::sortItems(column, order);
-    QApplication::processEvents();
-    Image_list* imParent=qobject_cast<Image_list *> (parent()->parent());
-    if (imParent) {
+    QTreeWidget::sortItems(column, header()->sortIndicatorOrder());
+    Image_list* imParent=imageList();
+    if (imParent && imParent->nparent) {
         QList<nPhysD*> myPhysList;
         for (int i=0; i < topLevelItemCount(); ++i) {
-            QTreeWidgetItem *thisItem=topLevelItem(i);
-            for (auto &item: imParent->itemsMap) {
-                if (item.second == thisItem) {
-                    myPhysList << item.first;
-                }
-            }
+            myPhysList << imParent->getPhys(topLevelItem(i));
         }
-        if (myPhysList.size() == imParent->nparent->physList.size()) {
-            DEBUG("--------------------------------------------------------------------------");
-            for (int i=0; i < myPhysList.size(); ++i) {
-                DEBUG(i << " " << myPhysList.at(i) << " " << imParent->nparent->physList.at(i));
-            }
-            DEBUG("--------------------------------------------------------------------------");
+        // refused if the list is not a permutation of neutrino's one: then restore the numbering order
+        if (!imParent->nparent->reorderPhys(myPhysList)) {
+            qWarning() << "Image list out of sync with neutrino: not reordering";
+            imParent->renumber();
+            QTreeWidget::sortItems(0, Qt::AscendingOrder);
         }
-        imParent->nparent->physList=myPhysList;
-
     }
 }

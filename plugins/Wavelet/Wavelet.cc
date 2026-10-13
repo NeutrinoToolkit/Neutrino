@@ -90,15 +90,14 @@ void Wavelet::bufferChanged(nPhysD* buf) {
 }
 
 void Wavelet::physDel(nPhysD* buf) {
-    std::vector<nPhysD *> localPhys;
-    localPhys.push_back(origSubmatrix);
-    localPhys.push_back(unwrapPhys);
-    localPhys.push_back(referencePhys);
-    localPhys.push_back(carrierPhys);
-    localPhys.push_back(syntheticPhys);
-    for (std::vector<nPhysD *>::iterator itr=localPhys.begin(); itr!=localPhys.end(); itr++) {
-        if (buf==*itr) {
-            *itr=nullptr;
+    for (nPhysD **my_phys : {&origSubmatrix, &unwrapPhys, &referencePhys, &carrierPhys, &syntheticPhys}) {
+        if (buf==*my_phys) {
+            *my_phys=nullptr;
+        }
+    }
+    for (auto &it : waveletPhys) {
+        if (it.second==buf) {
+            it.second=nullptr;
         }
     }
 }

@@ -59,6 +59,8 @@ nGenericPan::nGenericPan(neutrino *myparent)
 
     connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
     connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent, &neutrino::physChanged, this, &nGenericPan::refreshComboNames);
+    connect(nparent, &neutrino::physReordered, this, &nGenericPan::refreshComboNames);
 
     bufferChanged(nparent->getCurrentBuffer());
 
@@ -75,7 +77,7 @@ QString nGenericPan::panName() {
 }
 
 
-QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
+QString nGenericPan::getNameForCombo(QComboBox*, nPhysD *buffer) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     if (!my_set.contains("physNameLength")) {
@@ -86,7 +88,6 @@ QString nGenericPan::getNameForCombo(QComboBox* combo, nPhysD *buffer) {
     QString name="";
     if (nparent) {
         name=QString::fromUtf8(buffer->getName().c_str());
-        qDebug() << combo << len << name << name.length();
         if (name.length()>len) {
             name=name.left((len-5)/2)+"[...]"+name.right((len-5)/2);
         }
@@ -298,7 +299,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
 
 void nGenericPan::physDel(nPhysD * buffer) {
     DEBUG(panName().toStdString() <<  " >>>>> enter");
-    currentBuffer=nullptr;
+    if (currentBuffer==buffer) currentBuffer=nullptr;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
@@ -313,6 +314,7 @@ void nGenericPan::physDel(nPhysD * buffer) {
             }
         }
     }
+    refreshComboNames(); // the names show the position in the list
     DEBUG(panName().toStdString() << " >>>>> exit");
 }
 
@@ -1177,6 +1179,22 @@ void nGenericPan::button(QString name , int occurrence) {
                 obj->trigger();
             }
             my_occurrence++;
+        }
+    }
+}
+
+
+// image combos show "position : name": refresh them when an image is renamed, removed or the list is reordered
+void nGenericPan::refreshComboNames() {
+    foreach (QComboBox *combo, findChildren<QComboBox *>()) {
+        if (combo->property("neutrinoImage").isValid()) {
+            for (int i=0; i<combo->count(); i++) {
+                nPhysD *phys=combo->itemData(i).value<nPhysD*>();
+                if (nPhysExists(phys)) {
+                    QString name=getNameForCombo(combo,phys);
+                    if (combo->itemText(i)!=name) combo->setItemText(i,name);
+                }
+            }
         }
     }
 }

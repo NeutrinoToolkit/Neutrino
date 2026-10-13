@@ -106,6 +106,7 @@ public slots:
 
     void physAdd(nPhysD *);
     void physDel(nPhysD *);
+    void refreshComboNames();
 
     virtual void bufferChanged(nPhysD *);
 

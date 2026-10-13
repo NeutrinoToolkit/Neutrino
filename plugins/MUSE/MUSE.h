@@ -52,6 +52,7 @@ public slots:
     void on_actionMean_triggered();
     void on_actionExportTxt_triggered();
     void on_percent_valueChanged(double);
+    void forgetPhys(nPhysD*);
     void on_restLambda_valueChanged(double);
     void setstatusbar();
 

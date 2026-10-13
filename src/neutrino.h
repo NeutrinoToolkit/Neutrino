@@ -112,11 +112,13 @@ public slots:
     void on_actionOpen_Glob_triggered();
     void on_actionClose_All_Buffers_triggered();
     void closeCurrentBuffer();
-    void closeBuffer(nPhysD*);
+    bool closeBuffer(nPhysD*);
 
     void addPhys(nPhysD*);
     nPhysD* replacePhys(nPhysD*,nPhysD*,bool=true);
     void removePhys(nPhysD*);
+    void emitPhysChanged(nPhysD*);
+    bool reorderPhys(QList<nPhysD*>);
     void showPhys(nPhysD* my_phys=nullptr);
     void addShowPhys(nPhysD*);
 
@@ -133,6 +135,7 @@ public slots:
 
     // menu actions
     void addMenuBuffers(nPhysD*);
+    QString menuBufferText(nPhysD*);
     // File
     neutrino* fileNew();
 
@@ -142,9 +145,9 @@ public slots:
 
     QString getFileSave();
     void fileSave();
-    void fileSave(nPhysD*);
+    bool fileSave(nPhysD*);
     void fileSave(QString);
-    void fileSave(nPhysD*,QString);
+    bool fileSave(nPhysD*,QString);
     void on_actionSave_numebered_serie_triggered();
     bool fileClose();
     //	void file_quit_slot();
@@ -222,6 +225,8 @@ signals:
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
     void physReplace(std::pair<nPhysD*,nPhysD*>);
+    void physChanged(nPhysD*);                          // name, scale, origin... of an image changed (not necessarily the visible one)
+    void physReordered();                               // physList order changed (indexes shown in combos/lists)
 
     void keyPressEvent();
     void closeAll();

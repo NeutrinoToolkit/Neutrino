@@ -835,15 +835,20 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
             imagelist.append(fileOpen(fname));
         }
     }
+    // loading runs the event loop (and restores pans): drop images that have been closed meanwhile
+    QList <nPhysD *> loaded;
     for (auto& img: imagelist) {
-        if (img->prop.have("n_neutrinoPanData")) {
+        if (my_neu->nPhysExists(img)) loaded << img;
+    }
+    for (auto& img: loaded) {
+        if (my_neu->nPhysExists(img) && img->prop.have("n_neutrinoPanData")) {
             std::string panString=img->prop["n_neutrinoPanData"];
             qDebug() << panString;
             img->prop.erase("n_neutrinoPanData");
-            setPanData(panString);
+            my_neu->setPanData(panString);
         }
     }
-    return imagelist;
+    return loaded;
 }
 
 void neutrino::setPanData(std::string panstring){
@@ -1070,14 +1075,17 @@ void neutrino::addPhys(nPhysD* datamatrix) {
 }
 
 
-void neutrino::addMenuBuffers (nPhysD* datamatrix) {
-    QAction *action=new QAction(this);
+QString neutrino::menuBufferText(nPhysD* datamatrix) {
     QString name=QString::fromUtf8(datamatrix->getName().c_str());
     if (datamatrix->getType()==PHYS_FILE || datamatrix->getType()==PHYS_RFILE) {
-        action->setText(QFileInfo(name).fileName()+QString(": ")+name);
-    } else {
-        action->setText(name);
+        return QFileInfo(name).fileName()+QString(": ")+name;
     }
+    return name;
+}
+
+void neutrino::addMenuBuffers (nPhysD* datamatrix) {
+    QAction *action=new QAction(this);
+    action->setText(menuBufferText(datamatrix));
     action->setData(QVariant::fromValue(datamatrix));
     connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
     menuBuffers->addAction(action);
@@ -1091,6 +1099,7 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
             *oldPhys=*newPhys;
             delete newPhys;
             newPhys=oldPhys;
+            emitPhysChanged(newPhys);
         } else {
 //            newPhys->prop.erase("display_range");
             addPhys(newPhys);
@@ -1104,48 +1113,74 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
     return newPhys;
 }
 
+// order matters: take it out of physList, tell the pans (pointer still valid), show another
+// image, and only then delete it, so that nothing ever sees a dangling currentBuffer
 void neutrino::removePhys(nPhysD* datamatrix) {
-    DEBUG(">>>>>>>>>>>>>>>>> ENTER ");
-    if (nPhysExists(datamatrix)) {
-        std::string physremovename = datamatrix->getShortName();
-        DEBUG(">>>>>>>>>>>>>>>>> ENTER " << physremovename<< "  :  " << physList.size());
-        int position=indexOf(datamatrix);
-        if (position != -1) {
-            physList.removeAll(datamatrix);
-            QList<QAction *> lista=menuBuffers->actions();
-            foreach (QAction* action, menuBuffers->actions()) {
-                if (action->data() == QVariant::fromValue( datamatrix)) {
-                    menuBuffers->removeAction(action);
-                }
+    if (!nPhysExists(datamatrix)) return;
+
+    DEBUG(">>>>>>>>>>>>>>>>> ENTER " << datamatrix->getShortName() << "  :  " << physList.size());
+    int position=indexOf(datamatrix);
+    physList.removeAll(datamatrix);
+    foreach (QAction* action, menuBuffers->actions()) {
+        if (action->data() == QVariant::fromValue(datamatrix)) {
+            menuBuffers->removeAction(action);
+            action->deleteLater();
+        }
+    }
+
+    emit physDel(datamatrix);
+
+    if (physList.size()>0) {
+        if (currentBuffer==datamatrix) {
+            showPhys(physList.at(position%physList.size()));
+        }
+    } else {
+        currentBuffer=nullptr;
+        emitBufferChanged();
+        setWindowTitle(property("winId").toString()+QString(": Neutrino"));
+        setWindowFilePath("");
+        zoomChanged(1);
+        my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
+        my_view->setSize();
+    }
+    if (currentBuffer==datamatrix) currentBuffer=nullptr;
+
+    delete datamatrix;
+    DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physList.size());
+}
+
+// properties of an image (name, scale, origin...) changed: update menu, pans and, if visible, the view
+void neutrino::emitPhysChanged(nPhysD* my_phys) {
+    if (!nPhysExists(my_phys)) return;
+    foreach (QAction* action, menuBuffers->actions()) {
+        if (action->data() == QVariant::fromValue(my_phys)) {
+            action->setText(menuBufferText(my_phys));
+        }
+    }
+    emit physChanged(my_phys);
+    if (my_phys==currentBuffer) {
+        emitBufferChanged(my_phys);
+    }
+}
+
+// new order of the images: must be a permutation of physList
+bool neutrino::reorderPhys(QList<nPhysD*> newList) {
+    if (newList.size()!=physList.size()) return false;
+    for (auto &phys : physList) {
+        if (newList.count(phys)!=1) return false;
+    }
+    physList=newList;
+    for (auto &phys : physList) {
+        foreach (QAction* action, menuBuffers->actions()) {
+            if (action->data() == QVariant::fromValue(phys)) {
+                menuBuffers->removeAction(action);
+                menuBuffers->addAction(action);
             }
         }
-//        nApp::processEvents();
-        if (datamatrix){
-            DEBUG("removing from neutrino.cc");
-            delete datamatrix;
-        } else {
-            DEBUG("not removing. PLEASE NOTE that this is a failsafe to avoid deleting stuff owned by python");
-        }
-        if (physList.size()>0) {
-            int pos = position%physList.size();
-            qDebug() << physList.size() << pos;
-            qDebug() << physList;
-            showPhys(physList.at(pos));
-        } else {
-            currentBuffer=nullptr;
-            emitBufferChanged();
-            setWindowTitle(property("winId").toString()+QString(": Neutrino"));
-            setWindowFilePath("");
-            zoomChanged(1);
-            my_view->my_pixitem.setPixmap(QPixmap(":icons/icon.png"));
-            my_view->setSize();
-        }
-        //    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-        DEBUG(">>>>>>>>>>>>>>>>> EXIT " << physremovename << "  :  " << physList.size());
     }
-    emit physDel(datamatrix);
-    datamatrix=nullptr;
-    DEBUG(">>>>>>>>>>>>>>>>> EXIT ");
+    emit physReordered();
+    emitBufferChanged(currentBuffer); // window title shows the index
+    return true;
 }
 
 void
@@ -1389,7 +1424,9 @@ QString neutrino::getFileSave() {
 }
 
 void neutrino::on_actionSave_numebered_serie_triggered() {
-    QFileInfo fname=QFileInfo(getFileSave());
+    QString fsave=getFileSave();
+    if (fsave.isEmpty()) return;
+    QFileInfo fname=QFileInfo(fsave);
 
     QString base=QDir(fname.absolutePath()).filePath(fname.completeBaseName());
     QString suffix="."+fname.suffix();
@@ -1412,8 +1449,9 @@ neutrino::fileSave() {
     fileSave(getFileSave());
 }
 
-void neutrino::fileSave(nPhysD *phys) {
-    fileSave(phys,getFileSave());
+bool neutrino::fileSave(nPhysD *phys) {
+    if (!nPhysExists(phys)) return false;
+    return fileSave(phys,getFileSave());
 }
 
 void neutrino::fileSave(QString fname) {
@@ -1445,8 +1483,8 @@ void neutrino::fileSave(QString fname) {
     }
 }
 
-void neutrino::fileSave(nPhysD* phys, QString fname) {
-    if (phys) {
+bool neutrino::fileSave(nPhysD* phys, QString fname) {
+    if (nPhysExists(phys) && !fname.isEmpty()) {
         QString suffix=QFileInfo(fname).suffix().toLower();
         if (suffix.startsWith("neu")) {
             physFormat::phys_dump_binary(phys,QFile::encodeName(fname).toStdString().c_str());
@@ -1465,7 +1503,10 @@ void neutrino::fileSave(nPhysD* phys, QString fname) {
         phys->setShortName(QFileInfo(fname).fileName().toStdString());
         phys->setName(phys->getShortName());
         phys->setFromName(fname.toStdString());
+        emitPhysChanged(phys);
+        return true;
     }
+    return false;
 }
 
 bool
@@ -1482,10 +1523,11 @@ neutrino::fileClose() {
                                          QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
             switch (res) {
                 case QMessageBox::Yes:
-                    fileSave(phys); // TODO: add here a check for a cancel to avoid exiting
+                    if (!fileSave(phys)) return false; // save dialog cancelled: don't exit
                     break;
                 case QMessageBox::NoToAll:
                     my_set.setValue("askCloseUnsaved",false);
+                    break;
                 case QMessageBox::Cancel:
                     return false;
             }
@@ -1510,13 +1552,17 @@ neutrino::fileClose() {
 }
 
 void neutrino::on_actionClose_All_Buffers_triggered() {
-    while (physList.size()) closeCurrentBuffer();
+    for (auto &my_phys : getBufferList()) {
+        if (!closeBuffer(my_phys)) break; // Cancel
+    }
 //    for (auto &my_phys : physList) {
 //        qDebug() << "->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->" << my_phys;
 //        removePhys(my_phys);
 //    }
 }
-void neutrino::closeBuffer(nPhysD* my_phys) {
+// returns false if the user cancelled
+bool neutrino::closeBuffer(nPhysD* my_phys) {
+    bool ret=true;
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
 
@@ -1528,12 +1574,19 @@ void neutrino::closeBuffer(nPhysD* my_phys) {
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::NoToAll | QMessageBox::Cancel);
             switch (res) {
                 case QMessageBox::Yes:
-                    fileSave(my_phys); // TODO: add here a check for a cancel to avoid exiting
+                    if (fileSave(my_phys)) {
+                        removePhys(my_phys);
+                    } else {
+                        ret=false;
+                    }
                     break;
                 case QMessageBox::NoToAll:
                     my_set.setValue("askCloseUnsaved",false);
                 case QMessageBox::No:
                     removePhys(my_phys);
+                    break;
+                default:
+                    ret=false;
                     break;
             }
         } else {
@@ -1543,6 +1596,7 @@ void neutrino::closeBuffer(nPhysD* my_phys) {
     my_set.endGroup();
 
     QApplication::processEvents();
+    return ret;
 }
 
 void neutrino::closeCurrentBuffer() {

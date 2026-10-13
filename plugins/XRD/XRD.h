@@ -36,11 +36,29 @@
 
 #include "ui_XRD.h"
 
+#include <memory>
+#include <vector>
+
 class nRect;
 
 namespace Ui {
 class IPframe;
 }
+
+// everything belonging to one image plate: tab, settings, region and cropped image.
+// It is the context object of its connections, so they die with it.
+class XRDChannel : public QObject {
+    Q_OBJECT
+public:
+    XRDChannel(unsigned int);
+    ~XRDChannel();
+
+    const unsigned int k; // position in XRD::ips and in the tabs (IPs are removed only from the end)
+    std::unique_ptr<Ui::IPframe> ui;
+    QPointer<QWidget> tab;
+    QPointer<nRect> rect;
+    nPhysD *phys=nullptr; // cropped image, owned by neutrino
+};
 
 class XRD : public nGenericPan, private Ui::XRD {
     Q_OBJECT
@@ -51,24 +69,20 @@ class XRD : public nGenericPan, private Ui::XRD {
 public:
     
     Q_INVOKABLE XRD(neutrino *);
+    ~XRD() override;
 
 private:
 
-    std::vector<Ui::IPframe*> settingsUi;
-    
-    std::vector<nRect*> IPrect;
-
-    std::vector<nPhysD*> IPs;
+    std::vector<std::unique_ptr<XRDChannel>> ips;
 
 public slots:
     
     void setObjectVisibility(nPhysD*);
-    void loadSettings(QSettings &settings);
+    void loadSettings(QSettings &settings) override;
 
-    void cropImageNoShow();
-    void cropImage(bool=true);
     void cropImage(unsigned int, bool=true);
-    void saveImage();
+    void saveImage(unsigned int);
+    void forgetPhys(nPhysD*);
     void showSource();
 
     void on_actionAddIP_triggered();

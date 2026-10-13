@@ -156,7 +156,7 @@ void Camera::giveNeutrino(const QImage& image) {
             loc_blu->TscanBrightness();
             if (!erasePrevious->isChecked()) {
                 for (int i=0;i<3;i++) {
-                    imgColor[0]=nullptr;
+                    imgColor[i]=nullptr;
                 }
             }
             imgColor[0]=nparent->replacePhys(loc_red,imgColor[0]);

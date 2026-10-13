@@ -70,8 +70,11 @@ void Compare_lines::physDel(nPhysD* my_phys) {
 }
 
 void Compare_lines::physReplace(std::pair<nPhysD*,nPhysD*> my_mod) {
-    images.removeAll(my_mod.first);
-    images.append(my_mod.second);
+    // follow only the images we are comparing
+    if (images.contains(my_mod.first) && my_mod.first!=my_mod.second) {
+        images.replace(images.indexOf(my_mod.first), my_mod.second);
+        images.removeAll(my_mod.first);
+    }
     updatePlot();
 }
 

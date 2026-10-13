@@ -41,22 +41,27 @@ class Image_list : public nGenericPan, private Ui::Image_list {
 
 public:
     Q_INVOKABLE Image_list(neutrino*);
-    ~Image_list();
 
     std::map<nPhysD*,QTreeWidgetItem*> itemsMap;
+
+private:
+    bool updating=false; // we are changing the tree/selection ourselves: ignore the feedback
+    QTreeWidgetItem* updateItem(nPhysD*);
 
 public slots:
     void selectionChanged();
     void updatePad(nPhysD* = nullptr);
     void physAdd(nPhysD*);
     void physDel(nPhysD*);
+    void physChanged(nPhysD*);
+    void renumber();
     void buttonRemovePhys();
     void buttonCopyPhys();
 
     nPhysD*	getPhys(QTreeWidgetItem*);
     void changeProperties();
 
-    void keyPressEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *) override;
     void on_horizontalSlider_valueChanged(int);
 };
 

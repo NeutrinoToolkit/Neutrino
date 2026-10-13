@@ -35,14 +35,19 @@
 
 class nWinList;
 class neutrino;
+class Image_list;
 
 class nTreeWidget : public QTreeWidget {
     Q_OBJECT
 public:	
     Q_INVOKABLE nTreeWidget(QWidget *parent):QTreeWidget(parent){}
+    void setupSorting();
     QPoint dragposition;
     QList<QTreeWidgetItem*> dragitems;
     QElapsedTimer dragtime;
+
+private:
+    Image_list* imageList();
 
 public slots:
     void dropEvent(QDropEvent *);

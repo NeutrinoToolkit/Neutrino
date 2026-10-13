@@ -71,6 +71,7 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
     connect(nparent->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
+    connect(nparent, &neutrino::physDel, this, &MUSE::forgetPhys);
 
 	show();
 	on_actionMode_toggled();
@@ -94,6 +95,12 @@ void MUSE::nextPlane(){
 	DEBUG("here" << slices->value());
 
 	slices->setValue((slices->value()+1)%slices->maximum());
+}
+
+// an image we created was closed by the user
+void MUSE::forgetPhys(nPhysD *buf) {
+    if (buf==cubeSlice) cubeSlice=nullptr;
+    if (buf==meanSlice) meanSlice=nullptr;
 }
 
 void MUSE::on_percent_valueChanged(double val) {
@@ -498,7 +505,7 @@ void MUSE::loadCube() {
 					progress.setLabelText("Mean image");
 					progress.setValue(progress.value()+1);
 					QApplication::processEvents();
-					if (!meanSlice) nparent->removePhys(meanSlice);
+					if (meanSlice) nparent->removePhys(meanSlice);
 					meanSlice=new nPhysD(cubesize[0],cubesize[1],0.0,"mean slice");
 					nPhysImageF<int> my_num(cubesize[0],cubesize[1],0,"number");
 
