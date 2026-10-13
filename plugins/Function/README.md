@@ -1,7 +1,8 @@
 We implemented these functions: 
  
  - `phys(x,y)` will return the current image value of pixel `(x,y)`
- - `physN(x,y)` will return the value of pixel `(x,y)` of the Nth image (where N is a number)
+ - `physN(x,y)` will return the value of pixel `(x,y)` of the Nth image (where N is a number). N can be written
+   zero-padded to the number of digits of the last image (with 11 images `phys03` ... `phys10`) or plain (`phys3`)
  - `n_phys(N,x,y)` will return the value of pixel `(x,y)` of the Nth image
  
 There are also 2 values:

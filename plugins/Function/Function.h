@@ -60,6 +60,7 @@ struct fPhys : public exprtk::ifunction<double>
 
 public:
     virtual double operator()(const double&, const double&) override;
+    void forget(nPhysD *p) { if (p==my_phys) my_phys=nullptr; } // image closed during the computation
 
 private:
     nPhysD* my_phys;
@@ -72,6 +73,7 @@ struct physFunc3 : public exprtk::ifunction<double>
 
 public:
     virtual double operator()(const double &, const double&, const double&) override;
+    void forget(nPhysD *p) { for (auto &q : mylist) if (q==p) q=nullptr; } // image closed during the computation
 
 private:
     QList<nPhysD *> mylist;

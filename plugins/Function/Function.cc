@@ -39,7 +39,7 @@ fPhys::fPhys(nPhysD *physparent) : exprtk::ifunction<double>(2), my_phys(physpar
 
 fPhys::~fPhys() {}
 double fPhys::operator()(const double& x, const double& y) {
-    return my_phys->getPoint(x,y);
+    return my_phys ? my_phys->getPoint(x,y) : std::numeric_limits<double>::quiet_NaN();
 }
 
 
@@ -50,7 +50,7 @@ physFunc3::~physFunc3() {}
 
 double physFunc3::operator()(const double &imgnum, const double& x, const double& y) {
     int imgnumint=static_cast<int>(imgnum);
-    if (imgnumint >= 0  && imgnumint < mylist.size()) {
+    if (imgnumint >= 0  && imgnumint < mylist.size() && mylist[imgnumint]) {
         return mylist[imgnumint]->getPoint(x,y);
     } else {
         return std::numeric_limits<double>::quiet_NaN();
@@ -71,7 +71,7 @@ Function::Function(neutrino *mynparent) : nGenericPan(mynparent) {
 }
 
 void Function::on_actionCopy_Size_triggered() {
-    qDebug() << "here";
+    // qDebug() << "here";
     if (currentBuffer) {
         auto size=currentBuffer->getSize();
         sb_width->setValue(size.x());
@@ -83,11 +83,15 @@ void Function::on_actionCopy_Size_triggered() {
 void Function::on_doIt_released() {
     saveDefaults();
 
+    if (sb_width->value()<1 || sb_height->value()<1) {
+        statusbar->showMessage(tr("Width and height must be at least 1"),5000);
+        return;
+    }
+
+    // previous results are removed only once the new ones exist (a typo must not lose them)
+    std::vector<nPhysD*> previous;
     if (erasePrevious->isChecked()) {
-        for (auto &my_phys :physFunction) {
-            nparent->removePhys(my_phys);
-        }
-        physFunction.clear();
+        previous.swap(physFunction);
     }
 
     double x, y;
@@ -107,15 +111,26 @@ void Function::on_doIt_released() {
 
     symbol_table.add_function("rand",my_rand);
 
+    // physN: N padded to the digits of the last index (11 images: phys00..phys10);
+    // the unpadded name (phys3) is registered too, so both spellings work
     std::list<fPhys*> my_list;
-    for (int i=0; i<nparent->getBufferList().size(); i++) {
-        std::ostringstream oss;
-        oss << "phys" << std::setfill('0') << std::setw(int(log10(nparent->getBufferList().size()))) << i;
-        qDebug() << QString::fromStdString(oss.str());
+    const int nimages=nparent->getBufferList().size();
+    const int digits=QString::number(std::max(0,nimages-1)).size();
+    for (int i=0; i<nimages; i++) {
         fPhys *my_fun= new fPhys(nparent->getBuffer(i));
         my_list.push_back(my_fun);
-        symbol_table.add_function(oss.str().c_str(),*my_fun);
+        const std::string padded="phys"+QString::number(i).rightJustified(digits,'0').toStdString();
+        const std::string plain="phys"+std::to_string(i);
+        symbol_table.add_function(padded,*my_fun);
+        if (plain!=padded) symbol_table.add_function(plain,*my_fun);
     }
+
+    // the progress dialog runs the event loop: an image closed meanwhile reads as NaN, not freed memory
+    QMetaObject::Connection forgetClosed=connect(nparent, &neutrino::physDel, this, [&](nPhysD *closed) {
+        my_func.forget(closed);
+        mf.forget(closed);
+        for (auto &f : my_list) f->forget(closed);
+    });
 
     symbol_table.add_constant("width",sb_width->value());
     symbol_table.add_constant("height",sb_height->value());
@@ -125,15 +140,18 @@ void Function::on_doIt_released() {
     exprtk::expression<double> my_exprtk;
     my_exprtk.register_symbol_table(symbol_table);
 
+    // several images: expressions separated by a line containing only <br>
+    QString text=function->toPlainText();
+    text.replace("\r\n","\n");
+    QStringList functions_str=text.split(QRegularExpression("^\\s*<br>\\s*$", QRegularExpression::MultilineOption), Qt::SkipEmptyParts);
 
-
-    QStringList functions_str=function->toPlainText().split("\n<br>\n",Qt::SkipEmptyParts);
-
+    std::vector<nPhysD*> created;
     for (auto &function_str :functions_str) {
-        nPhysD *my_phys = new nPhysD(static_cast<unsigned int>(sb_width->value()), static_cast<unsigned int>(sb_height->value()), 0.0, "");
+        if (function_str.trimmed().isEmpty()) continue;
 
         exprtk::parser<double> parser;
         if (parser.compile(function_str.toStdString(),my_exprtk)) {
+            nPhysD *my_phys = new nPhysD(static_cast<unsigned int>(sb_width->value()), static_cast<unsigned int>(sb_height->value()), 0.0, "");
             QProgressDialog progress("", "Cancel", 0, static_cast<int>(my_phys->getW()), this);
             progress.setCancelButton(nullptr);
             progress.setWindowModality(Qt::WindowModal);
@@ -152,6 +170,7 @@ void Function::on_doIt_released() {
             my_phys->setName(name.toStdString());
             my_phys->setShortName("Function");
 
+            created.push_back(my_phys);
             physFunction.push_back(my_phys);
             nparent->addShowPhys(my_phys);
             erasePrevious->setEnabled(true);
@@ -165,6 +184,16 @@ void Function::on_doIt_released() {
                 function->setTextCursor(my_cursor);
                 qWarning() << "Error #" << i << error.token.position << QString::fromStdString(exprtk::parser_error::to_str(error.mode)) << QString::fromStdString(error.diagnostic.c_str());
             }
+        }
+    }
+    disconnect(forgetClosed);
+
+    if (created.empty()) {
+        // nothing new: keep the previous results
+        physFunction.insert(physFunction.begin(), previous.begin(), previous.end());
+    } else {
+        for (auto &my_phys : previous) {
+            nparent->removePhys(my_phys); // ignores images already closed
         }
     }
 
