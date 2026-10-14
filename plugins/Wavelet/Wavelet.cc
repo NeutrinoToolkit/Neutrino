@@ -274,6 +274,8 @@ void Wavelet::doUnwrap () {
 
         QString methodName=method->currentText();
 
+        // map given to the unwrap: the quality, or the barrier (times the quality for the quality guided methods)
+        physD unwrapQual=*qual;
         if (useBarrier->isChecked()) {
 			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
             QPolygonF my_poly=linebarrier.poly(phase->getW()+phase->getH());
@@ -289,36 +291,122 @@ void Wavelet::doUnwrap () {
 				barrierPhys.set(p.x()+1,p.y()  ,0.0);
 				barrierPhys.set(p.x()+1,p.y()+1,0.0);
 			}
+            unwrapQual=barrierPhys;
+            if (methodName=="Miguel+Quality" || methodName=="Quality") {
+                physMath::phys_point_multiply(unwrapQual,*qual);
+            }
+        }
+        auto doPhaseUnwrap = [&](physD &wrapped, physD &unwrapped) {
 			if (methodName=="Simple H+V") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV, uphase);
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, physWave::SIMPLE_HV, unwrapped);
 			} else if (methodName=="Simple V+H") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH, uphase);
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, physWave::SIMPLE_VH, unwrapped);
 			} else if (methodName=="Goldstein") {
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN, uphase);
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, physWave::GOLDSTEIN, unwrapped);
 			} else if (methodName=="Miguel") {
-                phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
+                // with the barrier the quality map is the barrier only
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, useBarrier->isChecked() ? physWave::MIGUEL_QUALITY : physWave::MIGUEL, unwrapped);
 			} else if (methodName=="Miguel+Quality") {
-                physMath::phys_point_multiply(barrierPhys,*qual);
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, physWave::MIGUEL_QUALITY, unwrapped);
 			} else if (methodName=="Quality") {
-                physMath::phys_point_multiply(barrierPhys,*qual);
-                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY, uphase);
+                physWave::phys_phase_unwrap(wrapped, unwrapQual, physWave::QUALITY, unwrapped);
 			}
-		} else {
-			if (methodName=="Simple H+V") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_HV, uphase);
-			} else if (methodName=="Simple V+H") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_VH, uphase);
-			} else if (methodName=="Goldstein") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::GOLDSTEIN, uphase);
-			} else if (methodName=="Miguel") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL, uphase);
-			} else if (methodName=="Miguel+Quality") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL_QUALITY, uphase);
-			} else if (methodName=="Quality") {
-                physWave::phys_phase_unwrap(*phase, *qual, physWave::QUALITY, uphase);
-			}
-		}
+        };
+
+        physD *angleMap=nullptr;
+        if (unwrapAngles->isChecked()) {
+            angleMap=static_cast<physD*>(waveletPhys["angle"]);
+            if (!nPhysExists(waveletPhys["angle"]) || angleMap->getW()!=phase->getW() || angleMap->getH()!=phase->getH()) {
+                statusbar->showMessage(tr("Unwrap angles needs the angle map of this wavelet (angle scan with more than one angle)"), 5000);
+                angleMap=nullptr;
+            }
+        }
+
+        if (angleMap) {
+            // where the best filter points opposite to the (unwrapped) fringe direction the phase changes sign: flip it
+            physD angle = angleMap->copy();
+            physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
+            physD unwrapAngle;
+            doPhaseUnwrap(angle, unwrapAngle);
+            physD flipped = phase->copy();
+            for (size_t k=0; k<flipped.getSurf(); k++) {
+                long swaps=std::lround(unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k]);
+                if (std::abs(swaps) % 2 == 1) {
+                    flipped.Timg_buffer[k] = -flipped.Timg_buffer[k];
+                }
+            }
+            doPhaseUnwrap(flipped, uphase);
+
+            // the orientation of the whole angle map is arbitrary: compare with the carrier as the reference,
+            // phase-carrier and phase+carrier, and keep the one with the smaller range (max-min)
+            physD carrierPhase(uphase.getW(),uphase.getH(),0.0);
+            physWave::phys_subtract_carrier(carrierPhase, angleCarrier->value(), widthCarrier->value());
+            auto finiteRange = [](physD &img) {
+                double mini=std::numeric_limits<double>::max(), maxi=-std::numeric_limits<double>::max();
+                for (size_t k=0; k<img.getSurf(); k++) {
+                    if (std::isfinite(img.Timg_buffer[k])) {
+                        mini=std::min(mini,img.Timg_buffer[k]);
+                        maxi=std::max(maxi,img.Timg_buffer[k]);
+                    }
+                }
+                return maxi-mini;
+            };
+            physD phaseMinus=uphase.copy(), phasePlus=uphase.copy();
+            physMath::phys_point_add(phaseMinus,carrierPhase);      // carrierPhase is -carrier
+            physMath::phys_point_subtract(phasePlus,carrierPhase);
+            if (finiteRange(phasePlus) < finiteRange(phaseMinus)) {
+                physMath::phys_multiply(uphase,-1.0); // the whole map was flipped
+            }
+        } else {
+            doPhaseUnwrap(*phase, uphase);
+        }
+
+        // old implementation
+//        if (useBarrier->isChecked()) {
+//			barrierPhys = nPhysD(phase->getW(),phase->getH(),1.0,"barrier");
+//            QPolygonF my_poly=linebarrier.poly(phase->getW()+phase->getH());
+//            my_poly.translate(qual->get_origin().x(),qual->get_origin().y());
+//			foreach(QPointF p, my_poly) {
+//				barrierPhys.set(p.x()-1,p.y()-1,0.0);
+//				barrierPhys.set(p.x()-1,p.y()  ,0.0);
+//				barrierPhys.set(p.x()-1,p.y()+1,0.0);
+//				barrierPhys.set(p.x()  ,p.y()-1,0.0);
+//				barrierPhys.set(p.x()  ,p.y()  ,0.0);
+//				barrierPhys.set(p.x()  ,p.y()+1,0.0);
+//				barrierPhys.set(p.x()+1,p.y()-1,0.0);
+//				barrierPhys.set(p.x()+1,p.y()  ,0.0);
+//				barrierPhys.set(p.x()+1,p.y()+1,0.0);
+//			}
+//			if (methodName=="Simple H+V") {
+//                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_HV, uphase);
+//			} else if (methodName=="Simple V+H") {
+//                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::SIMPLE_VH, uphase);
+//			} else if (methodName=="Goldstein") {
+//                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::GOLDSTEIN, uphase);
+//			} else if (methodName=="Miguel") {
+//                phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
+//			} else if (methodName=="Miguel+Quality") {
+//                physMath::phys_point_multiply(barrierPhys,*qual);
+//                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::MIGUEL_QUALITY, uphase);
+//			} else if (methodName=="Quality") {
+//                physMath::phys_point_multiply(barrierPhys,*qual);
+//                physWave::phys_phase_unwrap(*phase, barrierPhys, physWave::QUALITY, uphase);
+//			}
+//		} else {
+//			if (methodName=="Simple H+V") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_HV, uphase);
+//			} else if (methodName=="Simple V+H") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::SIMPLE_VH, uphase);
+//			} else if (methodName=="Goldstein") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::GOLDSTEIN, uphase);
+//			} else if (methodName=="Miguel") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL, uphase);
+//			} else if (methodName=="Miguel+Quality") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::MIGUEL_QUALITY, uphase);
+//			} else if (methodName=="Quality") {
+//                physWave::phys_phase_unwrap(*phase, *qual, physWave::QUALITY, uphase);
+//			}
+//		}
 
         uphase.setShortName("unwrap");
         uphase.setName(uphase.getShortName()+"-"+methodName.toStdString()+" "+QFileInfo(QString::fromUtf8(phase->getFromName().c_str())).fileName().toStdString());

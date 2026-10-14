@@ -686,6 +686,24 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="QCheckBox" name="unwrapAngles">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Fringes rotating by more than 90 degrees: unwrap the angle map of the wavelet and flip the phase where the filter points the opposite way (needs an angle scan)</string>
+             </property>
+             <property name="text">
+              <string>Unwrap angles</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="2">
             <widget class="QToolButton" name="lineBarrier">
              <property name="text">
