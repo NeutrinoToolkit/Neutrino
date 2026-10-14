@@ -1,4 +1,5 @@
-cmake_minimum_required (VERSION 3.9)
+# cmake_minimum_required (VERSION 3.9)
+cmake_minimum_required (VERSION 3.18...3.31)
 
 option(NEUTRINOPLUGINS "Compile Neutrino plugins" ON)
 if (${NEUTRINOPLUGINS})

@@ -59,7 +59,8 @@ file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
 set(LICENSESDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/licenses)
 #parse neutrino license file
 file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*.txt)
-list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
+# list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
+# CPACK_RESOURCE_FILE_LICENSE is set later (Package.cmake) and would clash with the alias of resources/licenses/Neutrino.txt
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
 file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})
@@ -112,7 +113,7 @@ if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
     target_link_libraries(${PROJECT_NAME} "-framework IOKit -framework CoreFoundation")
 
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macpackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 
     install (TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/.." COMPONENT binary)

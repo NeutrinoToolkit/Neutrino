@@ -23,5 +23,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
+# set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
+set(Qt6_DIR ${CMAKE_FIND_ROOT_PATH}/lib/cmake/Qt6) # same layout as the runtime deps in Package.cmake (lib/qt6/plugins)
 

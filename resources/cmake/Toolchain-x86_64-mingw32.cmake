@@ -34,6 +34,7 @@ SET(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32/sys-root/mingw)
 #set(Qt5Core_DIR ${CMAKE_FIND_ROOT_PATH}/qt/lib/cmake/Qt5Core)
 #find_package(Qt5Core)
 
-set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
+# set(Qt5_DIR ${CMAKE_FIND_ROOT_PATH}/qt5/lib/cmake/Qt5)
+set(Qt6_DIR ${CMAKE_FIND_ROOT_PATH}/lib/cmake/Qt6) # same layout as the runtime deps in Package.cmake (lib/qt6/plugins)
 
 

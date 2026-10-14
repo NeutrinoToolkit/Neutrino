@@ -65,11 +65,17 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     LIST(APPEND QRCS ${MY_QRCS})
     ## add help
 
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+    # the help (README.md -> html) is optional: without pandoc the Help button is not shown
+    if(NOT DEFINED PANDOC)
+        # find_program(PANDOC pandoc REQUIRED)
+        find_program(PANDOC pandoc)
+        if(NOT PANDOC)
+            message(STATUS "pandoc not found: plugins will have no help")
+        endif()
+    endif(NOT DEFINED PANDOC)
 
-        if(NOT DEFINED PANDOC)
-            find_program(PANDOC pandoc REQUIRED)
-        endif(NOT DEFINED PANDOC)
+    # if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md" AND PANDOC)
 
         set(README_MD "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
         set(README_HTML "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}README.html")

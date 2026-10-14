@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.9)
+# cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.18...3.31)
 
 project (Neutrino CXX)
 
@@ -38,7 +39,8 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     )
     if (BREW_libomp EQUAL 0 AND EXISTS "${BREW_libomp_PREFIX}")
         message(STATUS "Found libomp keg installed by Homebrew at ${BREW_libomp_PREFIX}")
-        set(CMAKE_PREFIX_PATH "${BREW_libomp_PREFIX}")
+        # set(CMAKE_PREFIX_PATH "${BREW_libomp_PREFIX}")
+        list(APPEND CMAKE_PREFIX_PATH "${BREW_libomp_PREFIX}") # keep the user paths (e.g. -DCMAKE_PREFIX_PATH=<Qt>)
     else()
     	message(STATUS "Brew not found. You should install it and install the libomp package")
     endif()

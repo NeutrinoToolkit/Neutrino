@@ -1,5 +1,5 @@
 find_package(HDF5 COMPONENTS HL QUIET)
-find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS}  QUIET)
+# find_library(HDF5HL NAMES hdf5_hl PATHS ${HDF5_LIBRARY_DIRS}  QUIET) # unused: HDF5_HL_LIBRARIES comes from find_package
 
 if (HDF5_FOUND AND HDF5_HL_LIBRARIES)
     #hdf5 libs
@@ -8,7 +8,8 @@ if (HDF5_FOUND AND HDF5_HL_LIBRARIES)
     add_definitions(-DHAVE_HDF5)
 
     # hdf5_hl
-    set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+    # set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+    set(LOCAL_LIBS ${LOCAL_LIBS} ${HDF5_HL_LIBRARIES})
     add_definitions(-DHAVE_LIBHDF5HL)
 
     ADD_NEUTRINO_PLUGIN()

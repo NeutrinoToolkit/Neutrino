@@ -48,7 +48,8 @@ else()
 endif()
 
 #gsl
-find_library(GSL NAMES gsl)
+# find_library(GSL NAMES gsl)
+find_library(GSL NAMES gsl REQUIRED) # used without HAVE_LIBGSL guards
 if (NOT ${GSL} STREQUAL "GSL-NOTFOUND")
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		message (STATUS "using gsl: ${GSL}")
@@ -72,7 +73,7 @@ endif()
 find_library(GSLCBLAS NAMES gslcblas)
 if (NOT ${GSLCBLAS} STREQUAL "GSLCBLAS-NOTFOUND")
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		message (STATUS "using gslcblas: ${GSL}")
+		message (STATUS "using gslcblas: ${GSLCBLAS}")
 	endif()
 	set(LIBS ${LIBS} ${GSLCBLAS})
 	add_definitions(-DHAVE_LIBGSLCBLAS)
