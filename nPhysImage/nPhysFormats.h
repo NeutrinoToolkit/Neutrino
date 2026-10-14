@@ -151,6 +151,17 @@ void phys_dump_binary(physD*my_phys, const char *ofile);
 
 void phys_dump_binary(physD*, std::ofstream &);
 
+// the pieces of phys_dump_binary/phys_resurrect_binary, so that sessions can (de)compress images in parallel:
+// compress and inflate are thread safe, write and read must be called in file order
+struct binary_block {
+    std::unique_ptr<unsigned char[]> data;
+    size_t size=0;
+};
+binary_block phys_compress_binary(physD*);
+void phys_write_binary(physD*, const binary_block &, std::ofstream &);
+int phys_read_binary(physD&, std::ifstream &, binary_block &);
+void phys_inflate_binary(physD&, const binary_block &);
+
 void phys_dump_ascii(physD*, std::ofstream &);
 
 int

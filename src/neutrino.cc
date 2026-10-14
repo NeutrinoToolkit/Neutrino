@@ -35,6 +35,7 @@
 #include "nPhysFormats.h"
 
 #include "neutrino.h"
+#include <omp.h>
 #include "nApp.h"
 
 #include "nView.h"
@@ -953,30 +954,80 @@ void neutrino::saveSession (QString fname) {
         if (file_info.suffix()=="neus") {
             setProperty("NeuSave-fileSave", fname);
 
-            QProgressDialog progress("Save session", "Cancel", 0, physList.size()+1, this);
+            QList<nPhysD*> toSave;
+            for (auto &phys : physList) {
+                if ((!dont_save_phys_dyn) || phys->getType()!=PHYS_DYN) {
+                    toSave << phys;
+                } else {
+                    qWarning() << "not saving " << QString::fromUtf8(phys->getShortName().c_str());
+                }
+            }
+
+            QProgressDialog progress("Save session", "Cancel", 0, toSave.size()+1, this);
             progress.setWindowModality(Qt::WindowModal);
             progress.show();
 
-            std::ofstream ofile(QFile::encodeName(fname).toStdString().c_str(), std::ios::out | std::ios::binary);
-            ofile << "Neutrino " << SHAVERSION__ << " " << physList.size() << " " << panList.size() << std::endl;
+            // write a temporary file and replace the session only when complete:
+            // a cancel, an error or a full disk must not destroy the previous session
+            QString fnameTmp=fname+".tmp";
+            std::ofstream ofile(QFile::encodeName(fnameTmp).toStdString().c_str(), std::ios::out | std::ios::binary);
+            bool ok=!ofile.fail();
+            QString errorMessage;
+            try {
+                ofile << "Neutrino " << SHAVERSION__ << " " << toSave.size() << " " << panList.size() << std::endl;
 
-            for (int i=0;i<physList.size(); i++) {
-                if (progress.wasCanceled()) break;
-                progress.setValue(i);
-                if ((!dont_save_phys_dyn) || physList.at(i)->getType()!=PHYS_DYN) {
-                    progress.setLabelText(QString::fromUtf8(physList.at(i)->getShortName().c_str()));
+                // compress a batch of images in parallel, then write them in order
+                const int batch=std::max(1,omp_get_max_threads()); // the threads of the preferences
+                for (int start=0; ok && start<toSave.size(); start+=batch) {
+                    if (progress.wasCanceled()) {
+                        ok=false;
+                        break;
+                    }
+                    const int nbatch=std::min(batch,(int)toSave.size()-start);
+                    progress.setLabelText(QString::fromUtf8(toSave.at(start)->getShortName().c_str()));
                     QApplication::processEvents();
-                    ofile << "NeutrinoImage" << std::endl;
-                    physFormat::phys_dump_binary(physList.at(i),ofile);
-                    physList.at(i)->setType(PHYS_FILE);
-                } else {
-                    qWarning() << "not saving " << QString::fromUtf8(physList.at(i)->getShortName().c_str());
+                    std::vector<physFormat::binary_block> blocks(nbatch);
+                    std::vector<std::string> errors(nbatch);
+#pragma omp parallel for schedule(dynamic)
+                    for (int b=0; b<nbatch; b++) {
+                        try {
+                            blocks[b]=physFormat::phys_compress_binary(toSave.at(start+b));
+                        } catch (std::exception &e) {
+                            errors[b]=e.what(); // exceptions must not leave the parallel region
+                        }
+                    }
+                    for (int b=0; b<nbatch; b++) {
+                        if (!errors[b].empty()) {
+                            throw phys_fileerror(toSave.at(start+b)->getShortName()+": "+errors[b]);
+                        }
+                        ofile << "NeutrinoImage" << std::endl;
+                        physFormat::phys_write_binary(toSave.at(start+b),blocks[b],ofile);
+                        progress.setValue(start+b+1);
+                    }
                 }
+                if (ok) {
+                    ofile << getPanData();
+                    ofile.flush();
+                    ok=!ofile.fail();
+                }
+            } catch (std::exception &e) {
+                ok=false;
+                errorMessage=QString::fromUtf8(e.what());
             }
-            progress.setValue(physList.size());
-            ofile << getPanData();
-            progress.setValue(physList.size()+1);
             ofile.close();
+            progress.setValue(toSave.size()+1);
+
+            if (ok && std::rename(QFile::encodeName(fnameTmp).constData(), QFile::encodeName(fname).constData())==0) {
+                for (auto &phys : toSave) {
+                    phys->setType(PHYS_FILE);
+                }
+            } else {
+                QFile::remove(fnameTmp);
+                if (!progress.wasCanceled()) {
+                    QMessageBox::warning(this,tr("Attention"),tr("Session not saved")+(errorMessage.isEmpty()?QString():"\n"+errorMessage), QMessageBox::Ok);
+                }
+                return;
+            }
         } else if (file_info.suffix().startsWith("tif")) {
             setProperty("NeuSave-fileSave", fname);
             std::vector <physD *> vecPhys;
@@ -1023,6 +1074,36 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                 progress.show();
                 QApplication::processEvents();
                 std::string panString;
+
+                // images are read in file order and decompressed in parallel, a batch at a time
+                const int batch=std::max(1,omp_get_max_threads()); // the threads of the preferences
+                std::vector<nPhysD*> pending;
+                std::vector<physFormat::binary_block> pendingBlocks;
+                auto flushPending = [&]() {
+                    std::vector<std::string> errors(pending.size());
+#pragma omp parallel for schedule(dynamic)
+                    for (int b=0; b<(int)pending.size(); b++) {
+                        try {
+                            physFormat::phys_inflate_binary(*pending[b],pendingBlocks[b]);
+                        } catch (std::exception &e) {
+                            errors[b]=e.what(); // exceptions must not leave the parallel region
+                        }
+                    }
+                    for (size_t b=0; b<pending.size(); b++) {
+                        if (errors[b].empty() && pending[b]->getSurf()>0) {
+                            progress.setLabelText(QString::fromUtf8(pending[b]->getShortName().c_str()));
+                            imagelist.push_back(pending[b]);
+                            addShowPhys(pending[b]);
+                        } else {
+                            qWarning() << "Error loading image" << QString::fromStdString(errors[b]);
+                            delete pending[b];
+                        }
+                    }
+                    pending.clear();
+                    pendingBlocks.clear();
+                    QApplication::processEvents();
+                };
+
                 while(ifile.peek()!=-1) {
                     getline(ifile,line);
                     QString qLine=QString::fromStdString(line);
@@ -1030,12 +1111,12 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                     if (qLine.startsWith("NeutrinoImage")) {
                         progress.setValue(++counter);
                         nPhysD *my_phys=new nPhysD();
-                        int ret=physFormat::phys_resurrect_binary(*my_phys,ifile);
+                        physFormat::binary_block block;
+                        int ret=physFormat::phys_read_binary(*my_phys,ifile,block);
                         if (ret>=0 && my_phys->getSurf()>0) {
-                            progress.setLabelText(QString::fromUtf8(my_phys->getShortName().c_str()));
-                            QApplication::processEvents();
-                            imagelist.push_back(my_phys);
-                            addShowPhys(my_phys);
+                            pending.push_back(my_phys);
+                            pendingBlocks.push_back(std::move(block));
+                            if ((int)pending.size()>=batch) flushPending();
                         } else {
                             delete my_phys;
                         }
@@ -1049,6 +1130,13 @@ QList <nPhysD *> neutrino::openSession (QString fname) {
                         }
                     }
                     QApplication::processEvents();
+                }
+                if (progress.wasCanceled()) {
+                    for (auto &phys : pending) delete phys;
+                    pending.clear();
+                    pendingBlocks.clear();
+                } else {
+                    flushPending();
                 }
                 qDebug() << ifile.tellg();
                 qDebug() << "resurrect pan:\n" << QString::fromStdString(panString);

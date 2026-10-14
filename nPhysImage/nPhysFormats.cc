@@ -566,69 +566,135 @@ void physFormat::phys_dump_binary(physD *my_phys, const char *fname) {
 }
 
 void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
+    binary_block block=phys_compress_binary(my_phys);
+    phys_write_binary(my_phys, block, ofile);
+}
 
-    if (!ofile.fail() && my_phys != nullptr) {
+// gzip of the image data (thread safe)
+physFormat::binary_block physFormat::phys_compress_binary(physD *my_phys) {
+    binary_block block;
+    if (my_phys == nullptr) {
+        throw phys_fileerror("ERROR compressing binary dump data");
+    }
+    size_t raw_size=my_phys->getSurf()*sizeof(double);
+    if (raw_size > (size_t) std::numeric_limits<int>::max()) {
+        throw phys_fileerror("ERROR image too big for the binary dump");
+    }
 
-        //int pos = ofile.tellg();
-        //int written_data = 0;
+    z_stream strm;
+    strm.zalloc = Z_NULL;
+    strm.zfree  = Z_NULL;
+    strm.opaque = Z_NULL;
+    int status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
+    if (status != Z_OK) {
+        throw phys_fileerror("Zlib deflateInit2 failed");
+    }
 
-        //ofile<<my_phys->property<<"\n";
-        my_phys->prop.dumper(ofile);
+    // deflateBound: the output can be bigger than the input if the data do not compress
+    size_t bound=deflateBound(&strm, raw_size);
+    block.data.reset(new unsigned char[bound]); // not zero initialized
 
-        DEBUG("Starting binary dump...");
+    strm.next_in = (unsigned char *) my_phys->Timg_buffer;
+    strm.avail_in = raw_size;
+    strm.next_out = block.data.get();
+    strm.avail_out = bound;
+    status= deflate (& strm, Z_FINISH);
+    block.size = bound - strm.avail_out;
+    deflateEnd (& strm);
 
+    if (status != Z_STREAM_END) {
+        // a truncated stream would be written without noticing
+        throw phys_fileerror("Zlib deflate did not complete");
+    }
+    DEBUG(5,"compressed " << raw_size << " -> " << block.size);
+    return block;
+}
 
-        //ofile<<my_phys->getW()<<"\n";
-        //ofile<<my_phys->getH()<<"\n";
-
-        // Compress data using zlib
-        int buffer_size=my_phys->getSurf()*sizeof(double);
-        std::vector<unsigned char> out(buffer_size);
-        z_stream strm;
-
-        strm.zalloc = Z_NULL;
-        strm.zfree  = Z_NULL;
-        strm.opaque = Z_NULL;
-        int status;
-        status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
-        if (status < 0) {
-            // .alex. -- questa non compila (e non sono sicuro sia a causa di anymap)
-            WARNING("Zlib a bad status of " << status);
-            exit (EXIT_FAILURE);
-        }
-
-        strm.next_in = (unsigned char *) my_phys->Timg_buffer;
-        strm.avail_in = my_phys->getSurf()*sizeof(double);
-        strm.avail_out = buffer_size;
-        strm.next_out = &out[0];
-        status= deflate (& strm, Z_FINISH);
-
-        if (status < 0) {
-            WARNING("Zlib a bad status of " << status);
-            exit (EXIT_FAILURE);
-        }
-        int writtendata = buffer_size - strm.avail_out;
-
-        deflateEnd (& strm);
-        DEBUG(5,"writtendata " << writtendata);
-
-        int oo = my_phys->getW();
-        ofile.write((const char *)&oo, sizeof(int));
-        oo = my_phys->getH();
-        ofile.write((const char *)&oo, sizeof(int));
-
-        ofile.write((const char *)&writtendata, sizeof (int));
-        ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
-        DEBUG("Binary dump finished");
-
-        //	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
-        ofile<<"\n"<<std::flush;
-
-        //written_data = ofile.tellg()-pos;
-    } else {
+// properties, size and compressed data (in file order)
+void physFormat::phys_write_binary(physD *my_phys, const binary_block &block, std::ofstream &ofile) {
+    if (ofile.fail() || my_phys == nullptr || block.data == nullptr) {
         throw phys_fileerror("ERROR writing binary dump data");
     }
+    my_phys->prop.dumper(ofile);
+
+    int oo = my_phys->getW();
+    ofile.write((const char *)&oo, sizeof(int));
+    oo = my_phys->getH();
+    ofile.write((const char *)&oo, sizeof(int));
+    int writtendata = block.size;
+    ofile.write((const char *)&writtendata, sizeof (int));
+    ofile.write((const char *)block.data.get(), block.size);
+    ofile<<"\n";
+    if (ofile.fail()) {
+        throw phys_fileerror("ERROR writing binary dump data (disk full?)");
+    }
 }
+
+// old implementation
+// void physFormat::phys_dump_binary(physD *my_phys, std::ofstream &ofile) {
+//
+//     if (!ofile.fail() && my_phys != nullptr) {
+//
+//         //int pos = ofile.tellg();
+//         //int written_data = 0;
+//
+//         //ofile<<my_phys->property<<"\n";
+//         my_phys->prop.dumper(ofile);
+//
+//         DEBUG("Starting binary dump...");
+//
+//
+//         //ofile<<my_phys->getW()<<"\n";
+//         //ofile<<my_phys->getH()<<"\n";
+//
+//         // Compress data using zlib
+//         int buffer_size=my_phys->getSurf()*sizeof(double);
+//         std::vector<unsigned char> out(buffer_size);
+//         z_stream strm;
+//
+//         strm.zalloc = Z_NULL;
+//         strm.zfree  = Z_NULL;
+//         strm.opaque = Z_NULL;
+//         int status;
+//         status=deflateInit2 (&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits | GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY);
+//         if (status < 0) {
+//             // .alex. -- questa non compila (e non sono sicuro sia a causa di anymap)
+//             WARNING("Zlib a bad status of " << status);
+//             exit (EXIT_FAILURE);
+//         }
+//
+//         strm.next_in = (unsigned char *) my_phys->Timg_buffer;
+//         strm.avail_in = my_phys->getSurf()*sizeof(double);
+//         strm.avail_out = buffer_size;
+//         strm.next_out = &out[0];
+//         status= deflate (& strm, Z_FINISH);
+//
+//         if (status < 0) {
+//             WARNING("Zlib a bad status of " << status);
+//             exit (EXIT_FAILURE);
+//         }
+//         int writtendata = buffer_size - strm.avail_out;
+//
+//         deflateEnd (& strm);
+//         DEBUG(5,"writtendata " << writtendata);
+//
+//         int oo = my_phys->getW();
+//         ofile.write((const char *)&oo, sizeof(int));
+//         oo = my_phys->getH();
+//         ofile.write((const char *)&oo, sizeof(int));
+//
+//         ofile.write((const char *)&writtendata, sizeof (int));
+//         ofile.write((const char *)(&out[0]), sizeof (char)*writtendata);
+//         DEBUG("Binary dump finished");
+//
+//         //	ofile.write((const char *)my_phys->Timg_buffer, my_phys->getSurf()*sizeof(double));
+//         ofile<<"\n"<<std::flush;
+//
+//         //written_data = ofile.tellg()-pos;
+//     } else {
+//         throw phys_fileerror("ERROR writing binary dump data");
+//     }
+// }
 
 void physFormat::phys_dump_ascii(physD *my_phys, std::ofstream &ofile)
 {	
@@ -1563,6 +1629,15 @@ std::vector <physD> physFormat::phys_resurrect_binary(std::string fname) {
 
 int
 physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
+    binary_block block;
+    int ret=phys_read_binary(my_phys, ifile, block);
+    if (ret<0) return ret;
+    phys_inflate_binary(my_phys, block);
+    return 0;
+}
+
+// properties, size and compressed data (in file order); allocates the image
+int physFormat::phys_read_binary(physD& my_phys, std::ifstream &ifile, binary_block &block) {
 
     if (ifile.fail() || ifile.eof()) {
         throw phys_fileerror("istream error");
@@ -1585,51 +1660,127 @@ physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
     DEBUG("h: "<<my_h);
     DEBUG("s: "<<buffer_size);
 
-    if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
+    if (ifile.fail() || my_w<=0 || my_h<=0 || buffer_size<=0) return -1;
+    // incompressible data can be (slightly) bigger than the raw image
+    size_t raw_size=(size_t)my_w*my_h*sizeof(double);
+    if ((size_t)buffer_size > compressBound(raw_size)+64) return -1; // this should not happend
+
+    block.data.reset(new unsigned char[buffer_size]);
+    block.size=buffer_size;
+    ifile.read((char*)block.data.get(), buffer_size);
+    if (ifile.fail()) return -1;
+
+    std::string line;
+    getline(ifile,line);
 
     my_phys.resize(my_w,my_h);
-    std::vector<unsigned char> in(buffer_size);
-    ifile.read((char*)&in[0], buffer_size);
+    return 0;
+}
 
-
+// gunzip into the image allocated by phys_read_binary (thread safe)
+void physFormat::phys_inflate_binary(physD& my_phys, const binary_block &block) {
     z_stream strm;
 
     strm.zalloc = Z_NULL;
     strm.zfree  = Z_NULL;
     strm.opaque = Z_NULL;
-    int status;
-    status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+    int status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
     if (status < 0) {
         std::ostringstream oss;
         oss << "Zlib inflateInit2 : got a bad status of " << status;
         throw phys_fileerror(oss.str());
-        return (EXIT_FAILURE);
     }
 
-    strm.next_in = &in[0];
-    strm.avail_in = buffer_size;
+    strm.next_in = block.data.get();
+    strm.avail_in = block.size;
     strm.next_out = (unsigned char *)my_phys.Timg_buffer;
     strm.avail_out = my_phys.getSurf()*sizeof(double);
     status = inflate (&strm, Z_SYNC_FLUSH);
+    inflateEnd (& strm);
     if (status < 0) {
         std::ostringstream oss;
         oss << "Zlib inflate : got a bad status of " << status;
         throw phys_fileerror(oss.str());
-        return (EXIT_FAILURE);
     }
-    inflateEnd (& strm);
+    if (status != Z_STREAM_END) {
+        // older versions could write a truncated stream: keep what is there
+        WARNING("Zlib inflate: incomplete data for " << my_phys.getName());
+    }
 
     my_phys.setType(PHYS_FILE);
-
-    //	ifile.read((char *)my_phys.Timg_buffer, my_phys.getSurf()*sizeof(double));
     my_phys.TscanBrightness();
-
-    std::string line;
-    getline(ifile,line);
-
-    DEBUG(line);
-    return 0;
 }
+
+// old implementation
+// int
+// physFormat::phys_resurrect_binary(physD& my_phys, std::ifstream &ifile) {
+//
+//     if (ifile.fail() || ifile.eof()) {
+//         throw phys_fileerror("istream error");
+//         return -1;
+//     }
+//
+//     my_phys.prop.loader(ifile);
+//
+// #ifdef __phys_debug
+//     my_phys.prop.dumper(std::cerr);
+// #endif
+//
+//     // w/h/size binary read
+//     int my_w, my_h, buffer_size;
+//     ifile.read((char *)&my_w, sizeof(int));
+//     ifile.read((char *)&my_h, sizeof(int));
+//     ifile.read((char *)&buffer_size, sizeof(int));
+//
+//     DEBUG("w: "<<my_w);
+//     DEBUG("h: "<<my_h);
+//     DEBUG("s: "<<buffer_size);
+//
+//     if (buffer_size>(int) (my_w*my_h*sizeof(double))) return -1; // this should not happend
+//
+//     my_phys.resize(my_w,my_h);
+//     std::vector<unsigned char> in(buffer_size);
+//     ifile.read((char*)&in[0], buffer_size);
+//
+//
+//     z_stream strm;
+//
+//     strm.zalloc = Z_NULL;
+//     strm.zfree  = Z_NULL;
+//     strm.opaque = Z_NULL;
+//     int status;
+//     status = inflateInit2 (&strm,windowBits | GZIP_ENCODING);
+//     if (status < 0) {
+//         std::ostringstream oss;
+//         oss << "Zlib inflateInit2 : got a bad status of " << status;
+//         throw phys_fileerror(oss.str());
+//         return (EXIT_FAILURE);
+//     }
+//
+//     strm.next_in = &in[0];
+//     strm.avail_in = buffer_size;
+//     strm.next_out = (unsigned char *)my_phys.Timg_buffer;
+//     strm.avail_out = my_phys.getSurf()*sizeof(double);
+//     status = inflate (&strm, Z_SYNC_FLUSH);
+//     if (status < 0) {
+//         std::ostringstream oss;
+//         oss << "Zlib inflate : got a bad status of " << status;
+//         throw phys_fileerror(oss.str());
+//         return (EXIT_FAILURE);
+//     }
+//     inflateEnd (& strm);
+//
+//     my_phys.setType(PHYS_FILE);
+//
+//     //	ifile.read((char *)my_phys.Timg_buffer, my_phys.getSurf()*sizeof(double));
+//     my_phys.TscanBrightness();
+//
+//     std::string line;
+//     getline(ifile,line);
+//
+//     DEBUG(line);
+//     return 0;
+// }
 
 void physFormat::phys_open_RAW(physD * my_phys, int kind, int skipbyte, bool endian){
     std::ifstream ifile(my_phys->getName().c_str(), std::ios::in | std::ios::binary);
