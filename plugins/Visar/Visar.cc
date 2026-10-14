@@ -1364,15 +1364,22 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
                 // double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*visars[k]->settingsUi->interfringe->value());
-                double thick_norm= M_PI* visars[k]->settingsUi->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-                double lambda_norm=M_PI*visars[k]->settingsUi->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                // double thick_norm= M_PI* visars[k]->settingsUi->resolution->value()/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                // double lambda_norm=M_PI*visars[k]->settingsUi->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                // the filter is built on true spatial frequencies (cycles/px) before rotating:
+                // rotating the FFT indices directly misplaces the notch on non-square images (unless angle is 0 or 90)
+                // across the carrier: same form as Ghost_fringes (the old exp(-pow(yr/thick_norm,2)) was a sub-bin wide notch)
+                double thick_norm=M_PI*visars[k]->settingsUi->resolution->value();
+                double interfringe=visars[k]->settingsUi->interfringe->value();
 
                 for (size_t x=0;x<dx;x++) {
                     for (size_t y=0;y<dy;y++) {
-                        double xr = xx[x]*cr - yy[y]*sr;
-                        double yr = xx[x]*sr + yy[y]*cr;
+                        double fx = xx[x]/(double)dx;
+                        double fy = yy[y]/(double)dy;
+                        double u = fx*cr - fy*sr; // along the carrier
+                        double v = fx*sr + fy*cr; // across the carrier
                         // double e_tot = 1.0-exp(-pow(yr/M_PI,2))/(1.0+exp(lambda-std::abs(xr)));
-                        double e_tot = 1.0-exp(-pow(yr/thick_norm,2))*exp(-pow(std::abs(xr)*lambda_norm-M_PI, 2));
+                        double e_tot = 1.0-exp(-pow(v*thick_norm,2))*exp(-pow(M_PI*(std::abs(u)*interfringe-1.0), 2));
                         imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                     }
                 }
@@ -1385,20 +1392,22 @@ void Visar::doWave(unsigned int k) {
 
                 physDeghost=new nPhysD(*imgs[1],"deghost VISAR "+std::to_string(tabPhase->currentIndex()+1));
 
-                QRect geom=visars[k]->maskRegion->path().boundingRect().toRect();
 
-                QPolygonF regionPoly=visars[k]->maskRegion->poly(1);
-                regionPoly=regionPoly.translated(imgs[1]->get_origin().x(),imgs[1]->get_origin().y());
+                // line points are relative to the image origin: pixels of the shot image = points + its origin
+                // (the bounding box must be shifted too, not only the polygon)
+                QPolygonF regionPoly=visars[k]->maskRegion->poly(1).translated(imgs[1]->get_origin().x(),imgs[1]->get_origin().y());
+                QRect geom=regionPoly.boundingRect().toRect().intersected(QRect(0,0,dx,dy));
                 std::vector<vec2f> vecPoints(regionPoly.size());
                 for(int k=0;k<regionPoly.size();k++) {
                     vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
                 }
 
-                for(int i=geom.left();i<geom.right(); i++) {
-                    for(int j=geom.top();j<geom.bottom(); j++) {
+                for(int i=geom.left();i<=geom.right(); i++) {
+                    for(int j=geom.top();j<=geom.bottom(); j++) {
                         vec2f pp(i,j);
                         if (point_inside_poly(pp,vecPoints)==true) {
-                            physDeghost->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                            // the filter is symmetric: the result is real (the modulus would flip negative ringing)
+                            physDeghost->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
 //doesntwork                            physDeghost->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
                         }
                     }
@@ -1436,17 +1445,23 @@ void Visar::doWave(unsigned int k) {
 
             progress.setValue(progress.value()+1);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            double thick_norm=visars[k]->settingsUi->resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-            double lambda_norm=visars[k]->settingsUi->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+            // double thick_norm=visars[k]->settingsUi->resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+            // double lambda_norm=visars[k]->settingsUi->interfringe->value()/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+            // the filter is built on true spatial frequencies (cycles/px) before rotating:
+            // rotating the FFT indices directly misses the carrier on non-square images (unless angle is 0 or 90)
+            double thick_norm=visars[k]->settingsUi->resolution->value()*M_PI;
+            double interfringe=visars[k]->settingsUi->interfringe->value();
             for (unsigned int m=0;m<2;m++) {
 #pragma omp parallel for collapse(2)
                 for (size_t x=0;x<(size_t)dx;x++) {
                     for (size_t y=0;y<(size_t)dy;y++) {
-                        double xr = xx[x]*cr - yy[y]*sr; //rotate
-                        double yr = xx[x]*sr + yy[y]*cr;
+                        double fx = xx[x]/(double)dx;
+                        double fy = yy[y]/(double)dy;
+                        double u = fx*cr - fy*sr; //rotate: along the carrier
+                        double v = fx*sr + fy*cr; // across the carrier
 
-                        double e_x = -pow(M_PI*(xr*lambda_norm-1.0), 2);
-                        double e_y = -pow(yr*thick_norm, 2);
+                        double e_x = -pow(M_PI*(u*interfringe-1.0), 2);
+                        double e_y = -pow(v*thick_norm, 2);
 
                         double gauss = exp(e_x)*exp(e_y);
 
@@ -1473,13 +1488,13 @@ void Visar::doWave(unsigned int k) {
                     visars[k]->intensity[m].Timg_buffer[kk] -= visars[k]->contrast[m].point(kk)*cos(2*M_PI*phase[m].point(kk));
                 }
                 // removing left and right border
-                int border=visars[k]->settingsUi->border->value();
+                int border=std::min(visars[k]->settingsUi->border->value(),(int)dx/2);
                 if ( border > 0) {
                     for (size_t y=0;y<(size_t)dy;y++) {
-                        int b=0;
+                        double b=0;
                         for (int x=0;x<border;x++) {
                             b+=visars[k]->intensity[m].point(x,y);
-                            b+=visars[k]->intensity[m].point(dx-x,y);
+                            b+=visars[k]->intensity[m].point(dx-1-x,y);
                         }
                         b=b/(2*border);
                         for (size_t x=0;x<(size_t)dx;x++) {

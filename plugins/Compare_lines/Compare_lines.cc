@@ -138,8 +138,8 @@ void Compare_lines::updatePlot() {
             QVector<double> toPlotx;
             QVector<double> toPloty;
 
-            // the line is in pixels of the displayed image: same shift as nObject::getRect
-            vec2f shift=phys->get_origin()-currentBuffer->get_origin();
+            // line points are relative to the image origin: pixel of this image = point + its origin
+            vec2f shift=phys->get_origin();
             vec2f scale=phys->get_scale();
             double dist=0.0;
             for(int ii=0;ii<my_poly.size();ii++) {

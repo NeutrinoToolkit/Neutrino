@@ -114,8 +114,12 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                     double cr = cos(angle_rad);
                     double sr = sin(angle_rad);
 
-                    double thick_norm=thickness[l]*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-                    double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                    // double thick_norm=thickness[l]*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                    // double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                    // the filter is built on true spatial frequencies (cycles/px) before rotating:
+                    // rotating the FFT indices directly misses the carrier on non-square images (unless angle is 0 or 90)
+                    double thick_norm=thickness[l]*M_PI;
+                    double lambda_norm=lambdas[i];
 
 #pragma omp parallel for
                     for (unsigned int k=0;k<surf;k++) {
@@ -125,8 +129,10 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                         int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
                         int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
 
-                        double xr = xx*cr - yy*sr; //rotate
-                        double yr = xx*sr + yy*cr;
+                        double fx = xx/(double)dx;
+                        double fy = yy/(double)dy;
+                        double xr = fx*cr - fy*sr; //rotate
+                        double yr = fx*sr + fy*cr;
 
                         double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
                         double e_y = -pow(yr*thick_norm, 2.);
@@ -480,8 +486,10 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    if (j>=(int)dy/2) j-=dy;\n"
                 "    float cr,sr;\n"
                 "    sr=sincos(angle,&cr);\n"
-                "    float xr=i*cr-j*sr;\n"
-                "    float yr=i*sr+j*cr;\n"
+                "    float fx=i/(float)dx;\n"
+                "    float fy=j/(float)dy;\n"
+                "    float xr=fx*cr-fy*sr;\n"
+                "    float yr=fx*sr+fy*cr;\n"
                 "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
                 "    outReal[id] = gauss * inReal[id];\n"
                 "    outImag[id] = gauss * inImag[id];\n"
@@ -724,16 +732,19 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     DEBUG("Angle: " << (int)nlambda << " " << angles[nangle] << " Lambda: " << (int)nangle << " " << lambdas[nlambda] << " Thick: " << (int)nthick << " " << thickness[nthick] );
 
                     float angle_rad=angles[nangle]*_phys_deg;
-                    float sr=sin(angle_rad);
-                    float cr=cos(angle_rad);
+                    // float sr=sin(angle_rad);
+                    // float cr=cos(angle_rad);
 
-                    float thick_norm=thickness[nthick] * M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                    // float thick_norm=thickness[nthick] * M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                    // true spatial frequencies (cycles/px) in the kernel, see the CPU version
+                    float thick_norm=thickness[nthick] * M_PI;
                     err=clSetKernelArg(kernelGabor,7, sizeof(float), &thick_norm);
 
                     err=clSetKernelArg(kernelGabor, 8, sizeof(float), &angle_rad);
                     check_opencl_error(err, "clSetKernelArg");
 
-                    float lambda_norm=lambdas[nlambda]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                    // float lambda_norm=lambdas[nlambda]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                    float lambda_norm=lambdas[nlambda];
                     err=clSetKernelArg(kernelGabor, 9, sizeof(float), &lambda_norm);
                     check_opencl_error(err, "clSetKernelArg");
 

@@ -45,7 +45,9 @@ Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
 
     connect(actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
     connect(actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
-    connect(doGhostB, SIGNAL(pressed()), this, SLOT(doGhost()));
+    connect(doGhostB, SIGNAL(clicked()), this, SLOT(doGhost()));
+    // the result was closed by the user
+    connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) { if (buf==ghostBusted) ghostBusted=nullptr; });
     connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
 
 }
@@ -53,7 +55,12 @@ Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
 void Ghost_fringes::guessCarrier() {
     nPhysD *image=getPhysFromCombo(ref);
 	if (image) {
-        QRect geom2=maskRegion->path().boundingRect().toRect();
+        // mask region in the pixels of this image: line points are relative to the image origin
+        QRect geom2=maskRegion->poly(1).translated(image->get_origin().x(),image->get_origin().y()).boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
+        if (geom2.width()<2 || geom2.height()<2) {
+            statusbar->showMessage(tr("The mask region is outside the image"), 5000);
+            return;
+        }
 		nPhysD datamatrix;
         datamatrix = image->sub(geom2);
 
@@ -180,27 +187,28 @@ void Ghost_fringes::doGhost () {
         double cr = cos((angleCarrier->value()) * _phys_deg);
         double sr = sin((angleCarrier->value()) * _phys_deg);
 
-        double lambda=sqrt(pow(cr*dx,2)+pow(sr*dy,2))/(M_PI*widthCarrier->value());
+        // the filter is built on true spatial frequencies (cycles/px) before rotating:
+        // rotating the FFT indices directly misplaces the notch on non-square images (unless angle is 0 or 90)
+        double wc=widthCarrier->value();
+        double res=resolution->value();
+        double depth=parameter->value();
+        double sharpness=sqrt(pow(cr*dx,2)+pow(sr*dy,2)); // model 1 edge, in frequency bins along the carrier
 
-        double thick_norm= resolution->value()*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+        // DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << wc);
 
-        DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << lambda);
-
-        if (filter_model->currentText()=="1") {
+        const bool model1 = filter_model->currentText()=="1";
+        const bool model2 = filter_model->currentText()=="2";
+        if (model1 || model2) {
             for (size_t x=0;x<dx;x++) {
                 for (size_t y=0;y<dy;y++) {
-                    double xr = xx[x]*cr - yy[y]*sr;
-                    double yr = xx[x]*sr + yy[y]*cr;
-                    double e_tot = 1.0-parameter->value()*exp(-pow(yr*thick_norm,2))/(1.0+exp(lambda-std::abs(xr)));
-                    imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
-                }
-            }
-        } else if (filter_model->currentText()=="2") {
-            for (size_t x=0;x<dx;x++) {
-                for (size_t y=0;y<dy;y++) {
-                    double xr = xx[x]*cr - yy[y]*sr;
-                    double yr = xx[x]*sr + yy[y]*cr;
-                    double e_tot = 1.0-parameter->value()*exp(-pow(yr*thick_norm,2))*exp(-pow(std::abs(xr)/lambda-M_PI, 2));
+                    double fx = xx[x]/(double)dx;
+                    double fy = yy[y]/(double)dy;
+                    double u = fx*cr - fy*sr; // along the carrier
+                    double v = fx*sr + fy*cr; // across the carrier
+                    double across = exp(-pow(v*M_PI*res,2));
+                    double e_tot = model1 ?
+                                1.0-depth*across/(1.0+exp(sharpness*(1.0/(M_PI*wc)-std::abs(u)))) :
+                                1.0-depth*across*exp(-pow(M_PI*(std::abs(u)*wc-1.0), 2));
                     imageFFT.set(x,y,imageFFT.point(x,y) * e_tot);
                 }
             }
@@ -211,20 +219,21 @@ void Ghost_fringes::doGhost () {
         deepcopy->setShortName("deghost");
         deepcopy->setName("deghost("+imageShot->getName()+","+filter_model->currentText().toStdString()+","+QString::number(resolution->value()).toStdString()+")");
 
-        QRect geom=maskRegion->path().boundingRect().toRect();
-
-        QPolygonF regionPoly=maskRegion->poly(1);
-        regionPoly=regionPoly.translated(imageShot->get_origin().x(),imageShot->get_origin().y());
+        // line points are relative to the image origin: pixels of the shot image = points + its origin
+        // (the bounding box must be shifted too, not only the polygon)
+        QPolygonF regionPoly=maskRegion->poly(1).translated(imageShot->get_origin().x(),imageShot->get_origin().y());
+        QRect geom=regionPoly.boundingRect().toRect().intersected(QRect(0,0,dx,dy));
         std::vector<vec2f> vecPoints(regionPoly.size());
         for(int k=0;k<regionPoly.size();k++) {
             vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
         }
 
-        for(int i=geom.left();i<geom.right(); i++) {
-            for(int j=geom.top();j<geom.bottom(); j++) {
+        for(int i=geom.left();i<=geom.right(); i++) {
+            for(int j=geom.top();j<=geom.bottom(); j++) {
                 vec2f pp(i,j);
                 if (point_inside_poly(pp,vecPoints)==true) {
-                    deepcopy->set(i,j, imageFFT.point(i,j).mod()/(dx*dy));
+                    // the filter is symmetric: the result is real (the modulus would flip negative ringing)
+                    deepcopy->set(i,j, imageFFT.point(i,j).real()/(dx*dy));
                 }
             }
         }
