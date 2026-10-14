@@ -91,16 +91,22 @@ void Integral_inversion::doInversion() {
         std::vector<vec2i> inv_axis;
 
 		int npoints=2.0*((axis->ref.last()->pos()-axis->ref.first()->pos()).manhattanLength());
-		axis_poly = axis->getLine(npoints);
+		// line points are relative to the image origin: pixels of my_phys = points + its origin
+		axis_poly = axis->poly(npoints).translated(my_phys->get_origin().x(),my_phys->get_origin().y());
+		if (axis_poly.size()<2) {
+			statusBar()->showMessage("Axis is too short", 5000);
+			return;
+		}
 		
 		//!fixme we should cut the line when it goes outside and not move the point
-        int xpos= std::max<int>(0lu,std::min((unsigned int)axis_poly.first().x(),my_phys->getW()-1));
-        int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.first().y(),my_phys->getH()-1));
+        // clamp as signed: points left of/above the image must go to 0, not wrap to the other side
+        int xpos=std::max<int>(0,std::min<int>(axis_poly.first().x(),my_phys->getW()-1));
+        int ypos=std::max<int>(0,std::min<int>(axis_poly.first().y(),my_phys->getH()-1));
 		axis_clean << QPoint(xpos,ypos);
 
 		for (int i=1; i<axis_poly.size(); i++) {
-            int xpos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).x(),my_phys->getW()-1));
-            int ypos=std::max<int>(0lu,std::min((unsigned int)axis_poly.at(i).y(),my_phys->getH()-1));
+            int xpos=std::max<int>(0,std::min<int>(axis_poly.at(i).x(),my_phys->getW()-1));
+            int ypos=std::max<int>(0,std::min<int>(axis_poly.at(i).y(),my_phys->getH()-1));
 			if (isHorizontal) {
 				if (xpos != axis_clean.last().x()) axis_clean << QPoint(xpos,ypos);
 			} else {
@@ -157,6 +163,7 @@ void Integral_inversion::doInversion() {
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 
         my_abel_params.iimage= &iimage;
+        my_abel_params.oimage.reset(); // never show the result of a previous run
 
         runThread(&my_abel_params, phys_invert_abel_transl, "Abel inversion..." , inv_axis.size());
 
@@ -167,8 +174,14 @@ void Integral_inversion::doInversion() {
 			// apply physics
 		QApplication::processEvents();		
 
-        if (my_abel_params.oimage) {
+        if (nThread.n_iter==-1) {
+            statusBar()->showMessage("Inversion stopped", 5000);
+        } else if (my_abel_params.oimage) {
             nPhysD inv_image(my_abel_params.oimage->copy());
+
+            if (phaseFringes_checkb->isChecked() && (physTabs->currentIndex()==1 || physTabs->currentIndex()==2)) {
+                physMath::phys_multiply(inv_image, 2*M_PI); // fringes -> radians
+            }
 
             switch (physTabs->currentIndex()) {
             case 0:

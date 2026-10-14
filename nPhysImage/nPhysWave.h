@@ -157,49 +157,86 @@ inline void phys_invert_abel_1D(std::vector<double> &ivec, std::vector<double> &
 
 	size_t size=ivec.size();
 	// FIRST element of *ptr MUST BE on symmetry axis
-// 	double integral;
-	int size_dy = size-1;
 
 	if (size==0)
 		return;
 
-	// 0. init 
-	//memset(ovec, 0, size*sizeof(sizeof(double))); ??????
+	// 0. init
 	std::fill(ovec.begin(), ovec.end(), 0);
 
-	// 1. dy - mind that this shifts the function to semi-integer indexes
-	std::vector<double> dy(size_dy), func_x(size_dy);
-	for (int i=0; i<size_dy; i++)
-		dy[i] = (ivec[i+1] - ivec[i]);
-		//dy[i] = 2.*__ifg_pi*(y[i+1] - y[i]); taken care of elsewhere
-
-	// 2. integral
-	int R0_idx = size-1; 			// considering R=0 for the first index
-	for (int R_idx=0; R_idx<R0_idx; R_idx++) {		// looping on function
-		std::fill(func_x.begin(), func_x.end(), 0);
-		for (int x_idx = (R_idx)+1; x_idx < R0_idx; x_idx++) {
-			func_x[R_idx] = 0.5*(dy[x_idx]+dy[x_idx-1])/sqrt(pow(x_idx-0.5,2) - pow(R_idx,2));
-			ovec[R_idx] += func_x[R_idx];
+	// 1. f(R) = -1/pi int_R^inf F'(y)/sqrt(y^2-R^2) dy
+	// F is linear between samples, so each interval is integrated exactly (singularity at y=R included):
+	// int_k^{k+1} dy/sqrt(y^2-R^2) = log(a_{k+1}/a_k) with a_k = k+sqrt(k^2-R^2)
+	for (size_t R_idx=1; R_idx<size; R_idx++) {
+		double a_prev = R_idx;
+		double sum = 0;
+		for (size_t x_idx=R_idx; x_idx+1<size; x_idx++) {
+			double a_next = (x_idx+1.0)+sqrt(pow(x_idx+1.0,2)-pow(R_idx,2));
+			sum += (ivec[x_idx+1]-ivec[x_idx])*log(a_next/a_prev);
+			a_prev = a_next;
 		}
-		// first index is R_idx, last index is (R0_idx-2): trapezioid integral correction
-
-		ovec[R_idx] -= 0.5*(func_x[R_idx]+func_x[R0_idx-1]);
-		ovec[R_idx] /= -M_PI;
-
+		ovec[R_idx] = -sum/M_PI;
 	}
 
-	// shift of half index on the right
-	double prev_p = ovec[0];
-	for (size_t ii=1; ii<size; ii++) {
-		ovec[ii] = .5*(prev_p+ovec[ii]);
-		prev_p = ovec[ii];
-	}
-	
-	// zero axis
-	ovec[0] = 0;
+	// 2. axis: f is even in R, parabolic extrapolation f(0)=(4f(1)-f(2))/3
+	if (size>2)
+		ovec[0] = (4.*ovec[1]-ovec[2])/3.;
+	else if (size>1)
+		ovec[0] = ovec[1];
 
 	return;
 }
+
+// old implementation: the trapezoid correction used func_x[R0_idx-1] (always 0), the [R,R+1/2] interval
+// was skipped and the half index shift was recursive (smoothing): 5-9% error on a gaussian
+// inline void phys_invert_abel_1D(std::vector<double> &ivec, std::vector<double> &ovec)
+// {
+//
+// 	size_t size=ivec.size();
+// 	// FIRST element of *ptr MUST BE on symmetry axis
+// // 	double integral;
+// 	int size_dy = size-1;
+//
+// 	if (size==0)
+// 		return;
+//
+// 	// 0. init 
+// 	//memset(ovec, 0, size*sizeof(sizeof(double))); ??????
+// 	std::fill(ovec.begin(), ovec.end(), 0);
+//
+// 	// 1. dy - mind that this shifts the function to semi-integer indexes
+// 	std::vector<double> dy(size_dy), func_x(size_dy);
+// 	for (int i=0; i<size_dy; i++)
+// 		dy[i] = (ivec[i+1] - ivec[i]);
+// 		//dy[i] = 2.*__ifg_pi*(y[i+1] - y[i]); taken care of elsewhere
+//
+// 	// 2. integral
+// 	int R0_idx = size-1; 			// considering R=0 for the first index
+// 	for (int R_idx=0; R_idx<R0_idx; R_idx++) {		// looping on function
+// 		std::fill(func_x.begin(), func_x.end(), 0);
+// 		for (int x_idx = (R_idx)+1; x_idx < R0_idx; x_idx++) {
+// 			func_x[R_idx] = 0.5*(dy[x_idx]+dy[x_idx-1])/sqrt(pow(x_idx-0.5,2) - pow(R_idx,2));
+// 			ovec[R_idx] += func_x[R_idx];
+// 		}
+// 		// first index is R_idx, last index is (R0_idx-2): trapezioid integral correction
+//
+// 		ovec[R_idx] -= 0.5*(func_x[R_idx]+func_x[R0_idx-1]);
+// 		ovec[R_idx] /= -M_PI;
+//
+// 	}
+//
+// 	// shift of half index on the right
+// 	double prev_p = ovec[0];
+// 	for (size_t ii=1; ii<size; ii++) {
+// 		ovec[ii] = .5*(prev_p+ovec[ii]);
+// 		prev_p = ovec[ii];
+// 	}
+// 	
+// 	// zero axis
+// 	ovec[0] = 0;
+//
+// 	return;
+// }
 
 
 

@@ -1116,7 +1116,7 @@ physWave::phys_apply_inversion_protons(physD &invimage, double energy, double re
     invimage.set_scale(res*1e2,res*1e2);
     invimage.prop["unitsX"]="cm";
     invimage.prop["unitsY"]="cm";
-    invimage.prop["unitsCB"]="C/m-3";
+    invimage.prop["unitsCB"]="C m-3";
 }
 
 
@@ -1163,6 +1163,7 @@ void physWave::phys_invert_abel(abel_params &params)
         for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
             if ((*params.iter_ptr)!=-1) {
 
+#pragma omp atomic
                 (*params.iter_ptr)++;
 
                 size_t axe_point[2];
@@ -1180,7 +1181,7 @@ void physWave::phys_invert_abel(abel_params &params)
 
                 phys_invert_abel_1D(copy_buffer, out_buffer);
 
-                double axis_val=0.5*out_buffer[1];
+                double axis_val=0.5*out_buffer[0];
 
                 params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
 
@@ -1191,7 +1192,7 @@ void physWave::phys_invert_abel(abel_params &params)
 
                 phys_invert_abel_1D(copy_buffer, out_buffer);
 
-                axis_val+=0.5*out_buffer[1];
+                axis_val+=0.5*out_buffer[0];
 
                 params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
 

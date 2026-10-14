@@ -745,20 +745,27 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
     nThread.setThread(iparams,my_func);
 
     nThread.start();
+    bool canceled=false;
     while (nThread.isRunning()) {
         if (max_calc > 0) {
             progress.setValue(nThread.n_iter);
             if (progress.wasCanceled()) {
                 nThread.stop();
+                canceled=true;
                 break;
             }
         }
         QApplication::processEvents();
     }
+    // the calculation stops at its next check of n_iter: wait for it, the caller owns its data
+    nThread.wait();
+    if (canceled) {
+        nThread.n_iter=-1; // a running iteration may have incremented it again
+    }
     progress.setValue(0);
     progress.hide();
     progress.close();
-    if (nThread.n_iter==0) {
+    if (!canceled && nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }
     
