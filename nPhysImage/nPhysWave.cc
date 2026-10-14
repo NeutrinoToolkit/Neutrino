@@ -921,18 +921,18 @@ void physWave::phys_phase_unwrap(physD &wphase, physD &quality, enum unwrap_stra
         uphase.setFromName(wphase.getFromName());
 
         switch (strategy) {
-            case SIMPLE_HV :
+            case SIMPLE_HV : // rows, then the columns starting from the unwrapped first row
                 unwrap::simple_h(wphase, uphase);
-                unwrap::simple_v(wphase, uphase);
+                unwrap::simple_v(wphase, uphase, true);
                 break;
 
             case SIMPLE_VH :
                 unwrap::simple_v(wphase, uphase);
-                unwrap::simple_h(wphase, uphase);
+                unwrap::simple_h(wphase, uphase, true);
                 break;
 
-            case GOLDSTEIN :
-                unwrap::goldstein(wphase, uphase);
+            case GOLDSTEIN : // quality: order of the flood fill, <=0 are cuts (barrier)
+                unwrap::goldstein(wphase, uphase, quality);
                 break;
 
             case QUALITY :

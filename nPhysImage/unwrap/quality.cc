@@ -2,6 +2,7 @@
 #include <limits>
 #include <algorithm>
 #include "unwrap.h"
+#include <cmath>
 
 inline int jump(double lVal, double rVal) {
     double difference = rVal - lVal;
@@ -41,7 +42,8 @@ inline bool EdgeComp(Edge const & a, Edge const & b) {
 void unwrap::miguel(physD &phase, physD &unwrap) {
     unsigned int dx=phase.getW();
     unsigned int dy=phase.getH();
-    physD quality_miguel(dx,dy,1.0);
+    // border pixels: lowest reliability, unwrapped last (as in Herraez et al.)
+    physD quality_miguel(dx,dy,0.0);
     for (unsigned int j = 1; j<dy -1; ++j) {
         for (unsigned int i = 1; i<dx - 1; ++i) {
             quality_miguel.set(i,j,reliability(phase, i,j));
@@ -53,14 +55,11 @@ void unwrap::miguel(physD &phase, physD &unwrap) {
 void unwrap::miguel_quality(physD& phase, physD& unwrap, physD& quality) {
     unsigned int dx=phase.getW();
     unsigned int dy=phase.getH();
-    physD quality_miguel(dx,dy,1.0);
-    for (unsigned int j = 0; j<dy; ++j) {
-        for (unsigned int i = 0; i<dx; ++i) {
-            if (j>0 && j<dy-1 && i>0 && i < dx-1) {
-                quality_miguel.set(i,j,quality.point(i,j)*reliability(phase, i,j));
-            } else{
-                quality_miguel.set(i,j,quality.point(i+j*dx));
-            }
+    // border pixels: lowest reliability, unwrapped last (as in Herraez et al.)
+    physD quality_miguel(dx,dy,0.0);
+    for (unsigned int j = 1; j<dy-1; ++j) {
+        for (unsigned int i = 1; i<dx-1; ++i) {
+            quality_miguel.set(i,j,quality.point(i,j)*reliability(phase, i,j));
         }
     }
     unwrap::quality(phase, unwrap, quality_miguel);
@@ -74,17 +73,19 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
     for (unsigned int i = 0; i<dx*dy; ++i) {
         px[i].jumps = 0;
         px[i].nPixels = 1;
-        px[i].quality = quality.point(i);
+        // NaN would break the ordering of std::sort: it is the worst quality
+        px[i].quality = std::isfinite(quality.point(i)) ? quality.point(i) : -std::numeric_limits<double>::infinity();
         px[i].first = &px[i];
         px[i].last = &px[i];
         px[i].next = nullptr;
     }
 
-    // calculate Edges
+    // calculate Edges (not through NaN phase: those pixels stay NaN)
     std::vector<Edge> edge((dx-1)*dy+(dy-1)*dx); // look the 4 for below!
     int k=0;
     for (unsigned int j = 0; j<dy; j++) {
         for (unsigned int i = 0; i<dx - 1; i++)  {
+            if (!std::isfinite(phase.point(i,j)) || !std::isfinite(phase.point(i+1,j))) continue;
             edge[k].p1 = &px[i+j*dx];
             edge[k].p2 = &px[i+1+j*dx];
             edge[k].quality = px[i+j*dx].quality + px[i+1+j*dx].quality;
@@ -94,6 +95,7 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
     }
     for (unsigned int j = 0; j<dy - 1; j++) {
         for (unsigned int i = 0; i<dx; i++) {
+            if (!std::isfinite(phase.point(i,j)) || !std::isfinite(phase.point(i,j+1))) continue;
             edge[k].p1 = &px[i+j*dx];
             edge[k].p2 = &px[i+(1+j)*dx];
             edge[k].quality = px[i+j*dx].quality + px[i+(1+j)*dx].quality;
@@ -101,6 +103,8 @@ void unwrap::quality(physD& phase, physD& unwrap, physD& quality) {
             k++;
         }
     }
+
+    edge.resize(k);
 
     //sort the Edges depending on their reiability. The Pixels with higher relibility (small value) first
     std::sort(edge.begin(), edge.end(), EdgeComp);

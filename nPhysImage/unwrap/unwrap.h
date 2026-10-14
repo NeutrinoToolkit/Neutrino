@@ -11,11 +11,13 @@ inline double grad(double p1, double p2) {
 
 namespace unwrap {
   void goldstein (physD &, physD &);
+  void goldstein (physD &, physD &, physD &); // quality: >0 order of the flood fill, <=0 (or NaN) are cuts
   void miguel (physD &, physD &);
   void miguel_quality (physD &, physD &, physD&);
   void quality (physD &, physD &, physD &);
-  void simple_h (physD&, physD&);
-  void simple_v (physD&, physD&);
+  // from_uphase: each line starts from the value already in uphase (second pass of H+V or V+H)
+  void simple_h (physD&, physD&, bool from_uphase=false);
+  void simple_v (physD&, physD&, bool from_uphase=false);
 }
 
 #endif

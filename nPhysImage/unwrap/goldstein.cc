@@ -2,6 +2,8 @@
  * maingold.c - phase unwrapping by means of residues & branch cuts
  */
 #include "unwrap.h"
+#include <cmath>
+#include <limits>
 
 #define POSITIVE    1
 #define NEGATIVE    2
@@ -164,11 +166,28 @@ void PlaceCut(nPhysBits &bits, int a, int b, int c, int d) {
 
 
 void unwrap::goldstein (physD &phase, physD &soln) {
+    physD quality(phase.getW(),phase.getH(),1.0,"qual");
+    unwrap::goldstein(phase, soln, quality);
+}
+
+void unwrap::goldstein (physD &phase, physD &soln, physD &quality) {
     unsigned int dx=phase.getW();
     unsigned int dy=phase.getH();
 
+    // quality orders the flood fill (highest first); NaN phase and quality<=0 (barrier) are cuts
     physD qual_map(dx,dy,0.0,"qual");
     nPhysBits bits(dx,dy,0,"bits");
+    for (unsigned int k=0; k<dx*dy; k++) {
+        double q=quality.point(k);
+        soln.set(k,std::numeric_limits<double>::quiet_NaN());
+        if (!std::isfinite(phase.point(k))) {
+            bits.set(k, BORDER); // branch cuts can end here, never unwrapped through
+        } else if (!(q>0)) {
+            bits.set(k, BRANCH_CUT);
+        } else {
+            qual_map.set(k,q);
+        }
+    }
 
     int NumRes=0;
     for (unsigned int j=0; j<dy - 1; j++) {
@@ -308,18 +327,40 @@ void unwrap::goldstein (physD &phase, physD &soln) {
             }
         }
     }
-    /* unwrap branch cut pixels */
-    for (unsigned int j=1; j<dy; j++) {
-        for (unsigned int i=1; i<dx; i++) {
-            if (bits.point(i,j) & AVOID) {
-                if ((bits.point(i-1,j) & UNWRAPPED)) {
-                    soln.set(i,j,soln.point(i-1,j)+grad(phase.point(i,j),phase.point(i-1,j)));
-                    bits.set(i,j,bits.point(i,j) | UNWRAPPED);
-                } else if ((bits.point(i,j-1) & UNWRAPPED)) {
-                    soln.set(i,j,soln.point(i,j-1)+grad(phase.point(i,j),phase.point(i,j-1)));
-                    bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+    /* unwrap branch cut pixels: from any unwrapped neighbour, until nothing changes (cuts can be long, also on the first row/column) */
+    bool changed=true;
+    while (changed) {
+        changed=false;
+        for (unsigned int j=0; j<dy; j++) {
+            for (unsigned int i=0; i<dx; i++) {
+                if ((bits.point(i,j) & BRANCH_CUT) && !(bits.point(i,j) & (UNWRAPPED | BORDER))) {
+                    const int ni[4]={(int)i-1,(int)i+1,(int)i,(int)i};
+                    const int nj[4]={(int)j,(int)j,(int)j-1,(int)j+1};
+                    for (int n=0; n<4; n++) {
+                        if (ni[n]>=0 && ni[n]<(int)dx && nj[n]>=0 && nj[n]<(int)dy && (bits.point(ni[n],nj[n]) & UNWRAPPED) && std::isfinite(soln.point(ni[n],nj[n]))) {
+                            soln.set(i,j,soln.point(ni[n],nj[n])+grad(phase.point(i,j),phase.point(ni[n],nj[n])));
+                            bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+                            changed=true;
+                            break;
+                        }
+                    }
                 }
             }
         }
     }
+    // old version: only from the left/top neighbour, first row/column never unwrapped
+//     /* unwrap branch cut pixels */
+//     for (unsigned int j=1; j<dy; j++) {
+//         for (unsigned int i=1; i<dx; i++) {
+//             if (bits.point(i,j) & AVOID) {
+//                 if ((bits.point(i-1,j) & UNWRAPPED)) {
+//                     soln.set(i,j,soln.point(i-1,j)+grad(phase.point(i,j),phase.point(i-1,j)));
+//                     bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+//                 } else if ((bits.point(i,j-1) & UNWRAPPED)) {
+//                     soln.set(i,j,soln.point(i,j-1)+grad(phase.point(i,j),phase.point(i,j-1)));
+//                     bits.set(i,j,bits.point(i,j) | UNWRAPPED);
+//                 }
+//             }
+//         }
+//     }
 }
