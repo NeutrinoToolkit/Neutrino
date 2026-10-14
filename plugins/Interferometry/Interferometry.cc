@@ -440,35 +440,108 @@ void Interferometry::doUnwrap () {
             };
 
             physD phase2=phase->copy();
-            bool haveAngles = nPhysExists(localPhys["angle_shot"]) && nPhysExists(localPhys["angle_ref"]);
+            bool haveAngles = nPhysExists(localPhys["angle_shot"]) && nPhysExists(localPhys["phase_2pi_shot"]);
             if (unwrapAngles->isChecked() && !haveAngles) {
-                statusbar->showMessage(tr("Unwrap angles needs the wavelet of both reference and shot"), 5000);
+                statusbar->showMessage(tr("Unwrap angles needs the wavelet of the shot"), 5000);
             }
             if (unwrapAngles->isChecked() && haveAngles) {
+                // where the best filter points opposite to the (unwrapped) fringe direction, the phase of the SHOT changes sign:
+                // flip the shot phase there, then subtract the reference (flipping the difference is wrong by 2*phase_ref)
                 physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
-                physMath::phys_point_subtract(angle,*static_cast<physD*>(localPhys["angle_ref"]));
-                physMath::phys_divide(angle,180);
-                physD orig_angle=angle.copy();
+                physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
                 physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
                 doPhaseUnwrap(angle, unwrapAngle);
-                physMath::phys_point_subtract(unwrapAngle,orig_angle);
-                physMath::phys_add(unwrapAngle,100);
-                for (size_t k=0; k<unwrapAngle.getSurf(); k++)
-                    if (int(unwrapAngle.Timg_buffer[k]) % 2 == 1) {
-                        phase2.Timg_buffer[k] = 1.0-phase2.Timg_buffer[k];
+
+                physD shotFlipped = (static_cast<physD*>(localPhys["phase_2pi_shot"]))->copy();
+                for (size_t k=0; k<unwrapAngle.getSurf(); k++) {
+                    long swaps=std::lround(unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k]); // round: unwrapped values are not exact integers away
+                    if (std::abs(swaps) % 2 == 1) {
+                        shotFlipped.Timg_buffer[k] = -shotFlipped.Timg_buffer[k];
                         unwrapAngle.Timg_buffer[k]=1;
                     } else {
                         unwrapAngle.Timg_buffer[k]=0;
                     }
+                }
+
+                // reference phase: the reference wavelet or the carrier
+                physD refPhase;
+                if ( !localPhys["phase_2pi_ref"] || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
+                    refPhase = physD(shotFlipped.getW(),shotFlipped.getH(),0.0);
+                    physWave::phys_subtract_carrier(refPhase, angleCarrier->value(), widthCarrier->value());
+                    physMath::phys_multiply(refPhase,-1.0);
+                } else {
+                    refPhase = static_cast<physD*>(localPhys["phase_2pi_ref"])->copy();
+                }
+
+                // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
+                // and keep the one with the smaller range (max-min of the unwrapped phase)
+                auto finiteRange = [](physD &img) {
+                    double mini=std::numeric_limits<double>::max(), maxi=-std::numeric_limits<double>::max();
+                    for (size_t k=0; k<img.getSurf(); k++) {
+                        if (std::isfinite(img.Timg_buffer[k])) {
+                            mini=std::min(mini,img.Timg_buffer[k]);
+                            maxi=std::max(maxi,img.Timg_buffer[k]);
+                        }
+                    }
+                    return maxi-mini;
+                };
+                physD phaseMinus=shotFlipped.copy(), phasePlus=shotFlipped.copy();
+                physMath::phys_point_subtract(phaseMinus,refPhase);
+                physMath::phys_point_add(phasePlus,refPhase);
+                physMath::phys_remainder(phaseMinus,1.0);
+                physMath::phys_remainder(phasePlus,1.0);
+                physD unwrapMinus, unwrapPlus;
+                doPhaseUnwrap(phaseMinus, unwrapMinus);
+                doPhaseUnwrap(phasePlus, unwrapPlus);
+                bool minus=finiteRange(unwrapMinus) <= finiteRange(unwrapPlus);
+                phase2 = minus ? phaseMinus : phasePlus;
+                unwrap = minus ? unwrapMinus : unwrapPlus;
+                phase2.set_origin(phase->get_origin());
+                phase2.set_scale(phase->get_scale());
+                unwrap.set_origin(phase->get_origin());
+                unwrap.set_scale(phase->get_scale());
+
                 phase2.TscanBrightness();
                 unwrapAngle.TscanBrightness();
                 unwrapAngle.setShortName("unwrap angles");
                 localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),localPhys["unwrap_angles"]);
-                phase2.setShortName("phase2");
+                phase2.setShortName(minus ? "phase2 (shot-ref)" : "phase2 (shot+ref)");
                 localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),localPhys["phase2"]);
+            } else {
+                doPhaseUnwrap(phase2, unwrap);
             }
 
-            doPhaseUnwrap(phase2, unwrap);
+            // old implementation: angle of shot-ref, flipped the difference (1-phase) with int() truncation
+//            physD phase2=phase->copy();
+//            bool haveAngles = nPhysExists(localPhys["angle_shot"]) && nPhysExists(localPhys["angle_ref"]);
+//            if (unwrapAngles->isChecked() && !haveAngles) {
+//                statusbar->showMessage(tr("Unwrap angles needs the wavelet of both reference and shot"), 5000);
+//            }
+//            if (unwrapAngles->isChecked() && haveAngles) {
+//                physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
+//                physMath::phys_point_subtract(angle,*static_cast<physD*>(localPhys["angle_ref"]));
+//                physMath::phys_divide(angle,180);
+//                physD orig_angle=angle.copy();
+//                physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
+//                doPhaseUnwrap(angle, unwrapAngle);
+//                physMath::phys_point_subtract(unwrapAngle,orig_angle);
+//                physMath::phys_add(unwrapAngle,100);
+//                for (size_t k=0; k<unwrapAngle.getSurf(); k++)
+//                    if (int(unwrapAngle.Timg_buffer[k]) % 2 == 1) {
+//                        phase2.Timg_buffer[k] = 1.0-phase2.Timg_buffer[k];
+//                        unwrapAngle.Timg_buffer[k]=1;
+//                    } else {
+//                        unwrapAngle.Timg_buffer[k]=0;
+//                    }
+//                phase2.TscanBrightness();
+//                unwrapAngle.TscanBrightness();
+//                unwrapAngle.setShortName("unwrap angles");
+//                localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),localPhys["unwrap_angles"]);
+//                phase2.setShortName("phase2");
+//                localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),localPhys["phase2"]);
+//            }
+
+//            doPhaseUnwrap(phase2, unwrap);
 #ifdef __phys_debug
             if (useBarrier->isChecked()) {
                 localPhys["barrier"]=nparent->replacePhys(new nPhysD(barrierPhys),localPhys["barrier"]);
