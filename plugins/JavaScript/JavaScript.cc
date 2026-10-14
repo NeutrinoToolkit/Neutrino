@@ -25,12 +25,13 @@
 
 #include "JavaScript.h"
 #include "nPhysImageF.h"
+#include <QScopedValueRollback>
 
 Q_DECLARE_METATYPE(QList<nGenericPan*>);
 Q_DECLARE_METATYPE(QList<neutrino*>);
 
-JavaScript::JavaScript(neutrino *my_nparent) : nGenericPan(my_nparent),
-my_eng(my_nparent)
+JavaScript::JavaScript(neutrino *my_nparent) : nGenericPan(my_nparent)
+// my_eng(my_nparent) // the engine is a member: no QObject parent
 {
     setupUi(this);
     my_eng.globalObject().setProperty("neu", my_eng.newQObject(nparent));
@@ -39,6 +40,13 @@ my_eng(my_nparent)
     my_eng.setObjectOwnership(qApp, QJSEngine::CppOwnership);
 
     my_eng.installExtensions(QJSEngine::ConsoleExtension);
+
+    // print() and console.log write in the output box; processEvents() keeps the GUI (and Stop) alive in long loops
+    my_eng.globalObject().setProperty("jsPan", my_eng.newQObject(this));
+    my_eng.setObjectOwnership(this, QJSEngine::CppOwnership);
+    my_eng.evaluate("function print() { jsPan.appendOutput(Array.prototype.map.call(arguments, function(a) { return String(a); }).join(' ')); }\n"
+                    "function processEvents() { jsPan.processScriptEvents(); }\n"
+                    "console.log = print;\n");
 
     qRegisterMetaType<nGenericPan*>("nGenericPan*");
     qRegisterMetaType<nPhysD*>("nPhysD*");
@@ -53,26 +61,86 @@ my_eng(my_nparent)
 
     QShortcut* my_shortcut = new QShortcut(key_seq, command);
     connect(my_shortcut, SIGNAL(activated()), this, SLOT(runIt()));
+    connect(actionRun, SIGNAL(triggered()), this, SLOT(runIt()));
+    connect(actionStop, SIGNAL(triggered()), this, SLOT(stopIt()));
+    actionRun->setToolTip(actionRun->toolTip()+" ("+key_seq.toString(QKeySequence::NativeText)+")");
     show();
 }
 
+// void JavaScript::runIt() {
+//     saveDefaults();
+//     QJSValue retval;
+//     output->clear();
+//     QString mytext=command->toPlainText();
+//     if(QFileInfo::exists(mytext)) {
+//         QFile t(mytext);
+//         t.open(QIODevice::ReadOnly| QIODevice::Text);
+//         QTextStream out(&t);
+//         QString toRun=out.readAll();
+//         t.close();
+//         retval = my_eng.evaluate(toRun, mytext);
+//     } else {
+//         qDebug() << mytext;
+//         retval = my_eng.evaluate(mytext);
+//     }
+//     output->setPlainText(retval.toString());
+// }
+
 void JavaScript::runIt() {
+    if (running) return; // processEvents() in a script can bring us here again
     saveDefaults();
-    QJSValue retval;
     output->clear();
     QString mytext=command->toPlainText();
-    if(QFileInfo::exists(mytext)) {
-        QFile t(mytext);
-        t.open(QIODevice::ReadOnly| QIODevice::Text);
-        QTextStream out(&t);
-        QString toRun=out.readAll();
-        t.close();
-        retval = my_eng.evaluate(toRun, mytext);
-    } else {
-        qDebug() << mytext;
-        retval = my_eng.evaluate(mytext);
+    QString toRun=mytext;
+    QString source;
+    // a single line with the name of a file: run the file
+    QString fname=mytext.trimmed();
+    if (!fname.contains('\n') && QFileInfo(fname).isFile()) {
+        QFile t(fname);
+        if (!t.open(QIODevice::ReadOnly| QIODevice::Text)) {
+            output->setPlainText(tr("Cannot open ")+fname+": "+t.errorString());
+            return;
+        }
+        QTextStream in(&t);
+        toRun=in.readAll();
+        source=fname;
     }
-    output->setPlainText(retval.toString());
+    // qDebug() << mytext;
+
+    QJSValue retval;
+    {
+        QScopedValueRollback<bool> guard(running,true);
+        actionRun->setEnabled(false);
+        actionStop->setEnabled(true);
+        my_eng.setInterrupted(false);
+        retval = my_eng.evaluate(toRun, source);
+        actionRun->setEnabled(true);
+        actionStop->setEnabled(false);
+    }
+
+    if (my_eng.isInterrupted()) {
+        my_eng.setInterrupted(false);
+        output->appendPlainText(tr("Stopped"));
+    } else if (retval.isError()) {
+        output->appendPlainText(tr("line %1: %2").arg(retval.property("lineNumber").toInt()).arg(retval.toString()));
+        QString stack=retval.property("stack").toString();
+        if (stack.contains('\n')) output->appendPlainText(stack); // only for nested calls
+    } else if (!retval.isUndefined()) {
+        output->appendPlainText(retval.toString());
+    }
+}
+
+void JavaScript::stopIt() {
+    my_eng.setInterrupted(true);
+}
+
+void JavaScript::appendOutput(QString text) {
+    output->appendPlainText(text);
+    processScriptEvents();
+}
+
+void JavaScript::processScriptEvents() {
+    QCoreApplication::processEvents();
 }
 
 void JavaScript::on_actionOpen_File_triggered() {
@@ -83,6 +151,8 @@ void JavaScript::on_actionOpen_File_triggered() {
         if (f.open(QFile::ReadOnly | QFile::Text)) {
             QTextStream in(&f);
             command->setPlainText(in.readAll());
+        } else {
+            statusbar->showMessage(tr("Cannot open ")+fname+": "+f.errorString(), 5000);
         }
     }
 }
@@ -92,10 +162,17 @@ void JavaScript::on_actionSave_File_triggered() {
     if (!fname.isEmpty()) {
         setProperty("NeuSave-fileJS", fname);
         QFile f(fname);
-        if (f.open(QFile::ReadWrite | QFile::Text)) {
-            QTextStream in(&f);
-            in << command->toPlainText();
+        // if (f.open(QFile::ReadWrite | QFile::Text)) {
+        //     QTextStream in(&f);
+        //     in << command->toPlainText();
+        // }
+        // command->setPlainText(fname);
+        if (f.open(QFile::WriteOnly | QFile::Truncate | QFile::Text)) {
+            QTextStream out(&f);
+            out << command->toPlainText();
+            statusbar->showMessage(tr("Saved ")+fname, 5000);
+        } else {
+            statusbar->showMessage(tr("Cannot write ")+fname+": "+f.errorString(), 5000);
         }
-        command->setPlainText(fname);
     }
 }

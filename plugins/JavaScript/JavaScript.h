@@ -41,11 +41,17 @@ public:
 
 public slots:
     void runIt();
+    void stopIt();
     void on_actionOpen_File_triggered();
     void on_actionSave_File_triggered();
 
+    // called by the scripts (print, console.log, processEvents)
+    void appendOutput(QString);
+    void processScriptEvents();
+
 private:
     QJSEngine my_eng;
+    bool running=false;
 
 };
 
