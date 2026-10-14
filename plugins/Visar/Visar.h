@@ -136,6 +136,8 @@ private:
 
     QPointer<nRect> sopRect;
 
+    bool computingWave=false; // our own replacePhys (deghost) must not ask for a new wave
+
 public slots:
 
     void fillComboShot();
@@ -150,6 +152,7 @@ public slots:
     void getPhysFromNameSetCombo(QFileInfo, QComboBox*);
 
     void needWave(unsigned int);
+    void imageChanged(nPhysD*);
 
     void doWave();
     void doWave(unsigned int);

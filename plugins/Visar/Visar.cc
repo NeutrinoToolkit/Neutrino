@@ -23,6 +23,7 @@
  *
  */
 #include "Visar.h"
+#include <QScopedValueRollback>
 #include "nCustomPlots.h"
 #include "nPhysD.h"
 #include "neutrino.h"
@@ -134,6 +135,8 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
     connect(etalon_lambda, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
 
     connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
+    // shot or reference modified (or replaced in place) by another plugin
+    connect(nparent, &neutrino::physChanged, this, &Visar::imageChanged);
 
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
@@ -1329,7 +1332,20 @@ void Visar::needWave(unsigned int k) {
     }
 }
 
+void Visar::imageChanged(nPhysD *phys) {
+    if (computingWave || !phys) return;
+    for (unsigned int k=0;k<visars.size();k++){
+        if (phys==getPhysFromCombo(visars[k]->settingsUi->refImage) || phys==getPhysFromCombo(visars[k]->settingsUi->shotImage)) {
+            needWave(k);
+        }
+    }
+    if (phys==getPhysFromCombo(sopRef) || phys==getPhysFromCombo(sopShot)) {
+        updatePlotSOP();
+    }
+}
+
 void Visar::doWave(unsigned int k) {
+    QScopedValueRollback<bool> rollback(computingWave, true);
     if (k< visars.size()) {
 
         std::array<nPhysD*,2> imgs={{getPhysFromCombo(visars[k]->settingsUi->refImage),getPhysFromCombo(visars[k]->settingsUi->shotImage)}};
