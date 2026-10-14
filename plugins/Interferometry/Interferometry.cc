@@ -339,7 +339,8 @@ void Interferometry::doWavelet (int iimage) {
         }
 
         if (retList["phase_2pi"] && retList["contrast"]) {
-            retList["synthetic"] = new nPhysD(physWave::phys_synthetic_interferogram(retList["phase_2pi"], retList["contrast"]));
+            // retList["synthetic"] = new nPhysD(physWave::phys_synthetic_interferogram(retList["phase_2pi"], retList["contrast"]));
+            retList["synthetic"] = new nPhysD(physWave::phys_synthetic_interferogram(retList["phase_2pi"], retList["contrast"], retList["intensity"]));
         }
         // qDebug() << retList.size();
         for(auto & itr : retList) {

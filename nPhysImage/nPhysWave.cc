@@ -30,12 +30,40 @@
  * @{
  */
 
+// sub-step position of the maximum of the filter response: parabola on log|z|^2 through the best filter
+// and its two neighbours (in units of the scan step, within +-0.5). Values <=0 mean "no neighbour" -> 0
+static double wavelet_parabolic_offset(double ym, double y0, double yp) {
+    if (ym<=0 || y0<=0 || yp<=0) return 0;
+    ym=log(ym);
+    y0=log(y0);
+    yp=log(yp);
+    double den=ym-2*y0+yp;
+    if (den>=0) return 0;
+    return std::clamp(0.5*(ym-yp)/den,-0.5,0.5);
+}
+
+// the FFT spreads a single NaN over the whole image: fill the non finite pixels (Laplace) on a copy of the data.
+// Returns false if there is no finite pixel at all
+static bool wavelet_finite_input(physD &data, physD &fdata) {
+    fdata=data;
+    std::vector<vec2i> holes;
+    for (size_t j=0; j<data.getH(); j++) {
+        for (size_t i=0; i<data.getW(); i++) {
+            if (!std::isfinite(data.point(i,j))) holes.push_back(vec2i(i,j));
+        }
+    }
+    if (holes.size()==data.getSurf()) return false;
+    if (holes.size()>0) physMath::laplace_fill(fdata,holes);
+    return true;
+}
+
 void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 {
     DEBUG(5,"start");
 
 
-    if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0)) {
+    physD fdata;
+    if (params.data && (params.n_angles > 0) && (params.n_lambdas > 0) && (params.data->getSurf() != 0) && wavelet_finite_input(*params.data, fdata)) {
 
         params.olist.clear();
 
@@ -91,17 +119,35 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
 #pragma omp parallel for
         for (size_t i = 0; i < surf; i++) {
-            t[i][0] = params.data->Timg_buffer[i];
+            // t[i][0] = params.data->Timg_buffer[i];
+            t[i][0] = fdata.Timg_buffer[i];
             t[i][1] = 0;
         }
 
         fftw_execute(plan_fwd);
 
         double damp_norm=params.damp*M_PI;
+        // Morlet admissibility: subtract kappa*exp(-(damp_norm*xr*lambda_norm)^2) so the filter is zero at zero frequency
+        // (otherwise the background leaks into the fringes for small damp). Normalized to keep gain 1 at the carrier
+        double kappa = damp_norm>0 ? exp(-damp_norm*damp_norm) : 0;
+        double norm_adm = 1.0/(1.0-kappa*kappa);
+
+        // refinement of lambda and angle maps: for each pixel keep the response of the filters next to the best one
+        // (lambda-1, lambda+1, angle-1, angle+1 at the same thickness). The previous responses are kept for one row
+        // of the inner scan, which is the shorter one between angles and lambdas
+        bool anglesInner = angles.size() <= lambdas.size();
+        size_t nInner = anglesInner ? angles.size() : lambdas.size();
+        size_t nOuter = anglesInner ? lambdas.size() : angles.size();
+        auto rowIdx = [&](size_t il, size_t ia) { return anglesInner ? ia : il; };
+        std::vector<float> prevRow(nInner*surf, -1);
+        std::vector<float> nearLambda(2*surf, -1), nearAngle(2*surf, -1); // [0..surf) minus, [surf..2surf) plus
+        std::vector<int> bestT(surf,-1), bestL(surf,-1), bestA(surf,-1);
 
         for (size_t l=0; l<thickness.size(); l++) {
-            for (size_t i=0; i<lambdas.size(); i++) {
-                for (size_t j=0; j<angles.size(); j++) {
+            for (size_t o=0; o<nOuter; o++) {
+                for (size_t n=0; n<nInner; n++) {
+                    size_t i = anglesInner ? o : n; // lambda index
+                    size_t j = anglesInner ? n : o; // angle index
 
                     if ((*params.iter_ptr)==-1) {
                         DEBUG("Aborting");
@@ -137,7 +183,8 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                         double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
                         double e_y = -pow(yr*thick_norm, 2.);
 
-                        double gauss = exp(e_x)*exp(e_y);
+                        // double gauss = exp(e_x)*exp(e_y);
+                        double gauss = norm_adm*(exp(e_x)-kappa*exp(-pow(damp_norm*xr*lambda_norm, 2.)))*exp(e_y);
 
                         t[k][0]=Ft[k][0]*gauss;
                         t[k][1]=Ft[k][1]*gauss;
@@ -150,13 +197,25 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 #pragma omp parallel for
                     for (size_t k=0; k<surf; k++) {
                         double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
+                        if (bestT[k]==(int)l) {
+                            if (bestA[k]==(int)j && bestL[k]+1==(int)i) nearLambda[surf+k]=qmap_local;
+                            if (bestL[k]==(int)i && bestA[k]+1==(int)j) nearAngle[surf+k]=qmap_local;
+                        }
                         if ( qmap_local > qmap->Timg_buffer[k]) {
                             qmap->Timg_buffer[k] = qmap_local;
                             wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
                             lambda->Timg_buffer[k] = lambdas[i];
                             angle->Timg_buffer[k] = angles[j];
                             thick->Timg_buffer[k] = thickness[l];
+                            bestT[k]=l;
+                            bestL[k]=i;
+                            bestA[k]=j;
+                            nearLambda[k] = i>0 ? prevRow[rowIdx(i-1,j)*surf+k] : -1;
+                            nearAngle[k]  = j>0 ? prevRow[rowIdx(i,j-1)*surf+k] : -1;
+                            nearLambda[surf+k] = -1;
+                            nearAngle[surf+k] = -1;
                         }
+                        prevRow[n*surf+k]=qmap_local;
                     }
 
                 }
@@ -176,15 +235,32 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         if ((*params.iter_ptr)!=-1) {
 
+            double dLambda = lambdas.size()>1 ? (lambdas.back()-lambdas.front())/(lambdas.size()-1) : 0;
+            double dAngle = angles.size()>1 ? (angles.back()-angles.front())/(angles.size()-1) : 0;
+
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
+                lambda->Timg_buffer[k] += dLambda*wavelet_parabolic_offset(nearLambda[k], qmap->Timg_buffer[k], nearLambda[surf+k]);
+                angle->Timg_buffer[k] += dAngle*wavelet_parabolic_offset(nearAngle[k], qmap->Timg_buffer[k], nearAngle[surf+k]);
                 qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/surf;
-                intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
+                // intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
+                intensity->Timg_buffer[k] = fdata.Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]); // NaN would spread in the blur
                 wphase->Timg_buffer[k]/=2*M_PI;
             }
 
-            physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
+            // physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
+            // the blur removes the residual fringes (phase and contrast errors): it must follow the interfringe.
+            // sigma = lambda/2 (blur radius = pi sigma): the carrier is damped to < 1%
+            physMath::phys_fast_gaussian_blur(*intensity,M_PI*std::max(params.init_lambda,params.end_lambda)/2.0);
 
+            // fringe visibility (Imax-Imin)/(Imax+Imin)
+            auto visibility = std::make_unique<physD>(dx, dy, 0.0, "visibility");
+#pragma omp parallel for
+            for (size_t k=0; k<surf; k++) {
+                visibility->Timg_buffer[k] = intensity->Timg_buffer[k]>0 ? 2.0*qmap->Timg_buffer[k]/intensity->Timg_buffer[k] : std::numeric_limits<double>::quiet_NaN();
+            }
+
+            params.olist["visibility"] = std::move(visibility);
             params.olist["phase_2pi"] = std::move(wphase);
             params.olist["contrast"]  = std::move(qmap);
             params.olist["lambda"]    = std::move(lambda);
@@ -437,14 +513,16 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 #ifdef HAVE_LIBCLFFT
 
     DEBUG(">>>>>>>>>>>>>>>>>>>>>here " << params.opencl_unit);
-    if (params.opencl_unit>0) {
+    physD fdata;
+    if (params.opencl_unit>0 && params.data && params.data->getSurf() && wavelet_finite_input(*params.data, fdata)) {
         DEBUG(">>>>>>>>>>>>>>>>>>>>>here \n" << get_platform_device_info_opencl(params.opencl_unit));
         params.iter=0;
         *params.iter_ptr=0;
 
         vec2i newSize(opencl_closest_size(params.data->getSize()));
 
-        double mean=params.data->sum()/params.data->getSurf();
+        // double mean=params.data->sum()/params.data->getSurf();
+        double mean=fdata.sum()/fdata.getSurf();
 
         physD padded(newSize.x(), newSize.y(), mean);
         bidimvec<int> offset=(newSize-params.data->get_size())/2;
@@ -454,7 +532,8 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 #pragma omp parallel for collapse(2)
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
-                padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));
+                // padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));
+                padded.set(i+offset.x(),j+offset.y(),fdata.getPoint(i,j));
             }
         }
 
@@ -478,7 +557,8 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         // KERNEL
         std::string textkernel=
-                "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy, const float damp_norm,  const float thick_norm,  const float angle, const float lambda_norm){\n"
+                // kappa, norm_adm: Morlet admissibility (zero at zero frequency, gain 1 at the carrier), see CPU version
+                "__kernel void gabor(__global float *inReal, __global float *inImag, __global float *outReal, __global float *outImag, const unsigned int dx, const unsigned int dy, const float damp_norm,  const float thick_norm,  const float angle, const float lambda_norm, const float kappa, const float norm_adm){\n"
                 "    size_t id = get_global_id(0);\n"
                 "    int i = id%dx;\n"
                 "    int j = id/dx;\n"
@@ -490,18 +570,42 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                 "    float fy=j/(float)dy;\n"
                 "    float xr=fx*cr-fy*sr;\n"
                 "    float yr=fx*sr+fy*cr;\n"
-                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
+//                "    float gauss=native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))*native_exp(-pown(yr*thick_norm,2));\n"
+                "    float gauss=norm_adm*(native_exp(-pown(damp_norm*(xr*lambda_norm-1.0f),2))-kappa*native_exp(-pown(damp_norm*xr*lambda_norm,2)))*native_exp(-pown(yr*thick_norm,2));\n"
                 "    outReal[id] = gauss * inReal[id];\n"
                 "    outImag[id] = gauss * inImag[id];\n"
                 "}\n"
-                "__kernel void best(__global float *inReal, __global float *inImag, __global float *outQual, __global float *outPhase, __global unsigned int *outLambdaAngle, const unsigned int nlambdaangle){\n"
+//                "__kernel void best(__global float *inReal, __global float *inImag, __global float *outQual, __global float *outPhase, __global unsigned int *outLambdaAngle, const unsigned int nlambdaangle){\n"
+//                "    size_t id = get_global_id(0);\n"
+//                "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
+//                "    if (quality>=outQual[id]) {\n"
+//                "        outQual[id]=quality;\n"
+//                "        outPhase[id]=atan2(inImag[id],inReal[id]);\n"
+//                "        outLambdaAngle[id]=nlambdaangle;\n"
+//                "    }\n"
+//                "}\n";
+                // nlambdaangle = (thick*nangles+angle)*nlambdas+lambda
+                // neigh keeps the responses next to the best filter (lambda-1, lambda+1, angle-1, angle+1), -1 if missing
+                // prevRow keeps the last responses along the inner scan (angles if anglesInner, else lambdas)
+                "__kernel void best(__global float *inReal, __global float *inImag, __global float *outQual, __global float *outPhase, __global unsigned int *outLambdaAngle, const unsigned int nlambdaangle, __global float *prevRow, __global float *neigh, const unsigned int nangles, const unsigned int nlambdas, const unsigned int anglesInner){\n"
                 "    size_t id = get_global_id(0);\n"
+                "    size_t N = get_global_size(0);\n"
                 "    float quality=pown(inReal[id],2)+pown(inImag[id],2);\n"
+                "    unsigned int l=nlambdaangle%nlambdas, a=nlambdaangle/nlambdas%nangles, t=nlambdaangle/nlambdas/nangles;\n"
+                "    unsigned int b=outLambdaAngle[id];\n"
+                "    unsigned int bl=b%nlambdas, ba=b/nlambdas%nangles, bt=b/nlambdas/nangles;\n"
+                "    if (bt==t && ba==a && bl+1==l) neigh[N+id]=quality;\n"
+                "    if (bt==t && bl==l && ba+1==a) neigh[3*N+id]=quality;\n"
                 "    if (quality>=outQual[id]) {\n"
                 "        outQual[id]=quality;\n"
                 "        outPhase[id]=atan2(inImag[id],inReal[id]);\n"
                 "        outLambdaAngle[id]=nlambdaangle;\n"
+                "        neigh[id]     = l>0 ? prevRow[(anglesInner ? a : l-1)*N+id] : -1.0f;\n"
+                "        neigh[2*N+id] = a>0 ? prevRow[(anglesInner ? a-1 : l)*N+id] : -1.0f;\n"
+                "        neigh[N+id]   = -1.0f;\n"
+                "        neigh[3*N+id] = -1.0f;\n"
                 "    }\n"
+                "    prevRow[(anglesInner ? a : l)*N+id]=quality;\n"
                 "}\n";
 
         DEBUG("KERNEL:\n" << textkernel << "\nEND KERNEL") ;
@@ -556,7 +660,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         /* Real and Imaginary arrays. */
         cl_uint N = dx*dy;
         cl_float *inReal = new cl_float[N];
-        cl_float *inImag = new cl_float[N];
+        cl_float *inImag = new cl_float[N](); // zero: also used to initialize best[0]
 
         /* Initialization of inReal*/
         for(cl_uint j=0; j<dy; j++) {
@@ -620,6 +724,18 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         err = clEnqueueWriteBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
         check_opencl_error(err, "best[2] clEnqueueWriteBuffer");
 
+        // refinement of lambda and angle maps (see CPU version): the previous responses are kept for one row
+        // of the inner scan, which is the shorter one between angles and lambdas
+        cl_uint anglesInner = params.n_angles <= params.n_lambdas;
+        size_t nInner = anglesInner ? params.n_angles : params.n_lambdas;
+        size_t nOuter = anglesInner ? params.n_lambdas : params.n_angles;
+
+        std::vector<float> neigh(4*N,-1);
+        cl_mem prevRow = clCreateBuffer(ctx, CL_MEM_READ_WRITE, nInner * N * sizeof(cl_float), NULL, &err);
+        check_opencl_error(err, "prevRow clCreateBuffer");
+        cl_mem neighBuf = clCreateBuffer(ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 4 * N * sizeof(cl_float), &neigh[0], &err);
+        check_opencl_error(err, "neighBuf clCreateBuffer");
+
 
         /* Execute Forward FFT. */
         err = clfftEnqueueTransform(planHandle, CLFFT_FORWARD, 1, &queue, 0, NULL, NULL, buffersIn, buffersOut, tmpBuffer);
@@ -678,6 +794,10 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         clSetKernelArg(kernelGabor, 5, sizeof(unsigned int), &dy);
         float damp_norm= params.damp * M_PI;
         clSetKernelArg(kernelGabor, 6, sizeof(float), &damp_norm);
+        float kappa = damp_norm>0 ? exp(-damp_norm*damp_norm) : 0;
+        float norm_adm = 1.0/(1.0-kappa*kappa);
+        clSetKernelArg(kernelGabor, 10, sizeof(float), &kappa);
+        clSetKernelArg(kernelGabor, 11, sizeof(float), &norm_adm);
         check_opencl_error(err, "clSetKernelArg");
 
         cl_kernel kernelBest = clCreateKernel(program, "best", &err);
@@ -688,6 +808,13 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         clSetKernelArg(kernelBest, 2, sizeof(cl_mem), &best[0]);
         clSetKernelArg(kernelBest, 3, sizeof(cl_mem), &best[1]);
         clSetKernelArg(kernelBest, 4, sizeof(cl_mem), &best[2]);
+        clSetKernelArg(kernelBest, 6, sizeof(cl_mem), &prevRow);
+        clSetKernelArg(kernelBest, 7, sizeof(cl_mem), &neighBuf);
+        cl_uint cl_nangles=params.n_angles;
+        cl_uint cl_nlambdas=params.n_lambdas;
+        clSetKernelArg(kernelBest, 8, sizeof(cl_uint), &cl_nangles);
+        clSetKernelArg(kernelBest, 9, sizeof(cl_uint), &cl_nlambdas);
+        clSetKernelArg(kernelBest, 10, sizeof(cl_uint), &anglesInner);
 
 
 
@@ -718,9 +845,11 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         for (size_t nthick=0; nthick <params.n_thicks; nthick++) {
 
-            for (size_t nangle=0; nangle <params.n_angles; nangle++) {
+            for (size_t o=0; o <nOuter; o++) {
 
-                for (size_t nlambda=0; nlambda <params.n_lambdas; nlambda++) {
+                for (size_t n=0; n <nInner; n++) {
+                    size_t nlambda = anglesInner ? o : n;
+                    size_t nangle = anglesInner ? n : o;
 
                     if ((*params.iter_ptr)==-1) {
                         DEBUG("Aborting");
@@ -760,13 +889,15 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
                     err = clFinish(queue);
                     check_opencl_error(err, "clFinish");
 
+                    // the filter index does not depend on the scan order
+                    iter=(nthick*params.n_angles+nangle)*params.n_lambdas+nlambda;
                     err=clSetKernelArg(kernelBest, 5, sizeof(unsigned int), &iter);
                     check_opencl_error(err, "clSetKernelArg");
 
                     clEnqueueNDRangeKernel(queue, kernelBest, 1, NULL, &totalJobs, NULL, 0, NULL, NULL);
                     err = clFinish(queue);
                     check_opencl_error(err, "clFinish");
-                    iter++;
+                    // iter++;
                     params.iter++;
 
                 }
@@ -784,6 +915,9 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         err = clEnqueueReadBuffer(queue, best[2], CL_TRUE, 0, N * sizeof(unsigned int), &lambdaangle[0], 0, NULL, NULL);
         check_opencl_error(err, "clEnqueueReadBuffer");
 
+        err = clEnqueueReadBuffer(queue, neighBuf, CL_TRUE, 0, 4 * N * sizeof(float), &neigh[0], 0, NULL, NULL);
+        check_opencl_error(err, "clEnqueueReadBuffer");
+
         err = clFinish(queue);
         check_opencl_error(err, "clFinish");
 
@@ -795,6 +929,8 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         clReleaseMemObject(best[0]);
         clReleaseMemObject(best[1]);
         clReleaseMemObject(best[2]);
+        clReleaseMemObject(prevRow);
+        clReleaseMemObject(neighBuf);
         clReleaseMemObject(tmpBuffer);
         clReleaseKernel(kernelBest);
         clReleaseKernel(kernelGabor);
@@ -815,31 +951,48 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
 
         params.olist.clear();
 
-        auto nQuality  = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Quality");
-        auto nPhase    = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Phase");
-        auto nIntensity= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Intensity");
+        // same outputs as the CPU version, nothing if stopped
+        if ((*params.iter_ptr)==-1) return;
+
+        // auto nQuality  = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Quality");
+        // auto nPhase    = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Phase");
+        // auto nIntensity= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Intensity");
+        auto nQuality  = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"quality");
+        auto nPhase    = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"phase_2pi");
+        auto nIntensity= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"intensity");
 
         for (size_t j=0; j<params.data->getH(); j++) {
             for (size_t i=0; i<params.data->getW(); i++) {
                 unsigned int k=(j+offset.y())*dx+i+offset.x();
                 nQuality->set(i,j,sqrt(quality_sqr[k]));
                 nPhase->set(i,j,phase[k]/(2*M_PI));
-                nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k]));
+                // nIntensity->set(i,j,params.data->point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k]));
+                nIntensity->set(i,j,fdata.point(i,j) - 2.0*nQuality->point(i,j)*cos(phase[k])); // NaN would spread in the blur
             }
         }
 
 //            physMath::phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
+        physMath::phys_fast_gaussian_blur(*nIntensity,M_PI*std::max(params.init_lambda,params.end_lambda)/2.0); // sigma = lambda/2, see CPU version
+
+        auto nVisibility= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"visibility");
+        for (size_t k=0; k<params.data->getSurf(); k++) {
+            nVisibility->set(k, nIntensity->point(k)>0 ? 2.0*nQuality->point(k)/nIntensity->point(k) : std::numeric_limits<double>::quiet_NaN());
+        }
+        params.olist["visibility"] = std::move(nVisibility);
 
         params.olist["phase_2pi"] = std::move(nPhase);
         params.olist["contrast"]  = std::move(nQuality);
         params.olist["intensity"] = std::move(nIntensity);
 
 
-        if (params.n_thicks>1) {
-            auto nThick = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Thick");
+        // if (params.n_thicks>1) {
+        {
+            // auto nThick = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Thick");
+            auto nThick = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"thick");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
-                    unsigned int k=j*dx+i;
+                    // unsigned int k=j*dx+i;
+                    unsigned int k=(j+offset.y())*dx+i+offset.x(); // buffers are padded
                     unsigned int val=lambdaangle[k]/params.n_lambdas/params.n_angles;
                     nThick->set(i,j,thickness[val]);
                 }
@@ -847,29 +1000,39 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             params.olist["thick"] = std::move(nThick);
         }
 
-        if (params.n_angles>1) {
-            auto nAngle = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Angle");
+        // if (params.n_angles>1) {
+        {
+            double dAngle = angles.size()>1 ? (angles.back()-angles.front())/(angles.size()-1) : 0;
+            // auto nAngle = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Angle");
+            auto nAngle = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"angle");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
-                    unsigned int k=j*dx+i;
+                    // unsigned int k=j*dx+i;
+                    unsigned int k=(j+offset.y())*dx+i+offset.x(); // buffers are padded
                     unsigned int val=lambdaangle[k]/params.n_lambdas%params.n_angles;
                     if (val >= angles.size()) {
                         DEBUG("ERROR \n" << i << " " << j << " " << val << " " << angles.size() << " " << k << " " << lambdaangle[k] << " " << params.n_lambdas << " " << dx );
                     } else {
-                        nAngle->set(i,j,angles[val]);
+                        // nAngle->set(i,j,angles[val]);
+                        nAngle->set(i,j,angles[val]+dAngle*wavelet_parabolic_offset(neigh[2*N+k],quality_sqr[k],neigh[3*N+k]));
                     }
                 }
             }
             params.olist["angle"] = std::move(nAngle);
         }
 
-        if (params.n_lambdas>1) {
-            auto nLambda = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Lambda");
+        // if (params.n_lambdas>1) {
+        {
+            double dLambda = lambdas.size()>1 ? (lambdas.back()-lambdas.front())/(lambdas.size()-1) : 0;
+            // auto nLambda = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"Lambda");
+            auto nLambda = std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"lambda");
             for (size_t j=0; j<params.data->getH(); j++) {
                 for (size_t i=0; i<params.data->getW(); i++) {
-                    unsigned int k=j*dx+i;
+                    // unsigned int k=j*dx+i;
+                    unsigned int k=(j+offset.y())*dx+i+offset.x(); // buffers are padded
                     unsigned int val=lambdaangle[k]%params.n_lambdas;
-                    nLambda->set(i,j,lambdas[val]);
+                    // nLambda->set(i,j,lambdas[val]);
+                    nLambda->set(i,j,lambdas[val]+dLambda*wavelet_parabolic_offset(neigh[k],quality_sqr[k],neigh[N+k]));
                 }
             }
             params.olist["lambda"] = std::move(nLambda);
@@ -884,7 +1047,8 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
             itr->second->setName(itr->first+ " "+params.data->getName());
 #pragma omp parallel for
             for (size_t k=0; k<params.data->getSurf(); k++) {
-                if (std::isnan(params.data->point(k))) {
+                // if (std::isnan(params.data->point(k))) {
+                if (!std::isfinite(params.data->point(k))) {
                     itr->second->set(k,std::numeric_limits<double>::quiet_NaN());
                 }
             }
@@ -953,14 +1117,19 @@ void physWave::phys_phase_unwrap(physD &wphase, physD &quality, enum unwrap_stra
     }
 }
 
-physD physWave::phys_synthetic_interferogram (physD *phase_over_2pi, physD *quality){
+// the wavelet model is data = intensity + 2 contrast cos(phase): with the intensity it rebuilds the data,
+// without it the fringes are drawn on a background 2 contrast
+physD physWave::phys_synthetic_interferogram (physD *phase_over_2pi, physD *quality, physD *intensity){
     physD synthetic;
     if (phase_over_2pi && quality) {
         if (phase_over_2pi->getW()==quality->getW() && phase_over_2pi->getH()==quality->getH()) {
+            if (intensity && (intensity->getW()!=phase_over_2pi->getW() || intensity->getH()!=phase_over_2pi->getH())) intensity=nullptr;
             synthetic.resize(phase_over_2pi->getW(),phase_over_2pi->getH());
 #pragma omp parallel for
             for (size_t ii=0; ii<phase_over_2pi->getSurf(); ii++) {
-                synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
+                // synthetic.set(ii,M_PI*quality->point(ii)*(1.0+cos(phase_over_2pi->point(ii)*2*M_PI)));
+                double fringes=2.0*quality->point(ii)*cos(phase_over_2pi->point(ii)*2*M_PI);
+                synthetic.set(ii, (intensity ? intensity->point(ii) : 2.0*quality->point(ii)) + fringes);
             }
             synthetic.prop=phase_over_2pi->prop;
             synthetic.setShortName("synthetic");

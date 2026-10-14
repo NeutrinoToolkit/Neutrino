@@ -660,11 +660,23 @@ physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
     double sx = (radiusX == 0) ? std::numeric_limits<double>::infinity() : pow(image.getW()/radiusX, 2)/2.0;
     double sy = (radiusY == 0) ? std::numeric_limits<double>::infinity() : pow(image.getH()/radiusY, 2)/2.0;
 
+// #pragma omp parallel for collapse(2)
+//     for (size_t j = 0 ; j < image.getH(); j++) {
+//         for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
+//             double blur=exp(-((i*i)/sx+(j-image.getH()/2)*(j-image.getH()/2)/sy));
+//             int k=i+((j+image.getH()/2+1)%image.getH())*(image.getW()/2+1);
+//             b2[k][0]*=blur;
+//             b2[k][1]*=blur;
+//         }
+//     }
+    // signed row frequency (the version above was shifted by one row for even heights: zero frequency was damped)
+    // note: exp(-2 (radius f)^2) is a gaussian of sigma = radius/pi
 #pragma omp parallel for collapse(2)
     for (size_t j = 0 ; j < image.getH(); j++) {
         for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
-            double blur=exp(-((i*i)/sx+(j-image.getH()/2)*(j-image.getH()/2)/sy));
-            int k=i+((j+image.getH()/2+1)%image.getH())*(image.getW()/2+1);
+            double fj = (j <= image.getH()/2) ? (double)j : (double)j-(double)image.getH();
+            double blur=exp(-((i*i)/sx+fj*fj/sy));
+            size_t k=i+j*(image.getW()/2+1);
             b2[k][0]*=blur;
             b2[k][1]*=blur;
         }

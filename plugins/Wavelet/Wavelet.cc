@@ -239,7 +239,8 @@ void Wavelet::doWavelet () {
 			}
 		}
         if (synthetic->isChecked()) {
-            nPhysD *tmpSynthetic = new nPhysD(physWave::phys_synthetic_interferogram(waveletPhys["phase_2pi"],waveletPhys["contrast"]));
+            // nPhysD *tmpSynthetic = new nPhysD(physWave::phys_synthetic_interferogram(waveletPhys["phase_2pi"],waveletPhys["contrast"]));
+            nPhysD *tmpSynthetic = new nPhysD(physWave::phys_synthetic_interferogram(waveletPhys["phase_2pi"],waveletPhys["contrast"],waveletPhys["intensity"]));
             if (erasePrevious->isChecked()) {
                 syntheticPhys=nparent->replacePhys(tmpSynthetic,syntheticPhys,false);
             } else {

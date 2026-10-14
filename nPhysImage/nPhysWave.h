@@ -117,8 +117,9 @@ void phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap
 // carrier subtraction
 void phys_subtract_carrier (nPhysImageF<double> &, double, double);
 
-// create a synthetic interferogram from phase and quality
-nPhysImageF<double> phys_synthetic_interferogram (nPhysImageF<double> *, nPhysImageF<double> *);
+// create a synthetic interferogram from phase and contrast (and intensity: intensity + 2 contrast cos(phase))
+// nPhysImageF<double> phys_synthetic_interferogram (nPhysImageF<double> *, nPhysImageF<double> *);
+nPhysImageF<double> phys_synthetic_interferogram (nPhysImageF<double> *, nPhysImageF<double> *, nPhysImageF<double> * =nullptr);
 
 std::vector<vec2f> phys_guess_carrier(nPhysImageF<double> &, double=1.0);
 
