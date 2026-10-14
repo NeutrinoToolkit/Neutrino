@@ -24,6 +24,21 @@
  */
 #include "Interpolate_path.h"
 #include "neutrino.h"
+#include "nPhysMaths.h"
+
+// laplace filling in the pan thread (Stop button of runThread)
+struct laplace_params {
+    physD *img;
+    std::vector<vec2i> pixels;
+    int result=-1;
+};
+
+void laplace_fill_transl(void *params, int &iter) {
+    laplace_params *my_params=static_cast<laplace_params*>(params);
+    iter=0;
+    my_params->result=physMath::laplace_fill(*my_params->img, my_params->pixels, 1e-6, 100000, &iter);
+    if (my_params->result<0) iter=1; // nothing to interpolate from: not a thread error (handled by doIt)
+}
 
 
 Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
@@ -42,7 +57,12 @@ Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
     connect(actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
 
     connect(doInterpolate, SIGNAL(clicked()), SLOT(doIt()));
+    // the weight is the exponent of the inverse distance method only
+    connect(method, &QComboBox::currentIndexChanged, this, [this](int) { weight->setEnabled(method->currentText()=="Inverse distance"); });
+    weight->setEnabled(method->currentText()=="Inverse distance");
     interpolatePhys=nullptr;
+    // the result was closed by the user: never replacePhys on a stale pointer
+    connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) { if (buf==interpolatePhys) interpolatePhys=nullptr; });
 }
 
 void Interpolate_path::doIt() {
@@ -56,50 +76,106 @@ void Interpolate_path::doIt() {
             vecPoints[k]=vec2f(regionPoly[k].x(),regionPoly[k].y());
         }
         
-        nPhysD *regionPath = new nPhysD(*my_phys);
-
         QPolygonF regionPoly2=region->poly(20).translated(my_phys->get_origin().x(),my_phys->get_origin().y());
 
         std::vector<std::pair<vec2f, double> > vals;
         for(int k=0;k<regionPoly2.size();k++) {
             vec2f p(regionPoly2[k].x(),regionPoly2[k].y());
-            double pval=regionPath->point(p);
+            double pval=my_phys->point(p);
             if (std::isfinite(pval)) {
                 vals.push_back(std::make_pair(p, pval));
             }
         }
-        
-        QRect rectRegion=regionPoly2.boundingRect().toRect();
+        if (vals.size()==0) {
+            showMessage(tr("No valid values along the path"), 5000);
+            return;
+        }
+
+        QRect rectRegion=regionPoly2.boundingRect().toRect().intersected(QRect(0,0,my_phys->getW(),my_phys->getH()));
+
+        nPhysD *regionPath = new nPhysD(*my_phys);
         
         double ex=weight->value();
         
         regionPath->setShortName("Region path");
         regionPath->setName("path");
+
+        if (method->currentText()=="Laplace") {
+            // harmonic interpolation: the pixels around the region are the boundary conditions
+            laplace_params my_params;
+            my_params.img=regionPath;
+            for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
+                for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+                    vec2f pp(i,j);
+                    if (point_inside_poly(pp,vecPoints)) {
+                        my_params.pixels.push_back(vec2i(i,j));
+                    }
+                }
+            }
+            // progress: about 2 sweeps per pixel of the region size
+            runThread(&my_params, laplace_fill_transl, "Laplace", 2*std::max(rectRegion.width(),rectRegion.height()));
+            if (nThread.n_iter==-1) {
+                delete regionPath;
+                showMessage(tr("Interpolation stopped"), 5000);
+                return;
+            }
+            if (my_params.result<0) {
+                delete regionPath;
+                showMessage(tr("No valid values around the region"), 5000);
+                return;
+            }
+            regionPath->TscanBrightness();
+            erasePrevious->setEnabled(true);
+            if (erasePrevious->isChecked()) {
+                interpolatePhys=nparent->replacePhys(regionPath,interpolatePhys,true);
+            } else {
+                nparent->addShowPhys(regionPath);
+                interpolatePhys=regionPath;
+            }
+            return;
+        }
+
+        // inverse distance weighting of the values along the path
         QProgressDialog progress("Interpolate", "Stop", 0, rectRegion.width(), this);
         progress.setWindowModality(Qt::WindowModal);
         progress.show();
+        bool canceled=false;
         for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
-            if (progress.wasCanceled()) break;
+            if (progress.wasCanceled()) {
+                canceled=true;
+                break;
+            }
             QApplication::processEvents();
             for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
                 vec2f pp(i,j);
                 if (point_inside_poly(pp,vecPoints)) {
                     double mean=0;
                     double weight=0;
+                    bool onSample=false;
                     for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
                         vec2f p=it->first;
-                        double wi=1.0/(pow(std::abs((pp-p).x()),ex)+pow(std::abs((pp-p).y()),ex));
-                        if (std::isfinite(wi) &&std::isfinite(it->second)) {
-                            mean+=wi*it->second;
-                            weight+=wi;
+                        double d2=(pp-p).mod2();
+                        if (d2==0) { // on a sample point: take its value (1/0 weight)
+                            mean=it->second;
+                            onSample=true;
+                            break;
                         }
+                        // double wi=1.0/(pow(std::abs((pp-p).x()),ex)+pow(std::abs((pp-p).y()),ex));
+                        double wi=1.0/pow(d2,ex/2.0); // inverse distance weighting 1/r^ex
+                        mean+=wi*it->second;
+                        weight+=wi;
                     }
-                    regionPath->set(pp,mean/weight);
+                    regionPath->set(pp,onSample ? mean : mean/weight);
                 }
             }
             progress.setValue(i-rectRegion.left());
         }
-        regionPath->reset_display();
+        if (canceled) {
+            delete regionPath;
+            showMessage(tr("Interpolation stopped"), 5000);
+            return;
+        }
+        regionPath->TscanBrightness();
 
         erasePrevious->setEnabled(true);
         if (erasePrevious->isChecked()) {

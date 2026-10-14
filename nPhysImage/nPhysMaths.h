@@ -221,6 +221,11 @@ struct contour_integral {
 };
 contour_integral contour_integrate(physD &, const std::list<vec2f> &contour, bool integrate_boundary=false);
 
+//! fill the pixels with the harmonic interpolation (laplace equation) of their surroundings:
+//! the pixels around them (finite values) are the boundary conditions. Red-black SOR.
+//! iter_ptr (if given) counts the sweeps; set it to -1 to stop. Returns the sweeps done, -1 if nothing to interpolate from
+int laplace_fill(physD &, const std::vector<vec2i> &pixels, double tol=1e-6, int max_iter=100000, int *iter_ptr=nullptr);
+
 
 template <class T>
 inline void phys_flip_ud(nPhysImageF<T> &img)

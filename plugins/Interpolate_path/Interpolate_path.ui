@@ -51,6 +51,43 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
+        <widget class="QLabel" name="labelMethod">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Method</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="method">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Laplace: smooth (harmonic) filling from the pixels around the region. Inverse distance: weighted mean of the values along the path (1/r^weight)</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>Laplace</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Inverse distance</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
@@ -62,7 +99,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QDoubleSpinBox" name="weight">
          <property name="value">
           <double>2.000000000000000</double>

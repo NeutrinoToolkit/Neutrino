@@ -1673,6 +1673,106 @@ physC::TscanBrightness() {
 }
 
 
+int physMath::laplace_fill(physD &iimage, const std::vector<vec2i> &pixels, double tol, int max_iter, int *iter_ptr)
+{
+    const int dx=iimage.getW();
+    const int dy=iimage.getH();
+
+    // index of the pixels to fill (-1 elsewhere)
+    std::vector<int> fill_idx(iimage.getSurf(),-1);
+    std::vector<size_t> fill_k;
+    int xmin=dx, xmax=-1, ymin=dy, ymax=-1;
+    for (auto p : pixels) { // by value: bidimvec accessors are not const
+        if (p.x()>=0 && p.x()<dx && p.y()>=0 && p.y()<dy) {
+            size_t k=p.x()+p.y()*dx;
+            if (fill_idx[k]<0) {
+                fill_idx[k]=fill_k.size();
+                fill_k.push_back(k);
+                xmin=std::min(xmin,p.x()); xmax=std::max(xmax,p.x());
+                ymin=std::min(ymin,p.y()); ymax=std::max(ymax,p.y());
+            }
+        }
+    }
+    if (fill_k.size()==0) return -1;
+
+    // usable neighbours: inside the image and either to be filled or finite (NaN and edges are left out: zero normal slope)
+    const size_t nfill=fill_k.size();
+    std::vector<std::array<size_t,4>> neigh(nfill);
+    std::vector<int> nneigh(nfill,0);
+    double border_sum=0;
+    size_t border_num=0;
+    for (size_t n=0; n<nfill; n++) {
+        int x=fill_k[n]%dx;
+        int y=fill_k[n]/dx;
+        const int nx[4]={x+1,x-1,x,x};
+        const int ny[4]={y,y,y+1,y-1};
+        for (int i=0; i<4; i++) {
+            if (nx[i]>=0 && nx[i]<dx && ny[i]>=0 && ny[i]<dy) {
+                size_t kk=nx[i]+ny[i]*dx;
+                if (fill_idx[kk]>=0) {
+                    neigh[n][nneigh[n]++]=kk;
+                } else if (std::isfinite(iimage.Timg_buffer[kk])) {
+                    neigh[n][nneigh[n]++]=kk;
+                    border_sum+=iimage.Timg_buffer[kk];
+                    border_num++;
+                }
+            }
+        }
+    }
+    if (border_num==0) return -1;
+
+    // initial guess: mean of the border
+    double border_mean=border_sum/border_num;
+    double scale=std::abs(border_mean);
+    for (auto &k : fill_k) {
+        iimage.Timg_buffer[k]=border_mean;
+    }
+    for (size_t n=0; n<nfill; n++) {
+        for (int i=0; i<nneigh[n]; i++) {
+            if (fill_idx[neigh[n][i]]<0) scale=std::max(scale,std::abs(iimage.Timg_buffer[neigh[n][i]]));
+        }
+    }
+    if (scale==0) scale=1;
+
+    // red-black ordering: the 4 neighbours of a pixel have the other color, so each half can be updated in parallel
+    std::array<std::vector<size_t>,2> color;
+    for (size_t n=0; n<nfill; n++) {
+        color[(fill_k[n]%dx+fill_k[n]/dx)%2].push_back(n);
+    }
+
+    // optimal over-relaxation for a region of size L: 2/(1+pi/L)
+    double L=std::max(xmax-xmin+1,ymax-ymin+1);
+    double omega=2.0/(1.0+M_PI/std::max(L,2.0));
+
+    int iter=0;
+    for (iter=0; iter<max_iter; iter++) {
+        if (iter_ptr) {
+            if (*iter_ptr==-1) break;
+            (*iter_ptr)++;
+        }
+        double max_change=0;
+        for (int c=0; c<2; c++) {
+            const std::vector<size_t> &my_color=color[c];
+#pragma omp parallel for reduction(max:max_change)
+            for (size_t m=0; m<my_color.size(); m++) {
+                size_t n=my_color[m];
+                if (nneigh[n]==0) continue;
+                double sum=0;
+                for (int i=0; i<nneigh[n]; i++) {
+                    sum+=iimage.Timg_buffer[neigh[n][i]];
+                }
+                double &val=iimage.Timg_buffer[fill_k[n]];
+                double delta=omega*(sum/nneigh[n]-val);
+                val+=delta;
+                max_change=std::max(max_change,std::abs(delta));
+            }
+        }
+        if (max_change<tol*scale) break;
+    }
+    DEBUG("laplace_fill: " << nfill << " pixels, omega " << omega << ", " << iter << " sweeps");
+    return iter;
+}
+
 /*!
  * @}
  */

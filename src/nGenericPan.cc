@@ -746,7 +746,8 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
 
     nThread.start();
     bool canceled=false;
-    while (nThread.isRunning()) {
+    // wait() with a timeout instead of spinning on processEvents: a busy GUI thread steals a core from the OpenMP loops
+    while (!nThread.wait(20)) {
         if (max_calc > 0) {
             progress.setValue(nThread.n_iter);
             if (progress.wasCanceled()) {
