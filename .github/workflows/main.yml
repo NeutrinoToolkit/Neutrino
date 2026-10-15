@@ -46,14 +46,16 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Neutrino.zip
-        path: "build/Neutrino*.zip"
+        path: |
+          build/Neutrino*.zip
+          build/Neutrino*.dmg
     - name: Upload
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "build/Neutrino*.zip"
+        file: "build/Neutrino*.zip;build/Neutrino*.dmg"
         update_latest_release: true
         overwrite: true
     

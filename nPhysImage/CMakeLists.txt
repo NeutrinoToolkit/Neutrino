@@ -8,7 +8,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include(FindNeutrinoDeps)
 
-target_link_libraries(nPhysImageF m ${LIBS})
+# target_link_libraries(nPhysImageF m ${LIBS})
+# usage requirements: the app and the plugins just link nPhysImageF
+target_include_directories(nPhysImageF BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${NPHYS_INCLUDES})
+target_compile_definitions(nPhysImageF PUBLIC ${NPHYS_DEFINITIONS})
+target_compile_options(nPhysImageF PUBLIC ${NPHYS_COMPILE_OPTIONS})
+target_link_libraries(nPhysImageF PUBLIC ${NPHYS_PUBLIC_LIBS} PRIVATE m ${NPHYS_PRIVATE_LIBS})
 
 # install
 if (WIN32)

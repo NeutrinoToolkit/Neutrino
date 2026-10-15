@@ -29,10 +29,11 @@ endif()
 list(LENGTH SOURCES LIST_LENGTH)
 message(STATUS "${LIST_LENGTH} source files")
 
-include(FindNeutrinoDeps)
+# include(FindNeutrinoDeps)
+# the dependencies come from the nPhysImageF usage requirements (nPhysImage/CMakeLists.txt)
 
 set(LIBS ${LIBS} "nPhysImageF")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
 add_definitions(-DSHAVERSION__="${VERSION_GIT_SHA}")
 
@@ -102,6 +103,17 @@ if(APPLE)
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_GIT_SHA}")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_GIT_SHA}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright ${PROJECT_COPYRIGHT_YEAR} Tommaso Vinci, Alessandro Flacco. GNU General Public License v2.0")
+
+    # LSMinimumSystemVersion: deployment target if given, otherwise the build host version (brew libraries are built for it)
+    if (CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(MACOSX_MINIMUM_SYSTEM_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    else()
+        execute_process(COMMAND sw_vers -productVersion OUTPUT_VARIABLE MACOSX_MINIMUM_SYSTEM_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # string(REGEX REPLACE "^([0-9]+)\\.([0-9]+).*" "\\1.\\2" MACOSX_MINIMUM_SYSTEM_VERSION "${MACOSX_MINIMUM_SYSTEM_VERSION}")
+        # brew bottles are built for <major>.0
+        string(REGEX REPLACE "^([0-9]+).*" "\\1.0" MACOSX_MINIMUM_SYSTEM_VERSION "${MACOSX_MINIMUM_SYSTEM_VERSION}")
+    endif()
+    message(STATUS "LSMinimumSystemVersion ${MACOSX_MINIMUM_SYSTEM_VERSION}")
 
     set(MACOSX_BUNDLE_ICON_FILE icon.icns)
     set(${PROJECT_NAME}_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.icns)

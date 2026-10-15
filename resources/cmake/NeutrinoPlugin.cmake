@@ -15,7 +15,15 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     MESSAGE(STATUS "Plugin : ${PROJECT_NAME}")
 
-    include(FindNeutrinoDeps)
+    # include(FindNeutrinoDeps)
+    # in-tree the dependencies come from the nPhysImageF target usage requirements;
+    # out-of-tree (no nPhysImageF target) they are found again and set globally as before
+    if (NOT TARGET nPhysImageF)
+        include(FindNeutrinoDeps)
+        include_directories(BEFORE ${NPHYS_INCLUDES})
+        add_compile_definitions(${NPHYS_DEFINITIONS})
+        add_compile_options(${NPHYS_COMPILE_OPTIONS})
+    endif()
 
     set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus Charts)
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
@@ -106,14 +114,26 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_dependencies(${PROJECT_NAME} Neutrino)
     add_dependencies(${PROJECT_NAME} nPhysImageF)
 
+    # link the nPhysImageF target: it brings its include dirs, HAVE_* definitions and public libs
+    if (TARGET nPhysImageF)
+        target_link_libraries(${PROJECT_NAME} nPhysImageF)
+    endif()
+
     IF(APPLE)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
+        # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
+        if (NOT TARGET nPhysImageF)
+            target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
+        endif()
     ENDIF()
 
     if(WIN32)
         set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+        # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a)
+        if (NOT TARGET nPhysImageF)
+            target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+        endif()
         # to check: --enable-runtime-pseudo-reloc
     endif()
 

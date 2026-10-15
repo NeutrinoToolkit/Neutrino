@@ -5,6 +5,20 @@ A light, expandable and full featured image analysis tool for research
 
 To install grab the file for your system here: https://github.com/NeutrinoToolkit/Neutrino/releases/tag/latest
 
+### macOS
+
+Download `Neutrino-Darwin-arm64.dmg` (Apple Silicon) or `Neutrino-Darwin-x86_64.dmg` (Intel), open it and drag `Neutrino.app` into `Applications` (a `.zip` with the same app is also available).
+
+The app is not signed with an Apple Developer ID nor notarized, so the first time macOS will refuse to open it ("Apple could not verify..." or "Neutrino is damaged"). To allow it, either:
+
+* open `System Settings → Privacy & Security`, scroll down and click `Open Anyway` next to the Neutrino message, then confirm; or
+* remove the quarantine flag from a terminal:
+  ```
+  xattr -dr com.apple.quarantine /Applications/Neutrino.app
+  ```
+
+This is needed only once (and again after each update).
+
 Rationale
 ---------
 

@@ -10,8 +10,8 @@
     <key>CFBundleName</key>
     <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
 
-    <key>CFBundleIdentifier</key>
-    <string>com.neutrino</string>
+    <!-- <key>CFBundleIdentifier</key> -->
+    <!-- <string>com.neutrino</string> -->
     <key>CFBundleExecutable</key>
     <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
 
@@ -30,7 +30,8 @@
     <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
 
     <key>LSMinimumSystemVersion</key>
-    <string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
+    <!-- <string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string> -->
+    <string>${MACOSX_MINIMUM_SYSTEM_VERSION}</string>
 
     <key>NSHumanReadableCopyright</key>
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>

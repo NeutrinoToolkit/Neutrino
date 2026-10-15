@@ -119,7 +119,7 @@ macM1_task:
     cmake ..
     make -j$(sysctl -n hw.ncpu) install
     ../resources/macPackage/prepareapp.sh
-    cp Neutrino-*.zip ..
+    cp Neutrino-*.zip Neutrino-*.dmg ..
   package_artifacts:
     path: "Neutrino-*.*"
 

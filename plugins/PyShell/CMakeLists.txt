@@ -22,7 +22,9 @@ if(Python_FOUND)
 
             set (PYTHONQT_FOUND_COMPLETE "TRUE")
             add_definitions(-DHAVE_PYTHONQT)
-            include_directories(${PYTHONQT_INCDIR})
+            # include_directories(${PYTHONQT_INCDIR})
+            find_path(PYTHONQTGUI_INCDIR PythonQtScriptingConsole.h HINTS ${PYTHONQT_INCDIR} PATH_SUFFIXES gui)
+            include_directories(${PYTHONQT_INCDIR} ${PYTHONQTALL_INCDIR} ${PYTHONQTGUI_INCDIR})
 
             if (NOT DEFINED NEUTRINO_ROOT)
                 set (NEUTRINO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
