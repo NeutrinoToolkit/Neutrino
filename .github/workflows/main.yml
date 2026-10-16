@@ -245,7 +245,7 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-portablexdr pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
+        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-libjpeg-turbo pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
         wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
         tar -zxvf fftw-3.3.6-pl2.tar.gz
         cd fftw-3.3.6-pl2
@@ -253,21 +253,28 @@ jobs:
         make -j$(nproc) bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
         make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
         cd ..
-        wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
-        tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
-        wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
-        wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
-        patch -p1 -u < hdf4-1-portability-fixes.patch
-        patch -p1 -u < hdf4-2-dllimport.patch
-        libtoolize --force
-        autoreconf --install
-        ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS" CFLAGS="$(rpm --eval %{${MINGW}_cflags}) -std=gnu17 -fpermissive"
-        make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
-        make -C hdf/src LDFLAGS="-no-undefined -lssp"
-        make -C hdf/src install
-        make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-        make -C mfhdf/libsrc install
-        cd ..
+        # HDF4 4.2.10 with autotools and the MXE patches (needed -std=gnu17 -fpermissive with GCC >= 14)
+        # wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+        # tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+        # wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+        # wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+        # patch -p1 -u < hdf4-1-portability-fixes.patch
+        # patch -p1 -u < hdf4-2-dllimport.patch
+        # libtoolize --force
+        # autoreconf --install
+        # ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS" CFLAGS="$(rpm --eval %{${MINGW}_cflags}) -std=gnu17 -fpermissive"
+        # make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+        # make -C hdf/src LDFLAGS="-no-undefined -lssp"
+        # make -C hdf/src install
+        # make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+        # make -C mfhdf/libsrc install
+        # cd ..
+        # HDF4 >= 4.3 builds for MinGW with CMake, no patches needed (libdf is now libhdf)
+        wget https://github.com/HDFGroup/hdf4/releases/download/hdf4.4.0/hdf4.4.0.tar.gz
+        echo "f69afb6362529c606f05fb4c95279316497c68bea9ed7794683b31544163e286  hdf4.4.0.tar.gz" | sha256sum -c -
+        tar -xzf hdf4.4.0.tar.gz
+        ${MINGW}-cmake -S hdf4.4.0 -B hdf4-build -DHDF4_ONLY_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DHDF4_BUILD_TOOLS=OFF -DHDF4_BUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DHDF4_BUILD_FORTRAN=OFF -DHDF4_BUILD_JAVA=OFF -DHDF4_ENABLE_SZIP_SUPPORT=OFF -DHDF4_NO_PACKAGES=ON
+        cmake --build hdf4-build -j$(nproc) --target install
         mkdir build && cd build
         ${MINGW}-cmake ..
         make -j$(nproc) package
