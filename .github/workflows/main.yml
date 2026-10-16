@@ -280,6 +280,9 @@ jobs:
         name: ${{ matrix.arch }}
         path: Neutrino-*.*
 
+  # an AppImage runs only where glibc is at least the one it was built with:
+  # AppImage and AppImageArm (Fedora 44, glibc 2.43, newest Qt) for recent distributions,
+  # AppImage_olderLinux and AppImageArm_olderLinux (AlmaLinux 9, glibc 2.34, Qt 6.6) for RHEL 9, Ubuntu 22.04, Debian 12 and newer
   AppImage:
     strategy:
       fail-fast: false
@@ -290,22 +293,26 @@ jobs:
             runner: ubuntu-latest
             arch: x86_64
             linuxdeploy: continuous
-            pkgs: lsb_release
             out: ..
           - name: AppImage_olderLinux
-            image: fedora:34
+            # image: fedora:34
+            image: almalinux:9
             runner: ubuntu-latest
             arch: x86_64
             linuxdeploy: continuous
-            pkgs: qconf redhat-lsb-core
             out: ../Neutrino-olderLinux.AppImage
           - name: AppImageArm
             image: fedora:44
             runner: ubuntu-24.04-arm
             arch: aarch64
             linuxdeploy: 1-alpha-20240109-1
-            pkgs: lsb_release
             out: ../Neutrino-Linux-arm64.AppImage
+          - name: AppImageArm_olderLinux
+            image: almalinux:9
+            runner: ubuntu-24.04-arm
+            arch: aarch64
+            linuxdeploy: 1-alpha-20240109-1
+            out: ../Neutrino-olderLinux-arm64.AppImage
     continue-on-error: ${{ matrix.name != 'AppImage' }}
     runs-on: ${{ matrix.runner }}
     container: ${{ matrix.image }}
@@ -323,7 +330,9 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        dnf -y install gcc gcc-c++ ${{ matrix.pkgs }} libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
+        # dnf -y install gcc gcc-c++ <matrix.pkgs> libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
+        if grep -q '^ID="almalinux"' /etc/os-release; then dnf -y install epel-release && dnf config-manager --set-enabled crb; fi
+        dnf -y install gcc gcc-c++ cmake make lsb_release libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw-devel rpm-build "qt6-*-devel" git wget file python3-devel python3-pip
         wget https://github.com/linuxdeploy/linuxdeploy/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-${{ matrix.arch }}.AppImage
         wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-plugin-qt-${{ matrix.arch }}.AppImage
         chmod +x linuxdeploy*.AppImage
