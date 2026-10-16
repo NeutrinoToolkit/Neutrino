@@ -190,7 +190,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15-intel, macos-15]
+        # macos-15-intel: Homebrew no longer ships Intel bottles (qt, gcc, python...), everything builds from source for hours
+        # os: [macos-15-intel, macos-15]
+        os: [macos-15]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -328,6 +330,8 @@ jobs:
         mkdir build && cd build
         cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
         make -j$(nproc) install DESTDIR=AppDir
+        # libraries bundled by the pip wheels (scipy.libs, numpy.libs) find each other via $ORIGIN, linuxdeploy does not
+        for d in AppDir/usr/lib/neutrino/python/*/python3*/site-packages/*.libs; do [ -d "$d" ] && LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$PWD/$d"; done; export LD_LIBRARY_PATH
         ../linuxdeploy-${{ matrix.arch }}.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
         cp Neutrino-*.AppImage ${{ matrix.out }}
     - name: PythonQt logs
