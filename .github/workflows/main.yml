@@ -225,6 +225,48 @@ jobs:
           Neutrino-*.zip
           Neutrino-*.dmg
 
+  # Intel Macs: Homebrew no longer ships Intel bottles, MacPorts still has prebuilt x86_64 binaries (-b: binaries only,
+  # never hours of compiling). MacPorts builds them for the runner's macOS: the app needs macOS 15 or later.
+  # No OpenCL/clFFT for now
+  mac-intel:
+    continue-on-error: true
+    runs-on: macos-15-intel
+    env:
+      PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: MacPorts
+      run: |
+        curl -sSL -o MacPorts.pkg https://github.com/macports/macports-base/releases/download/v2.12.7/MacPorts-2.12.7-15-Sequoia.pkg
+        sudo installer -pkg MacPorts.pkg -target /
+        echo /opt/local/bin >> $GITHUB_PATH
+        echo /opt/local/sbin >> $GITHUB_PATH
+        sudo /opt/local/bin/port -N selfupdate
+        sudo /opt/local/bin/port -N -b install $PORTS
+    - name: Build
+      run: |
+        mkdir -p build && cd build
+        # /usr/local is the runner's Homebrew: keep its libraries out
+        cmake .. -DCMAKE_PREFIX_PATH="/opt/local/libexec/qt6;/opt/local" -DCMAKE_IGNORE_PREFIX_PATH=/usr/local \
+          -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=ON \
+          -DPython_EXECUTABLE=/opt/local/bin/python3.13 -DPython3_EXECUTABLE=/opt/local/bin/python3.13 \
+          -DOpenMP_C_FLAGS="-Xclang -fopenmp -I/opt/local/include/libomp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I/opt/local/include/libomp" \
+          -DOpenMP_C_LIB_NAMES=omp -DOpenMP_CXX_LIB_NAMES=omp -DOpenMP_omp_LIBRARY=/opt/local/lib/libomp/libomp.dylib
+        make -j$(sysctl -n hw.ncpu) install
+        QT_BIN=/opt/local/libexec/qt6/bin DEPLOY_LIBPATHS="/opt/local/lib /opt/local/lib/libomp" ../resources/macPackage/prepareapp.sh
+        cp Neutrino-*.zip Neutrino-*.dmg ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
+    - uses: actions/upload-artifact@v4
+      with:
+        name: macos-15-intel
+        path: |
+          Neutrino-*.zip
+          Neutrino-*.dmg
+
   windows:
     strategy:
       fail-fast: false
@@ -361,7 +403,7 @@ jobs:
   # was the Cirrus upload task + EndBug/latest-tag + xresloader/upload-to-github-release
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac.result == 'success' && needs.windows.result == 'success' }}
-    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac, windows, AppImage]
+    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac, mac-intel, windows, AppImage]
     runs-on: ubuntu-latest
     permissions:
       contents: write

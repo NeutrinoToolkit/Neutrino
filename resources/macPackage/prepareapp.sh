@@ -45,7 +45,16 @@ if [ -e ${APP}/Contents/Resources/plugins/libPyShell.dylib ] && [ -f pyshell_pyt
 fi
 
 # $(brew --prefix qt)/bin/macdeployqt  dmg_dir/Neutrino.app -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib
-$(brew --prefix qt)/bin/macdeployqt  ${APP} -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib "${EXTRA_EXECUTABLES[@]}"
+# $(brew --prefix qt)/bin/macdeployqt  ${APP} -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib "${EXTRA_EXECUTABLES[@]}"
+# Homebrew by default; another Qt/prefix (e.g. MacPorts) can be given with
+# QT_BIN=/opt/local/libexec/qt6/bin DEPLOY_LIBPATHS="/opt/local/lib /opt/local/lib/libomp"
+QT_BIN=${QT_BIN:-$(brew --prefix qt)/bin}
+DEPLOY_LIBPATHS=${DEPLOY_LIBPATHS:-"$(brew --prefix)/lib $(brew --prefix brotli)/lib $(brew --prefix hdf4)/lib"}
+LIBPATH_ARGS=()
+for libpath in ${DEPLOY_LIBPATHS}; do
+    LIBPATH_ARGS+=("-libpath=${libpath}")
+done
+${QT_BIN}/macdeployqt ${APP} -always-overwrite "${LIBPATH_ARGS[@]}" "${EXTRA_EXECUTABLES[@]}"
 
 # python modules shipped with PyShell (PYSHELL_PIP_PACKAGES, e.g. numpy scipy) with the same python:
 # the wheels bring their own libraries (@loader_path), only the test suites are removed.
