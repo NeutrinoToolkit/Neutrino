@@ -284,7 +284,8 @@ AppImageArm_task:
     path: "Neutrino-*.AppImage"
 
 upload_task:
-  only_if: $CIRRUS_BRANCH == 'master'
+#  only_if: $CIRRUS_BRANCH == 'master'
+  only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_BRANCH == 'modernization'
   depends_on:
     - macM1
     - win32
@@ -303,5 +304,8 @@ upload_task:
     git config --global user.email "hello@cirruslabs.org"
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
     git pull
-    gh release upload --clobber latest package/*
+    # gh release upload --clobber latest package/*
+    if [ "$CIRRUS_BRANCH" = "master" ]; then RELTAG=latest; else RELTAG=$CIRRUS_BRANCH; fi
+    gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $RELTAG --notes "Builds of the $RELTAG branch" --target $CIRRUS_CHANGE_IN_REPO || true
+    gh release upload --clobber $RELTAG package/*
     

@@ -10,9 +10,16 @@ jobs:
       with:
         fetch-depth: 0
     - name: Tag latest
+      if: github.ref == 'refs/heads/master'
       uses: EndBug/latest-tag@latest
       with:
         description: Latest
+    - name: Tag modernization
+      if: github.ref == 'refs/heads/modernization'
+      uses: EndBug/latest-tag@latest
+      with:
+        ref: modernization
+        description: modernization
     - name: Prepare
       run: |
         brew update
@@ -44,4 +51,11 @@ jobs:
         file: "build/Neutrino*.zip;build/Neutrino*.dmg"
         update_latest_release: true
         overwrite: true
+    - name: Upload modernization
+      if: github.ref == 'refs/heads/modernization'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release view modernization >/dev/null 2>&1 || gh release create modernization --prerelease --title modernization --notes "Builds of the modernization branch" --target $GITHUB_SHA || true
+        gh release upload --clobber modernization build/Neutrino*.zip build/Neutrino*.dmg
     
