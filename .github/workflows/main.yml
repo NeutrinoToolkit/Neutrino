@@ -17,25 +17,11 @@ jobs:
       run: |
         brew update
         brew install objc-codegenutils objc-run
-        brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers
+        brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers python
     - name: Deps
       run: |
         brew install --force iltommi/brews/hdf4
         brew install --force iltommi/brews/clfft
-    - name: PyhtonQt
-      run: |
-        git clone https://github.com/iltommi/pythonqt.git
-        cd pythonqt
-        cd generator
-        qmake -r generator.pro
-        make -j10
-        QTDIR=$(brew --prefix qt) ./pythonqt_generator
-        cd ..
-        QTDIR=$(brew --prefix qt) qmake -r
-        make -j10
-        INSTALL_ROOT=$(brew --prefix) make install
-        cd ..
-      continue-on-error: true
     - name: Build
       run: |
         mkdir -p build && cd build

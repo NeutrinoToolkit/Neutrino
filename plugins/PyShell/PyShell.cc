@@ -1,6 +1,7 @@
 #include "Python.h"
 #include <QFont>
 #include <QThread>
+#include <QStandardPaths>
 
 #include "nPhysPyWrapper.h"
 
@@ -13,7 +14,8 @@ bool PyShellPlug::instantiate(neutrino *neu) {
     qDebug() << "here" << neu;
     nparent=neu;
 
-    PyShell::startup();
+    // PyShell::startup();
+    // python is started the first time it is needed (PyShell panel or script), see PyShell::startup()
 
     QPointer<QMenu> menuPython = nPluginLoader::getMenu(menuEntryPoint(),neu);
     qDebug() << "here";
@@ -55,6 +57,13 @@ bool PyShellPlug::instantiate(neutrino *neu) {
 PyShell::PyShell(neutrino *nparent) : nGenericPan(nparent)
 {
 	my_w.setupUi(this);
+
+    if (!startup()) {
+        my_w.script->setPlainText(tr("# Python could not be started: its standard library was not found"));
+        my_w.script->setEnabled(false);
+        show(true);
+        return;
+    }
 
     connect(my_w.actionRun_script, SIGNAL(triggered()), this, SLOT(loadScript()));
     connect(my_w.actionCleanup, SIGNAL(triggered()), this, SLOT(cleanup()));
@@ -98,13 +107,46 @@ PyShell::PyShell(neutrino *nparent) : nGenericPan(nparent)
     console->setFocus();
 }
 
-void PyShell::startup() {
-#if defined(Q_OS_WIN)
-    qDebug() << "here1";
-        PythonQt::init();
-#else
-    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+// start python only once (PythonQt::self() is null before PythonQt::init and after PythonQt::cleanup)
+// returns false if python cannot be started
+bool PyShell::startup() {
+    if (PythonQt::self()) return true;
+
+    // packaged python: <home>/lib/pythonX.Y (Windows: <home>/Lib) next to the application
+    const QString pyver=QString("python%1.%2").arg(PY_MAJOR_VERSION).arg(PY_MINOR_VERSION);
+    auto hasStdlib = [&pyver](const QString &home) {
+        return QFileInfo::exists(QDir(home).filePath("lib/"+pyver+"/os.py")) || QFileInfo::exists(QDir(home).filePath("Lib/os.py"));
+    };
+    const QDir appDir(qApp->applicationDirPath());
+    QString pyhome;
+    for (auto &candidate : {appDir.filePath("../Resources/python"), appDir.filePath("python"), appDir.filePath("../lib/neutrino/python")}) {
+        if (hasStdlib(candidate)) {
+            pyhome=QDir(candidate).absolutePath();
+            break;
+        }
+    }
+    if (!pyhome.isEmpty()) {
+        qputenv("PYTHONHOME", QFile::encodeName(pyhome));
+    } else if (qEnvironmentVariableIsEmpty("PYTHONHOME")) {
+#ifdef PYSHELL_PYTHON_HOME
+        // not packaged: python finds the installation it was built with, if it is still there
+        // (otherwise Py_Initialize would abort the whole application)
+        if (!hasStdlib(PYSHELL_PYTHON_HOME)) {
+            qWarning() << "PyShell: no python standard library found in" << PYSHELL_PYTHON_HOME;
+            return false;
+        }
 #endif
+    }
+
+// #if defined(Q_OS_WIN)
+//     qDebug() << "here1";
+//         PythonQt::init();
+// #else
+//     PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+// #endif
+    // same on every platform (the shipped site-packages are added below): without RedirectStdOut
+    // the console does not show the python output
+    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
 
 //     PythonQt_init_QtBindings();
 	PythonQt_QtAll::init();
@@ -136,18 +178,35 @@ void PyShell::startup() {
     QSettings settings("neutrino","");
     settings.beginGroup("PyShell");
 
-    QStringList sites=settings.value("siteFolder").toString().split(QRegularExpression("\\s*:\\s*"));
-//Re-enable below if numpy start to work again:
-#if defined(Q_OS_WIN)
-    QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
-    if (base.exists()) {
-        sites << base.absolutePath();
-        sites << base.filePath("plat-win32");
-        sites << base.filePath("lib-tk");
-        sites << base.filePath("site-packages");
-        sites << base.filePath("lib-dynload");
+    // QStringList sites=settings.value("siteFolder").toString().split(QRegularExpression("\\s*:\\s*"));
+    // addSysPath prepends: the last added comes first in sys.path
+    // order of precedence: site folders of the settings, user modules, modules shipped with neutrino
+    QStringList sites;
+
+    // modules shipped with neutrino (numpy, scipy): site-packages is not added by python (IgnoreSiteModule)
+    if (!pyhome.isEmpty()) {
+        sites << QDir(pyhome).filePath("lib/"+pyver+"/site-packages") << QDir(pyhome).filePath("Lib/site-packages");
     }
-#endif
+    // user modules: python -m pip install --target <folder> <module>, with the same python X.Y
+    const QString userModules=QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath(pyver);
+    QDir().mkpath(userModules);
+    sites << userModules;
+
+    // sites << settings.value("siteFolder").toString().split(QRegularExpression("\\s*:\\s*"));
+    // ':' on unix, ';' on windows (where ':' is in C:\...)
+    sites << settings.value("siteFolder").toString().split(QRegularExpression(QString("\\s*%1\\s*").arg(QDir::listSeparator())));
+// //Re-enable below if numpy start to work again:
+// #if defined(Q_OS_WIN)
+//     QDir base(QDir(qApp->applicationDirPath()).filePath("python2.7"));
+//     if (base.exists()) {
+//         sites << base.absolutePath();
+//         sites << base.filePath("plat-win32");
+//         sites << base.filePath("lib-tk");
+//         sites << base.filePath("site-packages");
+//         sites << base.filePath("lib-dynload");
+//     }
+// #endif
+    // windows: python is shipped in <bin>/python/lib/pythonX.Y (mingw layout), found above
 
     foreach (QString spath, sites) {
         qDebug() << "Python site folder " << spath;
@@ -155,6 +214,7 @@ void PyShell::startup() {
     }
 
     settings.endGroup();
+    return true;
 }
 
 void PyShell::cleanup() {

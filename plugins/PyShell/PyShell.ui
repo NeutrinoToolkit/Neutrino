@@ -226,7 +226,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>python path (: separated paths)</string>
+           <string>python path (: separated paths, ; on Windows)</string>
           </property>
           <property name="neutrinoSave" stdset="0">
            <bool>true</bool>

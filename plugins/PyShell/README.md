@@ -43,7 +43,8 @@ There are several constructors:
 * empty constructor `a=nPhysD()` (empty image)
 * from shape: `a=nPhysD(10,10,3,"ABC")` will create a 10x10 image filled with the value 3 and named ABC
 * from list and shape: `a=nPhysD(range(100),(10,10))` will create a 10x10 image
-* [does not work on windows] from numpy array: `a=nPhysD(np.array([[1, 2, 3], [4, 5, 6]]))` 
+* from raw doubles and shape: `a=nPhysD(data, (height, width))` where `data` are `bytes` (row major order)
+* from a numpy array: `a=array2phys(np.array([[1, 2, 3], [4, 5, 6]]))` (see *numpy and other modules* below)
 
 There is one static method to open a file (which returns a list of `nPhysD`): `b=nPhysD.open(`filename`)`
 
@@ -51,7 +52,8 @@ There are several method for each image here (we note with a a generic `nPhysD`)
 
 * to get the data
   * `a.getData()` will return a linearised vector of floats and  `a.getShape()` will return a couple of int with the shape (height, width)
-  * [does not work on windows] `a.toArray()` will return a numpy array
+  * `a.getBytes()` will return the data as raw doubles (row major order)
+  * `phys2array(a)` will return a numpy array (a copy of the data)
 
 * other methods (not exhaustive list)
   * `a.properties()` will return a list of strings of properties
@@ -59,6 +61,34 @@ There are several method for each image here (we note with a a generic `nPhysD`)
   * `a.setPropery('name', 'my image name')` will set the image property name to 'my image name'
  
  
+numpy and other modules
+-----------------------
+
+The packaged Neutrino ships its own python with `numpy` and `scipy`.
+`init.py` (run when PyShell starts) defines two functions to exchange images with numpy:
+
+* `phys2array(a)` returns a 2D numpy array (height, width) from the image `a`
+* `array2phys(arr)` returns a new image from a 2D numpy array
+
+```python
+import scipy.ndimage
+a=neu.getCurrentBuffer()
+b=array2phys(scipy.ndimage.gaussian_filter(phys2array(a), 5))
+neu.addShowPhys(b)
+```
+
+Other modules can be installed in the user modules folder, which is added to `sys.path`:
+`~/Library/Application Support/polytechnique/Neutrino/python3.X` on macOS
+(`python3.X` is the PyShell python version: `import sys; print(sys.version)`; `sys.path[...]` shows the folder).
+Use a python with the same version to install them:
+
+```
+python3.X -m pip install --target "<user modules folder>" <module>
+```
+
+Folders added in the PyShell settings (site folder) come first in `sys.path`, then the user modules folder, then the shipped modules.
+
+
 Generic tool window: `nPan`
 ---------------------------
 

@@ -26,6 +26,8 @@ public slots:
 
     nPhysD* new_nPhysD(QVector<double>, QPair<int,int>);
 
+    nPhysD* new_nPhysD(QByteArray, QPair<int,int>); // raw doubles in row major order (e.g. numpy tobytes())
+
 //    nPhysD* new_nPhysD(int, int, double val=0.0, QString name=QString("Python"));
 
     nPhysD* new_nPhysD(nPhysD*);
@@ -69,6 +71,9 @@ public slots:
     void setProperty(nPhysD *, QString, QVariant);
     
     QVector<double> getData(nPhysD*); // geta data in row major order
+
+    // QByteArray getBytes(nPhysD*); // (PythonQt returns a wrapped QByteArray, not python bytes)
+    PythonQtObjectPtr getBytes(nPhysD*); // data as python bytes of raw doubles in row major order (e.g. for numpy.frombuffer)
 
 #ifdef HAVE_NUMPY
     PyObject* toArray(nPhysD*);

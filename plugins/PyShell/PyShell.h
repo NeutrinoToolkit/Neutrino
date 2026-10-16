@@ -40,7 +40,8 @@ public slots:
 	void runScript(QString);
 	void changeScriptsFolder();
 	void changeSiteFolder();
-    static void startup();
+    // static void startup();
+    static bool startup();
     void cleanup();
 
 
@@ -130,6 +131,7 @@ public slots:
 
     void
     runPyScript(QString fname) {
+        if (!PyShell::startup()) return;
         QFile t(fname);
         t.open(QIODevice::ReadOnly| QIODevice::Text);
         PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());

@@ -271,6 +271,37 @@ void nPhysPyWrapper::setProperty(nPhysD* phys, QString prop_name, QVariant prop_
     phys->prop[prop_name.toStdString()]=my_data;
 }
 
+nPhysD* nPhysPyWrapper::new_nPhysD(QByteArray tempData, QPair<int,int> my_shape){
+    nPhysD *phys=new_nPhysD();
+    int h=my_shape.first; // row major: first rows(yw or height) than columns(xw or widthv)
+    int w=my_shape.second;
+
+    if (w>0 && h>0 && tempData.size()==qsizetype(sizeof(double))*w*h) {
+        phys->resize(w, h);
+        memcpy(phys->Timg_buffer, tempData.constData(), tempData.size());
+        phys->TscanBrightness();
+    } else {
+        qWarning() << "nPhysD: got" << tempData.size() << "bytes for shape" << h << "x" << w;
+    }
+    return phys;
+}
+
+// QByteArray nPhysPyWrapper::getBytes(nPhysD* phys){
+//     if (phys && phys->getSurf()>0) {
+//         return QByteArray(reinterpret_cast<const char*>(phys->Timg_buffer), phys->getSurf()*sizeof(double));
+//     }
+//     return QByteArray();
+// }
+PythonQtObjectPtr nPhysPyWrapper::getBytes(nPhysD* phys){
+    PythonQtObjectPtr ret;
+    if (phys && phys->getSurf()>0) {
+        ret.setNewRef(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(phys->Timg_buffer), phys->getSurf()*sizeof(double)));
+    } else {
+        ret.setNewRef(PyBytes_FromStringAndSize(nullptr, 0));
+    }
+    return ret;
+}
+
 QVector<double> nPhysPyWrapper::getData(nPhysD* phys){
     QVector<double> tempData;
     tempData.clear();
