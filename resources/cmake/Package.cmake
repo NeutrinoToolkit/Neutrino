@@ -48,6 +48,8 @@ elseif (LINUX)
             set(CPACK_INSTALL_PREFIX "/usr")
 
             set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+            # PyShell uses the python of the system (libpython comes from SHLIBDEPS)
+            set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "python3-numpy, python3-scipy")
 			
             set(CPACK_PACKAGE_CONTACT "alessandro.flacco@polytechnique.edu")
             set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alessandro Flacco <alessandro.flacco@polytechnique.edu>")
@@ -71,6 +73,8 @@ elseif (LINUX)
             # set (CPACK_SYSTEM_NAME "${DISTRO_CODE}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
             set (CPACK_SYSTEM_NAME "${DISTRO}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
             set(CPACK_RPM_PACKAGE_AUTOREQ YES)
+            # PyShell uses the python of the system (libpython comes from AUTOREQ)
+            set(CPACK_RPM_PACKAGE_SUGGESTS "python3-numpy, python3-scipy")
         endif()
     endif()
 

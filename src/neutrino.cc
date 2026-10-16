@@ -1184,7 +1184,8 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
     if (newPhys && newPhys->getSurf()) {
         bool redisplay = (currentBuffer==oldPhys);
         if (oldPhys && nPhysExists(oldPhys)) {
-            *oldPhys=*newPhys;
+//            *oldPhys=*newPhys;
+            *oldPhys=std::move(*newPhys);
             delete newPhys;
             newPhys=oldPhys;
         } else {

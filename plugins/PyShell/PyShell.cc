@@ -113,9 +113,13 @@ bool PyShell::startup() {
     if (PythonQt::self()) return true;
 
     // packaged python: <home>/lib/pythonX.Y (Windows: <home>/Lib) next to the application
+    // (<home>/lib64/pythonX.Y for a python with platlibdir lib64, e.g. fedora's in the AppImage)
     const QString pyver=QString("python%1.%2").arg(PY_MAJOR_VERSION).arg(PY_MINOR_VERSION);
+    // auto hasStdlib = [&pyver](const QString &home) {
+    //     return QFileInfo::exists(QDir(home).filePath("lib/"+pyver+"/os.py")) || QFileInfo::exists(QDir(home).filePath("Lib/os.py"));
+    // };
     auto hasStdlib = [&pyver](const QString &home) {
-        return QFileInfo::exists(QDir(home).filePath("lib/"+pyver+"/os.py")) || QFileInfo::exists(QDir(home).filePath("Lib/os.py"));
+        return QFileInfo::exists(QDir(home).filePath("lib/"+pyver+"/os.py")) || QFileInfo::exists(QDir(home).filePath("lib64/"+pyver+"/os.py")) || QFileInfo::exists(QDir(home).filePath("Lib/os.py"));
     };
     const QDir appDir(qApp->applicationDirPath());
     QString pyhome;
@@ -144,9 +148,11 @@ bool PyShell::startup() {
 // #else
 //     PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
 // #endif
-    // same on every platform (the shipped site-packages are added below): without RedirectStdOut
-    // the console does not show the python output
-    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+    // same on every platform: without RedirectStdOut the console does not show the python output.
+    // shipped python: its site-packages is added below. System python (linux packages, builds not packaged):
+    // the site module adds its site-packages (python3-numpy...) and the user one (~/.local/lib/pythonX.Y)
+    // PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule);
+    PythonQt::init(pyhome.isEmpty() ? int(PythonQt::RedirectStdOut) : int(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule));
 
 //     PythonQt_init_QtBindings();
 	PythonQt_QtAll::init();
@@ -185,7 +191,8 @@ bool PyShell::startup() {
 
     // modules shipped with neutrino (numpy, scipy): site-packages is not added by python (IgnoreSiteModule)
     if (!pyhome.isEmpty()) {
-        sites << QDir(pyhome).filePath("lib/"+pyver+"/site-packages") << QDir(pyhome).filePath("Lib/site-packages");
+        // sites << QDir(pyhome).filePath("lib/"+pyver+"/site-packages") << QDir(pyhome).filePath("Lib/site-packages");
+        sites << QDir(pyhome).filePath("lib/"+pyver+"/site-packages") << QDir(pyhome).filePath("lib64/"+pyver+"/site-packages") << QDir(pyhome).filePath("Lib/site-packages");
     }
     // user modules: python -m pip install --target <folder> <module>, with the same python X.Y
     const QString userModules=QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath(pyver);

@@ -64,7 +64,9 @@ There are several method for each image here (we note with a a generic `nPhysD`)
 numpy and other modules
 -----------------------
 
-The packaged Neutrino ships its own python with `numpy` and `scipy`.
+The packaged Neutrino ships its own python with `numpy` and `scipy` (macOS, Linux AppImage; on Windows only `numpy`).
+The Linux deb/rpm packages use the python of the system: install `numpy` and `scipy` with the package manager
+(`python3-numpy`, `python3-scipy`); the system and user (`~/.local/lib/python3.X`) site-packages are in `sys.path`.
 `init.py` (run when PyShell starts) defines two functions to exchange images with numpy:
 
 * `phys2array(a)` returns a 2D numpy array (height, width) from the image `a`
@@ -78,7 +80,8 @@ neu.addShowPhys(b)
 ```
 
 Other modules can be installed in the user modules folder, which is added to `sys.path`:
-`~/Library/Application Support/polytechnique/Neutrino/python3.X` on macOS
+`~/Library/Application Support/polytechnique/Neutrino/python3.X` on macOS,
+`~/.local/share/polytechnique/Neutrino/python3.X` on Linux, `%APPDATA%\polytechnique\Neutrino\python3.X` on Windows
 (`python3.X` is the PyShell python version: `import sys; print(sys.version)`; `sys.path[...]` shows the folder).
 Use a python with the same version to install them:
 
@@ -86,7 +89,7 @@ Use a python with the same version to install them:
 python3.X -m pip install --target "<user modules folder>" <module>
 ```
 
-Folders added in the PyShell settings (site folder) come first in `sys.path`, then the user modules folder, then the shipped modules.
+Folders added in the PyShell settings (site folder, `:` separated, `;` on Windows) come first in `sys.path`, then the user modules folder, then the shipped modules.
 
 
 Generic tool window: `nPan`

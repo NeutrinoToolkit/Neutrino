@@ -5,7 +5,7 @@ ubuntu_task:
   script: |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103
+    apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
     mkdir build && cd build
     cmake ..
     make -j2 package
@@ -20,7 +20,7 @@ debian_task:
   script: |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev
+    apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev
     apt-get install -yy qml6-module*
     mkdir build && cd build
     cmake ..
@@ -36,7 +36,7 @@ mint_task:
   script: |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103
+    apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
     mkdir build && cd build
     cmake ..
     make -j2 package
@@ -51,7 +51,7 @@ fedora_task:
   script: |
     dnf clean all
     dnf -y --nogpgcheck update
-    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build
+    dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel
     mkdir build && cd build
     cmake ..
     make -j2 package
@@ -67,7 +67,7 @@ opensuse_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
     mkdir build && cd build
     cmake ..
     make -j2 package
@@ -83,7 +83,7 @@ opensuseleap_task:
     zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
     zypper --gpg-auto-import-keys ref
     zypper update -y
-    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git
+    zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
     mkdir build && cd build
     export compiler=$(ls -1 /usr/bin/g++-[0-9][0-9])
     cmake -DCMAKE_CXX_COMPILER=$compiler  ..
@@ -203,12 +203,12 @@ AppImage_olderLinux_task:
     APPIMAGE_EXTRACT_AND_RUN: 1
     LD_LIBRARY_PATH: AppDir/usr/lib
   script: |
-    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget python3-devel python3-pip
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ../Neutrino-olderLinux.AppImage
@@ -230,12 +230,12 @@ AppImage_olderLinux_task:
 #     dnf install --assumeyes almalinux-release-devel
 #     dnf config-manager --set-enabled crb
 #     dnf update --assumeyes
-#     dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+#     dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget python3-devel python3-pip
 #     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
 #     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
 #     chmod +x linuxdeploy*.AppImage
 #     mkdir build && cd build
-#     cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+#     cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
 #     make -j2 install DESTDIR=AppDir
 #     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
 #     cp Neutrino-*.AppImage ../Neutrino-almaLinux.AppImage
@@ -250,12 +250,12 @@ AppImage_task:
     APPIMAGE_EXTRACT_AND_RUN: 1
     LD_LIBRARY_PATH: AppDir/usr/lib
   script: |
-    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    dnf -y install gcc gcc-c++ qconf libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget python3-devel python3-pip
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
     make -j2 install DESTDIR=AppDir
     ../linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ..
@@ -271,12 +271,12 @@ AppImageArm_task:
     APPIMAGE_EXTRACT_AND_RUN: 1
     LD_LIBRARY_PATH: AppDir/usr/lib    
   script: |
-    dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget
+    dnf -y install gcc gcc-c++ libtiff-devel gsl-devel redhat-lsb blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget python3-devel python3-pip
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-aarch64.AppImage
     wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-aarch64.AppImage
     chmod +x linuxdeploy*.AppImage
     mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
     make -j2 install DESTDIR=AppDir
     NO_STRIP=true ../linuxdeploy-aarch64.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
     cp Neutrino-*.AppImage ../Neutrino-Linux-arm64.AppImage

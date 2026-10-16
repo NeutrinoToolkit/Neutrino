@@ -35,7 +35,10 @@ if(Python_FOUND)
         set(PYTHONQT_BUILD_EXAMPLES OFF)
         set(PYTHONQT_INSTALL OFF)
         # all the QtAll modules but WebEngineWidgets (it would bring QtWebEngine into the packages)
-        set(PYTHONQTALL_CONFIG "PythonQtCore;PythonQtGui;PythonQtSvg;PythonQtSql;PythonQtNetwork;PythonQtXml;PythonQtMultimedia;PythonQtQml;PythonQtQuick;PythonQtUiTools")
+        # set(PYTHONQTALL_CONFIG "PythonQtCore;PythonQtGui;PythonQtSvg;PythonQtSql;PythonQtNetwork;PythonQtXml;PythonQtMultimedia;PythonQtQml;PythonQtQuick;PythonQtUiTools")
+        # cache variable: PythonQt declares it with set(CACHE), which (policy CMP0126 OLD) hides a normal variable
+        # in a new build directory
+        set(PYTHONQTALL_CONFIG "PythonQtCore;PythonQtGui;PythonQtSvg;PythonQtSql;PythonQtNetwork;PythonQtXml;PythonQtMultimedia;PythonQtQml;PythonQtQuick;PythonQtUiTools" CACHE STRING "PythonQt modules wrapped for PyShell")
         FetchContent_Declare(pythonqt
             GIT_REPOSITORY https://github.com/iltommi/pythonqt.git
             GIT_TAG 3793f8999edd4e0b9c6841096bd7cf94bceacb8a
@@ -100,8 +103,11 @@ if(Python_FOUND)
         else()
             set(PYSHELL_PYTHON_EXECUTABLE ${Python_EXECUTABLE})
         endif()
+        # execute_process(
+        #     COMMAND ${PYSHELL_PYTHON_EXECUTABLE} -c "import sys, sysconfig; print(sys.base_prefix); print(sysconfig.get_path('stdlib')); print('%d.%d' % sys.version_info[:2])"
+        # platlibdir: the stdlib is in <home>/<platlibdir>/pythonX.Y (lib64 for the fedora python)
         execute_process(
-            COMMAND ${PYSHELL_PYTHON_EXECUTABLE} -c "import sys, sysconfig; print(sys.base_prefix); print(sysconfig.get_path('stdlib')); print('%d.%d' % sys.version_info[:2])"
+            COMMAND ${PYSHELL_PYTHON_EXECUTABLE} -c "import sys, sysconfig; print(sys.base_prefix); print(sysconfig.get_path('stdlib')); print('%d.%d' % sys.version_info[:2]); print(getattr(sys, 'platlibdir', 'lib'))"
             OUTPUT_VARIABLE PYSHELL_PYTHON_PATHS
             RESULT_VARIABLE PYSHELL_PYTHON_RESULT
             OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -110,6 +116,7 @@ if(Python_FOUND)
             list(GET PYSHELL_PYTHON_PATHS 0 PYSHELL_PYTHON_HOME)
             list(GET PYSHELL_PYTHON_PATHS 1 PYSHELL_PYTHON_STDLIB)
             list(GET PYSHELL_PYTHON_PATHS 2 PYSHELL_PYTHON_VERSION)
+            list(GET PYSHELL_PYTHON_PATHS 3 PYSHELL_PYTHON_PLATLIBDIR)
             message(STATUS "PyShell: Python ${PYSHELL_PYTHON_VERSION} home ${PYSHELL_PYTHON_HOME}")
             # checked before starting python when it is not packaged (see PyShell::startup)
             target_compile_definitions(PyShell PRIVATE PYSHELL_PYTHON_HOME="${PYSHELL_PYTHON_HOME}")
@@ -122,10 +129,27 @@ if(Python_FOUND)
                 "PYSHELL_PYTHON_VERSION=\"${PYSHELL_PYTHON_VERSION}\"\n"
                 "PYSHELL_PIP_PACKAGES=\"${PYSHELL_PIP_PACKAGES}\"\n")
 
+            # ship python with neutrino (install rules): needed on windows, for the linux AppImage
+            # (-DPYSHELL_BUNDLE_PYTHON=ON). The deb/rpm packages use the python of the system
+            # (macOS: resources/macPackage/prepareapp.sh)
             if (WIN32)
-                # windows: the python home is <bin>/python (see PyShell::startup), libpythonX.Y.dll and the
-                # dlls of the modules are in <bin> with the other runtime dependencies (resources/cmake/Package.cmake)
-                set(PYSHELL_PYTHON_DEST "bin/python/lib/python${PYSHELL_PYTHON_VERSION}")
+                option(PYSHELL_BUNDLE_PYTHON "ship python, its standard library and PYSHELL_PIP_PACKAGES with neutrino" ON)
+            else()
+                option(PYSHELL_BUNDLE_PYTHON "ship python, its standard library and PYSHELL_PIP_PACKAGES with neutrino" OFF)
+            endif()
+
+            # if (WIN32)
+            if (PYSHELL_BUNDLE_PYTHON AND (WIN32 OR LINUX))
+                # the python home is <bin>/python on windows, <prefix>/lib/neutrino/python on linux (see PyShell::startup).
+                # windows: libpythonX.Y.dll and the dlls of the modules are in <bin> with the other runtime
+                # dependencies (resources/cmake/Package.cmake); linux AppImage: linuxdeploy ships the libraries
+                # set(PYSHELL_PYTHON_DEST "bin/python/lib/python${PYSHELL_PYTHON_VERSION}")
+                if (WIN32)
+                    set(PYSHELL_PYTHON_DEST "bin/python/${PYSHELL_PYTHON_PLATLIBDIR}/python${PYSHELL_PYTHON_VERSION}")
+                else()
+                    set(PYSHELL_PYTHON_DEST "lib/neutrino/python/${PYSHELL_PYTHON_PLATLIBDIR}/python${PYSHELL_PYTHON_VERSION}")
+                endif()
+                message(STATUS "PyShell: shipping python ${PYSHELL_PYTHON_VERSION} in ${PYSHELL_PYTHON_DEST}")
                 install(DIRECTORY ${PYSHELL_PYTHON_STDLIB}/ DESTINATION ${PYSHELL_PYTHON_DEST} COMPONENT binary
                     PATTERN "__pycache__" EXCLUDE
                     PATTERN "test" EXCLUDE
@@ -136,21 +160,43 @@ if(Python_FOUND)
                     PATTERN "ensurepip" EXCLUDE
                     PATTERN "site-packages" EXCLUDE
                     PATTERN "config-*" EXCLUDE)
-                # no pip for the target: the modules are the ones installed with the python of the target
-                # (e.g. mingw64-python3-numpy)
                 separate_arguments(PYSHELL_MODULES UNIX_COMMAND "${PYSHELL_PIP_PACKAGES}")
-                foreach(module ${PYSHELL_MODULES})
-                    if (IS_DIRECTORY "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}")
-                        message(STATUS "PyShell: shipping python module ${module}")
-                        file(GLOB module_info "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}-*-info")
-                        install(DIRECTORY "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}" ${module_info}
-                            DESTINATION ${PYSHELL_PYTHON_DEST}/site-packages COMPONENT binary
-                            PATTERN "__pycache__" EXCLUDE
-                            PATTERN "tests" EXCLUDE)
-                    else()
-                        message(STATUS "PyShell: python module ${module} not found in ${PYSHELL_PYTHON_STDLIB}/site-packages: not shipped")
-                    endif()
-                endforeach()
+                if (CMAKE_CROSSCOMPILING)
+                    # no pip for the target: the modules are the ones installed with the python of the target
+                    # (e.g. mingw64-python3-numpy)
+                    foreach(module ${PYSHELL_MODULES})
+                        if (IS_DIRECTORY "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}")
+                            message(STATUS "PyShell: shipping python module ${module}")
+                            file(GLOB module_info "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}-*-info")
+                            install(DIRECTORY "${PYSHELL_PYTHON_STDLIB}/site-packages/${module}" ${module_info}
+                                DESTINATION ${PYSHELL_PYTHON_DEST}/site-packages COMPONENT binary
+                                PATTERN "__pycache__" EXCLUDE
+                                PATTERN "tests" EXCLUDE)
+                        else()
+                            message(STATUS "PyShell: python module ${module} not found in ${PYSHELL_PYTHON_STDLIB}/site-packages: not shipped")
+                        endif()
+                    endforeach()
+                elseif (PYSHELL_MODULES)
+                    # binary wheels (with their own libraries) installed with pip at install time
+                    message(STATUS "PyShell: shipping python modules ${PYSHELL_PIP_PACKAGES} (pip, at install time)")
+                    install(CODE "
+                        set(site_packages \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PYSHELL_PYTHON_DEST}/site-packages\")
+                        execute_process(COMMAND \"${PYSHELL_PYTHON_EXECUTABLE}\" -m pip install --only-binary=:all: --no-compile
+                            --disable-pip-version-check --target \"\${site_packages}\" ${PYSHELL_MODULES} RESULT_VARIABLE pip_result)
+                        if (NOT pip_result EQUAL 0)
+                            message(FATAL_ERROR \"PyShell: pip could not install ${PYSHELL_PIP_PACKAGES}\")
+                        endif()
+                        file(REMOVE_RECURSE \"\${site_packages}/bin\")
+                        # (a GLOB_RECURSE of <site_packages>/*/tests also returns the directories it walks through)
+                        file(GLOB_RECURSE pip_tests LIST_DIRECTORIES true \"\${site_packages}/*\")
+                        list(FILTER pip_tests INCLUDE REGEX \"/tests$\")
+                        foreach(dir \${pip_tests})
+                            if (IS_DIRECTORY \"\${dir}\")
+                                file(REMOVE_RECURSE \"\${dir}\")
+                            endif()
+                        endforeach()
+                        " COMPONENT binary)
+                endif()
             endif()
         endif()
 

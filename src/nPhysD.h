@@ -11,7 +11,8 @@ public:
 
     using physD::physD;
 
-    nPhysD(physD in=physD()): physD(in) {
+//    nPhysD(physD in=physD()): physD(in) {
+    nPhysD(physD in=physD()): physD(std::move(in)) {
         qDebug() << "------------------------------------------------------------ CREATE "<< copies() << " " << this << QString::fromStdString(this->getName());
     }
 
@@ -32,6 +33,27 @@ public:
     {
         physD *tmpimg=static_cast<physD*>(this);
         *tmpimg=rhs;
+        reset_display(); // new pixels: the cached uchar_buf is stale
+        return *this;
+    }
+
+    // move versions: the user-declared copy operator= above suppresses the implicit ones,
+    // so without these a = temporary would deep copy the pixels
+    nPhysD(const nPhysD &) = default;
+    nPhysD(nPhysD &&) noexcept = default;
+
+    nPhysD & operator= (nPhysD &&rhs) noexcept
+    {
+        physD::operator=(std::move(static_cast<physD &>(rhs)));
+        display_prop = std::move(rhs.display_prop);
+        uchar_buf = std::move(rhs.uchar_buf);
+        return *this;
+    }
+
+    nPhysD & operator= (physD &&rhs)
+    {
+        physD::operator=(std::move(rhs));
+        reset_display();
         return *this;
     }
 
