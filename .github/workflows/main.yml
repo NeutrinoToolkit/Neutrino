@@ -29,7 +29,7 @@ jobs:
       run: |
         git config --global --add safe.directory '*'
         # apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev "qml6-module*"
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*"
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -55,7 +55,7 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev
         apt-get install -yy qml6-module*
         mkdir build && cd build
         cmake ..
@@ -83,7 +83,7 @@ jobs:
       run: |
         git config --global --add safe.directory '*'
         # apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev "qml6-module*"
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*"
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -259,7 +259,7 @@ jobs:
         patch -p1 -u < hdf4-2-dllimport.patch
         libtoolize --force
         autoreconf --install
-        ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+        ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS" CFLAGS="$(rpm --eval %{${MINGW}_cflags}) -std=gnu17 -fpermissive"
         make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
         make -C hdf/src LDFLAGS="-no-undefined -lssp"
         make -C hdf/src install

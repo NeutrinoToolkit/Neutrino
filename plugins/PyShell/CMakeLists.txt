@@ -41,7 +41,7 @@ if(Python_FOUND)
         set(PYTHONQTALL_CONFIG "PythonQtCore;PythonQtGui;PythonQtSvg;PythonQtSql;PythonQtNetwork;PythonQtXml;PythonQtMultimedia;PythonQtQml;PythonQtQuick;PythonQtUiTools" CACHE STRING "PythonQt modules wrapped for PyShell")
         FetchContent_Declare(pythonqt
             GIT_REPOSITORY https://github.com/iltommi/pythonqt.git
-            GIT_TAG 3793f8999edd4e0b9c6841096bd7cf94bceacb8a
+            GIT_TAG 574eb5737a8f2348653ce8f043f0692c722c67e4
         )
         FetchContent_MakeAvailable(pythonqt)
     endif()
