@@ -35,6 +35,9 @@ int nApp::exec() {
     if (!my_set.contains("threads")) {
         my_set.setValue("threads",1);
     }
+    // plugins plan FFTs in worker threads (e.g. the wavelet, with FFTW_MEASURE) while others plan in the GUI thread:
+    // the FFTW planner is not thread safe unless this is called (FFTW >= 3.3.5)
+    fftw_make_planner_thread_safe();
     changeThreads(my_set.value("threads").toInt());
 
     if (!my_set.contains("forceDecimalDot")) {

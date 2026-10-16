@@ -115,7 +115,12 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         fftw_complex *Ftmorlet = fftw_alloc_complex(surf);
 
         fftw_plan plan_fwd = fftw_plan_dft_2d(dy, dx, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-        fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, FFTW_ESTIMATE);
+        // fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, FFTW_ESTIMATE);
+        // the backward FFT runs once per filter: a measured plan is 1.3-3x faster (much more with fftw threads).
+        // Measuring costs about one second for a large image but FFTW keeps it (wisdom): the next plans of the same
+        // size are immediate, also with FFTW_ESTIMATE. FFTW_MEASURE overwrites t and Ftmorlet: plan before filling t
+        size_t n_filters = params.n_angles*params.n_lambdas*params.n_thicks;
+        fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, n_filters >= 16 ? FFTW_MEASURE : FFTW_ESTIMATE);
 
 #pragma omp parallel for
         for (size_t i = 0; i < surf; i++) {
@@ -131,6 +136,11 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         // (otherwise the background leaks into the fringes for small damp). Normalized to keep gain 1 at the carrier
         double kappa = damp_norm>0 ? exp(-damp_norm*damp_norm) : 0;
         double norm_adm = 1.0/(1.0-kappa*kappa);
+        // the filter is a narrow gaussian around the carrier: where all its exponents are below this limit
+        // |gauss| < exp(-50) = 2e-22 (well below the double precision of the peak, 1) and it is set to 0
+        // without computing the three exp
+        double log_negligible = -50.0 - log(norm_adm);
+        double log_kappa = damp_norm>0 ? -damp_norm*damp_norm : -std::numeric_limits<double>::infinity();
 
         // refinement of lambda and angle maps: for each pixel keep the response of the filters next to the best one
         // (lambda-1, lambda+1, angle-1, angle+1 at the same thickness). The previous responses are kept for one row
@@ -167,28 +177,53 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                     double thick_norm=thickness[l]*M_PI;
                     double lambda_norm=lambdas[i];
 
+// #pragma omp parallel for
+//                     for (unsigned int k=0;k<surf;k++) {
+//                         unsigned int x=k%dx;
+//                         unsigned int y=k/dx;
+//
+//                         int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
+//                         int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
+//
+//                         double fx = xx/(double)dx;
+//                         double fy = yy/(double)dy;
+//                         double xr = fx*cr - fy*sr; //rotate
+//                         double yr = fx*sr + fy*cr;
+//
+//                         double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+//                         double e_y = -pow(yr*thick_norm, 2.);
+//
+//                         // double gauss = exp(e_x)*exp(e_y);
+//                         double gauss = norm_adm*(exp(e_x)-kappa*exp(-pow(damp_norm*xr*lambda_norm, 2.)))*exp(e_y);
+//
+//                         t[k][0]=Ft[k][0]*gauss;
+//                         t[k][1]=Ft[k][1]*gauss;
+//
+//                     }
 #pragma omp parallel for
-                    for (unsigned int k=0;k<surf;k++) {
-                        unsigned int x=k%dx;
-                        unsigned int y=k/dx;
-
-                        int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
+                    for (unsigned int y=0;y<dy;y++) {
                         int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
-
-                        double fx = xx/(double)dx;
                         double fy = yy/(double)dy;
-                        double xr = fx*cr - fy*sr; //rotate
-                        double yr = fx*sr + fy*cr;
+                        for (unsigned int x=0;x<dx;x++) {
+                            size_t k=(size_t)y*dx+x;
+                            int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
+                            double fx = xx/(double)dx;
+                            double xr = fx*cr - fy*sr; //rotate
+                            double yr = fx*sr + fy*cr;
 
-                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-                        double e_y = -pow(yr*thick_norm, 2.);
+                            double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+                            double e_y = -pow(yr*thick_norm, 2.);
+                            double e_k = -pow(damp_norm*xr*lambda_norm, 2.); // admissibility term
 
-                        // double gauss = exp(e_x)*exp(e_y);
-                        double gauss = norm_adm*(exp(e_x)-kappa*exp(-pow(damp_norm*xr*lambda_norm, 2.)))*exp(e_y);
+                            double gauss = 0;
+                            // |gauss| <= norm_adm*max(exp(e_x),kappa*exp(e_k))*exp(e_y)
+                            if (e_y > log_negligible && (e_x > log_negligible || e_k+log_kappa > log_negligible)) {
+                                gauss = norm_adm*(exp(e_x)-kappa*exp(e_k))*exp(e_y);
+                            }
 
-                        t[k][0]=Ft[k][0]*gauss;
-                        t[k][1]=Ft[k][1]*gauss;
-
+                            t[k][0]=Ft[k][0]*gauss;
+                            t[k][1]=Ft[k][1]*gauss;
+                        }
                     }
 
                     fftw_execute(plan_bwd);
