@@ -305,7 +305,7 @@ upload_task:
     git remote set-url origin https://$GITHUB_TOKEN@github.com/NeutrinoToolkit/Neutrino
     git pull
     # gh release upload --clobber latest package/*
-    if [ "$CIRRUS_BRANCH" = "master" ]; then RELTAG=latest; else RELTAG=$CIRRUS_BRANCH; fi
-    gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $RELTAG --notes "Builds of the $RELTAG branch" --target $CIRRUS_CHANGE_IN_REPO || true
+    if [ "$CIRRUS_BRANCH" = "master" ]; then RELTAG=latest; else RELTAG=latest-$CIRRUS_BRANCH; fi
+    gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $CIRRUS_BRANCH --notes "Builds of the $CIRRUS_BRANCH branch" --target $CIRRUS_CHANGE_IN_REPO || true
     gh release upload --clobber $RELTAG package/*
     

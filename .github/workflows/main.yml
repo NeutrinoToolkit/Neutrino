@@ -18,7 +18,7 @@ jobs:
       if: github.ref == 'refs/heads/modernization'
       uses: EndBug/latest-tag@latest
       with:
-        ref: modernization
+        ref: latest-modernization
         description: modernization
     - name: Prepare
       run: |
@@ -56,6 +56,6 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release view modernization >/dev/null 2>&1 || gh release create modernization --prerelease --title modernization --notes "Builds of the modernization branch" --target $GITHUB_SHA || true
-        gh release upload --clobber modernization build/Neutrino*.zip build/Neutrino*.dmg
+        gh release view latest-modernization >/dev/null 2>&1 || gh release create latest-modernization --prerelease --title modernization --notes "Builds of the modernization branch" --target $GITHUB_SHA || true
+        gh release upload --clobber latest-modernization build/Neutrino*.zip build/Neutrino*.dmg
     
