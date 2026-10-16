@@ -1,30 +1,186 @@
-name: macIntel
+name: build
+
+# Cirrus CI shut down on June 1, 2026: all its tasks (.cirrus.yml) now live here.
+# Every branch is built; master publishes to the "Latest" release (tag latest),
+# modernization to the "modernization" prerelease (tag latest-modernization).
 
 on: push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
 jobs:
-  build:
-    runs-on: macos-15-intel
+
+  ubuntu:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: ubuntu:22.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - name: Git
+      run: apt-get update -qq && apt-get install -yy git
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Tag latest
-      if: github.ref == 'refs/heads/master'
-      uses: EndBug/latest-tag@latest
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.deb ..
+    - uses: actions/upload-artifact@v4
       with:
-        description: Latest
-    - name: Tag modernization
-      if: github.ref == 'refs/heads/modernization'
-      uses: EndBug/latest-tag@latest
+        name: ubuntu
+        path: Neutrino-*.*
+
+  debian:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: debian:testing
+    steps:
+    - name: Git
+      run: apt-get update -qq && apt-get install -yy git
+    - uses: actions/checkout@v4
       with:
-        ref: latest-modernization
-        description: modernization
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev
+        apt-get install -yy qml6-module*
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.deb ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: debian
+        path: Neutrino-*.*
+
+  mint:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: linuxmintd/mint21-amd64:latest
+    steps:
+    - name: Git
+      run: apt-get update -qq && apt-get install -yy git
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.deb ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: mint
+        path: Neutrino-*.*
+
+  fedora:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: fedora:36
+    steps:
+    - name: Git
+      run: dnf -y install git
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        dnf clean all
+        dnf -y --nogpgcheck update
+        dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.rpm ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: fedora
+        path: Neutrino-*.*
+
+  opensuse:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: opensuse/tumbleweed:latest
+    steps:
+    - name: Git
+      run: zypper install -y git tar gzip
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+        zypper --gpg-auto-import-keys ref
+        zypper update -y
+        zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.rpm ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: opensuse
+        path: Neutrino-*.*
+
+  opensuseleap:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    container: opensuse/leap:latest
+    steps:
+    - name: Git
+      run: zypper install -y git tar gzip
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+        zypper --gpg-auto-import-keys ref
+        zypper update -y
+        zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
+        mkdir build && cd build
+        export compiler=$(ls -1 /usr/bin/g++-[0-9][0-9])
+        cmake -DCMAKE_CXX_COMPILER=$compiler  ..
+        cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.rpm ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: opensuseleap
+        path: Neutrino-*.*
+
+  # macIntel (was GitHub Actions) and macM1 (was Cirrus)
+  mac:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15-intel, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Prepare
       run: |
         brew update
         brew install objc-codegenutils objc-run
         brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers python
+        brew install boost
     - name: Deps
       run: |
         brew install --force iltommi/brews/hdf4
@@ -35,27 +191,144 @@ jobs:
         cmake ..
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
-    - name: Archive
-      uses: actions/upload-artifact@v4
+        cp Neutrino-*.zip Neutrino-*.dmg ..
+    - uses: actions/upload-artifact@v4
       with:
-        name: Neutrino.zip
+        name: ${{ matrix.os }}
         path: |
-          build/Neutrino*.zip
-          build/Neutrino*.dmg
-    - name: Upload
-      if: github.ref == 'refs/heads/master'
-      uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          Neutrino-*.zip
+          Neutrino-*.dmg
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [mingw32, mingw64]
+    runs-on: ubuntu-latest
+    container: fedora:36
+    env:
+      MINGW: ${{ matrix.arch }}
+    steps:
+    - name: Git
+      run: dnf -y install git
+    - uses: actions/checkout@v4
       with:
-        file: "build/Neutrino*.zip;build/Neutrino*.dmg"
-        update_latest_release: true
-        overwrite: true
-    - name: Upload modernization
-      if: github.ref == 'refs/heads/modernization'
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    - name: Build
       run: |
-        gh release view latest-modernization >/dev/null 2>&1 || gh release create latest-modernization --prerelease --title modernization --notes "Builds of the modernization branch" --target $GITHUB_SHA || true
-        gh release upload --clobber latest-modernization build/Neutrino*.zip build/Neutrino*.dmg
-    
+        git config --global --add safe.directory '*'
+        dnf clean all
+        dnf -y --nogpgcheck update
+        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf ${MINGW}-portablexdr pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
+        wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
+        tar -zxvf fftw-3.3.6-pl2.tar.gz
+        cd fftw-3.3.6-pl2
+        ${MINGW}-configure --disable-static --enable-shared --enable-threads --with-combined-threads
+        make -j$(nproc) bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+        make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
+        cd ..
+        wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
+        tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
+        wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
+        wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
+        patch -p1 -u < hdf4-1-portability-fixes.patch
+        patch -p1 -u < hdf4-2-dllimport.patch
+        libtoolize --force
+        autoreconf --install
+        ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS"
+        make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
+        make -C hdf/src LDFLAGS="-no-undefined -lssp"
+        make -C hdf/src install
+        make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
+        make -C mfhdf/libsrc install
+        cd ..
+        mkdir build && cd build
+        ${MINGW}-cmake ..
+        make -j$(nproc) package
+        cp Neutrino*.exe Neutrino*.zip ..
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.arch }}
+        path: Neutrino-*.*
+
+  AppImage:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: AppImage
+            image: fedora:36
+            runner: ubuntu-latest
+            arch: x86_64
+            linuxdeploy: continuous
+            pkgs: qconf redhat-lsb-core
+            out: ..
+          - name: AppImage_olderLinux
+            image: fedora:34
+            runner: ubuntu-latest
+            arch: x86_64
+            linuxdeploy: continuous
+            pkgs: qconf redhat-lsb-core
+            out: ../Neutrino-olderLinux.AppImage
+          - name: AppImageArm
+            image: arm64v8/fedora
+            runner: ubuntu-24.04-arm
+            arch: aarch64
+            linuxdeploy: 1-alpha-20240109-1
+            pkgs: lsb_release
+            out: ../Neutrino-Linux-arm64.AppImage
+    continue-on-error: ${{ matrix.name != 'AppImage' }}
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.image }}
+    env:
+      VERSION: Linux
+      APPIMAGE_EXTRACT_AND_RUN: 1
+      LD_LIBRARY_PATH: AppDir/usr/lib
+      NO_STRIP: ${{ matrix.arch == 'aarch64' && 'true' || '' }}
+    steps:
+    - name: Git
+      run: dnf -y install git
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build
+      run: |
+        git config --global --add safe.directory '*'
+        dnf -y install gcc gcc-c++ ${{ matrix.pkgs }} libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
+        wget https://github.com/linuxdeploy/linuxdeploy/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-${{ matrix.arch }}.AppImage
+        wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-plugin-qt-${{ matrix.arch }}.AppImage
+        chmod +x linuxdeploy*.AppImage
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
+        make -j$(nproc) install DESTDIR=AppDir
+        ../linuxdeploy-${{ matrix.arch }}.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
+        cp Neutrino-*.AppImage ${{ matrix.out }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.name }}
+        path: Neutrino-*.AppImage
+
+  # was the Cirrus upload task + EndBug/latest-tag + xresloader/upload-to-github-release
+  release:
+    if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac.result == 'success' && needs.windows.result == 'success' }}
+    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac, windows, AppImage]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        path: package
+        merge-multiple: true
+    - name: Upload
+      run: |
+        ls -l package
+        if [ "$GITHUB_REF_NAME" = "master" ]; then RELTAG=latest; else RELTAG=latest-$GITHUB_REF_NAME; fi
+        # move the tag to this commit (refs/tags/ avoids clashes with a branch of the same name)
+        git tag -f $RELTAG $GITHUB_SHA
+        git push -f origin refs/tags/$RELTAG
+        gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $GITHUB_REF_NAME --notes "Builds of the $GITHUB_REF_NAME branch" --verify-tag
+        gh release upload --clobber $RELTAG package/*
