@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QThread>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
@@ -33,7 +34,9 @@ int nApp::exec() {
     QCoreApplication::setApplicationVersion(SHAVERSION__);
 
     if (!my_set.contains("threads")) {
-        my_set.setValue("threads",1);
+        // my_set.setValue("threads",1);
+        // all the cores by default (FFTW and OpenMP); users who already chose a value keep it
+        my_set.setValue("threads",std::max(1,QThread::idealThreadCount()));
     }
     // plugins plan FFTs in worker threads (e.g. the wavelet, with FFTW_MEASURE) while others plan in the GUI thread:
     // the FFTW planner is not thread safe unless this is called (FFTW >= 3.3.5)
