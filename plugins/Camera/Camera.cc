@@ -11,7 +11,7 @@
 #include <QMediaDevices>
 #include <QMediaFormat>
 #include <QVideoWidget>
-#if QT_CONFIG(permissions)
+#if defined(QT_FEATURE_permissions) && QT_CONFIG(permissions) // QPermissions exists only since Qt 6.5
 #include <QPermissions>
 #endif
 
@@ -34,7 +34,7 @@ Camera::Camera(neutrino *nparent) :
 
 // since Qt 6.5 the camera must be explicitly allowed (macOS asks the user once)
 void Camera::startCamera() {
-#if QT_CONFIG(permissions)
+#if defined(QT_FEATURE_permissions) && QT_CONFIG(permissions) // QPermissions exists only since Qt 6.5
     QCameraPermission cameraPermission;
     switch (qApp->checkPermission(cameraPermission)) {
         case Qt::PermissionStatus::Undetermined:

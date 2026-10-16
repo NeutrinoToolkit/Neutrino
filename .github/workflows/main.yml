@@ -18,7 +18,7 @@ jobs:
   ubuntu:
     continue-on-error: true
     runs-on: ubuntu-latest
-    container: ubuntu:22.04
+    container: ubuntu:24.04
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
@@ -28,11 +28,15 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
+        # apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev "qml6-module*"
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: ubuntu
@@ -51,12 +55,15 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-310 libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev
         apt-get install -yy qml6-module*
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: debian
@@ -65,7 +72,7 @@ jobs:
   mint:
     continue-on-error: true
     runs-on: ubuntu-latest
-    container: linuxmintd/mint21-amd64:latest
+    container: linuxmintd/mint22-amd64:latest
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
@@ -75,11 +82,15 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
+        # apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev python3-dev "qml6-module*"
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: mint
@@ -88,7 +99,7 @@ jobs:
   fedora:
     continue-on-error: true
     runs-on: ubuntu-latest
-    container: fedora:36
+    container: fedora:44
     steps:
     - name: Git
       run: dnf -y install git
@@ -100,11 +111,14 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install gcc gcc-c++ qconf git qt6-* libtiff-devel gsl-devel redhat-lsb-core blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel
+        dnf -y install gcc gcc-c++ git qt6-* libtiff-devel gsl-devel lsb_release blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: fedora
@@ -126,11 +140,14 @@ jobs:
         zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
         zypper --gpg-auto-import-keys ref
         zypper update -y
-        zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
+        zypper install -y --force-resolution gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: opensuse
@@ -149,7 +166,8 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+        # zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
+        zypper --non-interactive --quiet ar -C https://download.opensuse.org/repositories/science/$(. /etc/os-release; echo $VERSION_ID)/science.repo
         zypper --gpg-auto-import-keys ref
         zypper update -y
         zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
@@ -159,6 +177,9 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: opensuseleap
@@ -192,6 +213,9 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
         cp Neutrino-*.zip Neutrino-*.dmg ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}
@@ -205,7 +229,7 @@ jobs:
       matrix:
         arch: [mingw32, mingw64]
     runs-on: ubuntu-latest
-    container: fedora:36
+    container: fedora:44
     env:
       MINGW: ${{ matrix.arch }}
     steps:
@@ -219,7 +243,7 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz gtk-doc dh-autoreconf ${MINGW}-portablexdr pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
+        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-portablexdr pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
         wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
         tar -zxvf fftw-3.3.6-pl2.tar.gz
         cd fftw-3.3.6-pl2
@@ -246,6 +270,9 @@ jobs:
         ${MINGW}-cmake ..
         make -j$(nproc) package
         cp Neutrino*.exe Neutrino*.zip ..
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.arch }}
@@ -257,11 +284,11 @@ jobs:
       matrix:
         include:
           - name: AppImage
-            image: fedora:36
+            image: fedora:44
             runner: ubuntu-latest
             arch: x86_64
             linuxdeploy: continuous
-            pkgs: qconf redhat-lsb-core
+            pkgs: lsb_release
             out: ..
           - name: AppImage_olderLinux
             image: fedora:34
@@ -271,7 +298,7 @@ jobs:
             pkgs: qconf redhat-lsb-core
             out: ../Neutrino-olderLinux.AppImage
           - name: AppImageArm
-            image: arm64v8/fedora
+            image: fedora:44
             runner: ubuntu-24.04-arm
             arch: aarch64
             linuxdeploy: 1-alpha-20240109-1
@@ -303,6 +330,9 @@ jobs:
         make -j$(nproc) install DESTDIR=AppDir
         ../linuxdeploy-${{ matrix.arch }}.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
         cp Neutrino-*.AppImage ${{ matrix.out }}
+    - name: PythonQt logs
+      if: failure()
+      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}
