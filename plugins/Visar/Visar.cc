@@ -586,7 +586,8 @@ void Visar::addVisar() {
     connect(ui_settings->shotImage, &QComboBox::currentIndexChanged, c, needWaveK);
     // connect(ui_settings->method, &QComboBox::currentIndexChanged, c, needWaveK);
     connect(ui_settings->border, &QSpinBox::valueChanged, c, needWaveK);
-    connect(ui_settings->DeghostCheck, &QCheckBox::checkStateChanged, c, needWaveK);
+//    connect(ui_settings->DeghostCheck, &QCheckBox::checkStateChanged, c, needWaveK); // Qt >= 6.7
+    connect(ui_settings->DeghostCheck, &QCheckBox::toggled, c, needWaveK);
     connect(c->maskRegion, &nLine::sceneChanged, c, needWaveK);
 
     connect(ui_settings->DeghostCheck, &QCheckBox::toggled, c, [c](bool checked) { c->maskRegion->setVisible(checked); });
