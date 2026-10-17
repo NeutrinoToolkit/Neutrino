@@ -354,7 +354,7 @@ jobs:
             runner: ubuntu-latest
             arch: x86_64
             linuxdeploy: continuous
-            out: ../Neutrino-olderLinux.AppImage
+            out: ../Neutrino-olderLinux-x86_64.AppImage
           - name: AppImageArm
             image: fedora:44
             runner: ubuntu-24.04-arm
