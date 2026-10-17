@@ -25,7 +25,7 @@
 #include <QtGui>
 #include <QWidget>
 
-#include <sstream>
+// #include <sstream>
 
 #include "nGenericPan.h"
 #include "ui_RegionPath.h"

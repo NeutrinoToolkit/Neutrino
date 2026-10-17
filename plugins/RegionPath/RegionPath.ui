@@ -45,7 +45,7 @@
     <item row="3" column="0">
      <widget class="QComboBox" name="defaultValue">
       <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <item>
        <property name="text">
@@ -64,7 +64,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Mean</string>
+        <string>Mid-range</string>
        </property>
       </item>
       <item>

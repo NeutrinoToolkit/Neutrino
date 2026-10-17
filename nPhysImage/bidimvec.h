@@ -96,13 +96,14 @@ public:
 
 	//double intp(bidimvec<T>, bidimvec<T>);
 
-	inline T x(void)
+	// const: usable on const vectors (point_inside_poly takes the polygon by reference)
+	inline T x(void) const
 	{ return myval1; }
-	inline T first(void)
+	inline T first(void) const
 	{ return myval1; }
-	inline T y(void)
+	inline T y(void) const
 	{ return myval2; }
-	inline T second(void)
+	inline T second(void) const
 	{ return myval2; }
 
 	inline void set_first(T val)
@@ -299,7 +300,9 @@ template <class T> bidimvec<T>
 div_P(bidimvec<T> v1, bidimvec<T> v2)
 { return bidimvec<T>(v1.x()/v2.x(), v1.y()/v2.y()); }
 
-template <class T> bool point_inside_poly(bidimvec<T> test, std::vector<bidimvec<T> > vert)
+// template <class T> bool point_inside_poly(bidimvec<T> test, std::vector<bidimvec<T> > vert)
+// (by value: the polygon was copied for every tested point)
+template <class T> bool point_inside_poly(bidimvec<T> test, const std::vector<bidimvec<T> > &vert)
 {
     bool c = false;
     unsigned int i,j;

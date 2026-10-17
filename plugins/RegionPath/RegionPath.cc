@@ -47,8 +47,14 @@ RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent),
 void RegionPath::doIt() {
     saveDefaults();
     nPhysD *my_phys=getPhysFromCombo(image);
+    if (!my_phys) {
+        statusBar()->showMessage(tr("Select an image"),5000);
+        return;
+    }
     if (my_phys) {
         double replaceVal=getReplaceVal();
+        // the options read once (they were read by the OpenMP threads)
+        const bool inv=inverse->isChecked();
         QPolygonF regPoly=region.poly(1);
         regPoly=regPoly.translated(my_phys->get_origin().x(),my_phys->get_origin().y());
         
@@ -57,35 +63,76 @@ void RegionPath::doIt() {
             vecPoints[k]=vec2f(regPoly[k].x(),regPoly[k].y());
         }
         
-        QRect regRect=regPoly.boundingRect().toRect();
+        // QRect regRect=regPoly.boundingRect().toRect();
+        // inside the image: a region going out of it wrote with negative coordinates
+        // (cast to unsigned: undefined, on ARM 0, i.e. the first row/column overwritten)
+        QRect regRect=regPoly.boundingRect().toAlignedRect().intersected(QRect(0,0,my_phys->getW(),my_phys->getH()));
         
         nPhysD *regPath = new nPhysD(*my_phys);
         
-        if (!inverse->isChecked()) {
+        if (!inv) {
             regPath->set(replaceVal);
         } 
         
+        // regPath->setShortName("Region path");
+        // regPath->setName("path");
         regPath->setShortName("Region path");
-        regPath->setName("path");
-        QProgressDialog progress("Extracting", "Stop", 0, regRect.width(), this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.show();
-        for (int i=regRect.left(); i<=regRect.right(); i++) {
-            if (progress.wasCanceled()) break;
-            QApplication::processEvents();
-#pragma omp parallel for
-            for (int j=regRect.top(); j<=regRect.bottom(); j++) {
-                vec2f pp(i,j);
-                if (point_inside_poly(pp,vecPoints)==inverse->isChecked()) {
-                    regPath->set(pp,replaceVal);
-                } else {
-                    regPath->set(pp,my_phys->point(i,j));
+        regPath->setName("RegionPath("+my_phys->getName()+")");
+        // QProgressDialog progress("Extracting", "Stop", 0, regRect.width(), this);
+        // progress.setWindowModality(Qt::WindowModal);
+        // progress.show();
+        // for (int i=regRect.left(); i<=regRect.right(); i++) {
+        //     if (progress.wasCanceled()) break;
+        //     QApplication::processEvents();
+// #pragma omp parallel for
+        //     for (int j=regRect.top(); j<=regRect.bottom(); j++) {
+        //         vec2f pp(i,j);
+        //         if (point_inside_poly(pp,vecPoints)==inverse->isChecked()) {
+        //             regPath->set(pp,replaceVal);
+        //         } else {
+        //             regPath->set(pp,my_phys->point(i,j));
+        //         }
+        //     }
+        //     progress.setValue(i-regRect.left());
+        // }
+        // blocks of rows in parallel (threads were started for every column), pixel centres tested
+        // (the corner (i,j) shifted the mask by half a pixel); Stop discards the result
+        if (!regRect.isEmpty()) {
+            const int block=64;
+            QProgressDialog progress("Extracting", "Stop", 0, regRect.height(), this);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.show();
+            for (int j0=regRect.top(); j0<=regRect.bottom(); j0+=block) {
+                QApplication::processEvents();
+                if (progress.wasCanceled()) {
+                    delete regPath;
+                    statusBar()->showMessage(tr("Stopped"),5000);
+                    return;
                 }
+                const int j1=std::min(j0+block-1, regRect.bottom());
+#pragma omp parallel for
+                for (int j=j0; j<=j1; j++) {
+                    for (int i=regRect.left(); i<=regRect.right(); i++) {
+                        if (point_inside_poly(vec2f(i+0.5,j+0.5),vecPoints)==inv) {
+                            regPath->set(i,j,replaceVal);
+                        } else {
+                            regPath->set(i,j,my_phys->point(i,j));
+                        }
+                    }
+                }
+                progress.setValue(j1-regRect.top()+1);
             }
-            progress.setValue(i-regRect.left());
         }
         if (crop->isChecked()) {
+            // regRect is inside the image: the crop is not padded with 0 any more
+            if (regRect.isEmpty()) {
+                delete regPath;
+                statusBar()->showMessage(tr("The region is outside the image"),5000);
+                return;
+            }
             *regPath=regPath->sub(regRect);
+            regPath->setShortName("Region path");
+            regPath->setName("RegionPath("+my_phys->getName()+")");
         }
         regPath->TscanBrightness();
         erasePrevious->setEnabled(true);
@@ -102,7 +149,8 @@ void RegionPath::doIt() {
 double RegionPath::getReplaceVal() {
 	double val=0.0;
     nPhysD *my_phys=getPhysFromCombo(image);
-	if (image) {
+	// if (image) {
+	if (my_phys) {
         switch (defaultValue->currentIndex()) {
 			case 0:
 				val=std::numeric_limits<double>::quiet_NaN();
@@ -120,7 +168,14 @@ double RegionPath::getReplaceVal() {
 				val=0.0;
 				break;
 			default:
-                val=replace->text().toDouble();
+                // val=replace->text().toDouble();
+                {
+                    // the user locale, or the C one (toDouble alone: "1,5" was 0)
+                    bool ok;
+                    val=QLocale().toDouble(replace->text(),&ok);
+                    if (!ok) val=QLocale::c().toDouble(replace->text(),&ok);
+                    if (!ok) statusBar()->showMessage(tr("Cannot read the value ")+replace->text(),5000);
+                }
 				break;
 		}
 	}
