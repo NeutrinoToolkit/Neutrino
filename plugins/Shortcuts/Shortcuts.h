@@ -41,6 +41,9 @@ class Shortcuts : public nGenericPan, private Ui::Shortcuts {
 public:
     Q_INVOKABLE Shortcuts(neutrino*);
 
+private:
+    QString menuShortcuts();
+
 };
 
 NEUTRINO_PLUGIN(Shortcuts,Help,"",Qt::CTRL | Qt::Key_K);

@@ -380,6 +380,7 @@
     <addaction name="separator"/>
     <addaction name="menuTransformation"/>
     <addaction name="actionSet_origin"/>
+    <addaction name="actionSet_origin_all"/>
    </widget>
    <widget class="QMenu" name="menuAnalysis">
     <property name="title">
@@ -546,6 +547,7 @@
     <string>Ctrl+Left</string>
    </property>
   </action>
+  <!-- not in any menu nor used (inactive shortcut): removed
   <action name="actionShow_colortable">
    <property name="icon">
     <iconset>
@@ -558,6 +560,7 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
+  -->
   <action name="actionPrint">
    <property name="text">
     <string>Print</string>
@@ -566,6 +569,7 @@
     <string>Ctrl+P</string>
    </property>
   </action>
+  <!-- not in any menu nor used (inactive shortcut): removed
   <action name="actionHorizontal">
    <property name="icon">
     <iconset>
@@ -578,6 +582,8 @@
     <string>H</string>
    </property>
   </action>
+  -->
+  <!-- not in any menu nor used (inactive shortcut): removed
   <action name="actionVertical">
    <property name="icon">
     <iconset>
@@ -590,12 +596,13 @@
     <string>V</string>
    </property>
   </action>
+  -->
   <action name="actionReopen_to_saved">
    <property name="text">
     <string>Reopen saved</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>Ctrl+Shift+R</string>
    </property>
   </action>
   <action name="actionShow_ruler">
@@ -834,6 +841,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="actionSet_origin_all">
+   <property name="text">
+    <string>Set origin for all images</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+0</string>
    </property>
   </action>
   <action name="actionKeyboard_shortcut">

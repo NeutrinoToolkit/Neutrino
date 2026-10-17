@@ -39,7 +39,8 @@ public:
     Q_INVOKABLE Spectral_analysis(neutrino *);
 
 public slots:
-    void on_calculate_released();
+    // void on_calculate_released();
+    void on_calculate_clicked();
     void on_direction_toggled(bool);
 };
 

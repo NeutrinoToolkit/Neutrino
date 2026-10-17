@@ -309,7 +309,7 @@ nView::resizeEvent(QResizeEvent *e) {
 }
 
 void nView::keyPressEvent (QKeyEvent *e) {
-    qDebug() << e;
+    // qDebug() << e;
     QGraphicsView::keyPressEvent(e);
     if (scene()->selectedItems().size()) {
         if (e->key() == Qt::Key_Backspace) {
@@ -487,15 +487,19 @@ nView::changeColorTable () {
 
 void nView::setMouseOrigin() {
     if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
-        foreach (nPhysD* phys, nparent->physList) {
-            phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-            emit bufferChanged(phys);
-            qInfo() << "Origin set for all images";
-        }
+        // foreach (nPhysD* phys, nparent->physList) {
+        //     phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+        //     emit bufferChanged(phys);
+        //     qInfo() << "Origin set for all images";
+        // }
+        // (Alt+click on the menu entry; the keyboard has its own action, Ctrl+Shift+0)
+        setMouseOriginAll();
+        return;
     } else {
         if (nparent->currentBuffer) {
             nparent->currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
             emit bufferChanged(nparent->currentBuffer);
+            nparent->emitPhysChanged(nparent->currentBuffer); // the other pans (Image_list, Mouse_info...)
             qInfo() << "Origin set";
         }
     }
@@ -506,6 +510,19 @@ void nView::setMouseOrigin() {
     emit bufferOriginChanged();
     emitMouseposition(my_mouse.pos());
 
+}
+
+// origin at the mouse position for all the images (message once, the pans told with physChanged)
+void nView::setMouseOriginAll() {
+    foreach (nPhysD* phys, nparent->physList) {
+        phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
+        emit bufferChanged(phys);
+        nparent->emitPhysChanged(phys);
+    }
+    qInfo() << "Origin set for all images";
+    my_tics.update();
+    emit bufferOriginChanged();
+    emitMouseposition(my_mouse.pos());
 }
 
 void nView::nextMouseShape() {

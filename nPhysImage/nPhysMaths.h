@@ -142,38 +142,82 @@ std::map<std::string, physD > to_rect(const physC &iphys);
 std::map<std::string, physD > to_powersp(physC &iphys, bool);
 
 // shift functions
+// template <class T>
+// nPhysImageF<T> ftshift2(nPhysImageF<T> &iimg) {
+//     nPhysImageF<T> oimg;
+//     oimg.resize(iimg.getW(), iimg.getH());
+//     std::vector<T> vec;
+//     for (size_t jj=0; jj<iimg.getH(); jj++) {
+//         iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
+//         oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
+//     }
+//
+//     return oimg;
+// }
+//
+// template <class T>
+// nPhysImageF<T> ftshift1(nPhysImageF<T> &iimg, enum phys_direction ftdir=PHYS_X) {
+//     nPhysImageF<T> oimg;
+//     oimg.resize(iimg.getW(), iimg.getH());
+//     std::vector<T> vec;
+//
+//     if (ftdir == PHYS_X) {
+//         for (size_t jj=0; jj<iimg.getH(); jj++) {
+//             iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
+//             oimg.set_Trow(jj, 0, vec);
+//         }
+//     } else {
+//         for (size_t jj=0; jj<iimg.getH(); jj++) {
+//             iimg.get_Trow(jj, 0, vec);
+//             oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
+//         }
+//     }
+//
+//     return oimg;
+// }
+// (horizontally the row was rotated the other way: for an odd width the zero frequency went to W/2+1 (numpy
+// ifftshift instead of fftshift), and the same function was used before the backward transform, which needs
+// the inverse shift: forward -> shift -> backward did not give the image back for odd sizes)
+
+//! circular shift: the pixel (x,y) goes to ((x+dx) mod W, (y+dy) mod H)
 template <class T>
-nPhysImageF<T> ftshift2(nPhysImageF<T> &iimg) {
+nPhysImageF<T> circshift(nPhysImageF<T> &iimg, int dx, int dy) {
     nPhysImageF<T> oimg;
     oimg.resize(iimg.getW(), iimg.getH());
-    std::vector<T> vec;
-    for (size_t jj=0; jj<iimg.getH(); jj++) {
-        iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
-        oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
+    const int W=iimg.getW(), H=iimg.getH();
+    if (W==0 || H==0) return oimg;
+    dx=((dx%W)+W)%W;
+    dy=((dy%H)+H)%H;
+#pragma omp parallel for
+    for (int y=0; y<H; y++) {
+        int yo=(y+dy)%H;
+        for (int x=0; x<W; x++) {
+            oimg.Timg_matrix[yo][(x+dx)%W]=iimg.Timg_matrix[y][x];
+        }
     }
-
     return oimg;
+}
+
+//! zero frequency from (0,0) to the centre (floor(W/2), floor(H/2)), as numpy fftshift
+template <class T>
+nPhysImageF<T> ftshift2(nPhysImageF<T> &iimg) {
+    return circshift(iimg, iimg.getW()/2, iimg.getH()/2);
+}
+
+//! inverse of ftshift2 (numpy ifftshift): to be used before a backward transform
+template <class T>
+nPhysImageF<T> iftshift2(nPhysImageF<T> &iimg) {
+    return circshift(iimg, -(int)(iimg.getW()/2), -(int)(iimg.getH()/2));
 }
 
 template <class T>
 nPhysImageF<T> ftshift1(nPhysImageF<T> &iimg, enum phys_direction ftdir=PHYS_X) {
-    nPhysImageF<T> oimg;
-    oimg.resize(iimg.getW(), iimg.getH());
-    std::vector<T> vec;
+    return ftdir == PHYS_X ? circshift(iimg, iimg.getW()/2, 0) : circshift(iimg, 0, iimg.getH()/2);
+}
 
-    if (ftdir == PHYS_X) {
-        for (size_t jj=0; jj<iimg.getH(); jj++) {
-            iimg.get_Trow(jj, floor(iimg.getW()/2), vec);
-            oimg.set_Trow(jj, 0, vec);
-        }
-    } else {
-        for (size_t jj=0; jj<iimg.getH(); jj++) {
-            iimg.get_Trow(jj, 0, vec);
-            oimg.set_Trow(jj+floor(iimg.getH()/2), 0, vec);
-        }
-    }
-
-    return oimg;
+template <class T>
+nPhysImageF<T> iftshift1(nPhysImageF<T> &iimg, enum phys_direction ftdir=PHYS_X) {
+    return ftdir == PHYS_X ? circshift(iimg, -(int)(iimg.getW()/2), 0) : circshift(iimg, 0, -(int)(iimg.getH()/2));
 }
 
 template <class T>

@@ -68,6 +68,9 @@
        </property>
        <item row="0" column="0" rowspan="2">
         <widget class="QCheckBox" name="useFilter">
+         <property name="toolTip">
+          <string>Band-pass on the forward transform: only the frequencies between min and max are kept (H: horizontal, V: vertical); the filtered image is also given</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -101,11 +104,17 @@
          <property name="prefix">
           <string>min: </string>
          </property>
-         <property name="suffix">
-          <string> [px]</string>
+         <property name="toolTip">
+          <string>Frequency, in the units of the frequency axes: 1/(N dx), i.e. 1/pixel for a scale of 1 (absolute value; max 0: no upper limit)</string>
+         </property>
+         <property name="decimals">
+          <number>6</number>
          </property>
          <property name="maximum">
-          <double>99999.990000000005239</double>
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.001000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -125,11 +134,17 @@
          <property name="prefix">
           <string>max: </string>
          </property>
-         <property name="suffix">
-          <string> [px]</string>
+         <property name="toolTip">
+          <string>Frequency, in the units of the frequency axes: 1/(N dx), i.e. 1/pixel for a scale of 1 (absolute value; max 0: no upper limit)</string>
+         </property>
+         <property name="decimals">
+          <number>6</number>
          </property>
          <property name="maximum">
-          <double>99999.990000000005239</double>
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.001000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -161,11 +176,17 @@
          <property name="prefix">
           <string>min: </string>
          </property>
-         <property name="suffix">
-          <string> [px]</string>
+         <property name="toolTip">
+          <string>Frequency, in the units of the frequency axes: 1/(N dx), i.e. 1/pixel for a scale of 1 (absolute value; max 0: no upper limit)</string>
+         </property>
+         <property name="decimals">
+          <number>6</number>
          </property>
          <property name="maximum">
-          <double>99999.990000000005239</double>
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.001000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -185,11 +206,17 @@
          <property name="prefix">
           <string>max: </string>
          </property>
-         <property name="suffix">
-          <string> [px]</string>
+         <property name="toolTip">
+          <string>Frequency, in the units of the frequency axes: 1/(N dx), i.e. 1/pixel for a scale of 1 (absolute value; max 0: no upper limit)</string>
+         </property>
+         <property name="decimals">
+          <number>6</number>
          </property>
          <property name="maximum">
-          <double>99999.990000000005239</double>
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.001000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>

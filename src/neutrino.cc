@@ -146,6 +146,8 @@ neutrino::neutrino():
     connect(actionTranspose, SIGNAL(triggered()), this, SLOT(transpose()));
 
     connect(actionSet_origin, SIGNAL(triggered()), my_view, SLOT(setMouseOrigin()));
+    // (Alt with Ctrl+0 never triggered the Ctrl+0 shortcut): its own action
+    connect(actionSet_origin_all, SIGNAL(triggered()), my_view, SLOT(setMouseOriginAll()));
 
     connect(actionZoom_in, SIGNAL(triggered()), my_view, SLOT(zoomIn()));
     connect(actionZoom_out, SIGNAL(triggered()), my_view, SLOT(zoomOut()));

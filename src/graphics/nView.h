@@ -121,6 +121,8 @@ public slots:
 
     void setMouseOrigin();
 
+    void setMouseOriginAll();
+
     void toggleRuler();
     void toggleGrid();
 
