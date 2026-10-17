@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include <QWidget>
+#include <QTimer>
 
 #include "nGenericPan.h"
 #include "ui_Reflectivity.h"
@@ -39,11 +40,16 @@ class Reflectivity : public nGenericPan, private Ui::Reflectivity {
 public:	
     Q_INVOKABLE Reflectivity(neutrino *);
 
-    nPhysD *Refle;
+    // nPhysD *Refle;
+    nPhysD *Refle=nullptr; // was not initialised
 
 public slots:
 
     void doIt();
+    void parameterChanged();
+
+private:
+    QTimer updateTimer;    // live update, once the parameters stop changing
 
 };
 

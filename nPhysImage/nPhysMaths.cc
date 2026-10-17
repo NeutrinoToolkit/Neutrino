@@ -224,7 +224,9 @@ void physMath::phys_remainder(physD &iimage, double val) {
 
 void 
 physMath::phys_point_add(physD &iimage, physD &iimage2) {
-    if (iimage.getSurf()==iimage2.getSurf()) {
+    // if (iimage.getSurf()==iimage2.getSurf()) {
+    // (same number of pixels is not enough: 100x200 and 200x100 were combined pixel by pixel)
+    if (iimage.getW()==iimage2.getW() && iimage.getH()==iimage2.getH()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
             iimage.set(ii, iimage.point(ii)+iimage2.point(ii));
@@ -235,7 +237,9 @@ physMath::phys_point_add(physD &iimage, physD &iimage2) {
 
 void 
 physMath::phys_point_subtract(physD &iimage, physD &iimage2) {
-    if (iimage.getSurf()==iimage2.getSurf()) {
+    // if (iimage.getSurf()==iimage2.getSurf()) {
+    // (same number of pixels is not enough: 100x200 and 200x100 were combined pixel by pixel)
+    if (iimage.getW()==iimage2.getW() && iimage.getH()==iimage2.getH()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
             iimage.set(ii, iimage.point(ii)-iimage2.point(ii));
@@ -246,7 +250,9 @@ physMath::phys_point_subtract(physD &iimage, physD &iimage2) {
 
 void 
 physMath::phys_point_multiply(physD &iimage, physD &iimage2) {
-    if (iimage.getSurf()==iimage2.getSurf()) {
+    // if (iimage.getSurf()==iimage2.getSurf()) {
+    // (same number of pixels is not enough: 100x200 and 200x100 were combined pixel by pixel)
+    if (iimage.getW()==iimage2.getW() && iimage.getH()==iimage2.getH()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
             iimage.set(ii, iimage.point(ii)*iimage2.point(ii));
@@ -257,7 +263,9 @@ physMath::phys_point_multiply(physD &iimage, physD &iimage2) {
 
 void 
 physMath::phys_point_divide(physD &iimage, physD &iimage2) {
-    if (iimage.getSurf()==iimage2.getSurf()) {
+    // if (iimage.getSurf()==iimage2.getSurf()) {
+    // (same number of pixels is not enough: 100x200 and 200x100 were combined pixel by pixel)
+    if (iimage.getW()==iimage2.getW() && iimage.getH()==iimage2.getH()) {
 #pragma omp parallel for
         for (size_t ii=0; ii<iimage.getSurf(); ii++)
             iimage.set(ii, iimage.point(ii)/iimage2.point(ii));
