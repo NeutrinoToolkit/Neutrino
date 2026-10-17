@@ -87,7 +87,9 @@ jobs:
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
-        cp Neutrino*.deb ..
+        # cp Neutrino*.deb ..
+        # the Mint image reports itself as Ubuntu to lsb_release: same file name as the ubuntu job, rename it
+        for f in Neutrino*.deb; do cp "$f" "../$(echo "$f" | sed 's/-Ubuntu-/-Linuxmint-/')"; done
     - name: PythonQt logs
       if: failure()
       run: tail -n 80 build/_deps/pythonqt-build/*.log || true
@@ -225,11 +227,13 @@ jobs:
           Neutrino-*.zip
           Neutrino-*.dmg
 
-  # Intel Macs: Homebrew no longer ships Intel bottles, MacPorts still has prebuilt x86_64 binaries (-b: binaries only,
-  # never hours of compiling). MacPorts builds them for the runner's macOS: the app needs macOS 15 or later.
+  # Intel Macs: Homebrew no longer ships Intel bottles, MacPorts still has prebuilt x86_64 binaries
+  # (a port just updated may have no binary yet: it is compiled, timeout-minutes avoids hours of compiling).
+  # MacPorts builds them for the runner's macOS: the app needs macOS 15 or later.
   # No OpenCL/clFFT for now
   mac-intel:
     continue-on-error: true
+    timeout-minutes: 120
     runs-on: macos-15-intel
     env:
       PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig
@@ -244,7 +248,8 @@ jobs:
         echo /opt/local/bin >> $GITHUB_PATH
         echo /opt/local/sbin >> $GITHUB_PATH
         sudo /opt/local/bin/port -N selfupdate
-        sudo /opt/local/bin/port -N -b install $PORTS
+        # sudo /opt/local/bin/port -N -b install $PORTS
+        sudo /opt/local/bin/port -N install $PORTS
     - name: Build
       run: |
         mkdir -p build && cd build
