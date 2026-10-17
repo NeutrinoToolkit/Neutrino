@@ -1,5 +1,6 @@
 #include "nApp.h"
 #include "neutrino.h"
+#include "nVersion.h"
 #include <QtNetwork>
 #include "ui_nLogWin.h"
 #include <QFileDialog>
@@ -147,7 +148,11 @@ void nApp::saveLog(){
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        // t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+            QMessageBox::warning(&log_win,tr("Save Log"),tr("Cannot write file ")+fnametmp+"\n"+t.errorString(), QMessageBox::Ok);
+            return;
+        }
         QTextStream out(&t);
         out << log_win_ui->logger->toPlainText();
         t.close();
@@ -365,7 +370,7 @@ int nApp::checkUpdates() {
             qDebug() << ret << " : " << msgBox.result();
             switch ( msgBox.buttonRole(msgBox.clickedButton())) {
                 case QMessageBox::YesRole:
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+#if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
                     QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino/releases"));
 #else
                     QDesktopServices::openUrl(QUrl("https://github.com/NeutrinoToolkit/Neutrino"));

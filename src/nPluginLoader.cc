@@ -21,7 +21,7 @@ nPluginLoader::nPluginLoader(QString pname, neutrino *neu) :
             if (name_plugin.isEmpty()) {
                 name_plugin=QFileInfo(pname).baseName();
 
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
+#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
                 if (name_plugin.startsWith("lib")) {
                     name_plugin.remove(0,3);
                 }

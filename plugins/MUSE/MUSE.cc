@@ -161,8 +161,9 @@ void MUSE::on_actionExportTxt_triggered() {
 	QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
 	QFile t(dirName.filePath(fname));
 	qDebug() << fname<<    t.fileName();
-	t.open(QIODevice::WriteOnly| QIODevice::Text);
-	if (t.isOpen()) {
+	// t.open(QIODevice::WriteOnly| QIODevice::Text);
+	// if (t.isOpen()) {
+	if (t.open(QIODevice::WriteOnly| QIODevice::Text)) {
 		QTextStream out(&t);
 		QLocale loc("C");
         out << "# ( " << loc.toString(lastpoint.x()) << " , " << loc.toString(lastpoint.y()) << " ) " << Qt::endl;

@@ -1,7 +1,8 @@
 
-if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
-endif()
+# if (WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
+#     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
+# endif()
+# -mwindows is a link option: add_executable(... WIN32 ...) below already gives it (Debug keeps the console)
 
 
 find_package(Git REQUIRED)
@@ -16,11 +17,15 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## sources
-file(GLOB_RECURSE UIS *.ui)
+# CONFIGURE_DEPENDS: new files are picked up by the build, without re-running cmake by hand
+# file(GLOB_RECURSE UIS *.ui)
+file(GLOB_RECURSE UIS CONFIGURE_DEPENDS *.ui)
 
-file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
+# file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS *.cc *.cpp *.cxx *.h)
 
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+# add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+# now in the top CMakeLists.txt, for the plugins too
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     MESSAGE("SOURCES:\n${SOURCES}")
@@ -35,7 +40,16 @@ message(STATUS "${LIST_LENGTH} source files")
 set(LIBS ${LIBS} "nPhysImageF")
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../nPhysImage)
 
-add_definitions(-DSHAVERSION__="${VERSION_GIT_SHA}")
+# add_definitions(-DSHAVERSION__="${VERSION_GIT_SHA}")
+# the sha is written at build time in nVersion.cc, only when it changes (see nVersion.h):
+# a commit recompiles one file instead of all of src, and the sha is always the current one
+# (VERSION_GIT_SHA above, from configure time, is still used for the macOS Info.plist)
+set(VERSION_CC ${CMAKE_CURRENT_BINARY_DIR}/nVersion.cc)
+add_custom_target(NeutrinoVersion
+    COMMAND ${CMAKE_COMMAND} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DOUT=${VERSION_CC} -P ${CMAKE_SOURCE_DIR}/resources/cmake/GitVersion.cmake
+    BYPRODUCTS ${VERSION_CC}
+    VERBATIM)
+set_source_files_properties(${VERSION_CC} PROPERTIES GENERATED TRUE SKIP_AUTOGEN ON)
 
 set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus Charts)
 
@@ -45,43 +59,60 @@ set(QRCDIR ${CMAKE_CURRENT_BINARY_DIR}/qrc)
 
 # write automatically the qrc file for icons
 set(ICONSDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons)
-file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
+# the qrc files are written only when their content changes (file(WRITE) at every configure made rcc run again
+# and relinked Neutrino): the text is collected in QRC_CONTENT and written by file(CONFIGURE)
+# file(GLOB_RECURSE ICONS ${ICONSDIR}/*.png)
+file(GLOB_RECURSE ICONS CONFIGURE_DEPENDS ${ICONSDIR}/*.png)
 set(ICONS_QRC ${QRCDIR}/icons.qrc)
-file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
+# file(WRITE ${ICONS_QRC} "<RCC>\n    <qresource prefix=\"/icons/\">\n")
+set(QRC_CONTENT "<RCC>\n    <qresource prefix=\"/icons/\">\n")
 foreach(my_file ${ICONS})
     file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-    file(APPEND ${ICONS_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    # file(APPEND ${ICONS_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    string(APPEND QRC_CONTENT "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
-file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
+# file(APPEND ${ICONS_QRC} "    </qresource>\n</RCC>")
+string(APPEND QRC_CONTENT "    </qresource>\n</RCC>")
+file(CONFIGURE OUTPUT ${ICONS_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 
 
 # write automatically the qrc file for html
 set(LICENSESDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/licenses)
 #parse neutrino license file
-file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*.txt)
+# file(GLOB_RECURSE HTMLLICENSES ${LICENSESDIR}/*.txt)
+file(GLOB_RECURSE HTMLLICENSES CONFIGURE_DEPENDS ${LICENSESDIR}/*.txt)
 # list(APPEND HTMLLICENSES "${CPACK_RESOURCE_FILE_LICENSE}")
 # CPACK_RESOURCE_FILE_LICENSE is set later (Package.cmake) and would clash with the alias of resources/licenses/Neutrino.txt
 set(LICENSES_QRC ${QRCDIR}/licenses.qrc)
-file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
+# file(WRITE ${LICENSES_QRC} "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
+set(QRC_CONTENT "<RCC>\n    <qresource prefix=\"/licenses/\">\n")
 foreach(my_file ${HTMLLICENSES})
     file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-    file(APPEND ${LICENSES_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    # file(APPEND ${LICENSES_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    string(APPEND QRC_CONTENT "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
-file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
+# file(APPEND ${LICENSES_QRC} "    </qresource>\n</RCC>")
+string(APPEND QRC_CONTENT "    </qresource>\n</RCC>")
+file(CONFIGURE OUTPUT ${LICENSES_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 
 #parse neutrino colormap files
 set(CMAPDIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/colormaps/cmaps)
-file(GLOB_RECURSE CMAPS ${CMAPDIR}/*)
+# file(GLOB_RECURSE CMAPS ${CMAPDIR}/*)
+file(GLOB_RECURSE CMAPS CONFIGURE_DEPENDS ${CMAPDIR}/*)
 set(CMAP_QRC ${QRCDIR}/cmap.qrc)
-file(WRITE ${CMAP_QRC} "<RCC>\n    <qresource prefix=\"/cmaps/\">\n")
+# file(WRITE ${CMAP_QRC} "<RCC>\n    <qresource prefix=\"/cmaps/\">\n")
+set(QRC_CONTENT "<RCC>\n    <qresource prefix=\"/cmaps/\">\n")
 foreach(my_file ${CMAPS})
     file(RELATIVE_PATH my_file_relative_path ${QRCDIR} ${my_file})
     GET_FILENAME_COMPONENT(my_file_basename ${my_file} NAME)
-    file(APPEND ${CMAP_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    # file(APPEND ${CMAP_QRC} "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
+    string(APPEND QRC_CONTENT "        <file alias=\"${my_file_basename}\">${my_file_relative_path}</file>\n")
 endforeach()
-file(APPEND ${CMAP_QRC} "    </qresource>\n</RCC>")
+# file(APPEND ${CMAP_QRC} "    </qresource>\n</RCC>")
+string(APPEND QRC_CONTENT "    </qresource>\n</RCC>")
+file(CONFIGURE OUTPUT ${CMAP_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
@@ -89,7 +120,8 @@ include_directories(graphics pans)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QRCDIR} ${ICONSDIR})
 
-set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
+# set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
 
 if(APPLE)
 
@@ -136,12 +168,13 @@ if(APPLE)
 
 elseif(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-all-symbols -Wl,-allow-multiple-definition")
+    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-all-symbols -Wl,-allow-multiple-definition")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_executable(${PROJECT_NAME} ${RC_WIN} ${filedeps})
     else()
         add_executable(${PROJECT_NAME} WIN32 ${RC_WIN} ${filedeps})
     endif()
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,--export-all-symbols -Wl,-allow-multiple-definition)
 
     set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -156,13 +189,15 @@ elseif(LINUX)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS ON POSITION_INDEPENDENT_CODE ON)
+add_dependencies(${PROJECT_NAME} NeutrinoVersion)
 
 foreach(MODULE ${MODULES})
     set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
 endforeach()
 
 if(APPLE)
-add_definitions(-DQT_NO_OPENGL)
+# add_definitions(-DQT_NO_OPENGL)
+target_compile_definitions(${PROJECT_NAME} PRIVATE QT_NO_OPENGL)
 endif()
 
 #target_compile_definitions(${PROJECT_NAME} PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})

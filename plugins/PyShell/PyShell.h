@@ -133,7 +133,11 @@ public slots:
     runPyScript(QString fname) {
         if (!PyShell::startup()) return;
         QFile t(fname);
-        t.open(QIODevice::ReadOnly| QIODevice::Text);
+        // t.open(QIODevice::ReadOnly| QIODevice::Text);
+        if (!t.open(QIODevice::ReadOnly| QIODevice::Text)) {
+            QMessageBox::warning(nullptr,tr("Python script"),tr("Cannot read file ")+fname+"\n"+t.errorString(), QMessageBox::Ok);
+            return;
+        }
         PythonQt::self()->getMainModule().evalScript(QTextStream(&t).readAll());
         t.close();
     }

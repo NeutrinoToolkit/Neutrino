@@ -354,15 +354,15 @@ void Math_operations::doOperation () {
             } else if (operation->currentIndex()==separator[1]+13) {
                 physMath::phys_scharr(*myresult);
             } else if (operation->currentIndex()==separator[1]+14) {//TODO: write it better
-                for (int i=0; i<myresult->getSurf();i++) {
+                for (unsigned int i=0; i<myresult->getSurf();i++) {
                     myresult->set(i,0);
                 }
                 for (int p=0; p<nparent->getBufferList().size();p++) {
-                    for (int i=0; i<myresult->getSurf();i++) {
+                    for (unsigned int i=0; i<myresult->getSurf();i++) {
                         myresult->set(i,myresult->point(i)+nparent->getBufferList()[p]->point(i));
                     }
                 }
-                for (int i=0; i<myresult->getSurf();i++) {
+                for (unsigned int i=0; i<myresult->getSurf();i++) {
                     myresult->set(i,myresult->point(i)/nparent->getBufferList().size());
                 }
                 physMath::phys_scharr(*myresult);

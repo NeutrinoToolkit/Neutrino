@@ -416,7 +416,11 @@ void nCustomPlot::save_data(){
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
-        t.open(QIODevice::WriteOnly| QIODevice::Text);
+        // t.open(QIODevice::WriteOnly| QIODevice::Text);
+        if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+            QMessageBox::warning(this,tr("Save data in text"),tr("Cannot write file ")+fnametmp+"\n"+t.errorString(), QMessageBox::Ok);
+            return;
+        }
         QTextStream out(&t);
         get_data(out, sender());
         t.close();

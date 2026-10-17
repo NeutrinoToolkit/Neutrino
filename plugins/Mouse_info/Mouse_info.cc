@@ -190,7 +190,11 @@ Mouse_info::export_txt() {
 	if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
 		QFile t(fnametmp);
-		t.open(QIODevice::WriteOnly| QIODevice::Text);
+		// t.open(QIODevice::WriteOnly| QIODevice::Text);
+		if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
+			statusBar()->showMessage(tr("Cannot write file ")+fnametmp+": "+t.errorString(),5000);
+			return;
+		}
 		QTextStream out(&t);
 		out << getPointText();
 		t.close();

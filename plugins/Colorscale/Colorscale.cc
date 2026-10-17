@@ -281,8 +281,9 @@ void Colorscale::loadPalettes() {
 }
 
 void Colorscale::addItem(QString my_file) {
-    QListWidgetItem * item = new QListWidgetItem(getPaletteIconFile(my_file),my_file,my_w.fileList);
+    // QListWidgetItem * item = new QListWidgetItem(getPaletteIconFile(my_file),my_file,my_w.fileList);
     // qDebug() << item;
+    new QListWidgetItem(getPaletteIconFile(my_file),my_file,my_w.fileList); // owned by the list
 }
 
 void Colorscale::addPaletteFile() {

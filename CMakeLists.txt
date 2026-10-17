@@ -28,6 +28,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# same Qt API for the app, nPhysImage and the plugins (it was set only in src)
+add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")

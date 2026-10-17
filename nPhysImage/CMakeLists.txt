@@ -1,6 +1,7 @@
 # this is the frigging nPhysImage cmakelists
 
-file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
+# file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS *.cc *.cpp *.cxx *.h)
 
 add_library (nPhysImageF SHARED ${SOURCES})
 

@@ -8,7 +8,9 @@ if (${NEUTRINOPLUGINS})
 
     message(STATUS "Scanning plugins directory")
 
-    FILE(GLOB allfiles "*" LIST_DIRECTORIES true)
+    # FILE(GLOB allfiles "*" LIST_DIRECTORIES true)
+    # CONFIGURE_DEPENDS: a new plugin directory is picked up by the build
+    FILE(GLOB allfiles CONFIGURE_DEPENDS "*" LIST_DIRECTORIES true)
 
     FOREACH(oneplugin ${NEUTRINO_SKIP_PLUGINS})
         list(FILTER allfiles EXCLUDE REGEX ".*/plugins/${oneplugin}$")

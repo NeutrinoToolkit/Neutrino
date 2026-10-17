@@ -387,6 +387,19 @@ jobs:
         # dnf -y install gcc gcc-c++ <matrix.pkgs> libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
         if grep -q '^ID="almalinux"' /etc/os-release; then dnf -y install epel-release && dnf config-manager --set-enabled crb; fi
         dnf -y install gcc gcc-c++ cmake make lsb_release libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw-devel rpm-build "qt6-*-devel" git wget file python3-devel python3-pip
+        # EPEL 9 pandoc is 2.14 (no --embed-resources, needs >= 2.19): use the official static pandoc instead
+        if grep -q '^ID="almalinux"' /etc/os-release; then
+          dnf -y remove pandoc pandoc-common
+          PANDOC_ARCH=$([ "${{ matrix.arch }}" = aarch64 ] && echo arm64 || echo amd64)
+          wget https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-${PANDOC_ARCH}.tar.gz
+          grep "linux-${PANDOC_ARCH}" <<'EOF' | sha256sum -c -
+        8f8f67fdd540b6519326b0ac49d5c55c5d5d15e43920e80a086e02c8aff83268  pandoc-3.7.0.2-linux-amd64.tar.gz
+        4ef2997ff0fa7f86ada5a217722f4f732293e38518b4442ececce16628bd0e44  pandoc-3.7.0.2-linux-arm64.tar.gz
+        EOF
+          tar -xzf pandoc-3.7.0.2-linux-${PANDOC_ARCH}.tar.gz --strip-components=1 -C /usr/local
+          rm pandoc-3.7.0.2-linux-${PANDOC_ARCH}.tar.gz
+        fi
+        pandoc --version | head -1
         wget https://github.com/linuxdeploy/linuxdeploy/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-${{ matrix.arch }}.AppImage
         wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-plugin-qt-${{ matrix.arch }}.AppImage
         chmod +x linuxdeploy*.AppImage

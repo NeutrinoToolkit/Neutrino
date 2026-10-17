@@ -95,7 +95,8 @@ PyShell::PyShell(neutrino *nparent) : nGenericPan(nparent)
     DEBUG("->\n" << my_w.initScript->toPlainText().toStdString() << "\n<-");
     if (my_w.initScript->toPlainText().isEmpty()) {
         QFile t(":init.py");
-        t.open(QIODevice::ReadOnly| QIODevice::Text);
+        // t.open(QIODevice::ReadOnly| QIODevice::Text);
+        if (!t.open(QIODevice::ReadOnly| QIODevice::Text)) qWarning() << "cannot read :init.py";
         QString initScript=QTextStream(&t).readAll();
         t.close();    
         my_w.initScript->insertPlainText(initScript);
@@ -245,7 +246,11 @@ void PyShell::loadScript(bool execInline) {
         setProperty("NeuSave-fileScript",fname);
 		if (execInline) {
 			QFile t(fname);
-			t.open(QIODevice::ReadOnly| QIODevice::Text);
+			// t.open(QIODevice::ReadOnly| QIODevice::Text);
+			if (!t.open(QIODevice::ReadOnly| QIODevice::Text)) {
+				QMessageBox::warning(this,tr("Open python source"),tr("Cannot read file ")+fname+"\n"+t.errorString(), QMessageBox::Ok);
+				return;
+			}
 			QTextStream out(&t);
 			QString toRun=out.readAll();
 			t.close();

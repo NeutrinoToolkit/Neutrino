@@ -24,6 +24,7 @@
  */
 
 
+#include "nVersion.h"
 #include <QMetaObject>
 #include <QtSvg>
 #include <QDirIterator>
@@ -379,7 +380,7 @@ neutrino::scanPlugins(QString pluginsDirStr) {
 
 #if defined(Q_OS_WIN)
         QString extension("dll");
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_MACOS)
         QString extension("dylib");
 #elif defined(Q_OS_LINUX)
         QString extension("so");
@@ -397,7 +398,7 @@ neutrino::scanPlugins(QString pluginsDirStr) {
        progress.setCancelButton(nullptr);
         for (auto &pluginfile : pluginlist) {
             QString name_plugin=QFileInfo(pluginfile).baseName().replace("_"," ");
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
+#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
                 if (name_plugin.startsWith("lib")) {
                     name_plugin.remove(0,3);
                 }
@@ -423,7 +424,7 @@ neutrino::scanPlugins() {
 #if defined(Q_OS_WIN)
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
         pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_MACOS)
     pluginsDir.cdUp();
     pluginsDir.cd("Resources");
 #elif defined(Q_OS_LINUX)
@@ -868,12 +869,16 @@ void neutrino::setPanData(std::string panstring){
             if (my_pan) {
                 QApplication::processEvents();
                 QTemporaryFile tmpFile(this);
-                tmpFile.open();
+                // tmpFile.open();
+                if (!tmpFile.open()) {
+                    QMessageBox::critical(this,tr("Session error"),tr("Cannot create temporary file for ")+pName+"\n"+tmpFile.errorString(), QMessageBox::Ok);
+                    continue;
+                }
 
                 while(!ifile.eof()) {
                     getline(ifile,line);
                     qLine=QString::fromStdString(line);
-                    qDebug() << qLine;
+                    // qDebug() << qLine;
                     if (qLine.startsWith("NeutrinoPan-end"))
                         break;
                     tmpFile.write(line.c_str());
