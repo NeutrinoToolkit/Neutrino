@@ -77,6 +77,24 @@
       </column>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="erasePrevious">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Opening data replaces the images opened before by this window</string>
+      </property>
+      <property name="text">
+       <string>erase previous</string>
+      </property>
+      <property name="neutrinoSave" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar">

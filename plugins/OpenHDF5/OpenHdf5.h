@@ -73,6 +73,8 @@ private:
     void openAllFrames(QTreeWidgetItem *);
     void openFramesMean(QTreeWidgetItem *);
     void copyValues(QTreeWidgetItem *);
+    void showImages(std::vector<physD> &);
+    QList<nPhysD*> openedPhys;      // images opened by this window (the ones "erase previous" removes)
 };
 
 NEUTRINO_PLUGIN(OpenHdf5,Analysis);

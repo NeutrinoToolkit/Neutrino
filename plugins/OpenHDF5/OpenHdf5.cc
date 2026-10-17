@@ -242,8 +242,9 @@ void OpenHdf5::openImage(QTreeWidgetItem *item) {
     physD image;
     std::string error;
     if (nHdf5::readImage(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), image, error)) {
-        image.TscanBrightness();
-        nparent->addShowPhys(new nPhysD(std::move(image)));
+        std::vector<physD> images;
+        images.push_back(std::move(image));
+        showImages(images);
     } else {
         statusbar->showMessage(QString::fromStdString(error),5000);
     }
@@ -257,8 +258,9 @@ void OpenHdf5::openFrame(QTreeWidgetItem *item) {
     physD image;
     std::string error;
     if (nHdf5::readFrame(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), frame, image, error)) {
-        image.TscanBrightness();
-        nparent->addShowPhys(new nPhysD(std::move(image)));
+        std::vector<physD> images;
+        images.push_back(std::move(image));
+        showImages(images);
     } else {
         statusbar->showMessage(QString::fromStdString(error),5000);
     }
@@ -272,10 +274,7 @@ void OpenHdf5::openAllFrames(QTreeWidgetItem *item) {
     std::vector<physD> images;
     std::string error;
     if (nHdf5::readFrames(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), images, error)) {
-        for (auto &image : images) {
-            image.TscanBrightness();
-            nparent->addShowPhys(new nPhysD(std::move(image)));
-        }
+        showImages(images);
     } else {
         statusbar->showMessage(QString::fromStdString(error),5000);
     }
@@ -285,10 +284,31 @@ void OpenHdf5::openFramesMean(QTreeWidgetItem *item) {
     physD image;
     std::string error;
     if (nHdf5::readFramesMean(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), image, error)) {
-        image.TscanBrightness();
-        nparent->addShowPhys(new nPhysD(std::move(image)));
+        std::vector<physD> images;
+        images.push_back(std::move(image));
+        showImages(images);
     } else {
         statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+// add the images to neutrino; with "erase previous" the ones opened before by this window are removed
+void OpenHdf5::showImages(std::vector<physD> &images) {
+    if (images.empty()) return;
+    QList<nPhysD*> previous=openedPhys;
+    openedPhys.clear();
+    for (auto &image : images) {
+        image.TscanBrightness();
+        nPhysD *phys=new nPhysD(std::move(image));
+        nparent->addShowPhys(phys);
+        openedPhys << phys;
+    }
+    if (erasePrevious->isChecked()) {
+        for (nPhysD *phys : previous) {
+            if (nparent->nPhysExists(phys)) {
+                nparent->removePhys(phys);
+            }
+        }
     }
 }
 
