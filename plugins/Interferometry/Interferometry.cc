@@ -299,12 +299,23 @@ void Interferometry::doWavelet (int iimage) {
             my_params.n_thicks=my_image[iimage].numThick->value();
         }
 
-        double thick = widthCarrier->value();
+        // double thick = widthCarrier->value();
         my_params.damp=correlation->value();
 
         QRect geom2=region->getRect(image);
 
-        nPhysD datamatrix = image->sub(geom2,padding->isChecked()?thick:0);
+        // nPhysD datamatrix = image->sub(geom2,padding->isChecked()?thick:0);
+        // Pad: the image around the region is used for the computation, 2 windows on each side as the padding of
+        // the wavelet (it was 1 interfringe, less than the window, and filled with 0 beyond the image border:
+        // a step). Clipped to the image: only real pixels, the rest is padded by the wavelet itself
+        QRect geomPad=geom2;
+        if (padding->isChecked()) {
+            double window=std::max(my_params.damp*std::max(my_params.init_lambda,my_params.end_lambda),
+                                   std::max(my_params.init_thick,my_params.end_thick));
+            int margin=(int)std::ceil(2.0*window);
+            geomPad=geom2.adjusted(-margin,-margin,margin,margin).intersected(QRect(0,0,image->getW(),image->getH()));
+        }
+        nPhysD datamatrix = image->sub(geomPad);
 
         std::ostringstream my_name;
 
@@ -330,7 +341,9 @@ void Interferometry::doWavelet (int iimage) {
         for (auto& it : my_params.olist) {
             nPhysD my_phys;
             if (padding->isChecked()) {
-                my_phys = it.second->sub(thick,thick,geom2.width(),geom2.height());
+                // my_phys = it.second->sub(thick,thick,geom2.width(),geom2.height());
+                // back to the region (the margin can differ on each side where it was clipped)
+                my_phys = it.second->sub(geom2.x()-geomPad.x(),geom2.y()-geomPad.y(),geom2.width(),geom2.height());
             } else {
                 my_phys = *it.second;
             }

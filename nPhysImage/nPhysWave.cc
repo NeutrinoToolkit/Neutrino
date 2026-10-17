@@ -65,10 +65,6 @@ static double wavelet_window(const physWave::wavelet_params &params) {
     return std::max(params.damp*lambda_max, thick_max);
 }
 
-// the FFT is periodic: the opposite borders touched (CPU: no padding; OpenCL: only up to the next FFT size,
-// i.e. none for 512). Padded by 2 windows on each side (the window is down to exp(-4) at the image), to a size
-// with factors 2,3,5 (fast for FFTW and clFFT, see wavelet_fft_size); outside the image the nearest border pixel fades to the mean
-// with a cosine over the padding, so there is no step at the border nor where the padding wraps around
 // smallest size >= n with only the factors 2, 3 and 5: measured with FFTW, the cost per point is the same as for a
 // power of 2 (which would need up to 2x more points per side), while a factor 7 is 1.6x slower per point
 // (360 = 2^3 3^2 5 is faster than 350 = 2 5^2 7) and a large prime factor 2-3x slower
@@ -85,6 +81,9 @@ static int wavelet_fft_size(int n) {
     return best;
 }
 
+// the FFT is periodic: the opposite borders touched (CPU: no padding; OpenCL: only up to the next FFT size,
+// i.e. none for 512). Padded by 2 windows on each side (the window is down to exp(-4) at the image), to a size
+// with factors 2,3,5 (fast for FFTW and clFFT, see wavelet_fft_size), filled with the mean of the image
 static physD wavelet_pad(physD &fdata, double window, vec2i &offset) {
     const int W=fdata.getW(), H=fdata.getH();
     const int pad=(int)std::ceil(2.0*window);
@@ -94,14 +93,24 @@ static physD wavelet_pad(physD &fdata, double window, vec2i &offset) {
     const double mean=fdata.sum()/fdata.getSurf();
     physD padded(newSize.x(), newSize.y(), mean);
     padded.set_origin(fdata.get_origin()+offset);
-    auto taper=[pad](int d) { return d<=0 ? 1.0 : (d>=pad ? 0.0 : 0.5*(1.0+cos(M_PI*d/pad))); };
+//     auto taper=[pad](int d) { return d<=0 ? 1.0 : (d>=pad ? 0.0 : 0.5*(1.0+cos(M_PI*d/pad))); };
+// #pragma omp parallel for
+//     for (int j=0; j<newSize.y(); j++) {
+//         for (int i=0; i<newSize.x(); i++) {
+//             int x=i-offset.x(), y=j-offset.y();
+//             int cx=std::clamp(x,0,W-1), cy=std::clamp(y,0,H-1);
+//             double t=taper(std::abs(x-cx))*taper(std::abs(y-cy));
+//             padded.set(i,j,mean+(fdata.point(cx,cy)-mean)*t);
+//         }
+//     }
+    // (the border pixels extended along the normal and faded to the mean: for oblique fringes they make false
+    // fringes in the padding, which biased the phase near the borders and even inside, 10x worse than the plain
+    // mean in the tests: the step to the mean has a broad spectrum, weak at the carrier)
+    // the mean outside the image
 #pragma omp parallel for
-    for (int j=0; j<newSize.y(); j++) {
-        for (int i=0; i<newSize.x(); i++) {
-            int x=i-offset.x(), y=j-offset.y();
-            int cx=std::clamp(x,0,W-1), cy=std::clamp(y,0,H-1);
-            double t=taper(std::abs(x-cx))*taper(std::abs(y-cy));
-            padded.set(i,j,mean+(fdata.point(cx,cy)-mean)*t);
+    for (int j=0; j<H; j++) {
+        for (int i=0; i<W; i++) {
+            padded.set(i+offset.x(),j+offset.y(),fdata.point(i,j));
         }
     }
     DEBUG("wavelet padding " << W << "x" << H << " -> " << newSize.x() << "x" << newSize.y() << " (window " << window << ")");

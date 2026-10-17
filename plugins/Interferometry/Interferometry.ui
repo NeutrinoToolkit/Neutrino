@@ -198,6 +198,9 @@
               <pointsize>10</pointsize>
              </font>
             </property>
+            <property name="toolTip">
+             <string>Use the image around the region (2 analysis windows on each side, inside the image) for the computation: less error at the borders of the region</string>
+            </property>
             <property name="text">
              <string>Pad</string>
             </property>
