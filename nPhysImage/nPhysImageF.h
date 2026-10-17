@@ -409,10 +409,14 @@ public:
 
 	// get rotated matrix
     nPhysImageF<T> rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
-		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
+		// double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
+		// the exact cases on the angle in [0,360): -90 (the plugin range is -180..180) was interpolated
+		double alphaNorm=fmod(fmod(alphaDeg,360.0)+360.0,360.0);
+		double alpha=alphaNorm/180.0* M_PI;
         nPhysImageF<T> rotated;
 
-		if (alphaDeg==0.0) {
+		// if (alphaDeg==0.0) {
+		if (alphaNorm==0.0) {
             rotated.resize(getW(), getH());
             for (unsigned int j=0; j<rotated.getH(); j++) {
                 for (unsigned int i=0; i<rotated.getW(); i++) {
@@ -420,7 +424,8 @@ public:
 				}
 			}
             rotated.set_origin(get_origin());
-		} else if (alphaDeg==90.0) {
+		// } else if (alphaDeg==90.0) {
+		} else if (alphaNorm==90.0) {
             rotated.resize(getH(), getW());
             for (unsigned int j=0; j<rotated.getH(); j++) {
                 for (unsigned int i=0; i<rotated.getW(); i++) {
@@ -428,7 +433,8 @@ public:
 				}
 			}
             rotated.set_origin(get_origin().y(),getW()-1-get_origin().x());
-		} else if (alphaDeg==180.0) {
+		// } else if (alphaDeg==180.0) {
+		} else if (alphaNorm==180.0) {
             rotated.resize(getW(), getH());
             for (unsigned int j=0; j<rotated.getH(); j++) {
                 for (unsigned int i=0; i<rotated.getW(); i++) {
@@ -436,14 +442,17 @@ public:
 				}
 			}
             rotated.set_origin(getW()-1-get_origin().x(),getH()-1-get_origin().y());
-		} else if (alphaDeg==270.0) {
+		// } else if (alphaDeg==270.0) {
+		} else if (alphaNorm==270.0) {
             rotated.resize(getH(), getW());
             for (unsigned int j=0; j<rotated.getH(); j++) {
                 for (unsigned int i=0; i<rotated.getW(); i++) {
                     rotated.set(i,j,point(j,getH()-1-i));
 				}
 			}
-            rotated.set_origin(get_origin().y(),getH()-1-get_origin().x());
+            // rotated.set_origin(get_origin().y(),getH()-1-get_origin().x());
+            // the source (x,y) goes to (H-1-y, x)
+            rotated.set_origin(getH()-1-get_origin().y(),get_origin().x());
 		} else {		
 			double sina=sin(alpha);
 			double cosa=cos(alpha);
@@ -487,8 +496,11 @@ public:
     nPhysImageF<T> fast_rotated(double alphaDeg, T def_value=std::numeric_limits<T>::quiet_NaN()) {
 		double alpha=fmod(alphaDeg+360.0,360.0)/180.0* M_PI;
         nPhysImageF<T> rotated(getW(),getH(), def_value);
-		double dx_2=0.5*((double) getW());
-		double dy_2=0.5*((double) getH());
+		// double dx_2=0.5*((double) getW());
+		// double dy_2=0.5*((double) getH());
+		// centre of the pixels at integer coordinates: W/2 shifted by one pixel at 180 degrees (first column NaN)
+		double dx_2=0.5*((double) getW()-1.0);
+		double dy_2=0.5*((double) getH()-1.0);
 		double cosa=cos(alpha);
 		double sina=sin(alpha);
         for (unsigned int j=0; j<getH(); j++) {
@@ -498,7 +510,13 @@ public:
                 rotated.set(i,j,getPoint(ir,jr,def_value));
 			}
 		}
-        rotated.set_origin(get_origin());
+        // rotated.set_origin(get_origin());
+        // the origin rotates with the image around the centre (it stayed on the same pixel)
+        {
+            vec2f orig=get_origin();
+            double ox=orig.x()-dx_2, oy=orig.y()-dy_2;
+            rotated.set_origin(dx_2+ox*cosa+oy*sina, dy_2-ox*sina+oy*cosa);
+        }
         rotated.set_scale(get_scale());
 		std::ostringstream my_name;
         my_name << "(" << getName() << ").fast_rotated(" << alphaDeg << ")";
@@ -524,24 +542,47 @@ public:
 	// interfacing methods
 
 	// get point (to be used for accessing data - no overload)
+	// inline T getPoint(double x, double y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
+    //     if (Timg_matrix != nullptr) {
+	// 		if (x>=0 && y>=0) {
+    //             unsigned int x1=(unsigned int)x;
+    //             unsigned int y1=(unsigned int)y;
+    //             if (x==x1 && y==y1) return point((unsigned int)x1,(unsigned int)y1);
+    //             unsigned int x2=x1+1;
+    //             unsigned int y2=y1+1;
+	// 			if (x2<getW() && y2<getH()) {
+	// 				T data11=Timg_matrix[y1][x1];
+	// 				T data12=Timg_matrix[y1][x2];
+	// 				T data21=Timg_matrix[y2][x1];
+	// 				T data22=Timg_matrix[y2][x2];
+	// 				return (y2-y)*((x2-x)*data11+(x-x1)*data12)+(y-y1)*((x2-x)*data21+(x-x1)*data22);
+	// 			}
+	// 		}
+	// 	}
+	// 	return nan_value;
+	// }
+	// bilinear interpolation, pixels at integer coordinates. On the last row/column only the other direction is
+	// interpolated (it needed x+1<W even for an integer x: the last row and column were NaN); coordinates
+	// within 1e-9 of a pixel are snapped to it (cos(90deg) is not 0) and a neighbour with weight 0 is not
+	// used (a NaN neighbour does not spread)
 	inline T getPoint(double x, double y, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
-        if (Timg_matrix != nullptr) {
-			if (x>=0 && y>=0) {
-                unsigned int x1=(unsigned int)x;
-                unsigned int y1=(unsigned int)y;
-                if (x==x1 && y==y1) return point((unsigned int)x1,(unsigned int)y1);
-                unsigned int x2=x1+1;
-                unsigned int y2=y1+1;
-				if (x2<getW() && y2<getH()) {
-					T data11=Timg_matrix[y1][x1];
-					T data12=Timg_matrix[y1][x2];
-					T data21=Timg_matrix[y2][x1];
-					T data22=Timg_matrix[y2][x2];			
-					return (y2-y)*((x2-x)*data11+(x-x1)*data12)+(y-y1)*((x2-x)*data21+(x-x1)*data22);
-				}
-			}
-		}
-		return nan_value;
+        if (Timg_matrix == nullptr || getW()==0 || getH()==0) return nan_value;
+        const double eps=1e-9;
+        if (!(x > -eps && y > -eps && x < getW()-1+eps && y < getH()-1+eps)) return nan_value; // also NaN
+        double fx1=std::floor(x), fy1=std::floor(y);
+        double fx=x-fx1, fy=y-fy1;
+        if (fx < eps) fx=0;
+        if (fy < eps) fy=0;
+        if (fx > 1-eps) { fx1+=1; fx=0; }
+        if (fy > 1-eps) { fy1+=1; fy=0; }
+        unsigned int x1=std::min<unsigned int>((unsigned int)std::max(fx1,0.0), getW()-1);
+        unsigned int y1=std::min<unsigned int>((unsigned int)std::max(fy1,0.0), getH()-1);
+        if (x1==getW()-1) fx=0;
+        if (y1==getH()-1) fy=0;
+        auto row=[&](unsigned int yy) -> T {
+            return fx==0 ? Timg_matrix[yy][x1] : (1-fx)*Timg_matrix[yy][x1]+fx*Timg_matrix[yy][x1+1];
+        };
+        return fy==0 ? row(y1) : (1-fy)*row(y1)+fy*row(y1+1);
 	}
 	inline T getPoint(bidimvec<double> p, T nan_value=std::numeric_limits<T>::quiet_NaN()) {
 		return getPoint(p.x(),p.y(),nan_value);
