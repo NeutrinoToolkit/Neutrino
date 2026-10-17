@@ -39,9 +39,11 @@ public:
 public slots:
     void updatePlot(QPointF = QPointF());
     void setBehaviour();
+    void lockColors(bool);
 
 private:
     Ui::Lineout_H_V my_w;
+    QPointF lastPoint;
 };
 
 NEUTRINO_PLUGIN(Lineout_H_V,Analysis;Lineout);

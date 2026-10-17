@@ -52,7 +52,9 @@ public:
         // connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
         // (same signal as the nparent one below: every buffer change replotted twice)
 
-        connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
+        // connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
+        // toggled: also emitted when the state is restored from the settings (setChecked)
+        connect(my_w.actionLockClick,SIGNAL(toggled(bool)), this, SLOT(setBehaviour()));
 
         // connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
         connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(lockColors(bool)));
@@ -174,10 +176,10 @@ public slots:
     void setBehaviour() {
         if (my_w.actionLockClick->isChecked()) {
             disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
+            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
         } else {
             disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
+            connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
         }
         updatePlot();
     };
