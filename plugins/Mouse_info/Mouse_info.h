@@ -22,7 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <iostream>
+// #include <iostream>
 
 #include <QtGui>
 #include <QWidget>
@@ -57,6 +57,7 @@ public slots:
     void copyPoints();
     void export_txt();
     QString getPointText();
+    QString getPointText(bool cLocale);
     //	void bufferChanged(nPhysD*);
 };
 
