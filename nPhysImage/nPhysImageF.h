@@ -469,8 +469,10 @@ public:
 #pragma omp parallel for private(i) collapse(2)
             for (j=0; j<rotated.getH(); j++) {
                 for (i=0; i<rotated.getW(); i++) {
-					double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
-					double jr=(i+shiftx)*sin(alpha)+(j+shifty)*cos(alpha);
+					// double ir=(i+shiftx)*cos(alpha)-(j+shifty)*sin(alpha);
+					// double jr=(i+shiftx)*sin(alpha)+(j+shifty)*cos(alpha);
+					double ir=(i+shiftx)*cosa-(j+shifty)*sina; // computed once above
+					double jr=(i+shiftx)*sina+(j+shifty)*cosa;
                     rotated.set(i,j,getPoint(ir,jr,def_value));
 				}
 			}

@@ -31,16 +31,43 @@ Rotate::Rotate(neutrino *nparent) : nGenericPan(nparent)
 
     show();
 
-    connect(valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
-    connect(image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
+    // connect(valueAngle, SIGNAL(valueChanged(double)), this, SLOT(doRotateLive()));
+    // connect(image,SIGNAL(activated(int)),this,SLOT(doRotateLive()));
+    // (every step of the angle rotated again, and without "erase previous" added a new image;
+    // the fill value and "same size" were not used until the angle changed)
+    // live (300 ms after the last change) with "erase previous", otherwise the angle on Enter
+    updateTimer.setSingleShot(true);
+    updateTimer.setInterval(300);
+    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(doRotateLive()));
+    connect(valueAngle, SIGNAL(valueChanged(double)), this, SLOT(angleChanged()));
+    connect(valueAngle, SIGNAL(editingFinished()), this, SLOT(doRotateLive()));
+    connect(image,SIGNAL(activated(int)),this,SLOT(optionChanged()));
+    connect(defaultValue,SIGNAL(currentIndexChanged(int)),this,SLOT(optionChanged()));
+    connect(sameSize,SIGNAL(toggled(bool)),this,SLOT(optionChanged()));
     rotated=nullptr;
-	doRotateLive();
+	// doRotateLive();
+	// (at 0 degrees opening the plugin added a copy of the image)
+	if (valueAngle->value()!=0.0) doRotateLive();
+}
+
+void Rotate::angleChanged() {
+    if (erasePrevious->isChecked()) updateTimer.start();
+}
+
+void Rotate::optionChanged() {
+    updateTimer.start();
 }
 
 void Rotate::doRotateLive () {
+    updateTimer.stop();
     double alpha=valueAngle->value();
     nPhysD *my_phys=getPhysFromCombo(image);
     if (my_phys) {
+        // same parameters as the result still shown: nothing to do (e.g. Enter without changes)
+        if (nparent->nPhysExists(rotated) && my_phys==lastSource && alpha==lastAngle &&
+            defaultValue->currentIndex()==lastFill && sameSize->isChecked()==lastSameSize) {
+            return;
+        }
         if (my_phys!=rotated) {
             nPhysD *my_rot;
             if (sameSize->isChecked()) {
@@ -55,6 +82,10 @@ void Rotate::doRotateLive () {
                 nparent->addShowPhys(my_rot);
                 rotated=my_rot;
             }
+            lastSource=my_phys;
+            lastAngle=alpha;
+            lastFill=defaultValue->currentIndex();
+            lastSameSize=sameSize->isChecked();
         } else {
             statusbar->showMessage("Can't work on this image",5000);
 		}

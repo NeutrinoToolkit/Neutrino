@@ -24,6 +24,7 @@
  */
 #include <QtGui>
 #include <QWidget>
+#include <QTimer>
 
 #include "nGenericPan.h"
 #include "ui_Rotate.h"
@@ -44,6 +45,16 @@ public:
 public slots:
     void doRotateLive();
     double getReplaceVal(nPhysD*);
+    void angleChanged();
+    void optionChanged();
+
+private:
+    QTimer updateTimer;             // live update, once the parameters stop changing
+    // parameters of the last result: not computed again for the same ones
+    nPhysD *lastSource=nullptr;
+    double lastAngle=0;
+    int lastFill=-1;
+    bool lastSameSize=false;
 };
 
 NEUTRINO_PLUGIN(Rotate,Analysis);
