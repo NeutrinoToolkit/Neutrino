@@ -70,7 +70,9 @@ public:
 
     template<class T>
     anydata& operator=(bidimvec<T> rhs) {
-        std::ostringstream ss; ss << rhs;
+        // std::ostringstream ss; ss << rhs;
+        // (default precision 6: origin and scale were rounded to 6 significant digits when set)
+        std::ostringstream ss; ss.precision(15); ss << rhs;
         _v = vec_string{ss.str()};
         return *this;
     }
@@ -102,7 +104,8 @@ public:
             using T = std::decay_t<decltype(v)>;
             if constexpr (std::is_same_v<T, std::monostate>)  return {};
             else if constexpr (std::is_same_v<T, int>)        return std::to_string(v);
-            else if constexpr (std::is_same_v<T, double>)     { std::ostringstream ss; ss << v; return ss.str(); }
+            // else if constexpr (std::is_same_v<T, double>)     { std::ostringstream ss; ss << v; return ss.str(); }
+            else if constexpr (std::is_same_v<T, double>)     { std::ostringstream ss; ss.precision(15); ss << v; return ss.str(); } // was 6 digits
             else if constexpr (std::is_same_v<T, std::string>) return v;
             else                                               return v.s;  // vec_string
         }, _v);

@@ -33,12 +33,26 @@ Properties::Properties(neutrino *nnparent) : nGenericPan(nnparent)
 
     bufferChanged(currentBuffer);
 
+    // the values changed elsewhere (Mouse_info, Contours, PyShell...): bufferChanged is only the image switch
+    connect(nparent, SIGNAL(physChanged(nPhysD*)), this, SLOT(physChanged(nPhysD*)));
+
     show(true);
 }
 
 void
 Properties::bufferChanged(nPhysD *my_phys) {
     nGenericPan::bufferChanged(my_phys);
+    fillList();
+}
+
+void
+Properties::physChanged(nPhysD *my_phys) {
+    if (my_phys && my_phys==currentBuffer) fillList();
+}
+
+void
+Properties::fillList() {
+    nPhysD *my_phys=currentBuffer;
     std::string currentProperty("");
     if (propertyList->selectedItems().size() > 0) {
         currentProperty=propertyList->selectedItems().first()->text().toStdString();
@@ -69,19 +83,52 @@ Properties::on_propertyList_itemSelectionChanged() {
     }
 }
 
-void Properties::on_changePhysProperty_pressed() {
+// void Properties::on_changePhysProperty_pressed() {
+// (pressed: at mouse-down and not with the keyboard)
+void Properties::on_changePhysProperty_clicked() {
     if (currentBuffer) {
+        // std::string currentProperty =  propertyList->selectedItems().first()->text().toStdString();
+        // (first() of an empty selection: crash)
+        if (propertyList->selectedItems().isEmpty()) {
+            statusBar()->showMessage(tr("Select a property"),5000);
+            return;
+        }
         std::string currentProperty =  propertyList->selectedItems().first()->text().toStdString();
-        QVariant new_value(propertyValue->toPlainText());
-        anydata my_val=toAnydata(new_value);
+        QList<nPhysD*> targets;
         if (applyToAll->isChecked()) {
-            for (auto & phys: nparent->getBufferList()) {
-                phys->prop[currentProperty]=my_val;
+            targets=nparent->getBufferList();
+        } else {
+            targets << currentBuffer;
+        }
+        if (propertyValue->toPlainText().trimmed().isEmpty()) {
+            // an empty value removes the property
+            QString question=tr("Remove the property %1").arg(QString::fromStdString(currentProperty))+
+                    (applyToAll->isChecked() ? tr(" from all the images?") : tr("?"));
+            if (QMessageBox::question(this,tr("Remove property"),question,QMessageBox::Yes|QMessageBox::No)!=QMessageBox::Yes) {
+                return;
+            }
+            for (auto & phys: targets) {
+                phys->prop.erase(currentProperty);
             }
         } else {
-            currentBuffer->prop[currentProperty]=my_val;
+            QVariant new_value(propertyValue->toPlainText());
+            anydata my_val=toAnydata(new_value);
+            for (auto & phys: targets) {
+                phys->prop[currentProperty]=my_val;
+            }
         }
+        // if (applyToAll->isChecked()) {
+        //     for (auto & phys: nparent->getBufferList()) {
+        //         phys->prop[currentProperty]=my_val;
+        //     }
+        // } else {
+        //     currentBuffer->prop[currentProperty]=my_val;
+        // }
         nparent->showPhys(currentBuffer);
+        // tell the other pans (Image_list names, Mouse_info origin...)
+        for (auto & phys: targets) {
+            nparent->emitPhysChanged(phys);
+        }
     }
-    qDebug() << "here";
+    // qDebug() << "here";
 }

@@ -44,7 +44,12 @@ public:
 public slots:
     void bufferChanged(nPhysD*);
     void on_propertyList_itemSelectionChanged();
-    void on_changePhysProperty_pressed();
+    // void on_changePhysProperty_pressed();
+    void on_changePhysProperty_clicked();
+    void physChanged(nPhysD*);
+
+private:
+    void fillList();
 
 };
 
