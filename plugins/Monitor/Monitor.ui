@@ -14,7 +14,7 @@
    <string>Monitor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,1">
     <property name="leftMargin">
      <number>2</number>
     </property>
@@ -27,7 +27,7 @@
     <property name="bottomMargin">
      <number>2</number>
     </property>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QListView" name="listView">
       <property name="font">
        <font>
@@ -176,6 +176,60 @@
          </property>
          <property name="text">
           <string>Open all</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QWidget" name="widget_3" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QCheckBox" name="autoOpen">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Open the new files matching the pattern as soon as they are written in the directory</string>
+         </property>
+         <property name="text">
+          <string>auto-open new files</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="newestFirst">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Sort the files by modification date, newest first (otherwise by name)</string>
+         </property>
+         <property name="text">
+          <string>newest first</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

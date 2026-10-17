@@ -25,6 +25,8 @@
 #include <QtGui>
 #include <QWidget>
 #include <QFileSystemModel>
+#include <QTimer>
+#include <QMap>
 
 #include "nGenericPan.h"
 #include "ui_Monitor.h"
@@ -47,9 +49,23 @@ public slots:
     void listViewDoubleClicked(QModelIndex);
     void listViewActivated(QModelIndex);
     void textChanged();
-    void on_openAll_released();
+    // void on_openAll_released();
+    void on_openAll_clicked();
 
     void changeDir();
+
+    void openFiles(QStringList);
+    void sortFiles();
+    void directoryLoaded(QString);
+    void filesInserted(QModelIndex, int, int);
+    void openPending();
+
+private:
+    void openIndex(QModelIndex);
+    QList<nPhysD*> openedPhys;         // images opened by the monitor (the ones "erase previous" removes)
+    bool dirLoaded=false;              // rows inserted before the directory is loaded are not new files
+    QMap<QString,qint64> pendingFiles; // new files (auto-open) with their size, opened when the size is stable
+    QTimer pendingTimer;
 
 };
 
