@@ -24,6 +24,297 @@
  */
 #include "OpenHdf5.h"
 #include <QtGui>
+#include <QMenu>
+#include <QMessageBox>
+#include <QInputDialog>
+
+// item columns: 0 name, 1 type, 2 data, 3 (hidden) path in the file (file name for the top-level items)
+// Qt::UserRole of column 0: nHdf5::Kind of a dataset
+
+OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
+{
+    setupUi(this);
+    treeWidget->setColumnHidden((treeWidget->columnCount()-1),true);
+
+    connect(actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
+    connect(actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
+    connect(actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
+    connect(actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
+    connect(treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
+    treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
+
+    setProperty("NeuSave-fileHDF","nHDF.h5");
+
+    show();
+
+}
+
+void OpenHdf5::copyPath(){
+    // the old text, fileOpen("file","dataset"), is not a command of neutrino nor of PyShell:
+    // file::dataset (the usual notation, e.g. silx)
+    QStringList clipText;
+    foreach(QTreeWidgetItem *item, treeWidget->selectedItems()) {
+        if (item->parent()) {
+            clipText << getFilename(item)+"::"+item->data(3,0).toString();
+        } else {
+            clipText << getFilename(item);
+        }
+    }
+    QApplication::clipboard()->setText(clipText.join("\n"));
+}
+
+void OpenHdf5::removeFile(){
+    // the top-level items once each (two items of the same file deleted it twice)
+    QSet<QTreeWidgetItem *> files;
+    foreach(QTreeWidgetItem *item, treeWidget->selectedItems()) {
+        while (item->parent()) {
+            item=item->parent();
+        }
+        files.insert(item);
+    }
+    qDeleteAll(files);
+}
+
+void OpenHdf5::itemEntered(QTreeWidgetItem *item, int) {
+    statusbar->showMessage(item->data(3,0).toString(),5000);
+}
+
+QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
+    while (item->parent()) {
+        item=item->parent();
+    }
+    return item->data(3,0).toString();
+}
+
+void OpenHdf5::addAttributes(QTreeWidgetItem *parentItem, const std::vector<nHdf5::Attribute> &attributes) {
+    for (auto &attr : attributes) {
+        QTreeWidgetItem *item=new QTreeWidgetItem(parentItem,QStringList(QString::fromStdString(attr.name)));
+        item->setFlags(item->flags()|Qt::ItemIsEditable);
+        item->setData(1,0,"Attr "+QString::fromStdString(attr.type));
+        item->setData(2,0,QString::fromStdString(attr.text()));
+    }
+}
+
+void OpenHdf5::addNode(QTreeWidgetItem *item, const nHdf5::Node &node) {
+    addAttributes(item, node.attributes);
+    for (auto &child : node.children) {
+        QTreeWidgetItem *item2=new QTreeWidgetItem(item,QStringList(QString::fromStdString(child.name)));
+        QString type=QString::fromStdString(child.typeText);
+        if (child.type==nHdf5::Node::dataset) type="DS "+type;
+        item2->setData(1,0,type);
+        item2->setData(2,0,QString::fromStdString(child.dataText));
+        if (child.type==nHdf5::Node::dataset) {
+            item2->setData(3,0,QString::fromStdString(child.path));
+            item2->setData(0,Qt::UserRole,(int)child.kind);
+            if (child.kind==nHdf5::Kind::frames) item2->setData(0,Qt::UserRole+1,(qulonglong)child.dims[0]);
+            if (child.kind==nHdf5::Kind::image || child.kind==nHdf5::Kind::frames) {
+                // images in blue, with their groups expanded
+                QTreeWidgetItem *dataParent=item2->parent();
+                while (dataParent) {
+                    dataParent->setExpanded(true);
+                    dataParent->setForeground(0,QBrush(QColor(0,0,200)));
+                    dataParent=dataParent->parent();
+                }
+                for (int col=0; col<3; col++) item2->setForeground(col,QBrush(QColor(0,0,200)));
+            } else if (child.kind==nHdf5::Kind::none) {
+                item2->setBackground(2,QBrush(QColor(200,200,255)));
+            }
+        } else if (child.type==nHdf5::Node::other) {
+            // compound members
+            item2->setFlags(item2->flags()|Qt::ItemIsEditable);
+        }
+        addNode(item2, child);
+    }
+}
+
+void OpenHdf5::showFile(QString fname) {
+    statusbar->showMessage("Parsing "+fname);
+    QApplication::processEvents();
+    // for (int i=0;i<treeWidget->topLevelItemCount();i++) {
+    // (deleting while going forward skipped the next item)
+    for (int i=treeWidget->topLevelItemCount()-1;i>=0;i--) {
+        QTreeWidgetItem *item=treeWidget->topLevelItem(i);
+        if (item->data(3,0).toString()==fname) {
+            delete item;
+        }
+    }
+    nHdf5::Node root;
+    std::string error;
+    if (nHdf5::scanFile(QFile::encodeName(fname).toStdString(), root, error)) {
+        nparent->updateRecentFileActions(fname);
+        QTreeWidgetItem *item=new QTreeWidgetItem(treeWidget,QStringList(QFileInfo(fname).fileName()));
+        item->setData(1,0,"File");
+        item->setData(3,0,fname);
+        addNode(item, root);
+        treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        statusbar->showMessage("Done",2000);
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+void OpenHdf5::showFile() {
+    QStringList fnames=QFileDialog::getOpenFileNames(this,tr("Open HDF file source"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5 *.hdf5 *.hdf *.nxs);;")+tr("Any file")+QString(" (*)"));
+    foreach (QString fname, fnames) {
+        showFile(fname);
+    }
+    // if (!fnames.isEmpty()) setProperty("NeuSave-fileHDF", fnames);
+    // (a QStringList of several files is not a QString: the dialog lost the directory)
+    if (!fnames.isEmpty()) setProperty("NeuSave-fileHDF", fnames.last());
+}
+
+void OpenHdf5::saveFile() {
+    if (!currentBuffer) {
+        statusbar->showMessage(tr("No image to save"),5000);
+        return;
+    }
+    QString fname=QFileDialog::getSaveFileName(this,tr("Save image in HDF5"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5 *.hdf5);;")+tr("Any file")+QString(" (*)"));
+    if (fname.isEmpty()) return;
+    setProperty("NeuSave-fileHDF", fname);
+    std::string error;
+    if (nHdf5::writeImage(*currentBuffer, QFile::encodeName(fname).toStdString(), qApp->applicationVersion().toStdString(), error)) {
+        showFile(fname);
+        statusbar->showMessage(tr("Saved ")+fname,5000);
+    } else {
+        QMessageBox::warning(this,tr("Save HDF5"),QString::fromStdString(error),QMessageBox::Ok);
+    }
+}
+
+// double click: images are opened, 1D data copied, for frames the choice
+void OpenHdf5::openData(QTreeWidgetItem *item, int) {
+    // QString dataName=item->data(3,0).toString();
+    // nparent->showPhys(phys_open_Hdf5(getFilename(item),dataName.toStdString()));
+    // (showPhys shows only images already in neutrino: nothing was ever shown)
+    switch ((nHdf5::Kind)item->data(0,Qt::UserRole).toInt()) {
+    case nHdf5::Kind::image:
+        openImage(item);
+        break;
+    case nHdf5::Kind::data1D:
+        copyValues(item);
+        break;
+    case nHdf5::Kind::frames: {
+        QMenu *menu=dataMenu(item);
+        menu->exec(QCursor::pos());
+        delete menu;
+        break;
+    }
+    default:
+        if (!item->data(3,0).toString().isEmpty() && item->parent()) {
+            statusbar->showMessage(tr("Cannot open ")+item->data(1,0).toString()+" "+item->data(2,0).toString(),5000);
+        }
+        break;
+    }
+}
+
+QMenu *OpenHdf5::dataMenu(QTreeWidgetItem *item) {
+    QMenu *menu=new QMenu(this);
+    switch ((nHdf5::Kind)item->data(0,Qt::UserRole).toInt()) {
+    case nHdf5::Kind::image:
+        menu->addAction(tr("Open"), this, [=](){ openImage(item); });
+        break;
+    case nHdf5::Kind::frames:
+        menu->addAction(tr("Open mean of the frames"), this, [=](){ openFramesMean(item); });
+        menu->addAction(tr("Open frame..."), this, [=](){ openFrame(item); });
+        menu->addAction(tr("Open all frames"), this, [=](){ openAllFrames(item); });
+        break;
+    case nHdf5::Kind::data1D:
+        menu->addAction(tr("Copy values"), this, [=](){ copyValues(item); });
+        break;
+    default:
+        break;
+    }
+    menu->addAction(tr("Copy path"), this, SLOT(copyPath()));
+    return menu;
+}
+
+void OpenHdf5::contextMenu(QPoint pos) {
+    QTreeWidgetItem *item=treeWidget->itemAt(pos);
+    if (!item) return;
+    treeWidget->setCurrentItem(item);
+    QMenu *menu=dataMenu(item);
+    menu->exec(treeWidget->viewport()->mapToGlobal(pos));
+    delete menu;
+}
+
+void OpenHdf5::openImage(QTreeWidgetItem *item) {
+    physD image;
+    std::string error;
+    if (nHdf5::readImage(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), image, error)) {
+        image.TscanBrightness();
+        nparent->addShowPhys(new nPhysD(std::move(image)));
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+void OpenHdf5::openFrame(QTreeWidgetItem *item) {
+    int nframes=item->data(0,Qt::UserRole+1).toInt();
+    bool ok;
+    int frame=QInputDialog::getInt(this,tr("Open frame"),tr("Frame (0 - %1)").arg(nframes-1),0,0,std::max(0,nframes-1),1,&ok);
+    if (!ok) return;
+    physD image;
+    std::string error;
+    if (nHdf5::readFrame(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), frame, image, error)) {
+        image.TscanBrightness();
+        nparent->addShowPhys(new nPhysD(std::move(image)));
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+void OpenHdf5::openAllFrames(QTreeWidgetItem *item) {
+    int nframes=item->data(0,Qt::UserRole+1).toInt();
+    if (nframes>20 && QMessageBox::question(this,tr("Open all frames"),tr("Open %1 images?").arg(nframes),QMessageBox::Yes|QMessageBox::No)!=QMessageBox::Yes) {
+        return;
+    }
+    std::vector<physD> images;
+    std::string error;
+    if (nHdf5::readFrames(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), images, error)) {
+        for (auto &image : images) {
+            image.TscanBrightness();
+            nparent->addShowPhys(new nPhysD(std::move(image)));
+        }
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+void OpenHdf5::openFramesMean(QTreeWidgetItem *item) {
+    physD image;
+    std::string error;
+    if (nHdf5::readFramesMean(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), image, error)) {
+        image.TscanBrightness();
+        nparent->addShowPhys(new nPhysD(std::move(image)));
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+void OpenHdf5::copyValues(QTreeWidgetItem *item) {
+    std::vector<double> data;
+    std::string error;
+    if (nHdf5::readData1D(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), data, error)) {
+        // one value per line, C locale (the system locale gave decimal commas)
+        QString str_data;
+        QLocale cloc(QLocale::C);
+        for (auto &val : data) {
+            str_data += cloc.toString(val,'g',10) + "\n";
+        }
+        QApplication::clipboard()->setText(str_data);
+        statusbar->showMessage(QLocale().toString((int)data.size()) + tr(" values copied into the clipboard"),2000);
+    } else {
+        statusbar->showMessage(QString::fromStdString(error),5000);
+    }
+}
+
+// old implementation, before nHdf5io (not compiled):
+// - showPhys of an image never added to neutrino: nothing was shown
+// - integer datasets not read, arrays crashed (shadowed dims), file byte order, names with a trailing '\0'
+//   (physOrigin, physScale... never applied), int8/int16 attributes overflowing, compound data read at scan,
+//   files left open when the dataset could not be opened, HDF5 ids not closed
+#if 0
 
 
 #define HDF5_MAX_NAME 2048
@@ -650,3 +941,4 @@ void OpenHdf5::scan_attributes(hid_t aid, nPhysD *my_data){
     H5Tclose(atype);
     H5Sclose(aspace);
 }
+#endif

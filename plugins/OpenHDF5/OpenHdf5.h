@@ -31,8 +31,10 @@
 #ifndef OpenHdf5_H_
 #define OpenHdf5_H_
 
-#include "hdf5.h"
-#include "hdf5_hl.h"
+// #include "hdf5.h"
+// #include "hdf5_hl.h"
+// the HDF5 reading and writing is in nHdf5io (no Qt, tested on its own)
+#include "nHdf5io.h"
 
 #include "neutrino.h"
 
@@ -50,15 +52,27 @@ public slots:
     void removeFile();
     void showFile();
     void showFile(QString);
-    void scanGroup(hid_t, QTreeWidgetItem *);
-    void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = nullptr);
-    void scanDataset(hid_t, QTreeWidgetItem *);
+    // void scanGroup(hid_t, QTreeWidgetItem *);
+    // void scanAttribute(hid_t, QTreeWidgetItem *, nPhysD* = nullptr);
+    // void scanDataset(hid_t, QTreeWidgetItem *);
 
-    int phys_write_Hdf5(nPhysD *phys, std::string fname);
-    nPhysD* phys_open_Hdf5(QString fname, std::string dataName);
-    void scan_attributes(hid_t aid, nPhysD *my_data);
+    // int phys_write_Hdf5(nPhysD *phys, std::string fname);
+    // nPhysD* phys_open_Hdf5(QString fname, std::string dataName);
+    // void scan_attributes(hid_t aid, nPhysD *my_data);
 
     void copyPath();
+    void saveFile();
+    void contextMenu(QPoint);
+
+private:
+    void addNode(QTreeWidgetItem *, const nHdf5::Node &);
+    void addAttributes(QTreeWidgetItem *, const std::vector<nHdf5::Attribute> &);
+    QMenu *dataMenu(QTreeWidgetItem *);
+    void openImage(QTreeWidgetItem *);
+    void openFrame(QTreeWidgetItem *);
+    void openAllFrames(QTreeWidgetItem *);
+    void openFramesMean(QTreeWidgetItem *);
+    void copyValues(QTreeWidgetItem *);
 };
 
 NEUTRINO_PLUGIN(OpenHdf5,Analysis);
