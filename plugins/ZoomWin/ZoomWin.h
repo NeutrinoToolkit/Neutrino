@@ -48,6 +48,9 @@ public slots:
 
     void setBehaviour();
 
+private:
+    QPointF lastPoint;   // centre of the view (the clicked point in lock-click mode)
+
 };
 
 NEUTRINO_PLUGIN(ZoomWin,Image,"",Qt::CTRL | Qt::ALT | Qt::Key_Z);

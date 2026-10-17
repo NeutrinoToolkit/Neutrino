@@ -57,6 +57,57 @@ static bool wavelet_finite_input(physD &data, physD &fdata) {
     return true;
 }
 
+// half width (1/e) of the analysis window in pixels, the largest of the scan: damp*lambda across the fringes,
+// thick along them
+static double wavelet_window(const physWave::wavelet_params &params) {
+    double lambda_max=std::max(params.init_lambda,params.end_lambda);
+    double thick_max=std::max(params.init_thick,params.end_thick);
+    return std::max(params.damp*lambda_max, thick_max);
+}
+
+// the FFT is periodic: the opposite borders touched (CPU: no padding; OpenCL: only up to the next FFT size,
+// i.e. none for 512). Padded by 2 windows on each side (the window is down to exp(-4) at the image), to a size
+// with factors 2,3,5 (fast for FFTW and clFFT, see wavelet_fft_size); outside the image the nearest border pixel fades to the mean
+// with a cosine over the padding, so there is no step at the border nor where the padding wraps around
+// smallest size >= n with only the factors 2, 3 and 5: measured with FFTW, the cost per point is the same as for a
+// power of 2 (which would need up to 2x more points per side), while a factor 7 is 1.6x slower per point
+// (360 = 2^3 3^2 5 is faster than 350 = 2 5^2 7) and a large prime factor 2-3x slower
+static int wavelet_fft_size(int n) {
+    int best=1;
+    while (best<n) best*=2;
+    for (long p5=1; p5<=best; p5*=5) {
+        for (long p35=p5; p35<=best; p35*=3) {
+            long v=p35;
+            while (v<n) v*=2;
+            if (v<best) best=v;
+        }
+    }
+    return best;
+}
+
+static physD wavelet_pad(physD &fdata, double window, vec2i &offset) {
+    const int W=fdata.getW(), H=fdata.getH();
+    const int pad=(int)std::ceil(2.0*window);
+    // vec2i newSize=physWave::opencl_closest_size(vec2i(W+2*pad, H+2*pad));
+    vec2i newSize(wavelet_fft_size(W+2*pad), wavelet_fft_size(H+2*pad));
+    offset=vec2i((newSize.x()-W)/2, (newSize.y()-H)/2);
+    const double mean=fdata.sum()/fdata.getSurf();
+    physD padded(newSize.x(), newSize.y(), mean);
+    padded.set_origin(fdata.get_origin()+offset);
+    auto taper=[pad](int d) { return d<=0 ? 1.0 : (d>=pad ? 0.0 : 0.5*(1.0+cos(M_PI*d/pad))); };
+#pragma omp parallel for
+    for (int j=0; j<newSize.y(); j++) {
+        for (int i=0; i<newSize.x(); i++) {
+            int x=i-offset.x(), y=j-offset.y();
+            int cx=std::clamp(x,0,W-1), cy=std::clamp(y,0,H-1);
+            double t=taper(std::abs(x-cx))*taper(std::abs(y-cy));
+            padded.set(i,j,mean+(fdata.point(cx,cy)-mean)*t);
+        }
+    }
+    DEBUG("wavelet padding " << W << "x" << H << " -> " << newSize.x() << "x" << newSize.y() << " (window " << window << ")");
+    return padded;
+}
+
 void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 {
     DEBUG(5,"start");
@@ -67,8 +118,15 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         params.olist.clear();
 
-        unsigned int dx=params.data->getW();
-        unsigned int dy=params.data->getH();
+        // unsigned int dx=params.data->getW();
+        // unsigned int dy=params.data->getH();
+        // computed on the padded image, the results cropped back to the image at the end
+        const unsigned int dx0=params.data->getW();
+        const unsigned int dy0=params.data->getH();
+        vec2i offset;
+        fdata=wavelet_pad(fdata, wavelet_window(params), offset);
+        unsigned int dx=fdata.getW();
+        unsigned int dy=fdata.getH();
 
         unsigned int surf=dx*dy;
 
@@ -274,7 +332,8 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             double dAngle = angles.size()>1 ? (angles.back()-angles.front())/(angles.size()-1) : 0;
 
 #pragma omp parallel for
-            for (size_t k=0; k<params.data->getSurf(); k++) {
+            // for (size_t k=0; k<params.data->getSurf(); k++) {
+            for (size_t k=0; k<surf; k++) { // padded
                 lambda->Timg_buffer[k] += dLambda*wavelet_parabolic_offset(nearLambda[k], qmap->Timg_buffer[k], nearLambda[surf+k]);
                 angle->Timg_buffer[k] += dAngle*wavelet_parabolic_offset(nearAngle[k], qmap->Timg_buffer[k], nearAngle[surf+k]);
                 qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/surf;
@@ -304,6 +363,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             params.olist["thick"]     = std::move(thick);
 
             for(auto itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
+                *itr->second=itr->second->sub(offset.x(), offset.y(), dx0, dy0); // back to the image (without padding)
                 itr->second->TscanBrightness();
                 itr->second->set_origin(params.data->get_origin());
                 itr->second->set_scale(params.data->get_scale());
@@ -554,23 +614,27 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         params.iter=0;
         *params.iter_ptr=0;
 
-        vec2i newSize(opencl_closest_size(params.data->getSize()));
-
-        // double mean=params.data->sum()/params.data->getSurf();
-        double mean=fdata.sum()/fdata.getSurf();
-
-        physD padded(newSize.x(), newSize.y(), mean);
-        bidimvec<int> offset=(newSize-params.data->get_size())/2;
+//         vec2i newSize(opencl_closest_size(params.data->getSize()));
+//
+//         // double mean=params.data->sum()/params.data->getSurf();
+//         double mean=fdata.sum()/fdata.getSurf();
+//
+//         physD padded(newSize.x(), newSize.y(), mean);
+//         bidimvec<int> offset=(newSize-params.data->get_size())/2;
+//         DEBUG("padding offset : " << offset);
+//         padded.set_origin(params.data->get_origin()+offset);
+//
+// #pragma omp parallel for collapse(2)
+//         for (size_t j=0; j<params.data->getH(); j++) {
+//             for (size_t i=0; i<params.data->getW(); i++) {
+//                 // padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));
+//                 padded.set(i+offset.x(),j+offset.y(),fdata.getPoint(i,j));
+//             }
+//         }
+        // (only up to the next FFT size: no padding at all for 512) same padding as the CPU version
+        vec2i offset;
+        physD padded=wavelet_pad(fdata, wavelet_window(params), offset);
         DEBUG("padding offset : " << offset);
-        padded.set_origin(params.data->get_origin()+offset);
-
-#pragma omp parallel for collapse(2)
-        for (size_t j=0; j<params.data->getH(); j++) {
-            for (size_t i=0; i<params.data->getW(); i++) {
-                // padded.set(i+offset.x(),j+offset.y(),params.data->getPoint(i,j));
-                padded.set(i+offset.x(),j+offset.y(),fdata.getPoint(i,j));
-            }
-        }
 
         unsigned int dx = padded.getW();
         unsigned int dy = padded.getH();
