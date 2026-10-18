@@ -1218,7 +1218,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Icon size</string>
+           <string>Icons</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1226,33 +1226,81 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QComboBox" name="comboIconSize">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <property name="neutrinoSave" stdset="0">
-           <bool>true</bool>
-          </property>
-          <item>
-           <property name="text">
-            <string>Small</string>
+         <widget class="QWidget" name="widgetIcons" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayoutIcons">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Normal</string>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Large</string>
+           <property name="rightMargin">
+            <number>0</number>
            </property>
-          </item>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="comboIconSize">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Small</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Normal</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Large</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="iconTheme">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Icon colors: Automatic follows the dark/light mode of the system (applied at the next start)</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>false</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Automatic</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Light</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Dark</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item row="3" column="1">
@@ -1644,6 +1692,7 @@
   <tabstop>colorMax</tabstop>
   <tabstop>getColors</tabstop>
   <tabstop>comboIconSize</tabstop>
+  <tabstop>iconTheme</tabstop>
   <tabstop>fontFace</tabstop>
   <tabstop>fontSize</tabstop>
   <tabstop>physNameLength</tabstop>

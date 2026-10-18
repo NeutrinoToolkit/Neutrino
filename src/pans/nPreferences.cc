@@ -117,6 +117,12 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
+    // read by nApp::selectIconTheme at the next start
+    connect(iconTheme, &QComboBox::currentIndexChanged, this, [this](int) {
+        saveDefaults();
+        statusbar->showMessage(tr("Icons will change at the next start"), 5000);
+    });
+
     QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
     qDebug() << pluginListMap;
     for (auto& k : pluginListMap.keys()) {

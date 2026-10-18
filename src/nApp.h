@@ -69,6 +69,9 @@ public slots:
     bool addPaletteFile(QString);
     void addDefaultPalettes();
 
+    // light or dark icons (resources icons.qrc / icons_dark.qrc), chosen once at startup
+    void selectIconTheme();
+
     void clearLog();
     void copyLog();
     void saveLog();

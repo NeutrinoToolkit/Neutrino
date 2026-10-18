@@ -7,12 +7,42 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QThread>
+#include <QStyleHints>
+#include <QPalette>
 
 nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
     log_win(nullptr,Qt::Tool),
     log_win_ui(new Ui::nLogWin)
 {
 
+}
+
+// icons.qrc and icons_dark.qrc are both compiled in with the same /icons/ prefix and names
+// (the dark ones are made by resources/icons/Makefile): keep only one of them.
+// Changing the system mode while running needs a restart (QIcon keeps the images already loaded)
+void nApp::selectIconTheme() {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    int theme=my_set.value("iconThemeDefault",0).toInt(); // iconTheme combo of nPreferences: 0 automatic, 1 light, 2 dark
+    my_set.endGroup();
+
+    bool dark=(theme==2);
+    if (theme==0) {
+        // a dark window background (also the fallback when the system doesn't say)
+        bool darkPalette=palette().color(QPalette::Window).lightness() < palette().color(QPalette::WindowText).lightness();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        Qt::ColorScheme scheme=styleHints()->colorScheme();
+        dark = (scheme==Qt::ColorScheme::Unknown) ? darkPalette : (scheme==Qt::ColorScheme::Dark);
+#else
+        dark = darkPalette;
+#endif
+    }
+    if (dark) {
+        Q_CLEANUP_RESOURCE(icons);
+    } else {
+        Q_CLEANUP_RESOURCE(icons_dark);
+    }
+    qInfo() << "Icons:" << (dark ? "dark" : "light");
 }
 
 int nApp::exec() {
@@ -23,6 +53,8 @@ int nApp::exec() {
     qInstallMessageHandler(nApp::myMessageOutput);
 #endif
     qInfo() << "Default preference file:" << QSettings("neutrino","").fileName();
+
+    selectIconTheme(); // before any window uses the icons
 
     addDefaultPalettes();
 
