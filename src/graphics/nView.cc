@@ -41,6 +41,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     nparent(qobject_cast<neutrino *>(parent->parent())),
     nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
     my_scene(this),
+    my_mouse(this),
     my_tics(this),
     colorTable(":cmaps/Neutrino"),
     lockColors(false)
@@ -62,7 +63,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     if (!nparent) ERROREXIT("nView problem")
 
     my_scene.addItem(&my_pixitem);
-    my_scene.addItem(&my_mouse);
+//    my_scene.addItem(&my_mouse); // drawn in drawForeground
     my_scene.addItem(&my_tics);
 
     trasformazione.reset();
@@ -530,20 +531,28 @@ void nView::nextMouseShape() {
 }
 
 void nView::setMouseShape(int num) {
-    num%=my_mouse.num_shape;
-    my_mouse.hide();
-    update();
-    setSize();
-    QCursor cur;
-    if (num==0) {
-        my_pixitem.setCursor(Qt::CrossCursor);
-    } else {
-        my_pixitem.setCursor(Qt::BlankCursor);
-        my_mouse.show();
-    }
-    my_mouse.my_shape=num;
-    my_mouse.update();
-    qInfo() << "Mouse " << QLocale().toString(num);
+//    num%=my_mouse.num_shape;
+//    my_mouse.hide();
+//    update();
+//    setSize();
+//    QCursor cur;
+//    if (num==0) {
+//        my_pixitem.setCursor(Qt::CrossCursor);
+//    } else {
+//        my_pixitem.setCursor(Qt::BlankCursor);
+//        my_mouse.show();
+//    }
+//    my_mouse.my_shape=num;
+//    my_mouse.update();
+    my_mouse.setShape(num);
+    my_pixitem.setCursor(my_mouse.my_shape==0 ? Qt::CrossCursor : Qt::BlankCursor);
+    my_mouse.saveSettings();
+    qInfo() << "Mouse " << QLocale().toString(my_mouse.my_shape);
+}
+
+void nView::drawForeground(QPainter *painter, const QRectF &rect) {
+    QGraphicsView::drawForeground(painter, rect);
+    my_mouse.paint(painter);
 }
 
 void nView::keyReleaseEvent (QKeyEvent *e) {

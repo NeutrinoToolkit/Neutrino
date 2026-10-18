@@ -56,6 +56,9 @@ public:
     void keyPressEvent (QKeyEvent *) override;
     void keyReleaseEvent (QKeyEvent *) override;
 
+    // the custom mouse pointer (nMouse) is drawn over the scene
+    void drawForeground(QPainter *, const QRectF &) override;
+
 
     // zoom
     QTransform trasformazione;

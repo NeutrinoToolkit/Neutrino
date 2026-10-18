@@ -219,7 +219,11 @@ void nPreferences::on_getColors_released() {
 
 void nPreferences::changeDecorations() {
     saveDefaults();
-    nparent->my_view->my_mouse.pen.setWidthF(mouseThickness->value());
+//    nparent->my_view->my_mouse.pen.setWidthF(mouseThickness->value());
+    QPen mousePen=nparent->my_view->my_mouse.pen;
+    mousePen.setWidthF(mouseThickness->value());
+    nparent->my_view->my_mouse.setPen(mousePen);
+    nparent->my_view->my_mouse.saveSettings();
     nparent->my_view->my_tics.gridThickness=gridThickness->value();
     nparent->my_view->my_tics.showDimPixel=showDimPixel->isChecked();
     nparent->my_view->my_tics.showXYaxes=showXYaxes->isChecked();
@@ -331,7 +335,11 @@ void nPreferences::on_mouseColor_released() {
     colordial.setOption(QColorDialog::ShowAlphaChannel);
     colordial.exec();
     if (colordial.result() && colordial.currentColor().isValid()) {
-        nparent->my_view->my_mouse.pen.setColor(colordial.currentColor());
+//        nparent->my_view->my_mouse.pen.setColor(colordial.currentColor());
+        QPen mousePen=nparent->my_view->my_mouse.pen;
+        mousePen.setColor(colordial.currentColor());
+        nparent->my_view->my_mouse.setPen(mousePen);
+        nparent->my_view->my_mouse.saveSettings();
         nparent->my_view->update();
     }
 }
