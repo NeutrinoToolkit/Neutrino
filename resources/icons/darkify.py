@@ -3,8 +3,9 @@
 # greys get their lightness inverted (black -> #e6e6e6, white -> #1f1f1f), saturated colours are kept
 import re, sys, os, colorsys
 
-# icons copied unchanged (application logo, colourful icons)
-KEEP = {'icon', 'iconBW', 'logo', 'neutrino'}
+# icons copied unchanged (colourful application logos; iconBW, the black logo of "Raise viewer", is converted)
+# KEEP = {'icon', 'iconBW', 'logo', 'neutrino'}
+KEEP = {'icon', 'logo', 'neutrino'}
 # icons where the gradients (the light gear) are kept: they are already visible on a dark background
 KEEP_GRADIENTS = {'gearPy', 'savePref', 'loadPref'}
 # single colours kept (the flat light gear)

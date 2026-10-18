@@ -5,3 +5,6 @@ debian
 fedora
 ubuntu
 CMakeLists.txt.user
+
+# dark icons: generated svg (resources/icons/Makefile), only the png are needed by the build
+plugins/**/dark/*.svg
