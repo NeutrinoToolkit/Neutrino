@@ -1245,7 +1245,8 @@ nLine::saveSettings() {
 void
 nLine::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
-    setPos(settings.value("position").toPoint());
+//    setPos(settings.value("position").toPoint());
+    setPos(settings.value("position").toPointF());
 
 	if (property("parentPanControlLevel").toInt()<2) {
         int size = settings.beginReadArray("points");
@@ -1257,7 +1258,10 @@ nLine::loadSettings(QSettings &settings) {
 		}
         settings.endArray();
 		if (poly_tmp.size()>0) {
-			setPoints(poly_tmp);
+			// saveSettings writes the points in scene coordinates (mapToScene): back to item coordinates,
+			// otherwise each save/load moves the line by its position (the image origin)
+//			setPoints(poly_tmp);
+			setPoints(mapFromScene(poly_tmp));
 		} else {
 			showMessage(tr("Error reading from file"));
 		}

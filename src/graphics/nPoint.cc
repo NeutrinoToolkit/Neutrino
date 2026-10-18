@@ -398,7 +398,8 @@ nPoint::saveSettings() {
 void
 nPoint::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
-    setPos(settings.value("position").toPoint());
+//    setPos(settings.value("position").toPoint());
+    setPos(settings.value("position").toPointF()); // the origin can be fractional
     setPoint(QPointF(settings.value("x").toDouble(), settings.value("y").toDouble()));
     setToolTip(settings.value("name",toolTip()).toString());
     setZValue(settings.value("depth",zValue()).toDouble());

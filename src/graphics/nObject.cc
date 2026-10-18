@@ -744,7 +744,10 @@ nObject::loadSettings(QSettings &settings) {
 	}
     settings.endArray();
     if (poly_tmp.size()>1) {
-        setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
+        // saveSettings writes the points in scene coordinates (mapToScene): back to item coordinates,
+        // otherwise each save/load moves the object by its position (the image origin)
+//        setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
+        setRect(QRectF(mapFromScene(poly_tmp.at(0)),mapFromScene(poly_tmp.at(1))));
     } else {
         showMessage(tr("Error reading from file"));
     }

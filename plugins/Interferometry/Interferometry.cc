@@ -821,14 +821,18 @@ void Interferometry::addShape(){
         num++;
         QString tooltipStr="interpolateShape"+QLocale().toString(num);
         bool found =false;
-        foreach (QObject* widget, nparent->children()) {
-            nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->parent()==this) {
-                qDebug() << line->toolTip();
-                if (line->toolTip()==tooltipStr) {
-                    found=true;
-                }
-            }
+        // the shapes are children of the pan, not of nparent: the old search never found them and every new shape was "interpolateShape1"
+//        foreach (QObject* widget, nparent->children()) {
+//            nLine *line=qobject_cast<nLine *>(widget);
+//            if (line && line->parent()==this) {
+//                qDebug() << line->toolTip();
+//                if (line->toolTip()==tooltipStr) {
+//                    found=true;
+//                }
+//            }
+//        }
+        for (auto &it : my_shapes) {
+            if (it.second->toolTip()==tooltipStr) found=true;
         }
         if (!found) {
             addShape(tooltipStr);
@@ -923,11 +927,14 @@ void Interferometry::loadSettings(QSettings &settings){
     QStringList names=settings.value("interpolateShape").toStringList();
     foreach (QString name, names) {
         bool found=false;
-        foreach (QObject* widget, nparent->children()) {
-            nLine *line=qobject_cast<nLine *>(widget);
-            if (line && line->parent()==this) {
-                if (line->toolTip()==name) found=true;
-            }
+//        foreach (QObject* widget, nparent->children()) {
+//            nLine *line=qobject_cast<nLine *>(widget);
+//            if (line && line->parent()==this) {
+//                if (line->toolTip()==name) found=true;
+//            }
+//        }
+        for (auto &it : my_shapes) {
+            if (it.second->toolTip()==name) found=true; // sessions saved with duplicated names: one shape per name
         }
         if (!found) addShape(name);
     }
