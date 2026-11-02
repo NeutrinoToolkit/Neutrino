@@ -75,6 +75,10 @@ private:
     QPointF my_offset;
     QPointF my_offset_val;
     QPointF my_scale;
+    // celestial coordinates (FITS WCS, RA---TAN/DEC--TAN): CD matrix, my_offset=CRPIX, my_offset_val=CRVAL
+    bool my_tan=false;
+    double my_cd[2][2]={{1,0},{0,1}};
+    QPointF pixToWorld(QPointF fitsPixel) const;
 
     QVector<double> xvals;
     QVector<double> yvals;

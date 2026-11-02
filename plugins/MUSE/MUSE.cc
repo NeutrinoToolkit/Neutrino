@@ -123,6 +123,8 @@ void MUSE::horzScrollBarChanged(int value)
 
 void MUSE::xAxisChanged(QCPRange range)
 {
+	// the scroll bar follows the axis without moving it again (with the default range 0..99 it re-centred the axis on 99)
+	const QSignalBlocker block(horizontalScrollBar);
 	horizontalScrollBar->setValue(qRound(range.center()));
 	horizontalScrollBar->setPageStep(qRound(range.size()));
 }
@@ -221,28 +223,54 @@ void MUSE::plotClick(QMouseEvent* e) {
 }
 
 
+// FITS pixel (1-based, pixel centres on integers) -> RA, Dec in degrees, gnomonic projection (TAN) as in
+// Calabretta & Greisen 2002 (checked against astropy); linear when the header has no TAN celestial axes
+QPointF MUSE::pixToWorld(QPointF p) const {
+	const double dx=p.x()-my_offset.x(), dy=p.y()-my_offset.y();
+	if (!my_tan) {
+		return QPointF(dx*my_scale.x()+my_offset_val.x(), dy*my_scale.y()+my_offset_val.y());
+	}
+	const double deg=M_PI/180.0;
+	// intermediate world coordinates (radians on the projection plane)
+	const double X=(my_cd[0][0]*dx+my_cd[0][1]*dy)*deg;
+	const double Y=(my_cd[1][0]*dx+my_cd[1][1]*dy)*deg;
+	const double a0=my_offset_val.x()*deg, d0=my_offset_val.y()*deg;
+	const double den=cos(d0)-Y*sin(d0);
+	double ra=(a0+atan2(X,den))/deg;
+	const double dec=atan2(sin(d0)+Y*cos(d0), std::hypot(X,den))/deg;
+	ra=fmod(ra,360.0);
+	if (ra<0) ra+=360.0;
+	return QPointF(ra,dec);
+}
+
 void MUSE::updateLastPoint() {
 	doSpectrum(lastpoint);
 }
 
 void MUSE::doSpectrum(QPointF point) {
 
-	QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+	// QPoint pFloor(floor(point.x())+1.0,floor(point.y())+1.0);
+	// FITS pixel (1-based); the images are shown flipped (FITS row 1 at the bottom, north up)
+	const int Hfits = cubesize.size()==3 ? int(cubesize[1]) : 0;
+	QPoint pFloor(floor(point.x())+1.0, Hfits>0 ? Hfits-floor(point.y()) : floor(point.y())+1.0);
     qDebug() << pFloor;
     my_point->setPoint(point);
 
-	double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
-	double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
-
-	QPointF preal=QPointF(prealx,prealy);
+	// double prealx=(pFloor.x()-my_offset.x())*my_scale.x()+my_offset_val.x();
+	// double prealy=(pFloor.y()-my_offset.y())*my_scale.y()+my_offset_val.y();
+	//
+	// QPointF preal=QPointF(prealx,prealy);
+	// (linear: RA wrong by the 1/cos(Dec) of the projection, 4" on a MUSE cutout at Dec -28)
+	QPointF preal=pixToWorld(pFloor);
 
 	//    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
 
 	// if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
 	if (cubesize.size()==3 && point.x()>=0 && point.y()>=0 && point.x()<cubesize[0] && point.y()<cubesize[1]) {
 		lastpoint=pFloor;
-		vec2i p(point.x(),point.y());
+		// vec2i p(point.x(),point.y());
 		const int W=cubesize[0], H=cubesize[1], N=cubesize[2];
+		vec2i p(point.x(),H-1-int(point.y())); // row of the cube (the image is flipped)
 		const size_t surf=size_t(W)*H;
 		const int r=radius->value();
 		const int x0=std::max(0,p.x()-r), x1=std::min(W-1,p.x()+r);
@@ -276,9 +304,17 @@ void MUSE::showImagePlane(int z) {
 		my_phys->prop=cube_prop;
 
 		int offset=z*my_phys->getSurf();
+// #pragma omp parallel for
+// 		for (unsigned int k=0; k < my_phys->getSurf(); k++) {
+// 			my_phys->Timg_buffer[k]+=cubevect[offset+k];
+// 		}
+		// flipped vertically: FITS row 1 is the bottom of the image (north up)
+		const int W=cubesize[0], H=cubesize[1];
 #pragma omp parallel for
-		for (unsigned int k=0; k < my_phys->getSurf(); k++) {
-			my_phys->Timg_buffer[k]+=cubevect[offset+k];
+		for (int yy=0; yy<H; yy++) {
+			for (int xx=0; xx<W; xx++) {
+				my_phys->Timg_buffer[size_t(yy)*W+xx]+=cubevect[offset+size_t(H-1-yy)*W+xx];
+			}
 		}
 		my_phys->TscanBrightness();
 
@@ -387,6 +423,17 @@ void MUSE::loadCube() {
 			fits_get_hdu_type(fptr, &hdutype, &status);
             if (physFormat::fits_check_error(status)) return;
 
+			// tables (e.g. the catalogues of MUSE source files) are not images: the image calls fail on them
+			if (hdutype != IMAGE_HDU) {
+				fits_movrel_hdu(fptr, 1, nullptr, &status);
+				if (status == END_OF_FILE) {
+					status=0;
+					break;
+				}
+				if (physFormat::fits_check_error(status)) return;
+				continue;
+			}
+
 			if (hdutype == IMAGE_HDU) {
                 std::array<long,9> naxes={{1, 1, 1, 1, 1, 1, 1, 1, 1}};
 				int naxis = 0;
@@ -426,6 +473,7 @@ void MUSE::loadCube() {
 				DEBUG("wavelen " << wavelen);
 			}
 
+			my_tan=false; // the celestial coordinates of this HDU only
 			QString val_str1=extractData("CTYPE1",desc).toString();
 			QString val_str2=extractData("CTYPE2",desc).toString();
 			qDebug() << val_str1 << val_str2;
@@ -437,15 +485,29 @@ void MUSE::loadCube() {
 					qDebug() << "CRPIX1" << val_dbl1 << val_dbl2;
 					my_offset=QPointF(val_dbl1,val_dbl2);
 				}
-				val_dbl1=extractData("CD1_2",desc).toDouble(&ok1);
-				val_dbl2=extractData("CD2_1",desc).toDouble(&ok2);
-				if(ok1 && ok2 && val_dbl1==0 && val_dbl2==0) {
-					val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
-					val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
-					if(ok1 && ok2) {
-						qDebug() << "CD1_1" << val_dbl1 << val_dbl2;
-						my_scale=QPointF(val_dbl1,val_dbl2);
-					}
+				// val_dbl1=extractData("CD1_2",desc).toDouble(&ok1);
+				// val_dbl2=extractData("CD2_1",desc).toDouble(&ok2);
+				// if(ok1 && ok2 && val_dbl1==0 && val_dbl2==0) {
+				// 	val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
+				// 	val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
+				// 	if(ok1 && ok2) {
+				// 		qDebug() << "CD1_1" << val_dbl1 << val_dbl2;
+				// 		my_scale=QPointF(val_dbl1,val_dbl2);
+				// 	}
+				// }
+				// full CD matrix (CD1_2 and CD2_1 are 0 when missing)
+				val_dbl1=extractData("CD1_1",desc).toDouble(&ok1);
+				val_dbl2=extractData("CD2_2",desc).toDouble(&ok2);
+				if(ok1 && ok2) {
+					my_scale=QPointF(val_dbl1,val_dbl2);
+					my_cd[0][0]=val_dbl1;
+					my_cd[1][1]=val_dbl2;
+					bool ok;
+					double val=extractData("CD1_2",desc).toDouble(&ok);
+					my_cd[0][1]= ok ? val : 0.0;
+					val=extractData("CD2_1",desc).toDouble(&ok);
+					my_cd[1][0]= ok ? val : 0.0;
+					my_tan=true;
 				}
 				val_dbl1=extractData("CRVAL1",desc).toDouble(&ok1);
 				val_dbl2=extractData("CRVAL2",desc).toDouble(&ok2);
@@ -533,7 +595,8 @@ void MUSE::loadCube() {
 #pragma omp parallel for
 					for (int yy=0; yy<H; yy++) {
 						for (int l=0; l<N; l++) {
-							const double *row=&cubevect[l*surf+size_t(yy)*W];
+							// const double *row=&cubevect[l*surf+size_t(yy)*W];
+							const double *row=&cubevect[l*surf+size_t(H-1-yy)*W]; // flipped: north up
 							for (int xx=0; xx<W; xx++) {
 								if (std::isfinite(row[xx])) {
 									meanSlice->Timg_buffer[size_t(yy)*W+xx]+=row[xx];
@@ -554,6 +617,11 @@ void MUSE::loadCube() {
 					plot->graph(0)->setName("Mean spectrum");
 					plot->graph(0)->setData(xvals,ymean,true);
 
+					// scroll bar over the wavelengths of the cube (it was left at 0..99)
+					if (xvals.size()>0) {
+						const QSignalBlocker block(horizontalScrollBar);
+						horizontalScrollBar->setRange(qFloor(std::min(xvals.first(),xvals.last())), qCeil(std::max(xvals.first(),xvals.last())));
+					}
 					plot->rescaleAxes();
 					plot->replot();
 

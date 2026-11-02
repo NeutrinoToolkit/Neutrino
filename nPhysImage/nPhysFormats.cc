@@ -23,6 +23,7 @@
  *
  */
 #include "nPhysFormats.h"
+#include <memory>
 #include "NaNStream.h"
 #include "bidimvec.h"
 #include "nPhysMaths.h"
@@ -1457,6 +1458,9 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
     int status = 0, ii;
 
     fits_open_file(&fptr, ifilename.c_str(), READONLY, &status);
+    if (physFormat::fits_check_error(status)) return retVec;
+    // closed on every way out, also when fits_check_error throws
+    std::unique_ptr<fitsfile, void(*)(fitsfile*)> fileCloser(fptr, [](fitsfile *f) { int st=0; fits_close_file(f, &st); });
     int bitpix;
     int anaxis;
 
@@ -1481,6 +1485,27 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
         if (physFormat::fits_check_error(status)) return retVec;
 
         DEBUG("fits_get_hdu_type " << hdutype);
+
+        // tables (e.g. the catalogues of MUSE source files) are not images: the image calls fail on them
+        if (hdutype != IMAGE_HDU) {
+            fits_movrel_hdu(fptr, 1, nullptr, &status);
+            if (status == END_OF_FILE) {
+                status=0;
+                break;
+            }
+            if (physFormat::fits_check_error(status)) return retVec;
+            continue;
+        }
+
+        // name of the extension, if any (files with many images)
+        {
+            char extname[FLEN_VALUE];
+            int st=0;
+            if (fits_read_key_str(fptr, "EXTNAME", extname, nullptr, &st)==0 && extname[0]) {
+                phys.setShortName(extname);
+            }
+            fits_clear_errmsg();
+        }
         
         
         // 		if (hdutype == IMAGE_HDU) {
@@ -1600,8 +1625,8 @@ std::vector <physD> physFormat::phys_open_fits(std::string ifilename) {
             return retVec;
         }
     }
-    fits_close_file(fptr, &status);
-    physFormat::fits_check_error(status);
+    // fits_close_file(fptr, &status);
+    // physFormat::fits_check_error(status);
 #endif
     DEBUG("out of here");
     return retVec;
