@@ -102,17 +102,26 @@ Contours::on_draw_pb_released()
 		if (contour.size() > 1) {
 			// qDebug() << contour.size();
 
-			// set polygon
-            QPolygonF myp;
-			for (auto &p : contour) {
-				myp<<QPointF(p.x(), p.y());
-			}
-			my_c->setPoints(myp);
-			my_c->toggleClosedLine(true);
+			// // set polygon
+            // QPolygonF myp;
+			// for (auto &p : contour) {
+			// 	myp<<QPointF(p.x(), p.y());
+			// }
+			// my_c->setPoints(myp);
+			// my_c->toggleClosedLine(true);
 			if (moveOrigin->isChecked() && currentBuffer->get_origin()!=vec2f(centr.x(),centr.y())) {
 				currentBuffer->set_origin(centr);
 				nparent->emitPhysChanged(currentBuffer);
 			}
+			// set polygon (after the origin change): the line sits at the image origin, its points are
+			// relative to it; the contour is in pixel coordinates, pixel (i,j) has its centre at (i+0.5,j+0.5)
+			vec2f orig=currentBuffer->get_origin();
+            QPolygonF myp;
+			for (auto &p : contour) {
+				myp<<QPointF(p.x()+0.5-orig.x(), p.y()+0.5-orig.y());
+			}
+			my_c->setPoints(myp);
+			my_c->toggleClosedLine(true);
             statusBar()->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
 		} else {
             statusBar()->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
