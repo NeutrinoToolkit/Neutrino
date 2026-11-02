@@ -51,6 +51,7 @@ ZoomWin::ZoomWin(neutrino *nparent) : nGenericPan(nparent)
 void ZoomWin::updatePlot(QPointF p) {
     lastPoint=p;
     my_view->centerOn(p);
+    my_view->setMark(p);
 }
 
 void ZoomWin::changeZoom(double val) {

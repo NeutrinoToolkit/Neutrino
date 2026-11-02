@@ -214,6 +214,8 @@ void Integral_inversion::doInversion() {
             }
             
             nPhysD *invert = new nPhysD(inv_image);
+            // never replace one of the inputs (the previous result chosen as image or reference)
+            if (invertedPhys==my_phys || (refphase_checkb->isChecked() && invertedPhys==getPhysFromCombo(refphase_cb))) invertedPhys=nullptr;
             if (erasePrevious->isChecked()) {
                 invertedPhys=nparent->replacePhys(invert,invertedPhys);
 			} else {

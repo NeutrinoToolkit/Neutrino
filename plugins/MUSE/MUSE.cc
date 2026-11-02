@@ -28,6 +28,7 @@
 #include "neutrino.h"
 #include "nPhysFormats.h"
 #include "fitsio.h"
+#include <memory>
 
 #define HDF5_MAX_NAME 2048
 
@@ -67,13 +68,14 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	setProperty("NeuSave-MUSEprefix","spec_");
 	setProperty("NeuSave-MUSEdir",QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
 	qDebug() << property("NeuSave-MUSEdir");
-	my_timer.setInterval(property("NeuSave-interval").toInt());
+	setProperty("NeuSave-interval",100);
 	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
 
     connect(nparent->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
     connect(nparent, &neutrino::physDel, this, &MUSE::forgetPhys);
 
 	show();
+	my_timer.setInterval(property("NeuSave-interval").toInt());
 	on_actionMode_toggled();
 
     QShortcut *openFile = new QShortcut(QKeySequence(Qt::Key_O),this);
@@ -94,7 +96,7 @@ void MUSE::on_actionMovie_triggered() {
 void MUSE::nextPlane(){
 	DEBUG("here" << slices->value());
 
-	slices->setValue((slices->value()+1)%slices->maximum());
+	slices->setValue((slices->value()+1)%(slices->maximum()+1));
 }
 
 // an image we created was closed by the user
@@ -144,7 +146,7 @@ void MUSE::on_actionExportTxt_triggered() {
 		QString dirNamestr = QFileDialog::getExistingDirectory(this,tr("Spectra dir"),dirName.path());
 		if (QFileInfo(dirNamestr).isDir()) {
 			setProperty("NeuSave-MUSEdir",dirNamestr);
-			dirName.setCurrent(dirNamestr);
+			dirName.setPath(dirNamestr);
 		} else {
 			statusbar->showMessage("Cannot change to dir "+ dirNamestr+ ". Using"+ dirName.path());
 		}
@@ -152,6 +154,7 @@ void MUSE::on_actionExportTxt_triggered() {
 		QString text = QInputDialog::getText(this, tr("Prefix"),tr("Spectrum File prefix:"), QLineEdit::Normal, prefix, &ok);
 		if (ok) {
 			setProperty("NeuSave-MUSEprefix",text);
+			prefix=text;
 		} else {
 			return;
 		}
@@ -161,8 +164,6 @@ void MUSE::on_actionExportTxt_triggered() {
 	QString fname(prefix+QString("%1_%2.txt").arg(lastpoint.x(), max_len, 10, QLatin1Char('0')).arg(lastpoint.y(), max_len, 10, QLatin1Char('0')));
 	QFile t(dirName.filePath(fname));
 	qDebug() << fname<<    t.fileName();
-	// t.open(QIODevice::WriteOnly| QIODevice::Text);
-	// if (t.isOpen()) {
 	if (t.open(QIODevice::WriteOnly| QIODevice::Text)) {
 		QTextStream out(&t);
 		QLocale loc("C");
@@ -179,12 +180,16 @@ void MUSE::on_actionExportTxt_triggered() {
 void MUSE::keyPressEvent (QKeyEvent *e) {
 	int delta = (e->modifiers() & Qt::ShiftModifier) ? 10 : 1;
 	switch (e->key()) {
-		case Qt::Key_Left:
-			slices->setValue((slices->maximum()+slices->value()-delta)%slices->maximum());
+		case Qt::Key_Left: {
+			int n=slices->maximum()+1;
+			slices->setValue(((slices->value()-delta)%n+n)%n);
 			break;
-		case Qt::Key_Right:
-			slices->setValue((slices->maximum()+slices->value()+delta)%slices->maximum());
+		}
+		case Qt::Key_Right: {
+			int n=slices->maximum()+1;
+			slices->setValue((slices->value()+delta)%n);
 			break;
+		}
 		case Qt::Key_S:
 			on_actionExportTxt_triggered();
 			break;
@@ -209,7 +214,7 @@ void MUSE::keyPressEvent (QKeyEvent *e) {
 void MUSE::plotClick(QMouseEvent* e) {
 	QPointF my_pos(plot->xAxis->pixelToCoord(e->pos().x()),plot->yAxis->pixelToCoord(e->pos().y()));
 	if (my_pos.x()>plot->xAxis->range().lower && my_pos.x()<plot->xAxis->range().upper  && my_pos.y()>plot->yAxis->range().lower && my_pos.y()<plot->yAxis->range().upper ) {
-        int nslice=abs(xvals.size()*(my_pos.x()-wavelen.first())/(wavelen.second()-wavelen.first()));
+        int nslice=qRound((my_pos.x()-wavelen.first())/wavelen.second());
         qDebug() << my_pos << nslice;
         showImagePlane(nslice);
 	}
@@ -233,22 +238,24 @@ void MUSE::doSpectrum(QPointF point) {
 
 	//    qDebug() << toNum(pFloor) << toNum(my_offset) << toNum(my_scale) << toNum(my_offset_val) << toNum(preal);
 
-	if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
+	// if (cubesize.size()==3 && point.x()>0 && point.y()>0 &&  point.x()*point.y() < cubesize[0]*cubesize[1]) {
+	if (cubesize.size()==3 && point.x()>=0 && point.y()>=0 && point.x()<cubesize[0] && point.y()<cubesize[1]) {
 		lastpoint=pFloor;
 		vec2i p(point.x(),point.y());
-		for (int zz=0; zz< yvals.size(); zz++) {
-			yvals[zz]=0;
-		}
-
-		int surf=cubesize[0]*cubesize[1];
-
-#pragma omp parallel for collapse(3)
-		for (int xx=std::max((int)0,p.x()-radius->value());xx<=std::min((int)(cubesize[0]),p.x()+radius->value()); xx++) {
-			for (int yy=std::max((int)0,p.y()-radius->value());yy<=std::min((int)(cubesize[1]),p.y()+radius->value()); yy++) {
-				for (unsigned int zz=0; zz< cubesize[2]; zz++) {
-					yvals[zz]+=cubevect[xx+yy*cubesize[0]+zz*surf];
+		const int W=cubesize[0], H=cubesize[1], N=cubesize[2];
+		const size_t surf=size_t(W)*H;
+		const int r=radius->value();
+		const int x0=std::max(0,p.x()-r), x1=std::min(W-1,p.x()+r);
+		const int y0=std::max(0,p.y()-r), y1=std::min(H-1,p.y()+r);
+#pragma omp parallel for
+		for (int zz=0; zz<N; zz++) {
+			double sum=0;
+			for (int yy=y0; yy<=y1; yy++) {
+				for (int xx=x0; xx<=x1; xx++) {
+					sum+=cubevect[xx+size_t(yy)*W+zz*surf];
 				}
 			}
+			yvals[zz]=sum;
 		}
 		plot->graph(1)->setData(xvals,yvals,true);
         QString spec_name("("+locale().toString(pFloor.x())+","+locale().toString(pFloor.y())+ ") Ra:" + locale().toString(preal.x(),'g',8)+" Dec:" +locale().toString(preal.y(),'g',8));
@@ -264,7 +271,7 @@ void MUSE::showImagePlane(int z) {
 	disconnect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 	slices->setValue(z);
 	slicesSlider->setValue(z);
-	if (cubesize.size()==3 && z < (int)cubesize[2]) {
+	if (cubesize.size()==3 && z>=0 && z < (int)cubesize[2]) {
         nPhysD *my_phys=new nPhysD(cubesize[0],cubesize[1],0.0,locale().toString(z).toStdString());
 		my_phys->prop=cube_prop;
 
@@ -358,6 +365,10 @@ void MUSE::loadCube() {
 		int status = 0, ii;
 
         fits_open_file(&fptr, QFile::encodeName(fname).constData(), READONLY, &status);
+        if (physFormat::fits_check_error(status)) return;
+        // closed on every way out of this block
+        std::unique_ptr<fitsfile, void(*)(fitsfile*)> fileCloser(fptr, [](fitsfile *f) { int st=0; fits_close_file(f, &st); });
+        cube_prop=phys_properties(); // headers of a previous file
 		int bitpix;
 		int anaxis;
 
@@ -473,6 +484,11 @@ void MUSE::loadCube() {
 					cubevect.resize(totalsize);
 					cubesize.resize(anaxis);
                     fits_read_pix(fptr, TDOUBLE, &fpixel[0], totalsize, nullptr, (void *)&cubevect[0], nullptr, &status);
+                    if (physFormat::fits_check_error(status)) {
+                        cubevect.clear();
+                        cubesize.clear();
+                        return;
+                    }
 					DEBUG("got a cube : " << totalsize << " = " << axissize[0] << " x " << axissize[1] << " x " << axissize[2]);
 					for(int i=0; i<anaxis; i++) {
 						cubesize[i]=axissize[i];
@@ -489,18 +505,19 @@ void MUSE::loadCube() {
 						xvals[zz]=wavelen.first()+zz*wavelen.second();
 						ymean[zz]=0;
 					}
-					int surf=cubesize[0]*cubesize[1];
-					std::vector<unsigned int> not_nan(ymean.size(),0);
+					const size_t surf=size_t(cubesize[0])*cubesize[1];
 #pragma omp parallel for
-					for (unsigned int kk=0;kk<totalsize; kk++) {
-						if (std::isfinite(cubevect[kk])) {
-							ymean[kk/surf]+=cubevect[kk];
-							not_nan[kk/surf]++;
+					for (int zz=0; zz<(int)cubesize[2]; zz++) {
+						double sum=0;
+						size_t n=0;
+						for (size_t k=0; k<surf; k++) {
+							double val=cubevect[zz*surf+k];
+							if (std::isfinite(val)) {
+								sum+=val;
+								n++;
+							}
 						}
-					}
-
-					for (int xx=0; xx< xvals.size(); xx++) {
-						ymean[xx]/=not_nan[xx];
+						ymean[zz]=sum/n; // NaN for an empty plane
 					}
 
 					progress.setLabelText("Mean image");
@@ -512,18 +529,21 @@ void MUSE::loadCube() {
 
 					meanSlice->prop=cube_prop;
 
-#pragma omp parallel for collapse(2)
-					for (unsigned int l=0; l < cubesize[2]; l++) {
-						for (int k=0; k < surf; k++) {
-							double val=cubevect[l*surf+k];
-							if (std::isfinite(val)) {
-								meanSlice->Timg_buffer[k]+=val;
-								my_num.Timg_buffer[k]++;
+					const int W=cubesize[0], H=cubesize[1], N=cubesize[2];
+#pragma omp parallel for
+					for (int yy=0; yy<H; yy++) {
+						for (int l=0; l<N; l++) {
+							const double *row=&cubevect[l*surf+size_t(yy)*W];
+							for (int xx=0; xx<W; xx++) {
+								if (std::isfinite(row[xx])) {
+									meanSlice->Timg_buffer[size_t(yy)*W+xx]+=row[xx];
+									my_num.Timg_buffer[size_t(yy)*W+xx]++;
+								}
 							}
 						}
 					}
 #pragma omp parallel for
-					for (int k=0; k < surf; k++) {
+					for (int k=0; k < (int)surf; k++) {
 						meanSlice->Timg_buffer[k]/=my_num.Timg_buffer[k];
 					}
 
@@ -537,8 +557,8 @@ void MUSE::loadCube() {
 					plot->rescaleAxes();
 					plot->replot();
 
-					slices->setMaximum(axissize[2]);
-					slicesSlider->setMaximum(axissize[2]);
+					slices->setMaximum(axissize[2]-1);
+					slicesSlider->setMaximum(axissize[2]-1);
 
 					showImagePlane(slices->value());
 					break;
