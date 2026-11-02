@@ -1,9 +1,5 @@
 name: build
 
-# Cirrus CI shut down on June 1, 2026: all its tasks (.cirrus.yml) now live here.
-# Every branch is built; master publishes to the "Latest" release (tag latest),
-# modernization to the "modernization" prerelease (tag latest-modernization).
-
 on: push
 
 concurrency:
@@ -146,7 +142,7 @@ jobs:
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
-        cp Neutrino*.rpm ..
+        cp Neutrino*.rpm ../Neutrino-Linux-x86_64-openSUSE-Tumbleweed.rpm
     - name: PythonQt logs
       if: failure()
       run: tail -n 80 build/_deps/pythonqt-build/*.log || true
@@ -187,8 +183,7 @@ jobs:
         name: opensuseleap
         path: Neutrino-*.*
 
-  # macIntel (was GitHub Actions) and macM1 (was Cirrus)
-  mac:
+  mac-arm:
     strategy:
       fail-fast: false
       matrix:
@@ -227,10 +222,6 @@ jobs:
           Neutrino-*.zip
           Neutrino-*.dmg
 
-  # Intel Macs: Homebrew no longer ships Intel bottles, MacPorts still has prebuilt x86_64 binaries
-  # (a port just updated may have no binary yet: it is compiled, timeout-minutes avoids hours of compiling).
-  # MacPorts builds them for the runner's macOS: the app needs macOS 15 or later.
-  # No OpenCL/clFFT for now
   mac-intel:
     continue-on-error: true
     timeout-minutes: 120
@@ -300,23 +291,6 @@ jobs:
         make -j$(nproc) bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
         make install bin_PROGRAMS= sbin_PROGRAMS= noinst_PROGRAMS=
         cd ..
-        # HDF4 4.2.10 with autotools and the MXE patches (needed -std=gnu17 -fpermissive with GCC >= 14)
-        # wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.10/src/hdf-4.2.10.tar.bz2
-        # tar -jxvf hdf-4.2.10.tar.bz2 && cd hdf-4.2.10
-        # wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-1-portability-fixes.patch
-        # wget https://raw.githubusercontent.com/iltommi/mxe/master/src/hdf4-2-dllimport.patch
-        # patch -p1 -u < hdf4-1-portability-fixes.patch
-        # patch -p1 -u < hdf4-2-dllimport.patch
-        # libtoolize --force
-        # autoreconf --install
-        # ${MINGW}-configure --disable-static --enable-shared --disable-fortran --disable-netcdf LIBS="-lportablexdr -lws2_32"  CPPFLAGS="-DH4_F77_FUNC\(name,NAME\)=NAME -DH4_BUILT_AS_DYNAMIC_LIB=1 -DBIG_LONGS" CFLAGS="$(rpm --eval %{${MINGW}_cflags}) -std=gnu17 -fpermissive"
-        # make -C mfhdf/xdr LDFLAGS="-no-undefined -lssp"
-        # make -C hdf/src LDFLAGS="-no-undefined -lssp"
-        # make -C hdf/src install
-        # make -C mfhdf/libsrc LDFLAGS="-no-undefined -ldf"
-        # make -C mfhdf/libsrc install
-        # cd ..
-        # HDF4 >= 4.3 builds for MinGW with CMake, no patches needed (libdf is now libhdf)
         wget https://github.com/HDFGroup/hdf4/releases/download/hdf4.4.0/hdf4.4.0.tar.gz
         echo "f69afb6362529c606f05fb4c95279316497c68bea9ed7794683b31544163e286  hdf4.4.0.tar.gz" | sha256sum -c -
         tar -xzf hdf4.4.0.tar.gz
@@ -334,9 +308,6 @@ jobs:
         name: ${{ matrix.arch }}
         path: Neutrino-*.*
 
-  # an AppImage runs only where glibc is at least the one it was built with:
-  # AppImage and AppImageArm (Fedora 44, glibc 2.43, newest Qt) for recent distributions,
-  # AppImage_olderLinux and AppImageArm_olderLinux (AlmaLinux 9, glibc 2.34, Qt 6.6) for RHEL 9, Ubuntu 22.04, Debian 12 and newer
   AppImage:
     strategy:
       fail-fast: false
@@ -418,7 +389,6 @@ jobs:
         name: ${{ matrix.name }}
         path: Neutrino-*.AppImage
 
-  # was the Cirrus upload task + EndBug/latest-tag + xresloader/upload-to-github-release
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac.result == 'success' && needs.windows.result == 'success' }}
     needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac, mac-intel, windows, AppImage]
@@ -437,7 +407,6 @@ jobs:
       run: |
         ls -l package
         if [ "$GITHUB_REF_NAME" = "master" ]; then RELTAG=latest; else RELTAG=latest-$GITHUB_REF_NAME; fi
-        # move the tag to this commit (refs/tags/ avoids clashes with a branch of the same name)
         git tag -f $RELTAG $GITHUB_SHA
         git push -f origin refs/tags/$RELTAG
         gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $GITHUB_REF_NAME --notes "Builds of the $GITHUB_REF_NAME branch" --verify-tag
