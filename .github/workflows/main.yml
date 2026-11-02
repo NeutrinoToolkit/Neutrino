@@ -29,7 +29,7 @@ jobs:
       run: |
         git config --global --add safe.directory '*'
         # apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*"
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*" librsvg2-bin
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -55,7 +55,7 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan* libnetpbm11-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev librsvg2-bin
         apt-get install -yy qml6-module*
         mkdir build && cd build
         cmake ..
@@ -83,7 +83,7 @@ jobs:
       run: |
         git config --global --add safe.directory '*'
         # apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
-        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*"
+        apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*" librsvg2-bin
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -113,7 +113,7 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install gcc gcc-c++ git qt6-* libtiff-devel gsl-devel lsb_release blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel
+        dnf -y install gcc gcc-c++ git qt6-* libtiff-devel gsl-devel lsb_release blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build python3-devel librsvg2-tools
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -142,7 +142,7 @@ jobs:
         zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
         zypper --gpg-auto-import-keys ref
         zypper update -y
-        zypper install -y --force-resolution gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
+        zypper install -y --force-resolution gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel rsvg-convert
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
@@ -172,7 +172,7 @@ jobs:
         zypper --non-interactive --quiet ar -C https://download.opensuse.org/repositories/science/$(. /etc/os-release; echo $VERSION_ID)/science.repo
         zypper --gpg-auto-import-keys ref
         zypper update -y
-        zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel
+        zypper install -y gcc gcc-c++ qt6-* lsb-release libtiff-devel gsl-devel blas-devel pandoc hdf5-devel cfitsio-devel fftw3-threads-devel rpm-build git python3-devel rsvg-convert
         mkdir build && cd build
         export compiler=$(ls -1 /usr/bin/g++-[0-9][0-9])
         cmake -DCMAKE_CXX_COMPILER=$compiler  ..
@@ -204,7 +204,7 @@ jobs:
       run: |
         brew update
         brew install objc-codegenutils objc-run
-        brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers python
+        brew install libomp git cmake fftw gcc qt lcov pkg-config zlib cmake libtiff cfitsio hdf5 gsl pandoc vulkan-headers python librsvg
         brew install boost
     - name: Deps
       run: |
@@ -236,7 +236,7 @@ jobs:
     timeout-minutes: 120
     runs-on: macos-15-intel
     env:
-      PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig
+      PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig librsvg
     steps:
     - uses: actions/checkout@v4
       with:
@@ -292,7 +292,7 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-libjpeg-turbo pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel
+        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-libjpeg-turbo pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel librsvg2-tools
         wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
         tar -zxvf fftw-3.3.6-pl2.tar.gz
         cd fftw-3.3.6-pl2
@@ -386,7 +386,7 @@ jobs:
         git config --global --add safe.directory '*'
         # dnf -y install gcc gcc-c++ <matrix.pkgs> libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
         if grep -q '^ID="almalinux"' /etc/os-release; then dnf -y install epel-release && dnf config-manager --set-enabled crb; fi
-        dnf -y install gcc gcc-c++ cmake make lsb_release libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw-devel rpm-build "qt6-*-devel" git wget file python3-devel python3-pip
+        dnf -y install gcc gcc-c++ cmake make lsb_release libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw-devel rpm-build "qt6-*-devel" git wget file python3-devel python3-pip librsvg2-tools
         # EPEL 9 pandoc is 2.14 (no --embed-resources, needs >= 2.19): use the official static pandoc instead
         if grep -q '^ID="almalinux"' /etc/os-release; then
           dnf -y remove pandoc pandoc-common

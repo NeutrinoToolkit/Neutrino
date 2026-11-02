@@ -1,13 +1,16 @@
 SVGs = $(wildcard *.svg) 
 PNGs := $(patsubst %.svg, %.png, $(SVGs))
 # dark mode icons (selected at startup by nApp): generated from the light ones by darkify.py
+# (the build makes them itself, see src/CMakeLists.txt: here only to preview them, with "make dark dark-plugins")
 DARK_SVGs := $(patsubst %.svg, dark/%.svg, $(SVGs))
 DARK_PNGs := $(patsubst %.svg, dark/%.png, $(SVGs))
 
 INKSCAPE= /Applications/Inkscape.app/Contents/MacOS/inkscape
 
-# all: $(PNGs)
-all: $(PNGs) $(DARK_PNGs)
+all: $(PNGs)
+# all: $(PNGs) $(DARK_PNGs)
+
+dark: $(DARK_PNGs)
 
 %.png:%.svg
 	$(INKSCAPE) $< -o $@ 
@@ -36,7 +39,7 @@ $(dir $(1))dark/$(notdir $(1)): $(1:.png=.svg) darkify.py
 endef
 $(foreach p,$(PLUGIN_ICONS),$(eval $(call DARK_PLUGIN_RULE,$(p))))
 
-all: $(PLUGIN_DARK_PNGs)
+# all: $(PLUGIN_DARK_PNGs)
 
 dark-plugins: $(PLUGIN_DARK_PNGs)
 

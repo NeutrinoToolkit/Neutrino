@@ -2,18 +2,10 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    height="600"
    id="svg1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="help.svg"
+   sodipodi:docname="dv_help.svg"
    sodipodi:version="0.32"
    version="1.0"
    width="600"
@@ -21,7 +13,15 @@
    y="0"
    inkscape:export-filename="/Users/tommaso/local/src/neutrinoMaster/resources/icons/help.png"
    inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-ydpi="90"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <metadata
      id="metadata3">
     <rdf:RDF>
@@ -93,14 +93,22 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="text5716"
      showguides="true"
-     inkscape:guide-bbox="true">
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid3846"
        empspacing="5"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="0"
+       originy="0"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
   </sodipodi:namedview>
   <defs
      id="defs3">
@@ -10762,16 +10770,10 @@
      style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      id="text5716"
      transform="matrix(12.324674,0,0,12.324674,-2286.6164,-2614.9539)">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:39.02703476px;line-height:125%;font-family:'.SF NS Display Condensed';-inkscape-font-specification:'.SF NS Display Condensed, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="200.71652"
-       y="250.17694"
+    <path
+       style="font-weight:bold;font-size:39.027px;line-height:1.25;font-family:'.SF NS Display Condensed';-inkscape-font-specification:'.SF NS Display Condensed, Bold'"
+       d="m 214.22733,240.57264 h -6.87927 v -0.93375 q 0,-1.56261 0.62886,-2.76314 0.62885,-1.2196 2.6488,-3.0871 l 1.2196,-1.10526 q 1.0862,-0.99092 1.58166,-1.8675 0.51451,-0.87658 0.51451,-1.75317 0,-1.33393 -0.91469,-2.07712 -0.9147,-0.76224 -2.55353,-0.76224 -1.54355,0 -3.33482,0.64791 -1.79128,0.62885 -3.73501,1.88656 v -5.98364 q 2.30579,-0.80035 4.21141,-1.18148 1.90561,-0.38112 3.67784,-0.38112 4.6497,0 7.08889,1.90561 2.43918,1.88656 2.43918,5.52629 0,1.8675 -0.74319,3.35388 -0.74319,1.46733 -2.53447,3.16332 l -1.21959,1.0862 q -1.29582,1.18148 -1.696,1.90562 -0.40018,0.70508 -0.40018,1.5626 z m -6.87927,2.82031 h 6.87927 v 6.78399 h -6.87927 z"
        id="text5717"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan5719"
-         x="200.71652"
-         y="250.17694">?</tspan></text>
+       aria-label="?" />
   </g>
 </svg>
