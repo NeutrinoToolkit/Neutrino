@@ -35,6 +35,8 @@ ZoomWin::ZoomWin(neutrino *nparent) : nGenericPan(nparent)
     connect(actionLockClick, SIGNAL(toggled(bool)), this, SLOT(setBehaviour()));
     my_view->setInteractive(true);
     connect(my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
+    toolBar->addWidget(lineWidth);
+    connect(lineWidth, &QSpinBox::valueChanged, my_view, &ZoomView::setLineWidth);
 
     show();
     setBehaviour();
@@ -43,6 +45,7 @@ ZoomWin::ZoomWin(neutrino *nparent) : nGenericPan(nparent)
     // my_view->scale(2,2);
     // (multiplied the zoom restored by show(): the view was at twice the value shown)
     changeZoom(my_scale->value());
+    my_view->setLineWidth(lineWidth->value()); // restored by show()
     // centred on the mouse from the start (it showed the corner of the scene until the mouse moved)
     updatePlot(nparent->my_view->my_mouse.pos());
 

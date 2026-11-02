@@ -19,9 +19,12 @@ class ZoomView : public QGraphicsView
     void drawForeground(QPainter* painter, const QRectF& rect) override;
     // point marked by the cross (the view can't be centred on it near the edges of the scene)
     void setMark(QPointF p) { mark=p; viewport()->update(); }
+    // width of the diagonals in screen pixels (0: not drawn)
+    void setLineWidth(int w) { lineWidth=w; viewport()->update(); }
 
 private:
     QPointF mark;
+    int lineWidth=1;
 };
 
 #endif

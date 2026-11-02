@@ -287,7 +287,10 @@ void nGenericPan::show(bool onlyOneAllowed) {
         }
     }
 
-    if (!(QGuiApplication::keyboardModifiers() & Qt::AltModifier)) {
+    // if (!(QGuiApplication::keyboardModifiers() & Qt::AltModifier)) {
+    // Alt alone (e.g. Alt+click on the menu) opens the pan without its saved values;
+    // not Ctrl+Alt: it is held by the shortcuts of some plugins (ZoomWin Ctrl+Alt+Z, Colorscale Ctrl+Alt+C...)
+    if (QGuiApplication::keyboardModifiers() != Qt::AltModifier) {
         QApplication::processEvents();
         loadDefaults();
         QApplication::processEvents();
