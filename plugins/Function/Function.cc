@@ -146,7 +146,10 @@ void Function::on_doIt_released() {
     QStringList functions_str=text.split(QRegularExpression("^\\s*<br>\\s*$", QRegularExpression::MultilineOption), Qt::SkipEmptyParts);
 
     std::vector<nPhysD*> created;
+    int searchFrom=0; // position of each expression in the text (for the cursor on errors)
     for (auto &function_str :functions_str) {
+        int blockStart=std::max(0,(int)text.indexOf(function_str,searchFrom));
+        searchFrom=blockStart+function_str.size();
         if (function_str.trimmed().isEmpty()) continue;
 
         exprtk::parser<double> parser;
@@ -180,7 +183,8 @@ void Function::on_doIt_released() {
             for (std::size_t i = 0; i < parser.error_count(); ++i) {
                 exprtk::parser_error::type error = parser.get_error(i);
                 QTextCursor my_cursor=function->textCursor();
-                my_cursor.setPosition(error.token.position);
+                // my_cursor.setPosition(error.token.position);
+                my_cursor.setPosition(std::min<int>(blockStart+error.token.position, function->toPlainText().size()));
                 function->setTextCursor(my_cursor);
                 qWarning() << "Error #" << i << error.token.position << QString::fromStdString(exprtk::parser_error::to_str(error.mode)) << QString::fromStdString(error.diagnostic.c_str());
             }
