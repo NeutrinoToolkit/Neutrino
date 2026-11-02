@@ -262,7 +262,10 @@ FocalSpot::find_contour(double th)
             my_w.plot->replot();
 //  END PLOT radius
 
-            nContour->setPoints(myp);
+            // nContour->setPoints(myp);
+            // the line sits at the image origin, its points are relative to it;
+            // the contour is in pixel coordinates, pixel (i,j) has its centre at (i+0.5,j+0.5)
+            nContour->setPoints(myp.translated(0.5-currentBuffer->get_origin().x(), 0.5-currentBuffer->get_origin().y()));
             nContour->show();
         } else {
             my_w.statusBar->showMessage("Contour not ok", 5000);
