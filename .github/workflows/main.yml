@@ -187,8 +187,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-15-intel: Homebrew no longer ships Intel bottles (qt, gcc, python...), everything builds from source for hours
-        # os: [macos-15-intel, macos-15]
         os: [macos-15]
     runs-on: ${{ matrix.os }}
     steps:
@@ -391,7 +389,7 @@ jobs:
 
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac.result == 'success' && needs.windows.result == 'success' }}
-    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac, mac-intel, windows, AppImage]
+    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
     runs-on: ubuntu-latest
     permissions:
       contents: write
