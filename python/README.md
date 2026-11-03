@@ -22,11 +22,12 @@ Installation
 pip install neutrino-imaging
 ```
 
-or a wheel of the CI (`pip install neutrino_imaging-*.whl`). It needs python >= 3.12 and installs PySide6 and numpy:
+or a wheel of the CI (`pip install neutrino_imaging-*.whl`). It needs python >= 3.10 and installs PySide6 and numpy:
 the module uses the Qt of PySide6 (the wheels have no Qt). Wheels: Linux x86_64 and aarch64, macOS >= 15
-(arm64 and x86_64).
+(arm64 and x86_64), Windows x86_64.
 
-From the sources (`pip install .` in the Neutrino folder, or the cmake build: `PYTHONPATH=<build>/python`), see
+From the sources (`pip install .` in the Neutrino folder, or the cmake build with `-DNEUTRINO_PYTHON_MODULE=ON`:
+`PYTHONPATH=<build>/python`), see
 `CMakeLists.txt` and `Wheel.cmake` here.
 
 Without PySide6 (a module built against another Qt), `neutrino.app()` creates the QApplication and

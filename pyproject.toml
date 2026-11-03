@@ -17,7 +17,9 @@ readme = "python/README.md"
 license = "LGPL-3.0-or-later"
 license-files = ["LICENSE.md"]
 # stable ABI of nanobind: python >= 3.12 (older pythons would need a wheel each)
-requires-python = ">=3.12"
+# requires-python = ">=3.12"
+# the pythons of PySide6 (3.10: end of life in October 2026, still in Ubuntu 22.04): one wheel each for 3.10 and 3.11
+requires-python = ">=3.10"
 # PySide6 and not PySide6-Essentials: Neutrino uses QtCharts and QtMultimedia (PySide6-Addons)
 dependencies = ["PySide6>=6.12,<7", "numpy"]
 classifiers = [
@@ -39,19 +41,22 @@ build.targets = ["neutrino_python"]
 install.components = ["python"]
 # neutrino/__init__.py; the module neutrino/_neutrino is installed by cmake
 wheel.packages = ["python/neutrino"]
-# stable ABI: one wheel for python >= 3.12 (older pythons: one wheel each)
+# stable ABI: one wheel for python >= 3.12 (older pythons: one wheel each, scikit-build-core does it by itself)
 wheel.py-api = "cp312"
 sdist.exclude = ["build", "release", "debug", "cross32", "cross64", "darwin", "debian", "fedora", "ubuntu"]
 
 [tool.scikit-build.cmake.define]
 NEUTRINO_WHEEL = "ON"
+NEUTRINO_PYTHON_MODULE = "ON"
 NEUTRINO_PYSIDE_QT = "OFF"
 
 # the wheels of the CI (.github/workflows/main.yml, job wheels): pipx run cibuildwheel.
 # Compiled with the official Qt of the minimum PySide6 above (python/ci/before_all_*.sh, aqtinstall), the libraries
 # but Qt in the wheel (auditwheel/delocate), tested with the PySide6 of PyPI (python/tests/test_wheel.py)
 [tool.cibuildwheel]
-build = "cp312-*"
+# build = "cp312-*"
+# cp312: the abi3 wheel for python >= 3.12
+build = "cp310-* cp311-* cp312-*"
 skip = "*-musllinux_*"
 build-verbosity = 1
 test-command = "python {project}/python/tests/test_wheel.py"

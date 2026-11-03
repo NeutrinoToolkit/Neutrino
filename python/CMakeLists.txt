@@ -4,7 +4,10 @@
 # (macOS, NEUTRINO_PYSIDE_QT below). The wheel for the users: pyproject.toml (NEUTRINO_WHEEL, Wheel.cmake).
 # nanobind: the one installed for that python (pip install nanobind), otherwise downloaded (NEUTRINO_NANOBIND_TAG)
 # (not NEUTRINO_PYTHON: that is the python of the dark icons, src/CMakeLists.txt)
-option(NEUTRINO_PYTHON_MODULE "Build the neutrino python module" ON)
+# option(NEUTRINO_PYTHON_MODULE "Build the neutrino python module" ON)
+# OFF: the app (AppImage, deb, rpm, dmg, installer) doesn't use it; ON for the wheels (pyproject.toml) and for
+# development (cmake -DNEUTRINO_PYTHON_MODULE=ON, then PYTHONPATH=<build>/python)
+option(NEUTRINO_PYTHON_MODULE "Build the neutrino python module" OFF)
 # set(NEUTRINO_NANOBIND_TAG "v2.14.0" CACHE STRING "nanobind version downloaded when not installed")
 # (the same major version as the wheels: pyproject.toml)
 set(NEUTRINO_NANOBIND_TAG "v3.1.0" CACHE STRING "nanobind version downloaded when not installed")
@@ -20,10 +23,13 @@ if (NEUTRINO_PYTHON_MODULE)
         # stable ABI (python >= 3.12): one wheel for all the python versions
         find_package(Python 3.10 COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
     else()
-        find_package(Python 3.9 COMPONENTS Interpreter Development.Module)
+        # find_package(Python 3.9 COMPONENTS Interpreter Development.Module)
+        # 3.10: the minimum of nanobind 3 (e.g. AlmaLinux 9 has 3.9: the app is built without the module)
+        find_package(Python 3.10 COMPONENTS Interpreter Development.Module)
     endif()
     if (NOT Python_FOUND)
-        message(STATUS "neutrino python module: python development files not found, not built")
+        # message(STATUS "neutrino python module: python development files not found, not built")
+        message(STATUS "neutrino python module: python >= 3.10 with its development files not found, not built")
         return()
     endif()
 
