@@ -23,14 +23,19 @@
  *
  */
 
+// #include <unistd.h>
+// _WIN32: MinGW, MSVC and clang-cl (__WIN32 is only MinGW)
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 #include "nPreferences.h"
 // #include "nApp.h"
 #include "nCore.h"
 #include "nPhysWave.h"
 
-#ifdef	__WIN32
+// #ifdef	__WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -45,7 +50,8 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	int coreNum =1;
 
 
-#ifdef	__WIN32
+// #ifdef	__WIN32
+#ifdef _WIN32
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 

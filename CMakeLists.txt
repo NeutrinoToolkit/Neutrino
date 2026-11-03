@@ -21,8 +21,20 @@ set(PROJECT_COPYRIGHT_YEAR "2013-${CURRENT_YEAR}")
 set(DEBUG_LEVEL "10" CACHE STRING "DEBUG verbosity")
 
 ## global compile options
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+# set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+if (MSVC)
+    # cl and clang-cl (the python wheel on Windows: the ABI of PySide6): /Wall would be clang's -Weverything.
+    # /bigobj: big translation units (it was -Wa,-mbig-obj for MinGW in FindNeutrinoDeps.cmake)
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi /W3 -D__phys_debug=${DEBUG_LEVEL}")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /W3 -DQT_NO_DEBUG_OUTPUT")
+    add_compile_options(/bigobj)
+    # M_PI & co. in <cmath>, no warnings for the standard C functions (fopen, strcpy...), no min/max macros
+    add_compile_definitions(_USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS NOMINMAX)
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

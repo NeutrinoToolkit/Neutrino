@@ -8,9 +8,22 @@
 #   LIBS                  all of the above libraries (for out-of-tree plugins, see NeutrinoPlugin.cmake)
 # and applied to the nPhysImageF target in nPhysImage/CMakeLists.txt
 
-find_package(OpenMP REQUIRED)
-# set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
-list(APPEND NPHYS_PUBLIC_LIBS OpenMP::OpenMP_CXX)
+# find_package(OpenMP REQUIRED)
+# # set(LIBS ${LIBS} OpenMP::OpenMP_CXX)
+# list(APPEND NPHYS_PUBLIC_LIBS OpenMP::OpenMP_CXX)
+if (MSVC)
+    # cl/clang-cl (python wheel on Windows): without OpenMP the pragmas are ignored (serial code) and the omp_*
+    # functions come from the omp.h of MSVC (vcomp)
+    find_package(OpenMP)
+    if (NOT OpenMP_CXX_FOUND)
+        message(WARNING "OpenMP not found: the parallel loops of Neutrino will be serial")
+    endif()
+else()
+    find_package(OpenMP REQUIRED)
+endif()
+if (OpenMP_CXX_FOUND)
+    list(APPEND NPHYS_PUBLIC_LIBS OpenMP::OpenMP_CXX)
+endif()
 
 find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
@@ -50,7 +63,9 @@ endif()
 
 #in precompiled win dlls the threads are included
 if(WIN32)
-	if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+	# if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+	# (MinGW: the GNU assembler; MSVC/clang-cl: /bigobj in CMakeLists.txt)
+	if(MINGW AND ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
 		# add_compile_options(-Wa,-mbig-obj)
 		list(APPEND NPHYS_COMPILE_OPTIONS -Wa,-mbig-obj)
 	endif()
