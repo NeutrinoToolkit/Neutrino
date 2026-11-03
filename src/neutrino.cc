@@ -118,7 +118,17 @@ neutrino::neutrino():
 
     connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
 
-    connect(actionClose, SIGNAL(triggered()), this, SLOT(close()));
+    // connect(actionClose, SIGNAL(triggered()), this, SLOT(close()));
+    // the close shortcut of the menu (on macOS also in the pans) closes the active window: it was in closeEvent,
+    // but there it cancelled QApplication::quit (which closes all the windows) when a pan was the active window
+    connect(actionClose, &QAction::triggered, this, [this]() {
+        QWidget *active=QApplication::activeWindow();
+        if (active && active!=this) {
+            active->close();
+        } else {
+            close();
+        }
+    });
     connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
     connect(actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
 
@@ -1378,18 +1388,27 @@ void neutrino::exportGraphics (QString fout) {
 void neutrino::closeEvent (QCloseEvent *e) {
     qDebug() << "here" << sender();
     qDebug() << QApplication::activeWindow();
-    if (!QApplication::activeWindow() || QApplication::activeWindow() == this) {
-        disconnect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-        if (fileClose()) {
-            saveDefaults();
-            e->accept();
-        } else {
-            e->ignore();
-            connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-        }
+//    if (!QApplication::activeWindow() || QApplication::activeWindow() == this) {
+//        disconnect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+//        if (fileClose()) {
+//            saveDefaults();
+//            e->accept();
+//        } else {
+//            e->ignore();
+//            connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+//        }
+//    } else {
+//        QApplication::activeWindow()->close();
+//        e->ignore();
+//    }
+    // (the active window is closed by actionClose)
+    disconnect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    if (fileClose()) {
+        saveDefaults();
+        e->accept();
     } else {
-        QApplication::activeWindow()->close();
         e->ignore();
+        connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
     }
 }
 
