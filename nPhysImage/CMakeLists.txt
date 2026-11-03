@@ -15,7 +15,12 @@ include(FindNeutrinoDeps)
 target_include_directories(nPhysImageF BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${NPHYS_INCLUDES})
 target_compile_definitions(nPhysImageF PUBLIC ${NPHYS_DEFINITIONS})
 target_compile_options(nPhysImageF PUBLIC ${NPHYS_COMPILE_OPTIONS})
-target_link_libraries(nPhysImageF PUBLIC ${NPHYS_PUBLIC_LIBS} PRIVATE m ${NPHYS_PRIVATE_LIBS})
+# target_link_libraries(nPhysImageF PUBLIC ${NPHYS_PUBLIC_LIBS} PRIVATE m ${NPHYS_PRIVATE_LIBS})
+target_link_libraries(nPhysImageF PUBLIC ${NPHYS_PUBLIC_LIBS} PRIVATE ${NPHYS_PRIVATE_LIBS})
+# libm: not with MSVC/clang-cl (the math functions are in the C runtime; MinGW has it)
+if (NOT MSVC)
+    target_link_libraries(nPhysImageF PRIVATE m)
+endif()
 
 # install
 if (WIN32)
