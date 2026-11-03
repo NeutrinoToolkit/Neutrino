@@ -636,7 +636,8 @@ NB_MODULE(_neutrino, m) {
                 for (auto &it : img.get()->prop) ret.push_back(it.first);
                 return ret;
             }, "The names of the properties of the image")
-        .def("property", [](const PyImage &img, const std::string &name) {
+        // (-> nb::object: in nanobind 3 nb::none() is a different type)
+        .def("property", [](const PyImage &img, const std::string &name) -> nb::object {
                 nPhysD *phys=img.get();
                 auto it=phys->prop.find(name);
                 if (it==phys->prop.end()) return nb::none();

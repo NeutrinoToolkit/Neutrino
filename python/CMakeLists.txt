@@ -5,7 +5,9 @@
 # nanobind: the one installed for that python (pip install nanobind), otherwise downloaded (NEUTRINO_NANOBIND_TAG)
 # (not NEUTRINO_PYTHON: that is the python of the dark icons, src/CMakeLists.txt)
 option(NEUTRINO_PYTHON_MODULE "Build the neutrino python module" ON)
-set(NEUTRINO_NANOBIND_TAG "v2.14.0" CACHE STRING "nanobind version downloaded when not installed")
+# set(NEUTRINO_NANOBIND_TAG "v2.14.0" CACHE STRING "nanobind version downloaded when not installed")
+# (the same major version as the wheels: pyproject.toml)
+set(NEUTRINO_NANOBIND_TAG "v3.1.0" CACHE STRING "nanobind version downloaded when not installed")
 
 if (NEUTRINO_PYTHON_MODULE)
     if (CMAKE_CROSSCOMPILING)

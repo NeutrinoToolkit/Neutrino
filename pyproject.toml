@@ -3,7 +3,8 @@
 # newer than the minimum PySide6 below (checked by Wheel.cmake)
 
 [build-system]
-requires = ["scikit-build-core>=0.10", "nanobind>=2.14"]
+# requires = ["scikit-build-core>=0.10", "nanobind>=2.14"]
+requires = ["scikit-build-core>=0.10", "nanobind>=3.1,<4"]
 build-backend = "scikit_build_core.build"
 
 [project]
