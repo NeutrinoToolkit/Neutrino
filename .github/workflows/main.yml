@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -29,7 +29,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ubuntu
         path: Neutrino-*.*
@@ -41,7 +41,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -53,7 +53,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: debian
         path: Neutrino-*.*
@@ -65,7 +65,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -76,7 +76,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         for f in Neutrino*.deb; do cp "$f" "../$(echo "$f" | sed 's/-Ubuntu-/-Linuxmint-/')"; done
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: mint
         path: Neutrino-*.*
@@ -88,7 +88,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -101,7 +101,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: fedora
         path: Neutrino-*.*
@@ -113,7 +113,7 @@ jobs:
     steps:
     - name: Git
       run: zypper install -y git tar gzip
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -127,7 +127,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ../Neutrino-Linux-x86_64-openSUSE-Tumbleweed.rpm
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: opensuse
         path: Neutrino-*.*
@@ -139,7 +139,7 @@ jobs:
     steps:
     - name: Git
       run: zypper install -y git tar gzip
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -155,7 +155,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: opensuseleap
         path: Neutrino-*.*
@@ -163,7 +163,7 @@ jobs:
   mac-arm:
     runs-on: macos-15
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Prepare
@@ -183,7 +183,7 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
         cp Neutrino-*.zip Neutrino-*.dmg ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: macos-15
         path: |
@@ -197,7 +197,7 @@ jobs:
     env:
       PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig librsvg
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: MacPorts
@@ -219,7 +219,7 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         QT_BIN=/opt/local/libexec/qt6/bin DEPLOY_LIBPATHS="/opt/local/lib /opt/local/lib/libomp" ../resources/macPackage/prepareapp.sh
         cp Neutrino-*.zip Neutrino-*.dmg ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: macos-15-intel
         path: |
@@ -238,7 +238,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -263,7 +263,7 @@ jobs:
         ${MINGW}-cmake ..
         make -j$(nproc) package
         cp Neutrino*.exe Neutrino*.zip ..
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.arch }}
         path: Neutrino-*.*
@@ -308,7 +308,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -337,7 +337,7 @@ jobs:
         make -j$(nproc) install DESTDIR=AppDir
         ../linuxdeploy-${{ matrix.arch }}.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
         cp Neutrino-*.AppImage ${{ matrix.out }}
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.name }}
         path: Neutrino-*.AppImage
@@ -364,7 +364,7 @@ jobs:
       # Windows: the packages built by vcpkg (python/ci/before_all_windows.sh), cached
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     # Windows: cl, link and the Windows SDK in the environment (used by clang-cl)
@@ -374,7 +374,7 @@ jobs:
     - name: vcpkg cache
       if: runner.os == 'Windows'
       id: vcpkg-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: vcpkg-cache
         key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
@@ -386,11 +386,11 @@ jobs:
       run: pipx run "cibuildwheel>=3.1,<4" --output-dir wheelhouse
     - name: vcpkg cache save
       if: always() && runner.os == 'Windows' && steps.vcpkg-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: vcpkg-cache
         key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.name }}
         path: wheelhouse/*.whl
@@ -405,8 +405,8 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/download-artifact@v4
+    - uses: actions/checkout@v7
+    - uses: actions/download-artifact@v8
       with:
         path: package
         merge-multiple: true
