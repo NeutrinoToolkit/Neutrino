@@ -116,6 +116,7 @@ static void fromArray(physD &phys, const ArrayIn &arr) {
 
 static nb::object fromVariant(const QVariant &val);
 static QVariant toVariant(nb::handle obj);
+static bool convertTo(QVariant &val, QMetaType type);
 
 // ------------------------------------------------------------------ Image
 
@@ -308,7 +309,8 @@ static nb::object invokeMethod(QObject *obj, const std::string &name, nb::args a
             QMetaType ptype=method.parameterMetaType(j);
             if (ptype==QMetaType::fromType<QVariant>()) {
                 val=QVariant::fromValue(val); // the method takes the QVariant itself
-            } else if (val.metaType()!=ptype && !val.convert(ptype)) {
+            // } else if (val.metaType()!=ptype && !val.convert(ptype)) {
+            } else if (!convertTo(val, ptype)) {
                 ok=false;
                 break;
             }
@@ -359,12 +361,34 @@ static nb::object metaGetattr(QPointer<QObject> obj, const std::string &name) {
     throw nb::attribute_error((std::string(obj->metaObject()->className())+" has no attribute "+name).c_str());
 }
 
+// QVariant::convert, and (x, y) to the Qt points and sizes (Qt doesn't convert a list): the signals give them as tuples
+static bool convertTo(QVariant &val, QMetaType type) {
+    if (val.metaType()==type) return true;
+    const int id=type.id();
+    if ((id==QMetaType::QPointF || id==QMetaType::QPoint || id==QMetaType::QSizeF || id==QMetaType::QSize) &&
+        val.metaType().id()==QMetaType::QVariantList) {
+        QVariantList list=val.toList();
+        bool okx=false, oky=false;
+        double x=list.size()==2 ? list[0].toDouble(&okx) : 0, y=list.size()==2 ? list[1].toDouble(&oky) : 0;
+        if (!okx || !oky) return false;
+        switch (id) {
+            case QMetaType::QPointF: val=QPointF(x, y); break;
+            case QMetaType::QPoint: val=QPoint(qRound(x), qRound(y)); break;
+            case QMetaType::QSizeF: val=QSizeF(x, y); break;
+            default: val=QSize(qRound(x), qRound(y)); break;
+        }
+        return true;
+    }
+    return val.convert(type);
+}
+
 static void setQtProperty(QObject *obj, const std::string &name, nb::handle value) {
     int idx=obj->metaObject()->indexOfProperty(name.c_str());
     QVariant val=toVariant(value);
     if (idx>=0) {
         QMetaProperty prop=obj->metaObject()->property(idx);
-        if (!val.convert(prop.metaType()) || !prop.write(obj, val)) {
+        // if (!val.convert(prop.metaType()) || !prop.write(obj, val)) {
+        if (!convertTo(val, prop.metaType()) || !prop.write(obj, val)) {
             throw nb::type_error(("cannot set the property "+name).c_str());
         }
     } else {
@@ -606,6 +630,23 @@ NB_MODULE(_neutrino, m) {
                 img.changed();
             }, "array"_a, "Replaces the pixels (the shape can change)")
         .def("show", [](PyImage &img) { img.neu->showPhys(img.get()); }, "Makes it the visible image of its window")
+        // the properties of the image (anymap, e.g. from the file; the PyShell properties/getProperty/setProperty)
+        .def("properties", [](const PyImage &img) {
+                std::vector<std::string> ret;
+                for (auto &it : img.get()->prop) ret.push_back(it.first);
+                return ret;
+            }, "The names of the properties of the image")
+        .def("property", [](const PyImage &img, const std::string &name) {
+                nPhysD *phys=img.get();
+                auto it=phys->prop.find(name);
+                if (it==phys->prop.end()) return nb::none();
+                return fromVariant(::toVariant(it->second));
+            }, "name"_a, "A property of the image (None if it has none of that name)")
+        .def("setProperty", [](PyImage &img, const std::string &name, nb::handle value) {
+                QVariant val=toVariant(value);
+                img.get()->prop[name]=::toAnydata(val);
+                img.changed();
+            }, "name"_a, "value"_a, "Sets a property of the image")
         // .def("close", [](PyImage &img) { img.neu->closeBuffer(img.get()); })
         .def("close", [](PyImage &img, bool ask) {
                 nPhysD *phys=img.get();

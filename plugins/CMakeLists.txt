@@ -13,8 +13,8 @@ if (${NEUTRINOPLUGINS})
     add_custom_target(neutrino_ui_headers DEPENDS ${NEUTRINO_PLUGINS_UIS})
     set(NEUTRINO_PLUGINS_UI_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-    # PyShell (PythonQt) is replaced by the neutrino python module: not built any more, to be removed
-    list(APPEND NEUTRINO_SKIP_PLUGINS PyShell)
+    # PyShell (PythonQt) is replaced by the neutrino python module (python/README.md): removed
+    # list(APPEND NEUTRINO_SKIP_PLUGINS PyShell)
 
     message(STATUS "Scanning plugins directory")
 

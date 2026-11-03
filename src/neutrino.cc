@@ -2066,6 +2066,19 @@ QVariant toVariant(anydata &my_data) {
 anydata toAnydata(QVariant &my_variant) {
     bool ok;
     anydata my_data;
+    // a number or a point keeps its type: toInt() of a double QVariant succeeds and rounds it (1.5 -> 2)
+    switch (my_variant.metaType().id()) {
+        case QMetaType::Double: case QMetaType::Float:
+            my_data=my_variant.toDouble();
+            return my_data;
+        case QMetaType::QPointF: case QMetaType::QPoint: {
+            QPointF valPoint=my_variant.toPointF();
+            my_data=vec2f(valPoint.x(),valPoint.y());
+            return my_data;
+        }
+        default:
+            break;
+    }
     int valInt=my_variant.toInt(&ok);
     if (ok) {
         my_data=valInt;
