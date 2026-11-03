@@ -67,6 +67,15 @@ environment = { CMAKE_PREFIX_PATH = "/opt/Qt/current" }
 # Qt found to analyse the module, not put in the wheel
 repair-wheel-command = "LD_LIBRARY_PATH=/opt/Qt/current/lib auditwheel repair --exclude 'libQt6*' -w {dest_dir} {wheel}"
 
+[tool.cibuildwheel.windows]
+# clang-cl: the MSVC ABI of PySide6 (the MinGW build of the app can't be used), dependencies from vcpkg
+archs = ["AMD64"]
+before-all = "bash {project}/python/ci/before_all_windows.sh"
+before-build = "pip install delvewheel"
+environment = { CMAKE_GENERATOR = "Ninja", CC = "clang-cl", CXX = "clang-cl", CMAKE_TOOLCHAIN_FILE = "C:/vcpkg/scripts/buildsystems/vcpkg.cmake", VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md", CMAKE_PREFIX_PATH = "C:/Qt/current" }
+# libomp.dll (OpenMP of LLVM) in the wheel, not Qt (the DLLs of PySide6, neutrino/__init__.py)
+repair-wheel-command = 'delvewheel repair --add-path "C:/Program Files/LLVM/bin" --exclude "Qt6*.dll" -w {dest_dir} {wheel}'
+
 [tool.cibuildwheel.macos]
 before-all = "bash {project}/python/ci/before_all_macos.sh"
 # the Homebrew libraries of the runner (macos-15) are for macOS >= 15

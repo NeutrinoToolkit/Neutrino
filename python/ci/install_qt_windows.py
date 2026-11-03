@@ -1,10 +1,10 @@
 """Installs the official Qt for Windows from download.qt.io (for the python wheel: the Qt of PySide6).
 
-    python install_qt_windows.py 6.12.0 msvc2022_64 C:\\Qt qtcharts qtmultimedia
+    python install_qt_windows.py 6.12.0 msvc2022_64 C:\\Qt\\current qtcharts qtmultimedia
 
 From Qt 6.12 the Windows repository has a folder per compiler (qt6_6120/qt6_6120_msvc2022_64/Updates.xml), not
 known by aqtinstall 3.3 (it looks for qt6_6120/qt6_6120/Updates.xml). The archives are checked (sha1) and extracted
-in <outdir>/<version>/<arch> (e.g. C:\\Qt\\6.12.0\\msvc2022_64), the folder to give to CMAKE_PREFIX_PATH.
+in <target> (e.g. C:\\Qt\\current), the folder to give to CMAKE_PREFIX_PATH.
 Needs py7zr (pip install py7zr, it comes with aqtinstall)."""
 import hashlib
 import sys
@@ -30,14 +30,14 @@ def download(url, retries=3):
             print(f"retry {url}: {e}", flush=True)
 
 
-def main(version, arch, outdir, *modules):
+def main(version, arch, target, *modules):
     v = version.replace(".", "")
     base = f"{REPO}/qt6_{v}/qt6_{v}_{arch}"
     updates = ET.fromstring(download(f"{base}/Updates.xml"))
     wanted = [f"qt.qt6.{v}.win64_{arch}"] + [f"qt.qt6.{v}.addons.{m}.win64_{arch}" for m in modules]
     packages = {pu.findtext("Name"): pu for pu in updates.findall("PackageUpdate")}
     # the archives have no <version>/<arch> prefix (aqt archives had it)
-    target = Path(outdir) / version / arch
+    target = Path(target)
     target.mkdir(parents=True, exist_ok=True)
     for name in wanted:
         if name not in packages:

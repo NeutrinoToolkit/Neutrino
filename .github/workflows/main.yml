@@ -357,13 +357,39 @@ jobs:
             name: wheel-macos-arm64
           - os: macos-15-intel
             name: wheel-macos-x86_64
+          - os: windows-2025
+            name: wheel-windows-x86_64
     runs-on: ${{ matrix.os }}
+    env:
+      # Windows: the packages built by vcpkg (python/ci/before_all_windows.sh), cached
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    # Windows: cl, link and the Windows SDK in the environment (used by clang-cl)
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: runner.os == 'Windows'
+    # restore and save apart: the cache is kept also when the build fails
+    - name: vcpkg cache
+      if: runner.os == 'Windows'
+      id: vcpkg-cache
+      uses: actions/cache/restore@v4
+      with:
+        path: vcpkg-cache
+        key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
+    - name: vcpkg cache directory
+      if: runner.os == 'Windows'
+      shell: bash
+      run: mkdir -p vcpkg-cache
     - name: Build and test
       run: pipx run "cibuildwheel>=3.1,<4" --output-dir wheelhouse
+    - name: vcpkg cache save
+      if: always() && runner.os == 'Windows' && steps.vcpkg-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: vcpkg-cache
+        key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}
