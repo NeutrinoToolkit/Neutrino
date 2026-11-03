@@ -28,18 +28,32 @@ jobs:
         python-version: "3.12"
     # cl, link and the Windows SDK in the environment (clang-cl uses them)
     - uses: ilammy/msvc-dev-cmd@v1
+    # restore and save apart: the cache is kept also when a later step fails
     - name: vcpkg cache
-      uses: actions/cache@v4
+      id: vcpkg-cache
+      uses: actions/cache/restore@v4
       with:
         path: vcpkg-cache
         key: vcpkg-${{ env.VCPKG_TRIPLET }}-fftw3-gsl-hdf5-cfitsio-tiff-jpeg-zlib-v1
-    - name: Dependencies
+    - name: vcpkg
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Force -Path vcpkg-cache | Out-Null
         vcpkg install "fftw3[threads]" gsl hdf5 cfitsio tiff libjpeg-turbo zlib --triplet $env:VCPKG_TRIPLET
-        python -m pip install aqtinstall ninja nanobind
-        python -m aqt install-qt windows desktop $env:QT_VERSION win64_msvc2022_64 -m qtcharts qtmultimedia --outputdir C:\Qt
+        if ($LASTEXITCODE -ne 0) { exit 1 }
+    - name: vcpkg cache save
+      if: steps.vcpkg-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: vcpkg-cache
+        key: vcpkg-${{ env.VCPKG_TRIPLET }}-fftw3-gsl-hdf5-cfitsio-tiff-jpeg-zlib-v1
+    - name: Qt and tools
+      shell: pwsh
+      run: |
+        python -m pip install py7zr ninja nanobind
+        # (aqtinstall 3.3 doesn't know the Windows repository of Qt >= 6.12, one folder per compiler)
+        python python/ci/install_qt_windows.py $env:QT_VERSION msvc2022_64 C:\Qt qtcharts qtmultimedia
+        if ($LASTEXITCODE -ne 0) { exit 1 }
         Get-ChildItem C:\Qt\$env:QT_VERSION
         where.exe clang-cl
         clang-cl --version
