@@ -3,7 +3,8 @@
 # file(GLOB_RECURSE SOURCES *.cc *.cpp *.cxx *.h)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS *.cc *.cpp *.cxx *.h)
 
-add_library (nPhysImageF SHARED ${SOURCES})
+# add_library (nPhysImageF SHARED ${SOURCES})
+add_library (nPhysImageF ${NEUTRINO_LIB_TYPE} ${SOURCES})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

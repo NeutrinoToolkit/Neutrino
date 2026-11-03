@@ -27,9 +27,21 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# resources compressed with zlib: a Qt built without zstd (e.g. the one of the PySide6 wheel, used by the
+# python module) lacks qt_resourceFeatureZstd
+set(CMAKE_AUTORCC_OPTIONS --no-zstd)
 
 # same Qt API for the app, nPhysImage and the plugins (it was set only in src)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
+# python wheel (pyproject.toml, scikit-build-core): nPhysImage, libNeutrino and the plugins are static and
+# linked into the python module, which uses the Qt of the PySide6 package next to it (python/CMakeLists.txt)
+option(NEUTRINO_WHEEL "Build the python module for a wheel (everything linked into it)" OFF)
+if (NEUTRINO_WHEEL)
+    set(NEUTRINO_LIB_TYPE STATIC)
+else()
+    set(NEUTRINO_LIB_TYPE SHARED)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
@@ -52,5 +64,6 @@ endif()
 add_subdirectory (nPhysImage)
 add_subdirectory (plugins)
 add_subdirectory (src)
+add_subdirectory (python)
 
 include(Package)

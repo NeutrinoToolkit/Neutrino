@@ -374,9 +374,37 @@ jobs:
         name: ${{ matrix.name }}
         path: Neutrino-*.AppImage
 
+  # the python module (pip install neutrino-imaging): cibuildwheel, configured in pyproject.toml ([tool.cibuildwheel])
+  wheels:
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: wheel-linux-x86_64
+          - os: ubuntu-24.04-arm
+            name: wheel-linux-aarch64
+          - os: macos-15
+            name: wheel-macos-arm64
+          - os: macos-15-intel
+            name: wheel-macos-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Build and test
+      run: pipx run "cibuildwheel>=3.1,<4" --output-dir wheelhouse
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.name }}
+        path: wheelhouse/*.whl
+
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac-arm.result == 'success' && needs.windows.result == 'success' }}
-    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
+    # needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
+    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage, wheels]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -12,3 +12,6 @@ CMakeLists.txt.user
 resources/icons/dark/
 plugins/**/dark/
 resources/icons/__pycache__/
+
+# python wheel builds (pyproject.toml)
+/build/

@@ -174,7 +174,8 @@ file(CONFIGURE OUTPUT ${ICONS_DARK_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 # not by AUTORCC: it lists the files of the qrc at configure time, when the dark png do not exist yet;
 # qt_add_resources makes rcc depend on the custom commands above (resource name icons_dark for Q_CLEANUP_RESOURCE)
 set_source_files_properties(${ICONS_DARK_QRC} PROPERTIES SKIP_AUTORCC ON)
-qt_add_resources(ICONS_DARK_RCC ${ICONS_DARK_QRC})
+# qt_add_resources(ICONS_DARK_RCC ${ICONS_DARK_QRC})
+qt_add_resources(ICONS_DARK_RCC ${ICONS_DARK_QRC} OPTIONS --no-zstd)
 
 
 # write automatically the qrc file for html
@@ -228,7 +229,9 @@ set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_RCC} ${LICENSES_QRC} ${
 # libNeutrino: everything but main.cc, with the plugins compiled in (OBJECT libraries, resources/cmake/NeutrinoPlugin.cmake).
 # The executable is main.cc; a python module can load the library
 list(FILTER filedeps EXCLUDE REGEX "/src/main\\.cc$")
-add_library(NeutrinoLib SHARED ${filedeps})
+# add_library(NeutrinoLib SHARED ${filedeps})
+# (STATIC for a wheel: linked into the python module with all its objects, see python/CMakeLists.txt)
+add_library(NeutrinoLib ${NEUTRINO_LIB_TYPE} ${filedeps})
 set_target_properties(NeutrinoLib PROPERTIES OUTPUT_NAME Neutrino)
 add_dependencies(NeutrinoLib NeutrinoVersion)
 # for the users of the library (main.cc, the python module): its headers and the ui headers they include
@@ -349,4 +352,10 @@ endif()
 
 # target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
 target_link_libraries(NeutrinoLib PUBLIC ${LIBS} ${MODULES_TWEAK})
-target_link_libraries(${PROJECT_NAME} NeutrinoLib)
+# target_link_libraries(${PROJECT_NAME} NeutrinoLib)
+if (NEUTRINO_WHEEL)
+    # static: all the objects, the linker would drop the plugin registrations and the resources (nobody refers to them)
+    target_link_libraries(${PROJECT_NAME} "$<LINK_LIBRARY:WHOLE_ARCHIVE,NeutrinoLib>")
+else()
+    target_link_libraries(${PROJECT_NAME} NeutrinoLib)
+endif()
