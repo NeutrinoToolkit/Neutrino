@@ -94,11 +94,14 @@ public slots:
 
     void menuPaths();
 
-    void loadPlugin();
-    void loadPlugin(QString pname, bool launch);
-
-    void scanPlugins();
-    void scanPlugins(QString);
+    // void loadPlugin();
+    // void loadPlugin(QString pname, bool launch);
+    //
+    // void scanPlugins();
+    // void scanPlugins(QString);
+    // (the plugins are compiled into libNeutrino: nPanPlug.h)
+    void addPluginActions();
+    QMenu* pluginMenu(QString menuEntry);
 
     void openRecentFile();
     void clearRecentFile();

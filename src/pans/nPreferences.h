@@ -44,7 +44,7 @@ public slots:
 
     void changeGamma(int);
 
-    void updatePlugindirs(QListWidgetItem*);
+    // void updatePlugindirs(QListWidgetItem*);
     void changeFont();
     void hideEvent (QHideEvent*) override;
     void showEvent(QShowEvent*) override;
@@ -53,8 +53,8 @@ public slots:
     void resetSettings();
     void changeThreads(int);
 
-    void on_addPlugin_released();
-    void on_removePlugin_released();
+    // void on_addPlugin_released();
+    // void on_removePlugin_released();
 
     void on_getOrigin_released();
     void on_getScale_released();

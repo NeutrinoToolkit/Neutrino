@@ -6,6 +6,16 @@ if (${NEUTRINOPLUGINS})
 
     include(NeutrinoPlugin)
 
+    # the ui headers included by the neutrino headers (neutrino.h, nLine.h, nObject.h), generated once for all the plugins
+    find_package(Qt6 COMPONENTS Widgets REQUIRED)
+    qt6_wrap_ui(NEUTRINO_PLUGINS_UIS ${CMAKE_SOURCE_DIR}/src/neutrino.ui ${CMAKE_SOURCE_DIR}/src/graphics/nLine.ui
+                ${CMAKE_SOURCE_DIR}/src/graphics/nObject.ui ${CMAKE_SOURCE_DIR}/src/graphics/nPoint.ui)
+    add_custom_target(neutrino_ui_headers DEPENDS ${NEUTRINO_PLUGINS_UIS})
+    set(NEUTRINO_PLUGINS_UI_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+    # PyShell (PythonQt) is replaced by the neutrino python module: not built any more, to be removed
+    list(APPEND NEUTRINO_SKIP_PLUGINS PyShell)
+
     message(STATUS "Scanning plugins directory")
 
     # FILE(GLOB allfiles "*" LIST_DIRECTORIES true)

@@ -225,6 +225,41 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QR
 # set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_QRC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
 set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_RCC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
 
+# libNeutrino: everything but main.cc, with the plugins compiled in (OBJECT libraries, resources/cmake/NeutrinoPlugin.cmake).
+# The executable is main.cc; a python module can load the library
+list(FILTER filedeps EXCLUDE REGEX "/src/main\\.cc$")
+add_library(NeutrinoLib SHARED ${filedeps})
+set_target_properties(NeutrinoLib PROPERTIES OUTPUT_NAME Neutrino)
+add_dependencies(NeutrinoLib NeutrinoVersion)
+# for the users of the library (main.cc, the python module): its headers and the ui headers they include
+get_property(_neu_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (_neu_multi_config)
+    set(NEUTRINO_LIB_UI_DIR "${CMAKE_CURRENT_BINARY_DIR}/NeutrinoLib_autogen/include_$<CONFIG>")
+else()
+    set(NEUTRINO_LIB_UI_DIR "${CMAKE_CURRENT_BINARY_DIR}/NeutrinoLib_autogen/include")
+endif()
+target_include_directories(NeutrinoLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graphics
+                           ${CMAKE_CURRENT_SOURCE_DIR}/pans ${NEUTRINO_LIB_UI_DIR})
+
+get_property(NEUTRINO_PLUGINS GLOBAL PROPERTY NEUTRINO_PLUGINS)
+list(LENGTH NEUTRINO_PLUGINS NEUTRINO_PLUGINS_COUNT)
+message(STATUS "${NEUTRINO_PLUGINS_COUNT} plugins compiled in libNeutrino")
+# linking an OBJECT library adds its objects (so their NEUTRINO_PLUGIN registrations) and its libraries
+target_link_libraries(NeutrinoLib PRIVATE ${NEUTRINO_PLUGINS})
+
+if (WIN32)
+    target_link_options(NeutrinoLib PRIVATE -Wl,-allow-multiple-definition)
+    install (TARGETS NeutrinoLib COMPONENT binary RUNTIME DESTINATION bin)
+elseif(LINUX)
+    install (TARGETS NeutrinoLib COMPONENT binary DESTINATION lib)
+elseif (APPLE)
+    # @rpath: the executable has @executable_path/../Frameworks, a python module will have its own
+    set_target_properties(NeutrinoLib PROPERTIES INSTALL_NAME_DIR "@rpath")
+    install (TARGETS NeutrinoLib COMPONENT binary DESTINATION "${PROJECT_BINARY_DIR}/Neutrino.app/Contents/Frameworks")
+endif()
+
+set(MAIN_CC ${CMAKE_CURRENT_SOURCE_DIR}/main.cc)
+
 if(APPLE)
 
 
@@ -256,7 +291,8 @@ if(APPLE)
     set_source_files_properties(${${PROJECT_NAME}_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${${PROJECT_NAME}_ICONTYPE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
+    # add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${filedeps})
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${${PROJECT_NAME}_ICON} ${${PROJECT_NAME}_ICONTYPE} ${MAIN_CC})
     target_link_libraries(${PROJECT_NAME} "-framework IOKit -framework CoreFoundation")
 
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../resources/macPackage/neutrino.plist.cmake" ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
@@ -272,26 +308,31 @@ elseif(WIN32)
     set (RC_WIN "${${PROJECT_NAME}_SOURCE_DIR}/resources/winPackage/neutrino.rc")
     # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-all-symbols -Wl,-allow-multiple-definition")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_executable(${PROJECT_NAME} ${RC_WIN} ${filedeps})
+        # add_executable(${PROJECT_NAME} ${RC_WIN} ${filedeps})
+        add_executable(${PROJECT_NAME} ${RC_WIN} ${MAIN_CC})
     else()
-        add_executable(${PROJECT_NAME} WIN32 ${RC_WIN} ${filedeps})
+        # add_executable(${PROJECT_NAME} WIN32 ${RC_WIN} ${filedeps})
+        add_executable(${PROJECT_NAME} WIN32 ${RC_WIN} ${MAIN_CC})
     endif()
-    target_link_options(${PROJECT_NAME} PRIVATE -Wl,--export-all-symbols -Wl,-allow-multiple-definition)
-
-    set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
-    set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    # target_link_options(${PROJECT_NAME} PRIVATE -Wl,--export-all-symbols -Wl,-allow-multiple-definition)
+    #
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    # (the plugins link libNeutrino: the executable exports nothing)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
 
 elseif(LINUX)
-    add_executable(${PROJECT_NAME} ${filedeps})
+    # add_executable(${PROJECT_NAME} ${filedeps})
+    add_executable(${PROJECT_NAME} ${MAIN_CC})
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binary)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/linuxPackage/Neutrino.desktop DESTINATION share/applications)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/icons/icon.svg DESTINATION share/applications RENAME Neutrino.svg)
 
 endif()
 
-set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS ON POSITION_INDEPENDENT_CODE ON)
-add_dependencies(${PROJECT_NAME} NeutrinoVersion)
+# set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS ON POSITION_INDEPENDENT_CODE ON)
+# add_dependencies(${PROJECT_NAME} NeutrinoVersion)
+# (in NeutrinoLib)
 
 foreach(MODULE ${MODULES})
     set(MODULES_TWEAK "${MODULES_TWEAK};Qt6::${MODULE}")
@@ -299,9 +340,13 @@ endforeach()
 
 if(APPLE)
 # add_definitions(-DQT_NO_OPENGL)
+# target_compile_definitions(${PROJECT_NAME} PRIVATE QT_NO_OPENGL)
+target_compile_definitions(NeutrinoLib PRIVATE QT_NO_OPENGL)
 target_compile_definitions(${PROJECT_NAME} PRIVATE QT_NO_OPENGL)
 endif()
 
 #target_compile_definitions(${PROJECT_NAME} PRIVATE NEU_PLUGIN_LIST=${NEU_PLUGIN_LIST})
 
-target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
+# target_link_libraries(${PROJECT_NAME} ${LIBS} ${MODULES_TWEAK})
+target_link_libraries(NeutrinoLib PUBLIC ${LIBS} ${MODULES_TWEAK})
+target_link_libraries(${PROJECT_NAME} NeutrinoLib)

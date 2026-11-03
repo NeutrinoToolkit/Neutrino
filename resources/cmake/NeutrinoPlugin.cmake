@@ -1,3 +1,6 @@
+# A plugin is an OBJECT library compiled into libNeutrino (src/CMakeLists.txt links the targets listed in the
+# global property NEUTRINO_PLUGINS). It registers itself with NEUTRINO_PLUGIN (src/nPanPlug.h).
+# Before, it was a shared library loaded at run time by nPluginLoader (also out of the Neutrino tree).
 MACRO(ADD_NEUTRINO_PLUGIN)
 
     if (NOT DEFINED NEUTRINO_ROOT)
@@ -15,14 +18,18 @@ MACRO(ADD_NEUTRINO_PLUGIN)
 
     MESSAGE(STATUS "Plugin : ${PROJECT_NAME}")
 
-    # include(FindNeutrinoDeps)
-    # in-tree the dependencies come from the nPhysImageF target usage requirements;
-    # out-of-tree (no nPhysImageF target) they are found again and set globally as before
+#     # include(FindNeutrinoDeps)
+#     # in-tree the dependencies come from the nPhysImageF target usage requirements;
+#     # out-of-tree (no nPhysImageF target) they are found again and set globally as before
+#     if (NOT TARGET nPhysImageF)
+#         include(FindNeutrinoDeps)
+#         include_directories(BEFORE ${NPHYS_INCLUDES})
+#         add_compile_definitions(${NPHYS_DEFINITIONS})
+#         add_compile_options(${NPHYS_COMPILE_OPTIONS})
+#     endif()
+    # only in the Neutrino tree now
     if (NOT TARGET nPhysImageF)
-        include(FindNeutrinoDeps)
-        include_directories(BEFORE ${NPHYS_INCLUDES})
-        add_compile_definitions(${NPHYS_DEFINITIONS})
-        add_compile_options(${NPHYS_COMPILE_OPTIONS})
+        message(FATAL_ERROR "Neutrino plugins are built in the Neutrino tree (nPhysImageF target not found)")
     endif()
 
     set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus Charts)
@@ -31,16 +38,17 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     add_definitions(${QT_DEFINITIONS})
     include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-    # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
-    # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DQT_NO_DEBUG_OUTPUT")
-    # in-tree the flags come from the top CMakeLists.txt (appending them here doubled them):
-    # only an out-of-tree plugin sets them itself
-    if (NOT TARGET nPhysImageF)
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DQT_NO_DEBUG_OUTPUT")
-        add_compile_options(-Wall)
-        add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
-    endif()
+#     # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+#     # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DQT_NO_DEBUG_OUTPUT")
+#     # in-tree the flags come from the top CMakeLists.txt (appending them here doubled them):
+#     # only an out-of-tree plugin sets them itself
+#     if (NOT TARGET nPhysImageF)
+#         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+#         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DQT_NO_DEBUG_OUTPUT")
+#         add_compile_options(-Wall)
+#         add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+#     endif()
+    # (the flags come from the top CMakeLists.txt)
 
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -141,69 +149,85 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         add_custom_target(pandoc${PROJECT_NAME} ALL DEPENDS ${README_HTML} SOURCES ${README_MD})
     endif()
 
-    # QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
-    # the ui headers of the neutrino headers (ui_neutrino.h, ui_nLine.h, ui_nObject.h) are generated once by the
-    # Neutrino target (AUTOUIC): in-tree the plugins use those (the plugin depends on Neutrino, so they exist);
-    # out-of-tree (no nPhysImageF target) every plugin generates its own copy as before
-    if (TARGET nPhysImageF)
-        get_property(_neu_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-        if (_neu_multi_config)
-            set(NEUTRINO_UI_DIR "${CMAKE_BINARY_DIR}/src/Neutrino_autogen/include_$<CONFIG>")
-        else()
-            set(NEUTRINO_UI_DIR "${CMAKE_BINARY_DIR}/src/Neutrino_autogen/include")
-        endif()
-        # copies generated here by older builds would shadow the Neutrino ones (current binary dir is in the include path)
-        file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/ui_neutrino.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nLine.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nObject.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nPoint.h)
-    else()
-        QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
-    endif()
+#     # QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
+#     # the ui headers of the neutrino headers (ui_neutrino.h, ui_nLine.h, ui_nObject.h) are generated once by the
+#     # Neutrino target (AUTOUIC): in-tree the plugins use those (the plugin depends on Neutrino, so they exist);
+#     # out-of-tree (no nPhysImageF target) every plugin generates its own copy as before
+#     if (TARGET nPhysImageF)
+#         get_property(_neu_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+#         if (_neu_multi_config)
+#             set(NEUTRINO_UI_DIR "${CMAKE_BINARY_DIR}/src/Neutrino_autogen/include_$<CONFIG>")
+#         else()
+#             set(NEUTRINO_UI_DIR "${CMAKE_BINARY_DIR}/src/Neutrino_autogen/include")
+#         endif()
+#         # copies generated here by older builds would shadow the Neutrino ones (current binary dir is in the include path)
+#         file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/ui_neutrino.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nLine.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nObject.h ${CMAKE_CURRENT_BINARY_DIR}/ui_nPoint.h)
+#     else()
+#         QT_WRAP_UI(nUIs ${NEUTRINO_ROOT}/src/neutrino.ui ${NEUTRINO_ROOT}/src/graphics/nLine.ui ${NEUTRINO_ROOT}/src/graphics/nObject.ui ${NEUTRINO_ROOT}/src/graphics/nPoint.ui)
+#     endif()
+    # the ui headers of the neutrino headers are generated once for all the plugins (neutrino_ui_headers in
+    # plugins/CMakeLists.txt): the plugins can't use those of libNeutrino, which links them (dependency cycle)
+    include_directories(${NEUTRINO_PLUGINS_UI_DIR})
 
-#    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} "${CMAKE_BINARY_DIR}/src/qrc/icons.qrc" ${PANDOC_QRC} ${README_MD})
-    add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
-    add_dependencies(${PROJECT_NAME} Neutrino)
-    add_dependencies(${PROJECT_NAME} nPhysImageF)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE QT_PLUGIN QT_SHARED)
+##     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} "${CMAKE_BINARY_DIR}/src/qrc/icons.qrc" ${PANDOC_QRC} ${README_MD})
+#     add_library (${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES} ${UIS} ${nUIs} ${QRCS} ${PANDOC_QRC} ${README_MD})
+#     add_dependencies(${PROJECT_NAME} Neutrino)
+#     add_dependencies(${PROJECT_NAME} nPhysImageF)
+#     target_compile_definitions(${PROJECT_NAME} PRIVATE QT_PLUGIN QT_SHARED)
 
-    # link the nPhysImageF target: it brings its include dirs, HAVE_* definitions and public libs
-    if (TARGET nPhysImageF)
-        target_link_libraries(${PROJECT_NAME} nPhysImageF)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${NEUTRINO_UI_DIR})
-    endif()
+#     # link the nPhysImageF target: it brings its include dirs, HAVE_* definitions and public libs
+#     if (TARGET nPhysImageF)
+#         target_link_libraries(${PROJECT_NAME} nPhysImageF)
+#         target_include_directories(${PROJECT_NAME} PRIVATE ${NEUTRINO_UI_DIR})
+#     endif()
 
-    IF(APPLE)
-        # set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-        target_link_options(${PROJECT_NAME} PRIVATE "LINKER:-undefined,dynamic_lookup")
-        # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
-        if (NOT TARGET nPhysImageF)
-            target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
-        endif()
-    ENDIF()
+#     IF(APPLE)
+#         # set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+#         target_link_options(${PROJECT_NAME} PRIVATE "LINKER:-undefined,dynamic_lookup")
+#         # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
+#         if (NOT TARGET nPhysImageF)
+#             target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dylib;${LIBS})
+#         endif()
+#     ENDIF()
 
-    if(WIN32)
-        # set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
-        target_link_options(${PROJECT_NAME} PRIVATE -Wl,--allow-shlib-undefined)
-        # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
-        target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a)
-        if (NOT TARGET nPhysImageF)
-            target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
-        endif()
-        # to check: --enable-runtime-pseudo-reloc
-    endif()
+#     if(WIN32)
+#         # set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
+#         target_link_options(${PROJECT_NAME} PRIVATE -Wl,--allow-shlib-undefined)
+#         # target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a;${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+#         target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/src/libNeutrino.dll.a)
+#         if (NOT TARGET nPhysImageF)
+#             target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/nPhysImage/libnPhysImageF.dll.a;${LIBS})
+#         endif()
+#         # to check: --enable-runtime-pseudo-reloc
+#     endif()
+
+#     foreach(MODULE ${MODULES})
+#         list(APPEND MODULES_TWEAK "Qt6::${MODULE}")
+#     endforeach()
+
+#     target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
+
+#     if(APPLE)
+#         install(TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins" COMPONENT plugins)
+#     elseif(LINUX)
+#         install(TARGETS ${PROJECT_NAME} DESTINATION "lib/neutrino/plugins" COMPONENT plugins)
+#         set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
+#     elseif(WIN32)
+#         install(TARGETS ${PROJECT_NAME} DESTINATION "bin/plugins" COMPONENT plugins)
+#     endif()
+    add_library (${PROJECT_NAME} OBJECT ${HEADERS} ${SOURCES} ${UIS} ${QRCS} ${PANDOC_QRC} ${README_MD})
+    add_dependencies(${PROJECT_NAME} neutrino_ui_headers)
+
+    # PRIVATE: libNeutrino gets the objects and links these libraries too (LINK_ONLY)
+    target_link_libraries(${PROJECT_NAME} PRIVATE nPhysImageF)
 
     foreach(MODULE ${MODULES})
         list(APPEND MODULES_TWEAK "Qt6::${MODULE}")
     endforeach()
 
-    target_link_libraries(${PROJECT_NAME} ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS} ${LOCAL_LIBS} ${MODULES_TWEAK})
 
-    if(APPLE)
-        install(TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_BINARY_DIR}/Neutrino.app/Contents/Resources/plugins" COMPONENT plugins)
-    elseif(LINUX)
-        install(TARGETS ${PROJECT_NAME} DESTINATION "lib/neutrino/plugins" COMPONENT plugins)
-        set (PLUGIN_INSTALL_DIR "lib/neutrino/plugins")
-    elseif(WIN32)
-        install(TARGETS ${PROJECT_NAME} DESTINATION "bin/plugins" COMPONENT plugins)
-    endif()
+    set_property(GLOBAL APPEND PROPERTY NEUTRINO_PLUGINS ${PROJECT_NAME})
 
 ENDMACRO()
 

@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (C) 2013 Alessandro Flacco, Tommaso Vinci All Rights Reserved
- * 
+ *
  *    This file is part of neutrino.
  *
  *    Neutrino is free software: you can redistribute it and/or modify
@@ -17,41 +17,37 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with neutrino.  If not, see <http://www.gnu.org/licenses/>.
  *
- *    Contact Information: 
+ *    Contact Information:
  *	Alessandro Flacco <alessandro.flacco@polytechnique.edu>
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
-#include <QApplication>
 #include "nPanPlug.h"
-#include "nGenericPan.h"
+#include <algorithm>
 
-bool nPanPlug::instantiate(neutrino *neu) {
-    qDebug() << "here";
-    qDebug() << "Instantiate plugin" << name();
-
-    const QByteArray className(name()+"*");
-
-    const QMetaObject *mo = QMetaType::fromName(className).metaObject();
-
-    if(mo) {
-        QObject *objectPtr = mo->newInstance(Q_ARG(neutrino*,neu));
-        if(objectPtr) {
-            my_pan=qobject_cast<nGenericPan*>(objectPtr);
-            return true;
-        }
-    }
-    return false;
+// constructed at the first use: the plugins register themselves from the static initialisation of other files
+std::vector<nPanPlug>& nPanPlug::registry() {
+    static std::vector<nPanPlug> plugs;
+    return plugs;
 }
 
-bool nPanPlug::unload() {
-    if (my_pan) {
-        my_pan->close();
-        my_pan->deleteLater();
-        QApplication::processEvents();
-        return true;
-    } else {
-        return false;
-    }
+const std::vector<nPanPlug>& nPanPlug::all() {
+    return registry();
 }
 
+const nPanPlug* nPanPlug::find(const QString &name) {
+    for (auto &plug : registry()) {
+        if (plug.name == name) return &plug;
+    }
+    return nullptr;
+}
+
+bool nPanPlug::add(nPanPlug plug) {
+    if (find(plug.name)) return false;
+    auto &plugs = registry();
+    // sorted by name (the order of the static initialisation is not defined)
+    auto pos = std::lower_bound(plugs.begin(), plugs.end(), plug,
+                                [](const nPanPlug &a, const nPanPlug &b) { return a.name < b.name; });
+    plugs.insert(pos, std::move(plug));
+    return true;
+}
