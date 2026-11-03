@@ -24,7 +24,6 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        # apt-get install -yy git file pandoc cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libhdf5-dev libfftw3-dev libhdf4-dev  g++ build-essential libtiff5-dev libgsl-dev lsb-release libcfitsio-dev libhdf4-dev libhdf5-dev libhdf5-103 python3-dev
         apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*" librsvg2-bin
         mkdir build && cd build
         cmake ..
@@ -78,13 +77,10 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        # apt-get install -yy git file lsb-release pandoc g++ build-essential cmake qt6* libqt6* libgl1-mesa-dev libvulkan* libnetpbm10-dev libfftw3-dev libhdf4-dev libtiff5-dev libgsl-dev libcfitsio-dev libhdf5-dev libhdf5-103 python3-dev
         apt-get install -yy git file pandoc cmake libxkbcommon-dev libgl1-mesa-dev libvulkan-dev libnetpbm11-dev libfftw3-dev libhdf4-dev g++ build-essential libtiff-dev libgsl-dev lsb-release libcfitsio-dev libhdf5-dev libxcb-xkb-dev qt6-tools-dev qt6-multimedia-dev qt6-declarative-dev qt6-charts-dev qt6-svg-dev qt6-base-private-dev python3-dev "qml6-module*" librsvg2-bin
         mkdir build && cd build
         cmake ..
         make -j$(nproc) package
-        # cp Neutrino*.deb ..
-        # the Mint image reports itself as Ubuntu to lsb_release: same file name as the ubuntu job, rename it
         for f in Neutrino*.deb; do cp "$f" "../$(echo "$f" | sed 's/-Ubuntu-/-Linuxmint-/')"; done
     - name: PythonQt logs
       if: failure()
@@ -164,7 +160,6 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        # zypper --non-interactive --quiet ar -C http://download.opensuse.org/repositories/science/openSUSE_Tumbleweed/science.repo
         zypper --non-interactive --quiet ar -C https://download.opensuse.org/repositories/science/$(. /etc/os-release; echo $VERSION_ID)/science.repo
         zypper --gpg-auto-import-keys ref
         zypper update -y
@@ -184,11 +179,7 @@ jobs:
         path: Neutrino-*.*
 
   mac-arm:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-15]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
       with:
@@ -215,7 +206,7 @@ jobs:
       run: tail -n 80 build/_deps/pythonqt-build/*.log || true
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.os }}
+        name: macos-15
         path: |
           Neutrino-*.zip
           Neutrino-*.dmg
@@ -237,12 +228,10 @@ jobs:
         echo /opt/local/bin >> $GITHUB_PATH
         echo /opt/local/sbin >> $GITHUB_PATH
         sudo /opt/local/bin/port -N selfupdate
-        # sudo /opt/local/bin/port -N -b install $PORTS
         sudo /opt/local/bin/port -N install $PORTS
     - name: Build
       run: |
         mkdir -p build && cd build
-        # /usr/local is the runner's Homebrew: keep its libraries out
         cmake .. -DCMAKE_PREFIX_PATH="/opt/local/libexec/qt6;/opt/local" -DCMAKE_IGNORE_PREFIX_PATH=/usr/local \
           -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=ON \
           -DPython_EXECUTABLE=/opt/local/bin/python3.13 -DPython3_EXECUTABLE=/opt/local/bin/python3.13 \
@@ -318,7 +307,6 @@ jobs:
             linuxdeploy: continuous
             out: ..
           - name: AppImage_olderLinux
-            # image: fedora:34
             image: almalinux:9
             runner: ubuntu-latest
             arch: x86_64
@@ -353,7 +341,6 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory '*'
-        # dnf -y install gcc gcc-c++ <matrix.pkgs> libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw3-devel rpm-build qt6-* git wget file python3-devel python3-pip
         if grep -q '^ID="almalinux"' /etc/os-release; then dnf -y install epel-release && dnf config-manager --set-enabled crb; fi
         dnf -y install gcc gcc-c++ cmake make lsb_release libtiff-devel gsl-devel blas-devel pandoc hdf-devel hdf5-devel cfitsio-devel fftw-devel rpm-build "qt6-*-devel" git wget file python3-devel python3-pip librsvg2-tools
         # EPEL 9 pandoc is 2.14 (no --embed-resources, needs >= 2.19): use the official static pandoc instead
@@ -388,7 +375,7 @@ jobs:
         path: Neutrino-*.AppImage
 
   release:
-    if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac.result == 'success' && needs.windows.result == 'success' }}
+    if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac-arm.result == 'success' && needs.windows.result == 'success' }}
     needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
     runs-on: ubuntu-latest
     permissions:
