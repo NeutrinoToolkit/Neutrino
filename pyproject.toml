@@ -72,7 +72,8 @@ repair-wheel-command = "LD_LIBRARY_PATH=/opt/Qt/current/lib auditwheel repair --
 archs = ["AMD64"]
 before-all = "bash {project}/python/ci/before_all_windows.sh"
 before-build = "pip install delvewheel"
-environment = { CMAKE_GENERATOR = "Ninja", CC = "clang-cl", CXX = "clang-cl", CMAKE_TOOLCHAIN_FILE = "C:/vcpkg/scripts/buildsystems/vcpkg.cmake", VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md", CMAKE_PREFIX_PATH = "C:/Qt/current" }
+# (the triplet as a cmake variable: vcpkg.cmake doesn't use VCPKG_DEFAULT_TRIPLET; CMAKE_ARGS: scikit-build-core)
+environment = { CMAKE_GENERATOR = "Ninja", CC = "clang-cl", CXX = "clang-cl", CMAKE_TOOLCHAIN_FILE = "C:/vcpkg/scripts/buildsystems/vcpkg.cmake", CMAKE_ARGS = "-DVCPKG_TARGET_TRIPLET=x64-windows-static-md", CMAKE_PREFIX_PATH = "C:/Qt/current" }
 # libomp.dll (OpenMP of LLVM) in the wheel, not Qt (the DLLs of PySide6, neutrino/__init__.py)
 repair-wheel-command = 'delvewheel repair --add-path "C:/Program Files/LLVM/bin" --exclude "Qt6*.dll" -w {dest_dir} {wheel}'
 
