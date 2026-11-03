@@ -1,0 +1,71 @@
+# the neutrino python module as a wheel: pip install . (or pip wheel .), built by cmake with NEUTRINO_WHEEL
+# (python/CMakeLists.txt, python/Wheel.cmake). The module uses the Qt of PySide6: the Qt of the build must not be
+# newer than the minimum PySide6 below (checked by Wheel.cmake)
+
+[build-system]
+requires = ["scikit-build-core>=0.10", "nanobind>=2.14"]
+build-backend = "scikit_build_core.build"
+
+[project]
+# "neutrino" is taken on PyPI: the import name is neutrino
+name = "neutrino-imaging"
+version = "0.1.0"
+description = "Neutrino image analysis in python: windows, images (numpy arrays) and pans"
+readme = "README.md"
+license = "LGPL-3.0-or-later"
+license-files = ["LICENSE.md"]
+# stable ABI of nanobind: python >= 3.12 (older pythons would need a wheel each)
+requires-python = ">=3.12"
+# PySide6 and not PySide6-Essentials: Neutrino uses QtCharts and QtMultimedia (PySide6-Addons)
+dependencies = ["PySide6>=6.12,<7", "numpy"]
+classifiers = [
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage = "https://github.com/NeutrinoToolkit/Neutrino"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.26"
+build-dir = "build/{wheel_tag}"
+# only the module (not the executable) and only its install (not the app bundle, the libraries, ...)
+build.targets = ["neutrino_python"]
+install.components = ["python"]
+# neutrino/__init__.py; the module neutrino/_neutrino is installed by cmake
+wheel.packages = ["python/neutrino"]
+# stable ABI: one wheel for python >= 3.12 (older pythons: one wheel each)
+wheel.py-api = "cp312"
+sdist.exclude = ["build", "release", "debug", "cross32", "cross64", "darwin", "debian", "fedora", "ubuntu"]
+
+[tool.scikit-build.cmake.define]
+NEUTRINO_WHEEL = "ON"
+NEUTRINO_PYSIDE_QT = "OFF"
+
+# the wheels of the CI (.github/workflows/main.yml, job wheels): pipx run cibuildwheel.
+# Compiled with the official Qt of the minimum PySide6 above (python/ci/before_all_*.sh, aqtinstall), the libraries
+# but Qt in the wheel (auditwheel/delocate), tested with the PySide6 of PyPI (python/tests/test_wheel.py)
+[tool.cibuildwheel]
+build = "cp312-*"
+skip = "*-musllinux_*"
+build-verbosity = 1
+test-command = "python {project}/python/tests/test_wheel.py"
+
+[tool.cibuildwheel.linux]
+# the glibc of the Qt of the PySide6 wheels (manylinux_2_34 x86_64, manylinux_2_39 aarch64)
+manylinux-x86_64-image = "manylinux_2_34"
+manylinux-aarch64-image = "manylinux_2_34"
+before-all = "bash {project}/python/ci/before_all_linux.sh"
+environment = { CMAKE_PREFIX_PATH = "/opt/Qt/current" }
+# Qt found to analyse the module, not put in the wheel
+repair-wheel-command = "LD_LIBRARY_PATH=/opt/Qt/current/lib auditwheel repair --exclude 'libQt6*' -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+before-all = "bash {project}/python/ci/before_all_macos.sh"
+# the Homebrew libraries of the runner (macos-15) are for macOS >= 15
+environment = { CMAKE_PREFIX_PATH = "$HOME/Qt/current", MACOSX_DEPLOYMENT_TARGET = "15.0" }
+# Qt (@rpath to PySide6/Qt/lib) can't be found here: not put in the wheel
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel} --exclude Qt --ignore-missing-dependencies"
