@@ -35,7 +35,10 @@ Homepage = "https://github.com/NeutrinoToolkit/Neutrino"
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.26"
-build-dir = "build/{wheel_tag}"
+# build-dir = "build/{wheel_tag}"
+# one folder for all the pythons of a platform (cibuildwheel builds them one after the other): only the module and
+# nanobind depend on the python, nPhysImage, libNeutrino and the plugins are compiled once
+build-dir = "build/wheel"
 # only the module (not the executable) and only its install (not the app bundle, the libraries, ...)
 build.targets = ["neutrino_python"]
 install.components = ["python"]
