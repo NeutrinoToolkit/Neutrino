@@ -22,6 +22,12 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+// include guard before the includes and neutrino.h after the class (only neutrino* is used here): neutrino.h
+// includes this header again, and moc saw an empty file ("No relevant classes found", missing vtable) when the
+// class was in that inner inclusion; ui_neutrino.h (in neutrino.h) needs the complete nView
+#ifndef nView_H_
+#define nView_H_
+
 #include <iostream>
 
 #include <QtGui>
@@ -33,10 +39,10 @@
 
 #include "nMouse.h"
 #include "nTics.h"
-#include "neutrino.h"
+// #include "neutrino.h"
 
-#ifndef nView_H_
-#define nView_H_
+// #ifndef nView_H_  (moved above the includes)
+// #define nView_H_
 
 class neutrino;
 
@@ -161,5 +167,8 @@ signals:
     void bufferChanged(nPhysD*);
     void bufferOriginChanged();
 };
+
+// after the class: neutrino.h needs the complete nView (ui_neutrino.h)
+#include "neutrino.h"
 
 #endif

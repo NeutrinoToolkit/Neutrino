@@ -1633,7 +1633,8 @@ neutrino::fileClose() {
     my_set.beginGroup("nPreferences");
     foreach (nPhysD *phys, physList) {
         DEBUG( phys->getName() << " " << phys->getType());
-        if (phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        // if (phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        if (askCloseUnsaved && phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
@@ -1686,7 +1687,8 @@ bool neutrino::closeBuffer(nPhysD* my_phys) {
     my_set.beginGroup("nPreferences");
 
     if (nPhysExists(my_phys))  {
-        if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        // if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        if (askCloseUnsaved && my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString::fromUtf8(my_phys->getShortName().c_str())+QString("\n")+QString::fromUtf8(my_phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::NoToAll | QMessageBox::Cancel);

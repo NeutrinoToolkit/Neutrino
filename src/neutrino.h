@@ -73,6 +73,10 @@ public:
 
     QList<nPhysD*> physList;
 
+    // false: closing an image or the window doesn't ask to save the images not saved (e.g. the python module:
+    // a script must not wait for a dialog)
+    bool askCloseUnsaved=true;
+
 private:
     QList<nGenericPan*> panList;
 

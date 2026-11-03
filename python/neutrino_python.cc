@@ -606,7 +606,15 @@ NB_MODULE(_neutrino, m) {
                 img.changed();
             }, "array"_a, "Replaces the pixels (the shape can change)")
         .def("show", [](PyImage &img) { img.neu->showPhys(img.get()); }, "Makes it the visible image of its window")
-        .def("close", [](PyImage &img) { img.neu->closeBuffer(img.get()); })
+        // .def("close", [](PyImage &img) { img.neu->closeBuffer(img.get()); })
+        .def("close", [](PyImage &img, bool ask) {
+                nPhysD *phys=img.get();
+                QPointer<neutrino> neu=img.neu;
+                neu->askCloseUnsaved=ask;
+                neu->closeBuffer(phys);
+                if (neu) neu->askCloseUnsaved=true;
+            }, nb::arg("ask")=false,
+            "Closes the image; ask=True: asks to save it if it was not saved (like the GUI)")
         .def("window", [](const PyImage &img) { img.get(); return PyWindow{img.neu}; })
         .def("__eq__", [](const PyImage &a, const PyImage &b) { return a.phys==b.phys; })
         .def("__hash__", [](const PyImage &img) { return std::hash<void*>()(img.phys); })
@@ -705,7 +713,15 @@ NB_MODULE(_neutrino, m) {
                 for (auto &p : w.get()->getPanList()) ret.push_back(PyPan{p});
                 return ret;
             }, "The open pans")
-        .def("close", [](PyWindow &w) { if (w.neu) w.neu->close(); })
+        // .def("close", [](PyWindow &w) { if (w.neu) w.neu->close(); })
+        .def("close", [](PyWindow &w, bool ask) {
+                if (!w.neu) return;
+                QPointer<neutrino> neu=w.neu;
+                neu->askCloseUnsaved=ask;
+                neu->close();
+                if (neu) neu->askCloseUnsaved=true;
+            }, nb::arg("ask")=false,
+            "Closes the window; ask=True: asks to save the images not saved (like the GUI)")
         .def("raise_", [](PyWindow &w) { w.get()->raise(); w.get()->activateWindow(); })
         .def("widget", [](PyWindow &w) { return pysideWidget(w.get(), "QMainWindow"); }, "The PySide6 QMainWindow of the window")
         .def("setProperty", [](PyWindow &w, const std::string &name, nb::handle value) { setQtProperty(w.get(), name, value); })
