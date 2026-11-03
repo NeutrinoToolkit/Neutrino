@@ -24,6 +24,7 @@
  */
 #include "nOpenRAW.h"
 #include "neutrino.h"
+#include "nCore.h"
 #include "nPhysFormats.h"
 
 // physWavelets
@@ -57,7 +58,14 @@ void nOpenRAW::add(QStringList fnames) {
 void nOpenRAW::doOpen () {
 	foreach (QString fname, fileList) {
         nPhysD *datamatrix = new nPhysD(widthSB->value(), heightSB->value(), 0.0,fname.toLocal8Bit().constData());
-        physFormat::phys_open_RAW(datamatrix,kind->currentIndex(), skipSB->value(), endian->isChecked());
+        // physFormat::phys_open_RAW(datamatrix,kind->currentIndex(), skipSB->value(), endian->isChecked());
+        try {
+            physFormat::phys_open_RAW(datamatrix,kind->currentIndex(), skipSB->value(), endian->isChecked());
+        } catch (std::exception &e) {
+            nCore::self()->showException((fname+": "+QString(e.what())).toUtf8().constData());
+            delete datamatrix;
+            continue;
+        }
 		if (datamatrix && datamatrix->getSurf()>0) {
 			datamatrix->setShortName(QFileInfo(fname).fileName().toStdString());
 			datamatrix->setFromName(fname.toStdString());

@@ -1,7 +1,8 @@
 #include "nPhysPyWrapper.h"
 #include "nPhysWave.h"
 #include "nPhysFormats.h"
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 #include "neutrino.h"
 #ifdef HAVE_NUMPY
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
@@ -170,9 +171,11 @@ PyObject* nPhysPyWrapper::toArray(nPhysD* my_phys) {
  */
 void nPhysPyWrapper::delete_nPhysD(nPhysD* my_phys) {
     DEBUG("delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD delete_nPhysD");
-    nApp* my_app=qobject_cast<nApp*> (qApp);
+    // nApp* my_app=qobject_cast<nApp*> (qApp);
+    nCore* my_app=nCore::self();
     if (my_app) {
-        my_app->processEvents();
+        // my_app->processEvents();
+        QCoreApplication::processEvents();
         DEBUG("and here");
         for(auto& neu: my_app->neus()) {
             if (neu->getBufferList().contains(my_phys)) {

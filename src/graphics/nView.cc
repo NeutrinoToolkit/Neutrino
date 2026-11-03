@@ -23,7 +23,8 @@
  *
  */
 #include "neutrino.h"
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 #include "nView.h"
 #include <QShortcut>
 #include <QFileDialog>
@@ -39,7 +40,8 @@ nView::~nView ()
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
     nparent(qobject_cast<neutrino *>(parent->parent())),
-    nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
+    // nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
+    nPalettes (nCore::self()->nPalettes),
     my_scene(this),
     my_mouse(this),
     my_tics(this),

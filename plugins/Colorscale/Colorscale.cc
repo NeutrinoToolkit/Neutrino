@@ -25,7 +25,8 @@
 
 #include "Colorscale.h"
 #include "neutrino.h"
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 
 Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     dVal(this)

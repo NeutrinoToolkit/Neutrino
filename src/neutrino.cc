@@ -37,7 +37,8 @@
 
 #include "neutrino.h"
 #include <omp.h>
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 
 #include "nView.h"
 #include "nPluginLoader.h"
@@ -59,6 +60,8 @@ neutrino::~neutrino()
 neutrino::neutrino():
     currentBuffer(nullptr)
 {
+    // the first window initialises what the windows share (icon theme before setupUi)
+    nCore::self();
     setupUi(this);
     setAcceptDrops(true);
 
@@ -116,7 +119,9 @@ neutrino::neutrino():
     connect(actionExport_all_original_name, SIGNAL(triggered()), this, SLOT(exportAllGraphicsOriginalName()));
     connect(actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
-    connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+    // connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+    // only the Neutrino windows (QApplication::closeAllWindows would also close the other windows of a library user)
+    connect(actionQuit, SIGNAL(triggered()), nCore::self(), SLOT(closeAllWindows())) ;
 
     connect(actionClose, SIGNAL(triggered()), this, SLOT(close()));
     connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
@@ -219,12 +224,18 @@ neutrino::neutrino():
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
     }
 
-    nApp *napp(qobject_cast<nApp*> (qApp));
+    // nApp *napp(qobject_cast<nApp*> (qApp));
+    //
+    // actionLog_info->setChecked(napp->log_win.isVisible());
+    // connect (actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+    //
+    // connect(actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
+    nCore *core=nCore::self();
 
-    actionLog_info->setChecked(napp->log_win.isVisible());
-    connect (actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+    actionLog_info->setChecked(core->logWin()->isVisible());
+    connect (actionLog_info, SIGNAL(toggled(bool)), core->logWin(), SLOT(setVisible(bool)));
 
-    connect(actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
+    connect(actionCheck_for_updates, SIGNAL(triggered()),core,SLOT(checkUpdates()));
 
     // the next lines should be useful once we get rid of the plugin stuff...
 //#define xxstring(s) xstring(s)
@@ -1585,6 +1596,8 @@ void neutrino::fileSave(QString fname) {
 bool neutrino::fileSave(nPhysD* phys, QString fname) {
     if (nPhysExists(phys) && !fname.isEmpty()) {
         QString suffix=QFileInfo(fname).suffix().toLower();
+        // the writers throw phys_fileerror
+        try {
         if (suffix.startsWith("neu")) {
             physFormat::phys_dump_binary(phys,QFile::encodeName(fname).toStdString().c_str());
         } else if (fname.endsWith("tif") || fname.endsWith("tiff")) {
@@ -1597,6 +1610,10 @@ bool neutrino::fileSave(nPhysD* phys, QString fname) {
             phys->writeASC(QFile::encodeName(fname).toStdString().c_str());
         } else {
             my_view->my_pixitem.pixmap().save(QFile::encodeName(fname));
+        }
+        } catch (std::exception &e) {
+            nCore::self()->showException(e.what());
+            return false;
         }
         phys->setType(PHYS_FILE);
         phys->setShortName(QFileInfo(fname).fileName().toStdString());

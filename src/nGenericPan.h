@@ -45,9 +45,10 @@
 
 
 #include "nPanPlug.h"
+#include "nCore.h"
 
 class neutrino;
-class nApp;
+// class nApp;
 
 typedef void (*ifunc)(void *, int &);
 
@@ -77,7 +78,9 @@ public:
     ~nGenericPan() override {}
 
     QPointer<neutrino> nparent;
-    QPointer<nApp> napp;
+    // QPointer<nApp> napp;
+    // shared palettes, log and preferences (nApp is the QApplication only in the executable)
+    QPointer<nCore> napp;
 
     nPhysD *currentBuffer;
 

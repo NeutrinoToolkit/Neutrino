@@ -26,7 +26,8 @@
 #include <unistd.h>
 
 #include "nPreferences.h"
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 #include "nPhysWave.h"
 
 #ifdef	__WIN32
@@ -170,7 +171,8 @@ void nPreferences::changeGamma(int gamma_val) {
 }
 
 void nPreferences::changeThreads(int num) {
-	nApp::changeThreads(num);
+	// nApp::changeThreads(num);
+	nCore::changeThreads(num);
 }
 
 void nPreferences::openclUnitValueChange(int num) {

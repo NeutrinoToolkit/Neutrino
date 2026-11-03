@@ -6,6 +6,7 @@
 #include "nPhysPyWrapper.h"
 
 #include "PyShell.h"
+#include "nCore.h"
 
 #include "PythonQt_QtAll.h"
 
@@ -180,7 +181,9 @@ bool PyShell::startup() {
     PythonQt::self()->addDecorators(new nPyWrapper());
     PythonQt::self()->registerClass(& neutrino::staticMetaObject, "neutrino", PythonQtCreateObject<nPyWrapper>);
 
-    PythonQt::self()->getMainModule().addObject("nApp", qApp);
+    // PythonQt::self()->getMainModule().addObject("nApp", qApp);
+    // nApp is now nCore (neus(), closeAllWindows()...): the QApplication isn't Neutrino's when it is a library
+    PythonQt::self()->getMainModule().addObject("nApp", nCore::self());
 
     QSettings settings("neutrino","");
     settings.beginGroup("PyShell");

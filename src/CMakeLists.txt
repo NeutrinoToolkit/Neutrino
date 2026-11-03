@@ -109,7 +109,7 @@ file(CONFIGURE OUTPUT ${ICONS_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 # string(APPEND QRC_CONTENT "    </qresource>\n</RCC>")
 # file(CONFIGURE OUTPUT ${ICONS_DARK_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 
-# icons for the dark mode: same prefix and names (nApp keeps only one of the two resources at startup).
+# icons for the dark mode: same prefix and names (nCore keeps only one of the two resources at startup).
 # The dark png are generated at build time in ${CMAKE_CURRENT_BINARY_DIR}/icons_dark from the svg of the light icons
 # (resources/icons/darkify.py + rsvg-convert or inkscape); the light icon is used when there is no svg,
 # or when python or the svg renderer are not found.
