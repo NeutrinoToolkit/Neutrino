@@ -28,6 +28,8 @@ def checks():
     assert len(plugins) > 20 and "Wavelet" in plugins
 
     w = neutrino.Window()
+    # no "not saved" dialog when the script (or app.quit) closes images and windows
+    assert w.askCloseUnsaved is False
     means = []
     w.bufferChanged.connect(lambda: means.append(w.currentBuffer().mean()))
     a = np.random.rand(64, 128)

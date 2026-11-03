@@ -55,9 +55,11 @@ build-verbosity = 1
 test-command = "python {project}/python/tests/test_wheel.py"
 
 [tool.cibuildwheel.linux]
-# the glibc of the Qt of the PySide6 wheels (manylinux_2_34 x86_64, manylinux_2_39 aarch64)
+# the glibc of the Qt of the PySide6 wheels (manylinux_2_34 x86_64, manylinux_2_39 aarch64): the tools of the
+# official Qt (uic, moc) must run in the container
 manylinux-x86_64-image = "manylinux_2_34"
-manylinux-aarch64-image = "manylinux_2_34"
+# manylinux-aarch64-image = "manylinux_2_34"
+manylinux-aarch64-image = "quay.io/pypa/manylinux_2_39_aarch64"
 before-all = "bash {project}/python/ci/before_all_linux.sh"
 environment = { CMAKE_PREFIX_PATH = "/opt/Qt/current" }
 # Qt found to analyse the module, not put in the wheel

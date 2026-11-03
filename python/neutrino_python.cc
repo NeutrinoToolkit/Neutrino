@@ -610,9 +610,10 @@ NB_MODULE(_neutrino, m) {
         .def("close", [](PyImage &img, bool ask) {
                 nPhysD *phys=img.get();
                 QPointer<neutrino> neu=img.neu;
+                bool old=neu->askCloseUnsaved;
                 neu->askCloseUnsaved=ask;
                 neu->closeBuffer(phys);
-                if (neu) neu->askCloseUnsaved=true;
+                if (neu) neu->askCloseUnsaved=old;
             }, nb::arg("ask")=false,
             "Closes the image; ask=True: asks to save it if it was not saved (like the GUI)")
         .def("window", [](const PyImage &img) { img.get(); return PyWindow{img.neu}; })
@@ -665,9 +666,17 @@ NB_MODULE(_neutrino, m) {
     auto window = nb::class_<PyWindow>(m, "Window", "A Neutrino window. Besides these methods, its slots are available by name")
         .def("__init__", [](PyWindow *self) {
                 checkApplication();
-                new (self) PyWindow{new neutrino()};
+                // new (self) PyWindow{new neutrino()};
+                // a script must not wait for a dialog, also when app.quit() closes the window (askCloseUnsaved)
+                neutrino *neu=new neutrino();
+                neu->askCloseUnsaved=false;
+                new (self) PyWindow{neu};
             }, "A new Neutrino window (needs a QApplication)")
         .def_prop_ro("valid", [](const PyWindow &w) { return !w.neu.isNull(); })
+        .def_prop_rw("askCloseUnsaved", [](const PyWindow &w) { return w.get()->askCloseUnsaved; },
+            [](PyWindow &w, bool ask) { w.get()->askCloseUnsaved=ask; },
+            "Closing an image or the window asks to save the images not saved (like the GUI). False for the windows "
+            "made in python (also when app.quit() closes them), True for the others")
         .def("addPhys", [](PyWindow &w, ArrayIn arr, const std::string &name) {
                 nPhysD *phys=new nPhysD(physD(0, 0, 0.0, name.empty() ? "python" : name));
                 fromArray(*phys, arr);
@@ -717,9 +726,10 @@ NB_MODULE(_neutrino, m) {
         .def("close", [](PyWindow &w, bool ask) {
                 if (!w.neu) return;
                 QPointer<neutrino> neu=w.neu;
+                bool old=neu->askCloseUnsaved;
                 neu->askCloseUnsaved=ask;
                 neu->close();
-                if (neu) neu->askCloseUnsaved=true;
+                if (neu) neu->askCloseUnsaved=old;
             }, nb::arg("ask")=false,
             "Closes the window; ask=True: asks to save the images not saved (like the GUI)")
         .def("raise_", [](PyWindow &w) { w.get()->raise(); w.get()->activateWindow(); })

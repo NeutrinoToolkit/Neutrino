@@ -1,5 +1,6 @@
 #!/bin/bash
-# cibuildwheel before-all on Linux, in the manylinux_2_34 container (AlmaLinux 9, the glibc of the Qt of PySide6):
+# cibuildwheel before-all on Linux, in the manylinux_2_34 (x86_64, AlmaLinux 9) or manylinux_2_39 (aarch64,
+# AlmaLinux 10) container, the glibc of the Qt of PySide6:
 # the dependencies of Neutrino (put in the wheel by auditwheel) and the official Qt in /opt/Qt/current (aqtinstall,
 # only to compile: the wheel uses the Qt of PySide6)
 set -euxo pipefail
@@ -9,8 +10,16 @@ git config --global --add safe.directory '*'
 
 dnf -y install epel-release dnf-plugins-core
 dnf config-manager --set-enabled crb
-dnf -y install fftw-devel gsl-devel hdf5-devel hdf-devel cfitsio-devel libtiff-devel libjpeg-turbo-devel zlib-devel \
-    mesa-libGL-devel mesa-libEGL-devel libxkbcommon-devel fontconfig-devel freetype-devel dbus-devel librsvg2-tools git wget
+# dnf -y install fftw-devel gsl-devel hdf5-devel hdf-devel cfitsio-devel libtiff-devel libjpeg-turbo-devel zlib-devel \
+#     mesa-libGL-devel mesa-libEGL-devel libxkbcommon-devel fontconfig-devel freetype-devel dbus-devel librsvg2-tools git wget
+dnf -y install fftw-devel gsl-devel hdf5-devel libtiff-devel libjpeg-turbo-devel zlib-devel \
+    mesa-libGL-devel mesa-libEGL-devel libxkbcommon-devel fontconfig-devel freetype-devel dbus-devel git wget
+# for the test (same container): system libraries the Qt of PySide6 expects (QtMultimedia: libpulse)
+dnf -y install pulseaudio-libs pulseaudio-libs-glib2 libxkbcommon-x11 || echo "warning: some test libraries not available"
+# optional for Neutrino (HDF4, FITS, dark icons): one by one, the EPEL of AlmaLinux 10 may not have them
+for pkg in hdf-devel cfitsio-devel librsvg2-tools; do
+    dnf -y install $pkg || echo "warning: $pkg not available, Neutrino is built without it"
+done
 
 # pandoc (help of the plugins): EPEL 9 has 2.14, Neutrino needs >= 2.19 (same as the AppImage job)
 PANDOC_ARCH=$([ "$(uname -m)" = aarch64 ] && echo arm64 || echo amd64)
