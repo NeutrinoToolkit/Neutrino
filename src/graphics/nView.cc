@@ -39,7 +39,7 @@ nView::~nView ()
 }
 
 nView::nView (QWidget *parent) : QGraphicsView (parent),
-    nparent(qobject_cast<neutrino *>(parent->parent())),
+    nparent(parent ? qobject_cast<neutrino *>(parent->parent()) : nullptr), // (parent was used before the check)
     // nPalettes ((qobject_cast<nApp*> (qApp))->nPalettes),
     nPalettes (nCore::self()->nPalettes),
     my_scene(this),
@@ -72,7 +72,7 @@ nView::nView (QWidget *parent) : QGraphicsView (parent),
     fillimage=true;
     setMouseTracking(true);
     setInteractive(true);
-    QTapAndHoldGesture::setTimeout(5000);
+    // QTapAndHoldGesture::setTimeout(5000); (global for the application, and the tap and hold does nothing here)
     grabGesture(Qt::TapAndHoldGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
@@ -115,14 +115,18 @@ void nView::exportPixmap() {
     }
     my_suffix.clear();
 
-    QString allformats;
+    // (the list ended with an empty filter, and selectedFilter must be one of the filters, not the suffix)
+    QStringList filters;
     foreach (QByteArray format, my_list ) {
-        allformats += QString(format).toUpper()+" image (*."+format+");; ";
+        filters << QString(format).toUpper()+" image (*."+format+")";
     }
-    allformats.chop(1);
-    DEBUG(">"<< allformats.toStdString() << "<");
+    QString allformats=filters.join(";;");
     QString suffix=QFileInfo(property("pixmapFile").toString()).suffix();
-    QString fname = QFileDialog::getSaveFileName(this,tr("Save Pixmap"),property("pixmapFile").toString(),allformats,&suffix );
+    QString selected=filters.isEmpty() ? QString() : filters.first();
+    for (const QString &f : filters) {
+        if (f.endsWith("(*."+suffix+")")) selected=f;
+    }
+    QString fname = QFileDialog::getSaveFileName(this,tr("Save Pixmap"),property("pixmapFile").toString(),allformats,&selected );
     if (!fname.isEmpty()) {
         setProperty("pixmapFile",fname);
         my_pixitem.pixmap().save(fname);
@@ -205,10 +209,6 @@ bool nView::event(QEvent *event)
 
 bool nView::gestureEvent(QGestureEvent *event)
 {
-    qDebug() << "-------------------------------------------------------------------------";
-    foreach (QGesture *gesture, event->gestures()) {
-        qDebug() << "type: " << gesture->gestureType();
-    }
     QGesture *gesture=nullptr;
     if ((gesture = event->gesture(Qt::TapAndHoldGesture))) {
         tapandholdTriggered(static_cast<QTapAndHoldGesture *>(gesture));
@@ -219,15 +219,11 @@ bool nView::gestureEvent(QGestureEvent *event)
     if ((gesture = event->gesture(Qt::PinchGesture))) {
         pinchTriggered(static_cast<QPinchGesture *>(gesture));
     }
-    if ((gesture = event->gesture(Qt::PanGesture))) {
-        qDebug() << static_cast<QPanGesture *>(gesture);
-    }
     return true;
 }
 
 void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
-    DEBUG("-------------");
-    qDebug() << gesture;
+    Q_UNUSED(gesture);
 //    fillimage=true;
 //    setSize();
 //    update();
@@ -235,26 +231,25 @@ void nView::tapandholdTriggered(QTapAndHoldGesture *gesture) {
 
 void nView::pinchTriggered(QPinchGesture *gesture)
 {
-    incrzoom(gesture->lastScaleFactor());
+    // scaleFactor: the change since the last event (lastScaleFactor is the one before: one step late)
+    incrzoom(gesture->scaleFactor());
 }
 
 void nView::swipeTriggered(QSwipeGesture *gesture)
 {
     if (gesture->state() == Qt::GestureFinished) {
         //		qDebug() << "angle" << gesture->swipeAngle() << gesture->horizontalDirection() +	 gesture->verticalDirection();
-        switch (gesture->horizontalDirection() + gesture->verticalDirection()) {
-            case QSwipeGesture::Left:
-                previousColorTable();
-                break;
-            case QSwipeGesture::Right:
-                nextColorTable();
-                break;
-            case QSwipeGesture::Up:
-                prevBuffer();
-                break;
-            case QSwipeGesture::Down:
-                nextBuffer();
-                break;
+        // by the angle (0 right, 90 up): the sum horizontalDirection()+verticalDirection() of a diagonal swipe
+        // was another direction (Left+Up = Down)
+        const qreal angle=gesture->swipeAngle();
+        if (angle<45 || angle>=315) {
+            nextColorTable();
+        } else if (angle<135) {
+            prevBuffer();
+        } else if (angle<225) {
+            previousColorTable();
+        } else {
+            nextBuffer();
         }
         update();
     }
@@ -286,6 +281,9 @@ void nView::zoomOut() {
 
 void nView::incrzoom(double incr)
 {
+    // limits (the wheel could go to ~0 or to huge factors)
+    const double newZoom=transform().m11()*incr;
+    if (incr<=0 || newZoom<1e-3 || newZoom>1e3) return;
     scale(incr,incr);
     fillimage=false;
     setSize();
@@ -302,7 +300,7 @@ nView::setSize() {
         my_mouse.setSize(my_pixitem.pixmap().size());
     }
     emit zoomChanged(transform().m11());
-    repaint();
+    update(); // (repaint: a synchronous repaint at each image change and resize)
 }
 
 void
@@ -336,7 +334,7 @@ void nView::keyPressEvent (QKeyEvent *e) {
                         if (ppan) {
                             int res=QMessageBox::warning(ppan->nparent,tr("Attention"), "Really close "+ppan->panName()+"?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
                             if (res==QMessageBox::Ok) {
-                                ppan->closeEvent(nullptr);
+                                ppan->close(); // (closeEvent(nullptr) skipped the close of Qt)
                                 break;
                             }
                         }
@@ -384,14 +382,16 @@ void nView::rescaleColor(double val) {
     setProperty("percentPixels",val);
     if (nparent->currentBuffer) {
         if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) {
+            // bufferChanged is "the visible image is this one" (objects to its origin, pans...): physChanged for
+            // the others, and showPhys below emits bufferChanged for the visible one
             foreach (nPhysD* phys, nparent->physList) {
                 phys->prop["display_range"]=physMath::getColorPrecentPixels(*phys,val);
-                emit bufferChanged(phys);
+                if (phys!=nparent->currentBuffer) nparent->emitPhysChanged(phys);
             }
             qInfo() << "Colorscale of all images rescaled to show " << val << "% of the pixels";
         } else {
             nparent->currentBuffer->prop["display_range"]=physMath::getColorPrecentPixels(*nparent->currentBuffer,val);
-            emit bufferChanged(nparent->currentBuffer);
+            // (bufferChanged: emitted by showPhys below)
             qInfo() << "Images colorscale rescaled to show " << val << "% of the pixels";
         }
         nparent->showPhys();
@@ -413,17 +413,14 @@ void nView::rescaleMore() {
 void nView::cycleOverItems() {
     QList<QGraphicsItem *> lista;
     foreach (QGraphicsItem *oggetto, scene()->items() ) {
-        if (oggetto->type() > QGraphicsItem::UserType) {
-            if (oggetto->isVisible()) lista << oggetto;
-        } else {
-            qDebug() << oggetto;
-        }
+        if (oggetto->type() > QGraphicsItem::UserType && oggetto->isVisible()) lista << oggetto;
     }
     scene()->clearSelection();
     if (lista.size()>0) {
+        // the one after the focused one (it went backwards); the first if none has the focus
         int found=0;
-        for (int i=lista.size()-1; i >=0; i-- ) {
-            if (lista.at(i)->hasFocus()) found=(i+lista.size()-1)%lista.size();
+        for (int i=0; i<lista.size(); i++) {
+            if (lista.at(i)->hasFocus()) found=(i+1)%lista.size();
         }
 
         lista.at(found)->setFocus(Qt::TabFocusReason);
@@ -464,8 +461,7 @@ void nView::resetGamma() {
 void nView::setGamma(int value) {
     if (nparent->currentBuffer) {
         nparent->currentBuffer->prop["gamma"]=value;
-        nparent->showPhys();
-        emit bufferChanged(nparent->currentBuffer);
+        nparent->showPhys(); // (it emits bufferChanged: it was emitted twice)
     }
 }
 
@@ -501,8 +497,8 @@ void nView::setMouseOrigin() {
     } else {
         if (nparent->currentBuffer) {
             nparent->currentBuffer->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-            emit bufferChanged(nparent->currentBuffer);
-            nparent->emitPhysChanged(nparent->currentBuffer); // the other pans (Image_list, Mouse_info...)
+            // the other pans (Image_list, Mouse_info...), and bufferChanged (it was emitted twice)
+            nparent->emitPhysChanged(nparent->currentBuffer);
             qInfo() << "Origin set";
         }
     }
@@ -519,7 +515,8 @@ void nView::setMouseOrigin() {
 void nView::setMouseOriginAll() {
     foreach (nPhysD* phys, nparent->physList) {
         phys->set_origin(my_mouse.pos().x(),my_mouse.pos().y());
-        emit bufferChanged(phys);
+        // (bufferChanged was emitted for every image: objects and pans followed each one; emitPhysChanged
+        // emits it once, for the visible image)
         nparent->emitPhysChanged(phys);
     }
     qInfo() << "Origin set for all images";
@@ -611,7 +608,9 @@ void nView::mousePressEvent (QMouseEvent *e)
 {
 //    qDebug() << "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>";
     QGraphicsView::mousePressEvent(e);
-    if (e->modifiers()&Qt::ControlModifier && nparent->currentBuffer) {
+    // Ctrl-drag: the colour range of the pixels under the mouse (from (max,min): it grows with the pixels)
+    ctrlDrag=(e->modifiers()&Qt::ControlModifier) && nparent->currentBuffer;
+    if (ctrlDrag) {
         minMax=nparent->currentBuffer->get_min_max().swap();
     }
     emit mousePressEvent_sig(mapToScene(e->pos()));
@@ -622,27 +621,26 @@ void nView::mouseReleaseEvent (QMouseEvent *e)
 //    qDebug() << "end " << e;
     QGraphicsView::mouseReleaseEvent(e);
     emit mouseReleaseEvent_sig(mapToScene(e->pos()));
-    if (e->modifiers()==Qt::ControlModifier && minMax.x()!=minMax.y()) {
+    // only after a Ctrl-press (else the minMax of an older drag), with an image, and when the range grew
+    // (a Ctrl-click without moving gave (max,min): the colours inverted)
+    if (ctrlDrag && (e->modifiers()&Qt::ControlModifier) && nparent->currentBuffer && minMax.x()<minMax.y()) {
         nparent->currentBuffer->prop["display_range"]=minMax;
         setProperty("percentPixels",QVariant());
         nparent->showPhys();
     }
+    ctrlDrag=false;
 }
 
 void nView::mouseMoveEvent (QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
-    if (QGraphicsItem *item = itemAt(e->pos())) {
-        if (item->flags() & QGraphicsItem::ItemIsFocusable) {
-            qDebug() << item->toolTip();
-        }
-    }
 
     QPointF pos_mouse=mapToScene(e->pos());
     my_mouse.setPos(pos_mouse);
-    if (e->modifiers()==Qt::ControlModifier && nparent->currentBuffer) {
-        double val=nparent->currentBuffer->point(mapToScene(e->pos()).x(),mapToScene(e->pos()).y());
-        minMax=vec2f(std::min(minMax.x(),val),std::max(minMax.y(),val));
+    if (ctrlDrag && (e->modifiers()&Qt::ControlModifier) && nparent->currentBuffer) {
+        // pixel with floor and the int overload (a negative double to unsigned was undefined): NaN outside
+        double val=nparent->currentBuffer->point(vec2i(std::floor(pos_mouse.x()),std::floor(pos_mouse.y())));
+        if (std::isfinite(val)) minMax=vec2f(std::min(minMax.x(),val),std::max(minMax.y(),val));
     }
     emitMouseposition(pos_mouse);
 }

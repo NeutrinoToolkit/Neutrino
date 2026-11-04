@@ -74,6 +74,7 @@ public:
     void setSize();
 
     vec2f minMax;
+    bool ctrlDrag=false; // a Ctrl-press started a colour range drag
 
     bool show_mouse;
 
