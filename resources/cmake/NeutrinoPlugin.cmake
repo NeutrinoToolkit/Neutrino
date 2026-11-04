@@ -95,6 +95,11 @@ MACRO(ADD_NEUTRINO_PLUGIN)
     # file(GLOB MY_QRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
     file(GLOB MY_QRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
     LIST(APPEND QRCS ${MY_QRCS})
+    # the names of the resources (AUTORCC: the qrc basename), registered again by nCore in dark mode (src/CMakeLists.txt)
+    foreach(my_qrc ${MY_QRCS})
+        get_filename_component(my_qrc_name ${my_qrc} NAME_WE)
+        set_property(GLOBAL APPEND PROPERTY NEUTRINO_PLUGINS_QRCS ${my_qrc_name})
+    endforeach()
     ## add help
 
     # the help (README.md -> html) is optional: without pandoc the Help button is not shown
