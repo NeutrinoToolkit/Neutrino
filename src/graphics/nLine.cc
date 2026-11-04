@@ -1285,14 +1285,16 @@ nLine::loadSettings(QSettings &settings) {
 		}
         settings.endArray();
 		if (poly_tmp.size()>0) {
-			// saveSettings writes the points in scene coordinates (mapToScene): back to item coordinates,
-			// otherwise each save/load moves the line by its position (the image origin)
-//			setPoints(poly_tmp);
-			setPoints(mapFromScene(poly_tmp));
+			// saveSettings writes the points in scene coordinates (mapToScene) and setPoints takes scene coordinates
+			// (changeP maps them): no mapFromScene here, it moved the line by -origin at each save/load
+			setPoints(poly_tmp);
 		} else {
 			showMessage(tr("Error reading from file"));
 		}
 	}
+    // the saved position is the origin of the image of then: the points keep their place relative to it,
+    // and the line goes to the origin of the current image now (it did at the next buffer change, jumping)
+    if (nparent && nparent->getCurrentBuffer()) bufferChanged(nparent->getCurrentBuffer());
     setToolTip(settings.value("name",toolTip()).toString());
     setZValue(settings.value("depth",zValue()).toDouble());
     setWidthF(settings.value("width",nWidth).toDouble());

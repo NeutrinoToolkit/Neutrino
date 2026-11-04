@@ -88,10 +88,8 @@ nObject::nObject(neutrino *my_parent, QString cname) :
     // PADELLA
     my_pad.setWindowTitle(toolTip());
     QFile my_icon_f(":"+cname+".png");
-    qDebug() << my_icon_f.fileName();
 
     my_pad.setWindowIcon(QIcon(my_icon_f.fileName()));
-    qDebug() << my_pad.windowIcon().isNull();
     my_w.setupUi(&my_pad);
 
     my_w.spinWidth->setValue(nWidth);
@@ -137,6 +135,8 @@ void nObject::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QAction *expandBoth = menu.addAction("Expand Both (e)");
 	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandX()));
 	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandY()));
+    QAction *intersect = menu.addAction("Intersection with the image (i)");
+    connect(intersect, SIGNAL(triggered()), this, SLOT(intersection()));
     QAction *centerIt = menu.addAction("Center (c)");
     connect(centerIt, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
     QAction *submat = menu.addAction("Submatrix (s)");
@@ -162,6 +162,7 @@ void nObject::setRect(QRectF rect) {
 }
 
 QRect nObject::getRect(nPhysD* image) {
+    if (ref.size()<2) return QRect();
     QRect geom2=QRectF(mapToScene(ref[0]->pos()),mapToScene(ref[1]->pos())).toRect().normalized();
     // qDebug() << geom2;
     if (image && nparent->getCurrentBuffer()) {
@@ -192,7 +193,6 @@ void nObject::bufferChanged(nPhysD* my_phys) {
 
 void nObject::interactive ( ) {
     showMessage(tr("Click and drag"),5000);
-    qDebug() << "here" << moveRef << sender();
     switch (ref.size()) {
         case 0:
             connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
@@ -224,7 +224,6 @@ void nObject::hoverMoveEvent( QGraphicsSceneHoverEvent *){}
 
 
 void nObject::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
-    qDebug() << e;
 
     if (e->button()==Qt::LeftButton) {
         for (int i=0;i<ref.size();i++) {
@@ -234,7 +233,6 @@ void nObject::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
             }
         }
     }
-    qDebug()<< toolTip() << moveRef;
     if (moveRef.size()>0) { // if more that one just pick the last
         int keeplast=moveRef.last();
         moveRef.clear();
@@ -255,7 +253,6 @@ void nObject::mouseReleaseEvent ( QGraphicsSceneMouseEvent * e ) {
 }
 
 void nObject::mouseMoveEvent ( QGraphicsSceneMouseEvent * e ) {
-    qDebug() << moveRef;
     if (moveRef.contains(ref.size())) {
         QPointF delta=e->pos()-click_pos;
         moveBy(delta);
@@ -315,10 +312,16 @@ nObject::setOrder (double w) {
 void
 nObject::tableUpdated (QTableWidgetItem * item) {
     QPointF p;
-    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text());
-    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text());
-
-    changeP(item->row(),p, false);
+    bool okx=false, oky=false;
+    p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text(), &okx);
+    p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text(), &oky);
+    if (!okx || !oky) { // not a number: back to the current value (it was set to 0)
+        showMessage(tr("Not a number: ")+item->text(), 2000);
+        changePointPad(item->row());
+        return;
+    }
+    // the table shows the coordinates of the object (changePointPad), changeP takes scene coordinates
+    changeP(item->row(),mapToScene(p), false);
     itemChanged();
 }
 
@@ -376,8 +379,8 @@ void nObject::changePointPad(int nrow) {
     QPointF p=ref[nrow]->pos();
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
-    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
-    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     my_w.tableWidget->setItem(nrow, 0, xitem);
     my_w.tableWidget->setItem(nrow, 1, yitem);
     my_w.tableWidget->resizeRowToContents(nrow);
@@ -413,8 +416,8 @@ void nObject::addPoint (int pos) {
     my_w.tableWidget->insertRow(pos);
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
-    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
-    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     my_w.tableWidget->setItem(pos, 0, xitem);
     my_w.tableWidget->setItem(pos, 1, yitem);
     my_w.tableWidget->resizeRowToContents(pos);
@@ -422,7 +425,6 @@ void nObject::addPoint (int pos) {
 }
 
 void nObject::appendPoint () {
-    qDebug() << "here" << ref.size();
     addPoint(ref.size());
 }
 
@@ -461,7 +463,6 @@ void nObject::submatrix() {
 }
 
 void nObject::centerInBuffer() {
-    qDebug()  << getRectF();
     if (nparent->getCurrentBuffer()) {
         QRectF imageRect(0,0,nparent->getCurrentBuffer()->getW(),nparent->getCurrentBuffer()->getH());
         QRectF actualRect(getRectF());
@@ -477,7 +478,7 @@ void nObject::centerInBuffer() {
 
 
 void nObject::changeWidth () {
-    if (nparent->getCurrentBuffer()) {
+    if (ref.size()>1) { // (it needed an image, for nothing)
         QRectF rect=getRectF();
         bool ok;
         rect.setWidth(QLocale().toDouble(my_w.sizeWidth->text(),&ok));
@@ -489,7 +490,7 @@ void nObject::changeWidth () {
 }
 
 void nObject::changeHeight () {
-    if (nparent->getCurrentBuffer()) {
+    if (ref.size()>1) { // (it needed an image, for nothing)
         QRectF rect=getRectF();
         bool ok;
         rect.setHeight(QLocale().toDouble(my_w.sizeHeight->text(),&ok));
@@ -590,12 +591,10 @@ void nObject::copy_points() {
 
 void nObject::paste_points() {
     QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
-    qDebug() << my_l;
 
     QPolygonF my_poly;
     for (int i=0; i<my_l.size(); i++) {
         QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
-        qDebug() << my_p;
         if (my_p.size()==2) {
             bool ok0=false, ok1=false;
             double p0=my_p[0].toDouble(&ok0);
@@ -608,12 +607,14 @@ void nObject::paste_points() {
             }
         }
     }
-    qDebug() << my_poly;
     if (my_poly.size()>1) {
         moveRef.clear();
+        while (ref.size()<2) appendPoint();
+        // the clipboard has the coordinates of the object (copy_points), changeP takes scene coordinates
         for (int i=0; i<2; i++) {
-            changeP(i,my_poly[i], true);
+            changeP(i,mapToScene(my_poly[i]), true);
         }
+        itemChanged();
         moveRef.clear();
         my_pad.statusBar()->showMessage("Points pasted from clipboard",2000);
     } else {
@@ -679,7 +680,8 @@ QPainterPath nObject::shape() const {
 	stroker.setWidth(thickness);
 	QPainterPath my_shape = path();
 	for (int i =0; i<ref.size(); i++) {
-        my_shape.addPolygon(ref[i]->mapToScene(ref[i]->rect()));
+        // in the coordinates of the object (not of the scene: they differ by the image origin)
+        my_shape.addPolygon(ref[i]->mapToParent(ref[i]->rect()));
 	}
 	return stroker.createStroke(my_shape);
 }
@@ -701,7 +703,6 @@ void nObject::zoomChanged(double val){
 }
 
 void nObject::itemChanged() {
-    qDebug() << toolTip() << "sceneChanged";
     emit sceneChanged();
 }
 
@@ -731,7 +732,6 @@ nObject::saveSettings() {
 void
 nObject::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
-    qDebug() << "here: " << toolTip() << objectName();
     setPos(settings.value("position").toPointF());
 
     int size = settings.beginReadArray("points");
@@ -740,28 +740,28 @@ nObject::loadSettings(QSettings &settings) {
         settings.setArrayIndex(i);
         QPointF pp(settings.value("x").toDouble(),settings.value("y").toDouble());
         poly_tmp << pp;
-        qDebug() << toolTip() << i << pp;
 	}
     settings.endArray();
     if (poly_tmp.size()>1) {
-        // saveSettings writes the points in scene coordinates (mapToScene): back to item coordinates,
-        // otherwise each save/load moves the object by its position (the image origin)
-//        setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
-        setRect(QRectF(mapFromScene(poly_tmp.at(0)),mapFromScene(poly_tmp.at(1))));
+        // saveSettings writes the points in scene coordinates (mapToScene) and setRect takes scene coordinates
+        // (changeP maps them): no mapFromScene here, it moved the object by -origin at each save/load
+        setRect(QRectF(poly_tmp.at(0),poly_tmp.at(1)));
     } else {
         showMessage(tr("Error reading from file"));
     }
+    // the saved position is the origin of the image of then: the points keep their place relative to it,
+    // and the object goes to the origin of the current image now (it did at the next buffer change, jumping)
+    if (nparent && nparent->getCurrentBuffer()) bufferChanged(nparent->getCurrentBuffer());
     setToolTip(settings.value("name",toolTip()).toString());
     setZValue(settings.value("depth",zValue()).toDouble());
     setWidthF(settings.value("width",nWidth).toDouble());
     changeColor(settings.value("colorLine",nColor).value<QColor>());
     sizeHolder(settings.value("sizeHolder",nSizeHolder).toDouble());
-    changeColorHolder(settings.value("colorHolder",ref[0]->brush().color()).value<QColor>());
+    changeColorHolder(settings.value("colorHolder",holderColor).value<QColor>());
 
     if (settings.childGroups().contains("Properties")) {
         settings.beginGroup("Properties");
         foreach(QString my_key, settings.allKeys()) {
-            qDebug() << "load" <<  my_key << " : " << settings.value(my_key);
             setProperty(my_key.toStdString().c_str(), settings.value(my_key));
         }
         settings.endGroup();
@@ -772,7 +772,6 @@ nObject::loadSettings(QSettings &settings) {
 
 void
 nObject::saveSettings(QSettings &settings) {
-    qDebug() << "here: " << toolTip() << objectName();
     settings.beginGroup(toolTip());
     settings.remove("");
     settings.setValue("position",pos());
@@ -789,14 +788,11 @@ nObject::saveSettings(QSettings &settings) {
     settings.setValue("width",nWidth);
     settings.setValue("colorLine",nColor);
     settings.setValue("sizeHolder",nSizeHolder);
-    settings.setValue("colorHolder",ref[0]->brush().color());
+    settings.setValue("colorHolder",ref.size() ? ref[0]->brush().color() : holderColor);
 
     settings.beginGroup("Properties");
-    qDebug() << dynamicPropertyNames().size();
     foreach(QByteArray ba, dynamicPropertyNames()) {
-        qDebug() << "save" << ba << " : " << property(ba);
         if(ba.startsWith("NeuSave")) {
-            qDebug() << "write" << ba << " : " << property(ba);
             settings.setValue(ba, property(ba));
         }
     }
