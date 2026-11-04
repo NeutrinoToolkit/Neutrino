@@ -480,6 +480,8 @@ static const std::map<std::string, SignalConnector>& windowSignals() {
             [](neutrino *, QPointF p) { return std::vector<nb::object>{nb::make_tuple(p.x(), p.y())}; }); }},
         {"mouseAtWorld", [](neutrino *n, std::shared_ptr<PyCallback> cb) { return connectSignal(n, &neutrino::mouseAtWorld, cb,
             [](neutrino *, QPointF p) { return std::vector<nb::object>{nb::make_tuple(p.x(), p.y())}; }); }},
+        {"mouseClickAtWorld", [](neutrino *n, std::shared_ptr<PyCallback> cb) { return connectSignal(n, &neutrino::mouseClickAtWorld, cb,
+            [](neutrino *, QPointF p) { return std::vector<nb::object>{nb::make_tuple(p.x(), p.y())}; }); }},
         {"nZoom", [](neutrino *n, std::shared_ptr<PyCallback> cb) { return connectSignal(n, &neutrino::nZoom, cb,
             [](neutrino *, double z) { return std::vector<nb::object>{nb::float_(z)}; }); }},
         {"colorValue", [](neutrino *n, std::shared_ptr<PyCallback> cb) { return connectSignal(n, &neutrino::colorValue, cb,

@@ -180,6 +180,7 @@ public slots:
     void createDrawPoint();
 
     void mouseposition(QPointF=QPointF());
+    void mouseClickPosition(QPointF=QPointF());
 
     void zoomChanged(double);
 
@@ -225,7 +226,7 @@ signals:
     // signals for communications with pans
     void mouseAtMatrix(QPointF);					// mouse position on the matrix, no scale
     void mouseAtWorld(QPointF);					// mouse position with scale, relative to reference
-
+    void mouseClickAtWorld(QPointF);
     void nZoom(double);
 
     void bufferChanged(nPhysD*);						// visible image update

@@ -190,6 +190,7 @@ neutrino::neutrino():
     setCentralWidget(centralwidget);
 
     connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    connect(my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(mouseClickPosition(QPointF)));
     connect(my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
     connect(my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
     connect(my_view, SIGNAL(updatecolorbar(QString)), statusbar, SLOT(showMessage(QString)));
@@ -1497,6 +1498,20 @@ neutrino::mouseposition(QPointF pos_mouse) {
 
 
     emit mouseAtMatrix(pos_mouse);
+}
+
+void
+neutrino::mouseClickPosition(QPointF pos_mouse) {
+    if (nPhysExists(currentBuffer)) {
+        vec2f vec=currentBuffer->to_real(vec2f(pos_mouse.x(),pos_mouse.y()));
+        QPointF pos=QPointF(vec.x(),vec.y());
+        dx->setNum(pos.x());
+        dy->setNum(pos.y());
+        double val=currentBuffer->point(pos_mouse.x(),pos_mouse.y());
+        pos_z->setNum(val);
+        emit colorValue(val);
+        emit mouseClickAtWorld(pos);
+    }
 }
 
 QString neutrino::getFileSave() {
