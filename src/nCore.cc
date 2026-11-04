@@ -1,26 +1,158 @@
-#include "nApp.h"
+#include "nCore.h"
 #include "neutrino.h"
+#include "nGenericPan.h"
 #include "nVersion.h"
 #include <QtNetwork>
 #include "ui_nLogWin.h"
+#include <QApplication>
+#include <QClipboard>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QThread>
 #include <QStyleHints>
 #include <QPalette>
+#include <atomic>
 
-nApp::nApp( int &argc, char **argv ) : QApplication(argc, argv),
-    log_win(nullptr,Qt::Tool),
+// read by the message handler, also from the worker threads
+static std::atomic<nCore*> core_instance{nullptr};
+static QtMessageHandler previous_handler=nullptr;
+
+nCore* nCore::self() {
+    nCore *core=core_instance.load();
+    if (core==nullptr) {
+        if (qobject_cast<QApplication*>(QCoreApplication::instance())==nullptr) {
+            qFatal("Neutrino needs a QApplication");
+        }
+        core=new nCore();
+        bool dark=core->selectIconTheme(); // before any window (also the log window) uses the icons
+        core->createLogWin();
+        core_instance.store(core);
+        // after the store: the message handler can use the instance
+#ifndef __phys_debug
+        previous_handler=qInstallMessageHandler(nCore::myMessageOutput);
+#endif
+        qInfo() << "Default preference file:" << QSettings("neutrino","").fileName();
+        qInfo() << "Icons:" << (dark ? "dark" : "light");
+
+        core->addDefaultPalettes();
+
+        QSettings my_set("neutrino","");
+        my_set.beginGroup("nPreferences");
+        if (!my_set.contains("threads")) {
+            // all the cores by default (FFTW and OpenMP); users who already chose a value keep it
+            my_set.setValue("threads",std::max(1,QThread::idealThreadCount()));
+        }
+        // plugins plan FFTs in worker threads (e.g. the wavelet, with FFTW_MEASURE) while others plan in the GUI thread:
+        // the FFTW planner is not thread safe unless this is called (FFTW >= 3.3.5)
+        fftw_make_planner_thread_safe();
+        changeThreads(my_set.value("threads").toInt());
+
+        if (!my_set.contains("forceDecimalDot")) {
+            my_set.setValue("forceDecimalDot",true);
+        }
+        core->forceDecimalDot(my_set.value("forceDecimalDot").toBool());
+        my_set.endGroup();
+    }
+    return core;
+}
+
+nCore::nCore() :
     log_win_ui(new Ui::nLogWin)
 {
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
+    my_set.endGroup();
+}
 
+// the log window must not outlive the QApplication: it is deleted when the application quits
+// (and created again if Neutrino is used after that, e.g. by a second exec from python)
+void nCore::createLogWin() {
+    log_win=new QWidget(nullptr,Qt::Tool);
+    log_win_ui->setupUi(log_win);
+
+    connect(log_win_ui->clearLog,&QPushButton::released,this,&nCore::clearLog);
+    connect(log_win_ui->copyLog,&QPushButton::released,this,&nCore::copyLog);
+    connect(log_win_ui->saveLog,&QPushButton::released,this,&nCore::saveLog);
+    connect(log_win_ui->buttonFind,&QPushButton::released,this,&nCore::findLogText);
+    connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nCore::findLogText);
+
+    log_win_ui->logger->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
+    log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
+    log_win->setVisible(my_set.value("log_winVisible",false).toBool());
+    my_set.endGroup();
+    log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
+
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &nCore::deleteLogWin, Qt::UniqueConnection);
+}
+
+void nCore::deleteLogWin() {
+    if (log_win) {
+        saveLogSettings();
+        delete log_win;
+    }
+}
+
+QWidget* nCore::logWin() {
+    if (!log_win) createLogWin();
+    return log_win;
+}
+
+Ui::nLogWin* nCore::logUi() {
+    logWin();
+    return log_win_ui;
+}
+
+void nCore::showException(const char *what) {
+    logWin()->show();
+    qCritical() << what;
+}
+
+void nCore::handleFileOpen(bool enable) {
+    if (enable) {
+        qApp->installEventFilter(this);
+    } else {
+        qApp->removeEventFilter(this);
+    }
+}
+
+// the QFileOpenEvent is sent to the application object (it was nApp::event)
+bool nCore::eventFilter(QObject *obj, QEvent *ev) {
+    if (obj==qApp && ev->type() == QEvent::FileOpen) {
+        QWidget *widget = QApplication::activeWindow();
+        neutrino *neu=qobject_cast<neutrino *>(widget);
+        if (neu == nullptr) {
+            nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
+            if (pan) neu = pan->nparent;
+        }
+        if (neu == nullptr) neu = new neutrino();
+        neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
+        ev->accept();
+        return true;
+    }
+    return QObject::eventFilter(obj, ev);
+}
+
+void nCore::saveLogSettings() {
+    if (!log_win) return;
+    QSettings my_set("neutrino","");
+    my_set.beginGroup("nPreferences");
+    my_set.setValue("log_winVisible",log_win->isVisible());
+    my_set.setValue("log_level",log_win_ui->levelLog->currentIndex());
+    my_set.setValue("log_follow",log_win_ui->followLog->isChecked());
+    my_set.setValue("NeuSave-fileTxt",property("NeuSave-fileTxt"));
+    my_set.endGroup();
 }
 
 // icons.qrc and icons_dark.qrc are both compiled in with the same /icons/ prefix and names
 // (the dark ones are made by resources/icons/Makefile): keep only one of them.
 // Changing the system mode while running needs a restart (QIcon keeps the images already loaded)
-void nApp::selectIconTheme() {
+bool nCore::selectIconTheme() {
     QSettings my_set("neutrino","");
     my_set.beginGroup("nPreferences");
     int theme=my_set.value("iconThemeDefault",0).toInt(); // iconTheme combo of nPreferences: 0 automatic, 1 light, 2 dark
@@ -29,9 +161,10 @@ void nApp::selectIconTheme() {
     bool dark=(theme==2);
     if (theme==0) {
         // a dark window background (also the fallback when the system doesn't say)
-        bool darkPalette=palette().color(QPalette::Window).lightness() < palette().color(QPalette::WindowText).lightness();
+        QPalette pal=QGuiApplication::palette();
+        bool darkPalette=pal.color(QPalette::Window).lightness() < pal.color(QPalette::WindowText).lightness();
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        Qt::ColorScheme scheme=styleHints()->colorScheme();
+        Qt::ColorScheme scheme=QGuiApplication::styleHints()->colorScheme();
         dark = (scheme==Qt::ColorScheme::Unknown) ? darkPalette : (scheme==Qt::ColorScheme::Dark);
 #else
         dark = darkPalette;
@@ -42,88 +175,16 @@ void nApp::selectIconTheme() {
     } else {
         Q_CLEANUP_RESOURCE(icons_dark);
     }
-    qInfo() << "Icons:" << (dark ? "dark" : "light");
+    return dark;
 }
 
-int nApp::exec() {
-
-    log_win_ui->setupUi(&log_win);
-
-#ifndef __phys_debug
-    qInstallMessageHandler(nApp::myMessageOutput);
-#endif
-    qInfo() << "Default preference file:" << QSettings("neutrino","").fileName();
-
-    selectIconTheme(); // before any window uses the icons
-
-    addDefaultPalettes();
-
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
-
-    QCoreApplication::setOrganizationName("polytechnique");
-    QCoreApplication::setOrganizationDomain("edu");
-    QCoreApplication::setApplicationName("Neutrino");
-    QCoreApplication::setApplicationVersion(SHAVERSION__);
-
-    if (!my_set.contains("threads")) {
-        // my_set.setValue("threads",1);
-        // all the cores by default (FFTW and OpenMP); users who already chose a value keep it
-        my_set.setValue("threads",std::max(1,QThread::idealThreadCount()));
-    }
-    // plugins plan FFTs in worker threads (e.g. the wavelet, with FFTW_MEASURE) while others plan in the GUI thread:
-    // the FFTW planner is not thread safe unless this is called (FFTW >= 3.3.5)
-    fftw_make_planner_thread_safe();
-    changeThreads(my_set.value("threads").toInt());
-
-    if (!my_set.contains("forceDecimalDot")) {
-        my_set.setValue("forceDecimalDot",true);
-    }
-    forceDecimalDot(my_set.value("forceDecimalDot").toBool());
-
-    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
-
-    QObject::connect(log_win_ui->clearLog,&QPushButton::released,this,&nApp::clearLog);
-    QObject::connect(log_win_ui->copyLog,&QPushButton::released,this,&nApp::copyLog);
-    QObject::connect(log_win_ui->saveLog,&QPushButton::released,this,&nApp::saveLog);
-    QObject::connect(log_win_ui->buttonFind,&QPushButton::released,this,&nApp::findLogText);
-    QObject::connect(log_win_ui->lineFind,&QLineEdit::returnPressed,this,&nApp::findLogText);
-
-    log_win_ui->logger->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-
-    log_win_ui->levelLog->setCurrentIndex(my_set.value("log_level",0).toInt());
-    log_win_ui->followLog->setChecked(my_set.value("log_follow",1).toInt());
-    log_win.setVisible(my_set.value("log_winVisible",false).toBool());
-    setProperty("NeuSave-fileTxt",my_set.value("NeuSave-fileTxt","log.txt").toString());
-    log_win_ui->logger->setWordWrapMode(QTextOption::WrapAnywhere);
-
-    if (!my_set.contains("checkUpdates")) {
-        my_set.setValue("checkUpdates",QMessageBox::Yes == QMessageBox::question(nullptr,tr("Attention"),tr("Do you want to check for updates?"), QMessageBox::Yes | QMessageBox::No));
-    }
-    if (my_set.value("checkUpdates",true).toBool()) {
-        checkUpdates();
-    }
-
-    my_set.endGroup();
-
-    QStringList args=arguments();
-    args.removeFirst();
-
-    neutrino *my_neu = new neutrino();
-    for (auto &arg : args)
-        my_neu->fileOpen(arg);
-
-    my_neu->activateWindow();
-    return QApplication::exec();
-}
-
-void nApp::clearLog() {
+void nCore::clearLog() {
     log_win_ui->logger->clear();
     log_win_ui->logger->hide();
     log_win_ui->logger->show();
 }
 
-void nApp::findLogText() {
+void nCore::findLogText() {
     QString searchString = log_win_ui->lineFind->text();
     if (!searchString.isEmpty()) {
        bool found = log_win_ui->logger->find(searchString, QTextDocument::FindWholeWords);
@@ -139,50 +200,59 @@ void nApp::findLogText() {
     }
 }
 
-void nApp::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
-    nApp *napp(qobject_cast<nApp*> (qApp));
-    if (napp /*&& napp->log_win.isVisible()*/) {
-        if (napp->log_win_ui->levelLog->currentIndex() > type) return;
-        QByteArray localMsg = msg.toLocal8Bit();
-        QString outstr=QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz");
-        switch (type) {
-            case QtDebugMsg:
-                outstr += " D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
-                break;
-            case QtInfoMsg:
-                outstr +=" I: <font color=\"black\">";
-                break;
-            case QtWarningMsg:
-                outstr +=" W: <font color=\"#C71585\">";
-                break;
-            case QtCriticalMsg:
-                outstr +=" C: <font color=\"#9932CC\">";
-                break;
-            case QtFatalMsg:
-                outstr +=" F: <font color=\"#FF0000\">";
-                abort();
-        }
-        outstr +=  msg + "</font>";
+void nCore::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    nCore *core=core_instance.load();
+    // no log window (yet, or any more), or the application is being destroyed: the previous handler (the terminal)
+    if (core==nullptr || !core->log_win || QCoreApplication::instance()==nullptr || QCoreApplication::closingDown()) {
+        if (previous_handler) previous_handler(type, context, msg);
+        return;
+    }
+    if (core->log_win_ui->levelLog->currentIndex() > type) return;
+    QString outstr=QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz");
+    switch (type) {
+        case QtDebugMsg:
+            outstr += " D: <font color=\"#A9A9A9\">" + QString("Debug (") + context.file + QString(":")+ QLocale().toString(context.line) +QString(") ") + " :</font><font color=\"black\">";
+            break;
+        case QtInfoMsg:
+            outstr +=" I: <font color=\"black\">";
+            break;
+        case QtWarningMsg:
+            outstr +=" W: <font color=\"#C71585\">";
+            break;
+        case QtCriticalMsg:
+            outstr +=" C: <font color=\"#9932CC\">";
+            break;
+        case QtFatalMsg:
+            outstr +=" F: <font color=\"#FF0000\">";
+            abort();
+    }
+    outstr +=  msg + "</font>";
 
-        napp->log_win_ui->logger->append(outstr);
-        if (napp->log_win_ui->followLog->isChecked())
-            napp->log_win_ui->logger->verticalScrollBar()->setValue(napp->log_win_ui->logger->verticalScrollBar()->maximum());
-
+    // the widgets belong to the GUI thread: messages of the worker threads are queued
+    auto append = [core, outstr]() {
+        if (!core->log_win) return;
+        core->log_win_ui->logger->append(outstr);
+        if (core->log_win_ui->followLog->isChecked())
+            core->log_win_ui->logger->verticalScrollBar()->setValue(core->log_win_ui->logger->verticalScrollBar()->maximum());
+    };
+    if (QThread::currentThread()==core->thread()) {
+        append();
+    } else {
+        QMetaObject::invokeMethod(core, append, Qt::QueuedConnection);
     }
 }
 
-void nApp::copyLog() {
-    clipboard()->setText(log_win_ui->logger->toPlainText());
+void nCore::copyLog() {
+    QGuiApplication::clipboard()->setText(log_win_ui->logger->toPlainText());
 }
 
-void nApp::saveLog(){
-    QString fnametmp=QFileDialog::getSaveFileName(&log_win,tr("Save Log"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
+void nCore::saveLog(){
+    QString fnametmp=QFileDialog::getSaveFileName(log_win,tr("Save Log"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);
-        // t.open(QIODevice::WriteOnly| QIODevice::Text);
         if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-            QMessageBox::warning(&log_win,tr("Save Log"),tr("Cannot write file ")+fnametmp+"\n"+t.errorString(), QMessageBox::Ok);
+            QMessageBox::warning(log_win,tr("Save Log"),tr("Cannot write file ")+fnametmp+"\n"+t.errorString(), QMessageBox::Ok);
             return;
         }
         QTextStream out(&t);
@@ -191,7 +261,7 @@ void nApp::saveLog(){
     }
 
 }
-void nApp::addDefaultPalettes() {
+void nCore::addDefaultPalettes() {
     qDebug() << "reset Palettes";
     nPalettes.clear();
     QDirIterator it(":cmaps/", QDirIterator::Subdirectories);
@@ -215,7 +285,7 @@ void nApp::addDefaultPalettes() {
 }
 
 // a palette file is 256 RGB triplets (768 integers 0-255). Returns false if not loaded
-bool nApp::addPaletteFile(QString cmapfile) {
+bool nCore::addPaletteFile(QString cmapfile) {
     QSettings my_set("neutrino","");
     my_set.beginGroup("Palettes");
     QStringList hiddenPalettes=my_set.value("hiddenPalettes","").toStringList();
@@ -254,86 +324,25 @@ bool nApp::addPaletteFile(QString cmapfile) {
     return false;
 }
 
-void nApp::closeAllWindows() {
+void nCore::closeAllWindows() {
     qDebug() << "here" << sender();
     for(auto &neu : neus()) {
         neu->close();
     }
-    processEvents();
-    QSettings my_set("neutrino","");
-    my_set.beginGroup("nPreferences");
-    my_set.setValue("log_winVisible",log_win.isVisible());
-    my_set.setValue("log_level",log_win_ui->levelLog->currentIndex());
-    my_set.setValue("log_follow",log_win_ui->followLog->isChecked());
-    my_set.setValue("NeuSave-fileTxt",property("NeuSave-fileTxt"));
-
-    my_set.endGroup();
-    //    QApplication::closeAllWindows();
+    QCoreApplication::processEvents();
+    saveLogSettings();
 };
 
-
-
-QList<neutrino*> nApp::neus() {
+QList<neutrino*> nCore::neus() {
     QList<neutrino*> retList;
-    foreach (QWidget *widget, topLevelWidgets()) {
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
         neutrino *my_neu=qobject_cast<neutrino *>(widget);
         if (my_neu) retList<< my_neu;
     }
     return retList;
 }
 
-bool nApp::notify(QObject *rec, QEvent *ev)
-{
-    bool retval=false;
-    try {
-        retval = QApplication::notify(rec, ev);
-    } catch (std::exception &e) {
-        log_win.show();
-        qCritical() << e.what();
-    }
-    return retval;
-}
-
-//#include <QEvent>
-//#include <QMetaEnum>
-//#include <QDebug>
-
-///// Gives human-readable event type information.
-//QDebug operator<<(QDebug str, const QEvent * ev) {
-//   static int eventEnumIndex = QEvent::staticMetaObject
-//         .indexOfEnumerator("Type");
-//   str << "QEvent";
-//   if (ev) {
-//      QString name = QEvent::staticMetaObject
-//            .enumerator(eventEnumIndex).valueToKey(ev->type());
-//      if (!name.isEmpty()) str << name; else str << ev->type();
-//   } else {
-//      str << (void*)ev;
-//   }
-//   return str.maybeSpace();
-//}
-
-
-bool nApp::event(QEvent *ev) {
-    qDebug() << ev;
-    if (ev->type() == QEvent::FileOpen) {
-        QWidget *widget = activeWindow();
-        neutrino *neu=qobject_cast<neutrino *>(widget);
-        if (neu == nullptr) {
-            nGenericPan *pan=qobject_cast<nGenericPan *>(widget);
-            if (pan) neu = pan->nparent;
-        }
-        if (neu == nullptr) neu = new neutrino();
-        neu->fileOpen(static_cast<QFileOpenEvent *>(ev)->file());
-        ev->accept();
-    } else {
-        return QApplication::event(ev);
-    }
-    return true;
-}
-
-
-void nApp::changeThreads(int num) {
+void nCore::changeThreads(int num) {
     if (num<=1) {
         fftw_cleanup_threads();
     } else {
@@ -345,7 +354,7 @@ void nApp::changeThreads(int num) {
 }
 
 
-void nApp::forceDecimalDot(bool num) {
+void nCore::forceDecimalDot(bool num) {
     if (num) {
         qInfo() << "Force decimal dot separator ";
         QLocale::setDefault(QLocale::English);
@@ -356,7 +365,7 @@ void nApp::forceDecimalDot(bool num) {
     qDebug() << num;
 }
 
-int nApp::checkUpdates() {
+int nCore::checkUpdates() {
     QNetworkProxyFactory::setUseSystemConfiguration(true) ;
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl("https://api.github.com/repos/NeutrinoToolkit/Neutrino/commits/master")));
@@ -396,7 +405,6 @@ int nApp::checkUpdates() {
             msgBox.addButton(tr("Get it now"), QMessageBox::YesRole);
             msgBox.addButton(tr("Next time"), QMessageBox::RejectRole);
             msgBox.addButton(tr("Stop checking"), QMessageBox::NoRole);
-            //            msgBox.setIconPixmap(QPixmap(":icons/icon").scaledToWidth(100));
             int ret = msgBox.exec();
 
             qDebug() << ret << " : " << msgBox.result();

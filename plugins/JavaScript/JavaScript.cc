@@ -24,6 +24,7 @@
  */
 
 #include "JavaScript.h"
+#include "nCore.h"
 #include "nPhysImageF.h"
 #include <QScopedValueRollback>
 
@@ -35,9 +36,12 @@ JavaScript::JavaScript(neutrino *my_nparent) : nGenericPan(my_nparent)
 {
     setupUi(this);
     my_eng.globalObject().setProperty("neu", my_eng.newQObject(nparent));
-    my_eng.globalObject().setProperty("nApp", my_eng.newQObject(qApp));
+    // my_eng.globalObject().setProperty("nApp", my_eng.newQObject(qApp));
+    // nApp is now nCore (neus(), closeAllWindows()...): the QApplication isn't Neutrino's when it is a library
+    my_eng.globalObject().setProperty("nApp", my_eng.newQObject(nCore::self()));
     my_eng.setObjectOwnership(nparent, QJSEngine::CppOwnership);
-    my_eng.setObjectOwnership(qApp, QJSEngine::CppOwnership);
+    // my_eng.setObjectOwnership(qApp, QJSEngine::CppOwnership);
+    my_eng.setObjectOwnership(nCore::self(), QJSEngine::CppOwnership);
 
     my_eng.installExtensions(QJSEngine::ConsoleExtension);
 

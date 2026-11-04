@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -29,10 +29,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ubuntu
         path: Neutrino-*.*
@@ -44,7 +41,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -56,10 +53,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.deb ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: debian
         path: Neutrino-*.*
@@ -71,7 +65,7 @@ jobs:
     steps:
     - name: Git
       run: apt-get update -qq && apt-get install -yy git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -82,10 +76,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         for f in Neutrino*.deb; do cp "$f" "../$(echo "$f" | sed 's/-Ubuntu-/-Linuxmint-/')"; done
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: mint
         path: Neutrino-*.*
@@ -97,7 +88,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -110,10 +101,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: fedora
         path: Neutrino-*.*
@@ -125,7 +113,7 @@ jobs:
     steps:
     - name: Git
       run: zypper install -y git tar gzip
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -139,10 +127,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ../Neutrino-Linux-x86_64-openSUSE-Tumbleweed.rpm
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: opensuse
         path: Neutrino-*.*
@@ -154,7 +139,7 @@ jobs:
     steps:
     - name: Git
       run: zypper install -y git tar gzip
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -170,10 +155,7 @@ jobs:
         cmake ..
         make -j$(nproc) package
         cp Neutrino*.rpm ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: opensuseleap
         path: Neutrino-*.*
@@ -181,7 +163,7 @@ jobs:
   mac-arm:
     runs-on: macos-15
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Prepare
@@ -201,10 +183,7 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         ../resources/macPackage/prepareapp.sh
         cp Neutrino-*.zip Neutrino-*.dmg ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: macos-15
         path: |
@@ -218,7 +197,7 @@ jobs:
     env:
       PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qtdeclarative qt6-qttools qt6-qtcharts fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig librsvg
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: MacPorts
@@ -240,10 +219,7 @@ jobs:
         make -j$(sysctl -n hw.ncpu) install
         QT_BIN=/opt/local/libexec/qt6/bin DEPLOY_LIBPATHS="/opt/local/lib /opt/local/lib/libomp" ../resources/macPackage/prepareapp.sh
         cp Neutrino-*.zip Neutrino-*.dmg ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: macos-15-intel
         path: |
@@ -262,7 +238,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -270,7 +246,7 @@ jobs:
         git config --global --add safe.directory '*'
         dnf clean all
         dnf -y --nogpgcheck update
-        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-libjpeg-turbo pandoc ${MINGW}-cfitsio ${MINGW}-python3 ${MINGW}-python3-numpy qt6-qtbase-devel librsvg2-tools
+        dnf -y install cmake git ${MINGW}-qt6* ${MINGW}-gcc-c++ ${MINGW}-gcc ${MINGW}-gcc-gfortran ${MINGW}-libgomp ${MINGW}-gsl ${MINGW}-zlib mingw32-nsis unzip wget autoconf automake bash bison bzip2 flex gcc-c++ gdk-pixbuf2-devel gettext git gperf intltool make sed libffi-devel libtool openssl-devel p7zip patch perl pkgconfig python ruby scons unzip wget xz hostname gtk-doc dh-autoreconf ${MINGW}-libjpeg-turbo pandoc ${MINGW}-cfitsio qt6-qtbase-devel librsvg2-tools
         wget http://www.fftw.org/fftw-3.3.6-pl2.tar.gz
         tar -zxvf fftw-3.3.6-pl2.tar.gz
         cd fftw-3.3.6-pl2
@@ -287,10 +263,7 @@ jobs:
         ${MINGW}-cmake ..
         make -j$(nproc) package
         cp Neutrino*.exe Neutrino*.zip ..
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.arch }}
         path: Neutrino-*.*
@@ -335,7 +308,7 @@ jobs:
     steps:
     - name: Git
       run: dnf -y install git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Build
@@ -360,31 +333,80 @@ jobs:
         wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${{ matrix.linuxdeploy }}/linuxdeploy-plugin-qt-${{ matrix.arch }}.AppImage
         chmod +x linuxdeploy*.AppImage
         mkdir build && cd build
-        cmake -DCMAKE_INSTALL_PREFIX=/usr -DPYSHELL_BUNDLE_PYTHON=ON ..
+        cmake -DCMAKE_INSTALL_PREFIX=/usr ..
         make -j$(nproc) install DESTDIR=AppDir
-        # libraries bundled by the pip wheels (scipy.libs, numpy.libs) find each other via $ORIGIN, linuxdeploy does not
-        for d in AppDir/usr/lib/neutrino/python/*/python3*/site-packages/*.libs; do [ -d "$d" ] && LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$PWD/$d"; done; export LD_LIBRARY_PATH
         ../linuxdeploy-${{ matrix.arch }}.AppImage --appdir AppDir --plugin qt --output appimage --custom-apprun=../resources/linuxPackage/AppRun --icon-file=../resources/icons/neutrino.svg
         cp Neutrino-*.AppImage ${{ matrix.out }}
-    - name: PythonQt logs
-      if: failure()
-      run: tail -n 80 build/_deps/pythonqt-build/*.log || true
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.name }}
         path: Neutrino-*.AppImage
 
+  # the python module (pip install neutrino-toolkit): cibuildwheel, configured in pyproject.toml ([tool.cibuildwheel])
+  wheels:
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: wheel-linux-x86_64
+          - os: ubuntu-24.04-arm
+            name: wheel-linux-aarch64
+          - os: macos-15
+            name: wheel-macos-arm64
+          - os: macos-15-intel
+            name: wheel-macos-x86_64
+          - os: windows-2025
+            name: wheel-windows-x86_64
+    runs-on: ${{ matrix.os }}
+    env:
+      # Windows: the packages built by vcpkg (python/ci/before_all_windows.sh), cached
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    # Windows: cl, link and the Windows SDK in the environment (used by clang-cl)
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: runner.os == 'Windows'
+    # restore and save apart: the cache is kept also when the build fails
+    - name: vcpkg cache
+      if: runner.os == 'Windows'
+      id: vcpkg-cache
+      uses: actions/cache/restore@v6
+      with:
+        path: vcpkg-cache
+        key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
+    - name: vcpkg cache directory
+      if: runner.os == 'Windows'
+      shell: bash
+      run: mkdir -p vcpkg-cache
+    - name: Build and test
+      run: pipx run "cibuildwheel>=3.1,<4" --output-dir wheelhouse
+    - name: vcpkg cache save
+      if: always() && runner.os == 'Windows' && steps.vcpkg-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: vcpkg-cache
+        key: vcpkg-x64-windows-static-md-${{ hashFiles('python/ci/before_all_windows.sh') }}
+    - uses: actions/upload-artifact@v7
+      with:
+        name: ${{ matrix.name }}
+        path: wheelhouse/*.whl
+
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac-arm.result == 'success' && needs.windows.result == 'success' }}
-    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
+    # needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage]
+    needs: [ubuntu, debian, mint, fedora, opensuse, opensuseleap, mac-arm, mac-intel, windows, AppImage, wheels]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/download-artifact@v4
+    - uses: actions/checkout@v7
+    - uses: actions/download-artifact@v8
       with:
         path: package
         merge-multiple: true

@@ -10,39 +10,41 @@ cp -r Neutrino.app dmg_dir
 APP=dmg_dir/Neutrino.app
 PACKAGE_NAME=Neutrino-$(uname -s)-$(uname -m)
 
-# PyShell: ship the standard library of the python PythonQt was built with (pyshell_python.sh is written by cmake)
-# PyShell::startup sets PYTHONHOME to Contents/Resources/python
+# PyShell (PythonQt) removed: no python shipped in the app any more (the neutrino python module replaces it)
 EXTRA_EXECUTABLES=()
-if [ -e ${APP}/Contents/Resources/plugins/libPyShell.dylib ] && [ -f pyshell_python.sh ]; then
-    source ./pyshell_python.sh
-    PY_DEST=${APP}/Contents/Resources/python/lib/python${PYSHELL_PYTHON_VERSION}
-    mkdir -p ${PY_DEST}
-    rsync -a --exclude __pycache__ --exclude 'test/' --exclude 'tests/' --exclude idlelib --exclude tkinter --exclude turtledemo --exclude ensurepip --exclude site-packages --exclude 'config-*' "${PYSHELL_PYTHON_STDLIB}/" ${PY_DEST}/
-    # the compiled modules link brew libraries (openssl, xz, ...): let macdeployqt fix them too
-    # for so in ${PY_DEST}/lib-dynload/*.so; do
-    #     EXTRA_EXECUTABLES+=("-executable=${so}")
-    # done
-    # (only the few that need it: passing all of them makes macdeployqt very slow)
-    for so in ${PY_DEST}/lib-dynload/*.so; do
-        if otool -L ${so} | tail -n +2 | awk '{print $1}' | grep -qvE '^(/usr/lib|/System)'; then
-            EXTRA_EXECUTABLES+=("-executable=${so}")
-        fi
-    done
-    # libpython: macdeployqt looks for the brew Python.framework in the wrong place, so copy it here
-    # and point every binary using it to the copy
-    for bin in $(find ${APP} -type f \( -name '*.dylib' -o -perm +111 \)); do
-        PY_LIB=$(otool -L ${bin} 2>/dev/null | tail -n +2 | awk '{print $1}' | grep -E 'Python\.framework/Versions/[0-9.]+/Python$|libpython[0-9.]+\.dylib$' || true)
-        if [ -n "${PY_LIB}" ]; then
-            PY_LIB_NAME=libpython${PYSHELL_PYTHON_VERSION}.dylib
-            if [ ! -e ${APP}/Contents/Frameworks/${PY_LIB_NAME} ]; then
-                cp -L ${PY_LIB} ${APP}/Contents/Frameworks/${PY_LIB_NAME}
-                chmod u+w ${APP}/Contents/Frameworks/${PY_LIB_NAME}
-                install_name_tool -id @executable_path/../Frameworks/${PY_LIB_NAME} ${APP}/Contents/Frameworks/${PY_LIB_NAME}
-            fi
-            install_name_tool -change ${PY_LIB} @executable_path/../Frameworks/${PY_LIB_NAME} ${bin}
-        fi
-    done
-fi
+## PyShell: ship the standard library of the python PythonQt was built with (pyshell_python.sh is written by cmake)
+## PyShell::startup sets PYTHONHOME to Contents/Resources/python
+# EXTRA_EXECUTABLES=()
+# if [ -e ${APP}/Contents/Resources/plugins/libPyShell.dylib ] && [ -f pyshell_python.sh ]; then
+#     source ./pyshell_python.sh
+#     PY_DEST=${APP}/Contents/Resources/python/lib/python${PYSHELL_PYTHON_VERSION}
+#     mkdir -p ${PY_DEST}
+#     rsync -a --exclude __pycache__ --exclude 'test/' --exclude 'tests/' --exclude idlelib --exclude tkinter --exclude turtledemo --exclude ensurepip --exclude site-packages --exclude 'config-*' "${PYSHELL_PYTHON_STDLIB}/" ${PY_DEST}/
+#     # the compiled modules link brew libraries (openssl, xz, ...): let macdeployqt fix them too
+#     # for so in ${PY_DEST}/lib-dynload/*.so; do
+#     #     EXTRA_EXECUTABLES+=("-executable=${so}")
+#     # done
+#     # (only the few that need it: passing all of them makes macdeployqt very slow)
+#     for so in ${PY_DEST}/lib-dynload/*.so; do
+#         if otool -L ${so} | tail -n +2 | awk '{print $1}' | grep -qvE '^(/usr/lib|/System)'; then
+#             EXTRA_EXECUTABLES+=("-executable=${so}")
+#         fi
+#     done
+#     # libpython: macdeployqt looks for the brew Python.framework in the wrong place, so copy it here
+#     # and point every binary using it to the copy
+#     for bin in $(find ${APP} -type f \( -name '*.dylib' -o -perm +111 \)); do
+#         PY_LIB=$(otool -L ${bin} 2>/dev/null | tail -n +2 | awk '{print $1}' | grep -E 'Python\.framework/Versions/[0-9.]+/Python$|libpython[0-9.]+\.dylib$' || true)
+#         if [ -n "${PY_LIB}" ]; then
+#             PY_LIB_NAME=libpython${PYSHELL_PYTHON_VERSION}.dylib
+#             if [ ! -e ${APP}/Contents/Frameworks/${PY_LIB_NAME} ]; then
+#                 cp -L ${PY_LIB} ${APP}/Contents/Frameworks/${PY_LIB_NAME}
+#                 chmod u+w ${APP}/Contents/Frameworks/${PY_LIB_NAME}
+#                 install_name_tool -id @executable_path/../Frameworks/${PY_LIB_NAME} ${APP}/Contents/Frameworks/${PY_LIB_NAME}
+#             fi
+#             install_name_tool -change ${PY_LIB} @executable_path/../Frameworks/${PY_LIB_NAME} ${bin}
+#         fi
+#     done
+# fi
 
 # $(brew --prefix qt)/bin/macdeployqt  dmg_dir/Neutrino.app -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib
 # $(brew --prefix qt)/bin/macdeployqt  ${APP} -always-overwrite -libpath=$(brew --prefix)/lib -libpath=$(brew --prefix brotli)/lib -libpath=$(brew --prefix hdf4)/lib "${EXTRA_EXECUTABLES[@]}"
@@ -56,14 +58,14 @@ for libpath in ${DEPLOY_LIBPATHS}; do
 done
 ${QT_BIN}/macdeployqt ${APP} -always-overwrite "${LIBPATH_ARGS[@]}" "${EXTRA_EXECUTABLES[@]}"
 
-# python modules shipped with PyShell (PYSHELL_PIP_PACKAGES, e.g. numpy scipy) with the same python:
-# the wheels bring their own libraries (@loader_path), only the test suites are removed.
-# Installed after macdeployqt, which does not need to see them (and gets very slow with them)
-if [ -n "${PY_DEST}" ] && [ -n "${PYSHELL_PIP_PACKAGES}" ]; then
-    ${PYSHELL_PYTHON_EXECUTABLE} -m pip install --only-binary=:all: --no-compile --disable-pip-version-check --target ${PY_DEST}/site-packages ${PYSHELL_PIP_PACKAGES}
-    find ${PY_DEST}/site-packages -type d -name tests -prune -exec rm -rf {} +
-    rm -rf ${PY_DEST}/site-packages/bin
-fi
+## python modules shipped with PyShell (PYSHELL_PIP_PACKAGES, e.g. numpy scipy) with the same python:
+## the wheels bring their own libraries (@loader_path), only the test suites are removed.
+## Installed after macdeployqt, which does not need to see them (and gets very slow with them)
+# if [ -n "${PY_DEST}" ] && [ -n "${PYSHELL_PIP_PACKAGES}" ]; then
+#     ${PYSHELL_PYTHON_EXECUTABLE} -m pip install --only-binary=:all: --no-compile --disable-pip-version-check --target ${PY_DEST}/site-packages ${PYSHELL_PIP_PACKAGES}
+#     find ${PY_DEST}/site-packages -type d -name tests -prune -exec rm -rf {} +
+#     rm -rf ${PY_DEST}/site-packages/bin
+# fi
 
 # remove Qt plugins whose @rpath dependencies were not deployed (e.g. qtvirtualkeyboard, qpdf)
 for plugin in $(find ${APP}/Contents/PlugIns -name '*.dylib'); do
@@ -117,5 +119,16 @@ ditto -c -k --sequesterRsrc --keepParent ${APP} ${PACKAGE_NAME}.zip
 
 # create-dmg --icon-size 96 --volname Neutrino --volicon $DIR/dmg-icon.icns --background $DIR/background.png --window-size 420 400 --icon Neutrino.app 90 75 --app-drop-link 320 75 Neutrino-$(uname -s)-$(uname -m).dmg dmg_dir
 ln -s /Applications dmg_dir/Applications
-hdiutil create -volname Neutrino -srcfolder dmg_dir -fs HFS+ -format UDZO -ov ${PACKAGE_NAME}.dmg
+# hdiutil create -volname Neutrino -srcfolder dmg_dir -fs HFS+ -format UDZO -ov ${PACKAGE_NAME}.dmg
+# "hdiutil: create failed - Resource busy" happens at random (e.g. on the GitHub runners, the image is scanned): retry
+for attempt in 1 2 3 4 5; do
+    if hdiutil create -volname Neutrino -srcfolder dmg_dir -fs HFS+ -format UDZO -ov ${PACKAGE_NAME}.dmg; then
+        break
+    fi
+    if [ $attempt -eq 5 ]; then
+        exit 1
+    fi
+    echo "hdiutil failed (attempt ${attempt}), retrying"
+    sleep $((attempt * 10))
+done
 

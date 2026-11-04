@@ -25,7 +25,8 @@
 #include "nGenericPan.h"
 #include "ui_nPanHelp.h"
 
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 #include "neutrino.h"
 #include "nLine.h"
 #include "nRect.h"
@@ -37,7 +38,8 @@
 nGenericPan::nGenericPan(neutrino *myparent)
     : QMainWindow(myparent),
       nparent(myparent),
-      napp(qobject_cast<nApp*> (qApp)),
+      // napp(qobject_cast<nApp*> (qApp)),
+      napp(nCore::self()),
       currentBuffer(myparent->getCurrentBuffer())
 {
     setAttribute(Qt::WA_DeleteOnClose);

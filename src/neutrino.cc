@@ -37,10 +37,11 @@
 
 #include "neutrino.h"
 #include <omp.h>
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 
 #include "nView.h"
-#include "nPluginLoader.h"
+// #include "nPluginLoader.h"
 #include "nPanPlug.h"
 #include "nPreferences.h"
 #include "nOpenRAW.h"
@@ -59,6 +60,8 @@ neutrino::~neutrino()
 neutrino::neutrino():
     currentBuffer(nullptr)
 {
+    // the first window initialises what the windows share (icon theme before setupUi)
+    nCore::self();
     setupUi(this);
     setAcceptDrops(true);
 
@@ -116,7 +119,9 @@ neutrino::neutrino():
     connect(actionExport_all_original_name, SIGNAL(triggered()), this, SLOT(exportAllGraphicsOriginalName()));
     connect(actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
-    connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+    // connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
+    // only the Neutrino windows (QApplication::closeAllWindows would also close the other windows of a library user)
+    connect(actionQuit, SIGNAL(triggered()), nCore::self(), SLOT(closeAllWindows())) ;
 
     // connect(actionClose, SIGNAL(triggered()), this, SLOT(close()));
     // the close shortcut of the menu (on macOS also in the pans) closes the active window: it was in closeEvent,
@@ -171,7 +176,7 @@ neutrino::neutrino():
     connect(actionNext_LUT, SIGNAL(triggered()), my_view, SLOT(nextColorTable()));
     connect(actionPrevious_LUT, SIGNAL(triggered()), my_view, SLOT(previousColorTable()));
 
-    connect(actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
+    // connect(actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
 
     connect(actionLockColors, SIGNAL(toggled(bool)), my_view, SLOT(setLockColors(bool)));
@@ -215,7 +220,8 @@ neutrino::neutrino():
     show();
 
     // plugins
-    scanPlugins();
+    // scanPlugins();
+    addPluginActions();
 
     QApplication::processEvents();
 
@@ -229,12 +235,18 @@ neutrino::neutrino():
             qDebug() << metaObject()->method(i).name() << metaObject()->method(i).methodSignature();
     }
 
-    nApp *napp(qobject_cast<nApp*> (qApp));
+    // nApp *napp(qobject_cast<nApp*> (qApp));
+    //
+    // actionLog_info->setChecked(napp->log_win.isVisible());
+    // connect (actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+    //
+    // connect(actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
+    nCore *core=nCore::self();
 
-    actionLog_info->setChecked(napp->log_win.isVisible());
-    connect (actionLog_info, SIGNAL(toggled(bool)), &(napp->log_win), SLOT(setVisible(bool)));
+    actionLog_info->setChecked(core->logWin()->isVisible());
+    connect (actionLog_info, SIGNAL(toggled(bool)), core->logWin(), SLOT(setVisible(bool)));
 
-    connect(actionCheck_for_updates, SIGNAL(triggered()),napp,SLOT(checkUpdates()));
+    connect(actionCheck_for_updates, SIGNAL(triggered()),core,SLOT(checkUpdates()));
 
     // the next lines should be useful once we get rid of the plugin stuff...
 //#define xxstring(s) xstring(s)
@@ -384,116 +396,96 @@ nPhysD* neutrino::getBuffer(QString name) {
 
 // ------------------ PLUGINS -----------------------
 
-void
-neutrino::scanPlugins(QString pluginsDirStr) {
-    qInfo() << "Looking for plugins in" << pluginsDirStr;
-    QDir pluginsDir(pluginsDirStr);
-    if (pluginsDir.exists()) {
+// The plugins are compiled into libNeutrino and registered by NEUTRINO_PLUGIN (nPanPlug.h).
+// scanPlugins (the plugin directories, also those of the preferences) and loadPlugin (actionPlugin: a plugin file)
+// went with the dynamic plugins (nPluginLoader)
 
-#if defined(Q_OS_WIN)
-        QString extension("dll");
-#elif defined(Q_OS_MACOS)
-        QString extension("dylib");
-#elif defined(Q_OS_LINUX)
-        QString extension("so");
-#endif
+// the menu of a plugin: "File;Scripting" is the submenu Scripting of File, created if missing (a new menu of the
+// menubar goes before Help); empty: Analysis. Was nPluginLoader::getMenu
+QMenu* neutrino::pluginMenu(QString menuEntry) {
+    QPointer<QMenu> my_menu;
 
-        QStringList pluginlist;
-        QDirIterator it(pluginsDir.absolutePath(), QStringList() << "*."+extension, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            pluginlist.append(it.next());
-        }
-        pluginlist.sort();
-       QProgressDialog progress("Loading plugin", "Cancel", 0, pluginlist.size(), this);
-       progress.setWindowModality(Qt::WindowModal);
-       progress.show();
-       progress.setCancelButton(nullptr);
-        for (auto &pluginfile : pluginlist) {
-            QString name_plugin=QFileInfo(pluginfile).baseName().replace("_"," ");
-#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
-                if (name_plugin.startsWith("lib")) {
-                    name_plugin.remove(0,3);
+    if (menuEntry.isEmpty()) {
+        my_menu=menuAnalysis;
+    } else {
+        QStringList my_list=menuEntry.split(";");
+        // need a QWidget because it might be a QToolBar or QMenu
+        QWidget *parentMenu=menubar;
+        for (int i=0; i<my_list.size(); i++) {
+            bool found=false;
+            foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                if (menu->title()==my_list.at(i) || menu->objectName()==QString("menu"+my_list.at(i))) {
+                    found=true;
+                    parentMenu = my_menu = menu;
+                    break;
                 }
-#endif
-           progress.setLabelText("Plugin: "+name_plugin);
-           progress.setValue(progress.value()+1);
-            loadPlugin(pluginfile, false);
-        }
-       progress.close();
-
-//        QStringList listdirPlugins=property("NeuSave-plugindirs").toStringList();
-//        qDebug() << pluginsDir.absolutePath() << property("defaultPluginDir").toString();
-//        if (!listdirPlugins.contains(pluginsDir.absolutePath()) && pluginsDir.absolutePath() != property("defaultPluginDir").toString())
-//            listdirPlugins.append(pluginsDir.absolutePath());
-//        setProperty("NeuSave-plugindirs",listdirPlugins);
-    }
-}
-
-void
-neutrino::scanPlugins() {
-    QDir pluginsDir;
-    pluginsDir.setPath(qApp->applicationDirPath());
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#elif defined(Q_OS_MACOS)
-    pluginsDir.cdUp();
-    pluginsDir.cd("Resources");
-#elif defined(Q_OS_LINUX)
-    pluginsDir.cdUp();
-    pluginsDir.cd("lib/neutrino");
-#endif
-    pluginsDir.cd("plugins");
-    qDebug() << "defaultPluginDir:" << pluginsDir.absolutePath();
-    setProperty("defaultPluginDir",pluginsDir.absolutePath());
-    scanPlugins(pluginsDir.absolutePath());
-
-    QMap<QString, QVariant> pluginList(property("NeuSave-plugindirs").toMap());
-    qDebug() << pluginList;
-    for (auto& k : pluginList.keys()) {
-        qDebug() << k << pluginList[k];
-        if (pluginList[k].toInt() == 2) {
-            scanPlugins(k);
+            }
+            if (!found) {
+                if (qobject_cast<QMenuBar*>(parentMenu)) {
+                    // looking for help menu to insert this before
+                    QAction *menuHelp=nullptr;
+                    foreach (QMenu *menu, parentMenu->findChildren<QMenu*>()) {
+                        if (menu->title() == "Help") {
+                            menuHelp=menu->menuAction();
+                            break;
+                        }
+                    }
+                    if (menuHelp) {
+                        my_menu=new QMenu(my_list.at(i),parentMenu);
+                        (qobject_cast<QMenuBar*>(parentMenu))->insertMenu(menuHelp,my_menu);
+                    } else {
+                        my_menu=(qobject_cast<QMenuBar*>(parentMenu))->addMenu(my_list.at(i));
+                    }
+                } else if(qobject_cast<QMenu*>(parentMenu)) {
+                    my_menu=(qobject_cast<QMenu*>(parentMenu))->addMenu(my_list.at(i));
+                }
+                my_menu->setTitle(my_list.at(i));
+                parentMenu = my_menu;
+            }
         }
     }
-
-
-//    if (property("NeuSave-plugindirs").isValid()) {
-//        for (auto& d : property("NeuSave-plugindirs").toStringList()) {
-//            QStringList dir_flag=d.split("!#!");
-//            qDebug() << dir_flag;
-//            if (dir_flag.size()>1) {
-//                qDebug() << dir_flag[1].toInt();
-//            }
-//            if (dir_flag.size()>1 && dir_flag[1].toInt() == 1 && d!=pluginsDir.absolutePath())
-//                scanPlugins(dir_flag[0]);
-//        }
-//    }
-    QApplication::processEvents();
+    return my_menu;
 }
 
-void
-neutrino::loadPlugin()
-{
-    QStringList pnames=QFileDialog::getOpenFileNames(this,tr("Load Plugin"), property("NeuSave-loadPlugin").toString(),tr("Neutrino Plugins")+QString(" (*.dylib *.so *.dll);;")+tr("Any file")+QString(" (*)"));
-    bool launch(pnames.size()==1);
-    for(auto& pname: pnames) {
-        loadPlugin(pname, launch);
-    }
-}
+// a menu entry for every plugin, and a toolbar button for those with an icon (placed by their order).
+// Was the constructor of nPluginLoader
+void neutrino::addPluginActions() {
+    for (auto &plug : nPanPlug::all()) {
+        const QString name_plugin=plug.name;
+        const QIcon icon_plugin=plug.icon();
+        const QKeySequence shortcut_key=plug.shortcut();
+        auto create=plug.create;
 
-void
-neutrino::loadPlugin(QString pname, bool launch)
-{
-    if (!property("NeuSave-loadPlugin").isValid()) {
-        setProperty("NeuSave-loadPlugin",QString("plugin.so"));
-    }
+        if (!icon_plugin.isNull()) {
+            QToolButton *my_button = new QToolButton(toolBar);
+            QPointer<QAction> my_action;
+            foreach (QAction  *my_action_tmp, toolBar->actions()) {
+                QVariant  var=my_action_tmp->property("plugin-order");
+                if (var.toInt() > plug.order) {
+                    my_action = toolBar->insertWidget(my_action_tmp,my_button);
+                    break;
+                }
+            }
+            if(!my_action) {
+                my_action = toolBar->addWidget(my_button);
+            }
+            my_action->setProperty("plugin-order",plug.order);
+            connect (my_action, &QAction::triggered, this, [this, create]() { create(this); });
+            my_button->setDefaultAction(my_action);
+            my_action->setText(name_plugin);
+            my_action->setIcon(icon_plugin);
+            if (!shortcut_key.isEmpty()) {
+                my_action->setToolTip(my_action->toolTip()+" ["+shortcut_key.toString(QKeySequence::NativeText)+"]");
+            }
+        }
 
-    if (QFileInfo(pname).exists()) {
-        setProperty("NeuSave-loadPlugin",pname);
-        nPluginLoader *my_npl = new nPluginLoader(pname, this);
-        qDebug() << "Loading plugin" <<  QFileInfo(pname).baseName() << " : " << my_npl->ok();
-        if (launch) my_npl->run();
+        QMenu *my_menu=pluginMenu(plug.menuEntry);
+        QAction *my_action = new QAction(icon_plugin, QString(name_plugin).replace("_"," "), this);
+        my_action->setShortcut(shortcut_key);
+        my_action->setToolTip(my_action->toolTip()+" "+ shortcut_key.toString(QKeySequence::NativeText));
+        my_action->setProperty("neuPlugin",true);
+        connect (my_action, &QAction::triggered, this, [this, create]() { create(this); });
+        my_menu->addAction(my_action);
     }
 }
 
@@ -1604,6 +1596,8 @@ void neutrino::fileSave(QString fname) {
 bool neutrino::fileSave(nPhysD* phys, QString fname) {
     if (nPhysExists(phys) && !fname.isEmpty()) {
         QString suffix=QFileInfo(fname).suffix().toLower();
+        // the writers throw phys_fileerror
+        try {
         if (suffix.startsWith("neu")) {
             physFormat::phys_dump_binary(phys,QFile::encodeName(fname).toStdString().c_str());
         } else if (fname.endsWith("tif") || fname.endsWith("tiff")) {
@@ -1616,6 +1610,10 @@ bool neutrino::fileSave(nPhysD* phys, QString fname) {
             phys->writeASC(QFile::encodeName(fname).toStdString().c_str());
         } else {
             my_view->my_pixitem.pixmap().save(QFile::encodeName(fname));
+        }
+        } catch (std::exception &e) {
+            nCore::self()->showException(e.what());
+            return false;
         }
         phys->setType(PHYS_FILE);
         phys->setShortName(QFileInfo(fname).fileName().toStdString());
@@ -1635,7 +1633,8 @@ neutrino::fileClose() {
     my_set.beginGroup("nPreferences");
     foreach (nPhysD *phys, physList) {
         DEBUG( phys->getName() << " " << phys->getType());
-        if (phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        // if (phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        if (askCloseUnsaved && phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString("\n")+QString::fromUtf8(phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you want to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No  | QMessageBox::NoToAll | QMessageBox::Cancel);
@@ -1688,7 +1687,8 @@ bool neutrino::closeBuffer(nPhysD* my_phys) {
     my_set.beginGroup("nPreferences");
 
     if (nPhysExists(my_phys))  {
-        if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        // if (my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
+        if (askCloseUnsaved && my_phys->getType()==PHYS_DYN && my_set.value("askCloseUnsaved",true).toBool() == true) {
             int res=QMessageBox::warning(this,tr("Attention"),
                                          tr("The image")+QString::fromUtf8(my_phys->getShortName().c_str())+QString("\n")+QString::fromUtf8(my_phys->getName().c_str())+QString("\n")+tr("has not been saved. Do you vant to save it now?"),
                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::NoToAll | QMessageBox::Cancel);
@@ -1948,28 +1948,33 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
             QMetaObject::invokeMethod(this,pName.toLatin1().constData(),Q_RETURN_ARG(nGenericPan*, my_pan));
         }
     }
+    // if (my_pan==nullptr) {
+    //     foreach (QAction *my_action, findChildren<QAction *>()) {
+    //         if (!my_action->data().isNull()) {
+    //             nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
+    //             qDebug() << my_action->data() << my_qplugin;
+    //             if (my_qplugin!=nullptr) {
+    //                 qDebug() << pName << "plugin action" << my_qplugin->name();
+    //                 if (pName==my_qplugin->name()) {
+    //                     my_qplugin->run();
+    //                     QApplication::processEvents();
+    //                     QObject *p_obj = my_qplugin->instance();
+    //                     if (p_obj) {
+    //                         nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
+    //                         if (iface) {
+    //                             qDebug() << "reloaded";
+    //                             my_pan=iface->pan();
+    //                             break; // important otherwise pan might get closed in the meanwhile and give segfault
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     if (my_pan==nullptr) {
-        foreach (QAction *my_action, findChildren<QAction *>()) {
-            if (!my_action->data().isNull()) {
-                nPluginLoader *my_qplugin=my_action->data().value<nPluginLoader*>();
-                qDebug() << my_action->data() << my_qplugin;
-                if (my_qplugin!=nullptr) {
-                    qDebug() << pName << "plugin action" << my_qplugin->name();
-                    if (pName==my_qplugin->name()) {
-                        my_qplugin->run();
-                        QApplication::processEvents();
-                        QObject *p_obj = my_qplugin->instance();
-                        if (p_obj) {
-                            nPanPlug *iface = qobject_cast<nPanPlug *>(p_obj);
-                            if (iface) {
-                                qDebug() << "reloaded";
-                                my_pan=iface->pan();
-                                break; // important otherwise pan might get closed in the meanwhile and give segfault
-                            }
-                        }
-                    }
-                }
-            }
+        if (const nPanPlug *plug=nPanPlug::find(pName)) {
+            my_pan=plug->create(this);
         }
     }
     QApplication::processEvents();
@@ -2061,6 +2066,19 @@ QVariant toVariant(anydata &my_data) {
 anydata toAnydata(QVariant &my_variant) {
     bool ok;
     anydata my_data;
+    // a number or a point keeps its type: toInt() of a double QVariant succeeds and rounds it (1.5 -> 2)
+    switch (my_variant.metaType().id()) {
+        case QMetaType::Double: case QMetaType::Float:
+            my_data=my_variant.toDouble();
+            return my_data;
+        case QMetaType::QPointF: case QMetaType::QPoint: {
+            QPointF valPoint=my_variant.toPointF();
+            my_data=vec2f(valPoint.x(),valPoint.y());
+            return my_data;
+        }
+        default:
+            break;
+    }
     int valInt=my_variant.toInt(&ok);
     if (ok) {
         my_data=valInt;

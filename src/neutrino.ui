@@ -285,7 +285,6 @@
     <addaction name="actionOpen_RAW"/>
     <addaction name="actionOpen_Glob"/>
     <addaction name="menuOpen_Recent"/>
-    <addaction name="actionPlugin"/>
     <addaction name="separator"/>
     <addaction name="actionReopen_to_saved"/>
     <addaction name="actionSave"/>
@@ -791,15 +790,6 @@
    </property>
    <property name="toolTip">
     <string>Lock colorbar</string>
-   </property>
-  </action>
-  <action name="actionPlugin">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/icons/plugin.png</normaloff>:/icons/plugin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Load plugin ...</string>
    </property>
   </action>
   <action name="actionOpen_Glob">

@@ -33,7 +33,7 @@ Properties::Properties(neutrino *nnparent) : nGenericPan(nnparent)
 
     bufferChanged(currentBuffer);
 
-    // the values changed elsewhere (Mouse_info, Contours, PyShell...): bufferChanged is only the image switch
+    // the values changed elsewhere (Mouse_info, Contours, the python module...): bufferChanged is only the image switch
     connect(nparent, SIGNAL(physChanged(nPhysD*)), this, SLOT(physChanged(nPhysD*)));
 
     show(true);

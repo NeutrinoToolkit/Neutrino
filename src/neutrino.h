@@ -73,6 +73,10 @@ public:
 
     QList<nPhysD*> physList;
 
+    // false: closing an image or the window doesn't ask to save the images not saved (e.g. the python module:
+    // a script must not wait for a dialog)
+    bool askCloseUnsaved=true;
+
 private:
     QList<nGenericPan*> panList;
 
@@ -94,11 +98,14 @@ public slots:
 
     void menuPaths();
 
-    void loadPlugin();
-    void loadPlugin(QString pname, bool launch);
-
-    void scanPlugins();
-    void scanPlugins(QString);
+    // void loadPlugin();
+    // void loadPlugin(QString pname, bool launch);
+    //
+    // void scanPlugins();
+    // void scanPlugins(QString);
+    // (the plugins are compiled into libNeutrino: nPanPlug.h)
+    void addPluginActions();
+    QMenu* pluginMenu(QString menuEntry);
 
     void openRecentFile();
     void clearRecentFile();

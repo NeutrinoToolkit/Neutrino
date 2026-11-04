@@ -387,6 +387,15 @@ QVariant MUSE::extractData(QString key, QStringList values) {
 }
 
 void MUSE::loadCube() {
+    try {
+        openCube();
+    } catch (std::exception &e) {
+        nCore::self()->showException(e.what());
+    }
+}
+
+// void MUSE::loadCube() {
+void MUSE::openCube() {
 	QFileDialog fd;
     QString fname=fd.getOpenFileName(this,tr("Open MUSE file"),property("NeuSave-fileMUSE").toString(),tr("MUSE Cube")+QString(" (*.fits);;")+tr("Any file")+QString(" (*)"));
 

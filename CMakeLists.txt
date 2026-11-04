@@ -21,15 +21,39 @@ set(PROJECT_COPYRIGHT_YEAR "2013-${CURRENT_YEAR}")
 set(DEBUG_LEVEL "10" CACHE STRING "DEBUG verbosity")
 
 ## global compile options
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+# set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+if (MSVC)
+    # cl and clang-cl (the python wheel on Windows: the ABI of PySide6): /Wall would be clang's -Weverything.
+    # /bigobj: big translation units (it was -Wa,-mbig-obj for MinGW in FindNeutrinoDeps.cmake)
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi /W3 -D__phys_debug=${DEBUG_LEVEL}")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /W3 -DQT_NO_DEBUG_OUTPUT")
+    add_compile_options(/bigobj)
+    # M_PI & co. in <cmath>, no warnings for the standard C functions (fopen, strcpy...), no min/max macros
+    add_compile_definitions(_USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS NOMINMAX)
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -ggdb -D__phys_debug=${DEBUG_LEVEL}")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -DQT_NO_DEBUG_OUTPUT")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# resources compressed with zlib: a Qt built without zstd (e.g. the one of the PySide6 wheel, used by the
+# python module) lacks qt_resourceFeatureZstd
+set(CMAKE_AUTORCC_OPTIONS --no-zstd)
 
 # same Qt API for the app, nPhysImage and the plugins (it was set only in src)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
+# python wheel (pyproject.toml, scikit-build-core): nPhysImage, libNeutrino and the plugins are static and
+# linked into the python module, which uses the Qt of the PySide6 package next to it (python/CMakeLists.txt)
+option(NEUTRINO_WHEEL "Build the python module for a wheel (everything linked into it)" OFF)
+if (NEUTRINO_WHEEL)
+    set(NEUTRINO_LIB_TYPE STATIC)
+else()
+    set(NEUTRINO_LIB_TYPE SHARED)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/cmake)
 
@@ -52,5 +76,10 @@ endif()
 add_subdirectory (nPhysImage)
 add_subdirectory (plugins)
 add_subdirectory (src)
+add_subdirectory (python)
 
-include(Package)
+# include(Package)
+# the packages of the app (CPack: deb, rpm, dmg, nsis): not for a wheel (e.g. lsb_release is not in manylinux)
+if (NOT NEUTRINO_WHEEL)
+    include(Package)
+endif()

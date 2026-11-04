@@ -40,8 +40,13 @@ class MUSE : public nGenericPan, private Ui::MUSE {
 public:
     Q_INVOKABLE MUSE(neutrino *);
 
+private:
+    // the old loadCube (it throws phys_fileerror on cfitsio errors)
+    void openCube();
+
 public slots:
 
+    // asks for the file and calls openCube: the cfitsio errors (exceptions) go to the log window
     void loadCube();
 
     void doSpectrum(QPointF p);

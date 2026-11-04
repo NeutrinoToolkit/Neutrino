@@ -1,4 +1,5 @@
 set(HEADERS "../Lineout.h")
 set(UIS "../Lineout.ui")
+# both plugins are in libNeutrino: the moc of the common nLineout is in Lineout_H only (the ui header is still made here)
+set_source_files_properties(../Lineout.h PROPERTIES SKIP_AUTOMOC ON)
 ADD_NEUTRINO_PLUGIN()
-

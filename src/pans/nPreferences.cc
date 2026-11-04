@@ -23,13 +23,19 @@
  *
  */
 
+// #include <unistd.h>
+// _WIN32: MinGW, MSVC and clang-cl (__WIN32 is only MinGW)
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 #include "nPreferences.h"
-#include "nApp.h"
+// #include "nApp.h"
+#include "nCore.h"
 #include "nPhysWave.h"
 
-#ifdef	__WIN32
+// #ifdef	__WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -44,7 +50,8 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 	int coreNum =1;
 
 
-#ifdef	__WIN32
+// #ifdef	__WIN32
+#ifdef _WIN32
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 
@@ -83,7 +90,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         labelThreads->hide();
 	}
 
-    defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
+//     defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
     connect(forceDecimalDot, SIGNAL(toggled(bool)), napp, SLOT(forceDecimalDot(bool)));
@@ -113,7 +120,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_view,SLOT(setZoomFactor(int)));
 
-    connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs(QListWidgetItem*)));
+//     connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs(QListWidgetItem*)));
 
     connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
 
@@ -123,20 +130,20 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
         statusbar->showMessage(tr("Icons will change at the next start"), 5000);
     });
 
-    QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
-    qDebug() << pluginListMap;
-    for (auto& k : pluginListMap.keys()) {
-        qDebug() << k << pluginListMap[k];
-        QListWidgetItem *dd=new QListWidgetItem(pluginList);
-        dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
-        if (pluginListMap[k].toInt() == 0) {
-            dd->setCheckState(Qt::Unchecked);
-        } else {
-            dd->setCheckState(Qt::Checked);
-        }
-        dd->setText(k);
-        pluginList->addItem(dd);
-    }
+//     QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
+//     qDebug() << pluginListMap;
+//     for (auto& k : pluginListMap.keys()) {
+//         qDebug() << k << pluginListMap[k];
+//         QListWidgetItem *dd=new QListWidgetItem(pluginList);
+//         dd->setFlags(dd->flags() |  Qt::ItemIsUserCheckable);
+//         if (pluginListMap[k].toInt() == 0) {
+//             dd->setCheckState(Qt::Unchecked);
+//         } else {
+//             dd->setCheckState(Qt::Checked);
+//         }
+//         dd->setText(k);
+//         pluginList->addItem(dd);
+//     }
     qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
     connect(openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
     connect(openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
@@ -170,7 +177,8 @@ void nPreferences::changeGamma(int gamma_val) {
 }
 
 void nPreferences::changeThreads(int num) {
-	nApp::changeThreads(num);
+	// nApp::changeThreads(num);
+	nCore::changeThreads(num);
 }
 
 void nPreferences::openclUnitValueChange(int num) {
@@ -289,42 +297,43 @@ void nPreferences::showEvent(QShowEvent*e){
 	nGenericPan::showEvent(e);
 }
 
-void nPreferences::on_addPlugin_released() {
-	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
-	if (QFileInfo(dir).exists()) {
-		nparent->scanPlugins(dir);
-        QListWidgetItem *dd=new QListWidgetItem(pluginList);
-        dd->setFlags(dd->flags() | Qt::ItemIsUserCheckable);
-        dd->setCheckState(Qt::Checked);
-        dd->setText(dir);
-        pluginList->addItem(dd);
-	}
-//    saveDefaults();
-//    nparent->saveDefaults();
-}
+// (the plugin directories are gone: the plugins are compiled into libNeutrino)
+// void nPreferences::on_addPlugin_released() {
+// 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Plugin Directory"),nparent->property("NeuSave-lastplugindir").toString());
+// 	if (QFileInfo(dir).exists()) {
+// 		nparent->scanPlugins(dir);
+//         QListWidgetItem *dd=new QListWidgetItem(pluginList);
+//         dd->setFlags(dd->flags() | Qt::ItemIsUserCheckable);
+//         dd->setCheckState(Qt::Checked);
+//         dd->setText(dir);
+//         pluginList->addItem(dd);
+// 	}
+// //    saveDefaults();
+// //    nparent->saveDefaults();
+// }
 
-void nPreferences::updatePlugindirs(QListWidgetItem* item=nullptr) {
-    if (item) {
-        if (item->checkState() == Qt::Checked) {
-            QString dir= item->text();
-            if (QFileInfo(dir).exists()) {
-                nparent->scanPlugins(dir);
-            }
-        }
-    }
-    QMap<QString, QVariant> pluginListMap;
-    for(int i = 0; i < pluginList->count(); ++i) {
-        pluginListMap[pluginList->item(i)->text()]=QVariant(pluginList->item(i)->checkState());
-    }
-    nparent->setProperty("NeuSave-plugindirs",pluginListMap);
-    qDebug() << nparent->property("NeuSave-plugindirs");
-//    nparent->saveDefaults();
-}
+// void nPreferences::updatePlugindirs(QListWidgetItem* item=nullptr) {
+//     if (item) {
+//         if (item->checkState() == Qt::Checked) {
+//             QString dir= item->text();
+//             if (QFileInfo(dir).exists()) {
+//                 nparent->scanPlugins(dir);
+//             }
+//         }
+//     }
+//     QMap<QString, QVariant> pluginListMap;
+//     for(int i = 0; i < pluginList->count(); ++i) {
+//         pluginListMap[pluginList->item(i)->text()]=QVariant(pluginList->item(i)->checkState());
+//     }
+//     nparent->setProperty("NeuSave-plugindirs",pluginListMap);
+//     qDebug() << nparent->property("NeuSave-plugindirs");
+// //    nparent->saveDefaults();
+// }
 
-void nPreferences::on_removePlugin_released() {
-    qDeleteAll(pluginList->selectedItems());
-    updatePlugindirs();
-}
+// void nPreferences::on_removePlugin_released() {
+//     qDeleteAll(pluginList->selectedItems());
+//     updatePlugindirs();
+// }
 
 void nPreferences::on_gridColor_released() {
     QColorDialog colordial(nparent->my_view->my_tics.gridColor,this);
