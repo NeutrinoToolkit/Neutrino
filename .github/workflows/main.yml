@@ -481,3 +481,10 @@ jobs:
         git push -f origin refs/tags/$RELTAG
         gh release view $RELTAG >/dev/null 2>&1 || gh release create $RELTAG --prerelease --title $GITHUB_REF_NAME --notes "Builds of the $GITHUB_REF_NAME branch" --verify-tag
         gh release upload --clobber $RELTAG package/*
+        # the wheels of the previous builds (other version numbers): removed after the upload, only if this build has
+        # all of them (15, as in the pypi job; otherwise a platform whose wheel failed would have none)
+        if [ "$(ls package/neutrino_toolkit-*.whl 2>/dev/null | wc -l)" -eq 15 ]; then
+          gh release view $RELTAG --json assets -q '.assets[].name' | grep '^neutrino_toolkit-.*\.whl$' | while read -r asset; do
+            [ -e "package/$asset" ] || gh release delete-asset $RELTAG "$asset" --yes
+          done
+        fi
