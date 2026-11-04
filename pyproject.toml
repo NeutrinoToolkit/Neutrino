@@ -25,15 +25,37 @@ license-files = ["LICENSE.md"]
 requires-python = ">=3.10"
 # PySide6 and not PySide6-Essentials: Neutrino uses QtCharts and QtMultimedia (PySide6-Addons)
 dependencies = ["PySide6>=6.12,<7", "numpy"]
+# shown on PyPI (no email: it would be public there)
+authors = [{ name = "Alessandro Flacco" }, { name = "Tommaso Vinci" }]
+keywords = ["image analysis", "plasma physics", "interferometry", "numpy", "Qt", "PySide6"]
+# no License :: classifier: the license is in license = above (PEP 639)
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
 ]
 
+# the links in the sidebar of PyPI
 [project.urls]
-Homepage = "https://github.com/NeutrinoToolkit/Neutrino"
+# Homepage = "https://github.com/NeutrinoToolkit/Neutrino"
+Homepage = "https://neutrinotoolkit.github.io/Neutrino"
+Documentation = "https://github.com/NeutrinoToolkit/Neutrino/blob/master/python/README.md"
+Source = "https://github.com/NeutrinoToolkit/Neutrino"
+Issues = "https://github.com/NeutrinoToolkit/Neutrino/issues"
+Releases = "https://github.com/NeutrinoToolkit/Neutrino/releases"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
