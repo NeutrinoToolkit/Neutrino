@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 # "neutrino" is taken on PyPI: the import name is neutrino
-name = "neutrino-imaging"
+name = "neutrino-toolkit"
 version = "0.1.0"
 description = "Neutrino image analysis in python: windows, images (numpy arrays) and pans"
 # readme = "README.md"

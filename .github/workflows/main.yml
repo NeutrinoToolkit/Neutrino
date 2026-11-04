@@ -342,7 +342,7 @@ jobs:
         name: ${{ matrix.name }}
         path: Neutrino-*.AppImage
 
-  # the python module (pip install neutrino-imaging): cibuildwheel, configured in pyproject.toml ([tool.cibuildwheel])
+  # the python module (pip install neutrino-toolkit): cibuildwheel, configured in pyproject.toml ([tool.cibuildwheel])
   wheels:
     continue-on-error: true
     strategy:

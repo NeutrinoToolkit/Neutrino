@@ -19,10 +19,10 @@ Installation
 ------------
 
 ```
-pip install neutrino-imaging
+pip install neutrino-toolkit
 ```
 
-or a wheel of the CI (`pip install neutrino_imaging-*.whl`). It needs python >= 3.10 and installs PySide6 and numpy:
+or a wheel of the CI (`pip install neutrino_toolkit-*.whl`). It needs python >= 3.10 and installs PySide6 and numpy:
 the module uses the Qt of PySide6 (the wheels have no Qt). Wheels: Linux x86_64 and aarch64, macOS >= 15
 (arm64 and x86_64), Windows x86_64.
 
