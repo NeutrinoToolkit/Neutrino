@@ -12,8 +12,12 @@ app = QApplication([])
 w = neutrino.Window()
 w.addShowPhys(np.random.rand(512, 512))
 w.bufferChanged.connect(lambda: print(w.currentBuffer().mean()))
-app.exec()
+neutrino.run()
 ```
+
+`neutrino.run()` is `app.exec()` (it returns when the last window is closed), except in an interactive console: with
+`python -i script.py` or `ipython -i script.py` it returns at once and the console can be used while the windows work
+(in IPython it switches on `%gui qt`). In an IPython session started without a script, `%gui qt` does the same.
 
 Installation
 ------------
@@ -51,7 +55,7 @@ Windows: `neutrino.Window`
 
 Signals (`connect(callable)`, `disconnect(callable=None)`; the callable gets the arguments it accepts):
 `bufferChanged` (the `Image`), `physAdd`, `physDel`, `physChanged`, `physReordered`, `panAdd`, `panDel`,
-`mouseAtMatrix` and `mouseAtWorld` (`(x, y)`), `nZoom`, `colorValue`, `closeAll`, `destroyed`.
+`mouseAtMatrix`, `mouseAtWorld` and `mouseClickAtWorld` (`(x, y)`), `nZoom`, `colorValue`, `closeAll`, `destroyed`.
 
 Images: `neutrino.Image`
 ------------------------

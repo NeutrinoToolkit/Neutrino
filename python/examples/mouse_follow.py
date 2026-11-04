@@ -6,7 +6,9 @@ from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 
 import neutrino
 
-app = QApplication([])
+# app = QApplication([])
+# the QApplication already there if the script is run again (e.g. %run in IPython)
+app = QApplication.instance() or QApplication([])
 w = neutrino.Window()
 w.addShowPhys(np.random.rand(256, 256), "random")
 
@@ -36,4 +38,6 @@ def mousemove(point):
 
 w.mouseAtMatrix.connect(mousemove)
 box.show()
-app.exec()
+# app.exec()
+# app.exec(), or with python -i / ipython -i the console stays usable while the windows work
+neutrino.run()

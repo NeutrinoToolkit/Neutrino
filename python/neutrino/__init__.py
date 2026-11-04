@@ -5,7 +5,7 @@
     app = QApplication([])
     w = neutrino.Window()
     w.addShowPhys(np.random.rand(512, 512))
-    app.exec()
+    neutrino.run()  # app.exec(), or the console stays usable with python -i / ipython -i
 """
 
 # PySide6 first: its Qt is the one used by the module (a wheel has no Qt, it finds the one of the PySide6 package).
@@ -22,3 +22,21 @@ except ImportError:
     pass
 
 from ._neutrino import *  # noqa: F401,F403
+
+
+def run():
+    """Runs the Qt event loop until the last window is closed (app.exec()), except in an interactive console:
+    with python -i (PySide6 runs the Qt events while the console waits) and in IPython (ipython -i script.py: its Qt
+    integration, %gui qt, is switched on) it returns at once and the windows work while the console is used"""
+    import sys
+    try:
+        ipython = get_ipython()  # noqa: F821 (a builtin in IPython)
+    except NameError:
+        ipython = None
+    if ipython is not None:
+        ipython.enable_gui("qt")
+        return 0
+    if sys.flags.interactive:
+        return 0
+    from PySide6.QtWidgets import QApplication
+    return QApplication.instance().exec()

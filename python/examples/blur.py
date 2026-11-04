@@ -11,7 +11,9 @@ from PySide6.QtWidgets import QApplication
 
 import neutrino
 
-app = QApplication([])
+# app = QApplication([])
+# the QApplication already there if the script is run again (e.g. %run in IPython)
+app = QApplication.instance() or QApplication([])
 source = neutrino.Window()
 if len(sys.argv) > 1:
     image = source.fileOpen(sys.argv[1])[0]
@@ -24,4 +26,6 @@ for sigma in range(1, 10):
     win.addShowPhys(scipy.ndimage.gaussian_filter(image.array(), sigma), f"{image.name} blur {sigma}")
     windows.append(win)
 
-app.exec()
+# app.exec()
+# app.exec(), or with python -i / ipython -i the console stays usable while the windows work
+neutrino.run()
