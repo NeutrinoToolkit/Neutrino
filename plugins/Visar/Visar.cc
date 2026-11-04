@@ -1203,7 +1203,8 @@ void Visar::updatePlot() {
                 visars[k]->reflectivity[j] = refle;
                 visars[k]->quality[j] = visars[k]->cContrast[1][j]/visars[k]->cContrast[0][j];
                 visars[k]->velError[j] = abs(visars[k]->cPhaseErr[j]*sensitivity/refr_index);
-                visars[k]->reflError[j] = visars[k]->cReflErr[j]* (Rmat-beta) + beta;
+                // beta is an offset of the reflectivity, not of its error
+                visars[k]->reflError[j] = std::abs(visars[k]->cReflErr[j]*(Rmat-beta));
 
                 for (int i=0;i<abs(visars[k]->velocityUi->jump->value());i++) {
                     int jloc=i+1;
@@ -1635,49 +1636,56 @@ void Visar::getPhase(unsigned int k) {
             for (int j=geom2.top(); j<geom2.bottom(); j++) {
                 visars[k]->time_phase  << j;
                 visars[k]->cPhase[0]  << visars[k]->phaseUnwrap[0].point(geom2.center().x(),j,0)-visars[k]->phaseUnwrap[0].point(geom2.center().x(),geom2.top(),0);
-                visars[k]->cPhase[1]  << visars[k]->phaseUnwrap[1].point(geom2.center().x(),j,0);
 
+                // i<geom2.right() summed width-1 pixels divided by width: the spread had a spurious term ~ |mean|/sqrt(width)
+                // (the phase error grew with the fringe shift) and the means were biased by (width-1)/width;
+                // QRect::right() is the last column. sqrt(<x^2>-<x>^2) replaced by two passes (no cancellation, no NaN)
                 double meanIntRef=0.0;
                 double meanIntShot=0.0;
                 double contrastTmpRef=0.0;
                 double contrastTmpShot=0.0;
-                double meanPhaseTmp=0.0;
-                double meanPhaseTmpSqr=0.0;
-                double meanRefle=0.0;
-                double meanRefleSqr=0.0;
-                for (int i=geom2.left(); i<geom2.right();i++) {
+                QVector<double> rowPhase, rowRefle;
+                const double centerPhase=visars[k]->phaseUnwrap[1].point(geom2.center().x(),j,0);
+                for (int i=geom2.left(); i<=geom2.right();i++) {
                     double intRef=(visars[k]->intensity[0].point(i,j-refIntShift,0)-visars[k]->settingsUi->offRef->value())*visars[k]->settingsUi->multRef->value();
                     double intShot=visars[k]->intensity[1].point(i,j,0)-visars[k]->settingsUi->offRef->value();
 
                     meanIntRef+=intRef;
                     meanIntShot+=intShot;
 
-                    meanRefle+= intShot/intRef;
-                    meanRefleSqr+= pow(intShot/intRef,2);
+                    rowRefle << intShot/intRef;
 
                     contrastTmpRef+=visars[k]->contrast[0].point(i,j-refIntShift,0);
                     contrastTmpShot+=visars[k]->contrast[1].point(i,j,0);
-                    meanPhaseTmp += visars[k]->phaseUnwrap[1].point(i,j);
-                    meanPhaseTmpSqr += pow(visars[k]->phaseUnwrap[1].point(i,j),2);
+                    // the 2D unwrap can leave some columns a whole fringe off (fringe jumps): each pixel is brought
+                    // within half a fringe of the central column, which keeps its unwrapping
+                    double dPhase=visars[k]->phaseUnwrap[1].point(i,j)-centerPhase;
+                    rowPhase << centerPhase+dPhase-std::round(dPhase);
                 }
+                const double npix=std::max<qsizetype>(rowPhase.size(),1);
+                // mean and spread over the window
+                auto meanSpread=[npix](const QVector<double> &v) {
+                    double mean=0.0, var=0.0;
+                    for (double x : v) mean+=x;
+                    mean/=npix;
+                    for (double x : v) var+=(x-mean)*(x-mean);
+                    return std::make_pair(mean, sqrt(var/npix));
+                };
+                const auto [phaseMean, phaseSpread]=meanSpread(rowPhase);
 
-
-                meanIntRef/=geom2.width();
-                meanIntShot/=geom2.width();
-                meanRefle/=geom2.width();
-                meanRefleSqr/=geom2.width();
-
-                contrastTmpRef/=geom2.width();
-                contrastTmpShot/=geom2.width();
-                meanPhaseTmp /= geom2.width();
-                meanPhaseTmpSqr /= geom2.width();
+                meanIntRef/=npix;
+                meanIntShot/=npix;
+                contrastTmpRef/=npix;
+                contrastTmpShot/=npix;
 
                 visars[k]->cIntensity[0] << meanIntRef;
                 visars[k]->cIntensity[1] << meanIntShot;
                 visars[k]->cContrast[0]  << contrastTmpRef*visars[k]->settingsUi->multRef->value();
                 visars[k]->cContrast[1]  << contrastTmpShot;
-                visars[k]->cPhaseErr << sqrt(meanPhaseTmpSqr -pow(meanPhaseTmp,2));
-                visars[k]->cReflErr << sqrt(meanRefleSqr -pow(meanRefle,2));
+                // the phase of the shot: mean over the window (it was the value of the central column)
+                visars[k]->cPhase[1]  << phaseMean;
+                visars[k]->cPhaseErr << phaseSpread;
+                visars[k]->cReflErr << meanSpread(rowRefle).second;
 
 
             }
