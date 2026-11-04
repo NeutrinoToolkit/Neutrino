@@ -171,12 +171,10 @@ void nLine::copy_points() {
 
 void nLine::paste_points() {
     QStringList my_l=QApplication::clipboard()->text().split("\n",Qt::SkipEmptyParts);
-    qDebug() << my_l;
 
     QPolygonF my_poly;
     for (int i=0; i<my_l.size(); i++) {
         QStringList my_p=my_l[i].split(" ",Qt::SkipEmptyParts);
-        qDebug() << my_p;
         if (my_p.size()==2) {
             bool ok0=false, ok1=false;
             double p0=my_p[0].toDouble(&ok0);
@@ -189,7 +187,6 @@ void nLine::paste_points() {
             }
         }
     }
-    qDebug() << my_poly;
     if (my_poly.size()>0) {
         moveRef.clear();
         while (ref.size()<my_poly.size()) {
@@ -456,7 +453,7 @@ void nLine::toggleAntialias ( bool val ) {
 	if (val) {
 		showMessage(tr("Line is antialiased"));
 	} else {
-		showMessage(tr("Line is antialiased"));
+		showMessage(tr("Line is not antialiased"));
 	}
 	updatePlot();
 }
@@ -504,8 +501,14 @@ nLine::setOrder (double w) {
 void
 nLine::tableUpdated (QTableWidgetItem * item) {
 	QPointF p;
-	p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text());
-	p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text());
+	bool okx=false, oky=false;
+	p.rx()=QLocale().toDouble(my_w.points->item(item->row(),0)->text(), &okx);
+	p.ry()=QLocale().toDouble(my_w.points->item(item->row(),1)->text(), &oky);
+	if (!okx || !oky) { // not a number: back to the current value (it was set to 0)
+		showMessage(tr("Not a number: ")+item->text());
+		changePointPad(item->row());
+		return;
+	}
 	changeP(item->row(),p, true);
 }
 
@@ -568,8 +571,8 @@ void nLine::changePointPad(int nrow) {
 	QPointF p=ref[nrow]->pos();
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
-    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
-    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	my_w.points->setItem(nrow, 0, xitem);
 	my_w.points->setItem(nrow, 1, yitem);
 	my_w.points->resizeRowToContents(nrow);
@@ -617,8 +620,8 @@ void nLine::addPoint (int npos) {
 	my_w.points->insertRow(npos);
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
-    xitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
-    yitem->setTextAlignment(Qt::AlignHCenter & Qt::AlignVCenter);
+    xitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    yitem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	my_w.points->setItem(npos, 0, xitem);
 	my_w.points->setItem(npos, 1, yitem);
 	my_w.points->resizeRowToContents(npos);
@@ -657,12 +660,18 @@ void nLine::removePoint(int np) {
 
 void
 nLine::removePoint() {
-	QString removedrows;
+	// from the last row: removing a row shifts the following ones
+	QList<int> rows;
 	foreach (QTableWidgetSelectionRange r, my_w.points->selectedRanges()) {
 		for (int i=r.topRow(); i <=r.bottomRow(); i++) {
-			removePoint(i);
-            removedrows+=QString(" ")+QLocale().toString(i+1);
+			if (!rows.contains(i)) rows << i;
 		}
+	}
+	std::sort(rows.begin(), rows.end(), std::greater<int>());
+	QString removedrows;
+	foreach (int i, rows) {
+		removePoint(i);
+		removedrows+=QString(" ")+QLocale().toString(i+1);
 	}
 	showMessage(tr("Removed Rows:")+removedrows);
 }
@@ -756,13 +765,13 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 
 void nLine::makeHorizontal() {
 	if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
+		// the centre of the points, in scene (image) coordinates: the line stays at its height
+		// (it was size-origin-centre, from centerOnImage where it is a displacement)
 		QPointF p(0,0);
 		foreach (QGraphicsEllipseItem *item, ref){
-			p-=item->pos();
+			p+=item->pos();
 		}
-		p/=ref.size();
-		vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
-		p+=QPointF(p1.x(),p1.y());
+		p=mapToScene(p/ref.size());
 
 		while (ref.size()>2) removePoint(2);
 
@@ -777,13 +786,12 @@ void nLine::makeHorizontal() {
 
 void nLine::makeVertical() {
 	if (nparent->getCurrentBuffer() && property("parentPanControlLevel").toInt()<2) {
+		// the centre of the points, in scene (image) coordinates: the line stays where it is
 		QPointF p(0,0);
 		foreach (QGraphicsEllipseItem *item, ref){
-			p-=item->pos();
+			p+=item->pos();
 		}
-		p/=ref.size();
-		vec2f p1=nparent->getCurrentBuffer()->getSize()-nparent->getCurrentBuffer()->get_origin();
-		p+=QPointF(p1.x(),p1.y());
+		p=mapToScene(p/ref.size());
 
 		while (ref.size()>2) removePoint(2);
 
@@ -806,10 +814,11 @@ void nLine::makeRectangle() {
 		QPointF p1=my_rect.topLeft();
 		QPointF p2=my_rect.bottomRight();
 
-		changeP(0, p1);
-		changeP(1, QPointF(p1.x(),p2.y()));
-		changeP(2, p2);
-		changeP(3, QPointF(p2.x(),p1.y()));
+		// path() is in the coordinates of the line: isLocal (else shifted by the image origin)
+		changeP(0, p1, true);
+		changeP(1, QPointF(p1.x(),p2.y()), true);
+		changeP(2, p2, true);
+		changeP(3, QPointF(p2.x(),p1.y()), true);
 	}
 }
 
@@ -974,7 +983,8 @@ QPainterPath nLine::shape() const {
 	QPainterPath my_shape = stroker.createStroke( path() );
 	for (int i =0; i<ref.size(); i++) {
 		QRectF my_rect=ref[i]->rect();
-		my_shape.addPolygon(ref[i]->mapToScene(my_rect));
+		// in the coordinates of the line (not of the scene: they differ by the image origin)
+		my_shape.addPolygon(ref[i]->mapToParent(my_rect));
 	}
 	return my_shape;
 }
@@ -1101,6 +1111,7 @@ nLine::rearrange_monotone() {
 	prepareGeometryChange();
 	foreach (QGraphicsEllipseItem *item, ref){
 		item->setPos(my_poly[ii]);
+		changePointPad(ii);
 		ii++;
 	}
 
@@ -1153,34 +1164,41 @@ nLine::getContourSubImage(double fill_value)
         std::list<vec2i> cp_list;
 
         if (ref.size()>0) {
-            foreach (QGraphicsEllipseItem *item, ref){
-                my_poly<< item->pos();
-            }
+            // the drawn curve (bezier too), in image coordinates (like the plugins: the points are relative to the origin)
+            vec2f orig=nparent->getCurrentBuffer()->get_origin();
+            my_poly=poly(1).translated(orig.x(),orig.y());
             // force closed path
-            my_poly << ref[0]->pos();
+            my_poly << my_poly.first();
 
             for (int ii=0; ii<my_poly.size()-1; ii++) {
                 QPointF p1 = my_poly.at(ii);
                 QPointF p2 = my_poly.at(ii+1);
 
                 double steps = (p2-p1).manhattanLength();
+                if (steps==0) { // coincident points: it was 0/0
+                    cp_list.push_back(vec2i(std::floor(p1.x()), std::floor(p1.y())));
+                    continue;
+                }
                 for(int jj = 0; jj<=steps; jj++) {
                     QPointF np = p1+jj*(p2-p1)/steps;
-                    cp_list.push_back(vec2i(np.x(), np.y()));
+                    cp_list.push_back(vec2i(std::floor(np.x()), std::floor(np.y())));
                 }
             }
         }
 
-        // 2. call std::list<double> contour_integrate(nPhysD &iimage, std::list<vec2> &contour, bool integrate_boundary)
-        DEBUG("starting contour intergration");
-        nPhysImageF<char> data_map = physMath::contour_surface_map(*(nparent->getCurrentBuffer()), cp_list);
-        DEBUG("contour integration ended");
-
-        // generate map image
-        nPhysD sub_img(nparent->getCurrentBuffer()->getW(), nparent->getCurrentBuffer()->getH(), fill_value);
-        for (unsigned int ii=0; ii<data_map.getSurf(); ii++) {
-            char mval = data_map.point(ii);
-            if (mval=='i' || mval == 'c') sub_img.set(ii, nparent->getCurrentBuffer()->point(ii));
+        // 2. the pixels inside (even-odd, as contour_integrate) and the ones the contour crosses.
+        // (physMath::contour_surface_map filled from the image origin when it is set: often outside the contour)
+        nPhysD *img=nparent->getCurrentBuffer();
+        const int W=img->getW(), H=img->getH();
+        nPhysD sub_img(W, H, fill_value);
+        const QRect bbox=my_poly.boundingRect().toAlignedRect().adjusted(-1,-1,1,1).intersected(QRect(0,0,W,H));
+        for (int y=bbox.top(); y<=bbox.bottom(); y++) {
+            for (int x=bbox.left(); x<=bbox.right(); x++) {
+                if (my_poly.containsPoint(QPointF(x,y), Qt::OddEvenFill)) sub_img.set(x, y, img->point(x,y));
+            }
+        }
+        for (const vec2i &c : cp_list) {
+            if (c.x()>=0 && c.y()>=0 && c.x()<W && c.y()<H) sub_img.set(c.x(), c.y(), img->point(c.x(),c.y()));
         }
 
         //parent()->addShowPhys(sub_img);
@@ -1196,16 +1214,17 @@ nLine::getContainedIntegral()
 {
     nPhysD *img=nparent->getCurrentBuffer();
     if (!img || ref.size()<3) return QList<double>();
-    std::list<vec2f> poly;
-    foreach (QGraphicsEllipseItem *item, ref){
-        poly.push_back(vec2f(item->pos().x(), item->pos().y()));
+    // the drawn curve (bezier too), in image coordinates
+    std::list<vec2f> contour;
+    vec2f orig=img->get_origin();
+    for (const QPointF &p : poly(1)) {
+        contour.push_back(vec2f(p.x()+orig.x(), p.y()+orig.y()));
     }
-    physMath::contour_integral c_data = physMath::contour_integrate(*img, poly, true);
+    physMath::contour_integral c_data = physMath::contour_integrate(*img, contour, true);
     return QList<double>({c_data.integral, c_data.integral_sq, double(c_data.count)});
 }
 
 void nLine::extractPath() {
-    qDebug() << "here";
     nPhysD *my_path_image= new nPhysD(getContourSubImage());
     nparent->addShowPhys(my_path_image);
 }
@@ -1283,7 +1302,6 @@ nLine::loadSettings(QSettings &settings) {
     if (settings.childGroups().contains("Properties")) {
         settings.beginGroup("Properties");
         foreach(QString my_key, settings.allKeys()) {
-            qDebug() << "load" <<  my_key << " : " << settings.value(my_key);
             setProperty(my_key.toStdString().c_str(), settings.value(my_key));
 		}
         settings.endGroup();
@@ -1319,11 +1337,8 @@ nLine::saveSettings(QSettings &settings) {
     settings.setValue("samplePoints",numPoints);
 
     settings.beginGroup("Properties");
-	qDebug() << dynamicPropertyNames().size();
 	foreach(QByteArray ba, dynamicPropertyNames()) {
-		qDebug() << "save" << ba << " : " << property(ba);
 		if(ba.startsWith("NeuSave")) {
-			qDebug() << "write" << ba << " : " << property(ba);
             settings.setValue(ba, property(ba));
 		}
 	}
