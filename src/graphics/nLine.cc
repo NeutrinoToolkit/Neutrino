@@ -1005,37 +1005,40 @@ QPolygonF nLine::poly(int steps) const {
 
 		if (bezier && my_poly.size()>2) {
 
+			// centripetal parametrization: the parameter advances by sqrt(distance) between the points (T=i gave
+			// cusps and loops when the points are unevenly spaced). Coincident points: a minimal step
+			const int n=my_poly.size();
+			auto step=[&](int k) {
+				QPointF d=my_poly[(k+1)%n]-my_poly[k];
+				return std::max(sqrt(hypot(d.x(),d.y())),1e-3);
+			};
 			std::vector<double> T,X,Y;
-			if (closedLine)  {
-				const int guard=2;
-				T.resize(my_poly.size()+2*guard,0);
-				X.resize(my_poly.size()+2*guard,0);
-				Y.resize(my_poly.size()+2*guard,0);
-				for (int i = 0; i < (int) T.size(); i++ ) {
-					T[i]=i-guard;
-					X[i]=my_poly[(i+ref.size()-guard)%ref.size()].x();
-					Y[i]=my_poly[(i+ref.size()-guard)%ref.size()].y();
-				}
-			} else {
-				T.resize(my_poly.size());
-				X.resize(my_poly.size());
-				Y.resize(my_poly.size());
-				for (int i = 0; i < my_poly.size(); i++ ) {
-					T[i]=i;
-					X[i]=my_poly[i].x();
-					Y[i]=my_poly[i].y();
-				}
+			// closed: periodic spline from a natural one, the points repeated "guard" times on each side.
+			// The natural ends (no curvature) leak in with a factor ~0.27 per point: with 2 the curve had a kink
+			// at the first point (2.4 deg on a square, 8 deg on a triangle), with 12 it is below 1e-4 deg
+			const int guard=closedLine ? 12 : 0;
+			double t=0;
+			for (int i=1;i<=guard;i++) t-=step(((-i)%n+n)%n);
+			for (int i=-guard;i<n+guard;i++) {
+				const int k=((i%n)+n)%n;
+				T.push_back(t);
+				X.push_back(my_poly[k].x());
+				Y.push_back(my_poly[k].y());
+				if (closedLine || i<n-1) t+=step(k);
 			}
 
-            tk::spline sX(T,X), sY(T,Y);
+			tk::spline sX(T,X), sY(T,Y);
 
 			steps=std::max(steps,32); // if it's a bezier impose at least 16 steps...
-			int size=steps*(my_poly.size()-(closedLine?0:1));
-
-			for (int i = 0; i < size+1; i++ ) {
-				const double dtmp = (double) i / steps;
-				my_poly_interp.append(QPointF(sX(dtmp),sY(dtmp)));
+			const int nseg=closedLine ? n : n-1;
+			for (int k=0; k<nseg; k++) {
+				const double t0=T[guard+k], t1=T[guard+k+1];
+				for (int i=0; i<steps; i++) {
+					const double dtmp=t0+(t1-t0)*i/steps;
+					my_poly_interp.append(QPointF(sX(dtmp),sY(dtmp)));
+				}
 			}
+			my_poly_interp.append(QPointF(sX(T[guard+nseg]),sY(T[guard+nseg])));
 
 		} else {
 			if (closedLine && ref.size()) my_poly << ref[0]->pos();
