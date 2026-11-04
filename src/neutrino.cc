@@ -2020,6 +2020,11 @@ nGenericPan* neutrino::newPan(QString my_string) {
 
     nGenericPan *my_pan=new nGenericPan(this);
 
+    // a name (not a file): the panName of the pan (title, getPan, the saved settings)
+    if (!my_string.isEmpty() && !QFileInfo(my_string).exists()) {
+        my_pan->setProperty("panName",my_string);
+    }
+
 //    if (!my_string.isEmpty() && QFileInfo(my_string).exists()) {
 //        QFile file(my_string);
 //        file.open(QFile::ReadOnly);

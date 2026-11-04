@@ -46,7 +46,8 @@ Windows: `neutrino.Window`
   `w.images()` all of them
 * `w.fileOpen(filename)` returns the list of the `Image`s of the file, `w.fileSave(...)`
 * `w.openPan(name)` opens a tool (`neutrino.plugins()` the names), `w.getPan(name)`, `w.pans()`,
-  `w.newPan()` an empty tool, `w.newPan("my.ui")` one from a Qt Designer file
+  `w.newPan("name")` an empty tool with that name (its title, `w.getPan("name")`), for PySide widgets: see
+  `Pan` below
 * `w.close(ask=False)` closes it; `w.askCloseUnsaved` (False for the windows made in python) asks to save the images
   not saved
 * `w.widget()` the PySide6 `QMainWindow`
@@ -72,8 +73,10 @@ Tools: `neutrino.Pan`
 
 * `p.get("name")`, `p.set("name", value)`, `p.button("name")` (waits for the calculation it starts): the name of a
   widget is in square brackets in its tooltip; `p.widgets()` all the names
-* `p.getData(...)`, `p.close()`, `p.raise_()`, `p.window()`
-* `p.widget()` the PySide6 `QMainWindow` of the tool (e.g. `p.widget().findChild(QSpinBox, "name")`)
+* `p.getData(...)`, `p.show()`, `p.close()`, `p.raise_()`, `p.window()`
+* `p.widget()` the PySide6 `QMainWindow` of the tool (e.g. `p.widget().findChild(QSpinBox, "name")`, or
+  `p.widget().setCentralWidget(my_widget)` in a pan of `w.newPan`); `p.show()` and not `p.widget().show()`: it also
+  sets the title and the saved values, as for the other pans
 * its slots by name, Qt properties with `p.property(name)`, `p.setProperty(name, value)`
 
 From PyShell
@@ -93,7 +96,7 @@ From PyShell
 | `nPhysD.open(file)` | `w.fileOpen(file)` |
 | `a.properties()`, `a.getProperty(n)`, `a.setProperty(n, v)` | `img.properties()`, `img.property(n)`, `img.setProperty(n, v)` |
 | `n.getPanList()`, `n.getPan(name)` | `w.pans()`, `w.getPan(name)` |
-| `n.newPan()`, `n.newPan('my.ui')` | `w.newPan()`, `w.newPan('my.ui')` |
+| `n.newPan()`, `n.newPan('my.ui')` | `w.newPan('name')` + PySide widgets (a .ui file: `PySide6.QtUiTools.QUiLoader`) |
 | `p.getIt`/`p.get`, `p.setIt`/`p.set`, `p.button` | `p.get`, `p.set`, `p.button` |
 | `n.connect('mouseAtMatrix(QPointF)', f)` | `w.mouseAtMatrix.connect(f)` |
 | `PythonQt.QtGui` widgets | PySide6 (`p.widget()`, `w.widget()`) |

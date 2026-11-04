@@ -1,4 +1,4 @@
-"""A PySide window that follows the mouse on the Neutrino image: position and pixel value.
+"""A PySide window that follows the mouse click on the Neutrino image: position and pixel value.
 
 (the PyShell example mouse_follow.py, with the neutrino module and PySide6)"""
 import numpy as np
@@ -6,14 +6,12 @@ from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 
 import neutrino
 
-# app = QApplication([])
-# the QApplication already there if the script is run again (e.g. %run in IPython)
 app = QApplication.instance() or QApplication([])
 w = neutrino.Window()
 w.addShowPhys(np.random.rand(256, 256), "random")
 
+pan = w.newPan("Mouse follow")
 box = QWidget()
-box.setWindowTitle("Mouse Follow")
 layout = QVBoxLayout(box)
 pos_lbl = QLabel("(..)")
 val_lbl = QLabel("(..)")
@@ -26,18 +24,21 @@ layout.addWidget(val_lbl)
 pixels = {"array": w.currentBuffer()}
 w.bufferChanged.connect(lambda: pixels.update(array=w.currentBuffer()))
 
+val=0
 
 def mousemove(point):
     x, y = point
     pos_lbl.setText(f"x: {x:.1f} y: {y:.1f}")
-    a = pixels["array"]
-    i, j = int(y), int(x)
-    if 0 <= i < a.shape[0] and 0 <= j < a.shape[1]:
-        val_lbl.setText(f"value: {a[i, j]:.4g}")
+    val_lbl.setText(f"value: {val:.4g}")
+
+def mousecolor(valin):
+    global val
+    val = valin
 
 
-w.mouseAtMatrix.connect(mousemove)
-box.show()
-# app.exec()
-# app.exec(), or with python -i / ipython -i the console stays usable while the windows work
+w.mouseClickAtWorld.connect(mousemove)
+w.colorValue.connect(mousecolor)
+
+pan.widget().setCentralWidget(box)
+pan.show()
 neutrino.run()

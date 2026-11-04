@@ -693,6 +693,8 @@ NB_MODULE(_neutrino, m) {
         .def("window", [](PyPan &p) { return PyWindow{p.get()->nparent}; })
         .def("close", [](PyPan &p) { if (p.pan) p.pan->close(); })
         .def("raise_", [](PyPan &p) { p.get()->raiseIt(); })
+        // nGenericPan::show and not the QMainWindow one of widget().show(): the title, panAdd, the saved values
+        .def("show", [](PyPan &p) { p.get()->show(); }, "Shows the pan, as Neutrino does with its pans")
         .def("widget", [](PyPan &p) { return pysideWidget(p.get(), "QMainWindow"); }, "The PySide6 QMainWindow of the pan")
         .def("setProperty", [](PyPan &p, const std::string &name, nb::handle value) { setQtProperty(p.get(), name, value); })
         .def("property", [](PyPan &p, const std::string &name) { return fromVariant(p.get()->property(name.c_str())); })
