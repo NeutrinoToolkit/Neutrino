@@ -495,7 +495,11 @@ void Visar::addVisar() {
 
     //hack to save diffrent uis!!! (must stay between the two decorate calls: it fixes the saved names)
     foreach (QWidget *obj, wVisarSettings->findChildren<QWidget*>()+wVisarVelocity->findChildren<QWidget*>()) {
-        obj->setObjectName(obj->objectName()+"-VISAR"+QLocale().toString(k+1));
+        const QString suffix="-VISAR"+QLocale().toString(k+1);
+        // obj->setObjectName(obj->objectName()+"-VISAR"+QLocale().toString(k+1));
+        // the settings tab is already decorated: its tooltips end with " [name]" without the suffix
+        obj->setToolTip(obj->toolTip().replace(" ["+obj->objectName()+"]", " ["+obj->objectName()+suffix+"]"));
+        obj->setObjectName(obj->objectName()+suffix);
     }
 
     decorate(wVisarVelocity);

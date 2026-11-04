@@ -2,7 +2,7 @@
 
 (the PyShell example mouse_follow.py, with the neutrino module and PySide6)"""
 import numpy as np
-from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QToolBar, QVBoxLayout, QWidget
 
 import neutrino
 
@@ -11,6 +11,11 @@ w = neutrino.Window()
 w.addShowPhys(np.random.rand(256, 256), "random")
 
 pan = w.newPan("Mouse follow")
+
+toolbar = QToolBar("My main toolbar")
+toolbar.setObjectName("toolBar")
+
+
 box = QWidget()
 layout = QVBoxLayout(box)
 pos_lbl = QLabel("(..)")
@@ -40,5 +45,7 @@ w.mouseClickAtWorld.connect(mousemove)
 w.colorValue.connect(mousecolor)
 
 pan.widget().setCentralWidget(box)
+pan.widget().addToolBar(toolbar)
+pan.widget().setUnifiedTitleAndToolBarOnMac(True)
 pan.show()
 neutrino.run()
