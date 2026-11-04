@@ -205,7 +205,9 @@ void Visar::on_actionPrevious_triggered() {
 }
 
 void Visar::changeShot(QString num) {
-    qDebug() << num;
+    // not inside another one (it removes the images the first one is opening)
+    if (changingShot) return;
+    QScopedValueRollback<bool> rollback(changingShot, true);
     QSet<nPhysD*> old_phys;
     for (unsigned int k=0; k< visars.size(); k++) {
         old_phys << getPhysFromCombo(visars[k]->settingsUi->refImage) << getPhysFromCombo(visars[k]->settingsUi->shotImage) ;
@@ -276,8 +278,7 @@ void Visar::changeShot(QString num) {
     }
 
     tabChanged(0);
-
-    QApplication::processEvents();
+    // (no QApplication::processEvents(): Next/Previous clicked meanwhile ran a changeShot inside this one)
 }
 
 void Visar::fillComboShot() {
@@ -341,17 +342,13 @@ void Visar::fillComboShot() {
         matchRef.intersect(matchShot);
         match+=matchRef;
     }
-    qDebug() << comboShot->count();
     comboShot->clear();
-    qDebug() << comboShot->count();
-    qDebug() << match;
 
     QStringList my_list;
     for (auto &e : match) {
         my_list << e;
     }
     my_list.sort();
-    qDebug() << my_list;
     for (auto &e: my_list) {
         comboShot->addItem(e);
         if (e==oldvalue) {
@@ -368,10 +365,9 @@ void Visar::fillComboShot() {
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 }
 
+// (no QApplication::processEvents() around fileOpen: see changeShot)
 void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
-    QApplication::processEvents();
     QList <nPhysD *> my_phys=nparent->fileOpen(finfo.absoluteFilePath());
-    QApplication::processEvents();
     if (my_phys.size()) {
         for (int i=0; i<combo->count(); i++) {
             nPhysD* phys= combo->itemData(i).value<nPhysD*>();
@@ -381,7 +377,6 @@ void Visar::getPhysFromNameSetCombo(QFileInfo finfo, QComboBox* combo) {
             }
         }
     }
-    QApplication::processEvents();
 }
 
 QFileInfo getFileFromGlob(QFileInfoList list, QString my_glob, QString num) {
@@ -437,7 +432,6 @@ void Visar::calculate_etalon() {
 
     double sens=lam*1e-9/(2*tau*(1+delta)); // km/s
 
-    qDebug() << "delta tau sens deplace"  << delta << tau << sens << deplace;
     visar_sensitivity->setText(QString::number(sens));
     mirror_displacement->setText(QString::number(deplace));
 
@@ -462,7 +456,6 @@ VisarChannel::~VisarChannel() {
 
 void Visar::addVisar() {
     const unsigned int k=visars.size();
-    qDebug() << k << tabPhase->count();
 
     auto ch=std::make_unique<VisarChannel>(k, nullptr);
     Ui::VisarSettings* ui_settings=ch->settingsUi.get();
@@ -662,7 +655,7 @@ void Visar::renumberVisar(VisarChannel &c, unsigned int newk) {
 
 // toolbar action: remove the VISAR currently shown, after asking
 void Visar::delVisarAsk() {
-    if (visars.size()==0) {
+    if (visars.size()<=1) { // (it was ==0: the last one could be removed)
         statusbar->showMessage("Cannot remove last Visar");
         return;
     }
@@ -739,7 +732,7 @@ void Visar::loadSettings(QString my_settings) {
     } else {
         QSettings settings(my_settings,QSettings::IniFormat);
         settings.beginGroup("Properties");
-        int kMax=settings.value("NeuSave-numVisars",2).toUInt();
+        int kMax=settings.value("NeuSave-numVisars",1).toUInt(); // (default 1 as in the constructor, it was 2)
         unsigned int numVisars_save=visars.size();
         for (unsigned int k=0;k<numVisars_save;k++) {
             delVisar();
@@ -754,13 +747,11 @@ void Visar::loadSettings(QString my_settings) {
 
         whichRefl->setCurrentIndex(whichReflSaved);
 
-        QApplication::processEvents();
+        // (no QApplication::processEvents() between the steps: the VISARs were being rebuilt)
         sweepChanged();
         doWave();
         calculate_etalon();
-        QApplication::processEvents();
         setObjectVisibility (currentBuffer);
-        QApplication::processEvents();
     }
 }
 
@@ -866,7 +857,8 @@ QPointF Visar::getTimeSpaceFromPixel(QPointF p) {
     } else {
         double pos=sopDirection->currentIndex()==0 ? p.y() : p.x();
         posTime=getTime(sweepCoeffSOP,pos) - getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
-        posSpace=((direction(k)==0 ? p.x() : p.y())-physOriginSpace->value())*magnification->value();
+        // the direction of the SOP (it was the one of VISAR 1: direction(0), and visars[0] without VISARs)
+        posSpace=((sopDirection->currentIndex()==0 ? p.x() : p.y())-physOriginSpace->value())*magnification->value();
         sopPlot->setMousePosition(posTime);
     }
     return QPointF(posTime,posSpace);
@@ -979,13 +971,20 @@ void Visar::updatePlotSOP() {
         }
         int dx=geom2.width();
         int dy=geom2.height();
-        QVector<double> sopData(dir==0?dy:dx);
+        // mean over the finite pixels (NaN counted as 0 but still in the divisor before); none: NaN
+        QVector<double> sopData(dir==0?dy:dx), sopCount(dir==0?dy:dx);
         for (int j=0;j<dy;j++){
             for (int i=0;i<dx; i++) {
-                double val=shot->point(i+geom2.x(),j+geom2.y(),0.0);
-                if (ref && ref!=shot) val-=ref->point(i+geom2.x(),j+geom2.y(),0.0);
-                sopData[dir==0?j:i]+=val;
+                double val=shot->point(i+geom2.x(),j+geom2.y());
+                if (ref && ref!=shot) val-=ref->point(i+geom2.x(),j+geom2.y());
+                if (std::isfinite(val)) {
+                    sopData[dir==0?j:i]+=val;
+                    sopCount[dir==0?j:i]++;
+                }
             }
+        }
+        for (int l=0;l<sopData.size();l++) {
+            sopData[l]= sopCount[l]>0 ? sopData[l]/sopCount[l] : std::numeric_limits<double>::quiet_NaN();
         }
         time_sop.resize(sopData.size());
         sopCurve[0].resize(sopData.size());
@@ -994,13 +993,13 @@ void Visar::updatePlotSOP() {
             case 0:
                 for (int j=0;j<dy;j++) {
                     time_sop[j]=getTime(sweepCoeffSOP,geom2.y()+j)-getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
-                    sopCurve[0][j]=sopData[j]/dx-sopOffset->value();
+                    sopCurve[0][j]=sopData[j]-sopOffset->value(); // (already the mean)
                 }
                 break;
             case 1:
                 for (int i=0;i<dx;i++) {
                     time_sop[i]=getTime(sweepCoeffSOP,geom2.x()+i)-getTime(sweepCoeffSOP,sopOrigin->value()) + sopTimeOffset->value();
-                    sopCurve[0][i]=sopData[i]/dy-sopOffset->value();
+                    sopCurve[0][i]=sopData[i]-sopOffset->value();
                 }
                 break;
             default:
@@ -1038,17 +1037,21 @@ void Visar::updatePlotSOP() {
                 int k=reflList[numk];
 
                 if ( k>=0 && k<(int)visars.size() ) {
-                    for (int j=1;j<visars[k]->time_vel.size();j++) {
+                    const int nt=std::min(visars[k]->time_vel.size(), visars[k]->reflectivity.size());
+                    for (int j=1;j<nt;j++) {
                         double t_j1=visars[k]->time_vel[j-1];
                         double t_j=visars[k]->time_vel[j];
 
-                        if (time_sop[i]>t_j1 && time_sop[i]<=t_j ) {
+                        // either order: with a negative sweep the time decreases with the pixel, and
+                        // t_j1 < t <= t_j never matched (the temperature was computed with R=0, silently)
+                        if (t_j!=t_j1 && time_sop[i]>std::min(t_j1,t_j) && time_sop[i]<=std::max(t_j1,t_j)) {
                             double valRj_1=visars[k]->reflectivity[j-1];
                             double valRj=visars[k]->reflectivity[j];
 
                             my_reflectivity+=valRj_1+(time_sop[i]-t_j1)*(valRj-valRj_1)/(t_j-t_j1);
 
                             numrefl++;
+                            break; // one value per VISAR (a time axis going back and forth matched more segments)
                         }
                     }
                 }
@@ -1058,7 +1061,9 @@ void Visar::updatePlotSOP() {
             }
 
             my_reflectivity=std::min(std::max(my_reflectivity,0.0),1.0);
-            double my_temp=my_T0/log(1.0+(1.0-my_reflectivity)*my_A/sopCurve[0][i]);
+            // no temperature for counts <= 0 (log of <= 1 or of a negative: negative or meaningless values)
+            double my_temp= sopCurve[0][i]>0 ? my_T0/log(1.0+(1.0-my_reflectivity)*my_A/sopCurve[0][i])
+                                             : std::numeric_limits<double>::quiet_NaN();
 
             if (numrefl) {
                 sopCurve[1][i]=my_temp;
@@ -1130,17 +1135,15 @@ void Visar::updatePlot() {
                             }
                         }
                         if (sensitivity<0) valdn*=-1.0;
+                        // the refraction index together with its jump (it was pushed also for a skipped jump:
+                        // the following jumps used the index of the previous one)
                         if (ok1 && ok2) {
                             tjump << valdt;
                             njump << valdn;
+                            rjump << (ok3 ? valdrefr_index : 1.0);
                         } else {
                             visars[k]->velocityUi->jumpst->setPalette(my_palette);
                             statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
-                        }
-                        if (ok3) {
-                            rjump << valdrefr_index;
-                        } else {
-                            rjump << 1.0;
                         }
                     }
                 } else {
@@ -1265,7 +1268,6 @@ void Visar::updatePlot() {
                 const auto [mmin, mmax] = std::minmax_element(std::begin(visars[k]->time_vel), std::end(visars[k]->time_vel));
                 minmax.push_back(*mmin);
                 minmax.push_back(*mmax);
-                qDebug() << k << *mmin << *mmax;
             }
         }
     }
@@ -1273,7 +1275,6 @@ void Visar::updatePlot() {
     plotVelocity->rescaleAxes(true);
     if (minmax.size()) {
         const auto [mmin, mmax] = std::minmax_element(std::begin(minmax), std::end(minmax));
-        qDebug() << *mmin << *mmax;
         plotVelocity->xAxis->setRange(*mmin,*mmax);
     }
 
@@ -1288,6 +1289,10 @@ void Visar::getCarrier(unsigned int k) {
     nPhysD *phys=getPhysFromCombo(combo);
     if (phys && visars[k]->fringeRect) {
         QRect geom2=visars[k]->fringeRect->getRect(phys);
+        if (geom2.isEmpty()) {
+            statusbar->showMessage(tr("The region of VISAR ")+QLocale().toString(k+1)+tr(" is outside the image"), 5000);
+            return;
+        }
         nPhysD datamatrix = phys->sub(geom2);
 
         std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, visars[k]->settingsUi->guessWeight->value());
@@ -1412,7 +1417,7 @@ void Visar::doWave(unsigned int k) {
 
                 progress.setValue(progress.value()+1);
 
-                physDeghost=new nPhysD(*imgs[1],"deghost VISAR "+std::to_string(tabPhase->currentIndex()+1));
+                physDeghost=new nPhysD(*imgs[1],"deghost VISAR "+std::to_string(k+1)); // (it was the current tab)
 
 
                 // line points are relative to the image origin: pixels of the shot image = points + its origin
@@ -1578,12 +1583,9 @@ void Visar::doWave(unsigned int k) {
 
 
             if (physDeghost){
-                qDebug() << visars[k]->settingsUi->DeghostCheck->checkState();
-                qDebug() << physDeghost->getSize().x() << physDeghost->getSize().y();
                 if (visars[k]->settingsUi->DeghostCheck->checkState()==1) {
                     visars[k]->ghostPhys=nparent->replacePhys(physDeghost,visars[k]->ghostPhys,false);
                 } else if (visars[k]->settingsUi->DeghostCheck->checkState()==2) {
-                    qDebug() << nPhysExists(physDeghost) << visars[k]->ghostPhys;
                     delete physDeghost;
                     if (nPhysExists(visars[k]->ghostPhys)) {
                         nparent->removePhys(visars[k]->ghostPhys);
@@ -1771,7 +1773,6 @@ void Visar::getPhase(unsigned int k) {
 
 void
 Visar::export_txt_multiple() {
-    qDebug() << property("NeuSave-fileTxt");
     QString fnametmp=QFileDialog::getSaveFileName(this,tr("Save VISARs and SOP"),property("NeuSave-fileTxt").toString(),tr("Text files (*.txt *.csv);;Any file (*)"));
     if (!fnametmp.isEmpty()) {
         setProperty("NeuSave-fileTxt", fnametmp);
@@ -1902,7 +1903,13 @@ QString Visar::export_one(unsigned int k) {
             QRectF geom2=visars[k]->fringeRect->getRectF();
             out += QString("#Region (px)        : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
             out += QString("# Time       Velocity    ErrVel      Reflect     ErrRefl     Quality     Pixel       Shift       ErrShift    RefInt      ShotInt     RefContr    ShotContr.\n");
-            for (int j=0;j<visars[k]->time_phase.size();j++) {
+            // all the columns have the same length only after updatePlot: the shortest (it read past the end)
+            VisarChannel &c=*visars[k];
+            const int n=std::min({c.time_phase.size(), c.time_vel.size(), c.velocity.size(), c.velError.size(),
+                                  c.reflectivity.size(), c.reflError.size(), c.quality.size(), c.cPhase[1].size(),
+                                  c.cPhaseErr.size(), c.cIntensity[0].size(), c.cIntensity[1].size(),
+                                  c.cContrast[0].size(), c.cContrast[1].size()});
+            for (int j=0;j<n;j++) {
                 QVector<double> values {visars[k]->time_vel[j],visars[k]->velocity[j], visars[k]->velError[j],
                             visars[k]->reflectivity[j], visars[k]->reflError[j], visars[k]->quality[j],
                             visars[k]->time_phase[j],

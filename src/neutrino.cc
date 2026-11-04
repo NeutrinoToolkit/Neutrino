@@ -1189,7 +1189,6 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
 }
 
 nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //TODO: this should be done in nPhysImage...
-    qDebug() << newPhys << oldPhys;
     if (newPhys && newPhys->getSurf()) {
         bool redisplay = (currentBuffer==oldPhys);
         if (oldPhys && nPhysExists(oldPhys)) {
@@ -1210,7 +1209,8 @@ nPhysD* neutrino:: replacePhys(nPhysD* newPhys, nPhysD* oldPhys, bool show) { //
         }
         emit physReplace(std::make_pair(oldPhys, newPhys));
     }
-    QApplication::processEvents();
+    // no QApplication::processEvents() (see nView::showPhys): every step of a pan ends here, and the events handled
+    // here ran the next steps inside this one (e.g. holding the arrow of a spin box of Interferometry)
     return newPhys;
 }
 

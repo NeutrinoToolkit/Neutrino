@@ -137,6 +137,7 @@ private:
     QPointer<nRect> sopRect;
 
     bool computingWave=false; // our own replacePhys (deghost) must not ask for a new wave
+    bool changingShot=false; // changeShot must not run inside itself (it removes the images being opened)
 
 public slots:
 
