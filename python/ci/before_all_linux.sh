@@ -38,5 +38,9 @@ if [ "$(uname -m)" = aarch64 ]; then
 else
     $PY -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -m qtcharts qtmultimedia --outputdir /opt/Qt
 fi
-ln -sfn "$(ls -d /opt/Qt/$QT_VERSION/*/ | head -1)" /opt/Qt/current
-ls /opt/Qt/current/lib/cmake | head -50
+# (| head with pipefail: exit 141 when head closes the pipe before ls has written everything, at random)
+# ln -sfn "$(ls -d /opt/Qt/$QT_VERSION/*/ | head -1)" /opt/Qt/current
+# ls /opt/Qt/current/lib/cmake | head -50
+QT_DIRS=(/opt/Qt/$QT_VERSION/*/)
+ln -sfn "${QT_DIRS[0]}" /opt/Qt/current
+ls /opt/Qt/current/lib/cmake

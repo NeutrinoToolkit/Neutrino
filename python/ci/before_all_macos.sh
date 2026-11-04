@@ -15,4 +15,5 @@ python3 -m venv /tmp/aqt
 /tmp/aqt/bin/pip install aqtinstall
 /tmp/aqt/bin/aqt install-qt mac desktop $QT_VERSION clang_64 -m qtcharts qtmultimedia --outputdir $HOME/Qt
 ln -sfn $HOME/Qt/$QT_VERSION/macos $HOME/Qt/current
-ls $HOME/Qt/current/lib/cmake | head -50
+# ls $HOME/Qt/current/lib/cmake | head -50
+ls $HOME/Qt/current/lib/cmake
