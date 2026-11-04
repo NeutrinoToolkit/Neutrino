@@ -50,6 +50,7 @@ public:
     QPointer<nLine> maskRegion;
 
     std::map<std::string, nPhysD *> localPhys;
+    nPhysD *getLocal(const std::string &name);
 
     void loadSettings(QSettings&);
     void saveSettings(QSettings&);
@@ -57,6 +58,7 @@ public:
 private:
 
     std::map<QToolButton*, nLine *> my_shapes;
+    bool inLoop=false; // doShape handles events in its loop: the other steps must not run meanwhile
 
 public slots:
 

@@ -113,11 +113,19 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     connect(posZeroY,SIGNAL(editingFinished()), this, SLOT(doSubtract()));
 
     connect(cutoffValue, SIGNAL(valueChanged(double)), this, SLOT(doMaskCutoff()));
+    // blur of the phase before the interpolation (editingFinished: the same for an int or a double spin box)
+    connect(blurPhase, SIGNAL(editingFinished()), this, SLOT(doShape()));
 
     connect(addShapeB, SIGNAL(released()), this, SLOT(addShape()));
     connect(cutoffMin, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
     connect(cutoffMax, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
 
+}
+
+// a result of the pan, nullptr if there is none or it was closed (localPhys["name"] inserted null entries at each read)
+nPhysD *Interferometry::getLocal(const std::string &name) {
+    auto it=localPhys.find(name);
+    return (it!=localPhys.end() && it->second && nPhysExists(it->second)) ? it->second : nullptr;
 }
 
 void Interferometry::imagesTabBarClicked(int num) {
@@ -214,8 +222,8 @@ void Interferometry::bufferChanged(nPhysD* buf) {
         } else {
             region->hide();
         }
-        if (buf==localPhys["phase_2pi"] ||
-                buf==localPhys["phaseMask"] ||
+        if (buf==getLocal("phase_2pi") ||
+                buf==getLocal("phaseMask") ||
                 buf==getPhysFromCombo(my_image[0].image) ||
                 buf==getPhysFromCombo(my_image[1].image)) {
             maskRegion->setVisible(useMask->isChecked());
@@ -226,9 +234,14 @@ void Interferometry::bufferChanged(nPhysD* buf) {
 }
 
 void Interferometry::guessCarrier() {
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     nPhysD *image=getPhysFromCombo(my_image[0].image);
     if (image) {
         QRect geom2=region->getRect(image);
+        if (geom2.isEmpty()) {
+            statusbar->showMessage(tr("The region is outside the image"), 5000);
+            return;
+        }
         nPhysD datamatrix;
         datamatrix = image->sub(geom2);
 
@@ -245,6 +258,7 @@ void Interferometry::guessCarrier() {
 }
 
 void Interferometry::doWavelet () {
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     QElapsedTimer timer;
     timer.start();
     nThread.n_iter=0; // runThread sets it to -1 only if a wavelet below is stopped
@@ -256,8 +270,8 @@ void Interferometry::doWavelet () {
         }
         if (nThread.n_iter!=-1) doWavelet(1);
     }
-    if (nThread.n_iter==-1) { // stopped: don't chain on the previous results
-        statusbar->showMessage(tr("Wavelet stopped"), 5000);
+    if (nThread.n_iter==-1) { // stopped (or region outside the image): don't chain on the previous results
+        if (statusbar->currentMessage().isEmpty()) statusbar->showMessage(tr("Wavelet stopped"), 5000);
         return;
     }
     statusbar->showMessage(QLocale().toString(timer.elapsed())+" msec", 5000);
@@ -303,6 +317,12 @@ void Interferometry::doWavelet (int iimage) {
         my_params.damp=correlation->value();
 
         QRect geom2=region->getRect(image);
+        // outside the image: the wavelet of an empty matrix ended in the "Thread problems" box (modal: a script waited)
+        if (geom2.isEmpty()) {
+            statusbar->showMessage(tr("The region is outside the image ")+QString::fromStdString(image->getShortName()), 5000);
+            nThread.n_iter=-1; // like a stop: no unwrap of the previous results
+            return;
+        }
 
         // nPhysD datamatrix = image->sub(geom2,padding->isChecked()?thick:0);
         // Pad: the image around the region is used for the computation, 2 windows on each side as the padding of
@@ -359,7 +379,7 @@ void Interferometry::doWavelet (int iimage) {
         for(auto & itr : retList) {
             if (itr.second) {
                 itr.second->setShortName(itr.second->getShortName()+suffix);
-                localPhys[itr.first+suffix]=nparent->replacePhys(itr.second,localPhys[itr.first+suffix],false);
+                localPhys[itr.first+suffix]=nparent->replacePhys(itr.second,getLocal(itr.first+suffix),false);
             }
         }
         my_params.data=nullptr;
@@ -368,35 +388,46 @@ void Interferometry::doWavelet (int iimage) {
 }
 
 void Interferometry::doUnwrap () {
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Unwrapping");
-    if (localPhys["phase_2pi_shot"]) {
-        nPhysD diff=localPhys["phase_2pi_shot"]->copy();
-        if ( !localPhys["phase_2pi_ref"] || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
+    if (getLocal("phase_2pi_shot")) {
+        nPhysD diff=getLocal("phase_2pi_shot")->copy();
+        if ( !getLocal("phase_2pi_ref") || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
             physWave::phys_subtract_carrier(diff, angleCarrier->value(), widthCarrier->value());
-        } else if (localPhys["phase_2pi_ref"]) {
-            nPhysD ref_phase=localPhys["phase_2pi_ref"]->copy();
+        } else if (getLocal("phase_2pi_ref")) {
+            nPhysD ref_phase=getLocal("phase_2pi_ref")->copy();
+            // different sizes (region clipped differently by the borders of the two images): phys_point_subtract
+            // did nothing and the shot phase was used without the reference, silently
+            if (ref_phase.getW()!=diff.getW() || ref_phase.getH()!=diff.getH()) {
+                statusbar->showMessage(tr("Reference and shot wavelets have different sizes (")+
+                                       QLocale().toString(ref_phase.getW())+"x"+QLocale().toString(ref_phase.getH())+" "+
+                                       QLocale().toString(diff.getW())+"x"+QLocale().toString(diff.getH())+
+                                       tr("): the region must be inside both images"), 10000);
+                return;
+            }
             physMath::phys_point_subtract(diff,ref_phase);
         }
         physMath::phys_remainder(diff,1.0);
         diff.setShortName("phase_2pi_wrap"); // before replacePhys: pans and Image_list read it there
-        localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD(diff),localPhys["phase_2pi_wrap"]);
+        localPhys["phase_2pi_wrap"]=nparent->replacePhys(new nPhysD(diff),getLocal("phase_2pi_wrap"));
     }
     // qDebug() << "here";
 
-    if (localPhys["contrast_shot"]) {
-        nPhysD quality_loc= localPhys["contrast_shot"]->copy();
-        if (localPhys["contrast_ref"] && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))) {
-            physMath::phys_point_multiply(quality_loc,*localPhys["contrast_ref"]);
+    if (getLocal("contrast_shot")) {
+        nPhysD quality_loc= getLocal("contrast_shot")->copy();
+        if (getLocal("contrast_ref") && (getPhysFromCombo(my_image[0].image) != getPhysFromCombo(my_image[1].image))
+                && getLocal("contrast_ref")->getW()==quality_loc.getW() && getLocal("contrast_ref")->getH()==quality_loc.getH()) { // (else silently not multiplied)
+            physMath::phys_point_multiply(quality_loc,*getLocal("contrast_ref"));
             physMath::phys_sqrt(quality_loc);
         }
         quality_loc.setShortName("phase_quality");
-        localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),localPhys["phase_quality"]);
+        localPhys["phase_quality"]=nparent->replacePhys(new nPhysD(quality_loc),getLocal("phase_quality"));
     }
 
-    if (nPhysExists(localPhys["phase_2pi_wrap"]) && nPhysExists(localPhys["phase_quality"])) {
+    if (nPhysExists(getLocal("phase_2pi_wrap")) && nPhysExists(getLocal("phase_quality"))) {
 
-        physD *phase = static_cast<physD*>(localPhys["phase_2pi_wrap"]);
-        physD *qual = static_cast<physD*>(localPhys["phase_quality"]);
+        physD *phase = static_cast<physD*>(getLocal("phase_2pi_wrap"));
+        physD *qual = static_cast<physD*>(getLocal("phase_quality"));
 
         // qDebug() << "here";
         if (qual && phase) {
@@ -454,21 +485,23 @@ void Interferometry::doUnwrap () {
             };
 
             physD phase2=phase->copy();
-            bool haveAngles = nPhysExists(localPhys["angle_shot"]) && nPhysExists(localPhys["phase_2pi_shot"]);
+            bool haveAngles = nPhysExists(getLocal("angle_shot")) && nPhysExists(getLocal("phase_2pi_shot"));
             if (unwrapAngles->isChecked() && !haveAngles) {
                 statusbar->showMessage(tr("Unwrap angles needs the wavelet of the shot"), 5000);
             }
             if (unwrapAngles->isChecked() && haveAngles) {
                 // where the best filter points opposite to the (unwrapped) fringe direction, the phase of the SHOT changes sign:
                 // flip the shot phase there, then subtract the reference (flipping the difference is wrong by 2*phase_ref)
-                physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
+                physD angle = (static_cast<physD*>(getLocal("angle_shot")))->copy();
                 physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
                 physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
                 doPhaseUnwrap(angle, unwrapAngle);
 
-                physD shotFlipped = (static_cast<physD*>(localPhys["phase_2pi_shot"]))->copy();
+                physD shotFlipped = (static_cast<physD*>(getLocal("phase_2pi_shot")))->copy();
                 for (size_t k=0; k<unwrapAngle.getSurf(); k++) {
-                    long swaps=std::lround(unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k]); // round: unwrapped values are not exact integers away
+                    const double dAngle=unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k];
+                    // round: unwrapped values are not exact integers away; NaN: no flip (lround(NaN) is undefined)
+                    long swaps=std::isfinite(dAngle) ? std::lround(dAngle) : 0;
                     if (std::abs(swaps) % 2 == 1) {
                         shotFlipped.Timg_buffer[k] = -shotFlipped.Timg_buffer[k];
                         unwrapAngle.Timg_buffer[k]=1;
@@ -479,12 +512,12 @@ void Interferometry::doUnwrap () {
 
                 // reference phase: the reference wavelet or the carrier
                 physD refPhase;
-                if ( !localPhys["phase_2pi_ref"] || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
+                if ( !getLocal("phase_2pi_ref") || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
                     refPhase = physD(shotFlipped.getW(),shotFlipped.getH(),0.0);
                     physWave::phys_subtract_carrier(refPhase, angleCarrier->value(), widthCarrier->value());
                     physMath::phys_multiply(refPhase,-1.0);
                 } else {
-                    refPhase = static_cast<physD*>(localPhys["phase_2pi_ref"])->copy();
+                    refPhase = static_cast<physD*>(getLocal("phase_2pi_ref"))->copy();
                 }
 
                 // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
@@ -509,9 +542,9 @@ void Interferometry::doUnwrap () {
                 phase2.TscanBrightness();
                 unwrapAngle.TscanBrightness();
                 unwrapAngle.setShortName("unwrap angles");
-                localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),localPhys["unwrap_angles"]);
+                localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),getLocal("unwrap_angles"));
                 phase2.setShortName(minus ? "phase2 (shot-ref)" : "phase2 (shot+ref)");
-                localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),localPhys["phase2"]);
+                localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),getLocal("phase2"));
             } else {
                 doPhaseUnwrap(phase2, unwrap);
             }
@@ -549,7 +582,7 @@ void Interferometry::doUnwrap () {
 //            doPhaseUnwrap(phase2, unwrap);
 #ifdef __phys_debug
             if (useBarrier->isChecked()) {
-                localPhys["barrier"]=nparent->replacePhys(new nPhysD(barrierPhys),localPhys["barrier"]);
+                localPhys["barrier"]=nparent->replacePhys(new nPhysD(barrierPhys),getLocal("barrier"));
             }
 #endif
 
@@ -558,7 +591,7 @@ void Interferometry::doUnwrap () {
             unwrap.setFromName(phase->getFromName());
 
             nPhysD *unwrapcopy= new nPhysD(unwrap);
-            localPhys["phase_2pi_unwrap"]=nparent->replacePhys(unwrapcopy,localPhys["phase_2pi_unwrap"]);
+            localPhys["phase_2pi_unwrap"]=nparent->replacePhys(unwrapcopy,getLocal("phase_2pi_unwrap"));
 
         }
     }
@@ -567,41 +600,42 @@ void Interferometry::doUnwrap () {
 }
 
 void Interferometry::doSubtract () {
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Subtract and rotate");
 
-    if (localPhys["intensity_ref"] && localPhys["intensity_shot"]) {
-        nPhysD contrast_loc= *localPhys["intensity_shot"] / *localPhys["intensity_ref"];
+    if (getLocal("intensity_ref") && getLocal("intensity_shot")) {
+        nPhysD contrast_loc= *getLocal("intensity_shot") / *getLocal("intensity_ref");
         contrast_loc.TscanBrightness();
         nPhysD *contrast_rot=new nPhysD(contrast_loc.fast_rotated(rotAngle->value()));
         contrast_rot->setShortName("contrast");
-        localPhys["contrast"]=nparent->replacePhys(contrast_rot,localPhys["contrast"]);
+        localPhys["contrast"]=nparent->replacePhys(contrast_rot,getLocal("contrast"));
     }
 
-    if (localPhys["angle_ref"] && localPhys["angle_shot"]) {
-        nPhysD angle_loc= *localPhys["angle_shot"] - *localPhys["angle_ref"];
+    if (getLocal("angle_ref") && getLocal("angle_shot")) {
+        nPhysD angle_loc= *getLocal("angle_shot") - *getLocal("angle_ref");
         angle_loc.TscanBrightness();
         nPhysD *angle_rot=new nPhysD(angle_loc.fast_rotated(rotAngle->value()));
         angle_rot->setShortName("angle");
-        localPhys["angle"]=nparent->replacePhys(angle_rot,localPhys["angle"]);
+        localPhys["angle"]=nparent->replacePhys(angle_rot,getLocal("angle"));
     }
 
-    if (localPhys["lambda_ref"] && localPhys["lambda_shot"]) {
-        nPhysD lambda_loc= *localPhys["lambda_shot"] / *localPhys["lambda_ref"];
+    if (getLocal("lambda_ref") && getLocal("lambda_shot")) {
+        nPhysD lambda_loc= *getLocal("lambda_shot") / *getLocal("lambda_ref");
         lambda_loc.TscanBrightness();
         nPhysD *lambda_rot=new nPhysD(lambda_loc.fast_rotated(rotAngle->value()));
         lambda_rot->setShortName("lambda");
-        localPhys["lambda"]=nparent->replacePhys(lambda_rot,localPhys["lambda"]);
+        localPhys["lambda"]=nparent->replacePhys(lambda_rot,getLocal("lambda"));
     }
 
-    if (localPhys["phase_quality"]) {
-        nPhysD *quality_rot=new nPhysD(localPhys["phase_quality"]->fast_rotated(rotAngle->value()));
+    if (getLocal("phase_quality")) {
+        nPhysD *quality_rot=new nPhysD(getLocal("phase_quality")->fast_rotated(rotAngle->value()));
         quality_rot->setShortName("quality");
-        localPhys["quality"]=nparent->replacePhys(quality_rot,localPhys["quality"]);
+        localPhys["quality"]=nparent->replacePhys(quality_rot,getLocal("quality"));
     }
 
-    if (localPhys["phase_2pi_unwrap"]) {
+    if (getLocal("phase_2pi_unwrap")) {
 
-        nPhysD phase=localPhys["phase_2pi_unwrap"]->copy();
+        nPhysD phase=getLocal("phase_2pi_unwrap")->copy();
 
         if (opposite->isChecked()) {
             physMath::phys_multiply(phase,-1.0);
@@ -613,28 +647,6 @@ void Interferometry::doSubtract () {
         if (shot) zero = zero - shot->get_origin() + phase.get_origin();
         double offset=phase.point(vec2i(std::lround(zero.x()),std::lround(zero.y())));
         // double offset=phase.point(posZeroX->value(),posZeroY->value());
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "";
-        // qDebug() << "";
-        // qDebug() << "";
-        // qDebug() << posZeroX->value() << posZeroY->value() << offset;
-        // qDebug() << "";
-        // qDebug() << "";
-        // qDebug() << "";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
-        // qDebug() << "!@#!@$#!@##!@$!#@$@!##!@#!@$@@";
         if (std::isfinite(offset)) {
             physMath::phys_subtract(phase,offset);
         } else {
@@ -643,7 +655,7 @@ void Interferometry::doSubtract () {
 
         nPhysD *phase_rot=new nPhysD(phase.fast_rotated(rotAngle->value()));
         phase_rot->setShortName("phase_2pi");
-        localPhys["phase_2pi"]=nparent->replacePhys(phase_rot,localPhys["phase_2pi"]);
+        localPhys["phase_2pi"]=nparent->replacePhys(phase_rot,getLocal("phase_2pi"));
 
     }
     statusbar->clearMessage();
@@ -653,31 +665,29 @@ void Interferometry::doSubtract () {
 
 
 void Interferometry::doMaskCutoff() {
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Mask");
-    nPhysD *phase=localPhys["phase_2pi"];
+    nPhysD *phase=getLocal("phase_2pi");
     nPhysD *phaseMask=nullptr;
     if (nPhysExists(phase)) {
         if (useMask->isChecked()) {
             maskRegion->show();
             phaseMask =new nPhysD(phase->getW(),phase->getH(),0.0,"Mask");
             phaseMask->prop=phase->prop;
+            phaseMask->setShortName("Mask"); // (prop has the names too: the mask was called phase_2pi)
             // line points are relative to the image origin: pixels of the phase = points + its origin
             QPolygonF regionPoly=maskRegion->poly(1).translated(phase->get_origin().x(),phase->get_origin().y());
             QRect imageRect=QRect(0,0,phase->getW(),phase->getH());
             QRect rectRegion=regionPoly.boundingRect().toRect().intersected(imageRect);
-            QProgressDialog progress("Extracting",QString(), 0, rectRegion.width(), this);
-            progress.setWindowModality(Qt::WindowModal);
-            progress.show();
+            // (no progress dialog: its processEvents at each column let the spin boxes run doSubtract/doMaskCutoff
+            // again, which replaced and deleted phase while it was read)
             for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
                 for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
                     if (regionPoly.containsPoint(QPointF(i,j),Qt::OddEvenFill)) {
                         phaseMask->set(i,j,phase->point(i,j));
                     }
                 }
-                progress.setValue(i-rectRegion.left());
-                QApplication::processEvents();
             }
-            progress.close();
         } else {
             maskRegion->hide();
         }
@@ -686,8 +696,9 @@ void Interferometry::doMaskCutoff() {
             phaseMask=new nPhysD(*phase);
             phaseMask->setShortName("Mask");
         }
-        nPhysD *quality=localPhys["quality"];
-        if (nPhysExists(quality)) {
+        nPhysD *quality=getLocal("quality");
+        // same size only (a quality of an older region wrote outside the mask)
+        if (nPhysExists(quality) && quality->getW()==phaseMask->getW() && quality->getH()==phaseMask->getH()) {
             nPhysD loc_qual(*quality);
             double mini=loc_qual.get_min();
             double maxi=loc_qual.get_max();
@@ -697,7 +708,7 @@ void Interferometry::doMaskCutoff() {
                     phaseMask->Timg_buffer[k]=0.0;
         }
         phaseMask->TscanBrightness();
-        localPhys["phaseMask"]=nparent->replacePhys(phaseMask,localPhys["phaseMask"]);
+        localPhys["phaseMask"]=nparent->replacePhys(phaseMask,getLocal("phaseMask"));
     }
     statusbar->clearMessage();
 
@@ -705,99 +716,119 @@ void Interferometry::doMaskCutoff() {
 }
 
 void Interferometry::doShape(){
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Interpolating");
 
-    nPhysD *image=localPhys["phaseMask"];
+    nPhysD *image=getLocal("phaseMask");
 
     if (nPhysExists(image)) {
-        if (useInterpolate->isChecked()) {
-            if (localPhys["interpPhase_2piMask"]==image) {
+        // blur (blurPhase px, 0 = off) and then the interpolation of the regions, on a copy of the mask
+        const double blurRadius=blurPhase->value();
+        if (useInterpolate->isChecked() || blurRadius>0) {
+            if (getLocal("interpPhase_2piMask")==image) {
                 localPhys["interpPhase_2piMask"]=nullptr; // old sessions aliased it to the mask: don't overwrite the mask
             }
             nPhysD *regionPath = new nPhysD(*image);
-            regionPath->setShortName("phaseInterp");
-            QProgressDialog progress("Interpolate", "Stop", 0, my_shapes.size(), this);
-            progress.setWindowModality(Qt::WindowModal);
-            progress.show();
-            int prog=0;
-            for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++, prog++) {
-                progress.setValue(prog);
-                if (progress.wasCanceled()) break;
-                QApplication::processEvents();
+            regionPath->setShortName(useInterpolate->isChecked() ? "phaseInterp" : "phaseBlur");
+            if (blurRadius>0) {
+                // before the regions: their borders (the boundary of the interpolation) are the blurred phase.
+                // FFT blur: NaN pixels stay NaN, the borders of the image are periodic
+                statusbar->showMessage(tr("Blurring"));
+                physMath::phys_fast_gaussian_blur(*regionPath, blurRadius);
+            }
+            if (useInterpolate->isChecked()) {
+                // the loop handles events (the Stop button): image can be closed meanwhile, only the copy is used,
+                // and the steps of the pan triggered meanwhile (spin boxes, buttons) do nothing (inLoop)
+                const vec2f origin=regionPath->get_origin();
+                inLoop=true;
+                QProgressDialog progress("Interpolate", "Stop", 0, my_shapes.size(), this);
+                progress.setWindowModality(Qt::WindowModal);
+                progress.show();
+                int prog=0;
+                // a copy: a shape removed while the events run erases itself from my_shapes (removeShape)
+                std::vector<QPointer<nLine>> shapesCopy;
+                for (auto &it : my_shapes) shapesCopy.push_back(it.second);
+                for (auto it = shapesCopy.begin(); it != shapesCopy.end(); it++, prog++) {
+                    progress.setValue(prog);
+                    if (progress.wasCanceled()) break;
+                    QApplication::processEvents();
+                    if (!*it) continue; // removed meanwhile
 
-                nLine* region = (*it).second;
+                    nLine* shape = *it; // (it was called region, like the rectangle of the pan)
 
-                region->toggleClosedLine(true); // ensure no mess
+                    shape->toggleClosedLine(true); // ensure no mess
 
-                QPolygonF regionPoly=region->poly(1).translated(image->get_origin().x(),image->get_origin().y());
+                    QPolygonF regionPoly=shape->poly(1).translated(origin.x(),origin.y());
 
-                // convert QPolygonF to vector<vec2f>
-                std::vector<vec2f> vecPoints(regionPoly.size());
-                for(int k=0;k<regionPoly.size();k++) {
-                    QPointF pp=regionPoly[k];
-                    vecPoints[k]=vec2f(pp.x(),pp.y());
-                }
+                    // convert QPolygonF to vector<vec2f>
+                    std::vector<vec2f> vecPoints(regionPoly.size());
+                    for(int k=0;k<regionPoly.size();k++) {
+                        QPointF pp=regionPoly[k];
+                        vecPoints[k]=vec2f(pp.x(),pp.y());
+                    }
 
-                // harmonic (laplace) filling: the pixels around the shape are the boundary conditions
-                QRect rectRegion=regionPoly.boundingRect().toRect().adjusted(-1,-1,+1,+1).intersected(QRect(0,0,regionPath->getW(),regionPath->getH()));
-                std::vector<vec2i> pixels;
-                for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
-                    for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
-                        vec2f pp(i,j);
-                        if (point_inside_poly(pp,vecPoints)) {
-                            pixels.push_back(vec2i(i,j));
+                    // harmonic (laplace) filling: the pixels around the shape are the boundary conditions
+                    QRect rectRegion=regionPoly.boundingRect().toRect().adjusted(-1,-1,+1,+1).intersected(QRect(0,0,regionPath->getW(),regionPath->getH()));
+                    std::vector<vec2i> pixels;
+                    for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
+                        for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+                            vec2f pp(i,j);
+                            if (point_inside_poly(pp,vecPoints)) {
+                                pixels.push_back(vec2i(i,j));
+                            }
                         }
                     }
+                    physMath::laplace_fill(*regionPath, pixels);
+
+                    // old implementation: inverse distance (1/r^2) mean of 20 samples per segment of the shape
+    //                // these are the points on wich we will calculate the weighted mean
+    //                const unsigned int npoints=20;
+    //                std::vector<std::pair<vec2f, double> > vals;
+    //                for(unsigned int k=0;k+1<vecPoints.size();k++) {
+    //                    vec2f p1=vecPoints[k];
+    //                    vec2f p2=vecPoints[k+1];
+    //                    for(unsigned int kk=0;kk<npoints;kk++) {
+    //                        vec2f pp=p1+kk*(p2-p1)/npoints;
+    //                        double val=regionPath->point(pp);
+    //                        if (std::isfinite(val)) {
+    //                            vals.push_back(std::make_pair(pp, val));
+    //                        }
+    //                    }
+    //                }
+
+    //                if (vals.size()==0) continue;
+
+    //                QRect rectRegion=regionPoly.boundingRect().toRect().adjusted(-1,-1,+1,+1);
+
+    //                for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
+    //                    for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
+    //                        vec2f pp(i,j);
+    //                        if (point_inside_poly(pp,vecPoints)) {
+    //                            double mean=0;
+    //                            double weight=0;
+    //                            bool onSample=false;
+    //                            for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
+    //                                vec2f p=it->first;
+    //                                double pval=it->second;
+    //                                double d2=(pp-p).mod2();
+    //                                if (d2==0) { // on a sample point: 1/0 weight would give inf/inf
+    //                                    mean=pval;
+    //                                    onSample=true;
+    //                                    break;
+    //                                }
+    //                                double wi=1.0/d2;
+    //                                mean+=wi*pval;
+    //                                weight+=wi;
+    //                            }
+    //                            double ppval=onSample ? mean : mean/weight;
+    //                            regionPath->set(pp,ppval);
+    //                        }
+    //                    }
+    //                }
                 }
-                physMath::laplace_fill(*regionPath, pixels);
-
-                // old implementation: inverse distance (1/r^2) mean of 20 samples per segment of the shape
-//                // these are the points on wich we will calculate the weighted mean
-//                const unsigned int npoints=20;
-//                std::vector<std::pair<vec2f, double> > vals;
-//                for(unsigned int k=0;k+1<vecPoints.size();k++) {
-//                    vec2f p1=vecPoints[k];
-//                    vec2f p2=vecPoints[k+1];
-//                    for(unsigned int kk=0;kk<npoints;kk++) {
-//                        vec2f pp=p1+kk*(p2-p1)/npoints;
-//                        double val=regionPath->point(pp);
-//                        if (std::isfinite(val)) {
-//                            vals.push_back(std::make_pair(pp, val));
-//                        }
-//                    }
-//                }
-
-//                if (vals.size()==0) continue;
-
-//                QRect rectRegion=regionPoly.boundingRect().toRect().adjusted(-1,-1,+1,+1);
-
-//                for (int i=rectRegion.left(); i<=rectRegion.right(); i++) {
-//                    for (int j=rectRegion.top(); j<=rectRegion.bottom(); j++) {
-//                        vec2f pp(i,j);
-//                        if (point_inside_poly(pp,vecPoints)) {
-//                            double mean=0;
-//                            double weight=0;
-//                            bool onSample=false;
-//                            for(std::vector<std::pair<vec2f,double> >::iterator it=vals.begin();it!=vals.end();++it){
-//                                vec2f p=it->first;
-//                                double pval=it->second;
-//                                double d2=(pp-p).mod2();
-//                                if (d2==0) { // on a sample point: 1/0 weight would give inf/inf
-//                                    mean=pval;
-//                                    onSample=true;
-//                                    break;
-//                                }
-//                                double wi=1.0/d2;
-//                                mean+=wi*pval;
-//                                weight+=wi;
-//                            }
-//                            double ppval=onSample ? mean : mean/weight;
-//                            regionPath->set(pp,ppval);
-//                        }
-//                    }
-//                }
+                inLoop=false;
             }
-            localPhys["interpPhase_2piMask"]=nparent->replacePhys(regionPath,localPhys["interpPhase_2piMask"]);
+            localPhys["interpPhase_2piMask"]=nparent->replacePhys(regionPath,getLocal("interpPhase_2piMask"));
         }
         // without interpolation doCutoff uses phaseMask directly (no alias: replacePhys would overwrite the mask)
     }
@@ -866,8 +897,10 @@ void Interferometry::removeShape(QObject *obj){
 }
 
 void Interferometry::doCutoff(){
+    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Cutoff");
-    nPhysD *image=useInterpolate->isChecked() ? localPhys["interpPhase_2piMask"] : localPhys["phaseMask"];
+    // the result of doShape when it did something (interpolation or blur)
+    nPhysD *image=(useInterpolate->isChecked() || blurPhase->value()>0) ? getLocal("interpPhase_2piMask") : getLocal("phaseMask");
     if (nPhysExists(image)) {
         nPhysD *intNe= nullptr;
         if (useCropRegion->isChecked()) {
@@ -891,13 +924,13 @@ void Interferometry::doCutoff(){
             physMath::cutoff(*intNe,mini,maxi);
             intNe->reset_display();
 
-            if (nPhysExists(localPhys["interpPhase_2piMaskCutoff"])) {
-                localPhys["interpPhase_2piMaskCutoff"]->prop["display_range"]=intNe->get_min_max();
-                localPhys["interpPhase_2piMaskCutoff"]->reset_display();
+            if (nPhysExists(getLocal("interpPhase_2piMaskCutoff"))) {
+                getLocal("interpPhase_2piMaskCutoff")->prop["display_range"]=intNe->get_min_max();
+                getLocal("interpPhase_2piMaskCutoff")->reset_display();
             }
         }
         intNe->TscanBrightness();
-        localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,localPhys["interpPhase_2piMaskCutoff"],true);
+        localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,getLocal("interpPhase_2piMaskCutoff"),true);
     }
     statusbar->clearMessage();
 }
@@ -937,9 +970,7 @@ void Interferometry::loadSettings(QSettings &settings){
             std::string str0=qstr.at(0).toStdString();
             std::string str1=qstr.at(1).toStdString();
             for(auto & img : nparent->getBufferList()) {
-                qDebug() << qstr << "Image" << img;
                 if (img->getShortName() == str0 && img->getName() == str1) {
-                    qDebug() << "Found localPhys" << childKey;
                     localPhys[childKey.toStdString()]=img;
                 }
             }
@@ -980,10 +1011,9 @@ void Interferometry::saveSettings(QSettings &settings){
 
     QStringList localPhysNames;
     for (const auto& one : localPhys) {
-        localPhysNames.append(QString::fromStdString(one.first));
+        if (one.second && nPhysExists(one.second)) localPhysNames.append(QString::fromStdString(one.first)); // (not the null entries)
     }
     setProperty("NeuSave-localPhysNames",localPhysNames);
-    qDebug() << localPhysNames;
 
     nGenericPan::saveSettings(settings);
 }
