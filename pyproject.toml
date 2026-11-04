@@ -10,7 +10,10 @@ build-backend = "scikit_build_core.build"
 [project]
 # "neutrino" is taken on PyPI: the import name is neutrino
 name = "neutrino-toolkit"
-version = "0.1.0"
+# version = "0.1.0"
+# major.minor: the third number is added by python/ci/version.py (CI, every commit +1); a new
+# major.minor is published on PyPI (.github/workflows/main.yml, job pypi)
+version = "3.0"
 description = "Neutrino image analysis in python: windows, images (numpy arrays) and pans"
 # readme = "README.md"
 readme = "python/README.md"

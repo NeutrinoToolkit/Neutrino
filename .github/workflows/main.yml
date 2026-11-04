@@ -382,6 +382,12 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash
       run: mkdir -p vcpkg-cache
+    # major.minor of pyproject.toml + the commits since its change (python/ci/version.py)
+    - name: Version
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" = Windows ]; then PY=python; else PY=python3; fi
+        $PY python/ci/version.py --write
     - name: Build and test
       run: pipx run "cibuildwheel>=3.1,<4" --output-dir wheelhouse
     - name: vcpkg cache save
@@ -394,6 +400,63 @@ jobs:
       with:
         name: ${{ matrix.name }}
         path: wheelhouse/*.whl
+
+  # the wheels on PyPI (pip install neutrino-toolkit): only the first version of a new major.minor (the version line
+  # of pyproject.toml changed), from master or modernization. The other versions are in the GitHub releases
+  # trusted publishing: pypi.org, Publishing, publisher NeutrinoToolkit/Neutrino, workflow main.yml, environment pypi
+  pypi-check:
+    if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') }}
+    needs: [wheels]
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      publish: ${{ steps.check.outputs.publish }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Check PyPI
+      id: check
+      run: |
+        version=$(python3 python/ci/version.py)
+        echo "version=$version" >> $GITHUB_OUTPUT
+        # publish when PyPI has no version with this major.minor (also retried at the next push if it failed)
+        python3 - "$version" >> $GITHUB_OUTPUT <<'EOF'
+        import json, sys, urllib.error, urllib.request
+        major_minor = sys.argv[1].rsplit(".", 1)[0]
+        try:
+            releases = json.load(urllib.request.urlopen("https://pypi.org/pypi/neutrino-toolkit/json"))["releases"]
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                raise
+            releases = {}  # not on PyPI yet
+        published = [v for v in releases if v.rsplit(".", 1)[0] == major_minor]
+        print("publish=" + ("false" if published else "true"))
+        print(f"{sys.argv[1]}: PyPI has {published or 'no ' + major_minor + '.*'}", file=sys.stderr)
+        EOF
+
+  pypi:
+    if: ${{ !cancelled() && needs.pypi-check.outputs.publish == 'true' }}
+    needs: [pypi-check]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/neutrino-toolkit
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        pattern: wheel-*
+        path: dist
+        merge-multiple: true
+    - name: Check wheels
+      run: |
+        ls -l dist
+        # all the wheels (the wheels jobs are continue-on-error): 3 pythons x 5 platforms, of this version
+        n=$(ls dist/neutrino_toolkit-${{ needs.pypi-check.outputs.version }}-*.whl | wc -l)
+        if [ $n -ne 15 ] || [ $(ls dist | wc -l) -ne 15 ]; then echo "$n wheels of ${{ needs.pypi-check.outputs.version }} instead of 15"; exit 1; fi
+    - uses: pypa/gh-action-pypi-publish@release/v1
 
   release:
     if: ${{ !cancelled() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernization') && needs.mac-arm.result == 'success' && needs.windows.result == 'success' }}
