@@ -34,9 +34,9 @@ rm pandoc-3.7.0.2-linux-${PANDOC_ARCH}.tar.gz
 PY=/opt/python/cp312-cp312/bin/python
 $PY -m pip install aqtinstall
 if [ "$(uname -m)" = aarch64 ]; then
-    $PY -m aqt install-qt linux_arm64 desktop $QT_VERSION linux_gcc_arm64 -m qtcharts qtmultimedia --outputdir /opt/Qt
+    $PY -m aqt install-qt linux_arm64 desktop $QT_VERSION linux_gcc_arm64 -m qtmultimedia --outputdir /opt/Qt
 else
-    $PY -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -m qtcharts qtmultimedia --outputdir /opt/Qt
+    $PY -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -m qtmultimedia --outputdir /opt/Qt
 fi
 # (| head with pipefail: exit 141 when head closes the pipe before ls has written everything, at random)
 # ln -sfn "$(ls -d /opt/Qt/$QT_VERSION/*/ | head -1)" /opt/Qt/current

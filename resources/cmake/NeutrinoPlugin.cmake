@@ -32,7 +32,7 @@ MACRO(ADD_NEUTRINO_PLUGIN)
         message(FATAL_ERROR "Neutrino plugins are built in the Neutrino tree (nPhysImageF target not found)")
     endif()
 
-    set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus Charts)
+    set(MODULES Core Gui Widgets Svg PrintSupport Network Multimedia MultimediaWidgets)
     find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
     add_definitions(${QT_DEFINITIONS})

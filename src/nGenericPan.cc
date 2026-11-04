@@ -979,17 +979,24 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     }
 }
 
+// the status of the pan as commands of the neutrino python module
 void nGenericPan::print() {
-    qDebug() << "here";
-    QString my_pan="neu.getPan(\""+panName()+"\").set";
-    QString out;
+    auto quoted = [](QString str) {
+        return "\""+str.replace("\\","\\\\").replace("\"","\\\"").replace("\n","\\n")+"\"";
+    };
+    int occurrence=0;
+    for (auto &pan : nparent->getPanList()) {
+        if (pan->panName()==panName()) occurrence++;
+        if (pan==this) break;
+    }
+    QString out="import neutrino\npan = neutrino.windows()["+QString::number(nCore::self()->neus().indexOf(nparent))+
+                  "].getPan("+quoted(panName())+(occurrence>1 ? ", "+QString::number(occurrence) : "")+")\n";
     foreach (QWidget *widget, findChildren<QWidget *>()) {
-        qDebug() << widget->objectName() << widget->property("neutrinoSave");
         if ((widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) ||
             (widget->property("neutrinoImage").isValid()) ) {
             QString name=widget->objectName();
             QString val=get(name).toString();
-            out+=my_pan+"(\""+name+"\",\""+val+"\")\n";
+            out+="pan.set("+quoted(name)+", "+quoted(val)+")\n";
         }
     }
     QApplication::clipboard()->setText(out);

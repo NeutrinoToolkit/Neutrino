@@ -1,6 +1,6 @@
 """Installs the official Qt for Windows from download.qt.io (for the python wheel: the Qt of PySide6).
 
-    python install_qt_windows.py 6.12.0 msvc2022_64 C:\\Qt\\current qtcharts qtmultimedia
+    python install_qt_windows.py 6.12.0 msvc2022_64 C:\\Qt\\current qtmultimedia
 
 From Qt 6.12 the Windows repository has a folder per compiler (qt6_6120/qt6_6120_msvc2022_64/Updates.xml), not
 known by aqtinstall 3.3 (it looks for qt6_6120/qt6_6120/Updates.xml). The archives are checked (sha1) and extracted

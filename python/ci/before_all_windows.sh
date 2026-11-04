@@ -10,7 +10,7 @@ vcpkg install "fftw3[threads]" gsl hdf5 cfitsio tiff libjpeg-turbo zlib --triple
 
 python -m pip install py7zr
 # (not aqtinstall: version 3.3 doesn't know the Windows repository of Qt >= 6.12)
-python "$(dirname "$0")/install_qt_windows.py" $QT_VERSION msvc2022_64 C:/Qt/current qtcharts qtmultimedia
+python "$(dirname "$0")/install_qt_windows.py" $QT_VERSION msvc2022_64 C:/Qt/current qtmultimedia
 # ls C:/Qt/current/lib/cmake | head -50
 ls C:/Qt/current/lib/cmake
 clang-cl --version

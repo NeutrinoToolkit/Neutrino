@@ -51,7 +51,7 @@ add_custom_target(NeutrinoVersion
     VERBATIM)
 set_source_files_properties(${VERSION_CC} PROPERTIES GENERATED TRUE SKIP_AUTOGEN ON)
 
-set(MODULES Core Gui Sql Widgets Svg PrintSupport Network UiTools Multimedia MultimediaWidgets Qml DBus Charts)
+set(MODULES Core Gui Widgets Svg PrintSupport Network Multimedia MultimediaWidgets)
 
 find_package(Qt6 COMPONENTS ${MODULES} REQUIRED)
 
