@@ -38,7 +38,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     connect(nparent->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
     connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
 
-    connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(repaint()));
+    connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(update()));
 
     connect(my_w.actionCutoff,SIGNAL(triggered()),this,SLOT(cutOff()));
 
@@ -63,6 +63,8 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
     connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
 
+    // the value when typing is finished (it rescaled at every keystroke)
+    my_w.percent->setKeyboardTracking(false);
     connect(my_w.percent, SIGNAL(valueChanged(double)), nparent->my_view, SLOT(rescaleColor(double)));
     my_w.toolBar->addWidget(my_w.percent);
 
@@ -81,9 +83,7 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
     cutOffPhys=nullptr;
     // the cut-off image was closed by the user
     connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) { if (buf==cutOffPhys) cutOffPhys=nullptr; });
-    updatecolorbar();
-    QApplication::processEvents();
-    my_w.histogram->repaint();
+    updatecolorbar(); // (it updates the histogram; there was a processEvents and a repaint here)
 
     if (nparent->my_view->property("percentPixels").isValid()) {
         my_w.percent->setValue(nparent->my_view->property("percentPixels").toDouble());
@@ -105,49 +105,59 @@ void Colorscale::on_gamma_valueChanged(int val) {
     }
 }
 
-// setText doesn't emit editingFinished: apply explicitly
+// The line edits show the range rounded (QLocale().toString: 6 digits); the exact values are set in the image by
+// setRangeMin/Max (sliders, set to min/max, histogram) and the text is only read back when the user edits it.
+// (Everything went through the text before: each slider move or click rounded the range, e.g. 1234567.8 -> 1.23457e+06)
+void Colorscale::setRangeMin(double val) {
+    if (!currentBuffer) return;
+    vec2f minmax=currentBuffer->displayRange();
+    minmax.set_first(val);
+    currentBuffer->prop["display_range"]=minmax;
+    nparent->showPhys(); // bufferChanged: the text, the sliders and the histogram of this pan
+}
+
+void Colorscale::setRangeMax(double val) {
+    if (!currentBuffer) return;
+    vec2f minmax=currentBuffer->displayRange();
+    minmax.set_second(val);
+    currentBuffer->prop["display_range"]=minmax;
+    nparent->showPhys();
+}
+
 void Colorscale::setToMin () {
-    if (currentBuffer) {
-        my_w.lineMin->setText(QLocale().toString(currentBuffer->get_min()));
-        minChanged();
-    }
+    if (currentBuffer) setRangeMin(currentBuffer->get_min());
 }
 
 void Colorscale::setToMax () {
-    if (currentBuffer) {
-        my_w.lineMax->setText(QLocale().toString(currentBuffer->get_max()));
-        maxChanged();
-    }
+    if (currentBuffer) setRangeMax(currentBuffer->get_max());
 }
 
+// typed by the user (editingFinished also comes when the focus leaves an unedited field: its rounded text must
+// not replace the exact value); not a number: back to the current value (it set 0)
 void Colorscale::minChanged () {
-    QString value(my_w.lineMin->text());
-    my_w.sliderMin->blockSignals(true);
-    if (currentBuffer) {
-        vec2f minmax=currentBuffer->displayRange();
-        // DEBUG(QLocale().toDouble(value) << " " << minmax);
-        minmax.set_first(QLocale().toDouble(value));
-        currentBuffer->prop["display_range"]=minmax;
-        my_w.sliderMin->setValue(sliderValues().first());
+    if (!my_w.lineMin->isModified()) return;
+    bool ok=false;
+    double val=QLocale().toDouble(my_w.lineMin->text(), &ok);
+    my_w.lineMin->setModified(false);
+    if (ok) {
+        setRangeMin(val);
+    } else {
+        showMessage(tr("Not a number: ")+my_w.lineMin->text(),2000);
+        updatecolorbar();
     }
-    nparent->showPhys();
-    my_w.histogram->repaint();
-    my_w.sliderMin->blockSignals(false);
 }
 
 void Colorscale::maxChanged () {
-    my_w.sliderMax->blockSignals(true);
-    QString value(my_w.lineMax->text());
-    if (currentBuffer) {
-        vec2f minmax=currentBuffer->displayRange();
-        // DEBUG(QLocale().toDouble(value) << " " << minmax);
-        minmax.set_second(QLocale().toDouble(value));
-        currentBuffer->prop["display_range"]=minmax;
-        my_w.sliderMax->setValue(sliderValues().second());
+    if (!my_w.lineMax->isModified()) return;
+    bool ok=false;
+    double val=QLocale().toDouble(my_w.lineMax->text(), &ok);
+    my_w.lineMax->setModified(false);
+    if (ok) {
+        setRangeMax(val);
+    } else {
+        showMessage(tr("Not a number: ")+my_w.lineMax->text(),2000);
+        updatecolorbar();
     }
-    nparent->showPhys();
-    my_w.histogram->repaint();
-    my_w.sliderMax->blockSignals(false);
 }
 
 void Colorscale::invertColors () {
@@ -179,7 +189,7 @@ void Colorscale::bufferChanged(nPhysD *my_phys) {
         my_w.lineMin->setText("");
         my_w.lineMax->setText("");
     }
-    my_w.histogram->repaint();
+    my_w.histogram->update();
 
     if (nparent->my_view->property("percentPixels").isValid()) {
         my_w.percent->setValue(nparent->my_view->property("percentPixels").toDouble());
@@ -217,7 +227,7 @@ void Colorscale::updatecolorbar(QString) {
         my_w.sliderMax->setValue(sliderValues().second());
     }
     
-    my_w.histogram->repaint();
+    my_w.histogram->update();
 }
 
 
@@ -232,26 +242,21 @@ void Colorscale::on_sliderMax_sliderReleased() {
     if (!my_w.sliderMax->hasTracking()) on_sliderMax_valueChanged(my_w.sliderMax->value());
 }
 
+// the exact value of the slider position (not through the rounded text)
 void Colorscale::on_sliderMin_valueChanged(int val) {
-    double doubleVal=0.0;
-    if (currentBuffer) doubleVal = (double)val/my_w.sliderMin->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
-    my_w.lineMin->setText(QLocale().toString(doubleVal, 'g'));
-    minChanged();
-    my_w.histogram->repaint();
+    if (currentBuffer) setRangeMin((double)val/my_w.sliderMin->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min());
 }
 
 void Colorscale::on_sliderMax_valueChanged(int val) {
-    double doubleVal=1.0;
-    if (currentBuffer) doubleVal = (double)val/my_w.sliderMax->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min();
-    my_w.lineMax->setText(QLocale().toString(doubleVal, 'g'));
-    maxChanged();
-    my_w.histogram->repaint();
+    if (currentBuffer) setRangeMax((double)val/my_w.sliderMax->maximum()*(currentBuffer->get_max()-currentBuffer->get_min())+currentBuffer->get_min());
 }
 
 void Colorscale::cutOff() {
     if (currentBuffer) {
         nPhysD *cut=new nPhysD(*currentBuffer);
-        physMath::cutoff(*cut,QLocale().toDouble(my_w.lineMin->text()),QLocale().toDouble(my_w.lineMax->text()));
+        // the exact range (the line edits show it rounded)
+        vec2f range=currentBuffer->displayRange();
+        physMath::cutoff(*cut,range.first(),range.second());
         cutOffPhys=nparent->replacePhys(cut,cutOffPhys);
     }
 }

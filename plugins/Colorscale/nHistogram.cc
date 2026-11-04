@@ -28,11 +28,6 @@
 
 nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 {
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
-    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << parent;
     setMouseTracking(true);
     offsety=8;
     dyColorBar=offsety*3/2;
@@ -45,7 +40,7 @@ nHistogram::nHistogram (QWidget *parent) : QWidget(parent)
 
 void nHistogram::colorValue(double val) {
     colorvalue=val;
-    repaint();
+    update(); // (repaint: a synchronous paint at every mouse move on the image)
 }
 
 void nHistogram::mouseMoveEvent (QMouseEvent *e)
@@ -56,20 +51,23 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
         //        frac_value=pow(frac_value, parentPan->currentBuffer->gamma());
         double my_min,my_max;
         if (e->pos().y()<dyColorBar + 4*offsety) {
-            my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
-            my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
+            // the exact range (the line edits show it rounded)
+            vec2f range=parentPan->currentBuffer->displayRange();
+            my_min=range.first();
+            my_max=range.second();
         } else {
             my_min=parentPan->currentBuffer->get_min();
             my_max=parentPan->currentBuffer->get_max();
         }
         colorvalue=my_min+frac_value*(my_max-my_min);
         parentPan->my_w.statusbar->showMessage(tr("Value : ")+QLocale().toString(colorvalue),2000);
-        repaint();
+        update();
     }
 }
 
-void nHistogram::mousePressEvent (QMouseEvent *) {
-    if (parentPan->currentBuffer && !property("mousepress").isValid()){
+void nHistogram::mousePressEvent (QMouseEvent *e) {
+    // left button only (a right click started a range too)
+    if (e->button()==Qt::LeftButton && parentPan->currentBuffer && !property("mousepress").isValid()){
         setProperty("mousepress",colorvalue);
     }
 }
@@ -99,16 +97,19 @@ void nHistogram::paintEvent(QPaintEvent *)
     drawPicture(p);
 
     if (parentPan->currentBuffer) {
-        double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
-        double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
-        if (my_max != my_min) {
-            int position=offsetx+dx*(colorvalue-my_min)/(my_max-my_min);
-            position=std::min(std::max(position,offsetx),width()-offsetx);
+        // clamped as double before the int (a value far outside overflowed the int)
+        auto marker=[&](double lo, double hi) {
+            double x=offsetx+dx*(colorvalue-lo)/(hi-lo);
+            if (!std::isfinite(x)) x=offsetx;
+            return int(std::min(std::max(x,double(offsetx)),double(width()-offsetx)));
+        };
+        vec2f range=parentPan->currentBuffer->displayRange();
+        if (range.second() != range.first()) {
+            int position=marker(range.first(),range.second());
             p.drawLine(position,2*offsety,position,2*offsety+dyColorBar);
         }
         if (parentPan->currentBuffer->get_max()!=parentPan->currentBuffer->get_min()) {
-            int position=offsetx+dx*(colorvalue-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
-            position=std::min(std::max(position,offsetx),width()-offsetx);
+            int position=marker(parentPan->currentBuffer->get_min(),parentPan->currentBuffer->get_max());
             p.drawLine(position,dyHisto,position,dy);
         }
     }
@@ -174,11 +175,16 @@ void nHistogram::drawPicture (QPainter &p) {
         p.setBrush(QColor(0,0,0,127));
         p.setPen(QColor(0,0,0,127));
 
-        double my_min=QLocale().toDouble(parentPan->my_w.lineMin->text());
-        double my_max=QLocale().toDouble(parentPan->my_w.lineMax->text());
-
-        double mini=dx*(my_min-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
-        double maxi=dx*(my_max-parentPan->currentBuffer->get_min())/(parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min());
+        // the exact range (the line edits show it rounded); constant image: no position (it divided by 0)
+        vec2f range=parentPan->currentBuffer->displayRange();
+        const double imgRange=parentPan->currentBuffer->get_max()-parentPan->currentBuffer->get_min();
+        double mini=0, maxi=dx;
+        if (std::isfinite(imgRange) && imgRange>0) {
+            mini=dx*(range.first()-parentPan->currentBuffer->get_min())/imgRange;
+            maxi=dx*(range.second()-parentPan->currentBuffer->get_min())/imgRange;
+            mini=std::min(std::max(mini,-1.0*dx),2.0*dx);
+            maxi=std::min(std::max(maxi,-1.0*dx),2.0*dx);
+        }
         p.drawLine(offsetx,2*offsety+dyColorBar,offsetx+mini,dyHisto);
         p.drawLine(dx+offsetx,2*offsety+dyColorBar,offsetx+maxi,dyHisto);
 
@@ -205,7 +211,7 @@ void nHistogram::drawPicture (QPainter &p) {
                 }
             }
             if (too_big) {
-                num_labels--;
+                num_labels=std::max(1,num_labels-1); // (0: integer division by zero with a narrow widget)
                 for (int i=0; i<=num_labels; i++) {
                     p.drawLine(offsetx+i*dx/num_labels,offsety+4,offsetx+i*dx/num_labels,2*offsety);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());
@@ -241,7 +247,7 @@ void nHistogram::drawPicture (QPainter &p) {
                 }
             }
             if (too_big) {
-                num_labels--;
+                num_labels=std::max(1,num_labels-1); // (0: integer division by zero with a narrow widget)
                 for (int i=0; i<=num_labels; i++) {
                     p.drawLine(offsetx+i*dx/num_labels,height()-2*offsety,offsetx+i*dx/num_labels,height()-offsety-4);
                     double val=minmax.x()+pow(double(i)/num_labels,parentPan->currentBuffer->gamma())*(minmax.y()-minmax.x());

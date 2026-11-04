@@ -52,6 +52,8 @@ public:
 public slots:
     void minChanged();
     void maxChanged();
+    void setRangeMin(double);
+    void setRangeMax(double);
 	
 	void invertColors();
 	void setToMin();

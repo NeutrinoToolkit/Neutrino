@@ -659,6 +659,9 @@ public:
 
 		if (Tmaximum_value == Tminimum_value)
 			TscanBrightness();
+		// constant image or no finite pixel: no histogram (the bin width was 0: 0/0)
+		if (!std::isfinite(Tminimum_value) || !std::isfinite(Tmaximum_value) || Tmaximum_value == Tminimum_value)
+			return histogram;
 
         unsigned int nbins = std::max<int>(getW()*getH()/10000, 100lu);
         double binw = static_cast<double>(Tmaximum_value-Tminimum_value)/(nbins-1.);
@@ -667,11 +670,15 @@ public:
 		DEBUG(5,"histogram has "<<nbins<<" bins, bin width: "<<binw);
 
         for (unsigned int i=0; i<getSurf(); i++) {
-            unsigned int bin_n = static_cast<unsigned int>(floor((Timg_buffer[i]-Tminimum_value)/(binw)));
+            // NaN/inf skipped: their bin was static_cast<unsigned>(NaN), undefined (bin 0 here, out of the vector elsewhere)
+            if (!std::isfinite(Timg_buffer[i])) continue;
+            const double bin_d = floor((Timg_buffer[i]-Tminimum_value)/(binw));
+            const unsigned int bin_n = static_cast<unsigned int>(std::min(std::max(bin_d, 0.0), nbins-1.));
 			histogram[bin_n]++;
 		}
 
-        histogram.erase(std::remove(histogram.begin(), histogram.end(), 0.0), histogram.end());
+        // the empty bins stay: removing them (as it was) shifted the histogram with respect to the values
+        // histogram.erase(std::remove(histogram.begin(), histogram.end(), 0.0), histogram.end());
 		
 		return histogram;
 	}
@@ -1052,6 +1059,7 @@ nPhysImageF<T>::set_Trow(unsigned int index, unsigned int offset, std::vector<T>
 
 template<class T> void
 nPhysImageF<T>::TscanBrightness() {
+    histogram.clear(); // the pixels may have changed: the cached histogram is recomputed when asked (get_histogram)
     if (getSurf()>0) {
         bool found=false;
 

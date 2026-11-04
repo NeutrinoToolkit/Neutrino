@@ -147,7 +147,9 @@ void nView::showPhys(nPhysD *my_phys) {
         }
 
 
-        QApplication::processEvents();
+        // no QApplication::processEvents() in here (there were 3): showPhys must be atomic. Events handled in the
+        // middle could close my_phys (use after free) or run another showPhys (bufferChanged of the old image
+        // after the new one was shown), e.g. the sliders of Colorscale, which call showPhys at each value
         if (!nPalettes.contains(colorTable) && !nPalettes.isEmpty()) {
             colorTable=nPalettes.firstKey(); // the palette in use was removed
         }
@@ -161,12 +163,9 @@ void nView::showPhys(nPhysD *my_phys) {
             my_pixitem.setPixmap(QPixmap::fromImage(tempImage));
             nparent->currentBuffer=my_phys;
 
-            QApplication::processEvents();
-
             setSize();
 
             emit bufferChanged(my_phys);
-            QApplication::processEvents();
         }
     }
     DEBUG("EXIT");

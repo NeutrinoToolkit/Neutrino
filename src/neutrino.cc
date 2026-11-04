@@ -491,8 +491,7 @@ void neutrino::addPluginActions() {
 }
 
 void neutrino::emitBufferChanged(nPhysD *my_phys) {
-    qDebug() << "here";
-    QApplication::processEvents();
+    // (no QApplication::processEvents(): see nView::showPhys)
     if (my_phys) {
         double gamma_val=1.0;
         if (nPhysExists(my_phys)) {
