@@ -342,20 +342,11 @@ void Wavelet::doUnwrap () {
             // phase-carrier and phase+carrier, and keep the one with the smaller range (max-min)
             physD carrierPhase(uphase.getW(),uphase.getH(),0.0);
             physWave::phys_subtract_carrier(carrierPhase, angleCarrier->value(), widthCarrier->value());
-            auto finiteRange = [](physD &img) {
-                double mini=std::numeric_limits<double>::max(), maxi=-std::numeric_limits<double>::max();
-                for (size_t k=0; k<img.getSurf(); k++) {
-                    if (std::isfinite(img.Timg_buffer[k])) {
-                        mini=std::min(mini,img.Timg_buffer[k]);
-                        maxi=std::max(maxi,img.Timg_buffer[k]);
-                    }
-                }
-                return maxi-mini;
-            };
             physD phaseMinus=uphase.copy(), phasePlus=uphase.copy();
             physMath::phys_point_add(phaseMinus,carrierPhase);      // carrierPhase is -carrier
             physMath::phys_point_subtract(phasePlus,carrierPhase);
-            if (finiteRange(phasePlus) < finiteRange(phaseMinus)) {
+            // (the ranges of the finite pixels: phys_point_add/subtract end with TscanBrightness)
+            if (phasePlus.get_max()-phasePlus.get_min() < phaseMinus.get_max()-phaseMinus.get_min()) {
                 physMath::phys_multiply(uphase,-1.0); // the whole map was flipped
             }
         } else {

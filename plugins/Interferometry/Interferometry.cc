@@ -489,16 +489,6 @@ void Interferometry::doUnwrap () {
 
                 // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
                 // and keep the one with the smaller range (max-min of the unwrapped phase)
-                auto finiteRange = [](physD &img) {
-                    double mini=std::numeric_limits<double>::max(), maxi=-std::numeric_limits<double>::max();
-                    for (size_t k=0; k<img.getSurf(); k++) {
-                        if (std::isfinite(img.Timg_buffer[k])) {
-                            mini=std::min(mini,img.Timg_buffer[k]);
-                            maxi=std::max(maxi,img.Timg_buffer[k]);
-                        }
-                    }
-                    return maxi-mini;
-                };
                 physD phaseMinus=shotFlipped.copy(), phasePlus=shotFlipped.copy();
                 physMath::phys_point_subtract(phaseMinus,refPhase);
                 physMath::phys_point_add(phasePlus,refPhase);
@@ -507,7 +497,8 @@ void Interferometry::doUnwrap () {
                 physD unwrapMinus, unwrapPlus;
                 doPhaseUnwrap(phaseMinus, unwrapMinus);
                 doPhaseUnwrap(phasePlus, unwrapPlus);
-                bool minus=finiteRange(unwrapMinus) <= finiteRange(unwrapPlus);
+                // (the ranges of the finite pixels: phys_phase_unwrap ends with TscanBrightness)
+                bool minus=unwrapMinus.get_max()-unwrapMinus.get_min() <= unwrapPlus.get_max()-unwrapPlus.get_min();
                 phase2 = minus ? phaseMinus : phasePlus;
                 unwrap = minus ? unwrapMinus : unwrapPlus;
                 phase2.set_origin(phase->get_origin());
