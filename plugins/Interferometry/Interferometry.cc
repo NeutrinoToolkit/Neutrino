@@ -708,6 +708,8 @@ void Interferometry::doMaskCutoff() {
                     phaseMask->Timg_buffer[k]=0.0;
         }
         phaseMask->TscanBrightness();
+        // its own colour range: the display_range of the phase came with the copy of prop
+        phaseMask->prop.erase("display_range");
         localPhys["phaseMask"]=nparent->replacePhys(phaseMask,getLocal("phaseMask"));
     }
     statusbar->clearMessage();
@@ -828,6 +830,8 @@ void Interferometry::doShape(){
                 }
                 inLoop=false;
             }
+            // the copy of the mask carried its min/max, cached display and histogram (stopped or no shapes too)
+            regionPath->TscanBrightness();
             localPhys["interpPhase_2piMask"]=nparent->replacePhys(regionPath,getLocal("interpPhase_2piMask"));
         }
         // without interpolation doCutoff uses phaseMask directly (no alias: replacePhys would overwrite the mask)
@@ -911,7 +915,6 @@ void Interferometry::doCutoff(){
             intNe = new nPhysD(*image);
         }
         intNe->reset_display();
-        intNe->setShortName("interpPhase_2piMaskCutoff");
         if (display99->isChecked()) {
             physMath::cutoff(*intNe,physMath::getColorPrecentPixels(*intNe,99));
         }
@@ -924,12 +927,17 @@ void Interferometry::doCutoff(){
             physMath::cutoff(*intNe,mini,maxi);
             intNe->reset_display();
 
-            if (nPhysExists(getLocal("interpPhase_2piMaskCutoff"))) {
-                getLocal("interpPhase_2piMaskCutoff")->prop["display_range"]=intNe->get_min_max();
-                getLocal("interpPhase_2piMaskCutoff")->reset_display();
-            }
+            // (no effect: replacePhys moves the prop of intNe, with its display_range, over the old image)
+            // if (nPhysExists(getLocal("interpPhase_2piMaskCutoff"))) {
+            //     getLocal("interpPhase_2piMaskCutoff")->prop["display_range"]=intNe->get_min_max();
+            //     getLocal("interpPhase_2piMaskCutoff")->reset_display();
+            // }
         }
         intNe->TscanBrightness();
+        // its own colour range (the one of the phase came with the copies: the colour bar did not match the data)
+        intNe->prop.erase("display_range");
+        // after physMath::cutoff, which renames it "IntensityCutoff" (the pan finds its results by name)
+        intNe->setShortName("interpPhase_2piMaskCutoff");
         localPhys["interpPhase_2piMaskCutoff"]=nparent->replacePhys(intNe,getLocal("interpPhase_2piMaskCutoff"),true);
     }
     statusbar->clearMessage();

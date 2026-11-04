@@ -26,6 +26,7 @@
 #include <random>
 #include <limits>
 #include <time.h>
+#include <mutex>
 
 /*! \addtogroup nPhysMaths
  * @{
@@ -649,58 +650,141 @@ void physMath::phys_median_filter(physD& image, unsigned int N){
     image.TscanBrightness();
 }
 
-void
-physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
-{
-    if (radiusX==0  && radiusY==0) return;
-    std::vector<double> nan_free_phys(image.getSurf());
-#pragma omp parallel for
-    for (size_t i=0; i< image.getSurf(); i++) {
-        nan_free_phys[i]=std::isfinite(image.point(i))? image.point(i):image.get_min();
-    }
-    fftw_complex *b2 = fftw_alloc_complex(image.getH()*((image.getW()/2+1)));
-
-    fftw_plan fb = fftw_plan_dft_r2c_2d(image.getH(),image.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
-    fftw_plan bb = fftw_plan_dft_c2r_2d(image.getH(),image.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
-
-    fftw_execute(fb);
-
-    double sx = (radiusX == 0) ? std::numeric_limits<double>::infinity() : pow(image.getW()/radiusX, 2)/2.0;
-    double sy = (radiusY == 0) ? std::numeric_limits<double>::infinity() : pow(image.getH()/radiusY, 2)/2.0;
-
+// old implementation: periodic borders (no padding), NaN replaced by the image minimum before the blur,
+// radius = pi*sigma (kernel exp(-2 radius^2 f^2))
+// void
+// physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
+// {
+//     if (radiusX==0  && radiusY==0) return;
+//     std::vector<double> nan_free_phys(image.getSurf());
+// #pragma omp parallel for
+//     for (size_t i=0; i< image.getSurf(); i++) {
+//         nan_free_phys[i]=std::isfinite(image.point(i))? image.point(i):image.get_min();
+//     }
+//     fftw_complex *b2 = fftw_alloc_complex(image.getH()*((image.getW()/2+1)));
+//
+//     fftw_plan fb = fftw_plan_dft_r2c_2d(image.getH(),image.getW(),&nan_free_phys[0],b2,FFTW_ESTIMATE);
+//     fftw_plan bb = fftw_plan_dft_c2r_2d(image.getH(),image.getW(),b2,&nan_free_phys[0],FFTW_ESTIMATE);
+//
+//     fftw_execute(fb);
+//
+//     double sx = (radiusX == 0) ? std::numeric_limits<double>::infinity() : pow(image.getW()/radiusX, 2)/2.0;
+//     double sy = (radiusY == 0) ? std::numeric_limits<double>::infinity() : pow(image.getH()/radiusY, 2)/2.0;
+//
+// // #pragma omp parallel for collapse(2)
+// //     for (size_t j = 0 ; j < image.getH(); j++) {
+// //         for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
+// //             double blur=exp(-((i*i)/sx+(j-image.getH()/2)*(j-image.getH()/2)/sy));
+// //             int k=i+((j+image.getH()/2+1)%image.getH())*(image.getW()/2+1);
+// //             b2[k][0]*=blur;
+// //             b2[k][1]*=blur;
+// //         }
+// //     }
+//     // signed row frequency (the version above was shifted by one row for even heights: zero frequency was damped)
+//     // note: exp(-2 (radius f)^2) is a gaussian of sigma = radius/pi
 // #pragma omp parallel for collapse(2)
 //     for (size_t j = 0 ; j < image.getH(); j++) {
 //         for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
-//             double blur=exp(-((i*i)/sx+(j-image.getH()/2)*(j-image.getH()/2)/sy));
-//             int k=i+((j+image.getH()/2+1)%image.getH())*(image.getW()/2+1);
+//             double fj = (j <= image.getH()/2) ? (double)j : (double)j-(double)image.getH();
+//             double blur=exp(-((i*i)/sx+fj*fj/sy));
+//             size_t k=i+j*(image.getW()/2+1);
 //             b2[k][0]*=blur;
 //             b2[k][1]*=blur;
 //         }
 //     }
-    // signed row frequency (the version above was shifted by one row for even heights: zero frequency was damped)
-    // note: exp(-2 (radius f)^2) is a gaussian of sigma = radius/pi
+//     fftw_execute(bb);
+//
+// #pragma omp parallel for
+//     for (size_t i=0; i< image.getSurf(); i++) {
+//         if (std::isfinite(image.point(i))) {
+//             image.set(i,nan_free_phys[i]/image.getSurf());
+//         }
+//     }
+//     image.TscanBrightness();
+//     fftw_destroy_plan(fb);
+//     fftw_destroy_plan(bb);
+//     fftw_free(b2);
+// }
+
+// Gaussian blur, sigma = radiusX, radiusY in pixels (0: no blur along that axis), with FFT:
+// - the borders are mirrored over 3 sigma (FFT is periodic: the left and right borders were blurred together,
+//   a ramp 0..199 gave 87.5 at x=0)
+// - normalized convolution for the NaN pixels: blur(data*w)/blur(w), w=1 on the finite pixels (the NaN pixels
+//   were replaced by the minimum of the image, which pulled their surroundings towards it); NaN pixels stay NaN
+// - radius is sigma (it was pi*sigma: kernel exp(-2 radius^2 f^2))
+void
+physMath::phys_fast_gaussian_blur(physD &image, double radiusX, double radiusY)
+{
+    if (radiusX==0  && radiusY==0) return;
+    const int W=image.getW(), H=image.getH();
+    if (W==0 || H==0) return;
+    const double sigX=std::abs(radiusX), sigY=std::abs(radiusY);
+    const int padX=(int)std::ceil(3.0*sigX), padY=(int)std::ceil(3.0*sigY);
+    const int Wp=W+2*padX, Hp=H+2*padY;
+    // mirror index (period 2n, the border pixel repeated): any padding, also larger than the image
+    auto mirror=[](int k, int n) {
+        int m=k%(2*n);
+        if (m<0) m+=2*n;
+        return m<n ? m : 2*n-1-m;
+    };
+
+    const size_t np=(size_t)Wp*Hp, nc=(size_t)Hp*(Wp/2+1);
+    double *data=fftw_alloc_real(np), *weight=fftw_alloc_real(np);
+    fftw_complex *fdata=fftw_alloc_complex(nc), *fweight=fftw_alloc_complex(nc);
 #pragma omp parallel for collapse(2)
-    for (size_t j = 0 ; j < image.getH(); j++) {
-        for (size_t i = 0 ; i < image.getW()/2+1 ; i++) {
-            double fj = (j <= image.getH()/2) ? (double)j : (double)j-(double)image.getH();
-            double blur=exp(-((i*i)/sx+fj*fj/sy));
-            size_t k=i+j*(image.getW()/2+1);
-            b2[k][0]*=blur;
-            b2[k][1]*=blur;
+    for (int y=0; y<Hp; y++) {
+        for (int x=0; x<Wp; x++) {
+            const double v=image.point(mirror(x-padX,W), mirror(y-padY,H));
+            const bool ok=std::isfinite(v);
+            data[(size_t)y*Wp+x]=ok ? v : 0.0;
+            weight[(size_t)y*Wp+x]=ok ? 1.0 : 0.0;
         }
     }
-    fftw_execute(bb);
 
-#pragma omp parallel for
-    for (size_t i=0; i< image.getSurf(); i++) {
-        if (std::isfinite(image.point(i))) {
-            image.set(i,nan_free_phys[i]/image.getSurf());
+    // the planner of FFTW is not thread safe (the execution is): one plan at a time from here
+    static std::mutex planMutex;
+    fftw_plan fb, bb;
+    {
+        std::lock_guard<std::mutex> lock(planMutex);
+        fb = fftw_plan_dft_r2c_2d(Hp,Wp,data,fdata,FFTW_ESTIMATE);
+        bb = fftw_plan_dft_c2r_2d(Hp,Wp,fdata,data,FFTW_ESTIMATE);
+    }
+    fftw_execute_dft_r2c(fb,data,fdata);
+    fftw_execute_dft_r2c(fb,weight,fweight);
+
+    // FT of a gaussian of sigma s: exp(-2 pi^2 s^2 f^2), f in cycles per pixel
+    const double ax=2.0*M_PI*M_PI*sigX*sigX, ay=2.0*M_PI*M_PI*sigY*sigY;
+#pragma omp parallel for collapse(2)
+    for (int j=0; j<Hp; j++) {
+        for (int i=0; i<Wp/2+1; i++) {
+            const double fx=(double)i/Wp;
+            const double fy=((j <= Hp/2) ? (double)j : (double)j-(double)Hp)/Hp;
+            const double blur=exp(-(ax*fx*fx+ay*fy*fy));
+            const size_t k=(size_t)i+(size_t)j*(Wp/2+1);
+            fdata[k][0]*=blur;   fdata[k][1]*=blur;
+            fweight[k][0]*=blur; fweight[k][1]*=blur;
+        }
+    }
+    fftw_execute_dft_c2r(bb,fdata,data);
+    fftw_execute_dft_c2r(bb,fweight,weight);
+
+    // (the 1/N of the inverse transform cancels in the ratio)
+#pragma omp parallel for collapse(2)
+    for (int y=0; y<H; y++) {
+        for (int x=0; x<W; x++) {
+            if (std::isfinite(image.point(x,y))) {
+                const size_t k=(size_t)(y+padY)*Wp+(x+padX);
+                image.set(x,y,data[k]/weight[k]);
+            }
         }
     }
     image.TscanBrightness();
-    fftw_destroy_plan(fb);
-    fftw_destroy_plan(bb);
-    fftw_free(b2);
+    {
+        std::lock_guard<std::mutex> lock(planMutex);
+        fftw_destroy_plan(fb);
+        fftw_destroy_plan(bb);
+    }
+    fftw_free(data); fftw_free(weight); fftw_free(fdata); fftw_free(fweight);
 }
 
 void physMath::phys_hanning_window(physD &image){
@@ -1790,6 +1874,8 @@ int physMath::laplace_fill(physD &iimage, const std::vector<vec2i> &pixels, doub
         if (max_change<tol*scale) break;
     }
     DEBUG("laplace_fill: " << nfill << " pixels, omega " << omega << ", " << iter << " sweeps");
+    // new pixels: min/max (and, for an nPhysD, its cached display and histogram) as the other functions here
+    iimage.TscanBrightness();
     return iter;
 }
 
