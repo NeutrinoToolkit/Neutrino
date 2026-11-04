@@ -1202,6 +1202,11 @@ nLine::getContourSubImage(double fill_value)
         }
 
         //parent()->addShowPhys(sub_img);
+        // the properties of the mother image (origin, scale, names...), as Interferometry does for its mask
+        sub_img.prop=img->prop;
+        sub_img.setShortName("extract("+img->getShortName()+")");
+        // min/max of the extracted pixels (the colour scale), as after any change of the pixels
+        sub_img.TscanBrightness();
         return sub_img;
     } else {
         return nPhysD();
