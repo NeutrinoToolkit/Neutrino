@@ -86,7 +86,7 @@ void Box_lineout::updatePlot() {
     if (currentBuffer) {
         geomBox=box->getRect(currentBuffer);
         if (geomBox.isEmpty()) {
-            statusBar()->showMessage(tr("Attention: the region is outside the image!"),2000);
+            statusBar()->showMessage(tr("Attention: the region is outside the image!"));
         }
     }
     if (!currentBuffer || geomBox.isEmpty()) {

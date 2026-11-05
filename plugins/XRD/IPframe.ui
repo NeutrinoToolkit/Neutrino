@@ -74,7 +74,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/flipLeftRight.png</normaloff>:/icons/flipLeftRight.png</iconset>
         </property>
         <property name="checkable">
@@ -94,7 +94,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/flipUpDown.png</normaloff>:/icons/flipUpDown.png</iconset>
         </property>
         <property name="checkable">
@@ -114,7 +114,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/transpose.png</normaloff>:/icons/transpose.png</iconset>
         </property>
         <property name="checkable">
@@ -141,7 +141,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
         </property>
        </widget>
@@ -155,7 +155,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
         </property>
        </widget>
@@ -174,7 +174,7 @@
          <string>Show</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/eye.png</normaloff>:/icons/eye.png</iconset>
         </property>
        </widget>
@@ -185,7 +185,7 @@
   </layout>
   <action name="actionSaveIPs">
    <property name="icon">
-    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
@@ -204,7 +204,7 @@
   <tabstop>rectROI</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

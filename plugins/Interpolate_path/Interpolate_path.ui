@@ -167,7 +167,7 @@
   <action name="actionBezier">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//bezier.png</normaloff>:icons//bezier.png</iconset>
+     <normaloff>:/icons/bezier.png</normaloff>:/icons/bezier.png</iconset>
    </property>
    <property name="text">
     <string>bezier</string>
@@ -178,7 +178,7 @@
   </action>
   <action name="actionRegion">
    <property name="icon">
-    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/region.png</normaloff>:/icons/region.png</iconset>
    </property>
    <property name="text">
@@ -193,7 +193,7 @@
   <tabstop>image</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

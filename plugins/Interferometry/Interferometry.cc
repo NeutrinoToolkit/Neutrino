@@ -239,7 +239,7 @@ void Interferometry::guessCarrier() {
     if (image) {
         QRect geom2=region->getRect(image);
         if (geom2.isEmpty()) {
-            statusbar->showMessage(tr("The region is outside the image"), 5000);
+            statusbar->showMessage(tr("The region is outside the image"));
             return;
         }
         nPhysD datamatrix;
@@ -248,9 +248,9 @@ void Interferometry::guessCarrier() {
         std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 
         if (vecCarr.size()==0) {
-            statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+            statusbar->showMessage(tr("ERROR: Problem finding the carrier"));
         } else {
-            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg", 5000);
+            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg");
             widthCarrier->setValue(vecCarr[0].first());
             angleCarrier->setValue(vecCarr[0].second());
         }
@@ -271,10 +271,10 @@ void Interferometry::doWavelet () {
         if (nThread.n_iter!=-1) doWavelet(1);
     }
     if (nThread.n_iter==-1) { // stopped (or region outside the image): don't chain on the previous results
-        if (statusbar->currentMessage().isEmpty()) statusbar->showMessage(tr("Wavelet stopped"), 5000);
+        if (statusbar->currentMessage().isEmpty()) statusbar->showMessage(tr("Wavelet stopped"));
         return;
     }
-    statusbar->showMessage(QLocale().toString(timer.elapsed())+" msec", 5000);
+    statusbar->showMessage(QLocale().toString(timer.elapsed())+" msec");
     if (!chained->isChecked()) doUnwrap();
 }
 
@@ -319,7 +319,7 @@ void Interferometry::doWavelet (int iimage) {
         QRect geom2=region->getRect(image);
         // outside the image: the wavelet of an empty matrix ended in the "Thread problems" box (modal: a script waited)
         if (geom2.isEmpty()) {
-            statusbar->showMessage(tr("The region is outside the image ")+QString::fromStdString(image->getShortName()), 5000);
+            statusbar->showMessage(tr("The region is outside the image ")+QString::fromStdString(image->getShortName()));
             nThread.n_iter=-1; // like a stop: no unwrap of the previous results
             return;
         }
@@ -402,7 +402,7 @@ void Interferometry::doUnwrap () {
                 statusbar->showMessage(tr("Reference and shot wavelets have different sizes (")+
                                        QLocale().toString(ref_phase.getW())+"x"+QLocale().toString(ref_phase.getH())+" "+
                                        QLocale().toString(diff.getW())+"x"+QLocale().toString(diff.getH())+
-                                       tr("): the region must be inside both images"), 10000);
+                                       tr("): the region must be inside both images"));
                 return;
             }
             physMath::phys_point_subtract(diff,ref_phase);
@@ -487,7 +487,7 @@ void Interferometry::doUnwrap () {
             physD phase2=phase->copy();
             bool haveAngles = nPhysExists(getLocal("angle_shot")) && nPhysExists(getLocal("phase_2pi_shot"));
             if (unwrapAngles->isChecked() && !haveAngles) {
-                statusbar->showMessage(tr("Unwrap angles needs the wavelet of the shot"), 5000);
+                statusbar->showMessage(tr("Unwrap angles needs the wavelet of the shot"));
             }
             if (unwrapAngles->isChecked() && haveAngles) {
                 // where the best filter points opposite to the (unwrapped) fringe direction, the phase of the SHOT changes sign:
@@ -553,7 +553,7 @@ void Interferometry::doUnwrap () {
 //            physD phase2=phase->copy();
 //            bool haveAngles = nPhysExists(localPhys["angle_shot"]) && nPhysExists(localPhys["angle_ref"]);
 //            if (unwrapAngles->isChecked() && !haveAngles) {
-//                statusbar->showMessage(tr("Unwrap angles needs the wavelet of both reference and shot"), 5000);
+//                statusbar->showMessage(tr("Unwrap angles needs the wavelet of both reference and shot"));
 //            }
 //            if (unwrapAngles->isChecked() && haveAngles) {
 //                physD angle = (static_cast<physD*>(localPhys["angle_shot"]))->copy();
@@ -650,7 +650,7 @@ void Interferometry::doSubtract () {
         if (std::isfinite(offset)) {
             physMath::phys_subtract(phase,offset);
         } else {
-            statusbar->showMessage("Can't subtract point " + QLocale().toString(posZeroX->value()) + " , " + QLocale().toString(posZeroY->value()) + " is not finite", 5000);
+            statusbar->showMessage("Can't subtract point " + QLocale().toString(posZeroX->value()) + " , " + QLocale().toString(posZeroY->value()) + " is not finite");
         }
 
         nPhysD *phase_rot=new nPhysD(phase.fast_rotated(rotAngle->value()));

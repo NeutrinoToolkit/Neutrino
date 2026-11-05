@@ -216,7 +216,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
@@ -237,7 +237,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -249,7 +249,7 @@
   </action>
   <action name="actionExportTxt">
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
@@ -267,7 +267,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
    </property>
    <property name="text">
@@ -290,7 +290,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-Qt_5_12_2_5_12_2-Default/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

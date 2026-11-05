@@ -149,6 +149,83 @@ void nGenericPan::help() {
     }
 }
 
+void nGenericPan::reopenWithoutSavedValues() {
+    const nPanPlug *plug=nPanPlug::find(metaObject()->className());
+    QPointer<neutrino> neu=nparent;
+    if (!plug || !neu) return;
+    close(); // (it saves the current values: the next time the pan opens with them, as usual)
+    neu->setProperty("panWithoutSavedValues",true);
+    plug->create(neu);
+    neu->setProperty("panWithoutSavedValues",QVariant());
+}
+
+// draws the object names of the widgets usable from python on top of them
+class nWidgetNames : public QWidget {
+public:
+    nWidgetNames(nGenericPan *pan) : QWidget(pan), my_pan(pan) {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setGeometry(pan->rect());
+        pan->installEventFilter(this);
+        QTimer *timer=new QTimer(this); // follows the tabs, the scrolls and the layout
+        connect(timer, &QTimer::timeout, this, qOverload<>(&QWidget::update));
+        timer->start(300);
+        raise();
+        show();
+    }
+protected:
+    bool eventFilter(QObject *obj, QEvent *ev) override {
+        if (obj==my_pan && ev->type()==QEvent::Resize) {
+            setGeometry(my_pan->rect());
+            raise();
+        }
+        return false;
+    }
+    void paintEvent(QPaintEvent *) override {
+        QPainter painter(this);
+        QFont font=painter.font();
+        font.setPointSizeF(std::max(7.0,font.pointSizeF()*0.85));
+        painter.setFont(font);
+        QFontMetrics fm(font);
+        QList<QRect> drawn;
+        for (auto &wdgt : my_pan->findChildren<QWidget *>()) {
+            QString name=wdgt->objectName();
+            if (auto *tool=qobject_cast<QToolButton*>(wdgt)) {
+                if (tool->defaultAction()) name=tool->defaultAction()->objectName(); // the actions of the toolbars
+            }
+            if (name.isEmpty() || name.startsWith("qt_") || !wdgt->isVisible() || wdgt->visibleRegion().isEmpty()) continue;
+            // the widgets of decorate (their name is in the tooltip) and the actions of the toolbars
+            if (!(wdgt->property("neutrinoSave").isValid() || wdgt->property("neutrinoImage").isValid() ||
+                  qobject_cast<QPushButton*>(wdgt) || qobject_cast<QToolButton*>(wdgt))) continue;
+            QRect box=fm.boundingRect(name).adjusted(-2,-1,2,1);
+            box.moveTopLeft(wdgt->mapTo(my_pan, QPoint(0,0)));
+            if (box.right()>width()) box.moveRight(width()-1); // inside the window
+            for (int i=0; i<6; i++) { // below the labels already there
+                bool overlaps=false;
+                for (auto &other : drawn) overlaps |= box.intersects(other);
+                if (!overlaps) break;
+                box.translate(0,box.height());
+            }
+            drawn.append(box);
+            painter.setPen(QColor(160,140,0));
+            painter.setBrush(QColor(255,255,160,230));
+            painter.drawRect(box);
+            painter.setPen(Qt::black);
+            painter.drawText(box, Qt::AlignCenter, name);
+        }
+    }
+private:
+    nGenericPan *my_pan;
+};
+
+void nGenericPan::showWidgetNames(bool show) {
+    if (show) {
+        if (!widgetNames) widgetNames=new nWidgetNames(this);
+    } else if (widgetNames) {
+        widgetNames->deleteLater();
+    }
+}
+
 void nGenericPan::grabSave() {
     int progNum=0;
     while (progNum<10000) {
@@ -213,8 +290,6 @@ void nGenericPan::show(bool onlyOneAllowed) {
     }
     qDebug() << metaObject()->className();
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_S),this), SIGNAL(activated()), this, SLOT(grabSave()) );
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_J),this), SIGNAL(activated()), this, SLOT(print()) );
 
     // these properties will be automatically saved
     setProperty("NeuSave-fileIni",panName()+".ini");
@@ -229,8 +304,6 @@ void nGenericPan::show(bool onlyOneAllowed) {
             spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             spacer->setProperty("helpSpacer",true);
             my_tool->addWidget(spacer);
-
-            my_tool->addAction(QIcon(":icons/iconBW.png"),tr("Raise viewer"),this,SLOT(raiseNeutrino()));
 
             bool needPrefToolButtons=false;
             foreach (QWidget *wdgt, findChildren<QWidget *>()) {
@@ -248,6 +321,34 @@ void nGenericPan::show(bool onlyOneAllowed) {
                 setProperty("helpFile",helpFile.fileName());
                 my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
             }
+
+            // the hidden gestures of the pans, in a menu
+            QMenu *menu=new QMenu(this);
+            menu->addAction(QIcon(":icons/iconBW.png"),tr("Raise viewer"),this,&nGenericPan::raiseNeutrino);
+            menu->addSeparator();
+            QAction *act=menu->addAction(QIcon(":icons/savePy.png"),tr("Copy as Python"),this,&nGenericPan::print);
+            act->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_J));
+            act->setToolTip(tr("Copy to the clipboard the python commands that set the values of this window"));
+            act=menu->addAction(QIcon(":icons/eye.png"),tr("Show widget names"),this,&nGenericPan::showWidgetNames);
+            act->setCheckable(true);
+            act->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_N));
+            act->setToolTip(tr("The names of the widgets, for python (set, get, button)"));
+            act=menu->addAction(QIcon(":icons/copyImage.png"),tr("Screenshot to home folder"),this,&nGenericPan::grabSave);
+            act->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | Qt::Key_S));
+            if (nPanPlug::find(metaObject()->className())) {
+                menu->addSeparator();
+                act=menu->addAction(QIcon(":icons/back.png"),tr("Reset (reopen without saved values)"),this,&nGenericPan::reopenWithoutSavedValues);
+                act->setToolTip(tr("Close the window and open it again with the default values (as opening it holding Alt)"));
+            }
+            for (auto &a : menu->actions()) a->setShortcutContext(Qt::WindowShortcut);
+            addActions(menu->actions()); // the shortcuts work with the menu closed
+            QToolButton *menuButton=new QToolButton(my_tool);
+            menuButton->setObjectName("panMenu");
+            menuButton->setIcon(QIcon(":icons/gearPy.png"));
+            menuButton->setToolTip(tr("Raise viewer, python, screenshot, reset"));
+            menuButton->setMenu(menu);
+            menuButton->setPopupMode(QToolButton::InstantPopup);
+            my_tool->addWidget(menuButton);
             break;
         }
     }
@@ -289,7 +390,8 @@ void nGenericPan::show(bool onlyOneAllowed) {
     // if (!(QGuiApplication::keyboardModifiers() & Qt::AltModifier)) {
     // Alt alone (e.g. Alt+click on the menu) opens the pan without its saved values;
     // not Ctrl+Alt: it is held by the shortcuts of some plugins (ZoomWin Ctrl+Alt+Z, Colorscale Ctrl+Alt+C...)
-    if (QGuiApplication::keyboardModifiers() != Qt::AltModifier) {
+    // (or reopenWithoutSavedValues)
+    if (QGuiApplication::keyboardModifiers() != Qt::AltModifier && !nparent->property("panWithoutSavedValues").toBool()) {
         loadDefaults();
     }
     nparent->emitPanAdd(this);
@@ -990,7 +1092,7 @@ void nGenericPan::print() {
         }
     }
     QApplication::clipboard()->setText(out);
-    nparent->statusBar()->showMessage("Copied to clipboard",1000);
+    nparent->statusBar()->showMessage("Copied to clipboard");
     qWarning().noquote() << out;
 }
 

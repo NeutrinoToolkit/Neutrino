@@ -26,7 +26,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:icons/icons/icon.png</normaloff>:icons/icons/icon.png</iconset>
+    <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
@@ -516,7 +516,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset>
-     <normaloff>:icons/icon.png</normaloff>:icons/icon.png</iconset>
+     <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -550,7 +550,7 @@
   <action name="actionShow_colortable">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//colors.png</normaloff>:icons//colors.png</iconset>
+     <normaloff>:/icons/colors.png</normaloff>:/icons/colors.png</iconset>
    </property>
    <property name="text">
     <string>Show colortable</string>
@@ -572,7 +572,7 @@
   <action name="actionHorizontal">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//lineoutH.png</normaloff>:icons//lineoutH.png</iconset>
+     <normaloff>:/icons/lineoutH.png</normaloff>:/icons/lineoutH.png</iconset>
    </property>
    <property name="text">
     <string>Horizontal</string>
@@ -586,7 +586,7 @@
   <action name="actionVertical">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//lineoutV.png</normaloff>:icons//lineoutV.png</iconset>
+     <normaloff>:/icons/lineoutV.png</normaloff>:/icons/lineoutV.png</iconset>
    </property>
    <property name="text">
     <string>Vertical</string>
@@ -623,7 +623,7 @@
   <action name="actionLine">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
+     <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
    </property>
    <property name="text">
     <string>Line</string>
@@ -632,7 +632,7 @@
   <action name="actionRect">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
     <string>Rectangle</string>
@@ -641,7 +641,7 @@
   <action name="actionEllipse">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//ellipse.png</normaloff>:icons//ellipse.png</iconset>
+     <normaloff>:/icons/ellipse.png</normaloff>:/icons/ellipse.png</iconset>
    </property>
    <property name="text">
     <string>Ellipse</string>
@@ -650,7 +650,7 @@
   <action name="actionPreferences">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//gearPy.png</normaloff>:icons//gearPy.png</iconset>
+     <normaloff>:/icons/gearPy.png</normaloff>:/icons/gearPy.png</iconset>
    </property>
    <property name="text">
     <string>Preferences...</string>
@@ -686,7 +686,7 @@
   <action name="actionFlipRotate">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rotateLeft.png</normaloff>:icons//rotateLeft.png</iconset>
+     <normaloff>:/icons/rotateLeft.png</normaloff>:/icons/rotateLeft.png</iconset>
    </property>
    <property name="text">
     <string>FlipRotate</string>
@@ -698,7 +698,7 @@
   <action name="actionRotate_left">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rotateLeft.png</normaloff>:icons//rotateLeft.png</iconset>
+     <normaloff>:/icons/rotateLeft.png</normaloff>:/icons/rotateLeft.png</iconset>
    </property>
    <property name="text">
     <string>Rotate left</string>
@@ -707,7 +707,7 @@
   <action name="actionRotate_right">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rotateRight.png</normaloff>:icons//rotateRight.png</iconset>
+     <normaloff>:/icons/rotateRight.png</normaloff>:/icons/rotateRight.png</iconset>
    </property>
    <property name="text">
     <string>Rotate right</string>
@@ -716,7 +716,7 @@
   <action name="actionFlip_up_down">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//flipUpDown.png</normaloff>:icons//flipUpDown.png</iconset>
+     <normaloff>:/icons/flipUpDown.png</normaloff>:/icons/flipUpDown.png</iconset>
    </property>
    <property name="text">
     <string>Flip up-down</string>
@@ -725,7 +725,7 @@
   <action name="actionFlip_left_right">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//flipLeftRight.png</normaloff>:icons//flipLeftRight.png</iconset>
+     <normaloff>:/icons/flipLeftRight.png</normaloff>:/icons/flipLeftRight.png</iconset>
    </property>
    <property name="text">
     <string>Flip left-right</string>
@@ -734,7 +734,7 @@
   <action name="actionPaths">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
     <string>Paths</string>
@@ -955,6 +955,11 @@
    <header>../src/graphics/nView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/icons/icons.qrc"/>
+  <include location="../plugins/Colorscale/Colorscale.qrc"/>
+  <include location="../plugins/Lineout/Lineout_H/Lineout_H.qrc"/>
+  <include location="../plugins/Lineout/Lineout_V/Lineout_V.qrc"/>
+ </resources>
  <connections/>
 </ui>

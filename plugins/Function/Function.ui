@@ -173,7 +173,7 @@
   </widget>
   <action name="actionCopy_Size">
    <property name="icon">
-    <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/fillBoth.png</normaloff>:/icons/fillBoth.png</iconset>
    </property>
    <property name="text">
@@ -189,7 +189,7 @@
   <tabstop>erasePrevious</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -52,7 +52,7 @@ void Camera::startCamera() {
 
 void Camera::setCamera(const QCameraDevice &cameraDevice) {
     if (cameraDevice.isNull()) {
-        statusbar->showMessage(tr("No camera found!"),5000);
+        statusbar->showMessage(tr("No camera found!"));
         return;
     }
     m_camera.reset(new QCamera(cameraDevice));
@@ -104,13 +104,13 @@ void Camera::on_grab_clicked() {
 void Camera::displayCaptureError(int id, const QImageCapture::Error error, const QString &errorString) {
     Q_UNUSED(id);
     Q_UNUSED(error);
-    statusbar->showMessage(errorString,5000);
+    statusbar->showMessage(errorString);
 }
 
 void Camera::displayCameraError()
 {
     if (m_camera->error() != QCamera::NoError)
-        statusbar->showMessage(m_camera->errorString(),5000);
+        statusbar->showMessage(m_camera->errorString());
 }
 
 void Camera::updateCameraDevice(QAction *action)
@@ -133,7 +133,7 @@ void Camera::updateCameras() {
         cameraMenu.addAction(videoDeviceAction);
     }
     if (availableCameras.size()==0) {
-        statusbar->showMessage(tr("No camera found!"),5000);
+        statusbar->showMessage(tr("No camera found!"));
     }
 }
 

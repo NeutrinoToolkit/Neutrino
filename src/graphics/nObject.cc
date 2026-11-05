@@ -192,7 +192,7 @@ void nObject::bufferChanged(nPhysD* my_phys) {
 }
 
 void nObject::interactive ( ) {
-    showMessage(tr("Click and drag"),5000);
+    showMessage(tr("Click and drag"));
     switch (ref.size()) {
         case 0:
             connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
@@ -316,7 +316,7 @@ nObject::tableUpdated (QTableWidgetItem * item) {
     p.rx()=QLocale().toDouble(my_w.tableWidget->item(item->row(),0)->text(), &okx);
     p.ry()=QLocale().toDouble(my_w.tableWidget->item(item->row(),1)->text(), &oky);
     if (!okx || !oky) { // not a number: back to the current value (it was set to 0)
-        showMessage(tr("Not a number: ")+item->text(), 2000);
+        showMessage(tr("Not a number: ")+item->text());
         changePointPad(item->row());
         return;
     }
@@ -586,7 +586,7 @@ void nObject::copy_points() {
     }
     DEBUG(str_points.toStdString());
     QApplication::clipboard()->setText(str_points);
-    my_pad.statusBar()->showMessage("Points copied to clipboard",2000);
+    my_pad.statusBar()->showMessage("Points copied to clipboard");
 }
 
 void nObject::paste_points() {
@@ -616,9 +616,9 @@ void nObject::paste_points() {
         }
         itemChanged();
         moveRef.clear();
-        my_pad.statusBar()->showMessage("Points pasted from clipboard",2000);
+        my_pad.statusBar()->showMessage("Points pasted from clipboard");
     } else {
-        my_pad.statusBar()->showMessage("Error pasting from clipboard",2000);
+        my_pad.statusBar()->showMessage("Error pasting from clipboard");
     }
 }
 

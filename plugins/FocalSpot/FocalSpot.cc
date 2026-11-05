@@ -219,7 +219,7 @@ FocalSpot::find_contour(double th)
             my_w.stats->append(QString("Mean radius: %1").arg(meanr));
             my_w.stats->append(QString("Min Max radius:  %1  %2").arg(min_r).arg(max_r));
 
-            my_w.statusBar->showMessage("Contour ok", 2000);
+            my_w.statusBar->showMessage("Contour ok");
 
             // {integral, number of pixels} inside the contour (boundary included)
             // the contour is sub-pixel: the pixels whose centre is inside are the right estimate (no boundary pixels)
@@ -267,7 +267,7 @@ FocalSpot::find_contour(double th)
             nContour->setPoints(myp.translated(0.5-currentBuffer->get_origin().x(), 0.5-currentBuffer->get_origin().y()));
             nContour->show();
         } else {
-            my_w.statusBar->showMessage("Contour not ok", 5000);
+            my_w.statusBar->showMessage("Contour not ok");
             nContour->hide(); // don't show the contour of another image/threshold
         }
 

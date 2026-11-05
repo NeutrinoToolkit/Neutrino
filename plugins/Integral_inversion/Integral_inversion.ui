@@ -751,7 +751,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <action name="actionBezier">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//bezier.png</normaloff>:icons//bezier.png</iconset>
+     <normaloff>:/icons/bezier.png</normaloff>:/icons/bezier.png</iconset>
    </property>
    <property name="text">
     <string>bezier</string>
@@ -763,7 +763,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <action name="actionLine">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//line.png</normaloff>:icons//line.png</iconset>
+     <normaloff>:/icons/line.png</normaloff>:/icons/line.png</iconset>
    </property>
    <property name="text">
     <string>line</string>
@@ -775,7 +775,7 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <action name="actionFlipline">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//flipline.png</normaloff>:icons//flipline.png</iconset>
+     <normaloff>:/icons/flipline.png</normaloff>:/icons/flipline.png</iconset>
    </property>
    <property name="text">
     <string>flipline</string>
@@ -792,6 +792,8 @@ K[H2]=2.01e-6, K[He]=5.23e-7, K[Ar]=4.2e-6
   <tabstop>molarRefr_le</tabstop>
   <tabstop>plainTextEdit_3</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

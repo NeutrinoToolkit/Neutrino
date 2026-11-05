@@ -430,7 +430,7 @@
   <action name="actionClipboard">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
     <string>saveClipboard</string>
@@ -442,7 +442,7 @@
   <action name="actionTxt">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveTxt.png</normaloff>:icons//saveTxt.png</iconset>
+     <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
     <string>saveTxt</string>
@@ -454,7 +454,7 @@
   <action name="actionRect">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
     <string>rect</string>
@@ -474,6 +474,8 @@
  </customwidgets>
  <resources>
   <include location="../Lineout/Lineout_H/Lineout_H.qrc"/>
+  <include location="../Lineout/Lineout_V/Lineout_V.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

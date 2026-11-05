@@ -96,7 +96,7 @@ void Math_operations::doOperation () {
         DEBUG("Operator " << operation->currentIndex() << " " << separator[0] << " " << separator[1] << " " << operation->currentText().toStdString());
         nPhysD *myresult=nullptr;
         if (std::find(separator.begin(), separator.end(), operation->currentIndex()) != separator.end()) {
-            statusbar->showMessage(tr("Select an operation"),5000);
+            statusbar->showMessage(tr("Select an operation"));
             return;
         }
         // parameters separated by any whitespace (split(" ") gave empty items with double spaces)
@@ -106,13 +106,13 @@ void Math_operations::doOperation () {
             nPhysD *operand2=nullptr;
 
             if (radioNumber1->isChecked() && radioNumber2->isChecked()) {
-                statusbar->showMessage("One operand must be an image",5000);
+                statusbar->showMessage("One operand must be an image");
                 return;
             }
 
             if ((radioImage1->isChecked() && !my_phys1) || (radioImage2->isChecked() && !my_phys2) ||
                 (radioNumber1->isChecked() && !my_phys2) || (radioNumber2->isChecked() && !my_phys1)) {
-                statusbar->showMessage(tr("Missing image"),5000);
+                statusbar->showMessage(tr("Missing image"));
                 return;
             }
 
@@ -150,7 +150,7 @@ void Math_operations::doOperation () {
             QRectF rTot=r1.intersected(r2);;
             // qDebug() << operation->currentText();
             if (rTot.isEmpty()) {
-                statusbar->showMessage(tr("The images do not overlap"),5000);
+                statusbar->showMessage(tr("The images do not overlap"));
                 delete operand1;
                 delete operand2;
                 return;
@@ -368,7 +368,7 @@ void Math_operations::doOperation () {
 
         } else { // 1 image and 1(or more) scalars
             if (!my_phys1) {
-                statusbar->showMessage(tr("Missing image"),5000);
+                statusbar->showMessage(tr("Missing image"));
                 return;
             }
             myresult=new nPhysD(*my_phys1);
@@ -431,7 +431,7 @@ void Math_operations::doOperation () {
                 for (unsigned int i=0; i<myresult->getSurf();i++) {
                     myresult->set(i,count[i] ? sum[i]/count[i] : std::numeric_limits<double>::quiet_NaN());
                 }
-                statusbar->showMessage(tr("Average of %1 images of size %2x%3").arg(used).arg(my_phys1->getW()).arg(my_phys1->getH()),5000);
+                statusbar->showMessage(tr("Average of %1 images of size %2x%3").arg(used).arg(my_phys1->getW()).arg(my_phys1->getH()));
             }
         }
         // qDebug() << "here";

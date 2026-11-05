@@ -142,10 +142,10 @@ void Cutoff_mask::doOperation () {
             if (cutoffPhys==my_phys1 || cutoffPhys==my_phys2) cutoffPhys=nullptr;
             cutoffPhys=nparent->replacePhys(masked,cutoffPhys);
         } else {
-            statusBar()->showMessage("Error image size do not match", 5000);
+            statusBar()->showMessage("Error image size do not match");
         }
     } else {
-        statusBar()->showMessage("Error "+cutValue->text(), 5000);
+        statusBar()->showMessage("Error "+cutValue->text());
     }
 }
 

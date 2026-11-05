@@ -78,8 +78,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>:icons//lockzoom</normaloff>
-     <normalon>:/lockzoom2</normalon>:icons//lockzoom</iconset>
+     <normaloff>:/icons/lockzoom.png</normaloff>
+     <normalon>:/icons/lockzoom2.png</normalon>:/icons/lockzoom.png</iconset>
    </property>
    <property name="text">
     <string>toggleZoom</string>
@@ -138,6 +138,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

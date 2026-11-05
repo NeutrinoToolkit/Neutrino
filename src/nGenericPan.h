@@ -88,6 +88,7 @@ public:
     panThread nThread;
 
     QPointer<QMainWindow> helpwin;
+    QPointer<QWidget> widgetNames; // the overlay of showWidgetNames
 
 public slots:
 
@@ -96,6 +97,12 @@ public slots:
     QString panName();
     void grabSave();
     void help();
+
+    // the menu of the toolbar (gear): copy as python, widget names, screenshot, reset
+    // closes the pan and opens it again with the values of the .ui (as opening it with Alt)
+    void reopenWithoutSavedValues();
+    // the object names (for python: set, get, button) drawn on the widgets
+    void showWidgetNames(bool);
 
     void showMessage(QString);
     void showMessage(QString,int);

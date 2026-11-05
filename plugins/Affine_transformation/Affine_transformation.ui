@@ -433,6 +433,7 @@
  </tabstops>
  <resources>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -166,7 +166,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -333,7 +333,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
              </property>
             </widget>
@@ -357,7 +357,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -393,7 +393,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -427,7 +427,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -458,7 +458,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -479,7 +479,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
              </property>
             </widget>
@@ -607,7 +607,7 @@
                  <string>...</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+                 <iconset resource="../../resources/icons/icons.qrc">
                   <normaloff>:/icons/autoRefresh.png</normaloff>:/icons/autoRefresh.png</iconset>
                 </property>
                </widget>
@@ -624,7 +624,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -645,7 +645,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -666,7 +666,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -854,7 +854,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+              <iconset resource="../../resources/icons/icons.qrc">
                <normaloff>:/icons/lockOpen.png</normaloff>
                <normalon>:/icons/lockClose.png</normalon>:/icons/lockOpen.png</iconset>
              </property>
@@ -1551,7 +1551,7 @@
   </widget>
   <action name="actionReset_settings">
    <property name="icon">
-    <iconset resource="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -1626,7 +1626,7 @@
   <tabstop>openclDescription</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-Neutrino-Desktop_arm_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

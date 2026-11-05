@@ -48,7 +48,7 @@ void RegionPath::doIt() {
     saveDefaults();
     nPhysD *my_phys=getPhysFromCombo(image);
     if (!my_phys) {
-        statusBar()->showMessage(tr("Select an image"),5000);
+        statusBar()->showMessage(tr("Select an image"));
         return;
     }
     if (my_phys) {
@@ -106,7 +106,7 @@ void RegionPath::doIt() {
                 QApplication::processEvents();
                 if (progress.wasCanceled()) {
                     delete regPath;
-                    statusBar()->showMessage(tr("Stopped"),5000);
+                    statusBar()->showMessage(tr("Stopped"));
                     return;
                 }
                 const int j1=std::min(j0+block-1, regRect.bottom());
@@ -127,7 +127,7 @@ void RegionPath::doIt() {
             // regRect is inside the image: the crop is not padded with 0 any more
             if (regRect.isEmpty()) {
                 delete regPath;
-                statusBar()->showMessage(tr("The region is outside the image"),5000);
+                statusBar()->showMessage(tr("The region is outside the image"));
                 return;
             }
             *regPath=regPath->sub(regRect);
@@ -174,7 +174,7 @@ double RegionPath::getReplaceVal() {
                     bool ok;
                     val=QLocale().toDouble(replace->text(),&ok);
                     if (!ok) val=QLocale::c().toDouble(replace->text(),&ok);
-                    if (!ok) statusBar()->showMessage(tr("Cannot read the value ")+replace->text(),5000);
+                    if (!ok) statusBar()->showMessage(tr("Cannot read the value ")+replace->text());
                 }
 				break;
 		}

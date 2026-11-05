@@ -142,7 +142,7 @@ void Colorscale::minChanged () {
     if (ok) {
         setRangeMin(val);
     } else {
-        showMessage(tr("Not a number: ")+my_w.lineMin->text(),2000);
+        showMessage(tr("Not a number: ")+my_w.lineMin->text());
         updatecolorbar();
     }
 }
@@ -155,7 +155,7 @@ void Colorscale::maxChanged () {
     if (ok) {
         setRangeMax(val);
     } else {
-        showMessage(tr("Not a number: ")+my_w.lineMax->text(),2000);
+        showMessage(tr("Not a number: ")+my_w.lineMax->text());
         updatecolorbar();
     }
 }
@@ -304,7 +304,7 @@ void Colorscale::addPaletteFile() {
         my_set.endGroup();
         my_set.sync();
         if (!napp->addPaletteFile(my_file)) {
-            showMessage(tr("Not a palette file (256 lines of R G B, 0-255): ")+my_file,5000);
+            showMessage(tr("Not a palette file (256 lines of R G B, 0-255): ")+my_file);
             continue;
         }
         my_set.beginGroup("Palettes");

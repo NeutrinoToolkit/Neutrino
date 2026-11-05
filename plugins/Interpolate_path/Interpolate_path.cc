@@ -87,7 +87,7 @@ void Interpolate_path::doIt() {
             }
         }
         if (vals.size()==0) {
-            showMessage(tr("No valid values along the path"), 5000);
+            showMessage(tr("No valid values along the path"));
             return;
         }
 
@@ -116,12 +116,12 @@ void Interpolate_path::doIt() {
             runThread(&my_params, laplace_fill_transl, "Laplace", 2*std::max(rectRegion.width(),rectRegion.height()));
             if (nThread.n_iter==-1) {
                 delete regionPath;
-                showMessage(tr("Interpolation stopped"), 5000);
+                showMessage(tr("Interpolation stopped"));
                 return;
             }
             if (my_params.result<0) {
                 delete regionPath;
-                showMessage(tr("No valid values around the region"), 5000);
+                showMessage(tr("No valid values around the region"));
                 return;
             }
             regionPath->TscanBrightness();
@@ -172,7 +172,7 @@ void Interpolate_path::doIt() {
         }
         if (canceled) {
             delete regionPath;
-            showMessage(tr("Interpolation stopped"), 5000);
+            showMessage(tr("Interpolation stopped"));
             return;
         }
         regionPath->TscanBrightness();

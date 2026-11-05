@@ -94,7 +94,7 @@ void Integral_inversion::doInversion() {
 		// line points are relative to the image origin: pixels of my_phys = points + its origin
 		axis_poly = axis->poly(npoints).translated(my_phys->get_origin().x(),my_phys->get_origin().y());
 		if (axis_poly.size()<2) {
-			statusBar()->showMessage("Axis is too short", 5000);
+			statusBar()->showMessage("Axis is too short");
 			return;
 		}
 		
@@ -127,7 +127,7 @@ void Integral_inversion::doInversion() {
             if (ref && iimage.getW() == ref->getW() && iimage.getH() == ref->getH()) {
                 iimage = iimage - (*ref);
             } else {
-                statusBar()->showMessage("Problem in removing reference", 5000);
+                statusBar()->showMessage("Problem in removing reference");
             }
         }
         iimage.setFromName(iimage.getName());
@@ -174,7 +174,7 @@ void Integral_inversion::doInversion() {
 			// apply physics
 
         if (nThread.n_iter==-1) {
-            statusBar()->showMessage("Inversion stopped", 5000);
+            statusBar()->showMessage("Inversion stopped");
         } else if (my_abel_params.oimage) {
             nPhysD inv_image(my_abel_params.oimage->copy());
 
@@ -222,7 +222,7 @@ void Integral_inversion::doInversion() {
                 nparent->addPhys(invert);
 			}
         } else {
-            statusBar()->showMessage("Problem in inversion", 5000);
+            statusBar()->showMessage("Problem in inversion");
         }
 		
 	}

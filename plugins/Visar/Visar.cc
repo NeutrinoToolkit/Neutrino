@@ -309,7 +309,7 @@ void Visar::fillComboShot() {
                 }
             }
             if (matchRef.size()==0 || matchShot.size()==0) {
-                statusbar->showMessage("Error: Visar "+QString::number(k+1)+" "+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images", 1000);
+                statusbar->showMessage("Error: Visar "+QString::number(k+1)+" "+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images");
             }
             matchRef.intersect(matchShot);
             match+=matchRef;
@@ -337,7 +337,7 @@ void Visar::fillComboShot() {
             }
         }
         if (matchRef.size()==0 || matchShot.size()==0) {
-            statusbar->showMessage("Error: SOP"+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images", 1000);
+            statusbar->showMessage("Error: SOP"+ QString::number(matchRef.size()) + " ref and " + QString::number(matchShot.size()) + " shot images");
         }
         matchRef.intersect(matchShot);
         match+=matchRef;
@@ -361,7 +361,7 @@ void Visar::fillComboShot() {
         comboShot->show();
     }
     comboShot->setEnabled(match.size()!=0);
-    statusbar->showMessage("Found "+QString::number(my_list.size())+" images", 1000);
+    statusbar->showMessage("Found "+QString::number(my_list.size())+" images");
     connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
 }
 
@@ -966,7 +966,7 @@ void Visar::updatePlotSOP() {
             geom2=geom2.intersected(QRect(0,0,ref->getW(),ref->getH()));
         }
         if (geom2.isEmpty()) {
-            statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
+            statusbar->showMessage(tr("Attention: the region is outside the image!"));
             return;
         }
         int dx=geom2.width();
@@ -1131,7 +1131,7 @@ void Visar::updatePlot() {
                             valdrefr_index=locale().toDouble(my_jumps.at(2),&ok3);
                             if (!ok3) {
                                 visars[k]->velocityUi->jumpst->setPalette(my_palette);
-                                statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg,5000);
+                                statusbar->showMessage(tr("Skipped unreadable refraction index '")+err_msg);
                             }
                         }
                         if (sensitivity<0) valdn*=-1.0;
@@ -1143,12 +1143,12 @@ void Visar::updatePlot() {
                             rjump << (ok3 ? valdrefr_index : 1.0);
                         } else {
                             visars[k]->velocityUi->jumpst->setPalette(my_palette);
-                            statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
+                            statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg);
                         }
                     }
                 } else {
                     visars[k]->velocityUi->jumpst->setPalette(my_palette);
-                    statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg,5000);
+                    statusbar->showMessage(tr("Skipped unreadable jump '")+err_msg);
                 }
             }
             foreach (double a, tjump) {
@@ -1290,7 +1290,7 @@ void Visar::getCarrier(unsigned int k) {
     if (phys && visars[k]->fringeRect) {
         QRect geom2=visars[k]->fringeRect->getRect(phys);
         if (geom2.isEmpty()) {
-            statusbar->showMessage(tr("The region of VISAR ")+QLocale().toString(k+1)+tr(" is outside the image"), 5000);
+            statusbar->showMessage(tr("The region of VISAR ")+QLocale().toString(k+1)+tr(" is outside the image"));
             return;
         }
         nPhysD datamatrix = phys->sub(geom2);
@@ -1298,7 +1298,7 @@ void Visar::getCarrier(unsigned int k) {
         std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, visars[k]->settingsUi->guessWeight->value());
 
         if (vecCarr.size()==0) {
-            statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight", 5000);
+            statusbar->showMessage("ERROR: Problem finding the carrier try to change the weight");
         } else {
             visars[k]->settingsUi->interfringe->setValue(vecCarr[0].first());
             visars[k]->settingsUi->angle->setValue(vecCarr[0].second());
@@ -1600,7 +1600,7 @@ void Visar::doWave(unsigned int k) {
             } else {
                 DEBUG("BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! BIG ERROR! ");
             }
-            statusBar()->showMessage("Size mismatch",5000);
+            statusBar()->showMessage("Size mismatch");
         }
     }
 }
@@ -1778,7 +1778,7 @@ Visar::export_txt_multiple() {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString());
             return;
         }
         QTextStream out(&t);
@@ -1788,7 +1788,7 @@ Visar::export_txt_multiple() {
         }
         out << export_sop();
         t.close();
-        statusBar()->showMessage(tr("Export in file:")+fnametmp,5000);
+        statusBar()->showMessage(tr("Export in file:")+fnametmp);
     }
 }
 
@@ -1811,7 +1811,7 @@ Visar::export_txt() {
         setProperty("NeuSave-fileTxt", fnametmp);
         QFile t(fnametmp);
         if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString());
             return;
         }
         QTextStream out(&t);
@@ -1829,7 +1829,7 @@ Visar::export_txt() {
                 break;
         }
         t.close();
-        statusBar()->showMessage(tr("Export in file:")+fnametmp,5000);
+        statusBar()->showMessage(tr("Export in file:")+fnametmp);
     }
 }
 
@@ -1983,15 +1983,15 @@ void Visar::copy_image() {
         case 0:
             if (tabPhase->currentIndex()>=0 && tabPhase->currentIndex()<(int)visars.size())
                 visars[tabPhase->currentIndex()]->settingsUi->plotPhaseIntensity->copy_image();
-            statusbar->showMessage("Phase image copied to clipboard",3000);
+            statusbar->showMessage("Phase image copied to clipboard");
             break;
         case 1:
             plotVelocity->copy_image();
-            statusbar->showMessage("Velocity image copied to clipboard",3000);
+            statusbar->showMessage("Velocity image copied to clipboard");
             break;
         case 2:
             sopPlot->copy_image();
-            statusbar->showMessage("SOP image copied to clipboard",3000);
+            statusbar->showMessage("SOP image copied to clipboard");
             break;
     }
 }

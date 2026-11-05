@@ -122,9 +122,9 @@ Contours::on_draw_pb_released()
 			}
 			my_c->setPoints(myp);
 			my_c->toggleClosedLine(true);
-            statusBar()->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"),5000);
+            statusBar()->showMessage(QLocale().toString(cutoff) + " : " + QLocale().toString((unsigned int)contour.size())+" "+tr("points"));
 		} else {
-            statusBar()->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"),5000);
+            statusBar()->showMessage(QLocale().toString(cutoff) + " : "+tr("cannot trace contour"));
 		}
 	}
 }

@@ -125,7 +125,7 @@ void XRD::on_actionDelIP_triggered() {
         tabIPs->removeTab(ch->k);
         // ch (tab, widgets, region, connections) destroyed here; its cropped image stays open
     } else {
-        statusbar->showMessage("Cannot remove last IP",5000);
+        statusbar->showMessage("Cannot remove last IP");
     }
 }
 
@@ -176,7 +176,7 @@ void XRD::cropImage(unsigned int k, bool show) {
         if (nPhysExists(img) && ch.rect) {
             QRect geom2=ch.rect->getRect(img).intersected(QRect(0,0,img->getW(),img->getH()));
             if (geom2.isEmpty()) {
-                statusbar->showMessage(tr("IP region outside the image"),2000);
+                statusbar->showMessage(tr("IP region outside the image"));
                 return;
             }
             nPhysD cropped(img->sub(geom2));
@@ -225,7 +225,7 @@ void XRD::cropImage(unsigned int k, bool show) {
                 ch.phys->prop["display_range"]=img->prop["display_range"];
                 nparent->showPhys(ch.phys);
             }
-            statusbar->showMessage("IP" + QString::number(k) + " : " + tabName + " cropped",2000);
+            statusbar->showMessage("IP" + QString::number(k) + " : " + tabName + " cropped");
         }
     }
 }

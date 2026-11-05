@@ -60,7 +60,7 @@ void nHistogram::mouseMoveEvent (QMouseEvent *e)
             my_max=parentPan->currentBuffer->get_max();
         }
         colorvalue=my_min+frac_value*(my_max-my_min);
-        parentPan->my_w.statusbar->showMessage(tr("Value : ")+QLocale().toString(colorvalue),2000);
+        parentPan->my_w.statusbar->showMessage(tr("Value : ")+QLocale().toString(colorvalue));
         update();
     }
 }

@@ -118,9 +118,9 @@ void Wavelet::guessCarrier() {
         std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
 		
         if (vecCarr.size()==0) {
-            statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+            statusbar->showMessage(tr("ERROR: Problem finding the carrier"));
 		} else {
-            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg", 5000);
+            statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg");
             disconnect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
             disconnect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
             disconnect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
@@ -248,10 +248,10 @@ void Wavelet::doWavelet () {
         }
         
         QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*my_params.n_thicks*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
-        statusbar->showMessage(out+status_bar_measure, 50000);
+        statusbar->showMessage(out+status_bar_measure);
         DEBUG(status_bar_measure.toStdString());
     } else {
-        statusbar->showMessage("Canceled", 5000);
+        statusbar->showMessage("Canceled");
     }
     setEnabled(true);
 }
@@ -315,7 +315,7 @@ void Wavelet::doUnwrap () {
         if (unwrapAngles->isChecked()) {
             angleMap=static_cast<physD*>(waveletPhys["angle"]);
             if (!nPhysExists(waveletPhys["angle"]) || angleMap->getW()!=phase->getW() || angleMap->getH()!=phase->getH()) {
-                statusbar->showMessage(tr("Unwrap angles needs the angle map of this wavelet (angle scan with more than one angle)"), 5000);
+                statusbar->showMessage(tr("Unwrap angles needs the angle map of this wavelet (angle scan with more than one angle)"));
                 angleMap=nullptr;
             }
         }

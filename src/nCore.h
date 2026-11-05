@@ -45,6 +45,9 @@ class nCore : public QObject {
 public:
     static nCore* self();
 
+    // the time (ms) of the messages of the status bars: all of them, the code shows its messages without a timeout
+    static constexpr int statusMessageTime=5000;
+
     QMap<QString, std::vector<unsigned char>> nPalettes;
 
     // the log window (created again if it was deleted at the quit of the application)

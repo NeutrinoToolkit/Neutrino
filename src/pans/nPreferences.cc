@@ -127,7 +127,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
     // read by nApp::selectIconTheme at the next start
     connect(iconTheme, &QComboBox::currentIndexChanged, this, [this](int) {
         saveDefaults();
-        statusbar->showMessage(tr("Icons will change at the next start"), 5000);
+        statusbar->showMessage(tr("Icons will change at the next start"));
     });
 
 //     QMap<QString, QVariant> pluginListMap(nparent->property("NeuSave-plugindirs").toMap());
@@ -173,7 +173,7 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 }
 
 void nPreferences::changeGamma(int gamma_val) {
-    statusbar->showMessage(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QLocale().toString(2-gamma_val) : QLocale().toString(gamma_val)),1000);
+    statusbar->showMessage(QString(QChar(0x03B3))+" "+QString(gamma_val<1? "1/"+ QLocale().toString(2-gamma_val) : QLocale().toString(gamma_val)));
 }
 
 void nPreferences::changeThreads(int num) {

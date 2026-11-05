@@ -166,7 +166,7 @@ QString nLine::getPointsStr(){
 
 void nLine::copy_points() {
 	QApplication::clipboard()->setText(getPointsStr());
-    my_pad.statusBar()->showMessage("Points copied to clipboard",2000);
+    my_pad.statusBar()->showMessage("Points copied to clipboard");
 }
 
 void nLine::paste_points() {
@@ -200,9 +200,9 @@ void nLine::paste_points() {
             changeP(i,my_poly[i], true);
         }
         moveRef.clear();
-        my_pad.statusBar()->showMessage("Points pasted from clipboard",2000);
+        my_pad.statusBar()->showMessage("Points pasted from clipboard");
     } else {
-        my_pad.statusBar()->showMessage("Error pasting from clipboard",2000);
+        my_pad.statusBar()->showMessage("Error pasting from clipboard");
     }
 }
 
@@ -212,7 +212,7 @@ void nLine::save_points() {
 		setProperty("NeuSave-fileTxt", fnametmp);
 		QFile t(fnametmp);
 		if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-			my_pad.statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+			my_pad.statusBar()->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString());
 			return;
 		}
 		QTextStream out(&t);
@@ -678,8 +678,8 @@ nLine::removePoint() {
 
 void
 nLine::showMessage (QString s) {
-	nparent->statusBar()->showMessage(s,2000);
-	my_pad.statusBar()->showMessage(s,2000);
+	nparent->statusBar()->showMessage(s);
+	my_pad.statusBar()->showMessage(s);
 }
 
 void

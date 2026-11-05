@@ -953,7 +953,7 @@
   <action name="actionRect">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//rect.png</normaloff>:icons//rect.png</iconset>
+     <normaloff>:/icons/rect.png</normaloff>:/icons/rect.png</iconset>
    </property>
    <property name="text">
     <string>rect</string>
@@ -1049,6 +1049,7 @@
  </tabstops>
  <resources>
   <include location="../Ghost_fringes/GhostFringes.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

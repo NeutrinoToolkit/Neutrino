@@ -44,7 +44,7 @@ void Spectral_analysis::on_calculate_clicked() {
     nPhysD *my_phys=getPhysFromCombo(image);
     phys_fft dir = direction->isChecked() ? PHYS_BACKWARD :PHYS_FORWARD;
     if (!my_phys) {
-        statusBar()->showMessage(tr("Select an image"),5000);
+        statusBar()->showMessage(tr("Select an image"));
         return;
     }
     if (my_phys) {
@@ -57,11 +57,11 @@ void Spectral_analysis::on_calculate_clicked() {
             // }
             // (a missing image or another size gave an empty complex matrix: empty images were added)
             if (!my_phys_img) {
-                statusBar()->showMessage(tr("Select the imaginary part"),5000);
+                statusBar()->showMessage(tr("Select the imaginary part"));
                 return;
             }
             if (my_phys_img->getW()!=my_phys->getW() || my_phys_img->getH()!=my_phys->getH()) {
-                statusBar()->showMessage(tr("Real and imaginary parts must have the same size"),5000);
+                statusBar()->showMessage(tr("Real and imaginary parts must have the same size"));
                 return;
             }
             temp_complex= physMath::from_real_imaginary(*my_phys, *my_phys_img);
@@ -93,7 +93,7 @@ void Spectral_analysis::on_calculate_clicked() {
         physC filtered;
         if (useFilter->isChecked()) {
             if (dir==PHYS_BACKWARD) {
-                statusBar()->showMessage(tr("The filter works on the forward transform"),5000);
+                statusBar()->showMessage(tr("The filter works on the forward transform"));
                 return;
             }
             const int W=ft.getW(), H=ft.getH();

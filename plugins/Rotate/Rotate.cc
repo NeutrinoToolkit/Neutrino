@@ -87,7 +87,7 @@ void Rotate::doRotateLive () {
             lastFill=defaultValue->currentIndex();
             lastSameSize=sameSize->isChecked();
         } else {
-            statusbar->showMessage("Can't work on this image",5000);
+            statusbar->showMessage("Can't work on this image");
 		}
 	}
 }

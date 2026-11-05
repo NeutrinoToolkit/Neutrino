@@ -163,7 +163,7 @@ void Affine_transformation::affine() {
         if (!std::isfinite(minx) || !std::isfinite(maxx) || !std::isfinite(miny) || !std::isfinite(maxy) ||
             !std::all_of(vecBackward.begin(),vecBackward.end(),[](double v){return std::isfinite(v);}) ||
             (maxx-minx)<1 || (maxy-miny)<1 || (maxx-minx)*(maxy-miny)>maxSurf) {
-            showMessage(tr("Invalid transformation: check that the points of each line are not aligned"),5000);
+            showMessage(tr("Invalid transformation: check that the points of each line are not aligned"));
             return;
         }
         unsigned int dx=(unsigned int) (maxx-minx);
@@ -188,7 +188,7 @@ void Affine_transformation::affine() {
         if (crop->isChecked()){
             QRect reg=region.getRect().intersected(QRect(0,0,dx,dy));
             if (reg.isEmpty()) {
-                showMessage(tr("The crop region is outside the transformed image"),5000);
+                showMessage(tr("The crop region is outside the transformed image"));
                 return;
             }
             nPhysD mycopy(affinePhys.sub(reg));
@@ -228,7 +228,7 @@ void Affine_transformation::findshift() {
     nPhysD *my_phys_other=getPhysFromCombo(image2);
     if (my_phys && my_phys_other) {
         if (my_phys->getSize()!=my_phys_other->getSize()) {
-            showMessage(tr("Find shift needs two images of the same size"),5000);
+            showMessage(tr("Find shift needs two images of the same size"));
             return;
         }
         nPhysD my_phys_copy(*my_phys);
@@ -279,7 +279,7 @@ void Affine_transformation::findshift() {
         l1.setPoints(poly);
         poly.translate(-maxx,-maxy);
         l2.setPoints(poly);
-        showMessage(tr("Shift: ")+QLocale().toString(maxx)+" "+QLocale().toString(maxy),5000);
+        showMessage(tr("Shift: ")+QLocale().toString(maxx)+" "+QLocale().toString(maxy));
         apply();
     }
 }

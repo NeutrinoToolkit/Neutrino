@@ -107,7 +107,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc">
+         <iconset resource="../../resources/icons/icons.qrc">
           <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
         </property>
        </widget>
@@ -350,7 +350,7 @@
   <tabstop>numThick</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../build-neutrino-Qt_6_3_2_6_3_2_temporary-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

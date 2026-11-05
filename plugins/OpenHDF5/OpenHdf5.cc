@@ -78,7 +78,7 @@ void OpenHdf5::removeFile(){
 }
 
 void OpenHdf5::itemEntered(QTreeWidgetItem *item, int) {
-    statusbar->showMessage(item->data(3,0).toString(),5000);
+    statusbar->showMessage(item->data(3,0).toString());
 }
 
 QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
@@ -149,9 +149,9 @@ void OpenHdf5::showFile(QString fname) {
         item->setData(3,0,fname);
         addNode(item, root);
         treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        statusbar->showMessage("Done",2000);
+        statusbar->showMessage("Done");
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -167,7 +167,7 @@ void OpenHdf5::showFile() {
 
 void OpenHdf5::saveFile() {
     if (!currentBuffer) {
-        statusbar->showMessage(tr("No image to save"),5000);
+        statusbar->showMessage(tr("No image to save"));
         return;
     }
     QString fname=QFileDialog::getSaveFileName(this,tr("Save image in HDF5"),property("NeuSave-fileHDF").toString(),tr("HDF5")+QString(" (*.h5 *.hdf5);;")+tr("Any file")+QString(" (*)"));
@@ -176,7 +176,7 @@ void OpenHdf5::saveFile() {
     std::string error;
     if (nHdf5::writeImage(*currentBuffer, QFile::encodeName(fname).toStdString(), qApp->applicationVersion().toStdString(), error)) {
         showFile(fname);
-        statusbar->showMessage(tr("Saved ")+fname,5000);
+        statusbar->showMessage(tr("Saved ")+fname);
     } else {
         QMessageBox::warning(this,tr("Save HDF5"),QString::fromStdString(error),QMessageBox::Ok);
     }
@@ -202,7 +202,7 @@ void OpenHdf5::openData(QTreeWidgetItem *item, int) {
     }
     default:
         if (!item->data(3,0).toString().isEmpty() && item->parent()) {
-            statusbar->showMessage(tr("Cannot open ")+item->data(1,0).toString()+" "+item->data(2,0).toString(),5000);
+            statusbar->showMessage(tr("Cannot open ")+item->data(1,0).toString()+" "+item->data(2,0).toString());
         }
         break;
     }
@@ -246,7 +246,7 @@ void OpenHdf5::openImage(QTreeWidgetItem *item) {
         images.push_back(std::move(image));
         showImages(images);
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -262,7 +262,7 @@ void OpenHdf5::openFrame(QTreeWidgetItem *item) {
         images.push_back(std::move(image));
         showImages(images);
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -276,7 +276,7 @@ void OpenHdf5::openAllFrames(QTreeWidgetItem *item) {
     if (nHdf5::readFrames(QFile::encodeName(getFilename(item)).toStdString(), item->data(3,0).toString().toStdString(), images, error)) {
         showImages(images);
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -288,7 +288,7 @@ void OpenHdf5::openFramesMean(QTreeWidgetItem *item) {
         images.push_back(std::move(image));
         showImages(images);
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -323,9 +323,9 @@ void OpenHdf5::copyValues(QTreeWidgetItem *item) {
             str_data += cloc.toString(val,'g',10) + "\n";
         }
         QApplication::clipboard()->setText(str_data);
-        statusbar->showMessage(QLocale().toString((int)data.size()) + tr(" values copied into the clipboard"),2000);
+        statusbar->showMessage(QLocale().toString((int)data.size()) + tr(" values copied into the clipboard"));
     } else {
-        statusbar->showMessage(QString::fromStdString(error),5000);
+        statusbar->showMessage(QString::fromStdString(error));
     }
 }
 
@@ -374,7 +374,7 @@ void OpenHdf5::removeFile(){
 }
 
 void OpenHdf5::itemEntered(QTreeWidgetItem *item, int) {
-    statusbar->showMessage(item->data(3,0).toString(),5000);
+    statusbar->showMessage(item->data(3,0).toString());
 }
 
 QString OpenHdf5::getFilename(QTreeWidgetItem *item) {
@@ -410,9 +410,9 @@ void OpenHdf5::showFile(QString fname) {
         treeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
         H5Gclose(grp);
         H5Fclose(file_id);
-        statusbar->showMessage("Done",2000);
+        statusbar->showMessage("Done");
     } else {
-        statusbar->showMessage("Problem opening file",5000);
+        statusbar->showMessage("Problem opening file");
     }
 }
 
@@ -795,7 +795,7 @@ nPhysD* OpenHdf5::phys_open_Hdf5(QString fname, std::string dataName) {
                     }
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     clipboard->setText(str_data);
-                    statusbar->showMessage(QLocale().toString((int)data.size()) + " values copied into the clipboard",2000);
+                    statusbar->showMessage(QLocale().toString((int)data.size()) + " values copied into the clipboard");
 
 
                 } else if(ndims==2) {

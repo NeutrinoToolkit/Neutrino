@@ -473,7 +473,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
+            <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -490,7 +490,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+            <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -507,7 +507,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//saveTxt.png</normaloff>:icons//saveTxt.png</iconset>
+            <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -605,6 +605,8 @@
   <tabstop>points</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

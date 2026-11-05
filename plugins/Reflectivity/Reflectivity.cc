@@ -64,12 +64,12 @@ void Reflectivity::doIt () {
     nPhysD *imageShot=getPhysFromCombo(shot);
     nPhysD *imageRef=getPhysFromCombo(ref);
     if (!imageShot || !imageRef) {
-        statusbar->showMessage(tr("Select the shot and the reference images"),5000);
+        statusbar->showMessage(tr("Select the shot and the reference images"));
         return;
     }
     // pixel by pixel: the sizes must be the same (phys_point_divide did nothing otherwise, silently)
     if (imageShot->getW()!=imageRef->getW() || imageShot->getH()!=imageRef->getH()) {
-        statusbar->showMessage(tr("Shot and reference must have the same size"),5000);
+        statusbar->showMessage(tr("Shot and reference must have the same size"));
         return;
     }
     if (imageShot && imageRef) {

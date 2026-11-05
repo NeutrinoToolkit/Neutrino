@@ -84,7 +84,7 @@ void Function::on_doIt_released() {
     saveDefaults();
 
     if (sb_width->value()<1 || sb_height->value()<1) {
-        statusbar->showMessage(tr("Width and height must be at least 1"),5000);
+        statusbar->showMessage(tr("Width and height must be at least 1"));
         return;
     }
 
@@ -179,7 +179,7 @@ void Function::on_doIt_released() {
             erasePrevious->setEnabled(true);
 
         } else {
-            statusbar->showMessage(QString::fromStdString(parser.error())+" Check log",5000);
+            statusbar->showMessage(QString::fromStdString(parser.error())+" Check log");
             for (std::size_t i = 0; i < parser.error_count(); ++i) {
                 exprtk::parser_error::type error = parser.get_error(i);
                 QTextCursor my_cursor=function->textCursor();

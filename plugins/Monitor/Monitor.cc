@@ -104,7 +104,7 @@ void Monitor::openIndex(QModelIndex index) {
 void Monitor::openFiles(QStringList files) {
     QList<nPhysD*> opened=nparent->fileOpen(files);
     if (opened.isEmpty()) {
-        statusBar()->showMessage(tr("Cannot open ")+files.join(", "),5000);
+        statusBar()->showMessage(tr("Cannot open ")+files.join(", "));
         return;
     }
     if (erase->isChecked()) {
@@ -134,7 +134,7 @@ Monitor::listViewActivated(QModelIndex index) {
 		// QString sizeF=" ("+QLocale().toString(num,'f',1)+unit+")";
 		// (Kb, Mb... are bits)
 		QString sizeF=" ("+QLocale().formattedDataSize(fInfo.size())+")";
-        statusBar()->showMessage(fInfo.lastModified().toString() +sizeF,5000);
+        statusBar()->showMessage(fInfo.lastModified().toString() +sizeF);
 	}
 }
 

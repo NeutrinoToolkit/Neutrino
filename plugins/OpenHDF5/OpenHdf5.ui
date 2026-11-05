@@ -144,7 +144,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
+     <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -153,7 +153,7 @@
   <action name="actionClose">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
     <string>Close</string>
@@ -162,7 +162,7 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
     <string>Copy</string>
@@ -174,7 +174,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//save.png</normaloff>:icons//save.png</iconset>
+     <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -184,6 +184,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../resources/icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

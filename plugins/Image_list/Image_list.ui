@@ -198,7 +198,7 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
     <string>copy</string>
@@ -210,7 +210,7 @@
   <action name="actionRemove">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
+     <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
     <string>remove</string>
@@ -222,7 +222,7 @@
   <action name="actionShort">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//short.png</normaloff>:icons//short.png</iconset>
+     <normaloff>:/icons/short.png</normaloff>:/icons/short.png</iconset>
    </property>
    <property name="text">
     <string>Short</string>
@@ -234,7 +234,7 @@
   <action name="actionName">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//name.png</normaloff>:icons//name.png</iconset>
+     <normaloff>:/icons/name.png</normaloff>:/icons/name.png</iconset>
    </property>
    <property name="text">
     <string>Name</string>
@@ -246,7 +246,7 @@
   <action name="actionOrigin">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//center.png</normaloff>:icons//center.png</iconset>
+     <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
    </property>
    <property name="text">
     <string>Origin</string>
@@ -258,7 +258,7 @@
   <action name="actionScale">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//scale.png</normaloff>:icons//scale.png</iconset>
+     <normaloff>:/icons/scale.png</normaloff>:/icons/scale.png</iconset>
    </property>
    <property name="text">
     <string>Scale</string>
@@ -269,7 +269,7 @@
   </action>
   <action name="actionRescale">
    <property name="icon">
-    <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/rescale.png</normaloff>:/icons/rescale.png</iconset>
    </property>
    <property name="text">
@@ -288,7 +288,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
+  <include location="Image_list.qrc"/>
  </resources>
  <connections/>
 </ui>

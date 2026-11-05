@@ -54,7 +54,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+       <iconset resource="../../resources/icons/icons.qrc">
         <normaloff>:/icons/lockColor.png</normaloff>:/icons/lockColor.png</iconset>
       </property>
       <property name="iconSize">
@@ -80,7 +80,7 @@
        <string>...</string>
       </property>
       <property name="icon">
-       <iconset resource="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+       <iconset resource="../../resources/icons/icons.qrc">
         <normaloff>:/icons/autoRefresh.png</normaloff>
         <normalon>:/icons/center.png</normalon>:/icons/autoRefresh.png</iconset>
       </property>
@@ -117,7 +117,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

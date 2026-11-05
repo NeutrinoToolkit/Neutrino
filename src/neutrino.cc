@@ -1401,7 +1401,7 @@ void neutrino::on_actionKeyboard_shortcut_triggered() {
         setProperty("NeuSave-shortcut",text.replace(" ","_"));
         nGenericPan *my_pan= openPan(text,false);
         if(!my_pan) {
-            statusBar()->showMessage(tr("Can't find ")+text, 2000);
+            statusBar()->showMessage(tr("Can't find ")+text);
         }
     }
 }
@@ -1417,7 +1417,7 @@ void neutrino::keyReleaseEvent (QKeyEvent *)
 // Drag and Drop
 void neutrino::dragEnterEvent(QDragEnterEvent *e)
 {
-    statusBar()->showMessage(tr("Drop content"), 2000);
+    statusBar()->showMessage(tr("Drop content"));
     e->acceptProposedAction();
 }
 
@@ -1456,7 +1456,7 @@ void neutrino::dropEvent(QDropEvent *e) {
 
 void
 neutrino::zoomChanged(double zoom) {
-    statusBar()->showMessage(QString(tr("Zoom")+" : %1").arg(100.0*zoom,0,' ',1),2000);
+    statusBar()->showMessage(QString(tr("Zoom")+" : %1").arg(100.0*zoom,0,' ',1));
     emit nZoom(zoom);
     update();
 }
@@ -1725,7 +1725,7 @@ void neutrino::closeCurrentBuffer() {
 void
 neutrino::createDrawLine() {
     menuPath->setDefaultAction(actionLine);
-    statusBar()->showMessage(tr("Click for points, press Esc to finish"),5000);
+    statusBar()->showMessage(tr("Click for points, press Esc to finish"));
     nLine *item = new nLine(this);
     item->interactive();
     actionPaths->setIcon(menuPath->defaultAction()->icon());
@@ -1749,7 +1749,7 @@ neutrino::newRect(QRectF rectangle, QString name) {
 void
 neutrino::createDrawRect() {
     menuPath->setDefaultAction(actionRect);
-    statusBar()->showMessage(tr("Click for the first point of the rectangle"),5000);
+    statusBar()->showMessage(tr("Click for the first point of the rectangle"));
     nRect *item = new nRect(this);
     item->interactive();
     actionPaths->setIcon(menuPath->defaultAction()->icon());
@@ -1759,7 +1759,7 @@ neutrino::createDrawRect() {
 void
 neutrino::createDrawPoint() {
     menuPath->setDefaultAction(actionPoint);
-    statusBar()->showMessage(tr("Click for the point"),5000);
+    statusBar()->showMessage(tr("Click for the point"));
     nPoint *item = new nPoint(this);
     item->interactive();
     actionPaths->setIcon(menuPath->defaultAction()->icon());
@@ -1769,7 +1769,7 @@ neutrino::createDrawPoint() {
 void
 neutrino::createDrawEllipse() {
     menuPath->setDefaultAction(actionEllipse);
-    statusBar()->showMessage(tr("Click and release to create the ellipse"),5000);
+    statusBar()->showMessage(tr("Click and release to create the ellipse"));
     nEllipse *item = new nEllipse(this);
     item->interactive();
     actionPaths->setIcon(menuPath->defaultAction()->icon());

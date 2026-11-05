@@ -90,7 +90,7 @@ void Properties::on_changePhysProperty_clicked() {
         // std::string currentProperty =  propertyList->selectedItems().first()->text().toStdString();
         // (first() of an empty selection: crash)
         if (propertyList->selectedItems().isEmpty()) {
-            statusBar()->showMessage(tr("Select a property"),5000);
+            statusBar()->showMessage(tr("Select a property"));
             return;
         }
         std::string currentProperty =  propertyList->selectedItems().first()->text().toStdString();

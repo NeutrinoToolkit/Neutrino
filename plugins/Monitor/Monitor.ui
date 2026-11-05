@@ -69,7 +69,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc">
+          <iconset resource="../../resources/icons/icons.qrc">
            <normaloff>:/icons/dir.png</normaloff>:/icons/dir.png</iconset>
          </property>
          <property name="iconSize">
@@ -250,7 +250,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../../../build-neutrino-Desktop_x86_darwin_generic_mach_o_32bit-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

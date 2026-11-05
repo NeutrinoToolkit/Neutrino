@@ -394,6 +394,7 @@
  </tabstops>
  <resources>
   <include location="GhostFringes.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -58,7 +58,7 @@ void Ghost_fringes::guessCarrier() {
         // mask region in the pixels of this image: line points are relative to the image origin
         QRect geom2=maskRegion->poly(1).translated(image->get_origin().x(),image->get_origin().y()).boundingRect().toRect().intersected(QRect(0,0,image->getW(),image->getH()));
         if (geom2.width()<2 || geom2.height()<2) {
-            statusbar->showMessage(tr("The mask region is outside the image"), 5000);
+            statusbar->showMessage(tr("The mask region is outside the image"));
             return;
         }
 		nPhysD datamatrix;
@@ -66,7 +66,7 @@ void Ghost_fringes::guessCarrier() {
 
         std::vector<vec2f> vecCarr=physWave::phys_guess_carrier(datamatrix, weightCarrier->value());
         if (vecCarr.size()==0) {
-            statusbar->showMessage(tr("ERROR: Problem finding the carrier"), 5000);
+            statusbar->showMessage(tr("ERROR: Problem finding the carrier"));
 		} else {
             widthCarrier->setValue(vecCarr[0].first());
             angleCarrier->setValue(vecCarr[0].second());

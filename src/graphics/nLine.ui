@@ -313,7 +313,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+            <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -392,7 +392,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//remove.png</normaloff>:icons//remove.png</iconset>
+            <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -408,7 +408,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../resources/icons/icons.qrc">
             <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
           </property>
          </widget>
@@ -423,7 +423,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>:icons//plus.png</normaloff>:icons//plus.png</iconset>
+            <normaloff>:/icons/plus.png</normaloff>:/icons/plus.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -442,7 +442,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../resources/icons/icons.qrc">
             <normaloff>:/icons/paste.png</normaloff>:/icons/paste.png</iconset>
           </property>
           <property name="iconSize">
@@ -478,7 +478,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../resources/icons/icons.qrc">
             <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
           </property>
          </widget>
@@ -492,7 +492,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../resources/icons/icons.qrc">
             <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
           </property>
          </widget>
@@ -503,7 +503,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+           <iconset resource="../../resources/icons/icons.qrc">
             <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
           </property>
          </widget>
@@ -569,7 +569,7 @@
   <action name="actionClosedLine">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//closedLine.png</normaloff>:icons//closedLine.png</iconset>
+     <normaloff>:/icons/closedLine.png</normaloff>:/icons/closedLine.png</iconset>
    </property>
    <property name="text">
     <string>closedLine</string>
@@ -581,7 +581,7 @@
   <action name="actionLoadPref">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//loadPref.png</normaloff>:icons//loadPref.png</iconset>
+     <normaloff>:/icons/loadPref.png</normaloff>:/icons/loadPref.png</iconset>
    </property>
    <property name="text">
     <string>loadPref</string>
@@ -593,7 +593,7 @@
   <action name="actionSavePref">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//savePref.png</normaloff>:icons//savePref.png</iconset>
+     <normaloff>:/icons/savePref.png</normaloff>:/icons/savePref.png</iconset>
    </property>
    <property name="text">
     <string>savePref</string>
@@ -605,7 +605,7 @@
   <action name="actionSaveClipboard">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveClipboard.png</normaloff>:icons//saveClipboard.png</iconset>
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
    </property>
    <property name="text">
     <string>saveClipboard</string>
@@ -617,7 +617,7 @@
   <action name="actionSaveTxt">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//saveTxt.png</normaloff>:icons//saveTxt.png</iconset>
+     <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
    </property>
    <property name="text">
     <string>saveTxt</string>
@@ -629,7 +629,7 @@
   <action name="actionBezier">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//bezier.png</normaloff>:icons//bezier.png</iconset>
+     <normaloff>:/icons/bezier.png</normaloff>:/icons/bezier.png</iconset>
    </property>
    <property name="text">
     <string>bezier</string>
@@ -641,7 +641,7 @@
   <action name="actionAntialias">
    <property name="icon">
     <iconset>
-     <normaloff>:icons//antialias.png</normaloff>:icons//antialias.png</iconset>
+     <normaloff>:/icons/antialias.png</normaloff>:/icons/antialias.png</iconset>
    </property>
    <property name="text">
     <string>antialias</string>
@@ -652,7 +652,7 @@
   </action>
   <action name="actionSavePDF">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/savePDF.png</normaloff>:/icons/savePDF.png</iconset>
    </property>
    <property name="text">
@@ -664,7 +664,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -676,7 +676,7 @@
   </action>
   <action name="actionExtract">
    <property name="icon">
-    <iconset resource="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc">
+    <iconset resource="../../resources/icons/icons.qrc">
      <normaloff>:/icons/regionExtract.png</normaloff>:/icons/regionExtract.png</iconset>
    </property>
    <property name="text">
@@ -713,7 +713,7 @@
   <tabstop>colorButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../../build-neutrinoMaster-Brew-Debug/src/qrc/icons.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

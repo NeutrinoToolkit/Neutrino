@@ -112,7 +112,7 @@ void Mouse_info::addPoint(QPointF position) {
 		zitem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
         points->setItem(pos, 4, zitem);
         points->resizeRowToContents(pos);
-		statusBar()->showMessage(tr("Added point ")+QLocale().toString(pos+1),2000);
+		statusBar()->showMessage(tr("Added point ")+QLocale().toString(pos+1));
 	}
 }
 
@@ -264,7 +264,7 @@ void Mouse_info::copyPoints() {
 	QClipboard *clipboard = QApplication::clipboard();
 	// clipboard->setText(getPointText());
 	clipboard->setText(getPointText(false));
-	statusBar()->showMessage(tr("Point values copied"),2000);
+	statusBar()->showMessage(tr("Point values copied"));
 }
 
 void
@@ -275,16 +275,16 @@ Mouse_info::export_txt() {
 		QFile t(fnametmp);
 		// t.open(QIODevice::WriteOnly| QIODevice::Text);
 		if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-			statusBar()->showMessage(tr("Cannot write file ")+fnametmp+": "+t.errorString(),5000);
+			statusBar()->showMessage(tr("Cannot write file ")+fnametmp+": "+t.errorString());
 			return;
 		}
 		QTextStream out(&t);
 		// out << getPointText();
 		out << getPointText(true);
 		t.close();
-		statusBar()->showMessage(tr("Export in file:")+fnametmp,2000);
+		statusBar()->showMessage(tr("Export in file:")+fnametmp);
 	} else {
-		statusBar()->showMessage(tr("Export canceled"),2000);
+		statusBar()->showMessage(tr("Export canceled"));
 	}
 }
 
@@ -315,7 +315,7 @@ Mouse_info::remove_point() {
 	if (removedrows.isEmpty()) {
 		statusBar()->showMessage(tr("No row was selected"));
 	} else {
-		statusBar()->showMessage(tr("Removed Rows:")+removedrows,2000);
+		statusBar()->showMessage(tr("Removed Rows:")+removedrows);
 	}
 }
 

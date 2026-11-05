@@ -11,6 +11,8 @@
 #include <QScrollBar>
 #include <QThread>
 #include <QStyleHints>
+#include <QStatusBar>
+#include <QTimer>
 #include <QPalette>
 #include <atomic>
 
@@ -21,6 +23,30 @@ void neutrinoPluginResourcesLast();
 static std::atomic<nCore*> core_instance{nullptr};
 static QtMessageHandler previous_handler=nullptr;
 
+// every status bar of the application (windows, pans, objects, also those of python) clears its messages after
+// nCore::statusMessageTime: installed on the application, it sees the first polish of each status bar
+class nStatusBarTimer : public QObject {
+public:
+    using QObject::QObject;
+protected:
+    bool eventFilter(QObject *obj, QEvent *ev) override {
+        if (ev->type()==QEvent::Polish) {
+            QStatusBar *bar=qobject_cast<QStatusBar*>(obj);
+            if (bar && !bar->property("nStatusTimer").toBool()) {
+                bar->setProperty("nStatusTimer",true);
+                QTimer *timer=new QTimer(bar);
+                timer->setSingleShot(true);
+                timer->setInterval(nCore::statusMessageTime);
+                connect(timer, &QTimer::timeout, bar, &QStatusBar::clearMessage);
+                connect(bar, &QStatusBar::messageChanged, timer, [timer](const QString &msg) {
+                    if (msg.isEmpty()) timer->stop(); else timer->start();
+                });
+            }
+        }
+        return QObject::eventFilter(obj, ev);
+    }
+};
+
 nCore* nCore::self() {
     nCore *core=core_instance.load();
     if (core==nullptr) {
@@ -29,6 +55,7 @@ nCore* nCore::self() {
         }
         core=new nCore();
         bool dark=core->selectIconTheme(); // before any window (also the log window) uses the icons
+        qApp->installEventFilter(new nStatusBarTimer(core)); // before the windows (and the log window)
         core->createLogWin();
         core_instance.store(core);
         // after the store: the message handler can use the instance

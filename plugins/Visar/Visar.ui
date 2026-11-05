@@ -1225,6 +1225,7 @@
  </tabstops>
  <resources>
   <include location="Visar.qrc"/>
+  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

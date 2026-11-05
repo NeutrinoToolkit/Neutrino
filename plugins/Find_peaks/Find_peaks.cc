@@ -105,7 +105,7 @@ void Find_peaks::set_scale() {
                 }
                 nparent->emitPhysChanged(currentBuffer);
             } else {
-                statusbar->showMessage(tr("Invalid scale: the fitted period is zero or missing"),5000);
+                statusbar->showMessage(tr("Invalid scale: the fitted period is zero or missing"));
             }
         }
     }
@@ -172,7 +172,7 @@ void Find_peaks::updatePlot() {
     QRect geom2;
     if (currentBuffer) {
         geom2=box->getRect(currentBuffer);
-        if (geom2.isEmpty()) statusbar->showMessage(tr("Attention: the region is outside the image!"),2000);
+        if (geom2.isEmpty()) statusbar->showMessage(tr("Attention: the region is outside the image!"));
     }
     if (!currentBuffer || geom2.isEmpty()) { // no stale results
         for (int i=plot->itemCount()-1; i>=0; i--) {
@@ -402,7 +402,7 @@ void Find_peaks::updatePlot() {
 void Find_peaks::on_actionClipboard_triggered() {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(getPoints());
-    statusbar->showMessage(tr("Point values copied"),2000);
+    statusbar->showMessage(tr("Point values copied"));
 }
 
 void Find_peaks::on_actionTxt_triggered() {
@@ -411,15 +411,15 @@ void Find_peaks::on_actionTxt_triggered() {
         setProperty("NeuSave-fileTxt",fnametmp);
         QFile t(fnametmp);
         if (!t.open(QIODevice::WriteOnly| QIODevice::Text)) {
-            statusbar->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString(),5000);
+            statusbar->showMessage(tr("Cannot write ")+fnametmp+": "+t.errorString());
             return;
         }
         QTextStream out(&t);
         out << getPoints();
         t.close();
-        statusbar->showMessage(tr("Export in file:")+fnametmp,2000);
+        statusbar->showMessage(tr("Export in file:")+fnametmp);
     } else {
-        statusbar->showMessage(tr("Export canceled"),2000);
+        statusbar->showMessage(tr("Export canceled"));
     }
 }
 
