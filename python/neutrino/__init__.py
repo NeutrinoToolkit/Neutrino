@@ -22,6 +22,11 @@ except ImportError:
     pass
 
 from ._neutrino import *  # noqa: F401,F403
+from ._neutrino import __version__  # noqa: F401 (not in the * import)
+from . import _neutrino
+
+# help(neutrino) lists what is in __all__ (without it, only what is defined here: not the classes of _neutrino)
+__all__ = [name for name in dir(_neutrino) if not name.startswith("_") and not name.endswith("_")] + ["run"]
 
 
 def run():
