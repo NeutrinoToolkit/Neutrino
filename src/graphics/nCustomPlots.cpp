@@ -50,10 +50,10 @@ nCustomRangeLineEdit::nCustomRangeLineEdit(QCPAxis *axis):
     setLock(my_axis->property("lock").toBool());
     rangeChanged(my_axis->range());
 
-    connect(my_axis,SIGNAL(rangeChanged(QCPRange)),this,SLOT(rangeChanged(QCPRange)));
-    connect(my_min,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
-    connect(my_max,SIGNAL(textEdited(QString)),this,SLOT(setRange(QString)));
-    connect(my_lock,SIGNAL(toggled(bool)),this,SLOT(setLock(bool)));
+    connect(my_axis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged), this, &nCustomRangeLineEdit::rangeChanged);
+    connect(my_min, &QLineEdit::textEdited, this, &nCustomRangeLineEdit::setRange);
+    connect(my_max, &QLineEdit::textEdited, this, &nCustomRangeLineEdit::setRange);
+    connect(my_lock, &QToolButton::toggled, this, &nCustomRangeLineEdit::setLock);
 
     QHBoxLayout* gridLayout = new QHBoxLayout(this);
     gridLayout->setContentsMargins(QMargins(0,0,0,0));
@@ -115,7 +115,7 @@ nCustomPlot::nCustomPlot(QWidget* parent):
 
     setContentsMargins(0,0,0,0);
 
-    connect(this, SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)), this, SLOT(myAxisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
+    connect(this, &nCustomPlot::axisDoubleClick, this, &nCustomPlot::myAxisDoubleClick);
 
     setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
@@ -147,19 +147,19 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
     Ui::nCustomPlot my_w;
     my_w.setupUi(preferences);
     preferences->setWindowTitle(winTitle);
-    connect(my_w.actionLoadPref,SIGNAL(triggered()),this,SLOT(loadSettings()));
-    connect(my_w.actionSavePref,SIGNAL(triggered()),this,SLOT(saveSettings()));
-    connect(my_w.actionChangeFonts, SIGNAL(triggered()), this, SLOT(changeAllFonts()));
-    connect(my_w.actionRefresh, SIGNAL(triggered()), this, SLOT(replot()));
-    connect(my_w.actionCopy, SIGNAL(triggered()), this, SLOT(copy_data()));
-    connect(my_w.actionSave, SIGNAL(triggered()), this, SLOT(save_data()));
-    connect(my_w.actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
-    connect(my_w.actionExport, SIGNAL(triggered()), this, SLOT(export_image()));
+    connect(my_w.actionLoadPref, &QAction::triggered, this, qOverload<>(&nCustomPlot::loadSettings));
+    connect(my_w.actionSavePref, &QAction::triggered, this, qOverload<>(&nCustomPlot::saveSettings));
+    connect(my_w.actionChangeFonts, &QAction::triggered, this, &nCustomPlot::changeAllFonts);
+    connect(my_w.actionRefresh, &QAction::triggered, this, [this]() { replot(); });
+    connect(my_w.actionCopy, &QAction::triggered, this, &nCustomPlot::copy_data);
+    connect(my_w.actionSave, &QAction::triggered, this, &nCustomPlot::save_data);
+    connect(my_w.actionCopyImage, &QAction::triggered, this, &nCustomPlot::copy_image);
+    connect(my_w.actionExport, &QAction::triggered, this, &nCustomPlot::export_image);
     if (!title.isNull()) {
         my_w.plotTitle->setText(title->text());
     }
-    connect(my_w.plotTitle, SIGNAL(textEdited(QString)), this, SLOT(setTitle(QString)));
-    connect(my_w.fontTitle,SIGNAL(released()),this,SLOT(changeTitleFont()));
+    connect(my_w.plotTitle, &QLineEdit::textEdited, this, &nCustomPlot::setTitle);
+    connect(my_w.fontTitle, &QToolButton::released, this, &nCustomPlot::changeTitleFont);
 
     foreach (QCPAxis *axis, findChildren<QCPAxis *>()) {
         if (axis->visible()) {
@@ -171,7 +171,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             cb_axis->setChecked(true);
             cb_axis->setFont(f);
             cb_axis->setProperty("axis",QVariant::fromValue(axis));
-            connect(cb_axis,SIGNAL(toggled(bool)),this,SLOT(showAxis(bool)));
+            connect(cb_axis, &QCheckBox::toggled, this, &nCustomPlot::showAxis);
             my_w.labels_layout->addWidget(cb_axis,row,col++,Qt::AlignCenter);
 
 
@@ -180,7 +180,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             le->setFont(f);
             le->setText(axis->label());
             le->setProperty("axis",QVariant::fromValue(axis));
-            connect(le,SIGNAL(textChanged(QString)),this,SLOT(setLabel(QString)));
+            connect(le, &QLineEdit::textChanged, this, &nCustomPlot::setLabel);
             my_w.labels_layout->addWidget(le,row,col++);
 
 
@@ -189,14 +189,18 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             cb_grid->setCheckState(axis->grid()->visible() && axis->grid()->subGridVisible()?Qt::Checked:(axis->grid()->visible()?Qt::PartiallyChecked:Qt::Unchecked));
             cb_grid->setFont(f);
             cb_grid->setProperty("grid",QVariant::fromValue(axis->grid()));
-            connect(cb_grid,SIGNAL(stateChanged(int)),this,SLOT(showGrid(int)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+            connect(cb_grid, &QCheckBox::checkStateChanged, this, &nCustomPlot::showGrid); // (tristate: not toggled)
+#else
+            connect(cb_grid, &QCheckBox::stateChanged, this, &nCustomPlot::showGrid);
+#endif
             my_w.labels_layout->addWidget(cb_grid,row,col++,Qt::AlignCenter);
 
             QCheckBox *cb_log = new QCheckBox("", this);
             cb_log->setChecked(axis->scaleType()==QCPAxis::stLogarithmic);
             cb_log->setFont(f);
             cb_log->setProperty("axis",QVariant::fromValue(axis));
-            connect(cb_log,SIGNAL(toggled(bool)),this,SLOT(setLog(bool)));
+            connect(cb_log, &QCheckBox::toggled, this, &nCustomPlot::setLog);
             my_w.labels_layout->addWidget(cb_log,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_color = new QToolButton(this);
@@ -204,13 +208,13 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             px.fill(axis->labelColor());
             tb_color->setIcon(px);
             tb_color->setProperty("axis",QVariant::fromValue(axis));
-            connect(tb_color,SIGNAL(released()),this,SLOT(setColor()));
+            connect(tb_color, &QToolButton::released, this, &nCustomPlot::setColor);
             my_w.labels_layout->addWidget(tb_color,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_font = new QToolButton(this);
             tb_font->setIcon(QIcon(":icons/font"));
             tb_font->setProperty("axis",QVariant::fromValue(axis));
-            connect(tb_font,SIGNAL(released()),this,SLOT(changeAxisFont()));
+            connect(tb_font, &QToolButton::released, this, &nCustomPlot::changeAxisFont);
             my_w.labels_layout->addWidget(tb_font,row,col++,Qt::AlignCenter);
 
             nCustomRangeLineEdit *minmax = new nCustomRangeLineEdit(axis);
@@ -229,7 +233,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             cb_graph->setChecked(graph->visible());
             cb_graph->setFont(f);
             cb_graph->setProperty("graph",QVariant::fromValue(graph));
-            connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+            connect(cb_graph, &QCheckBox::toggled, this, &nCustomPlot::showGraph);
             my_w.graphs_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
 
             QLabel *le = new QLabel(graph->name(),this);
@@ -245,19 +249,19 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             sb_thick->setSingleStep(0.1);
             sb_thick->setValue(graph->pen().widthF());
             sb_thick->setProperty("graph",QVariant::fromValue(graph));
-            connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+            connect(sb_thick, &QDoubleSpinBox::valueChanged, this, &nCustomPlot::changeGraphThickness);
             my_w.graphs_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_copy = new QToolButton(this);
             tb_copy->setIcon(QIcon(":icons/saveClipboard"));
             tb_copy->setProperty("graph",QVariant::fromValue(graph));
-            connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+            connect(tb_copy, &QToolButton::released, this, &nCustomPlot::copy_data);
             my_w.graphs_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_save = new QToolButton(this);
             tb_save->setIcon(QIcon(":icons/saveTxt"));
             tb_save->setProperty("graph",QVariant::fromValue(graph));
-            connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+            connect(tb_save, &QToolButton::released, this, &nCustomPlot::save_data);
             my_w.graphs_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
         }
         QCPErrorBars *errbar = qobject_cast<QCPErrorBars *>(plottable(g));
@@ -270,7 +274,7 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             cb_graph->setChecked(errbar->visible());
             cb_graph->setFont(f);
             cb_graph->setProperty("errbar",QVariant::fromValue(errbar));
-            connect(cb_graph,SIGNAL(toggled(bool)),this,SLOT(showGraph(bool)));
+            connect(cb_graph, &QCheckBox::toggled, this, &nCustomPlot::showGraph);
             my_w.errorbars_layout->addWidget(cb_graph,row,col++,Qt::AlignCenter);
 
             QLabel *le = new QLabel(errbar->name(),this);
@@ -286,19 +290,19 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
             sb_thick->setSingleStep(0.1);
             sb_thick->setValue(errbar->pen().widthF());
             sb_thick->setProperty("errbar",QVariant::fromValue(errbar));
-            connect(sb_thick,SIGNAL(valueChanged(double)),this,SLOT(changeGraphThickness(double)));
+            connect(sb_thick, &QDoubleSpinBox::valueChanged, this, &nCustomPlot::changeGraphThickness);
             my_w.errorbars_layout->addWidget(sb_thick,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_copy = new QToolButton(this);
             tb_copy->setIcon(QIcon(":icons/saveClipboard"));
             tb_copy->setProperty("errbar",QVariant::fromValue(errbar));
-            connect(tb_copy,SIGNAL(released()),this,SLOT(copy_data()));
+            connect(tb_copy, &QToolButton::released, this, &nCustomPlot::copy_data);
             my_w.errorbars_layout->addWidget(tb_copy,row,col++,Qt::AlignCenter);
 
             QToolButton *tb_save = new QToolButton(this);
             tb_save->setIcon(QIcon(":icons/saveTxt"));
             tb_save->setProperty("errbar",QVariant::fromValue(errbar));
-            connect(tb_save,SIGNAL(released()),this,SLOT(save_data()));
+            connect(tb_save, &QToolButton::released, this, &nCustomPlot::save_data);
             my_w.errorbars_layout->addWidget(tb_save,row,col++,Qt::AlignCenter);
         }
     }

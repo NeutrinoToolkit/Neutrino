@@ -93,13 +93,13 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 //     defaultPluginDir->setText(nparent->property("defaultPluginDir").toString());
 
 
-    connect(forceDecimalDot, SIGNAL(toggled(bool)), napp, SLOT(forceDecimalDot(bool)));
+    connect(forceDecimalDot, &QCheckBox::toggled, napp, &nCore::forceDecimalDot);
 
     openclUnit->setMaximum(physWave::openclEnabled());
 
 
-    connect(openclUnit, SIGNAL(valueChanged(int)), this, SLOT(openclUnitValueChange(int)));
-    connect(threads, SIGNAL(valueChanged(int)), this, SLOT(changeThreads(int)));
+    connect(openclUnit, &QSpinBox::valueChanged, this, &nPreferences::openclUnitValueChange);
+    connect(threads, &QSpinBox::valueChanged, this, &nPreferences::changeThreads);
 
     show(true);
 
@@ -107,22 +107,22 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
 	changeFont();
 
-    connect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
-    connect(fontFace, SIGNAL(activated(int)), this, SLOT(changeFont()));
-    connect(fontSize, SIGNAL(valueChanged(int)), this, SLOT(changeFont()));
-    connect(showDimPixel, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(showXYaxes, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(showColorbar, SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(showColorbarValues , SIGNAL(released()), this, SLOT(changeDecorations()));
-    connect(mouseThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
-    connect(gridThickness, SIGNAL(valueChanged(double)), this, SLOT(changeDecorations()));
-    connect(actionReset_settings, SIGNAL(triggered()), this, SLOT(resetSettings()));
+    connect(comboIconSize, &QComboBox::currentIndexChanged, this, &nPreferences::changeIconSize);
+    connect(fontFace, &QFontComboBox::activated, this, &nPreferences::changeFont);
+    connect(fontSize, &QSpinBox::valueChanged, this, &nPreferences::changeFont);
+    connect(showDimPixel, &QCheckBox::released, this, &nPreferences::changeDecorations);
+    connect(showXYaxes, &QCheckBox::released, this, &nPreferences::changeDecorations);
+    connect(showColorbar, &QCheckBox::released, this, &nPreferences::changeDecorations);
+    connect(showColorbarValues, &QCheckBox::released, this, &nPreferences::changeDecorations);
+    connect(mouseThickness, &QDoubleSpinBox::valueChanged, this, &nPreferences::changeDecorations);
+    connect(gridThickness, &QDoubleSpinBox::valueChanged, this, &nPreferences::changeDecorations);
+    connect(actionReset_settings, &QAction::triggered, this, &nPreferences::resetSettings);
 
-    connect(currentStepScaleFactor,SIGNAL(valueChanged(int)),nparent->my_view,SLOT(setZoomFactor(int)));
+    connect(currentStepScaleFactor, &QSpinBox::valueChanged, nparent->my_view, &nView::setZoomFactor);
 
 //     connect(pluginList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(updatePlugindirs(QListWidgetItem*)));
 
-    connect(physNameLength, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+    connect(physNameLength, &QSpinBox::valueChanged, this, &nPreferences::saveDefaults);
 
     // read by nApp::selectIconTheme at the next start
     connect(iconTheme, &QComboBox::currentIndexChanged, this, [this](int) {
@@ -145,31 +145,31 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 //         pluginList->addItem(dd);
 //     }
     qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
-    connect(openNewWindow, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
-    connect(openclUnit, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
-    connect(separateRGB, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
-    connect(askCloseUnsaved, SIGNAL(stateChanged(int)), this, SLOT(saveDefaults()));
+    connect(openNewWindow, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
+    connect(openclUnit, &QSpinBox::valueChanged, this, &nPreferences::saveDefaults);
+    connect(separateRGB, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
+    connect(askCloseUnsaved, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
 
     foreach (QCheckBox *wdg, groupBox->findChildren<QCheckBox *>()) {
-        connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+        connect(wdg, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
     }
     foreach (QToolButton *wdg, groupBox->findChildren<QToolButton *>()) {
-        connect(wdg, SIGNAL(toggled(bool)), this, SLOT(saveDefaults()));
+        connect(wdg, &QToolButton::toggled, this, &nPreferences::saveDefaults);
     }
     foreach (QLineEdit *wdg, groupBox->findChildren<QLineEdit *>()) {
-        connect(wdg, SIGNAL(editingFinished()), this, SLOT(saveDefaults()));
+        connect(wdg, &QLineEdit::editingFinished, this, &nPreferences::saveDefaults);
     }
     foreach (QSpinBox *wdg, groupBox->findChildren<QSpinBox *>()) {
-        connect(wdg, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+        connect(wdg, &QSpinBox::valueChanged, this, &nPreferences::saveDefaults);
     }
     foreach (QDoubleSpinBox *wdg, groupBox->findChildren<QDoubleSpinBox *>()) {
-        connect(wdg, SIGNAL(valueChanged(double)), this, SLOT(saveDefaults()));
+        connect(wdg, &QDoubleSpinBox::valueChanged, this, &nPreferences::saveDefaults);
     }
     foreach (QSlider *wdg, groupBox->findChildren<QSlider *>()) {
-        connect(wdg, SIGNAL(valueChanged(int)), this, SLOT(saveDefaults()));
+        connect(wdg, &QSlider::valueChanged, this, &nPreferences::saveDefaults);
     }
 
-    connect(gamma, SIGNAL(valueChanged(int)), this, SLOT(changeGamma(int)));
+    connect(gamma, &QSlider::valueChanged, this, &nPreferences::changeGamma);
 }
 
 void nPreferences::changeGamma(int gamma_val) {
@@ -288,12 +288,12 @@ void nPreferences::changeIconSize(int val) {
 }
 
 void nPreferences::hideEvent(QHideEvent*e){
-    disconnect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    disconnect(comboIconSize, &QComboBox::currentIndexChanged, this, &nPreferences::changeIconSize);
 	nGenericPan::hideEvent(e);
 }
 
 void nPreferences::showEvent(QShowEvent*e){
-    connect(comboIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(changeIconSize(int)));
+    connect(comboIconSize, &QComboBox::currentIndexChanged, this, &nPreferences::changeIconSize);
 	nGenericPan::showEvent(e);
 }
 

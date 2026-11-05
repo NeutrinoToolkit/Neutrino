@@ -43,8 +43,8 @@ nLine::nLine(nGenericPan *parentPan, int level) : nLine(parentPan->nparent)
 	setProperty("parentPanControlLevel",level);
 	if (level>0) {
         my_w.name->setReadOnly(true);
-        disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
-        disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+        disconnect(my_w.name, &QLineEdit::textChanged, this, &nLine::changeToolTip);
+        disconnect(my_w.actionRemove, &QAction::triggered, this, &nLine::deleteLater);
 		my_w.actionRemove->setVisible(false);
         if (level>1) {
             sizeHolder(0.0);
@@ -68,9 +68,9 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
         nparent->setProperty("numLine",num);
 		setProperty("numLine",num);
         setToolTip("line"+QLocale().toString(num));
-        connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(nparent->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        connect(nparent, &neutrino::mouseAtMatrix, this, &nLine::movePoints);
+        connect(nparent->my_view, &nView::zoomChanged, this, &nLine::zoomChanged);
+        connect(nparent, &neutrino::bufferChanged, this, &nLine::bufferChanged);
 
         zoom=nparent->getZoom();
 
@@ -110,48 +110,48 @@ nLine::nLine(neutrino *my_parent) : QGraphicsObject(),
     my_pad.setWindowIcon(QIcon(":line"));
 	my_w.setupUi(&my_pad);
 
-	connect(my_w.actionLoadPref, SIGNAL(triggered()), this, SLOT(loadSettings()));
-	connect(my_w.actionSavePref, SIGNAL(triggered()), this, SLOT(saveSettings()));
+	connect(my_w.actionLoadPref, &QAction::triggered, this, qOverload<>(&nLine::loadSettings));
+	connect(my_w.actionSavePref, &QAction::triggered, this, qOverload<>(&nLine::saveSettings));
 
-	connect(my_w.copyGraphPoints, SIGNAL(released()), my_w.plot, SLOT(copy_data()));
-	connect(my_w.saveGraphPoints, SIGNAL(released()), my_w.plot, SLOT(save_data()));
-	connect(my_w.saveGraphImage , SIGNAL(released()), my_w.plot, SLOT(export_image()));
+	connect(my_w.copyGraphPoints, &QToolButton::released, my_w.plot, &nCustomPlot::copy_data);
+	connect(my_w.saveGraphPoints, &QToolButton::released, my_w.plot, &nCustomPlot::save_data);
+	connect(my_w.saveGraphImage, &QToolButton::released, my_w.plot, &nCustomPlot::export_image);
 
-	connect(my_w.actionBezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
-	connect(my_w.actionClosedLine, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
-	connect(my_w.actionAntialias, SIGNAL(triggered()), this, SLOT(toggleAntialias()));
+	connect(my_w.actionBezier, &QAction::triggered, this, qOverload<>(&nLine::toggleBezier));
+	connect(my_w.actionClosedLine, &QAction::triggered, this, qOverload<>(&nLine::toggleClosedLine));
+	connect(my_w.actionAntialias, &QAction::triggered, this, qOverload<>(&nLine::toggleAntialias));
 
-	connect(my_w.actionExtract, SIGNAL(triggered()), this, SLOT(extractPath()));
+	connect(my_w.actionExtract, &QAction::triggered, this, &nLine::extractPath);
 
-	connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+	connect(my_w.actionRemove, &QAction::triggered, this, &nLine::deleteLater);
 
 	my_w.spinWidth->setValue(nWidth);
 	my_w.spinDepth->setValue(zValue());
 	my_w.colorLabel->setPalette(QPalette(colorLine));
 
-	connect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+	connect(my_w.name, &QLineEdit::textChanged, this, &nLine::changeToolTip);
 
 	my_w.name->setText(toolTip());
 	my_w.spinSizeHolder->setValue(nSizeHolder);
 	my_w.cutPoints->setValue(numPoints);
 	my_w.colorHolderLabel->setPalette(QPalette(colorHolder));
 
-	connect(my_w.addPoint, SIGNAL(released()),this, SLOT(addPoint()));
-	connect(my_w.removeRow, SIGNAL(released()),this, SLOT(removePoint()));
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
-    connect(my_w.pastePoints, SIGNAL(released()),this, SLOT(paste_points()));
-    connect(my_w.savePoints, SIGNAL(released()),this, SLOT(save_points()));
+	connect(my_w.addPoint, &QToolButton::released, this, qOverload<>(&nLine::addPoint));
+	connect(my_w.removeRow, &QToolButton::released, this, qOverload<>(&nLine::removePoint));
+    connect(my_w.copyPoints, &QToolButton::released, this, &nLine::copy_points);
+    connect(my_w.pastePoints, &QToolButton::released, this, &nLine::paste_points);
+    connect(my_w.savePoints, &QToolButton::released, this, &nLine::save_points);
 
-	connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
-	connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-	connect(my_w.colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
-	connect(my_w.colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-	connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
-	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+	connect(my_w.spinWidth, &QDoubleSpinBox::valueChanged, this, &nLine::setWidthF);
+	connect(my_w.spinDepth, &QDoubleSpinBox::valueChanged, this, &nLine::setOrder);
+	connect(my_w.colorButton, &QPushButton::pressed, this, qOverload<>(&nLine::changeColor));
+	connect(my_w.colorHolderButton, &QPushButton::pressed, this, qOverload<>(&nLine::changeColorHolder));
+	connect(my_w.spinSizeHolder, &QDoubleSpinBox::valueChanged, this, &nLine::sizeHolder);
+	connect(my_w.points, &QTableWidget::itemChanged, this, &nLine::tableUpdated);
 
-	connect(my_w.cutPoints, SIGNAL(valueChanged(int)), this, SLOT(setNumPoints(int)));
+	connect(my_w.cutPoints, &QSpinBox::valueChanged, this, &nLine::setNumPoints);
 
-	connect(my_w.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
+	connect(my_w.tabWidget, &QTabWidget::currentChanged, this, &nLine::updatePlot);
 
 }
 
@@ -274,7 +274,7 @@ QPolygonF nLine::getLine(int np) {
 
 void nLine::interactive ( ) {
 	showMessage(tr("Click for first point, press Esc to finish"));
-    connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nLine::addPointAfterClick);
 	appendPoint();
 }
 
@@ -567,7 +567,7 @@ nLine::changeP (int np, QPointF p, bool isLocal) {
 }
 
 void nLine::changePointPad(int nrow) {
-	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+	disconnect(my_w.points, &QTableWidget::itemChanged, this, &nLine::tableUpdated);
 	QPointF p=ref[nrow]->pos();
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
@@ -576,7 +576,7 @@ void nLine::changePointPad(int nrow) {
 	my_w.points->setItem(nrow, 0, xitem);
 	my_w.points->setItem(nrow, 1, yitem);
 	my_w.points->resizeRowToContents(nrow);
-	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+	connect(my_w.points, &QTableWidget::itemChanged, this, &nLine::tableUpdated);
 }
 
 void nLine::addPoint() {
@@ -616,7 +616,7 @@ void nLine::addPoint (int npos) {
 	sizeHolder(nSizeHolder);
 	setNumPoints(numPoints);
 
-	disconnect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+	disconnect(my_w.points, &QTableWidget::itemChanged, this, &nLine::tableUpdated);
 	my_w.points->insertRow(npos);
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
@@ -625,7 +625,7 @@ void nLine::addPoint (int npos) {
 	my_w.points->setItem(npos, 0, xitem);
 	my_w.points->setItem(npos, 1, yitem);
 	my_w.points->resizeRowToContents(npos);
-	connect(my_w.points, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+	connect(my_w.points, &QTableWidget::itemChanged, this, &nLine::tableUpdated);
 }
 
 void nLine::appendPoint () {
@@ -694,7 +694,7 @@ nLine::keyPressEvent ( QKeyEvent * e ) {
 			break;
 		case Qt::Key_Return:
 		case Qt::Key_Escape:
-            if (disconnect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)))) {
+            if (disconnect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nLine::addPointAfterClick)) {
 				removeLastPoint();
 				showMessage(tr("Adding points ended"));
 				ungrabKeyboard();
@@ -888,38 +888,38 @@ void nLine::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	if (nodeSelected>=0) {
 		moveRef.clear();
         QAction *append = menu.addAction("Append point "+QLocale().toString(nodeSelected+1)+" (a)");
-		connect(append, SIGNAL(triggered()), this, SLOT(contextAppendPoint()));
+		connect(append, &QAction::triggered, this, &nLine::contextAppendPoint);
         QAction *prepend = menu.addAction("Prepend point "+QLocale().toString(nodeSelected+1)+" (p)");
-		connect(prepend, SIGNAL(triggered()), this, SLOT(contextPrependPoint()));
+		connect(prepend, &QAction::triggered, this, &nLine::contextPrependPoint);
         QAction *remove = menu.addAction("Delete point "+QLocale().toString(nodeSelected+1)+" (d)");
-		connect(remove, SIGNAL(triggered()), this, SLOT(contextRemovePoint()));
+		connect(remove, &QAction::triggered, this, &nLine::contextRemovePoint);
 		menu.addAction(menu.addSeparator());
 	}
 	QAction *bezier = menu.addAction("Straight/Bezier (b)");
-	connect(bezier, SIGNAL(triggered()), this, SLOT(toggleBezier()));
+	connect(bezier, &QAction::triggered, this, qOverload<>(&nLine::toggleBezier));
 	QAction *closedline = menu.addAction("Closed/Open (c)");
-	connect(closedline, SIGNAL(triggered()), this, SLOT(toggleClosedLine()));
+	connect(closedline, &QAction::triggered, this, qOverload<>(&nLine::toggleClosedLine));
 	QAction *centerimage = menu.addAction("Center on image (C)");
-	connect(centerimage, SIGNAL(triggered()), this, SLOT(centerOnImage()));
+	connect(centerimage, &QAction::triggered, this, &nLine::centerOnImage);
 	QAction *twoHoriz = menu.addAction("2 points Horizontal (x)");
-	connect(twoHoriz, SIGNAL(triggered()), this, SLOT(makeHorizontal()));
+	connect(twoHoriz, &QAction::triggered, this, &nLine::makeHorizontal);
 	QAction *twoVert = menu.addAction("2 points Vertical (y)");
-	connect(twoVert, SIGNAL(triggered()), this, SLOT(makeVertical()));
+	connect(twoVert, &QAction::triggered, this, &nLine::makeVertical);
     QAction *makeRect = menu.addAction("4 points Rectangle (r)");
-    connect(makeRect, SIGNAL(triggered()), this, SLOT(makeRectangle()));
+    connect(makeRect, &QAction::triggered, this, &nLine::makeRectangle);
     QAction *makeRectExp = menu.addAction("4 points Rectangle image (shift-r)");
-    connect(makeRectExp, SIGNAL(triggered()), this, SLOT(makeRectangleExpand()));
+    connect(makeRectExp, &QAction::triggered, this, &nLine::makeRectangleExpand);
     menu.addAction(menu.addSeparator());
     QAction *copy = menu.addAction("Copy points (shift-c)");
-    connect(copy, SIGNAL(triggered()), this, SLOT(copy_points()));
+    connect(copy, &QAction::triggered, this, &nLine::copy_points);
     QAction *paste = menu.addAction("Paste points (shift-v)");
-    connect(paste, SIGNAL(triggered()), this, SLOT(paste_points()));
+    connect(paste, &QAction::triggered, this, &nLine::paste_points);
     menu.addAction(menu.addSeparator());
     QAction *showPan = menu.addAction("Show control (w)");
-    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+    connect(showPan, &QAction::triggered, this, &nLine::togglePadella);
     if (property("parentPanControlLevel").toInt()==0) {
         QAction *removePan = menu.addAction("Remove");
-        connect(removePan, SIGNAL(triggered()), this, SLOT(deleteLater()));
+        connect(removePan, &QAction::triggered, this, &nLine::deleteLater);
     }
     menu.exec(e->screenPos());
 }

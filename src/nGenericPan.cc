@@ -43,24 +43,24 @@ nGenericPan::nGenericPan(neutrino *myparent)
       currentBuffer(myparent->getCurrentBuffer())
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    connect(qApp,SIGNAL(aboutToQuit()),this,SLOT(saveDefaults()));
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &nGenericPan::saveDefaults);
 
     if (nparent==nullptr || napp==nullptr) return;
 
-    connect(nparent, SIGNAL(destroyed()), this, SLOT(close()));
+    connect(nparent, &neutrino::destroyed, this, &nGenericPan::close);
 
-    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(mouseAtMatrix(QPointF)));
-    connect(nparent, SIGNAL(mouseAtWorld(QPointF)), this, SLOT(mouseAtWorld(QPointF)));
+    connect(nparent, &neutrino::mouseAtMatrix, this, &nGenericPan::mouseAtMatrix);
+    connect(nparent, &neutrino::mouseAtWorld, this, &nGenericPan::mouseAtWorld);
 
-    connect(nparent, SIGNAL(nZoom(double)), this, SLOT(nZoom(double)));
+    connect(nparent, &neutrino::nZoom, this, &nGenericPan::nZoom);
 
-    connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(imageMousePress(QPointF)));
-    connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(imageMouseRelease(QPointF)));
+    connect(nparent->my_view, &nView::mousePressEvent_sig, this, &nGenericPan::imageMousePress);
+    connect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nGenericPan::imageMouseRelease);
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(bufferChanged(nPhysD *)));
+    connect(nparent, &neutrino::bufferChanged, this, &nGenericPan::bufferChanged);
 
-    connect(nparent, SIGNAL(physAdd(nPhysD*)), this, SLOT(physAdd(nPhysD*)));
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent, &neutrino::physAdd, this, &nGenericPan::physAdd);
+    connect(nparent, &neutrino::physDel, this, &nGenericPan::physDel);
     connect(nparent, &neutrino::physChanged, this, &nGenericPan::refreshComboNames);
     connect(nparent, &neutrino::physReordered, this, &nGenericPan::refreshComboNames);
 
@@ -133,12 +133,12 @@ void nGenericPan::help() {
             my_help.setupUi(helpwin);
             helpwin->setWindowTitle(panName()+" help");
             my_help.help->setSource(QUrl("qrc"+helpFile));
-            connect(my_help.actionHome, SIGNAL(triggered()), my_help.help, SLOT(home()));
-            connect(my_help.actionBack, SIGNAL(triggered()), my_help.help, SLOT(backward()));
-            connect(my_help.actionForward, SIGNAL(triggered()), my_help.help, SLOT(forward()));
-            connect(my_help.actionPrint, SIGNAL(triggered()), my_help.help, SLOT(print()));
-            connect(my_help.actionIncreaseFont, SIGNAL(triggered()), my_help.help, SLOT(zoomIn()));
-            connect(my_help.actionDecreaseFont, SIGNAL(triggered()), my_help.help, SLOT(zoomOut()));
+            connect(my_help.actionHome, &QAction::triggered, my_help.help, &nHelpTextBrowser::home);
+            connect(my_help.actionBack, &QAction::triggered, my_help.help, &nHelpTextBrowser::backward);
+            connect(my_help.actionForward, &QAction::triggered, my_help.help, &nHelpTextBrowser::forward);
+            connect(my_help.actionPrint, &QAction::triggered, my_help.help, &nHelpTextBrowser::print);
+            connect(my_help.actionIncreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomIn);
+            connect(my_help.actionDecreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomOut);
             helpwin->show();
         }
     } else {
@@ -249,8 +249,8 @@ void nGenericPan::decorate(QWidget *main_widget) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
                 //connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
-                connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
-                connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
+                connect(combo, &QComboBox::highlighted, this, &nGenericPan::comboChanged);
+                connect(combo, &QComboBox::activated, this, &nGenericPan::comboChanged);
             }
         }
     }
@@ -313,13 +313,13 @@ void nGenericPan::show(bool onlyOneAllowed) {
                 }
             }
             if(needPrefToolButtons) {
-                my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,SLOT(loadSettings()));
-                my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,SLOT(saveSettings()));
+                my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,[this]() { loadSettings(); });
+                my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,[this]() { saveSettings(); });
             }
             QFile helpFile(":/"+panName()+"README.html");
             if (helpFile.exists()) {
                 setProperty("helpFile",helpFile.fileName());
-                my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,SLOT(help()));
+                my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,&nGenericPan::help);
             }
 
             // the hidden gestures of the pans, in a menu
@@ -405,14 +405,14 @@ void nGenericPan::physDel(nPhysD * buffer) {
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
-                disconnect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
-                disconnect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
+                disconnect(combo, &QComboBox::highlighted, this, &nGenericPan::comboChanged);
+                disconnect(combo, &QComboBox::activated, this, &nGenericPan::comboChanged);
             }
             int position=combo->findData(QVariant::fromValue(buffer));
             combo->removeItem(position);
             if (combo->property("neutrinoImage").toBool()) {
-                connect(combo,SIGNAL(highlighted(int)),this, SLOT(comboChanged(int)));
-                connect(combo,SIGNAL(activated(int)),this, SLOT(comboChanged(int)));
+                connect(combo, &QComboBox::highlighted, this, &nGenericPan::comboChanged);
+                connect(combo, &QComboBox::activated, this, &nGenericPan::comboChanged);
             }
         }
     }
@@ -701,7 +701,7 @@ void nGenericPan::closeEvent(QCloseEvent*){
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
             if (combo->property("neutrinoImage").toBool()) {
-                disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
+                disconnect(combo, &QComboBox::currentIndexChanged, this, &nGenericPan::comboChanged); // (never connected)
             }
         }
     }

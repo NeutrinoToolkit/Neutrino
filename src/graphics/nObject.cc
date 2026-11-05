@@ -42,9 +42,9 @@ nObject::nObject(nGenericPan *parentPan, int level, QString cname) : nObject(par
     setProperty("parentPanControlLevel",level);
     if (level>0) {
         my_w.name->setReadOnly(true);
-        disconnect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+        disconnect(my_w.name, &QLineEdit::textChanged, this, &nObject::changeToolTip);
 
-        disconnect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
+        disconnect(my_w.actionRemove, &QAction::triggered, this, &nObject::deleteLater);
         my_w.actionRemove->setVisible(false);
     }
 }
@@ -63,9 +63,9 @@ nObject::nObject(neutrino *my_parent, QString cname) :
         setProperty(my_prop_name.c_str(),num);
 
         setToolTip(cname+QString(" ")+QLocale().toString(num));
-        connect(my_parent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoints(QPointF)));
-        connect(my_parent->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-        connect(my_parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+        connect(my_parent, &neutrino::mouseAtMatrix, this, &nObject::movePoints);
+        connect(my_parent->my_view, &nView::zoomChanged, this, &nObject::zoomChanged);
+        connect(my_parent, &neutrino::bufferChanged, this, &nObject::bufferChanged);
         zoom=my_parent->getZoom();
         if (my_parent->getCurrentBuffer()) {
             bufferChanged(my_parent->getCurrentBuffer());
@@ -96,32 +96,32 @@ nObject::nObject(neutrino *my_parent, QString cname) :
     my_w.spinDepth->setValue(zValue());
     my_w.colorLabel->setPalette(QPalette(nColor));
 
-    connect(my_w.name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    connect(my_w.name, &QLineEdit::textChanged, this, &nObject::changeToolTip);
 
     my_w.name->setText(toolTip());
     my_w.spinSizeHolder->setValue(nSizeHolder);
 
-    connect(my_w.spinWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidthF(double)));
-    connect(my_w.spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-    connect(my_w.colorButton, SIGNAL(pressed()), this, SLOT(changeColor()));
-    connect(my_w.colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-    connect(my_w.spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
-    connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    connect(my_w.spinWidth, &QDoubleSpinBox::valueChanged, this, &nObject::setWidthF);
+    connect(my_w.spinDepth, &QDoubleSpinBox::valueChanged, this, &nObject::setOrder);
+    connect(my_w.colorButton, &QPushButton::pressed, this, qOverload<>(&nObject::changeColor));
+    connect(my_w.colorHolderButton, &QPushButton::pressed, this, qOverload<>(&nObject::changeColorHolder));
+    connect(my_w.spinSizeHolder, &QDoubleSpinBox::valueChanged, this, &nObject::sizeHolder);
+    connect(my_w.tableWidget, &QTableWidget::itemChanged, this, &nObject::tableUpdated);
 
-    connect(my_w.actionFillH, SIGNAL(triggered()), this, SLOT(expandX()));
-    connect(my_w.actionFillV, SIGNAL(triggered()), this, SLOT(expandY()));
-    connect(my_w.actionFillBoth, SIGNAL(triggered()), this, SLOT(expandX()));
-    connect(my_w.actionFillBoth, SIGNAL(triggered()), this, SLOT(expandY()));
-    connect(my_w.actionIntersect, SIGNAL(triggered()), this, SLOT(intersection()));
-    connect(my_w.actionSubmatrix, SIGNAL(triggered()), this, SLOT(submatrix()));
-    connect(my_w.actionRemove, SIGNAL(triggered()), this, SLOT(deleteLater()));
-    connect(my_w.actionCenter, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
+    connect(my_w.actionFillH, &QAction::triggered, this, &nObject::expandX);
+    connect(my_w.actionFillV, &QAction::triggered, this, &nObject::expandY);
+    connect(my_w.actionFillBoth, &QAction::triggered, this, &nObject::expandX);
+    connect(my_w.actionFillBoth, &QAction::triggered, this, &nObject::expandY);
+    connect(my_w.actionIntersect, &QAction::triggered, this, &nObject::intersection);
+    connect(my_w.actionSubmatrix, &QAction::triggered, this, &nObject::submatrix);
+    connect(my_w.actionRemove, &QAction::triggered, this, &nObject::deleteLater);
+    connect(my_w.actionCenter, &QAction::triggered, this, &nObject::centerInBuffer);
 
-    connect(my_w.copyPoints, SIGNAL(released()),this, SLOT(copy_points()));
-    connect(my_w.pastePoints, SIGNAL(released()),this, SLOT(paste_points()));
+    connect(my_w.copyPoints, &QToolButton::released, this, &nObject::copy_points);
+    connect(my_w.pastePoints, &QToolButton::released, this, &nObject::paste_points);
 
-	connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-	connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+	connect(my_w.sizeWidth, &QLineEdit::editingFinished, this, &nObject::changeWidth);
+	connect(my_w.sizeHeight, &QLineEdit::editingFinished, this, &nObject::changeHeight);
 
     updateSize();
 }
@@ -129,26 +129,26 @@ nObject::nObject(neutrino *my_parent, QString cname) :
 void nObject::contextMenuEvent ( QGraphicsSceneContextMenuEvent * e ) {
 	QMenu menu;
 	QAction *expandx = menu.addAction("Expand width (x)");
-	connect(expandx, SIGNAL(triggered()), this, SLOT(expandX()));
+	connect(expandx, &QAction::triggered, this, &nObject::expandX);
 	QAction *expandy = menu.addAction("Expand height (y)");
-	connect(expandy, SIGNAL(triggered()), this, SLOT(expandY()));
+	connect(expandy, &QAction::triggered, this, &nObject::expandY);
 	QAction *expandBoth = menu.addAction("Expand Both (e)");
-	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandX()));
-	connect(expandBoth, SIGNAL(triggered()), this, SLOT(expandY()));
+	connect(expandBoth, &QAction::triggered, this, &nObject::expandX);
+	connect(expandBoth, &QAction::triggered, this, &nObject::expandY);
     QAction *intersect = menu.addAction("Intersection with the image (i)");
-    connect(intersect, SIGNAL(triggered()), this, SLOT(intersection()));
+    connect(intersect, &QAction::triggered, this, &nObject::intersection);
     QAction *centerIt = menu.addAction("Center (c)");
-    connect(centerIt, SIGNAL(triggered()), this, SLOT(centerInBuffer()));
+    connect(centerIt, &QAction::triggered, this, &nObject::centerInBuffer);
     QAction *submat = menu.addAction("Submatrix (s)");
-    connect(submat, SIGNAL(triggered()), this, SLOT(submatrix()));
+    connect(submat, &QAction::triggered, this, &nObject::submatrix);
     menu.addAction(menu.addSeparator());
     QAction *copy = menu.addAction("Copy points (shift-c)");
-    connect(copy, SIGNAL(triggered()), this, SLOT(copy_points()));
+    connect(copy, &QAction::triggered, this, &nObject::copy_points);
     QAction *paste = menu.addAction("Paste points (shift-v)");
-    connect(paste, SIGNAL(triggered()), this, SLOT(paste_points()));
+    connect(paste, &QAction::triggered, this, &nObject::paste_points);
     menu.addAction(menu.addSeparator());
     QAction *showPan = menu.addAction("Show control (w)");
-    connect(showPan, SIGNAL(triggered()), this, SLOT(togglePadella()));
+    connect(showPan, &QAction::triggered, this, &nObject::togglePadella);
 
     menu.exec(e->screenPos());
 }
@@ -195,8 +195,8 @@ void nObject::interactive ( ) {
     showMessage(tr("Click and drag"));
     switch (ref.size()) {
         case 0:
-            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-            connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+            connect(nparent->my_view, &nView::mousePressEvent_sig, this, &nObject::interactive);
+            connect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nObject::interactive);
             appendPoint();
             moveRef << 0 ;
             break;
@@ -205,8 +205,8 @@ void nObject::interactive ( ) {
             moveRef.clear();
             moveRef << 1 ;
         case 2:
-            disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(interactive()));
-            disconnect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(interactive()));
+            disconnect(nparent->my_view, &nView::mousePressEvent_sig, this, &nObject::interactive);
+            disconnect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nObject::interactive);
         default:
             break;
     }
@@ -375,7 +375,7 @@ nObject::changeP (int np, QPointF p, bool updatepad) {
 }
 
 void nObject::changePointPad(int nrow) {
-    disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    disconnect(my_w.tableWidget, &QTableWidget::itemChanged, this, &nObject::tableUpdated);
     QPointF p=ref[nrow]->pos();
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(p.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(p.y()));
@@ -384,7 +384,7 @@ void nObject::changePointPad(int nrow) {
     my_w.tableWidget->setItem(nrow, 0, xitem);
     my_w.tableWidget->setItem(nrow, 1, yitem);
     my_w.tableWidget->resizeRowToContents(nrow);
-    connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    connect(my_w.tableWidget, &QTableWidget::itemChanged, this, &nObject::tableUpdated);
 }
 
 void nObject::addPoint (int pos) {
@@ -412,7 +412,7 @@ void nObject::addPoint (int pos) {
     ref[pos]->setVisible(false);
     ref[pos]->setParentItem(this);
     sizeHolder(nSizeHolder);
-    disconnect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    disconnect(my_w.tableWidget, &QTableWidget::itemChanged, this, &nObject::tableUpdated);
     my_w.tableWidget->insertRow(pos);
     QTableWidgetItem *xitem= new QTableWidgetItem(QLocale().toString(position.x()));
     QTableWidgetItem *yitem= new QTableWidgetItem(QLocale().toString(position.y()));
@@ -421,7 +421,7 @@ void nObject::addPoint (int pos) {
     my_w.tableWidget->setItem(pos, 0, xitem);
     my_w.tableWidget->setItem(pos, 1, yitem);
     my_w.tableWidget->resizeRowToContents(pos);
-    connect(my_w.tableWidget, SIGNAL(itemChanged(QTableWidgetItem * )), this, SLOT(tableUpdated(QTableWidgetItem * )));
+    connect(my_w.tableWidget, &QTableWidget::itemChanged, this, &nObject::tableUpdated);
 }
 
 void nObject::appendPoint () {
@@ -502,12 +502,12 @@ void nObject::changeHeight () {
 }
 
 void nObject::updateSize() {
-    disconnect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-    disconnect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    disconnect(my_w.sizeWidth, &QLineEdit::editingFinished, this, &nObject::changeWidth);
+    disconnect(my_w.sizeHeight, &QLineEdit::editingFinished, this, &nObject::changeHeight);
     my_w.sizeWidth->setText(QLocale().toString(getRectF().width()));
     my_w.sizeHeight->setText(QLocale().toString(getRectF().height()));
-    connect(my_w.sizeWidth, SIGNAL(editingFinished()), this, SLOT(changeWidth()));
-    connect(my_w.sizeHeight, SIGNAL(editingFinished()), this, SLOT(changeHeight()));
+    connect(my_w.sizeWidth, &QLineEdit::editingFinished, this, &nObject::changeWidth);
+    connect(my_w.sizeHeight, &QLineEdit::editingFinished, this, &nObject::changeHeight);
 }
 
 void

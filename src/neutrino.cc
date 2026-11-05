@@ -83,7 +83,7 @@ neutrino::neutrino():
             menuTransformation->setDefaultAction(act);
         }
     }
-    connect(actionFlipRotate, SIGNAL(triggered()), this, SLOT(menuFlipRotate()));
+    connect(actionFlipRotate, &QAction::triggered, this, &neutrino::menuFlipRotate);
 
     QString defualtActionPath=QSettings("neutrino","").value("defualtActionPath", "Rectangle").toString();
 
@@ -97,31 +97,31 @@ neutrino::neutrino():
             menuPath->setDefaultAction(act);
         }
     }
-    connect(actionPaths, SIGNAL(triggered()), this, SLOT(menuPaths()));
+    connect(actionPaths, &QAction::triggered, this, &neutrino::menuPaths);
 
 
-    connect(actionLine, SIGNAL(triggered()), this, SLOT(createDrawLine()));
-    connect(actionRect, SIGNAL(triggered()), this, SLOT(createDrawRect()));
-    connect(actionPoint, SIGNAL(triggered()), this, SLOT(createDrawPoint()));
-    connect(actionEllipse, SIGNAL(triggered()), this, SLOT(createDrawEllipse()));
+    connect(actionLine, &QAction::triggered, this, &neutrino::createDrawLine);
+    connect(actionRect, &QAction::triggered, this, &neutrino::createDrawRect);
+    connect(actionPoint, &QAction::triggered, this, &neutrino::createDrawPoint);
+    connect(actionEllipse, &QAction::triggered, this, &neutrino::createDrawEllipse);
 
-    connect(actionNew, SIGNAL(triggered()), this, SLOT(fileNew()));
-    connect(actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
-    connect(actionOpen_RAW, SIGNAL(triggered()), this, SLOT(openRAW()));
-    connect(actionSave, SIGNAL(triggered()), this, SLOT(fileSave()));
+    connect(actionNew, &QAction::triggered, this, &neutrino::fileNew);
+    connect(actionOpen, &QAction::triggered, this, [this]() { this->fileOpen(); });
+    connect(actionOpen_RAW, &QAction::triggered, this, &neutrino::openRAW);
+    connect(actionSave, &QAction::triggered, this, qOverload<>(&neutrino::fileSave));
 
-    connect(actionReopen_to_saved, SIGNAL(triggered()), this, SLOT(fileReopen()));
+    connect(actionReopen_to_saved, &QAction::triggered, this, &neutrino::fileReopen);
 
-    connect(actionSave_Session, SIGNAL(triggered()), this, SLOT(saveSession()));
+    connect(actionSave_Session, &QAction::triggered, this, [this]() { this->saveSession(); });
 
-    connect(actionExport, SIGNAL(triggered()), this, SLOT(exportGraphics()));
-    connect(actionExport_all, SIGNAL(triggered()), this, SLOT(exportAllGraphics()));
-    connect(actionExport_all_original_name, SIGNAL(triggered()), this, SLOT(exportAllGraphicsOriginalName()));
-    connect(actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+    connect(actionExport, &QAction::triggered, this, qOverload<>(&neutrino::exportGraphics));
+    connect(actionExport_all, &QAction::triggered, this, &neutrino::exportAllGraphics);
+    connect(actionExport_all_original_name, &QAction::triggered, this, &neutrino::exportAllGraphicsOriginalName);
+    connect(actionPrint, &QAction::triggered, this, &neutrino::print);
 
     // connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows())) ;
     // only the Neutrino windows (QApplication::closeAllWindows would also close the other windows of a library user)
-    connect(actionQuit, SIGNAL(triggered()), nCore::self(), SLOT(closeAllWindows())) ;
+    connect(actionQuit, &QAction::triggered, nCore::self(), &nCore::closeAllWindows);
 
     // connect(actionClose, SIGNAL(triggered()), this, SLOT(close()));
     // the close shortcut of the menu (on macOS also in the pans) closes the active window: it was in closeEvent,
@@ -134,66 +134,66 @@ neutrino::neutrino():
             close();
         }
     });
-    connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(actionPreferences, SIGNAL(triggered()), this, SLOT(Preferences()));
+    connect(actionAbout, &QAction::triggered, this, &neutrino::about);
+    connect(actionPreferences, &QAction::triggered, this, &neutrino::Preferences);
 
 
-    connect(actionPrev_Buffer, SIGNAL(triggered()), my_view, SLOT(prevBuffer()));
-    connect(actionNext_Buffer, SIGNAL(triggered()), my_view, SLOT(nextBuffer()));
+    connect(actionPrev_Buffer, &QAction::triggered, my_view, &nView::prevBuffer);
+    connect(actionNext_Buffer, &QAction::triggered, my_view, &nView::nextBuffer);
 
-    connect(actionClose_Buffer, SIGNAL(triggered()), this, SLOT(closeCurrentBuffer()), Qt::UniqueConnection);
+    connect(actionClose_Buffer, &QAction::triggered, this, &neutrino::closeCurrentBuffer, Qt::UniqueConnection);
 
-    connect(actionShow_mouse, SIGNAL(triggered()), my_view, SLOT(nextMouseShape()));
+    connect(actionShow_mouse, &QAction::triggered, my_view, &nView::nextMouseShape);
 
-    connect(actionRescale99, SIGNAL(triggered()), my_view, SLOT(rescale99()));
-    connect(actionRescale_max, SIGNAL(triggered()), my_view, SLOT(rescaleColor()));
+    connect(actionRescale99, &QAction::triggered, my_view, &nView::rescale99);
+    connect(actionRescale_max, &QAction::triggered, my_view, [r=my_view]() { r->rescaleColor(); });
 
-    connect(actionShow_less_pixels, SIGNAL(triggered()), my_view, SLOT(rescaleLess()));
-    connect(actionShow_more_pixels, SIGNAL(triggered()), my_view, SLOT(rescaleMore()));
+    connect(actionShow_less_pixels, &QAction::triggered, my_view, &nView::rescaleLess);
+    connect(actionShow_more_pixels, &QAction::triggered, my_view, &nView::rescaleMore);
 
-    connect(actionShow_ruler, SIGNAL(triggered()), my_view, SLOT(toggleRuler()));
-    connect(actionShow_grid, SIGNAL(triggered()), my_view, SLOT(toggleGrid()));
+    connect(actionShow_ruler, &QAction::triggered, my_view, &nView::toggleRuler);
+    connect(actionShow_grid, &QAction::triggered, my_view, &nView::toggleGrid);
 
-    connect(actionRotate_left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
-    connect(actionRotate_right, SIGNAL(triggered()), this, SLOT(rotateRight()));
-    connect(actionFlip_up_down, SIGNAL(triggered()), this, SLOT(flipUpDown()));
-    connect(actionFlip_left_right, SIGNAL(triggered()), this, SLOT(flipLeftRight()));
-    connect(actionTranspose, SIGNAL(triggered()), this, SLOT(transpose()));
+    connect(actionRotate_left, &QAction::triggered, this, &neutrino::rotateLeft);
+    connect(actionRotate_right, &QAction::triggered, this, &neutrino::rotateRight);
+    connect(actionFlip_up_down, &QAction::triggered, this, &neutrino::flipUpDown);
+    connect(actionFlip_left_right, &QAction::triggered, this, &neutrino::flipLeftRight);
+    connect(actionTranspose, &QAction::triggered, this, &neutrino::transpose);
 
-    connect(actionSet_origin, SIGNAL(triggered()), my_view, SLOT(setMouseOrigin()));
+    connect(actionSet_origin, &QAction::triggered, my_view, &nView::setMouseOrigin);
     // (Alt with Ctrl+0 never triggered the Ctrl+0 shortcut): its own action
-    connect(actionSet_origin_all, SIGNAL(triggered()), my_view, SLOT(setMouseOriginAll()));
+    connect(actionSet_origin_all, &QAction::triggered, my_view, &nView::setMouseOriginAll);
 
-    connect(actionZoom_in, SIGNAL(triggered()), my_view, SLOT(zoomIn()));
-    connect(actionZoom_out, SIGNAL(triggered()), my_view, SLOT(zoomOut()));
-    connect(actionZoom_eq, SIGNAL(triggered()), my_view, SLOT(zoomEq()));
+    connect(actionZoom_in, &QAction::triggered, my_view, &nView::zoomIn);
+    connect(actionZoom_out, &QAction::triggered, my_view, &nView::zoomOut);
+    connect(actionZoom_eq, &QAction::triggered, my_view, &nView::zoomEq);
 
-    connect(actionIncrement, SIGNAL(triggered()), my_view, SLOT(incrGamma()));
-    connect(actionDecrement, SIGNAL(triggered()), my_view, SLOT(decrGamma()));
-    connect(actionReset, SIGNAL(triggered()), my_view, SLOT(resetGamma()));
-    connect(actionCycle_over_items, SIGNAL(triggered()), my_view, SLOT(cycleOverItems()));
+    connect(actionIncrement, &QAction::triggered, my_view, &nView::incrGamma);
+    connect(actionDecrement, &QAction::triggered, my_view, &nView::decrGamma);
+    connect(actionReset, &QAction::triggered, my_view, &nView::resetGamma);
+    connect(actionCycle_over_items, &QAction::triggered, my_view, &nView::cycleOverItems);
 
-    connect(actionNext_LUT, SIGNAL(triggered()), my_view, SLOT(nextColorTable()));
-    connect(actionPrevious_LUT, SIGNAL(triggered()), my_view, SLOT(previousColorTable()));
+    connect(actionNext_LUT, &QAction::triggered, my_view, &nView::nextColorTable);
+    connect(actionPrevious_LUT, &QAction::triggered, my_view, &nView::previousColorTable);
 
     // connect(actionPlugin, SIGNAL(triggered()), this, SLOT(loadPlugin()));
 
 
-    connect(actionLockColors, SIGNAL(toggled(bool)), my_view, SLOT(setLockColors(bool)));
+    connect(actionLockColors, &QAction::toggled, my_view, &nView::setLockColors);
 
-    connect(actionCopy, SIGNAL(triggered()), my_view, SLOT(copyImage()));
-    connect(actionExport_pixmap, SIGNAL(triggered()), my_view, SLOT(exportPixmap()));
+    connect(actionCopy, &QAction::triggered, my_view, &nView::copyImage);
+    connect(actionExport_pixmap, &QAction::triggered, my_view, &nView::exportPixmap);
 
     statusbar->addPermanentWidget(sbarra, 0);
 
     setAttribute(Qt::WA_DeleteOnClose);
     setCentralWidget(centralwidget);
 
-    connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
-    connect(my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(mouseClickPosition(QPointF)));
-    connect(my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
-    connect(my_view, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(emitBufferChanged(nPhysD*)));
-    connect(my_view, SIGNAL(updatecolorbar(QString)), statusbar, SLOT(showMessage(QString)));
+    connect(my_view, &nView::mouseposition, this, &neutrino::mouseposition);
+    connect(my_view, &nView::mousePressEvent_sig, this, &neutrino::mouseClickPosition);
+    connect(my_view, &nView::zoomChanged, this, &neutrino::zoomChanged);
+    connect(my_view, &nView::bufferChanged, this, &neutrino::emitBufferChanged);
+    connect(my_view, &nView::updatecolorbar, statusbar, [this](QString msg) { statusbar->showMessage(msg); });
 
     //recent file stuff
 
@@ -202,7 +202,7 @@ neutrino::neutrino():
     for (int i = 0; i < my_set.value("MaxRecentFiles",20).toInt(); ++i) {
         QAction *act = new QAction(this);
         act->setVisible(false);
-        connect(act, SIGNAL(triggered()),this, SLOT(openRecentFile()));
+        connect(act, &QAction::triggered, this, &neutrino::openRecentFile);
         menuOpen_Recent->addAction(act);
         recentFileActs << act;
     }
@@ -211,7 +211,7 @@ neutrino::neutrino():
     menuOpen_Recent->addSeparator();
     QAction *act = new QAction("Clear Menu", this);
     act->setVisible(true);
-    connect(act, SIGNAL(triggered()),this, SLOT(clearRecentFile()));
+    connect(act, &QAction::triggered, this, &neutrino::clearRecentFile);
     menuOpen_Recent->addAction(act);
 
     updateRecentFileActions();
@@ -227,7 +227,7 @@ neutrino::neutrino():
 
     // autosave config
     QTimer *timerSaveDefaults =  new QTimer(this);
-    connect(timerSaveDefaults, SIGNAL(timeout()), this, SLOT(saveDefaults()));
+    connect(timerSaveDefaults, &QTimer::timeout, this, &neutrino::saveDefaults);
     timerSaveDefaults->start(60000); // 1 min
 
     for (int i=0; i<metaObject()->methodCount(); i++){
@@ -244,9 +244,9 @@ neutrino::neutrino():
     nCore *core=nCore::self();
 
     actionLog_info->setChecked(core->logWin()->isVisible());
-    connect (actionLog_info, SIGNAL(toggled(bool)), core->logWin(), SLOT(setVisible(bool)));
+    connect(actionLog_info, &QAction::toggled, core->logWin(), &QWidget::setVisible);
 
-    connect(actionCheck_for_updates, SIGNAL(triggered()),core,SLOT(checkUpdates()));
+    connect(actionCheck_for_updates, &QAction::triggered, core, &nCore::checkUpdates);
 
     // the next lines should be useful once we get rid of the plugin stuff...
 //#define xxstring(s) xstring(s)
@@ -519,7 +519,7 @@ void neutrino::emitPanAdd(nGenericPan* pan) {
     QVariant v;
     v.setValue(pan);
     act->setData(v);
-    connect(act, SIGNAL(triggered()),pan, SLOT(raiseIt()));
+    connect(act, &QAction::triggered, pan, &nGenericPan::raiseIt);
     menuWindow->addAction(act);
 
     panList.removeAll(pan);
@@ -1174,7 +1174,7 @@ void neutrino::addMenuBuffers (nPhysD* datamatrix) {
     QAction *action=new QAction(this);
     action->setText(menuBufferText(datamatrix));
     action->setData(QVariant::fromValue(datamatrix));
-    connect(action, SIGNAL(triggered()),this, SLOT(openRecentBuffer()));
+    connect(action, &QAction::triggered, this, &neutrino::openRecentBuffer);
     menuBuffers->addAction(action);
 }
 
@@ -1384,13 +1384,13 @@ void neutrino::closeEvent (QCloseEvent *e) {
 //        e->ignore();
 //    }
     // (the active window is closed by actionClose)
-    disconnect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+    disconnect(my_view, &nView::mouseposition, this, &neutrino::mouseposition);
     if (fileClose()) {
         saveDefaults();
         e->accept();
     } else {
         e->ignore();
-        connect(my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(mouseposition(QPointF)));
+        connect(my_view, &nView::mouseposition, this, &neutrino::mouseposition);
     }
 }
 
@@ -1865,8 +1865,8 @@ void neutrino::about() {
     QDialog myabout(this);
     Ui::nAbout my_about;
     my_about.setupUi(&myabout);
-    connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
-    connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
+    connect(my_about.buttonBox, &QDialogButtonBox::accepted, &myabout, &QDialog::close);
+    connect(my_about.buttonBox, &QDialogButtonBox::rejected, &myabout, &QDialog::close);
 
     my_about.version->setText(QString(neutrinoVersion)+" ("+QApplication::applicationVersion()+")"); // version (git sha)
     QDirIterator it(":licenses/", QDirIterator::Subdirectories);

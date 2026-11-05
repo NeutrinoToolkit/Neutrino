@@ -64,9 +64,9 @@ nPoint::nPoint(neutrino *my_parent) :
 	setOrder(0.0);
 	setToolTip(tr("point")+QString(" ")+QLocale().toString(num));
 
-    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(movePoint(QPointF)));
+    connect(nparent, &neutrino::mouseAtMatrix, this, &nPoint::movePoint);
 
-    connect(nparent->my_view, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+    connect(nparent->my_view, &nView::zoomChanged, this, &nPoint::zoomChanged);
 
     zoom=nparent->getZoom();
 
@@ -76,20 +76,20 @@ nPoint::nPoint(neutrino *my_parent) :
 	my_pad.setWindowIcon(QIcon(":center"));
     my_w->setupUi(&my_pad);
 
-    connect(my_w->name, SIGNAL(textChanged(QString)), this, SLOT(changeToolTip(QString)));
+    connect(my_w->name, &QLineEdit::textChanged, this, &nPoint::changeToolTip);
 
     my_w->name->setText(toolTip());
     my_w->spinSizeHolder->setValue(nSizeHolder);
     my_w->colorHolderLabel->setPalette(QPalette(holderColor));
 
-    connect(my_w->spinDepth, SIGNAL(valueChanged(double)), this, SLOT(setOrder(double)));
-    connect(my_w->colorHolderButton, SIGNAL(pressed()), this, SLOT(changeColorHolder()));
-    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->spinDepth, &QDoubleSpinBox::valueChanged, this, &nPoint::setOrder);
+    connect(my_w->colorHolderButton, &QPushButton::pressed, this, qOverload<>(&nPoint::changeColorHolder));
+    connect(my_w->spinSizeHolder, &QDoubleSpinBox::valueChanged, this, &nPoint::sizeHolder);
 	
-    connect(my_w->spinSizeHolder, SIGNAL(valueChanged(double)), this, SLOT(sizeHolder(double)));
+    connect(my_w->spinSizeHolder, &QDoubleSpinBox::valueChanged, this, &nPoint::sizeHolder);
 
-    connect(my_w->xPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
-    connect(my_w->yPos, SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
+    connect(my_w->xPos, &QLineEdit::textChanged, this, &nPoint::changePos);
+    connect(my_w->yPos, &QLineEdit::textChanged, this, &nPoint::changePos);
 	
 	QBrush refBrush;
 	refBrush.setStyle(Qt::SolidPattern);
@@ -102,7 +102,7 @@ nPoint::nPoint(neutrino *my_parent) :
 	ref.setParentItem(this);
 	sizeHolder(nSizeHolder);
 	
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(bufferChanged(nPhysD*)));
+    connect(nparent, &neutrino::bufferChanged, this, &nPoint::bufferChanged);
 
 	moveRef=false;
 }
@@ -125,13 +125,13 @@ void nPoint::bufferChanged(nPhysD* my_phys) {
 
 void nPoint::interactive ( ) {
     showMessage(tr("Click for the first point"));
-    connect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    connect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nPoint::addPointAfterClick);
 }
 
 void nPoint::addPointAfterClick ( QPointF p) {
 	setPoint(p);
 	showMessage(tr("Point added"));
-    disconnect(nparent->my_view, SIGNAL(mouseReleaseEvent_sig(QPointF)), this, SLOT(addPointAfterClick(QPointF)));
+    disconnect(nparent->my_view, &nView::mouseReleaseEvent_sig, this, &nPoint::addPointAfterClick);
 }
 
 void nPoint::mousePressEvent ( QGraphicsSceneMouseEvent * e ) {
@@ -233,14 +233,15 @@ nPoint::setPoint (QPointF p) {
 void nPoint::changePos(QString valStr) {
 	bool ok;
     double val=QLocale().toDouble(valStr,&ok);
-	if (ok) {
-		disconnect(sender(), SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
+	QLineEdit *edit=qobject_cast<QLineEdit*>(sender());
+	if (ok && edit) {
+		disconnect(edit, &QLineEdit::textChanged, this, &nPoint::changePos);
         if (sender()==my_w->xPos) {
 			setPoint(QPointF(val,ref.pos().y()));
         } else if (sender()==my_w->yPos) {
 			setPoint(QPointF(ref.pos().x(),val));
 		}
-		connect(sender(), SIGNAL(textChanged(QString)), this, SLOT(changePos(QString)));
+		connect(edit, &QLineEdit::textChanged, this, &nPoint::changePos);
 	}
 }
 

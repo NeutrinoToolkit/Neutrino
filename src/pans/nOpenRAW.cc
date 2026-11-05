@@ -32,7 +32,7 @@
 nOpenRAW::nOpenRAW(neutrino *nparent) : nGenericPan(nparent)
 {
     setupUi(this);
-    connect(okButton, SIGNAL(pressed()), this, SLOT(doOpen()));
+    connect(okButton, &QPushButton::pressed, this, &nOpenRAW::doOpen);
     show();
 }
 
