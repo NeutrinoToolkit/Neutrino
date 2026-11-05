@@ -131,7 +131,7 @@ void OpenHdf5::addNode(QTreeWidgetItem *item, const nHdf5::Node &node) {
 
 void OpenHdf5::showFile(QString fname) {
     statusbar->showMessage("Parsing "+fname);
-    QApplication::processEvents();
+    statusbar->repaint(); // the message, before the parsing (no processEvents)
     // for (int i=0;i<treeWidget->topLevelItemCount();i++) {
     // (deleting while going forward skipped the next item)
     for (int i=treeWidget->topLevelItemCount()-1;i>=0;i--) {
@@ -391,7 +391,7 @@ void OpenHdf5::openData(QTreeWidgetItem *item, int) {
 
 void OpenHdf5::showFile(QString fname) {
     statusbar->showMessage("Parsing "+fname);
-    QApplication::processEvents();
+    statusbar->repaint(); // the message, before the parsing (no processEvents)
     for (int i=0;i<treeWidget->topLevelItemCount();i++) {
         QTreeWidgetItem *item=treeWidget->topLevelItem(i);
         if (item->data(3,0).toString()==fname) {
@@ -712,7 +712,6 @@ void OpenHdf5::scanGroup(hid_t gid, QTreeWidgetItem *parentItem) {
             break;
         }
     }
-    QApplication::processEvents();
 }
 
 

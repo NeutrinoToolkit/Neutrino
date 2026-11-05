@@ -46,7 +46,6 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
 
     connect(my_w.plot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
     show();
-    QApplication::processEvents();
     calculate_stats();
 
 }

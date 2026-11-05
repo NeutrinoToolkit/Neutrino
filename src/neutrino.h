@@ -87,7 +87,6 @@ public slots:
 
     void setGamma(int value);
 
-    void processEvents();
     void contextMenuEvent(QContextMenuEvent *);
     void menuFlipRotate();
     void rotateLeft();

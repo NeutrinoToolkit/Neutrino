@@ -139,7 +139,6 @@ void nCustomPlot::contextMenuEvent (QContextMenuEvent *) {
     foreach (QMainWindow *prefTmp, findChildren<QMainWindow *>()) {
         if(prefTmp->windowTitle() == winTitle) {
             prefTmp->close();
-            QApplication::processEvents();
         }
     }
 

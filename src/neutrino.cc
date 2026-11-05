@@ -224,7 +224,6 @@ neutrino::neutrino():
     // scanPlugins();
     addPluginActions();
 
-    QApplication::processEvents();
 
     // autosave config
     QTimer *timerSaveDefaults =  new QTimer(this);
@@ -297,9 +296,6 @@ void neutrino::on_actionOpen_Glob_triggered () {
 }
 
 
-
-void neutrino::processEvents()
-{ QApplication::processEvents(); }
 
 void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
     QMenu *my_menu=new QMenu(this);
@@ -514,9 +510,7 @@ void neutrino::emitBufferChanged(nPhysD *my_phys) {
         }
     }
     my_view->update();
-    QApplication::processEvents();
     emit bufferChanged(my_phys);
-    QApplication::processEvents();
 }
 
 void neutrino::emitPanAdd(nGenericPan* pan) {
@@ -822,7 +816,6 @@ QList <nPhysD *> neutrino::fileOpen(QString fname) {
 
         my_neu->updateRecentFileActions(fname);
 
-        QApplication::processEvents();
     } else {
         QString formats("Neutrino Images (");
         for (auto &format : physFormat::phys_image_open_formats()) {
@@ -871,7 +864,6 @@ void neutrino::setPanData(std::string panstring){
             nGenericPan *my_pan=openPan(pName, false);
 
             if (my_pan) {
-                QApplication::processEvents();
                 QTemporaryFile tmpFile(this);
                 // tmpFile.open();
                 if (!tmpFile.open()) {
@@ -889,9 +881,7 @@ void neutrino::setPanData(std::string panstring){
                     tmpFile.write("\n");
                 }
                 tmpFile.flush();
-                QApplication::processEvents();
                 QMetaObject::invokeMethod(my_pan,"loadSettings",Q_ARG(QString,tmpFile.fileName()));
-                QApplication::processEvents();
                 tmpFile.close(); // this should also remove it...
                 my_pan->raiseIt();
             } else {
@@ -1666,17 +1656,11 @@ neutrino::fileClose() {
     }
     my_set.endGroup();
 
-    QApplication::processEvents();
-    for (auto &pan : getPanList()) {
-        qDebug() << pan->windowTitle();
-    }
     for (auto &pan : getPanList()) {
         pan->hide();
         pan->close();
-        QApplication::processEvents();
     }
 
-    QApplication::processEvents();
 
     deleteLater();
     return true;
@@ -1991,7 +1975,6 @@ nGenericPan* neutrino::openPan(QString pName, bool force) {
             my_pan=plug->create(this);
         }
     }
-    QApplication::processEvents();
 
     if (force && my_pan==nullptr) {
         my_pan=new nGenericPan(this);

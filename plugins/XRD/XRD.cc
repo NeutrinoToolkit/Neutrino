@@ -49,7 +49,6 @@ XRD::XRD(neutrino *parent) : nGenericPan(parent) {
 
     show(true);
 
-    QApplication::processEvents();
 
     connect(source, &QAbstractButton::released, this, &XRD::showSource);
 
@@ -148,7 +147,6 @@ void XRD::loadSettings(QSettings &my_settings) {
     nGenericPan::loadSettings(my_settings); // widgets (angle, flips, image...), regions, properties
 
     on_cropAll_triggered();
-    QApplication::processEvents();
     showSource();
 }
 

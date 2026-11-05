@@ -113,7 +113,6 @@ void nGenericPan::physAdd(nPhysD *buffer) {
             }
         }
     }
-    QApplication::processEvents();
 }
 
 
@@ -122,7 +121,6 @@ void nGenericPan::raiseNeutrino() {
         nparent->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
         nparent->raise();  // for MacOS
         nparent->activateWindow(); // for Windows
-        QApplication::processEvents();
     }
 }
 
@@ -210,7 +208,6 @@ void nGenericPan::show(bool onlyOneAllowed) {
             qDebug() << this << pan;
             if (pan!=this && pan->metaObject()->className() == metaObject()->className()) {
                 pan->close();
-                QApplication::processEvents();
             }
         }
     }
@@ -293,9 +290,7 @@ void nGenericPan::show(bool onlyOneAllowed) {
     // Alt alone (e.g. Alt+click on the menu) opens the pan without its saved values;
     // not Ctrl+Alt: it is held by the shortcuts of some plugins (ZoomWin Ctrl+Alt+Z, Colorscale Ctrl+Alt+C...)
     if (QGuiApplication::keyboardModifiers() != Qt::AltModifier) {
-        QApplication::processEvents();
         loadDefaults();
-        QApplication::processEvents();
     }
     nparent->emitPanAdd(this);
 
@@ -367,8 +362,6 @@ nPhysD* nGenericPan::getPhysFromCombo(QComboBox* combo) {
 
 void
 nGenericPan::loadUi(QSettings &settings) {
-    repaint();
-    QApplication::processEvents();
     foreach (QLineEdit *widget, findChildren<QLineEdit *>()) {
         if (widget->property("neutrinoSave").isValid() && widget->property("neutrinoSave").toBool()) {
             widget->setText(settings.value(widget->objectName(),widget->text()).toString());
@@ -613,7 +606,6 @@ void nGenericPan::closeEvent(QCloseEvent*){
     saveDefaults();
     foreach (QObject* widget, nparent->children()) {
         if (widget->parent()==this) {
-            QApplication::processEvents();
             nLine *line=qobject_cast<nLine *>(widget);
             if (line) {
                 line->my_pad.hide();
@@ -634,7 +626,6 @@ void nGenericPan::closeEvent(QCloseEvent*){
                 elli->my_pad.hide();
                 elli->deleteLater();
             }
-            QApplication::processEvents();
         }
     }
 //    foreach (QWidget *widget, QApplication::allWidgets()) {
@@ -655,7 +646,6 @@ void nGenericPan::closeEvent(QCloseEvent*){
 //        }
 //    }
     nparent->emitPanDel(this);
-    QApplication::processEvents();
     deleteLater();
 }
 
@@ -1171,7 +1161,6 @@ QList<QList<qreal> >  nGenericPan::getData(QString name, int occurrence) {
 }
 
 void nGenericPan::button(QString name , int occurrence) {
-    QApplication::processEvents();
     int my_occurrence;
     my_occurrence=1;
     foreach (QPushButton *obj, findChildren<QPushButton *>()) {

@@ -172,7 +172,6 @@ void Integral_inversion::doInversion() {
 		DEBUG(5,"about to launch thread");
 
 			// apply physics
-		QApplication::processEvents();		
 
         if (nThread.n_iter==-1) {
             statusBar()->showMessage("Inversion stopped", 5000);

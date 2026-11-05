@@ -329,7 +329,6 @@ void MUSE::showImagePlane(int z) {
 		plot->setMousePosition(xvals[z]);
 		setstatusbar();
 	}
-	QApplication::processEvents();
 	connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 	connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
 }
@@ -401,7 +400,6 @@ void MUSE::openCube() {
 
     if (!fname.isEmpty()) {
         fd.close();
-		QApplication::processEvents();
         setProperty("NeuSave-fileMUSE", fname);
 
 

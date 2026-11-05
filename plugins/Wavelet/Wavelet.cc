@@ -104,7 +104,6 @@ void Wavelet::physDel(nPhysD* buf) {
 
 
 void Wavelet::guessCarrier() {
-    QApplication::processEvents();
     nPhysD *my_phys=getPhysFromCombo(image);
     if (my_phys) {
         QRect geom2=region.getRect(my_phys);
@@ -218,7 +217,6 @@ void Wavelet::doWavelet () {
                 }
             }
         }
-        QApplication::processEvents();
         
         for(auto &itr: waveletPhys) {
             if (itr.first=="phase_2pi") {
@@ -255,7 +253,6 @@ void Wavelet::doWavelet () {
     } else {
         statusbar->showMessage("Canceled", 5000);
     }
-    QApplication::processEvents();
     setEnabled(true);
 }
 

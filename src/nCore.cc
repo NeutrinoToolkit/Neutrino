@@ -335,7 +335,6 @@ void nCore::closeAllWindows() {
     for(auto &neu : neus()) {
         neu->close();
     }
-    QCoreApplication::processEvents();
     saveLogSettings();
 };
 
