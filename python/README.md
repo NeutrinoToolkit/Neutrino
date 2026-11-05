@@ -82,7 +82,7 @@ Tools: `neutrino.Pan`
 * `p.widget()` the PySide6 `QMainWindow` of the tool (e.g. `p.widget().findChild(QSpinBox, "name")`, or
   `p.widget().setCentralWidget(my_widget)` in a pan of `w.newPan`); `p.show()` and not `p.widget().show()`: it also
   sets the title and the saved values, as for the other pans. A `QToolBar` added before `p.show()` with
-  `setObjectName("toolBar")` gets the buttons of the pans (Raise viewer, preferences, help)
+  `setObjectName("toolBar")` gets the buttons of the pans (preferences, help and the gear menu: raise viewer, copy as python, widget names, screenshot, reset)
 * its slots by name, Qt properties with `p.property(name)`, `p.setProperty(name, value)`
 
 From PyShell

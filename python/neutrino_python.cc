@@ -607,6 +607,7 @@ NB_MODULE(_neutrino, m) {
     });
     nb::module_::import_("atexit").attr("register")(m.attr("_cleanup"));
 
+    m.attr("__version__")=nb::str(neutrinoVersion); // 3.2.0: as the wheel (python/ci/version.py)
     m.def("version", []() { return std::string(SHAVERSION__); }, "The git sha of Neutrino");
     m.def("qtVersion", []() { return std::string(qVersion()); }, "The version of the Qt library of Neutrino");
 
