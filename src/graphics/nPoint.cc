@@ -22,10 +22,15 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include "nCore.h"
 #include "nPoint.h"
 #include "neutrino.h"
 #include "ui_nPoint.h"
 #include <iostream>
+
+nPoint::~nPoint() {
+    nCore::disconnectChildren(&my_pad, this); // its widgets are destroyed after this (see nCore::disconnectChildren)
+}
 
 nPoint::nPoint(nGenericPan *parentPan, int level) : nPoint(parentPan->nparent)
 {

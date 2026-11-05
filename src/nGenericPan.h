@@ -161,6 +161,9 @@ public slots:
     void show(bool onlyOneAllowed=false);
 
     void keyPressEvent(QKeyEvent *event) override;
+    // the deleteLater of the pan: its children are destroyed after the destructors of the plugin and their signals
+    // (destroyed, currentChanged of the tabs...) must not reach its slots (function pointer connections call them)
+    bool event(QEvent *event) override;
     void print();
 
 

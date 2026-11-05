@@ -49,7 +49,7 @@ public:
     nPoint(neutrino * = nullptr);
     nPoint(nGenericPan*, int level);
 
-    ~nPoint() override {};
+    ~nPoint() override;
 	
     neutrino *nparent;
 	

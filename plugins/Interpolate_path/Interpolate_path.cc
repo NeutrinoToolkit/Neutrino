@@ -53,10 +53,10 @@ Interpolate_path::Interpolate_path(neutrino *nparent) : nGenericPan(nparent)
 
     show();
 
-    connect(actionRegion, SIGNAL(triggered()), region, SLOT(togglePadella()));
-    connect(actionBezier, SIGNAL(triggered()), region, SLOT(toggleBezier()));
+    connect(actionRegion, &QAction::triggered, region, &nLine::togglePadella);
+    connect(actionBezier, &QAction::triggered, region, qOverload<>(&nLine::toggleBezier));
 
-    connect(doInterpolate, SIGNAL(clicked()), SLOT(doIt()));
+    connect(doInterpolate, &QPushButton::clicked, this, &Interpolate_path::doIt);
     // the weight is the exponent of the inverse distance method only
     connect(method, &QComboBox::currentIndexChanged, this, [this](int) { weight->setEnabled(method->currentText()=="Inverse distance"); });
     weight->setEnabled(method->currentText()=="Inverse distance");

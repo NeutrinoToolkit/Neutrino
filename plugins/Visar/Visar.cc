@@ -120,53 +120,53 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
         addVisar();
     }
 
-    connect(actionDoWavelets, SIGNAL(triggered()), this, SLOT(doWave()));
-    connect(actionAddVisar, SIGNAL(triggered()), this, SLOT(addVisar()));
+    connect(actionDoWavelets, &QAction::triggered, this, qOverload<>(&Visar::doWave));
+    connect(actionAddVisar, &QAction::triggered, this, &Visar::addVisar);
     connect(actionDelVisar, &QAction::triggered, this, &Visar::delVisarAsk);
 
-    connect(actionSaveTxt, SIGNAL(triggered()), this, SLOT(export_txt()));
-    connect(actionSaveTxtMultiple, SIGNAL(triggered()), this, SLOT(export_txt_multiple()));
-    connect(actionCopy, SIGNAL(triggered()), this, SLOT(export_clipboard()));
-    connect(actionCopyImage, SIGNAL(triggered()), this, SLOT(copy_image()));
+    connect(actionSaveTxt, &QAction::triggered, this, &Visar::export_txt);
+    connect(actionSaveTxtMultiple, &QAction::triggered, this, &Visar::export_txt_multiple);
+    connect(actionCopy, &QAction::triggered, this, &Visar::export_clipboard);
+    connect(actionCopyImage, &QAction::triggered, this, &Visar::copy_image);
 
     connect(etalon_thickness, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
     connect(etalon_dn_over_dlambda, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
     connect(etalon_n0, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
     connect(etalon_lambda, &QDoubleSpinBox::valueChanged, this, &Visar::calculate_etalon);
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(setObjectVisibility(nPhysD*)));
+    connect(nparent, &neutrino::bufferChanged, this, &Visar::setObjectVisibility);
     // shot or reference modified (or replaced in place) by another plugin
     connect(nparent, &neutrino::physChanged, this, &Visar::imageChanged);
 
-    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(tabPhase, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    connect(tabVelocity, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tabs, &QTabWidget::currentChanged, this, &Visar::tabChanged);
+    connect(tabPhase, &QTabWidget::currentChanged, this, &Visar::tabChanged);
+    connect(tabVelocity, &QTabWidget::currentChanged, this, &Visar::tabChanged);
 
-    connect(sopRect, SIGNAL(sceneChanged()), this, SLOT(updatePlotSOP()));
-    connect(sopRef, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopShot, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopTimeOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopOffset, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopOrigin, SIGNAL(valueChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(sopCalibT0, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(sopCalibA, SIGNAL(valueChanged(double)), this, SLOT(updatePlotSOP()));
-    connect(whichRefl, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlotSOP()));
-    connect(enableSOP, SIGNAL(toggled(bool)), this, SLOT(updatePlotSOP()));
+    connect(sopRect, &nRect::sceneChanged, this, &Visar::updatePlotSOP);
+    connect(sopRef, &QComboBox::currentIndexChanged, this, &Visar::updatePlotSOP);
+    connect(sopShot, &QComboBox::currentIndexChanged, this, &Visar::updatePlotSOP);
+    connect(sopTimeOffset, &QDoubleSpinBox::valueChanged, this, &Visar::updatePlotSOP);
+    connect(sopOffset, &QDoubleSpinBox::valueChanged, this, &Visar::updatePlotSOP);
+    connect(sopOrigin, &QSpinBox::valueChanged, this, &Visar::updatePlotSOP);
+    connect(sopDirection, &QComboBox::currentIndexChanged, this, &Visar::updatePlotSOP);
+    connect(sopCalibT0, &QDoubleSpinBox::valueChanged, this, &Visar::updatePlotSOP);
+    connect(sopCalibA, &QDoubleSpinBox::valueChanged, this, &Visar::updatePlotSOP);
+    connect(whichRefl, &QComboBox::currentIndexChanged, this, &Visar::updatePlotSOP);
+    connect(enableSOP, &QCheckBox::toggled, this, &Visar::updatePlotSOP);
 
-    connect(actionRefreshComboShot, SIGNAL(triggered()), this, SLOT(fillComboShot()));
+    connect(actionRefreshComboShot, &QAction::triggered, this, &Visar::fillComboShot);
 
-    connect(plotVelocity,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
-    connect(sopPlot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(plotVelocity, &VisarPlot::mouseMove, this, &Visar::mouseAtPlot);
+    connect(sopPlot, &nSOPPlot::mouseMove, this, &Visar::mouseAtPlot);
     connect(sopScale, &QLineEdit::editingFinished, this, &Visar::sweepChangedSOP);
     connect(sopScaleType, &QComboBox::currentIndexChanged, this, &Visar::sweepChangedSOP);
 
-    connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+    connect(comboShot, &QComboBox::currentTextChanged, this, &Visar::changeShot);
 
-    connect(globDirRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
-    connect(globDirShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
-    connect(globRef, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
-    connect(globShot, SIGNAL(textChanged(QString)), this, SLOT(fillComboShot()));
+    connect(globDirRef, &QLineEdit::textChanged, this, &Visar::fillComboShot);
+    connect(globDirShot, &QLineEdit::textChanged, this, &Visar::fillComboShot);
+    connect(globRef, &QLineEdit::textChanged, this, &Visar::fillComboShot);
+    connect(globShot, &QLineEdit::textChanged, this, &Visar::fillComboShot);
     connect(globRefresh, &QAbstractButton::released, this, [this]() { refreshGlob(-1); });
 
     loadDefaults();
@@ -282,7 +282,7 @@ void Visar::changeShot(QString num) {
 }
 
 void Visar::fillComboShot() {
-    disconnect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+    disconnect(comboShot, &QComboBox::currentTextChanged, this, &Visar::changeShot);
     QString oldvalue=comboShot->currentText();
 
     QSet<QString> match;
@@ -362,7 +362,7 @@ void Visar::fillComboShot() {
     }
     comboShot->setEnabled(match.size()!=0);
     statusbar->showMessage("Found "+QString::number(my_list.size())+" images");
-    connect(comboShot, SIGNAL(currentTextChanged(QString)), this, SLOT(changeShot(QString)));
+    connect(comboShot, &QComboBox::currentTextChanged, this, &Visar::changeShot);
 }
 
 // (no QApplication::processEvents() around fileOpen: see changeShot)
@@ -574,7 +574,7 @@ void Visar::addVisar() {
     connect(ui_settings->physScale, &QLineEdit::editingFinished, c, sweepK);
     connect(ui_settings->physScaleType, &QComboBox::currentIndexChanged, c, sweepK);
 
-    connect(ui_settings->plotPhaseIntensity, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(ui_settings->plotPhaseIntensity, &VisarPhasePlot::mouseMove, this, &Visar::mouseAtPlot);
 
     connect(ui_settings->interfringe, &QDoubleSpinBox::valueChanged, c, needWaveK);
     connect(ui_settings->angle, &QDoubleSpinBox::valueChanged, c, needWaveK);
@@ -588,8 +588,8 @@ void Visar::addVisar() {
     connect(c->maskRegion, &nLine::sceneChanged, c, needWaveK);
 
     connect(ui_settings->DeghostCheck, &QCheckBox::toggled, c, [c](bool checked) { c->maskRegion->setVisible(checked); });
-    connect(ui_settings->Deghost, SIGNAL(released()), c->maskRegion, SLOT(togglePadella()));
-    connect(ui_settings->fringeRegion, SIGNAL(released()), c->fringeRect, SLOT(togglePadella()));
+    connect(ui_settings->Deghost, &QToolButton::released, c->maskRegion, &nLine::togglePadella);
+    connect(ui_settings->fringeRegion, &QToolButton::released, c->fringeRect, &nRect::togglePadella);
 
     connect(ui_settings->globDirRef, &QLineEdit::textChanged, this, &Visar::fillComboShot);
     connect(ui_settings->globDirShot, &QLineEdit::textChanged, this, &Visar::fillComboShot);
@@ -1462,7 +1462,7 @@ void Visar::doWave(unsigned int k) {
                 visars[k]->intensity[m]= imgs[m]->copy();
                 progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-                physMath::phys_fast_gaussian_blur(visars[k]->intensity[m], visars[k]->settingsUi->resolution->value());
+                physMath::phys_fast_gaussian_blur(visars[k]->intensity[m], visars[k]->settingsUi->resolution->value()/2);
                 progress.setValue(progress.value()+1);
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
                 zz_morlet[m].resize(dx,dy);

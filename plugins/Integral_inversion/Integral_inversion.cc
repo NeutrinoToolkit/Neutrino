@@ -36,21 +36,21 @@ Integral_inversion::Integral_inversion(neutrino *nparent)
 	axis->forceMonotone = true;
 	axis->setPoints(QPolygonF()<<QPointF(10, 10)<<QPointF(50, 50));
 
-	connect(axis, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
+	connect(axis, &nLine::sceneChanged, this, &Integral_inversion::sceneChanged);
 
 	QDoubleValidator *dVal = new QDoubleValidator(this);
 	dVal->setNotation(QDoubleValidator::ScientificNotation);
     molarRefr_le->setValidator(dVal);
     molarRefr_le->setText(QLocale().toString(5.23e-7));
 
-    connect(actionLine, SIGNAL(triggered()), axis, SLOT(togglePadella()));
-    connect(actionFlipline, SIGNAL(triggered()), axis, SLOT(switchOrdering()));
-    connect(actionBezier, SIGNAL(triggered()), axis, SLOT(toggleBezier()));
-    connect(refphase_checkb, SIGNAL(stateChanged(int)), this, SLOT(refphase_checkbChanged(int)));
+    connect(actionLine, &QAction::triggered, axis, &nLine::togglePadella);
+    connect(actionFlipline, &QAction::triggered, axis, &nLine::switchOrdering);
+    connect(actionBezier, &QAction::triggered, axis, qOverload<>(&nLine::toggleBezier));
+    connect(refphase_checkb, &QCheckBox::toggled, this, [this](bool on) { refphase_checkbChanged(on ? Qt::Checked : Qt::Unchecked); });
 
-    connect(doInversionB, SIGNAL(clicked()), SLOT(doInversion()));
+    connect(doInversionB, &QPushButton::clicked, this, &Integral_inversion::doInversion);
 
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent, &neutrino::physDel, this, &Integral_inversion::physDel);
 
     invAlgo_cb->addItem("Abel", QVariant::fromValue(10));
     invAlgo_cb->addItem("Abel-HF (experimental!)", QVariant::fromValue(20));

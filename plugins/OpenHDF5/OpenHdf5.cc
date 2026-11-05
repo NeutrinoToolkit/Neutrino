@@ -36,14 +36,14 @@ OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
     setupUi(this);
     treeWidget->setColumnHidden((treeWidget->columnCount()-1),true);
 
-    connect(actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
-    connect(actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
-    connect(actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
-    connect(actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
-    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
-    connect(treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
+    connect(actionOpen, &QAction::triggered, this, qOverload<>(&OpenHdf5::showFile));
+    connect(actionClose, &QAction::triggered, this, &OpenHdf5::removeFile);
+    connect(actionCopy, &QAction::triggered, this, &OpenHdf5::copyPath);
+    connect(actionSave, &QAction::triggered, this, &OpenHdf5::saveFile);
+    connect(treeWidget, &QTreeWidget::itemDoubleClicked, this, &OpenHdf5::openData);
+    connect(treeWidget, &QTreeWidget::itemPressed, this, &OpenHdf5::itemEntered);
     treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
+    connect(treeWidget, &QTreeWidget::customContextMenuRequested, this, &OpenHdf5::contextMenu);
 
     setProperty("NeuSave-fileHDF","nHDF.h5");
 
@@ -225,7 +225,7 @@ QMenu *OpenHdf5::dataMenu(QTreeWidgetItem *item) {
     default:
         break;
     }
-    menu->addAction(tr("Copy path"), this, SLOT(copyPath()));
+    menu->addAction(tr("Copy path"), this, &OpenHdf5::copyPath);
     return menu;
 }
 
@@ -344,11 +344,11 @@ OpenHdf5::OpenHdf5(neutrino *nparent) : nGenericPan(nparent)
     setupUi(this);
     treeWidget->setColumnHidden((treeWidget->columnCount()-1),true);
 
-    connect(actionOpen, SIGNAL(triggered()), this, SLOT(showFile()));
-    connect(actionClose, SIGNAL(triggered()), this, SLOT(removeFile()));
-    connect(actionCopy, SIGNAL(triggered()), this, SLOT(copyPath()));
-    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(openData(QTreeWidgetItem*, int)));
-    connect(treeWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this, SLOT(itemEntered(QTreeWidgetItem*, int)));
+    connect(actionOpen, &QAction::triggered, this, qOverload<>(&OpenHdf5::showFile));
+    connect(actionClose, &QAction::triggered, this, &OpenHdf5::removeFile);
+    connect(actionCopy, &QAction::triggered, this, &OpenHdf5::copyPath);
+    connect(treeWidget, &QTreeWidget::itemDoubleClicked, this, &OpenHdf5::openData);
+    connect(treeWidget, &QTreeWidget::itemPressed, this, &OpenHdf5::itemEntered);
 
     setProperty("NeuSave-fileHDF","nHDF.h5");
 

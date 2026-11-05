@@ -47,23 +47,23 @@ public:
     {
         my_w.setupUi(this);
 
-        connect(my_w.actionToggleZoom,SIGNAL(triggered()), this, SLOT(updatePlot()));
+        connect(my_w.actionToggleZoom, &QAction::triggered, this, [this]() { updatePlot(); });
 
         // connect(parent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
         // (same signal as the nparent one below: every buffer change replotted twice)
 
         // connect(my_w.actionLockClick,SIGNAL(triggered()), this, SLOT(setBehaviour()));
         // toggled: also emitted when the state is restored from the settings (setChecked)
-        connect(my_w.actionLockClick,SIGNAL(toggled(bool)), this, SLOT(setBehaviour()));
+        connect(my_w.actionLockClick, &QAction::toggled, this, &nLineout::setBehaviour);
 
         // connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
-        connect(my_w.actionLockColors, SIGNAL(toggled(bool)), this, SLOT(lockColors(bool)));
+        connect(my_w.actionLockColors, &QAction::toggled, this, &nLineout::lockColors);
 
-        connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
+        connect(nparent, &neutrino::bufferChanged, this, [this]() { updatePlot(); });
 
         // in zoom mode the plot covers the visible part of the image: follow the scrollbars too
-        connect(nparent->my_view->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(viewChanged()));
-        connect(nparent->my_view->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(viewChanged()));
+        connect(nparent->my_view->horizontalScrollBar(), &QScrollBar::valueChanged, this, &nLineout::viewChanged);
+        connect(nparent->my_view->verticalScrollBar(), &QScrollBar::valueChanged, this, &nLineout::viewChanged);
 
         my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
         my_w.plot->graph(0)->setPen(QPen(Qt::black));
@@ -175,11 +175,11 @@ public slots:
 
     void setBehaviour() {
         if (my_w.actionLockClick->isChecked()) {
-            disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
+            disconnect(nparent->my_view, &nView::mouseposition, this, &nLineout::updatePlot);
+            connect(nparent->my_view, &nView::mousePressEvent_sig, this, &nLineout::updatePlot, Qt::UniqueConnection);
         } else {
-            disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-            connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
+            disconnect(nparent->my_view, &nView::mousePressEvent_sig, this, &nLineout::updatePlot);
+            connect(nparent->my_view, &nView::mouseposition, this, &nLineout::updatePlot, Qt::UniqueConnection);
         }
         updatePlot();
     };

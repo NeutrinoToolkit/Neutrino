@@ -32,20 +32,20 @@ Box_lineout::Box_lineout(neutrino *nparent) : nGenericPan(nparent)
     // signals
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
-    connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
+    connect(actionRect, &QAction::triggered, box, &nRect::togglePadella);
 
-    connect(actionSaveClipboard, SIGNAL(triggered()), plot, SLOT(copy_data()));
-    connect(actionSaveTxt      , SIGNAL(triggered()), plot, SLOT(save_data()));
-    connect(actionSavePDF      , SIGNAL(triggered()), plot, SLOT(export_image()));
+    connect(actionSaveClipboard, &QAction::triggered, plot, &nCustomDoublePlot::copy_data);
+    connect(actionSaveTxt, &QAction::triggered, plot, &nCustomDoublePlot::save_data);
+    connect(actionSavePDF, &QAction::triggered, plot, &nCustomDoublePlot::export_image);
 
     plot->graph(0)->setName("Horizontal");
     plot->graph(1)->setName("Vertical");
 
     show();
-    connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
-    connect(box, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
-    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updatePlot()));
-    connect(plot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
+    connect(nparent, &neutrino::bufferChanged, this, &Box_lineout::updatePlot);
+    connect(box, &nRect::sceneChanged, this, &Box_lineout::sceneChanged);
+    connect(tabWidget, &QTabWidget::currentChanged, this, &Box_lineout::updatePlot);
+    connect(plot, &nCustomDoublePlot::mouseMove, this, &Box_lineout::mouseMove);
     updatePlot();
 }
 

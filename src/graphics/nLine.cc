@@ -22,6 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include "nCore.h"
 #include "neutrino.h"
 #include "nLine.h"
 #include "nGenericPan.h"
@@ -30,6 +31,7 @@
 #include "spline.h"
 
 nLine::~nLine() {
+    nCore::disconnectChildren(&my_pad, this); // its widgets are destroyed after this (see nCore::disconnectChildren)
 	foreach (QGraphicsEllipseItem* item, ref) {
 		delete item;
 	}

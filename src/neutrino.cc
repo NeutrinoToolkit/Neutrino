@@ -297,6 +297,11 @@ void neutrino::on_actionOpen_Glob_triggered () {
 
 
 
+bool neutrino::event(QEvent *event) {
+    if (event->type()==QEvent::DeferredDelete) nCore::disconnectChildren(this);
+    return QMainWindow::event(event);
+}
+
 void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
     QMenu *my_menu=new QMenu(this);
     my_menu->setAttribute(Qt::WA_DeleteOnClose);

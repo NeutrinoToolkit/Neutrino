@@ -39,15 +39,15 @@ Reflectivity::Reflectivity(neutrino *nparent) : nGenericPan(nparent)
     // connect(max_val, SIGNAL(valueChanged(double)), this, SLOT(doIt()));
     // connect(blur, SIGNAL(valueChanged(int)), this, SLOT(doIt()));
     // (every step of a spinbox computed again, and without "erase previous" added a new image)
-    connect(doItB, SIGNAL(clicked()), this, SLOT(doIt()));
-    connect(offset, SIGNAL(valueChanged(double)), this, SLOT(parameterChanged()));
-    connect(multiplier, SIGNAL(valueChanged(double)), this, SLOT(parameterChanged()));
-    connect(min_val, SIGNAL(valueChanged(double)), this, SLOT(parameterChanged()));
-    connect(max_val, SIGNAL(valueChanged(double)), this, SLOT(parameterChanged()));
-    connect(blur, SIGNAL(valueChanged(int)), this, SLOT(parameterChanged()));
+    connect(doItB, &QPushButton::clicked, this, &Reflectivity::doIt);
+    connect(offset, &QDoubleSpinBox::valueChanged, this, &Reflectivity::parameterChanged);
+    connect(multiplier, &QDoubleSpinBox::valueChanged, this, &Reflectivity::parameterChanged);
+    connect(min_val, &QDoubleSpinBox::valueChanged, this, &Reflectivity::parameterChanged);
+    connect(max_val, &QDoubleSpinBox::valueChanged, this, &Reflectivity::parameterChanged);
+    connect(blur, &QSpinBox::valueChanged, this, &Reflectivity::parameterChanged);
     updateTimer.setSingleShot(true);
     updateTimer.setInterval(300);
-    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(doIt()));
+    connect(&updateTimer, &QTimer::timeout, this, &Reflectivity::doIt);
     show();
 
 }

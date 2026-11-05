@@ -37,13 +37,13 @@ Cutoff_mask::Cutoff_mask(neutrino *nparent) : nGenericPan(nparent)
     // the slider applies on release (keyboard/wheel steps immediately); while dragging only the value is shown
     slider->setTracking(false);
 
-    connect(cutValue,SIGNAL(editingFinished()), this, SLOT(doOperation()));
-    connect(cutValue,SIGNAL(editingFinished()), this, SLOT(syncSlider()));
-    connect(doIt,SIGNAL(clicked()),this,SLOT(doOperation()));
-    connect(slider,SIGNAL(valueChanged(int)),this,SLOT(sliderChanged(int)));
-    connect(slider,SIGNAL(sliderMoved(int)),this,SLOT(sliderMoved(int)));
-    connect(image2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMiniMaxi()));
-    connect(replaceVal, SIGNAL(currentIndexChanged(int)), this, SLOT(doOperation()));
+    connect(cutValue, &QLineEdit::editingFinished, this, &Cutoff_mask::doOperation);
+    connect(cutValue, &QLineEdit::editingFinished, this, &Cutoff_mask::syncSlider);
+    connect(doIt, &QPushButton::clicked, this, &Cutoff_mask::doOperation);
+    connect(slider, &QSlider::valueChanged, this, &Cutoff_mask::sliderChanged);
+    connect(slider, &QSlider::sliderMoved, this, &Cutoff_mask::sliderMoved);
+    connect(image2, &QComboBox::currentIndexChanged, this, &Cutoff_mask::updateMiniMaxi);
+    connect(replaceVal, &QComboBox::currentIndexChanged, this, &Cutoff_mask::doOperation);
     // the result was closed by the user
     connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) { if (buf==cutoffPhys) cutoffPhys=nullptr; });
 

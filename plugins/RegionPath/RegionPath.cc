@@ -38,10 +38,10 @@ RegionPath::RegionPath(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
-    connect(actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
-    connect(actionBezier, SIGNAL(triggered()), &region, SLOT(toggleBezier()));
+    connect(actionRegion, &QAction::triggered, &region, &nLine::togglePadella);
+    connect(actionBezier, &QAction::triggered, &region, qOverload<>(&nLine::toggleBezier));
 
-    connect(doItB, SIGNAL(clicked()), SLOT(doIt()));
+    connect(doItB, &QPushButton::clicked, this, &RegionPath::doIt);
 }
 
 void RegionPath::doIt() {

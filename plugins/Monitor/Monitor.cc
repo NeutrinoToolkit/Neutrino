@@ -46,29 +46,29 @@ Monitor::Monitor(neutrino *nparent) : nGenericPan(nparent)
 //    proxyModel->setSourceModel(fileModel);
 
     listView->setModel(fileModel);
-    connect(dirName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
-    connect(pattern, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+    connect(dirName, &QLineEdit::textChanged, this, &Monitor::textChanged);
+    connect(pattern, &QLineEdit::textChanged, this, &Monitor::textChanged);
 
-    connect(listView, SIGNAL(clicked(QModelIndex)), this, SLOT(listViewClicked(QModelIndex)));
+    connect(listView, &QListView::clicked, this, &Monitor::listViewClicked);
     // connect(listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
     // activated: double click or Enter (or single click, if that is the platform setting)
-    connect(listView, SIGNAL(activated(QModelIndex)), this, SLOT(listViewDoubleClicked(QModelIndex)));
-    connect(listView, SIGNAL(entered(QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
+    connect(listView, &QListView::activated, this, &Monitor::listViewDoubleClicked);
+    connect(listView, &QListView::entered, this, &Monitor::listViewActivated);
     // the file info also when moving with the keyboard
-    connect(listView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(listViewActivated(QModelIndex)));
+    connect(listView->selectionModel(), &QItemSelectionModel::currentChanged, this, &Monitor::listViewActivated);
 
     // auto-open: new files are opened when their size has not changed for a second (still being written otherwise)
     pendingTimer.setSingleShot(true);
     pendingTimer.setInterval(1000);
-    connect(&pendingTimer, SIGNAL(timeout()), this, SLOT(openPending()));
-    connect(fileModel, SIGNAL(directoryLoaded(QString)), this, SLOT(directoryLoaded(QString)));
-    connect(fileModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(filesInserted(QModelIndex,int,int)));
-    connect(newestFirst, SIGNAL(toggled(bool)), this, SLOT(sortFiles()));
+    connect(&pendingTimer, &QTimer::timeout, this, &Monitor::openPending);
+    connect(fileModel, &QFileSystemModel::directoryLoaded, this, &Monitor::directoryLoaded);
+    connect(fileModel, &QFileSystemModel::rowsInserted, this, &Monitor::filesInserted);
+    connect(newestFirst, &QCheckBox::toggled, this, &Monitor::sortFiles);
 
     textChanged();
 
     // connect(changeDirB, SIGNAL(released()), this, SLOT(changeDir()));
-    connect(changeDirB, SIGNAL(clicked()), this, SLOT(changeDir()));
+    connect(changeDirB, &QToolButton::clicked, this, &Monitor::changeDir);
 }
 
 

@@ -33,7 +33,7 @@ Contours::Contours(neutrino *nparent) : nGenericPan(nparent)
 	my_c = new nLine(this,3);
 	my_c->setPoints(QPolygonF()<<QPointF(0,0)<<QPointF(0,0));
 
-    connect(actionLine, SIGNAL(triggered()), my_c, SLOT(togglePadella()));
+    connect(actionLine, &QAction::triggered, my_c, &nLine::togglePadella);
 
 	show();
 	on_percent_released();
@@ -51,9 +51,9 @@ Contours::on_percent_released() {
 void
 Contours::on_actionCenter_toggled(bool check) {
 	if (check) {
-        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        connect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &Contours::setOrigin);
 	} else {
-        disconnect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setOrigin(QPointF)));
+        disconnect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &Contours::setOrigin);
 	}
 }
 

@@ -51,18 +51,18 @@ Affine_transformation::Affine_transformation(neutrino *nparent) : nGenericPan(np
     l2.setPoints(poly);
 	
 
-    connect(line1, SIGNAL(released()), &l1, SLOT(togglePadella()));
-    connect(line2, SIGNAL(released()), &l2, SLOT(togglePadella()));
+    connect(line1, &QToolButton::released, &l1, &nLine::togglePadella);
+    connect(line2, &QToolButton::released, &l2, &nLine::togglePadella);
 
-    connect(actionRegion, SIGNAL(triggered()), &region, SLOT(togglePadella()));
+    connect(actionRegion, &QAction::triggered, &region, &nRect::togglePadella);
 
-    connect(&l1, SIGNAL(sceneChanged()), this, SLOT(apply()));
-    connect(&l2, SIGNAL(sceneChanged()), this, SLOT(apply()));
+    connect(&l1, &nLine::sceneChanged, this, &Affine_transformation::apply);
+    connect(&l2, &nLine::sceneChanged, this, &Affine_transformation::apply);
 
-    connect(first,SIGNAL(clicked()),this,SLOT(affine()));
-    connect(second,SIGNAL(clicked()),this,SLOT(affine()));
+    connect(first, &QPushButton::clicked, this, qOverload<>(&Affine_transformation::affine));
+    connect(second, &QPushButton::clicked, this, qOverload<>(&Affine_transformation::affine));
 	
-    connect(actionReset, SIGNAL(triggered()), this, SLOT(resetPoints()));
+    connect(actionReset, &QAction::triggered, this, &Affine_transformation::resetPoints);
 
     connect(actionShift, &QAction::triggered, this, &Affine_transformation::findshift);
 

@@ -38,27 +38,27 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
     linebarrier.setPoints(poly);
     show();
 
-    connect(actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-    connect(actionDoAll, SIGNAL(triggered()), this, SLOT(doAll()));
+    connect(actionCarrier, &QAction::triggered, this, &Wavelet::guessCarrier);
+    connect(actionDoAll, &QAction::triggered, this, &Wavelet::doAll);
 
-    connect(actionRect, SIGNAL(triggered()), &region, SLOT(togglePadella()));
+    connect(actionRect, &QAction::triggered, &region, &nRect::togglePadella);
 	
-    connect(doWaveletB, SIGNAL(pressed()), this, SLOT(doWavelet()));
-    connect(doUnwrapB, SIGNAL(pressed()), this, SLOT(doUnwrap()));
+    connect(doWaveletB, &QPushButton::pressed, this, &Wavelet::doWavelet);
+    connect(doUnwrapB, &QPushButton::pressed, this, &Wavelet::doUnwrap);
 
-    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
+    connect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::guessCarrier);
 
-    connect(doRemoveB, SIGNAL(pressed()), this, SLOT(doRemove()));
+    connect(doRemoveB, &QPushButton::pressed, this, &Wavelet::doRemove);
 	
-    connect(useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
-    connect(lineBarrier, SIGNAL(released()), &linebarrier, SLOT(togglePadella()));
+    connect(useBarrier, &QCheckBox::toggled, this, &Wavelet::useBarrierToggled);
+    connect(lineBarrier, &QToolButton::released, &linebarrier, &nLine::togglePadella);
     useBarrierToggled(useBarrier->isChecked());
 
     widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
     angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
-    connect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-    connect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+    connect(widthCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+    connect(angleCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+    connect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
 	
     origSubmatrix=unwrapPhys=referencePhys=carrierPhys=syntheticPhys=nullptr;
 }
@@ -121,16 +121,16 @@ void Wavelet::guessCarrier() {
             statusbar->showMessage(tr("ERROR: Problem finding the carrier"));
 		} else {
             statusbar->showMessage(tr("Carrier: ")+QLocale().toString(vecCarr[0].first())+"px "+QLocale().toString(vecCarr[0].second())+"deg");
-            disconnect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-            disconnect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-            disconnect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            disconnect(widthCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+            disconnect(angleCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+            disconnect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
             widthCarrier->setValue(vecCarr[0].first());
             angleCarrier->setValue(vecCarr[0].second());
             widthCarrierLabel->setText(QLocale().toString(widthCarrier->value())+widthCarrier->suffix());
             angleCarrierLabel->setText(QLocale().toString(angleCarrier->value())+angleCarrier->suffix());
-            connect(widthCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-            connect(angleCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
-            connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(doRemoveCarrier()));
+            connect(widthCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+            connect(angleCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
+            connect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Wavelet::doRemoveCarrier);
 		}
 	}
 }

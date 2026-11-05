@@ -357,6 +357,11 @@ bool nCore::addPaletteFile(QString cmapfile) {
     return false;
 }
 
+void nCore::disconnectChildren(QObject *obj, QObject *receiver) {
+    if (!receiver) receiver=obj;
+    for (auto *child : obj->findChildren<QObject*>()) QObject::disconnect(child, nullptr, receiver, nullptr);
+}
+
 void nCore::closeAllWindows() {
     qDebug() << "here" << sender();
     for(auto &neu : neus()) {

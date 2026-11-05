@@ -65,7 +65,7 @@ Function::Function(neutrino *mynparent) : nGenericPan(mynparent) {
     QKeySequence key_seq=QKeySequence(Qt::CTRL | Qt::Key_Return);
     function->setToolTip("Press "+key_seq.toString(QKeySequence::NativeText)+" to execute"+function->toolTip());
     QShortcut* my_shortcut = new QShortcut(key_seq, function);
-    connect(my_shortcut, SIGNAL(activated()), this, SLOT(on_doIt_released()));
+    connect(my_shortcut, &QShortcut::activated, this, &Function::on_doIt_released);
 
     show();
 }

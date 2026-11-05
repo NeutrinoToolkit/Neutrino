@@ -34,17 +34,17 @@ FocalSpot::FocalSpot(neutrino *nparent) : nGenericPan(nparent)
     nContour = new nLine(this,3);
     nContour->toggleClosedLine(true);
     // (bufferChanged is already handled by the bufferChanged override)
-    connect(my_w.zero_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
-    connect(my_w.check_dsb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
-    connect(my_w.blur_radius_sb, SIGNAL(editingFinished()), this, SLOT(calculate_stats()));
+    connect(my_w.zero_dsb, &QDoubleSpinBox::editingFinished, this, &FocalSpot::calculate_stats);
+    connect(my_w.check_dsb, &QDoubleSpinBox::editingFinished, this, &FocalSpot::calculate_stats);
+    connect(my_w.blur_radius_sb, &QDoubleSpinBox::editingFinished, this, &FocalSpot::calculate_stats);
     if (my_w.centroid->isChecked()) {
-        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &FocalSpot::setPosZero);
     }
     my_w.plot->addGraph(my_w.plot->xAxis, my_w.plot->yAxis);
     my_w.plot->graph(0)->setPen(QPen(Qt::black));
     my_w.plot->show();
 
-    connect(my_w.plot,SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseAtPlot(QMouseEvent*)));
+    connect(my_w.plot, &nCustomPlotMouseX::mouseMove, this, &FocalSpot::mouseAtPlot);
     show();
     calculate_stats();
 
@@ -57,9 +57,9 @@ void FocalSpot::loadSettings(QString my_settings) {
 
 void FocalSpot::on_centroid_toggled(bool tog) {
     if (tog) {
-        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &FocalSpot::setPosZero);
     } else {
-        disconnect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        disconnect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &FocalSpot::setPosZero);
     }
 }
 

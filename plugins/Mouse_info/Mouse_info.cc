@@ -34,23 +34,23 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
     // connect(removeRowB, SIGNAL(released()),this, SLOT(remove_point()));
     // connect(copyPointsB, SIGNAL(released()),this, SLOT(copyPoints()));
     // connect(exportTxtB, SIGNAL(released()),this, SLOT(export_txt()));
-    connect(removeRowB, SIGNAL(clicked()),this, SLOT(remove_point()));
-    connect(copyPointsB, SIGNAL(clicked()),this, SLOT(copyPoints()));
-    connect(exportTxtB, SIGNAL(clicked()),this, SLOT(export_txt()));
+    connect(removeRowB, &QToolButton::clicked, this, &Mouse_info::remove_point);
+    connect(copyPointsB, &QToolButton::clicked, this, &Mouse_info::copyPoints);
+    connect(exportTxtB, &QToolButton::clicked, this, &Mouse_info::export_txt);
 
-    connect(nparent, SIGNAL(mouseAtMatrix(QPointF)), this, SLOT(setMouse(QPointF)));
-    connect(rx, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
-    connect(ry, SIGNAL(editingFinished()), this, SLOT(updateOrigin()));
-    connect(sc_x, SIGNAL(editingFinished()), this, SLOT(updateScale()));
-    connect(sc_y, SIGNAL(editingFinished()), this, SLOT(updateScale()));
-    connect(unit_x, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
-    connect(unit_y, SIGNAL(editingFinished()), this, SLOT(updateUnits()));
+    connect(nparent, &neutrino::mouseAtMatrix, this, &Mouse_info::setMouse);
+    connect(rx, &QLineEdit::editingFinished, this, &Mouse_info::updateOrigin);
+    connect(ry, &QLineEdit::editingFinished, this, &Mouse_info::updateOrigin);
+    connect(sc_x, &QLineEdit::editingFinished, this, &Mouse_info::updateScale);
+    connect(sc_y, &QLineEdit::editingFinished, this, &Mouse_info::updateScale);
+    connect(unit_x, &QLineEdit::editingFinished, this, &Mouse_info::updateUnits);
+    connect(unit_y, &QLineEdit::editingFinished, this, &Mouse_info::updateUnits);
 
     // origin, scale and units are applied when the editing is finished (also textChanged was connected,
     // in updateLabels: every keystroke changed the image); they are connected only here, once
-    connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(addPoint(QPointF)));
+    connect(nparent->my_view, &nView::mousePressEvent_sig, this, &Mouse_info::addPoint);
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updateLabels()));
+    connect(nparent, &neutrino::bufferChanged, this, &Mouse_info::updateLabels);
 
     mouse=nparent->my_view->my_mouse.pos();
 	updateLabels();

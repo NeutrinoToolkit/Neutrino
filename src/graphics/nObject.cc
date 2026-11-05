@@ -22,6 +22,7 @@
  *	Tommaso Vinci <tommaso.vinci@polytechnique.edu>
  *
  */
+#include "nCore.h"
 #include "neutrino.h"
 #include "nObject.h"
 #include "ui_nObject.h"
@@ -30,6 +31,7 @@
 #include <iostream>
 
 nObject::~nObject() {
+    nCore::disconnectChildren(&my_pad, this); // its widgets are destroyed after this (see nCore::disconnectChildren)
     foreach (QGraphicsRectItem* item, ref) {
         delete item;
     }

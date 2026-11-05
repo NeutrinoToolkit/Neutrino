@@ -43,12 +43,12 @@ Ghost_fringes::Ghost_fringes(neutrino *nparent) : nGenericPan(nparent),
 
     show();
 
-    connect(actionCarrier, SIGNAL(triggered()), this, SLOT(guessCarrier()));
-    connect(actionRegion, SIGNAL(triggered()), maskRegion, SLOT(togglePadella()));
-    connect(doGhostB, SIGNAL(clicked()), this, SLOT(doGhost()));
+    connect(actionCarrier, &QAction::triggered, this, &Ghost_fringes::guessCarrier);
+    connect(actionRegion, &QAction::triggered, maskRegion, &nLine::togglePadella);
+    connect(doGhostB, &QPushButton::clicked, this, &Ghost_fringes::doGhost);
     // the result was closed by the user
     connect(nparent, &neutrino::physDel, this, [this](nPhysD *buf) { if (buf==ghostBusted) ghostBusted=nullptr; });
-    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
+    connect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Ghost_fringes::guessCarrier);
 
 }
 

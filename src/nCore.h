@@ -74,6 +74,12 @@ public slots:
 
     static void changeThreads(int);
 
+    // disconnects the signals of the children of obj from obj, before it is deleted: the children are destroyed
+    // (and emit) after the destructor of the derived class, and the function pointer connections would call its
+    // slots on the half destroyed object (the SIGNAL/SLOT ones did not: they went through its metaobject)
+    // (receiver: a member window, e.g. the properties window of the lines, whose widgets call the slots of obj)
+    static void disconnectChildren(QObject *obj, QObject *receiver=nullptr);
+
     bool addPaletteFile(QString);
     void addDefaultPalettes();
 

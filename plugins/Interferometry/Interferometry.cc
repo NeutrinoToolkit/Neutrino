@@ -56,32 +56,32 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
                 my_obj->setProperty("id",k);
             }
         }
-        connect(my_image[k].doit, SIGNAL(released()), this, SLOT(doWavelet()));
+        connect(my_image[k].doit, &QToolButton::released, this, qOverload<>(&Interferometry::doWavelet));
     }
 
     show();
 
-    connect(images, SIGNAL(currentChanged(int)), this, SLOT(imagesTabBarClicked(int)));
-    connect(region, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
-    connect(maskRegion, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
-    connect(unwrapBarrier, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
+    connect(images, &QTabWidget::currentChanged, this, &Interferometry::imagesTabBarClicked);
+    connect(region, &nRect::key_pressed, this, &Interferometry::line_key_pressed);
+    connect(maskRegion, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
+    connect(unwrapBarrier, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
 
-    connect(actionDoWavelet, SIGNAL(triggered()), this, SLOT(doWavelet()));
+    connect(actionDoWavelet, &QAction::triggered, this, qOverload<>(&Interferometry::doWavelet));
 
-    connect(actionRect, SIGNAL(triggered()), region, SLOT(togglePadella()));
-    connect(lineBarrier, SIGNAL(released()), unwrapBarrier, SLOT(togglePadella()));
-    connect(maskRegionTB, SIGNAL(released()), maskRegion, SLOT(togglePadella()));
+    connect(actionRect, &QAction::triggered, region, &nRect::togglePadella);
+    connect(lineBarrier, &QToolButton::released, unwrapBarrier, &nLine::togglePadella);
+    connect(maskRegionTB, &QToolButton::released, maskRegion, &nLine::togglePadella);
 
-    connect(doCarrier, SIGNAL(released()), this, SLOT(guessCarrier()));
-    connect(doUnwrapB, SIGNAL(released()), this, SLOT(doUnwrap()));
-    connect(doSubtractB, SIGNAL(released()), this, SLOT(doSubtract()));
-    connect(doMaskCutoffB, SIGNAL(released()), this, SLOT(doMaskCutoff()));
-    connect(doInterpolate, SIGNAL(released()), this, SLOT(doShape()));
-    connect(doCutoffB, SIGNAL(released()), this, SLOT(doCutoff()));
+    connect(doCarrier, &QToolButton::released, this, &Interferometry::guessCarrier);
+    connect(doUnwrapB, &QToolButton::released, this, &Interferometry::doUnwrap);
+    connect(doSubtractB, &QToolButton::released, this, &Interferometry::doSubtract);
+    connect(doMaskCutoffB, &QToolButton::released, this, &Interferometry::doMaskCutoff);
+    connect(doInterpolate, &QToolButton::released, this, &Interferometry::doShape);
+    connect(doCutoffB, &QToolButton::released, this, &Interferometry::doCutoff);
 
-    connect(weightCarrier, SIGNAL(valueChanged(double)), this, SLOT(guessCarrier()));
+    connect(weightCarrier, &QDoubleSpinBox::valueChanged, this, &Interferometry::guessCarrier);
 
-    connect(useBarrier, SIGNAL(toggled(bool)), this, SLOT(useBarrierToggled(bool)));
+    connect(useBarrier, &QCheckBox::toggled, this, &Interferometry::useBarrierToggled);
     // the simple methods follow rows and columns: they cannot use a barrier
     connect(method, &QComboBox::currentTextChanged, this, [this](const QString &text) {
         useBarrier->setEnabled(!text.startsWith("Simple"));
@@ -89,8 +89,8 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     });
     useBarrier->setEnabled(!method->currentText().startsWith("Simple"));
     lineBarrier->setEnabled(!method->currentText().startsWith("Simple"));
-    connect(useMask, SIGNAL(toggled(bool)), this, SLOT(maskRegionToggled(bool)));
-    connect(useInterpolate, SIGNAL(toggled(bool)), this, SLOT(interpolateToggled(bool)));
+    connect(useMask, &QCheckBox::toggled, this, &Interferometry::maskRegionToggled);
+    connect(useInterpolate, &QCheckBox::toggled, this, &Interferometry::interpolateToggled);
 
     useBarrierToggled(useBarrier->isChecked());
     maskRegionToggled(useMask->isChecked());
@@ -99,26 +99,26 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     cropRegion =  new nRect(this,1);
     cropRegion->changeToolTip("CropRegion");
     cropRegion->setRect(QRectF(150,150,100,100));
-    connect(useCropRegion, SIGNAL(toggled(bool)), this, SLOT(useCropRegionToggled(bool)));
+    connect(useCropRegion, &QCheckBox::toggled, this, &Interferometry::useCropRegionToggled);
     useCropRegionToggled(useCropRegion->isChecked());
-    connect(cropRegionTB, SIGNAL(released()), cropRegion, SLOT(togglePadella()));
+    connect(cropRegionTB, &QToolButton::released, cropRegion, &nRect::togglePadella);
 
 
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
+    connect(nparent, &neutrino::physDel, this, &Interferometry::physDel);
 
-    connect(rotAngle,SIGNAL(valueChanged(double)), this, SLOT(doSubtract()));
+    connect(rotAngle, &QDoubleSpinBox::valueChanged, this, &Interferometry::doSubtract);
 
-    connect(posZeroButton,SIGNAL(toggled(bool)), this, SLOT(getPosZero(bool)));
-    connect(posZeroX,SIGNAL(editingFinished()), this, SLOT(doSubtract()));
-    connect(posZeroY,SIGNAL(editingFinished()), this, SLOT(doSubtract()));
+    connect(posZeroButton, &QToolButton::toggled, this, &Interferometry::getPosZero);
+    connect(posZeroX, &QSpinBox::editingFinished, this, &Interferometry::doSubtract);
+    connect(posZeroY, &QSpinBox::editingFinished, this, &Interferometry::doSubtract);
 
-    connect(cutoffValue, SIGNAL(valueChanged(double)), this, SLOT(doMaskCutoff()));
+    connect(cutoffValue, &QDoubleSpinBox::valueChanged, this, &Interferometry::doMaskCutoff);
     // blur of the phase before the interpolation (editingFinished: the same for an int or a double spin box)
-    connect(blurPhase, SIGNAL(editingFinished()), this, SLOT(doShape()));
+    connect(blurPhase, &QDoubleSpinBox::editingFinished, this, &Interferometry::doShape);
 
-    connect(addShapeB, SIGNAL(released()), this, SLOT(addShape()));
-    connect(cutoffMin, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
-    connect(cutoffMax, SIGNAL(editingFinished()), this, SLOT(doCutoff()));
+    connect(addShapeB, &QToolButton::released, this, qOverload<>(&Interferometry::addShape));
+    connect(cutoffMin, &QLineEdit::editingFinished, this, &Interferometry::doCutoff);
+    connect(cutoffMax, &QLineEdit::editingFinished, this, &Interferometry::doCutoff);
 
 }
 
@@ -180,9 +180,9 @@ void Interferometry::physDel(nPhysD* buf) {
 void Interferometry::getPosZero(bool check) {
     if (check) {
         nparent->showPhys(getPhysFromCombo(my_image[1].image));
-        connect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        connect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &Interferometry::setPosZero);
     } else {
-        disconnect(nparent->my_view, SIGNAL(mouseDoubleClickEvent_sig(QPointF)), this, SLOT(setPosZero(QPointF)));
+        disconnect(nparent->my_view, &nView::mouseDoubleClickEvent_sig, this, &Interferometry::setPosZero);
     }
 }
 
@@ -884,9 +884,9 @@ void Interferometry::addShape(QString name){
     my_shapes[my_b]=my_l;
     shapes->layout()->addWidget(my_b);
 
-    connect(my_l, SIGNAL(key_pressed(int)), this, SLOT(line_key_pressed(int)));
-    connect(my_l, SIGNAL(destroyed(QObject*)), this, SLOT(removeShape(QObject*)));
-    connect(my_b, SIGNAL(released()), my_l, SLOT(togglePadella()));
+    connect(my_l, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
+    connect(my_l, &nLine::destroyed, this, &Interferometry::removeShape);
+    connect(my_b, &QToolButton::released, my_l, &nLine::togglePadella);
 }
 
 void Interferometry::removeShape(QObject *obj){

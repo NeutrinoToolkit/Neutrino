@@ -354,7 +354,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             // physMath::phys_fast_gaussian_blur(*intensity,params.end_thick/2.0);
             // the blur removes the residual fringes (phase and contrast errors): it must follow the interfringe.
             // sigma = lambda/2 (blur radius = pi sigma): the carrier is damped to < 1%
-            physMath::phys_fast_gaussian_blur(*intensity,M_PI*std::max(params.init_lambda,params.end_lambda)/2.0);
+            physMath::phys_fast_gaussian_blur(*intensity,std::max(params.init_lambda,params.end_lambda)/2.0);
 
             // fringe visibility (Imax-Imin)/(Imax+Imin)
             auto visibility = std::make_unique<physD>(dx, dy, 0.0, "visibility");
@@ -1080,7 +1080,7 @@ void physWave::phys_wavelet_field_2D_morlet_opencl(wavelet_params &params) {
         }
 
 //            physMath::phys_fast_gaussian_blur(*nIntensity,params.thickness/2.0);
-        physMath::phys_fast_gaussian_blur(*nIntensity,M_PI*std::max(params.init_lambda,params.end_lambda)/2.0); // sigma = lambda/2, see CPU version
+        physMath::phys_fast_gaussian_blur(*nIntensity,std::max(params.init_lambda,params.end_lambda)/2.0); // sigma = lambda/2, see CPU version
 
         auto nVisibility= std::make_unique<physD>(params.data->getW(),params.data->getH(),0,"visibility");
         for (size_t k=0; k<params.data->getSurf(); k++) {

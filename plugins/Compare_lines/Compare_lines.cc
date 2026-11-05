@@ -34,21 +34,21 @@ Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent),
     poly << QPointF(0,0) << QPointF(100,100);
     line.setPoints(poly);
 
-    connect(actionSaveClipboard, SIGNAL(triggered()), plot, SLOT(copy_data()));
-    connect(actionSaveTxt      , SIGNAL(triggered()), plot, SLOT(save_data()));
-    connect(actionSavePDF      , SIGNAL(triggered()), plot, SLOT(export_image()));
+    connect(actionSaveClipboard, &QAction::triggered, plot, &nCustomPlot::copy_data);
+    connect(actionSaveTxt, &QAction::triggered, plot, &nCustomPlot::save_data);
+    connect(actionSavePDF, &QAction::triggered, plot, &nCustomPlot::export_image);
 
-    connect(actionAddAll, SIGNAL(triggered()), this, SLOT(addImages()));
-    connect(actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeImages()));
+    connect(actionAddAll, &QAction::triggered, this, &Compare_lines::addImages);
+    connect(actionRemoveAll, &QAction::triggered, this, &Compare_lines::removeImages);
 
 
-    connect(addImageB, SIGNAL(released()), this, SLOT(addImage()));
-    connect(removeImageB, SIGNAL(released()), this, SLOT(removeImage()));
+    connect(addImageB, &QToolButton::released, this, &Compare_lines::addImage);
+    connect(removeImageB, &QToolButton::released, this, &Compare_lines::removeImage);
 
-    connect(current, SIGNAL(released()), this, SLOT(updatePlot()));
+    connect(current, &QCheckBox::released, this, &Compare_lines::updatePlot);
 
-    connect(nparent, SIGNAL(physDel(nPhysD*)), this, SLOT(physDel(nPhysD*)));
-    connect(nparent, SIGNAL(physReplace(std::pair<nPhysD*,nPhysD*>)), this, SLOT(physReplace(std::pair<nPhysD*,nPhysD*>)));
+    connect(nparent, &neutrino::physDel, this, &Compare_lines::physDel);
+    connect(nparent, &neutrino::physReplace, this, &Compare_lines::physReplace);
 
     plot->xAxis->setLabel(tr("Distance"));
     plot->yAxis->setLabel(tr("Value"));
@@ -57,9 +57,9 @@ Compare_lines::Compare_lines(neutrino *nparent) : nGenericPan(nparent),
     plot->graph(0)->setName("Compare Lines");
 
     show();
-    connect(actionLine, SIGNAL(triggered()), &line, SLOT(togglePadella()));
-    connect(&line, SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
-    connect(nparent, SIGNAL(bufferChanged(nPhysD*)), this, SLOT(updatePlot()));
+    connect(actionLine, &QAction::triggered, &line, &nLine::togglePadella);
+    connect(&line, &nLine::sceneChanged, this, &Compare_lines::sceneChanged);
+    connect(nparent, &neutrino::bufferChanged, this, &Compare_lines::updatePlot);
     updatePlot();
 }
 

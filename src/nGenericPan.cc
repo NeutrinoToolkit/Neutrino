@@ -696,6 +696,11 @@ nGenericPan::saveUi(QSettings &settings) {
 
 }
 
+bool nGenericPan::event(QEvent *event) {
+    if (event->type()==QEvent::DeferredDelete) nCore::disconnectChildren(this);
+    return QMainWindow::event(event);
+}
+
 void nGenericPan::closeEvent(QCloseEvent*){
     qDebug() << "Going to close" << this;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {

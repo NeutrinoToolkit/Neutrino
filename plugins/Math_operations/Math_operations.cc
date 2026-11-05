@@ -33,8 +33,8 @@ Math_operations::Math_operations(neutrino *nparent) : nGenericPan(nparent)
     setupUi(this);
     // connect(calculate, SIGNAL(pressed()), this, SLOT(doOperation()));
     // clicked: pressed() runs at mouse-down and not with the keyboard
-    connect(calculate, SIGNAL(clicked()), this, SLOT(doOperation()));
-    connect(operation, SIGNAL(currentIndexChanged(int)), this, SLOT(enableGroups(int)));
+    connect(calculate, &QPushButton::clicked, this, &Math_operations::doOperation);
+    connect(operation, &QComboBox::currentIndexChanged, this, &Math_operations::enableGroups);
     operatorResult=nullptr;
 
     for(int i=0;i<operation->count();i++){

@@ -32,9 +32,9 @@ ZoomWin::ZoomWin(neutrino *nparent) : nGenericPan(nparent)
     toolBar->addWidget(my_scale);
     // connect(actionLockClick, SIGNAL(triggered()), this, SLOT(setBehaviour()));
     // toggled: also emitted when the state is restored from the settings (setChecked)
-    connect(actionLockClick, SIGNAL(toggled(bool)), this, SLOT(setBehaviour()));
+    connect(actionLockClick, &QAction::toggled, this, &ZoomWin::setBehaviour);
     my_view->setInteractive(true);
-    connect(my_scale, SIGNAL(valueChanged(double)), this, SLOT(changeZoom(double)));
+    connect(my_scale, &QDoubleSpinBox::valueChanged, this, &ZoomWin::changeZoom);
     toolBar->addWidget(lineWidth);
     connect(lineWidth, &QSpinBox::valueChanged, my_view, &ZoomView::setLineWidth);
 
@@ -66,10 +66,10 @@ void ZoomWin::changeZoom(double val) {
 
 void ZoomWin::setBehaviour() {
     if (actionLockClick->isChecked()) {
-        disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
+        disconnect(nparent->my_view, &nView::mouseposition, this, &ZoomWin::updatePlot);
+        connect(nparent->my_view, &nView::mousePressEvent_sig, this, &ZoomWin::updatePlot, Qt::UniqueConnection);
     } else {
-        disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(updatePlot(QPointF)));
-        connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(updatePlot(QPointF)), Qt::UniqueConnection);
+        disconnect(nparent->my_view, &nView::mousePressEvent_sig, this, &ZoomWin::updatePlot);
+        connect(nparent->my_view, &nView::mouseposition, this, &ZoomWin::updatePlot, Qt::UniqueConnection);
     }
 }

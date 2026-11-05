@@ -37,10 +37,10 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     box =  new nRect(this,1);
     box->setRect(QRectF(0,0,100,100));
 
-    connect(setOrigin, SIGNAL(clicked()), this, SLOT(set_origin()));
-    connect(setScale, SIGNAL(clicked()), this, SLOT(set_scale()));
+    connect(setOrigin, &QPushButton::clicked, this, &Find_peaks::set_origin);
+    connect(setScale, &QPushButton::clicked, this, &Find_peaks::set_scale);
 
-    connect(actionRect, SIGNAL(triggered()), box, SLOT(togglePadella()));
+    connect(actionRect, &QAction::triggered, box, &nRect::togglePadella);
 
     toolBar->addWidget(direction);
     toolBar->addWidget(param);
@@ -59,13 +59,13 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     p.setStyle(Qt::DotLine);
     plot->graph(1)->setPen(p);
 
-    connect(nparent, SIGNAL(bufferChanged(nPhysD *)), this, SLOT(updatePlot()));
-    connect(box, SIGNAL(sceneChanged()), this, SLOT(updatePlot()));
-    connect(direction, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
-    connect(param, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-    connect(order, SIGNAL(valueChanged(int)), this, SLOT(updatePlot()));
-    connect(prominence, SIGNAL(valueChanged(double)), this, SLOT(updatePlot()));
-    connect(transpose, SIGNAL(toggled(bool)), this, SLOT(updatePlot()));
+    connect(nparent, &neutrino::bufferChanged, this, &Find_peaks::updatePlot);
+    connect(box, &nRect::sceneChanged, this, &Find_peaks::updatePlot);
+    connect(direction, &QToolButton::toggled, this, &Find_peaks::updatePlot);
+    connect(param, &QDoubleSpinBox::valueChanged, this, &Find_peaks::updatePlot);
+    connect(order, &QSpinBox::valueChanged, this, &Find_peaks::updatePlot);
+    connect(prominence, &QDoubleSpinBox::valueChanged, this, &Find_peaks::updatePlot);
+    connect(transpose, &QCheckBox::toggled, this, &Find_peaks::updatePlot);
     updatePlot();
 }
 

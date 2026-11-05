@@ -107,7 +107,7 @@ void XRD::on_actionAddIP_triggered() {
 
     auto cropK=[this,c]() { cropImage(c->k); };
     connect(c->rect, &nRect::sceneChanged, c, [this,c]() { cropImage(c->k,false); });
-    connect(ui_IP->rectROI, SIGNAL(released()), c->rect, SLOT(togglePadella()));
+    connect(ui_IP->rectROI, &QToolButton::released, c->rect, &nRect::togglePadella);
     connect(ui_IP->saveImage, &QAbstractButton::released, c, [this,c]() { saveImage(c->k); });
 
     connect(ui_IP->angle, &QDoubleSpinBox::valueChanged, c, cropK);

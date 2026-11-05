@@ -44,17 +44,17 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 
     my_point =  new nPoint(nparent);
 
-	connect(horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
-	connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
+	connect(horizontalScrollBar, &QScrollBar::valueChanged, this, &MUSE::horzScrollBarChanged);
+	connect(plot->xAxis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged), this, &MUSE::xAxisChanged);
 
-	connect(radius,SIGNAL(valueChanged(int)),this,SLOT(updateLastPoint()));
+	connect(radius, &QSpinBox::valueChanged, this, &MUSE::updateLastPoint);
 
-	connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-	connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	connect(slices, &QSpinBox::valueChanged, this, &MUSE::showImagePlane);
+	connect(slicesSlider, &QSlider::valueChanged, this, &MUSE::showImagePlane);
 
-	connect(plot,SIGNAL(mouseDoubleClick(QMouseEvent*)), this, SLOT(plotClick(QMouseEvent*)));
+	connect(plot, &nCustomPlotMouseX2Y::mouseDoubleClick, this, &MUSE::plotClick);
 
-	new QShortcut(QKeySequence( Qt::Key_S),this, SLOT(on_actionExportTxt_triggered()));
+	connect(new QShortcut(QKeySequence(Qt::Key_S),this), &QShortcut::activated, this, &MUSE::on_actionExportTxt_triggered);
 
 	setProperty("NeuSave-fileMUSE","myfile.fits");
 	plot->addGraph(plot->xAxis, plot->yAxis2);
@@ -69,9 +69,9 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	setProperty("NeuSave-MUSEdir",QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
 	qDebug() << property("NeuSave-MUSEdir");
 	setProperty("NeuSave-interval",100);
-	connect(&my_timer,SIGNAL(timeout()), this, SLOT(nextPlane()));
+	connect(&my_timer, &QTimer::timeout, this, &MUSE::nextPlane);
 
-    connect(nparent->my_view,SIGNAL(keypressed(QKeyEvent*)),this,SLOT(keyPressEvent(QKeyEvent*)));
+    connect(nparent->my_view, &nView::keypressed, this, &MUSE::keyPressEvent);
     connect(nparent, &neutrino::physDel, this, &MUSE::forgetPhys);
 
 	show();
@@ -79,7 +79,7 @@ MUSE::MUSE(neutrino *nnparent) : nGenericPan(nnparent),
 	on_actionMode_toggled();
 
     QShortcut *openFile = new QShortcut(QKeySequence(Qt::Key_O),this);
-    connect(openFile, SIGNAL(activated()), this, SLOT(loadCube()) );
+    connect(openFile, &QShortcut::activated, this, &MUSE::loadCube);
 
 	loadCube();
 }
@@ -295,8 +295,8 @@ void MUSE::doSpectrum(QPointF point) {
 
 void MUSE::showImagePlane(int z) {
 	qDebug() << z;
-	disconnect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-	disconnect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	disconnect(slices, &QSpinBox::valueChanged, this, &MUSE::showImagePlane);
+	disconnect(slicesSlider, &QSlider::valueChanged, this, &MUSE::showImagePlane);
 	slices->setValue(z);
 	slicesSlider->setValue(z);
 	if (cubesize.size()==3 && z>=0 && z < (int)cubesize[2]) {
@@ -329,8 +329,8 @@ void MUSE::showImagePlane(int z) {
 		plot->setMousePosition(xvals[z]);
 		setstatusbar();
 	}
-	connect(slices,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
-	connect(slicesSlider,SIGNAL(valueChanged(int)),this,SLOT(showImagePlane(int)));
+	connect(slices, &QSpinBox::valueChanged, this, &MUSE::showImagePlane);
+	connect(slicesSlider, &QSlider::valueChanged, this, &MUSE::showImagePlane);
 }
 
 void MUSE::on_restLambda_valueChanged(double) {
@@ -347,12 +347,12 @@ void MUSE::setstatusbar() {
 
 void MUSE::on_actionMode_toggled() {
 	if (actionMode->isChecked()) {
-        disconnect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
-        connect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        disconnect(nparent->my_view, &nView::mouseposition, this, &MUSE::doSpectrum);
+        connect(nparent->my_view, &nView::mousePressEvent_sig, this, &MUSE::doSpectrum);
         my_point->show();
     } else {
-        disconnect(nparent->my_view, SIGNAL(mousePressEvent_sig(QPointF)), this, SLOT(doSpectrum(QPointF)));
-        connect(nparent->my_view, SIGNAL(mouseposition(QPointF)), this, SLOT(doSpectrum(QPointF)));
+        disconnect(nparent->my_view, &nView::mousePressEvent_sig, this, &MUSE::doSpectrum);
+        connect(nparent->my_view, &nView::mouseposition, this, &MUSE::doSpectrum);
         my_point->hide();
 	}
 }

@@ -38,12 +38,12 @@ Rotate::Rotate(neutrino *nparent) : nGenericPan(nparent)
     // live (300 ms after the last change) with "erase previous", otherwise the angle on Enter
     updateTimer.setSingleShot(true);
     updateTimer.setInterval(300);
-    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(doRotateLive()));
-    connect(valueAngle, SIGNAL(valueChanged(double)), this, SLOT(angleChanged()));
-    connect(valueAngle, SIGNAL(editingFinished()), this, SLOT(doRotateLive()));
-    connect(image,SIGNAL(activated(int)),this,SLOT(optionChanged()));
-    connect(defaultValue,SIGNAL(currentIndexChanged(int)),this,SLOT(optionChanged()));
-    connect(sameSize,SIGNAL(toggled(bool)),this,SLOT(optionChanged()));
+    connect(&updateTimer, &QTimer::timeout, this, &Rotate::doRotateLive);
+    connect(valueAngle, &QDoubleSpinBox::valueChanged, this, &Rotate::angleChanged);
+    connect(valueAngle, &QDoubleSpinBox::editingFinished, this, &Rotate::doRotateLive);
+    connect(image, &QComboBox::activated, this, &Rotate::optionChanged);
+    connect(defaultValue, &QComboBox::currentIndexChanged, this, &Rotate::optionChanged);
+    connect(sameSize, &QCheckBox::toggled, this, &Rotate::optionChanged);
     rotated=nullptr;
 	// doRotateLive();
 	// (at 0 degrees opening the plugin added a copy of the image)

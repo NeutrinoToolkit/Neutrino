@@ -35,14 +35,14 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
 
     my_w.histogram->parentPan=this;
 
-    connect(nparent->my_view, SIGNAL(updatecolorbar(QString)), this, SLOT(updatecolorbar(QString)));
-    connect(nparent, SIGNAL(colorValue(double)), my_w.histogram, SLOT(colorValue(double)));
+    connect(nparent->my_view, &nView::updatecolorbar, this, &Colorscale::updatecolorbar);
+    connect(nparent, &neutrino::colorValue, my_w.histogram, &nHistogram::colorValue);
 
-    connect(my_w.actionLog,SIGNAL(triggered()),my_w.histogram,SLOT(update()));
+    connect(my_w.actionLog, &QAction::triggered, my_w.histogram, [h=my_w.histogram]() { h->update(); });
 
-    connect(my_w.actionCutoff,SIGNAL(triggered()),this,SLOT(cutOff()));
+    connect(my_w.actionCutoff, &QAction::triggered, this, &Colorscale::cutOff);
 
-    connect(my_w.actionInvert,SIGNAL(triggered()),this,SLOT(invertColors()));
+    connect(my_w.actionInvert, &QAction::triggered, this, &Colorscale::invertColors);
 
     dVal.setNotation(QDoubleValidator::ScientificNotation);
     my_w.lineMin->setValidator(&dVal);
@@ -53,24 +53,24 @@ Colorscale::Colorscale (neutrino *parent) : nGenericPan(parent),
         my_w.lineMin->setText(QLocale().toString(minmax.first()));
         my_w.lineMax->setText(QLocale().toString(minmax.second()));
     }
-    connect(my_w.lineMin, SIGNAL(editingFinished()), this, SLOT(minChanged()));
-    connect(my_w.lineMax, SIGNAL(editingFinished()), this, SLOT(maxChanged()));
+    connect(my_w.lineMin, &QLineEdit::editingFinished, this, &Colorscale::minChanged);
+    connect(my_w.lineMax, &QLineEdit::editingFinished, this, &Colorscale::maxChanged);
 
-    connect(my_w.setToMin,SIGNAL(clicked()),this,SLOT(setToMin()));
-    connect(my_w.setToMax,SIGNAL(clicked()),this,SLOT(setToMax()));
+    connect(my_w.setToMin, &QPushButton::clicked, this, &Colorscale::setToMin);
+    connect(my_w.setToMax, &QPushButton::clicked, this, &Colorscale::setToMax);
 
-    connect(my_w.addPaletteFile, SIGNAL(released()), this, SLOT(addPaletteFile()));
-    connect(my_w.removePaletteFile, SIGNAL(released()), this, SLOT(removePaletteFile()));
-    connect(my_w.resetPalettes, SIGNAL(released()), this, SLOT(resetPalettes()));
+    connect(my_w.addPaletteFile, &QPushButton::released, this, &Colorscale::addPaletteFile);
+    connect(my_w.removePaletteFile, &QPushButton::released, this, &Colorscale::removePaletteFile);
+    connect(my_w.resetPalettes, &QPushButton::released, this, &Colorscale::resetPalettes);
 
     // the value when typing is finished (it rescaled at every keystroke)
     my_w.percent->setKeyboardTracking(false);
-    connect(my_w.percent, SIGNAL(valueChanged(double)), nparent->my_view, SLOT(rescaleColor(double)));
+    connect(my_w.percent, &QDoubleSpinBox::valueChanged, nparent->my_view, &nView::rescaleColor);
     my_w.toolBar->addWidget(my_w.percent);
 
     loadPalettes();
 
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    connect(my_w.palettes, &QComboBox::currentIndexChanged, this, &Colorscale::paletteComboChange);
 
     //    connect(palettes, SIGNAL(highlighted(QString)), nparent, SLOT(changeColorTable(QString)));
 
@@ -213,9 +213,9 @@ vec2i Colorscale::sliderValues() {
 
 void Colorscale::updatecolorbar(QString) {
     // qDebug() << "-------------------------------";
-    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    disconnect(my_w.palettes, &QComboBox::currentIndexChanged, this, &Colorscale::paletteComboChange);
     my_w.palettes->setCurrentIndex(my_w.palettes->findData(nparent->my_view->colorTable));
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    connect(my_w.palettes, &QComboBox::currentIndexChanged, this, &Colorscale::paletteComboChange);
 
     // the sliders only show the range: their (quantized) values must not be written back to the image
     const QSignalBlocker blockMin(my_w.sliderMin), blockMax(my_w.sliderMax);
@@ -274,12 +274,12 @@ const QIcon Colorscale::getPaletteIconFile(QString paletteName) {
 }
 
 void Colorscale::loadPalettes() {
-    disconnect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    disconnect(my_w.palettes, &QComboBox::currentIndexChanged, this, &Colorscale::paletteComboChange);
     my_w.palettes->clear();
     for (auto& name : napp->nPalettes.keys()) {
         my_w.palettes->addItem(getPaletteIconFile(name), QFileInfo(name).baseName().replace("_"," "), name);
     }
-    connect(my_w.palettes, SIGNAL(currentIndexChanged(int)), this, SLOT(paletteComboChange(int)));
+    connect(my_w.palettes, &QComboBox::currentIndexChanged, this, &Colorscale::paletteComboChange);
     my_w.fileList->clear();
     foreach(QString my_file,napp->nPalettes.keys()) {
         addItem(my_file);
