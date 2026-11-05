@@ -174,7 +174,6 @@ jobs:
     - name: Deps
       run: |
         brew install --force iltommi/brews/hdf4
-        brew install --force iltommi/brews/clfft
     - name: Build
       run: |
         mkdir -p build && cd build
@@ -211,7 +210,6 @@ jobs:
       run: |
         mkdir -p build && cd build
         cmake .. -DCMAKE_PREFIX_PATH="/opt/local/libexec/qt6;/opt/local" -DCMAKE_IGNORE_PREFIX_PATH=/usr/local \
-          -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=ON \
           -DPython_EXECUTABLE=/opt/local/bin/python3.13 -DPython3_EXECUTABLE=/opt/local/bin/python3.13 \
           -DOpenMP_C_FLAGS="-Xclang -fopenmp -I/opt/local/include/libomp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I/opt/local/include/libomp" \
           -DOpenMP_C_LIB_NAMES=omp -DOpenMP_CXX_LIB_NAMES=omp -DOpenMP_omp_LIBRARY=/opt/local/lib/libomp/libomp.dylib

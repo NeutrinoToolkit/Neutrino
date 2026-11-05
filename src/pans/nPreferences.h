@@ -49,7 +49,6 @@ public slots:
     void hideEvent (QHideEvent*) override;
     void showEvent(QShowEvent*) override;
 
-    void openclUnitValueChange(int);
     void resetSettings();
     void changeThreads(int);
 

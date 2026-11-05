@@ -209,6 +209,48 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QSpinBox" name="candidates">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Regularization of interfringe and angle: each pixel keeps its K best filters and takes the one nearest to the interfringe and angle maps smoothed over the neighbours (weighted by the contrast). 0: off (the best filter of each pixel)</string>
+            </property>
+            <property name="prefix">
+             <string>K </string>
+            </property>
+            <property name="maximum">
+             <number>9</number>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="logLambda">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Interfringe values spaced geometrically (the same relative step everywhere: the filter accepts a relative mismatch, about 20% for damp 1), otherwise linearly (a wide range had a coarse step for the dense fringes: lower contrast and phase errors between the values)</string>
+            </property>
+            <property name="text">
+             <string>log λ</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="neutrinoSave" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -454,6 +496,9 @@
        </property>
        <item>
         <widget class="QSpinBox" name="posZeroX">
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>zero x position</string>
          </property>
@@ -578,12 +623,12 @@
        <bool>true</bool>
       </property>
       <property name="title">
-       <string>Mask &amp;&amp; quality cutoff</string>
+       <string>Blur, mask &amp;&amp; quality cutoff</string>
       </property>
       <property name="checkable">
        <bool>false</bool>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,0,1,0">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -596,6 +641,23 @@
        <property name="bottomMargin">
         <number>2</number>
        </property>
+       <item>
+        <widget class="QDoubleSpinBox" name="blurPhase">
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_7">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QCheckBox" name="useMask">
          <property name="text">
@@ -632,6 +694,9 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="cutoffValue">
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>Remove low quality</string>
          </property>
@@ -674,9 +739,9 @@
     <item>
      <widget class="QGroupBox" name="Shapes">
       <property name="title">
-       <string>Blur &amp;&amp; Interpolate</string>
+       <string>Interpolate</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0,0">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -689,20 +754,6 @@
        <property name="bottomMargin">
         <number>2</number>
        </property>
-       <item>
-        <widget class="QDoubleSpinBox" name="blurPhase">
-         <property name="decimals">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line_7">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QCheckBox" name="useInterpolate">
          <property name="toolTip">

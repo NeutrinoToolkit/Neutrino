@@ -109,12 +109,12 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     connect(rotAngle, &QDoubleSpinBox::valueChanged, this, &Interferometry::doSubtract);
 
     connect(posZeroButton, &QToolButton::toggled, this, &Interferometry::getPosZero);
-    connect(posZeroX, &QSpinBox::editingFinished, this, &Interferometry::doSubtract);
-    connect(posZeroY, &QSpinBox::editingFinished, this, &Interferometry::doSubtract);
+    // the spin boxes have keyboardTracking off: valueChanged comes at the end of the editing, and only for a new value
+    connect(posZeroX, &QSpinBox::valueChanged, this, &Interferometry::doSubtract);
+    connect(posZeroY, &QSpinBox::valueChanged, this, &Interferometry::doSubtract);
 
     connect(cutoffValue, &QDoubleSpinBox::valueChanged, this, &Interferometry::doMaskCutoff);
-    // blur of the phase before the interpolation (editingFinished: the same for an int or a double spin box)
-    connect(blurPhase, &QDoubleSpinBox::editingFinished, this, &Interferometry::doShape);
+    connect(blurPhase, &QDoubleSpinBox::valueChanged, this, &Interferometry::doMaskCutoff);
 
     connect(addShapeB, &QToolButton::released, this, qOverload<>(&Interferometry::addShape));
     connect(cutoffMin, &QLineEdit::editingFinished, this, &Interferometry::doCutoff);
@@ -188,9 +188,10 @@ void Interferometry::getPosZero(bool check) {
 
 void Interferometry::setPosZero(QPointF point) {
     if(currentBuffer) {
+        // one doSubtract for the new point, not one per coordinate
+        const QSignalBlocker bx(posZeroX), by(posZeroY);
         posZeroX->setValue(point.x());
         posZeroY->setValue(point.y());
-        Zero->setChecked(true);
         doSubtract();
     }
 }
@@ -343,15 +344,9 @@ void Interferometry::doWavelet (int iimage) {
 
         int niter=my_params.n_angles*my_params.n_lambdas*my_params.n_thicks+1;
 
-        QSettings settings("neutrino","");
-        settings.beginGroup("nPreferences");
-        if (physWave::openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
-            DEBUG("Ready to run on OpenCL");
-            my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "Wavelet"+QString(suffix.c_str()), niter);
-        } else {
-            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
-        }
+        my_params.n_candidates=candidates->value();
+        my_params.log_lambda=logLambda->isChecked();
+        runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
         if (nThread.n_iter==-1) {
             my_params.data=nullptr;
             return;
@@ -669,7 +664,16 @@ void Interferometry::doMaskCutoff() {
     statusbar->showMessage("Mask");
     nPhysD *phase=getLocal("phase_2pi");
     nPhysD *phaseMask=nullptr;
-    if (nPhysExists(phase)) {
+    // blur (blurPhase px, 0 = off) before the mask: the zeros outside the region and the cut pixels are not smeared
+    // into the phase (FFT blur: NaN pixels stay NaN, the borders of the image are periodic)
+    nPhysD blurred;
+    if (nPhysExists(phase) && blurPhase->value()>0) {
+        statusbar->showMessage(tr("Blurring"));
+        blurred=phase->copy();
+        physMath::phys_fast_gaussian_blur(blurred, blurPhase->value());
+        phase=&blurred;
+    }
+    if (phase==&blurred || nPhysExists(phase)) {
         if (useMask->isChecked()) {
             maskRegion->show();
             phaseMask =new nPhysD(phase->getW(),phase->getH(),0.0,"Mask");
@@ -724,20 +728,13 @@ void Interferometry::doShape(){
     nPhysD *image=getLocal("phaseMask");
 
     if (nPhysExists(image)) {
-        // blur (blurPhase px, 0 = off) and then the interpolation of the regions, on a copy of the mask
-        const double blurRadius=blurPhase->value();
-        if (useInterpolate->isChecked() || blurRadius>0) {
+        // the interpolation of the regions, on a copy of the mask (the blur is before the mask: doMaskCutoff)
+        if (useInterpolate->isChecked()) {
             if (getLocal("interpPhase_2piMask")==image) {
                 localPhys["interpPhase_2piMask"]=nullptr; // old sessions aliased it to the mask: don't overwrite the mask
             }
             nPhysD *regionPath = new nPhysD(*image);
-            regionPath->setShortName(useInterpolate->isChecked() ? "phaseInterp" : "phaseBlur");
-            if (blurRadius>0) {
-                // before the regions: their borders (the boundary of the interpolation) are the blurred phase.
-                // FFT blur: NaN pixels stay NaN, the borders of the image are periodic
-                statusbar->showMessage(tr("Blurring"));
-                physMath::phys_fast_gaussian_blur(*regionPath, blurRadius);
-            }
+            regionPath->setShortName("phaseInterp");
             if (useInterpolate->isChecked()) {
                 // the loop handles events (the Stop button): image can be closed meanwhile, only the copy is used,
                 // and the steps of the pan triggered meanwhile (spin boxes, buttons) do nothing (inLoop)
@@ -903,8 +900,8 @@ void Interferometry::removeShape(QObject *obj){
 void Interferometry::doCutoff(){
     if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
     statusbar->showMessage("Cutoff");
-    // the result of doShape when it did something (interpolation or blur)
-    nPhysD *image=(useInterpolate->isChecked() || blurPhase->value()>0) ? getLocal("interpPhase_2piMask") : getLocal("phaseMask");
+    // the result of doShape when it did something (interpolation)
+    nPhysD *image=useInterpolate->isChecked() ? getLocal("interpPhase_2piMask") : getLocal("phaseMask");
     if (nPhysExists(image)) {
         nPhysD *intNe= nullptr;
         if (useCropRegion->isChecked()) {

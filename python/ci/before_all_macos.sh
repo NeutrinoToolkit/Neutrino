@@ -6,7 +6,7 @@ source "$(dirname "$0")/qt_version.sh"
 
 # hdf5 and not hdf5-mpi (it would bring open-mpi in the wheel). No Homebrew qt: the official one must be found
 brew install libomp fftw gsl hdf5 libtiff jpeg-turbo cfitsio pandoc librsvg
-brew install iltommi/brews/hdf4 iltommi/brews/clfft || echo "hdf4/clfft not installed: built without them"
+brew install iltommi/brews/hdf4 || echo "hdf4 not installed: built without it"
 if brew list qtbase >/dev/null 2>&1 || brew list qt >/dev/null 2>&1; then
     echo "warning: Homebrew Qt is installed, CMAKE_PREFIX_PATH must point to the official Qt"
 fi

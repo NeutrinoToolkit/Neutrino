@@ -32,15 +32,10 @@
 #include "nPreferences.h"
 // #include "nApp.h"
 #include "nCore.h"
-#include "nPhysWave.h"
 
 // #ifdef	__WIN32
 #ifdef _WIN32
 #include <windows.h>
-#endif
-
-#ifdef HAVE_LIBCLFFT
-#include "clFFT.h"
 #endif
 
 
@@ -95,10 +90,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 
     connect(forceDecimalDot, &QCheckBox::toggled, napp, &nCore::forceDecimalDot);
 
-    openclUnit->setMaximum(physWave::openclEnabled());
-
-
-    connect(openclUnit, &QSpinBox::valueChanged, this, &nPreferences::openclUnitValueChange);
     connect(threads, &QSpinBox::valueChanged, this, &nPreferences::changeThreads);
 
     show(true);
@@ -146,7 +137,6 @@ nPreferences::nPreferences(neutrino *nparent) : nGenericPan(nparent) {
 //     }
     qDebug() << "<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.<>.";
     connect(openNewWindow, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
-    connect(openclUnit, &QSpinBox::valueChanged, this, &nPreferences::saveDefaults);
     connect(separateRGB, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
     connect(askCloseUnsaved, &QCheckBox::toggled, this, &nPreferences::saveDefaults);
 
@@ -179,16 +169,6 @@ void nPreferences::changeGamma(int gamma_val) {
 void nPreferences::changeThreads(int num) {
 	// nApp::changeThreads(num);
 	nCore::changeThreads(num);
-}
-
-void nPreferences::openclUnitValueChange(int num) {
-    openclDescription->clear();
-#ifdef HAVE_LIBCLFFT
-	if (num>0) {
-        openclDescription->setPlainText(QString::fromStdString(physWave::get_platform_device_info_opencl(num)));
-		setProperty("openclUnit",num);
-	}
-#endif
 }
 
 void nPreferences::resetSettings() {

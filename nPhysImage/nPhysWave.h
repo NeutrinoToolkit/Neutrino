@@ -42,28 +42,18 @@
 #include "mcomplex.h"
 #include "bidimvec.h"
 
-#ifdef HAVE_LIBCLFFT
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#include "clFFT.h"
-#endif
-
 #ifndef nPhysWave_h_
 #define nPhysWave_h_
 
 namespace physWave {
 
 
-#ifdef HAVE_LIBCLFFT
-std::string CHECK_OPENCL_ERROR(cl_int err);
-#define check_opencl_error(__err_num, __err_msg) if (__err_num != CL_SUCCESS) {WARNING(__err_num << " " << CHECK_OPENCL_ERROR(__err_num) << " " << __err_msg); throw phys_fileerror(__err_msg);};
-#endif
-
 enum unwrap_strategy {GOLDSTEIN, QUALITY, SIMPLE_HV, SIMPLE_VH, MIGUEL, MIGUEL_QUALITY};
 
 class wavelet_params {
 public:
     wavelet_params() :
-    data(nullptr),	opencl_unit(0), iter(0), iter_ptr(&iter) {
+    data(nullptr), iter(0), iter_ptr(&iter) {
         DEBUG("wavelet_params created");
     }
     
@@ -82,8 +72,15 @@ public:
     size_t n_thicks;
 
     double damp;
-	
-    int opencl_unit;
+
+    // regularization of lambda and angle (0: off, the filter of largest response of each pixel):
+    // each pixel keeps its n_candidates best filters, then chooses the one nearest to the lambda and angle maps
+    // smoothed over the neighbours (weighted by the contrast)
+    size_t n_candidates=0;
+
+    // lambda values spaced geometrically (constant relative step: the filter accepts a relative mismatch, about
+    // 1/(pi damp)), otherwise linearly (the step was too coarse for the dense fringes of a wide range)
+    bool log_lambda=false;
 
 	int iter;
 	int *iter_ptr;
@@ -93,23 +90,8 @@ public:
 
 void phys_wavelet_field_2D_morlet(wavelet_params &);
 
-void phys_wavelet_field_2D_morlet_opencl(wavelet_params &);
-
 // traslation functions
 void phys_wavelet_trasl_cpu(void *, int &);
-
-int openclEnabled();
-
-unsigned int opencl_closest_size(unsigned int);
-
-vec2i opencl_closest_size(vec2i);
-
-#ifdef HAVE_LIBCLFFT
-std::pair<cl_platform_id,cl_device_id> get_platform_device_opencl(int);
-std::string get_platform_device_info_opencl(int);
-#endif
-
-void phys_wavelet_trasl_opencl(void *, int &);
 
 // unwrap methods
 void phys_phase_unwrap(nPhysImageF<double> &, nPhysImageF<double> &, enum unwrap_strategy, nPhysImageF<double>&);

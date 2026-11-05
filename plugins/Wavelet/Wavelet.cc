@@ -156,9 +156,6 @@ void Wavelet::doWavelet () {
 
 		//qCalculation_th my_qt;
 
-		QSettings settings("neutrino","");
-        settings.beginGroup("nPreferences");
-
         if (numAngle->value()==0) {
             my_params.init_angle=angleCarrier->value();
             my_params.end_angle=angleCarrier->value();
@@ -189,18 +186,9 @@ void Wavelet::doWavelet () {
         my_params.damp=damp->value();
         my_params.data=&datamatrix;
 
-        QString out;
-
-        qDebug() << physWave::openclEnabled() << settings.value("openclUnit").toInt();
-
-        if (physWave::openclEnabled()>0 && settings.value("openclUnit").toInt()>0) {
-            out="OpenCL: ";
-            my_params.opencl_unit=settings.value("openclUnit").toInt();
-            runThread(&my_params, physWave::phys_wavelet_trasl_opencl, "OpenCL wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thicks);
-        } else {
-            out="CPU: ";
-            runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "CPU wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thicks);
-        }
+        my_params.n_candidates=candidates->value();
+        my_params.log_lambda=logLambda->isChecked();
+        runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thicks);
 
 
         erasePrevious->setEnabled(true);
@@ -248,7 +236,7 @@ void Wavelet::doWavelet () {
         }
         
         QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*my_params.n_thicks*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
-        statusbar->showMessage(out+status_bar_measure);
+        statusbar->showMessage(status_bar_measure);
         DEBUG(status_bar_measure.toStdString());
     } else {
         statusbar->showMessage("Canceled");

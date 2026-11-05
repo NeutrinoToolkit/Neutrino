@@ -1,6 +1,6 @@
 # find the nPhysImageF dependencies.
 # Nothing is set globally: the results are collected in
-#   NPHYS_INCLUDES        include dirs (public: the nPhysImage headers include fftw, gsl, hdf4, tiff, clFFT...)
+#   NPHYS_INCLUDES        include dirs (public: the nPhysImage headers include fftw, gsl, hdf4, tiff...)
 #   NPHYS_DEFINITIONS     HAVE_* definitions (public: the nPhysImage headers depend on them)
 #   NPHYS_COMPILE_OPTIONS compile options (public)
 #   NPHYS_PUBLIC_LIBS     libraries used also by the consumers (OpenMP, fftw, gsl)
@@ -193,32 +193,6 @@ if (NOT ${CFITS} STREQUAL "CFITS-NOTFOUND")
 	list(APPEND NPHYS_DEFINITIONS HAVE_LIBCFITSIO)
 	list(APPEND NPHYS_INCLUDES ${CFITS_INCLUDE_DIR})
 	ENDIF()
-endif()
-
-# opencl
-find_package(OpenCL QUIET)
-if (OpenCL_FOUND)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		message (STATUS "using OpenCL: ${OpenCL_LIBRARIES}")
-	endif()
-
-	# include_directories(${OpenCL_INCLUDE_DIRS})
-	# set(LIBS ${LIBS} ${OpenCL_LIBRARIES})
-	# add_definitions(-DHAVE_OPENCL)
-	list(APPEND NPHYS_INCLUDES ${OpenCL_INCLUDE_DIRS})
-	list(APPEND NPHYS_PRIVATE_LIBS ${OpenCL_LIBRARIES})
-	list(APPEND NPHYS_DEFINITIONS HAVE_OPENCL)
-
-	find_library (CLFFT NAMES clFFT)
-    if (NOT ${CLFFT} STREQUAL "CLFFT-NOTFOUND")
-		if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-			message (STATUS "using clFFT: ${CLFFT}")
-		endif()
-		# set(LIBS ${LIBS} ${CLFFT})
-		# add_definitions(-DHAVE_LIBCLFFT)
-		list(APPEND NPHYS_PRIVATE_LIBS ${CLFFT})
-		list(APPEND NPHYS_DEFINITIONS HAVE_LIBCLFFT)
-	endif()
 endif()
 
 set(LIBS ${LIBS} ${NPHYS_PUBLIC_LIBS} ${NPHYS_PRIVATE_LIBS})

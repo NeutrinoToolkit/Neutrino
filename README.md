@@ -86,7 +86,7 @@ Needs CMake >= 3.18, a C++17 compiler and:
 
 * Qt 6 (Widgets, Svg, PrintSupport, Network, Multimedia)
 * FFTW 3, GSL, libtiff, libjpeg, zlib, OpenMP
-* optional: HDF4, HDF5, CFITSIO, OpenCL with clFFT (GPU wavelets), pandoc (the help of the pans)
+* optional: HDF4, HDF5, CFITSIO, pandoc (the help of the pans)
 
 ```
 mkdir build && cd build
