@@ -1868,7 +1868,7 @@ void neutrino::about() {
     connect(my_about.buttonBox, SIGNAL(accepted()), &myabout, SLOT(close()));
     connect(my_about.buttonBox, SIGNAL(rejected()), &myabout, SLOT(close()));
 
-    my_about.version->setText(QApplication::applicationVersion());
+    my_about.version->setText(QString(neutrinoVersion)+" ("+QApplication::applicationVersion()+")"); // version (git sha)
     QDirIterator it(":licenses/", QDirIterator::Subdirectories);
     QStringList licenses;
     while (it.hasNext()) {

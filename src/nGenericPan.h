@@ -145,6 +145,12 @@ public slots:
     void button(QString, int=1);
     QStringList widgets();
 
+    // the data calculated by the pan (python: Pan.results(what), a dict; lists of numbers are numpy arrays).
+    // The default has the curves of the plots: {plot: {graph: {"x": [...], "y": [...]}}}; a plugin reimplements it
+    // to give its own results (e.g. Visar: velocity, reflectivity... of each VISAR).
+    // what (optional, invalid for all) selects a part, as the pan likes: here the object name of a plot
+    Q_INVOKABLE virtual QVariantMap results(QVariant what=QVariant());
+
     void show(bool onlyOneAllowed=false);
 
     void keyPressEvent(QKeyEvent *event) override;

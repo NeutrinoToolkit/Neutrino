@@ -172,6 +172,9 @@ public slots:
     
     QString export_one(unsigned int);
     QString export_sop();
+
+    // python: Pan.results(what)
+    QVariantMap results(QVariant what=QVariant()) override;
     
     void export_clipboard();
     

@@ -74,6 +74,11 @@ Tools: `neutrino.Pan`
 * `p.get("name")`, `p.set("name", value)`, `p.button("name")` (waits for the calculation it starts): the name of a
   widget is in square brackets in its tooltip; `p.widgets()` all the names
 * `p.getData(...)`, `p.show()`, `p.close()`, `p.raise_()`, `p.window()`
+* `p.results(what=None)`: the data calculated by the pan, a dict of numpy arrays. By default the curves of its plots
+  (`{plot: {graph: {"x": ..., "y": ...}}}`, `what` the name of a plot); Visar gives
+  `{"visar": [{"time", "velocity", "velocityError", "reflectivity", ...}, ...], "sop": {...}}`, with `what` "sop",
+  a VISAR number (0 for the first) or its name ("Visar1"). A plugin gives its own by reimplementing
+  `nGenericPan::results(QVariant what)`
 * `p.widget()` the PySide6 `QMainWindow` of the tool (e.g. `p.widget().findChild(QSpinBox, "name")`, or
   `p.widget().setCentralWidget(my_widget)` in a pan of `w.newPan`); `p.show()` and not `p.widget().show()`: it also
   sets the title and the saved values, as for the other pans. A `QToolBar` added before `p.show()` with

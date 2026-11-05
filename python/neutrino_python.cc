@@ -229,6 +229,18 @@ static nb::object fromVariant(const QVariant &val) {
             for (auto &v : val.toList()) ret.append(fromVariant(v));
             return ret;
         }
+        case QMetaType::QVariantMap: {
+            nb::dict ret;
+            const QVariantMap map=val.toMap();
+            for (auto it=map.constBegin(); it!=map.constEnd(); it++) ret[it.key().toUtf8().constData()]=fromVariant(it.value());
+            return ret;
+        }
+        case QMetaType::QVariantHash: {
+            nb::dict ret;
+            const QVariantHash map=val.toHash();
+            for (auto it=map.constBegin(); it!=map.constEnd(); it++) ret[it.key().toUtf8().constData()]=fromVariant(it.value());
+            return ret;
+        }
         case QMetaType::QPointF: case QMetaType::QPoint: {
             QPointF p=val.toPointF();
             return nb::make_tuple(p.x(), p.y());
@@ -244,6 +256,13 @@ static nb::object fromVariant(const QVariant &val) {
         default: break;
     }
     if (type==QMetaType::fromType<nPhysD*>()) return toPython(val.value<nPhysD*>());
+    if (type==QMetaType::fromType<QList<double>>()) { // (QVector<double>) a numpy array
+        const QList<double> vec=val.value<QList<double>>();
+        double *data=new double[std::max<qsizetype>(vec.size(),1)];
+        if (!vec.isEmpty()) std::memcpy(data, vec.constData(), vec.size()*sizeof(double));
+        nb::capsule owner(data, [](void *p) noexcept { delete[] static_cast<double*>(p); });
+        return nb::cast(nb::ndarray<nb::numpy, double, nb::ndim<1>>(data, {(size_t)vec.size()}, owner));
+    }
     if (type==QMetaType::fromType<QList<QList<qreal>>>()) {
         nb::list ret;
         for (auto &row : val.value<QList<QList<qreal>>>()) {
@@ -685,6 +704,13 @@ NB_MODULE(_neutrino, m) {
         .def("getData", [](PyPan &p, const std::string &widget, int occurrence) {
                 return fromVariant(QVariant::fromValue(p.get()->getData(QString::fromStdString(widget), occurrence)));
             }, "widget"_a, "occurrence"_a=1, "The data of a plot")
+        .def("results", [](PyPan &p, nb::handle what) {
+                return fromVariant(p.get()->results(what.is_none() ? QVariant() : toVariant(what)));
+            }, "what"_a=nb::none(),
+             "The data calculated by the pan, a dict (the lists of numbers are numpy arrays). By default the curves "
+             "of its plots, {plot: {graph: {'x': array, 'y': array}}}; some pans give their own results (e.g. Visar). "
+             "what selects a part, depending on the pan (by default the name of a plot; Visar: 'sop', a VISAR number "
+             "from 0 or its name 'Visar1')")
         .def("widgets", [](PyPan &p) {
                 std::vector<std::string> ret;
                 for (auto &w : p.get()->widgets()) ret.push_back(w.toStdString());

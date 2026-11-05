@@ -1160,6 +1160,32 @@ QList<QList<qreal> >  nGenericPan::getData(QString name, int occurrence) {
     return myListList;
 }
 
+QVariantMap nGenericPan::results(QVariant what) {
+    QVariantMap ret;
+    for (auto &plot : findChildren<nCustomPlot *>()) {
+        if (what.isValid() && plot->objectName()!=what.toString()) continue;
+        QVariantMap graphs;
+        for (int i=0; i<plot->graphCount(); i++) {
+            QCPGraph *graph=plot->graph(i);
+            QList<double> x, y;
+            for (auto it=graph->data()->constBegin(); it!=graph->data()->constEnd(); it++) {
+                x.append(it->key);
+                y.append(it->value);
+            }
+            QString name=graph->name().isEmpty() ? "graph"+QString::number(i) : graph->name();
+            while (graphs.contains(name)) name+="_"+QString::number(i);
+            graphs[name]=QVariantMap({{"x",QVariant::fromValue(x)},{"y",QVariant::fromValue(y)}});
+        }
+        if (!graphs.isEmpty()) {
+            QString name=plot->objectName();
+            while (ret.contains(name)) name+="_";
+            ret[name]=graphs;
+        }
+    }
+    if (what.isValid()) return ret.isEmpty() ? ret : ret.first().toMap(); // only that plot: its graphs
+    return ret;
+}
+
 void nGenericPan::button(QString name , int occurrence) {
     int my_occurrence;
     my_occurrence=1;

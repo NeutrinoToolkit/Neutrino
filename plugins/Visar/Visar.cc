@@ -1885,6 +1885,58 @@ QString Visar::export_sop() {
     return out;
 }
 
+// the calculated data (python: Pan.results(what)): the columns of the exports, as arrays
+// {"visar": [{"name", "enabled", "time", "velocity", ...} one per VISAR], "sop": {"time", "counts", ...}}.
+// what: "sop" for the SOP alone, the number of a VISAR (0 for the first) or its name ("Visar1") for that VISAR alone
+QVariantMap Visar::results(QVariant what) {
+    auto list = [](const QVector<double> &vec) { return QVariant::fromValue(QList<double>(vec)); };
+    QVariantList visarList;
+    for (auto &c : visars) {
+        QVariantMap one;
+        one["name"]=tabPhase->tabText(c->k);
+        one["enabled"]=c->velocityUi->enableVisar->isChecked();
+        // velocity (time of the sweep)
+        one["time"]=list(c->time_vel);
+        one["velocity"]=list(c->velocity);
+        one["velocityError"]=list(c->velError);
+        one["reflectivity"]=list(c->reflectivity);
+        one["reflectivityError"]=list(c->reflError);
+        one["quality"]=list(c->quality);
+        // phase (pixels along the time axis of the image)
+        one["pixel"]=list(c->time_phase);
+        one["shift"]=list(c->cPhase[1]);
+        one["shiftError"]=list(c->cPhaseErr);
+        one["shiftReference"]=list(c->cPhase[0]);
+        one["intensityReference"]=list(c->cIntensity[0]);
+        one["intensityShot"]=list(c->cIntensity[1]);
+        one["contrastReference"]=list(c->cContrast[0]);
+        one["contrastShot"]=list(c->cContrast[1]);
+        visarList.append(one);
+    }
+    QVariantMap ret;
+    ret["visar"]=visarList;
+    if (enableSOP->isChecked()) {
+        QVariantMap sop;
+        sop["time"]=list(time_sop);
+        sop["counts"]=list(sopCurve[0]);
+        // the temperature with the reflectivity of the VISARs, or without (where there is none): 0 in the other
+        sop["temperature"]=list(sopCurve[1]);
+        sop["temperatureNoReflectivity"]=list(sopCurve[2]);
+        ret["sop"]=sop;
+    }
+    if (what.isValid()) {
+        if (what.toString().compare("sop",Qt::CaseInsensitive)==0) return ret.value("sop").toMap();
+        bool isNumber=false;
+        int k=what.toInt(&isNumber);
+        for (int i=0; !isNumber && i<(int)visars.size(); i++) {
+            if (tabPhase->tabText(i).compare(what.toString(),Qt::CaseInsensitive)==0) k=i, isNumber=true;
+        }
+        if (isNumber && k>=0 && k<visarList.size()) return visarList[k].toMap();
+        return QVariantMap();
+    }
+    return ret;
+}
+
 QString Visar::export_one(unsigned int k) {
     QString out;
     if (k<visars.size()) {
