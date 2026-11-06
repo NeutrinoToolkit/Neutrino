@@ -121,6 +121,4 @@ Toolbar
 - **Duplicate**: the next run creates new images instead of replacing the current results (to compare two settings).
 - **Delete**: closes the results of the pan, except the image shown.
 
-On the lines and rectangles of the pan (region, mask, barrier, shapes) the **.** key runs their step.
-
 During the wavelet the progress is shown in the status bar of the pan, with a **Stop** button.

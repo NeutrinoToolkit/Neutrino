@@ -62,9 +62,6 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
     show();
 
     connect(images, &QTabWidget::currentChanged, this, &Interferometry::imagesTabBarClicked);
-    connect(region, &nRect::key_pressed, this, &Interferometry::line_key_pressed);
-    connect(maskRegion, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
-    connect(unwrapBarrier, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
 
     connect(actionDoWavelet, &QAction::triggered, this, qOverload<>(&Interferometry::doWavelet));
 
@@ -145,25 +142,6 @@ void Interferometry::on_actionDelete_triggered() {
             nparent->removePhys(itr->second);
     }
     DEBUG(localPhys.size());
-}
-
-void Interferometry::line_key_pressed(int key) {
-    if (key==Qt::Key_Period) {
-        if (sender()==maskRegion) {
-            doMaskCutoff();
-        } else if (sender()==unwrapBarrier) {
-            doUnwrap();
-        } else if (sender()==region) {
-            doWavelet();
-        } else {
-            for (std::map<QToolButton*,nLine*>::iterator it = my_shapes.begin(); it != my_shapes.end(); it++) {
-                if (sender()==(*it).second) {
-                    doShape();
-                }
-            }
-        }
-        nparent->activateWindow();
-    }
 }
 
 void Interferometry::physDel(nPhysD* buf) {
@@ -873,7 +851,6 @@ void Interferometry::addShape(QString name){
     my_shapes[my_b]=my_l;
     shapes->layout()->addWidget(my_b);
 
-    connect(my_l, &nLine::key_pressed, this, &Interferometry::line_key_pressed);
     connect(my_l, &nLine::destroyed, this, &Interferometry::removeShape);
     connect(my_b, &QToolButton::released, my_l, &nLine::togglePadella);
 }

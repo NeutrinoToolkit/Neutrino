@@ -81,7 +81,6 @@ public slots:
     void getPosZero(bool);
     void setPosZero(QPointF);
 
-    void line_key_pressed(int);
     
     void addShape();
     void addShape(QString);

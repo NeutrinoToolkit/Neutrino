@@ -65,6 +65,8 @@ public slots:
     void on_horizontalSlider_valueChanged(int);
 };
 
-NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I, -100);
+// NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::Key_I, -100);
+// (Alt+I: I alone is the intersection of the selected rectangle)
+NEUTRINO_PLUGIN(Image_list,Image,":icons/info.png", Qt::ALT | Qt::Key_I, -100);
 
 #endif

@@ -34,14 +34,24 @@ Shortcuts::Shortcuts(neutrino *nparent) : nGenericPan(nparent)
     if (lic.open(QFile::ReadOnly | QFile::Text)) {
         // QString htmltext=QTextStream(&lic).readAll().replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText)).replace("%OPTION%",QKeySequence(Qt::META).toString(QKeySequence::NativeText)).replace("%COMMAND%",QKeySequence(Qt::ALT).toString(QKeySequence::NativeText));
         // the menu shortcuts from the actions themselves (the fixed list was out of date)
-        QString htmltext=QTextStream(&lic).readAll().replace("%MENUS%",menuShortcuts()).replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText)).replace("%OPTION%",QKeySequence(Qt::META).toString(QKeySequence::NativeText)).replace("%COMMAND%",QKeySequence(Qt::ALT).toString(QKeySequence::NativeText));
+        // QString htmltext=QTextStream(&lic).readAll().replace("%MENUS%",menuShortcuts()).replace("%CTRL%",QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText)).replace("%OPTION%",QKeySequence(Qt::META).toString(QKeySequence::NativeText)).replace("%COMMAND%",QKeySequence(Qt::ALT).toString(QKeySequence::NativeText));
+        // the keys of the gear menu of the pans (nGenericPan) as Qt writes them (the modifiers in the order of the
+        // platform), and Alt for the reset (on macOS %OPTION% was Qt::META, i.e. Control)
+        auto panKey=[](Qt::Key key) {
+            return QKeySequence(Qt::CTRL | Qt::ALT | Qt::META | key).toString(QKeySequence::NativeText).toHtmlEscaped();
+        };
+        QString alt=QKeySequence(Qt::ALT | Qt::Key_A).toString(QKeySequence::NativeText);
+        alt.chop(1); // (the modifier alone)
+        if (alt.endsWith('+')) alt.chop(1);
+        QString htmltext=QTextStream(&lic).readAll().replace("%MENUS%",menuShortcuts()).replace("%PAN_S%",panKey(Qt::Key_S)).replace("%PAN_J%",panKey(Qt::Key_J)).replace("%PAN_N%",panKey(Qt::Key_N)).replace("%ALT%",alt.toHtmlEscaped());
         textBrowser->insertHtml(htmltext);
     }
     show(true);
 }
 
 // the shortcuts of all the actions of neutrino and of the plugins, by menu;
-// a shortcut used by more than one action is shown in red (Qt runs none of them)
+// a shortcut used by more than one action, or also by the keys of the objects, is shown in red
+// (Qt runs none of two actions; a menu shortcut is run instead of the key of the selected object)
 QString Shortcuts::menuShortcuts() {
     QMap<QString, QList<QPair<QString,QString>>> groups; // menu -> (action, keys)
     QMap<QString, QStringList> byKey;                     // key -> actions
@@ -78,6 +88,26 @@ QString Shortcuts::menuShortcuts() {
         }
         html+="<HR>\n";
     }
+    // the keys of the selected objects (nLine, nObject, nPoint, keyPressEvent) and of the image (nView):
+    // the menu shortcuts are run before them, an object never gets a key that is also a menu shortcut
+    const QList<QPair<QString,QString>> objectKeys={
+        {"Up", tr("move (selected object, mouse cursor)")}, {"Down", tr("move (selected object, mouse cursor)")},
+        {"Left", tr("move (selected object, mouse cursor)")}, {"Right", tr("move (selected object, mouse cursor)")},
+        {"Shift+Up", tr("move faster")}, {"Shift+Down", tr("move faster")},
+        {"Shift+Left", tr("move faster")}, {"Shift+Right", tr("move faster")},
+        {"Return", tr("stop adding points (line), click (image)")}, {"Esc", tr("stop adding points (line, rectangle)")},
+        {"Backspace", tr("delete the selected object")},
+        {"W", tr("properties window (line, rectangle, point)")}, {"B", tr("Bezier (line)")},
+        {"C", tr("closed line, center the rectangle")}, {"Shift+C", tr("center the line, copy the rectangle points")},
+        {"S", tr("antialias (line), submatrix (rectangle)")}, {"A", tr("append point (line)")},
+        {"P", tr("prepend point (line)")}, {"D", tr("delete point (line)")},
+        {"X", tr("horizontal (line), expand width (rectangle)")}, {"Y", tr("vertical (line), expand height (rectangle)")},
+        {"R", tr("rectangle (line)")}, {"Shift+R", tr("expand to the image (line)")},
+        {"E", tr("expand (rectangle)")}, {"I", tr("intersection with the image (rectangle)")},
+        {"Shift+V", tr("paste the points (rectangle)")}};
+    for (auto &key : objectKeys) {
+        if (byKey.contains(key.first)) byKey[key.first] << tr("key of the objects: ")+key.second;
+    }
     QStringList conflicts;
     for (auto it=byKey.begin(); it!=byKey.end(); ++it) {
         if (it.value().size()>1) {
@@ -85,7 +115,7 @@ QString Shortcuts::menuShortcuts() {
         }
     }
     if (!conflicts.isEmpty()) {
-        html.prepend("<FONT COLOR=\"red\"><B>"+tr("Shortcuts used more than once (they do not work):")+"</B><BR>\n"+conflicts.join("<BR>\n")+"</FONT><HR>\n");
+        html.prepend("<FONT COLOR=\"red\"><B>"+tr("Shortcuts used more than once (only the menu one works, two menu ones: none):")+"</B><BR>\n"+conflicts.join("<BR>\n")+"</FONT><HR>\n");
     }
     return html;
 }
