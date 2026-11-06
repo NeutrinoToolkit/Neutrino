@@ -80,6 +80,20 @@ Integral_inversion::sceneChanged()
 }
 
 void Integral_inversion::doInversion() {
+    if (running) { // once more at the end, with the last axis
+        pending=true;
+        return;
+    }
+    running=true;
+    do {
+        pending=false;
+        invert();
+    } while (pending && nThread.n_iter!=-1);
+    pending=false;
+    running=false;
+}
+
+void Integral_inversion::invert() {
 	saveDefaults();
     nPhysD *my_phys=getPhysFromCombo(image);
     if (my_phys) {
@@ -133,12 +147,12 @@ void Integral_inversion::doInversion() {
         iimage.setFromName(iimage.getName());
         iimage.setName("inverted");
 
-        if (blurRadius_checkb->isChecked()) {	// blur
+        if (blurRadius_sb->value()>0) {	// blur (0: off)
             physMath::phys_fast_gaussian_blur(iimage, blurRadius_sb->value());
         }
 
-        if (multiply_checkb->isChecked()) {	// multiply
-            physMath::phys_multiply(iimage, multiply_sb->value());
+        if (multiplyFactor->value()!=1) {	// multiply
+            physMath::phys_multiply(iimage, multiplyFactor->value());
         }
 
 
@@ -159,6 +173,7 @@ void Integral_inversion::doInversion() {
         my_abel_params.ialgo = (enum physWave::inversion_algo) invAlgo_cb->itemData(cb_idx).value<int>();
 
         my_abel_params.iphysics = physWave::ABEL_NONE;
+        my_abel_params.symmetric = symmetric_checkb->isChecked();
 
 		DEBUG(10,"algo value is: "<<my_abel_params.ialgo);
 

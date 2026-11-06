@@ -66,8 +66,7 @@ Wavelet::Wavelet(neutrino *nparent) : nGenericPan(nparent), region(this,1), line
 void Wavelet::on_relative_toggled(bool tog) {
     minStretch->setSuffix(tog?" X":" [px]");
     maxStretch->setSuffix(tog?" X":" [px]");
-    minThick->setSuffix(tog?" X":" [px]");
-    maxThick->setSuffix(tog?" X":" [px]");
+    thick->setSuffix(tog?" X":" [px]");
 }
 
 void Wavelet::useBarrierToggled(bool val) {
@@ -174,28 +173,20 @@ void Wavelet::doWavelet () {
             my_params.end_lambda=maxStretch->value()*conversionStretch;
             my_params.n_lambdas=numStretch->value();
         }
-        if (numThick->value()==0) {
-            my_params.init_thick=widthCarrier->value();
-            my_params.end_thick=widthCarrier->value();
-            my_params.n_thicks=1;
-        } else {
-            my_params.init_thick=minThick->value()*conversionStretch;
-            my_params.end_thick=maxThick->value()*conversionStretch;
-            my_params.n_thicks=numThick->value();
-        }
+        // 0: the interfringe of the carrier
+        my_params.thick = thick->value()>0 ? thick->value()*conversionStretch : widthCarrier->value();
         my_params.damp=damp->value();
         my_params.data=&datamatrix;
 
         my_params.n_candidates=candidates->value();
         my_params.log_lambda=logLambda->isChecked();
-        runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet", my_params.n_angles*my_params.n_lambdas*my_params.n_thicks);
+        runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet", my_params.n_angles*my_params.n_lambdas);
 
 
         erasePrevious->setEnabled(true);
         for(auto &itr : my_params.olist) {
             if (!(itr.first=="angle"  && my_params.n_angles ==1) &&
-                !(itr.first=="lambda" && my_params.n_lambdas==1) &&
-                !(itr.first=="thick"  && my_params.n_thicks ==1)) {
+                !(itr.first=="lambda" && my_params.n_lambdas==1)) {
                 nPhysD *this_phys = new nPhysD(*itr.second);
                 if (erasePrevious->isChecked()) {
                     waveletPhys[itr.first]=nparent->replacePhys(this_phys,waveletPhys[itr.first],false);
@@ -235,7 +226,7 @@ void Wavelet::doWavelet () {
             }
         }
         
-        QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*my_params.n_thicks*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
+        QString status_bar_measure=QString("%1 sec, %2 Mpx/s").arg(1.0e-3*timer.elapsed(),0,' ',1).arg(1.0e-3*my_params.n_angles*my_params.n_lambdas*geom2.width()*geom2.height()/timer.elapsed(),0,' ',1);
         statusbar->showMessage(status_bar_measure);
         DEBUG(status_bar_measure.toStdString());
     } else {

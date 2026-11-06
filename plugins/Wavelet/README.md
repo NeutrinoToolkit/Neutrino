@@ -31,8 +31,8 @@ reconstruction des franges.
 Commencer le calcul avec un nombre de points (number) modéré (ex. 5) entre
 les limites indiquées.
 
-6. La valeur **Thickness** impose la plage sur laquelle un saut de frange peut être
-détecté. Une trop petite valeur fera ressortir le *bruit* tandis qu’une trop
+6. La valeur **thick** (longueur de la fenêtre le long des franges ; 0 : l’interfrange de la
+porteuse) impose la plage sur laquelle un saut de frange peut être détecté. Une trop petite valeur fera ressortir le *bruit* tandis qu’une trop
 grande valeur lissera les gradients raides. La valeur **Damp** contribue à lisser
 les discontinuités lors d’un saut de frange. Augmenter la valeur lorsque, après
 calcul, les franges ne sont pas *connectées*. Mais une valeur trop

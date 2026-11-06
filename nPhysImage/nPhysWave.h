@@ -66,10 +66,11 @@ public:
     double init_lambda;
     double end_lambda;
     size_t n_lambdas;
+    // lambda values spaced geometrically (constant relative step: the filter accepts a relative mismatch, about
+    // 1/(pi damp)), otherwise linearly (the step was too coarse for the dense fringes of a wide range)
+    bool log_lambda=false;
 
-    double init_thick;
-    double end_thick;
-    size_t n_thicks;
+    double thick;
 
     double damp;
 
@@ -78,9 +79,6 @@ public:
     // smoothed over the neighbours (weighted by the contrast)
     size_t n_candidates=0;
 
-    // lambda values spaced geometrically (constant relative step: the filter accepts a relative mismatch, about
-    // 1/(pi damp)), otherwise linearly (the step was too coarse for the dense fringes of a wide range)
-    bool log_lambda=false;
 
 	int iter;
 	int *iter_ptr;

@@ -51,6 +51,9 @@ public:
     nPhysD *invertedPhys;
 private:
     physWave::abel_params my_abel_params;
+    // an inversion is running (runThread handles the events: the axis moves meanwhile) / another one is wanted
+    bool running=false, pending=false;
+    void invert();
 
 public slots:
     void physDel(nPhysD*);

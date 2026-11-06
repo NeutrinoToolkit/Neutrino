@@ -85,8 +85,7 @@ static bool wavelet_finite_input(physD &data, physD &fdata) {
 // thick along them
 static double wavelet_window(const physWave::wavelet_params &params) {
     double lambda_max=std::max(params.init_lambda,params.end_lambda);
-    double thick_max=std::max(params.init_thick,params.end_thick);
-    return std::max(params.damp*lambda_max, thick_max);
+    return std::max(params.damp*lambda_max, params.thick);
 }
 
 // smallest size >= n with only the factors 2, 3 and 5: measured with FFTW, the cost per point is the same as for a
@@ -172,11 +171,10 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         auto wphase   = std::make_unique<physD>(dx, dy, 0.0, "phase_2pi");
         auto lambda   = std::make_unique<physD>(dx, dy, 0.0, "lambda");
         auto angle    = std::make_unique<physD>(dx, dy, 0.0, "angle");
-        auto thick    = std::make_unique<physD>(dx, dy, 0.0, "thick");
         auto intensity= std::make_unique<physD>(dx, dy, 0.0, "intensity");
 
 
-        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas), thickness(params.n_thicks);
+        std::vector<double> angles(params.n_angles), lambdas(params.n_lambdas);
         if (params.n_angles==1) {
             angles[0]=0.5*(params.end_angle+params.init_angle);
         } else {
@@ -184,12 +182,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                 angles[nangle] = params.init_angle + nangle*(params.end_angle-params.init_angle)/(params.n_angles-1);
         }
         lambdas=wavelet_lambdas(params);
-        if (params.n_thicks==1) {
-            thickness[0]=0.5*(params.end_thick+params.init_thick);
-        } else {
-            for (size_t nthick=0; nthick<params.n_thicks; nthick++)
-                thickness[nthick] = params.init_thick + nthick*(params.end_thick-params.init_thick)/(params.n_thicks-1);
-        }
 
         params.iter=0;
         *params.iter_ptr=0;
@@ -204,7 +196,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         // the backward FFT runs once per filter: a measured plan is 1.3-3x faster (much more with fftw threads).
         // Measuring costs about one second for a large image but FFTW keeps it (wisdom): the next plans of the same
         // size are immediate, also with FFTW_ESTIMATE. FFTW_MEASURE overwrites t and Ftmorlet: plan before filling t
-        size_t n_filters = params.n_angles*params.n_lambdas*params.n_thicks;
+        size_t n_filters = params.n_angles*params.n_lambdas;
         fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, n_filters >= 16 ? FFTW_MEASURE : FFTW_ESTIMATE);
 
 #pragma omp parallel for
@@ -228,7 +220,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         double log_kappa = damp_norm>0 ? -damp_norm*damp_norm : -std::numeric_limits<double>::infinity();
 
         // refinement of lambda and angle maps: for each pixel keep the response of the filters next to the best one
-        // (lambda-1, lambda+1, angle-1, angle+1 at the same thickness). The previous responses are kept for one row
+        // (lambda-1, lambda+1, angle-1, angle+1). The previous responses are kept for one row
         // of the inner scan, which is the shorter one between angles and lambdas
         bool anglesInner = angles.size() <= lambdas.size();
         size_t nInner = anglesInner ? angles.size() : lambdas.size();
@@ -236,36 +228,36 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         auto rowIdx = [&](size_t il, size_t ia) { return anglesInner ? ia : il; };
         std::vector<float> prevRow(nInner*surf, -1);
         std::vector<float> nearLambda(2*surf, -1), nearAngle(2*surf, -1); // [0..surf) minus, [surf..2surf) plus
-        std::vector<int> bestT(surf,-1), bestL(surf,-1), bestA(surf,-1);
+        std::vector<int> bestL(surf,-1), bestA(surf,-1);
 
         // regularization (wavelet_params::n_candidates): the K best filters of each pixel (response, phase, indices)
         const size_t K = params.n_candidates>=2 ? params.n_candidates : 0;
         std::vector<float> candQ(K*surf, -1), candPh(K*surf, 0);
-        std::vector<short> candT(K*surf, -1), candL(K*surf, -1), candA(K*surf, -1);
+        std::vector<short> candL(K*surf, -1), candA(K*surf, -1);
 
-        for (size_t l=0; l<thickness.size(); l++) {
-            for (size_t o=0; o<nOuter; o++) {
-                for (size_t n=0; n<nInner; n++) {
-                    size_t i = anglesInner ? o : n; // lambda index
-                    size_t j = anglesInner ? n : o; // angle index
 
-                    if ((*params.iter_ptr)==-1) {
-                        DEBUG("Aborting");
-                        break;
-                    }
-                    params.iter++;
-                    (*params.iter_ptr)++;
-                    DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<" lam "<<lambdas[i]<<", ang "<<angles[j]);
-                    double angle_rad=angles[j]*_phys_deg;
-                    double cr = cos(angle_rad);
-                    double sr = sin(angle_rad);
+        for (size_t o=0; o<nOuter; o++) {
+            for (size_t n=0; n<nInner; n++) {
+                size_t i = anglesInner ? o : n; // lambda index
+                size_t j = anglesInner ? n : o; // angle index
 
-                    // double thick_norm=thickness[l]*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
-                    // double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
-                    // the filter is built on true spatial frequencies (cycles/px) before rotating:
-                    // rotating the FFT indices directly misses the carrier on non-square images (unless angle is 0 or 90)
-                    double thick_norm=thickness[l]*M_PI;
-                    double lambda_norm=lambdas[i];
+                if ((*params.iter_ptr)==-1) {
+                    DEBUG("Aborting");
+                    break;
+                }
+                params.iter++;
+                (*params.iter_ptr)++;
+                DEBUG(11,(100.*params.iter)/(angles.size()*lambdas.size())<<" lam "<<lambdas[i]<<", ang "<<angles[j]);
+                double angle_rad=angles[j]*_phys_deg;
+                double cr = cos(angle_rad);
+                double sr = sin(angle_rad);
+
+                // double thick_norm=thickness[l]*M_PI/sqrt(pow(sr*dx,2)+pow(cr*dy,2));
+                // double lambda_norm=lambdas[i]/sqrt(pow(cr*dx,2)+pow(sr*dy,2));
+                // the filter is built on true spatial frequencies (cycles/px) before rotating:
+                // rotating the FFT indices directly misses the carrier on non-square images (unless angle is 0 or 90)
+                double thick_norm=params.thick*M_PI;
+                double lambda_norm=lambdas[i];
 
 // #pragma omp parallel for
 //                     for (unsigned int k=0;k<surf;k++) {
@@ -291,75 +283,69 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 //
 //                     }
 #pragma omp parallel for
-                    for (unsigned int y=0;y<dy;y++) {
-                        int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
-                        double fy = yy/(double)dy;
-                        for (unsigned int x=0;x<dx;x++) {
-                            size_t k=(size_t)y*dx+x;
-                            int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
-                            double fx = xx/(double)dx;
-                            double xr = fx*cr - fy*sr; //rotate
-                            double yr = fx*sr + fy*cr;
+                for (unsigned int y=0;y<dy;y++) {
+                    int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
+                    double fy = yy/(double)dy;
+                    for (unsigned int x=0;x<dx;x++) {
+                        size_t k=(size_t)y*dx+x;
+                        int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
+                        double fx = xx/(double)dx;
+                        double xr = fx*cr - fy*sr; //rotate
+                        double yr = fx*sr + fy*cr;
 
-                            double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-                            double e_y = -pow(yr*thick_norm, 2.);
-                            double e_k = -pow(damp_norm*xr*lambda_norm, 2.); // admissibility term
+                        double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
+                        double e_y = -pow(yr*thick_norm, 2.);
+                        double e_k = -pow(damp_norm*xr*lambda_norm, 2.); // admissibility term
 
-                            double gauss = 0;
-                            // |gauss| <= norm_adm*max(exp(e_x),kappa*exp(e_k))*exp(e_y)
-                            if (e_y > log_negligible && (e_x > log_negligible || e_k+log_kappa > log_negligible)) {
-                                gauss = norm_adm*(exp(e_x)-kappa*exp(e_k))*exp(e_y);
-                            }
-
-                            t[k][0]=Ft[k][0]*gauss;
-                            t[k][1]=Ft[k][1]*gauss;
+                        double gauss = 0;
+                        // |gauss| <= norm_adm*max(exp(e_x),kappa*exp(e_k))*exp(e_y)
+                        if (e_y > log_negligible && (e_x > log_negligible || e_k+log_kappa > log_negligible)) {
+                            gauss = norm_adm*(exp(e_x)-kappa*exp(e_k))*exp(e_y);
                         }
+
+                        t[k][0]=Ft[k][0]*gauss;
+                        t[k][1]=Ft[k][1]*gauss;
                     }
+                }
 
-                    fftw_execute(plan_bwd);
+                fftw_execute(plan_bwd);
 
-                    // decision
+                // decision
 #pragma omp parallel for
-                    for (size_t k=0; k<surf; k++) {
-                        double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
-                        if (bestT[k]==(int)l) {
-                            if (bestA[k]==(int)j && bestL[k]+1==(int)i) nearLambda[surf+k]=qmap_local;
-                            if (bestL[k]==(int)i && bestA[k]+1==(int)j) nearAngle[surf+k]=qmap_local;
-                        }
-                        if ( qmap_local > qmap->Timg_buffer[k]) {
-                            qmap->Timg_buffer[k] = qmap_local;
-                            wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
-                            lambda->Timg_buffer[k] = lambdas[i];
-                            angle->Timg_buffer[k] = angles[j];
-                            thick->Timg_buffer[k] = thickness[l];
-                            bestT[k]=l;
-                            bestL[k]=i;
-                            bestA[k]=j;
-                            nearLambda[k] = i>0 ? prevRow[rowIdx(i-1,j)*surf+k] : -1;
-                            nearAngle[k]  = j>0 ? prevRow[rowIdx(i,j-1)*surf+k] : -1;
-                            nearLambda[surf+k] = -1;
-                            nearAngle[surf+k] = -1;
-                        }
-                        prevRow[n*surf+k]=qmap_local;
-                        if (K) { // replaces the weakest of the K candidates
-                            size_t kmin=k*K;
-                            for (size_t c=k*K+1; c<(k+1)*K; c++) if (candQ[c]<candQ[kmin]) kmin=c;
-                            if (qmap_local>candQ[kmin]) {
-                                candQ[kmin]=qmap_local;
-                                candPh[kmin]=atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
-                                candT[kmin]=l;
-                                candL[kmin]=i;
-                                candA[kmin]=j;
-                            }
+                for (size_t k=0; k<surf; k++) {
+                    double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
+                    if (bestA[k]==(int)j && bestL[k]+1==(int)i) nearLambda[surf+k]=qmap_local;
+                    if (bestL[k]==(int)i && bestA[k]+1==(int)j) nearAngle[surf+k]=qmap_local;
+                    if ( qmap_local > qmap->Timg_buffer[k]) {
+                        qmap->Timg_buffer[k] = qmap_local;
+                        wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
+                        lambda->Timg_buffer[k] = lambdas[i];
+                        angle->Timg_buffer[k] = angles[j];
+                        bestL[k]=i;
+                        bestA[k]=j;
+                        nearLambda[k] = i>0 ? prevRow[rowIdx(i-1,j)*surf+k] : -1;
+                        nearAngle[k]  = j>0 ? prevRow[rowIdx(i,j-1)*surf+k] : -1;
+                        nearLambda[surf+k] = -1;
+                        nearAngle[surf+k] = -1;
+                    }
+                    prevRow[n*surf+k]=qmap_local;
+                    if (K) { // replaces the weakest of the K candidates
+                        size_t kmin=k*K;
+                        for (size_t c=k*K+1; c<(k+1)*K; c++) if (candQ[c]<candQ[kmin]) kmin=c;
+                        if (qmap_local>candQ[kmin]) {
+                            candQ[kmin]=qmap_local;
+                            candPh[kmin]=atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
+                            candL[kmin]=i;
+                            candA[kmin]=j;
                         }
                     }
+                }
 
-                }
-                //! todo: this is awful: add exception?
-                if ((*params.iter_ptr)==-1) {
-                    DEBUG("aborting");
-                    break;
-                }
+            }
+            //! todo: this is awful: add exception?
+            if ((*params.iter_ptr)==-1) {
+                DEBUG("aborting");
+                break;
             }
         }
 
@@ -401,6 +387,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                         double angS=0.5*atan2(ws.Timg_buffer[k], wc.Timg_buffer[k])/_phys_deg;
                         size_t cbest=k*K;
                         double dbest=std::numeric_limits<double>::infinity();
+                        bool found=false;
                         for (size_t c=k*K; c<(k+1)*K; c++) {
                             if (candQ[c]<0) continue;
                             double dl = dLambda==0 ? 0 : wavelet_log_lambda(params) ?
@@ -408,15 +395,14 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                                         (lambdas[candL[c]]-lamS)/dLambda;
                             double da = dAngle!=0 ? remainder(angles[candA[c]]-angS, 180.0)/dAngle : 0;
                             double d=dl*dl+da*da;
-                            if (d<dbest || (d==dbest && candQ[c]>candQ[cbest])) { dbest=d; cbest=c; }
+                            if (d<dbest || (d==dbest && candQ[c]>candQ[cbest])) { dbest=d; cbest=c; found=true; }
                         }
-                        if (candQ[cbest]>=0 && (candL[cbest]!=bestL[k] || candA[cbest]!=bestA[k] || candT[cbest]!=bestT[k])) {
+                        if (found && (candL[cbest]!=bestL[k] || candA[cbest]!=bestA[k])) {
                             qmap->Timg_buffer[k]=candQ[cbest];
                             wphase->Timg_buffer[k]=candPh[cbest];
                             lambda->Timg_buffer[k]=lambdas[candL[cbest]];
                             angle->Timg_buffer[k]=angles[candA[cbest]];
-                            thick->Timg_buffer[k]=thickness[candT[cbest]];
-                            nearLambda[k]=nearLambda[surf+k]=nearAngle[k]=nearAngle[surf+k]=-1;
+                                nearLambda[k]=nearLambda[surf+k]=nearAngle[k]=nearAngle[surf+k]=-1;
                         }
                     }
                 }
@@ -451,7 +437,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
             params.olist["lambda"]    = std::move(lambda);
             params.olist["angle"]     = std::move(angle);
             params.olist["intensity"] = std::move(intensity);
-            params.olist["thick"]     = std::move(thick);
 
             for(auto itr = params.olist.begin(); itr != params.olist.end(); ++itr) {
                 *itr->second=itr->second->sub(offset.x(), offset.y(), dx0, dy0); // back to the image (without padding)
@@ -699,6 +684,46 @@ physWave::phys_apply_inversion_protons(physD &invimage, double energy, double re
 
 
 //! General function for Abel inversion
+// inversion of the two profiles of one axis point (each starts on the axis and goes to the image border, padded
+// with its last value); symmetric: the average of the two sides over the length both have, written on both sides
+template <class F>
+static void phys_invert_abel_point(physWave::abel_params &params, size_t ii, enum phys_direction sym_idx, enum phys_direction inv_idx,
+                                   std::vector<double> &neg_buffer, std::vector<double> &pos_buffer, std::vector<double> &out_buffer, F invert_1D)
+{
+    size_t integral_size = neg_buffer.size();
+    unsigned int axe_point[2] = { (unsigned int) params.iaxis[ii].x(), (unsigned int) params.iaxis[ii].y() };
+
+    size_t neg_len = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &neg_buffer[0], integral_size, PHYS_NEG);
+    size_t pos_len = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &pos_buffer[0], integral_size, PHYS_POS);
+
+    if (params.symmetric) {
+        size_t len = std::min(neg_len, pos_len);
+        for (size_t j=0; j<len; j++)
+            neg_buffer[j] = 0.5*(neg_buffer[j]+pos_buffer[j]);
+        for (size_t j=len; j<integral_size; j++)
+            neg_buffer[j] = neg_buffer[len-1];	// boundary normalization
+        invert_1D(neg_buffer, out_buffer);
+        params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
+        params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
+        return;
+    }
+
+    for (size_t j=neg_len; j<integral_size; j++)
+        neg_buffer[j] = neg_buffer[neg_len-1];	// boundary normalization
+    invert_1D(neg_buffer, out_buffer);
+    double axis_val = 0.5*out_buffer[0];
+    params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
+
+    for (size_t j=pos_len; j<integral_size; j++)
+        pos_buffer[j] = pos_buffer[pos_len-1];	// boundary normalization
+    invert_1D(pos_buffer, out_buffer);
+    axis_val += 0.5*out_buffer[0];
+    params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
+
+    // set on axis value
+    params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(), axis_val);
+}
+
 void physWave::phys_invert_abel(abel_params &params)
 {
 
@@ -709,9 +734,6 @@ void physWave::phys_invert_abel(abel_params &params)
     params.oimage = std::make_unique<physD>(params.iimage->getW(), params.iimage->getH(), 0.0, "Inverted");
     params.oimage->set_origin(params.iimage->get_origin());
     params.oimage->set_scale(params.iimage->get_scale());
-
-    
-    // adorabile ridondanza qui..
 
     // 1. set direction indexes
     enum phys_direction sym_idx, inv_idx;
@@ -728,15 +750,13 @@ void physWave::phys_invert_abel(abel_params &params)
             break;
     }
 
-    DEBUG(5,"after direction allocation");
-
     size_t integral_size = params.iimage->getSizeByIndex(inv_idx);
 
     *params.iter_ptr = 0;
     // 2. switch on algo
 
     if (params.ialgo == ABEL) {
-        DEBUG(1, "Plain ABEL inversion");
+        DEBUG(1, "Plain ABEL inversion" << (params.symmetric ? " (symmetric)" : ""));
 #pragma omp parallel for shared (params)
         for (size_t ii = 0; ii<params.iaxis.size(); ii++) {
             if ((*params.iter_ptr)!=-1) {
@@ -744,48 +764,18 @@ void physWave::phys_invert_abel(abel_params &params)
 #pragma omp atomic
                 (*params.iter_ptr)++;
 
-                size_t axe_point[2];
-
-                std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
-                axe_point[0] = params.iaxis[ii].x();
-                axe_point[1] = params.iaxis[ii].y();
-
-                int copied=0;
-
-                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
-
-                for (size_t j=copied; j<integral_size; j++)
-                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
-
-                phys_invert_abel_1D(copy_buffer, out_buffer);
-
-                double axis_val=0.5*out_buffer[0];
-
-                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
-
-                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
-
-                for (size_t j=copied; j<integral_size; j++)
-                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
-
-                phys_invert_abel_1D(copy_buffer, out_buffer);
-
-                axis_val+=0.5*out_buffer[0];
-
-                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
-
-                // set on axis value
-                params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(),axis_val);
+                std::vector<double> neg_buffer(integral_size), pos_buffer(integral_size), out_buffer(integral_size);
+                phys_invert_abel_point(params, ii, sym_idx, inv_idx, neg_buffer, pos_buffer, out_buffer,
+                                       [](std::vector<double> &in, std::vector<double> &out) { phys_invert_abel_1D(in, out); });
             }
         }
 
         params.oimage->setName(std::string("ABEL ")+params.oimage->getName());
         params.oimage->setShortName("ABEL");
 
-        //params.oimage->setName(std::string("Inverted (ABEL) ")+std::string(params.iimage->getShortName()));
     } else if (params.ialgo == ABEL_HF) {
 
-        DEBUG(1, "Hankel-Fourier implementation of ABEL inversion");
+        DEBUG(1, "Hankel-Fourier implementation of ABEL inversion" << (params.symmetric ? " (symmetric)" : ""));
         // testing purposes only! Many problems in this one:
         // 1. code copy
         // 2. lut optimization not working properly
@@ -795,23 +785,8 @@ void physWave::phys_invert_abel(abel_params &params)
         //! by fixing integral_size as a single vector size for transformation, results in padding
         //! hence in a modification of the image resolution
 
-        /*if (sym_idx == PHYS_X) {
-            params.oimage->resize(params.iimage->getW(), 3*integral_size);
-        } else {
-            params.oimage->resize(3*integral_size, params.iimage->getH());
-        }*/
-
-        //		int axe_inv_mean[2];
-        //		axe_inv_mean[0] = 0;
-        //		axe_inv_mean[1] = 0;
-        //		for (size_t ii=0; ii<params.iaxis.size(); ii++) {
-        //			axe_inv_mean[0] += params.iaxis[ii].x();
-        //			axe_inv_mean[1] += params.iaxis[ii].y();
-        //		}
-
-        //		DEBUG(5, "Axe average: "<<(double)axe_inv_mean[inv_idx]/params.iaxis.size());
-
-        std::vector<double> copy_buffer(integral_size), out_buffer(integral_size);
+        // the plan is made on the first input buffer: the same buffers for all the points
+        std::vector<double> neg_buffer(integral_size), pos_buffer(integral_size), out_buffer(integral_size), copy_buffer(integral_size);
 
         std::vector<double> Fivec;
         fftw_plan r2rplan=nullptr;
@@ -820,41 +795,17 @@ void physWave::phys_invert_abel(abel_params &params)
             if ((*params.iter_ptr)!=-1) {
                 (*params.iter_ptr)++;
 
-                int axe_point[2] = { params.iaxis[ii].x(), params.iaxis[ii].y()};
-
-                //cerr << axe_point[0]  << " , " << axe_point[1] << endl;
-                int copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_NEG);
-
-                for (size_t j=copied; j<integral_size; j++)
-                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
-
-
-                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut, Fivec, r2rplan);
-                //phys_invert_abelHF_1D(&copy_buffer[0], out_buffer, copied, &my_lut);
-                double upper_axe_point = 0.5*out_buffer[0];
-
-                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_NEG);
-                //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_NEG);
-
-                copied = params.iimage->get_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &copy_buffer[0], integral_size, PHYS_POS);
-                for (size_t j=copied; j<integral_size; j++)
-                    copy_buffer[j] = copy_buffer[copied-1];	// boundary normalization
-
-                phys_invert_abelHF_1D(copy_buffer, out_buffer, my_lut, Fivec, r2rplan);
-                //phys_invert_abelHF_1D(copy_buffer, &out_buffer[0], copied, &my_lut);
-
-                upper_axe_point+=0.5*out_buffer[0];
-
-                params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx], &out_buffer[0], integral_size, PHYS_POS);
-                //params.oimage->set_Tvector(inv_idx, axe_point[sym_idx], axe_point[inv_idx]-axe_average+1.5*integral_size, &out_buffer[0], integral_size, PHYS_POS);
-
-                params.oimage->set(params.iaxis[ii].x(), params.iaxis[ii].y(), upper_axe_point);
+                phys_invert_abel_point(params, ii, sym_idx, inv_idx, neg_buffer, pos_buffer, out_buffer,
+                                       [&](std::vector<double> &in, std::vector<double> &out) {
+                                           copy_buffer = in;
+                                           phys_invert_abelHF_1D(copy_buffer, out, my_lut, Fivec, r2rplan);
+                                       });
 
                 DEBUG(10,"step: "<<ii);
             }
         }
 
-        fftw_destroy_plan(r2rplan);
+        if (r2rplan) fftw_destroy_plan(r2rplan);
 
         params.oimage->setName(std::string("ABEL")+params.oimage->getName());
         params.oimage->setShortName("ABEL");

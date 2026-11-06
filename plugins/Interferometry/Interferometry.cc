@@ -304,15 +304,7 @@ void Interferometry::doWavelet (int iimage) {
             my_params.n_lambdas=my_image[iimage].numStretch->value();
         }
 
-        if (my_image[iimage].numThick->value()==0) {
-            my_params.init_thick=widthCarrier->value()*thickness->value();
-            my_params.end_thick=widthCarrier->value()*thickness->value();
-            my_params.n_thicks=1;
-        } else {
-            my_params.init_thick=my_image[iimage].minThick->value()*widthCarrier->value()*thickness->value();
-            my_params.end_thick=my_image[iimage].maxThick->value()*widthCarrier->value()*thickness->value();
-            my_params.n_thicks=my_image[iimage].numThick->value();
-        }
+        my_params.thick=widthCarrier->value()*thickness->value();
 
         // double thick = widthCarrier->value();
         my_params.damp=correlation->value();
@@ -332,7 +324,7 @@ void Interferometry::doWavelet (int iimage) {
         QRect geomPad=geom2;
         if (padding->isChecked()) {
             double window=std::max(my_params.damp*std::max(my_params.init_lambda,my_params.end_lambda),
-                                   std::max(my_params.init_thick,my_params.end_thick));
+                                   my_params.thick);
             int margin=(int)std::ceil(2.0*window);
             geomPad=geom2.adjusted(-margin,-margin,margin,margin).intersected(QRect(0,0,image->getW(),image->getH()));
         }
@@ -342,7 +334,7 @@ void Interferometry::doWavelet (int iimage) {
 
         my_params.data=&datamatrix;
 
-        int niter=my_params.n_angles*my_params.n_lambdas*my_params.n_thicks+1;
+        int niter=my_params.n_angles*my_params.n_lambdas+1;
 
         my_params.n_candidates=candidates->value();
         my_params.log_lambda=logLambda->isChecked();

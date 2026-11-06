@@ -701,7 +701,14 @@ bool nGenericPan::event(QEvent *event) {
     return QMainWindow::event(event);
 }
 
-void nGenericPan::closeEvent(QCloseEvent*){
+void nGenericPan::closeEvent(QCloseEvent *event){
+    // during runThread (the pan is not modal any more): stop the calculation, the pan stays open (its caller
+    // is still running and uses it)
+    if (nThread.isRunning()) {
+        nThread.stop();
+        event->ignore();
+        return;
+    }
     qDebug() << "Going to close" << this;
     foreach (QComboBox *combo, findChildren<QComboBox *>()) {
         if (combo->property("neutrinoImage").isValid()) {
@@ -839,24 +846,40 @@ void nGenericPan::saveSettings(QSettings &settings) {
 //
 void
 nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc) {
-    QProgressDialog progress(title, "Stop", 0, max_calc, this);
+    // the progress is in the status bar of the pan, with a Stop button: a modal dialog took the focus (e.g. from the
+    // main window while moving a line with auto update). The pan is disabled meanwhile, as the dialog did, except
+    // its status bar; the main window stays usable (the calculations work on copies of the images)
+    bool canceled=false;
+    QProgressBar *bar=nullptr;
+    QToolButton *stop=nullptr;
     if (max_calc > 0) {
-        progress.setWindowModality(Qt::WindowModal);
-        progress.show();
+        bar=new QProgressBar();
+        bar->setRange(0,max_calc);
+        bar->setFormat(title+" %p%");
+        bar->setMaximumHeight(statusBar()->fontMetrics().height()+4);
+        stop=new QToolButton();
+        stop->setText(tr("Stop"));
+        connect(stop, &QToolButton::clicked, this, [&canceled]() { canceled=true; });
+        statusBar()->addPermanentWidget(bar,1);
+        statusBar()->addPermanentWidget(stop);
     }
+    QList<QPointer<QWidget>> disabled;
+    for (auto &w : findChildren<QWidget *>(Qt::FindDirectChildrenOnly)) {
+        if (w!=statusBar() && w->isEnabled()) {
+            w->setEnabled(false);
+            disabled << w;
+        }
+    }
+
     nThread.setThread(iparams,my_func);
 
     nThread.start();
-    bool canceled=false;
     // wait() with a timeout instead of spinning on processEvents: a busy GUI thread steals a core from the OpenMP loops
     while (!nThread.wait(20)) {
-        if (max_calc > 0) {
-            progress.setValue(nThread.n_iter);
-            if (progress.wasCanceled()) {
-                nThread.stop();
-                canceled=true;
-                break;
-            }
+        if (bar) bar->setValue(nThread.n_iter);
+        if (canceled) {
+            nThread.stop();
+            break;
         }
         QApplication::processEvents();
     }
@@ -865,13 +888,15 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
     if (canceled) {
         nThread.n_iter=-1; // a running iteration may have incremented it again
     }
-    progress.setValue(0);
-    progress.hide();
-    progress.close();
+    delete bar;
+    delete stop;
+    for (auto &w : disabled) {
+        if (w) w->setEnabled(true);
+    }
     if (!canceled && nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }
-    
+
 }
 
 bool nGenericPan::nPhysExists(nPhysD* phys){

@@ -41,8 +41,8 @@ def checks():
     # the PySide objects of the window and of a pan
     assert w.widget().metaObject().className() == "neutrino"
     pan = w.openPan("Wavelet")
-    spin = pan.widget().findChild(QDoubleSpinBox, "minThick")
-    assert spin is not None and spin.value() == pan.get("minThick")
+    spin = pan.widget().findChild(QDoubleSpinBox, "minStretch")
+    assert spin is not None and spin.value() == pan.get("minStretch")
 
     # a PySide button driving Neutrino
     button = QPushButton("noise")
