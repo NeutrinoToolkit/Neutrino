@@ -316,7 +316,10 @@ void nGenericPan::show(bool onlyOneAllowed) {
                 my_tool->addAction(QIcon(":icons/loadPref.png"),tr("Load preferences"),this,[this]() { loadSettings(); });
                 my_tool->addAction(QIcon(":icons/savePref.png"),tr("Save preferences"),this,[this]() { saveSettings(); });
             }
-            QFile helpFile(":/"+panName()+"README.html");
+            // the help is named after the plugin directory, as its class (e.g. Ghost_fringes): not panName, which
+            // has spaces for the underscores
+            QFile helpFile(":/"+QString(metaObject()->className())+"README.html");
+            if (!helpFile.exists()) helpFile.setFileName(":/"+panName()+"README.html");
             if (helpFile.exists()) {
                 setProperty("helpFile",helpFile.fileName());
                 my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,&nGenericPan::help);
