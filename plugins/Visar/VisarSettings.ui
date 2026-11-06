@@ -632,8 +632,20 @@
          </item>
          <item>
           <widget class="QSpinBox" name="border">
+           <property name="toolTip">
+            <string>Background subtraction: for each time, the mean intensity of this many pixels at both sides of the region is subtracted (0: off)</string>
+           </property>
+           <property name="specialValueText">
+            <string>border: off</string>
+           </property>
+           <property name="suffix">
+            <string> [px]</string>
+           </property>
            <property name="maximum">
             <number>999</number>
+           </property>
+           <property name="neutrinoSave" stdset="0">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

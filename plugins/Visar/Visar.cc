@@ -1871,7 +1871,7 @@ QString Visar::export_sop() {
         out += QString("#Calib              : %L1 %L2\n").arg(sopCalibT0->value()).arg(sopCalibA->value());
         QRectF geom2=sopRect->getRectF();
         out += QString("#Region (px)        : ") + QString::number(geom2.left())+" "+QString::number(geom2.right())+" "+QString::number(geom2.top())+" "+QString::number(geom2.bottom())+"\n";
-        out += QString("#Time\tCounts\tTblackbody\tTgrayIn\tTgrayOut\n");
+        out += QString("#Time\tCounts\tT(R)\tT(R=0)\n");
 
         for (int i=0;i<time_sop.size();i++) {
             out += QLocale().toString(time_sop[i])+ " ";
