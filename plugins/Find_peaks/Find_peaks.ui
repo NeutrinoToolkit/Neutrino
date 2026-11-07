@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>372</height>
+    <width>519</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,7 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0,0">
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,2,0">
        <property name="leftMargin">
         <number>4</number>
        </property>
@@ -68,26 +68,20 @@
        <property name="verticalSpacing">
         <number>2</number>
        </property>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelSpacing">
          <property name="text">
-          <string>+</string>
+          <string>Peak spacing</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>x</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLineEdit" name="scaleOffset">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="spacingWorld">
+         <property name="toolTip">
+          <string>Distance between two consecutive peaks in world units (e.g. mm, nm): the scale of the image is this value divided by the fitted spacing in pixels</string>
          </property>
          <property name="text">
           <string>1</string>
@@ -97,126 +91,80 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="scale">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QDoubleSpinBox" name="prominence">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
+       <item row="0" column="2">
+        <widget class="QLabel" name="scaleInfo">
          <property name="toolTip">
-          <string>Minimum prominence of a peak (height above its surrounding valleys), in % of the profile range</string>
+          <string>Fitted spacing of the peaks [px] (linear fit of the positions against the peak numbers) and the resulting scale</string>
          </property>
-         <property name="suffix">
-          <string> %</string>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="decimals">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <double>100.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>10.000000000000000</double>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
-       <item row="2" column="3">
-        <widget class="QDoubleSpinBox" name="param">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+       <item row="0" column="3">
+        <widget class="QPushButton" name="setScale">
+         <property name="toolTip">
+          <string>Sets the scale of the image along the direction of the profile</string>
          </property>
-         <property name="suffix">
-          <string> px</string>
-         </property>
-         <property name="maximum">
-          <double>1000.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
+         <property name="text">
+          <string>Set scale</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
+        <widget class="QLabel" name="labelFirst">
          <property name="text">
-          <string>Scale</string>
+          <string>First peak at</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
-       <item row="0" column="4">
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="firstPeakWorld">
+         <property name="toolTip">
+          <string>World coordinate of the first peak found (the leftmost or topmost red line): the origin of the image is placed so that this peak is at this value, with the scale from the peak spacing</string>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="neutrinoSave" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="originInfo">
+         <property name="toolTip">
+          <string>Fitted position of the first peak [px] and the resulting origin [px]</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
         <widget class="QPushButton" name="setOrigin">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+         <property name="toolTip">
+          <string>Sets the origin of the image along the direction of the profile</string>
          </property>
          <property name="text">
-          <string>Set</string>
+          <string>Set origin</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+       <item row="2" column="3">
+        <widget class="QPushButton" name="calibrateBoth">
+         <property name="toolTip">
+          <string>Sets both the scale and the origin of the image</string>
          </property>
          <property name="text">
-          <string>Origin</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+          <string>Calibrate</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="4">
-        <widget class="QPushButton" name="setScale">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
+       <item row="3" column="0">
         <widget class="QToolButton" name="direction">
          <property name="text">
           <string>...</string>
@@ -234,49 +182,51 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="origin">
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="prominence">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
+         <property name="toolTip">
+          <string>Minimum prominence of a peak (height above its surrounding valleys), in % of the profile range</string>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QLineEdit" name="originOffset">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+         <property name="suffix">
+          <string> %</string>
          </property>
-         <property name="text">
-          <string>0</string>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>10.000000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="4">
-        <widget class="QSpinBox" name="order">
+       <item row="3" column="2">
+        <widget class="QDoubleSpinBox" name="param">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="neutrinoSave" stdset="0">
-          <bool>true</bool>
+         <property name="toolTip">
+          <string>Smoothing before the peak search: sigma of the gaussian blur [px] (0: none). The plot shows the smoothed profile (dotted). A large blur shifts the peaks toward their higher neighbours</string>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="5">
-        <widget class="QCheckBox" name="transpose">
-         <property name="text">
-          <string/>
+         <property name="suffix">
+          <string> px</string>
+         </property>
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
          </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
@@ -371,16 +321,51 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="coeff">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="fitLayout">
+      <item>
+            <widget class="QSpinBox" name="order">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Order of the polynomial fit of the peaks (coefficients on the right, from the order 0)</string>
+             </property>
+             <property name="prefix">
+              <string>Order </string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+      </item>
+      <item>
+         <widget class="QLineEdit" name="coeff">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+      </item>
+      <item>
+            <widget class="QCheckBox" name="transpose">
+             <property name="toolTip">
+              <string>Polynomial fit (coefficients below, order in the toolbar): unchecked, the position [px] as a function of the peak number; checked, the peak number as a function of the position [px] (e.g. to calibrate a non linear axis)</string>
+             </property>
+             <property name="text">
+              <string>Fit number(position)</string>
+             </property>
+             <property name="neutrinoSave" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QLineEdit" name="fourier">
@@ -474,8 +459,6 @@
  </customwidgets>
  <resources>
   <include location="../Lineout/Lineout_H/Lineout_H.qrc"/>
-  <include location="../Lineout/Lineout_V/Lineout_V.qrc"/>
-  <include location="../../resources/icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

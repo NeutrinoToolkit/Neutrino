@@ -39,12 +39,14 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
 
     connect(setOrigin, &QPushButton::clicked, this, &Find_peaks::set_origin);
     connect(setScale, &QPushButton::clicked, this, &Find_peaks::set_scale);
+    connect(calibrateBoth, &QPushButton::clicked, this, &Find_peaks::calibrate);
+    connect(spacingWorld, &QLineEdit::textChanged, this, &Find_peaks::updateCalibration);
+    connect(firstPeakWorld, &QLineEdit::textChanged, this, &Find_peaks::updateCalibration);
 
     connect(actionRect, &QAction::triggered, box, &nRect::togglePadella);
 
     toolBar->addWidget(direction);
     toolBar->addWidget(param);
-    toolBar->addWidget(order);
     toolBar->addWidget(prominence);
 
 
@@ -70,45 +72,70 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
 }
 
 
+// scale [world units/px] from the peak spacing in world units and the fitted spacing [px]; origin [px] such that
+// the first peak is at its world value with that scale
+bool Find_peaks::calibration(double &my_scale, double &my_origin) {
+    bool ok1, ok2;
+    const double spacing=locale().toDouble(spacingWorld->text(),&ok1);
+    const double first=locale().toDouble(firstPeakWorld->text(),&ok2);
+    if (!ok1 || !ok2 || spacing==0 || !std::isfinite(fitSpacing) || !std::isfinite(fitFirst) || fitSpacing==0) return false;
+    my_scale=spacing/fitSpacing;
+    my_origin=fitFirst-first/my_scale;
+    return std::isfinite(my_scale) && std::isfinite(my_origin);
+}
+
+void Find_peaks::updateCalibration() {
+    if (!std::isfinite(fitSpacing) || !std::isfinite(fitFirst)) {
+        scaleInfo->setText(tr("(not enough peaks)"));
+        originInfo->clear();
+        return;
+    }
+    double my_scale, my_origin;
+    if (calibration(my_scale, my_origin)) {
+        scaleInfo->setText(tr("fit %1 px → scale %2/px").arg(locale().toString(fitSpacing,'g',6), locale().toString(my_scale,'g',6)));
+        originInfo->setText(tr("fit %1 px → origin %2 px").arg(locale().toString(fitFirst,'g',6), locale().toString(my_origin,'g',6)));
+    } else {
+        scaleInfo->setText(tr("fit %1 px").arg(locale().toString(fitSpacing,'g',6)));
+        originInfo->setText(tr("fit %1 px").arg(locale().toString(fitFirst,'g',6)));
+    }
+}
+
+// (previous version: origin = fitted position of the first peak minus an offset in pixels, and scale = the
+// multiplier divided by the fitted spacing)
 void Find_peaks::set_origin() {
-    if (currentBuffer) {
-        bool ok=true;
-        double my_origin=0.0;
-        if (!originOffset->text().isEmpty()) my_origin=locale().toDouble(originOffset->text(),&ok);
-        if (ok) {
-            // fitted position of the first peak, minus the requested offset
-            double new_origin=locale().toDouble(origin->text(),&ok)-my_origin;
-            if (ok && std::isfinite(new_origin)) {
-                if (direction->isChecked()) {
-                    currentBuffer->set_origin(currentBuffer->get_origin().x(),new_origin);
-                } else {
-                    currentBuffer->set_origin(new_origin,currentBuffer->get_origin().y());
-                }
-                nparent->emitPhysChanged(currentBuffer);
-            }
+    double my_scale, my_origin;
+    if (currentBuffer && calibration(my_scale, my_origin)) {
+        // the objects follow the origin of the image: the region goes back on the same pixels
+        const QRectF region=box->getRectF();
+        if (direction->isChecked()) {
+            currentBuffer->set_origin(currentBuffer->get_origin().x(),my_origin);
+        } else {
+            currentBuffer->set_origin(my_origin,currentBuffer->get_origin().y());
         }
+        nparent->emitPhysChanged(currentBuffer);
+        box->setRect(region);
+    } else {
+        statusbar->showMessage(tr("No calibration: not enough peaks or invalid world values"));
     }
 }
 
 void Find_peaks::set_scale() {
-    if (currentBuffer) {
-        bool ok=true;
-        double scaleMult=1.0;
-        if (!scaleOffset->text().isEmpty()) scaleMult=locale().toDouble(scaleOffset->text(),&ok);
-        if (ok) {
-            double my_scale=scaleMult/locale().toDouble(scale->text(),&ok);
-            if (ok && std::isfinite(my_scale) && my_scale!=0) {
-                if (direction->isChecked()) {
-                    currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
-                } else {
-                    currentBuffer->set_scale(my_scale,currentBuffer->get_scale().y());
-                }
-                nparent->emitPhysChanged(currentBuffer);
-            } else {
-                statusbar->showMessage(tr("Invalid scale: the fitted period is zero or missing"));
-            }
+    double my_scale, my_origin;
+    if (currentBuffer && calibration(my_scale, my_origin)) {
+        if (direction->isChecked()) {
+            currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
+        } else {
+            currentBuffer->set_scale(my_scale,currentBuffer->get_scale().y());
         }
+        nparent->emitPhysChanged(currentBuffer);
+    } else {
+        statusbar->showMessage(tr("No calibration: not enough peaks or invalid world values"));
     }
+}
+
+void Find_peaks::calibrate() {
+    set_scale();
+    set_origin();
 }
 
 void Find_peaks::mouseAtMatrix(QPointF p) {
@@ -184,6 +211,8 @@ void Find_peaks::updatePlot() {
         points->setRowCount(0);
         coeff->clear();
         fourier->clear();
+        fitFirst=fitSpacing=std::numeric_limits<double>::quiet_NaN();
+        updateCalibration();
         return;
     }
     {
@@ -244,7 +273,9 @@ void Find_peaks::updatePlot() {
         fftw_plan planR2C=fftw_plan_dft_r2c_1d(M, ext.data(), spec, FFTW_ESTIMATE);
         fftw_plan planC2R=fftw_plan_dft_c2r_1d(M, spec, ext.data(), FFTW_ESTIMATE);
         fftw_execute(planR2C);
-        double sx=pow(M/param->value(),2)/2.0;
+        // gaussian of sigma = param [px]: its transform is exp(-2 pi^2 sigma^2 f^2), f=i/M (sigma 0: no blur)
+        // double sx=pow(M/param->value(),2)/2.0; // (this was a sigma of param/pi)
+        double sx=pow(M/(M_PI*param->value()),2)/2.0;
         for (int i=0;i<M/2+1;i++) {
             double blur=exp(-i*i/sx);
             spec[i][0]*=blur;
@@ -285,8 +316,9 @@ void Find_peaks::updatePlot() {
             }
         }
 
-        // 3. peak number from the distance to the first one in units of the typical spacing:
-        //    a missing peak leaves a gap instead of shifting all the following ones
+        // 3. peak numbers, incrementally: each gap in units of the local spacing (the previous gap per step,
+        //    the median gap for the first one). A missing peak leaves a gap instead of shifting all the following
+        //    ones, and a spacing that changes along the profile (e.g. the dispersion of a spectrometer) is followed
         std::vector<double> fitx;
         std::vector<double> fity;
         std::vector<double> fitz;
@@ -297,8 +329,19 @@ void Find_peaks::updatePlot() {
             std::nth_element(gaps.begin(),gaps.begin()+gaps.size()/2,gaps.end());
             spacing=gaps[gaps.size()/2];
         }
+        // (previous version: the distance to the first peak in units of the median gap, which was wrong as soon as
+        // the accumulated change of the spacing was more than half a spacing)
+        // for (size_t i=0;i<peaks.size();i++) {
+        //     fitx.push_back(spacing>0 ? std::round((peaks[i].pos-peaks[0].pos)/spacing) : double(i));
+        double number=0, step=spacing;
         for (size_t i=0;i<peaks.size();i++) {
-            fitx.push_back(spacing>0 ? std::round((peaks[i].pos-peaks[0].pos)/spacing) : double(i));
+            if (i>0) {
+                const double gap=peaks[i].pos-peaks[i-1].pos;
+                const double n = step>0 ? std::max(1.0,std::round(gap/step)) : 1.0;
+                number+=n;
+                step=gap/n;
+            }
+            fitx.push_back(number);
             fity.push_back(peaks[i].pos);
             fitz.push_back(peaks[i].val);
         }
@@ -354,7 +397,8 @@ void Find_peaks::updatePlot() {
         }
         coeff->setText(outcoeff);
 
-        if (fitx.size()>2) {
+        fitFirst=fitSpacing=std::numeric_limits<double>::quiet_NaN();
+        if (fitx.size()>=2) {
             double c0, c1, cov00, cov01, cov11, sum_square;
             gsl_fit_linear (&fitx[0], 1, &fity[0], 1, fitx.size(), &c0, &c1, &cov00, &cov01, &cov11, &sum_square);
             QString msg=QLocale().toString((unsigned int)(fitx.size()))+
@@ -364,9 +408,10 @@ void Find_peaks::updatePlot() {
                     " sq:"+QLocale().toString(sqrt(sum_square)/fitx.size())+
                     "]";
             statusbar->showMessage(msg);
-            origin->setText(locale().toString(c0));
-            scale->setText(locale().toString(c1));
+            fitFirst=c0;
+            fitSpacing=c1;
         }
+        updateCalibration();
 
         for (int i=plot->itemCount()-1; i>=0; i--) { // backwards: removing shifts the following items
             if (plot->item(i)->property(panName().toLatin1()).isValid()) plot->removeItem(plot->item(i));

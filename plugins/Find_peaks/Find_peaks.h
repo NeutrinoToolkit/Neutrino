@@ -32,6 +32,8 @@
 #include "ui_Find_peaks.h"
 #include "neutrino.h"
 
+#include <limits>
+
 class nRect;
 
 class Find_peaks : public nGenericPan, private Ui::Find_peaks {
@@ -48,6 +50,8 @@ public slots:
 
     void set_origin();
     void set_scale();
+    void calibrate();
+    void updateCalibration();
     void on_actionClipboard_triggered();
     void on_actionTxt_triggered();
 
@@ -55,6 +59,12 @@ public slots:
 
 private:
     QPointer<nRect> box;
+
+    // linear fit of the peak positions [px] against the peak numbers: the first peak and the spacing
+    double fitFirst=std::numeric_limits<double>::quiet_NaN();
+    double fitSpacing=std::numeric_limits<double>::quiet_NaN();
+    // the calibration from the fit and the world values of the pan (false if not available)
+    bool calibration(double &scale, double &origin);
 };
 
 
