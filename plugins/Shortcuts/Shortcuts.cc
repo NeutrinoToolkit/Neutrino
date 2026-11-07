@@ -57,6 +57,13 @@ QString Shortcuts::menuShortcuts() {
     QMap<QString, QStringList> byKey;                     // key -> actions
     foreach (QAction *action, nparent->findChildren<QAction*>()) {
         if (action->shortcut().isEmpty()) continue;
+        // not the actions of the analysis windows (children of nparent): e.g. their gear menu, one per open window,
+        // active only in its window (listed in the html)
+        bool inPan=false;
+        for (QObject *obj=action->parent(); obj && obj!=nparent; obj=obj->parent()) {
+            if (qobject_cast<nGenericPan*>(obj)) { inPan=true; break; }
+        }
+        if (inPan) continue;
         // only the actions in a menu/toolbar: the others have no active shortcut
         if (action->associatedObjects().isEmpty()) continue;
         QString menuName=tr("Other");

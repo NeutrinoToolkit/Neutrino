@@ -291,9 +291,15 @@ void nView::incrzoom(double incr)
 void
 nView::setSize() {
     QRectF bBox=my_tics.boundingRect();
-    setSceneRect(bBox);
+    if (bBox!=sceneRect()) setSceneRect(bBox);
     if (fillimage) {
-        fitInView(bBox, Qt::KeepAspectRatio);
+        if (bBox!=fitRect || viewport()->size()!=fitViewport) {
+            fitInView(bBox, Qt::KeepAspectRatio);
+            fitRect=bBox;
+            fitViewport=viewport()->size();
+        }
+    } else {
+        fitRect=QRectF();
     }
     if (my_mouse.size != my_pixitem.pixmap().size()) {
         my_mouse.setSize(my_pixitem.pixmap().size());

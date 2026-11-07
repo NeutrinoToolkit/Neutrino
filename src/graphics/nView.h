@@ -69,6 +69,10 @@ public:
     // zoom
     QTransform trasformazione;
     bool fillimage;
+    // the scene rect and viewport size of the last fit: setSize refits only when one changed (each fitInView resets
+    // the transform: the view replays the last mouse event, a hover leave for the object moved away by keyboard)
+    QRectF fitRect;
+    QSize fitViewport;
     void incrzoom(double);
 
     void setSize();
